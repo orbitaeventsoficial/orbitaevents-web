@@ -191,7 +191,7 @@ export async function markPortalAccessHit(input: {
         lastAccessUa: input.userAgent || undefined,
       },
     });
-  } catch {
-    // best-effort tracking
+  } catch (error) {
+    console.error('[ClientPortal] Error actualitzant accés:', error);
   }
 }

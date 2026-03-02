@@ -157,7 +157,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             type="button"
             onClick={handleDeleteLead}
             disabled={deleting || saving}
-            className={`rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+            className={`rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
           >
             {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : 'Eliminar registre'}
           </button>
@@ -166,7 +166,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             onClick={handleSave}
             disabled={saving || deleting}
             aria-busy={saving}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             {saving ? 'Guardant...' : 'Desar canvis'}
           </button>
@@ -177,7 +177,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Nom
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.name}
             onChange={(e) => updateField('name', e.target.value)}
           />
@@ -185,7 +185,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Email
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.email}
             onChange={(e) => updateField('email', e.target.value)}
           />
@@ -193,7 +193,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Telèfon
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.phone}
             onChange={(e) => updateField('phone', e.target.value)}
           />
@@ -202,7 +202,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           Data event
           <input
             type="date"
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.eventDate}
             onChange={(e) => updateField('eventDate', e.target.value)}
           />
@@ -210,7 +210,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Tipus event
           <select
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.eventType}
             onChange={(e) => updateField('eventType', e.target.value)}
           >
@@ -224,7 +224,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Ubicació
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.eventLocation}
             onChange={(e) => updateField('eventLocation', e.target.value)}
           />
@@ -232,7 +232,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Invitats
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.guestCount}
             onChange={(e) => updateField('guestCount', e.target.value)}
           />
@@ -240,7 +240,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Pressupost
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.budget}
             onChange={(e) => updateField('budget', e.target.value)}
           />
@@ -248,7 +248,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm md:col-span-2">
           Missatge
           <textarea
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             rows={3}
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
@@ -260,7 +260,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadStatus} />
           </span>
           <select
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.status}
             onChange={(e) => updateField('status', e.target.value)}
           >
@@ -277,7 +277,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadPriority} />
           </span>
           <select
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.priority}
             onChange={(e) => updateField('priority', e.target.value)}
           >
@@ -294,7 +294,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadEditorSource} />
           </span>
           <select
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.source}
             onChange={(e) => updateField('source', e.target.value)}
           >
@@ -308,7 +308,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Responsable
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.assignedTo}
             onChange={(e) => updateField('assignedTo', e.target.value)}
           />
@@ -316,7 +316,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Idioma preferit
           <select
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.preferredLocale}
             onChange={(e) => updateField('preferredLocale', e.target.value)}
           >
@@ -335,7 +335,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm">
           Pack interessat
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.interestedPackId}
             onChange={(e) => updateField('interestedPackId', e.target.value)}
           />
@@ -343,7 +343,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm md:col-span-2">
           Extras (separats per coma)
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.interestedExtras}
             onChange={(e) => updateField('interestedExtras', e.target.value)}
           />
@@ -357,7 +357,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadEditorLanding} />
           </span>
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.landingPage}
             onChange={(e) => updateField('landingPage', e.target.value)}
           />
@@ -368,7 +368,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadEditorUtmSource} />
           </span>
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.utmSource}
             onChange={(e) => updateField('utmSource', e.target.value)}
           />
@@ -379,7 +379,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadEditorUtmMedium} />
           </span>
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.utmMedium}
             onChange={(e) => updateField('utmMedium', e.target.value)}
           />
@@ -390,7 +390,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <InfoTooltip text={ADMIN_HELP.leadEditorUtmCampaign} />
           </span>
           <input
-            className="rounded-lg border border-white/10 px-3 py-2"
+            className="rounded-xl border border-white/10 px-3 py-2"
             value={form.utmCampaign}
             onChange={(e) => updateField('utmCampaign', e.target.value)}
           />

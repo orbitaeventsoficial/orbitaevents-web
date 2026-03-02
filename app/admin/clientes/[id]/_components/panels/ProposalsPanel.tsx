@@ -12,7 +12,7 @@ import { formatDateSimple } from '@/lib/constants';
 // ═══════════════════════════════════════════════════════════════════════════
 
 const STATUS_STYLES: Record<ProposalStatus, { bg: string; text: string; border: string }> = {
-  DRAFT: { bg: 'bg-slate-500/20', text: 'text-slate-300', border: 'border-slate-500/40' },
+  DRAFT: { bg: 'bg-white/5', text: 'text-white/60', border: 'border-white/15' },
   SENT: { bg: 'bg-cyan-500/20', text: 'text-cyan-300', border: 'border-cyan-500/40' },
   VIEWED: { bg: 'bg-violet-500/20', text: 'text-violet-300', border: 'border-violet-500/40' },
   ACCEPTED: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', border: 'border-emerald-500/40' },
@@ -103,14 +103,14 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
           </div>
           <Link
             href={`/admin/presupuestos?customerId=${data.customer.id}`}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors"
           >
             + Nou pressupost
           </Link>
         </div>
 
         {error && (
-          <div className="mt-3 rounded-lg border px-3 py-2 text-sm">
+          <div className="mt-3 rounded-xl border px-3 py-2 text-sm">
             {error}
           </div>
         )}
@@ -168,7 +168,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
           <p className="">No hi ha pressupostos per aquest client.</p>
           <Link
             href={`/admin/presupuestos?customerId=${data.customer.id}`}
-            className="mt-4 inline-block rounded-lg px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 inline-block rounded-xl px-4 py-2 text-sm font-semibold text-white"
           >
             Crear primer pressupost
           </Link>
@@ -221,7 +221,7 @@ function ProposalGroup({
             {proposals.length}
           </span>
         </span>
-        <span className={`text-slate-400 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}>
+        <span className={`text-white/40 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}>
           ▾
         </span>
       </button>
@@ -247,6 +247,14 @@ function ProposalGroup({
   );
 }
 
+// Estat del contracte associat
+const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  DRAFT: { label: 'Esborrany', color: 'text-white/60 bg-white/5 border-white/15' },
+  SENT: { label: 'Enviat', color: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40' },
+  SIGNED: { label: 'Signat', color: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/40' },
+  CANCELLED: { label: 'Cancel·lat', color: 'text-rose-300 bg-rose-500/20 border-rose-500/40' },
+};
+
 function ProposalCard({
   proposal,
   busyId,
@@ -266,11 +274,91 @@ function ProposalCard({
   onUpdateStatus: (status: ProposalStatus) => Promise<void>;
   customerId: string;
 }) {
+  const router = useRouter();
   const style = STATUS_STYLES[proposal.status];
   const isBusy = busyId?.includes(proposal.id) || false;
   const canSend = proposal.status === 'DRAFT';
   const canMarkAccepted = proposal.status === 'SENT' || proposal.status === 'VIEWED';
   const canMarkExpired = proposal.status === 'SENT' || proposal.status === 'VIEWED';
+  const [contractBusy, setContractBusy] = useState(false);
+  const [contractError, setContractError] = useState<string | null>(null);
+
+  const contractStatus = proposal.contractStatus;
+  const contractRef = proposal.contractReference;
+  const canGenerateContract = proposal.status === 'ACCEPTED' && !contractStatus;
+  const canSendContract = contractStatus === 'DRAFT';
+  const canMarkSigned = contractStatus === 'SENT';
+
+  const generateContract = async () => {
+    setContractBusy(true);
+    setContractError(null);
+    try {
+      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload?.error || 'Error generant contracte');
+      }
+      // Download the PDF
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `contracte-${res.headers.get('X-Contract-Reference') || proposal.reference}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      router.refresh();
+    } catch (err) {
+      setContractError(err instanceof Error ? err.message : 'Error');
+    } finally {
+      setContractBusy(false);
+    }
+  };
+
+  const sendContractEmail = async () => {
+    setContractBusy(true);
+    setContractError(null);
+    try {
+      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload?.ok) {
+        throw new Error(payload?.error || 'Error enviant contracte');
+      }
+      router.refresh();
+    } catch (err) {
+      setContractError(err instanceof Error ? err.message : 'Error');
+    } finally {
+      setContractBusy(false);
+    }
+  };
+
+  const updateContractStatus = async (status: 'SIGNED' | 'CANCELLED') => {
+    setContractBusy(true);
+    setContractError(null);
+    try {
+      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload?.ok) {
+        throw new Error(payload?.error || 'Error actualitzant contracte');
+      }
+      router.refresh();
+    } catch (err) {
+      setContractError(err instanceof Error ? err.message : 'Error');
+    } finally {
+      setContractBusy(false);
+    }
+  };
 
   return (
     <div className="rounded-xl border p-4">
@@ -324,7 +412,7 @@ function ProposalCard({
         )}
 
         {canSend && isConfirming && (
-          <div className="flex items-center gap-1 rounded-lg border px-2 py-1">
+          <div className="flex items-center gap-1 rounded-xl border px-2 py-1">
             <span className="text-xs">Confirmes l'enviament?</span>
             <button
               type="button"
@@ -378,6 +466,70 @@ function ProposalCard({
           </button>
         )}
       </div>
+
+      {/* Contract section */}
+      {proposal.status === 'ACCEPTED' && (
+        <div className="mt-3 border-t pt-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {contractStatus && contractRef && (
+              <span className="flex items-center gap-1.5 text-xs">
+                📄 Contracte {contractRef}
+                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${CONTRACT_STATUS_LABELS[contractStatus]?.color || ''}`}>
+                  {CONTRACT_STATUS_LABELS[contractStatus]?.label || contractStatus}
+                </span>
+              </span>
+            )}
+
+            {canGenerateContract && (
+              <button
+                type="button"
+                onClick={generateContract}
+                disabled={contractBusy}
+                className="rounded border px-2.5 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
+              >
+                {contractBusy ? '...' : '📄 Generar contracte'}
+              </button>
+            )}
+
+            {canSendContract && (
+              <button
+                type="button"
+                onClick={sendContractEmail}
+                disabled={contractBusy}
+                className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
+              >
+                {contractBusy ? '...' : '📧 Enviar contracte'}
+              </button>
+            )}
+
+            {canMarkSigned && (
+              <button
+                type="button"
+                onClick={() => updateContractStatus('SIGNED')}
+                disabled={contractBusy}
+                className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
+              >
+                {contractBusy ? '...' : '✍️ Marcar signat'}
+              </button>
+            )}
+
+            {contractStatus && contractStatus !== 'CANCELLED' && contractStatus !== 'SIGNED' && (
+              <button
+                type="button"
+                onClick={() => updateContractStatus('CANCELLED')}
+                disabled={contractBusy}
+                className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
+              >
+                {contractBusy ? '...' : '🚫 Cancel·lar'}
+              </button>
+            )}
+          </div>
+
+          {contractError && (
+            <p className="mt-2 text-xs text-rose-400">{contractError}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

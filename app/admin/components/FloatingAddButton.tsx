@@ -47,7 +47,7 @@ export default function FloatingAddButton() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-xl border border-slate-600 bg-slate-800/95 backdrop-blur-sm px-4 py-2.5 text-sm font-medium text-slate-200 shadow-lg transition-all hover:bg-slate-700 hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-black/80 backdrop-blur-md px-4 py-2.5 text-sm font-medium text-white/90 shadow-lg transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
             >
               <span className="text-base">{item.icon}</span>
               <span>{item.label}</span>
@@ -64,7 +64,7 @@ export default function FloatingAddButton() {
         aria-expanded={open}
         className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${
           open
-            ? 'bg-slate-600 rotate-45'
+            ? 'bg-white/20 rotate-45'
             : 'bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400'
         }`}
       >

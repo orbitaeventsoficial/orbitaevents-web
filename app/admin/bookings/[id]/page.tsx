@@ -10,6 +10,8 @@ import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
+import InvoiceSection from './InvoiceSection';
+import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
@@ -34,6 +36,17 @@ async function getBooking(id: string) {
         extras: { include: { extra: { include: { translations: true } } } },
         inventory: { include: { item: true } },
         lead: true,
+        proposals: {
+          select: {
+            id: true, reference: true, status: true, pdfUrl: true,
+            contractStatus: true, contractReference: true, contractPdfUrl: true, contractSignedAt: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        invoices: {
+          select: { id: true, reference: true, status: true, total: true, holdedInvoiceUrl: true, holdedSyncError: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+        },
         postEventReport: true,
         clientSurvey: true,
         clientFeedback: true,
@@ -363,38 +376,45 @@ export default async function BookingDetailPage({ params }: PageProps) {
         )}
         <div className="mt-3 flex flex-wrap gap-2">
           <PostEventEmailButton bookingId={booking.id} />
-          <Link
-            href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5"
-          >
-            Crear informe intern
-          </Link>
           {customer && (
             <Link
               href={`/admin/clientes/${customer.id}`}
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5"
+              className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5 transition-colors"
             >
-              Obrir fitxa client 360
+              Fitxa client 360
             </Link>
           )}
-          <a
-            href={googleCalendarUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5"
-          >
-            Afegir a Google Calendar
-          </a>
-          <Link
-            href="/admin/settings/integrations"
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5"
-          >
-            Sincronitzar mòbil/ICS
-          </Link>
           <CalendarSyncButton bookingId={booking.id} />
+          <details className="relative group">
+            <summary className="list-none rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold cursor-pointer hover:bg-white/5 transition-colors select-none">
+              Mes accions ▾
+            </summary>
+            <div className="absolute right-0 top-full mt-1 z-20 w-52 rounded-xl border border-white/10 bg-black shadow-xl py-1">
+              <Link
+                href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
+                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+              >
+                Crear informe intern
+              </Link>
+              <a
+                href={googleCalendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+              >
+                Afegir a Google Calendar
+              </a>
+              <Link
+                href="/admin/settings/integrations"
+                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+              >
+                Sincronitzar mobil/ICS
+              </Link>
+            </div>
+          </details>
         </div>
         {customer && (
-          <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3 text-xs">
+          <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-xs">
             Historial client: {customer.totalEvents} esdeveniments · {formatCurrency(customer.totalSpent)} ·
             {' '}últim esdeveniment {formatDateSimple(customer.lastEventDate)}
           </div>
@@ -441,7 +461,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <h2 className="text-lg font-semibold mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
-        <div className="p-4 rounded-lg border mb-4">
+        <div className="p-4 rounded-xl border mb-4">
           <div className="flex items-start justify-between">
             <div>
               <span className="text-xs font-medium uppercase">Pack</span>
@@ -471,7 +491,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
               );
               return (
-                <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                   <div>
                     <p className="font-medium">
                       {extraTranslation?.name || extra.extra.slug}
@@ -489,7 +509,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* Extra Hours */}
         {booking.extraHours > 0 && (
-          <div className="mt-4 flex items-center justify-between p-3 rounded-lg">
+          <div className="mt-4 flex items-center justify-between p-3 rounded-xl">
             <p className="font-medium">Hores extra</p>
             <p className="font-medium">
               {booking.extraHours}h × {formatCurrency(booking.pack.extraHourPrice)} = {formatCurrency(booking.extraHours * booking.pack.extraHourPrice)}
@@ -532,14 +552,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* Payment Status */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className={`p-4 rounded-lg ${booking.depositPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-rose-950/30 border border-rose-400/30'}`}>
+          <div className={`p-4 rounded-xl ${booking.depositPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-rose-950/30 border border-rose-400/30'}`}>
             <p className="text-xs font-medium uppercase">Paga i Senyal (30%)</p>
             <p className="text-lg font-bold">{formatCurrency(booking.depositAmount)}</p>
             <span className={`text-xs ${booking.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>
               {booking.depositPaid ? '✓ Pagat' : '✗ Pendent'}
             </span>
           </div>
-          <div className={`p-4 rounded-lg ${booking.remainingPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-amber-950/30 border border-amber-400/30'}`}>
+          <div className={`p-4 rounded-xl ${booking.remainingPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-amber-950/30 border border-amber-400/30'}`}>
             <p className="text-xs font-medium uppercase">Resta</p>
             <p className="text-lg font-bold">{formatCurrency(booking.remainingAmount)}</p>
             <span className={`text-xs ${booking.remainingPaid ? 'text-emerald-300' : 'text-amber-300'}`}>
@@ -574,6 +594,40 @@ export default async function BookingDetailPage({ params }: PageProps) {
         targetMarginPct={targetMarginPct}
       />
 
+      {/* Document Flow: Pressupost → Contracte → Factura */}
+      <DocumentFlowSection
+        proposals={booking.proposals.map((p) => ({
+          id: p.id,
+          reference: p.reference,
+          status: p.status,
+          pdfUrl: p.pdfUrl,
+          contractStatus: p.contractStatus,
+          contractReference: p.contractReference,
+          contractPdfUrl: p.contractPdfUrl,
+          contractSignedAt: p.contractSignedAt?.toISOString() || null,
+        }))}
+        invoices={booking.invoices.map((inv) => ({
+          id: inv.id,
+          reference: inv.reference,
+          status: inv.status,
+          holdedInvoiceUrl: inv.holdedInvoiceUrl,
+        }))}
+      />
+
+      {/* Invoice */}
+      <InvoiceSection
+        bookingId={booking.id}
+        invoices={booking.invoices.map((inv) => ({
+          id: inv.id,
+          reference: inv.reference,
+          status: inv.status,
+          total: Number(inv.total),
+          holdedInvoiceUrl: inv.holdedInvoiceUrl,
+          holdedSyncError: inv.holdedSyncError,
+          createdAt: inv.createdAt.toISOString(),
+        }))}
+      />
+
       {/* Notes */}
       {booking.notes && (
         <section className="rounded-xl border border-white/10 shadow-sm p-6">
@@ -588,18 +642,18 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm" aria-label="Extres de la reserva">
               <thead>
                 <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide">
-                  <th className="px-2 py-2">Data</th>
-                  <th className="px-2 py-2">Acció</th>
-                  <th className="px-2 py-2">Flux</th>
-                  <th className="px-2 py-2">Canal</th>
+                  <th scope="col" className="px-2 py-2">Data</th>
+                  <th scope="col" className="px-2 py-2">Acció</th>
+                  <th scope="col" className="px-2 py-2">Flux</th>
+                  <th scope="col" className="px-2 py-2">Canal</th>
                 </tr>
               </thead>
               <tbody>
                 {recentCommRows.map((row) => (
-                  <tr key={row.id} className="border-b border-white/10">
+                  <tr key={row.id} className="border-b border-white/10 hover:bg-white/[0.03] transition-colors">
                     <td className="px-2 py-2 whitespace-nowrap">{formatDateTimeFull(row.createdAt)}</td>
                     <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
                     <td className="px-2 py-2">{row.flow}</td>
@@ -617,19 +671,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <section className="rounded-xl border p-6">
           <h2 className="mb-4 text-lg font-semibold">Post-event</h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.postEventReport ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
               <p className="font-medium">Informe Intern</p>
               <p className="text-sm">
                 {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.clientSurvey ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
               <p className="font-medium">Enquesta Client</p>
               <p className="text-sm">
                 {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.clientFeedback ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
               <p className="font-medium">Feedback Enviat</p>
               <p className="text-sm">
                 {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}

@@ -80,7 +80,8 @@ async function translateWithDeepL(text: string, targetLang: string): Promise<str
     const data = await response.json();
     const translated = data?.translations?.[0]?.text;
     return typeof translated === 'string' ? translated : null;
-  } catch {
+  } catch (error) {
+    console.error('[Translate] Error traduint:', error);
     return null;
   } finally {
     clearTimeout(timeout);

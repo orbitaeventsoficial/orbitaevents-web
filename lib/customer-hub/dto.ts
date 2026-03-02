@@ -19,6 +19,11 @@ export type ProposalDTO = {
   sentAt?: string;
   acceptedAt?: string;
   snapshot?: Record<string, unknown>;
+  // Contract fields
+  contractReference?: string | null;
+  contractStatus?: string | null;
+  contractSentAt?: string | null;
+  contractSignedAt?: string | null;
 };
 
 export type BookingDTO = {

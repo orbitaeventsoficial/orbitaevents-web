@@ -200,7 +200,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
           <p className="text-sm">Encara no hi ha versions desades.</p>
         ) : (
           filteredEntries.map((entry) => (
-            <div key={entry.id} className="rounded-lg border border-white/10 p-3">
+            <div key={entry.id} className="rounded-xl border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">
                   {formatDateTimeFull(entry.createdAt)}

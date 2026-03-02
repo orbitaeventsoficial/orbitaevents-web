@@ -364,6 +364,8 @@ export interface QuoteData {
   validityDays?: number;
   conditions?: string[];
   whyChooseUs?: string;
+  /** Data d'emissió opcional. Si no es proporciona, usa la data actual. */
+  issueDate?: string;
 }
 
 export async function generateQuotePDF(
@@ -467,7 +469,9 @@ export async function generateQuotePDF(
   let y = 16;
 
   const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
-  const issueDate = new Date().toLocaleDateString(toIntlLocale(locale));
+  const issueDate = data.issueDate
+    ? new Date(data.issueDate).toLocaleDateString(toIntlLocale(locale))
+    : new Date().toLocaleDateString(toIntlLocale(locale));
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
   const eventDate = formatClientDate(data.date || '-', locale);
   const eventSchedule = data.eventSchedule?.trim() || '-';
@@ -817,6 +821,502 @@ export async function generateQuotePDF(
     doc.setPage(pageNum);
     drawFooter();
   }
+  return doc;
+}
+
+// ============================================
+// CONTRACT PDF (dark theme, mateixa estètica que QuotePDF)
+// ============================================
+
+export interface ContractPdfData {
+  contractReference: string;
+  contractDate: Date;
+
+  // Parts
+  companyName: string;
+  companyLegalName: string;
+  companyNIF: string;
+  companyAddress: string;
+  companyIBAN: string;
+  companyPhone: string;
+  companyEmail: string;
+
+  clientName: string;
+  clientNIF?: string;
+  clientAddress?: string;
+  clientEmail: string;
+  clientPhone?: string;
+
+  // Servei
+  eventType: string;
+  eventDate: Date;
+  eventTime?: string;
+  eventEndTime?: string;
+  eventLocation: string;
+  guestCount: number;
+  packName: string;
+  packPrice: number;
+  djHours: number;
+  extras?: { name: string; price: number; quantity: number }[];
+
+  // Econòmic
+  subtotal: number;
+  discount: number;
+  vatRate: number;
+  vatAmount: number;
+  total: number;
+
+  // Pagament
+  depositAmount: number;
+  depositDueDate: Date;
+  finalPaymentDue: Date;
+
+  // Clàusules
+  cancellationPolicy: string;
+  additionalClauses?: string;
+}
+
+export async function generateContractPDF(
+  data: ContractPdfData,
+  locale: 'ca' | 'es' | 'en' = 'ca',
+  branding?: PdfBrandingOptions
+): Promise<jsPDFType> {
+  const { default: jsPDF } = await getJsPDF();
+  const doc = new jsPDF();
+
+  const t = {
+    ca: {
+      title: 'CONTRACTE DE PRESTACIÓ DE SERVEIS',
+      ref: 'Referència',
+      date: 'Data',
+      parties: 'LES PARTS',
+      provider: 'PRESTADOR DEL SERVEI',
+      client: 'CLIENT',
+      nif: 'NIF',
+      address: 'Adreça',
+      email: 'Email',
+      phone: 'Telèfon',
+      serviceDetails: 'DETALLS DEL SERVEI',
+      eventType: 'Tipus',
+      eventDate: 'Data',
+      eventTime: 'Horari',
+      location: 'Lloc',
+      guests: 'Convidats',
+      pack: 'Pack contractat',
+      extras: 'Extres',
+      economicSummary: 'RESUM ECONÒMIC',
+      subtotal: 'Subtotal',
+      discount: 'Descompte',
+      vat: 'IVA',
+      total: 'TOTAL',
+      paymentTerms: 'CONDICIONS DE PAGAMENT',
+      deposit: 'Aval (dipòsit)',
+      depositDue: 'Venciment aval',
+      remaining: 'Resta',
+      remainingDue: 'Venciment resta',
+      iban: 'IBAN per transferència',
+      cancellation: 'POLÍTICA DE CANCEL·LACIÓ',
+      additionalClauses: 'CLÀUSULES ADDICIONALS',
+      legalClauses: 'CLÀUSULES LEGALS',
+      legalText1: 'Ambdues parts declaren tenir capacitat legal suficient per a la signatura del present contracte.',
+      legalText2: 'El prestador es compromet a realitzar el servei amb la màxima professionalitat i qualitat.',
+      legalText3: 'En cas de força major (desastres naturals, pandèmies, restriccions governamentals), ambdues parts queden alliberades de les seves obligacions sense penalització.',
+      legalText4: 'Per a qualsevol controvèrsia derivada del present contracte, ambdues parts se sotmeten als jutjats i tribunals de Granollers (Barcelona).',
+      legalText5: 'Les dades personals seran tractades d\'acord amb el RGPD (UE) 2016/679 i la LOPDGDD 3/2018.',
+      signatures: 'SIGNATURES',
+      signProvider: 'El Prestador',
+      signClient: 'El Client',
+      signDate: 'Data de signatura',
+      signName: 'Nom i cognoms',
+      sign: 'Signatura',
+    },
+    es: {
+      title: 'CONTRATO DE PRESTACIÓN DE SERVICIOS',
+      ref: 'Referencia',
+      date: 'Fecha',
+      parties: 'LAS PARTES',
+      provider: 'PRESTADOR DEL SERVICIO',
+      client: 'CLIENTE',
+      nif: 'NIF',
+      address: 'Dirección',
+      email: 'Email',
+      phone: 'Teléfono',
+      serviceDetails: 'DETALLES DEL SERVICIO',
+      eventType: 'Tipo',
+      eventDate: 'Fecha',
+      eventTime: 'Horario',
+      location: 'Lugar',
+      guests: 'Invitados',
+      pack: 'Pack contratado',
+      extras: 'Extras',
+      economicSummary: 'RESUMEN ECONÓMICO',
+      subtotal: 'Subtotal',
+      discount: 'Descuento',
+      vat: 'IVA',
+      total: 'TOTAL',
+      paymentTerms: 'CONDICIONES DE PAGO',
+      deposit: 'Señal (depósito)',
+      depositDue: 'Vencimiento señal',
+      remaining: 'Resto',
+      remainingDue: 'Vencimiento resto',
+      iban: 'IBAN para transferencia',
+      cancellation: 'POLÍTICA DE CANCELACIÓN',
+      additionalClauses: 'CLÁUSULAS ADICIONALES',
+      legalClauses: 'CLÁUSULAS LEGALES',
+      legalText1: 'Ambas partes declaran tener capacidad legal suficiente para la firma del presente contrato.',
+      legalText2: 'El prestador se compromete a realizar el servicio con la máxima profesionalidad y calidad.',
+      legalText3: 'En caso de fuerza mayor (desastres naturales, pandemias, restricciones gubernamentales), ambas partes quedan liberadas de sus obligaciones sin penalización.',
+      legalText4: 'Para cualquier controversia derivada del presente contrato, ambas partes se someten a los juzgados y tribunales de Granollers (Barcelona).',
+      legalText5: 'Los datos personales serán tratados conforme al RGPD (UE) 2016/679 y la LOPDGDD 3/2018.',
+      signatures: 'FIRMAS',
+      signProvider: 'El Prestador',
+      signClient: 'El Cliente',
+      signDate: 'Fecha de firma',
+      signName: 'Nombre y apellidos',
+      sign: 'Firma',
+    },
+    en: {
+      title: 'SERVICE AGREEMENT',
+      ref: 'Reference',
+      date: 'Date',
+      parties: 'THE PARTIES',
+      provider: 'SERVICE PROVIDER',
+      client: 'CLIENT',
+      nif: 'Tax ID',
+      address: 'Address',
+      email: 'Email',
+      phone: 'Phone',
+      serviceDetails: 'SERVICE DETAILS',
+      eventType: 'Type',
+      eventDate: 'Date',
+      eventTime: 'Schedule',
+      location: 'Location',
+      guests: 'Guests',
+      pack: 'Selected package',
+      extras: 'Extras',
+      economicSummary: 'ECONOMIC SUMMARY',
+      subtotal: 'Subtotal',
+      discount: 'Discount',
+      vat: 'VAT',
+      total: 'TOTAL',
+      paymentTerms: 'PAYMENT TERMS',
+      deposit: 'Deposit',
+      depositDue: 'Deposit due',
+      remaining: 'Remaining',
+      remainingDue: 'Remaining due',
+      iban: 'IBAN for bank transfer',
+      cancellation: 'CANCELLATION POLICY',
+      additionalClauses: 'ADDITIONAL CLAUSES',
+      legalClauses: 'LEGAL CLAUSES',
+      legalText1: 'Both parties declare having sufficient legal capacity to sign this contract.',
+      legalText2: 'The provider commits to delivering the service with the highest professionalism and quality.',
+      legalText3: 'In cases of force majeure (natural disasters, pandemics, government restrictions), both parties are released from their obligations without penalty.',
+      legalText4: 'For any dispute arising from this contract, both parties submit to the courts of Granollers (Barcelona).',
+      legalText5: 'Personal data will be processed in accordance with GDPR (EU) 2016/679.',
+      signatures: 'SIGNATURES',
+      signProvider: 'The Provider',
+      signClient: 'The Client',
+      signDate: 'Signature date',
+      signName: 'Full name',
+      sign: 'Signature',
+    },
+  }[locale];
+
+  // Dark theme colors (same as quote PDF)
+  const neutral = [241, 245, 249] as [number, number, number];
+  const muted = [148, 163, 184] as [number, number, number];
+  const border = [51, 65, 85] as [number, number, number];
+  const surface = [24, 28, 33] as [number, number, number];
+  const surfaceSoft = [29, 34, 40] as [number, number, number];
+  const accent = [212, 175, 55] as [number, number, number];
+
+  const left = 14;
+  const contentWidth = 182;
+  const pageBottom = 255;
+  const lineHeight = 5;
+  let y = 16;
+
+  const fmtDate = (d: Date) =>
+    new Date(d).toLocaleDateString(toIntlLocale(locale), {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+  const brandName = branding?.brandName?.trim() || 'Orbita Events';
+
+  // -- Helpers --
+  const drawCard = (
+    x: number, top: number, width: number, height: number, rounded = 2, soft = false
+  ) => {
+    doc.setFillColor(...(soft ? surfaceSoft : surface));
+    doc.roundedRect(x, top, width, height, rounded, rounded, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(x, top, width, height, rounded, rounded, 'S');
+    doc.setFillColor(...accent);
+    doc.roundedRect(x, top + 1.5, 1.4, Math.max(2, height - 3), 0.8, 0.8, 'F');
+  };
+
+  const drawSectionTitle = (title: string) => {
+    doc.setTextColor(...accent);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.text(title, left + 4, y);
+    y += 7;
+  };
+
+  const drawRow = (label: string, value: string, bold = false) => {
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text(label, left + 6, y);
+    doc.setTextColor(...neutral);
+    if (bold) doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    const lines = doc.splitTextToSize(value, 120).slice(0, 2);
+    doc.text(lines, left + 55, y);
+    y += lineHeight * lines.length;
+  };
+
+  const ensureSpace = (space: number) => {
+    if (y + space > pageBottom) {
+      doc.addPage();
+      doc.setFillColor(18, 20, 24);
+      doc.rect(0, 0, 210, 297, 'F');
+      drawCompactHeader();
+    }
+  };
+
+  const drawCompactHeader = () => {
+    drawCard(left, 10, contentWidth, 16, 3, true);
+    doc.setTextColor(...neutral);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.text(brandName, left + 6, 19);
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, 19, { align: 'right' });
+    y = 34;
+  };
+
+  const drawFooter = () => {
+    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
+    const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
+    const phone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
+    doc.setDrawColor(...border);
+    doc.line(left, 282, left + contentWidth, 282);
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.text(`${website} · ${email} · ${phone}`, left, 287);
+  };
+
+  // -- Page 1: Background --
+  doc.setFillColor(18, 20, 24);
+  doc.rect(0, 0, 210, 297, 'F');
+
+  // -- Header --
+  const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
+  const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
+  drawCard(left, y, contentWidth, 26, 3, true);
+  if (hasLogo) {
+    try {
+      const fmt = getImageFormatFromDataUrl(logoSource);
+      const props = doc.getImageProperties(logoSource);
+      const fitted = fitWithin(props.width, props.height, 52, 14);
+      doc.addImage(logoSource, fmt, left + 5, y + 5 + (14 - fitted.height) / 2, fitted.width, fitted.height);
+    } catch { /* fallback */ }
+  }
+  doc.setTextColor(...neutral);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text(brandName, hasLogo ? left + 62 : left + 6, y + 11);
+  doc.setTextColor(...accent);
+  doc.setFontSize(10);
+  doc.text(t.title, hasLogo ? left + 62 : left + 6, y + 18.5);
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, y + 8.5, { align: 'right' });
+  doc.text(`${t.date}: ${fmtDate(data.contractDate)}`, left + contentWidth - 6, y + 13, { align: 'right' });
+  y += 34;
+
+  // -- Parts --
+  ensureSpace(55);
+  drawCard(left, y - 4, contentWidth, 50, 2, true);
+  drawSectionTitle(t.parties);
+
+  // Provider (left column)
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text(t.provider, left + 6, y);
+  y += 5;
+  doc.setTextColor(...neutral);
+  doc.setFontSize(9);
+  doc.text(data.companyLegalName, left + 6, y);
+  y += 4.5;
+  doc.setTextColor(...muted);
+  doc.setFontSize(8);
+  doc.text(`${t.nif}: ${data.companyNIF}`, left + 6, y);
+  y += 4;
+  doc.text(`${t.address}: ${data.companyAddress}`, left + 6, y);
+  y += 4;
+  doc.text(`${t.email}: ${data.companyEmail}`, left + 6, y);
+  y += 7;
+
+  // Client (same column, below)
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text(t.client, left + 6, y);
+  y += 5;
+  doc.setTextColor(...neutral);
+  doc.setFontSize(9);
+  doc.text(data.clientName, left + 6, y);
+  y += 4.5;
+  doc.setTextColor(...muted);
+  doc.setFontSize(8);
+  if (data.clientNIF) { doc.text(`${t.nif}: ${data.clientNIF}`, left + 6, y); y += 4; }
+  if (data.clientAddress) { doc.text(`${t.address}: ${data.clientAddress}`, left + 6, y); y += 4; }
+  doc.text(`${t.email}: ${data.clientEmail}`, left + 6, y);
+  if (data.clientPhone) { doc.text(`${t.phone}: ${data.clientPhone}`, left + 100, y); }
+  y += 8;
+
+  // -- Service Details --
+  const extrasCount = data.extras?.length || 0;
+  const serviceBoxHeight = 40 + extrasCount * 5;
+  ensureSpace(serviceBoxHeight + 10);
+  drawCard(left, y - 4, contentWidth, serviceBoxHeight, 2, false);
+  drawSectionTitle(t.serviceDetails);
+  drawRow(t.eventType, data.eventType);
+  drawRow(t.eventDate, fmtDate(data.eventDate));
+  if (data.eventTime) drawRow(t.eventTime, `${data.eventTime}${data.eventEndTime ? ` - ${data.eventEndTime}` : ''}`);
+  drawRow(t.location, data.eventLocation);
+  drawRow(t.guests, `${data.guestCount}`);
+  drawRow(t.pack, `${data.packName} (${data.djHours}h)`, true);
+  if (data.extras && data.extras.length > 0) {
+    for (const extra of data.extras) {
+      drawRow(t.extras, `${extra.name} — ${(extra.price * extra.quantity).toFixed(2)}€`);
+    }
+  }
+  y += 4;
+
+  // -- Economic Summary --
+  ensureSpace(45);
+  drawCard(left, y - 4, contentWidth, 38 + (data.discount > 0 ? 5 : 0), 2, true);
+  drawSectionTitle(t.economicSummary);
+  drawRow(t.subtotal, `${data.subtotal.toFixed(2)}€`);
+  if (data.discount > 0) drawRow(t.discount, `-${data.discount.toFixed(2)}€`);
+  drawRow(`${t.vat} (${data.vatRate}%)`, `${data.vatAmount.toFixed(2)}€`);
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text(t.total, left + 6, y + 2);
+  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, y + 2, { align: 'right' });
+  y += 10;
+
+  // -- Payment Terms --
+  ensureSpace(42);
+  drawCard(left, y - 4, contentWidth, 38, 2, false);
+  drawSectionTitle(t.paymentTerms);
+  drawRow(t.deposit, `${data.depositAmount.toFixed(2)}€`);
+  drawRow(t.depositDue, fmtDate(data.depositDueDate));
+  drawRow(t.remaining, `${(data.total - data.depositAmount).toFixed(2)}€`);
+  drawRow(t.remainingDue, fmtDate(data.finalPaymentDue));
+  drawRow(t.iban, data.companyIBAN, true);
+  y += 4;
+
+  // -- Cancellation Policy --
+  const cancelLines = doc.splitTextToSize(data.cancellationPolicy, contentWidth - 12).slice(0, 8);
+  const cancelBoxHeight = 14 + cancelLines.length * 4.2;
+  ensureSpace(cancelBoxHeight + 6);
+  drawCard(left, y - 4, contentWidth, cancelBoxHeight, 2, false);
+  drawSectionTitle(t.cancellation);
+  doc.setTextColor(...neutral);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.2);
+  doc.text(cancelLines, left + 6, y);
+  y += cancelLines.length * 4.2 + 6;
+
+  // -- Additional Clauses --
+  if (data.additionalClauses?.trim()) {
+    const addLines = doc.splitTextToSize(data.additionalClauses.trim(), contentWidth - 12).slice(0, 8);
+    const addBoxHeight = 14 + addLines.length * 4.2;
+    ensureSpace(addBoxHeight + 6);
+    drawCard(left, y - 4, contentWidth, addBoxHeight, 2, false);
+    drawSectionTitle(t.additionalClauses);
+    doc.setTextColor(...neutral);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.2);
+    doc.text(addLines, left + 6, y);
+    y += addLines.length * 4.2 + 6;
+  }
+
+  // -- Legal Clauses --
+  const legalTexts = [t.legalText1, t.legalText2, t.legalText3, t.legalText4, t.legalText5];
+  const allLegalLines = legalTexts.flatMap(txt => doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 3));
+  const legalBoxHeight = 14 + allLegalLines.length * 3.8;
+  ensureSpace(legalBoxHeight + 6);
+  drawCard(left, y - 4, contentWidth, legalBoxHeight, 2, false);
+  drawSectionTitle(t.legalClauses);
+  doc.setTextColor(...neutral);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  let legalY = y;
+  for (const txt of legalTexts) {
+    const lines = doc.splitTextToSize(`• ${txt}`, contentWidth - 12).slice(0, 3);
+    doc.text(lines, left + 6, legalY);
+    legalY += lines.length * 3.8;
+  }
+  y = legalY + 6;
+
+  // -- Signatures --
+  ensureSpace(55);
+  drawCard(left, y - 4, contentWidth, 48, 2, true);
+  drawSectionTitle(t.signatures);
+
+  const sigColWidth = (contentWidth - 20) / 2;
+
+  // Provider signature
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text(t.signProvider, left + 6, y);
+  y += 5;
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(`${t.signName}: ${data.companyLegalName}`, left + 6, y);
+  doc.text(`${t.signName}: ____________________`, left + 6 + sigColWidth + 8, y);
+
+  // Client signature labels
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.signClient, left + 6 + sigColWidth + 8, y - 5);
+
+  y += 8;
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${t.signDate}: ____________________`, left + 6, y);
+  doc.text(`${t.signDate}: ____________________`, left + 6 + sigColWidth + 8, y);
+  y += 10;
+  doc.setDrawColor(...border);
+  doc.line(left + 6, y, left + 6 + sigColWidth - 4, y);
+  doc.line(left + 6 + sigColWidth + 8, y, left + 6 + sigColWidth * 2 + 4, y);
+  doc.setTextColor(...muted);
+  doc.setFontSize(7);
+  doc.text(t.sign, left + 6 + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
+  doc.text(t.sign, left + 6 + sigColWidth + 8 + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
+
+  // -- Footer on all pages --
+  const totalPages = doc.internal.pages.length - 1;
+  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+    doc.setPage(pageNum);
+    drawFooter();
+  }
+
   return doc;
 }
 

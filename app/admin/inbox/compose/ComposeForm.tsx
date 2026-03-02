@@ -199,7 +199,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     }
   }
 
-  const inputClasses = "w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/90 placeholder:text-white/30 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
 
   return (
     <div className="space-y-6">
@@ -208,8 +208,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           onClick={() => setMode('email')}
           type="button"
           aria-pressed={mode === 'email'}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-slate-700/80 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-300'
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            mode === 'email' ? 'bg-white/10/80 text-white/90 shadow' : 'text-white/40 hover:text-white/60'
           }`}
         >
           ✉️ Correu normal
@@ -218,8 +218,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           onClick={() => setMode('quote')}
           type="button"
           aria-pressed={mode === 'quote'}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-slate-700/80 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-300'
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            mode === 'quote' ? 'bg-white/10/80 text-white/90 shadow' : 'text-white/40 hover:text-white/60'
           }`}
         >
           💰 Pressupost professional
@@ -315,7 +315,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         selectedPackId === pack.id
                           ? 'border-cyan-500 bg-cyan-500/10'
-                          : 'border-slate-600/50 hover:border-slate-500/50 bg-slate-700/30'
+                          : 'border-white/10 hover:border-white/10 bg-white/[0.03]'
                       }`}
                     >
                         <p className="font-semibold">{name}</p>
@@ -328,11 +328,13 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Price */}
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="cf-price" className="block text-sm font-medium mb-2">
                   Preu total (€) *
                 </label>
                 <input
+                  id="cf-price"
                   type="number"
+                  min={0}
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   className={`${inputClasses} text-2xl font-bold`}
@@ -400,7 +402,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                         locale === l.code
                           ? 'bg-cyan-500/20 text-cyan-300 border-2 border-cyan-500/50'
-                          : 'bg-slate-700/50 text-slate-300 border-2 border-transparent hover:bg-slate-600/50'
+                          : 'bg-white/5 text-white/60 border-2 border-transparent hover:bg-white/10'
                       }`}
                     >
                       {l.label}
@@ -472,7 +474,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                 sent
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : sending
-                  ? 'bg-slate-700/50 text-slate-500 border border-slate-600/50 cursor-not-allowed'
+                  ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
                   : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
               }`}
             >

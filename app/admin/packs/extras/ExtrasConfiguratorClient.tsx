@@ -171,7 +171,7 @@ export default function ExtrasConfiguratorClient() {
                   <input
                     value={extra.id}
                     onChange={(e) => updateExtra(index, { id: e.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                     placeholder="id-extra"
                   />
                 </label>
@@ -180,7 +180,7 @@ export default function ExtrasConfiguratorClient() {
                   <input
                     value={extra.icon || ''}
                     onChange={(e) => updateExtra(index, { icon: e.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                     placeholder="✨"
                   />
                 </label>
@@ -189,7 +189,7 @@ export default function ExtrasConfiguratorClient() {
                   <input
                     value={extra.name}
                     onChange={(e) => updateExtra(index, { name: e.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                     placeholder="Nom de l\'extra"
                   />
                 </label>
@@ -198,7 +198,7 @@ export default function ExtrasConfiguratorClient() {
                   <select
                     value={extra.category || 'other'}
                     onChange={(e) => updateExtra(index, { category: e.target.value as ExtraDefinition['category'] })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                   >
                     {CATEGORY_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -212,7 +212,7 @@ export default function ExtrasConfiguratorClient() {
                   <input
                     value={extra.description || ''}
                     onChange={(e) => updateExtra(index, { description: e.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                     placeholder="Descripció breu"
                   />
                 </label>
@@ -228,7 +228,7 @@ export default function ExtrasConfiguratorClient() {
                         })
                       }
                       disabled={Boolean(extra.consultarPrecio)}
-                      className="mt-1 w-full rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm disabled:opacity-50"
                     />
                   </label>
                   <label className="flex items-center gap-2 text-xs font-medium">
@@ -287,7 +287,7 @@ export default function ExtrasConfiguratorClient() {
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         active
                           ? 'border-emerald-400/50 bg-emerald-500/20 text-emerald-200'
-                          : 'border-slate-600/50 bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                          : 'border-white/10 bg-white/5/60 text-white/70 hover:bg-white/5/60'
                       }`}
                     >
                       {SERVICE_LABELS[service]}

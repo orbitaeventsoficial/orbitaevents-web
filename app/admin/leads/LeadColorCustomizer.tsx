@@ -122,7 +122,7 @@ export default function LeadColorCustomizer() {
           <button
             type="button"
             onClick={resetColors}
-            className="rounded-lg border px-3 py-1.5 text-xs"
+            className="rounded-xl border px-3 py-1.5 text-xs"
           >
             Restablir colors per defecte
           </button>

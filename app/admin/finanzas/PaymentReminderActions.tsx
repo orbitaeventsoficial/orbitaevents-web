@@ -75,7 +75,7 @@ export default function PaymentReminderActions({
       <a
         href={waLink}
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className="rounded-md px-2 py-1 text-xs font-semibold text-white"
       >
         Obrir WA

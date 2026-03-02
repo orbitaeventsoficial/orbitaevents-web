@@ -353,19 +353,19 @@ export default async function CatalogPage({
               </Link>
               <div className="sm:col-span-2 mt-1 overflow-hidden rounded-xl border border-white/10">
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1120px] text-sm">
+                  <table className="w-full min-w-[1120px] text-sm" aria-label="Catàleg de packs i extres">
                     <thead className="text-xs uppercase tracking-wide">
                       <tr>
-                        <th className="px-3 py-2 text-left">Pack</th>
-                        <th className="px-3 py-2 text-left">Semàfor</th>
-                        <th className="px-3 py-2 text-right">Preu</th>
-                        <th className="px-3 py-2 text-right">Cost estimat</th>
-                        <th className="px-3 py-2 text-right">Benefici</th>
-                        <th className="px-3 py-2 text-right">Marge</th>
-                        <th className="px-3 py-2 text-right">Ratio cost</th>
-                        <th className="px-3 py-2 text-right">Preu recomanat</th>
-                        <th className="px-3 py-2 text-right">Desviació</th>
-                        <th className="px-3 py-2 text-left">Components</th>
+                        <th scope="col" className="px-3 py-2 text-left">Pack</th>
+                        <th scope="col" className="px-3 py-2 text-left">Semàfor</th>
+                        <th scope="col" className="px-3 py-2 text-right">Preu</th>
+                        <th scope="col" className="px-3 py-2 text-right">Cost estimat</th>
+                        <th scope="col" className="px-3 py-2 text-right">Benefici</th>
+                        <th scope="col" className="px-3 py-2 text-right">Marge</th>
+                        <th scope="col" className="px-3 py-2 text-right">Ratio cost</th>
+                        <th scope="col" className="px-3 py-2 text-right">Preu recomanat</th>
+                        <th scope="col" className="px-3 py-2 text-right">Desviació</th>
+                        <th scope="col" className="px-3 py-2 text-left">Components</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
@@ -397,7 +397,7 @@ export default async function CatalogPage({
                           <td className="px-3 py-2 text-right">{formatPct(row.marginPct)}</td>
                           <td className="px-3 py-2 text-right">{formatPct(row.costRatioPct)}</td>
                           <td className="px-3 py-2 text-right">{formatCurrency(row.recommendedPrice)}</td>
-                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'text-amber-200' : 'text-slate-300'}`}>
+                          <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'text-amber-200' : 'text-white/70'}`}>
                             {formatPct(row.divergencePct)}
                           </td>
                           <td className="px-3 py-2 text-xs">

@@ -39,7 +39,7 @@ function getDueDateColor(dueDate: string | null): string {
   const diffDays = Math.floor((due.getTime() - now.getTime()) / 86400000);
   if (diffDays < 0) return 'text-rose-400 font-semibold'; // vençuda
   if (diffDays === 0) return 'text-amber-400 font-semibold'; // avui
-  return 'text-slate-400'; // futur
+  return 'text-white/40'; // futur
 }
 
 export default function TaskKanbanView() {
@@ -65,8 +65,8 @@ export default function TaskKanbanView() {
         customerName: (t.customerName as string) || (t.customer as Record<string, unknown>)?.name as string || null,
       }));
       setTasks(rows);
-    } catch {
-      // keep existing state
+    } catch (error) {
+      console.error('[TaskKanban] Error carregant tasques:', error);
     } finally {
       setLoading(false);
     }
@@ -201,7 +201,7 @@ export default function TaskKanbanView() {
                     <button
                       key={target.status}
                       onClick={() => moveTask(task.id, target.status)}
-                      className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20"
+                      className="flex-1 rounded-xl border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20"
                     >
                       {target.label}
                     </button>

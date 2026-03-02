@@ -39,6 +39,7 @@ const navItemsConfig: NavItemConfig[] = [
     dropdown: [
       { labelKey: 'bodas', descKey: 'bodasDesc', href: '/servicios/bodas', icon: '💍' },
       { labelKey: 'fiestas', descKey: 'fiestasDesc', href: '/servicios/fiestas', icon: '🎉' },
+      { labelKey: 'discomovil', descKey: 'discomovilDesc', href: '/servicios/discomovil', icon: '🎵' },
       { labelKey: 'empresas', descKey: 'empresasDesc', href: '/servicios/empresas', icon: '💼' },
     ]
   },
@@ -52,6 +53,7 @@ const navItemsConfig: NavItemConfig[] = [
       { labelKey: 'halloween', descKey: 'halloweenDesc', href: '/tematica-halloween', icon: '🎃' },
     ]
   },
+  { labelKey: 'configurator', href: '/configurador', badge: 'NEW' },
   { labelKey: 'portfolio', href: '/portfolio' },
   { labelKey: 'reviews', href: '/opiniones' },
   { labelKey: 'contact', href: '/contacto' },
@@ -376,7 +378,7 @@ export default function HeaderChampion() {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden flex flex-col gap-1.5 p-2 -mr-2"
+                className="lg:hidden flex flex-col items-center justify-center gap-1.5 w-11 h-11 -mr-2 rounded-xl"
                 aria-label="Menú"
                 aria-expanded={isMobileMenuOpen}
               >
@@ -450,7 +452,13 @@ export default function HeaderChampion() {
                             className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg cursor-pointer"
                             role="button"
                             tabIndex={0}
-                            aria-expanded="true"
+                            aria-expanded={true}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                (e.currentTarget as HTMLElement).click();
+                              }
+                            }}
                           >
                             <span className="flex items-center gap-2">
                               {tNav(item.labelKey)}

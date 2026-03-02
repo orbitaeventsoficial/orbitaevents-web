@@ -57,6 +57,16 @@ async function main() {
     // Empresa
     { key: 'company.name', value: 'Òrbita Events', type: 'STRING', category: 'company', label: 'Nom empresa' },
     { key: 'company.legalName', value: 'Orbita Events S.L.', type: 'STRING', category: 'company', label: 'Nom legal' },
+    { key: 'company.nif', value: '', type: 'STRING', category: 'company', label: 'NIF / CIF' },
+    { key: 'company.address', value: '', type: 'STRING', category: 'company', label: 'Adreça fiscal' },
+    { key: 'company.city', value: '', type: 'STRING', category: 'company', label: 'Ciutat' },
+    { key: 'company.postalCode', value: '', type: 'STRING', category: 'company', label: 'Codi postal' },
+    { key: 'company.iban', value: '', type: 'STRING', category: 'company', label: 'IBAN' },
+    { key: 'company.bankName', value: '', type: 'STRING', category: 'company', label: 'Nom del banc' },
+
+    // Holded
+    { key: 'holded.enabled', value: 'false', type: 'BOOLEAN', category: 'holded', label: 'Holded activat', description: 'Activa la sincronització de factures amb Holded' },
+    { key: 'holded.apiKey', value: '', type: 'STRING', category: 'holded', label: 'API Key de Holded', description: 'Clau API per connectar amb Holded' },
   ];
 
   for (const setting of settings) {

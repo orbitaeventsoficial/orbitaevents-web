@@ -85,7 +85,8 @@ export default function BookingFilters() {
         <select
           value={status}
           onChange={(e) => updateParams({ status: e.target.value })}
-          className="rounded-lg border px-3 py-1.5 text-xs font-medium bg-transparent"
+          aria-label="Filtrar per estat"
+          className="rounded-xl border px-3 py-1.5 text-xs font-medium bg-transparent"
         >
           <option value="">Tots els estats</option>
           {STATUS_OPTIONS.map((opt) => (
@@ -98,7 +99,8 @@ export default function BookingFilters() {
         <select
           value={eventType}
           onChange={(e) => updateParams({ eventType: e.target.value })}
-          className="rounded-lg border px-3 py-1.5 text-xs font-medium bg-transparent"
+          aria-label="Filtrar per tipus d'esdeveniment"
+          className="rounded-xl border px-3 py-1.5 text-xs font-medium bg-transparent"
         >
           <option value="">Tots els tipus</option>
           {EVENT_TYPE_OPTIONS.map((opt) => (
@@ -112,7 +114,8 @@ export default function BookingFilters() {
           type="date"
           value={fromDate}
           onChange={(e) => updateParams({ fromDate: e.target.value })}
-          className="rounded-lg border px-3 py-1.5 text-xs bg-transparent"
+          aria-label="Data des de"
+          className="rounded-xl border px-3 py-1.5 text-xs bg-transparent"
           title="Des de"
         />
 
@@ -120,8 +123,10 @@ export default function BookingFilters() {
           type="date"
           value={toDate}
           onChange={(e) => updateParams({ toDate: e.target.value })}
-          className="rounded-lg border px-3 py-1.5 text-xs bg-transparent"
+          aria-label="Data fins a"
+          className="rounded-xl border px-3 py-1.5 text-xs bg-transparent"
           title="Fins a"
+          min={fromDate || undefined}
         />
 
         {hasFilters && (
@@ -131,7 +136,7 @@ export default function BookingFilters() {
               setSearch('');
               router.push('/admin/bookings');
             }}
-            className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
+            className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
           >
             Netejar filtres
           </button>

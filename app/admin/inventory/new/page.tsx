@@ -147,10 +147,11 @@ export default function NewInventoryItemPage() {
         <h2 className="text-sm font-semibold">Informació bàsica</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">
+            <label htmlFor="ni-code" className="text-xs">
               Codi <span className="">(opcional, s&apos;auto-genera)</span>
             </label>
             <input
+              id="ni-code"
               type="text"
               value={form.code}
               onChange={(e) => updateField('code', e.target.value)}
@@ -159,19 +160,21 @@ export default function NewInventoryItemPage() {
             />
           </div>
           <div>
-            <label className="text-xs">Nom *</label>
+            <label htmlFor="ni-name" className="text-xs">Nom *</label>
             <input
+              id="ni-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Altaveu JBL PRX 15"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
         <div>
-          <label className="text-xs">Descripció</label>
+          <label htmlFor="ni-description" className="text-xs">Descripció</label>
           <textarea
+            id="ni-description"
             value={form.description}
             onChange={(e) => updateField('description', e.target.value)}
             rows={2}
@@ -193,7 +196,7 @@ export default function NewInventoryItemPage() {
               className={`rounded-xl border px-2 py-2.5 text-xs font-medium transition-all ${
                 form.category === cat.value
                   ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                  : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
+                  : 'border-white/10 bg-white/[0.03] text-white/40 hover:bg-white/5'
               }`}
             >
               <span className="text-base">{cat.icon}</span>
@@ -208,23 +211,27 @@ export default function NewInventoryItemPage() {
         <h2 className="text-sm font-semibold">Detalls tècnics</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Potència (W)</label>
+            <label htmlFor="ni-watts" className="text-xs">Potència (W)</label>
             <input
+              id="ni-watts"
               type="number"
+              min={0}
               value={form.watts}
               onChange={(e) => updateField('watts', e.target.value)}
               placeholder="1000"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Valor actual (€) *</label>
+            <label htmlFor="ni-value" className="text-xs">Valor actual (€) *</label>
             <input
+              id="ni-value"
               type="number"
+              min={0}
               value={form.value}
               onChange={(e) => updateField('value', e.target.value)}
               placeholder="500"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
@@ -235,10 +242,10 @@ export default function NewInventoryItemPage() {
                   key={c.value}
                   type="button"
                   onClick={() => updateField('condition', c.value)}
-                  className={`flex-1 rounded-lg border px-1 py-2 text-[10px] font-medium transition-all ${
+                  className={`flex-1 rounded-xl border px-1 py-2 text-[10px] font-medium transition-all ${
                     form.condition === c.value
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   {c.label}
@@ -263,21 +270,25 @@ export default function NewInventoryItemPage() {
         {form.isConsumable && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-xs">Estoc actual</label>
+              <label htmlFor="ni-stock" className="text-xs">Estoc actual</label>
               <input
+                id="ni-stock"
                 type="number"
+                min={0}
                 value={form.stockQuantity}
                 onChange={(e) => updateField('stockQuantity', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
             <div>
-              <label className="text-xs">Estoc mínim</label>
+              <label htmlFor="ni-min-stock" className="text-xs">Estoc mínim</label>
               <input
+                id="ni-min-stock"
                 type="number"
+                min={0}
                 value={form.minStock}
                 onChange={(e) => updateField('minStock', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
           </div>
@@ -289,32 +300,37 @@ export default function NewInventoryItemPage() {
         <h2 className="text-sm font-semibold">Amortització</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Preu de compra (€)</label>
+            <label htmlFor="ni-purchase-price" className="text-xs">Preu de compra (€)</label>
             <input
+              id="ni-purchase-price"
               type="number"
+              min={0}
               value={form.purchasePrice}
               onChange={(e) => updateField('purchasePrice', e.target.value)}
               placeholder="800"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Data de compra</label>
+            <label htmlFor="ni-purchase-date" className="text-xs">Data de compra</label>
             <input
+              id="ni-purchase-date"
               type="date"
               value={form.purchaseDate}
               onChange={(e) => updateField('purchaseDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Vida útil (hores)</label>
+            <label htmlFor="ni-life-hours" className="text-xs">Vida útil (hores)</label>
             <input
+              id="ni-life-hours"
               type="number"
+              min={0}
               value={form.expectedLifeHours}
               onChange={(e) => updateField('expectedLifeHours', e.target.value)}
               placeholder="2000"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
@@ -322,8 +338,9 @@ export default function NewInventoryItemPage() {
 
       {/* Notes */}
       <div className="rounded-2xl border p-5">
-        <label className="text-xs">Notes internes</label>
+        <label htmlFor="ni-notes" className="text-xs">Notes internes</label>
         <textarea
+          id="ni-notes"
           value={form.notes}
           onChange={(e) => updateField('notes', e.target.value)}
           rows={2}

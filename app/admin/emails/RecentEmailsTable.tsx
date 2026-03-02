@@ -68,13 +68,13 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
           <p className="mt-2">Cap activitat recent</p>
         </div>
       ) : (
-        <div className="divide-y divide-slate-700/30 max-h-96 overflow-y-auto">
+        <div className="divide-y divide-white/5 max-h-96 overflow-y-auto">
           {activities.map((activity) => {
             const actionInfo = actionLabels[activity.action] || {
               label: activity.action,
               icon: '📋',
-              bg: 'bg-slate-500/20',
-              text: 'text-slate-300',
+              bg: 'bg-white/10',
+              text: 'text-white/70',
             };
 
             return (

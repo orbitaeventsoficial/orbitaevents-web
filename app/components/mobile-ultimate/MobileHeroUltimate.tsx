@@ -91,7 +91,7 @@ function AnimatedBadge() {
   const t = useTranslations('mobileHero');
 
   const badges = useMemo(() => [
-    { emoji: '✨', text: t('badges.halloween'), gradient: 'from-amber-500 to-orange-500' },
+    { emoji: '✨', text: t('badges.halloween', { year: new Date().getFullYear() }), gradient: 'from-amber-500 to-orange-500' },
     { emoji: '🪄', text: t('badges.monMagic'), gradient: 'from-purple-500 to-pink-500' },
     { emoji: '⭐', text: t('badges.rating'), gradient: 'from-amber-400 to-yellow-500' },
   ], [t]);

@@ -221,8 +221,8 @@ export default function EditBlogPostPage() {
           <h2 className="text-lg font-semibold mb-4">Configuració</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-sm mb-1">Slug</label>
-              <input
+              <label htmlFor="blog-slug" className="block text-sm mb-1">Slug</label>
+              <input id="blog-slug"
                 value={formData.slug}
                 onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
                 required
@@ -230,40 +230,45 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Autor</label>
+              <label htmlFor="blog-author" className="block text-sm mb-1">Autor</label>
               <input
+                id="blog-author"
                 value={formData.author}
                 onChange={(e) => setFormData((prev) => ({ ...prev, author: e.target.value }))}
                 className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Categoria</label>
+              <label htmlFor="blog-category" className="block text-sm mb-1">Categoria</label>
               <input
+                id="blog-category"
                 value={formData.category}
                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
                 className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm mb-1">Etiquetes (separades per comes)</label>
+              <label htmlFor="blog-tags" className="block text-sm mb-1">Etiquetes (separades per comes)</label>
               <input
+                id="blog-tags"
                 value={formData.tags}
                 onChange={(e) => setFormData((prev) => ({ ...prev, tags: e.target.value }))}
                 className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm mb-1">URL imatge destacada</label>
+              <label htmlFor="blog-featured-image" className="block text-sm mb-1">URL imatge destacada</label>
               <input
+                id="blog-featured-image"
                 value={formData.featuredImage}
                 onChange={(e) => setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))}
                 className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Temps lectura (min)</label>
+              <label htmlFor="blog-reading-time" className="block text-sm mb-1">Temps lectura (min)</label>
               <input
+                id="blog-reading-time"
                 type="number"
                 min={1}
                 value={formData.readingTime}
@@ -291,10 +296,10 @@ export default function EditBlogPostPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocale('es')}
-                className={`rounded-lg px-3 py-1.5 text-sm ${
+                className={`rounded-xl px-3 py-1.5 text-sm ${
                   activeLocale === 'es'
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                    : 'border border-slate-700 text-slate-400'
+                    : 'border border-white/10 text-white/40'
                 }`}
               >
                 Espanyol
@@ -302,10 +307,10 @@ export default function EditBlogPostPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocale('ca')}
-                className={`rounded-lg px-3 py-1.5 text-sm ${
+                className={`rounded-xl px-3 py-1.5 text-sm ${
                   activeLocale === 'ca'
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                    : 'border border-slate-700 text-slate-400'
+                    : 'border border-white/10 text-white/40'
                 }`}
               >
                 Català
@@ -315,8 +320,9 @@ export default function EditBlogPostPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm mb-1">Títol</label>
+              <label htmlFor={`blog-title-${activeLocale}`} className="block text-sm mb-1">Títol</label>
               <input
+                id={`blog-title-${activeLocale}`}
                 value={formData.translations[activeLocale].title}
                 onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
                 required
@@ -324,8 +330,9 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Extracte</label>
+              <label htmlFor={`blog-excerpt-${activeLocale}`} className="block text-sm mb-1">Extracte</label>
               <textarea
+                id={`blog-excerpt-${activeLocale}`}
                 value={formData.translations[activeLocale].excerpt}
                 onChange={(e) => updateTranslation(activeLocale, 'excerpt', e.target.value)}
                 rows={3}
@@ -334,8 +341,9 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Contingut</label>
+              <label htmlFor={`blog-content-${activeLocale}`} className="block text-sm mb-1">Contingut</label>
               <textarea
+                id={`blog-content-${activeLocale}`}
                 value={formData.translations[activeLocale].content}
                 onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
                 rows={12}
@@ -344,16 +352,18 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Meta títol (SEO)</label>
+              <label htmlFor={`blog-meta-title-${activeLocale}`} className="block text-sm mb-1">Meta títol (SEO)</label>
               <input
+                id={`blog-meta-title-${activeLocale}`}
                 value={formData.translations[activeLocale].metaTitle}
                 onChange={(e) => updateTranslation(activeLocale, 'metaTitle', e.target.value)}
                 className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Meta descripció (SEO)</label>
+              <label htmlFor={`blog-meta-desc-${activeLocale}`} className="block text-sm mb-1">Meta descripció (SEO)</label>
               <textarea
+                id={`blog-meta-desc-${activeLocale}`}
                 value={formData.translations[activeLocale].metaDescription}
                 onChange={(e) => updateTranslation(activeLocale, 'metaDescription', e.target.value)}
                 rows={2}

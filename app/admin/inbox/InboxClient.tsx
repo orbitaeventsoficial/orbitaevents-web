@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
 import { getEventLabel, formatDateShort, formatDateTimeFull, formatDateSimple, DEFAULT_LOCALE } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface LeadData {
   id: string;
@@ -96,6 +97,7 @@ export default function InboxClient({
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loadingSelected, setLoadingSelected] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   // Convertir leads a format unificat
   const emails = useMemo(() => {
@@ -262,7 +264,8 @@ export default function InboxClient({
 
   async function handleDeleteImapEmail(email: UnifiedEmail) {
     if (email.type !== 'imap' || !email.imapData?.uid) return;
-    if (!confirm('Segur que vols eliminar aquest email?')) return;
+    const ok = await confirm({ title: 'Eliminar email', message: 'Segur que vols eliminar aquest email?', confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
@@ -310,8 +313,8 @@ export default function InboxClient({
           <button
             onClick={() => setActiveTab('all')}
             type="button"
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'all' ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
+            className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+              activeTab === 'all' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
             }`}
           >
             📬 Tot ({emails.length})
@@ -319,8 +322,8 @@ export default function InboxClient({
           <button
             onClick={() => setActiveTab('leads')}
             type="button"
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'leads' ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
+            className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+              activeTab === 'leads' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
             }`}
           >
             📋 Entrades web ({initialLeads.length})
@@ -329,8 +332,8 @@ export default function InboxClient({
             <button
               onClick={() => setActiveTab('emails')}
               type="button"
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'emails' ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
+              className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                activeTab === 'emails' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
               }`}
             >
               📧 Emails ({imapEmails.length})
@@ -349,8 +352,8 @@ export default function InboxClient({
           <button
             onClick={() => setFilter('all')}
             type="button"
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              filter === 'all' ? 'bg-slate-700/50 text-slate-200' : 'text-slate-400 hover:bg-slate-700/50'
+            className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
+              filter === 'all' ? 'bg-white/5 text-white/80' : 'text-white/40 hover:bg-white/5'
             }`}
           >
             Tots
@@ -358,8 +361,8 @@ export default function InboxClient({
           <button
             onClick={() => setFilter('unread')}
             type="button"
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              filter === 'unread' ? 'bg-slate-700/50 text-slate-200' : 'text-slate-400 hover:bg-slate-700/50'
+            className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
+              filter === 'unread' ? 'bg-white/5 text-white/80' : 'text-white/40 hover:bg-white/5'
             }`}
           >
             🔵 No llegits ({totalUnread})
@@ -367,7 +370,7 @@ export default function InboxClient({
         </nav>
 
         {imapConfigured && (
-          <div className="mt-4 p-3 border rounded-lg">
+          <div className="mt-4 p-3 border rounded-xl">
             <p className="text-sm font-medium">Només Òrbita</p>
             <p className="text-xs mt-1">
               Es mostren només emails de <span className="">orbitaevents.com</span>
@@ -380,14 +383,14 @@ export default function InboxClient({
             onClick={loadImapEmails}
             disabled={loadingImap}
             type="button"
-            className="w-full mt-4 px-3 py-2 border rounded-lg text-sm transition-colors disabled:opacity-50"
+            className="w-full mt-4 px-3 py-2 border rounded-xl text-sm transition-colors disabled:opacity-50"
           >
             {loadingImap ? '⏳ Carregant...' : '🔄 Actualitzar'}
           </button>
         )}
 
         {imapError && (
-          <div className="mt-4 p-3 border rounded-lg">
+          <div className="mt-4 p-3 border rounded-xl">
             <p className="text-xs">{imapError}</p>
           </div>
         )}
@@ -404,14 +407,14 @@ export default function InboxClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cercar..."
               aria-label="Cercar emails"
-              className="w-full pl-10 pr-4 py-2 rounded-lg border text-sm focus:ring-1"
+              className="w-full pl-10 pr-4 py-2 rounded-xl border text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
 
         {flashMessage && (
           <div
-            className={`mx-3 mt-3 rounded-lg border px-3 py-2 text-xs ${
+            className={`mx-3 mt-3 rounded-xl border px-3 py-2 text-xs ${
               flashMessage.type === 'success'
                 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
                 : 'border-rose-500/30 bg-rose-500/10 text-rose-300'
@@ -450,7 +453,7 @@ export default function InboxClient({
                 key={email.id}
                 onClick={() => handleSelectEmail(email)}
                 type="button"
-                className={`w-full text-left p-4 border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors ${
+                className={`w-full text-left p-4 border-b border-white/5 hover:bg-white/[0.03] transition-colors ${
                   selectedEmail?.id === email.id ? 'bg-cyan-500/10 border-l-4 border-l-cyan-500' : ''
                 } ${!email.read ? 'bg-blue-500/5' : ''}`}
               >
@@ -468,7 +471,7 @@ export default function InboxClient({
                           Nou
                         </span>
                       )}
-                      <p className={`text-sm truncate ${!email.read ? 'font-semibold text-slate-100' : 'text-slate-300'}`}>
+                      <p className={`text-sm truncate ${!email.read ? 'font-semibold text-white/90' : 'text-white/60'}`}>
                         {email.fromName}
                       </p>
                     </div>
@@ -499,7 +502,7 @@ export default function InboxClient({
                       {selectedEmail.type === 'lead' ? '📋 Entrada web' : '📧 Correu IMAP'}
                     </span>
                     {selectedEmail.leadData?.status && (
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[selectedEmail.leadData.status] || 'bg-slate-700/50 text-slate-400'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[selectedEmail.leadData.status] || 'bg-white/5 text-white/40'}`}>
                         {selectedEmail.leadData.status}
                       </span>
                     )}
@@ -576,7 +579,7 @@ export default function InboxClient({
                 {selectedEmail.imapData?.bodyHtml ? (
                   <div
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }}
-                    className="p-4 rounded-lg border"
+                    className="p-4 rounded-xl border"
                   />
                 ) : (
                   <p className="whitespace-pre-wrap">
@@ -670,6 +673,8 @@ export default function InboxClient({
           }}
         />
       )}
+
+      <ConfirmDialog {...dialogProps} />
 
       {showQuote && selectedEmail && (
         <QuoteModal
@@ -785,7 +790,7 @@ function ComposeModal({
             onClick={onClose}
             type="button"
             aria-label="Tancar modal"
-            className="p-2 rounded-lg"
+            className="p-2 rounded-xl"
           >
             ✕
           </button>
@@ -798,7 +803,7 @@ function ComposeModal({
               type="email"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border focus:ring-1"
+              className="w-full px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               placeholder="email@exemple.com"
             />
           </div>
@@ -808,7 +813,7 @@ function ComposeModal({
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border focus:ring-1"
+              className="w-full px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
@@ -841,7 +846,7 @@ function ComposeModal({
                       setQuotePackId(e.target.value);
                       if (next) setQuotePrice(next.price);
                     }}
-                    className="w-full px-3 py-2 rounded-lg border text-sm"
+                    className="w-full px-3 py-2 rounded-xl border text-sm"
                   >
                     {PACK_OPTIONS.map((pack) => (
                       <option key={pack.id} value={pack.id}>
@@ -851,12 +856,14 @@ function ComposeModal({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1">Preu base (€)</label>
+                  <label htmlFor="ib-quote-price" className="block text-xs mb-1">Preu base (€)</label>
                   <input
+                    id="ib-quote-price"
                     type="number"
+                    min={0}
                     value={quotePrice}
                     onChange={(e) => setQuotePrice(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-lg border text-sm"
+                    className="w-full px-3 py-2 rounded-xl border text-sm"
                   />
                 </div>
               </div>
@@ -875,7 +882,7 @@ function ComposeModal({
             aria-busy={sending}
             className={`px-6 py-2 rounded-xl font-medium ${
               sent ? 'bg-emerald-500 text-white' :
-              sending ? 'bg-slate-600 text-slate-400' :
+              sending ? 'bg-white/15 text-white/40' :
               'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
             }`}
           >
@@ -954,7 +961,7 @@ function QuoteModal({
       <div className="border rounded-2xl shadow-xl max-w-xl w-full" role="dialog" aria-modal="true" aria-labelledby="quote-title">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 id="quote-title" className="text-lg font-semibold">📄 Pressupost personalitzat</h2>
-          <button onClick={onClose} type="button" className="p-2 rounded-lg">✕</button>
+          <button onClick={onClose} type="button" className="p-2 rounded-xl">✕</button>
         </div>
 
         <div className="p-6 space-y-4">

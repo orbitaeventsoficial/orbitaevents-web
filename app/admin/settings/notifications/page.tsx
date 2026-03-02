@@ -173,7 +173,7 @@ export default function SettingsNotificationsPage() {
         <h2 className="text-lg font-semibold mb-4">🧪 Test d'Email</h2>
         
       {testResult && (
-          <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-emerald-950/30 border border-emerald-400/30 text-emerald-300' : 'bg-rose-950/30 border border-rose-400/30 text-rose-300'}`} role={testResult.success ? 'status' : 'alert'}>
+          <div className={`mb-4 p-4 rounded-xl ${testResult.success ? 'bg-emerald-950/30 border border-emerald-400/30 text-emerald-300' : 'bg-rose-950/30 border border-rose-400/30 text-rose-300'}`} role={testResult.success ? 'status' : 'alert'}>
             <div className="flex items-center gap-2">
               <span className="text-xl">{testResult.success ? '✅' : '❌'}</span>
               <span>{testResult.message}</span>
@@ -186,7 +186,7 @@ export default function SettingsNotificationsPage() {
           disabled={testing || !config?.status.emailReady}
           type="button"
           aria-busy={testing}
-          className="px-6 py-3 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {testing ? '📤 Enviant...' : '📧 Envia correu de prova'}
         </button>
@@ -225,14 +225,14 @@ export default function SettingsNotificationsPage() {
                   ? 'text-emerald-300'
                   : config?.automation.lastStatus === 'error'
                     ? 'text-rose-300'
-                    : 'text-slate-200'
+                    : 'text-white/80'
               }
             >
               {config?.automation.lastStatus || 'Sense dades'}
             </span>
           </div>
           {config?.automation.lastSummary && (
-            <div className="rounded-lg bg-white/5 p-3">
+            <div className="rounded-xl bg-white/5 p-3">
               <p>
                 Seq: {config.automation.lastSummary.sequences?.executed ?? 0} · Email:{' '}
                 {config.automation.lastSummary.sequences?.sentEmail ?? 0} · WA:{' '}
@@ -251,7 +251,7 @@ export default function SettingsNotificationsPage() {
 
         {autopilotResult && (
           <div
-            className={`mt-4 p-3 rounded-lg ${
+            className={`mt-4 p-3 rounded-xl ${
               autopilotResult.success
                 ? 'bg-emerald-950/30 border border-emerald-400/30 text-emerald-300'
                 : 'bg-rose-950/30 border border-rose-400/30 text-rose-300'
@@ -267,7 +267,7 @@ export default function SettingsNotificationsPage() {
           disabled={runningAutopilot || !config?.automation.cronSecretConfigured}
           type="button"
           aria-busy={runningAutopilot}
-          className="mt-4 px-6 py-3 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 px-6 py-3 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {runningAutopilot ? '🚀 Executant...' : '🚀 Executar resum diari ara'}
         </button>
@@ -289,7 +289,7 @@ export default function SettingsNotificationsPage() {
               {Object.entries(config?.smtp || {}).map(([key, value]) => (
                 <div key={key} className="flex justify-between py-1 border-b border-white/10">
                   <span className="uppercase text-xs">{key}</span>
-                  <span className={value.includes('✅') ? 'text-emerald-300' : value.includes('❌') ? 'text-rose-300' : 'text-slate-200'}>
+                  <span className={value.includes('✅') ? 'text-emerald-300' : value.includes('❌') ? 'text-rose-300' : 'text-white/80'}>
                     {value}
                   </span>
                 </div>
@@ -317,7 +317,7 @@ export default function SettingsNotificationsPage() {
           <h2 className="text-lg font-semibold mb-4">📝 Instruccions de Configuració</h2>
           
           {instructions.map((instruction, index) => (
-            <pre key={index} className="p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
+            <pre key={index} className="p-4 rounded-xl overflow-x-auto text-sm whitespace-pre-wrap mb-4">
               {instruction}
             </pre>
           ))}
@@ -330,7 +330,7 @@ export default function SettingsNotificationsPage() {
         
         <div className="prose prose-sm max-w-none">
           <h3 className="text-base font-medium">Variables d'entorn necessàries:</h3>
-          <div className="bg-white/5 p-4 rounded-lg font-mono text-xs">
+          <div className="bg-white/5 p-4 rounded-xl font-mono text-xs">
             <div className=""># Obligatòries per email</div>
             <div>SMTP_HOST=smtp.dondominio.com</div>
             <div>SMTP_PORT=587</div>

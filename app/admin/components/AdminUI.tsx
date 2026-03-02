@@ -24,7 +24,7 @@ type QuickAction = {
 };
 
 const VARIANT_STYLES = {
-  default: 'border-slate-600 bg-slate-700/50 text-slate-300 hover:bg-slate-700',
+  default: 'border-white/15 bg-white/5 text-white/60 hover:bg-white/10',
   success: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20',
   warning: 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20',
   danger: 'border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20',
@@ -85,7 +85,7 @@ type DataCardProps = {
 };
 
 const CARD_COLORS = {
-  default: 'border-slate-700/50 bg-slate-800/60',
+  default: 'border-white/10 bg-white/[0.03]',
   blue: 'border-sky-500/20 bg-gradient-to-br from-sky-500/10 to-sky-600/5',
   green: 'border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5',
   amber: 'border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5',
@@ -93,7 +93,7 @@ const CARD_COLORS = {
 };
 
 const CARD_TEXT_COLORS = {
-  default: 'text-slate-400',
+  default: 'text-white/40',
   blue: 'text-sky-400',
   green: 'text-emerald-400',
   amber: 'text-amber-400',
@@ -305,7 +305,7 @@ export function KeyboardHint({ keys, description }: { keys: string[]; descriptio
 
 export function Skeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={`animate-pulse rounded-xl bg-slate-700/50 ${className}`} />
+    <div className={`animate-pulse rounded-xl bg-white/5 ${className}`} />
   );
 }
 

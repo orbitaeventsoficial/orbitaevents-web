@@ -317,8 +317,8 @@ function MobileReviewsSection() {
         setReviews(fiveStarReviews);
         setAverageRating(data.rating ?? 5);
         setTotalReviews(data.user_ratings_total ?? 0);
-      } catch {
-        // silently fail
+      } catch (error) {
+        console.error('[MobileHome] Error carregant reviews:', error);
       }
     }
     loadReviews();
@@ -564,7 +564,7 @@ function MobileFooter() {
         </div>
 
         {/* Copyright - Dynamic year */}
-        <p className="text-white/20 text-xs mt-4">
+        <p className="text-white/40 text-xs mt-4">
           © {currentYear} Òrbita Events. {t('copyright')}
         </p>
       </div>

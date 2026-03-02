@@ -40,7 +40,7 @@ export default function CalendarTokenManager({
     <div className="mt-3 space-y-2">
       {url ? (
         <>
-          <p className="break-all rounded-lg p-2 text-xs">{url}</p>
+          <p className="break-all rounded-xl p-2 text-xs">{url}</p>
           <p className="text-xs">
             A Google Calendar: Configuració → Afegir calendari → &quot;Des de URL&quot;.
           </p>
@@ -55,7 +55,7 @@ export default function CalendarTokenManager({
         type="button"
         onClick={regenerate}
         disabled={loading}
-        className="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="inline-flex rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {loading ? 'Generant...' : 'Generar / Regenerar token'}
       </button>

@@ -54,8 +54,8 @@ const EVENT_COLORS: Partial<Record<TimelineEventType, string>> = {
   TASK_CREATED: 'border-l-amber-500',
   TASK_DONE: 'border-l-emerald-500',
   MESSAGE_SENT: 'border-l-violet-500',
-  NOTE_ADDED: 'border-l-slate-500',
-  ACTIVITY: 'border-l-slate-600',
+  NOTE_ADDED: 'border-l-white/20',
+  ACTIVITY: 'border-l-white/10',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -157,8 +157,8 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
             onClick={() => setFilter(opt.key)}
             className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors ${
               filter === opt.key
-                ? 'bg-slate-100 text-slate-900'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                ? 'bg-white/10 text-black'
+                : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/80'
             }`}
           >
             {opt.icon} {opt.label}
@@ -196,7 +196,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
         <button
           type="button"
           onClick={toggleExpand}
-          className="mt-3 w-full rounded-lg border py-2 text-xs transition-colors"
+          className="mt-3 w-full rounded-xl border py-2 text-xs transition-colors"
         >
           {expanded ? 'Mostra menys ↑' : `Mostra més (${groupedTimeline.length - 5} dies més) ↓`}
         </button>
@@ -211,11 +211,11 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
 
 function EventCard({ event }: { event: TimelineEventDTO }) {
   const icon = EVENT_ICONS[event.type] || '•';
-  const borderColor = EVENT_COLORS[event.type] || 'border-l-slate-600';
+  const borderColor = EVENT_COLORS[event.type] || 'border-l-white/10';
 
   return (
     <article
-      className={`rounded-lg border-l-2 bg-slate-800/50 p-2.5 pl-3 ${borderColor}`}
+      className={`rounded-xl border-l-2 bg-white/[0.03] p-2.5 pl-3 ${borderColor}`}
     >
       <div className="flex items-start gap-2">
         <span className="text-sm">{icon}</span>
@@ -251,7 +251,7 @@ function EmptyState({ filter }: { filter: TimelineFilter }) {
   };
 
   return (
-    <div className="rounded-lg border p-4 text-center">
+    <div className="rounded-xl border p-4 text-center">
       <p className="text-sm">{messages[filter]}</p>
     </div>
   );

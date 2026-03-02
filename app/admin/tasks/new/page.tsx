@@ -64,7 +64,7 @@ export default function NewTaskPage() {
         <label className="flex flex-col gap-1 text-sm">
           Títol
           <input
-            className="rounded-lg border px-3 py-2"
+            className="rounded-xl border px-3 py-2"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -74,7 +74,7 @@ export default function NewTaskPage() {
         <label className="flex flex-col gap-1 text-sm">
           Descripció
           <textarea
-            className="rounded-lg border px-3 py-2"
+            className="rounded-xl border px-3 py-2"
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -86,7 +86,7 @@ export default function NewTaskPage() {
             Data límit
             <input
               type="date"
-              className="rounded-lg border px-3 py-2"
+              className="rounded-xl border px-3 py-2"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
@@ -95,7 +95,7 @@ export default function NewTaskPage() {
           <label className="flex flex-col gap-1 text-sm">
             Prioritat
             <select
-              className="rounded-lg border px-3 py-2"
+              className="rounded-xl border px-3 py-2"
               value={priority}
               onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')}
             >
@@ -108,7 +108,7 @@ export default function NewTaskPage() {
         </div>
 
         {error && (
-          <p className="rounded-lg border px-3 py-2 text-sm">
+          <p className="rounded-xl border px-3 py-2 text-sm">
             {error}
           </p>
         )}
@@ -117,13 +117,13 @@ export default function NewTaskPage() {
           <button
             type="submit"
             disabled={saving || !title.trim()}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             {saving ? 'Guardant...' : 'Crear tasca'}
           </button>
           <Link
             href={customerId ? `/admin/clientes/${customerId}?tab=tasks` : '/admin/tasks'}
-            className="rounded-lg border px-4 py-2 text-sm font-medium"
+            className="rounded-xl border px-4 py-2 text-sm font-medium"
           >
             Cancel·lar
           </Link>

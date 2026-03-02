@@ -70,7 +70,7 @@ export default function CommunicationPanel({
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
           return (
-            <div key={flow.key} className="rounded-lg border border-white/10 p-3">
+            <div key={flow.key} className="rounded-xl border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{flow.label}</p>
                 <p className="text-xs">
@@ -95,7 +95,7 @@ export default function CommunicationPanel({
                 <a
                   href={waLink(flow.key)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="rounded-md px-2 py-1 text-xs font-semibold text-white"
                 >
                   Obrir WhatsApp

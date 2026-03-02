@@ -133,8 +133,8 @@ export default function ManualActionsPanel() {
             aria-busy={runningCron}
             className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
               runningCron
-                ? 'bg-slate-700/50 text-slate-500 border border-slate-600/50 cursor-not-allowed'
-                : 'bg-slate-700/50 text-slate-200 border border-slate-600/50 hover:bg-slate-600/50'
+                ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
+                : 'bg-white/5 text-white/80 border border-white/10 hover:bg-white/10'
             }`}
           >
             {runningCron ? (
@@ -171,8 +171,8 @@ export default function ManualActionsPanel() {
             aria-busy={runningReminder}
             className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
               runningReminder
-                ? 'bg-slate-700/50 text-slate-500 border border-slate-600/50 cursor-not-allowed'
-                : 'bg-slate-700/50 text-slate-200 border border-slate-600/50 hover:bg-slate-600/50'
+                ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
+                : 'bg-white/5 text-white/80 border border-white/10 hover:bg-white/10'
             }`}
           >
             {runningReminder ? 'Enviant...' : '⭐ Envia recordatori'}
@@ -202,7 +202,7 @@ export default function ManualActionsPanel() {
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
               aria-label="Email de prova"
-              className="flex-1 px-3 py-2 text-sm rounded-xl border focus:ring-1"
+              className="flex-1 px-3 py-2 text-sm rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
             <button
               onClick={sendTestEmail}
@@ -211,7 +211,7 @@ export default function ManualActionsPanel() {
               aria-busy={sendingTest}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 sendingTest
-                  ? 'bg-slate-700/50 text-slate-500 border border-slate-600/50'
+                  ? 'bg-white/5 text-white/30 border border-white/10'
                   : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
               }`}
             >

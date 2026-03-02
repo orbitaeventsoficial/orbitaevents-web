@@ -177,7 +177,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
       <h2 className="text-sm font-semibold">Foto</h2>
 
       {error && (
-        <div className="rounded-lg border p-2">
+        <div className="rounded-xl border p-2">
           <p className="text-xs">{error}</p>
         </div>
       )}
@@ -197,7 +197,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="rounded-lg px-2 py-1 text-xs backdrop-blur-sm"
+                className="rounded-xl px-2 py-1 text-xs backdrop-blur-sm"
               >
                 Canviar
               </button>
@@ -205,7 +205,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={uploading}
-                className="rounded-lg px-2 py-1 text-xs backdrop-blur-sm"
+                className="rounded-xl px-2 py-1 text-xs backdrop-blur-sm"
               >
                 Treure
               </button>
@@ -224,7 +224,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
           className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${
             dragActive
               ? 'border-cyan-400 bg-cyan-500/10'
-              : 'border-slate-600/50 bg-slate-900/30 hover:border-slate-500'
+              : 'border-white/10 bg-white/[0.02] hover:border-white/20'
           }`}
         >
           {uploading ? (

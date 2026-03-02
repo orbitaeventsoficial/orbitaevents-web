@@ -124,7 +124,8 @@ export async function getProfitabilityConfig(): Promise<ProfitabilityConfig> {
   try {
     const parsed = JSON.parse(setting.value);
     return normalizeProfitabilityConfig(parsed);
-  } catch {
+  } catch (error) {
+    console.error('[ProfitabilityService] Error parsejant config:', error);
     return DEFAULT_CONFIG;
   }
 }

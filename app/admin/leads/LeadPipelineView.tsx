@@ -51,7 +51,7 @@ const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
 
 
 const PRIORITY_DOT: Record<string, string> = {
-  LOW: 'bg-slate-500',
+  LOW: 'bg-white/20',
   MEDIUM: 'bg-blue-500',
   HIGH: 'bg-orange-500',
   URGENT: 'bg-rose-500',
@@ -67,7 +67,7 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
       className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
         active
           ? 'border-cyan-400/50 bg-cyan-500/15 text-cyan-200'
-          : 'border-slate-700 text-slate-400 hover:text-slate-200'
+          : 'border-white/10 text-white/40 hover:text-white/80'
       }`}
     >
       {label}
@@ -229,7 +229,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             placeholder="Filtrar per nom, email, telèfon..."
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-8 pr-4 py-1.5 rounded-lg border text-xs focus:ring-1 transition-all bg-transparent"
+            className="w-full pl-8 pr-4 py-1.5 rounded-xl border text-xs focus:ring-1 transition-all bg-transparent"
           />
           <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -244,7 +244,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               onClick={() => setLocalPriority(localPriority === p ? null : p)}
             />
           ))}
-          <span className="border-l border-slate-700 mx-0.5" />
+          <span className="border-l border-white/10 mx-0.5" />
           {availableEventTypes.map((et) => (
             <FilterChip
               key={et}
@@ -253,7 +253,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               onClick={() => setLocalEventType(localEventType === et ? null : et)}
             />
           ))}
-          <span className="border-l border-slate-700 mx-0.5" />
+          <span className="border-l border-white/10 mx-0.5" />
           {availableSources.map((s) => (
             <FilterChip
               key={s}
@@ -264,7 +264,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
           ))}
           {hasLocalFilters && (
             <>
-              <span className="border-l border-slate-700 mx-0.5" />
+              <span className="border-l border-white/10 mx-0.5" />
               <button
                 type="button"
                 onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}

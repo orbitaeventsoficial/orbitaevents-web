@@ -90,7 +90,7 @@ export default async function ReportsPage() {
           <div className="border-b p-4">
             <h3 className="font-semibold">📝 Events sense informe ({availableBookings.length})</h3>
           </div>
-          <div className="divide-y divide-slate-700/40">
+          <div className="divide-y divide-white/5/40">
             {availableBookings.map((booking) => {
               const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
               return (
@@ -103,7 +103,7 @@ export default async function ReportsPage() {
                   </div>
                   <Link
                     href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-                    className="px-4 py-2 text-white rounded-lg text-sm font-medium"
+                    className="px-4 py-2 text-white rounded-xl text-sm font-medium"
                   >
                     Crear informe
                   </Link>
@@ -163,7 +163,7 @@ export default async function ReportsPage() {
                   </div>
                   <Link
                     href={`/admin/bookings/${report.bookingId}`}
-                    className="px-4 py-2 bg-white/5 rounded-lg text-sm font-medium hover:bg-white/10"
+                    className="px-4 py-2 bg-white/5 rounded-xl text-sm font-medium hover:bg-white/10"
                   >
                     Veure detalls
                   </Link>

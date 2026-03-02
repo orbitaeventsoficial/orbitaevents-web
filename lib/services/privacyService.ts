@@ -16,6 +16,7 @@ import type {
   ConsentType,
   DataRequestType,
   DataResponseType,
+  LegalDocumentType,
   PrivacyAction,
   Prisma,
 } from '@prisma/client';
@@ -640,12 +641,12 @@ export async function getAuditSummary(startDate: Date, endDate: Date) {
  * Obtenir document legal actiu
  */
 export async function getActiveLegalDocument(
-  type: string,
+  type: LegalDocumentType,
   locale: string
 ) {
   return prisma.legalDocument.findFirst({
     where: {
-      type: type as any,
+      type,
       locale,
       isActive: true,
       effectiveFrom: { lte: new Date() },
@@ -659,7 +660,7 @@ export async function getActiveLegalDocument(
  * Obtenir versió actual d'un document legal
  */
 export async function getCurrentLegalVersion(
-  type: string,
+  type: LegalDocumentType,
   locale: string
 ): Promise<string | null> {
   const doc = await getActiveLegalDocument(type, locale);

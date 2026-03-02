@@ -84,7 +84,7 @@ export default async function IntegrationsPage() {
           </p>
           <a
             href="/api/google/oauth/start"
-            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
+            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
           >
             Connectar Google
           </a>
@@ -103,7 +103,7 @@ export default async function IntegrationsPage() {
           </p>
           <a
             href="/api/google-ads/oauth/start"
-            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
+            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
           >
             {map['integrations.googleAds.refreshToken'] ? 'Reconnectar Google Ads' : 'Connectar Google Ads'}
           </a>
@@ -120,7 +120,7 @@ export default async function IntegrationsPage() {
           <p className="mt-1 text-xs">Compte: {map['integrations.gmail.email'] || '-'}</p>
           <a
             href="/api/gmail/oauth/start"
-            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
+            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
           >
             Connectar Gmail
           </a>
@@ -141,7 +141,7 @@ export default async function IntegrationsPage() {
           )}
           <Link
             href="/admin/inbox/settings"
-            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
+            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
           >
             Configurar IMAP
           </Link>
@@ -166,7 +166,7 @@ export default async function IntegrationsPage() {
           )}
           <a
             href="/api/google-calendar/oauth/start"
-            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
+            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
           >
             {googleCalendarConnected ? 'Reconnectar Google Calendar' : 'Connectar Google Calendar'}
           </a>

@@ -93,10 +93,10 @@ export default function LeadNotesPanel({
         </button>
       </div>
       {error && (
-        <p className="mb-3 rounded-lg border px-3 py-2 text-sm">{error}</p>
+        <p className="mb-3 rounded-xl border px-3 py-2 text-sm">{error}</p>
       )}
       {success && (
-        <p className="mb-3 rounded-lg border px-3 py-2 text-sm">{success}</p>
+        <p className="mb-3 rounded-xl border px-3 py-2 text-sm">{success}</p>
       )}
 
       {notes.length === 0 ? (
@@ -104,7 +104,7 @@ export default function LeadNotesPanel({
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <div key={note.id} className="rounded-lg border p-3 transition-colors">
+            <div key={note.id} className="rounded-xl border p-3 transition-colors">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs">{formatNoteDate(note.createdAt)}</span>

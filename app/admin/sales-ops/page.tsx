@@ -327,8 +327,8 @@ export default async function SalesOpsPage() {
             <a
               href="/api/admin/reports/executive"
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border px-4 py-2 text-sm font-semibold"
+              rel="noopener noreferrer"
+              className="rounded-xl border px-4 py-2 text-sm font-semibold"
             >
               Exportar informe executiu (JSON)
             </a>
@@ -387,7 +387,7 @@ export default async function SalesOpsPage() {
               <div className="mt-3">
                 <Link
                   href={row.href}
-                  className="inline-flex rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                  className="inline-flex rounded-xl border px-3 py-1.5 text-xs font-semibold"
                 >
                   {row.cta}
                 </Link>
@@ -426,18 +426,18 @@ export default async function SalesOpsPage() {
         <section className="rounded-2xl border p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Conversió per origen</h2>
           <div className="mt-4 overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm" aria-label="Conversió per origen">
               <thead>
                 <tr className="border-b text-left text-xs uppercase">
-                  <th className="py-2">Origen</th>
-                  <th className="py-2">Total</th>
-                  <th className="py-2">Tancats</th>
-                  <th className="py-2">Taxa de tancament</th>
+                  <th scope="col" className="py-2">Origen</th>
+                  <th scope="col" className="py-2">Total</th>
+                  <th scope="col" className="py-2">Tancats</th>
+                  <th scope="col" className="py-2">Taxa de tancament</th>
                 </tr>
               </thead>
               <tbody>
                 {bySource.map((row) => (
-                  <tr key={row.source} className="border-b">
+                  <tr key={row.source} className="border-b hover:bg-white/[0.03] transition-colors">
                     <td className="py-2 font-medium">{row.source}</td>
                     <td className="py-2">{row.total}</td>
                     <td className="py-2">{row.won}</td>
@@ -452,18 +452,18 @@ export default async function SalesOpsPage() {
         <section className="rounded-2xl border p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Conversió per comercial</h2>
           <div className="mt-4 overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm" aria-label="Conversió per comercial">
               <thead>
                 <tr className="border-b text-left text-xs uppercase">
-                  <th className="py-2">Comercial</th>
-                  <th className="py-2">Total</th>
-                  <th className="py-2">Tancats</th>
-                  <th className="py-2">Taxa de tancament</th>
+                  <th scope="col" className="py-2">Comercial</th>
+                  <th scope="col" className="py-2">Total</th>
+                  <th scope="col" className="py-2">Tancats</th>
+                  <th scope="col" className="py-2">Taxa de tancament</th>
                 </tr>
               </thead>
               <tbody>
                 {byAssignee.map((row) => (
-                  <tr key={row.assignee} className="border-b">
+                  <tr key={row.assignee} className="border-b hover:bg-white/[0.03] transition-colors">
                     <td className="py-2 font-medium">{row.assignee}</td>
                     <td className="py-2">{row.total}</td>
                     <td className="py-2">{row.won}</td>
@@ -500,7 +500,7 @@ export default async function SalesOpsPage() {
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
                     href={`/admin/leads/${lead.id}`}
-                    className="rounded-lg border px-2.5 py-1 text-xs font-medium"
+                    className="rounded-xl border px-2.5 py-1 text-xs font-medium"
                   >
                     Obrir entrada
                   </Link>
@@ -508,8 +508,8 @@ export default async function SalesOpsPage() {
                     <a
                       href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}`}
                       target="_blank"
-                      rel="noreferrer"
-                      className="rounded-lg px-2.5 py-1 text-xs font-semibold text-white"
+                      rel="noopener noreferrer"
+                      className="rounded-xl px-2.5 py-1 text-xs font-semibold text-white"
                     >
                       WhatsApp
                     </a>

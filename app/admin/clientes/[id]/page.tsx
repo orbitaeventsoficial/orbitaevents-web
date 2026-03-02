@@ -74,7 +74,7 @@ function CustomerHubSkeleton() {
             </div>
             <div className="flex gap-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-9 w-24 rounded-lg" />
+                <div key={i} className="h-9 w-24 rounded-xl" />
               ))}
             </div>
           </div>
@@ -89,7 +89,7 @@ function CustomerHubSkeleton() {
           {/* Tabs */}
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-9 w-28 rounded-lg" />
+              <div key={i} className="h-9 w-28 rounded-xl" />
             ))}
           </div>
         </div>
@@ -105,7 +105,7 @@ function CustomerHubSkeleton() {
             <div className="mt-2 h-4 w-2/3 rounded" />
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-14 rounded-lg" />
+                <div key={i} className="h-14 rounded-xl" />
               ))}
             </div>
           </div>
@@ -140,7 +140,7 @@ function CustomerHubSkeleton() {
             </div>
             <div className="mt-4 space-y-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-16 rounded-lg" />
+                <div key={i} className="h-16 rounded-xl" />
               ))}
             </div>
           </div>

@@ -9,7 +9,7 @@
       "title": "Fiesta Halloween Barcelona | Decoración Completa + DJ + Efectos | Òrbita Events",
       "description": "Transforma tu evento en una noche de terror. Decoración por todo el espacio: fantasmas gigantes, jaulas con tarántulas, caldero mágico, velas, espejos extraños... DJ + efectos especiales. Desde 600€."
     },
-    "badge": "🎃 Temporada Halloween 2025",
+    "badge": "🎃 Temporada Halloween {year}",
     "hero": {
       "title1": "NOCHES DE",
       "title2": "TERROR",
@@ -18,7 +18,7 @@
     "cta": {
       "reserve": "Reserva tu noche de terror",
       "whatsapp": "WhatsApp directo",
-      "reserve2025": "Reserva Halloween 2025",
+      "reserve2025": "Reserva Halloween {year}",
       "requestInfo": "Solicitar info"
     },
     "gallery": {
@@ -45,7 +45,7 @@
     },
     "packs": {
       "title": "Packs",
-      "titleHighlight": "Halloween 2025",
+      "titleHighlight": "Halloween {year}",
       "subtitle": "Todo incluye decoración completa. Elige el nivel de intensidad.",
       "mostRequested": "MÁS PEDIDO",
       "hours": "horas",
@@ -155,7 +155,7 @@
       }
     },
     "urgency": {
-      "title": "Halloween 2025",
+      "title": "Halloween {year}",
       "subtitle": "Los sábados de octubre vuelan. Reserva pronto.",
       "octobrerDates": "Sábados de octubre:",
       "dates": [
@@ -518,7 +518,7 @@
         },
         {
           "q": "¿Qué ocurre si necesitamos cambiar la fecha o el número de invitados?",
-          "a": "Revisamos nuestra agenda y, siempre que haya disponibilidad, trasladamos la reserva; la señal del 30% queda como crédito para la nueva fecha y te enviamos un contrato actualizado. Si finalmente se cancela con menos de 15 días, se aplica la política habitual (señal no reembolsable), pero te ayudamos a encontrar alternativa."
+          "a": "Revisamos nuestra agenda y, siempre que haya disponibilidad, trasladamos la reserva sin coste adicional (mínimo 30 días de antelación); la señal del 30% queda como crédito para la nueva fecha y te enviamos un contrato actualizado. Si finalmente se cancela, se aplica la política habitual: más de 60 días, 100% devolución; 30-60 días, 50% devolución; menos de 30 días, no reembolsable."
         }
       ]
     },
@@ -1522,7 +1522,8 @@
       "reviews": "Opiniones",
       "contact": "Contacto",
       "faq": "FAQ",
-      "blog": "Blog"
+      "blog": "Blog",
+      "configurator": "Configurador"
     },
     "dropdowns": {
       "servicesTitle": "Nuestros servicios",
@@ -1935,7 +1936,10 @@
       "errorContact": "Introduce tu email o número de teléfono",
       "errorCaptcha": "Por favor, completa la verificación de seguridad",
       "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente.",
-      "downloadPDF": "Descargar Presupuesto PDF"
+      "downloadPDF": "Descargar Presupuesto PDF",
+      "captchaExplanation": "Verificación de seguridad para protegerte del spam",
+      "preferWhatsApp": "¿Prefieres hablar directamente?",
+      "contactWhatsApp": "Contactar por WhatsApp"
     },
     "discountCodeErrors": {
       "expired": "Este código ha caducado.",
@@ -2541,7 +2545,7 @@
       "paymentFacilities": "Facilidades de pago:",
       "paymentInfo": {
         "deposit": "Depósito: 30% en el momento de la reserva",
-        "rest": "Resto: día del evento",
+        "rest": "Resto: 7 días antes del evento",
         "noFees": "Sin comisiones de transferencia"
       }
     },
@@ -2761,8 +2765,8 @@
       "flexiblePayment": "Pago flexible:",
       "paymentFeatures": {
         "deposit": "30% al reservar tu fecha",
-        "rest": "70% el día del evento",
-        "cancel": "Cancelación gratuita hasta 15 días antes"
+        "rest": "70% 7 días antes del evento",
+        "cancel": "Más de 60 días: 100% devolución. 30-60 días: 50% devolución. Menos de 30 días: no reembolsable."
       },
       "extras": {
         "hora-extra": {
@@ -3209,19 +3213,21 @@
           "senal": "Señal:",
           "senalDesc": "30% del total para confirmar la reserva",
           "resto": "Resto:",
-          "restoDesc": "El día del evento o según acuerdo",
+          "restoDesc": "70% restante, 7 días antes del evento",
           "metodos": "Métodos:",
           "metodosDesc": "Transferencia bancaria, Bizum, efectivo"
         }
       },
       "section4": {
         "title": "4. Cancelaciones",
-        "item1": "Más de 30 días antes:",
-        "item2": "Entre 15-30 días:",
-        "item3": "Menos de 15 días:",
-        "item3Desc": "Cobro del 100% del servicio",
-        "item4": "Fuerza mayor:",
-        "item4Desc": "Se acordarán condiciones especiales"
+        "item1": "Más de 60 días antes:",
+        "item1Desc": "Devolución del 100% de la señal",
+        "item2": "Entre 30-60 días:",
+        "item2Desc": "Devolución del 50% de la señal",
+        "item3": "Menos de 30 días:",
+        "item3Desc": "La señal no es reembolsable",
+        "item4": "Cancelación por parte del prestador:",
+        "item4Desc": "Devolución del 100% de todos los pagos recibidos"
       },
       "section5": {
         "title": "5. Obligaciones del Cliente",
@@ -3841,7 +3847,7 @@
         "title": "🎃 Temática Halloween",
         "description": "Noches de terror con decoración completa",
         "price": "Desde 600€",
-        "badge": "🔥 Temporada 2025",
+        "badge": "🔥 Temporada {year}",
         "href": "/tematica-halloween",
         "features": [
           "DJ temático",
@@ -4125,7 +4131,7 @@
       "total": "TOTAL",
       "conditions": "Condiciones",
       "deposit": "Depósito del 30% para confirmar la reserva",
-      "remaining": "Resto a pagar el día del evento",
+      "remaining": "Resto a pagar 7 días antes del evento",
       "includes": "Incluye montaje, desmontaje y desplazamiento",
       "signature": "Firma",
       "accept": "Acepto las condiciones"
@@ -4376,7 +4382,7 @@
       "trustYears": "🎯 +2 años de experiencia",
       "trustLocation": "📍 Barcelona y Girona",
       "trustResponse": "⚡ Respuesta en 2h",
-      "guarantee": "✓ Presupuesto sin compromiso · Cancelación gratuita hasta 7 días antes"
+      "guarantee": "✓ Presupuesto sin compromiso · Cancelación con devolución 100% hasta 60 días antes"
     },
     "testimonis": {
       "0": {
@@ -5640,7 +5646,7 @@
           },
           {
             "question": "¿Qué pasa si tengo que cancelar?",
-            "answer": "Entendemos que a veces las cosas cambian. Cancelación gratuita hasta 30 días antes. Entre 30-15 días, retenemos el 50% de la reserva. Menos de 15 días, no hay devolución. ¡Pero si quieres cambiar de fecha, siempre intentamos adaptarnos!"
+            "answer": "Entendemos que a veces las cosas cambian. Más de 60 días: 100% devolución. 30-60 días: 50% devolución. Menos de 30 días: no reembolsable. Si quieres cambiar de fecha (mínimo 30 días de antelación), siempre intentamos adaptarnos."
           },
           {
             "question": "¿Hay costes extra?",
@@ -6209,7 +6215,7 @@
         "limited": "🔥 ¡Se acaba!",
         "available": "✓ Disponible"
       },
-      "guarantee": "✓ Presupuesto sin compromiso · Cancelación gratuita hasta 7 días antes"
+      "guarantee": "✓ Presupuesto sin compromiso · Cancelación con devolución 100% hasta 60 días antes"
     },
     "heroVideo": {
       "badge": "✨ Creadores de Experiencias Inmersivas",
@@ -6274,7 +6280,7 @@
     "socialProof": "5.0 · Opiniones verificadas",
     "whatsappMessage": "¡Hola! Quiero información para mi evento.",
     "badges": {
-      "halloween": "Agenda 2026 abierta",
+      "halloween": "Agenda {year} abierta",
       "monMagic": "Mundo Mágico",
       "rating": "5.0/5 · 50+ eventos"
     },
@@ -6306,7 +6312,7 @@
         "subtitle": "Noches de terror",
         "description": "Decoración completa, DJ temático, efectos FX",
         "price": "Desde 600€",
-        "badge": "🔥 Temporada 2025",
+        "badge": "🔥 Temporada {year}",
         "features": {
           "0": "Fantasmas gigantes",
           "1": "Caldero mágico",
@@ -6570,7 +6576,7 @@
         },
         "2": {
           "title": "Sin compromiso",
-          "description": "Cancela sin coste si cambias de idea"
+          "description": "Devolución 100% si cancelas con +60 días"
         },
         "3": {
           "title": "Valoración 5.0",

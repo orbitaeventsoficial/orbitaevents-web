@@ -228,6 +228,7 @@ export default function PresupuestoPdfStudio({
   const [showCustomerPicker, setShowCustomerPicker] = useState(false);
   const [searchingCustomers, setSearchingCustomers] = useState(false);
   const [proposalId, setProposalId] = useState(initialProposalId);
+  const [issueDate, setIssueDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [eventDate, setEventDate] = useState('');
   const [eventSchedule, setEventSchedule] = useState('');
   const [eventLocation, setEventLocation] = useState('');
@@ -497,10 +498,11 @@ export default function PresupuestoPdfStudio({
       if (Array.isArray(draft.customExtras)) {
         setCustomExtras(
           draft.customExtras
+            .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
             .map((item) => ({
-              id: typeof (item as any)?.id === 'string' ? (item as any).id : '',
-              name: typeof (item as any)?.name === 'string' ? (item as any).name : '',
-              price: Number((item as any)?.price || 0),
+              id: typeof item.id === 'string' ? item.id : '',
+              name: typeof item.name === 'string' ? item.name : '',
+              price: Number(item.price || 0),
             }))
             .filter((item) => item.id && item.name)
         );
@@ -929,6 +931,7 @@ export default function PresupuestoPdfStudio({
         eventType,
         pack: finalPack,
         date: eventDate || '-',
+        issueDate: issueDate || undefined,
         eventSchedule: eventSchedule.trim() || undefined,
         eventLocation: eventLocation.trim() || undefined,
         guests: Math.max(0, Number(guests) || 0),
@@ -1212,7 +1215,7 @@ export default function PresupuestoPdfStudio({
               <button
                 type="button"
                 onClick={() => setShowCustomerPicker(!showCustomerPicker)}
-                className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5"
+                className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5"
               >
                 + Cercar client
               </button>
@@ -1221,7 +1224,7 @@ export default function PresupuestoPdfStudio({
               <button
                 type="button"
                 onClick={clearSelectedCustomer}
-                className="rounded-lg border px-3 py-1.5 text-xs transition-colors hover:bg-white/5"
+                className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5"
               >
                 Canviar client
               </button>
@@ -1248,7 +1251,7 @@ export default function PresupuestoPdfStudio({
                         key={c.id}
                         type="button"
                         onClick={() => selectCustomer(c)}
-                        className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5"
+                        className="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5"
                       >
                         <div>
                           <span className="font-medium">{c.name}</span>
@@ -1270,7 +1273,7 @@ export default function PresupuestoPdfStudio({
 
           {/* Selected customer badge */}
           {isCustomerScoped && (
-            <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
+            <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
               <span className="text-emerald-400">&#10003;</span>
               <span className="font-medium">{clientName}</span>
               <span className="text-xs opacity-60">{clientEmail}</span>
@@ -1334,7 +1337,11 @@ export default function PresupuestoPdfStudio({
             ) : null}
           </div>
           <label className="text-sm">
-            Data de l'esdeveniment
+            Data d&apos;emissió
+            <input className={inputClass} type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
+          </label>
+          <label className="text-sm">
+            Data de l&apos;esdeveniment
             <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
           </label>
           <label className="text-sm">
@@ -1502,7 +1509,7 @@ export default function PresupuestoPdfStudio({
           <h3 className="text-sm font-semibold">Extres del catàleg</h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {compatibleExtras.map((extra) => (
-              <label key={extra.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+              <label key={extra.id} className="flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
                 <input
                   type="checkbox"
                   checked={selectedExtras.includes(extra.id)}
@@ -1547,7 +1554,7 @@ export default function PresupuestoPdfStudio({
           {customExtras.length > 0 && (
             <div className="space-y-2">
               {customExtras.map((extra) => (
-                <div key={extra.id} className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm">
+                <div key={extra.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm">
                   <span className="">{extra.name}</span>
                   <div className="flex items-center gap-3">
                     <span className="">+{extra.price}€</span>
@@ -1567,11 +1574,11 @@ export default function PresupuestoPdfStudio({
 
         <div className={`admin-quote-actions rounded-xl border p-3 ${sectionStatus.allOk ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
           {sectionStatus.allOk ? (
-            <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400">
+            <div className="mb-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400">
               <span>&#10003;</span> Tot correcte — el pressupost està llest per generar o enviar.
             </div>
           ) : (
-            <div className="mb-3 rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+            <div className="mb-3 rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
               Revisa els camps marcats abans de continuar:
               <ul className="mt-1 list-inside list-disc text-xs">
                 {sectionStatus.clientWarn && <li>{sectionStatus.clientWarn}</li>}

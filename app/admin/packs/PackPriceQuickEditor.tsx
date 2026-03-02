@@ -69,19 +69,19 @@ export default function PackPriceQuickEditor({
     }
   }
 
-  const inputClass = 'w-full rounded-lg border border-slate-700/60 bg-slate-950/80 px-2 py-1 text-sm text-slate-100';
+  const inputClass = 'w-full rounded-xl border border-white/10 bg-black/60 px-2 py-1 text-sm text-white/90';
 
   return (
     <>
-      <div className="rounded-lg border p-2">
+      <div className="rounded-xl border p-2">
         <p className="">Pack PVP (editable)</p>
         <input className={inputClass} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className="rounded-lg border p-2">
+      <div className="rounded-xl border p-2">
         <p className="">Hora extra PVP (editable)</p>
         <input className={inputClass} value={extraHourPrice} onChange={(e) => setExtraHourPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className={`col-span-2 rounded-lg border p-2 ${overallClass}`}>
+      <div className={`col-span-2 rounded-xl border p-2 ${overallClass}`}>
         <p className="font-semibold">Semàfor preu pack: {packDiv >= 0 ? '+' : ''}{packDiv.toFixed(1)}%</p>
         <p className="font-semibold">Semàfor hora extra: {extraDiv >= 0 ? '+' : ''}{extraDiv.toFixed(1)}%</p>
         <div className="mt-2 flex items-center gap-2">

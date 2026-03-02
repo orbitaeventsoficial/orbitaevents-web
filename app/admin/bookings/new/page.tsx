@@ -199,8 +199,8 @@ export default function NewBookingPage() {
         if (dateParam) {
           setForm((prev) => ({ ...prev, eventDate: dateParam }));
         }
-      } catch {
-        // Silent
+      } catch (error) {
+        console.error('[NewBooking] Error carregant dades inicials:', error);
       } finally {
         setLoading(false);
       }
@@ -335,8 +335,8 @@ export default function NewBookingPage() {
           }
         }
       }
-    } catch {
-      // Silent
+    } catch (error) {
+      console.error('[NewBooking] Error validant codi descompte:', error);
     } finally {
       setValidatingCode(false);
     }
@@ -494,30 +494,33 @@ export default function NewBookingPage() {
         <h2 className="text-sm font-semibold">Dades del client</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Nom *</label>
+            <label htmlFor="nb-name" className="text-xs">Nom *</label>
             <input
+              id="nb-name"
               type="text"
               value={form.clientName}
               onChange={(e) => updateField('clientName', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Email *</label>
+            <label htmlFor="nb-email" className="text-xs">Email *</label>
             <input
+              id="nb-email"
               type="email"
               value={form.clientEmail}
               onChange={(e) => updateField('clientEmail', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Telèfon *</label>
+            <label htmlFor="nb-phone" className="text-xs">Telèfon *</label>
             <input
+              id="nb-phone"
               type="tel"
               value={form.clientPhone}
               onChange={(e) => updateField('clientPhone', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
@@ -532,8 +535,8 @@ export default function NewBookingPage() {
         <h2 className="text-sm font-semibold">Detalls de l&apos;esdeveniment</h2>
 
         <div>
-          <label className="text-xs">Tipus</label>
-          <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
+          <span id="nb-event-type-label" className="text-xs">Tipus</span>
+          <div role="group" aria-labelledby="nb-event-type-label" className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
             {EVENT_TYPES.map((et) => (
               <button
                 key={et.value}
@@ -543,7 +546,7 @@ export default function NewBookingPage() {
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
                     ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/60'
-                    : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
+                    : 'border-white/10 bg-white/[0.03] text-white/40 hover:bg-white/[0.06]'
                 }`}
               >
                 <span className="text-base leading-none">{et.icon}</span>
@@ -555,63 +558,70 @@ export default function NewBookingPage() {
 
         <div className="grid gap-4 sm:grid-cols-4">
           <div>
-            <label className="text-xs">Data *</label>
+            <label htmlFor="nb-date" className="text-xs">Data *</label>
             <input
+              id="nb-date"
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Hora inici</label>
+            <label htmlFor="nb-start-time" className="text-xs">Hora inici</label>
             <input
+              id="nb-start-time"
               type="time"
               value={form.eventStartTime}
               onChange={(e) => updateField('eventStartTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Hora final</label>
+            <label htmlFor="nb-end-time" className="text-xs">Hora final</label>
             <input
+              id="nb-end-time"
               type="time"
               value={form.eventEndTime}
               onChange={(e) => updateField('eventEndTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Convidats</label>
+            <label htmlFor="nb-guests" className="text-xs">Convidats</label>
             <input
+              id="nb-guests"
               type="number"
               value={form.guestCount}
               onChange={(e) => updateField('guestCount', e.target.value)}
               placeholder="100"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              min={1}
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Ubicació *</label>
+            <label htmlFor="nb-location" className="text-xs">Ubicació *</label>
             <input
+              id="nb-location"
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Ciutat o comarca"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Espai / Lloc concret</label>
+            <label htmlFor="nb-venue" className="text-xs">Espai / Lloc concret</label>
             <input
+              id="nb-venue"
               type="text"
               value={form.eventVenue}
               onChange={(e) => updateField('eventVenue', e.target.value)}
               placeholder="Nom de la finca, restaurant..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
@@ -633,7 +643,7 @@ export default function NewBookingPage() {
                 className={`rounded-xl border p-4 text-center transition-all ${
                   isSelected
                     ? 'border-cyan-400 bg-cyan-500/15 ring-1 ring-cyan-400/50'
-                    : 'border-slate-700/50 bg-slate-900/40 hover:bg-slate-800/60'
+                    : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05]'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -669,14 +679,15 @@ export default function NewBookingPage() {
 
         {form.packId && (
           <div>
-            <label className="text-xs">Hores extra</label>
+            <label htmlFor="nb-extra-hours" className="text-xs">Hores extra</label>
             <input
+              id="nb-extra-hours"
               type="number"
               min="0"
               max="10"
               value={form.extraHours}
               onChange={(e) => updateField('extraHours', e.target.value)}
-              className="mt-1 w-24 rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-24 rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         )}
@@ -696,7 +707,7 @@ export default function NewBookingPage() {
                   className={`flex items-center justify-between rounded-xl border p-3 transition-all ${
                     isSelected
                       ? 'border-emerald-400/50 bg-emerald-500/10'
-                      : 'border-slate-700/50 bg-slate-900/40'
+                      : 'border-white/10 bg-white/[0.02]'
                   }`}
                 >
                   <button
@@ -704,7 +715,7 @@ export default function NewBookingPage() {
                     onClick={() => toggleExtra(extra)}
                     className="flex-1 text-center"
                   >
-                    <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-slate-300'}`}>
+                    <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-white/60'}`}>
                       {isSelected ? '✓ ' : ''}{name}
                     </span>
                     <span className="ml-2 text-xs">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
@@ -716,7 +727,7 @@ export default function NewBookingPage() {
                       max="20"
                       value={selectedExtras[extra.id].quantity}
                       onChange={(e) => updateExtraQuantity(extra.id, parseInt(e.target.value, 10) || 1)}
-                      className="w-14 rounded-lg border px-2 py-1 text-xs text-center"
+                      className="w-14 rounded-xl border px-2 py-1 text-xs text-center"
                     />
                   )}
                 </div>
@@ -734,16 +745,17 @@ export default function NewBookingPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Km totals (anada + tornada)</label>
+            <label htmlFor="nb-km" className="text-xs">Km totals (anada + tornada)</label>
             <div className="mt-1 relative">
               <input
+                id="nb-km"
                 type="number"
                 min="0"
                 step="1"
                 value={form.distanceKm}
                 onChange={(e) => updateField('distanceKm', e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm focus:ring-1"
+                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">km</span>
             </div>
@@ -791,19 +803,21 @@ export default function NewBookingPage() {
         <h2 className="text-sm font-semibold">Descompte i notes</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Descompte (€)</label>
+            <label htmlFor="nb-discount" className="text-xs">Descompte (€)</label>
             <input
+              id="nb-discount"
               type="number"
               min="0"
               value={form.discount}
               onChange={(e) => updateField('discount', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Codi descompte</label>
+            <label htmlFor="nb-discount-code" className="text-xs">Codi descompte</label>
             <div className="mt-1 flex gap-2">
               <input
+                id="nb-discount-code"
                 type="text"
                 value={form.discountCode}
                 onChange={(e) => { updateField('discountCode', e.target.value.toUpperCase()); setDiscountValidation(null); }}
@@ -830,8 +844,9 @@ export default function NewBookingPage() {
           <div className="sm:col-span-1" />
         </div>
         <div>
-          <label className="text-xs">Notes internes</label>
+          <label htmlFor="nb-notes" className="text-xs">Notes internes</label>
           <textarea
+            id="nb-notes"
             value={form.notes}
             onChange={(e) => updateField('notes', e.target.value)}
             rows={3}

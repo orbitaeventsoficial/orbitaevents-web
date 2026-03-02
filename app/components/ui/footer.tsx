@@ -227,7 +227,7 @@ export default function Footer() {
                   <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                     {signal.metric}
                   </span>
-                  <span className="text-[11px] sm:text-xs text-white/60 text-center">
+                  <span className="text-[11px] sm:text-xs text-white/70 text-center">
                     {signal.label}
                   </span>
                 </motion.div>
@@ -457,9 +457,8 @@ export default function Footer() {
         <div className="py-6 pb-24 lg:pb-6 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
-            {/* HYDRATION FIX: Fixed year to avoid server/client mismatch */}
             <p className="text-white/60 text-sm text-center md:text-left">
-              © 2025 Òrbita Events · {t('since')} · {t('copyright')}
+              © {new Date().getFullYear()} Òrbita Events · {t('since')} · {t('copyright')}
             </p>
 
             {/* Legal Links */}

@@ -76,7 +76,7 @@ function RecentItems({ onClose }: { onClose: () => void }) {
             key={item.href}
             href={item.href}
             onClick={onClose}
-            className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+            className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
           >
             <span className="truncate">{item.label}</span>
             <span className="text-[10px] shrink-0">{item.type}</span>
@@ -181,7 +181,7 @@ export default function AdminSearchModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-xs"
+            className="rounded-xl px-2 py-1 text-xs"
           >
             Esc
           </button>
@@ -213,7 +213,7 @@ export default function AdminSearchModal({
                     key={lead.id}
                     href={`/admin/leads/${lead.id}`}
                     onClick={() => { addRecentItem({ href: `/admin/leads/${lead.id}`, label: lead.name, type: 'Entrada' }); onClose(); }}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{lead.name}</span>
                     <span className="text-[11px]">{lead.status}</span>
@@ -232,7 +232,7 @@ export default function AdminSearchModal({
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
                     onClick={() => { addRecentItem({ href: `/admin/bookings/${booking.id}`, label: `${booking.reference} · ${booking.clientName}`, type: 'Reserva' }); onClose(); }}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{booking.reference} · {booking.clientName}</span>
                     <span className="text-[11px]">{labelEstatReserva(booking.status)}</span>
@@ -251,7 +251,7 @@ export default function AdminSearchModal({
                     key={customer.id}
                     href={`/admin/clientes/${customer.id}`}
                     onClick={() => { addRecentItem({ href: `/admin/clientes/${customer.id}`, label: customer.name, type: 'Client' }); onClose(); }}
-                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{customer.name}</span>
                     <span className="text-[11px]">{customer.totalEvents} esdeveniments</span>
@@ -281,7 +281,7 @@ export default function AdminSearchModal({
                       key={item.href}
                       href={item.href}
                       onClick={onClose}
-                      className="rounded-lg border px-3 py-2 text-sm"
+                      className="rounded-xl border px-3 py-2 text-sm"
                     >
                       {item.label}
                     </Link>

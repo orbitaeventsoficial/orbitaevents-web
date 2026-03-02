@@ -22,7 +22,12 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; description
   company: {
     label: 'Empresa',
     icon: '🏢',
-    description: 'Dades legals i nom comercial',
+    description: 'Dades legals i nom comercial (edita a Configuració empresa)',
+  },
+  holded: {
+    label: 'Holded',
+    icon: '🧾',
+    description: 'Integració amb Holded per facturació',
   },
   contact: {
     label: 'Contacte',
@@ -141,6 +146,15 @@ export default async function SettingsPage() {
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold">Traduccions</h3>
           <p className="text-sm">Gestiona el contingut multiidioma</p>
+        </Link>
+
+        <Link
+          href="/admin/settings/company"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+        >
+          <div className="text-2xl mb-2">🏢</div>
+          <h3 className="font-semibold">Empresa i Holded</h3>
+          <p className="text-sm">Dades fiscals, IBAN, NIF i integració Holded</p>
         </Link>
 
         <Link

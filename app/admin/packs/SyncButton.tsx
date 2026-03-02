@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 export default function SyncButton() {
   const [syncing, setSyncing] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
   const [result, setResult] = useState<{
     ok: boolean;
     message?: string;
@@ -13,7 +15,8 @@ export default function SyncButton() {
   } | null>(null);
 
   async function handleSync() {
-    if (!confirm('Sincronizar tots els packs del config a la base de dades?')) return;
+    const ok = await confirm({ title: 'Sincronitzar packs', message: 'Sincronitzar tots els packs del config a la base de dades?', confirmLabel: 'Sincronitzar', variant: 'warning' });
+    if (!ok) return;
 
     setSyncing(true);
     setResult(null);
@@ -96,6 +99,7 @@ export default function SyncButton() {
           )}
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

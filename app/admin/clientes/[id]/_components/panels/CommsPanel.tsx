@@ -77,7 +77,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
       <div className="mt-3 rounded-xl border p-3">
         <p className="text-xs">Afegir nota interna</p>
         <textarea
-          className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+          className="mt-2 w-full rounded-xl border px-3 py-2 text-sm"
           rows={3}
           placeholder="Escriu una nota de seguiment..."
           value={note}
@@ -102,7 +102,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="mt-4 space-y-2">
         {data.messages.length === 0 ? (
-          <p className="rounded-lg border p-3 text-sm">
+          <p className="rounded-xl border p-3 text-sm">
             No hi ha comunicacions encara.
           </p>
         ) : (

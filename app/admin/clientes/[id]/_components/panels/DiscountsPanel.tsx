@@ -9,7 +9,7 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 function getStatus(dc: DiscountCodeDTO): { label: string; color: string } {
-  if (!dc.isActive) return { label: 'Desactivat', color: 'border-slate-600 bg-slate-700/20 text-slate-400' };
+  if (!dc.isActive) return { label: 'Desactivat', color: 'border-white/10 bg-white/5 text-white/40' };
   if (dc.currentUses >= dc.maxUses) return { label: 'Esgotat', color: 'border-violet-500/50 bg-violet-500/10 text-violet-300' };
   if (new Date(dc.validUntil) < new Date()) return { label: 'Caducat', color: 'border-rose-500/50 bg-rose-500/10 text-rose-300' };
   return { label: 'Actiu', color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300' };
@@ -29,7 +29,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="mt-4 space-y-3">
         {codes.length === 0 ? (
-          <p className="rounded-lg border p-3 text-sm">
+          <p className="rounded-xl border p-3 text-sm">
             Sense codis de descompte.
           </p>
         ) : (

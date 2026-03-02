@@ -317,16 +317,17 @@ interface AdminTableProps {
   headers: string[];
   children: ReactNode;
   empty?: string;
+  'aria-label'?: string;
 }
 
-export function AdminTable({ headers, children, empty = 'Cap resultat' }: AdminTableProps) {
+export function AdminTable({ headers, children, empty = 'Cap resultat', 'aria-label': ariaLabel }: AdminTableProps) {
   return (
     <div className="ap-table-wrap">
-      <table className="ap-table">
+      <table className="ap-table" aria-label={ariaLabel}>
         <thead className="ap-table-head">
           <tr>
             {headers.map((h) => (
-              <th key={h} className="ap-table-th">{h}</th>
+              <th key={h} scope="col" className="ap-table-th">{h}</th>
             ))}
           </tr>
         </thead>

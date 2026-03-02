@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { refreshFuelReferenceNow } from '@/lib/services/fuelReferenceService';
 import { getRequestId } from '@/lib/request-context';
+import { timingSafeEqual } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -16,7 +17,11 @@ function isAuthorized(request: NextRequest, requestId: string): boolean {
     });
     return false;
   }
-  return authHeader === `Bearer ${cronSecret}`;
+  if (!authHeader) return false;
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const received = Buffer.from(authHeader);
+  if (expected.length !== received.length) return false;
+  return timingSafeEqual(expected, received);
 }
 
 async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {

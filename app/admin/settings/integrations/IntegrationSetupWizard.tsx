@@ -72,8 +72,8 @@ export default function IntegrationSetupWizard({
             <li>Scopes recomanats Gmail: `gmail.readonly`, `gmail.modify`</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/api/gmail/oauth/start" className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Gmail</a>
-            <Link href="/admin/inbox/settings" className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Configurar IMAP</Link>
+            <a href="/api/gmail/oauth/start" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Gmail</a>
+            <Link href="/admin/inbox/settings" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Configurar IMAP</Link>
           </div>
         </div>
       )}
@@ -88,8 +88,8 @@ export default function IntegrationSetupWizard({
             <li>Scope recomanat: `https://www.googleapis.com/auth/calendar.events`</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/api/google-calendar/oauth/start" className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Calendar</a>
-            <Link href="/admin/emails" className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Revisar cron/email</Link>
+            <a href="/api/google-calendar/oauth/start" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Calendar</a>
+            <Link href="/admin/emails" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Revisar cron/email</Link>
           </div>
         </div>
       )}
@@ -105,7 +105,7 @@ export default function IntegrationSetupWizard({
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5"
+              className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5"
             >
               Tornar al pas 1
             </button>

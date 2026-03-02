@@ -407,7 +407,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 Reserva associada
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-white/10 p-4">
+                <div className="rounded-xl border border-white/10 p-4">
                   <p className="font-medium">
                     📅 {formatDateFull(lead.booking.eventDate)}
                   </p>
@@ -416,7 +416,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <p className="text-sm">Ubicació: {lead.booking.eventLocation}</p>
                   <p className="text-sm">Convidats: {lead.booking.guestCount}</p>
                 </div>
-                <div className="rounded-lg border border-white/10 p-4">
+                <div className="rounded-xl border border-white/10 p-4">
                   <p className="text-lg font-bold">
                     {formatNumber(lead.booking.total)}€
                   </p>
@@ -430,7 +430,7 @@ export default async function LeadDetailPage({ params }: Props) {
                     Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({formatNumber(lead.booking.remainingAmount)}€)
                   </p>
                 </div>
-                <div className="rounded-lg border border-white/10 p-4 md:col-span-2">
+                <div className="rounded-xl border border-white/10 p-4 md:col-span-2">
                   <h4 className="text-sm font-semibold mb-2">Post-event i automatitzacions</h4>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="text-sm">
@@ -527,7 +527,7 @@ export default async function LeadDetailPage({ params }: Props) {
                           `Hola ${lead.name}, gràcies per confiar en Òrbita Events! Ens ajudaria molt la teva valoració: ${reviewUrl}`
                         )}`}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white"
                       >
                         Enviar per WhatsApp
@@ -537,7 +537,7 @@ export default async function LeadDetailPage({ params }: Props) {
                       <a
                         href={reviewUrl}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium"
                       >
                         Obrir formulari client
@@ -722,7 +722,7 @@ export default async function LeadDetailPage({ params }: Props) {
               </dl>
               <Link
                 href={`/admin/clientes/${lead.customer.id}`}
-                className="mt-4 inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
+                className="mt-4 inline-flex rounded-xl px-3 py-1.5 text-xs font-semibold text-white"
               >
                 Obrir fitxa client
               </Link>
@@ -741,7 +741,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <Link
                     key={item.id}
                     href={`/admin/leads/${item.id}`}
-                    className="block rounded-lg border border-white/10 p-3"
+                    className="block rounded-xl border border-white/10 p-3"
                   >
                     <p className="text-sm font-medium">
                       {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}

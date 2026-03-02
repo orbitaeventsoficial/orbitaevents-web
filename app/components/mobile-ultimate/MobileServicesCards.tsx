@@ -58,7 +58,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
   const title = t(`services.${service.id}.title`);
   const subtitle = t(`services.${service.id}.subtitle`);
   const price = t(`services.${service.id}.price`);
-  const badge = service.badgeKey ? t(`services.${service.id}.badge`) : '';
+  const badge = service.badgeKey ? t(`services.${service.id}.badge`, { year: new Date().getFullYear() }) : '';
   const veilGradient = useMemo(() => {
     switch (service.id) {
       case 'halloween':

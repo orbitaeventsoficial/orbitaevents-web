@@ -26,26 +26,45 @@ export function getPriorityItems(newLeadsCount: number): NavItem[] {
 
 export const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Operativa',
+    title: 'Comercial',
     defaultOpen: true,
     items: [
       { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
-      { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
-      { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
       { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
+      { icon: '📄', label: 'Pressupostos', href: '/admin/presupuestos' },
+      { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops' },
+      { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
     ],
   },
   {
-    title: 'Eines',
+    title: 'Producte',
+    defaultOpen: false,
+    items: [
+      { icon: '🎵', label: 'Packs', href: '/admin/packs' },
+      { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
+      { icon: '💰', label: 'Preus', href: '/admin/pricing' },
+      { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
+      { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
+    ],
+  },
+  {
+    title: 'Finances',
     defaultOpen: false,
     items: [
       { icon: '💶', label: 'Economia', href: '/admin/economia' },
-      { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
-      { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
       { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-      { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
-      { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
+      { icon: '📉', label: 'Estadístiques', href: '/admin/stats' },
+    ],
+  },
+  {
+    title: 'Contingut',
+    defaultOpen: false,
+    items: [
       { icon: '📰', label: 'Blog', href: '/admin/blog' },
+      { icon: '❓', label: 'FAQ', href: '/admin/faq' },
+      { icon: '✏️', label: 'Textos', href: '/admin/text-manager' },
+      { icon: '⭐', label: 'Ressenyes', href: '/admin/google-reviews' },
+      { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
     ],
   },
   {

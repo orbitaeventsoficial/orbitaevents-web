@@ -13,6 +13,7 @@ export default function NewReportPage() {
   const bookingId = searchParams?.get('bookingId') ?? null;
 
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [booking, setBooking] = useState<any>(null);
   const [inventoryItems, setInventoryItems] = useState<Array<{
     id: string;
@@ -73,11 +74,11 @@ export default function NewReportPage() {
       if (res.ok) {
         router.push('/admin/post-event/reports');
       } else {
-        alert('Error creant informe');
+        setFormError('Error creant informe');
       }
     } catch (error) {
       log.error('Error creating report', error);
-      alert('Error creant informe');
+      setFormError('Error creant informe');
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function NewReportPage() {
             {inventoryItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/5 px-3 py-2"
+                className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2"
               >
                 <span className="text-xs font-mono font-bold">{item.inventoryItem.code}</span>
                 <span className="text-sm flex-1 truncate">{item.inventoryItem.name}</span>
@@ -138,6 +139,12 @@ export default function NewReportPage() {
         </div>
       )}
 
+      {formError && (
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-3 text-sm text-rose-300 flex items-center justify-between" role="alert">
+          <span>{formError}</span>
+          <button type="button" onClick={() => setFormError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="border border-white/10 rounded-xl p-6 space-y-6">
         {/* Event Summary */}
         <div>
@@ -148,7 +155,7 @@ export default function NewReportPage() {
             name="eventSummary"
             required
             rows={4}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             placeholder="Descriu com va anar l'event en general..."
           />
         </div>
@@ -162,7 +169,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="setupTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             />
           </div>
           <div>
@@ -172,7 +179,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="startTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             />
           </div>
           <div>
@@ -182,7 +189,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="endTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             />
           </div>
         </div>
@@ -198,7 +205,7 @@ export default function NewReportPage() {
               name="soundQuality"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             />
           </div>
           <div>
@@ -210,7 +217,7 @@ export default function NewReportPage() {
               name="danceFloorLevel"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             />
           </div>
         </div>
@@ -223,7 +230,7 @@ export default function NewReportPage() {
           <input
             type="text"
             name="musicStyles"
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             placeholder="Reggaeton, House, Comercial..."
           />
         </div>
@@ -236,7 +243,7 @@ export default function NewReportPage() {
           <textarea
             name="incidents"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             placeholder="Descriu qualsevol incidència o problema..."
           />
         </div>
@@ -249,7 +256,7 @@ export default function NewReportPage() {
           <textarea
             name="notes"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
             placeholder="Qualsevol altra informació rellevant..."
           />
         </div>
@@ -261,7 +268,7 @@ export default function NewReportPage() {
           </label>
           <select
             name="status"
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
           >
             <option value="DRAFT">Esborrany</option>
             <option value="COMPLETED">Completat</option>
@@ -273,13 +280,13 @@ export default function NewReportPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 text-white rounded-lg font-medium disabled:opacity-50"
+            className="flex-1 px-6 py-3 text-white rounded-xl font-medium disabled:opacity-50"
           >
             {loading ? 'Guardant...' : '💾 Desar Informe'}
           </button>
           <Link
             href="/admin/post-event"
-            className="px-6 py-3 bg-white/5 rounded-lg font-medium hover:bg-white/10"
+            className="px-6 py-3 bg-white/5 rounded-xl font-medium hover:bg-white/10"
           >
             Cancel·lar
           </Link>

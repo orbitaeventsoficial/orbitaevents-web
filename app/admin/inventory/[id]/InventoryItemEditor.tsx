@@ -6,6 +6,7 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 
 const CATEGORIES = [
   { value: 'SOUND', label: 'So', icon: '🔊' },
@@ -59,6 +60,7 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const [form, setForm] = useState({
     name: item.name,
@@ -133,7 +135,8 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
   }, [form, item.id, router]);
 
   const handleDelete = useCallback(async () => {
-    if (!confirm('Segur que vols eliminar/retirar aquest element?')) return;
+    const ok = await confirm({ title: 'Eliminar element', message: 'Segur que vols eliminar/retirar aquest element?', confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/admin/inventory/${item.id}`, {
@@ -169,12 +172,13 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         <h2 className="text-sm font-semibold">Editar element</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Nom *</label>
+            <label htmlFor="inv-name" className="text-xs">Nom *</label>
             <input
+              id="inv-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
@@ -185,10 +189,10 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
                   key={s.value}
                   type="button"
                   onClick={() => updateField('status', s.value)}
-                  className={`rounded-lg border px-2 py-1.5 text-[10px] font-medium transition-all ${
+                  className={`rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
                     form.status === s.value
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   {s.label}
@@ -198,8 +202,9 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
           </div>
         </div>
         <div>
-          <label className="text-xs">Descripció</label>
+          <label htmlFor="inv-description" className="text-xs">Descripció</label>
           <textarea
+            id="inv-description"
             value={form.description}
             onChange={(e) => updateField('description', e.target.value)}
             rows={2}
@@ -208,11 +213,12 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Categoria</label>
+            <label htmlFor="inv-category" className="text-xs">Categoria</label>
             <select
+              id="inv-category"
               value={form.category}
               onChange={(e) => updateField('category', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -229,10 +235,10 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
                   key={c.value}
                   type="button"
                   onClick={() => updateField('condition', c.value)}
-                  className={`flex-1 rounded-lg border px-1 py-1.5 text-[10px] font-medium transition-all ${
+                  className={`flex-1 rounded-xl border px-1 py-1.5 text-[10px] font-medium transition-all ${
                     form.condition === c.value
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   {c.label}
@@ -243,21 +249,25 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Potència (W)</label>
+            <label htmlFor="inv-watts" className="text-xs">Potència (W)</label>
             <input
+              id="inv-watts"
               type="number"
+              min={0}
               value={form.watts}
               onChange={(e) => updateField('watts', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Valor actual (€) *</label>
+            <label htmlFor="inv-value" className="text-xs">Valor actual (€) *</label>
             <input
+              id="inv-value"
               type="number"
+              min={0}
               value={form.value}
               onChange={(e) => updateField('value', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
@@ -268,30 +278,35 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         <h2 className="text-sm font-semibold">Amortització</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Preu compra (€)</label>
+            <label htmlFor="inv-purchase-price" className="text-xs">Preu compra (€)</label>
             <input
+              id="inv-purchase-price"
               type="number"
+              min={0}
               value={form.purchasePrice}
               onChange={(e) => updateField('purchasePrice', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Data compra</label>
+            <label htmlFor="inv-purchase-date" className="text-xs">Data compra</label>
             <input
+              id="inv-purchase-date"
               type="date"
               value={form.purchaseDate}
               onChange={(e) => updateField('purchaseDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Vida útil (hores)</label>
+            <label htmlFor="inv-life-hours" className="text-xs">Vida útil (hores)</label>
             <input
+              id="inv-life-hours"
               type="number"
+              min={0}
               value={form.expectedLifeHours}
               onChange={(e) => updateField('expectedLifeHours', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
         </div>
@@ -299,8 +314,9 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
 
       {/* Notes */}
       <div className="rounded-2xl border p-5">
-        <label className="text-xs">Notes internes</label>
+        <label htmlFor="inv-notes" className="text-xs">Notes internes</label>
         <textarea
+          id="inv-notes"
           value={form.notes}
           onChange={(e) => updateField('notes', e.target.value)}
           rows={2}
@@ -326,6 +342,7 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
           Eliminar
         </button>
       </div>
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

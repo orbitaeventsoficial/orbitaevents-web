@@ -16,7 +16,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="mt-4 space-y-3">
         {data.leads.length === 0 ? (
-          <p className="rounded-lg border p-3 text-sm">
+          <p className="rounded-xl border p-3 text-sm">
             Cap entrada vinculada a aquest client.
           </p>
         ) : (

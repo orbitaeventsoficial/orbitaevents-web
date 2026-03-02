@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
 
 type DiscountCode = {
   id: string;
@@ -57,6 +58,7 @@ const INITIAL_FORM: FormData = {
 };
 
 export default function DiscountCodesPage() {
+  const toast = useToast();
   const [codes, setCodes] = useState<DiscountCode[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,8 +76,9 @@ export default function DiscountCodesPage() {
         setCodes(data.codes || []);
         setStats(data.stats || null);
       }
-    } catch {
-      // Silent
+    } catch (error) {
+      console.error('[DiscountCodes] Error carregant codis:', error);
+      toast.error('Error carregant codis de descompte');
     } finally {
       setLoading(false);
     }
@@ -140,8 +143,9 @@ export default function DiscountCodesPage() {
         body: JSON.stringify({ _action: 'toggle', id, isActive: !active }),
       });
       loadCodes();
-    } catch {
-      // Silent
+    } catch (error) {
+      console.error('[DiscountCodes] Error canviant estat:', error);
+      toast.error('Error canviant l\'estat del codi');
     }
   };
 
@@ -212,8 +216,9 @@ export default function DiscountCodesPage() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="text-xs">Codi *</label>
+              <label htmlFor="dc-code" className="text-xs">Codi *</label>
               <input
+                id="dc-code"
                 type="text"
                 value={form.code}
                 onChange={(e) => updateField('code', e.target.value.toUpperCase())}
@@ -227,10 +232,10 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'PERCENTAGE')}
-                  className={`flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-all ${
+                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'PERCENTAGE'
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   Percentatge %
@@ -238,10 +243,10 @@ export default function DiscountCodesPage() {
                 <button
                   type="button"
                   onClick={() => updateField('type', 'FIXED_AMOUNT')}
-                  className={`flex-1 rounded-lg border px-3 py-2.5 text-xs font-medium transition-all ${
+                  className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'FIXED_AMOUNT'
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   Import fix
@@ -249,58 +254,66 @@ export default function DiscountCodesPage() {
               </div>
             </div>
             <div>
-              <label className="text-xs">
+              <label htmlFor="dc-value" className="text-xs">
                 Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(€)'}
               </label>
               <input
+                id="dc-value"
                 type="number"
+                min={0}
                 value={form.value}
                 onChange={(e) => updateField('value', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="text-xs">Vàlid fins *</label>
+              <label htmlFor="dc-valid-until" className="text-xs">Vàlid fins *</label>
               <input
+                id="dc-valid-until"
                 type="date"
                 value={form.validUntil}
                 onChange={(e) => updateField('validUntil', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
             <div>
-              <label className="text-xs">Usos màxims</label>
+              <label htmlFor="dc-max-uses" className="text-xs">Usos màxims</label>
               <input
+                id="dc-max-uses"
                 type="number"
+                min={0}
                 value={form.maxUses}
                 onChange={(e) => updateField('maxUses', e.target.value)}
                 placeholder="Il·limitat"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
             <div>
-              <label className="text-xs">Comanda mínima (€)</label>
+              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (€)</label>
               <input
+                id="dc-min-order"
                 type="number"
+                min={0}
                 value={form.minOrderValue}
                 onChange={(e) => updateField('minOrderValue', e.target.value)}
                 placeholder="Sense mínim"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs">Descripció</label>
+            <label htmlFor="dc-description" className="text-xs">Descripció</label>
             <input
+              id="dc-description"
               type="text"
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               placeholder="Descripció interna del codi..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
 
@@ -339,7 +352,7 @@ export default function DiscountCodesPage() {
       {/* Codes table */}
       <div className="rounded-2xl border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" aria-label="Codis de descompte">
             <thead className="border-b">
               <tr>
                 <th scope="col" className="px-4 py-3 text-left font-medium">Codi</th>
@@ -352,12 +365,12 @@ export default function DiscountCodesPage() {
                 <th scope="col" className="px-4 py-3 text-right font-medium">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-white/5">
               {codes.map((c) => {
                 const expired = isExpired(c.validUntil);
                 const maxReached = c.maxUses != null && c.currentUses >= c.maxUses;
                 return (
-                  <tr key={c.id} className="transition-colors">
+                  <tr key={c.id} className="hover:bg-white/[0.03] transition-colors">
                     <td className="px-4 py-3">
                       <code className="text-xs font-mono px-2 py-1 rounded">
                         {c.code}
@@ -372,7 +385,7 @@ export default function DiscountCodesPage() {
                     <td className="px-4 py-3 font-semibold">
                       {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
                     </td>
-                    <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-slate-300'}`}>
+                    <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-white/60'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-[10px]">Caducat</span>}
                     </td>
@@ -385,7 +398,7 @@ export default function DiscountCodesPage() {
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           c.isActive && !expired && !maxReached
                             ? 'bg-emerald-500/20 text-emerald-300'
-                            : 'bg-slate-500/20 text-slate-400'
+                            : 'bg-white/5 text-white/40'
                         }`}
                       >
                         {c.isActive && !expired && !maxReached ? 'Actiu' : 'Inactiu'}
@@ -398,7 +411,7 @@ export default function DiscountCodesPage() {
                       <button
                         type="button"
                         onClick={() => toggleActive(c.id, c.isActive)}
-                        className="rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors"
+                        className="rounded-xl border px-2.5 py-1.5 text-xs font-medium transition-colors"
                       >
                         {c.isActive ? 'Desactivar' : 'Activar'}
                       </button>

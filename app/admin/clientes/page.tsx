@@ -138,6 +138,18 @@ export default function AdminContactesPage() {
     notes: '',
   });
 
+  // Close modals on Escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showAddModal) setShowAddModal(false);
+        if (showActionModal) setShowActionModal(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showAddModal, showActionModal]);
+
   // Duplicate detection
   const [duplicateWarnings, setDuplicateWarnings] = useState<Array<{
     id: string;
@@ -472,7 +484,7 @@ export default function AdminContactesPage() {
               className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
                 priorityFilter === value
                   ? PRIORITY_FILTER_STYLES[value]
-                  : 'border-slate-700 text-slate-400 hover:text-slate-200'
+                  : 'border-white/10 text-white/40 hover:text-white/70'
               }`}
             >
               {value === 'ALL' ? 'Totes prioritats' : `Prioritat ${value.toLowerCase()}`}
@@ -506,9 +518,9 @@ export default function AdminContactesPage() {
       {!loading && customers.length > 0 && (
         <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[1060px] text-sm">
+          <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
-              <tr className="border-b">
+              <tr className="border-b hover:bg-white/[0.03] transition-colors">
                 <th scope="col" className="text-center p-4 font-medium">Nom</th>
                 <th scope="col" className="text-center p-4 font-medium hidden md:table-cell">Contacte</th>
                 <th scope="col" className="text-center p-4 font-medium hidden lg:table-cell">Font</th>
@@ -522,7 +534,7 @@ export default function AdminContactesPage() {
               {filteredCustomers.map(({ customer, priority }) => {
                 const nextStep = getNextStep(customer);
                 return (
-                <tr key={customer.id} className="border-b transition-colors">
+                <tr key={customer.id} className="border-b hover:bg-white/[0.03] transition-colors">
                   <td className="p-4 text-center">
                     <div className="flex items-center justify-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">
@@ -564,7 +576,7 @@ export default function AdminContactesPage() {
                       customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' :
                       customer.source === 'web' ? 'bg-emerald-500/20 text-emerald-300' :
                       customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
-                      'bg-slate-500/20 text-slate-400'
+                      'bg-white/5 text-white/40'
                     }`}>
                       {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
                     </span>
@@ -590,7 +602,7 @@ export default function AdminContactesPage() {
                     <div className="space-y-1">
                       <Link
                         href={nextStep.href}
-                        className="inline-flex rounded-lg border px-2 py-1 text-xs font-semibold"
+                        className="inline-flex rounded-xl border px-2 py-1 text-xs font-semibold"
                       >
                         {nextStep.label}
                       </Link>
@@ -605,7 +617,7 @@ export default function AdminContactesPage() {
                           setShowActionModal(true);
                         }}
                         type="button"
-                        className="p-2 rounded-lg transition-all"
+                        className="p-2 rounded-xl transition-all"
                         title="Iniciar procés"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -615,7 +627,7 @@ export default function AdminContactesPage() {
                         </button>
                       <Link
                         href={`/admin/clientes/${customer.id}`}
-                        className="p-2 rounded-lg transition-all"
+                        className="p-2 rounded-xl transition-all"
                         title="Fitxa 360"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -640,7 +652,7 @@ export default function AdminContactesPage() {
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               disabled={page === 1}
-              className="rounded-lg border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
+              className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
             >
               ← Anterior
             </button>
@@ -648,7 +660,7 @@ export default function AdminContactesPage() {
               type="button"
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={page === totalPages}
-              className="rounded-lg border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
+              className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
             >
               Següent →
             </button>
@@ -689,7 +701,7 @@ export default function AdminContactesPage() {
                     <Link
                       key={dup.id}
                       href={`/admin/clientes/${dup.id}`}
-                      className="flex items-center justify-between rounded-lg border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
+                      className="flex items-center justify-between rounded-xl border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
                     >
                       <div>
                         <p className="text-sm font-medium">{dup.name}</p>
@@ -699,7 +711,7 @@ export default function AdminContactesPage() {
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                           dup.matchScore >= 80 ? 'bg-rose-500/20 text-rose-300' :
                           dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                          'bg-slate-500/20 text-slate-400'
+                          'bg-white/5 text-white/40'
                         }`}>
                           {dup.matchScore}%
                         </span>
@@ -716,30 +728,39 @@ export default function AdminContactesPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-sm mb-2">Nom *</label>
+                    <label htmlFor="nc-name" className="block text-sm mb-2">Nom <span className="text-rose-400">*</span></label>
                     <input
+                      id="nc-name"
                       type="text"
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
+                      className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
+                        !newCustomer.name && newCustomer.email ? 'border-rose-500/40' : ''
+                      }`}
                       placeholder="Maria García"
+                      required
                     />
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-sm mb-2">Email *</label>
+                    <label htmlFor="nc-email" className="block text-sm mb-2">Email <span className="text-rose-400">*</span></label>
                     <input
+                      id="nc-email"
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
+                      className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
+                        !newCustomer.email && newCustomer.name ? 'border-rose-500/40' : ''
+                      }`}
                       placeholder="maria@email.com"
+                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2">Telèfon</label>
+                    <label htmlFor="nc-phone" className="block text-sm mb-2">Telèfon</label>
                     <input
+                      id="nc-phone"
                       type="tel"
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
@@ -749,8 +770,9 @@ export default function AdminContactesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2">DNI / NIF / NIE</label>
+                    <label htmlFor="nc-dni" className="block text-sm mb-2">DNI / NIF / NIE</label>
                     <input
+                      id="nc-dni"
                       type="text"
                       value={newCustomer.dni}
                       onChange={(e) => setNewCustomer({ ...newCustomer, dni: e.target.value })}
@@ -760,8 +782,9 @@ export default function AdminContactesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2">Instagram</label>
+                    <label htmlFor="nc-instagram" className="block text-sm mb-2">Instagram</label>
                     <input
+                      id="nc-instagram"
                       type="text"
                       value={newCustomer.instagram}
                       onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
@@ -771,8 +794,9 @@ export default function AdminContactesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2">Font</label>
+                    <label htmlFor="nc-source" className="block text-sm mb-2">Font</label>
                     <select
+                      id="nc-source"
                       value={newCustomer.source}
                       onChange={(e) => setNewCustomer({ ...newCustomer, source: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
@@ -791,8 +815,9 @@ export default function AdminContactesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-2">Notes</label>
+                  <label htmlFor="nc-notes" className="block text-sm mb-2">Notes</label>
                   <textarea
+                    id="nc-notes"
                     value={newCustomer.notes}
                     onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all resize-none"

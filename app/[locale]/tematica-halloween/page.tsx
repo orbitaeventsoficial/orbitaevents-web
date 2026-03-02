@@ -67,7 +67,7 @@ export default async function HalloweenPage() {
 
         <div className="relative z-10 h-full flex flex-col justify-end pb-16 px-4 max-w-6xl mx-auto">
           <span className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/20 border border-orange-500/50 rounded-full text-orange-400 text-sm w-fit mb-4">
-            <span className="text-lg">🎃</span> {t('badge')}
+            <span className="text-lg">🎃</span> {t('badge', { year: new Date().getFullYear() })}
           </span>
 
           <h1 className="text-5xl md:text-7xl font-black">
@@ -184,7 +184,7 @@ export default async function HalloweenPage() {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            {t('packs.title')} <span className="text-orange-500">{t('packs.titleHighlight')}</span>
+            {t('packs.title')} <span className="text-orange-500">{t('packs.titleHighlight', { year: new Date().getFullYear() })}</span>
           </h2>
           <p className="text-white/60 text-center mb-12">
             {t('packs.subtitle')}
@@ -272,7 +272,7 @@ export default async function HalloweenPage() {
               href="/contacto?tema=halloween"
               className="px-8 py-4 bg-orange-500 hover:bg-orange-400 text-black font-bold text-lg rounded-full transition-colors inline-flex items-center justify-center gap-2"
             >
-              <span>👻</span> {t('cta.reserve2025')}
+              <span>👻</span> {t('cta.reserve2025', { year: new Date().getFullYear() })}
             </Link>
             <Link
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tWhatsapp('halloween'))}`}

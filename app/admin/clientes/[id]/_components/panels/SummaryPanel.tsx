@@ -107,7 +107,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           {alerts.map((alert, i) => (
             <div
               key={i}
-              className={`rounded-lg border px-3 py-2 text-sm ${
+              className={`rounded-xl border px-3 py-2 text-sm ${
                 alert.type === 'warning'
                   ? 'border-amber-500/40 bg-amber-500/10 text-amber-200'
                   : alert.type === 'success'
@@ -132,7 +132,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="rounded-lg border px-3 py-1.5 text-xs"
+              className="rounded-xl border px-3 py-1.5 text-xs"
             >
               ✏️ Editar
             </button>
@@ -142,7 +142,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={cancelEdit}
                 disabled={saving}
-                className="rounded-lg border px-3 py-1.5 text-xs disabled:opacity-50"
+                className="rounded-xl border px-3 py-1.5 text-xs disabled:opacity-50"
               >
                 Cancel·la
               </button>
@@ -150,7 +150,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
               >
                 {saving ? 'Desant...' : 'Desa'}
               </button>
@@ -159,7 +159,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         </div>
 
         {error && (
-          <p className="mt-2 rounded-lg border px-3 py-2 text-xs">
+          <p className="mt-2 rounded-xl border px-3 py-2 text-xs">
             {error}
           </p>
         )}
@@ -276,7 +276,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             nextEvents.length > 0 && (
               <div className="space-y-3">
                 {nextEvents.map((ev) => (
-                  <div key={ev.id} className="rounded-lg border p-2">
+                  <div key={ev.id} className="rounded-xl border p-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">
                         {ev.reference || 'Reserva'}
@@ -382,14 +382,17 @@ function InfoField({
     );
   }
 
+  const fieldId = `sp-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+
   if (type === 'select' && options) {
     return (
       <div>
-        <label className="text-xs">{label}</label>
+        <label htmlFor={fieldId} className="text-xs">{label}</label>
         <select
+          id={fieldId}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -403,12 +406,13 @@ function InfoField({
 
   return (
     <div>
-      <label className="text-xs">{label}</label>
+      <label htmlFor={fieldId} className="text-xs">{label}</label>
       <input
+        id={fieldId}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
       />
     </div>
   );
@@ -486,13 +490,13 @@ function QuickAction({
     amber: 'border-amber-500/40 text-amber-300 hover:bg-amber-500/10',
     emerald: 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10',
     indigo: 'border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10',
-    slate: 'border-slate-600 text-slate-300 hover:bg-slate-800',
+    slate: 'border-white/15 text-white/60 hover:bg-white/10',
   };
 
   return (
     <a
       href={href}
-      className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${colorStyles[color]}`}
+      className={`rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors ${colorStyles[color]}`}
     >
       {label}
     </a>

@@ -227,7 +227,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-label="Historial de bolos">
               <thead className="border-b">
                 <tr>
                   <th scope="col" className="px-4 py-3 text-left font-medium">Referència</th>
@@ -238,9 +238,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <th scope="col" className="px-4 py-3 text-left font-medium">Checkin</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-white/5">
                 {item.bookingItems.map((bi) => (
-                  <tr key={bi.id} className="transition-colors">
+                  <tr key={bi.id} className="hover:bg-white/[0.03] transition-colors">
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/bookings/${bi.booking.id}`}
@@ -296,7 +296,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-label="Registres d'ús">
               <thead className="border-b">
                 <tr>
                   <th scope="col" className="px-4 py-3 text-left font-medium">Data</th>
@@ -304,9 +304,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <th scope="col" className="px-4 py-3 text-left font-medium">Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-white/5">
                 {item.usageHistory.map((usage) => (
-                  <tr key={usage.id} className="transition-colors">
+                  <tr key={usage.id} className="hover:bg-white/[0.03] transition-colors">
                     <td className="px-4 py-3">{formatDate(usage.usedAt)}</td>
                     <td className="px-4 py-3 font-medium">
                       {usage.hoursUsed ? `${usage.hoursUsed}h` : '—'}

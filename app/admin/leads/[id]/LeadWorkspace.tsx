@@ -276,7 +276,7 @@ export default function LeadWorkspace({
                         <button
                           type="button"
                           onClick={() => updateTask(task.id, 'DONE')}
-                          className="rounded-lg border px-2.5 py-1 text-xs font-medium"
+                          className="rounded-xl border px-2.5 py-1 text-xs font-medium"
                         >
                           Marcar feta
                         </button>
@@ -284,7 +284,7 @@ export default function LeadWorkspace({
                         <button
                           type="button"
                           onClick={() => updateTask(task.id, 'OPEN')}
-                          className="rounded-lg border px-2.5 py-1 text-xs font-medium"
+                          className="rounded-xl border px-2.5 py-1 text-xs font-medium"
                         >
                           Reobrir
                         </button>
@@ -292,7 +292,7 @@ export default function LeadWorkspace({
                       <button
                         type="button"
                         onClick={() => deleteTask(task.id)}
-                        className="rounded-lg border px-2.5 py-1 text-xs font-medium"
+                        className="rounded-xl border px-2.5 py-1 text-xs font-medium"
                       >
                         Eliminar
                       </button>
@@ -327,7 +327,7 @@ export default function LeadWorkspace({
             </select>
             <input
               type="file"
-              className="w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-2 file:text-sm file:font-medium"
+              className="w-full text-sm file:mr-3 file:rounded-xl file:border-0 file:px-3 file:py-2 file:text-sm file:font-medium"
               onChange={(e) => setDocFile(e.target.files?.[0] || null)}
             />
             <button
@@ -352,7 +352,7 @@ export default function LeadWorkspace({
                     <a
                       href={doc.fileUrl}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="min-w-0 flex-1"
                     >
                       <p className="truncate text-sm font-semibold">{doc.title}</p>
@@ -364,7 +364,7 @@ export default function LeadWorkspace({
                       type="button"
                       onClick={() => deleteDocument(doc.id)}
                       disabled={deletingDocumentId === doc.id}
-                      className={`rounded-lg border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDocumentId === doc.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                      className={`rounded-xl border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDocumentId === doc.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                     >
                       {deletingDocumentId === doc.id ? 'Eliminant...' : confirmingDocumentId === doc.id ? 'Segur?' : 'Eliminar'}
                     </button>
@@ -411,7 +411,7 @@ export default function LeadWorkspace({
                     <button
                       type="button"
                       onClick={() => deleteActivity(activity.id)}
-                      className={`rounded-lg border px-2 py-1 text-xs font-medium ${confirmingActivityId === activity.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                      className={`rounded-xl border px-2 py-1 text-xs font-medium ${confirmingActivityId === activity.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                     >
                       {confirmingActivityId === activity.id ? 'Segur?' : 'Eliminar'}
                     </button>

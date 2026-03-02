@@ -45,7 +45,7 @@ export default function SlaAutomationButton() {
         type="button"
         onClick={run}
         disabled={running}
-        className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {running ? 'Executant...' : 'Executar regles 24h'}
       </button>

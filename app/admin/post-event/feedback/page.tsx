@@ -100,13 +100,13 @@ export default async function FeedbackPage() {
                   <div className="flex gap-2">
                     <Link
                       href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${formatDateSimple(booking.eventDate)}!`}
-                      className="px-4 py-2 text-white rounded-lg text-sm font-medium"
+                      className="px-4 py-2 text-white rounded-xl text-sm font-medium"
                     >
                       ✉️ Envia correu
                     </Link>
                     <Link
                       href={`/admin/bookings/${booking.id}`}
-                      className="px-4 py-2 bg-white/5 rounded-lg text-sm font-medium hover:bg-white/10"
+                      className="px-4 py-2 bg-white/5 rounded-xl text-sm font-medium hover:bg-white/10"
                     >
                       Veure
                     </Link>

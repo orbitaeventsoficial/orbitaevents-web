@@ -144,7 +144,7 @@ export default function ClientPortalAccessPanel({
           <select
             value={locale}
             onChange={(event) => setLocale(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
           >
             <option value="ca">Català</option>
             <option value="es">Castellà</option>
@@ -160,7 +160,7 @@ export default function ClientPortalAccessPanel({
             max={365}
             value={expiresInDays}
             onChange={(event) => setExpiresInDays(Number(event.target.value) || 30)}
-            className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
           />
         </label>
       </div>
@@ -172,7 +172,7 @@ export default function ClientPortalAccessPanel({
             value={headline}
             onChange={(event) => setHeadline(event.target.value)}
             placeholder="Benvinguts a l'espai del vostre esdeveniment"
-            className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
           />
         </label>
 
@@ -182,7 +182,7 @@ export default function ClientPortalAccessPanel({
             value={introMessage}
             onChange={(event) => setIntroMessage(event.target.value)}
             placeholder="Aquí teniu tots els detalls en un únic lloc"
-            className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
           />
         </label>
       </div>
@@ -193,10 +193,10 @@ export default function ClientPortalAccessPanel({
             value={accentColor}
             onChange={(event) => setAccentColor(event.target.value)}
             placeholder="#06b6d4"
-            className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
           />
         </label>
-        <div className="grid grid-cols-2 gap-2 rounded-lg border border-white/10 p-3 text-xs">
+        <div className="grid grid-cols-2 gap-2 rounded-xl border border-white/10 p-3 text-xs">
           <label className="inline-flex items-center gap-2">
             <input type="checkbox" checked={showTimeline} onChange={(e) => setShowTimeline(e.target.checked)} />
             Timeline
@@ -221,7 +221,7 @@ export default function ClientPortalAccessPanel({
           type="button"
           onClick={handleCreateLink}
           disabled={loading}
-          className="rounded-lg px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+          className="rounded-xl px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
         >
           {loading ? 'Generant...' : active ? 'Rotar enllaç' : 'Generar enllaç'}
         </button>
@@ -229,7 +229,7 @@ export default function ClientPortalAccessPanel({
           type="button"
           onClick={handleCopy}
           disabled={!generatedUrl}
-          className="rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
+          className="rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
         >
           Copiar enllaç
         </button>
@@ -237,20 +237,20 @@ export default function ClientPortalAccessPanel({
           type="button"
           onClick={handleRevoke}
           disabled={loading || !active}
-          className="rounded-lg border px-4 py-2 text-xs font-semibold disabled:opacity-60"
+          className="rounded-xl border px-4 py-2 text-xs font-semibold disabled:opacity-60"
         >
           Revocar
         </button>
       </div>
 
       {generatedUrl && (
-        <div className="mt-3 rounded-lg border p-3">
+        <div className="mt-3 rounded-xl border p-3">
           <p className="text-[11px] uppercase tracking-wide mb-1">Enllaç generat</p>
           <p className="text-xs break-all">{generatedUrl}</p>
         </div>
       )}
 
-      <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3 text-xs">
+      <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-xs">
         <p>Estat: {active ? 'Actiu' : 'No hi ha cap enllaç actiu'}</p>
         {active && (
           <>

@@ -53,7 +53,7 @@ const THEMES: ThemeConfig[] = [
     particles: ['✨', '🌙', '💫', '⭐'],
     colors: {
       primary: '#a78bfa',
-      background: 'from-slate-900 via-purple-950 to-slate-900',
+      background: 'from-[#0a0a0a] via-purple-950 to-[#0a0a0a]',
     },
   },
   {
@@ -81,7 +81,7 @@ const THEMES: ThemeConfig[] = [
     particles: ['⚡', '🧙‍♂️', '🦉', '🪄', '⭐', '✨', '🏰'],
     colors: {
       primary: '#fbbf24',
-      background: 'from-slate-900 via-amber-950/20 to-slate-900',
+      background: 'from-[#0a0a0a] via-amber-950/20 to-[#0a0a0a]',
     },
     specialElement: 'magicShield',
   },

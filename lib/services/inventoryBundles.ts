@@ -37,7 +37,8 @@ export async function getInventoryBundles(): Promise<InventoryBundle[]> {
     const bundles = normalizeBundles(parsed?.bundles);
     if (bundles.length === 0) return [{ id: 'equip-1', name: 'Equip 1', itemIds: [] }];
     return bundles;
-  } catch {
+  } catch (error) {
+    console.error('[InventoryBundles] Error parsejant bundles:', error);
     return [{ id: 'equip-1', name: 'Equip 1', itemIds: [] }];
   }
 }

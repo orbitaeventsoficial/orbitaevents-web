@@ -127,6 +127,10 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     sentAt: p.sentAt?.toISOString(),
     acceptedAt: p.acceptedAt?.toISOString(),
     snapshot: (p.snapshot as Record<string, unknown> | null) || undefined,
+    contractReference: p.contractReference || null,
+    contractStatus: p.contractStatus || null,
+    contractSentAt: p.contractSentAt?.toISOString() || null,
+    contractSignedAt: p.contractSignedAt?.toISOString() || null,
   }));
 
   const bookings = bookingsRows.map((b: any) => {

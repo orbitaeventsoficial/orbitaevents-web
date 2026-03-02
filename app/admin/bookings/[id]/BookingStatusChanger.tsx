@@ -1,9 +1,9 @@
 'use client';
 
-// app/admin/bookings/[id]/BookingStatusChanger.tsx
 // Component client per canviar l'estat d'una reserva
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 
 interface Props {
   bookingId: string;
@@ -27,7 +27,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [showConfirmComplete, setShowConfirmComplete] = useState(false);
+  const { confirm: confirmDialog, dialogProps } = useConfirmDialog();
 
   const handleStatusChange = async (newStatus: string) => {
     // Si canviem a COMPLETED, mostrar confirmació
@@ -59,14 +61,19 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       // Refrescar la pàgina
       router.refresh();
 
-      // Si s\'han actualitzat les stats, mostrar notificació
+      // Notificacions informatives
+      const msgs: string[] = [];
       if (data.statsUpdated) {
-        alert(`✅ Event completat!\n\nLes estadístiques s\'han actualitzat:\n• +1 event\n• +${guestCount} persones`);
+        msgs.push(`Estadistiques actualitzades: +1 event, +${guestCount} persones`);
       }
       if (data.calendarSync?.status === 'synced') {
-        alert('📅 Google Calendar sincronitzat automàticament.');
+        msgs.push('Google Calendar sincronitzat');
       } else if (data.calendarSync?.status === 'error') {
-        alert(`⚠️ Reserva actualitzada, però ha fallat la sincronització amb Google Calendar: ${data.calendarSync.error || 'error desconegut'}`);
+        msgs.push(`Calendar sync error: ${data.calendarSync.error || 'desconegut'}`);
+      }
+      if (msgs.length > 0) {
+        setSuccessMsg(msgs.join(' | '));
+        setTimeout(() => setSuccessMsg(null), 6000);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
@@ -95,7 +102,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all
                 ${isActive
                   ? `${conf.bg} ${conf.text} ${conf.border} cursor-default`
-                  : 'bg-slate-700/50 text-slate-400 border-slate-600/50 hover:border-slate-500/50 hover:text-slate-300'
+                  : 'bg-white/5 text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
                 }
                 ${isLoading ? 'opacity-50 cursor-wait' : ''}
                 disabled:cursor-not-allowed
@@ -108,10 +115,21 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         })}
       </div>
 
+      {/* Success */}
+      {successMsg && (
+        <div className="mt-2 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-300" role="status">
+          <span>✓</span>
+          <span className="flex-1">{successMsg}</span>
+          <button type="button" onClick={() => setSuccessMsg(null)} className="text-emerald-400/50 hover:text-emerald-400">✕</button>
+        </div>
+      )}
+
       {/* Error */}
       {error && (
-        <div className="mt-2 p-2 border text-sm rounded-xl" role="alert">
-          {error}
+        <div className="mt-2 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-xs text-rose-300" role="alert">
+          <span>⚠️</span>
+          <span className="flex-1">{error}</span>
+          <button type="button" onClick={() => setError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
         </div>
       )}
 
@@ -161,6 +179,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
           </div>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

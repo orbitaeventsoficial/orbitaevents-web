@@ -94,8 +94,8 @@ export default async function FAQPage() {
               key={key}
               className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
                 count > 0
-                  ? 'bg-slate-700/50 text-slate-200'
-                  : 'bg-slate-800/40 text-slate-500'
+                  ? 'bg-white/5 text-white/80'
+                  : 'bg-white/[0.03] text-white/30'
               }`}
             >
               <span>{config.icon}</span>
@@ -129,7 +129,7 @@ export default async function FAQPage() {
                 </span>
               </h2>
             </div>
-            <div className="divide-y divide-slate-700/30">
+            <div className="divide-y divide-white/5">
               {categoryFaqs.map((faq) => {
                 const translation = faq.translations.find((t) => t.locale === 'es') || faq.translations[0];
                 return (
@@ -167,7 +167,7 @@ export default async function FAQPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <Link
                           href={`/admin/faq/${faq.id}`}
-                          className="inline-flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                          className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors"
                         >
                           Editar
                         </Link>

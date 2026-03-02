@@ -6,10 +6,12 @@ import { log } from '@/lib/logger';
 export default function PostEventEmailButton({ bookingId }: { bookingId: string }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSend = async () => {
     if (sending || sent) return;
     setSending(true);
+    setError(null);
 
     try {
       const res = await fetch('/api/admin/emails/send-post-event', {
@@ -24,26 +26,31 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
       }
 
       setSent(true);
-    } catch (error) {
-      log.error('Error sending post-event email', error);
-      alert(error instanceof Error ? error.message : 'Error enviant email post-event');
+    } catch (err) {
+      log.error('Error sending post-event email', err);
+      setError(err instanceof Error ? err.message : 'Error enviant email post-event');
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleSend}
-      disabled={sending || sent}
-      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-        sent
-          ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-          : 'bg-amber-500 text-white hover:bg-amber-600'
-      } disabled:opacity-60`}
-    >
-      {sent ? '✅ Enviat!' : sending ? '⏳ Enviant...' : 'Envia post-event al client'}
-    </button>
+    <div className="inline-flex flex-col">
+      <button
+        type="button"
+        onClick={handleSend}
+        disabled={sending || sent}
+        className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${
+          sent
+            ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+            : 'bg-amber-500 text-white hover:bg-amber-600'
+        } disabled:opacity-60`}
+      >
+        {sent ? '✓ Enviat!' : sending ? 'Enviant...' : 'Envia post-event al client'}
+      </button>
+      {error && (
+        <span className="text-[10px] text-rose-400 mt-1">{error}</span>
+      )}
+    </div>
   );
 }

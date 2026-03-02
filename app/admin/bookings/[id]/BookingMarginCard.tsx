@@ -255,7 +255,7 @@ export default function BookingMarginCard({
           {typeof inventoryRemainingHoursMin === 'number' && (
             <div className="flex justify-between">
               <span>Element més crític (mínim)</span>
-              <span className={inventoryRemainingHoursMin < 200 ? 'text-rose-300' : 'text-slate-200'}>
+              <span className={inventoryRemainingHoursMin < 200 ? 'text-rose-300' : 'text-white/80'}>
                 {inventoryRemainingHoursMin.toFixed(0)}h restants
               </span>
             </div>
@@ -397,25 +397,26 @@ export default function BookingMarginCard({
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
-            <label className="block text-xs font-medium mb-1">Distància (km)</label>
+            <label htmlFor="bmc-distance" className="block text-xs font-medium mb-1">Distància (km)</label>
             <input
+              id="bmc-distance"
               type="number"
               min="0"
               step="1"
               value={distanceKm}
               onChange={(e) => setDistanceKm(Number(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm focus:ring-2"
+              className="w-full px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm focus:ring-2"
             />
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">Km extra</label>
-            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm">
+            <div className="px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm">
               {billableKm} km
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">Cost viatge</label>
-            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-bold">
+            <div className="px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
             <p className="mt-1 text-[11px]">
@@ -424,17 +425,17 @@ export default function BookingMarginCard({
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
             <p className="text-[11px] uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
             <p className="text-[11px]">{distanceKm.toFixed(1)} km × {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
             <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
             <p className="text-[11px]">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
           </div>
-          <div className={`rounded-lg border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+          <div className={`rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-[11px] uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}
@@ -452,7 +453,7 @@ export default function BookingMarginCard({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="mt-3 px-4 py-2 text-black rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
+            className="mt-3 px-4 py-2 text-black rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors"
           >
             {saving ? '⏳ Desant...' : '💾 Desar canvis'}
           </button>

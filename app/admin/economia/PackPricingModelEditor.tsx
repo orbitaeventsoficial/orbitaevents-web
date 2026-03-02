@@ -141,7 +141,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
               type="button"
               onClick={save}
               disabled={saving}
-              className="admin-pack-model-save rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60"
+              className="admin-pack-model-save rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-60"
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
@@ -152,7 +152,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
         <aside className="admin-pack-model-aside rounded-xl border p-4">
           <h3 className="text-sm font-semibold">Lectura ràpida de coeficients</h3>
           <div className="mt-3 space-y-2 text-xs">
-            <div className="admin-pack-model-note rounded-lg border p-3">
+            <div className="admin-pack-model-note rounded-xl border p-3">
               <p className="font-semibold">Objectiu marge: {pct(form.marginTargetPct)}</p>
               <button
                 type="button"
@@ -162,7 +162,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor marge
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-lg border p-3">
+            <div className="admin-pack-model-note rounded-xl border p-3">
               <p className="font-semibold">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
               <button
                 type="button"
@@ -179,7 +179,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor IRPF
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-lg border p-3">
+            <div className="admin-pack-model-note rounded-xl border p-3">
               <p className="font-semibold">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
               <button
                 type="button"
@@ -189,7 +189,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor divergència
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-lg border p-3">
+            <div className="admin-pack-model-note rounded-xl border p-3">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
               <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
             </div>

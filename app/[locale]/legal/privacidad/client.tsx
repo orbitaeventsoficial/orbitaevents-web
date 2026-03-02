@@ -15,7 +15,7 @@ export default function PrivacidadClient() {
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>
-            {t('lastUpdate')} 13 de diciembre de 2025
+            {t('lastUpdate')} {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
 
           {/* Banner Portal de Privacitat */}

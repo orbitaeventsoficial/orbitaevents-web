@@ -186,7 +186,7 @@ export default function EditPackForm({
     };
   }, [included, formData.djHours, formData.maxGuests, formData.soundWatts, pricingModel]);
 
-  const input = 'block w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2.5 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:text-sm';
+  const input = 'block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white/90 placeholder:text-white/30 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:text-sm';
   const packDiv = divPct(Number(formData.price), recommended.pack || pricingHint.recommendedPrice);
   const extraDiv = divPct(Number(formData.extraHourPrice), recommended.extra || pricingHint.recommendedExtraHourPrice);
   const packSignal = getMarginSignal(Number(formData.price), recommended.pack || pricingHint.recommendedPrice, pricingHint.alertThreshold);
@@ -226,8 +226,8 @@ export default function EditPackForm({
         if (!selectedBundleId && next.length > 0) {
           setSelectedBundleId(next[0].id);
         }
-      } catch {
-        // silent
+      } catch (error) {
+        console.error('[EditPackForm] Error carregant bundles:', error);
       }
     };
     void loadBundles();
@@ -385,7 +385,7 @@ export default function EditPackForm({
       <section className="rounded-2xl border border-white/10 p-5">
         <h2 className="text-xl font-bold">Editor pro de pack</h2>
         <p className="mt-1 text-sm">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'border-amber-400/50 bg-amber-500/15 text-amber-200' : 'border-slate-700/60 bg-slate-900/60 text-slate-300'}`}>{t.icon} {t.label}</button>)}</div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'border-amber-400/50 bg-amber-500/15 text-amber-200' : 'border-white/10 bg-white/[0.02] text-white/60'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
       {error && <div className="rounded-xl border p-4 text-sm">❌ {error}</div>}
@@ -419,7 +419,7 @@ export default function EditPackForm({
             <button
               type="button"
               onClick={() => setAutoPricing((v) => !v)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${autoPricing ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-100' : 'border-slate-600/50 bg-slate-800/70 text-slate-200'}`}
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${autoPricing ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-100' : 'border-white/10 bg-white/5/70 text-white/80'}`}
             >
               Preu automàtic {autoPricing ? 'ON' : 'OFF'}
             </button>
@@ -430,7 +430,7 @@ export default function EditPackForm({
                 setFormData((prev) => ({ ...prev, price: Math.max(1, round2(recommended.pack)), extraHourPrice: Math.max(1, round2(recommended.extra)) }));
                 setInfo('Preus recomanats aplicats una vegada.');
               }}
-              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+              className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
             >
               Aplicar recomanat ara
             </button>
@@ -443,7 +443,7 @@ export default function EditPackForm({
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.max(1, Number(prev.djHours) - 1) }))}
-                  className="h-8 w-8 rounded-lg border"
+                  className="h-8 w-8 rounded-xl border"
                 >
                   -
                 </button>
@@ -451,7 +451,7 @@ export default function EditPackForm({
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.min(24, Number(prev.djHours) + 1) }))}
-                  className="h-8 w-8 rounded-lg border"
+                  className="h-8 w-8 rounded-xl border"
                 >
                   +
                 </button>
@@ -495,6 +495,7 @@ export default function EditPackForm({
               <input
                 type="number"
                 step="0.01"
+                min={0}
                 value={formData.price}
                 onChange={(e) => {
                   setAutoPricing(false);
@@ -519,6 +520,7 @@ export default function EditPackForm({
               <input
                 type="number"
                 step="0.01"
+                min={0}
                 value={formData.extraHourPrice}
                 onChange={(e) => {
                   setAutoPricing(false);
@@ -547,7 +549,7 @@ export default function EditPackForm({
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} className="flex items-center gap-3 rounded-lg border p-2">
+                  <article key={item.id} className="flex items-center gap-3 rounded-xl border p-2">
                     <img
                       src={item.imageUrl || '/placeholder.png'}
                       alt={item.name}
@@ -574,15 +576,15 @@ export default function EditPackForm({
           </p>
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border p-3">
+            <div className="rounded-xl border p-3">
               <p className="text-xs">Elements</p>
               <p className="text-lg font-semibold">{included.length}</p>
             </div>
-            <div className="rounded-lg border p-3">
+            <div className="rounded-xl border p-3">
               <p className="text-xs">Unitats totals</p>
               <p className="text-lg font-semibold">{totalUnits}</p>
             </div>
-            <div className="rounded-lg border p-3">
+            <div className="rounded-xl border p-3">
               <p className="text-xs">Cost inventari/h</p>
               <p className="text-lg font-semibold">{eur(recommended.inventoryCostHour)}</p>
             </div>
@@ -599,7 +601,7 @@ export default function EditPackForm({
                       key={bundle.id}
                       type="button"
                       onClick={() => setSelectedBundleId(bundle.id)}
-                      className={`rounded-lg border px-3 py-2 text-left transition-colors ${active ? 'border-indigo-300 bg-indigo-700 text-white' : 'border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`rounded-xl border px-3 py-2 text-left transition-colors ${active ? 'border-indigo-300 bg-indigo-700 text-white' : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/10'}`}
                     >
                       <p className="text-sm font-semibold">{bundle.name}</p>
                       <p className="text-xs opacity-80">{bundle.itemIds.length} elements</p>
@@ -612,7 +614,7 @@ export default function EditPackForm({
                   type="button"
                   onClick={() => addBundleToPack(selectedBundleId)}
                   disabled={!selectedBundleId}
-                  className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
                   + Afegir lot seleccionat al pack
                 </button>
@@ -624,21 +626,21 @@ export default function EditPackForm({
             <button
               type="button"
               onClick={() => autoComposeInventory('base')}
-              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Compositor automàtic BASE
             </button>
             <button
               type="button"
               onClick={() => autoComposeInventory('pro')}
-              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Compositor automàtic PRO
             </button>
             <button
               type="button"
               onClick={() => { setPackInventory([]); setInfo('Inventari del pack netejat.'); }}
-              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Buidar composició
             </button>
@@ -655,12 +657,12 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('available'); }}
               onDragLeave={() => setDropZone((p) => p === 'available' ? null : p)}
               onDrop={dropOut}
-              className={`rounded-xl border p-3 ${dropZone === 'available' ? 'border-rose-400/60 bg-rose-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}
+              className={`rounded-xl border p-3 ${dropZone === 'available' ? 'border-rose-400/60 bg-rose-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
               <p className="mb-2 text-sm font-semibold">Disponibles ({available.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-lg border p-2">
+                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -678,12 +680,12 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('included'); }}
               onDragLeave={() => setDropZone((p) => p === 'included' ? null : p)}
               onDrop={dropIn}
-              className={`rounded-xl border p-3 ${dropZone === 'included' ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}
+              className={`rounded-xl border p-3 ${dropZone === 'included' ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
               <p className="mb-2 text-sm font-semibold">Inclosos ({included.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-lg border p-2">
+                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -719,7 +721,7 @@ export default function EditPackForm({
                   </article>
                 ))}
                 {included.length === 0 && (
-                  <p className="rounded-lg border border-dashed p-4 text-center text-sm">
+                  <p className="rounded-xl border border-dashed p-4 text-center text-sm">
                     Arrossega aquí els elements del pack.
                   </p>
                 )}

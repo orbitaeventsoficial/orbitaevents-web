@@ -13,7 +13,7 @@ export type PipelineLead = {
   priority: string;
   customerId: string | null;
   budget: string | null;
-  // cachedScore: available after `prisma generate` (migration pending)
+  cachedScore: number | null;
   createdAt: Date;
   booking: {
     id: string;
@@ -40,7 +40,7 @@ export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereIn
       priority: true,
       customerId: true,
       budget: true,
-      // cachedScore: true, — uncomment after `prisma generate`
+      cachedScore: true,
       createdAt: true,
       booking: {
         select: {

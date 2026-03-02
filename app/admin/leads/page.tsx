@@ -367,14 +367,14 @@ export default async function LeadsPage({
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="rounded-lg border px-2 py-1 text-[11px] font-medium"
+                      className="rounded-xl border px-2 py-1 text-[11px] font-medium"
                     >
                       Obrir fitxa
                     </Link>
                     {lead.customerId && (
                       <Link
                         href={`/admin/clientes/${lead.customerId}`}
-                        className="rounded-lg border px-2 py-1 text-[11px] font-medium"
+                        className="rounded-xl border px-2 py-1 text-[11px] font-medium"
                       >
                         Client
                       </Link>
@@ -405,21 +405,21 @@ export default async function LeadsPage({
       {/* Desktop Table View */}
       <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1120px] text-sm">
+          <table className="w-full min-w-[1120px] text-sm" aria-label="Pipeline d'entrades">
             <thead className="border-b">
               <tr>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Contacte</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Origen</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Temps pendent</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Prioritat</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Contacte</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Origen</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Temps pendent</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Prioritat</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-white/5">
               {leads.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -436,7 +436,7 @@ export default async function LeadsPage({
                   const priorityConf = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.MEDIUM;
 
                   return (
-                    <tr key={lead.id} className="transition-colors">
+                    <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap">
@@ -521,12 +521,12 @@ export default async function LeadsPage({
                   params.set('page', String(data.pagination.page - 1));
                   return params.toString();
                 })()}`}
-                className="rounded-lg border px-3 py-1"
+                className="rounded-xl border px-3 py-1"
               >
                 ← Anterior
               </Link>
             ) : (
-              <span className="rounded-lg border px-3 py-1">← Anterior</span>
+              <span className="rounded-xl border px-3 py-1">← Anterior</span>
             )}
             {data.pagination.page < data.pagination.totalPages ? (
               <Link
@@ -535,12 +535,12 @@ export default async function LeadsPage({
                   params.set('page', String(data.pagination.page + 1));
                   return params.toString();
                 })()}`}
-                className="rounded-lg border px-3 py-1"
+                className="rounded-xl border px-3 py-1"
               >
                 Següent →
               </Link>
             ) : (
-              <span className="rounded-lg border px-3 py-1">Següent →</span>
+              <span className="rounded-xl border px-3 py-1">Següent →</span>
             )}
           </div>
         </section>

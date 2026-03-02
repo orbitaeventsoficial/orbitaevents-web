@@ -245,7 +245,7 @@ export default async function PostEventPage() {
             </span>
           </h2>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-white/5">
           {data.recentBookings.map((booking) => {
             const packName =
               getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);

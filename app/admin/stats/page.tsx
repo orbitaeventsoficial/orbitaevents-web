@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface Stat {
   key: string;
@@ -21,6 +22,7 @@ export default function StatsPage() {
   const [editingStat, setEditingStat] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   useEffect(() => {
     loadStats();
@@ -67,7 +69,8 @@ export default function StatsPage() {
   }
 
   async function resetStat(key: string) {
-    if (!confirm('Resetar al valor calculat automàticament?')) return;
+    const ok = await confirm({ title: 'Resetar estadística', message: 'Resetar al valor calculat automàticament?', confirmLabel: 'Resetar', variant: 'warning' });
+    if (!ok) return;
 
     setSaving(true);
     try {
@@ -126,7 +129,7 @@ export default function StatsPage() {
             className={`border rounded-xl p-6 ${
               stat.isManual
                 ? 'bg-orange-950/30 border-orange-400/30'
-                : 'bg-slate-950/60 border-white/10'
+                : 'bg-black/60 border-white/10'
             }`}
           >
             <div className="flex items-start justify-between mb-4">
@@ -145,15 +148,15 @@ export default function StatsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-white/5 rounded-lg p-3">
+              <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Actual</div>
                 <div className="text-2xl font-bold">{stat.value}</div>
               </div>
-              <div className="bg-white/5 rounded-lg p-3">
+              <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Calculat</div>
                 <div className="text-2xl font-bold">{stat.calculated}</div>
               </div>
-              <div className="bg-white/5 rounded-lg p-3">
+              <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Manual</div>
                 <div className="text-2xl font-bold">
                   {stat.fallback || '—'}
@@ -167,7 +170,7 @@ export default function StatsPage() {
                   type="number"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
+                  className="flex-1 px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
                   step="0.1"
                 />
                 <button
@@ -175,14 +178,14 @@ export default function StatsPage() {
                   disabled={saving}
                   type="button"
                   aria-busy={saving}
-                  className="px-6 py-2 text-white rounded-lg font-medium disabled:opacity-50"
+                  className="px-6 py-2 text-white rounded-xl font-medium disabled:opacity-50"
                 >
                   {saving ? 'Desant...' : 'Desar'}
                 </button>
                 <button
                   onClick={() => setEditingStat(null)}
                   type="button"
-                  className="px-4 py-2 bg-white/5 rounded-lg font-medium hover:bg-white/10"
+                  className="px-4 py-2 bg-white/5 rounded-xl font-medium hover:bg-white/10"
                 >
                   Cancel·lar
                 </button>
@@ -192,7 +195,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => startEdit(stat)}
                   type="button"
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg font-medium hover:bg-white/10"
+                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl font-medium hover:bg-white/10"
                 >
                   ✏️ Editar Valor Manual
                 </button>
@@ -202,7 +205,7 @@ export default function StatsPage() {
                     disabled={saving}
                     type="button"
                     aria-busy={saving}
-                    className="px-4 py-2 border rounded-lg font-medium disabled:opacity-50"
+                    className="px-4 py-2 border rounded-xl font-medium disabled:opacity-50"
                   >
                     🔄 Usar Valor Automàtic
                   </button>
@@ -223,6 +226,7 @@ export default function StatsPage() {
           <li>• Pots restablir a automàtic en qualsevol moment</li>
         </ul>
       </div>
+      <ConfirmDialog {...dialogProps} />
     </AdminPage>
   );
 }

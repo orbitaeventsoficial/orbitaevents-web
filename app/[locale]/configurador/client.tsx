@@ -27,6 +27,7 @@ import { generateQuotePDF } from '@/lib/pdf-utils';
 import { fetchWithCsrf } from '@/lib/csrf';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
+import { getWhatsAppUrl } from '@/config/site-config';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
@@ -224,8 +225,8 @@ export default function ConfiguradorClient() {
           });
           setExtrasCatalog(normalized);
         }
-      } catch {
-        // Fallback a EXTRAS del config
+      } catch (error) {
+        console.error('[Configurador] Error carregant extres:', error);
       }
     }
 
@@ -337,7 +338,8 @@ export default function ConfiguradorClient() {
 
   // Scroll al top quan canvies de pas o selecciones pack
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'instant' : 'smooth' });
   }, [step, config.selectedPack, config.eventType]);
 
   const availableExtras = useMemo(() => {
@@ -485,6 +487,7 @@ export default function ConfiguradorClient() {
             return (
               <button
                 key={service.slug}
+                aria-pressed={config.eventType === service.slug}
                 onClick={() => {
                   setConfig({ ...config, eventType: service.slug as EventType });
                   setStep(2);
@@ -678,7 +681,7 @@ export default function ConfiguradorClient() {
                 <label
                   key={extra.id}
                   htmlFor={`extra-${extra.id}`}
-                  className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden ${
+                  className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden min-h-[44px] ${
                     config.extras.includes(extra.id)
                       ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
                       : 'border-border hover:border-fuchsia-500/50'
@@ -749,9 +752,10 @@ export default function ConfiguradorClient() {
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
+              aria-label={t('step3.discountCode')}
               value={discountCodeInput}
               onChange={(e) => {
-                setDiscountCodeInput(e.target.value.toUpperCase());
+                setDiscountCodeInput(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''));
                 setDiscountCodeError('');
               }}
               placeholder={t('step3.discountCodePlaceholder')}
@@ -761,6 +765,7 @@ export default function ConfiguradorClient() {
               type="button"
               onClick={applyDiscountCode}
               disabled={discountCodeLoading || !discountCodeInput.trim()}
+              aria-busy={discountCodeLoading}
               className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
             >
               {discountCodeLoading ? t('step3.validatingCode') : t('step3.applyCode')}
@@ -1071,6 +1076,7 @@ export default function ConfiguradorClient() {
                     id="name"
                     name="name"
                     autoComplete="name"
+                    aria-required="true"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
@@ -1089,6 +1095,7 @@ export default function ConfiguradorClient() {
                     id="contact"
                     name="contact"
                     autoComplete="email tel"
+                    aria-required="true"
                     value={formData.contact}
                     onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
@@ -1102,6 +1109,7 @@ export default function ConfiguradorClient() {
 
             {/* Turnstile CAPTCHA */}
             <div className="pt-2">
+              <p className="text-xs text-text-muted mb-2">{t('step4.captchaExplanation')}</p>
               <TurnstileWidget
                 onSuccess={(token) => {
                   setTurnstileToken(token);
@@ -1116,7 +1124,7 @@ export default function ConfiguradorClient() {
             <button
               type="submit"
               disabled={sending || !turnstileToken}
-              className="w-full btn-primary text-xl py-6 flex items-center justify-center gap-3 animate-pulse hover:animate-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary sm:text-xl text-lg sm:py-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sending ? (
                 <>
@@ -1125,7 +1133,7 @@ export default function ConfiguradorClient() {
                 </>
               ) : (
                 <>
-                  <FileText className="w-6 h-6" />
+                  <span className="animate-pulse"><FileText className="w-6 h-6" /></span>
                   {t('step4.reserveWithDiscount', { amount: earlyBirdDiscount })}
                 </>
               )}
@@ -1138,6 +1146,20 @@ export default function ConfiguradorClient() {
             >
               {t('step4.reviewConfig')}
             </button>
+
+            {/* WhatsApp fallback */}
+            <div className="text-center pt-4 border-t border-border">
+              <p className="text-xs text-text-muted mb-2">{t('step4.preferWhatsApp')}</p>
+              <a
+                href={getWhatsAppUrl('configurador', { packName: config.selectedPack?.name, precio: finalPrice })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] transition-colors"
+                onClick={() => track('Configurador_WhatsApp_Fallback', { step: 4, packId: config.selectedPack?.id })}
+              >
+                💬 {t('step4.contactWhatsApp')}
+              </a>
+            </div>
           </form>
         )}
 
@@ -1155,27 +1177,36 @@ export default function ConfiguradorClient() {
     <div className="min-h-screen bg-bg-main py-20 overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Progress Steps con glow fucsia */}
-        <div className="mb-16 flex justify-center">
+        <nav aria-label={t('step1.title')} className="mb-16 flex justify-center">
           <div className="flex items-center gap-2 sm:gap-4">
-            {[1, 2, 3, 4].map((s) => (
+            {([
+              { n: 1, label: t('step1.title') },
+              { n: 2, label: 'Pack' },
+              { n: 3, label: t('step3.title') },
+              { n: 4, label: t('step4.lastStep') },
+            ] as const).map(({ n: s, label }) => (
               <div key={s} className="flex items-center gap-2 sm:gap-4">
-                <div
-                  className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all ${
-                    step >= s
-                      ? 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]'
-                      : 'bg-bg-surface text-text-muted border border-border'
-                  }`}
-                >
-                  {step > s ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : s}
-                  {step === s && (
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 blur-lg" />
-                  )}
+                <div className="flex flex-col items-center gap-1">
+                  <div
+                    aria-current={step === s ? 'step' : undefined}
+                    className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all ${
+                      step >= s
+                        ? 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]'
+                        : 'bg-bg-surface text-text-muted border border-border'
+                    }`}
+                  >
+                    {step > s ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : s}
+                    {step === s && (
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 blur-lg" />
+                    )}
+                  </div>
+                  <span className="hidden sm:block text-[10px] text-text-muted max-w-[80px] text-center truncate">{label}</span>
                 </div>
                 {s < 4 && <div className={`h-0.5 w-6 sm:w-12 ${step > s ? 'bg-gradient-to-r from-purple-500 to-fuchsia-500' : 'bg-border'}`} />}
               </div>
             ))}
           </div>
-        </div>
+        </nav>
 
         {/* Steps Content */}
         {step === 1 && renderStep1()}

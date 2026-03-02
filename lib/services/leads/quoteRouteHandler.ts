@@ -29,13 +29,13 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
     };
   }
 
-  const djHours = typeof (pack as any).durationHours === 'number' ? (pack as any).durationHours : 4;
+  const djHours = pack.durationHours ?? 4;
   return {
     name: pack.name,
     price: pack.priceValue ?? 500,
     djHours,
     extraHourPrice: 80,
-    description: (pack as any).emotion || pack.tagline || pack.name,
+    description: pack.emotion || pack.tagline || pack.name,
   };
 }
 

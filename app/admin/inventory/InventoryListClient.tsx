@@ -84,8 +84,8 @@ export default function InventoryListClient() {
       const data = await res.json();
       setItems(data.items || []);
       setStats(data.stats || {});
-    } catch {
-      // Silently fail
+    } catch (error) {
+      console.error('[Inventory] Error carregant inventari:', error);
     } finally {
       setLoading(false);
     }
@@ -176,8 +176,8 @@ export default function InventoryListClient() {
       if (res.ok) {
         fetchData();
       }
-    } catch {
-      // Silently fail
+    } catch (error) {
+      console.error('[Inventory] Error actualitzant item:', error);
     }
   }, [fetchData]);
 
@@ -274,7 +274,7 @@ export default function InventoryListClient() {
               className={`px-3 py-2 text-xs font-medium transition-colors ${
                 viewMode === 'list'
                   ? 'bg-cyan-500/20 text-cyan-200'
-                  : 'bg-slate-700/50 text-slate-400 hover:bg-slate-600/50'
+                  : 'bg-white/5 text-white/40 hover:bg-white/10/50'
               }`}
             >
               Llista
@@ -285,7 +285,7 @@ export default function InventoryListClient() {
               className={`px-3 py-2 text-xs font-medium transition-colors ${
                 viewMode === 'grid'
                   ? 'bg-cyan-500/20 text-cyan-200'
-                  : 'bg-slate-700/50 text-slate-400 hover:bg-slate-600/50'
+                  : 'bg-white/5 text-white/40 hover:bg-white/10/50'
               }`}
             >
               Graella
@@ -337,7 +337,7 @@ export default function InventoryListClient() {
           <select
             value={selectedBundleId}
             onChange={(e) => setSelectedBundleId(e.target.value)}
-            className="rounded-lg border px-3 py-2 text-xs"
+            className="rounded-xl border px-3 py-2 text-xs"
           >
             {bundles.map((bundle) => (
               <option key={bundle.id} value={bundle.id}>
@@ -349,9 +349,9 @@ export default function InventoryListClient() {
             value={bundleNameDraft}
             onChange={(e) => setBundleNameDraft(e.target.value)}
             placeholder="Nou lot"
-            className="rounded-lg border px-3 py-2 text-xs"
+            className="rounded-xl border px-3 py-2 text-xs"
           />
-          <button type="button" onClick={createBundle} className="rounded-lg border px-3 py-2 text-xs">
+          <button type="button" onClick={createBundle} className="rounded-xl border px-3 py-2 text-xs">
             + Crear lot
           </button>
         </div>
@@ -362,9 +362,9 @@ export default function InventoryListClient() {
                 value={selectedBundle.name}
                 onChange={(e) => renameSelectedBundle(e.target.value)}
                 onBlur={persistRenameSelectedBundle}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
+                className="w-full rounded-xl border px-3 py-2 text-sm"
               />
-              <button type="button" onClick={deleteSelectedBundle} className="rounded-lg border px-3 py-1.5 text-xs">
+              <button type="button" onClick={deleteSelectedBundle} className="rounded-xl border px-3 py-1.5 text-xs">
                 Eliminar lot
               </button>
             </div>
@@ -373,7 +373,7 @@ export default function InventoryListClient() {
                 value={bundleItemSearch}
                 onChange={(e) => setBundleItemSearch(e.target.value)}
                 placeholder="Afegir element per nom o codi"
-                className="w-full rounded-lg border px-3 py-2 text-xs"
+                className="w-full rounded-xl border px-3 py-2 text-xs"
               />
               <div className="max-h-24 overflow-auto space-y-1">
                 {candidateItems.map((item) => (
@@ -381,7 +381,7 @@ export default function InventoryListClient() {
                     key={item.id}
                     type="button"
                     onClick={() => addItemToBundle(item.id)}
-                    className="w-full text-left rounded-lg border px-2 py-1 text-xs"
+                    className="w-full text-left rounded-xl border px-2 py-1 text-xs"
                   >
                     + {item.code} · {item.name}
                   </button>
@@ -389,7 +389,7 @@ export default function InventoryListClient() {
               </div>
               <div className="max-h-24 overflow-auto space-y-1">
                 {selectedBundleItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg border px-2 py-1 text-xs">
+                  <div key={item.id} className="flex items-center justify-between rounded-xl border px-2 py-1 text-xs">
                     <span className="">{item.code} · {item.name}</span>
                     <button type="button" onClick={() => removeItemFromBundle(item.id)} className="">Treure</button>
                   </div>
@@ -409,7 +409,7 @@ export default function InventoryListClient() {
               <Link
                 key={item.id}
                 href={`/admin/inventory/${item.id}`}
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs"
+                className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs"
               >
                 <code className="font-mono">{item.code}</code>
                 <span>{item.name}</span>
@@ -427,7 +427,7 @@ export default function InventoryListClient() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cercar per nom o codi..."
-          className="w-full rounded-xl border px-4 py-3 text-sm focus:ring-1"
+          className="w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
         />
 
         <div className="grid gap-2 sm:grid-cols-3">
@@ -436,7 +436,7 @@ export default function InventoryListClient() {
             <select
               value={filterCategory ?? ''}
               onChange={(e) => setFilterCategory(e.target.value || null)}
-              className="w-full rounded-lg border px-2 py-1.5 text-xs focus:ring-1"
+              className="w-full rounded-xl border px-2 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               <option value="">Totes</option>
               {categories.map((cat) => {
@@ -456,7 +456,7 @@ export default function InventoryListClient() {
             <select
               value={filterStatus ?? ''}
               onChange={(e) => setFilterStatus(e.target.value || null)}
-              className="w-full rounded-lg border px-2 py-1.5 text-xs focus:ring-1"
+              className="w-full rounded-xl border px-2 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               <option value="">Tots</option>
               {statuses.map((st) => (
@@ -551,7 +551,7 @@ export default function InventoryListClient() {
         /* Vista Llista (taula) */
         <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-label="Inventari d'equipament">
               <thead className="border-b">
                 <tr>
                   <th scope="col" className="px-4 py-3 text-left font-medium">Codi</th>
@@ -564,13 +564,13 @@ export default function InventoryListClient() {
                   <th scope="col" className="px-4 py-3 text-right font-medium">Accions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-white/5">
                 {items.map((item) => {
                   const catConf = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦' };
                   const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
 
                   return (
-                    <tr key={item.id} className="transition-colors">
+                    <tr key={item.id} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-4 py-3">
                         <code className="text-xs font-mono px-2 py-1 rounded">
                           {item.code}
@@ -622,7 +622,7 @@ export default function InventoryListClient() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/admin/inventory/${item.id}`}
-                          className="inline-flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                          className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors"
                         >
                           Fitxa
                         </Link>

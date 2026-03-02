@@ -151,7 +151,8 @@ export async function getFuelCostPerKmReference(): Promise<{
         costPerKm: refreshed.costPerKm,
         updatedAt: new Date().toISOString(),
       };
-    } catch {
+    } catch (error) {
+      console.error('[FuelReference] Error refrescant preu combustible:', error);
       return {
         costPerKm: Number.isFinite(costValue) && costValue > 0 ? costValue : DEFAULT_FUEL_COST_PER_KM,
         updatedAt,

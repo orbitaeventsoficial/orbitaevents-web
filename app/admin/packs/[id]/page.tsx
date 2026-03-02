@@ -137,7 +137,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
               <Link
                 key={b.id}
                 href={`/admin/bookings/${b.id}`}
-                className="flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition-colors hover:bg-white/5"
+                className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors hover:bg-white/5"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-xs">{b.reference}</span>

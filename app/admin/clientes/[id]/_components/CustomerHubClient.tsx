@@ -100,7 +100,7 @@ class PanelErrorBoundary extends Component<
             <button
               type="button"
               onClick={() => this.setState({ hasError: false })}
-              className="mt-3 rounded-lg border px-3 py-1.5 text-xs"
+              className="mt-3 rounded-xl border px-3 py-1.5 text-xs"
             >
               Torna a intentar
             </button>
@@ -137,7 +137,7 @@ function TimelineSkeleton() {
       <div className="h-5 w-1/2 rounded" />
       <div className="mt-3 space-y-2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-16 rounded-lg" />
+          <div key={i} className="h-16 rounded-xl" />
         ))}
       </div>
     </aside>
@@ -257,7 +257,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         {/* Refresh error banner */}
         {refreshError && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-lg border px-4 py-2 text-sm">
+            <div className="rounded-xl border px-4 py-2 text-sm">
               {refreshError}
               <button
                 type="button"
@@ -273,7 +273,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         {/* Refreshing indicator */}
         {isPending && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-lg border px-4 py-2 text-sm">
+            <div className="rounded-xl border px-4 py-2 text-sm">
               <span className="mr-2 inline-block animate-spin">⟳</span>
               Actualitzant dades...
             </div>

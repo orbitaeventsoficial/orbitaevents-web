@@ -141,15 +141,16 @@ export default function NewBlogPostPage() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Configuració general */}
-        <div className="rounded-lg border border-white/10 bg-white/5 p-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Configuració general</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor="nb-slug" className="mb-2 block text-sm font-medium text-white">
                 Slug (URL) *
               </label>
               <input
+                id="nb-slug"
                 type="text"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
@@ -162,7 +163,7 @@ export default function NewBlogPostPage() {
                   }
                 }}
                 placeholder="mi-primer-post"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
                 required
               />
               <p className="mt-1 text-xs text-white/60">
@@ -172,23 +173,25 @@ export default function NewBlogPostPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-white">Autor</label>
+                <label htmlFor="nb-author" className="mb-2 block text-sm font-medium text-white">Autor</label>
                 <input
+                  id="nb-author"
                   type="text"
                   value={formData.author}
                   onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-white">
+                <label htmlFor="nb-category" className="mb-2 block text-sm font-medium text-white">
                   Categoria
                 </label>
                 <select
+                  id="nb-category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 >
                   <option value="general">General</option>
                   <option value="bodas">Bodes</option>
@@ -201,59 +204,63 @@ export default function NewBlogPostPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor="nb-tags" className="mb-2 block text-sm font-medium text-white">
                 Etiquetes (separades per comes)
               </label>
               <input
+                id="nb-tags"
                 type="text"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 placeholder="dj, bodas, música"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor="nb-featured-image" className="mb-2 block text-sm font-medium text-white">
                 Imatge destacada (URL)
               </label>
               <input
+                id="nb-featured-image"
                 type="url"
                 value={formData.featuredImage}
                 onChange={(e) =>
                   setFormData({ ...formData, featuredImage: e.target.value })
                 }
                 placeholder="https://..."
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-white">
+                <label htmlFor="nb-reading-time" className="mb-2 block text-sm font-medium text-white">
                   Temps de lectura (minuts)
                 </label>
                 <input
+                  id="nb-reading-time"
                   type="number"
                   value={formData.readingTime}
                   onChange={(e) =>
                     setFormData({ ...formData, readingTime: parseInt(e.target.value) })
                   }
                   min="1"
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-white">
+                <label htmlFor="nb-publish-date" className="mb-2 block text-sm font-medium text-white">
                   Data de publicació
                 </label>
                 <input
+                  id="nb-publish-date"
                   type="date"
                   value={formData.publishedAt}
                   onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}
                   max={new Date().toISOString().split('T')[0]}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 />
                 <p className="mt-1 text-xs text-white/50">Deixa buit per usar avui</p>
               </div>
@@ -278,14 +285,14 @@ export default function NewBlogPostPage() {
         </div>
 
         {/* Translations */}
-        <div className="rounded-lg border border-white/10 bg-white/5 p-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white">Contingut</h2>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setActiveLocale('es')}
-                className={`rounded-lg px-4 py-2 ${
+                className={`rounded-xl px-4 py-2 ${
                   activeLocale === 'es'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white/5 text-white/60'
@@ -296,7 +303,7 @@ export default function NewBlogPostPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocale('ca')}
-                className={`rounded-lg px-4 py-2 ${
+                className={`rounded-xl px-4 py-2 ${
                   activeLocale === 'ca'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white/5 text-white/60'
@@ -309,71 +316,76 @@ export default function NewBlogPostPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor={`nb-title-${activeLocale}`} className="mb-2 block text-sm font-medium text-white">
                 Títol *
               </label>
               <input
+                id={`nb-title-${activeLocale}`}
                 type="text"
                 value={formData.translations[activeLocale].title}
                 onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor={`nb-excerpt-${activeLocale}`} className="mb-2 block text-sm font-medium text-white">
                 Extracte *
               </label>
               <textarea
+                id={`nb-excerpt-${activeLocale}`}
                 value={formData.translations[activeLocale].excerpt}
                 onChange={(e) => updateTranslation(activeLocale, 'excerpt', e.target.value)}
                 rows={3}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor={`nb-content-${activeLocale}`} className="mb-2 block text-sm font-medium text-white">
                 Contingut (Markdown) *
               </label>
               <textarea
+                id={`nb-content-${activeLocale}`}
                 value={formData.translations[activeLocale].content}
                 onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
                 rows={15}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 font-mono text-sm text-white"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-mono text-sm text-white"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor={`nb-meta-title-${activeLocale}`} className="mb-2 block text-sm font-medium text-white">
                 Meta títol (SEO)
               </label>
               <input
+                id={`nb-meta-title-${activeLocale}`}
                 type="text"
                 value={formData.translations[activeLocale].metaTitle}
                 onChange={(e) =>
                   updateTranslation(activeLocale, 'metaTitle', e.target.value)
                 }
                 placeholder="Si està buit, s'usarà el títol"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white">
+              <label htmlFor={`nb-meta-desc-${activeLocale}`} className="mb-2 block text-sm font-medium text-white">
                 Meta descripció (SEO)
               </label>
               <textarea
+                id={`nb-meta-desc-${activeLocale}`}
                 value={formData.translations[activeLocale].metaDescription}
                 onChange={(e) =>
                   updateTranslation(activeLocale, 'metaDescription', e.target.value)
                 }
                 rows={2}
                 placeholder="Si està buida, s'usarà l'extracte"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
           </div>
@@ -385,14 +397,14 @@ export default function NewBlogPostPage() {
             type="submit"
             disabled={loading}
             aria-busy={loading}
-            className="rounded-lg px-6 py-3 text-white disabled:opacity-50"
+            className="rounded-xl px-6 py-3 text-white disabled:opacity-50"
           >
             {loading ? 'Desant...' : 'Crear post'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/admin/blog')}
-            className="rounded-lg border border-white/10 bg-white/5 px-6 py-3 text-white hover:bg-white/10"
+            className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-white hover:bg-white/10"
           >
             Cancel·lar
           </button>

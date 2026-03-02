@@ -125,20 +125,20 @@ export default async function MensajesPage() {
       <section className="flex flex-wrap gap-3">
         <Link
           href="/admin/leads?status=NEW"
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
         >
           🔵 Veure noves ({data.pendingLeads})
         </Link>
         <a
           href="https://wa.me/34600000000"
           target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
         >
           💬 Obrir WhatsApp Web
         </a>
         <Link
           href="/admin/leads"
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium"
         >
           👥 Totes les entrades
         </Link>
@@ -150,27 +150,27 @@ export default async function MensajesPage() {
           <h3 className="font-semibold">📋 Plantilles Ràpides</h3>
         </div>
         <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Primer contacte</p>
             <p className="text-xs mt-1">Resposta inicial a una entrada nova</p>
           </button>
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Envia pressupost</p>
             <p className="text-xs mt-1">Acompanyament de pressupost</p>
           </button>
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Seguiment</p>
             <p className="text-xs mt-1">Recordatori després de dies</p>
           </button>
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Confirmació</p>
             <p className="text-xs mt-1">Confirmar reserva</p>
           </button>
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Preesdeveniment</p>
             <p className="text-xs mt-1">Detalls abans de l&apos;esdeveniment</p>
           </button>
-          <button type="button" className="p-3 rounded-lg border text-left transition-colors">
+          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
             <p className="font-medium">Postesdeveniment</p>
             <p className="text-xs mt-1">Agraïment i enquesta</p>
           </button>
@@ -182,7 +182,7 @@ export default async function MensajesPage() {
         <div className="border-b p-4">
           <h3 className="font-semibold">📬 Missatges recents</h3>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-white/5">
           {data.recentLeads.map((lead) => {
             const statusConfig = LEAD_STATUS_CONFIG_LOCAL[lead.status] || LEAD_STATUS_CONFIG_LOCAL.NEW;
             const sourceIcon = SOURCE_ICONS[lead.source] || '📩';
@@ -222,7 +222,7 @@ export default async function MensajesPage() {
                       <a
                         href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-xl"
                         title="WhatsApp"
                       >
                         💬
@@ -230,7 +230,7 @@ export default async function MensajesPage() {
                     )}
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl"
                       title="Obre"
                     >
                       👁️

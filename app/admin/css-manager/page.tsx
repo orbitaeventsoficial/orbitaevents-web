@@ -429,7 +429,7 @@ export default function AdminCssManagerPage() {
           <button
             type="button"
             onClick={() => setCss(EXAMPLE_CSS)}
-            className="admin-keep-colors admin-css-btn admin-css-btn--neutral rounded-lg border px-3 py-1.5 text-xs"
+            className="admin-keep-colors admin-css-btn admin-css-btn--neutral rounded-xl border px-3 py-1.5 text-xs"
           >
             Carregar exemple
           </button>
@@ -459,7 +459,7 @@ export default function AdminCssManagerPage() {
                 <button
                   type="button"
                   onClick={() => setCss(buildPaletteCss(palette))}
-                  className="admin-keep-colors admin-css-btn admin-css-btn--neutral mt-3 rounded-lg border px-3 py-1.5 text-xs"
+                  className="admin-keep-colors admin-css-btn admin-css-btn--neutral mt-3 rounded-xl border px-3 py-1.5 text-xs"
                 >
                   Aplicar paleta
                 </button>
@@ -472,7 +472,7 @@ export default function AdminCssManagerPage() {
             type="button"
             onClick={save}
             disabled={saving || loading}
-            className="admin-keep-colors admin-css-btn admin-css-btn--save rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+            className="admin-keep-colors admin-css-btn admin-css-btn--save rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
           >
             {saving ? 'Desant...' : 'Desar CSS'}
           </button>

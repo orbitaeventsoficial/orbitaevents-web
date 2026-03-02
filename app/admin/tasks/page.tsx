@@ -177,16 +177,16 @@ export default async function TasksPage({
       back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
       actions={
         <>
-          <div className="flex items-center gap-1 rounded-lg border p-0.5">
+          <div className="flex items-center gap-1 rounded-xl border p-0.5">
             <Link
               href={`/admin/tasks?view=kanban${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${isKanban ? 'bg-slate-600 text-white' : ''}`}
+              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${isKanban ? 'bg-white/10 text-white' : ''}`}
             >
               Kanban
             </Link>
             <Link
               href={`/admin/tasks?view=list${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${!isKanban ? 'bg-slate-600 text-white' : ''}`}
+              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${!isKanban ? 'bg-white/10 text-white' : ''}`}
             >
               Llista
             </Link>

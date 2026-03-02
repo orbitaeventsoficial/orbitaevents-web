@@ -9,7 +9,7 @@
       "title": "Barcelona Halloween Party | Complete Decoration + DJ + Effects | Orbita Events",
       "description": "Transform your event into a night of terror. Decoration throughout the space: giant ghosts, cages with tarantulas, magic cauldron, candles, strange mirrors... DJ + special effects. From €600."
     },
-    "badge": "🎃 Halloween Season 2025",
+    "badge": "🎃 Halloween Season {year}",
     "hero": {
       "title1": "NIGHTS OF",
       "title2": "TERROR",
@@ -18,7 +18,7 @@
     "cta": {
       "reserve": "Book your night of terror",
       "whatsapp": "direct WhatsApp",
-      "reserve2025": "Book Halloween 2025",
+      "reserve2025": "Book Halloween {year}",
       "requestInfo": "Request info"
     },
     "gallery": {
@@ -45,7 +45,7 @@
     },
     "packs": {
       "title": "Packs",
-      "titleHighlight": "Halloween 2025",
+      "titleHighlight": "Halloween {year}",
       "subtitle": "Everything includes complete decoration. Choose the intensity level.",
       "mostRequested": "MORE ORDER",
       "hours": "hours",
@@ -155,7 +155,7 @@
       }
     },
     "urgency": {
-      "title": "Halloween 2025",
+      "title": "Halloween {year}",
       "subtitle": "Saturdays in October fly by. Book soon.",
       "octobrerDates": "October Saturdays:",
       "dates": [
@@ -518,7 +518,7 @@
         },
         {
           "q": "What happens if we need to change the date or number of guests?",
-          "a": "We review our agenda and, whenever there is availability, we transfer the reservation; The 30% deposit remains as credit for the new date and we send you an updated contract. If you finally cancel with less than 15 days, the usual policy applies (non-refundable deposit), but we will help you find an alternative."
+          "a": "We review our agenda and, whenever there is availability, we transfer the reservation at no extra cost (minimum 30 days in advance); the 30% deposit remains as credit for the new date and we send you an updated contract. If you ultimately cancel, the standard policy applies: more than 60 days, 100% refund; 30-60 days, 50% refund; less than 30 days, non-refundable."
         }
       ]
     },
@@ -1522,7 +1522,8 @@
       "reviews": "Opinions",
       "contact": "Contact",
       "faq": "FAQ",
-      "blog": "Blog"
+      "blog": "Blog",
+      "configurator": "Configurator"
     },
     "dropdowns": {
       "servicesTitle": "Our services",
@@ -1935,7 +1936,10 @@
       "errorContact": "Enter your email or phone number",
       "errorCaptcha": "Please complete the security check",
       "errorSend": "Error sending. Please try again or call us directly.",
-      "downloadPDF": "Download PDF Budget"
+      "downloadPDF": "Download PDF Budget",
+      "captchaExplanation": "Security check to protect you from spam",
+      "preferWhatsApp": "Prefer to talk directly?",
+      "contactWhatsApp": "Contact via WhatsApp"
     },
     "discountCodeErrors": {
       "expired": "This code has expired.",
@@ -2541,7 +2545,7 @@
       "paymentFacilities": "Payment facilities:",
       "paymentInfo": {
         "deposit": "Deposit: 30% at time of booking",
-        "rest": "Rest: day of the event",
+        "rest": "Rest: 7 days before the event",
         "noFees": "No transfer fees"
       }
     },
@@ -2761,8 +2765,8 @@
       "flexiblePayment": "Flexible payment:",
       "paymentFeatures": {
         "deposit": "30% when you reserve your date",
-        "rest": "70% on the day of the event",
-        "cancel": "Free cancellation up to 15 days before"
+        "rest": "70% 7 days before the event",
+        "cancel": "More than 60 days: 100% refund. 30-60 days: 50% refund. Less than 30 days: non-refundable."
       },
       "extras": {
         "hora-extra": {
@@ -3209,19 +3213,21 @@
           "senal": "Sign:",
           "senalDesc": "30% of the total to confirm the reservation",
           "resto": "Rest:",
-          "restoDesc": "On the day of the event or according to agreement",
+          "restoDesc": "Remaining 70%, 7 days before the event",
           "metodos": "Methods:",
           "metodosDesc": "Bank transfer, Bizum, cash"
         }
       },
       "section4": {
         "title": "4. Cancellations",
-        "item1": "More than 30 days before:",
-        "item2": "Between 15-30 days:",
-        "item3": "Less than 15 days:",
-        "item3Desc": "100% service charge",
-        "item4": "Force Majeure:",
-        "item4Desc": "Special conditions will be agreed"
+        "item1": "More than 60 days before:",
+        "item1Desc": "100% deposit refund",
+        "item2": "Between 30-60 days:",
+        "item2Desc": "50% deposit refund",
+        "item3": "Less than 30 days:",
+        "item3Desc": "Deposit is non-refundable",
+        "item4": "Cancellation by the provider:",
+        "item4Desc": "100% refund of all payments received"
       },
       "section5": {
         "title": "5. Obligations of the Client",
@@ -3841,7 +3847,7 @@
         "title": "🎃 Halloween theme",
         "description": "Horror nights with complete decoration",
         "price": "From €600",
-        "badge": "🔥 Season 2025",
+        "badge": "🔥 Season {year}",
         "href": "/halloween-theme",
         "features": [
           "Theme DJ",
@@ -4125,7 +4131,7 @@
       "total": "TOTAL",
       "conditions": "Conditions",
       "deposit": "30% deposit to confirm reservation",
-      "remaining": "Rest to be paid on the day of the event",
+      "remaining": "Rest to be paid 7 days before the event",
       "includes": "Includes assembly, disassembly and movement",
       "signature": "Signature",
       "accept": "I accept the conditions"
@@ -4376,7 +4382,7 @@
       "trustYears": "🎯 +2 years of experience",
       "trustLocation": "📍 Barcelona and Girona",
       "trustResponse": "⚡ Response in 2 hours",
-      "guarantee": "✓ No-obligation quote · Free cancellation up to 7 days before"
+      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before"
     },
     "testimonis": {
       "0": {
@@ -5640,7 +5646,7 @@
           },
           {
             "question": "What happens if I have to cancel?",
-            "answer": "We understand that sometimes things change. Free cancellation up to 30 days before. Between 30-15 days, we retain 50% of the reservation. Less than 15 days, there are no returns. But if you want to change the date, we always try to accommodate!"
+            "answer": "We understand that sometimes things change. More than 60 days: 100% refund. 30-60 days: 50% refund. Less than 30 days: non-refundable. If you want to change the date (minimum 30 days in advance), we always try to accommodate!"
           },
           {
             "question": "Are there extra costs?",
@@ -6209,7 +6215,7 @@
         "limited": "🔥 It's over!",
         "available": "✓ Available"
       },
-      "guarantee": "✓ No-obligation quote · Free cancellation up to 7 days before"
+      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before"
     },
     "heroVideo": {
       "badge": "✨ Creators of Immersive Experiences",
@@ -6274,7 +6280,7 @@
     "socialProof": "5.0 · Verified opinions",
     "whatsappMessage": "Hello! I'd like information for my event.",
     "badges": {
-      "halloween": "Calendar 2026 open",
+      "halloween": "Calendar {year} open",
       "monMagic": "Magic World",
       "rating": "5.0/5 · 50+ events"
     },
@@ -6306,7 +6312,7 @@
         "subtitle": "nights of terror",
         "description": "Full decoration, theme DJ, FX effects",
         "price": "From €600",
-        "badge": "🔥 Season 2025",
+        "badge": "🔥 Season {year}",
         "features": {
           "0": "giant ghosts",
           "1": "magic cauldron",
@@ -6570,7 +6576,7 @@
         },
         "2": {
           "title": "No commitment",
-          "description": "Cancel for free if you change your mind"
+          "description": "100% refund if cancelled 60+ days before"
         },
         "3": {
           "title": "5.0 rating",

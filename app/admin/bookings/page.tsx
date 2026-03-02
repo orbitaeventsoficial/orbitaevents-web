@@ -241,7 +241,7 @@ export default async function BookingsPage({
                 className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
                   isPast && booking.status !== 'COMPLETED'
                     ? 'border-orange-500/30'
-                    : 'border-slate-700/50 bg-slate-800/60 hover:bg-slate-700/40'
+                    : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -323,7 +323,7 @@ export default async function BookingsPage({
       {/* Desktop Table View */}
       <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1060px] text-sm">
+          <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de reserves">
             <thead className="border-b">
               <tr>
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Ref.</th>
@@ -337,7 +337,7 @@ export default async function BookingsPage({
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-white/5">
               {bookings.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -357,7 +357,7 @@ export default async function BookingsPage({
                       className={`transition-colors ${
                         isPast && booking.status !== 'COMPLETED'
                           ? 'bg-orange-500/5'
-                          : 'hover:bg-slate-700/30'
+                          : 'hover:bg-white/[0.03]'
                       }`}
                     >
                       <td className="px-4 py-3 text-center">
@@ -456,22 +456,22 @@ export default async function BookingsPage({
             {pagination.page > 1 ? (
               <Link
                 href={`/admin/bookings?page=${pagination.page - 1}`}
-                className="rounded-lg border px-3 py-1"
+                className="rounded-xl border px-3 py-1"
               >
                 ← Anterior
               </Link>
             ) : (
-              <span className="rounded-lg border px-3 py-1">← Anterior</span>
+              <span className="rounded-xl border px-3 py-1">← Anterior</span>
             )}
             {pagination.page < pagination.totalPages ? (
               <Link
                 href={`/admin/bookings?page=${pagination.page + 1}`}
-                className="rounded-lg border px-3 py-1"
+                className="rounded-xl border px-3 py-1"
               >
                 Següent →
               </Link>
             ) : (
-              <span className="rounded-lg border px-3 py-1">Següent →</span>
+              <span className="rounded-xl border px-3 py-1">Següent →</span>
             )}
           </div>
         </section>

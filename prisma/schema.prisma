@@ -9,6 +9,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -269,6 +270,7 @@ model Customer {
   leads             Lead[]
   bookings          Booking[]
   proposals         Proposal[]
+  invoices          Invoice[]
   tasks             Task[]
   testimonials      CustomerTestimonial[]
   discountCodes     CustomerDiscountCode[]
@@ -635,6 +637,7 @@ model Booking {
   clientSurvey       ClientSurvey?
   clientFeedback     ClientFeedback?
   proposals          Proposal[]
+  invoices           Invoice[]
   tasks              Task[]
   portalAccesses     ClientPortalAccess[]
 
@@ -699,6 +702,22 @@ enum ProposalStatus {
   EXPIRED
 }
 
+enum ContractStatus {
+  DRAFT
+  SENT
+  SIGNED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING_SYNC
+  SYNCED
+  SYNC_ERROR
+  PAID
+  CANCELLED
+}
+
 model Proposal {
   id            String         @id @default(cuid())
   reference     String         @unique
@@ -721,6 +740,21 @@ model Proposal {
   pdfUrl        String?
   pdfKey        String?
   tasks         Task[]
+
+  // Contracte (neix d'una proposta acceptada)
+  contractReference  String?
+  contractStatus     ContractStatus?
+  contractPdfUrl     String?
+  contractPdfKey     String?
+  contractSentAt     DateTime?
+  contractSignedAt   DateTime?
+  contractSignedBy   String?
+  depositAmount      Float?
+  depositDueDate     DateTime?
+  finalPaymentDue    DateTime?
+  cancellationPolicy String?        @db.Text
+  additionalClauses  String?        @db.Text
+
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   sentAt        DateTime?
@@ -730,7 +764,51 @@ model Proposal {
   @@index([leadId])
   @@index([bookingId])
   @@index([status, createdAt])
+  @@index([contractStatus])
   @@map("proposals")
+}
+
+model Invoice {
+  id              String        @id @default(cuid())
+  reference       String        @unique // FAC-YYYY-NNNN
+  bookingId       String
+  booking         Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customerId      String
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  // Dades fiscals (snapshot al moment de creació)
+  clientName      String
+  clientNIF       String?
+  clientAddress   String?
+
+  // Imports
+  subtotal        Float
+  discount        Float         @default(0)
+  vatRate         Float         @default(21)
+  vatAmount       Float
+  total           Float
+
+  // Estat
+  status          InvoiceStatus @default(DRAFT)
+
+  // Integració Holded
+  holdedInvoiceId   String?
+  holdedContactId   String?
+  holdedSyncedAt    DateTime?
+  holdedSyncError   String?
+  holdedInvoiceUrl  String?
+
+  // PDF
+  pdfUrl          String?
+  pdfKey          String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([status])
+  @@map("invoices")
 }
 
 model Task {

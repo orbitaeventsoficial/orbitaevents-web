@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getPackPricingModelConfig, computePackPricingHealth } from '@/lib/services/packPricingHealth';
 import { getRequestId } from '@/lib/request-context';
+import { timingSafeEqual } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -12,8 +13,11 @@ const DIVERGENCE_THRESHOLD_PCT = 15;
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return false;
-  return authHeader === `Bearer ${cronSecret}`;
+  if (!cronSecret || !authHeader) return false;
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const received = Buffer.from(authHeader);
+  if (expected.length !== received.length) return false;
+  return timingSafeEqual(expected, received);
 }
 
 export async function GET(request: NextRequest) {

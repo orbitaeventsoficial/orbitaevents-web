@@ -26,8 +26,8 @@ export default function LeadQuickStatus({
       });
       if (!res.ok) throw new Error();
       router.refresh();
-    } catch {
-      // Silent fail for compact control
+    } catch (error) {
+      console.error('[LeadQuickStatus] Error canviant estat:', error);
     } finally {
       setSaving(false);
     }
@@ -38,8 +38,9 @@ export default function LeadQuickStatus({
       value={currentStatus}
       onChange={(e) => onChange(e.target.value as LeadStatus)}
       disabled={saving}
-      className="rounded-lg border px-2 py-1 text-[11px]"
+      className="rounded-xl border px-2 py-1 text-[11px]"
       title="Canviar estat"
+      aria-label="Canviar estat"
     >
       <option value="NEW">Entrada nova</option>
       <option value="CONTACTED">Contactat</option>

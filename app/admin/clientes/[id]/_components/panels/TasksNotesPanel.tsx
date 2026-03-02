@@ -72,14 +72,14 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
         </div>
         <Link
           href={`/admin/tasks/new?customerId=${data.customer.id}`}
-          className="rounded-lg px-3 py-2 text-xs font-semibold text-white"
+          className="rounded-xl px-3 py-2 text-xs font-semibold text-white"
         >
           Nova tasca
         </Link>
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg border p-2 text-xs">
+        <p className="mt-3 rounded-xl border p-2 text-xs">
           {error}
         </p>
       )}
@@ -129,12 +129,12 @@ function TaskColumn({
       <p className="text-xs uppercase tracking-wider">{title}</p>
       <div className="mt-2 space-y-2">
         {items.length === 0 ? (
-          <p className="rounded-lg border p-3 text-xs">
+          <p className="rounded-xl border p-3 text-xs">
             Sense tasques.
           </p>
         ) : (
           items.map((task) => (
-            <article key={task.id} className="rounded-lg border p-3">
+            <article key={task.id} className="rounded-xl border p-3">
               <p className="text-sm">{task.title}</p>
               <p className="mt-1 text-[11px]">
                 {task.dueDate

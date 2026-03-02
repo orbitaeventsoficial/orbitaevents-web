@@ -19,24 +19,12 @@ export async function getSlaSnapshot() {
     },
   });
 
-  const openAutoTasks = await (async () => {
-    try {
-      const prismaAny = prisma as any;
-      return await prismaAny.task.count({
-        where: {
-          status: { in: ['OPEN', 'IN_PROGRESS'] },
-          createdBy: 'SLA Bot',
-        },
-      });
-    } catch {
-      return prisma.leadTask.count({
-        where: {
-          status: { in: ['OPEN', 'IN_PROGRESS'] },
-          createdBy: 'SLA Bot',
-        },
-      });
-    }
-  })();
+  const openAutoTasks = await prisma.task.count({
+    where: {
+      status: { in: ['OPEN', 'IN_PROGRESS'] },
+      createdBy: 'SLA Bot',
+    },
+  });
 
   return {
     slaHours: SLA_HOURS,
@@ -89,25 +77,20 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
         },
       });
 
-      try {
-        const txAny = tx as any;
-        await txAny.task.create({
-          data: {
-            legacyLeadTaskId: createdLegacyTask.id,
-            customerId: lead.customerId || null,
-            leadId: lead.id,
-            title: createdLegacyTask.title,
-            description: createdLegacyTask.description,
-            dueDate: createdLegacyTask.dueDate,
-            priority: createdLegacyTask.priority,
-            status: createdLegacyTask.status,
-            assignedTo: createdLegacyTask.assignedTo,
-            createdBy: createdLegacyTask.createdBy,
-          },
-        });
-      } catch {
-        // Keep SLA flow non-blocking if universal tasks table is not available yet.
-      }
+      await tx.task.create({
+        data: {
+          legacyLeadTaskId: createdLegacyTask.id,
+          customerId: lead.customerId || null,
+          leadId: lead.id,
+          title: createdLegacyTask.title,
+          description: createdLegacyTask.description,
+          dueDate: createdLegacyTask.dueDate,
+          priority: createdLegacyTask.priority,
+          status: createdLegacyTask.status,
+          assignedTo: createdLegacyTask.assignedTo,
+          createdBy: createdLegacyTask.createdBy,
+        },
+      });
 
       await tx.leadActivity.create({
         data: {

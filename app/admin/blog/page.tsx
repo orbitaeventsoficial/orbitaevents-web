@@ -6,6 +6,7 @@ import { Pencil, Trash2, Plus } from 'lucide-react';
 import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface BlogPost {
   id: string;
@@ -37,6 +38,7 @@ export default function BlogAdminPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const searchParams = useSearchParams();
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -66,7 +68,8 @@ export default function BlogAdminPage() {
   }, [searchParams]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Segur que vols eliminar aquest post?')) return;
+    const ok = await confirm({ title: 'Eliminar post', message: 'Segur que vols eliminar aquest post?', confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/admin/blog?id=${id}`, {
@@ -117,7 +120,7 @@ export default function BlogAdminPage() {
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
             aria-label="Idioma"
-            className="rounded-xl border px-4 py-2 focus:ring-1"
+            className="rounded-xl border px-4 py-2 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
           >
             <option value="es">Castellà</option>
             <option value="ca">Català</option>
@@ -176,8 +179,8 @@ export default function BlogAdminPage() {
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-2xl border backdrop-blur-sm overflow-x-auto">
+            <table className="w-full text-sm" aria-label="Llistat d'articles del blog">
               <thead className="border-b">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left font-medium">
@@ -200,11 +203,11 @@ export default function BlogAdminPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-white/5">
                 {posts.map((post) => {
                   const translation = post.translations[0];
                   return (
-                    <tr key={post.id} className="transition-colors">
+                    <tr key={post.id} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-6 py-4">
                         <div>
                           <div className="font-medium">
@@ -243,7 +246,7 @@ export default function BlogAdminPage() {
                               (window.location.href = `/admin/blog/edit/${post.id}`)
                             }
                             type="button"
-                            className="rounded-lg p-2 transition-colors"
+                            className="rounded-xl p-2 transition-colors"
                             title="Editar"
                           >
                             <Pencil className="h-5 w-5" />
@@ -251,7 +254,7 @@ export default function BlogAdminPage() {
                           <button
                             onClick={() => handleDelete(post.id)}
                             type="button"
-                            className="rounded-lg p-2 transition-colors"
+                            className="rounded-xl p-2 transition-colors"
                             title="Eliminar"
                           >
                             <Trash2 className="h-5 w-5" />
@@ -290,6 +293,7 @@ export default function BlogAdminPage() {
           )}
         </>
       )}
+      <ConfirmDialog {...dialogProps} />
     </AdminPage>
   );
 }

@@ -15,7 +15,7 @@ export default function FaqLayout({ children }: { children: React.ReactNode }) {
         </p>
         <Link
           href="/admin"
-          className="mt-4 inline-flex rounded-lg border px-3 py-1.5 text-xs font-semibold"
+          className="mt-4 inline-flex rounded-xl border px-3 py-1.5 text-xs font-semibold"
         >
           Tornar al tauler
         </Link>

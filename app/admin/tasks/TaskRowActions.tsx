@@ -32,8 +32,8 @@ export default function TaskRowActions({
         throw new Error(data?.error || 'No s’ha pogut actualitzar la tasca');
       }
       router.refresh();
-    } catch {
-      // keep silent in compact row actions
+    } catch (error) {
+      console.error('[TaskRowActions] Error actualitzant tasca:', error);
     } finally {
       setSaving(false);
     }

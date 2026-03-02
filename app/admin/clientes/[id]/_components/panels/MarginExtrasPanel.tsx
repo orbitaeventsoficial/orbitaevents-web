@@ -30,12 +30,12 @@ export default function MarginExtrasPanel({
         <Metric label="Marge estimat" value={money(margin)} />
       </div>
 
-      <div className="mt-4 rounded-lg border p-3 text-xs flex items-center justify-between">
+      <div className="mt-4 rounded-xl border p-3 text-xs flex items-center justify-between">
         <span>Per editar extres i cost real, obre l&apos;Studio amb el proposal actiu.</span>
         {active && (
           <Link
             href={`/admin/presupuestos?proposalId=${active.id}&customerId=${data.customer.id}`}
-            className="rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ml-3 shrink-0"
+            className="rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors ml-3 shrink-0"
           >
             Obrir Studio →
           </Link>

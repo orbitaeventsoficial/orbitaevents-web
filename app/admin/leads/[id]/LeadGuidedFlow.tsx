@@ -197,7 +197,7 @@ export default function LeadGuidedFlow({
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg border px-3 py-2 text-xs">
+        <p className="mt-3 rounded-xl border px-3 py-2 text-xs">
           {error}
         </p>
       )}
@@ -231,7 +231,7 @@ export default function LeadGuidedFlow({
                 <span className="sm:hidden">{i + 1}</span>
               </button>
               {i < STEPS.length - 1 && (
-                <span className={`hidden lg:block mx-1 text-lg ${isDone ? 'text-emerald-500' : 'text-slate-600'}`}>
+                <span className={`hidden lg:block mx-1 text-lg ${isDone ? 'text-emerald-500' : 'text-white/40'}`}>
                   →
                 </span>
               )}

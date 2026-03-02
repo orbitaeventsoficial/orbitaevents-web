@@ -211,56 +211,56 @@ export default async function ClientPortalPage({
   const travelCharge = calculateTravelCharge(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <main className="min-h-screen bg-gradient-to-b from-black via-[#0a0a0a] to-black text-white/90">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="rounded-2xl border bg-slate-900/60 p-6 shadow-xl" style={{ borderColor: accentBorder }}>
+        <header className="rounded-2xl border bg-white/[0.03] p-6 shadow-xl" style={{ borderColor: accentBorder }}>
           <p className="text-xs uppercase tracking-[0.2em]" style={{ color: accentHex }}>{t.booking} {booking.reference}</p>
           <h1 className="mt-2 text-2xl font-bold">{personalization.headline || t.defaultHeadline}</h1>
-          <p className="mt-2 text-sm text-slate-300">{personalization.introMessage || t.defaultIntro}</p>
+          <p className="mt-2 text-sm text-white/70">{personalization.introMessage || t.defaultIntro}</p>
         </header>
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+        <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="text-lg font-semibold">{t.event}</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
             <div>
-              <p className="text-slate-400">{t.eventDate}</p>
+              <p className="text-white/40">{t.eventDate}</p>
               <p>{new Date(booking.eventDate).toLocaleDateString(toIntlLocale(locale))}</p>
             </div>
             <div>
-              <p className="text-slate-400">{t.eventLocation}</p>
+              <p className="text-white/40">{t.eventLocation}</p>
               <p>{booking.eventVenue ? `${booking.eventVenue} · ${booking.eventLocation}` : booking.eventLocation}</p>
             </div>
             <div>
-              <p className="text-slate-400">{t.eventGuests}</p>
+              <p className="text-white/40">{t.eventGuests}</p>
               <p>{booking.guestCount}</p>
             </div>
           </div>
         </section>
 
         {(typeof booking.distanceKm === 'number' && booking.distanceKm > 0) && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.travel}</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.travelDistance}</p>
+                <p className="text-white/40">{t.travelDistance}</p>
                 <p>{formatDistanceKm(totalTravelKm)} km</p>
-                <p className="text-xs text-slate-500">{t.travelRoundTripFrom} Granollers</p>
+                <p className="text-xs text-white/40">{t.travelRoundTripFrom} Granollers</p>
                 <p className="text-xs text-emerald-300">{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.travelRate}</p>
+                <p className="text-white/40">{t.travelRate}</p>
                 <p>{TRAVEL_BLOCK_EUR} € / {TRAVEL_BLOCK_KM} km extra</p>
-                <p className="text-xs text-slate-400">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm)} km ({travelBlocks} trams)</p>
+                <p className="text-xs text-white/40">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm)} km ({travelBlocks} trams)</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.travelEstimated}</p>
+                <p className="text-white/40">{t.travelEstimated}</p>
                 <p>{formatCurrency(travelCharge)}</p>
               </div>
             </div>
           </section>
         )}
 
-        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+        <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="text-lg font-semibold">{t.services}</h2>
           <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-950/20 p-4">
             <p className="text-xs uppercase text-amber-300">Pack</p>
@@ -284,18 +284,18 @@ export default async function ClientPortalPage({
         </section>
 
         {showPayments && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.payments}</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.paymentDeposit}</p>
+                <p className="text-white/40">{t.paymentDeposit}</p>
                 <p className="text-base font-semibold">{formatCurrency(booking.depositAmount)}</p>
                 <p className={booking.depositPaid ? 'text-emerald-300' : 'text-amber-300'}>
                   {booking.depositPaid ? t.paid : t.pending}
                 </p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.paymentRemaining}</p>
+                <p className="text-white/40">{t.paymentRemaining}</p>
                 <p className="text-base font-semibold">{formatCurrency(booking.remainingAmount)}</p>
                 <p className={booking.remainingPaid ? 'text-emerald-300' : 'text-amber-300'}>
                   {booking.remainingPaid ? t.paid : t.pending}
@@ -306,19 +306,19 @@ export default async function ClientPortalPage({
         )}
 
         {showTimeline && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.timeline}</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">{t.status}</p>
+                <p className="text-white/40">{t.status}</p>
                 <p>{STATUS_LABELS[booking.status] || booking.status}</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">Portal</p>
+                <p className="text-white/40">Portal</p>
                 <p>{access.expiresAt ? `Vàlid fins ${new Date(access.expiresAt).toLocaleDateString('ca-ES')}` : 'Actiu'}</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-slate-400">Post-event</p>
+                <p className="text-white/40">Post-event</p>
                 <p>{booking.postEventReport ? 'Informe intern completat' : 'En progrés'}</p>
               </div>
             </div>
@@ -326,7 +326,7 @@ export default async function ClientPortalPage({
         )}
 
         {showDocuments && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.documents}</h2>
             {latestProposal?.pdfUrl ? (
               <div className="mt-3">
@@ -334,28 +334,28 @@ export default async function ClientPortalPage({
                   href={latestProposal.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold text-slate-100 hover:brightness-110"
+                  className="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold text-white/90 hover:brightness-110"
                   style={{ borderColor: accentBorder, backgroundColor: accentBg }}
                 >
                   Obrir pressupost ({latestProposal.reference})
                 </a>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-slate-300">{t.noDocuments}</p>
+              <p className="mt-3 text-sm text-white/70">{t.noDocuments}</p>
             )}
           </section>
         )}
 
         {showPostEvent && booking.status === 'COMPLETED' && (
-          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.postEvent}</h2>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 text-sm text-white/70">
               Estat de seguiment: {(booking as Record<string, unknown>).clientFeedback ? 'feedback enviat' : 'pendent de tancament'}.
             </p>
           </section>
         )}
 
-        <footer className="mt-8 text-center text-xs text-slate-400">
+        <footer className="mt-8 text-center text-xs text-white/40">
           <p>Orbita Events</p>
           <Link href={`/${locale}`} className="hover:underline" style={{ color: accentHex }}>
             {t.backHome}

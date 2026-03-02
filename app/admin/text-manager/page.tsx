@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -115,7 +116,7 @@ const SECTIONS: Section[] = [
     name: 'Footer',
     icon: '🦶',
     description: 'Peu de pàgina i enllaços legals',
-    color: 'from-slate-500 to-zinc-500',
+    color: 'from-white/20 to-zinc-500',
     paths: ['footer.', 'legal.']
   },
   {
@@ -204,6 +205,8 @@ export default function TextManagerPage() {
   const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
 
   // Historial de canvis
+  const { confirm, dialogProps } = useConfirmDialog();
+
   const [changeHistory, setChangeHistory] = useState<Array<{
     path: string;
     oldValue: string;
@@ -388,17 +391,17 @@ export default function TextManagerPage() {
     }
   };
 
-  const handleRevertAll = () => {
-    if (confirm('Vols revertir TOTS els canvis d\'aquest idioma?')) {
-      if (activeLanguage === 'es') {
-        setEsTexts({ ...originalEsTexts });
-      } else if (activeLanguage === 'ca') {
-        setCaTexts({ ...originalCaTexts });
-      } else if (activeLanguage === 'en') {
-        setEnTexts({ ...originalEnTexts });
-      }
-      setChangeHistory([]);
+  const handleRevertAll = async () => {
+    const ok = await confirm({ title: 'Revertir canvis', message: `Vols revertir TOTS els canvis de ${LANGUAGE_META[activeLanguage].label}?`, confirmLabel: 'Revertir', variant: 'warning' });
+    if (!ok) return;
+    if (activeLanguage === 'es') {
+      setEsTexts({ ...originalEsTexts });
+    } else if (activeLanguage === 'ca') {
+      setCaTexts({ ...originalCaTexts });
+    } else if (activeLanguage === 'en') {
+      setEnTexts({ ...originalEnTexts });
     }
+    setChangeHistory([]);
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -471,10 +474,10 @@ export default function TextManagerPage() {
     return (
       <div
         key={path}
-        className={`bg-slate-900/70 rounded-xl border transition-all ${
+        className={`bg-black/70 rounded-xl border transition-all ${
           isModified
             ? 'border-orange-300 shadow-md shadow-orange-100'
-            : 'border-slate-700/60 hover:border-slate-700/60'
+            : 'border-white/10 hover:border-white/10'
         }`}
       >
         <div className="p-4">
@@ -494,7 +497,7 @@ export default function TextManagerPage() {
               {isModified && (
                 <button
                   onClick={() => handleRevert(path)}
-                  className="text-xs px-3 py-1 rounded-lg border transition-colors"
+                  className="text-xs px-3 py-1 rounded-xl border transition-colors"
                   title="Revertir canvis"
                 >
                   ↩️ Revertir
@@ -510,10 +513,10 @@ export default function TextManagerPage() {
             value={value}
             onChange={(e) => handleTextChange(path, e.target.value)}
             rows={Math.min(12, Math.max(2, value.split('\n').length + 1))}
-            className={`w-full px-4 py-3 rounded-lg border transition-all resize-y font-sans ${
+            className={`w-full px-4 py-3 rounded-xl border transition-all resize-y font-sans ${
               isModified
                 ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-                : 'border-slate-700/60 bg-slate-900/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                : 'border-white/10 bg-white/[0.02] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
             }`}
             placeholder="Text buit..."
           />
@@ -521,7 +524,7 @@ export default function TextManagerPage() {
           {showComparison && (
             <div className="mt-3 space-y-2">
               {activeLanguage !== 'es' && otherLangValues.es && (
-                <div className="p-3 rounded-lg border">
+                <div className="p-3 rounded-xl border">
                   <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🇪🇸 Espanyol:</span>
                   </div>
@@ -529,7 +532,7 @@ export default function TextManagerPage() {
                 </div>
               )}
               {activeLanguage !== 'ca' && otherLangValues.ca && (
-                <div className="p-3 rounded-lg border">
+                <div className="p-3 rounded-xl border">
                   <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🏴 Català:</span>
                   </div>
@@ -537,7 +540,7 @@ export default function TextManagerPage() {
                 </div>
               )}
               {activeLanguage !== 'en' && otherLangValues.en && (
-                <div className="p-3 rounded-lg border">
+                <div className="p-3 rounded-xl border">
                   <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🇬🇧 Anglès:</span>
                   </div>
@@ -548,7 +551,7 @@ export default function TextManagerPage() {
           )}
 
           {isModified && (
-            <div className="mt-2 p-2 rounded-lg text-xs border">
+            <div className="mt-2 p-2 rounded-xl text-xs border">
               <span className="font-medium">Original:</span>{' '}
               <span className="italic">{originalTexts[path]}</span>
             </div>
@@ -609,37 +612,37 @@ export default function TextManagerPage() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setActiveLanguage('es')}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'es'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
+                        : 'bg-black/70 text-white/60 hover:bg-white/10'
                     }`}
                   >
                     {LANGUAGE_META.es.icon} {LANGUAGE_META.es.label}
                   </button>
                   <button
                     onClick={() => setActiveLanguage('ca')}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'ca'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
+                        : 'bg-black/70 text-white/60 hover:bg-white/10'
                     }`}
                   >
                     {LANGUAGE_META.ca.icon} {LANGUAGE_META.ca.label}
                   </button>
                   <button
                     onClick={() => setActiveLanguage('en')}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'en'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
+                        : 'bg-black/70 text-white/60 hover:bg-white/10'
                     }`}
                   >
                     {LANGUAGE_META.en.icon} {LANGUAGE_META.en.label}
                   </button>
                 </div>
               </div>
-              <div className="text-xs px-3 py-1.5 rounded-lg border">
+              <div className="text-xs px-3 py-1.5 rounded-xl border">
                 💡 Estàs editant: {LANGUAGE_META[activeLanguage].label} · Auto-traducció ON
               </div>
             </div>
@@ -687,10 +690,10 @@ export default function TextManagerPage() {
               {/* Toggle modificats */}
               <button
                 onClick={() => setShowOnlyModified(!showOnlyModified)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
+                    : 'bg-white/5 text-white/60 hover:bg-white/5'
                 }`}
               >
                     {showOnlyModified ? '✅ Només modificats' : '📋 Mostrar tots'}
@@ -699,10 +702,10 @@ export default function TextManagerPage() {
               {/* Comparar idiomes */}
               <button
                 onClick={() => setShowComparison(!showComparison)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
+                    : 'bg-white/5 text-white/60 hover:bg-white/5'
                 }`}
               >
                 🌐 Comparar idiomes
@@ -713,7 +716,7 @@ export default function TextManagerPage() {
               {modifiedCount > 0 && (
                 <button
                   onClick={handleRevertAll}
-                  className="px-4 py-2 rounded-lg text-sm font-medium border transition-all"
+                  className="px-4 py-2 rounded-xl text-sm font-medium border transition-all"
                 >
                   ↩️ Revertir ({modifiedCount})
                 </button>
@@ -726,7 +729,7 @@ export default function TextManagerPage() {
                 className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
                   modifiedCount > 0
                     ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-slate-800 text-slate-400 cursor-not-allowed'
+                    : 'bg-white/5 text-white/40 cursor-not-allowed'
                 }`}
               >
                 {saving ? (
@@ -793,7 +796,7 @@ export default function TextManagerPage() {
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
                     ? 'bg-gradient-to-r from-amber-500/30 to-orange-500/20 text-amber-100 border border-amber-400/40 shadow-lg'
-                    : 'bg-slate-900/70 hover:bg-slate-900/60 text-slate-100'
+                    : 'bg-black/70 hover:bg-white/[0.02] text-white/90'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -817,7 +820,7 @@ export default function TextManagerPage() {
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg`
-                        : 'bg-slate-900/70 hover:bg-slate-900/60 text-slate-100'
+                        : 'bg-black/70 hover:bg-white/[0.02] text-white/90'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -832,12 +835,12 @@ export default function TextManagerPage() {
                             {counts.modified}
                           </span>
                         )}
-                        <span className={`text-xs ${isActive ? 'opacity-70' : 'text-slate-400'}`}>
+                        <span className={`text-xs ${isActive ? 'opacity-70' : 'text-white/40'}`}>
                           {counts.total}
                         </span>
                       </div>
                     </div>
-                    <p className={`text-xs mt-1 ${isActive ? 'opacity-70' : 'text-slate-400'}`}>
+                    <p className={`text-xs mt-1 ${isActive ? 'opacity-70' : 'text-white/40'}`}>
                       {section.description}
                     </p>
                   </button>
@@ -852,7 +855,7 @@ export default function TextManagerPage() {
                   </h3>
                   <div className="space-y-2">
                     {changeHistory.slice(-10).reverse().map((change, i) => (
-                      <div key={i} className="text-xs p-2 rounded-lg">
+                      <div key={i} className="text-xs p-2 rounded-xl">
                         <code className="break-all">
                           {change.path.split('.').slice(-2).join('.')}
                         </code>
@@ -874,8 +877,8 @@ export default function TextManagerPage() {
             {/* Info de secció activa */}
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
-                SECTIONS.find(s => s.id === activeSection)?.color || 'from-slate-500 to-slate-600'
-              } text-slate-100`}>
+                SECTIONS.find(s => s.id === activeSection)?.color || 'from-white/20 to-white/10'
+              } text-white/90`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   {SECTIONS.find(s => s.id === activeSection)?.icon}
                   {SECTIONS.find(s => s.id === activeSection)?.name}
@@ -946,6 +949,7 @@ export default function TextManagerPage() {
           </button>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

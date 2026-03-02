@@ -58,8 +58,8 @@ const THEMES = [
 
   // Zen / Relaxació
   { id: 'zen', emoji: '🪷', category: 'zen', items: ['🪷', '🧘', '☯️', '🕯️', '🪨', '💧', '🌸'], cursor: '🪷', colors: ['#a3a3a3', '#737373'], bg: 'from-stone-950 via-neutral-950 to-black', sound: [174.61, 220, 261.63] },
-  { id: 'rain', emoji: '🌧️', category: 'zen', items: ['💧', '🌧️', '☔', '🌈', '🍃', '🐸'], cursor: '💧', colors: ['#60a5fa', '#3b82f6'], bg: 'from-blue-950 via-slate-950 to-black', sound: [196, 233.08, 261.63] },
-  { id: 'snow', emoji: '❄️', category: 'zen', items: ['❄️', '☃️', '🌨️', '⛄', '🏔️', '🎿'], cursor: '❄️', colors: ['#e0f2fe', '#bae6fd'], bg: 'from-sky-950 via-slate-950 to-black', sound: [293.66, 349.23, 392] },
+  { id: 'rain', emoji: '🌧️', category: 'zen', items: ['💧', '🌧️', '☔', '🌈', '🍃', '🐸'], cursor: '💧', colors: ['#60a5fa', '#3b82f6'], bg: 'from-blue-950 via-black to-black', sound: [196, 233.08, 261.63] },
+  { id: 'snow', emoji: '❄️', category: 'zen', items: ['❄️', '☃️', '🌨️', '⛄', '🏔️', '🎿'], cursor: '❄️', colors: ['#e0f2fe', '#bae6fd'], bg: 'from-sky-950 via-black to-black', sound: [293.66, 349.23, 392] },
 ];
 
 // Category IDs map to translation keys in sensorial.categoryNames.*
@@ -615,7 +615,7 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
           </button>
         )}
 
-        <p className="text-white/20 text-xs text-center mt-8">
+        <p className="text-white/40 text-xs text-center mt-8">
           {t('tutorial.madeBy')}
         </p>
       </motion.div>

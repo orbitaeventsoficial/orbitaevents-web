@@ -30,7 +30,7 @@ const SOURCE_SELECTED_STYLES: Record<string, string> = {
   REFERRAL: 'border-orange-400/70 bg-orange-500/25 text-orange-100',
   GOOGLE: 'border-amber-400/70 bg-amber-500/25 text-amber-100',
   WEBSITE: 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100',
-  OTHER: 'border-slate-400/70 bg-slate-500/25 text-slate-100',
+  OTHER: 'border-white/20 bg-white/10 text-white/90',
 };
 
 const EVENT_TYPES = [
@@ -46,7 +46,7 @@ const EVENT_TYPES = [
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: 'LOW', label: 'Baixa', selected: 'border-slate-400/60 bg-slate-500/20 text-slate-200' },
+  { value: 'LOW', label: 'Baixa', selected: 'border-white/15 bg-white/5 text-white/80' },
   { value: 'MEDIUM', label: 'Mitjana', selected: 'border-sky-400/60 bg-sky-500/20 text-sky-100' },
   { value: 'HIGH', label: 'Alta', selected: 'border-orange-400/60 bg-orange-500/20 text-orange-100' },
   { value: 'URGENT', label: 'Urgent', selected: 'border-rose-400/70 bg-rose-500/25 text-rose-100' },
@@ -284,7 +284,7 @@ export default function IntakePage() {
                   <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                     dup.matchScore >= 80 ? 'bg-rose-500/20 text-rose-300' :
                     dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                    'bg-slate-500/20 text-slate-400'
+                    'bg-white/5 text-white/40'
                   }`}>
                     {dup.matchScore}%
                   </span>
@@ -315,7 +315,7 @@ export default function IntakePage() {
               className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
                   ? `${SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
-                  : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
+                  : 'border-white/10 bg-white/[0.02] text-white/60 hover:bg-white/5'
               }`}
             >
               <span className="inline-flex items-center justify-center gap-1.5">
@@ -333,33 +333,36 @@ export default function IntakePage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Nom *</label>
+            <label htmlFor="intake-name" className="text-xs">Nom *</label>
             <input
+              id="intake-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Nom i cognom"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Email *</label>
+            <label htmlFor="intake-email" className="text-xs">Email *</label>
             <input
+              id="intake-email"
               type="email"
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="client@exemple.com"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Telèfon</label>
+            <label htmlFor="intake-phone" className="text-xs">Telèfon</label>
             <input
+              id="intake-phone"
               type="tel"
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
@@ -370,10 +373,10 @@ export default function IntakePage() {
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
-                  className={`admin-keep-colors rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
+                  className={`admin-keep-colors rounded-xl border px-2 py-2 text-sm font-medium transition-all ${
                     form.priority === p.value
                       ? `${p.selected} shadow-sm`
-                      : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
+                      : 'border-white/10 text-white/40 hover:bg-white/5'
                   }`}
                 >
                   {p.label}
@@ -400,7 +403,7 @@ export default function IntakePage() {
                 className={`admin-keep-colors rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
                     ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
-                    : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
+                    : 'border-white/10 bg-white/[0.02] text-white/40 hover:bg-white/5'
                 }`}
               >
                 <span className="text-base leading-none">{et.icon}</span>
@@ -412,51 +415,57 @@ export default function IntakePage() {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs">Data</label>
+            <label htmlFor="intake-date" className="text-xs">Data</label>
             <input
+              id="intake-date"
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div>
-            <label className="text-xs">Ubicació</label>
+            <label htmlFor="intake-location" className="text-xs">Ubicació</label>
             <input
+              id="intake-location"
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Lloc de celebració"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs">Convidats</label>
+              <label htmlFor="intake-guests" className="text-xs">Convidats</label>
               <input
+                id="intake-guests"
                 type="number"
+                min={1}
                 value={form.guestCount}
                 onChange={(e) => updateField('guestCount', e.target.value)}
                 placeholder="100"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
             <div>
-              <label className="text-xs">Pressupost</label>
+              <label htmlFor="intake-budget" className="text-xs">Pressupost</label>
               <input
+                id="intake-budget"
                 type="text"
                 value={form.budget}
                 onChange={(e) => updateField('budget', e.target.value)}
                 placeholder="2.000€"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <label className="text-xs">Missatge / Notes</label>
+          <label htmlFor="intake-message" className="text-xs">Missatge / Notes</label>
           <textarea
+            id="intake-message"
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
             rows={3}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface LeadActionsProps {
   leadId: string;
@@ -18,16 +19,17 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
   const [isDeleting, setIsDeleting] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [priorityUpdating, setPriorityUpdating] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const handleDelete = async () => {
     if (hasBooking) {
-      alert("No es pot eliminar una entrada amb reserva associada");
+      setActionError("No es pot eliminar una entrada amb reserva associada");
       return;
     }
 
-    if (!confirm(`Segur que vols eliminar l'entrada "${leadName}"?\n\nAquesta acció no es pot desfer.`)) {
-      return;
-    }
+    const ok = await confirm({ title: 'Eliminar entrada', message: `Segur que vols eliminar l'entrada "${leadName}"?\n\nAquesta acció no es pot desfer.`, confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     setIsDeleting(true);
     try {
@@ -42,7 +44,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
 
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error eliminant l'entrada");
+      setActionError(error instanceof Error ? error.message : "Error eliminant l'entrada");
     } finally {
       setIsDeleting(false);
     }
@@ -63,7 +65,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       }
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error actualitzant l'estat");
+      setActionError(error instanceof Error ? error.message : "Error actualitzant l'estat");
     } finally {
       setStatusUpdating(false);
     }
@@ -84,19 +86,26 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       }
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error actualitzant la prioritat");
+      setActionError(error instanceof Error ? error.message : "Error actualitzant la prioritat");
     } finally {
       setPriorityUpdating(false);
     }
   };
 
   return (
+    <div className="flex flex-col items-end gap-1">
+      {actionError && (
+        <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-2 py-1 text-[10px] text-rose-300">
+          <span>{actionError}</span>
+          <button type="button" onClick={() => setActionError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+        </div>
+      )}
     <div className="flex items-center justify-end gap-2">
       <select
         value={currentStatus}
         onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
         disabled={statusUpdating}
-        className="rounded-lg border px-2 py-1.5 text-xs"
+        className="rounded-xl border px-2 py-1.5 text-xs"
         title="Canviar estat"
       >
         <option value="NEW">Entrada nova</option>
@@ -110,7 +119,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         value={currentPriority}
         onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
         disabled={priorityUpdating}
-        className="rounded-lg border px-2 py-1.5 text-xs"
+        className="rounded-xl border px-2 py-1.5 text-xs"
         title="Canviar prioritat"
       >
         <option value="LOW">Baixa</option>
@@ -124,7 +133,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
             `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
           )}`}
           target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors border"
+          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium transition-colors border"
           title="Envia per WhatsApp"
         >
           💬 WA
@@ -132,7 +141,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       )}
       <Link
         href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
+        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Veure
       </Link>
@@ -141,15 +150,17 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         disabled={isDeleting || hasBooking}
         type="button"
         aria-busy={isDeleting}
-        className={`inline-flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors
+        className={`inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors
           ${hasBooking
-            ? 'bg-slate-700/30 text-slate-500 cursor-not-allowed border border-slate-600/30'
+            ? 'bg-white/[0.03] text-white/30 cursor-not-allowed border border-white/10'
             : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30'
           }`}
         title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Elimina entrada'}
       >
         {isDeleting ? '...' : '🗑️'}
       </button>
+      <ConfirmDialog {...dialogProps} />
+    </div>
     </div>
   );
 }

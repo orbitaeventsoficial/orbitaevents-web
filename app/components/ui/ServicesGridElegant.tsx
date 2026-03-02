@@ -71,7 +71,7 @@ export default function ServicesGridElegant() {
             const styles = SERVICE_STYLES[key];
             const href = SERVICE_HREFS[key];
             const image = SERVICE_IMAGES[key];
-            const badge = t(`items.${key}.badge`);
+            const badge = t(`items.${key}.badge`, { year: new Date().getFullYear() });
             const features = t.raw(`items.${key}.features`) as string[];
 
             return (

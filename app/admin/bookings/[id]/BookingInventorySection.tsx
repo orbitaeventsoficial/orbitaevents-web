@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 
 const CATEGORY_LABELS: Record<string, string> = {
   SOUND: '🔊 So',
@@ -85,6 +86,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   const [showSearch, setShowSearch] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [skippedDetails, setSkippedDetails] = useState<SkippedDetail[]>([]);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const reasonLabel = (reason: string) => {
     if (reason === 'OVERLAP') return 'Ocupat en una altra reserva activa';
@@ -99,7 +101,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       if (query) params.set('search', query);
 
       const res = await fetch(`/api/admin/bookings/${bookingId}/inventory?${params}`);
-      if (!res.ok) return;
+      if (!res.ok) throw new Error('Error carregant inventari');
 
       const data = await res.json();
       setAssigned(data.assigned || []);
@@ -208,7 +210,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   }, [selectedBundleId, bookingId, fetchData, searchQuery]);
 
   const handleRemove = useCallback(async (assignmentId: string) => {
-    if (!confirm('Segur que vols treure aquest element?')) return;
+    const ok = await confirm({ title: 'Treure element', message: 'Segur que vols treure aquest element de la reserva?', confirmLabel: 'Treure', variant: 'warning' });
+    if (!ok) return;
 
     try {
       const res = await fetch(
@@ -217,15 +220,15 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       );
 
       if (!res.ok) {
-        alert('Error eliminant assignació');
+        setMessage('Error eliminant assignació');
         return;
       }
 
       fetchData(searchQuery);
     } catch {
-      alert('Error eliminant');
+      setMessage('Error eliminant');
     }
-  }, [bookingId, searchQuery, fetchData]);
+  }, [bookingId, searchQuery, fetchData, confirm]);
 
   const handleToggleCheckout = useCallback(async (assignment: Assignment) => {
     try {
@@ -289,24 +292,27 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             type="button"
             onClick={handleAssignPack}
             disabled={packTemplate.length === 0}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium disabled:opacity-50 transition-colors"
+            className="rounded-xl border px-3 py-1.5 text-xs font-medium disabled:opacity-50 transition-colors"
           >
             + Afegir inventari del pack
           </button>
           <button
             type="button"
             onClick={() => setShowSearch(!showSearch)}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+            className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             {showSearch ? 'Tancar cerca' : '+ Afegir element'}
           </button>
         </div>
       </div>
       {message && (
-        <p className="mb-3 text-xs">{message}</p>
+        <div className="mb-3 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-xs text-rose-300" role="alert">
+          <span className="flex-1">{message}</span>
+          <button type="button" onClick={() => setMessage(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+        </div>
       )}
       {skippedDetails.length > 0 && (
-        <div className="mb-3 rounded-lg border p-3">
+        <div className="mb-3 rounded-xl border p-3">
           <p className="mb-2 text-xs font-semibold">Elements no afegits</p>
           <ul className="space-y-1">
             {skippedDetails.map((detail) => (
@@ -323,7 +329,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <select
             value={selectedBundleId}
             onChange={(e) => setSelectedBundleId(e.target.value)}
-            className="rounded-lg border px-3 py-1.5 text-xs"
+            className="rounded-xl border px-3 py-1.5 text-xs"
+            aria-label="Seleccionar lot d'equipament"
           >
             {bundles.map((bundle) => (
               <option key={bundle.id} value={bundle.id}>
@@ -334,7 +341,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <button
             type="button"
             onClick={handleAssignBundle}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+            className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             + Afegir lot
           </button>
@@ -349,7 +356,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           {assigned.map((a) => (
             <div
               key={a.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
+              className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <code className="text-xs font-mono px-2 py-0.5 rounded shrink-0">
@@ -374,10 +381,10 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 <button
                   type="button"
                   onClick={() => handleToggleCheckout(a)}
-                  className={`rounded-lg px-2 py-1 text-xs font-medium transition-all ${
+                  className={`rounded-xl px-2 py-1 text-xs font-medium transition-all ${
                     a.checkedOut
                       ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
-                      : 'bg-slate-700/50 text-slate-400 border border-slate-600/50 hover:bg-slate-600/50'
+                      : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'
                   }`}
                 >
                   {a.checkedOut ? 'Sortida fet' : 'Marcar sortida'}
@@ -390,7 +397,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                       if (e.target.value) handleCheckin(a, e.target.value);
                     }}
                     defaultValue=""
-                    className="rounded-lg border px-2 py-1 text-xs"
+                    className="rounded-xl border px-2 py-1 text-xs"
+                    aria-label="Condició de retorn"
                   >
                     <option value="" disabled>Retorn...</option>
                     {CONDITION_OPTIONS.map((c) => (
@@ -400,7 +408,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 )}
 
                 {a.checkedIn && (
-                  <span className="text-xs px-2 py-1 rounded-lg">
+                  <span className="text-xs px-2 py-1 rounded-xl">
                     Retornat
                   </span>
                 )}
@@ -409,7 +417,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 <button
                   type="button"
                   onClick={() => handleRemove(a.id)}
-                  className="rounded-lg px-2 py-1 text-xs transition-colors"
+                  className="rounded-xl px-2 py-1 text-xs transition-colors"
                 >
                   Treure
                 </button>
@@ -427,7 +435,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cercar per nom o codi..."
-            className="w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
+            className="w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             autoFocus
           />
 
@@ -438,7 +446,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
               {available.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <code className="text-xs font-mono px-1.5 py-0.5 rounded">
@@ -452,7 +460,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                   <button
                     type="button"
                     onClick={() => handleAssign(item.id)}
-                    className="rounded-lg border px-2 py-1 text-xs font-medium transition-colors shrink-0"
+                    className="rounded-xl border px-2 py-1 text-xs font-medium transition-colors shrink-0"
                   >
                     Afegir
                   </button>
@@ -462,6 +470,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           )}
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </section>
   );
 }

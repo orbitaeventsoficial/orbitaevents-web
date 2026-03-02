@@ -207,8 +207,8 @@ export default async function EconomiaPage() {
     });
     inventoryValue = invAgg._sum.value || 0;
     inventoryCount = invAgg._count || 0;
-  } catch {
-    // silently fail
+  } catch (error) {
+    console.error("[Economia] Error carregant dades:", error);
   }
 
   // History logs
@@ -380,6 +380,7 @@ export default async function EconomiaPage() {
       monthCollected={monthCollected}
       atRiskRows={atRiskRows}
       upcomingDueRows={upcomingDueRows}
+      allPaymentRows={rows}
       hasReport={!!report}
       reportError={reportError}
       realized={report?.realized ?? { revenue: 0, netMargin: 0, avgMarginPct: 0, bookings: 0 }}

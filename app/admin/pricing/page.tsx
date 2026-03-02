@@ -101,7 +101,7 @@ const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: stri
   SOUND: { label: 'So', icon: '🔊', color: 'bg-blue-500/20' },
   LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'bg-yellow-500/20' },
   EFFECTS: { label: 'Efectes', icon: '✨', color: 'bg-purple-500/20' },
-  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'bg-slate-500/20' },
+  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'bg-white/5' },
   CABLING: { label: 'Cablejat', icon: '🔌', color: 'bg-green-500/20' },
   TECH: { label: 'Tècnic', icon: '💻', color: 'bg-indigo-500/20' },
   DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'bg-orange-500/20' },
@@ -115,7 +115,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   IN_USE: { label: 'En ús', color: 'bg-blue-500/20 text-blue-300' },
   MAINTENANCE: { label: 'Manteniment', color: 'bg-yellow-500/20 text-yellow-300' },
   BROKEN: { label: 'Avariat', color: 'bg-rose-500/20 text-rose-300' },
-  RETIRED: { label: 'Retirat', color: 'bg-slate-500/20 text-slate-400' },
+  RETIRED: { label: 'Retirat', color: 'bg-white/5 text-white/40' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -227,7 +227,7 @@ export default function PricingAdminPage() {
               px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
               ${activeTab === tab.key
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
-                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 border border-slate-600/50'
+                : 'bg-white/5 text-white/60 hover:bg-white/10 border border-white/10'
               }
             `}
           >
@@ -236,7 +236,7 @@ export default function PricingAdminPage() {
             {tab.badge && (
               <span className={`
                 text-xs px-2 py-0.5 rounded-full
-                ${activeTab === tab.key ? 'bg-white/20' : 'bg-slate-600/50'}
+                ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10'}
               `}>
                 {tab.badge}
               </span>
@@ -295,7 +295,7 @@ export default function PricingAdminPage() {
                 {stats.topExtras.map((extra, i) => (
                   <div key={extra.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-600'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-zinc-400' : i === 2 ? 'bg-amber-600' : 'bg-white/15'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{extra.name}</span>
@@ -318,7 +318,7 @@ export default function PricingAdminPage() {
                 {stats.topPacks.map((pack, i) => (
                   <div key={pack.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-600'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-zinc-400' : i === 2 ? 'bg-amber-600' : 'bg-white/15'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{pack.name}</span>
@@ -387,7 +387,7 @@ export default function PricingAdminPage() {
             {extras.map(extra => (
               <div
                 key={extra.id}
-                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-slate-700/50 bg-slate-800/60 backdrop-blur-sm'}`}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-white/10 bg-white/[0.03] backdrop-blur-sm'}`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -405,7 +405,7 @@ export default function PricingAdminPage() {
                       {extra.linkedInventory.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-4">
                           {extra.linkedInventory.map(item => (
-                            <span key={item.itemCode} className="px-3 py-1 text-sm rounded-lg flex items-center gap-1 border">
+                            <span key={item.itemCode} className="px-3 py-1 text-sm rounded-xl flex items-center gap-1 border">
                               🔧 {item.itemName}
                               {item.quantity > 1 && <span className="">×{item.quantity}</span>}
                             </span>
@@ -432,21 +432,21 @@ export default function PricingAdminPage() {
                               type="number"
                               value={editPrice}
                               onChange={e => setEditPrice(Number(e.target.value))}
-                              className="w-28 px-3 py-2 border-2 rounded-lg text-right text-xl font-bold focus:outline-none"
+                              className="w-28 px-3 py-2 border-2 rounded-xl text-right text-xl font-bold focus:outline-none"
                               /* eslint-disable-next-line jsx-a11y/no-autofocus */
                               autoFocus
                             />
                             <span className="text-xl">€</span>
                           </div>
                           <div className="flex gap-2">
-                            <button onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm rounded-lg transition-colors">Cancel·lar</button>
-                            <button onClick={() => savePrice(extra.id)} disabled={saving} className="px-4 py-1.5 text-sm text-white rounded-lg font-medium transition-colors disabled:opacity-50">
+                            <button type="button" onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm rounded-xl transition-colors">Cancel·lar</button>
+                            <button type="button" onClick={() => savePrice(extra.id)} disabled={saving} className="px-4 py-1.5 text-sm text-white rounded-xl font-medium transition-colors disabled:opacity-50">
                               {saving ? '...' : '✓ Desar'}
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <button onClick={() => { setEditingExtra(extra.id); setEditPrice(extra.price); }} className="group">
+                        <button type="button" onClick={() => { setEditingExtra(extra.id); setEditPrice(extra.price); }} className="group">
                           <div className="text-3xl font-bold transition-colors">{formatCurrency(extra.price)}</div>
                           <div className="text-xs mt-1">Clic per editar ✏️</div>
                         </button>
@@ -528,12 +528,12 @@ export default function PricingAdminPage() {
                       {pack.includedInventory.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {pack.includedInventory.slice(0, 6).map(item => (
-                            <span key={item.itemCode} className="px-2 py-1 text-xs rounded-lg border">
+                            <span key={item.itemCode} className="px-2 py-1 text-xs rounded-xl border">
                               {item.itemName}
                             </span>
                           ))}
                           {pack.includedInventory.length > 6 && (
-                            <span className="px-2 py-1 text-xs rounded-lg">
+                            <span className="px-2 py-1 text-xs rounded-xl">
                               +{pack.includedInventory.length - 6} més
                             </span>
                           )}
@@ -593,12 +593,12 @@ export default function PricingAdminPage() {
               placeholder="Cerca per nom o codi..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="flex-1 px-4 py-2.5 rounded-xl border focus:ring-1"
+              className="flex-1 px-4 py-2.5 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border focus:ring-1"
+              className="px-4 py-2.5 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             >
               <option value="all">Totes les categories</option>
               {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
@@ -610,8 +610,8 @@ export default function PricingAdminPage() {
           {/* Llista */}
           <div className="grid gap-3">
             {filteredInventory.map(item => {
-              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'bg-slate-500/20' };
-              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-slate-500/20 text-slate-400' };
+              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'bg-white/5' };
+              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-white/5 text-white/40' };
 
               return (
                 <div key={item.id} className="rounded-2xl border backdrop-blur-sm p-4 transition-colors">

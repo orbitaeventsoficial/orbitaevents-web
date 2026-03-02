@@ -44,7 +44,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
   }
 
   const inputClass =
-    'w-full rounded-xl border border-stone-300 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
+    'w-full rounded-xl border border-stone-300 bg-black/60 px-3 py-2 text-sm text-white/90 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
 
   function ratioBadge(value: number, warnAt: number, dangerAt: number) {
     if (value >= dangerAt) return { label: 'Fora marge', cls: 'bg-rose-500/15 text-rose-300 border-rose-500/40' };
@@ -151,7 +151,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
               type="button"
               onClick={save}
               disabled={saving}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
             >
               {saving ? 'Desant...' : 'Desar configuració'}
             </button>
@@ -165,25 +165,25 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             Cada ratio és un coeficient de cost. A més ratio, menys marge.
           </p>
           <div className="mt-3 space-y-3 text-xs">
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="font-semibold">Pack: {(form.packCostRatio * 100).toFixed(1)}%</p>
               <p className="">Calcula el cost directe del pack.</p>
               <p className="">Marge teòric: {(100 - form.packCostRatio * 100).toFixed(1)}%</p>
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${packState.cls}`}>{packState.label}</span>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="font-semibold">Extres: {(form.extraCostRatio * 100).toFixed(1)}%</p>
               <p className="">Cost intern estimat dels extres.</p>
               <p className="">Marge teòric: {(100 - form.extraCostRatio * 100).toFixed(1)}%</p>
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${extrasState.cls}`}>{extrasState.label}</span>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="font-semibold">Hora extra: {(form.extraHourCostRatio * 100).toFixed(1)}%</p>
               <p className="">Cost intern de cada hora addicional.</p>
               <p className="">Marge teòric: {(100 - form.extraHourCostRatio * 100).toFixed(1)}%</p>
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${extraHourState.cls}`}>{extraHourState.label}</span>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="font-semibold">Cost operatiu fix: {form.fixedOperationalCost.toFixed(0)}€</p>
               <p className="">Cost fix per servei (temps, gestió, logística).</p>
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${fixedState.cls}`}>{fixedState.label}</span>

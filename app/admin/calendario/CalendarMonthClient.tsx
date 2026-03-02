@@ -456,8 +456,8 @@ export default function CalendarMonthClient() {
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
 
-          let bgClass = 'bg-slate-800/90';
-          let hoverClass = 'hover:bg-slate-700/90';
+          let bgClass = 'bg-white/5';
+          let hoverClass = 'hover:bg-white/5/90';
           if (hasReservas && !hasBloqueos) {
             bgClass = 'bg-emerald-600/30';
             hoverClass = 'hover:bg-emerald-600/40';
@@ -512,7 +512,7 @@ export default function CalendarMonthClient() {
                     'inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs sm:text-sm font-semibold transition-colors',
                     isToday(cell.date)
                       ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
-                      : 'text-slate-300',
+                      : 'text-white/70',
                   ].join(' ')}
                 >
                   {cell.date.getDate()}
@@ -674,7 +674,7 @@ export default function CalendarMonthClient() {
                           <input
                             type="date"
                             autoFocus
-                            className="rounded-lg border border-white/20 bg-white/5 px-2 py-0.5 text-[10px]"
+                            className="rounded-xl border border-white/20 bg-white/5 px-2 py-0.5 text-[10px]"
                             defaultValue={r.fechaEvento.slice(0, 10)}
                             onBlur={() => setChangingDateForBooking(null)}
                             onChange={(e) => {
@@ -688,7 +688,7 @@ export default function CalendarMonthClient() {
                         ) : (
                           <button
                             onClick={() => setChangingDateForBooking(r.id)}
-                            className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                            className="rounded-xl border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
                           >
                             Canviar data
                           </button>

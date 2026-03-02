@@ -134,7 +134,7 @@ export default function BottomNav() {
                 whileTap={{ scale: 0.9 }}
                 className="relative"
               >
-                <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
+                <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
                 {/* Indicador actiu */}
                 {active && (
                   reduceMotion ? (

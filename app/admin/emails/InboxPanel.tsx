@@ -4,6 +4,7 @@ import { formatDateShort, formatDateTimeFull, DEFAULT_LOCALE } from '@/lib/const
 
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface EmailMessage {
   id: string;
@@ -70,6 +71,7 @@ export default function InboxPanel() {
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [page, setPage] = useState(0);
   const limit = 20;
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const fetchEmails = async () => {
     setLoading(true);
@@ -133,7 +135,8 @@ export default function InboxPanel() {
   };
 
   const handleDelete = async (uid: number) => {
-    if (!confirm('Segur que vols eliminar aquest email?')) return;
+    const ok = await confirm({ title: 'Eliminar email', message: 'Segur que vols eliminar aquest email?', confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     try {
       const res = await fetch(`/api/admin/inbox/messages/${uid}`, { method: 'DELETE' });
@@ -146,7 +149,7 @@ export default function InboxPanel() {
       }
       setTotal(prev => prev - 1);
     } catch {
-      alert('Error eliminant email');
+      setError('Error eliminant email');
     }
   };
 
@@ -186,10 +189,10 @@ export default function InboxPanel() {
           type="button"
           aria-label="Refrescar emails"
           aria-busy={loading}
-          className="p-2 rounded-lg transition-colors disabled:opacity-50"
+          className="p-2 rounded-xl transition-colors disabled:opacity-50"
           title="Refrescar"
         >
-          <svg className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`w-5 h-5 text-white/40 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
@@ -217,7 +220,7 @@ export default function InboxPanel() {
       {!loading && !error && (
         <div className="flex">
           {/* Email List */}
-          <div className={`${selectedEmail ? 'w-1/3 border-r border-slate-700/50' : 'w-full'} divide-y divide-slate-700/30 max-h-[500px] overflow-y-auto`}>
+          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} divide-y divide-white/5 max-h-[500px] overflow-y-auto`}>
             {emails.length === 0 ? (
               <div className="p-8 text-center">
                 <span className="text-4xl">📭</span>
@@ -230,16 +233,16 @@ export default function InboxPanel() {
                   onClick={() => handleEmailClick(email)}
                   type="button"
                   aria-pressed={selectedEmail?.uid === email.uid}
-                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-slate-700/30 transition-colors ${
+                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-white/[0.03] transition-colors ${
                     selectedEmail?.uid === email.uid ? 'bg-cyan-500/10 border-l-2 border-l-cyan-500' : ''
-                  } ${!email.isRead ? 'bg-slate-700/20' : ''}`}
+                  } ${!email.isRead ? 'bg-white/[0.02]' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-100' : 'text-slate-300'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-white/90' : 'text-white/60'}`}>
                         {email.from.name || email.from.address}
                       </p>
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-200' : 'text-slate-400'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-white/80' : 'text-white/40'}`}>
                         {email.subject}
                       </p>
                       <p className="text-xs truncate mt-1">
@@ -285,7 +288,7 @@ export default function InboxPanel() {
                     <button
                       onClick={() => handleDelete(selectedEmail.uid)}
                       type="button"
-                      className="p-2 rounded-lg transition-colors"
+                      className="p-2 rounded-xl transition-colors"
                       title="Eliminar"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -296,7 +299,7 @@ export default function InboxPanel() {
                       onClick={() => setSelectedEmail(null)}
                       type="button"
                       aria-label="Tancar detall"
-                      className="p-2 rounded-lg transition-colors"
+                      className="p-2 rounded-xl transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -345,7 +348,7 @@ export default function InboxPanel() {
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
               type="button"
-              className="px-3 py-1.5 text-sm border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               ← Anterior
             </button>
@@ -353,13 +356,14 @@ export default function InboxPanel() {
               onClick={() => setPage(p => p + 1)}
               disabled={(page + 1) * limit >= total}
               type="button"
-              className="px-3 py-1.5 text-sm border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Següent →
             </button>
           </div>
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </section>
   );
 }

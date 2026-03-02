@@ -65,7 +65,7 @@ export default function ReviewsSection({
         <div className="container mx-auto px-4">
           <div className="flex justify-center">
             <div className="animate-pulse flex space-x-4">
-              <div className="h-4 w-32 bg-slate-200 rounded"></div>
+              <div className="h-4 w-32 bg-white/20 rounded"></div>
             </div>
           </div>
         </div>
@@ -76,12 +76,12 @@ export default function ReviewsSection({
   if (!data || data.reviews.length === 0) {
     // Mostrar CTA per demanar ressenyes
     return (
-      <section className={`py-16 bg-gradient-to-b from-slate-900 to-black ${className}`}>
+      <section className={`py-16 bg-gradient-to-b from-black to-black ${className}`}>
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             🌟 La Teva Opinió Importa
           </h2>
-          <p className="text-slate-400 mb-8 max-w-xl mx-auto">
+          <p className="text-white/40 mb-8 max-w-xl mx-auto">
             Si has gaudit dels nostres serveis, ens encantaria que compartissis la teva experiència
           </p>
           <a
@@ -105,7 +105,7 @@ export default function ReviewsSection({
   const googleUrl = data.googleReviewsUrl || SITE_CONFIG.reviews.googleBusinessUrl;
 
   return (
-    <section className={`py-16 md:py-24 bg-gradient-to-b from-slate-900 to-black overflow-hidden ${className}`}>
+    <section className={`py-16 md:py-24 bg-gradient-to-b from-black to-black overflow-hidden ${className}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -119,20 +119,20 @@ export default function ReviewsSection({
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
-                  className={`text-2xl ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-slate-600'}`}
+                  className={`text-2xl ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-white/20'}`}
                 >
                   ★
                 </span>
               ))}
             </div>
             <span className="text-2xl font-bold text-white">{data.rating.toFixed(1)}</span>
-            <span className="text-slate-400">
+            <span className="text-white/40">
               ({data.user_ratings_total} {data.user_ratings_total === 1 ? 'opinió' : 'opinions'})
             </span>
           </div>
           
           {/* Google Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm text-slate-300">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm text-white/70">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -180,13 +180,13 @@ export default function ReviewsSection({
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span
                           key={star}
-                          className={`text-sm ${star <= review.rating ? 'text-amber-400' : 'text-slate-600'}`}
+                          className={`text-sm ${star <= review.rating ? 'text-amber-400' : 'text-white/20'}`}
                         >
                           ★
                         </span>
                       ))}
                     </div>
-                    <span className="text-xs text-slate-500">{review.relative_time_description}</span>
+                    <span className="text-xs text-white/30">{review.relative_time_description}</span>
                   </div>
                 </div>
               </div>
@@ -201,14 +201,14 @@ export default function ReviewsSection({
               )}
               
               {/* Text */}
-              <p className="text-slate-300 text-sm leading-relaxed line-clamp-4">
+              <p className="text-white/70 text-sm leading-relaxed line-clamp-4">
                 {review.text}
               </p>
               
               {/* Source Badge */}
               <div className="mt-4 flex items-center gap-2">
                 {review.source === 'google' && (
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <span className="text-xs text-white/30 flex items-center gap-1">
                     <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     </svg>
@@ -216,7 +216,7 @@ export default function ReviewsSection({
                   </span>
                 )}
                 {review.source === 'database' && (
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <span className="text-xs text-white/30 flex items-center gap-1">
                     ✓ Verificat
                   </span>
                 )}
@@ -240,7 +240,7 @@ export default function ReviewsSection({
               </svg>
               Deixa la Teva Opinió
             </a>
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-4 text-sm text-white/30">
               La teva opinió ens ajuda a millorar i a ajudar altres clients
             </p>
           </div>
@@ -276,14 +276,14 @@ export function ReviewsBadge({ className = '' }: { className?: string }) {
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
-            className={`text-xs ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-slate-500'}`}
+            className={`text-xs ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-white/30'}`}
           >
             ★
           </span>
         ))}
       </div>
       <span className="text-sm font-medium text-white">{data.rating.toFixed(1)}</span>
-      <span className="text-xs text-slate-400">({data.user_ratings_total})</span>
+      <span className="text-xs text-white/40">({data.user_ratings_total})</span>
     </a>
   );
 }
@@ -309,14 +309,14 @@ export function ReviewsInline({ className = '' }: { className?: string }) {
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
-            className={`text-sm ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-slate-300'}`}
+            className={`text-sm ${star <= Math.round(data.rating) ? 'text-amber-400' : 'text-white/70'}`}
           >
             ★
           </span>
         ))}
       </div>
       <span className="text-sm font-semibold">{data.rating.toFixed(1)}</span>
-      <span className="text-xs text-slate-500">• {data.user_ratings_total} opinions</span>
+      <span className="text-xs text-white/30">• {data.user_ratings_total} opinions</span>
     </div>
   );
 }

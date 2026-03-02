@@ -35,7 +35,7 @@ const COLUMNS_DEF: Omit<PipelineColumn, 'bookings'>[] = [
 ];
 
 function getMarginColor(pct: number | null): string {
-  if (pct === null) return 'text-slate-400';
+  if (pct === null) return 'text-white/40';
   if (pct > 40) return 'text-emerald-400';
   if (pct > 20) return 'text-amber-400';
   return 'text-rose-400';
@@ -70,7 +70,7 @@ export default function BookingPipelineView() {
       }));
       setBookings(mapped);
     } catch {
-      // keep state
+      toast.error('Error carregant reserves');
     } finally {
       setLoading(false);
     }
@@ -273,7 +273,7 @@ export default function BookingPipelineView() {
                           key={target.status}
                           onClick={() => moveBooking(booking.id, target.status)}
                           disabled={isUpdating}
-                          className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20 disabled:opacity-50"
+                          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20 disabled:opacity-50"
                         >
                           {target.label}
                         </button>

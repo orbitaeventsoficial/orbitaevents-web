@@ -9,7 +9,7 @@
       "title": "Festa Halloween Barcelona | Decoració Completa + DJ + Efectes | Òrbita Events",
       "description": "Transforma el teu event en una nit de terror. Decoració arreu: fantasmes gegants, gabies amb taràntules, caldero màgic, espelmes, miralls estranys... DJ + efectes especials. Des de 600€."
     },
-    "badge": "🎃 Temporada Halloween 2025",
+    "badge": "🎃 Temporada Halloween {year}",
     "hero": {
       "title1": "NITS DE",
       "title2": "TERROR",
@@ -18,7 +18,7 @@
     "cta": {
       "reserve": "Reserva la teva nit de terror",
       "whatsapp": "WhatsApp directe",
-      "reserve2025": "Reserva Halloween 2025",
+      "reserve2025": "Reserva Halloween {year}",
       "requestInfo": "Sol·licitar info"
     },
     "gallery": {
@@ -45,7 +45,7 @@
     },
     "packs": {
       "title": "Packs",
-      "titleHighlight": "Halloween 2025",
+      "titleHighlight": "Halloween {year}",
       "subtitle": "Tot inclou decoració completa. Tria el nivell d'intensitat.",
       "mostRequested": "MÉS DEMANAT",
       "hours": "hores",
@@ -155,7 +155,7 @@
       }
     },
     "urgency": {
-      "title": "Halloween 2025",
+      "title": "Halloween {year}",
       "subtitle": "Els dissabtes d'octubre volen. Reserva aviat.",
       "octobrerDates": "Dissabtes d'octubre:",
       "dates": [
@@ -496,7 +496,7 @@
         },
         {
           "q": "Què passa si hem de canviar la data o el nombre de convidats?",
-          "a": "Revisem la nostra agenda i, si hi ha disponibilitat, traslladem la reserva; la senyal del 30% es manté com a crèdit per a la nova data i t'envien un contracte actualitzat. Si finalment es cancel·la amb menys de 15 dies, s'aplica la política habitual (senyal no reemborsable), però t'acompanyem per trobar alternativa."
+          "a": "Revisem la nostra agenda i, si hi ha disponibilitat, traslladem la reserva sense cost addicional (mínim 30 dies d'antelació); la senyal del 30% es manté com a crèdit per a la nova data i t'enviem un contracte actualitzat. Si finalment es cancel·la, s'aplica la política habitual: més de 60 dies, 100% retorn; 30-60 dies, 50% retorn; menys de 30 dies, no reemborsable."
         }
       ]
     },
@@ -1586,7 +1586,10 @@
       "errorContact": "Introduïu el vostre correu electrònic o número de telèfon",
       "errorCaptcha": "Si us plau, completa la verificació de seguretat",
       "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament.",
-      "downloadPDF": "Descarregar Pressupost PDF"
+      "downloadPDF": "Descarregar Pressupost PDF",
+      "captchaExplanation": "Verificació de seguretat per protegir-te del spam",
+      "preferWhatsApp": "Prefereixes parlar directament?",
+      "contactWhatsApp": "Contacta per WhatsApp"
     },
     "discountCodeErrors": {
       "expired": "Aquest codi ha caducat.",
@@ -2127,7 +2130,7 @@
       "paymentFacilities": "Facilitats de pagament:",
       "paymentInfo": {
         "deposit": "Dipòsit: 30% en el moment de la reserva",
-        "rest": "Resta: dia de l'esdeveniment",
+        "rest": "Resta: 7 dies abans de l'esdeveniment",
         "noFees": "Sense comissions de transferència"
       }
     },
@@ -2347,8 +2350,8 @@
       "flexiblePayment": "Pagament flexible:",
       "paymentFeatures": {
         "deposit": "30% en reservar la teva data",
-        "rest": "70% el dia de l'event",
-        "cancel": "Cancel·lació gratuïta fins 15 dies abans"
+        "rest": "70% 7 dies abans de l'event",
+        "cancel": "Més de 60 dies: 100% retorn. 30-60 dies: 50% retorn. Menys de 30 dies: no reemborsable."
       },
       "extras": {
         "hora-extra": {
@@ -2942,7 +2945,7 @@
         "title": "🎃 Temàtica Halloween",
         "description": "Nits de terror amb decoració completa",
         "price": "Des de 600€",
-        "badge": "🔥 Temporada 2025",
+        "badge": "🔥 Temporada {year}",
         "href": "/tematica-halloween",
         "features": [
           "DJ temàtic",
@@ -3075,7 +3078,8 @@
       "reviews": "Opinions",
       "contact": "Contacte",
       "faq": "FAQ",
-      "blog": "Blog"
+      "blog": "Blog",
+      "configurator": "Configurador"
     },
     "dropdowns": {
       "servicesTitle": "Els nostres serveis",
@@ -3407,19 +3411,21 @@
             "senal": "Senyal:",
             "senalDesc": "30% del total per confirmar la reserva",
             "resto": "Resta:",
-            "restoDesc": "El dia de l'esdeveniment o segons acord",
+            "restoDesc": "70% restant, 7 dies abans de l'esdeveniment",
             "metodos": "Mètodes:",
             "metodosDesc": "Transferència bancària, Bizum, efectiu"
           }
         },
         "section4": {
           "title": "4. Cancel·lacions",
-          "item1": "Més de 30 dies abans:",
-          "item2": "Entre 15-30 dies:",
-          "item3": "Menys de 15 dies:",
-          "item3Desc": "Cobrament del 100% del servei",
-          "item4": "Força major:",
-          "item4Desc": "S'acordaran condicions especials"
+          "item1": "Més de 60 dies abans:",
+          "item1Desc": "Retorn del 100% de l'aval",
+          "item2": "Entre 30-60 dies:",
+          "item2Desc": "Retorn del 50% de l'aval",
+          "item3": "Menys de 30 dies:",
+          "item3Desc": "L'aval no és reemborsable",
+          "item4": "Cancel·lació per part del prestador:",
+          "item4Desc": "Retorn del 100% de tots els pagaments rebuts"
         },
         "section5": {
           "title": "5. Obligacions del Client",
@@ -3629,7 +3635,7 @@
       "total": "TOTAL",
       "conditions": "Condicions",
       "deposit": "Dipòsit del 30% per confirmar la reserva",
-      "remaining": "Resta a pagar el dia de l'esdeveniment",
+      "remaining": "Resta a pagar 7 dies abans de l'esdeveniment",
       "includes": "Inclou muntatge, desmuntatge i desplaçament",
       "signature": "Signatura",
       "accept": "Accepto les condicions"
@@ -4086,7 +4092,7 @@
       "trustYears": "🎯 +2 anys d'experiència",
       "trustLocation": "📍 Barcelona i Girona",
       "trustResponse": "⚡ Resposta en 2h",
-      "guarantee": "✓ Pressupost sense compromís · Cancel·lació gratuïta fins 7 dies abans"
+      "guarantee": "✓ Pressupost sense compromís · Cancel·lació amb retorn 100% fins 60 dies abans"
     },
     "testimonis": {
       "0": {
@@ -4566,19 +4572,21 @@
           "senal": "Senyal:",
           "senalDesc": "30% del total per confirmar la reserva",
           "resto": "Resta:",
-          "restoDesc": "El dia de l'esdeveniment o segons acord",
+          "restoDesc": "70% restant, 7 dies abans de l'esdeveniment",
           "metodos": "Mètodes:",
           "metodosDesc": "Transferència bancària, Bizum, efectiu"
         }
       },
       "section4": {
         "title": "4. Cancel·lacions",
-        "item1": "Més de 30 dies abans:",
-        "item2": "Entre 15-30 dies:",
-        "item3": "Menys de 15 dies:",
-        "item3Desc": "Cobrament del 100% del servei",
-        "item4": "Força major:",
-        "item4Desc": "S'acordaran condicions especials"
+        "item1": "Més de 60 dies abans:",
+        "item1Desc": "Retorn del 100% de l'aval",
+        "item2": "Entre 30-60 dies:",
+        "item2Desc": "Retorn del 50% de l'aval",
+        "item3": "Menys de 30 dies:",
+        "item3Desc": "L'aval no és reemborsable",
+        "item4": "Cancel·lació per part del prestador:",
+        "item4Desc": "Retorn del 100% de tots els pagaments rebuts"
       },
       "section5": {
         "title": "5. Obligacions del Client",
@@ -5890,7 +5898,7 @@
           },
           {
             "question": "Què passa si he de cancel·lar?",
-            "answer": "Entenem que a vegades les coses canvien. Cancel·lació gratuïta fins 30 dies abans. Entre 30-15 dies, retenim el 50% de la reserva. Menys de 15 dies, no hi ha devolució. Però si vols canviar de data, sempre intentem adaptar-nos!"
+            "answer": "Entenem que a vegades les coses canvien. Més de 60 dies: 100% retorn. 30-60 dies: 50% retorn. Menys de 30 dies: no reemborsable. Si vols canviar de data (mínim 30 dies d'antelació), sempre intentem adaptar-nos!"
           },
           {
             "question": "Hi ha costos extres?",
@@ -6459,7 +6467,7 @@
         "limited": "🔥 S'acaba!",
         "available": "✓ Disponible"
       },
-      "guarantee": "✓ Pressupost sense compromís · Cancel·lació gratuïta fins a 7 dies abans"
+      "guarantee": "✓ Pressupost sense compromís · Cancel·lació amb retorn 100% fins 60 dies abans"
     },
     "heroVideo": {
       "badge": "✨ Creadors d'Experiències Immersives",
@@ -6524,7 +6532,7 @@
     "socialProof": "5.0 · Opinions verificades",
     "whatsappMessage": "Hola! Vull informació per al meu esdeveniment.",
     "badges": {
-      "halloween": "Agenda 2026 oberta",
+      "halloween": "Agenda {year} oberta",
       "monMagic": "Món Màgic",
       "rating": "5.0/5 · 50+ events"
     },
@@ -6556,7 +6564,7 @@
         "subtitle": "Nits de terror",
         "description": "Decoració completa, DJ temàtic, efectes FX",
         "price": "Des de 600€",
-        "badge": "🔥 Temporada 2025",
+        "badge": "🔥 Temporada {year}",
         "features": {
           "0": "Fantasmes gegants",
           "1": "Caldero màgic",
@@ -6820,7 +6828,7 @@
         },
         "2": {
           "title": "Sense compromís",
-          "description": "Cancel·la sense cost si canvies d'idea"
+          "description": "Retorn 100% si cancel·les amb +60 dies"
         },
         "3": {
           "title": "Valoració 5.0",

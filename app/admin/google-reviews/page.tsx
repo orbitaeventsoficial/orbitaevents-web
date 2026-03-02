@@ -125,7 +125,7 @@ export default function GoogleReviewsAdminPage() {
           <button
             onClick={syncReviews}
             disabled={syncing}
-            className="mt-2 text-xs px-3 py-1 border rounded-lg text-white transition-colors disabled:opacity-50"
+            className="mt-2 text-xs px-3 py-1 border rounded-xl text-white transition-colors disabled:opacity-50"
           >
             {syncing ? 'Actualitzant...' : 'Refrescar'}
           </button>
@@ -143,7 +143,7 @@ export default function GoogleReviewsAdminPage() {
             <p className="mb-4">Encara no hi ha ressenyes de 5 estrelles</p>
             <button
               onClick={syncReviews}
-              className="px-6 py-3 border rounded-lg text-white font-medium transition-colors"
+              className="px-6 py-3 border rounded-xl text-white font-medium transition-colors"
             >
               Refrescar ressenyes
             </button>
@@ -156,7 +156,7 @@ export default function GoogleReviewsAdminPage() {
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-slate-950/60/[0.07] transition-colors"
+                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-black/60/[0.07] transition-colors"
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
@@ -201,7 +201,7 @@ export default function GoogleReviewsAdminPage() {
           href="https://g.page/r/CXcgbvANsXSzEBE/review"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-white font-medium transition-colors"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 border rounded-xl text-white font-medium transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

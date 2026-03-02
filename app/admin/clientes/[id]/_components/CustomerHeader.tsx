@@ -72,14 +72,14 @@ const STATUS_STYLES: Record<HubStatus | 'default', { bg: string; text: string; b
     border: 'border-rose-500/40',
   },
   LEAD: {
-    bg: 'bg-slate-500/20',
-    text: 'text-slate-300',
-    border: 'border-slate-500/40',
+    bg: 'bg-white/10',
+    text: 'text-white/70',
+    border: 'border-white/15',
   },
   default: {
-    bg: 'bg-slate-500/20',
-    text: 'text-slate-300',
-    border: 'border-slate-500/40',
+    bg: 'bg-white/10',
+    text: 'text-white/70',
+    border: 'border-white/15',
   },
 };
 
@@ -209,7 +209,7 @@ export default function CustomerHeader({
                       className="fixed inset-0 z-40"
                       onClick={() => setMenuOpen(false)}
                     />
-                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border py-1 shadow-xl min-w-[140px]">
+                    <div className="absolute left-0 top-full z-50 mt-1 rounded-xl border py-1 shadow-xl min-w-[140px]">
                       {(['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'] as HubStatus[]).map((s) => {
                         const style = STATUS_STYLES[s];
                         const isActive = s === status;
@@ -221,8 +221,8 @@ export default function CustomerHeader({
                             disabled={isActive}
                             className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
                               isActive
-                                ? 'bg-slate-700/50 font-semibold'
-                                : 'hover:bg-slate-700/50'
+                                ? 'bg-white/10 font-semibold'
+                                : 'hover:bg-white/10'
                             } ${style.text}`}
                           >
                             {labelEstatClient(s)}
@@ -351,7 +351,7 @@ export default function CustomerHeader({
                         ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
                         : isDone
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
+                          : 'bg-white/5 text-white/40 border border-white/10'
                     }`}
                   >
                     {stageLabel[stage]}
@@ -366,7 +366,7 @@ export default function CustomerHeader({
             <p className="mt-1 text-sm">{nextAction.description}</p>
             <Link
               href={nextAction.href}
-              className="mt-2 inline-flex rounded-lg border px-3 py-1.5 text-xs font-semibold"
+              className="mt-2 inline-flex rounded-xl border px-3 py-1.5 text-xs font-semibold"
             >
               {nextAction.label}
             </Link>
@@ -382,10 +382,10 @@ export default function CustomerHeader({
                 key={item.key}
                 type="button"
                 onClick={() => setTab(item.key)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all flex items-center gap-1.5 ${
+                className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-all flex items-center gap-1.5 ${
                   tab === item.key
-                    ? 'bg-slate-100 text-slate-900 shadow-sm'
-                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-slate-100'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/90'
                 }`}
               >
                 <span className="text-base">{item.icon}</span>
@@ -394,7 +394,7 @@ export default function CustomerHeader({
                   <span
                     className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                       tab === item.key
-                        ? 'bg-slate-800 text-slate-100'
+                        ? 'bg-black/60 text-white'
                         : 'bg-amber-500/20 text-amber-300'
                     }`}
                   >
@@ -411,7 +411,7 @@ export default function CustomerHeader({
           <select
             value={tab}
             onChange={(e) => setTab(e.target.value as TabKey)}
-            className="w-full rounded-lg border px-3 py-2.5 text-sm appearance-none"
+            className="w-full rounded-xl border px-3 py-2.5 text-sm appearance-none"
           >
             {TABS.map((item) => {
               const badge = item.badge?.(data);
@@ -448,13 +448,13 @@ function ActionButton({
     cyan: 'bg-cyan-500 hover:bg-cyan-600 text-white',
     indigo: 'bg-indigo-500 hover:bg-indigo-600 text-white',
     amber: 'bg-amber-500 hover:bg-amber-600 text-white',
-    slate: 'bg-slate-800 border border-slate-600 hover:bg-slate-700 text-slate-200',
+    slate: 'bg-white/5 border border-white/15 hover:bg-white/10 text-white/80',
   };
 
   return (
     <Link
       href={href}
-      className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 ${colorStyles[color]}`}
+      className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 ${colorStyles[color]}`}
     >
       <span>{icon}</span>
       <span className="hidden sm:inline">{label}</span>
@@ -476,13 +476,13 @@ function KpiChip({
       className={`rounded-xl border px-3 py-2 transition-colors ${
         highlight
           ? 'border-cyan-500/30 bg-cyan-500/5'
-          : 'border-slate-700/70 bg-slate-900/60'
+          : 'border-white/10 bg-white/[0.02]'
       }`}
     >
       <p className="text-[11px] uppercase tracking-wider">{label}</p>
       <p
         className={`mt-1 text-sm font-semibold ${
-          highlight ? 'text-cyan-200' : 'text-slate-100'
+          highlight ? 'text-cyan-200' : 'text-white/90'
         }`}
       >
         {value}

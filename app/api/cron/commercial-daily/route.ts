@@ -9,6 +9,7 @@ import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getRequestId } from '@/lib/request-context';
+import { timingSafeEqual } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -22,7 +23,11 @@ function isAuthorized(request: NextRequest, requestId: string): boolean {
     });
     return false;
   }
-  return authHeader === `Bearer ${cronSecret}`;
+  if (!authHeader) return false;
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const received = Buffer.from(authHeader);
+  if (expected.length !== received.length) return false;
+  return timingSafeEqual(expected, received);
 }
 
 async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {

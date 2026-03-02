@@ -83,10 +83,11 @@ export default function CanvasGeneratorPage() {
           <div className="space-y-5">
             {/* Nom client */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label htmlFor="cv-name" className="block text-sm font-medium mb-1">
                 Nom del client
               </label>
               <input
+                id="cv-name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -97,10 +98,11 @@ export default function CanvasGeneratorPage() {
 
             {/* Codi descompte */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label htmlFor="cv-code" className="block text-sm font-medium mb-1">
                 Codi de descompte
               </label>
               <input
+                id="cv-code"
                 type="text"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
@@ -118,11 +120,12 @@ export default function CanvasGeneratorPage() {
                 {['10', '15', '20', '25'].map((pct) => (
                   <button
                     key={pct}
+                    type="button"
                     onClick={() => setFormData({ ...formData, discount: pct })}
                     className={`flex-1 py-2.5 rounded-xl font-medium transition-all ${
                       formData.discount === pct
                         ? 'bg-amber-500 text-white'
-                        : 'bg-white/5 text-slate-300 hover:bg-white/5'
+                        : 'bg-white/5 text-white/70 hover:bg-white/5'
                     }`}
                   >
                     {pct}%
@@ -133,10 +136,11 @@ export default function CanvasGeneratorPage() {
 
             {/* Tipus event */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label htmlFor="cv-event-type" className="block text-sm font-medium mb-1">
                 Tipus d&apos;event
               </label>
               <select
+                id="cv-event-type"
                 value={formData.eventType}
                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
                 className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2"
@@ -151,10 +155,11 @@ export default function CanvasGeneratorPage() {
 
             {/* URL foto */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label htmlFor="cv-photo-url" className="block text-sm font-medium mb-1">
                 URL de la foto de l&apos;event (opcional)
               </label>
               <input
+                id="cv-photo-url"
                 type="url"
                 value={formData.photoUrl}
                 onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
@@ -175,6 +180,7 @@ export default function CanvasGeneratorPage() {
                 {PRESETS.map((preset) => (
                   <button
                     key={preset.id}
+                    type="button"
                     onClick={() => setFormData({ ...formData, preset: preset.id })}
                     className={`p-3 rounded-xl border-2 transition-all text-left ${
                       formData.preset === preset.id
@@ -195,12 +201,14 @@ export default function CanvasGeneratorPage() {
           {/* Actions */}
           <div className="flex gap-3 mt-8">
             <button
+              type="button"
               onClick={handlePreview}
               className="flex-1 py-3 text-white font-medium rounded-xl transition-colors"
             >
               👁️ Previsualitzar
             </button>
             <button
+              type="button"
               onClick={handleCopyUrl}
               className="px-4 py-3 bg-white/5 font-medium rounded-xl hover:bg-white/5 transition-colors"
             >
@@ -247,6 +255,7 @@ export default function CanvasGeneratorPage() {
           {previewUrl && (
             <div className="mt-6 space-y-3">
               <button
+                type="button"
                 onClick={handleDownload}
                 className="w-full py-3 text-white font-medium rounded-xl transition-colors"
               >

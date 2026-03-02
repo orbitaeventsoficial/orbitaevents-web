@@ -265,7 +265,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
               className={`
                 aspect-square rounded-lg flex items-center justify-center
                 text-xs font-medium transition-all duration-200 relative
-                ${day.isPast ? 'text-white/20' : ''}
+                ${day.isPast ? 'text-white/40' : ''}
                 ${day.isSaturday && day.available ? `
                   bg-emerald-500/30 text-emerald-300 
                   hover:bg-emerald-500/50 cursor-pointer
@@ -275,7 +275,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
                   bg-red-500/20 text-red-400/70
                   cursor-not-allowed
                 ` : ''}
-                ${!day.isSaturday && !day.isPast ? 'text-white/50 hover:text-white/70' : ''}
+                ${!day.isSaturday && !day.isPast ? 'text-white/60 hover:text-white/80' : ''}
                 ${day.isWeekend && !day.isSaturday ? 'text-amber-400/50' : ''}
               `}
               title={

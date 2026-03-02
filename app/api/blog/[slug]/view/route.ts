@@ -18,7 +18,8 @@ export async function POST(
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    console.error('[Blog] Error incrementant views:', error);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

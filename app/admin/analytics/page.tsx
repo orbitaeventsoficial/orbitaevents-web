@@ -285,7 +285,7 @@ export default async function AnalyticsPage() {
           </div>
           <Link
             href={`/admin/leads?from=${ops.last7Days.toISOString().slice(0, 10)}&page=1`}
-            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
           >
             Veure entrades d&apos;aquesta setmana
           </Link>
@@ -331,7 +331,7 @@ export default async function AnalyticsPage() {
                 Google Ads
               </Link>
               <span
-                className={`rounded-full border border-slate-600/50 px-3 py-1 text-xs ${
+                className={`rounded-full border border-white/10 px-3 py-1 text-xs ${
                   ga4Ready ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
               }`}
             >
@@ -480,7 +480,7 @@ export default async function AnalyticsPage() {
             </div>
             <div className="space-y-2 p-4 text-sm">
               {ga4.searchTerms.length === 0 && (
-                <p className="">Sense dades de cerca interna.</p>
+                <p className="text-center py-4 text-white/40 text-xs">📊 Sense dades de cerca interna</p>
               )}
               {ga4.searchTerms.map((row) => (
                 <div key={`${row.dimension}-${row.value}`} className="flex items-center justify-between">
@@ -508,8 +508,8 @@ export default async function AnalyticsPage() {
             <a
               href={process.env.NEXT_PUBLIC_GOOGLE_ADS_URL || 'https://ads.google.com'}
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+              rel="noopener noreferrer"
+              className="rounded-xl border px-3 py-1.5 text-xs font-semibold"
             >
               Obrir Google Ads
             </a>
@@ -661,7 +661,7 @@ export default async function AnalyticsPage() {
               );
             })}
             {data.leads.bySource.length === 0 && (
-              <p className="text-center py-4">No hi ha dades</p>
+              <p className="text-center py-6 text-white/40 text-xs">📊 Sense entrades registrades</p>
             )}
           </div>
         </div>
@@ -683,9 +683,9 @@ export default async function AnalyticsPage() {
                 QUOTE_SENT: { label: 'Pressupost', color: 'bg-purple-500' },
                 NEGOTIATING: { label: 'Negociant', color: 'bg-orange-500' },
                 WON: { label: 'Guanyats', color: 'bg-emerald-500' },
-                LOST: { label: 'Perduts', color: 'bg-slate-500' },
+                LOST: { label: 'Perduts', color: 'bg-white/20' },
               };
-              const config = statusLabels[status.status] || { label: status.status, color: 'bg-slate-500' };
+              const config = statusLabels[status.status] || { label: status.status, color: 'bg-white/20' };
               return (
                 <div key={status.status}>
                   <div className="flex items-center justify-between text-sm">
@@ -704,7 +704,7 @@ export default async function AnalyticsPage() {
               );
             })}
             {data.leads.conversionByMonth.length === 0 && (
-              <p className="text-center py-4">No hi ha dades</p>
+              <p className="text-center py-6 text-white/40 text-xs">📊 Sense dades de conversió</p>
             )}
           </div>
         </div>
@@ -731,7 +731,7 @@ export default async function AnalyticsPage() {
               );
             })}
             {data.bookings.byEventType.length === 0 && (
-              <p className="col-span-full text-center py-4">No hi ha dades</p>
+              <p className="col-span-full text-center py-6 text-white/40 text-xs">📊 Sense events registrats</p>
             )}
           </div>
         </div>
@@ -762,38 +762,38 @@ export default async function AnalyticsPage() {
             <a
               href="https://tagmanager.google.com/"
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border p-4 text-sm transition"
+              rel="noopener noreferrer"
+              className="rounded-xl border p-4 text-sm transition"
             >
               Obrir Google Tag Manager
             </a>
             <a
               href="https://tagassistant.google.com/"
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border p-4 text-sm transition"
+              rel="noopener noreferrer"
+              className="rounded-xl border p-4 text-sm transition"
             >
               Tag Assistant (Preview)
             </a>
             <a
               href="https://support.google.com/tagmanager/answer/6102821"
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border p-4 text-sm transition"
+              rel="noopener noreferrer"
+              className="rounded-xl border p-4 text-sm transition"
             >
               Guia d&apos;etiquetes i activadors
             </a>
             <a
               href="https://support.google.com/tagmanager/answer/6107166"
               target="_blank"
-              rel="noreferrer"
-              className="rounded-lg border p-4 text-sm transition"
+              rel="noopener noreferrer"
+              className="rounded-xl border p-4 text-sm transition"
             >
               Esdeveniments i dataLayer
             </a>
           </div>
 
-          <div className="rounded-lg border p-4 text-sm">
+          <div className="rounded-xl border p-4 text-sm">
             Les mètriques de trànsit i clics depenen del destí de Google Tag Manager (per exemple, GA4).
             Si vols veure analítica dins del panell, connecta un destí compatible o indica quin proveïdor vols usar.
           </div>

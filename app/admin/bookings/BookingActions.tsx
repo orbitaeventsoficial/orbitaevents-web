@@ -83,8 +83,9 @@ export default function BookingActions({
         value={status}
         onChange={(e) => handleStatusChange(e.target.value)}
         disabled={isUpdatingStatus}
-        className="rounded-lg border px-2 py-1.5 text-xs"
+        className="rounded-xl border px-2 py-1.5 text-xs"
         title="Canviar estat"
+        aria-label="Canviar estat reserva"
       >
         <option value="PENDING">Pendent</option>
         <option value="CONFIRMED">Confirmada</option>
@@ -94,21 +95,21 @@ export default function BookingActions({
       </select>
       <Link
         href={calendarHref}
-        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
+        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Calendari
       </Link>
       {customerId && (
         <Link
           href={`/admin/clientes/${customerId}`}
-          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
+          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
         >
           Client
         </Link>
       )}
       <Link
         href={`/admin/bookings/${id}`}
-        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
+        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Veure
       </Link>
@@ -118,7 +119,7 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+          className={`inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
         >
           {isDeleting ? 'Eliminant...' : confirmingDelete ? 'Segur?' : 'Eliminar'}
         </button>

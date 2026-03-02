@@ -176,7 +176,7 @@ export default function SettingsClient({
               </div>
             </div>
 
-            <div className="divide-y divide-slate-700/30">
+            <div className="divide-y divide-white/5">
               {categorySettings.map((setting) => {
                 const isEditing = editingKey === setting.key;
                 const isSaving = savingKey === setting.key;
@@ -201,7 +201,7 @@ export default function SettingsClient({
                                 ? 'bg-purple-500/20 text-purple-300'
                                 : setting.type === 'JSON'
                                 ? 'bg-orange-500/20 text-orange-300'
-                                : 'bg-slate-500/20 text-slate-300'
+                                : 'bg-white/10 text-white/70'
                             }`}
                           >
                             {TYPE_LABELS[setting.type]}
@@ -220,7 +220,7 @@ export default function SettingsClient({
                           <div className="space-y-2">
                             {setting.type === 'BOOLEAN' ? (
                               <select
-                                className="rounded-lg border px-3 py-1.5 text-sm focus:ring-1"
+                                className="rounded-xl border px-3 py-1.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                                 value={draftValue || 'false'}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               >
@@ -229,13 +229,13 @@ export default function SettingsClient({
                               </select>
                             ) : setting.type === 'JSON' ? (
                               <textarea
-                                className="rounded-lg border px-3 py-1.5 text-sm w-64 h-24 focus:ring-1"
+                                className="rounded-xl border px-3 py-1.5 text-sm w-64 h-24 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               />
                             ) : (
                               <input
-                                className="rounded-lg border px-3 py-1.5 text-sm focus:ring-1"
+                                className="rounded-xl border px-3 py-1.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                                 type={setting.type === 'NUMBER' ? 'number' : 'text'}
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
@@ -244,7 +244,7 @@ export default function SettingsClient({
 
                             <div className="flex items-center justify-end gap-2">
                               <button
-                                className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
+                                className="text-xs px-3 py-1.5 rounded-xl border transition-colors"
                                 onClick={cancelEdit}
                                 disabled={isSaving}
                                 type="button"
@@ -252,7 +252,7 @@ export default function SettingsClient({
                                 Cancel·lar
                               </button>
                               <button
-                                className="text-xs px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors"
+                                className="text-xs px-3 py-1.5 rounded-xl text-white shadow-lg transition-colors"
                                 onClick={() => saveSetting(setting)}
                                 disabled={isSaving}
                                 type="button"
@@ -272,7 +272,7 @@ export default function SettingsClient({
                               {formatDateSimple(current.updatedAt)}
                             </p>
                             <button
-                              className="mt-2 text-xs px-3 py-1.5 rounded-lg border transition-colors"
+                              className="mt-2 text-xs px-3 py-1.5 rounded-xl border transition-colors"
                               onClick={() => startEdit(current)}
                               type="button"
                             >

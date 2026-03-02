@@ -100,7 +100,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Nom de la vista"
-          className="flex-1 rounded-xl border px-3 py-2 text-xs focus:ring-1"
+          className="flex-1 rounded-xl border px-3 py-2 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
         />
         <button
           type="button"

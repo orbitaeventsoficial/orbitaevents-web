@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface CoverageArea {
   city: string;
@@ -28,6 +29,7 @@ export default function CoveragePage() {
   const [newCity, setNewCity] = useState('');
   const [newProvince, setNewProvince] = useState('Barcelona');
   const [adding, setAdding] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   useEffect(() => {
     loadAreas();
@@ -75,7 +77,8 @@ export default function CoveragePage() {
   }
 
   async function removeArea(city: string) {
-    if (!confirm(`Eliminar ${city}?`)) return;
+    const ok = await confirm({ title: 'Eliminar ciutat', message: `Segur que vols eliminar ${city}?`, confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
 
     try {
       const res = await fetch('/api/admin/coverage', {
@@ -153,13 +156,13 @@ export default function CoveragePage() {
             onChange={(e) => setNewCity(e.target.value)}
             placeholder="Nom de la ciutat"
             aria-label="Nom de la ciutat"
-            className="flex-1 px-4 py-2 rounded-xl border focus:ring-1"
+            className="flex-1 px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
           />
           <select
             value={newProvince}
             onChange={(e) => setNewProvince(e.target.value)}
             aria-label="Província"
-            className="px-4 py-2 rounded-xl border focus:ring-1"
+            className="px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
           >
             {PROVINCES.map(p => (
               <option key={p} value={p}>{p}</option>
@@ -190,7 +193,7 @@ export default function CoveragePage() {
                     key={area.city}
                     className="border rounded-xl p-3 flex items-center justify-between"
                   >
-                    <span className={`font-medium ${area.enabled ? 'text-slate-100' : 'text-slate-500'}`}>
+                    <span className={`font-medium ${area.enabled ? 'text-white/90' : 'text-white/30'}`}>
                       {area.city}
                     </span>
                     <div className="flex items-center gap-2">
@@ -200,7 +203,7 @@ export default function CoveragePage() {
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           area.enabled
                             ? 'bg-emerald-500/20 text-emerald-300'
-                            : 'bg-slate-500/20 text-slate-400'
+                            : 'bg-white/10 text-white/40'
                         }`}
                       >
                         {area.enabled ? '✓ Activa' : '✕ Desactivada'}
@@ -219,6 +222,7 @@ export default function CoveragePage() {
           </div>
         ))}
       </div>
+      <ConfirmDialog {...dialogProps} />
     </AdminPage>
   );
 }

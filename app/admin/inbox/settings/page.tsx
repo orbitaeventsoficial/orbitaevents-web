@@ -68,7 +68,7 @@ export default async function InboxSettingsPage() {
       {!configured && (
         <section className="rounded-xl border p-6 shadow-sm">
           <h2 className="mb-3 text-lg font-semibold">Variables requerides</h2>
-          <div className="rounded-lg p-4 font-mono text-xs">
+          <div className="rounded-xl p-4 font-mono text-xs">
             <div>IMAP_HOST=imap.dondominio.com</div>
             <div>IMAP_PORT=993</div>
             <div>IMAP_USER=info@orbitaevents.com</div>

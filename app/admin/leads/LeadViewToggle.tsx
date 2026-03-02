@@ -40,7 +40,7 @@ export default function LeadViewToggle({
           id="lead-view-mode"
           value={view}
           onChange={(e) => setView(e.target.value === 'pipeline' ? 'pipeline' : 'list')}
-          className="rounded-xl border px-3 py-1.5 text-xs font-medium focus:ring-1"
+          className="rounded-xl border px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
         >
           <option value="pipeline">Pipeline</option>
           <option value="list">Llista</option>

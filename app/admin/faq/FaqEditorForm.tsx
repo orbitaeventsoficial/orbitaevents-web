@@ -113,8 +113,9 @@ export default function FaqEditorForm({
         <h2 className="text-sm font-semibold">Dades bàsiques</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs">Slug</label>
+            <label htmlFor="faq-slug" className="text-xs">Slug</label>
             <input
+              id="faq-slug"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="faq-reserva-data"
@@ -122,8 +123,9 @@ export default function FaqEditorForm({
             />
           </div>
           <div>
-            <label className="text-xs">Categoria</label>
+            <label htmlFor="faq-category" className="text-xs">Categoria</label>
             <select
+              id="faq-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
@@ -136,10 +138,13 @@ export default function FaqEditorForm({
             </select>
           </div>
           <div>
-            <label className="text-xs">Ordre</label>
+            <label htmlFor="faq-order" className="text-xs">Ordre</label>
             <input
+              id="faq-order"
               type="number"
               value={order}
+              min={0}
+              max={999}
               onChange={(e) => setOrder(Number.parseInt(e.target.value || '0', 10))}
               className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
             />
@@ -166,16 +171,18 @@ export default function FaqEditorForm({
             <h3 className="text-sm font-semibold">Idioma: {t.locale.toUpperCase()}</h3>
             <div className="mt-3 space-y-3">
               <div>
-                <label className="text-xs">Pregunta</label>
+                <label htmlFor={`faq-question-${t.locale}`} className="text-xs">Pregunta</label>
                 <input
+                  id={`faq-question-${t.locale}`}
                   value={t.question}
                   onChange={(e) => updateTranslation(t.locale, 'question', e.target.value)}
                   className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label className="text-xs">Resposta</label>
+                <label htmlFor={`faq-answer-${t.locale}`} className="text-xs">Resposta</label>
                 <textarea
+                  id={`faq-answer-${t.locale}`}
                   rows={4}
                   value={t.answer}
                   onChange={(e) => updateTranslation(t.locale, 'answer', e.target.value)}

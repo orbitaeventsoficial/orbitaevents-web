@@ -128,6 +128,7 @@ interface EconomiaClientProps {
   monthCollected: number;
   atRiskRows: PaymentRow[];
   upcomingDueRows: PaymentRow[];
+  allPaymentRows?: PaymentRow[];
   hasReport: boolean;
   reportError: boolean;
   realized: { revenue: number; netMargin: number; avgMarginPct: number; bookings: number };
@@ -315,6 +316,351 @@ function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { overdueTot
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+// ─── Payment Timeline Bar ─────────────────────────────────────────────────────
+
+function PaymentTimelineBar({ row }: { row: PaymentRow }) {
+  const rawDepositPct = row.total > 0 ? (row.depositAmount / row.total) * 100 : 30;
+  const depositPct = Math.max(0, Math.min(100, rawDepositPct));
+  const remainingPct = 100 - depositPct;
+
+  const depositColor = row.depositPaid
+    ? 'bg-emerald-500'
+    : row.overdueDeposit
+      ? 'bg-rose-500'
+      : row.dueSoonDeposit
+        ? 'bg-amber-500'
+        : 'bg-white/15';
+
+  const remainingColor = row.remainingPaid
+    ? 'bg-emerald-500'
+    : row.overdueRemaining
+      ? 'bg-rose-500'
+      : row.dueSoonRemaining
+        ? 'bg-amber-500'
+        : 'bg-white/15';
+
+  const depositLabel = `Diposit: ${money(row.depositAmount)} ${row.depositPaid ? '(pagat)' : '(pendent)'}`;
+  const remainingLabel = `Resta: ${money(row.remainingAmount)} ${row.remainingPaid ? '(pagat)' : '(pendent)'}`;
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-0.5 h-4 rounded-full overflow-hidden bg-white/5 w-full">
+        <div
+          className={`h-full ${depositColor} transition-all duration-300 relative group`}
+          style={{ width: `${depositPct}%` }}
+          title={depositLabel}
+          role="meter"
+          aria-valuenow={depositPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={depositLabel}
+        >
+          <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+            {depositPct > 15 ? `${Math.round(depositPct)}%` : ''}
+          </span>
+        </div>
+        <div
+          className={`h-full ${remainingColor} transition-all duration-300 relative group`}
+          style={{ width: `${remainingPct}%` }}
+          title={remainingLabel}
+          role="meter"
+          aria-valuenow={remainingPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={remainingLabel}
+        >
+          <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+            {remainingPct > 15 ? `${Math.round(remainingPct)}%` : ''}
+          </span>
+        </div>
+      </div>
+      <div className="flex justify-between text-[9px] text-white/40">
+        <span className="flex items-center gap-1">
+          <span className={`inline-block w-1.5 h-1.5 rounded-full ${depositColor}`} />
+          Diposit {row.depositPaid ? '✓' : ''}
+        </span>
+        <span className="flex items-center gap-1">
+          Resta {row.remainingPaid ? '✓' : ''}
+          <span className={`inline-block w-1.5 h-1.5 rounded-full ${remainingColor}`} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Cobrement Filters Section ──────────────────────────────────────────────
+
+type PaymentFilter = 'tots' | 'pendents' | 'vencits' | 'proxims' | 'pagats';
+
+function CobramentFiltersSection({
+  allRows,
+  overdueDepositCount,
+  overdueRemainingCount,
+  dueSoonDepositCount,
+  dueSoonRemainingCount,
+}: {
+  allRows: PaymentRow[];
+  overdueDepositCount: number;
+  overdueRemainingCount: number;
+  dueSoonDepositCount: number;
+  dueSoonRemainingCount: number;
+}) {
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<PaymentFilter>('pendents');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const filteredRows = useMemo(() => {
+    let rows = allRows;
+
+    // Text search
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      rows = rows.filter(
+        (r) => r.reference.toLowerCase().includes(q) || r.clientName.toLowerCase().includes(q)
+      );
+    }
+
+    // Filter by status
+    switch (filter) {
+      case 'pendents':
+        rows = rows.filter((r) => !r.depositPaid || !r.remainingPaid);
+        break;
+      case 'vencits':
+        rows = rows.filter((r) => r.overdueDeposit || r.overdueRemaining);
+        break;
+      case 'proxims':
+        rows = rows.filter((r) => r.dueSoonDeposit || r.dueSoonRemaining);
+        break;
+      case 'pagats':
+        rows = rows.filter((r) => r.depositPaid && r.remainingPaid);
+        break;
+    }
+
+    return rows;
+  }, [allRows, search, filter]);
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selected.size === filteredRows.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filteredRows.map((r) => r.id)));
+    }
+  };
+
+  const [bulkError, setBulkError] = useState<string | null>(null);
+
+  const bulkMarkPaid = async (field: 'depositPaid' | 'remainingPaid') => {
+    if (selected.size === 0) return;
+    setBulkBusy(true);
+    setBulkError(null);
+    try {
+      const res = await fetch('/api/admin/bookings/bulk-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingIds: Array.from(selected),
+          field,
+          value: true,
+        }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload?.ok) {
+        setBulkError(payload?.error || 'Error actualitzant pagaments');
+        return;
+      }
+      setSelected(new Set());
+      window.location.reload();
+    } catch {
+      setBulkError('Error de connexió');
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const csvData = filteredRows.map((r) => ({
+    Referencia: r.reference,
+    Client: r.clientName,
+    Telefon: r.clientPhone,
+    'Data event': r.eventDate.split('T')[0],
+    Total: r.total,
+    Diposit: r.depositAmount,
+    'Diposit pagat': r.depositPaid ? 'Sí' : 'No',
+    Resta: r.remainingAmount,
+    'Resta pagat': r.remainingPaid ? 'Sí' : 'No',
+    Estat: r.status,
+  }));
+
+  const filterChips: { id: PaymentFilter; label: string; count?: number }[] = [
+    { id: 'tots', label: 'Tots', count: allRows.length },
+    { id: 'pendents', label: 'Pendents', count: allRows.filter((r) => !r.depositPaid || !r.remainingPaid).length },
+    { id: 'vencits', label: 'Vencits', count: overdueDepositCount + overdueRemainingCount },
+    { id: 'proxims', label: 'Pròxims 7d', count: dueSoonDepositCount + dueSoonRemainingCount },
+    { id: 'pagats', label: 'Pagats', count: allRows.filter((r) => r.depositPaid && r.remainingPaid).length },
+  ];
+
+  return (
+    <>
+      {/* Filter bar */}
+      <section className="rounded-xl border border-white/10 p-3 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            placeholder="Cerca referència o client..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none"
+          />
+          <ExportCsvButton
+            data={csvData}
+            filename="cobraments"
+            columns={[
+              { header: 'Referència', accessor: (r) => String(r.Referencia || '') },
+              { header: 'Client', accessor: (r) => String(r.Client || '') },
+              { header: 'Telèfon', accessor: (r) => String(r.Telefon || '') },
+              { header: 'Data event', accessor: (r) => String(r['Data event'] || '') },
+              { header: 'Total', accessor: (r) => Number(r.Total || 0) },
+              { header: 'Dipòsit', accessor: (r) => Number(r.Diposit || 0) },
+              { header: 'Dipòsit pagat', accessor: (r) => String(r['Diposit pagat'] || '') },
+              { header: 'Resta', accessor: (r) => Number(r.Resta || 0) },
+              { header: 'Resta pagat', accessor: (r) => String(r['Resta pagat'] || '') },
+              { header: 'Estat', accessor: (r) => String(r.Estat || '') },
+            ]}
+          />
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {filterChips.map((chip) => (
+            <button
+              key={chip.id}
+              type="button"
+              onClick={() => setFilter(chip.id)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                filter === chip.id
+                  ? 'border-amber-500/50 bg-amber-500/15 text-amber-200'
+                  : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              {chip.label}
+              {chip.count !== undefined && (
+                <span className="ml-1.5 text-[10px] opacity-70">({chip.count})</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Bulk actions */}
+      {selected.size > 0 && (
+        <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">{selected.size} seleccionat{selected.size !== 1 ? 's' : ''}</span>
+          <button
+            type="button"
+            onClick={() => bulkMarkPaid('depositPaid')}
+            disabled={bulkBusy}
+            className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+          >
+            {bulkBusy ? '...' : 'Marcar dipòsit pagat'}
+          </button>
+          <button
+            type="button"
+            onClick={() => bulkMarkPaid('remainingPaid')}
+            disabled={bulkBusy}
+            className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+          >
+            {bulkBusy ? '...' : 'Marcar resta pagada'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="text-xs text-white/40 hover:text-white/60"
+          >
+            Netejar selecció
+          </button>
+          {bulkError && <p className="text-xs text-rose-400">{bulkError}</p>}
+        </section>
+      )}
+
+      {/* Table with timeline */}
+      <section className="rounded-2xl border p-3 shadow-lg overflow-x-auto">
+        <table className="w-full text-sm" aria-label="Cobraments pendents">
+          <thead>
+            <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
+              <th scope="col" className="px-2 py-2 w-8">
+                <input
+                  type="checkbox"
+                  checked={selected.size === filteredRows.length && filteredRows.length > 0}
+                  onChange={toggleAll}
+                  className="accent-amber-500"
+                />
+              </th>
+              <th scope="col" className="px-2 py-2">Referència</th>
+              <th scope="col" className="px-2 py-2">Client</th>
+              <th scope="col" className="px-2 py-2 hidden sm:table-cell">Data</th>
+              <th scope="col" className="px-2 py-2 hidden md:table-cell">Progrés</th>
+              <th scope="col" className="px-2 py-2 text-right">Dipòsit</th>
+              <th scope="col" className="px-2 py-2 text-right">Resta</th>
+              <th scope="col" className="px-2 py-2 text-right hidden sm:table-cell">Total</th>
+              <th scope="col" className="px-2 py-2 w-10"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRows.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-2 py-8 text-center text-white/40">
+                  Cap resultat amb els filtres actuals.
+                </td>
+              </tr>
+            )}
+            {filteredRows.map((row) => (
+              <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                <td className="px-2 py-2">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(row.id)}
+                    onChange={() => toggleSelect(row.id)}
+                    className="accent-amber-500"
+                  />
+                </td>
+                <td className="px-2 py-2 font-mono text-xs font-semibold">{row.reference}</td>
+                <td className="px-2 py-2 truncate max-w-[120px]">{row.clientName}</td>
+                <td className="px-2 py-2 hidden sm:table-cell text-xs">{formatDateSimple(row.eventDate)}</td>
+                <td className="px-2 py-2 hidden md:table-cell min-w-[100px]">
+                  <PaymentTimelineBar row={row} />
+                </td>
+                <td className="px-2 py-2 text-right">
+                  <span className={`text-xs font-medium ${row.depositPaid ? 'text-emerald-400' : row.overdueDeposit ? 'text-rose-400' : 'text-white/60'}`}>
+                    {money(row.depositAmount)}
+                  </span>
+                </td>
+                <td className="px-2 py-2 text-right">
+                  <span className={`text-xs font-medium ${row.remainingPaid ? 'text-emerald-400' : row.overdueRemaining ? 'text-rose-400' : 'text-white/60'}`}>
+                    {money(row.remainingAmount)}
+                  </span>
+                </td>
+                <td className="px-2 py-2 text-right hidden sm:table-cell font-semibold text-xs">{money(row.total)}</td>
+                <td className="px-2 py-2">
+                  <Link href={`/admin/bookings/${row.id}`} className="text-xs text-white/40 hover:text-white/70">
+                    &rarr;
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </>
+  );
+}
+
 export default function EconomiaClient(props: EconomiaClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>('resum');
 
@@ -422,9 +768,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <KpiCard
                     label="Total pendent de cobrar"
                     value={money(props.outstandingTotal)}
-                    color="text-slate-100"
+                    color="text-white/90"
                     borderColor="border-white/10"
-                    bgColor="bg-slate-950/60"
+                    bgColor="bg-white/[0.03]"
                     delay={0.05}
                   />
                   <KpiCard
@@ -468,9 +814,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos realitzats"
                     value={money(props.realized.revenue)}
                     sub={`${props.realized.bookings} completats`}
-                    color="text-slate-100"
+                    color="text-white/90"
                     borderColor="border-white/10"
-                    bgColor="bg-slate-950/60"
+                    bgColor="bg-white/[0.03]"
                     delay={0.05}
                   />
                   <KpiCard
@@ -486,9 +832,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     label="Ingressos previstos"
                     value={money(props.forecast.revenue)}
                     sub={`${props.forecast.bookings} en pipeline`}
-                    color="text-slate-100"
+                    color="text-white/90"
                     borderColor="border-white/10"
-                    bgColor="bg-slate-950/60"
+                    bgColor="bg-white/[0.03]"
                     delay={0.15}
                   />
                   <KpiCard
@@ -631,7 +977,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         href={`/admin/bookings/${row.id}`}
                         className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                       >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-black">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black">
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
@@ -662,40 +1008,26 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'cobraments' && (
             <>
               <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-slate-100" borderColor="border-white/10" bgColor="bg-slate-950/60" />
+                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" />
                 <KpiCard label="Pendent fora de termini" value={money(props.overdueTotal)} color="text-rose-300" borderColor="border-rose-500/30" bgColor="bg-rose-500/10" delay={0.05} />
                 <KpiCard label="Vencen en 7 dies" value={money(props.dueSoonTotal)} color="text-amber-300" borderColor="border-amber-500/30" bgColor="bg-amber-500/10" delay={0.1} />
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="text-emerald-300" borderColor="border-emerald-500/30" bgColor="bg-emerald-500/10" delay={0.15} />
               </div>
 
-              <section className="grid gap-3 rounded-xl border border-white/10 p-3 sm:grid-cols-2">
-                <div className="rounded-lg border p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide">Fora de termini</p>
-                  <p className="mt-1 text-sm">
-                    Bestretes: <span className="font-bold">{overdueDepositCount}</span> · Saldo: <span className="font-bold">{overdueRemainingCount}</span>
-                  </p>
-                </div>
-                <div className="rounded-lg border p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide">Pròxims 7 dies</p>
-                  <p className="mt-1 text-sm">
-                    Bestretes: <span className="font-bold">{dueSoonDepositCount}</span> · Saldo: <span className="font-bold">{dueSoonRemainingCount}</span>
-                  </p>
-                </div>
-              </section>
-
-              <section className="rounded-xl border px-4 py-3 text-xs">
-                <p>
-                  <span className="font-semibold">Guia:</span> codi `OE-...` = referència interna de la reserva.
-                  <span className="font-semibold"> Bestreta</span> = primer pagament per confirmar la data.
-                  <span className="font-semibold"> Saldo restant</span> = import final pendent.
-                </p>
-              </section>
+              {/* Filtres + Accions massives */}
+              <CobramentFiltersSection
+                allRows={props.allPaymentRows || [...props.atRiskRows, ...props.upcomingDueRows]}
+                overdueDepositCount={overdueDepositCount}
+                overdueRemainingCount={overdueRemainingCount}
+                dueSoonDepositCount={dueSoonDepositCount}
+                dueSoonRemainingCount={dueSoonRemainingCount}
+              />
 
               {/* Vençuts */}
               <section className="rounded-2xl border p-5 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⚠️</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
                     <h2 className="text-lg font-bold">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
                       <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -750,12 +1082,12 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         <div className="mt-3 border-t border-white/10 pt-3">
                           <div className="mb-3 flex items-center justify-between gap-2">
                             <p className="text-[11px]">Codi reserva: {row.reference}</p>
-                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors">
+                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors">
                               Obrir reserva
                             </Link>
                           </div>
                           <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                            <div className={`rounded-lg border p-3 ${row.depositPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                            <div className={`rounded-xl border p-3 ${row.depositPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
                               <div className="flex items-center justify-between mb-1">
                                 <p className={`text-xs font-semibold ${row.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Bestreta</p>
                                 <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
@@ -765,7 +1097,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
-                            <div className={`rounded-lg border p-3 ${row.remainingPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                            <div className={`rounded-xl border p-3 ${row.remainingPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
                               <div className="flex items-center justify-between mb-1">
                                 <p className={`text-xs font-semibold ${row.remainingPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Saldo restant</p>
                                 <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
@@ -794,7 +1126,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {/* Pròxims */}
               <section className="rounded-2xl border p-5 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⏰</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⏰</span>
                   <h2 className="text-lg font-bold">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
                     <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -849,9 +1181,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               {props.hasReport && (
                 <>
                   <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-slate-100" borderColor="border-white/10" bgColor="bg-slate-950/60" />
+                    <KpiCard label="Ingressos realitzats" value={money(props.realized.revenue)} sub={`${props.realized.bookings} completats`} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" />
                     <KpiCard label="Marge net realitzat" value={money(props.realized.netMargin)} sub={`Mitjà ${pct(props.realized.avgMarginPct)}`} color="text-emerald-300" borderColor="border-emerald-400/30" bgColor="bg-emerald-950/30" delay={0.05} />
-                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-slate-100" borderColor="border-white/10" bgColor="bg-slate-950/60" delay={0.1} />
+                    <KpiCard label="Previsió d'ingressos" value={money(props.forecast.revenue)} sub={`${props.forecast.bookings} en pipeline`} color="text-white/90" borderColor="border-white/10" bgColor="bg-white/[0.03]" delay={0.1} />
                     <KpiCard label="Previsió de marge" value={money(props.forecast.netMargin)} sub={`Mitjà ${pct(props.forecast.avgMarginPct)}`} color="text-amber-300" borderColor="border-amber-400/30" bgColor="bg-amber-950/30" delay={0.15} />
                   </div>
 
@@ -859,7 +1191,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div className="grid gap-5 xl:grid-cols-2">
                     <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">🏆</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">🏆</span>
                         <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
                       </div>
                       <div className="space-y-2">
@@ -872,7 +1204,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               href={`/admin/bookings/${row.id}`}
                               className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-black">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-black">
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
@@ -898,7 +1230,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                     <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⚠️</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
                         <h2 className="text-base font-bold">Esdeveniments en risc</h2>
                         {props.riskProfitability.length > 0 && (
                           <span className="rounded-full px-2 py-0.5 text-xs font-bold">
@@ -919,7 +1251,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               href={`/admin/bookings/${row.id}`}
                               className="flex items-center gap-3 rounded-xl border p-3 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs">📉</span>
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">📉</span>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold truncate transition-colors">
                                   {row.reference} &middot; {row.clientName}
@@ -940,18 +1272,18 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   {/* Taula per canal */}
                   <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">📊</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">📊</span>
                       <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
+                      <table className="min-w-full text-sm" aria-label="Rendibilitat per canal">
                         <thead>
                           <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider">
-                            <th className="py-3 pr-4">Canal</th>
-                            <th className="py-3 pr-4">Esdeveniments</th>
-                            <th className="py-3 pr-4">Ingressos</th>
-                            <th className="py-3 pr-4">Marge net</th>
-                            <th className="py-3">Marge %</th>
+                            <th scope="col" className="py-3 pr-4">Canal</th>
+                            <th scope="col" className="py-3 pr-4">Esdeveniments</th>
+                            <th scope="col" className="py-3 pr-4">Ingressos</th>
+                            <th scope="col" className="py-3 pr-4">Marge net</th>
+                            <th scope="col" className="py-3">Marge %</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -989,14 +1321,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                 {props.cashFlow && props.cashFlow.length > 0 ? (
                   <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[700px] w-full text-sm">
+                    <table className="min-w-[700px] w-full text-sm" aria-label="Projecció de tresoreria">
                       <thead>
                         <tr className="text-left text-[11px] uppercase tracking-wider">
-                          <th className="px-3 py-2">Mes</th>
-                          <th className="px-3 py-2 text-right">Ingressos previstos</th>
-                          <th className="px-3 py-2 text-right">Costos estimats</th>
-                          <th className="px-3 py-2 text-right">Flux net</th>
-                          <th className="px-3 py-2 text-right">Acumulat</th>
+                          <th scope="col" className="px-3 py-2">Mes</th>
+                          <th scope="col" className="px-3 py-2 text-right">Ingressos previstos</th>
+                          <th scope="col" className="px-3 py-2 text-right">Costos estimats</th>
+                          <th scope="col" className="px-3 py-2 text-right">Flux net</th>
+                          <th scope="col" className="px-3 py-2 text-right">Acumulat</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
@@ -1032,13 +1364,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
                   <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[700px] w-full text-sm">
+                    <table className="min-w-[700px] w-full text-sm" aria-label="Previsió de vendes">
                       <thead>
                         <tr className="text-left text-[11px] uppercase tracking-wider">
-                          <th className="px-3 py-2">Mes</th>
-                          <th className="px-3 py-2 text-right">Mitjana històrica</th>
-                          <th className="px-3 py-2 text-right">Pipeline ponderat</th>
-                          <th className="px-3 py-2 text-right">Previsió combinada</th>
+                          <th scope="col" className="px-3 py-2">Mes</th>
+                          <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
+                          <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
+                          <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
@@ -1065,15 +1397,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
 
                   <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[600px] w-full text-sm">
+                    <table className="min-w-[600px] w-full text-sm" aria-label="CAC per canal">
                       <thead>
                         <tr className="text-left text-[11px] uppercase tracking-wider">
-                          <th className="px-3 py-2">Canal</th>
-                          <th className="px-3 py-2 text-right">Leads</th>
-                          <th className="px-3 py-2 text-right">Guanyats</th>
-                          <th className="px-3 py-2 text-right">Conversió</th>
-                          <th className="px-3 py-2 text-right">CAC estimat</th>
-                          <th className="px-3 py-2 text-right">CAC real</th>
+                          <th scope="col" className="px-3 py-2">Canal</th>
+                          <th scope="col" className="px-3 py-2 text-right">Leads</th>
+                          <th scope="col" className="px-3 py-2 text-right">Guanyats</th>
+                          <th scope="col" className="px-3 py-2 text-right">Conversió</th>
+                          <th scope="col" className="px-3 py-2 text-right">CAC estimat</th>
+                          <th scope="col" className="px-3 py-2 text-right">CAC real</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
@@ -1129,19 +1461,19 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
 
                 <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
-                  <table className="min-w-[1250px] w-full text-sm">
+                  <table className="min-w-[1250px] w-full text-sm" aria-label="Rendibilitat per pack">
                     <thead className="">
                       <tr className="text-left text-[11px] uppercase tracking-wider">
-                        <th className="px-3 py-2">Pack</th>
-                        <th className="px-3 py-2">Semàfor</th>
-                        <th className="px-3 py-2 text-right">PVP</th>
-                        <th className="px-3 py-2 text-right">Cost estimat</th>
-                        <th className="px-3 py-2 text-right">Benefici</th>
-                        <th className="px-3 py-2 text-right">Marge</th>
-                        <th className="px-3 py-2 text-right">Hora extra</th>
-                        <th className="px-3 py-2 text-right">Cost/h extra</th>
-                        <th className="px-3 py-2 text-right">Benefici/h extra</th>
-                        <th className="px-3 py-2 text-right">Marge h extra</th>
+                        <th scope="col" className="px-3 py-2">Pack</th>
+                        <th scope="col" className="px-3 py-2">Semàfor</th>
+                        <th scope="col" className="px-3 py-2 text-right">PVP</th>
+                        <th scope="col" className="px-3 py-2 text-right">Cost estimat</th>
+                        <th scope="col" className="px-3 py-2 text-right">Benefici</th>
+                        <th scope="col" className="px-3 py-2 text-right">Marge</th>
+                        <th scope="col" className="px-3 py-2 text-right">Hora extra</th>
+                        <th scope="col" className="px-3 py-2 text-right">Cost/h extra</th>
+                        <th scope="col" className="px-3 py-2 text-right">Benefici/h extra</th>
+                        <th scope="col" className="px-3 py-2 text-right">Marge h extra</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">

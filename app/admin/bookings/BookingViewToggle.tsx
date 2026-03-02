@@ -19,7 +19,7 @@ export default function BookingViewToggle() {
   };
 
   return (
-    <div className="flex rounded-lg border overflow-hidden shrink-0">
+    <div className="flex rounded-xl border overflow-hidden shrink-0">
       <button
         type="button"
         onClick={() => toggle('list')}
