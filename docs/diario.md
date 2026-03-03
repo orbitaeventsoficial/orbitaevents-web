@@ -1,6 +1,6 @@
 # Diari de treball — Òrbita Events
 
-## 2026-03-03 — Auditoria de bugs completa (2 commits, ~30 bugs arreglats)
+## 2026-03-03 — Auditoria de bugs completa (3 commits, ~35 bugs arreglats)
 
 ### Objectiu de la sessió
 Continuar l'auditoria de bugs iniciada a la sessió anterior (que va petar per límit de context). Arreglar tots els bugs trobats, traduir respira-rosa a català, i fer push.
@@ -107,11 +107,39 @@ Arreglat també `hover:bg-white/5/90` → `hover:bg-white/10` (classe Tailwind i
 - 3 bugs menors
 - TypeScript: 0 errors, tsc: OK
 
+### 11. Rate limit off-by-one (commit 3)
+**Fitxer**: `lib/middleware/admin-rate-limit.ts`
+Comparació `<= ADMIN_AUTH_LIMIT` permetia 6 intents fallits en lloc de 5. Arreglat a `<` tant per Redis com in-memory.
+
+### 12. Middleware auth documentat (commit 3)
+**Fitxer**: `lib/middleware/admin-auth.ts`
+- Documentat que Edge Runtime no suporta `timingSafeEqual` ni `createHmac`
+- La validació timing-safe i CSRF completa (signatura+expiració) la fa `requireAuth()` a les API routes (Node.js runtime)
+- El middleware fa check ràpid igualtat header/cookie com a primera porta
+
+### 13. Altres fixes commit 3
+| Fitxer | Bug | Solució |
+|--------|-----|---------|
+| `contractService.ts` | `snapshot` null causa crash | Fallback `(proposal.snapshot \|\| {})` |
+| `blog/page.tsx` | Locale default `'es'` | Canviat a `'ca'` |
+| `InventoryListClient.tsx` | Errors API silenciosos | `console.error` amb status |
+| `BookingMarginCard.tsx` | `persistDistance` silenciós | `console.error` amb detalls |
+
+### 14. Descartats (falsos positius)
+L'agent de pàgines públiques va reportar ~15 links `/contacto` sense prefix locale, però TOTS usen `<Link>` de `@/lib/navigation` (next-intl) que gestiona el locale automàticament. No són bugs. L'únic cas real era `reservar/page.tsx` que usa `<a>` tags (arreglat al commit 2).
+
+### Resum commit 3
+- 6 fitxers modificats
+- Rate limit off-by-one (seguretat)
+- 4 errors silenciosos arreglats
+- 1 null check contracte
+
 ### Total sessió
-- **2 commits** pushejats
-- **~30 bugs arreglats** en total
-- **3 agents d'auditoria** executats en paral·lel (economia, components compartits, pàgines públiques/API)
+- **3 commits** pushejats
+- **~35 bugs arreglats** en total
+- **6 agents d'auditoria** executats en paral·lel
 - **0 errors TypeScript**
+- Àrees auditades: auth, middleware, rate limiting, CSRF, calendari, economia, components compartits, crons, portal i18n, pàgines públiques, formularis, inventari, blog, contractes, proposals
 
 ## 2026-03-02 (sessió 3) — Passada final exhaustiva: htmlFor+id a TOTS els formularis + Auditoria completa
 
