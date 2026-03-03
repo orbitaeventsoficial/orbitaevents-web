@@ -23,7 +23,7 @@ interface CacheOptions {
 }
 
 const DEFAULT_TTL = 60 * 1000; // 1 minute
-const DEFAULT_MAX_SIZE = 100;
+const DEFAULT_MAX_SIZE = 250;
 
 class QueryCache {
   private cache: Map<string, CacheEntry<unknown>>;
@@ -262,8 +262,8 @@ export const CacheKeys = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const CacheTTL = {
-  VERY_SHORT: 30 * 1000, // 30 seconds - Real-time critical data
-  SHORT: 60 * 1000, // 1 minute - Dashboard stats
+  VERY_SHORT: 60 * 1000, // 1 minute - Real-time critical data
+  SHORT: 2 * 60 * 1000, // 2 minutes - Dashboard stats
   MEDIUM: 5 * 60 * 1000, // 5 minutes - Lists, counts
   LONG: 15 * 60 * 1000, // 15 minutes - Public data, testimonials
   VERY_LONG: 60 * 60 * 1000, // 1 hour - Static content, config

@@ -154,40 +154,35 @@ export default async function BookingDetailPage({ params }: PageProps) {
     booking.pack.translations,
     booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
   );
-  const commLogs = await prisma.adminLog.findMany({
-    where: {
-      entity: 'booking',
-      entityId: booking.id,
-      action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-  });
+  // Paral·lelitzar totes les queries secundàries
+  const [commLogs, customer, activePortalAccess, profitabilityConfig, marginTargetSetting] = await Promise.all([
+    prisma.adminLog.findMany({
+      where: {
+        entity: 'booking',
+        entityId: booking.id,
+        action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    }),
+    booking.customerId
+      ? prisma.customer.findUnique({
+          where: { id: booking.customerId },
+          select: { id: true, totalEvents: true, totalSpent: true, lastEventDate: true },
+        })
+      : prisma.customer.findFirst({
+          where: { emailNormalized: booking.clientEmail.trim().toLowerCase() },
+          select: { id: true, totalEvents: true, totalSpent: true, lastEventDate: true },
+        }),
+    getActivePortalAccessForBooking(booking.id) as Promise<Parameters<typeof ClientPortalAccessPanel>[0]['initialActive']>,
+    getProfitabilityConfig(),
+    prisma.setting.findUnique({ where: { key: 'pricing.pack.marginTargetPct' } }),
+  ]);
   const commStatuses = {
     PAYMENT: deriveFlowStatus(commLogs, 'PAYMENT'),
     POST_EVENT: deriveFlowStatus(commLogs, 'POST_EVENT'),
     GENERAL: deriveFlowStatus(commLogs, 'GENERAL'),
   } as const;
-  const customer = booking.customerId
-    ? await prisma.customer.findUnique({
-        where: { id: booking.customerId },
-        select: {
-          id: true,
-          totalEvents: true,
-          totalSpent: true,
-          lastEventDate: true,
-        },
-      })
-    : await prisma.customer.findFirst({
-        where: { emailNormalized: booking.clientEmail.trim().toLowerCase() },
-        select: {
-          id: true,
-          totalEvents: true,
-          totalSpent: true,
-          lastEventDate: true,
-        },
-      });
-  const activePortalAccess = await getActivePortalAccessForBooking(booking.id) as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
   const reviewFlowStatus = booking.reviewSubmittedAt || booking.clientSurvey
     ? 'RESPONDIDO'
     : booking.postEventEmailSent
@@ -224,8 +219,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
   const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
   const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
-  const profitabilityConfig = await getProfitabilityConfig();
-  const marginTargetSetting = await prisma.setting.findUnique({ where: { key: 'pricing.pack.marginTargetPct' } });
   const marginTargetRaw = Number(marginTargetSetting?.value);
   const targetMarginPct = Number.isFinite(marginTargetRaw)
     ? (marginTargetRaw > 1 ? marginTargetRaw : marginTargetRaw * 100)

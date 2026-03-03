@@ -312,36 +312,28 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ];
   const activities = activitiesRaw.length > 0 ? activitiesRaw : [{ icon: '✅', text: 'Tot al dia, sense activitat pendent', time: 'Ara' }];
 
-  // Financial forecasts (resilient — no bloquejar si falla)
-  let cashFlowNet30 = 0;
-  let pipelineWeighted30 = 0;
-  try {
-    const cashFlow = await buildCashFlowForecast(2);
-    cashFlowNet30 = cashFlow.length > 0 ? cashFlow[0].netFlow : 0;
-  } catch { /* ignorar */ }
-
-  try {
-    const pipeline = await buildPipelineForecast(2);
-    pipelineWeighted30 = pipeline.length > 0 ? pipeline[0].combined : 0;
-  } catch { /* ignorar */ }
-
-  // Pagaments pendents (reserves confirmades/preparing amb pagament pendent)
-  let pendingPayments = 0;
-  try {
-    const pendingBookings = await prisma.booking.findMany({
+  // Financial forecasts (en paral·lel, resilients)
+  const [cashFlowResult, pipelineResult, pendingBookingsResult] = await Promise.all([
+    cachedQuery('admin:dashboard:cashflow', () => buildCashFlowForecast(2), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:pipeline', () => buildPipelineForecast(2), CacheTTL.SHORT).catch(() => []),
+    cachedQuery(`admin:dashboard:pending-payments:${dayKey}`, () => prisma.booking.findMany({
       where: {
         status: { in: ['CONFIRMED', 'PREPARING'] },
         OR: [{ depositPaid: false }, { remainingPaid: false }],
       },
       select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
-    });
-    for (const b of pendingBookings) {
-      const deposit = Number(b.depositAmount) || 0;
-      const total = Number(b.total) || 0;
-      if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
-      if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
-    }
-  } catch { /* ignorar */ }
+    }), CacheTTL.SHORT).catch(() => []),
+  ]);
+
+  const cashFlowNet30 = cashFlowResult.length > 0 ? cashFlowResult[0].netFlow : 0;
+  const pipelineWeighted30 = pipelineResult.length > 0 ? pipelineResult[0].combined : 0;
+  let pendingPayments = 0;
+  for (const b of pendingBookingsResult) {
+    const deposit = Number(b.depositAmount) || 0;
+    const total = Number(b.total) || 0;
+    if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
+    if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
+  }
 
   return {
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
