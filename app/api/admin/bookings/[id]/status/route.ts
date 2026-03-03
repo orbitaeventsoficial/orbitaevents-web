@@ -61,12 +61,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           WHERE key = 'total_events'
         `;
 
-        // 2. Incrementar total_people amb guestCount
-        await tx.$executeRaw`
-          UPDATE settings
-          SET value = CAST(CAST(value AS INTEGER) + ${existing.guestCount} AS TEXT)
-          WHERE key = 'total_people'
-        `;
+        // 2. Incrementar total_people amb guestCount (si n'hi ha)
+        const guests = existing.guestCount || 0;
+        if (guests > 0) {
+          await tx.$executeRaw`
+            UPDATE settings
+            SET value = CAST(CAST(value AS INTEGER) + ${guests} AS TEXT)
+            WHERE key = 'total_people'
+          `;
+        }
 
         // 3. Crear notificació en viu
         await tx.liveNotification.create({

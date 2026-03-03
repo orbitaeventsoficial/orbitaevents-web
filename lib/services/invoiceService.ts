@@ -143,6 +143,9 @@ async function syncInvoiceToHolded(invoiceId: string): Promise<void> {
     },
   });
 
+  if (!invoice.booking) {
+    throw new Error('La factura no té booking associada');
+  }
   if (!invoice.customer?.email) {
     throw new Error('El client de la factura no té email');
   }
