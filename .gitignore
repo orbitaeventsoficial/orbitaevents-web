@@ -53,3 +53,4 @@ contact.html
 playwright-report/
 test-results/
 *.html
+!public/respira-rosa/index.html

@@ -110,8 +110,9 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
-    } catch {
-      // Keep existing state on error
+    } catch (err) {
+      console.error('Error carregant pipeline', err);
+      toast.error('Error carregant el pipeline');
     } finally {
       setLoading(false);
     }

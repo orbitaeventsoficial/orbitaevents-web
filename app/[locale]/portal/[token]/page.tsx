@@ -48,6 +48,15 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     travelRoundTripFrom: 'Anada i tornada des de',
     travelIncluded: 'Inclòs',
     travelExtraKm: 'Km extra',
+    portalLabel: 'Portal',
+    portalValidUntil: 'Vàlid fins',
+    portalActive: 'Actiu',
+    postEventDone: 'Informe completat',
+    postEventProgress: 'En progrés',
+    openQuote: 'Obrir pressupost',
+    feedbackSent: 'Feedback enviat',
+    pendingClose: 'Pendent de tancament',
+    trackingStatus: 'Estat de seguiment',
     backHome: 'Anar al web principal',
   },
   es: {
@@ -77,6 +86,15 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     travelRoundTripFrom: 'Ida y vuelta desde',
     travelIncluded: 'Incluido',
     travelExtraKm: 'Km extra',
+    portalLabel: 'Portal',
+    portalValidUntil: 'Válido hasta',
+    portalActive: 'Activo',
+    postEventDone: 'Informe completado',
+    postEventProgress: 'En progreso',
+    openQuote: 'Abrir presupuesto',
+    feedbackSent: 'Feedback enviado',
+    pendingClose: 'Pendiente de cierre',
+    trackingStatus: 'Estado de seguimiento',
     backHome: 'Ir a la web principal',
   },
   en: {
@@ -106,21 +124,27 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     travelRoundTripFrom: 'Round trip from',
     travelIncluded: 'Included',
     travelExtraKm: 'Extra km',
+    portalLabel: 'Portal',
+    portalValidUntil: 'Valid until',
+    portalActive: 'Active',
+    postEventDone: 'Report completed',
+    postEventProgress: 'In progress',
+    openQuote: 'Open quote',
+    feedbackSent: 'Feedback sent',
+    pendingClose: 'Pending closure',
+    trackingStatus: 'Tracking status',
     backHome: 'Back to main site',
   },
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pendent',
-  CONFIRMED: 'Confirmada',
-  PREPARING: 'Preparant',
-  COMPLETED: 'Completada',
-  CANCELLED: 'Cancel·lada',
+const STATUS_LABELS: Record<Locale, Record<string, string>> = {
+  ca: { PENDING: 'Pendent', CONFIRMED: 'Confirmada', PREPARING: 'Preparant', COMPLETED: 'Completada', CANCELLED: 'Cancel·lada' },
+  es: { PENDING: 'Pendiente', CONFIRMED: 'Confirmada', PREPARING: 'Preparando', COMPLETED: 'Completada', CANCELLED: 'Cancelada' },
+  en: { PENDING: 'Pending', CONFIRMED: 'Confirmed', PREPARING: 'Preparing', COMPLETED: 'Completed', CANCELLED: 'Cancelled' },
 };
 
-
-function formatDistanceKm(km: number): string {
-  return new Intl.NumberFormat('ca-ES', {
+function formatDistanceKm(km: number, locale: Locale): string {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     minimumFractionDigits: 0,
     maximumFractionDigits: 1,
   }).format(km);
@@ -243,14 +267,14 @@ export default async function ClientPortalPage({
             <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-white/40">{t.travelDistance}</p>
-                <p>{formatDistanceKm(totalTravelKm)} km</p>
+                <p>{formatDistanceKm(totalTravelKm, locale)} km</p>
                 <p className="text-xs text-white/40">{t.travelRoundTripFrom} Granollers</p>
                 <p className="text-xs text-emerald-300">{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-white/40">{t.travelRate}</p>
                 <p>{TRAVEL_BLOCK_EUR} € / {TRAVEL_BLOCK_KM} km extra</p>
-                <p className="text-xs text-white/40">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm)} km ({travelBlocks} trams)</p>
+                <p className="text-xs text-white/40">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm, locale)} km ({travelBlocks} trams)</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-white/40">{t.travelEstimated}</p>
@@ -311,15 +335,15 @@ export default async function ClientPortalPage({
             <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-white/40">{t.status}</p>
-                <p>{STATUS_LABELS[booking.status] || booking.status}</p>
+                <p>{STATUS_LABELS[locale][booking.status] || booking.status}</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-white/40">Portal</p>
-                <p>{access.expiresAt ? `Vàlid fins ${new Date(access.expiresAt).toLocaleDateString('ca-ES')}` : 'Actiu'}</p>
+                <p className="text-white/40">{t.portalLabel}</p>
+                <p>{access.expiresAt ? `${t.portalValidUntil} ${new Date(access.expiresAt).toLocaleDateString(toIntlLocale(locale))}` : t.portalActive}</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-white/40">Post-event</p>
-                <p>{booking.postEventReport ? 'Informe intern completat' : 'En progrés'}</p>
+                <p className="text-white/40">{t.postEvent}</p>
+                <p>{booking.postEventReport ? t.postEventDone : t.postEventProgress}</p>
               </div>
             </div>
           </section>
@@ -333,11 +357,11 @@ export default async function ClientPortalPage({
                 <a
                   href={latestProposal.pdfUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold text-white/90 hover:brightness-110"
                   style={{ borderColor: accentBorder, backgroundColor: accentBg }}
                 >
-                  Obrir pressupost ({latestProposal.reference})
+                  {t.openQuote} ({latestProposal.reference})
                 </a>
               </div>
             ) : (
@@ -350,7 +374,7 @@ export default async function ClientPortalPage({
           <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-lg font-semibold">{t.postEvent}</h2>
             <p className="mt-2 text-sm text-white/70">
-              Estat de seguiment: {(booking as Record<string, unknown>).clientFeedback ? 'feedback enviat' : 'pendent de tancament'}.
+              {t.trackingStatus}: {(booking as Record<string, unknown>).clientFeedback ? t.feedbackSent : t.pendingClose}.
             </p>
           </section>
         )}

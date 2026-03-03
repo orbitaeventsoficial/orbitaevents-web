@@ -88,11 +88,12 @@ export async function GET(request: NextRequest) {
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-      const [total, withEvents, recentMonth, withGdpr] = await Promise.all([
+      const [total, withEvents, recentMonth, withGdpr, vip] = await Promise.all([
         prisma.customer.count(),
         prisma.customer.count({ where: { totalEvents: { gt: 0 } } }),
         prisma.customer.count({ where: { createdAt: { gt: oneMonthAgo } } }),
         prisma.customer.count({ where: { gdprConsent: true } }),
+        prisma.customer.count({ where: { totalSpent: { gte: 2000 } } }),
       ]);
 
       responseData.stats = {
@@ -100,6 +101,7 @@ export async function GET(request: NextRequest) {
         withEvents,
         recentMonth,
         withGdpr,
+        vip,
       };
     }
 

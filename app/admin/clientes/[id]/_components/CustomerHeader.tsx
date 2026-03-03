@@ -6,6 +6,7 @@ import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
 import { labelEstatClient } from '@/lib/customer-hub/labels';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useHubContext } from './CustomerHubClient';
+import { useToast } from '@/app/admin/components/ToastProvider';
 import { formatDate, formatNumber } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -97,6 +98,7 @@ export default function CustomerHeader({
   setTab: (tab: TabKey) => void;
 }) {
   const { refresh } = useHubContext();
+  const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -169,8 +171,9 @@ export default function CustomerHeader({
       if (res.ok) {
         refresh();
       }
-    } catch {
-      // Silently fail, user can retry
+    } catch (err) {
+      console.error('Error canviant estat del client', err);
+      toast.error('Error canviant l\'estat del client');
     } finally {
       setActionLoading(null);
     }

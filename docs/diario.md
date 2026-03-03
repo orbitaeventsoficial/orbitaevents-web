@@ -1,5 +1,57 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-03 — Auditoria de bugs (continuació) + Respira rosa + Portal i18n
+
+### Objectiu de la sessió
+Continuar l'auditoria de bugs iniciada a la sessió anterior (que va petar per límit de context). Arreglar tots els bugs trobats, traduir respira-rosa a català, i fer push.
+
+### Context
+La sessió anterior va fer:
+- 3 commits: bugs Customer Hub/pack sync/respira/start-process, 6 bugs bookings, performance admin
+- 2 agents d'auditoria en paral·lel (leads/clients/portal + economia/API) van completar
+
+### 1. Respira-rosa traduït a català
+**Fitxer**: `public/respira-rosa/index.html`
+Tot el cartell llegenda de la tècnica 5-4-3-2-1 estava en castellà (és HTML estàtic, fora de next-intl).
+- `<html lang="es">` → `<html lang="ca">`
+- "ESTRATEGIA DE RELAJACIÓN" → "ESTRATÈGIA DE RELAXACIÓ"
+- "Observa a tu alrededor y nombra:" → "Observa al teu voltant i anomena:"
+- 5 passos: VER→VEURE, TOCAR, OÍR→SENTIR, OLER→OLORAR, SABOREAR→ASSABORIR
+- Botons: "Tocar para empezar" → "Toca per començar", "Permitir movimiento" → "Permetre moviment"
+- Missatges JS: "Movimiento no permitido" → "Moviment no permès", etc.
+- Tots els comentaris JS traduïts
+- Afegit excepció al `.gitignore` (`!public/respira-rosa/index.html`) perquè `*.html` l'excloïa
+
+### 2. Portal client — i18n complet (11 bugs arreglats)
+**Fitxer**: `app/[locale]/portal/[token]/page.tsx`
+El portal del client és multilingüe (ca/es/en) però tenia molts textos hardcoded en català.
+- `STATUS_LABELS`: de `Record<string, string>` → `Record<Locale, Record<string, string>>` (3 idiomes)
+- `formatDistanceKm`: ara rep `locale` i usa `toIntlLocale(locale)` (era `'ca-ES'` hardcoded)
+- 9 claus noves als 3 idiomes: portalLabel, portalValidUntil, portalActive, postEventDone, postEventProgress, openQuote, feedbackSent, pendingClose, trackingStatus
+- Data portal: `toLocaleDateString('ca-ES')` → `toLocaleDateString(toIntlLocale(locale))`
+- `rel="noreferrer"` → `rel="noopener noreferrer"` (consistència codebase)
+
+### 3. Catch silenciosos i errors sense feedback (4 fitxers)
+L'agent d'auditoria va trobar múltiples llocs on errors es silenciaven sense feedback a l'usuari.
+
+| Fitxer | Problema | Solució |
+|--------|----------|---------|
+| `LeadPipelineView.tsx` | catch buit a fetchPipeline | `console.error` + `toast.error` |
+| `CustomerHeader.tsx` | catch buit a changeStatus | import useToast + `toast.error` |
+| `LeadWorkspace.tsx` | 7× `if (!res.ok) return;` sense feedback | `toast.error` a cada operació (tasques, documents, activitats) |
+
+### 4. KPI VIP clients — stats.vip absent
+**Fitxer**: `app/api/admin/customers/route.ts`
+El component `clientes/page.tsx` mostra un KPI "VIP" amb `stats.vip`, però l'API no retornava aquest camp.
+- Afegit `prisma.customer.count({ where: { totalSpent: { gte: 2000 } } })` al Promise.all de stats
+- Afegit `vip` al objecte de resposta
+
+### Resum de canvis
+- 7 fitxers modificats
+- 11 bugs arreglats (portal i18n: 6, catch silenciosos: 4, stats.vip: 1)
+- 1 fitxer traduït completament (respira-rosa)
+- TypeScript: 0 errors
+
 ## 2026-03-02 (sessió 3) — Passada final exhaustiva: htmlFor+id a TOTS els formularis + Auditoria completa
 
 ### Objectiu de la sessió

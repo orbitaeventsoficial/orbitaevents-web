@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
+import { useToast } from '@/app/admin/components/ToastProvider';
 
 type LeadTask = {
   id: string;
@@ -43,6 +44,7 @@ export default function LeadWorkspace({
   initialDocuments: LeadDocument[];
   initialActivities: LeadActivity[];
 }) {
+  const toast = useToast();
   const [tasks, setTasks] = useState(initialTasks);
   const [documents, setDocuments] = useState(initialDocuments);
   const [activities, setActivities] = useState(initialActivities);
@@ -100,7 +102,7 @@ export default function LeadWorkspace({
       }),
     });
     setLoadingTask(false);
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error creant tasca'); return; }
     const data = await res.json();
     setTasks((prev) => [data.task, ...prev]);
     refreshActivities();
@@ -115,7 +117,7 @@ export default function LeadWorkspace({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error actualitzant tasca'); return; }
     const data = await res.json();
     setTasks((prev) => prev.map((task) => (task.id === taskId ? data.task : task)));
     refreshActivities();
@@ -125,7 +127,7 @@ export default function LeadWorkspace({
     const res = await fetch(`/api/admin/leads/${leadId}/tasks/${taskId}`, {
       method: 'DELETE',
     });
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error eliminant tasca'); return; }
     setTasks((prev) => prev.filter((task) => task.id !== taskId));
     refreshActivities();
   };
@@ -144,7 +146,7 @@ export default function LeadWorkspace({
       body: formData,
     });
     setLoadingDoc(false);
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error pujant document'); return; }
     const data = await res.json();
     setDocuments((prev) => [data.document, ...prev]);
     refreshActivities();
@@ -160,7 +162,7 @@ export default function LeadWorkspace({
     const res = await fetch(`/api/admin/leads/${leadId}/activities/${activityId}`, {
       method: 'DELETE',
     });
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error eliminant activitat'); return; }
     setActivities((prev) => prev.filter((activity) => activity.id !== activityId));
   };
 
@@ -171,7 +173,7 @@ export default function LeadWorkspace({
       method: 'DELETE',
     });
     setCleaningActivities(false);
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error netejant activitats'); return; }
     refreshActivities();
   };
 
@@ -184,7 +186,7 @@ export default function LeadWorkspace({
       method: 'DELETE',
     });
     setDeletingDocumentId(null);
-    if (!res.ok) return;
+    if (!res.ok) { toast.error('Error eliminant document'); return; }
 
     setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
     refreshActivities();
