@@ -7,56 +7,16 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { supabaseAdmin } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { sendEmail, sendTestimonialApprovedEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// Check if Supabase is configured
-function checkSupabase() {
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: 'Database not configured' },
-      { status: 503 }
-    );
-  }
-  return null;
-}
-
-// Verificar autenticació admin
-function verifyAdminAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return false;
-
-  if (authHeader.startsWith('Basic ')) {
-    const base64 = authHeader.slice(6);
-    const decoded = Buffer.from(base64, 'base64').toString();
-    const [user, pass] = decoded.split(':');
-    return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS;
-  }
-
-  if (authHeader.startsWith('Bearer ')) {
-    const key = authHeader.slice(7);
-    return key === process.env.ADMIN_KEY;
-  }
-
-  return false;
-}
-
-/**
- * POST - Iniciar procés
- */
 export async function POST(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
-  const dbError = checkSupabase();
-  if (dbError) return dbError;
-
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
-  }
 
   try {
     const body = await request.json();
@@ -69,18 +29,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtenir client (només camps necessaris)
-    const { data: customer, error: customerError } = await supabaseAdmin!
-      .from('customers')
-      .select('id, email, name')
-      .eq('id', customerId)
-      .single();
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
+      select: { id: true, email: true, name: true },
+    });
 
-    if (customerError || !customer) {
+    if (!customer) {
       return NextResponse.json({ error: 'Client no trobat' }, { status: 404 });
     }
 
-    // Executar procés segons tipus
     let result;
 
     switch (processType) {
@@ -107,14 +64,16 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Actualitzar última data de contacte
-    await supabaseAdmin!
-      .from('customers')
-      .update({
-        last_contact_date: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', customerId);
+    // Registrar activitat
+    await prisma.customerActivity.create({
+      data: {
+        customerId,
+        action: processType,
+        details: { description: `Procés "${processType}" iniciat` },
+      },
+    }).catch((err) => {
+      console.error('Error registrant activitat:', err);
+    });
 
     return NextResponse.json({
       success: true,
@@ -131,9 +90,6 @@ export async function POST(request: NextRequest) {
 // FUNCIONS DE PROCÉS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Enviar email de sol·licitud d'opinió
- */
 async function sendReviewRequestEmail(customer: { name: string; email: string }, locale = 'ca') {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
   const reviewUrl = `${baseUrl}/${locale}/opiniones/nueva`;
@@ -153,41 +109,30 @@ async function sendReviewRequestEmail(customer: { name: string; email: string },
           <div style="background: linear-gradient(135deg, #FFB800, #CC9600); padding: 40px; text-align: center;">
             <h1 style="color: #000; margin: 0; font-size: 28px;">ÒRBITA EVENTS</h1>
           </div>
-
           <div style="padding: 30px; color: #e5e5e5;">
             <h2 style="color: #FFB800; margin-top: 0;">Hola ${customer.name.split(' ')[0]}!</h2>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Esperem que el teu esdeveniment hagi anat genial! 🎉
             </p>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Ens encantaria conèixer la teva experiència. La teva opinió ens ajuda a millorar i a arribar a més persones.
             </p>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Com a agraïment, rebràs un <strong style="color: #FFB800;">descompte de fins al 25%</strong> per al teu pròxim esdeveniment!
             </p>
-
             <div style="text-align: center; margin: 30px 0;">
               <a href="${reviewUrl}"
                  style="background: linear-gradient(135deg, #FFB800, #CC9600);
-                        color: #000;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
+                        color: #000; padding: 16px 32px; text-decoration: none;
+                        border-radius: 12px; font-weight: bold; font-size: 16px;
                         display: inline-block;">
                 ⭐ Deixar la meva opinió
               </a>
             </div>
-
             <p style="color: #666; font-size: 14px; text-align: center;">
               Només et portarà 2 minuts!
             </p>
           </div>
-
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
               © ${new Date().getFullYear()} Òrbita Events
@@ -202,14 +147,10 @@ async function sendReviewRequestEmail(customer: { name: string; email: string },
   return { emailSent: true, type: 'review_request' };
 }
 
-/**
- * Enviar seqüència post-event completa
- */
 async function sendPostEventSequence(
   customer: { name: string; email: string },
   bookingId?: string
 ) {
-  // 1. Generar codi de descompte personalitzat
   const cleanName = (customer.name || 'CLIENT')
     .toUpperCase()
     .normalize('NFD')
@@ -219,23 +160,27 @@ async function sendPostEventSequence(
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   const discountCode = `${cleanName}10${random}`;
 
-  // 2. Guardar codi a Supabase (si tenim bookingId)
-  if (bookingId && supabaseAdmin) {
-    await supabaseAdmin.from('discount_codes').insert({
-      code: discountCode,
-      discount_percent: 10,
-      source: 'post_event',
-      max_uses: 1,
-      is_active: true,
-      created_at: new Date().toISOString(),
+  // Guardar codi a Prisma
+  try {
+    await prisma.discountCode.create({
+      data: {
+        code: discountCode,
+        type: 'PERCENTAGE',
+        value: 10,
+        maxUses: 1,
+        isActive: true,
+        validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        sourceType: 'POST_EVENT',
+      },
     });
+  } catch (err) {
+    console.error('Error creant codi descompte:', err);
   }
 
-  // 3. Enviar email amb canvas
   await sendTestimonialApprovedEmail({
     to: customer.email,
     name: customer.name,
-    rating: 5, // Assumim rating 5 per post-event
+    rating: 5,
     discountCode,
     discountPercent: 10,
   });
@@ -243,9 +188,6 @@ async function sendPostEventSequence(
   return { emailSent: true, type: 'post_event', discountCode };
 }
 
-/**
- * Enviar email de benvinguda
- */
 async function sendWelcomeEmail(customer: { name: string; email: string }, locale = 'ca') {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
   const websiteUrl = `${baseUrl}/${locale}`;
@@ -265,18 +207,14 @@ async function sendWelcomeEmail(customer: { name: string; email: string }, local
           <div style="background: linear-gradient(135deg, #FFB800, #CC9600); padding: 40px; text-align: center;">
             <h1 style="color: #000; margin: 0; font-size: 28px;">BENVINGUT/DA! 🎉</h1>
           </div>
-
           <div style="padding: 30px; color: #e5e5e5;">
             <h2 style="color: #FFB800; margin-top: 0;">Hola ${customer.name.split(' ')[0]}!</h2>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Gràcies per confiar en Òrbita Events per als teus esdeveniments especials.
             </p>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Som especialistes en crear experiències úniques amb DJ professional, il·luminació espectacular i efectes especials.
             </p>
-
             <div style="background: rgba(255,184,0,0.1); border: 1px solid rgba(255,184,0,0.3); border-radius: 12px; padding: 20px; margin: 24px 0;">
               <h3 style="color: #FFB800; margin: 0 0 12px 0;">Els nostres serveis:</h3>
               <ul style="margin: 0; padding-left: 20px; color: #ccc;">
@@ -286,26 +224,19 @@ async function sendWelcomeEmail(customer: { name: string; email: string }, local
                 <li>🎪 Producció tècnica</li>
               </ul>
             </div>
-
             <div style="text-align: center; margin: 30px 0;">
               <a href="${websiteUrl}"
                  style="background: linear-gradient(135deg, #FFB800, #CC9600);
-                        color: #000;
-                        padding: 16px 32px;
-                        text-decoration: none;
-                        border-radius: 12px;
-                        font-weight: bold;
-                        font-size: 16px;
+                        color: #000; padding: 16px 32px; text-decoration: none;
+                        border-radius: 12px; font-weight: bold; font-size: 16px;
                         display: inline-block;">
                 Veure els nostres serveis
               </a>
             </div>
-
             <p style="font-size: 14px; color: #888; text-align: center;">
               Qualsevol dubte, contacta'ns a ${SITE_CONFIG.business.phone}
             </p>
           </div>
-
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
               © ${new Date().getFullYear()} Òrbita Events
@@ -320,12 +251,25 @@ async function sendWelcomeEmail(customer: { name: string; email: string }, local
   return { emailSent: true, type: 'welcome' };
 }
 
-/**
- * Enviar email promocional
- */
 async function sendPromoEmail(customer: { name: string; email: string }) {
-  // Generar codi promocional
   const promoCode = `PROMO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+  // Guardar codi a Prisma
+  try {
+    await prisma.discountCode.create({
+      data: {
+        code: promoCode,
+        type: 'PERCENTAGE',
+        value: 15,
+        maxUses: 1,
+        isActive: true,
+        validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        sourceType: 'PROMOTION',
+      },
+    });
+  } catch (err) {
+    console.error('Error creant codi promo:', err);
+  }
 
   await sendEmail({
     to: customer.email,
@@ -342,14 +286,11 @@ async function sendPromoEmail(customer: { name: string; email: string }) {
           <div style="background: linear-gradient(135deg, #FF6B00, #FFB800); padding: 40px; text-align: center;">
             <h1 style="color: #000; margin: 0; font-size: 28px;">OFERTA EXCLUSIVA 🎁</h1>
           </div>
-
           <div style="padding: 30px; color: #e5e5e5; text-align: center;">
             <h2 style="color: #FFB800; margin-top: 0;">Hola ${customer.name.split(' ')[0]}!</h2>
-
             <p style="font-size: 16px; line-height: 1.6;">
               Tenim una oferta especial per tu!
             </p>
-
             <div style="background: rgba(255,184,0,0.1); border: 2px solid #FFB800; border-radius: 16px; padding: 30px; margin: 24px 0;">
               <p style="color: #FFB800; margin: 0 0 12px 0; font-size: 14px;">EL TEU CODI:</p>
               <p style="font-size: 36px; font-weight: bold; color: #FFB800; margin: 0; letter-spacing: 4px;">
@@ -362,12 +303,10 @@ async function sendPromoEmail(customer: { name: string; email: string }) {
                 Vàlid durant 30 dies
               </p>
             </div>
-
             <p style="font-size: 14px; color: #888;">
               Contacta'ns per reservar el teu pròxim esdeveniment!
             </p>
           </div>
-
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
               © ${new Date().getFullYear()} Òrbita Events

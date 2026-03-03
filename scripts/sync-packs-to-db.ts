@@ -54,13 +54,13 @@ async function main() {
 
         if (existing) {
           // Actualizar pack existente
+          // NO tocar isActive — respectar l'estat actual de la BD
           await prisma.pack.update({
             where: { slug: pack.slug },
             data: {
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
-              isActive: true,
               isFeatured: pack.popular || pack.isFlash || false,
               order: configPacks.indexOf(pack),
             }

@@ -71,7 +71,7 @@ const Footer = dynamic(
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Pàgines immersives sense header/footer
-const IMMERSIVE_PAGES = ['/sensorial'];
+const IMMERSIVE_PAGES = ['/sensorial', '/respira'];
 
 // Pàgines on mostrar la intro
 const INTRO_PAGES = ['/', '/ca', '/es'];

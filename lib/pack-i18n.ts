@@ -19,6 +19,18 @@ function getByPath(source: Record<string, unknown>, path: string): unknown {
   }, source);
 }
 
+/**
+ * Detecta si un valor sembla una clau i18n (conté punts i no espais).
+ * "configurator.step2.packs.bodas-basico.name" → true
+ * "DJ professional 3 hores" → false
+ */
+function looksLikeI18nKey(value: string): boolean {
+  return value.includes('.') && !value.includes(' ');
+}
+
+/**
+ * Genera totes les variants possibles d'una clau i18n per buscar-la.
+ */
 function normalizeCandidateKeys(value: string): string[] {
   const candidates = new Set<string>();
   const raw = value.trim();
@@ -30,12 +42,19 @@ function normalizeCandidateKeys(value: string): string[] {
   candidates.add(noConfigurator);
   candidates.add(`configurator.${noConfigurator}`);
 
-  if (noConfigurator.startsWith('pages.parties.discoPacks.')) {
-    const modern = noConfigurator.replace('pages.parties.discoPacks.', 'services.mobile.discoPacks.');
+  // pages.mobile.X → services.mobile.X
+  if (noConfigurator.startsWith('pages.mobile.')) {
+    const modern = noConfigurator.replace('pages.mobile.', 'services.mobile.');
     candidates.add(modern);
     candidates.add(`configurator.${modern}`);
   }
 
+  // services.mobile.X
+  if (raw.startsWith('services.mobile.')) {
+    candidates.add(raw);
+  }
+
+  // features.fN → features.N-1 (índex basat en 0)
   if (noConfigurator.includes('.features.f')) {
     const match = noConfigurator.match(/^(.*)\.features\.f(\d+)$/);
     if (match) {
@@ -48,43 +67,58 @@ function normalizeCandidateKeys(value: string): string[] {
     }
   }
 
+  // features.N → features.fN+1
+  const numericMatch = noConfigurator.match(/^(.*)\.features\.(\d+)$/);
+  if (numericMatch) {
+    const base = numericMatch[1];
+    const idx = Number.parseInt(numericMatch[2], 10);
+    candidates.add(`${base}.features.f${idx + 1}`);
+    candidates.add(`configurator.${base}.features.f${idx + 1}`);
+  }
+
   return Array.from(candidates);
 }
 
-function humanizeKey(value: string): string {
-  const parts = value.split('.');
-  const last = parts[parts.length - 1] || value;
-  const prev = parts.length > 1 ? parts[parts.length - 2] : '';
-
-  if (/^f\d+$/i.test(last)) {
-    const n = last.slice(1);
-    return `Característica ${n}`;
-  }
-
-  const semantic = new Set(['name', 'tagline', 'ideal', 'description', 'title']);
-  const token = semantic.has(last) && prev ? prev : last;
-
-  return token
-    .replace(/[-_]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (m) => m.toUpperCase());
-}
-
+/**
+ * Resol una clau i18n a text real.
+ * Si el valor no és una clau (conté espais), el retorna directament.
+ * MAI retorna una clau en brut — si no es pot resoldre, retorna cadena buida.
+ */
 export function resolvePackI18nKey(value: string | null | undefined, locale: string): string {
   if (!value) return '';
-  if (!value.includes('.')) return value;
+
+  // Si el text ja és llegible (conté espais), retornar-lo directament
+  if (!looksLikeI18nKey(value)) return value;
+
   const normalized = (locale === 'ca' || locale === 'en' || locale === 'es' ? locale : 'ca') as Locale;
+
   for (const candidate of normalizeCandidateKeys(value)) {
     const resolved = getByPath(MESSAGES[normalized], candidate);
     if (typeof resolved === 'string' && resolved.trim()) {
       return resolved;
     }
   }
-  return humanizeKey(value);
+
+  // Fallback a català si estem en un altre idioma
+  if (normalized !== 'ca') {
+    for (const candidate of normalizeCandidateKeys(value)) {
+      const resolved = getByPath(MESSAGES.ca, candidate);
+      if (typeof resolved === 'string' && resolved.trim()) {
+        return resolved;
+      }
+    }
+  }
+
+  // MAI retornar una clau en brut — retornar cadena buida
+  return '';
 }
 
+/**
+ * Resol un array de features. Filtra les que no es puguin resoldre.
+ */
 export function resolvePackI18nFeatures(values: string[] | null | undefined, locale: string): string[] {
   if (!Array.isArray(values)) return [];
-  return values.map((value) => resolvePackI18nKey(value, locale));
+  return values
+    .map((value) => resolvePackI18nKey(value, locale))
+    .filter((text) => text.length > 0);
 }

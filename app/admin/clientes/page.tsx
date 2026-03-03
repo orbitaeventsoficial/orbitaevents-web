@@ -67,7 +67,7 @@ function getNextStep(customer: Customer): { label: string; href: string; hint: s
 
   return {
     label: 'Crear pressupost',
-    href: `/admin/presupuestos?email=${encodeURIComponent(customer.email)}`,
+    href: `/admin/presupuestos?customerId=${encodeURIComponent(customer.id)}`,
     hint: 'Primer pas per avançar venda',
   };
 }

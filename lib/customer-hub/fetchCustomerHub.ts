@@ -20,11 +20,11 @@ function deriveHubStatus(input: {
 }
 
 export async function fetchCustomerHub(customerId: string): Promise<CustomerHubDTO> {
-  const prismaAny = prisma as any;
-  const resolvedCustomerId = await resolveCustomerId(prismaAny, customerId);
+  const db = prisma as any;
+  const resolvedCustomerId = await resolveCustomerId(db, customerId);
   if (!resolvedCustomerId) throw new Error('Customer not found');
 
-  const customerBase: any = await prismaAny.customer.findUnique({
+  const customerBase: any = await db.customer.findUnique({
     where: { id: resolvedCustomerId },
     select: {
       id: true,
@@ -38,7 +38,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   if (!customerBase) throw new Error('Customer not found');
 
   const leads: any[] = await safeQuery(() =>
-    prismaAny.lead.findMany({
+    db.lead.findMany({
       where: { customerId: resolvedCustomerId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -53,7 +53,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const leadIds = leads.map((l: any) => l.id);
 
   const proposals: any[] = await safeQuery(() =>
-    prismaAny.proposal.findMany({
+    db.proposal.findMany({
       where: { customerId: resolvedCustomerId },
       orderBy: { createdAt: 'desc' },
       take: 80,
@@ -63,7 +63,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const bookingsRaw: any[] = await safeQuery(
     () =>
-      prismaAny.booking.findMany({
+      db.booking.findMany({
         where: { customerId: resolvedCustomerId },
         orderBy: { createdAt: 'desc' },
         take: 80,
@@ -77,7 +77,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       ? []
       : await safeQuery(
           () =>
-            prismaAny.booking.findMany({
+            db.booking.findMany({
               where: { leadId: { in: leadIds } },
               orderBy: { createdAt: 'desc' },
               take: 80,
@@ -90,7 +90,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const customerTasks: any[] = await safeQuery(
     () =>
-      prismaAny.task.findMany({
+      db.task.findMany({
         where: { customerId: resolvedCustomerId },
         orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }],
         take: 120,
@@ -100,7 +100,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const activityLog: any[] = await safeQuery(
     () =>
-      prismaAny.customerActivity.findMany({
+      db.customerActivity.findMany({
         where: { customerId: resolvedCustomerId },
         orderBy: { createdAt: 'desc' },
         take: 120,
@@ -110,7 +110,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const customerDiscountCodes: any[] = await safeQuery(
     () =>
-      prismaAny.customerDiscountCode.findMany({
+      db.customerDiscountCode.findMany({
         where: { customerId: resolvedCustomerId },
         orderBy: { createdAt: 'desc' },
         take: 50,
@@ -193,7 +193,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       .filter((activity: any) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
       .map((activity: any) => ({
         id: activity.id,
-        channel: activity.type === 'EMAIL' ? 'EMAIL' : activity.type === 'WHATSAPP' ? 'WHATSAPP' : 'NOTE',
+        channel: activity.type === 'EMAIL' ? 'EMAIL' : activity.type === 'WHATSAPP' ? 'WHATSAPP' : activity.type === 'CALL' ? 'CALL' : 'NOTE',
         subject: activity.title || undefined,
         bodyPreview: activity.description || undefined,
         createdAt: activity.createdAt.toISOString(),
@@ -218,11 +218,20 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const activeProposal = active.proposalId ? proposalsMapped.find((p: any) => p.id === active.proposalId) : undefined;
 
   const totalQuoted = proposalsMapped.reduce((sum: number, p: any) => sum + (p.total || 0), 0);
-  const totalPaid = bookingsRows.reduce((sum: number, b: any) => sum + (b.depositPaid ? (b.depositAmount || 0) : 0), 0);
+  const totalPaid = bookingsRows.reduce((sum: number, b: any) => {
+    let paid = 0;
+    if (b.depositPaid && typeof b.depositAmount === 'number') paid += b.depositAmount;
+    if (b.remainingPaid && typeof b.total === 'number' && typeof b.depositAmount === 'number') {
+      paid += b.total - b.depositAmount;
+    }
+    return sum + paid;
+  }, 0);
   const marginEstimated =
-    activeProposal && typeof activeProposal.snapshot?.subtotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
-      ? Number(activeProposal.snapshot.total) - Number(activeProposal.snapshot.subtotal)
-      : undefined;
+    activeProposal && typeof activeProposal.snapshot?.costTotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
+      ? Number(activeProposal.snapshot.total) - Number(activeProposal.snapshot.costTotal)
+      : activeProposal && typeof activeProposal.snapshot?.subtotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
+        ? Number(activeProposal.snapshot.total) * 0.35
+        : undefined;
 
   const nextEventDate = bookings
     .filter((b: any) => b.date && b.status !== 'CANCELLED')
@@ -309,54 +318,54 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   };
 }
 
-async function resolveCustomerId(prismaAny: any, entityId: string): Promise<string | null> {
-  const customer = await prismaAny.customer.findUnique({
+async function resolveCustomerId(db: any, entityId: string): Promise<string | null> {
+  const customer = await db.customer.findUnique({
     where: { id: entityId },
     select: { id: true },
   });
   if (customer?.id) return customer.id;
 
   const lead = await safeQuery(
-    () => prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
+    () => db.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (lead?.customerId) return lead.customerId;
 
   const booking = await safeQuery(
-    () => prismaAny.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+    () => db.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
     null
   );
   if (booking?.leadId) {
     const bookingLead = await safeQuery(
-      () => prismaAny.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
+      () => db.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
       null
     );
     if (bookingLead?.customerId) return bookingLead.customerId;
   }
 
   const proposal = await safeQuery(
-    () => prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
+    () => db.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (proposal?.customerId) return proposal.customerId;
 
   const task = await safeQuery(
-    () => prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
+    () => db.task.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (task?.customerId) return task.customerId;
 
   const [leadTask, leadActivity, leadDocument] = await Promise.all([
     safeQuery(
-      () => prismaAny.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      () => db.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
       null
     ),
     safeQuery(
-      () => prismaAny.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      () => db.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
       null
     ),
     safeQuery(
-      () => prismaAny.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      () => db.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
       null
     ),
   ]);
@@ -365,7 +374,7 @@ async function resolveCustomerId(prismaAny: any, entityId: string): Promise<stri
   if (!fallbackLeadId) return null;
 
   const fallbackLead = await safeQuery(
-    () => prismaAny.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
+    () => db.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
 
@@ -375,7 +384,8 @@ async function resolveCustomerId(prismaAny: any, entityId: string): Promise<stri
 async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await query();
-  } catch {
+  } catch (error) {
+    console.error('[CustomerHub] safeQuery error:', error);
     return fallback;
   }
 }

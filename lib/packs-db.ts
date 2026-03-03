@@ -31,6 +31,37 @@ type DbPack = {
   }[];
 };
 
+/**
+ * Detecta si un valor és una clau i18n (punts sense espais) i per tant no és text real.
+ */
+function looksLikeI18nKey(value: string): boolean {
+  return value.includes('.') && !value.includes(' ');
+}
+
+/**
+ * Retorna el text real, preferint el valor directe si no és una clau i18n.
+ * Si és una clau, intenta resoldre-la; si falla, usa el fallback del config estàtic.
+ */
+function resolveOrFallback(dbValue: string | null | undefined, configFallback: string | undefined, locale: string): string {
+  // Si la BD té text real (no una clau), usar-lo directament
+  if (dbValue && !looksLikeI18nKey(dbValue)) return dbValue;
+
+  // Si la BD té una clau i18n, intentar resoldre-la
+  if (dbValue) {
+    const resolved = resolvePackI18nKey(dbValue, locale);
+    if (resolved) return resolved;
+  }
+
+  // Fallback: text directe del config estàtic (ja és text real, no claus)
+  if (configFallback && !looksLikeI18nKey(configFallback)) return configFallback;
+  if (configFallback) {
+    const resolved = resolvePackI18nKey(configFallback, locale);
+    if (resolved) return resolved;
+  }
+
+  return '';
+}
+
 function mapPack(pack: DbPack, locale: string): PackDefinition {
   const translation =
     pack.translations.find((t) => t.locale === locale) ||
@@ -41,30 +72,53 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
   const fallbackPack = fallbackPacks.find((p) => p.slug === pack.slug);
   const code = pack.code || fallbackPack?.id || pack.slug;
   const service = (pack.service || fallbackPack?.service || 'fiestas') as ServiceSlug;
-  const rawName = translation?.name || fallbackPack?.name || pack.slug;
-  const rawTagline = translation?.tagline || fallbackPack?.tagline || '';
-  const rawEmotion = translation?.description || translation?.tagline || fallbackPack?.emotion || '';
-  const rawFeatures = (translation?.features?.length ? translation.features : fallbackPack?.features) || [];
+
+  const name = resolveOrFallback(translation?.name, fallbackPack?.name, locale);
+  const tagline = resolveOrFallback(translation?.tagline, fallbackPack?.tagline, locale);
+  const emotion = resolveOrFallback(
+    translation?.description || translation?.tagline,
+    fallbackPack?.emotion || fallbackPack?.tagline,
+    locale,
+  );
+
+  // Features: si la BD té claus i18n, preferir les del config estàtic
+  const dbFeatures = translation?.features?.length ? translation.features : [];
+  const configFeatures = fallbackPack?.features || [];
+  let features: string[];
+
+  if (dbFeatures.length > 0 && dbFeatures.some((f) => !looksLikeI18nKey(f))) {
+    // BD té text real → usar-lo
+    features = dbFeatures.filter((f) => !looksLikeI18nKey(f) || resolvePackI18nKey(f, locale));
+    features = features.map((f) => looksLikeI18nKey(f) ? (resolvePackI18nKey(f, locale) || f) : f).filter(Boolean);
+  } else if (configFeatures.length > 0) {
+    // Fallback a config estàtic (text directe en català)
+    features = resolvePackI18nFeatures(configFeatures, locale);
+    if (features.length === 0) features = configFeatures.filter((f) => !looksLikeI18nKey(f));
+  } else {
+    features = resolvePackI18nFeatures(dbFeatures, locale);
+  }
+
   const rawBadge = translation?.badge || fallbackPack?.badge || null;
+  const badge = rawBadge ? resolveOrFallback(rawBadge, fallbackPack?.badge || undefined, locale) : null;
 
   return {
     id: code,
     service,
     slug: pack.slug,
     i18nBaseKey: fallbackPack?.i18nBaseKey,
-    name: resolvePackI18nKey(rawName, locale),
-    tagline: resolvePackI18nKey(rawTagline, locale),
-    emotion: resolvePackI18nKey(rawEmotion, locale),
+    name: name || pack.slug,
+    tagline,
+    emotion,
     price: `${Math.round(pack.price)}€`,
     priceValue: pack.price,
     priceOriginal: pack.originalPrice ? `${Math.round(pack.originalPrice)}€` : null,
     priceOriginalValue: pack.originalPrice ?? null,
-    features: resolvePackI18nFeatures(rawFeatures, locale),
+    features,
     duration: `${durationHours} ${durationLabel}`,
     durationHours,
     extraHourPrice: Number((pack as { extraHourPrice?: number | null }).extraHourPrice ?? 0) || undefined,
     popular: pack.isFeatured || false,
-    badge: rawBadge ? resolvePackI18nKey(rawBadge, locale) : null,
+    badge: badge || null,
     capacidadMinima: pack.minGuests ?? undefined,
     capacidadMaxima: pack.maxGuests ?? undefined,
     isFlash: code === 'oferta-flash' || pack.slug.includes('flash'),

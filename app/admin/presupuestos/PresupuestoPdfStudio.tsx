@@ -611,19 +611,25 @@ export default function PresupuestoPdfStudio({
     const timer = window.setTimeout(async () => {
       setSearchingCustomers(true);
       try {
-        const res = await fetch(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`);
+        const res = await fetch(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { credentials: 'include' });
         const data = await res.json().catch(() => ({}));
-        if (res.ok && Array.isArray(data?.customers)) {
+        const apiCustomers = Array.isArray(data?.data?.customers)
+          ? data.data.customers
+          : [];
+
+        if (res.ok && Array.isArray(apiCustomers)) {
           setCustomerResults(
-            data.customers.map((c: any) => ({
+            apiCustomers.map((c: any) => ({
               id: c.id,
               name: c.name || '',
               email: c.email || '',
               phone: c.phone || '',
             }))
           );
+        } else {
+          setCustomerResults([]);
         }
-      } catch { /* ignore */ }
+      } catch (error) { console.error('Error cercant clients:', error); }
       finally { setSearchingCustomers(false); }
     }, 350);
 
@@ -1700,3 +1706,4 @@ export default function PresupuestoPdfStudio({
     </section>
   );
 }
+

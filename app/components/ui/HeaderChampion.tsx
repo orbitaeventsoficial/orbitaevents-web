@@ -70,8 +70,8 @@ export default function HeaderChampion() {
   const tExperiences = useTranslations('header.experiences');
   const tZones = useTranslations('header.zones');
   const respiraLabel = 'Respira';
-  const respiraTitle = 'Espacio sensorial';
-  const respiraDescription = 'Un espacio para personas con sensibilidad sensorial, para sentirse a gusto y descansar.';
+  const respiraTitle = 'Espai sensorial';
+  const respiraDescription = 'Un espai per a persones amb sensibilitat sensorial, per sentir-se a gust i descansar.';
 
   // Estados
   const [isVisible, setIsVisible] = useState(true);

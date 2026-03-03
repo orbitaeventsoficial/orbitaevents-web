@@ -33,8 +33,8 @@ type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
 const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   bodas: ['bodas'],
-  discomovil: ['discomovil', 'fiestas'],
-  fiestas: ['fiestas', 'discomovil'],
+  discomovil: ['discomovil'],
+  fiestas: ['fiestas'],
   alquiler: ['alquiler'],
   empresas: ['empresas'],
 };
@@ -78,14 +78,6 @@ function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, fi
   }
 }
 
-function normalizePackBaseKey(baseKey: string): string {
-  const noConfigurator = baseKey.startsWith('configurator.') ? baseKey.slice('configurator.'.length) : baseKey;
-  if (noConfigurator.startsWith('pages.parties.discoPacks.')) {
-    return noConfigurator.replace('pages.parties.discoPacks.', 'services.mobile.discoPacks.');
-  }
-  return noConfigurator;
-}
-
 function humanizeKeyFallback(value: string): string {
   if (!value || !isI18nKey(value)) return value;
   const parts = value.split('.');
@@ -108,9 +100,7 @@ function humanizeKeyFallback(value: string): string {
 
 export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
-  const tRoot = useTranslations();
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
-  const tServicesMobile = useTranslations('services.mobile');
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const dateLocale = toIntlLocale(locale);
   const { track } = useAnalytics();
@@ -135,70 +125,54 @@ export default function ConfiguradorClient() {
   const [discountCodeError, setDiscountCodeError] = useState('');
   const [appliedDiscountCode, setAppliedDiscountCode] = useState<AppliedDiscountCode | null>(null);
 
-  const getTranslatedText = (key: string, fallback: string): string => {
-    try {
-      if (key.startsWith('services.mobile.')) {
-        const nested = key.slice('services.mobile.'.length);
-        const translated = tServicesMobile(nested);
-        if (translated !== nested) return translated;
-      }
-      if (key.startsWith('pages.mobile.')) {
-        const nested = key.slice('pages.mobile.'.length);
-        const translated = tMobile(nested);
-        if (translated !== nested) return translated;
-      }
-      if (key.startsWith('configurator.')) {
-        const nested = key.slice('configurator.'.length);
-        const translated = t(nested);
-        if (translated !== nested) return translated;
-      }
-      if (key.startsWith('step2.')) {
-        const translated = t(key);
-        if (translated !== key) return translated;
-      }
-
-      const translated = tRoot(key as any);
-      return translated !== key ? translated : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
   const getLocalizedPack = (pack: any) => {
+    // Els packs ja vénen amb text real (no claus i18n) gràcies a packs-config + packs-db
+    // Si encara queda alguna clau i18n, intentem traduir-la
     const fallbackPack = fallbackPacks.find((item) => item.id === pack.id || item.slug === pack.slug);
-    const safeNameRaw = isI18nKey(pack.name || '') && fallbackPack ? fallbackPack.name : pack.name;
-    const safeTaglineRaw = isI18nKey(pack.tagline || '') && fallbackPack ? fallbackPack.tagline : pack.tagline;
-    const safeFeatures = (pack.features || []).map((feature: string, index: number) => {
-      if (isI18nKey(feature) && fallbackPack?.features?.[index]) {
+
+    const resolveName = (value: string) => {
+      if (!isI18nKey(value)) return value;
+      if (fallbackPack && !isI18nKey(fallbackPack.name)) return fallbackPack.name;
+      return humanizeKeyFallback(value);
+    };
+
+    const resolveTagline = (value: string) => {
+      if (!isI18nKey(value)) return value;
+      if (fallbackPack && !isI18nKey(fallbackPack.tagline)) return fallbackPack.tagline;
+      return humanizeKeyFallback(value);
+    };
+
+    const features = (pack.features || []).map((feature: string, index: number) => {
+      if (!isI18nKey(feature)) return feature;
+      if (fallbackPack?.features?.[index] && !isI18nKey(fallbackPack.features[index])) {
         return fallbackPack.features[index];
       }
-      return feature;
+      return humanizeKeyFallback(feature);
     });
-
-    const baseKey = pack.i18nBaseKey || `step2.packs.${pack.id}`;
-    const normalizedBase = normalizePackBaseKey(baseKey);
-    const localizedFeatures = safeFeatures.map((feature: string, index: number) => {
-      const byF = getTranslatedText(`${normalizedBase}.features.f${index + 1}`, feature);
-      if (byF !== feature) return byF;
-      const byIndex = getTranslatedText(`${normalizedBase}.features.${index}`, feature);
-      return byIndex !== feature ? byIndex : humanizeKeyFallback(feature);
-    });
-
-    const translatedName = getTranslatedText(`${normalizedBase}.name`, safeNameRaw);
-    const translatedTagline = getTranslatedText(`${normalizedBase}.tagline`, safeTaglineRaw);
 
     return {
       ...pack,
-      name: humanizeKeyFallback(translatedName),
-      tagline: humanizeKeyFallback(translatedTagline),
-      features: localizedFeatures,
+      name: resolveName(pack.name || ''),
+      tagline: resolveTagline(pack.tagline || ''),
+      features,
     };
   };
 
   const getPacksForEventType = useCallback((eventType: EventType | null) => {
     if (!eventType) return [];
     const allowedServices = EVENT_TYPE_SERVICE_MAP[eventType];
-    return allPacks.filter((pack) => allowedServices.includes(pack.service));
+    const byService = allPacks.filter((pack) => allowedServices.includes(pack.service));
+
+    // Deduplicar per slug (BD pot tenir duplicats del config estàtic)
+    const deduped = new Map<string, any>();
+    for (const pack of byService) {
+      const key = pack.slug || pack.id;
+      if (!deduped.has(key)) {
+        deduped.set(key, pack);
+      }
+    }
+
+    return Array.from(deduped.values());
   }, [allPacks]);
 
   // Set minDate on client to avoid hydration mismatch
@@ -534,6 +508,9 @@ export default function ConfiguradorClient() {
         <div className="grid md:grid-cols-3 gap-6">
           {packs.map((pack) => {
             const localizedPack = getLocalizedPack(pack);
+            const safeFeatures = (localizedPack.features || []).map((feature: string) =>
+              isI18nKey(feature) ? humanizeKeyFallback(feature) : feature
+            );
             return (
             <div
               key={localizedPack.id}
@@ -563,14 +540,14 @@ export default function ConfiguradorClient() {
               </div>
 
               <ul className="space-y-2 mb-6">
-                {localizedPack.features.slice(0, 4).map((feature: string, index: number) => (
+                {safeFeatures.slice(0, 4).map((feature: string, index: number) => (
                   <li key={`${localizedPack.id}-feature-${index}`} className="flex items-start text-sm text-text-muted">
                     <Check className="w-4 h-4 text-oe-gold mr-2 mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
-                {localizedPack.features.length > 4 && (
-                  <li className="text-xs text-oe-gold">+ {localizedPack.features.length - 4} {t('step2.moreFeatures')}</li>
+                {safeFeatures.length > 4 && (
+                  <li className="text-xs text-oe-gold">+ {safeFeatures.length - 4} {t('step2.moreFeatures')}</li>
                 )}
               </ul>
 
@@ -1217,3 +1194,8 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
+
+
+
+
+

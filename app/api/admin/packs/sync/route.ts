@@ -27,25 +27,24 @@ export async function POST(req: NextRequest) {
     let updated = 0;
     const errors: string[] = [];
 
-    // Obtener todos los packs existentes en una sola query
+    // Obtenir tots els packs existents en una sola query
     const existingPacks = await prisma.pack.findMany({
       where: { slug: { in: configPacks.map(p => p.slug) } },
-      select: { id: true, slug: true },
+      select: { id: true, slug: true, isActive: true },
     });
-    const existingMap = new Map(existingPacks.map(p => [p.slug, p.id]));
+    const existingMap = new Map(existingPacks.map(p => [p.slug, { id: p.id, isActive: p.isActive }]));
 
-    // Usar transacción para batch de operaciones
+    // Transacció per batch d'operacions
     await prisma.$transaction(async (tx) => {
       for (const pack of configPacks) {
         try {
-          const existingId = existingMap.get(pack.slug);
+          const existing = existingMap.get(pack.slug);
           const packData = {
             code: pack.id,
             service: pack.service,
             price: pack.priceValue,
             originalPrice: pack.priceOriginalValue || null,
             djHours: pack.durationHours || 4,
-            isActive: true,
             isFeatured: pack.popular || pack.isFlash || false,
             order: configPacks.indexOf(pack),
             minGuests: pack.capacidadMinima ?? null,
@@ -54,16 +53,17 @@ export async function POST(req: NextRequest) {
 
           let packId: string;
 
-          if (existingId) {
+          if (existing) {
+            // NO tocar isActive — respectar l'estat actual de la BD
             await tx.pack.update({
               where: { slug: pack.slug },
               data: packData,
             });
-            packId = existingId;
+            packId = existing.id;
             updated++;
           } else {
             const newPack = await tx.pack.create({
-              data: { slug: pack.slug, ...packData },
+              data: { slug: pack.slug, isActive: true, ...packData },
             });
             packId = newPack.id;
             created++;

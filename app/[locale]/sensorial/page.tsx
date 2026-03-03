@@ -919,11 +919,22 @@ export default function EspaiSensorial() {
           </div>
 
           <div className="flex gap-2">
+            <motion.a
+              href="/respira-rosa/index.html"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2.5 rounded-full bg-gradient-to-r from-pink-500/30 to-rose-500/30
+                       border border-pink-300/30 text-pink-200 text-sm font-medium
+                       backdrop-blur-sm transition-all hover:from-pink-500/40 hover:to-rose-500/40
+                       flex items-center gap-1.5"
+            >
+              🌼 5-4-3-2-1
+            </motion.a>
             <motion.button
               onClick={() => setShowExplanation(true)}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="p-3 rounded-full bg-white/10 hover:bg-white/20 
+              className="p-3 rounded-full bg-white/10 hover:bg-white/20
                        backdrop-blur-sm border border-white/10 text-white/70"
             >
               💜

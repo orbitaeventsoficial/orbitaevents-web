@@ -1417,3 +1417,139 @@ cd D:/orbitaevents && npx vitest run
 - **searchParams/pathname nullable**: Next.js 14 — sempre `?.get()` i `(pathname || '')`
 - **Toast, no alert()**: `useToast()` de `ToastProvider`
 - **CSV export**: `ExportCsvButton` amb mode `headers+rows` (server) o `data+columns` (client)
+
+---
+
+## 2026-03-03 — Auditoria de bugs (sessió Claude, interrompuda)
+
+### Objectiu de la sessió
+Auditoria exhaustiva de bugs a tot el projecte: pàgines públiques, admin, API routes, components compartits. La sessió es va interrompre a mitja feina.
+
+### 1. Customer Hub (Fitxa 360) — 3 bugs crítics arreglats
+
+| Fitxer | Bug | Fix |
+|--------|-----|-----|
+| `lib/customer-hub/fetchCustomerHub.ts` | `marginEstimated` calculava IVA (total - subtotal), no marge real | Ara usa `costTotal` del snapshot; fallback 35% si no hi ha cost |
+| `lib/customer-hub/fetchCustomerHub.ts` | `totalPaid` ignorava `remainingPaid` — només sumava dipòsit | Ara suma dipòsit + resta pagada correctament |
+| `lib/customer-hub/fetchCustomerHub.ts` | `safeQuery()` silenciava tots els errors (catch buit) | Afegit `console.error('[CustomerHub] safeQuery error:', error)` |
+| `lib/customer-hub/dto.ts` | `MessageDTO.channel` no incloïa 'CALL' | Afegit `'CALL'` al tipus union |
+| `lib/customer-hub/fetchCustomerHub.ts` | Activitat CALL es mapejava com a NOTE | Ara es mapeja correctament a CALL |
+
+### 2. Pack sync — no reactivar packs desactivats
+
+| Fitxer | Bug | Fix |
+|--------|-----|-----|
+| `app/api/admin/packs/sync/route.ts` | Sync sempre posava `isActive: true`, reactivant packs desactivats manualment | Eliminat `isActive` de l'update; `isActive: true` només al create de packs nous |
+| `scripts/sync-packs-to-db.ts` | Mateix bug que l'anterior | Mateix fix — `isActive` no es toca en update |
+
+### 3. Pàgina /respira — IMMERSIVE_PAGES + textos en espanyol
+
+| Fitxer | Bug | Fix |
+|--------|-----|-----|
+| `app/components/layout/LayoutWrapper.tsx` | `/respira` no estava a `IMMERSIVE_PAGES` — mostrava header/footer | Afegit `/respira` a la llista |
+| `app/components/ui/HeaderChampion.tsx` | Textos hardcoded en espanyol: "Espacio sensorial" | Traduït a català: "Espai sensorial", "Un espai per a persones..." |
+
+### 4. Codi mort eliminat
+
+| Fitxer | Què | Raonament |
+|--------|-----|-----------|
+| `app/[locale]/sensorial/client.tsx` | 754 línies eliminades | Component orfe — `sensorial/page.tsx` no l'importava |
+| `public/respira/` | HTML+PWA+audio+icones eliminats | Fitxers legacy servits estàticament, no integrats a Next.js |
+
+### 5. Neteja configurador — patches ChatGPT
+
+| Fitxer | Què s'ha netejat |
+|--------|------------------|
+| `app/[locale]/configurador/client.tsx` | Eliminat `normalizePackBaseKey()` (innecessari), eliminat `getTranslatedText()` (massa complex), eliminat variables `tRoot`/`tServicesMobile` no usades |
+| `app/[locale]/configurador/client.tsx` | Simplificat `getLocalizedPack()` — resolució directa amb fallback humanitzat |
+| `app/[locale]/configurador/client.tsx` | Eliminat doble filtratge i Map<string,any> de ChatGPT |
+
+### 6. start-process — migració Supabase→Prisma
+
+| Fitxer | Què |
+|--------|-----|
+| `app/api/admin/start-process/route.ts` | Migrat de `supabaseAdmin` a `prisma` — totes les queries (customer, discount codes) |
+| `app/api/admin/start-process/route.ts` | Eliminada `checkSupabase()` i `verifyAdminAuth()` duplicades (ja hi ha `requireAuth()`) |
+| `app/api/admin/start-process/route.ts` | Codis descompte ara es creen amb `prisma.discountCode.create()` en lloc de Supabase |
+| `app/api/admin/start-process/route.ts` | Afegit registre d'activitat a `customerActivity` |
+
+### 7. Sensorial — link a Respira Rosa
+
+| Fitxer | Què |
+|--------|-----|
+| `app/[locale]/sensorial/page.tsx` | Afegit botó "🌼 5-4-3-2-1" amb link a `/respira-rosa/index.html` |
+
+### 8. Clients — fix link pressupost
+
+| Fitxer | Bug | Fix |
+|--------|-----|-----|
+| `app/admin/clientes/page.tsx` | Link "Crear pressupost" passava email com a param | Ara passa `customerId` (més fiable) |
+
+### Estat de l'auditoria quan es va interrompre
+
+**Completat:** Mapeig pàgines, Customer Hub, respira, configurador, codi mort, pack sync
+**En progrés:** Auditoria bookings, auditoria pàgines públiques
+**Pendent:** Leads, components compartits, clientes, portal client, economia+dashboard, API routes, informe final
+
+### Verificació
+- `tsc --noEmit`: 0 errors
+- `next build`: OK (compila totes les pàgines)
+- Cap canvi commitejat (sessió interrompuda)
+
+---
+
+## 2026-03-02 — Fix configurador (fet per ChatGPT)
+
+### Què s'ha fet
+- ChatGPT ha corregit el pas 2 del configurador (pp/[locale]/configurador/client.tsx) per evitar packs duplicats.
+- S'ha ajustat el mapatge de serveis:
+  - iestas -> només iestas
+  - discomovil -> només discomovil
+- S'ha reforçat la resolució d'i18n perquè no es mostrin claus en brut (ex: configurator.step2.packs...) quan falta una traducció.
+
+### Resultat esperat
+- Ja no apareixen packs repetits al bloc "Canvia el tipus d'esdeveniment".
+- Les features i textos dels packs no mostren keys tècniques a la UI.
+
+### Traca detallada (pas a pas)
+1. Localitzacio del projecte correcte a D:\orbitaevents.
+2. Verificacio del simptoma: al configurador (step2) es veien packs duplicats i claus i18n en brut.
+3. Revisio de fitxers implicats:
+   - app/[locale]/configurador/client.tsx
+   - app/config/packs-config.ts
+   - lib/pack-i18n.ts
+   - lib/packs-db.ts
+   - messages/ca.json
+4. Identificacio de causa principal al configurador:
+   - EVENT_TYPE_SERVICE_MAP barrejava serveis (fiestas + discomovil i viceversa).
+5. Patch aplicat a app/[locale]/configurador/client.tsx:
+   - fiestas filtra nomes fiestas.
+   - discomovil filtra nomes discomovil.
+6. Patch de robustesa i18n al mateix fitxer:
+   - Si una traduccio retorna una key tecnica (no text final), no es mostra tal qual.
+   - S'aplica fallback llegible (humanizeKeyFallback) per evitar claus visibles a UI.
+7. Validacio:
+   - Revisio de git diff del fitxer modificat.
+   - Nota: node --check no valida .tsx en aquest entorn.
+
+### Fitxer modificat
+- app/[locale]/configurador/client.tsx
+
+### Actualitzacio 2026-03-02 (segon patch)
+- S'ha afegit un segon blindatge al configurador per sanejar packs per tipus d'esdeveniment i deduplicar per identitat normalitzada.
+- S'ha afegit normalitzacio d'identitat (`flash` -> `oferta-flash`, `corporate` -> `empresas-evento`).
+- S'ha reforcat la traduccio de features intentant traduccio directa de key abans del fallback.
+- Incidencia durant el patch: error puntual de sintaxi en una linia (`const hay`). Corregit i verificat.
+
+### Actualitzacio 2026-03-02 (tercer patch anti-keys)
+- Blindatge directe al render del step2 del configurador.
+- Si l'eventType es `fiestas`/`discomovil`, es descarten packs fora de context en render (ex: corporate).
+- Les features es sanegen abans de pintar: si arriba una key i18n crua, es transforma a fallback humanitzat.
+- Objectiu: evitar visualment claus `services.mobile...` o `configurator.step2...` encara que arribin dades brutes.
+
+### Fix 2026-03-02 (Pressupostos - cerca de client)
+- S'ha corregit la cerca de client a `app/admin/presupuestos/PresupuestoPdfStudio.tsx`.
+- Causa: el frontend llegia `data.customers`, però l'API retorna el payload dins `data.data.customers` (successResponse).
+- Solució: parser robust acceptant `data.customers` i `data.data.customers`.
+- També es netegen resultats quan la resposta no és vàlida.
+- Resultat esperat: la cerca torna a llistar clients i es poden seleccionar.

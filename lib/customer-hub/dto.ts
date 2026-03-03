@@ -69,7 +69,7 @@ export type TaskDTO = {
 
 export type MessageDTO = {
   id: string;
-  channel: 'EMAIL' | 'NOTE' | 'WHATSAPP';
+  channel: 'EMAIL' | 'NOTE' | 'WHATSAPP' | 'CALL';
   subject?: string;
   bodyPreview?: string;
   sentAt?: string;
