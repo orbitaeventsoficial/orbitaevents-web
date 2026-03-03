@@ -1,6 +1,6 @@
 # Diari de treball — Òrbita Events
 
-## 2026-03-03 — Auditoria de bugs completa (3 commits, ~35 bugs arreglats)
+## 2026-03-03 — Auditoria de bugs completa (4 commits, ~37 bugs arreglats)
 
 ### Objectiu de la sessió
 Continuar l'auditoria de bugs iniciada a la sessió anterior (que va petar per límit de context). Arreglar tots els bugs trobats, traduir respira-rosa a català, i fer push.
@@ -134,12 +134,18 @@ L'agent de pàgines públiques va reportar ~15 links `/contacto` sense prefix lo
 - 4 errors silenciosos arreglats
 - 1 null check contracte
 
+### 15. Booking stats + invoice (commit 4)
+| Fitxer | Bug | Solució |
+|--------|-----|---------|
+| `status/route.ts` | `guestCount` null causa error SQL `CAST(NULL + 1)` | Guard `existing.guestCount \|\| 0` |
+| `invoiceService.ts` | Accés `invoice.booking.pack` sense check null | Guard `if (!invoice.booking) throw` |
+
 ### Total sessió
-- **3 commits** pushejats
-- **~35 bugs arreglats** en total
+- **4 commits** pushejats
+- **~37 bugs arreglats** en total
 - **6 agents d'auditoria** executats en paral·lel
 - **0 errors TypeScript**
-- Àrees auditades: auth, middleware, rate limiting, CSRF, calendari, economia, components compartits, crons, portal i18n, pàgines públiques, formularis, inventari, blog, contractes, proposals
+- Àrees auditades: auth, middleware, rate limiting, CSRF, calendari, economia, components compartits, crons, portal i18n, pàgines públiques, formularis, inventari, blog, contractes, proposals, invoices, booking stats
 
 ## 2026-03-02 (sessió 3) — Passada final exhaustiva: htmlFor+id a TOTS els formularis + Auditoria completa
 
