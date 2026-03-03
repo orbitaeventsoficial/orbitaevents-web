@@ -53,6 +53,8 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
           : Buffer.from(base64Credentials, 'base64').toString('utf8');
       const [user, ...passParts] = decoded.split(':');
       const pass = passParts.join(':');
+      // Edge Runtime no suporta timingSafeEqual — la validació timing-safe
+      // la fa requireAuth() a les API routes (Node.js runtime).
       authValid = user === ADMIN_USER && pass === ADMIN_PASS;
     } catch {
       authValid = false;
@@ -67,6 +69,9 @@ export async function handleAdminAuth(req: NextRequest): Promise<NextResponse | 
   }
 
   // CSRF check for API mutations (not needed for Bearer auth)
+  // Nota: Edge Runtime no suporta crypto.createHmac, per tant aquí només comprovem
+  // igualtat header/cookie. La validació completa (signatura + expiració) la fa
+  // requireAuth() a les API routes via verifyCsrf() (Node.js runtime).
   if (pathname.startsWith('/api/admin')) {
     const method = req.method.toUpperCase();
     const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);

@@ -79,7 +79,10 @@ export default function InventoryListClient() {
       if (filterStatus) params.set('status', filterStatus);
 
       const res = await fetch(`/api/admin/inventory?${params}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        console.error('[Inventory] API error:', res.status);
+        return;
+      }
 
       const data = await res.json();
       setItems(data.items || []);
@@ -173,9 +176,11 @@ export default function InventoryListClient() {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (res.ok) {
-        fetchData();
+      if (!res.ok) {
+        console.error('[Inventory] Error canviant estat:', res.status);
+        return;
       }
+      fetchData();
     } catch (error) {
       console.error('[Inventory] Error actualitzant item:', error);
     }

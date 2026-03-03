@@ -31,7 +31,7 @@ export async function checkAdminRateLimit(req: NextRequest): Promise<boolean> {
       });
       if (res.ok) {
         const data = (await res.json()) as { result: number | null };
-        return (data.result || 0) <= ADMIN_AUTH_LIMIT;
+        return (data.result || 0) < ADMIN_AUTH_LIMIT;
       }
     } catch {
       // Fall through to in-memory
@@ -44,7 +44,7 @@ export async function checkAdminRateLimit(req: NextRequest): Promise<boolean> {
   }
   const entry = adminAuthAttempts.get(clientIp);
   if (!entry || entry.resetTime < now) return true;
-  return entry.count <= ADMIN_AUTH_LIMIT;
+  return entry.count < ADMIN_AUTH_LIMIT;
 }
 
 export async function recordFailedAttempt(req: NextRequest): Promise<void> {

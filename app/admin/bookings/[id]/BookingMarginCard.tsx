@@ -139,7 +139,7 @@ export default function BookingMarginCard({
 
   const persistDistance = useCallback(async (nextDistanceKm: number) => {
     try {
-      await fetch(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,8 +148,9 @@ export default function BookingMarginCard({
           travelCost: calculateTravelCost(nextDistanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM),
         }),
       });
-    } catch {
-      // Silent: mantenim el valor local encara que falli la persistència
+      if (!res.ok) console.error('[BookingMarginCard] Error desant distància:', res.status);
+    } catch (err) {
+      console.error('[BookingMarginCard] Error desant distància:', err);
     }
   }, [bookingId, vehicleCostPerKm]);
 

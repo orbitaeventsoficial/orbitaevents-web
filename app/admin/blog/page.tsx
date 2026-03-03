@@ -32,7 +32,7 @@ interface BlogPost {
 export default function BlogAdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [locale, setLocale] = useState('es');
+  const [locale, setLocale] = useState('ca');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);

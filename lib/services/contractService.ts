@@ -129,7 +129,7 @@ async function renderContractPDF(proposalId: string): Promise<{
   const locale = (proposal.locale || 'ca') as SupportedLocale;
   const contractReference = proposal.contractReference || generateContractNumber();
 
-  const snapshot = proposal.snapshot as Record<string, unknown>;
+  const snapshot = (proposal.snapshot || {}) as Record<string, unknown>;
   const eventDate = proposal.booking?.eventDate || new Date(snapshot.eventDate as string || Date.now());
   const depositAmount = proposal.depositAmount ?? Math.round(proposal.total * 0.3 * 100) / 100;
 
