@@ -453,26 +453,32 @@ export default async function BookingsPage({
             Pàgina {pagination.page} de {pagination.totalPages}
           </span>
           <div className="flex items-center gap-2">
-            {pagination.page > 1 ? (
-              <Link
-                href={`/admin/bookings?page=${pagination.page - 1}`}
-                className="rounded-xl border px-3 py-1"
-              >
-                ← Anterior
-              </Link>
-            ) : (
-              <span className="rounded-xl border px-3 py-1">← Anterior</span>
-            )}
-            {pagination.page < pagination.totalPages ? (
-              <Link
-                href={`/admin/bookings?page=${pagination.page + 1}`}
-                className="rounded-xl border px-3 py-1"
-              >
-                Següent →
-              </Link>
-            ) : (
-              <span className="rounded-xl border px-3 py-1">Següent →</span>
-            )}
+            {(() => {
+              const filterParams = new URLSearchParams();
+              if (sp.status) filterParams.set('status', sp.status);
+              if (sp.eventType) filterParams.set('eventType', sp.eventType);
+              if (sp.fromDate) filterParams.set('fromDate', sp.fromDate);
+              if (sp.toDate) filterParams.set('toDate', sp.toDate);
+              if (sp.search) filterParams.set('search', sp.search);
+              if (sp.view) filterParams.set('view', sp.view);
+              const base = filterParams.toString();
+              const prevHref = `/admin/bookings?page=${pagination.page - 1}${base ? `&${base}` : ''}`;
+              const nextHref = `/admin/bookings?page=${pagination.page + 1}${base ? `&${base}` : ''}`;
+              return (
+                <>
+                  {pagination.page > 1 ? (
+                    <Link href={prevHref} className="rounded-xl border px-3 py-1">← Anterior</Link>
+                  ) : (
+                    <span className="rounded-xl border px-3 py-1">← Anterior</span>
+                  )}
+                  {pagination.page < pagination.totalPages ? (
+                    <Link href={nextHref} className="rounded-xl border px-3 py-1">Següent →</Link>
+                  ) : (
+                    <span className="rounded-xl border px-3 py-1">Següent →</span>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </section>
       )}

@@ -144,8 +144,12 @@ export async function GET(req: NextRequest) {
     const where = {
       ...(validStatus && { status: validStatus }),
       ...(validEventType && { eventType: validEventType }),
-      ...(fromDate && { eventDate: { gte: new Date(fromDate) } }),
-      ...(toDate && { eventDate: { lte: new Date(toDate) } }),
+      ...((fromDate || toDate) && {
+        eventDate: {
+          ...(fromDate && { gte: new Date(fromDate) }),
+          ...(toDate && { lte: new Date(toDate + 'T23:59:59') }),
+        },
+      }),
       ...(search && {
         OR: [
           { clientName: { contains: search, mode: 'insensitive' as const } },

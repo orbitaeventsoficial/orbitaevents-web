@@ -221,7 +221,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
   });
   const bAny = booking as Record<string, unknown>;
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
-  const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
+  const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
   const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
   const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
   const profitabilityConfig = await getProfitabilityConfig();
@@ -642,7 +642,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm" aria-label="Extres de la reserva">
+            <table className="min-w-full text-sm" aria-label="Historial de comunicacions">
               <thead>
                 <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide">
                   <th scope="col" className="px-2 py-2">Data</th>

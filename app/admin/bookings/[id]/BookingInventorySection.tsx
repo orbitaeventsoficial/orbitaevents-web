@@ -241,10 +241,10 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         }),
       });
 
-      if (!res.ok) return;
+      if (!res.ok) { setMessage('Error marcant sortida'); return; }
       fetchData(searchQuery);
     } catch {
-      // Silently fail
+      setMessage('Error marcant sortida');
     }
   }, [bookingId, searchQuery, fetchData]);
 
@@ -260,10 +260,10 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         }),
       });
 
-      if (!res.ok) return;
+      if (!res.ok) { setMessage('Error marcant retorn'); return; }
       fetchData(searchQuery);
     } catch {
-      // Silently fail
+      setMessage('Error marcant retorn');
     }
   }, [bookingId, searchQuery, fetchData]);
 
