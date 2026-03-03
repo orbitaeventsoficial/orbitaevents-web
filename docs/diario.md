@@ -1,5 +1,72 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-03 — Pressupostos: traçabilitat total (lead obligatori + vista unificada)
+
+### Objectiu de la sessió
+- Localitzar on es guarda el pressupost "perdut".
+- Fer visible els pressupostos ja creats des de `/admin/presupuestos`.
+- Forçar regla comercial: pressupost enviat => sempre amb lead.
+- Si ja existeix client, vincular-hi el pressupost automàticament.
+
+### Diagnòstic inicial (fet i verificat)
+- S'ha trobat 1 pressupost existent a `lead_documents` (`type=QUOTE`):
+  - `Pressupost PRE-2026-D11F`
+  - `fileUrl`: `https://orbitaevents.com/api/admin/leads/cmlm96j7c000011ioe30vt0gj/quote`
+- No hi havia registres a `proposals` en aquell moment.
+- Conclusió: part del flux desa pressupost com a document de lead (URL dinàmica), no com a fitxer local.
+
+### Canvis implementats
+
+1. **Vista central de pressupostos creats**
+- Fitxer: `app/admin/presupuestos/page.tsx`
+- Afegit contenidor **"Pressupostos creats"** amb 2 blocs:
+  - `LeadDocument QUOTE` (pressupostos del flux leads)
+  - `Proposals` (pressupostos del PDF Studio)
+- Permet obrir directament els pressupostos ja generats.
+
+2. **PDF Studio envia més context al backend**
+- Fitxer: `app/admin/presupuestos/PresupuestoPdfStudio.tsx`
+- El `POST /api/admin/emails/quote` ara envia també:
+  - `customerName`, `customerPhone`
+  - `eventType`, `eventDate`, `eventSchedule`, `eventLocation`, `guestCount`
+- Objectiu: poder crear/enllaçar lead/client de forma fiable al backend.
+
+3. **Lead obligatori en enviar pressupost (ruta email)**
+- Fitxer: `app/api/admin/emails/quote/route.ts`
+- Regla aplicada:
+  - si no hi ha `lead`, es busca lead reutilitzable;
+  - si no n'hi ha, es **crea lead automàticament** amb `status: QUOTE_SENT`;
+  - el trail comercial (note/document/activity/follow-up) es desa sempre sobre el lead efectiu.
+
+4. **Assignació automàtica a client existent**
+- Fitxer: `app/api/admin/emails/quote/route.ts`
+- Quan no arriba `customerId`, es fa match de client per:
+  - `emailNormalized`
+  - `phoneNormalized`
+- Si es troba client existent, el pressupost s'hi vincula i, si cal, també s'actualitza el `lead.customerId`.
+
+5. **Garantia final al flux de proposta enviada**
+- Fitxer: `app/api/admin/proposals/[id]/send/route.ts`
+- En `POST /proposals/[id]/send`, si la proposta no té `leadId`:
+  - reutilitza lead existent o en crea un,
+  - l'enllaça a la proposta,
+  - i després marca `SENT`.
+
+### Verificació
+- `npx tsc -p tsconfig.json --noEmit --pretty false` => OK
+- Consulta directa Prisma per confirmar pressupost existent => OK
+
+### Commit creat
+- `aa50ee0`
+- Missatge: `feat(admin): list created quotes and enforce lead/client linkage on quote send`
+- Fitxers inclosos al commit:
+  - `app/admin/presupuestos/PresupuestoPdfStudio.tsx`
+  - `app/admin/presupuestos/page.tsx`
+  - `app/api/admin/emails/quote/route.ts`
+  - `app/api/admin/proposals/[id]/send/route.ts`
+- Fitxer no relacionat **no inclòs**: `app/api/admin/economia/cash-flow/route.ts`
+
+---
 ## 2026-03-03 — Auditoria de bugs completa (4 commits, ~37 bugs arreglats)
 
 ### Objectiu de la sessió
@@ -1700,3 +1767,4 @@ Auditoria exhaustiva de bugs a tot el projecte: pàgines públiques, admin, API 
 - Solució: parser robust acceptant `data.customers` i `data.data.customers`.
 - També es netegen resultats quan la resposta no és vàlida.
 - Resultat esperat: la cerca torna a llistar clients i es poden seleccionar.
+
