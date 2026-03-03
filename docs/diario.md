@@ -1,6 +1,6 @@
 # Diari de treball — Òrbita Events
 
-## 2026-03-03 — Auditoria de bugs (continuació) + Respira rosa + Portal i18n
+## 2026-03-03 — Auditoria de bugs completa (2 commits, ~30 bugs arreglats)
 
 ### Objectiu de la sessió
 Continuar l'auditoria de bugs iniciada a la sessió anterior (que va petar per límit de context). Arreglar tots els bugs trobats, traduir respira-rosa a català, i fer push.
@@ -46,11 +46,72 @@ El component `clientes/page.tsx` mostra un KPI "VIP" amb `stats.vip`, però l'AP
 - Afegit `prisma.customer.count({ where: { totalSpent: { gte: 2000 } } })` al Promise.all de stats
 - Afegit `vip` al objecte de resposta
 
-### Resum de canvis
+### Resum commit 1
 - 7 fitxers modificats
 - 11 bugs arreglats (portal i18n: 6, catch silenciosos: 4, stats.vip: 1)
 - 1 fitxer traduït completament (respira-rosa)
 - TypeScript: 0 errors
+
+### 5. Seguretat auth — 3 vulnerabilitats CRÍTIQUES (commit 2)
+**Fitxer**: `lib/auth.ts`
+3 agents d'auditoria en paral·lel van trobar vulnerabilitats greus:
+
+| Vulnerabilitat | Severitat | Solució |
+|----------------|-----------|---------|
+| Bypass via header `x-admin-authenticated: 1` | CRÍTIC | Eliminat completament |
+| Escalació de rol via header `x-admin-role` | CRÍTIC | Només llegeix de cookie, fallback VIEWER (era OWNER) |
+| Comparació de credencials amb `===` (timing attack) | CRÍTIC | `timingSafeEqual` per Basic Auth + Bearer |
+
+### 6. Calendari — bug timezone (CRÍTIC)
+**Fitxer**: `app/admin/calendario/CalendarMonthClient.tsx`
+`formatKey()` usava `toISOString().slice(0, 10)` que converteix a UTC. A Espanya (UTC+1/+2), un event a les 23:00 del 15 de març apareixia al dia 16. Ara usa `getFullYear()/getMonth()/getDate()` (hora local).
+
+Arreglat també `hover:bg-white/5/90` → `hover:bg-white/10` (classe Tailwind invàlida).
+
+### 7. Economia — bugs de càlcul
+**Fitxer**: `lib/services/pipelineForecast.ts`
+- `historicalAvg` calculava la mitjana *per reserva* (total / nReserves). El pipeline era la *suma total* ponderat. Unitats incompatibles. Ara agrupa per (any, mes) i calcula el total mensual real, i la mitjana entre anys.
+- Mes actual apareixia tant a les dades històriques com a la previsió (bias). Ara el forecast comença al mes següent.
+
+**Fitxer**: `lib/services/cashFlowForecast.ts`
+- Usava `total - depositAmount` per calcular pendent. Ara usa `remainingAmount` de la BD (camp real) amb fallback.
+- Protecció contra ingressos negatius (`Math.max(0, ...)`) si depositAmount > total per error de dades.
+
+### 8. Components UI
+| Fitxer | Bug | Solució |
+|--------|-----|---------|
+| `Charts.tsx` | `strokeToFill()` no gestionava hex (#rrggbb) — tots els callers passen hex | Parsing RGB + rgba() |
+| `Charts.tsx` | `buildAreaPath()` crash amb array buit | Guard `if (values.length === 0) return ''` |
+| `AdminHelpLegend.tsx` | Classe Tailwind invàlida `bg-black/60/95` | `bg-black/95` |
+
+### 9. Crons en castellà → català
+| Fitxer | Canvi |
+|--------|-------|
+| `commercial-daily/route.ts` | Email resum diari + WA: tot en català (era castellà) |
+| `post-event/route.ts` | Auth amb `timingSafeEqual` (era `===`), locale fallback `ca` (era `es`), logs en català |
+
+### 10. Altres bugs arreglats
+| Fitxer | Bug | Solució |
+|--------|-----|---------|
+| `reservar/page.tsx` | Links `/contacto` i `/disponibilidad` sense prefix locale | `/${locale}/contacto` i `/${locale}/disponibilidad` |
+| `pricing/page.tsx` | `loadData()` silenciós si API retorna `ok: false` | Mostra `setMessage({ type: 'error', ... })` |
+| `contact/route.ts` | Log error DB en castellà | Traduït a català |
+
+### Resum commit 2
+- 11 fitxers modificats, 75 insercions, 64 eliminacions
+- 3 vulnerabilitats de seguretat CRÍTIQUES arreglades
+- 1 bug de timezone CRÍTIC arreglat
+- 2 bugs d'economia (càlcul incorrecte)
+- 4 bugs de components UI
+- 2 crons traduïts
+- 3 bugs menors
+- TypeScript: 0 errors, tsc: OK
+
+### Total sessió
+- **2 commits** pushejats
+- **~30 bugs arreglats** en total
+- **3 agents d'auditoria** executats en paral·lel (economia, components compartits, pàgines públiques/API)
+- **0 errors TypeScript**
 
 ## 2026-03-02 (sessió 3) — Passada final exhaustiva: htmlFor+id a TOTS els formularis + Auditoria completa
 
