@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { verifyCsrf } from '@/lib/csrf';
 
 const ADMIN_USER = process.env.ADMIN_USER;
@@ -55,7 +56,11 @@ export function verifyBasicAuth(req: NextRequest): AuthResult {
       return { authenticated: false, error: 'Server configuration error' };
     }
 
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    const userMatch = user.length === ADMIN_USER.length &&
+      timingSafeEqual(Buffer.from(user), Buffer.from(ADMIN_USER));
+    const passMatch = pass.length === ADMIN_PASS.length &&
+      timingSafeEqual(Buffer.from(pass), Buffer.from(ADMIN_PASS));
+    if (userMatch && passMatch) {
       return { authenticated: true, user, method: 'basic' };
     }
 
@@ -76,7 +81,8 @@ export function verifyBearerAuth(req: NextRequest): AuthResult {
   }
 
   const token = authHeader.slice(7).trim();
-  if (token === ADMIN_KEY) {
+  if (token.length === ADMIN_KEY.length &&
+      timingSafeEqual(Buffer.from(token), Buffer.from(ADMIN_KEY))) {
     return { authenticated: true, user: 'admin-key', method: 'bearer' };
   }
 
@@ -106,10 +112,9 @@ export function forbiddenResponse(message = 'Forbidden'): NextResponse {
 }
 
 export function getAdminRole(req: NextRequest): AdminRole {
-  const roleHeader = req.headers.get('x-admin-role')?.toUpperCase() as AdminRole | undefined;
   const roleCookie = req.cookies.get('admin_role')?.value?.toUpperCase() as AdminRole | undefined;
-  const rawRole = roleHeader || roleCookie || 'OWNER';
-  return rawRole in ROLE_PERMISSIONS ? rawRole : 'OWNER';
+  const rawRole = roleCookie || 'OWNER';
+  return rawRole in ROLE_PERMISSIONS ? rawRole : 'VIEWER';
 }
 
 export function requirePermission(req: NextRequest, permission: AdminPermission): NextResponse | null {
@@ -126,10 +131,6 @@ export function requirePermission(req: NextRequest, permission: AdminPermission)
  * Retorna null si autenticat, o NextResponse si no
  */
 export function requireAuth(req: NextRequest): NextResponse | null {
-  if (req.headers.get('x-admin-authenticated') === '1') {
-    return null;
-  }
-
   const bearerAuth = verifyBearerAuth(req);
   const auth = bearerAuth.authenticated ? bearerAuth : verifyBasicAuth(req);
   if (!auth.authenticated) {

@@ -135,7 +135,7 @@ export default async function BookingPage({
           <p className="text-white/60 mb-4">{t('help.title')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="/contacto"
+              href={`/${locale}/contacto`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-white"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -144,7 +144,7 @@ export default async function BookingPage({
               {t('help.contact')}
             </a>
             <a
-              href="/disponibilidad"
+              href={`/${locale}/disponibilidad`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-white"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

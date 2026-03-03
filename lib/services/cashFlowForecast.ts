@@ -34,6 +34,7 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
       depositAmount: true,
       depositPaid: true,
       remainingPaid: true,
+      remainingAmount: true,
       travelCost: true,
       distanceKm: true,
       pack: { select: { price: true, extraHourPrice: true } },
@@ -63,9 +64,10 @@ export async function buildCashFlowForecast(monthsAhead = 6): Promise<CashFlowMo
     // Ingressos pendents de cobrar
     const total = Number(booking.total) || 0;
     const depositAmount = Number(booking.depositAmount) || 0;
+    const remainingAmount = Number(booking.remainingAmount) || Math.max(0, total - depositAmount);
     let pendingIncome = 0;
     if (!booking.depositPaid) pendingIncome += depositAmount;
-    if (!booking.remainingPaid) pendingIncome += (total - depositAmount);
+    if (!booking.remainingPaid) pendingIncome += Math.max(0, remainingAmount);
     entry.income += pendingIncome;
 
     // Cost estimat

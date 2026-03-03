@@ -76,17 +76,24 @@ export async function buildPipelineForecast(monthsAhead = 6): Promise<ForecastMo
     },
   });
 
-  // Agrupar per mes de l'any (1-12) per calcular estacionalitat
-  const monthlyTotals = new Map<number, number[]>(); // month(1-12) → array of totals
+  // Agrupar per (any, mes) per calcular total mensual real
+  const monthlyRevByYearMonth = new Map<string, number>(); // "2024-06" → total revenue
   for (const b of historicBookings) {
     const d = new Date(b.eventDate);
-    const m = d.getMonth() + 1;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    monthlyRevByYearMonth.set(key, (monthlyRevByYearMonth.get(key) || 0) + (Number(b.total) || 0));
+  }
+
+  // Agrupar per mes calendari (1-12) → array de totals mensuals (un per any)
+  const monthlyTotals = new Map<number, number[]>();
+  for (const [key, total] of monthlyRevByYearMonth) {
+    const m = parseInt(key.split('-')[1], 10);
     const totals = monthlyTotals.get(m) || [];
-    totals.push(Number(b.total) || 0);
+    totals.push(total);
     monthlyTotals.set(m, totals);
   }
 
-  // Mitjana per mes
+  // Mitjana mensual per mes calendari (total ingressos / nombre d'anys amb dades)
   const monthlyAvg = new Map<number, number>();
   for (const [m, totals] of monthlyTotals) {
     monthlyAvg.set(m, totals.reduce((a, b) => a + b, 0) / totals.length);
@@ -98,9 +105,9 @@ export async function buildPipelineForecast(monthsAhead = 6): Promise<ForecastMo
     ? allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length
     : 0;
 
-  // 3. Construir previsió
+  // 3. Construir previsió (comença al mes SEGÜENT per evitar solapament amb dades històriques)
   const result: ForecastMonth[] = [];
-  for (let i = 0; i < monthsAhead; i++) {
+  for (let i = 1; i <= monthsAhead; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
     const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const calMonth = d.getMonth() + 1;

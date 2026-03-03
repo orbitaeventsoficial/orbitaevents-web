@@ -1,8 +1,8 @@
 // app/api/cron/post-event/route.ts
-// CRON JOB: Envia emails post-event automaticos
-// Ejecutar diariamente via Railway Cron o similar
+// CRON JOB: Envia emails post-event automàtics
+// Executar diàriament via Railway Cron o similar
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import crypto, { timingSafeEqual } from 'crypto';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
@@ -13,36 +13,23 @@ import { toIntlLocale } from '@/lib/constants';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-// Verificar autorizacion (el cron envia CRON_SECRET)
+// Verificar autorització (el cron envia CRON_SECRET)
 function isAuthorized(request: NextRequest, requestId: string): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
-    log.error('CRON_SECRET no configurado - el cron no puede ejecutarse', undefined, {
+    log.error('CRON_SECRET no configurat - el cron no pot executar-se', undefined, {
       context: { requestId, endpoint: 'cron/post-event:isAuthorized' },
     });
     return false;
   }
 
-  if (!authHeader) {
-    log.warn('Intento de acceso a cron sin authorization header', {
-      requestId,
-      endpoint: 'cron/post-event:isAuthorized',
-    });
-    return false;
-  }
-
-  const isValid = authHeader === `Bearer ${cronSecret}`;
-  if (!isValid) {
-    log.warn('Intento de acceso a cron con credenciales invalidas', {
-      requestId,
-      endpoint: 'cron/post-event:isAuthorized',
-      ip: request.headers.get('x-forwarded-for'),
-    });
-  }
-
-  return isValid;
+  if (!authHeader) return false;
+  const expected = Buffer.from(`Bearer ${cronSecret}`);
+  const received = Buffer.from(authHeader);
+  if (expected.length !== received.length) return false;
+  return timingSafeEqual(expected, received);
 }
 
 interface ProcessedResult {
@@ -159,7 +146,7 @@ export async function GET(request: NextRequest) {
             };
 
           } catch (emailError) {
-            log.error('Error enviando email post-event', emailError, {
+            log.error('Error enviant email post-event', emailError, {
               context: {
                 requestId,
                 endpoint: 'cron/post-event:GET',
@@ -280,7 +267,7 @@ function generatePostEventEmail(params: {
     },
   };
 
-  const t = texts[locale as keyof typeof texts] || texts.es;
+  const t = texts[locale as keyof typeof texts] || texts.ca;
 
   return `
 <!DOCTYPE html>

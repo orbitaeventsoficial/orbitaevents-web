@@ -29,6 +29,7 @@ function buildPoints(values: number[], height: number, width: number) {
 }
 
 function buildAreaPath(values: number[], height: number, width: number) {
+  if (values.length === 0) return '';
   const step = values.length > 1 ? width / (values.length - 1) : width;
   const points = values.map((v, i) => {
     const x = i * step;
@@ -42,6 +43,13 @@ function buildAreaPath(values: number[], height: number, width: number) {
 }
 
 function strokeToFill(stroke: string) {
+  if (stroke.startsWith('#')) {
+    const hex = stroke.slice(1);
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.22)`;
+  }
   return stroke.replace(')', ', 0.22)').replace('rgb', 'rgba');
 }
 

@@ -150,9 +150,11 @@ export default function PricingAdminPage() {
         setPacks(data.data.packs);
         setInventory(data.data.inventory);
         setStats(data.data.stats);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Error carregant dades' });
       }
     } catch (error) {
-      log.error('Error:', error);
+      log.error('Error carregant pricing:', error);
       setMessage({ type: 'error', text: 'Error carregant dades' });
     }
     setLoading(false);

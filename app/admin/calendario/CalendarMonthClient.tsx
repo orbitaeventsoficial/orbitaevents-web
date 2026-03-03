@@ -71,7 +71,10 @@ function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): string {
 }
 
 function formatKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function getMonthDays({ year, month }: MonthYear): CalendarCell[] {
@@ -457,7 +460,7 @@ export default function CalendarMonthClient() {
           const hasBloqueos = dayData.bloqueos.length > 0;
 
           let bgClass = 'bg-white/5';
-          let hoverClass = 'hover:bg-white/5/90';
+          let hoverClass = 'hover:bg-white/10';
           if (hasReservas && !hasBloqueos) {
             bgClass = 'bg-emerald-600/30';
             hoverClass = 'hover:bg-emerald-600/40';

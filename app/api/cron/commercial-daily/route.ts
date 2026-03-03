@@ -18,7 +18,7 @@ function isAuthorized(request: NextRequest, requestId: string): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
-    log.error('CRON_SECRET no configurado para commercial-daily', undefined, {
+    log.error('CRON_SECRET no configurat per commercial-daily', undefined, {
       context: { requestId, endpoint: 'cron/commercial-daily:isAuthorized' },
     });
     return false;
@@ -140,20 +140,20 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    const subject = `Resumen diario comercial · ${new Date().toLocaleDateString('es-ES')}`;
+    const subject = `Resum diari comercial · ${new Date().toLocaleDateString('ca-ES')}`;
     const html = `
       <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">
-        <h2 style="margin:0 0 12px 0;color:#f8fafc">Resumen diario comercial</h2>
+        <h2 style="margin:0 0 12px 0;color:#f8fafc">Resum diari comercial</h2>
         <ul style="line-height:1.8;margin:0 0 18px 0;padding-left:18px">
-          <li>Secuencias ejecutadas: <strong>${sequences.executed}</strong></li>
-          <li>Envíos email: <strong>${sequences.sentEmail}</strong></li>
-          <li>Envíos WhatsApp: <strong>${sequences.sentWhatsapp}</strong></li>
-          <li>Tareas SLA creadas: <strong>${sla.createdTasks}</strong></li>
+          <li>Seqüències executades: <strong>${sequences.executed}</strong></li>
+          <li>Enviaments email: <strong>${sequences.sentEmail}</strong></li>
+          <li>Enviaments WhatsApp: <strong>${sequences.sentWhatsapp}</strong></li>
+          <li>Tasques SLA creades: <strong>${sla.createdTasks}</strong></li>
           <li>Recordatoris pagament: <strong>${paymentReminders.sent}</strong> enviats de ${paymentReminders.checked} revisats</li>
-          <li>Comunicaciones 24h: <strong>${commSent24h}</strong></li>
-          <li>Respondidas 24h: <strong>${commResponded24h}</strong> (${(responseRate * 100).toFixed(1)}%)</li>
-          <li>Leads abiertos: <strong>${openLeads}</strong></li>
-          <li>Tareas abiertas: <strong>${openTasks}</strong></li>
+          <li>Comunicacions 24h: <strong>${commSent24h}</strong></li>
+          <li>Respostes 24h: <strong>${commResponded24h}</strong> (${(responseRate * 100).toFixed(1)}%)</li>
+          <li>Leads oberts: <strong>${openLeads}</strong></li>
+          <li>Tasques obertes: <strong>${openTasks}</strong></li>
         </ul>
       </div>
     `;
@@ -168,13 +168,13 @@ export async function GET(request: NextRequest) {
     const waTo = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');
     if (waTo) {
       const waText = [
-        `📊 Resumen comercial ${new Date().toLocaleDateString('es-ES')}`,
-        `Secuencias: ${sequences.executed}`,
+        `📊 Resum comercial ${new Date().toLocaleDateString('ca-ES')}`,
+        `Seqüències: ${sequences.executed}`,
         `Email: ${sequences.sentEmail} · WA: ${sequences.sentWhatsapp}`,
-        `SLA tasks: ${sla.createdTasks}`,
+        `Tasques SLA: ${sla.createdTasks}`,
         `Pagaments: ${paymentReminders.sent}/${paymentReminders.checked} recordatoris`,
         `Comms 24h: ${commSent24h} · Resp: ${commResponded24h} (${(responseRate * 100).toFixed(1)}%)`,
-        `Open leads: ${openLeads} · Open tasks: ${openTasks}`,
+        `Leads oberts: ${openLeads} · Tasques obertes: ${openTasks}`,
       ].join('\n');
       await sendWhatsAppText({ to: waTo, text: waText });
     }

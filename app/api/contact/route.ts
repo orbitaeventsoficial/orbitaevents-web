@@ -469,7 +469,7 @@ export async function POST(req: NextRequest) {
       }
 
     } catch (dbError) {
-      log.error('Error guardando lead en la base de datos', dbError, {
+      log.error('Error guardant lead a la base de dades', dbError, {
         context: {
           eventType: event,
           source: determineSource(packId, packName),
@@ -477,6 +477,7 @@ export async function POST(req: NextRequest) {
           hasPhone: !!clientPhone,
         }
       });
+      // No interrompem el flux — l'admin rep l'email igualment
     }
 
     if (_savedLeadId && clientEmail) {

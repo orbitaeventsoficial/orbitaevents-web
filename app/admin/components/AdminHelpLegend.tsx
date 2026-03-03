@@ -4,7 +4,7 @@ import { HELP_ENTRIES } from './adminHelpGlossary';
 
 export default function AdminHelpLegend() {
   return (
-    <aside className="fixed right-4 top-24 z-[70] hidden w-80 max-h-[70vh] overflow-auto rounded-2xl border bg-black/60/95 p-4 shadow-2xl lg:block">
+    <aside className="fixed right-4 top-24 z-[70] hidden w-80 max-h-[70vh] overflow-auto rounded-2xl border bg-black/95 p-4 shadow-2xl lg:block">
       <h3 className="text-sm font-semibold">Glossari de l&apos;admin</h3>
       <p className="mt-1 text-xs">
         Explicat fàcil: què és cada cosa i per a què serveix. Mira també els símbols <strong>?</strong>.
