@@ -1048,6 +1048,13 @@ export default function PresupuestoPdfStudio({
         body: JSON.stringify({
           customerId: customerId || undefined,
           to: clientEmail.trim(),
+          customerName: clientName.trim(),
+          customerPhone: clientPhone.trim() || undefined,
+          eventType,
+          eventDate: eventDate || undefined,
+          eventSchedule: eventSchedule.trim() || undefined,
+          eventLocation: eventLocation.trim() || undefined,
+          guestCount: guests,
           packId: packId || 'custom',
           price: total,
           extras: payloadExtras,
@@ -1706,4 +1713,5 @@ export default function PresupuestoPdfStudio({
     </section>
   );
 }
+
 

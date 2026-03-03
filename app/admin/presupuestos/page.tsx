@@ -36,6 +36,7 @@ export default async function PresupuestosPage({
         select: { id: true, name: true, email: true, preferredLocale: true },
       })
     : null;
+
   const brandSettingsRows = await prisma.setting.findMany({
     where: {
       key: {
@@ -53,6 +54,49 @@ export default async function PresupuestosPage({
   });
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
 
+  const createdQuotes = await prisma.leadDocument.findMany({
+    where: {
+      type: 'QUOTE',
+      ...(leadId ? { leadId } : {}),
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: {
+      id: true,
+      title: true,
+      fileUrl: true,
+      createdAt: true,
+      leadId: true,
+      lead: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  const createdProposals = await prisma.proposal.findMany({
+    where: leadId ? { leadId } : undefined,
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: {
+      id: true,
+      reference: true,
+      status: true,
+      total: true,
+      createdAt: true,
+      customerId: true,
+      leadId: true,
+      customer: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
   return (
     <AdminPage
       title="Pressupostos"
@@ -66,6 +110,61 @@ export default async function PresupuestosPage({
       back={{ href: '/admin/settings', label: 'Configuració' }}
       actions={customer ? <Link href={`/admin/clientes/${customer.id}`} className="ap-btn ap-btn--secondary">👤 Fitxa Client</Link> : undefined}
     >
+      <section className="mb-6 rounded-2xl border p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-base font-semibold">Pressupostos creats</h2>
+          {leadId ? (
+            <Link href="/admin/presupuestos" className="text-xs hover:underline">
+              Veure tots
+            </Link>
+          ) : null}
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-70">Des de leads (LeadDocument QUOTE)</p>
+            {createdQuotes.length === 0 ? (
+              <p className="text-sm opacity-80">No n'hi ha.</p>
+            ) : (
+              <div className="space-y-2">
+                {createdQuotes.map((quote) => (
+                  <div key={quote.id} className="rounded-xl border p-3">
+                    <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="block hover:underline">
+                      <p className="text-sm font-semibold">{quote.title}</p>
+                    </a>
+                    <p className="mt-1 text-xs opacity-80">
+                      {quote.lead?.name || 'Lead'} ({quote.lead?.email || 'sense email'}) · {new Date(quote.createdAt).toLocaleString('ca-ES')} · ID lead: {quote.leadId}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-70">Des de PDF Studio (Proposals)</p>
+            {createdProposals.length === 0 ? (
+              <p className="text-sm opacity-80">No n'hi ha.</p>
+            ) : (
+              <div className="space-y-2">
+                {createdProposals.map((proposal) => (
+                  <div key={proposal.id} className="rounded-xl border p-3">
+                    <Link
+                      href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                      className="block hover:underline"
+                    >
+                      <p className="text-sm font-semibold">{proposal.reference} · {proposal.total.toFixed(2)}€</p>
+                    </Link>
+                    <p className="mt-1 text-xs opacity-80">
+                      {proposal.customer?.name || 'Client'} ({proposal.customer?.email || 'sense email'}) · {proposal.status} · {new Date(proposal.createdAt).toLocaleString('ca-ES')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       <PresupuestoPdfStudio
         initialCustomerId={customer?.id || ''}

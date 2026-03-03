@@ -15,6 +15,8 @@ import type { PackDefinition } from '@/config/packs-config';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { translateHtmlForLocale, translateTextForLocale } from '@/lib/services/translationService';
+import type { EventType } from '@prisma/client';
+import { normalizeEmail, normalizePhone } from '@/lib/utils/normalize';
 
 type QuotePack = {
   name: string;
@@ -23,6 +25,27 @@ type QuotePack = {
   extraHourPrice: number;
   description: string;
 };
+
+function mapLeadEventType(raw: unknown): EventType {
+  const value = String(raw || '').toLowerCase();
+  if (value === 'bodas' || value === 'wedding') return 'WEDDING';
+  if (value === 'empresas' || value === 'corporate') return 'CORPORATE';
+  if (value === 'fiestas' || value === 'private_party') return 'PRIVATE_PARTY';
+  return 'OTHER';
+}
+
+function normalizeLocale(raw: unknown): string {
+  const value = String(raw || 'ca').toLowerCase();
+  if (value.startsWith('es')) return 'es';
+  if (value.startsWith('en')) return 'en';
+  return 'ca';
+}
+
+function parseDateOrNull(value: unknown): Date | null {
+  if (!value) return null;
+  const parsed = new Date(String(value));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
 
 function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
   if (!pack) {
@@ -130,6 +153,13 @@ export async function POST(req: NextRequest) {
       leadId,
       customerId,
       to, // Manual email when no lead
+      customerName,
+      customerPhone,
+      eventType,
+      eventDate,
+      eventSchedule,
+      eventLocation,
+      guestCount,
       packId,
       price,
       extras,
@@ -148,16 +178,16 @@ export async function POST(req: NextRequest) {
 
     const template = await getQuoteTemplateSettings();
 
-    // Get lead if provided, otherwise create minimal data for quote
-    let lead = leadId ? await prisma.lead.findUnique({ where: { id: leadId } }) : null;
-    const customer = customerId
+    // Get lead if provided; if sending from customer without lead, create or reuse one.
+    let lead = leadId ? await prisma.lead.findUnique({ where: { id: String(leadId) } }) : null;
+    let customer = customerId
       ? await prisma.customer.findUnique({
           where: { id: String(customerId) },
           select: { id: true, name: true, email: true, preferredLocale: true },
         })
       : null;
     let recipientEmail = to;
-    let recipientName = 'Client';
+    let recipientName = String(customerName || 'Client').trim() || 'Client';
 
     if (leadId && !lead) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
@@ -170,18 +200,83 @@ export async function POST(req: NextRequest) {
       recipientEmail = customer.email || recipientEmail;
       recipientName = customer.name || recipientName;
     }
+
     if (!recipientEmail) {
       return NextResponse.json({ error: 'No hi ha correu de desti del client' }, { status: 400 });
     }
-    const emailCountBefore = leadId
+
+    if (!customer && !lead) {
+      const normalizedEmail = normalizeEmail(recipientEmail);
+      const normalizedPhone = customerPhone ? normalizePhone(String(customerPhone)) : null;
+      customer = await prisma.customer.findFirst({
+        where: {
+          OR: [
+            { emailNormalized: normalizedEmail },
+            ...(normalizedPhone ? [{ phoneNormalized: normalizedPhone }] : []),
+          ],
+        },
+        select: { id: true, name: true, email: true, preferredLocale: true },
+      });
+      if (customer && !recipientName.trim()) {
+        recipientName = customer.name || recipientName;
+      }
+    }
+
+    if (lead && customer && lead.customerId !== customer.id) {
+      lead = await prisma.lead.update({
+        where: { id: lead.id },
+        data: { customerId: customer.id },
+      });
+    }
+
+    const resolvedLocale = normalizeLocale(
+      lead?.preferredLocale || customer?.preferredLocale || locale || 'ca'
+    );
+
+    if (!lead && customer?.id) {
+      const reusableLead = await prisma.lead.findFirst({
+        where: {
+          OR: [
+            { customerId: customer.id },
+            { email: recipientEmail },
+          ],
+          status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] },
+        },
+        orderBy: { updatedAt: 'desc' },
+      });
+
+      if (reusableLead) {
+        lead = reusableLead;
+      } else {
+        lead = await prisma.lead.create({
+          data: {
+            customerId: customer.id,
+            name: recipientName,
+            email: recipientEmail,
+            phone: customerPhone ? String(customerPhone) : null,
+            eventType: mapLeadEventType(eventType || packId),
+            eventDate: parseDateOrNull(eventDate),
+            eventSchedule: eventSchedule ? String(eventSchedule) : null,
+            eventLocation: eventLocation ? String(eventLocation) : null,
+            guestCount: Number.isFinite(Number(guestCount)) ? Math.max(0, Math.round(Number(guestCount))) : null,
+            budget: Number.isFinite(Number(price)) ? String(Number(price).toFixed(2)) : null,
+            message: customMessage ? String(customMessage) : null,
+            interestedPackId: packId ? String(packId) : null,
+            interestedExtras: [],
+            source: 'OTHER',
+            status: 'QUOTE_SENT',
+            preferredLocale: resolvedLocale,
+          },
+        });
+      }
+    }
+
+    const activeLeadId = lead?.id || null;
+    const emailCountBefore = activeLeadId
       ? await prisma.leadActivity.count({
-          where: { leadId, type: 'EMAIL' },
+          where: { leadId: activeLeadId, type: 'EMAIL' },
         })
       : 0;
-
-    const resolvedLocale = String(
-      lead?.preferredLocale || customer?.preferredLocale || locale || 'ca'
-    ).toLowerCase();
     const packDataBase = await resolvePack(String(packId).toLowerCase(), resolvedLocale);
     const packData = {
       ...packDataBase,
@@ -218,16 +313,18 @@ export async function POST(req: NextRequest) {
     quoteData.validUntil = new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000);
     quoteData.notes = mergeNotes([customMessage, notes, lead?.message || undefined]);
 
-    // Only update lead records if we have a lead
-    if (lead && leadId) {
+    // Persist lead-side trail for every quote linked to a lead.
+    if (lead) {
+      const targetLeadId = lead.id;
+
       await prisma.lead.update({
-        where: { id: leadId },
+        where: { id: targetLeadId },
         data: { status: 'QUOTE_SENT', updatedAt: new Date() },
       });
 
       await prisma.leadNote.create({
         data: {
-          leadId,
+          leadId: targetLeadId,
           content: `📄 Pressupost enviat: ${quoteData.quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
         },
       });
@@ -235,12 +332,12 @@ export async function POST(req: NextRequest) {
       const documentTitle = `Pressupost ${quoteData.quoteNumber}`;
       await prisma.leadDocument.create({
         data: {
-          leadId,
+          leadId: targetLeadId,
           type: 'QUOTE',
           source: 'MANUAL',
           title: documentTitle,
           fileUrl: `quote-email:${quoteData.quoteNumber}`,
-          filePath: `lead/${leadId}/quote/${quoteData.quoteNumber}`,
+          filePath: `lead/${targetLeadId}/quote/${quoteData.quoteNumber}`,
           mimeType: 'text/html',
           createdBy: 'Admin',
         },
@@ -248,7 +345,7 @@ export async function POST(req: NextRequest) {
 
       await prisma.leadActivity.create({
         data: {
-          leadId,
+          leadId: targetLeadId,
           type: 'EMAIL',
           title: 'Pressupost enviat',
           description: documentTitle,
@@ -268,7 +365,7 @@ export async function POST(req: NextRequest) {
             customerId: lead.customerId,
             action: 'QUOTE_SENT',
             details: {
-              leadId,
+              leadId: targetLeadId,
               quoteNumber: quoteData.quoteNumber,
               total: quoteData.total,
             },
@@ -284,7 +381,7 @@ export async function POST(req: NextRequest) {
           const existingTask = await prisma.task.findFirst({
             where: {
               customerId: lead.customerId,
-              leadId,
+              leadId: targetLeadId,
               title: followUpTitle,
               status: { in: ['OPEN', 'IN_PROGRESS'] },
             },
@@ -294,7 +391,7 @@ export async function POST(req: NextRequest) {
             await prisma.task.create({
               data: {
                 customerId: lead.customerId,
-                leadId,
+                leadId: targetLeadId,
                 title: followUpTitle,
                 description: 'Fer seguiment comercial del pressupost enviat.',
                 dueDate: followUpDueDate,
@@ -307,7 +404,7 @@ export async function POST(req: NextRequest) {
         } catch {
           const legacyTask = await prisma.leadTask.findFirst({
             where: {
-              leadId,
+              leadId: targetLeadId,
               title: followUpTitle,
               status: { in: ['OPEN', 'IN_PROGRESS'] },
             },
@@ -316,7 +413,7 @@ export async function POST(req: NextRequest) {
           if (!legacyTask) {
             await prisma.leadTask.create({
               data: {
-                leadId,
+                leadId: targetLeadId,
                 title: followUpTitle,
                 description: 'Fer seguiment comercial del pressupost enviat.',
                 dueDate: followUpDueDate,
@@ -330,7 +427,7 @@ export async function POST(req: NextRequest) {
       } else {
         const legacyTask = await prisma.leadTask.findFirst({
           where: {
-            leadId,
+            leadId: targetLeadId,
             title: followUpTitle,
             status: { in: ['OPEN', 'IN_PROGRESS'] },
           },
@@ -339,7 +436,7 @@ export async function POST(req: NextRequest) {
         if (!legacyTask) {
           await prisma.leadTask.create({
             data: {
-              leadId,
+              leadId: targetLeadId,
               title: followUpTitle,
               description: 'Fer seguiment comercial del pressupost enviat.',
               dueDate: followUpDueDate,
@@ -351,6 +448,7 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
     if (!lead && customer?.id) {
       await prisma.customerActivity.create({
         data: {
@@ -429,3 +527,7 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
+
+
