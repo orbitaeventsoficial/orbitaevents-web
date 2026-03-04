@@ -7,6 +7,7 @@ import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge
 import { formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
+import Tooltip from '@/app/admin/components/Tooltip';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -217,7 +218,9 @@ export default function BookingMarginCard({
           <p className={`text-lg font-bold ${marginColor}`}>{formatCurrency(netMargin)}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase">% Marge</p>
+          <Tooltip text="Calculat pel motor de cost (costEngine.ts) — pack, extras, transport, operacional">
+            <p className="text-xs font-medium uppercase">% Marge</p>
+          </Tooltip>
           <p className={`text-2xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-[11px] mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :

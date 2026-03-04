@@ -21,6 +21,7 @@ import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
+import Tooltip from '@/app/admin/components/Tooltip';
 
 export const dynamic = 'force-dynamic';
 
@@ -334,7 +335,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </div>
         <div className={`rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'border-emerald-500/30 bg-emerald-500/5' : booking.depositPaid ? 'border-amber-500/30 bg-amber-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
           <div className="flex items-center gap-2">
-            <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+            <Tooltip text={booking.depositPaid && booking.remainingPaid ? 'Paga i senyal + resta pagats' : booking.depositPaid ? 'Paga i senyal pagada, falta la resta' : 'Cap pagament rebut'}>
+              <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+            </Tooltip>
             <p className="text-xs uppercase tracking-wide">Pagament</p>
           </div>
           <p className="text-xl font-semibold">

@@ -96,20 +96,20 @@ export default async function AdminDashboard() {
       {/* ═══ PRÒXIM BOLO ═══ */}
       {d.nextEvent && (
         <Link href={`/admin/bookings/${d.nextEvent.id}`} className="block">
-          <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-colors ${
+          <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-all admin-card-glass ${
             d.nextEvent.daysUntil <= 1
-              ? 'border-amber-500/50 bg-amber-500/5'
+              ? 'border-amber-500/50 admin-glow-pulse'
               : d.nextEvent.daysUntil <= 3
-                ? 'border-cyan-500/30 bg-cyan-500/5'
-                : 'border-white/10 bg-white/[0.02]'
+                ? 'border-cyan-500/30'
+                : 'border-white/10'
           }`}>
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-xs font-bold uppercase tracking-wider ${
-                    d.nextEvent.daysUntil === 0 ? 'text-amber-400' : d.nextEvent.daysUntil <= 1 ? 'text-amber-400' : 'text-cyan-400'
+                    d.nextEvent.daysUntil <= 1 ? 'text-amber-400' : 'text-cyan-400'
                   }`}>
-                    {d.nextEvent.daysUntil === 0 ? 'AVUI' : d.nextEvent.daysUntil === 1 ? 'DEMÀ' : `D&apos;aquí ${d.nextEvent.daysUntil} dies`}
+                    {d.nextEvent.daysUntil === 0 ? 'AVUI' : d.nextEvent.daysUntil === 1 ? 'DEMÀ' : `D'aquí ${d.nextEvent.daysUntil} dies`}
                   </span>
                   <span className={`inline-block w-2 h-2 rounded-full ${
                     d.nextEvent.daysUntil <= 1 ? 'bg-amber-400 animate-pulse' : 'bg-cyan-400'
@@ -126,24 +126,23 @@ export default async function AdminDashboard() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-2xl font-bold">{formatCurrency(d.nextEvent.total)}</p>
+                <p className="text-2xl font-bold" style={{ fontFamily: 'var(--font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(d.nextEvent.total)}</p>
                 <p className="text-xs opacity-70 mt-0.5">{d.nextEvent.packName}</p>
                 <div className="flex items-center justify-end gap-1.5 mt-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-emerald-400' : d.nextEvent.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                  <Tooltip text={d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Tot pagat' : d.nextEvent.depositPaid ? 'Falta pagament final' : 'Sense cap pagament'}>
+                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-emerald-400' : d.nextEvent.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                  </Tooltip>
                   <span className="text-xs">
                     {d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Pagat' : d.nextEvent.depositPaid ? 'Parcial' : 'Pendent'}
                   </span>
                 </div>
                 {d.nextEvent.checklistTotal > 0 && (
-                  <div className="flex items-center justify-end gap-1.5 mt-1.5">
-                    <div className="w-12 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          d.nextEvent.checklistDone === d.nextEvent.checklistTotal ? 'bg-emerald-500' : d.nextEvent.checklistDone > 0 ? 'bg-amber-500' : 'bg-rose-500'
-                        }`}
-                        style={{ width: `${Math.round((d.nextEvent.checklistDone / d.nextEvent.checklistTotal) * 100)}%` }}
-                      />
-                    </div>
+                  <div className="flex items-center justify-end gap-1.5 mt-2">
+                    <RadialProgress
+                      value={Math.round((d.nextEvent.checklistDone / d.nextEvent.checklistTotal) * 100)}
+                      size={36}
+                      strokeWidth={3}
+                    />
                     <span className="text-xs opacity-60">
                       {d.nextEvent.checklistDone}/{d.nextEvent.checklistTotal}
                     </span>
@@ -235,13 +234,15 @@ export default async function AdminDashboard() {
             <p className="admin-cr-stat-label">Fetes</p>
             <p className="admin-cr-stat-value admin-cr-stat-value--emerald">{d.checklistTodayDoneCount}</p>
           </div>
-          <div className="admin-cr-stat-box">
-            <p className="admin-cr-stat-label">Progrés</p>
-            <p className="admin-cr-stat-value">
-              {d.checklistTodayDoneCount + d.checklistTodayPendingCount > 0
-                ? `${Math.round((d.checklistTodayDoneCount / (d.checklistTodayDoneCount + d.checklistTodayPendingCount)) * 100)}%`
-                : '0%'}
-            </p>
+          <div className="admin-cr-stat-box flex items-center justify-center">
+            <RadialProgress
+              value={d.checklistTodayDoneCount + d.checklistTodayPendingCount > 0
+                ? Math.round((d.checklistTodayDoneCount / (d.checklistTodayDoneCount + d.checklistTodayPendingCount)) * 100)
+                : 0}
+              size={64}
+              strokeWidth={5}
+              label="Progrés"
+            />
           </div>
         </div>
       </section>

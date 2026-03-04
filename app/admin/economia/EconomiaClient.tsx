@@ -245,7 +245,7 @@ function KpiCard({ label, value, sub, color, borderColor, bgColor, delay = 0 }: 
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay }}
-      className={`rounded-xl border ${borderColor} ${bgColor} p-4 shadow-md backdrop-blur-sm`}
+      className={`rounded-xl border ${borderColor} ${bgColor} p-4 shadow-md admin-card-glass`}
     >
       <p className="text-xs font-medium uppercase tracking-wider">{label}</p>
       <p className={`mt-1 text-2xl font-black tracking-tight ${color}`}>{value}</p>
@@ -290,7 +290,7 @@ function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { overdueTot
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center rounded-2xl border border-white/10 p-6 shadow-lg"
+      className="flex flex-col items-center justify-center rounded-2xl border border-white/10 p-6 shadow-lg admin-card-glass"
     >
       <p className="text-xs font-medium uppercase tracking-wider mb-3">Salut financera</p>
       <div className="relative w-28 h-28">

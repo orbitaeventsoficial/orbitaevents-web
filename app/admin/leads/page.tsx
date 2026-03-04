@@ -326,7 +326,7 @@ export default async function LeadsPage({
             return (
               <article
                 key={lead.id}
-                className="rounded-2xl border backdrop-blur-sm p-4 transition-colors"
+                className="rounded-2xl border p-4 transition-colors admin-card-glass"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -403,7 +403,7 @@ export default async function LeadsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border overflow-hidden admin-card-glass">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1120px] text-sm" aria-label="Pipeline d'entrades">
             <thead className="border-b">
