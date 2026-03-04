@@ -23,9 +23,9 @@
       min-height:100vh;
       position:relative;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
-      padding:40px 20px;
+      padding:72px 20px 40px;
     }
     .layer{
       position:absolute;
@@ -145,7 +145,7 @@
       display:flex;align-items:center;justify-content:center;
       background:rgba(255, 238, 248, .92);
       padding:20px;
-      z-index:3;
+      z-index:20;
     }
     .panel{
       max-width:520px;width:100%;
@@ -313,16 +313,23 @@
     }
 
     startBtn.addEventListener("click", async () => {
-      // iOS requereix gest d'usuari: demanem permís també aquí
-      await requestMotionPermission();
-      playWaterSound();
-      overlay.style.display = "none";
-      cardRoot.setAttribute("aria-hidden", "false");
-    }, { passive: true });
-    
+      try {
+        // Amagar overlay immediatament (no bloquejar l'entrada)
+        overlay.style.display = "none";
+        cardRoot.setAttribute("aria-hidden", "false");
+        // iOS requereix gest d'usuari: demanem permís també aquí
+        await requestMotionPermission();
+        playWaterSound();
+      } catch (e) {
+        // En cas d'error, assegurar que l'overlay s'amaga igualment
+        overlay.style.display = "none";
+        cardRoot.setAttribute("aria-hidden", "false");
+      }
+    });
+
     motionBtn.addEventListener("click", async () => {
       await requestMotionPermission();
-    }, { passive: true });
+    });
 
     // Bombolla al tocar la targeta
     cardRoot.addEventListener("pointerdown", async () => {

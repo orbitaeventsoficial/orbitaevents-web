@@ -172,7 +172,7 @@ export const trackPhoneClick = (source: string = 'generic'): void => {
  */
 export const trackPackSelection = (data: {
   packId: PackId;
-  packType: 'boda' | 'empresa' | 'fiesta' | 'discomovil' | 'alquiler';
+  packType: 'boda' | 'empresa' | 'fiesta' | 'discomovil';
 }): void => {
   const pack = getPackById(data.packId);
   if (!pack) {

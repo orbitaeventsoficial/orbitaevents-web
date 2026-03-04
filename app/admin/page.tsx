@@ -5,7 +5,8 @@ import QuickActions from './components/QuickActions';
 import LeadStatusQuickActions from './components/LeadStatusQuickActions';
 import BookingStatusQuickActions from './components/BookingStatusQuickActions';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
-import { formatDateTimeFull } from '@/lib/constants';
+import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants';
+import { EVENT_TYPE_LABELS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,6 +81,99 @@ export default async function AdminDashboard() {
           <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
         </div>
       </div>
+
+      {/* ═══ PRÒXIM BOLO ═══ */}
+      {d.nextEvent && (
+        <Link href={`/admin/bookings/${d.nextEvent.id}`} className="block">
+          <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-colors ${
+            d.nextEvent.daysUntil <= 1
+              ? 'border-amber-500/50 bg-amber-500/5'
+              : d.nextEvent.daysUntil <= 3
+                ? 'border-cyan-500/30 bg-cyan-500/5'
+                : 'border-white/10 bg-white/[0.02]'
+          }`}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`text-xs font-bold uppercase tracking-wider ${
+                    d.nextEvent.daysUntil === 0 ? 'text-amber-400' : d.nextEvent.daysUntil <= 1 ? 'text-amber-400' : 'text-cyan-400'
+                  }`}>
+                    {d.nextEvent.daysUntil === 0 ? 'AVUI' : d.nextEvent.daysUntil === 1 ? 'DEMÀ' : `D&apos;aquí ${d.nextEvent.daysUntil} dies`}
+                  </span>
+                  <span className={`inline-block w-2 h-2 rounded-full ${
+                    d.nextEvent.daysUntil <= 1 ? 'bg-amber-400 animate-pulse' : 'bg-cyan-400'
+                  }`} />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-bold truncate">{d.nextEvent.clientName}</h2>
+                <p className="text-sm opacity-70 mt-1">
+                  {formatDate(d.nextEvent.eventDate)}
+                  {d.nextEvent.eventStartTime && ` · ${d.nextEvent.eventStartTime}`}
+                  {d.nextEvent.eventType && ` · ${EVENT_TYPE_LABELS[d.nextEvent.eventType] || d.nextEvent.eventType}`}
+                </p>
+                <p className="text-sm opacity-50 mt-0.5 truncate">
+                  {[d.nextEvent.eventVenue, d.nextEvent.eventLocation].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-2xl font-bold">{formatCurrency(d.nextEvent.total)}</p>
+                <p className="text-xs opacity-70 mt-0.5">{d.nextEvent.packName}</p>
+                <div className="flex items-center justify-end gap-1.5 mt-2">
+                  <span className={`inline-block w-2 h-2 rounded-full ${d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'bg-emerald-400' : d.nextEvent.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                  <span className="text-xs">
+                    {d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Pagat' : d.nextEvent.depositPaid ? 'Parcial' : 'Pendent'}
+                  </span>
+                </div>
+                {d.nextEvent.checklistTotal > 0 && (
+                  <div className="flex items-center justify-end gap-1.5 mt-1.5">
+                    <div className="w-12 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${
+                          d.nextEvent.checklistDone === d.nextEvent.checklistTotal ? 'bg-emerald-500' : d.nextEvent.checklistDone > 0 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}
+                        style={{ width: `${Math.round((d.nextEvent.checklistDone / d.nextEvent.checklistTotal) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-xs opacity-60">
+                      {d.nextEvent.checklistDone}/{d.nextEvent.checklistTotal}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <p className="text-xs opacity-40 mt-3">Toca per veure detalls →</p>
+          </section>
+        </Link>
+      )}
+
+      {/* ═══ OBJECTIU MENSUAL ═══ */}
+      <section className="rounded-2xl border border-white/10 p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide opacity-60">Ingressos del mes</p>
+            <p className="text-lg font-bold">
+              {formatCurrency(d.revenueThisMonth)}
+              <span className="text-sm font-normal opacity-50"> / {formatCurrency(d.revenueTarget)}</span>
+            </p>
+          </div>
+          <span className={`text-2xl font-black ${
+            d.revenueMonthPct >= 100 ? 'text-emerald-400' : d.revenueMonthPct >= 60 ? 'text-amber-400' : 'text-rose-400'
+          }`}>
+            {d.revenueMonthPct}%
+          </span>
+        </div>
+        <div className="w-full h-3 rounded-full bg-white/5 overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              d.revenueMonthPct >= 100 ? 'bg-emerald-500' : d.revenueMonthPct >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+            }`}
+            style={{ width: `${Math.min(100, d.revenueMonthPct)}%` }}
+          />
+        </div>
+        <div className="flex justify-between mt-1.5 text-[10px] opacity-40">
+          <span>0 €</span>
+          <span>{formatCurrency(d.revenueTarget)}</span>
+        </div>
+      </section>
 
       <section className="admin-cr-panel admin-cr-panel--pilot">
         <div className="admin-cr-panel-head">
@@ -208,20 +302,29 @@ export default async function AdminDashboard() {
           <p className="admin-cr-small admin-cr-small--muted">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
         </div>
         <div className="admin-cr-grid-3">
-          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--rose">
-            <p className="admin-cr-stat-label">Temps sense resposta</p>
+          <Link href="/admin/leads" className={`admin-cr-radar-card ${d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald'}`}>
+            <div className="flex items-center gap-2">
+              <span className={`inline-block w-3 h-3 rounded-full ${d.staleLeadsCount > 0 ? 'bg-rose-400' : 'bg-emerald-400'}`} />
+              <p className="admin-cr-stat-label">Temps sense resposta</p>
+            </div>
             <p className={`admin-cr-radar-value ${d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald'}`}>{d.staleLeadsCount}</p>
-            <p className="admin-cr-small">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
+            <p className="admin-cr-small">Leads amb més de 24h sense avançar.</p>
           </Link>
-          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--amber">
-            <p className="admin-cr-stat-label">Leads calents</p>
+          <Link href="/admin/leads" className={`admin-cr-radar-card ${d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald'}`}>
+            <div className="flex items-center gap-2">
+              <span className={`inline-block w-3 h-3 rounded-full ${d.hotLeadsCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+              <p className="admin-cr-stat-label">Leads calents</p>
+            </div>
             <p className={`admin-cr-radar-value ${d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald'}`}>{d.hotLeadsCount}</p>
-            <p className="admin-cr-small">Prioritat alta/urgent. Són els que poden tancar abans.</p>
+            <p className="admin-cr-small">Prioritat alta/urgent.</p>
           </Link>
-          <Link href="/admin/presupuestos" className="admin-cr-radar-card admin-cr-radar-card--cyan">
-            <p className="admin-cr-stat-label">Pressupostos en joc</p>
+          <Link href="/admin/presupuestos" className={`admin-cr-radar-card ${d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald'}`}>
+            <div className="flex items-center gap-2">
+              <span className={`inline-block w-3 h-3 rounded-full ${d.quotesInFlightCount > 0 ? 'bg-cyan-400' : 'bg-emerald-400'}`} />
+              <p className="admin-cr-stat-label">Pressupostos en joc</p>
+            </div>
             <p className={`admin-cr-radar-value ${d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald'}`}>{d.quotesInFlightCount}</p>
-            <p className="admin-cr-small">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
+            <p className="admin-cr-small">Enviats o negociant.</p>
           </Link>
         </div>
       </section>
@@ -267,14 +370,18 @@ export default async function AdminDashboard() {
         <div className="admin-cr-info-card">
           <p className="admin-cr-kicker">Salut sistema</p>
           <div className="admin-cr-health-grid">
-            {d.healthItems.map((item) => (
-              <div key={item.label} className="admin-cr-health-item">
-                <p className="admin-cr-health-label">{item.label}</p>
-                <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
-                  {item.status}
-                </p>
-              </div>
-            ))}
+            {d.healthItems.map((item) => {
+              const dot = item.status === 'OK' ? 'bg-emerald-400' : item.status === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400';
+              return (
+                <div key={item.label} className="admin-cr-health-item">
+                  <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
+                  <p className="admin-cr-health-label">{item.label}</p>
+                  <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
+                    {item.status}
+                  </p>
+                </div>
+              );
+            })}
           </div>
           <p className="admin-cr-footnote">
             Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}

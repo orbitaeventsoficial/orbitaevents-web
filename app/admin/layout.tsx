@@ -199,7 +199,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     loadAdminCss();
-  }, [loadAdminCss, pathname]);
+  }, [loadAdminCss]);
 
   useEffect(() => {
     const onCssUpdated = () => {

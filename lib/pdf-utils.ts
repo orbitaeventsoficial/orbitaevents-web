@@ -56,8 +56,6 @@ const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: string }>
   fiestas: { ca: 'Festes', es: 'Fiestas', en: 'Parties' },
   discomovil: { ca: 'Discomòbil', es: 'Discomóvil', en: 'Mobile DJ' },
   empresas: { ca: 'Empreses', es: 'Empresas', en: 'Corporate' },
-  produccion: { ca: 'Producció Tècnica', es: 'Producción Técnica', en: 'Technical Production' },
-  alquiler: { ca: 'Lloguer d\'Equip', es: 'Alquiler de Equipo', en: 'Equipment Rental' },
 };
 
 export interface PdfBrandingOptions {

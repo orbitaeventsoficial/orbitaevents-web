@@ -77,7 +77,7 @@ export default async function PresupuestosPage({
   });
 
   const createdProposals = await prisma.proposal.findMany({
-    where: leadId ? { leadId } : undefined,
+    where: leadId ? { leadId } : {},
     orderBy: { createdAt: 'desc' },
     take: 20,
     select: {

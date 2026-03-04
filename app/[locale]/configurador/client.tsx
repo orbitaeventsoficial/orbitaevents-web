@@ -29,13 +29,12 @@ import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
 import { getWhatsAppUrl } from '@/config/site-config';
 
-type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
+type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'empresas';
 
 const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   bodas: ['bodas'],
   discomovil: ['discomovil'],
   fiestas: ['fiestas'],
-  alquiler: ['alquiler'],
   empresas: ['empresas'],
 };
 

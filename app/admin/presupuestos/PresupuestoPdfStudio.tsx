@@ -104,9 +104,7 @@ const SERVICE_LABEL: Record<ServiceSlug, string> = {
   bodas: 'Bodes',
   fiestas: 'Festes',
   discomovil: 'Discomòbil',
-  alquiler: 'Lloguer',
   empresas: 'Empreses',
-  produccion: 'Producció',
 };
 
 function formatEUR(value: number): string {
@@ -192,7 +190,8 @@ async function translateBatchForPdf(texts: string[], locale: Locale): Promise<Ma
       byLang.set(locale, translated);
       result.set(original, translated);
     }
-  } catch {
+  } catch (error) {
+    console.error('Error translating batch for PDF:', error);
     for (const original of toFetch) result.set(original, original);
   }
 
@@ -299,8 +298,8 @@ export default function PresupuestoPdfStudio({
           });
           setLogoDataUrl(dataUrl);
           return;
-        } catch {
-          // keep trying next candidate
+        } catch (error) {
+          console.warn('Failed to load logo candidate:', error);
         }
       }
     };
@@ -336,8 +335,8 @@ export default function PresupuestoPdfStudio({
         ) as Record<string, string>;
 
         setPricingCatalog({ packNamesBySlug, extraNamesBySlug, extraDescriptionsBySlug });
-      } catch {
-        // Keep config fallback silently.
+      } catch (error) {
+        console.warn('Error loading pricing catalog:', error);
       }
     };
 
@@ -456,7 +455,8 @@ export default function PresupuestoPdfStudio({
           `Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada+tornada`
         );
         lastDistanceDestinationRef.current = destination;
-      } catch {
+      } catch (error) {
+        console.error('Error calculating distance:', error);
         setTravelKm(0);
         setDistanceMessage('No s’ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
       } finally {
@@ -516,8 +516,8 @@ export default function PresupuestoPdfStudio({
       if (typeof draft.brandEmail === 'string') setBrandEmail(draft.brandEmail);
       if (typeof draft.brandPhone === 'string') setBrandPhone(draft.brandPhone);
       if (typeof draft.brandTagline === 'string') setBrandTagline(draft.brandTagline);
-    } catch {
-      // Ignore corrupted drafts.
+    } catch (error) {
+      console.warn('Corrupted local draft, ignoring:', error);
     } finally {
       setDraftLoaded(true);
     }
@@ -863,8 +863,8 @@ export default function PresupuestoPdfStudio({
       setAutosaving(true);
       void saveProposalDraft('DRAFT')
         .then(() => setAutosaveTick(Date.now()))
-        .catch(() => {
-          // Keep silent to avoid noisy UI while editing.
+        .catch((error) => {
+          console.warn('Autosave failed:', error);
         })
         .finally(() => setAutosaving(false));
     }, 750);

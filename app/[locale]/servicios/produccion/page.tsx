@@ -3,9 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
-import { getMinPriceByService } from '@/config/packs-config';
-
-const MIN_PRICE = getMinPriceByService('produccion');
+// Producció tècnica ja no és un servei amb packs — preu de referència fix
+const MIN_PRICE = 600;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;

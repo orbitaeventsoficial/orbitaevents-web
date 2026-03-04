@@ -114,6 +114,29 @@ export interface DashboardData {
   cashFlowNet30: number;
   pipelineWeighted30: number;
   pendingPayments: number;
+  // Next event ("pròxim bolo")
+  nextEvent: {
+    id: string;
+    reference: string;
+    clientName: string;
+    eventDate: Date;
+    eventStartTime: string | null;
+    eventLocation: string;
+    eventVenue: string | null;
+    eventType: string | null;
+    total: number;
+    depositPaid: boolean;
+    remainingPaid: boolean;
+    status: string;
+    packName: string;
+    daysUntil: number;
+    checklistDone: number;
+    checklistTotal: number;
+  } | null;
+  // Monthly revenue
+  revenueThisMonth: number;
+  revenueTarget: number;
+  revenueMonthPct: number;
   // Computed
   timeline: { id: string; icon: string; text: string; time: string; ts: number; href: string }[];
   alerts: DashboardAlert[];
@@ -149,7 +172,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   );
 
   const [ga4, profitConfig] = await Promise.all([
-    Promise.race([getGa4Report().catch(() => null), timeoutPromise(1200)]),
+    Promise.race([getGa4Report().catch(() => null), timeoutPromise(3000)]),
     getProfitabilityConfig(),
   ]);
 
@@ -170,8 +193,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:customers:count', () => prisma.customer.count(), CacheTTL.MEDIUM).catch(() => 0),
     cachedQuery('admin:dashboard:testimonials:pending', () => prisma.customerTestimonial.count({ where: { isApproved: false } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:testimonials:approved', () => prisma.customerTestimonial.count({ where: { isApproved: true } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery('admin:dashboard:recent-leads:5', () => prisma.lead.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, eventType: true, status: true, createdAt: true } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:upcoming-bookings:5', () => prisma.booking.findMany({ where: { eventDate: { gte: now }, status: 'CONFIRMED' }, take: 5, orderBy: { eventDate: 'asc' }, select: { id: true, clientName: true, eventDate: true, eventType: true } }), CacheTTL.VERY_SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:recent-leads:5', () => prisma.lead.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, eventType: true, status: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:upcoming-bookings:5', () => prisma.booking.findMany({ where: { eventDate: { gte: now }, status: 'CONFIRMED' }, take: 5, orderBy: { eventDate: 'asc' }, select: { id: true, clientName: true, eventDate: true, eventType: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:inventory:group-status', () => prisma.inventoryItem.groupBy({ by: ['status'], _count: true }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:testimonials:avg-rating', () => prisma.customerTestimonial.aggregate({ where: { isApproved: true }, _avg: { rating: true } }), CacheTTL.SHORT).catch(() => ({ _avg: { rating: null } })),
     cachedQuery('admin:dashboard:leads:won', () => prisma.lead.count({ where: { status: 'WON' } }), CacheTTL.SHORT).catch(() => 0),
@@ -180,18 +203,18 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: '@leads.orbitaevents.local' } } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage', 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
     prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
-    cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:timeline:activity', () => prisma.customerActivity.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:timeline:admin-logs', () => prisma.adminLog.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, entity: true, createdAt: true } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:tasks:upcoming', () => prisma.leadTask.findMany({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }, take: 6, orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }], select: { id: true, title: true, dueDate: true, status: true, lead: { select: { id: true, name: true } } } }), CacheTTL.VERY_SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:timeline:activity', () => prisma.customerActivity.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:timeline:admin-logs', () => prisma.adminLog.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, entity: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:tasks:upcoming', () => prisma.leadTask.findMany({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }, take: 6, orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }], select: { id: true, title: true, dueDate: true, status: true, lead: { select: { id: true, name: true } } } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:leads:stale:${dayKey}`, () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:hot', () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] }, priority: { in: ['HIGH', 'URGENT'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:quotes-in-flight', () => prisma.lead.count({ where: { status: { in: ['QUOTE_SENT', 'NEGOTIATING'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:checklist:done:${dayKey}`, () => prisma.task.count({ where: { createdBy: 'system:daily-checklist', createdAt: { gte: todayStart, lte: todayEnd }, status: 'DONE' } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:checklist:pending:${dayKey}`, () => prisma.task.count({ where: { createdBy: 'system:daily-checklist', createdAt: { gte: todayStart, lte: todayEnd }, status: { in: ['OPEN', 'IN_PROGRESS'] } } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery('admin:dashboard:command:leads', () => prisma.lead.findMany({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } }, orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }], take: 6, select: { id: true, name: true, status: true, priority: true, createdAt: true } }), CacheTTL.VERY_SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.VERY_SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:command:leads', () => prisma.lead.findMany({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } }, orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }], take: 6, select: { id: true, name: true, status: true, priority: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:margin:avg', () => prisma.booking.findMany({
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
       select: { total: true, travelCost: true, pack: { select: { price: true } }, extras: { select: { price: true, quantity: true } } },
@@ -335,6 +358,69 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
   }
 
+  // Pròxim bolo: la reserva confirmada més propera
+  const [nextEventRaw, monthlyRevenue, revenueTargetSetting] = await Promise.all([
+    cachedQuery(`admin:dashboard:next-event:${dayKey}`, () => prisma.booking.findFirst({
+      where: { eventDate: { gte: now }, status: { in: ['CONFIRMED', 'PREPARING'] } },
+      orderBy: { eventDate: 'asc' },
+      select: {
+        id: true, reference: true, clientName: true, eventDate: true,
+        eventStartTime: true, eventLocation: true, eventVenue: true, eventType: true,
+        total: true, depositPaid: true, remainingPaid: true, status: true,
+        pack: { select: { translations: { where: { locale: 'ca' }, select: { name: true } } } },
+      },
+    }), CacheTTL.SHORT).catch(() => null),
+    cachedQuery(`admin:dashboard:revenue-month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.aggregate({
+      where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: startOfMonth } },
+      _sum: { total: true },
+    }), CacheTTL.SHORT).catch(() => ({ _sum: { total: null } })),
+    cachedQuery('admin:dashboard:revenue-target', () => prisma.setting.findUnique({
+      where: { key: 'dashboard.revenueTarget' },
+    }), CacheTTL.MEDIUM).catch(() => null),
+  ]);
+
+  let nextEvent: DashboardData['nextEvent'] = null;
+  if (nextEventRaw) {
+    const diffMs = new Date(nextEventRaw.eventDate).getTime() - now.getTime();
+    const daysUntil = Math.max(0, Math.ceil(diffMs / 86400000));
+    // Checklist state for next event
+    const checklistSetting = await prisma.setting.findUnique({
+      where: { key: `booking.checklist.${nextEventRaw.id}` },
+    }).catch(() => null);
+    let checklistDone = 0;
+    let checklistTotal = 7; // default items count
+    if (checklistSetting?.value) {
+      try {
+        const items = JSON.parse(checklistSetting.value) as Array<{ checked: boolean }>;
+        checklistTotal = items.length;
+        checklistDone = items.filter((i) => i.checked).length;
+      } catch { /* use defaults */ }
+    }
+    nextEvent = {
+      id: nextEventRaw.id,
+      reference: nextEventRaw.reference,
+      clientName: nextEventRaw.clientName,
+      eventDate: nextEventRaw.eventDate,
+      eventStartTime: nextEventRaw.eventStartTime,
+      eventLocation: nextEventRaw.eventLocation,
+      eventVenue: nextEventRaw.eventVenue,
+      eventType: nextEventRaw.eventType,
+      total: nextEventRaw.total,
+      depositPaid: nextEventRaw.depositPaid,
+      remainingPaid: nextEventRaw.remainingPaid,
+      status: nextEventRaw.status,
+      packName: nextEventRaw.pack?.translations?.[0]?.name || '—',
+      daysUntil,
+      checklistDone,
+      checklistTotal,
+    };
+  }
+
+  const revenueThisMonth = Number(monthlyRevenue?._sum?.total) || 0;
+  const revenueTargetRaw = Number(revenueTargetSetting?.value);
+  const revenueTarget = Number.isFinite(revenueTargetRaw) && revenueTargetRaw > 0 ? revenueTargetRaw : 3000;
+  const revenueMonthPct = revenueTarget > 0 ? Math.min(100, Math.round((revenueThisMonth / revenueTarget) * 100)) : 0;
+
   return {
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
     customersCount, testimonialsPending, testimonialsApproved,
@@ -350,6 +436,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cashFlowNet30,
     pipelineWeighted30,
     pendingPayments,
+    nextEvent,
+    revenueThisMonth,
+    revenueTarget,
+    revenueMonthPct,
     leadsSeries, leadsWonSeries, bookingsSeries, revenueSeries, revenueTotal30,
     recentLeads, upcomingBookings, upcomingTasks,
     commandLeads, commandBookings, recentAdminLogs,

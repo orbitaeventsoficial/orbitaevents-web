@@ -58,7 +58,7 @@ export default function NewPackForm() {
             value={form.slug}
             onChange={(e) => setForm({ ...form, slug: e.target.value })}
             className={inputClass}
-            placeholder="party-starter"
+            placeholder="disco-basico"
             required
           />
         </div>
@@ -80,11 +80,10 @@ export default function NewPackForm() {
             onChange={(e) => setForm({ ...form, service: e.target.value })}
             className={inputClass}
           >
-            <option value="fiestas">fiestas</option>
-            <option value="discomovil">discomovil</option>
-            <option value="bodas">bodas</option>
-            <option value="empresas">empresas</option>
-            <option value="produccion">produccion</option>
+            <option value="fiestas">Festes</option>
+            <option value="discomovil">Discomòbil</option>
+            <option value="bodas">Bodes</option>
+            <option value="empresas">Empreses</option>
           </select>
         </div>
         <div>

@@ -257,7 +257,8 @@ export default function InboxClient({
       });
       router.push(`/admin/leads/${data.lead.id}`);
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error('Error importing lead from email:', error);
       setFlashMessage({ type: 'error', text: 'Error important email a lead' });
     }
   }
@@ -282,7 +283,8 @@ export default function InboxClient({
       setSelectedEmail((prev) => (prev?.id === email.id ? null : prev));
       setImapUnread((prev) => Math.max(0, prev - (email.read ? 0 : 1)));
       setFlashMessage({ type: 'success', text: 'Email eliminat correctament' });
-    } catch {
+    } catch (error) {
+      console.error('Error deleting IMAP email:', error);
       setFlashMessage({ type: 'error', text: 'Error eliminant email' });
     }
   }
@@ -699,11 +701,11 @@ function ComposeModal({
   onClose: () => void;
 }) {
   const FALLBACK_OPTIONS: QuotePackOption[] = [
-    { id: 'party-starter', label: 'Party Starter', price: 350 },
-    { id: 'party-machine', label: 'Party Machine', price: 400 },
-    { id: 'vip-experience', label: 'VIP Experience', price: 700 },
-    { id: 'boda-signature', label: 'Boda Signature', price: 800 },
-    { id: 'corporate-event', label: 'Corporate Event', price: 850 },
+    { id: 'disco-basico', label: 'Bàsic (Festes)', price: 350 },
+    { id: 'disco-completo', label: 'Complet (Festes)', price: 400 },
+    { id: 'disco-premium', label: 'Premium (Festes)', price: 700 },
+    { id: 'bodas-premium', label: 'Premium (Bodes)', price: 800 },
+    { id: 'empresas-evento', label: 'Estàndard (Empreses)', price: 850 },
   ];
   const PACK_OPTIONS = packOptions.length > 0 ? packOptions : FALLBACK_OPTIONS;
   const initialPack = PACK_OPTIONS[0];
@@ -906,11 +908,11 @@ function QuoteModal({
   onSent: (message: string) => void;
 }) {
   const FALLBACK_OPTIONS: QuotePackOption[] = [
-    { id: 'party-starter', label: 'Party Starter', price: 350 },
-    { id: 'party-machine', label: 'Party Machine', price: 400 },
-    { id: 'vip-experience', label: 'VIP Experience', price: 700 },
-    { id: 'boda-signature', label: 'Boda Signature', price: 800 },
-    { id: 'corporate-event', label: 'Corporate Event', price: 850 },
+    { id: 'disco-basico', label: 'Bàsic (Festes)', price: 350 },
+    { id: 'disco-completo', label: 'Complet (Festes)', price: 400 },
+    { id: 'disco-premium', label: 'Premium (Festes)', price: 700 },
+    { id: 'bodas-premium', label: 'Premium (Bodes)', price: 800 },
+    { id: 'empresas-evento', label: 'Estàndard (Empreses)', price: 850 },
   ];
   const PACK_OPTIONS = packOptions.length > 0 ? packOptions : FALLBACK_OPTIONS;
 
@@ -949,7 +951,8 @@ function QuoteModal({
 
       onSent(`Pressupost enviat (${data.quoteNumber}) a ${recipient}`);
       onClose();
-    } catch {
+    } catch (error) {
+      console.error('Error sending quote:', error);
       setError('Error enviant pressupost');
     } finally {
       setSending(false);

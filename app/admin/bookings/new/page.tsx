@@ -124,6 +124,7 @@ export default function NewBookingPage() {
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
+  const [dateConflicts, setDateConflicts] = useState<Array<{ id: string; reference: string; clientName: string; eventStartTime: string | null }>>([]);
 
   const updateField = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -249,6 +250,21 @@ export default function NewBookingPage() {
 
     return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatAmount, total, deposit };
   }, [form.packId, form.extraHours, form.discount, selectedExtras, packs, travelCharge]);
+
+  // Margin estimator (simplified costEngine inline — no server call needed)
+  const marginEstimate = useMemo(() => {
+    if (!pricing) return null;
+    const packCost = pricing.packPrice * 0.36;
+    const extrasCost = pricing.extrasPrice * 0.28;
+    const extraHoursCost = pricing.extraHoursPrice * 0.2;
+    const fixedCost = 45;
+    const travelCostEst = internalTravelCost;
+    const directCost = packCost + extrasCost + extraHoursCost + fixedCost + travelCostEst;
+    const netMargin = pricing.total - directCost;
+    const marginPct = pricing.total > 0 ? (netMargin / pricing.total) * 100 : 0;
+    const tone = marginPct >= 50 ? 'emerald' : marginPct >= 30 ? 'amber' : 'rose';
+    return { directCost, netMargin, marginPct, tone };
+  }, [pricing, internalTravelCost]);
 
   const toggleExtra = (extra: Extra) => {
     setSelectedExtras((prev) => {
@@ -385,6 +401,37 @@ export default function NewBookingPage() {
 
     return () => clearTimeout(timer);
   }, [form.eventLocation, form.eventVenue, calculateDistanceForDestination]);
+
+  // Double-booking detection
+  useEffect(() => {
+    if (!form.eventDate) {
+      setDateConflicts([]);
+      return;
+    }
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/admin/bookings?fromDate=${form.eventDate}&toDate=${form.eventDate}&limit=10`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        const active = (data.bookings || []).filter(
+          (b: any) => ['PENDING', 'CONFIRMED', 'PREPARING'].includes(b.status)
+        );
+        setDateConflicts(active.map((b: any) => ({
+          id: b.id,
+          reference: b.reference,
+          clientName: b.clientName,
+          eventStartTime: b.eventStartTime || null,
+        })));
+      } catch {
+        // ignore abort
+      }
+    })();
+    return () => controller.abort();
+  }, [form.eventDate]);
 
   const handleSubmit = useCallback(async () => {
     if (!form.clientName || !form.clientEmail || !form.clientPhone) {
@@ -600,6 +647,22 @@ export default function NewBookingPage() {
             />
           </div>
         </div>
+
+        {dateConflicts.length > 0 && (
+          <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-3">
+            <p className="text-sm font-semibold text-amber-300">
+              Ja {dateConflicts.length === 1 ? 'hi ha 1 reserva' : `hi ha ${dateConflicts.length} reserves`} el {form.eventDate}
+            </p>
+            <ul className="mt-1.5 space-y-0.5">
+              {dateConflicts.map((c) => (
+                <li key={c.id} className="text-xs text-amber-200/70">
+                  {c.reference} · {c.clientName}{c.eventStartTime ? ` · ${c.eventStartTime}` : ''}
+                </li>
+              ))}
+            </ul>
+            <p className="text-[10px] text-amber-200/50 mt-1.5">Pots continuar si els horaris no es solapen.</p>
+          </div>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -911,6 +974,52 @@ export default function NewBookingPage() {
               </p>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Margin estimate */}
+      {marginEstimate && (
+        <div className={`rounded-2xl border-2 p-5 ${
+          marginEstimate.tone === 'emerald' ? 'border-emerald-500/30 bg-emerald-500/5' :
+          marginEstimate.tone === 'amber' ? 'border-amber-500/30 bg-amber-500/5' :
+          'border-rose-500/30 bg-rose-500/5'
+        }`}>
+          <h2 className="text-sm font-semibold mb-3">Rendibilitat estimada</h2>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-xs opacity-60">Cost estimat</p>
+              <p className="text-lg font-bold">{marginEstimate.directCost.toFixed(0)}€</p>
+            </div>
+            <div>
+              <p className="text-xs opacity-60">Marge net</p>
+              <p className={`text-lg font-bold ${
+                marginEstimate.tone === 'emerald' ? 'text-emerald-400' :
+                marginEstimate.tone === 'amber' ? 'text-amber-400' :
+                'text-rose-400'
+              }`}>{marginEstimate.netMargin.toFixed(0)}€</p>
+            </div>
+            <div>
+              <p className="text-xs opacity-60">Marge %</p>
+              <p className={`text-lg font-bold ${
+                marginEstimate.tone === 'emerald' ? 'text-emerald-400' :
+                marginEstimate.tone === 'amber' ? 'text-amber-400' :
+                'text-rose-400'
+              }`}>{marginEstimate.marginPct.toFixed(1)}%</p>
+            </div>
+          </div>
+          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mt-3">
+            <div
+              className={`h-full rounded-full transition-all ${
+                marginEstimate.tone === 'emerald' ? 'bg-emerald-500' :
+                marginEstimate.tone === 'amber' ? 'bg-amber-500' :
+                'bg-rose-500'
+              }`}
+              style={{ width: `${Math.min(100, Math.max(0, marginEstimate.marginPct))}%` }}
+            />
+          </div>
+          <p className="text-[10px] opacity-40 mt-2">
+            Estimació basada en ratis estàndard. El marge real es calcularà amb costos d&apos;inventari assignat.
+          </p>
         </div>
       )}
 

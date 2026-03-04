@@ -8,7 +8,7 @@ const DEFAULT_FIXED_PACK_COST = 35;
 const DEFAULT_ALERT_DIVERGENCE_PCT = 20;
 const DEFAULT_SOCIAL_SECURITY_PCT = 0.32;
 const DEFAULT_IRPF_PCT = 0.15;
-const DEFAULT_SPECIALIST_SERVICES = ['bodas', 'produccion', 'empresas'];
+const DEFAULT_SPECIALIST_SERVICES = ['bodas', 'empresas'];
 
 type PackWithInventory = {
   id: string;

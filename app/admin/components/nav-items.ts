@@ -53,7 +53,6 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: '💶', label: 'Economia', href: '/admin/economia' },
       { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-      { icon: '📉', label: 'Estadístiques', href: '/admin/stats' },
     ],
   },
   {
@@ -75,6 +74,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
       { icon: '🎛️', label: 'Features', href: '/admin/features' },
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
+      { icon: '📊', label: 'Estadístiques web', href: '/admin/stats' },
+      { icon: '🎨', label: 'Tema admin', href: '/admin/css-manager' },
     ],
   },
 ];

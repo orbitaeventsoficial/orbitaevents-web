@@ -269,9 +269,10 @@ export default async function BookingsPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="font-bold">{formatCurrency(booking.total)}</p>
-                    {!booking.depositPaid && (
-                      <p className="text-[10px] font-medium">Paga pendent</p>
-                    )}
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'text-emerald-400' : booking.depositPaid ? 'text-amber-400' : 'text-rose-400'}`}>
+                      <span className={`inline-block w-1.5 h-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                      {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                    </span>
                     {(() => {
                       const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
                       const marginPct = computeSimpleMarginPct(
@@ -397,9 +398,10 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-4 py-3 font-medium text-center">
                         {formatCurrency(booking.total)}
-                        {!booking.depositPaid && (
-                          <span className="block text-xs">Paga pendent</span>
-                        )}
+                        <span className={`flex items-center justify-center gap-1 text-[10px] font-medium mt-0.5 ${booking.depositPaid && booking.remainingPaid ? 'text-emerald-400' : booking.depositPaid ? 'text-amber-400' : 'text-rose-400'}`}>
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                          {booking.depositPaid && booking.remainingPaid ? 'Pagat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         {(() => {

@@ -8,8 +8,6 @@ const SERVICE_LABELS: Record<ServiceSlug, string> = {
   fiestas: 'Festes',
   discomovil: 'Discomòbil',
   empresas: 'Empreses',
-  produccion: 'Producció',
-  alquiler: 'Lloguer',
 };
 
 const CATEGORY_OPTIONS: Array<{ value: ExtraDefinition['category']; label: string }> = [

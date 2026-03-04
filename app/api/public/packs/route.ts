@@ -22,7 +22,7 @@ interface PacksResponse {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const serviceParam = searchParams.get('service');
-  const allowedServices = new Set(['bodas', 'fiestas', 'discomovil', 'empresas', 'alquiler', 'produccion']);
+  const allowedServices = new Set(['bodas', 'fiestas', 'discomovil', 'empresas']);
   const service = serviceParam && allowedServices.has(serviceParam) ? serviceParam : undefined;
   const locale = searchParams.get('locale') || 'ca';
 

@@ -79,7 +79,7 @@ async function calculateStats() {
     });
     const ratingAverage = avgRating._avg.overallRating
       ? Math.round(avgRating._avg.overallRating * 10) / 10
-      : 4.8; // Default 4.8
+      : 5.0;
 
     return {
       'stats.events_completed': eventsCount,

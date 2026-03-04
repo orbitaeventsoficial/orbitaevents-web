@@ -15,14 +15,12 @@ export const metadata = {
   title: 'Packs | Òrbita Admin',
 };
 
-const SERVICE_ORDER = ['bodas', 'fiestas', 'discomovil', 'empresas', 'produccion', 'alquiler'];
+const SERVICE_ORDER = ['bodas', 'fiestas', 'discomovil', 'empresas'];
 const SERVICE_LABELS: Record<string, string> = {
   bodas: 'Bodes',
   fiestas: 'Festes',
   discomovil: 'Discomòbil',
   empresas: 'Empreses',
-  produccion: 'Producció',
-  alquiler: 'Lloguer',
 };
 
 async function getPacks() {

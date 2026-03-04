@@ -10,6 +10,7 @@ import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
+import BookingChecklist from './BookingChecklist';
 import InvoiceSection from './InvoiceSection';
 import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
@@ -155,7 +156,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
     booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
   );
   // Paral·lelitzar totes les queries secundàries
-  const [commLogs, customer, activePortalAccess, profitabilityConfig, marginTargetSetting] = await Promise.all([
+  const [commLogs, activityLogs, customer, activePortalAccess, profitabilityConfig, marginTargetSetting] = await Promise.all([
     prisma.adminLog.findMany({
       where: {
         entity: 'booking',
@@ -164,6 +165,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
       },
       orderBy: { createdAt: 'desc' },
       take: 100,
+    }),
+    prisma.adminLog.findMany({
+      where: { entity: 'booking', entityId: booking.id },
+      orderBy: { createdAt: 'desc' },
+      take: 30,
     }),
     booking.customerId
       ? prisma.customer.findUnique({
@@ -214,6 +220,40 @@ export default async function BookingDetailPage({ params }: PageProps) {
       channel: typeof details.channel === 'string' ? details.channel : '-',
     };
   });
+  const ACTION_LABELS: Record<string, { icon: string; label: string }> = {
+    CREATE: { icon: '🆕', label: 'Reserva creada' },
+    UPDATE: { icon: '✏️', label: 'Reserva actualitzada' },
+    DELETE: { icon: '🗑️', label: 'Reserva eliminada' },
+    STATUS_CHANGE: { icon: '🔄', label: 'Canvi d\'estat' },
+    COMM_SENT: { icon: '📤', label: 'Comunicació enviada' },
+    COMM_RESPONDED: { icon: '📥', label: 'Resposta rebuda' },
+    PAYMENT_RECORDED: { icon: '💰', label: 'Pagament registrat' },
+    INVENTORY_ASSIGNED: { icon: '📦', label: 'Inventari assignat' },
+    CALENDAR_SYNC: { icon: '📅', label: 'Sincronitzat calendari' },
+    PORTAL_ACCESS: { icon: '🔗', label: 'Accés portal' },
+    CONTRACT_SIGNED: { icon: '✍️', label: 'Contracte signat' },
+    INVOICE_CREATED: { icon: '🧾', label: 'Factura creada' },
+  };
+  const activityTimeline = activityLogs.map((entry) => {
+    const details = parseLogDetails(entry.details);
+    const config = ACTION_LABELS[entry.action] || { icon: '📋', label: entry.action };
+    let description = '';
+    if (entry.action === 'STATUS_CHANGE' && details.from && details.to) {
+      description = `${details.from} → ${details.to}`;
+    } else if (entry.action === 'UPDATE' && details.fields) {
+      description = `Camps: ${Array.isArray(details.fields) ? details.fields.join(', ') : String(details.fields)}`;
+    } else if (details.channel) {
+      description = `${details.flow || ''} · ${details.channel}`;
+    }
+    return {
+      id: entry.id,
+      icon: config.icon,
+      label: config.label,
+      description,
+      createdAt: entry.createdAt,
+    };
+  });
+
   const bAny = booking as Record<string, unknown>;
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
@@ -292,14 +332,20 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <p className="text-xs uppercase tracking-wide">Total reserva</p>
           <p className="text-xl font-semibold">{formatCurrency(booking.total)}</p>
         </div>
-        <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide">Pagament</p>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'border-emerald-500/30 bg-emerald-500/5' : booking.depositPaid ? 'border-amber-500/30 bg-amber-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
+          <div className="flex items-center gap-2">
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+            <p className="text-xs uppercase tracking-wide">Pagament</p>
+          </div>
           <p className="text-xl font-semibold">
             {booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide">Flux client</p>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${reviewFlowStatus === 'RESPONDIDO' ? 'border-emerald-500/30 bg-emerald-500/5' : reviewFlowStatus === 'ENVIADO' ? 'border-amber-500/30 bg-amber-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
+          <div className="flex items-center gap-2">
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${reviewFlowStatus === 'RESPONDIDO' ? 'bg-emerald-400' : reviewFlowStatus === 'ENVIADO' ? 'bg-amber-400' : 'bg-rose-400'}`} />
+            <p className="text-xs uppercase tracking-wide">Flux client</p>
+          </div>
           <p className="text-xl font-semibold">
             {reviewFlowStatus === 'RESPONDIDO'
               ? 'Respost'
@@ -308,8 +354,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 : 'Falta enviar'}
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide">Post-event intern</p>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${internalPostEventStatus === 'COMPLETO' ? 'border-emerald-500/30 bg-emerald-500/5' : internalPostEventStatus === 'EN_PROGRESO' ? 'border-amber-500/30 bg-amber-500/5' : 'border-white/10'}`}>
+          <div className="flex items-center gap-2">
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${internalPostEventStatus === 'COMPLETO' ? 'bg-emerald-400' : internalPostEventStatus === 'EN_PROGRESO' ? 'bg-amber-400' : 'bg-white/30'}`} />
+            <p className="text-xs uppercase tracking-wide">Post-event intern</p>
+          </div>
           <p className="text-xl font-semibold">
             {internalPostEventStatus === 'COMPLETO'
               ? 'Completat'
@@ -562,6 +611,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Checklist de preparació */}
+      {(booking.status === 'CONFIRMED' || booking.status === 'PREPARING') && (
+        <BookingChecklist bookingId={booking.id} />
+      )}
+
       {/* Margin + Travel Cost (editable) */}
       <BookingMarginCard
         bookingId={booking.id}
@@ -658,6 +712,31 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         )}
       </section>
+
+      {/* Activity timeline */}
+      {activityTimeline.length > 0 && (
+        <section className="rounded-xl border border-white/10 shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
+          <div className="relative pl-6 space-y-0">
+            <div className="absolute left-2 top-1 bottom-1 w-px bg-white/10" />
+            {activityTimeline.map((entry) => (
+              <div key={entry.id} className="relative flex items-start gap-3 py-2.5">
+                <span className="absolute -left-4 top-3 w-2 h-2 rounded-full bg-white/30 ring-2 ring-black" />
+                <span className="text-base leading-none">{entry.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">{entry.label}</p>
+                  {entry.description && (
+                    <p className="text-xs opacity-50 mt-0.5">{entry.description}</p>
+                  )}
+                </div>
+                <span className="text-xs opacity-40 whitespace-nowrap shrink-0">
+                  {formatDateTimeFull(entry.createdAt)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Post-Event Section */}
       {booking.status === 'COMPLETED' && (

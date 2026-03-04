@@ -1,5 +1,162 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-04 sessió 4 — Double-booking + Estimador marge + Historial canvis
+
+### Canvis implementats
+
+#### 1. Detecció de double-booking (CRÍTIC)
+- **Fitxer**: `app/admin/bookings/new/page.tsx`
+- Quan l'usuari selecciona una data, es fa fetch de reserves actives (PENDING/CONFIRMED/PREPARING) al mateix dia
+- Si hi ha conflictes, banner groc amb referència, client i hora de cada reserva existent
+- No bloqueja la creació (un DJ pot fer 2 bolos si els horaris no es solapen), només avisa
+- AbortController per cancel·lar peticions obsoletes quan canvia la data ràpidament
+
+#### 2. Estimador de rendibilitat en temps real
+- **Fitxer**: `app/admin/bookings/new/page.tsx`
+- Secció "Rendibilitat estimada" sota el resum de preus
+- Mostra: cost estimat, marge net (€), marge % amb barra de progrés
+- Semàfor: verd ≥50%, groc ≥30%, vermell <30%
+- Usa ratis estàndard del costEngine (packCostRatio 0.36, extraCostRatio 0.28, etc.)
+- Nota que el marge real es calcularà amb inventari assignat post-creació
+
+#### 3. Historial de canvis a fitxa reserva
+- **Fitxer**: `app/admin/bookings/[id]/page.tsx`
+- Nova query `activityLogs`: tots els AdminLog de la reserva (no només comunicacions)
+- Timeline visual amb línia vertical, punts, icones i timestamps
+- 12 tipus d'acció reconeguts: CREATE, UPDATE, STATUS_CHANGE, COMM_SENT, PAYMENT_RECORDED, etc.
+- Descripcions contextuals: "PENDING → CONFIRMED", "Camps: eventDate, notes", etc.
+- Mostrat just abans del Post-Event a la fitxa
+
+### Raonament
+- **Double-booking**: El buit més crític identificat — cap sistema professional permet crear reserves sense avisar de conflictes
+- **Estimador marge**: Un DJ ha de saber si un bolo serà rendible ABANS de crear-lo, no després. Decisió comercial informada
+- **Historial**: Traçabilitat completa — saber qui va canviar què i quan. Essencial per auditoria i disputes
+
+### Verificació
+- `tsc --noEmit`: 0 errors
+- `next build`: OK
+
+---
+
+## 2026-03-04 sessió 3 — Checklist de preparació per bolo
+
+### Canvis implementats
+
+#### Checklist de reserva
+1. **BookingChecklist.tsx** (nou): Component client amb checklist interactiu per preparar cada bolo.
+   - 7 ítems per defecte: confirmar client, playlist, equipament, vehicle, adreça, pagament, contracte
+   - Toggle checkboxes amb UI optimista + save a API
+   - Afegir/eliminar ítems personalitzats
+   - Barra de progrés amb percentatge i colors (verd/groc/vermell)
+   - Només es mostra per reserves CONFIRMED/PREPARING
+
+2. **API checklist** (`/api/admin/bookings/[id]/checklist`): GET + PUT.
+   - Emmagatzema al model Setting (clau `booking.checklist.{id}`, categoria `checklist`)
+   - Retorna ítems per defecte si no hi ha dades guardades
+   - Auth via `requireAuth()`
+
+3. **Integració al detall reserva**: Checklist visible abans del BookingMarginCard per reserves confirmades/preparant.
+
+4. **Integració al dashboard**: Card "Pròxim bolo" ara mostra barra de progrés del checklist amb fracció (X/Y) al costat del semàfor de pagament.
+
+5. **dashboard-data.ts**: Afegits camps `checklistDone` i `checklistTotal` al `nextEvent`, llegint l'estat del Setting de BD.
+
+### Raonament
+- Un DJ necessita saber si ho té tot llest abans de cada bolo. La checklist respon "Tinc tot el material?" en 2 segons.
+- Guardar a Setting evita canvis d'esquema Prisma — zero migracions.
+- La barra al dashboard permet veure d'un cop d'ull si el pròxim event està preparat sense entrar a la fitxa.
+
+### Verificació
+- `tsc --noEmit`: 0 errors
+- `next build`: OK
+- Fix: camp `category: 'checklist'` obligatori al create del Setting
+
+---
+
+## 2026-03-04 sessió 2 — Dashboard professional: Pròxim Bolo + Objectiu Mensual
+
+### Canvis implementats
+
+#### Residuals de la sessió anterior
+1. **Slugs antics**: Actualitzats FALLBACK_OPTIONS a InboxClient.tsx (x2 ocurrències) i placeholder a NewPackForm. Tots els noms antics (Party Starter, VIP Experience, etc.) substituïts per noms catalans.
+2. **Finanzas**: Verificat que és un redirect a economia (igual que rentabilidad).
+
+#### Dashboard — Millores professionals
+3. **Card "Pròxim bolo"**: Card prominent a dalt del dashboard amb:
+   - Compte enrere dinàmic (AVUI/DEMÀ/d'aquí X dies) amb punt animat si és avui/demà
+   - Nom client, data, hora, lloc, venue
+   - Tipus d'event, pack, total
+   - Semàfor pagament (verd/groc/vermell)
+   - Border canvia de color segons urgència (groc si ≤1 dia, cian si ≤3, neutre si >3)
+   - Link directe a la fitxa de reserva
+
+4. **Barra "Objectiu mensual"**: Visualització d'ingressos vs objectiu:
+   - Barra de progrés amb color dinàmic (verd ≥100%, groc ≥60%, vermell <60%)
+   - Percentatge gran a la dreta
+   - Ingressos actuals / objectiu configurable
+   - Objectiu llegit de `setting` (clau `dashboard.revenueTarget`, default 3.000€)
+
+### Raonament
+- Un DJ obre l'admin i vol saber 2 coses: "Què tinc demà?" i "Vaig bé de pasta aquest mes?". Les 2 respostes ara estan a dalt de tot, abans de tot.
+- L'objectiu és configurable via BD (no hardcoded) per poder ajustar-lo cada temporada.
+
+---
+
+## 2026-03-04 — Consolidació Professional (Fases A–F)
+
+### Objectiu de la sessió
+Pla de consolidació complet: fixes crítics, packs amb noms clars, consolidació de pàgines, velocitat, i semàfors visuals.
+
+### Canvis implementats
+
+#### Fase A: Fixes crítics
+1. **A1: Fix presupuestos crash** — `app/admin/presupuestos/page.tsx:80`: canviat `where: leadId ? { leadId } : undefined` → `where: leadId ? { leadId } : {}`. Prisma no accepta `where: undefined`.
+2. **A2-A4**: Verificats com ja aplicats (respira-rosa overlay z-index, auth economia, catch buits).
+
+#### Fase B: Packs — noms catalans + neteja (18→10)
+3. **Noms renombrats a català clar**:
+   - Bodes: Essential→Bàsic, Signature→Premium, Royal Wedding→Exclusiu
+   - Festes: Party Starter→Bàsic, Party Machine→Complet, VIP Experience→Premium
+   - Empreses: Corporate Cocktail→Còctel, Corporate Event→Estàndard, Corporate Gala→Gala
+   - Oferta Flash: mantingut (ja era en català)
+4. **Eliminats packs irreals**: Producció tècnica (3 packs) i Lloguer (categoria buida). Un DJ no és empresa de producció.
+5. **ServiceSlug simplificat**: `'fiestas' | 'bodas' | 'discomovil' | 'empresas'` (sense produccion/alquiler).
+6. **Fitxers actualitzats**: packs-config.ts, packs/page.tsx, NewPackForm.tsx, api/public/packs/route.ts, configurador/client.tsx, servicios/page.tsx, packPricingHealth.ts, analytics.ts, pdf-utils.ts, ExtrasConfiguratorClient.tsx, PresupuestoPdfStudio.tsx.
+7. **Badge corregit**: "MILLOR VENDUT" → "MILLOR VENUT".
+8. **Slugs unificats**: Tots els slugs ara coincideixen amb l'id del pack (bodas-basico, disco-completo, etc.).
+
+#### Fase C: Stats valor real
+9. **Fallback rating**: `app/api/admin/stats/route.ts` canviat de 4.8 → 5.0 (coherent amb dashboard-data.ts i site-config.ts que ja deien 5.0).
+
+#### Fase D: Consolidar pàgines + nav
+10. **Nav reorganitzat**: Stats i CSS Manager moguts a secció Configuració (no mereixen secció pròpia a Finances).
+11. **Nav simplificat**: Finances passa de 3→2 ítems (Economia + Analítica). Configuració guanya Stats web + Tema admin.
+12. **Rentabilidad**: Ja era un redirect a economia — no cal tocar.
+
+#### Fase E: Velocitat admin
+13. **CSS fetch**: Tret `pathname` del useEffect dependency a `layout.tsx` → CSS es carrega 1 cop (no a cada navegació).
+14. **GA4 timeout**: 1200ms → 3000ms (menys fallbacks per xarxa lenta).
+15. **Cache TTL**: 8 queries VERY_SHORT (60s) pujades a SHORT (2min) — timeline, command, recent-leads, upcoming-bookings, tasks. No són temps real crític.
+
+#### Fase F: Semàfors visuals
+16. **Dashboard health**: Afegit punt de color (verd/groc/vermell) al costat de cada ítem de salut del sistema.
+17. **Dashboard radar**: Semàfors dinàmics — fons i punt canvien de color segons el valor (0=verd, >0=color d'atenció).
+18. **Reserves llistat**: Indicador pagament amb punt de color a cada reserva (verd=pagat, groc=parcial, vermell=pendent). Tant a vista mòbil com taula desktop.
+19. **Fitxa reserva**: Cards superiors amb semàfor visual (border + fons colorat + punt) per Pagament, Flux client i Post-event intern.
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- `npx next build` → OK
+- Tots els fitxers compilats correctament
+
+### Raonament
+- **Packs en català clar**: Un client de Barcelona no vol veure "Royal Wedding" ni "VIP Experience". Vol veure "Exclusiu" o "Premium" — paraules que entén sense pensar.
+- **Eliminar producció/lloguer**: Un DJ sol no pot oferir 3 tècnics + coordinador. Si mai sorgeix, es fa com a pressupost personalitzat.
+- **Semàfors**: L'objectiu és que amb 1 cop d'ull sàpigues: va bé (verd), cal atenció (groc), urgent (vermell). Sense llegir text.
+- **Velocitat**: Cada navegació admin feia fetch CSS + 32 queries. Ara CSS es carrega 1 cop i les queries no crítiques tenen 2min de cache.
+
+---
+
 ## 2026-03-03 — Pressupostos: traçabilitat total (lead obligatori + vista unificada)
 
 ### Objectiu de la sessió
