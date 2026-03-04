@@ -714,7 +714,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     >
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md backdrop-blur-sm">
+      <nav className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md admin-card-glass">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;

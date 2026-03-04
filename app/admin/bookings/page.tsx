@@ -175,24 +175,24 @@ export default async function BookingsPage({
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="admin-bookings-stat admin-bookings-stat--total shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--total admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
           <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="admin-bookings-stat admin-bookings-stat--pending shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--pending admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Pendents</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.PENDING?.count || 0}</p>
         </div>
-        <div className="admin-bookings-stat admin-bookings-stat--confirmed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--confirmed admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Confirmades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
-        <div className="admin-bookings-stat admin-bookings-stat--completed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--completed admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Completades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.COMPLETED?.count || 0}</p>
         </div>
-        <div className="admin-bookings-stat admin-bookings-stat--cancelled shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--cancelled admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Cancel·lades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CANCELLED?.count || 0}</p>
         </div>
@@ -207,7 +207,7 @@ export default async function BookingsPage({
       </div>
 
       {/* Info Alert */}
-      <div className="rounded-2xl border backdrop-blur-sm p-3 text-center sm:p-4">
+      <div className="rounded-2xl border admin-card-glass p-3 text-center sm:p-4">
         <p className="text-xs sm:text-sm">
           <strong>Auto:</strong> Quan passa a <span className="font-semibold">COMPLETED</span>, les stats públiques s&apos;actualitzen.
         </p>
@@ -222,7 +222,7 @@ export default async function BookingsPage({
       {!isKanban && <>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="rounded-2xl border backdrop-blur-sm p-8 text-center">
+          <div className="rounded-2xl border admin-card-glass p-8 text-center">
             <span className="text-4xl">📅</span>
             <p className="mt-2">Encara no hi ha reserves</p>
             <Link href="/admin/bookings/new" className="text-sm mt-2 inline-block font-medium">
@@ -238,7 +238,7 @@ export default async function BookingsPage({
             return (
               <article
                 key={booking.id}
-                className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
+                className={`block rounded-2xl border admin-card-glass p-4 transition-colors ${
                   isPast && booking.status !== 'COMPLETED'
                     ? 'border-orange-500/30'
                     : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
@@ -322,7 +322,7 @@ export default async function BookingsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border admin-card-glass overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de reserves">
             <thead className="border-b">

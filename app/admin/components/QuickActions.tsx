@@ -106,7 +106,7 @@ export default function QuickActions() {
   }
 
   return (
-    <section className="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-sky-500/12 via-cyan-500/10 to-emerald-500/12 backdrop-blur-sm p-4">
+    <section className="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-sky-500/12 via-cyan-500/10 to-emerald-500/12 admin-card-glass p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase">Accions ràpides</p>

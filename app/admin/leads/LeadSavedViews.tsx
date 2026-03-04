@@ -80,7 +80,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
   }, []);
 
   return (
-    <section className="rounded-2xl border backdrop-blur-sm p-4">
+    <section className="rounded-2xl border admin-card-glass p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs uppercase">Vistes guardades</p>

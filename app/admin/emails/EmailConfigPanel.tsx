@@ -48,7 +48,7 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+    <section className="rounded-2xl border admin-card-glass overflow-hidden">
       <div className="px-6 py-4 border-b">
         <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>

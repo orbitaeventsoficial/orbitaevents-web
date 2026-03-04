@@ -413,15 +413,15 @@ export default function AdminContactesPage() {
       actions={
         stats ? (
           <div className="flex gap-3 flex-wrap">
-            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
               <p className="text-2xl font-bold">{stats.total}</p>
               <p className="text-xs">Total</p>
             </div>
-            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
               <p className="text-2xl font-bold">{stats.vip}</p>
               <p className="text-xs">VIP</p>
             </div>
-            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
               <p className="text-2xl font-bold">{stats.withEvents}</p>
               <p className="text-xs">Amb esdeveniments</p>
             </div>
@@ -516,7 +516,7 @@ export default function AdminContactesPage() {
 
       {/* Customers List */}
       {!loading && customers.length > 0 && (
-        <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+        <div className="rounded-2xl border admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
@@ -675,7 +675,7 @@ export default function AdminContactesPage() {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
             onClick={() => setShowAddModal(false)}
             role="presentation"
           >
@@ -857,7 +857,7 @@ export default function AdminContactesPage() {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
             onClick={() => setShowActionModal(false)}
             role="presentation"
           >

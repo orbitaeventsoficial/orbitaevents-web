@@ -226,7 +226,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
         </button>
       </div>
 
-      <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <div className="rounded-2xl border admin-card-glass overflow-hidden">
         <div className="p-6 space-y-6">
 
           <div>

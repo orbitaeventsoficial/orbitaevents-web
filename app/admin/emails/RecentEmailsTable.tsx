@@ -56,7 +56,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+    <section className="rounded-2xl border admin-card-glass overflow-hidden">
       <div className="px-6 py-4 border-b">
         <h2 className="font-semibold">📊 Activitat Recent</h2>
         <p className="text-xs mt-1">Ultims 7 dies</p>

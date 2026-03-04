@@ -105,7 +105,7 @@ export function DataCard({ title, value, subtitle, trend, icon, color = 'default
   const textColor = CARD_TEXT_COLORS[color];
 
   const content = (
-    <div className={`rounded-2xl border backdrop-blur-sm p-4 transition-all ${cardColor} ${(href || onClick) ? 'cursor-pointer hover:scale-[1.02]' : ''}`}>
+    <div className={`rounded-2xl border admin-card-glass p-4 transition-all ${cardColor} ${(href || onClick) ? 'cursor-pointer hover:scale-[1.02]' : ''}`}>
       <div className="flex items-start justify-between">
         <div>
           <p className={`text-[10px] sm:text-xs font-medium uppercase ${textColor}`}>{title}</p>
@@ -212,7 +212,7 @@ export function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 admin-card-glass" onClick={onClose} />
       
       <div className="relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-2xl">
         <h3 className="text-lg font-semibold">{title}</h3>
@@ -264,7 +264,7 @@ export function Toast({ type, message, onClose }: ToastProps) {
   const style = TOAST_STYLES[type];
 
   return (
-    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl backdrop-blur-sm`}>
+    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl admin-card-glass`}>
       <span className="text-lg">{style.icon}</span>
       <p className="text-sm">{message}</p>
       {onClose && (

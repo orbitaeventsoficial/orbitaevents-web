@@ -308,23 +308,23 @@ export default function InventoryListClient() {
 
       {/* KPIs */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Elements</p>
           <p className="mt-2 text-3xl font-bold">{items.length}</p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Disponibles</p>
           <p className="mt-2 text-3xl font-bold">
             {items.filter((i) => i.status === 'AVAILABLE').length}
           </p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">En ús</p>
           <p className="mt-2 text-3xl font-bold">
             {items.filter((i) => i.status === 'IN_USE').length}
           </p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Valor Total</p>
           <p className="mt-2 text-3xl font-bold">
             {formatNumber(totalValue)}€
@@ -514,7 +514,7 @@ export default function InventoryListClient() {
                       {catConf.icon}
                     </div>
                   )}
-                  <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text} backdrop-blur-sm`}>
+                  <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text} admin-card-glass`}>
                     {statusConf.label}
                   </span>
                 </div>
@@ -554,7 +554,7 @@ export default function InventoryListClient() {
         </section>
       ) : (
         /* Vista Llista (taula) */
-        <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+        <section className="rounded-2xl border admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm" aria-label="Inventari d'equipament">
               <thead className="border-b">
@@ -642,7 +642,7 @@ export default function InventoryListClient() {
       )}
 
       {items.length === 0 && (
-        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4">No hi ha elements que coincideixin amb els filtres</p>
           {(search || filterCategory || filterStatus) && (

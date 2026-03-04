@@ -288,7 +288,7 @@ export default function PricingAdminPage() {
 
           {/* Top Performers */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border backdrop-blur-sm p-6">
+            <div className="rounded-2xl border admin-card-glass p-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <span className="text-2xl">🏆</span>
                 Extras Més Venuts
@@ -311,7 +311,7 @@ export default function PricingAdminPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border backdrop-blur-sm p-6">
+            <div className="rounded-2xl border admin-card-glass p-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
                 Packs Més Populars
@@ -336,7 +336,7 @@ export default function PricingAdminPage() {
           </div>
 
           {/* Llegenda */}
-          <div className="rounded-2xl border backdrop-blur-sm p-6">
+          <div className="rounded-2xl border admin-card-glass p-6">
             <h3 className="font-bold mb-3 flex items-center gap-2">
               <span className="text-xl">💡</span>
               Com funciona aquesta pàgina
@@ -389,7 +389,7 @@ export default function PricingAdminPage() {
             {extras.map(extra => (
               <div
                 key={extra.id}
-                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-white/10 bg-white/[0.03] backdrop-blur-sm'}`}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-white/10 bg-white/[0.03] admin-card-glass'}`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -493,7 +493,7 @@ export default function PricingAdminPage() {
 
           <div className="grid gap-4">
             {packs.map(pack => (
-              <div key={pack.id} className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+              <div key={pack.id} className="rounded-2xl border admin-card-glass overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -616,7 +616,7 @@ export default function PricingAdminPage() {
               const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-white/5 text-white/40' };
 
               return (
-                <div key={item.id} className="rounded-2xl border backdrop-blur-sm p-4 transition-colors">
+                <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl`}>
@@ -705,7 +705,7 @@ function StatCard({
   const style = styles[color];
 
   return (
-    <div className={`rounded-2xl border bg-gradient-to-br backdrop-blur-sm p-4 sm:p-5 ${style}`}>
+    <div className={`rounded-2xl border bg-gradient-to-br admin-card-glass p-4 sm:p-5 ${style}`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-3xl">{icon}</span>
       </div>

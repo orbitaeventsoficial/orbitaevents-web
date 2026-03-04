@@ -301,7 +301,7 @@ export default function CalendarMonthClient() {
   return (
     <AdminPage title="Calendari">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-3 rounded-2xl border backdrop-blur-sm p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -579,7 +579,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div className="rounded-2xl border backdrop-blur-sm p-4 sm:p-5">
+        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-semibold">

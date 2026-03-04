@@ -234,7 +234,7 @@ export default async function EmailsAdminPage() {
         {/* Columna Principal (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
-          <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+          <section className="rounded-2xl border admin-card-glass overflow-hidden">
             <div className="px-6 py-4 border-b flex items-center justify-between">
               <div>
                 <h2 className="font-semibold">
@@ -291,7 +291,7 @@ export default async function EmailsAdminPage() {
           <ManualActionsPanel />
 
           {/* Google Reviews Link */}
-          <section className="rounded-2xl border backdrop-blur-sm p-6">
+          <section className="rounded-2xl border admin-card-glass p-6">
             <h3 className="font-semibold mb-4">⭐ Google Reviews</h3>
             <p className="text-sm mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:

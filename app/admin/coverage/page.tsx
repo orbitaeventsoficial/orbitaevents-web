@@ -132,22 +132,22 @@ export default function CoveragePage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <div className="text-xs font-medium uppercase">Total Ciutats</div>
           <div className="text-3xl font-bold mt-2">{areas.length}</div>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <div className="text-xs font-medium uppercase">Actives</div>
           <div className="text-3xl font-bold mt-2">{activeAreas}</div>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <div className="text-xs font-medium uppercase">Províncies</div>
           <div className="text-3xl font-bold mt-2">{provinces.length}</div>
         </div>
       </div>
 
       {/* Add Area Form */}
-      <div className="rounded-2xl border backdrop-blur-sm p-6">
+      <div className="rounded-2xl border admin-card-glass p-6">
         <h2 className="text-lg font-semibold mb-4">Afegir Ciutat</h2>
         <div className="flex gap-3">
           <input
@@ -183,7 +183,7 @@ export default function CoveragePage() {
       {/* Areas by Province */}
       <div className="space-y-4">
         {provinces.map(province => (
-          <div key={province} className="rounded-2xl border backdrop-blur-sm p-6">
+          <div key={province} className="rounded-2xl border admin-card-glass p-6">
             <h3 className="font-semibold mb-3">{province}</h3>
             <div className="space-y-2">
               {areas

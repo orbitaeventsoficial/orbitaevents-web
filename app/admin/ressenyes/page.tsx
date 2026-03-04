@@ -113,13 +113,13 @@ export default function AdminRessenyesPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {activeList.length === 0 && (
-          <div className="rounded-2xl border backdrop-blur-sm p-6">
+          <div className="rounded-2xl border admin-card-glass p-6">
             No hi ha ressenyes en aquest estat.
           </div>
         )}
 
         {activeList.map((t) => (
-          <div key={t.id} className="rounded-2xl border backdrop-blur-sm p-6">
+          <div key={t.id} className="rounded-2xl border admin-card-glass p-6">
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
                 <div className="text-base font-semibold">{t.customer.name}</div>

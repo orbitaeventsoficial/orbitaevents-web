@@ -313,7 +313,7 @@ export default async function LeadsPage({
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
         {leads.length === 0 ? (
-          <div className="rounded-2xl border backdrop-blur-sm p-8 text-center">
+          <div className="rounded-2xl border admin-card-glass p-8 text-center">
             <span className="text-4xl">📭</span>
             <p className="mt-2">Encara no hi ha entrades</p>
             <p className="text-xs">Els contactes apareixeran aquí</p>

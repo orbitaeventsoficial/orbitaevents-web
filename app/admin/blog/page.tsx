@@ -167,7 +167,7 @@ export default function BlogAdminPage() {
           <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <p className="">Encara no hi ha posts</p>
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
@@ -179,7 +179,7 @@ export default function BlogAdminPage() {
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border backdrop-blur-sm overflow-x-auto">
+          <div className="rounded-2xl border admin-card-glass overflow-x-auto">
             <table className="w-full text-sm" aria-label="Llistat d'articles del blog">
               <thead className="border-b">
                 <tr>

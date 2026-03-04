@@ -113,7 +113,7 @@ export default async function PacksPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{packs.length}</p>
         </div>
@@ -162,7 +162,7 @@ export default async function PacksPage() {
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
+                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
                       ? 'admin-packs-card admin-packs-card--featured'
                       : 'admin-packs-card admin-packs-card--normal'
@@ -316,7 +316,7 @@ export default async function PacksPage() {
               return (
                 <div
                   key={pack.id}
-                  className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
+                  className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
                       ? 'admin-packs-card admin-packs-card--featured'
                       : 'admin-packs-card admin-packs-card--normal'
@@ -451,7 +451,7 @@ export default async function PacksPage() {
       )}
 
       {packs.length === 0 && (
-        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4">No hi ha packs configurats</p>
           <p className="text-sm">Executa el seed per carregar dades inicials</p>

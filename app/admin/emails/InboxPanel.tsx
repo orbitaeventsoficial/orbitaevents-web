@@ -167,7 +167,7 @@ export default function InboxPanel() {
   const unreadCount = emails.filter(e => !e.isRead).length;
 
   return (
-    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+    <section className="rounded-2xl border admin-card-glass overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b flex items-center justify-between">
         <div>

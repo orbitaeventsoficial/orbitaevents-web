@@ -93,7 +93,7 @@ export default async function SettingsPage() {
     >
 
       {/* Info Alert */}
-      <div className="rounded-2xl border backdrop-blur-sm p-4">
+      <div className="rounded-2xl border admin-card-glass p-4">
         <p className="text-sm">
           <strong>Nota:</strong> Les estadístiques públiques (esdeveniments, persones) s&apos;actualitzen
           automàticament quan una reserva passa a <span className="font-semibold">COMPLETED</span>.
@@ -101,7 +101,7 @@ export default async function SettingsPage() {
         </p>
       </div>
       {Object.keys(settings).length === 0 ? (
-        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">⚙️</span>
           <p className="mt-4">No hi ha configuracions</p>
           <p className="text-sm">Executa el seed per carregar dades inicials</p>
@@ -114,7 +114,7 @@ export default async function SettingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/presupuestos"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">🧾</div>
           <h3 className="font-semibold">Editor PDF de pressupost</h3>
@@ -123,7 +123,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/settings/quotes"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">📄</div>
           <h3 className="font-semibold">Plantilla de pressupostos</h3>
@@ -132,7 +132,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/catalog?tab=packs"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
           <h3 className="font-semibold">Catàleg</h3>
@@ -141,7 +141,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/text-manager"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold">Traduccions</h3>
@@ -150,7 +150,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/settings/company"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">🏢</div>
           <h3 className="font-semibold">Empresa i Holded</h3>
@@ -159,7 +159,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/faq"
-          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
+          className="rounded-2xl border admin-card-glass p-6 transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
           <h3 className="font-semibold">FAQs</h3>

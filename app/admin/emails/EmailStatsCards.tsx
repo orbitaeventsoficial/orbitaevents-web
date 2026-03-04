@@ -63,7 +63,7 @@ export default function EmailStatsCards({ stats }: { stats: Stats }) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className={`rounded-2xl border ${card.borderColor} bg-gradient-to-br ${card.gradient} backdrop-blur-sm p-4`}
+          className={`rounded-2xl border ${card.borderColor} bg-gradient-to-br ${card.gradient} admin-card-glass p-4`}
         >
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">{card.icon}</span>

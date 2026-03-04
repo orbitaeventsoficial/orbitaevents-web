@@ -61,23 +61,23 @@ export default async function FAQPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Preguntes</p>
           <p className="mt-2 text-3xl font-bold">{faqs.length}</p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Actives</p>
           <p className="mt-2 text-3xl font-bold">
             {faqs.filter((f) => f.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Categories</p>
           <p className="mt-2 text-3xl font-bold">
             {Object.keys(faqsByCategory).length}
           </p>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Idiomes</p>
           <p className="mt-2 text-3xl font-bold">
             {new Set(faqs.flatMap(f => f.translations.map(t => t.locale))).size}
@@ -118,7 +118,7 @@ export default async function FAQPage() {
         return (
           <section
             key={category}
-            className="rounded-2xl border backdrop-blur-sm overflow-hidden"
+            className="rounded-2xl border admin-card-glass overflow-hidden"
           >
             <div className="border-b p-4">
               <h2 className="font-semibold flex items-center gap-2">
@@ -182,7 +182,7 @@ export default async function FAQPage() {
       })}
 
       {faqs.length === 0 && (
-        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">❓</span>
           <p className="mt-4">No hi ha preguntes freqüents</p>
           <p className="text-sm">Crea la primera pregunta per començar</p>

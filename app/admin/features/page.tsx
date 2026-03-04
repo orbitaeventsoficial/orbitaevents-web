@@ -72,22 +72,22 @@ export default function FeaturesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <div className="text-xs font-medium uppercase">Total funcionalitats</div>
           <div className="text-3xl font-bold mt-2">{features.length}</div>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
           <div className="text-xs font-medium uppercase">Actives</div>
           <div className="text-3xl font-bold mt-2">{activeCount}</div>
         </div>
-        <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <div className="rounded-2xl border admin-card-glass p-4">
               <div className="text-xs font-medium uppercase">Desactivades</div>
           <div className="text-3xl font-bold mt-2">{features.length - activeCount}</div>
         </div>
       </div>
 
       {/* Features List */}
-      <div className="rounded-2xl border backdrop-blur-sm p-6">
+      <div className="rounded-2xl border admin-card-glass p-6">
         <h2 className="text-lg font-semibold mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (
