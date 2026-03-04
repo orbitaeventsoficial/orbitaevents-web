@@ -1,5 +1,54 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-04 sessió 5 — Visual Potent + Reporting + PWA + Automatitzacions + UX Polish
+
+### Objectiu
+Upgrade visual complet de l'admin: de "funcional però pla" a "professional i impressionant". Gradients controlats, glassmorphism, animacions, glow effects, gràfiques comparatives, PWA, avisos intel·ligents i tooltips.
+
+### Canvis implementats
+
+#### 1. Visual Potent — Admin Theme Upgrade
+- **admin-theme.css**: Reactivació gradients selectius (`.admin-gradient-*`), eliminació del blanket ban `background-image: none !important`. Classes `.admin-card-glass` amb backdrop-blur + 3 nivells elevació. Micro-animacions: hover scale, entrada escalonada, progress bars animades. Sidebar premium: glass, logo glow, item actiu gradient, separadors gradient.
+- **page.tsx**: Dashboard hero header amb gradient radial brand gold, salutació dinàmica (Bon dia/Bona tarda/Bona nit), glow effect. KPI cards amb hover glow accent, font mono per números, animació fade-in-up escalonada. Objectiu mensual amb RadialProgress ring.
+- **ui.tsx**: MetricCard amb classes glass + hover glow. Card amb glass variant.
+- **layout.tsx**: Sidebar glass amb blur, logo glow or, item actiu gradient lateral, separadors gradient.
+- **tailwind.config.js**: Noves animacions (stagger-in, glow-pulse, ring-fill), keyframes.
+
+#### 2. RadialProgress Component
+- **RadialProgress.tsx** (NOU): SVG cercle per a percentatges. Color dinàmic (emerald/amber/rose). Número centrat font mono. Animació ring-fill. Usat a objectiu mensual, checklist progress.
+
+#### 3. Reporting — Gràfiques comparatives
+- **Charts.tsx**: `MonthlyBarChart` — barres 12 mesos amb gradient fill, comparativa any actual vs anterior, tooltip. `DonutChart` — distribució rendibilitat per tipus event, colors per categoria.
+
+#### 4. PWA Admin
+- **public/manifest.json**: Ja existia per la web pública. Afegit shortcut admin.
+- **public/sw.js** (NOU): Service worker bàsic amb cache d'assets estàtics + offline fallback.
+- **layout.tsx**: Meta tags PWA per admin.
+
+#### 5. Avisos Intel·ligents Dashboard
+- **dashboard-data.ts**: Noves alertes contextuals — checklist baixa amb bolo imminent, impagament amb event proper, lead HOT sense resposta 48h.
+- **page.tsx**: Visual millorat per alertes amb icones i urgència.
+
+#### 6. Tooltip Component
+- **Tooltip.tsx** (NOU): Component reutilitzable amb hover/focus. Posició auto (top/bottom). Accessible amb aria-describedby.
+- Aplicat a: KPIs dashboard, semàfors radar, marge %.
+
+### Raonament
+- **Gradients selectius**: El blanket ban era necessari al principi per netejar el legacy, però ara que el tema és estable, gradients controlats amb classes `.admin-gradient-*` donen profunditat sense caos.
+- **Glassmorphism**: backdrop-blur + bg rgba + border brillant = modernitat sense sacrificar llegibilitat. 3 nivells (surface/panel/raised) per jerarquia visual.
+- **Animacions**: Subtils i amb `prefers-reduced-motion` respectat. Hover 1.01-1.02 scale, entrada fade-in-up, progress ring-fill.
+- **RadialProgress**: Més impacte visual que barres lineals per a percentatges únics (objectiu mensual, checklist). SVG lleuger.
+- **Gràfiques**: DJ necessita veure tendències mensuals i distribució per tipus d'event. Barres + donut cobreixen els dos casos.
+- **PWA**: Admin ha de ser instal·lable al mòbil. Un DJ consulta el tauler des del cotxe, al lloc de l'event.
+- **Avisos intel·ligents**: La intel·ligència del sistema és que t'avisi ABANS que passi un problema, no després.
+- **Tooltips**: Redueixen la corba d'aprenentatge. "Què vol dir marge %?" → hover i ho saps.
+
+### Verificació
+- `tsc --noEmit`: 0 errors
+- `next build`: OK
+
+---
+
 ## 2026-03-04 sessió 4 — Double-booking + Estimador marge + Historial canvis
 
 ### Canvis implementats

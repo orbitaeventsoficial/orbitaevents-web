@@ -1,3 +1,9 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN THEME — Òrbita Events
+   Visual potent: glassmorphism, gradients selectius, micro-animacions
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Variables ─────────────────────────────────────────────────────────── */
 html.admin-mode {
   --at-bg: #121417;
   --at-surface: #1b1f24;
@@ -14,6 +20,7 @@ html.admin-mode {
 
   --at-brand: #c18b2c;
   --at-brand-soft: rgba(193, 139, 44, 0.18);
+  --at-brand-glow: rgba(193, 139, 44, 0.12);
 
   --at-info: #3f74a8;
   --at-success: #2f7d44;
@@ -22,6 +29,11 @@ html.admin-mode {
 
   --at-contacted: #636b75;
   --at-quote: #755e3f;
+
+  /* Glass tokens */
+  --at-glass-bg: rgba(27, 31, 36, 0.72);
+  --at-glass-border: rgba(255, 255, 255, 0.08);
+  --at-glass-shine: rgba(255, 255, 255, 0.04);
 }
 
 html.admin-mode .admin-layout-shell {
@@ -36,6 +48,7 @@ html.admin-mode .admin-layout-shell {
   --admin-danger: var(--at-danger);
 }
 
+/* ─── Base ──────────────────────────────────────────────────────────────── */
 html.admin-mode .admin-layout-body,
 html.admin-mode .admin-layout-shell,
 html.admin-mode .admin-main,
@@ -48,6 +61,7 @@ html.admin-mode .admin-main-shell {
   font-size: 15.5px;
 }
 
+/* ─── Typography ────────────────────────────────────────────────────────── */
 html.admin-mode .admin-main-shell h1,
 html.admin-mode .admin-main-shell .admin-page-title {
   color: var(--at-text) !important;
@@ -65,9 +79,14 @@ html.admin-mode .admin-main-shell h3 {
   font-size: clamp(1.05rem, 0.98rem + 0.25vw, 1.2rem) !important;
 }
 
-/* Solid shell chrome */
-html.admin-mode .admin-sidebar,
-html.admin-mode .admin-mobile-sidebar,
+html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt, span) {
+  color: var(--at-muted);
+}
+html.admin-mode .admin-main-shell :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--at-subtle) !important;
+}
+
+/* ─── Shell chrome ──────────────────────────────────────────────────────── */
 html.admin-mode .admin-mobile-header,
 html.admin-mode .admin-desktop-header,
 html.admin-mode .admin-bottom-nav {
@@ -75,34 +94,36 @@ html.admin-mode .admin-bottom-nav {
   border-color: var(--at-border) !important;
 }
 
-/* Kill legacy gradients in admin only */
-html.admin-mode .admin-layout-shell [class*='bg-gradient'],
-html.admin-mode .admin-layout-shell [class*='from-'],
-html.admin-mode .admin-layout-shell [class*='via-'],
-html.admin-mode .admin-layout-shell [class*='to-'] {
-  background-image: none !important;
+/* ═══ SIDEBAR PREMIUM — Glass + Gradient ═══ */
+html.admin-mode .admin-sidebar,
+html.admin-mode .admin-mobile-sidebar {
+  background: var(--at-glass-bg) !important;
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-color: var(--at-glass-border) !important;
+  border-right: 1px solid var(--at-glass-border) !important;
 }
 
-html.admin-mode .admin-layout-shell .gradient-text-gold,
-html.admin-mode .admin-layout-shell .title-gradient {
-  background: none !important;
-  -webkit-text-fill-color: currentColor !important;
-  color: var(--at-text) !important;
+/* Logo glow */
+html.admin-mode .admin-sidebar-logo-wrap,
+html.admin-mode .admin-mobile-sidebar-logo {
+  box-shadow: 0 0 20px var(--at-brand-glow), 0 0 40px rgba(193, 139, 44, 0.06);
 }
 
-html.admin-mode .admin-layout-shell,
-html.admin-mode .admin-layout-shell *,
-html.admin-mode .admin-main-shell,
-html.admin-mode .admin-main-shell * {
-  background-image: none !important;
+/* Active nav item — gradient lateral */
+html.admin-mode .admin-layout-shell .admin-nav-item--active {
+  background: linear-gradient(90deg, rgba(193, 139, 44, 0.22) 0%, rgba(193, 139, 44, 0.04) 100%) !important;
+  border-color: rgba(193, 139, 44, 0.35) !important;
 }
 
+/* Idle nav items */
 html.admin-mode .admin-layout-shell .admin-nav-item--idle,
 html.admin-mode .admin-layout-shell .admin-nav-section-btn,
 html.admin-mode .admin-layout-shell .admin-recent-chip--idle {
   background: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%) !important;
   border-color: var(--admin-border) !important;
   color: var(--admin-text) !important;
+  transition: all 0.2s ease-out;
 }
 
 html.admin-mode .admin-layout-shell .admin-nav-item--idle:hover,
@@ -113,21 +134,227 @@ html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
   color: var(--admin-text) !important;
 }
 
-/* Unified cards/containers — only elements with explicit visual box classes.
-   Bare semantic tags (section/article/aside) removed: they're often used as
-   layout wrappers and shouldn't get a panel bg unless they also carry a visual class. */
+/* Nav section separators — gradient line */
+html.admin-mode .admin-nav-section {
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent 5%, var(--at-border) 50%, transparent 95%) 1;
+}
+
+/* ─── GRADIENT CONTROL ──────────────────────────────────────────────────
+   Legacy gradient ban is SELECTIVE now: only kill Tailwind gradient classes
+   from the public site. Admin-specific .admin-gradient-* classes are allowed.
+   SVG elements are also excluded so charts/icons can use gradients. ──── */
+html.admin-mode .admin-layout-shell [class*='bg-gradient']:not(.admin-gradient),
+html.admin-mode .admin-layout-shell [class*='from-']:not(.admin-gradient):not(svg *),
+html.admin-mode .admin-layout-shell [class*='via-']:not(.admin-gradient):not(svg *),
+html.admin-mode .admin-layout-shell [class*='to-']:not(.admin-gradient):not(svg *) {
+  background-image: none !important;
+}
+
+html.admin-mode .admin-layout-shell .gradient-text-gold,
+html.admin-mode .admin-layout-shell .title-gradient {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--at-text) !important;
+}
+
+/* Global kill — but exclude admin-gradient-* and SVG */
+html.admin-mode .admin-layout-shell *:not(.admin-gradient):not(.admin-gradient *):not(svg):not(svg *),
+html.admin-mode .admin-main-shell *:not(.admin-gradient):not(.admin-gradient *):not(svg):not(svg *) {
+  background-image: none !important;
+}
+
+/* ═══ ADMIN GRADIENT CLASSES — Controlled gradients ═══ */
+html.admin-mode .admin-gradient.admin-gradient--hero {
+  background-image: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(193, 139, 44, 0.12) 0%, transparent 70%) !important;
+}
+html.admin-mode .admin-gradient.admin-gradient--gold {
+  background-image: linear-gradient(135deg, rgba(193, 139, 44, 0.15) 0%, transparent 60%) !important;
+}
+html.admin-mode .admin-gradient.admin-gradient--sidebar-sep {
+  background-image: linear-gradient(90deg, transparent, var(--at-border), transparent) !important;
+  height: 1px !important;
+}
+
+/* ═══ GLASS CARDS — 3 nivells d'elevació ═══ */
+html.admin-mode .admin-card-glass {
+  background: var(--at-glass-bg) !important;
+  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  border: 1px solid var(--at-glass-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 var(--at-glass-shine);
+}
+
+html.admin-mode .admin-card-glass--raised {
+  background: rgba(35, 42, 49, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--at-glass-shine);
+}
+
+html.admin-mode .admin-card-glass--elevated {
+  background: rgba(44, 53, 62, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ═══ METRIC CARD GLOW — hover glow per accent ═══ */
+html.admin-mode .admin-ui-metric-card {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+html.admin-mode .admin-ui-metric-card:hover {
+  transform: scale(1.015);
+}
+
+html.admin-mode .admin-ui-metric-card--cyan:hover {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.12), 0 0 40px rgba(34, 211, 238, 0.06) !important;
+  border-color: rgba(34, 211, 238, 0.3) !important;
+}
+html.admin-mode .admin-ui-metric-card--emerald:hover {
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.12), 0 0 40px rgba(52, 211, 153, 0.06) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+}
+html.admin-mode .admin-ui-metric-card--rose:hover {
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.12), 0 0 40px rgba(244, 114, 182, 0.06) !important;
+  border-color: rgba(244, 114, 182, 0.3) !important;
+}
+html.admin-mode .admin-ui-metric-card--amber:hover {
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.12), 0 0 40px rgba(251, 191, 36, 0.06) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+html.admin-mode .admin-ui-metric-card--purple:hover {
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.12), 0 0 40px rgba(167, 139, 250, 0.06) !important;
+  border-color: rgba(167, 139, 250, 0.3) !important;
+}
+html.admin-mode .admin-ui-metric-card--sky:hover {
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.12), 0 0 40px rgba(96, 165, 250, 0.06) !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Metric value — mono font */
+html.admin-mode .admin-ui-metric-value {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ STAGGERED ENTRY ANIMATION ═══ */
+html.admin-mode .admin-stagger-item {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: adminFadeInUp 0.45s ease-out forwards;
+}
+html.admin-mode .admin-stagger-item:nth-child(1) { animation-delay: 0.04s; }
+html.admin-mode .admin-stagger-item:nth-child(2) { animation-delay: 0.08s; }
+html.admin-mode .admin-stagger-item:nth-child(3) { animation-delay: 0.12s; }
+html.admin-mode .admin-stagger-item:nth-child(4) { animation-delay: 0.16s; }
+html.admin-mode .admin-stagger-item:nth-child(5) { animation-delay: 0.20s; }
+html.admin-mode .admin-stagger-item:nth-child(6) { animation-delay: 0.24s; }
+html.admin-mode .admin-stagger-item:nth-child(7) { animation-delay: 0.28s; }
+html.admin-mode .admin-stagger-item:nth-child(8) { animation-delay: 0.32s; }
+html.admin-mode .admin-stagger-item:nth-child(9) { animation-delay: 0.36s; }
+html.admin-mode .admin-stagger-item:nth-child(10) { animation-delay: 0.40s; }
+
+@keyframes adminFadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ MICRO-ANIMATIONS ═══ */
+/* Card hover scale */
+html.admin-mode .admin-main-shell .admin-cr-radar-card,
+html.admin-mode .admin-main-shell .admin-cr-step,
+html.admin-mode .admin-main-shell .admin-cr-mini-card,
+html.admin-mode .admin-main-shell .admin-cr-stat-box,
+html.admin-mode .admin-main-shell .admin-ui-card {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+html.admin-mode .admin-main-shell .admin-cr-radar-card:hover,
+html.admin-mode .admin-main-shell .admin-cr-step:hover,
+html.admin-mode .admin-main-shell .admin-cr-mini-card:hover {
+  transform: scale(1.012);
+}
+
+/* Progress bar animation */
+html.admin-mode .admin-progress-animated {
+  animation: adminProgressFill 0.8s ease-out forwards;
+  transform-origin: left;
+}
+
+@keyframes adminProgressFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Radial progress ring animation */
+@keyframes adminRingFill {
+  from { stroke-dashoffset: var(--ring-circumference, 282.7); }
+  to { stroke-dashoffset: var(--ring-offset, 0); }
+}
+
+html.admin-mode .admin-radial-ring {
+  animation: adminRingFill 0.8s ease-out forwards;
+}
+
+/* Glow pulse for urgent items */
+@keyframes adminGlowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.15); }
+  50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+}
+
+html.admin-mode .admin-glow-pulse {
+  animation: adminGlowPulse 2s ease-in-out infinite;
+}
+
+/* ═══ DASHBOARD HERO HEADER ═══ */
+html.admin-mode .admin-hero-header {
+  position: relative;
+  padding: 1.75rem 1.5rem 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+html.admin-mode .admin-hero-title {
+  font-family: var(--font-display, system-ui);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.2rem) !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--at-text) !important;
+}
+
+html.admin-mode .admin-hero-subtitle {
+  font-size: 0.95rem;
+  color: var(--at-muted) !important;
+  margin-top: 0.25rem;
+}
+
+html.admin-mode .admin-hero-glow {
+  position: absolute;
+  top: -30%;
+  left: -10%;
+  width: 50%;
+  height: 160%;
+  background: radial-gradient(ellipse, rgba(193, 139, 44, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ═══ UNIFIED CARDS — glass treatment ═══ */
 html.admin-mode .admin-main-shell :is(.panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
   background: var(--at-panel) !important;
   border-color: var(--at-border) !important;
 }
 
-/* Grid wrappers (no visual box) — transparent so children's rounded corners don't show square parent bg */
 html.admin-mode .admin-main-shell .admin-quote-studio {
   background: transparent !important;
   border-color: transparent !important;
 }
 
-/* Inputs */
+/* ─── Inputs ─────────────────────────────────────────────────────────── */
 html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']) {
   background: var(--at-input) !important;
   border-color: var(--at-border) !important;
@@ -143,11 +370,12 @@ html.admin-mode .admin-main-shell :is(input, textarea)::placeholder {
   color: var(--at-subtle) !important;
 }
 
-/* Buttons and links */
+/* ─── Buttons ────────────────────────────────────────────────────────── */
 html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
   background: var(--at-raised) !important;
   border-color: var(--at-border-strong) !important;
   color: var(--at-text) !important;
+  transition: all 0.2s ease-out;
 }
 
 html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors):hover {
@@ -155,7 +383,7 @@ html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex):no
   border-color: var(--at-brand) !important;
 }
 
-/* Pipeline solid colors by status */
+/* ═══ PIPELINE STATUS COLORS ═══ */
 html.admin-mode .admin-main-shell .admin-leads-tone--new {
   background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%) !important;
   border-color: var(--at-info) !important;
@@ -181,7 +409,7 @@ html.admin-mode .admin-main-shell .admin-leads-tone--lost {
   border-color: var(--at-danger) !important;
 }
 
-/* Bookings KPI solid colors */
+/* ═══ BOOKINGS KPI COLORS ═══ */
 html.admin-mode .admin-main-shell .admin-bookings-stat--total {
   background: var(--at-panel) !important;
   border-color: var(--at-border-strong) !important;
@@ -203,10 +431,79 @@ html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
   border-color: var(--at-danger) !important;
 }
 
-/* Keep typography consistent */
-html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt, span) {
-  color: var(--at-muted);
+/* ═══ TOOLTIP ═══ */
+html.admin-mode .admin-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
 }
-html.admin-mode .admin-main-shell :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) {
-  color: var(--at-subtle) !important;
+
+html.admin-mode .admin-tooltip-bubble {
+  position: absolute;
+  z-index: 50;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  color: var(--at-text);
+  background: var(--at-raised);
+  border: 1px solid var(--at-border-strong);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+html.admin-mode .admin-tooltip-wrap:hover .admin-tooltip-bubble,
+html.admin-mode .admin-tooltip-wrap:focus-within .admin-tooltip-bubble {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html.admin-mode .admin-tooltip-bubble--top {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+
+html.admin-mode .admin-tooltip-wrap:hover .admin-tooltip-bubble--top,
+html.admin-mode .admin-tooltip-wrap:focus-within .admin-tooltip-bubble--top {
+  transform: translateX(-50%) translateY(0);
+}
+
+html.admin-mode .admin-tooltip-bubble--bottom {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+html.admin-mode .admin-tooltip-wrap:hover .admin-tooltip-bubble--bottom,
+html.admin-mode .admin-tooltip-wrap:focus-within .admin-tooltip-bubble--bottom {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ═══ PREFERS-REDUCED-MOTION ═══ */
+@media (prefers-reduced-motion: reduce) {
+  html.admin-mode .admin-stagger-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  html.admin-mode .admin-progress-animated {
+    animation: none;
+    transform: scaleX(1);
+  }
+  html.admin-mode .admin-radial-ring {
+    animation: none;
+  }
+  html.admin-mode .admin-glow-pulse {
+    animation: none;
+  }
+  html.admin-mode .admin-ui-metric-card:hover,
+  html.admin-mode .admin-main-shell .admin-cr-radar-card:hover,
+  html.admin-mode .admin-main-shell .admin-cr-step:hover,
+  html.admin-mode .admin-main-shell .admin-cr-mini-card:hover {
+    transform: none;
+  }
 }

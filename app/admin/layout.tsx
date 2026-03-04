@@ -213,6 +213,10 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => { /* silent */ });
+    }
   }, []);
 
   useEffect(() => {
@@ -386,6 +390,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="ca" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#121417" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
+        <link rel="apple-touch-icon" href="/favicon-192.png" />
+      </head>
       <body className="admin-layout-body" suppressHydrationWarning>
         <div
           className="admin-layout-shell"

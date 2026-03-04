@@ -1,5 +1,7 @@
 import { MetricCard, Card, Button } from './components/ui';
-import { MiniLineChart } from './components/Charts';
+import { MiniLineChart, MonthlyBarChart, DonutChart } from './components/Charts';
+import RadialProgress from './components/RadialProgress';
+import Tooltip from './components/Tooltip';
 import Link from 'next/link';
 import QuickActions from './components/QuickActions';
 import LeadStatusQuickActions from './components/LeadStatusQuickActions';
@@ -7,6 +9,14 @@ import BookingStatusQuickActions from './components/BookingStatusQuickActions';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
 import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants';
 import { EVENT_TYPE_LABELS } from '@/lib/constants';
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 6) return 'Bona nit';
+  if (h < 13) return 'Bon dia';
+  if (h < 20) return 'Bona tarda';
+  return 'Bona nit';
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -54,31 +64,32 @@ export default async function AdminDashboard() {
 
   return (
     <div className="admin-control-room">
-      {/* Header */}
-      <div className="admin-cr-header">
-        <div className="admin-cr-header-top">
-          <div>
-            <h1 className="admin-cr-title">Resum ràpid</h1>
-            <p className="admin-cr-subtitle">Visió general del negoci</p>
+      {/* ═══ HERO HEADER ═══ */}
+      <div className="admin-hero-header admin-gradient admin-gradient--hero admin-card-glass">
+        <div className="admin-hero-glow" />
+        <div className="relative z-10">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium opacity-60 mb-1">{getGreeting()}</p>
+              <h1 className="admin-hero-title">Òrbita Events</h1>
+              <p className="admin-hero-subtitle">Visió general del negoci</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/admin/analytics" className="hidden sm:inline-flex">
+                <Button variant="secondary" icon="📈" label="Analítica" />
+              </Link>
+              <Link href="/admin/leads">
+                <Button variant="primary" icon="+" label="Nou lead" />
+              </Link>
+            </div>
           </div>
-          <Link href="/admin/leads" className="admin-cr-mobile-only">
-            <Button variant="primary" icon="+" label="Nou" />
-          </Link>
-        </div>
-        <div className="admin-cr-desktop-actions">
-          <Link href="/admin/analytics">
-            <Button variant="secondary" icon="📈" label="Analítica" />
-          </Link>
-          <Link href="/admin/leads">
-            <Button variant="primary" icon="+" label="Nou lead" />
-          </Link>
-        </div>
-        <div className="admin-cr-quick-links">
-          <Link href="/admin/inbox" className="admin-cr-quick-link">📥 Inbox (IMAP)</Link>
-          <Link href="/admin/emails" className="admin-cr-quick-link">🤖 Correus automàtics</Link>
-          <Link href="/admin/bookings" className="admin-cr-quick-link">📋 Reserves</Link>
-          <Link href="/admin/economia" className="admin-cr-quick-link">💶 Economia</Link>
-          <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
+          <div className="admin-cr-quick-links mt-4">
+            <Link href="/admin/inbox" className="admin-cr-quick-link">📥 Inbox (IMAP)</Link>
+            <Link href="/admin/emails" className="admin-cr-quick-link">🤖 Correus automàtics</Link>
+            <Link href="/admin/bookings" className="admin-cr-quick-link">📋 Reserves</Link>
+            <Link href="/admin/economia" className="admin-cr-quick-link">💶 Economia</Link>
+            <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
+          </div>
         </div>
       </div>
 
@@ -145,33 +156,33 @@ export default async function AdminDashboard() {
         </Link>
       )}
 
-      {/* ═══ OBJECTIU MENSUAL ═══ */}
-      <section className="rounded-2xl border border-white/10 p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide opacity-60">Ingressos del mes</p>
-            <p className="text-lg font-bold">
-              {formatCurrency(d.revenueThisMonth)}
-              <span className="text-sm font-normal opacity-50"> / {formatCurrency(d.revenueTarget)}</span>
-            </p>
-          </div>
-          <span className={`text-2xl font-black ${
-            d.revenueMonthPct >= 100 ? 'text-emerald-400' : d.revenueMonthPct >= 60 ? 'text-amber-400' : 'text-rose-400'
-          }`}>
-            {d.revenueMonthPct}%
-          </span>
-        </div>
-        <div className="w-full h-3 rounded-full bg-white/5 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              d.revenueMonthPct >= 100 ? 'bg-emerald-500' : d.revenueMonthPct >= 60 ? 'bg-amber-500' : 'bg-rose-500'
-            }`}
-            style={{ width: `${Math.min(100, d.revenueMonthPct)}%` }}
+      {/* ═══ OBJECTIU MENSUAL — amb RadialProgress ═══ */}
+      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass">
+        <div className="flex items-center gap-5">
+          <RadialProgress
+            value={d.revenueMonthPct}
+            size={88}
+            strokeWidth={7}
           />
-        </div>
-        <div className="flex justify-between mt-1.5 text-[10px] opacity-40">
-          <span>0 €</span>
-          <span>{formatCurrency(d.revenueTarget)}</span>
+          <div className="flex-1 min-w-0">
+            <Tooltip text="Objectiu mensual configurable a Configuració">
+              <p className="text-xs font-medium uppercase tracking-wide opacity-60">Ingressos del mes</p>
+            </Tooltip>
+            <p className="text-xl font-bold mt-1" style={{ fontFamily: 'var(--font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
+              {formatCurrency(d.revenueThisMonth)}
+            </p>
+            <p className="text-sm opacity-50">
+              de {formatCurrency(d.revenueTarget)} objectiu
+            </p>
+            <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden mt-2">
+              <div
+                className={`h-full rounded-full admin-progress-animated ${
+                  d.revenueMonthPct >= 100 ? 'bg-emerald-500' : d.revenueMonthPct >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+                }`}
+                style={{ width: `${Math.min(100, d.revenueMonthPct)}%` }}
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -305,7 +316,9 @@ export default async function AdminDashboard() {
           <Link href="/admin/leads" className={`admin-cr-radar-card ${d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald'}`}>
             <div className="flex items-center gap-2">
               <span className={`inline-block w-3 h-3 rounded-full ${d.staleLeadsCount > 0 ? 'bg-rose-400' : 'bg-emerald-400'}`} />
-              <p className="admin-cr-stat-label">Temps sense resposta</p>
+              <Tooltip text="Leads NEW/CONTACTED amb >24h sense canvi d'estat">
+                <p className="admin-cr-stat-label">Temps sense resposta</p>
+              </Tooltip>
             </div>
             <p className={`admin-cr-radar-value ${d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald'}`}>{d.staleLeadsCount}</p>
             <p className="admin-cr-small">Leads amb més de 24h sense avançar.</p>
@@ -313,7 +326,9 @@ export default async function AdminDashboard() {
           <Link href="/admin/leads" className={`admin-cr-radar-card ${d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald'}`}>
             <div className="flex items-center gap-2">
               <span className={`inline-block w-3 h-3 rounded-full ${d.hotLeadsCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-              <p className="admin-cr-stat-label">Leads calents</p>
+              <Tooltip text="Prioritat HIGH o URGENT, en estat actiu">
+                <p className="admin-cr-stat-label">Leads calents</p>
+              </Tooltip>
             </div>
             <p className={`admin-cr-radar-value ${d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald'}`}>{d.hotLeadsCount}</p>
             <p className="admin-cr-small">Prioritat alta/urgent.</p>
@@ -321,7 +336,9 @@ export default async function AdminDashboard() {
           <Link href="/admin/presupuestos" className={`admin-cr-radar-card ${d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald'}`}>
             <div className="flex items-center gap-2">
               <span className={`inline-block w-3 h-3 rounded-full ${d.quotesInFlightCount > 0 ? 'bg-cyan-400' : 'bg-emerald-400'}`} />
-              <p className="admin-cr-stat-label">Pressupostos en joc</p>
+              <Tooltip text="Leads en estat QUOTE_SENT o NEGOTIATING">
+                <p className="admin-cr-stat-label">Pressupostos en joc</p>
+              </Tooltip>
             </div>
             <p className={`admin-cr-radar-value ${d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald'}`}>{d.quotesInFlightCount}</p>
             <p className="admin-cr-small">Enviats o negociant.</p>
@@ -421,16 +438,16 @@ export default async function AdminDashboard() {
       </section>
 
       <div className="admin-cr-kpi-grid">
-        <MetricCard icon="📋" label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" />
-        <MetricCard icon="📨" label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" />
-        <MetricCard icon="🏆" label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" />
-        <MetricCard icon="⭐" label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" />
-        <MetricCard icon="🌐" label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" />
-        <MetricCard icon="⏱️" label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" />
-        <MetricCard icon="📊" label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} />
-        <MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${Math.round(d.cashFlowNet30)} €`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} />
-        <MetricCard icon="🔮" label="Pipeline ponderat" value={`${Math.round(d.pipelineWeighted30)} €`} change="Vendes probables" changeType="neutral" accent="amber" />
-        <MetricCard icon="💶" label="Pendent de cobrar" value={`${Math.round(d.pendingPayments)} €`} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} />
+        <div className="admin-stagger-item"><MetricCard icon="📋" label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" /></div>
+        <div className="admin-stagger-item"><MetricCard icon="📨" label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" /></div>
+        <div className="admin-stagger-item"><MetricCard icon="🏆" label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" /></div>
+        <div className="admin-stagger-item"><MetricCard icon="⭐" label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" /></div>
+        <div className="admin-stagger-item"><MetricCard icon="🌐" label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></div>
+        <div className="admin-stagger-item"><MetricCard icon="⏱️" label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></div>
+        <div className="admin-stagger-item"><Tooltip text="Cost engine: costEngine.ts"><MetricCard icon="📊" label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Previsió cashFlowForecast.ts"><MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${Math.round(d.cashFlowNet30)} €`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Pipeline ponderat per probabilitat"><MetricCard icon="🔮" label="Pipeline ponderat" value={`${Math.round(d.pipelineWeighted30)} €`} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Reserves amb pagament pendent"><MetricCard icon="💶" label="Pendent de cobrar" value={`${Math.round(d.pendingPayments)} €`} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
       </div>
 
       <div className="admin-cr-chart-grid">
@@ -457,6 +474,20 @@ export default async function AdminDashboard() {
               { data: d.bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: d.bookingsConfirmed },
               { data: d.revenueSeries, stroke: '#a78bfa', label: '€', value: d.revenueTotal30 },
             ]} />
+          </div>
+        </Card>
+      </div>
+
+      {/* ═══ GRÀFIQUES COMPARATIVES ═══ */}
+      <div className="admin-cr-chart-grid">
+        <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding>
+          <div className="admin-cr-card-pad">
+            <MonthlyBarChart data={d.monthlyRevenue} />
+          </div>
+        </Card>
+        <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding>
+          <div className="admin-cr-card-pad flex items-center justify-center py-4">
+            <DonutChart segments={d.eventTypeDistribution} />
           </div>
         </Card>
       </div>

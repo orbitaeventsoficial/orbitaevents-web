@@ -110,6 +110,8 @@ module.exports = {
         'shimmer': 'shimmer 2s infinite',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
         'float': 'float 3s ease-in-out infinite',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+        'ring-fill': 'ringFill 0.8s ease-out forwards',
       },
 
       keyframes: {
@@ -128,6 +130,14 @@ module.exports = {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 8px rgba(251, 191, 36, 0.15)' },
+          '50%': { boxShadow: '0 0 20px rgba(251, 191, 36, 0.3)' },
+        },
+        ringFill: {
+          from: { strokeDashoffset: 'var(--ring-circumference, 282.7)' },
+          to: { strokeDashoffset: 'var(--ring-offset, 0)' },
         },
       },
 

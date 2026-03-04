@@ -137,6 +137,10 @@ export interface DashboardData {
   revenueThisMonth: number;
   revenueTarget: number;
   revenueMonthPct: number;
+  // Monthly revenue (12 months)
+  monthlyRevenue: { label: string; current: number; previous: number }[];
+  // Event type distribution
+  eventTypeDistribution: { label: string; value: number; color: string }[];
   // Computed
   timeline: { id: string; icon: string; text: string; time: string; ts: number; href: string }[];
   alerts: DashboardAlert[];
@@ -421,6 +425,86 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const revenueTarget = Number.isFinite(revenueTargetRaw) && revenueTargetRaw > 0 ? revenueTargetRaw : 3000;
   const revenueMonthPct = revenueTarget > 0 ? Math.min(100, Math.round((revenueThisMonth / revenueTarget) * 100)) : 0;
 
+  // ─── Monthly revenue bars (12 months current + previous year) ──────
+  const monthLabels = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
+  const [monthlyRevenueData, eventTypeData] = await Promise.all([
+    cachedQuery('admin:dashboard:monthly-revenue-12', async () => {
+      const currentYear = now.getFullYear();
+      const data: { label: string; current: number; previous: number }[] = [];
+      for (let m = 0; m < 12; m++) {
+        const curStart = new Date(currentYear, m, 1);
+        const curEnd = new Date(currentYear, m + 1, 0, 23, 59, 59, 999);
+        const prevStart = new Date(currentYear - 1, m, 1);
+        const prevEnd = new Date(currentYear - 1, m + 1, 0, 23, 59, 59, 999);
+        const [cur, prev] = await Promise.all([
+          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: curStart, lte: curEnd } }, _sum: { total: true } }),
+          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: prevStart, lte: prevEnd } }, _sum: { total: true } }),
+        ]);
+        data.push({ label: monthLabels[m], current: Number(cur._sum.total) || 0, previous: Number(prev._sum.total) || 0 });
+      }
+      return data;
+    }, CacheTTL.MEDIUM).catch(() => monthLabels.map((l) => ({ label: l, current: 0, previous: 0 }))),
+    cachedQuery('admin:dashboard:event-type-dist', async () => {
+      const groups = await prisma.booking.groupBy({
+        by: ['eventType'],
+        where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
+        _count: true,
+      });
+      const colorMap: Record<string, string> = {
+        BODA: '#f472b6', FIESTA: '#fbbf24', EMPRESA: '#60a5fa', DISCOTECA_MOVIL: '#a78bfa',
+      };
+      return groups.map((g) => ({
+        label: g.eventType || 'Altres',
+        value: g._count,
+        color: (g.eventType && colorMap[g.eventType]) || '#34d399',
+      }));
+    }, CacheTTL.MEDIUM).catch(() => []),
+  ]);
+
+  // ─── Smart alerts (PAS 4: avisos intel·ligents) ────────────────────
+  // Checklist low + event imminent
+  if (nextEvent && nextEvent.daysUntil <= 1 && nextEvent.checklistTotal > 0) {
+    const checklistPct = Math.round((nextEvent.checklistDone / nextEvent.checklistTotal) * 100);
+    if (checklistPct < 50) {
+      alerts.push({
+        type: 'error',
+        title: 'Checklist massa baix!',
+        description: `El bolo de ${nextEvent.clientName} és ${nextEvent.daysUntil === 0 ? 'AVUI' : 'DEMÀ'} i la checklist està al ${checklistPct}%.`,
+        href: `/admin/bookings/${nextEvent.id}`,
+        action: 'Completar checklist',
+      });
+    }
+  }
+  // Unpaid + event in 3 days
+  if (nextEvent && nextEvent.daysUntil <= 3 && !nextEvent.depositPaid) {
+    alerts.push({
+      type: 'warning',
+      title: 'Pagament pendent imminent',
+      description: `${nextEvent.clientName} no ha pagat la paga i senyal i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
+      href: `/admin/bookings/${nextEvent.id}`,
+      action: 'Gestionar pagament',
+    });
+  }
+  // Hot leads without response >48h
+  if (hotLeadsCount > 0) {
+    const hotStale = await cachedQuery(`admin:dashboard:hot-stale:${dayKey}`, () => prisma.lead.count({
+      where: {
+        status: { in: ['NEW', 'CONTACTED'] },
+        priority: { in: ['HIGH', 'URGENT'] },
+        createdAt: { lt: new Date(now.getTime() - 48 * 60 * 60 * 1000) },
+      },
+    }), CacheTTL.SHORT).catch(() => 0);
+    if (hotStale > 0) {
+      alerts.push({
+        type: 'error',
+        title: 'Lead HOT sense resposta!',
+        description: `${hotStale} lead${hotStale > 1 ? 's' : ''} de prioritat alta/urgent porta${hotStale > 1 ? 'en' : ''} més de 48h sense avançar.`,
+        href: '/admin/leads',
+        action: 'Respondre ara',
+      });
+    }
+  }
+
   return {
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
     customersCount, testimonialsPending, testimonialsApproved,
@@ -440,6 +524,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     revenueThisMonth,
     revenueTarget,
     revenueMonthPct,
+    monthlyRevenue: monthlyRevenueData,
+    eventTypeDistribution: eventTypeData,
     leadsSeries, leadsWonSeries, bookingsSeries, revenueSeries, revenueTotal30,
     recentLeads, upcomingBookings, upcomingTasks,
     commandLeads, commandBookings, recentAdminLogs,
