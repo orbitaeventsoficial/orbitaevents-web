@@ -1,28 +1,17 @@
 /**
- * API ROUTE: Admin Events (Supabase)
- * ==================================
+ * API ROUTE: Admin Events (Prisma)
+ * =================================
  * GET - Obtenir events completats/passats
  * PATCH - Actualitzar estat post-event
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { supabaseAdmin } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 import { safeParseInt } from '@/lib/utils';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
-
-// Check if Supabase is configured
-function checkSupabase() {
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: 'Database not configured' },
-      { status: 503 }
-    );
-  }
-  return null;
-}
 
 /**
  * GET - Obtenir events passats/completats
@@ -30,36 +19,45 @@ function checkSupabase() {
 export async function GET(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
-  const dbError = checkSupabase();
-  if (dbError) return dbError;
 
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'completed';
+    const status = searchParams.get('status') || 'COMPLETED';
     const daysAgo = safeParseInt(searchParams.get('days'), 30, 1, 365);
 
-    // Calcular data límit
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
 
-    const { data: bookings, error } = await supabaseAdmin!
-      .from('bookings')
-      .select('id, event_date, status, client_name, client_email, event_type, post_event_sent_at, review_requested_at, created_at, updated_at')
-      .eq('status', status)
-      .gte('event_date', cutoffDate.toISOString())
-      .lte('event_date', new Date().toISOString())
-      .order('event_date', { ascending: false })
-      .limit(100);
-
-    if (error) throw error;
+    const bookings = await prisma.booking.findMany({
+      where: {
+        status: status as any,
+        eventDate: {
+          gte: cutoffDate,
+          lte: new Date(),
+        },
+      },
+      select: {
+        id: true,
+        eventDate: true,
+        status: true,
+        clientName: true,
+        clientEmail: true,
+        eventType: true,
+        postEventEmailSentAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { eventDate: 'desc' },
+      take: 100,
+    });
 
     return NextResponse.json({
       success: true,
-      data: bookings || [],
+      data: bookings,
       stats: {
-        total: bookings?.length || 0,
-        pending: bookings?.filter(b => !b.post_event_sent_at).length || 0,
-        sent: bookings?.filter(b => b.post_event_sent_at).length || 0,
+        total: bookings.length,
+        pending: bookings.filter(b => !b.postEventEmailSentAt).length,
+        sent: bookings.filter(b => b.postEventEmailSentAt).length,
       },
     });
   } catch (error) {
@@ -74,36 +72,25 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
-  const dbError = checkSupabase();
-  if (dbError) return dbError;
 
   try {
     const body = await request.json();
-    const { bookingId, post_event_sent_at, review_requested_at } = body;
+    const { bookingId, post_event_sent_at } = body;
 
     if (!bookingId) {
       return NextResponse.json({ error: 'bookingId és obligatori' }, { status: 400 });
     }
 
-    const updateData: Record<string, string> = {
-      updated_at: new Date().toISOString(),
-    };
+    const updateData: Record<string, unknown> = {};
 
     if (post_event_sent_at) {
-      updateData.post_event_sent_at = post_event_sent_at;
-    }
-    if (review_requested_at) {
-      updateData.review_requested_at = review_requested_at;
+      updateData.postEventEmailSentAt = new Date(post_event_sent_at);
     }
 
-    const { data: booking, error } = await supabaseAdmin!
-      .from('bookings')
-      .update(updateData)
-      .eq('id', bookingId)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const booking = await prisma.booking.update({
+      where: { id: bookingId },
+      data: updateData,
+    });
 
     return NextResponse.json({
       success: true,

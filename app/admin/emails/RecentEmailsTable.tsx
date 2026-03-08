@@ -23,7 +23,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
       text: 'text-blue-300',
     },
     TESTIMONIAL_SUBMITTED: {
-      label: 'Valoracio rebuda',
+      label: 'Valoració rebuda',
       icon: '⭐',
       bg: 'bg-amber-500/20',
       text: 'text-amber-300',
@@ -35,7 +35,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
       text: 'text-emerald-300',
     },
     LEAD_EMAIL_SENT: {
-      label: 'Confirmacio lead enviada',
+      label: 'Confirmació lead enviada',
       icon: '✉️',
       bg: 'bg-purple-500/20',
       text: 'text-purple-300',
@@ -59,7 +59,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
     <section className="rounded-2xl border admin-card-glass overflow-hidden">
       <div className="px-6 py-4 border-b">
         <h2 className="font-semibold">📊 Activitat Recent</h2>
-        <p className="text-xs mt-1">Ultims 7 dies</p>
+        <p className="text-xs mt-1">Últims 7 dies</p>
       </div>
 
       {activities.length === 0 ? (

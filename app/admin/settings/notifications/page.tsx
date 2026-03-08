@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { useState, useEffect } from 'react';
 import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface NotificationConfig {
   smtp: {
@@ -99,7 +100,7 @@ export default function SettingsNotificationsPage() {
     setRunningAutopilot(true);
     setAutopilotResult(null);
     try {
-      const res = await fetch('/api/admin/automation/daily-summary/run', {
+      const res = await fetchWithCsrf('/api/admin/automation/daily-summary/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

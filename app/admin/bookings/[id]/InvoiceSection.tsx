@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface InvoiceData {
   id: string;
@@ -46,7 +47,7 @@ export default function InvoiceSection({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(url, options);
+      const res = await fetchWithCsrf(url, options);
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || !payload?.ok) {
         throw new Error(payload?.error || 'Error');

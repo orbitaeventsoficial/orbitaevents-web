@@ -4,7 +4,7 @@
  * Component de pujada de fotos per a elements d'inventari.
  * Accepta qualsevol format d'imatge (JPG, PNG, HEIC, BMP, TIFF, GIF, SVG...)
  * Converteix automàticament a WebP optimitzat (800px, qualitat 0.82)
- * i puja a Supabase Storage (bucket "inventory").
+ * i puja al storage local via API.
  */
 
 import { useCallback, useState, useRef } from 'react';
@@ -117,7 +117,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
       setSizeInfo(`${originalKB} KB → ${optimizedKB} KB WebP`);
       setPreview(previewUrl);
 
-      // 2. Pujar a Supabase via API
+      // 2. Pujar via API
       const formData = new FormData();
       formData.append('file', blob, `${itemCode}.webp`);
 

@@ -183,6 +183,7 @@ model Extra {
   slug         String             @unique
   isActive     Boolean            @default(true)
   price        Float
+  costPerUnit  Float?
   priceType    PriceType          @default(FIXED)
   order        Int                @default(0)
 

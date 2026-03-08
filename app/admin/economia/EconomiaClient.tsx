@@ -14,6 +14,7 @@ import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import PackPricingModelEditor from './PackPricingModelEditor';
 import PackPricingModelHistory from './PackPricingModelHistory';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -464,7 +465,7 @@ function CobramentFiltersSection({
     setBulkBusy(true);
     setBulkError(null);
     try {
-      const res = await fetch('/api/admin/bookings/bulk-payment', {
+      const res = await fetchWithCsrf('/api/admin/bookings/bulk-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

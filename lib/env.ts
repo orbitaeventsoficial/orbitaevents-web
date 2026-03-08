@@ -27,8 +27,8 @@ const serverSchema = z.object({
   SMTP_FROM: z.string().optional(),
   CONTACT_TO: z.string().optional(),
 
-  // Supabase (Optional - media uploads won't work without it)
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  // Storage (Optional)
+  UPLOADS_DIR: z.string().optional(),
 
   // Rate limiting (Optional)
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
@@ -66,8 +66,6 @@ const serverSchema = z.object({
 const clientSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
   NEXT_PUBLIC_GTM_ID: z.string().optional(),
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().optional(),
   NEXT_PUBLIC_GOOGLE_ADS_URL: z.string().url().optional(),

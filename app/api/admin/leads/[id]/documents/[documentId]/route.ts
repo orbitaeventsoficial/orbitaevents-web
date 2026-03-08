@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { supabaseAdmin } from '@/lib/supabase';
+import { deleteFile } from '@/lib/storage';
 import { requireAuth } from '@/lib/auth';
 
 interface Params {
@@ -30,16 +30,8 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Document no trobat' }, { status: 404 });
     }
 
-    if (doc.filePath && supabaseAdmin) {
-      const { error: storageError } = await supabaseAdmin.storage
-        .from('media')
-        .remove([doc.filePath]);
-      if (storageError) {
-        log.warn('No s’ha pogut eliminar el fitxer de storage', {
-          message: storageError.message,
-          name: storageError.name,
-        });
-      }
+    if (doc.filePath) {
+      await deleteFile(doc.filePath);
     }
 
     await prisma.leadDocument.delete({

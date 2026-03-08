@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function SendExecutiveReportButton() {
   const [sending, setSending] = useState(false);
@@ -10,7 +11,7 @@ export default function SendExecutiveReportButton() {
     setSending(true);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/reports/executive/send', {
+      const res = await fetchWithCsrf('/api/admin/reports/executive/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

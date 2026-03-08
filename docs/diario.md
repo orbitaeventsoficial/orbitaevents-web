@@ -1,5 +1,118 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 — Auditoria de bugs funcionals + correcció CSS + rendiment
+
+### Objectiu
+Arreglar bugs reals que l'usuari notava: pressupostos que desapareixien, colors que no es veien, admin lent, emails que no s'enviaven.
+
+### Bugs crítics corregits
+
+#### 1. Pressupostos desapareixien (CSRF)
+- **Causa**: `PresupuestoPdfStudio.tsx` feia `fetch()` sense token CSRF. L'API (`proposals/route.ts`) verifica CSRF → retornava 403 → el pressupost mai es guardava a la BD.
+- **Fix**: Substituït `fetch()` per `fetchWithCsrf()` a les 2 crides de guardat/enviament.
+- **Per què no es va detectar abans**: L'error 403 es capturava genèricament i mostrava "No s'ha pogut guardar" sense indicar que era un problema de CSRF.
+
+#### 2. 13 components més amb el mateix bug CSRF
+- **Fitxers arreglats**: clientes/page.tsx, SummaryPanel.tsx, CommsPanel.tsx, ProposalsPanel.tsx, EconomiaClient.tsx, InvoiceSection.tsx, LeadSavedViews.tsx, QuickActions.tsx, SlaAutomationButton.tsx, SendExecutiveReportButton.tsx, CalendarSyncButton.tsx, CalendarTokenManager.tsx, notifications/page.tsx
+- **Impacte**: Crear clients, editar factures, guardar vistes de leads, executar automatitzacions, sincronitzar calendari — tot fallava silenciosament amb 403.
+
+#### 3. Email post-event no s'enviava des de fitxa reserva
+- **Causa 1**: `PostEventEmailButton.tsx` enviava JSON però la ruta esperava FormData → fix a FormData.
+- **Causa 2**: `send-post-event/route.ts` retornava `NextResponse.redirect(303)` en lloc de JSON. Quan `fetch()` segueix el redirect, `res.ok` sempre és `true` (200 de la pàgina HTML), fins i tot en errors → l'usuari veia "Enviat!" quan no s'havia enviat.
+- **Fix**: Ruta canviada a retornar JSON. Botons actualitzats per gestionar la resposta JSON.
+
+#### 4. Plantilla email post-event duplicada en 3 fitxers
+- **Causa**: Mateixa plantilla HTML copiada a `cron/post-event/route.ts`, `emails/run-cron/route.ts` i `emails/send-post-event/route.ts`.
+- **Fix**: Creat `lib/services/postEventEmailService.ts` com a font única de veritat. Els 3 fitxers ara importen d'allà.
+
+### CSS — 3 regles assassines eliminades
+
+#### 5. admin-theme.css matava tots els colors
+- **Regla 1 (línia 347)**: `html.admin-mode .admin-main-shell :is(.rounded-xl, .rounded-2xl, .rounded-3xl) { background: var(--at-panel) !important }` — forçava TOTS els elements arrodonits al mateix gris fosc. Cards de mètriques, passos del pilot, semàfors del radar — tot invisible.
+- **Regla 2 (línia 374)**: Tots els botons forçats al mateix gris (`var(--at-raised) !important`) — botons primaris, secundaris, d'èxit, tots iguals.
+- **Regla 3 (línia 162)**: `background-image: none !important` a TOTS els elements — matava gradients de QuickActions, glass cards, etc.
+- **Fix**: Eliminades les 3 regles. Ara els components controlen els seus propis colors.
+
+### Rendiment
+
+#### 6. Dashboard 12× més ràpid al primer load
+- **Causa**: El bucle d'ingressos mensuals feia `for (let m = 0; m < 12; m++) { await Promise.all([cur, prev]) }` — 12 iteracions seqüencials, 2 queries cada una = 12 round trips a la BD.
+- **Fix**: Totes les 24 queries en un sol `Promise.all()` — 1 round trip en lloc de 12.
+- **Extra**: Query de checklist setting ara cacheada amb `cachedQuery()`.
+
+### Qualitat menor
+- Accents catalans: "Ultims" → "Últims", "Valoracio" → "Valoració", "Confirmacio" → "Confirmació"
+- `SendPostEventButton.tsx`: Canviat de `fetchWithCsrf` (innecessari) a `fetch` simple, afegit estat `sent` visual
+
+### Verificació
+- `npx tsc --noEmit`: 0 errors
+- `npm run build`: OK (233 pàgines)
+- SMTP verificat: connexió OK a smtp.dondominio.com:465
+
+---
+
+## 2026-03-08 — Migració Supabase → Railway + Tasques pendents
+
+### Objectiu
+Completar les 3 tasques pendents de la sessió anterior i migrar completament de Supabase a Railway.
+
+### Raonament
+Supabase ha tancat el període de gràcia gratuït. Railway ja es paga ($15/mes) i ofereix BD PostgreSQL integrada. Millor consolidar tot en un sol proveïdor que pagar dos serveis. A més, Supabase s'usava de forma mixta (Prisma per la majoria + client Supabase per a customerService i events), cosa que era una inconsistència arquitectònica.
+
+### Tasques completades
+
+#### 1. costPerUnit a Extra (schema.prisma)
+- Afegit camp `costPerUnit Float?` al model Extra
+- Permetrà calcular semàfors de marge per extra individual
+
+#### 2. prisma db push (Railway)
+- BD configurada: `tramway.proxy.rlwy.net:57035/railway`
+- Aplicats: Invoice, InvoiceStatus, ContractStatus, camps contracte a Proposal, costPerUnit a Extra
+- `.env`, `.env.local`, `.env.production`, `.env.railway` actualitzats amb nova connexió
+
+#### 3. sync-packs-to-db.ts
+- 10 packs creats amb traduccions ca/es/en
+- Noms en català clar: Bàsic, Premium, Exclusiu, Complet, Còctel, Estàndard, Gala
+
+#### 4. Eliminació total de Supabase (14 fitxers)
+**Per què?** Supabase feia dues coses: BD (ja migrada a Prisma fa temps) i Storage (pujada fitxers). Les úniques parts que encara usaven el client Supabase directe eren customerService.ts, events/route.ts i les rutes de pujada de fitxers. Consolidar-ho tot a Prisma + filesystem és més coherent i elimina una dependència externa.
+
+**Fitxers eliminats:**
+- `lib/supabase.ts` — client centralitzat, tipus legacy
+- `scripts/sync-inventory-images.mjs` — depenia de Supabase Storage
+- `@supabase/supabase-js` — desinstal·lat de package.json
+
+**Fitxers reescrits (Supabase → Prisma):**
+- `lib/services/customerService.ts` — totes les queries ara amb Prisma, tipus de Prisma Client
+- `app/api/admin/events/route.ts` — queries de bookings via Prisma
+
+**Fitxers reescrits (Supabase Storage → filesystem local):**
+- `app/api/upload/route.ts` — pujada general de fitxers
+- `app/api/admin/inventory/[id]/photo/route.ts` — fotos inventari
+- `app/api/admin/leads/[id]/documents/route.ts` — documents de leads
+- `app/api/admin/leads/[id]/documents/[documentId]/route.ts` — eliminació documents
+
+**Nous fitxers creats:**
+- `lib/storage.ts` — mòdul de storage amb filesystem local (uploadFile, deleteFile, readFile, getPublicUrl, isLocalStorageUrl)
+- `app/api/uploads/[...path]/route.ts` — serveix fitxers pujats amb cache immutable i MIME types
+
+**Fitxers netejats:**
+- `lib/inventory-image-constants.ts` — eliminat bucket Supabase, isInventoryBucketUrl
+- `lib/env.ts` — eliminades vars SUPABASE_*, afegit UPLOADS_DIR
+- `next.config.mjs` — eliminat `*.supabase.co` de remotePatterns i CSP
+- `app/admin/inventory/InventoryListClient.tsx` — `.supabase.co/` → `/api/uploads/`
+- `app/admin/layout.tsx` — "Prisma + Supabase" → "Prisma + Railway"
+- `app/admin/inventory/[id]/InventoryPhotoUpload.tsx` — comentaris actualitzats
+- `.env`, `.env.local`, `.env.production`, `.env.railway`, `.env.example` — eliminades totes les vars Supabase
+
+### Verificació
+- `npx tsc --noEmit`: 0 errors
+- `npm run build`: OK
+- `npx vitest run`: 167 tests, tots passen
+- `grep -ri supabase *.{ts,tsx,js,mjs}`: 0 resultats
+
+---
+
 ## 2026-03-04 sessió 5 — Visual Potent + Reporting + PWA + Automatitzacions + UX Polish
 
 ### Objectiu

@@ -471,7 +471,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <div className="admin-sidebar-foot-card">
             <p className="admin-sidebar-foot-kicker">Sistema</p>
             <p className="admin-sidebar-foot-title">Òrbita Admin</p>
-            <p className="admin-sidebar-foot-meta">v2.0 · Prisma + Supabase</p>
+            <p className="admin-sidebar-foot-meta">v2.1 · Prisma + Railway</p>
           </div>
         </div>
       </aside>

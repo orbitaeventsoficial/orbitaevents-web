@@ -1,38 +1,19 @@
-// app/api/admin/inventory/[id]/photo/route.ts
-// API per pujar fotos d'inventari a Supabase Storage
+/**
+ * API per pujar fotos d'inventari (Local Storage)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
-import { supabaseAdmin } from '@/lib/supabase';
+import { uploadFile, deleteFile, isLocalStorageUrl } from '@/lib/storage';
 import {
-  INVENTORY_BUCKET,
-  INVENTORY_BUCKET_CONFIG,
   INVENTORY_IMAGE_MAX_DIMENSION,
   INVENTORY_IMAGE_MAX_FILE_SIZE,
   INVENTORY_IMAGE_WEBP_QUALITY,
   inventoryImagePath,
-  isInventoryBucketUrl,
 } from '@/lib/inventory-image-constants';
-
-let bucketEnsured = false;
-
-/** Crea el bucket si no existeix (una sola vegada per instància de servidor) */
-async function ensureBucket() {
-  if (bucketEnsured || !supabaseAdmin) return;
-  try {
-    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const exists = buckets?.some((b) => b.name === INVENTORY_BUCKET);
-    if (!exists) {
-      await supabaseAdmin.storage.createBucket(INVENTORY_BUCKET, INVENTORY_BUCKET_CONFIG);
-      log.info(`Bucket "${INVENTORY_BUCKET}" creat automàticament a Supabase Storage`);
-    }
-    bucketEnsured = true;
-  } catch (err) {
-    log.error('Error creant bucket:', err);
-  }
-}
 
 interface Params {
   params: { id: string };
@@ -70,15 +51,6 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Element no trobat' }, { status: 404 });
     }
 
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase Storage no configurat' },
-        { status: 503 }
-      );
-    }
-
-    await ensureBucket();
-
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
@@ -90,45 +62,23 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'El fitxer supera 10 MB' }, { status: 400 });
     }
 
-    const filePath = inventoryImagePath(item.code);
+    const filePath = `inventory/${inventoryImagePath(item.code)}`;
 
-    // Eliminar foto anterior si existeix al mateix path
-    await supabaseAdmin.storage.from(INVENTORY_BUCKET).remove([filePath]);
+    // Eliminar foto anterior si existeix
+    await deleteFile(filePath);
 
     const buffer = await normalizeInventoryImage(file);
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from(INVENTORY_BUCKET)
-      .upload(filePath, buffer, {
-        contentType: 'image/webp',
-        upsert: true,
-      });
-
-    if (uploadError) {
-      log.error('Error pujant a Supabase Storage:', uploadError);
-      return NextResponse.json(
-        { error: 'Error pujant fitxer a Storage' },
-        { status: 500 }
-      );
-    }
-
-    const { data: urlData } = supabaseAdmin.storage
-      .from(INVENTORY_BUCKET)
-      .getPublicUrl(filePath);
-
-    const imageUrl = urlData.publicUrl;
+    const result = await uploadFile(filePath, buffer);
 
     await prisma.inventoryItem.update({
       where: { id },
-      data: { imageUrl },
+      data: { imageUrl: result.publicUrl },
     });
 
-    return NextResponse.json({ ok: true, imageUrl });
+    return NextResponse.json({ ok: true, imageUrl: result.publicUrl });
   } catch (error) {
     log.error('Error pujant foto inventari:', error);
-    return NextResponse.json(
-      { error: 'Error pujant foto' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error pujant foto' }, { status: 500 });
   }
 }
 
@@ -149,18 +99,9 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Element no trobat' }, { status: 404 });
     }
 
-    // Eliminar de Supabase Storage — només si la URL pertany al nostre bucket.
-    // Evita intentar eliminar imatges externes (URLs d'altres dominis o fonts antigues).
-    if (supabaseAdmin && item.imageUrl && isInventoryBucketUrl(item.imageUrl)) {
-      const filePath = inventoryImagePath(item.code);
-      const { error: removeError } = await supabaseAdmin.storage
-        .from(INVENTORY_BUCKET)
-        .remove([filePath]);
-      if (removeError) {
-        log.warn("No s'ha pogut eliminar la imatge del Storage (continuem):", {
-          message: removeError.message,
-        });
-      }
+    if (item.imageUrl && isLocalStorageUrl(item.imageUrl)) {
+      const filePath = `inventory/${inventoryImagePath(item.code)}`;
+      await deleteFile(filePath);
     }
 
     await prisma.inventoryItem.update({
@@ -171,9 +112,6 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     log.error('Error eliminant foto inventari:', error);
-    return NextResponse.json(
-      { error: 'Error eliminant foto' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error eliminant foto' }, { status: 500 });
   }
 }

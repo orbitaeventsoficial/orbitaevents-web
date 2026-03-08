@@ -507,7 +507,7 @@ export default function InventoryListClient() {
                       alt={item.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform"
-                      unoptimized={item.imageUrl.startsWith('data:') || item.imageUrl.includes('.supabase.co/')}
+                      unoptimized={item.imageUrl.startsWith('data:') || item.imageUrl.includes('/api/uploads/')}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl">

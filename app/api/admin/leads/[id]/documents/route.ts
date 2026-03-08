@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { supabaseAdmin } from '@/lib/supabase';
+import { uploadFile } from '@/lib/storage';
 import { requireAuth } from '@/lib/auth';
 import type { LeadDocumentType } from '@prisma/client';
 
@@ -47,10 +47,6 @@ export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Storage no configurat' }, { status: 500 });
-    }
-
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const title = String(formData.get('title') || '').trim();
@@ -81,22 +77,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     const path = `leads/${params.id}/documents/${timestamp}-${random}.${ext}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { data, error } = await supabaseAdmin.storage
-      .from('media')
-      .upload(path, buffer, {
-        contentType: file.type,
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-    if (error) {
-      log.error('Error pujant document', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    const { data: urlData } = supabaseAdmin.storage
-      .from('media')
-      .getPublicUrl(data.path);
+    const result = await uploadFile(path, buffer);
 
     const doc = await prisma.leadDocument.create({
       data: {
@@ -104,8 +85,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         type,
         source: 'MANUAL',
         title,
-        fileUrl: urlData.publicUrl,
-        filePath: data.path,
+        fileUrl: result.publicUrl,
+        filePath: result.path,
         mimeType: file.type,
         size: file.size,
         createdBy,

@@ -141,27 +141,14 @@ html.admin-mode .admin-nav-section {
 }
 
 /* ─── GRADIENT CONTROL ──────────────────────────────────────────────────
-   Legacy gradient ban is SELECTIVE now: only kill Tailwind gradient classes
-   from the public site. Admin-specific .admin-gradient-* classes are allowed.
-   SVG elements are also excluded so charts/icons can use gradients. ──── */
-html.admin-mode .admin-layout-shell [class*='bg-gradient']:not(.admin-gradient),
-html.admin-mode .admin-layout-shell [class*='from-']:not(.admin-gradient):not(svg *),
-html.admin-mode .admin-layout-shell [class*='via-']:not(.admin-gradient):not(svg *),
-html.admin-mode .admin-layout-shell [class*='to-']:not(.admin-gradient):not(svg *) {
-  background-image: none !important;
-}
-
+   Només neutralitza gradients de la web pública que es filtrin a l'admin.
+   No toquem res dins .admin-main-shell (els components admin controlen
+   els seus propis colors). ──── */
 html.admin-mode .admin-layout-shell .gradient-text-gold,
 html.admin-mode .admin-layout-shell .title-gradient {
   background: none !important;
   -webkit-text-fill-color: currentColor !important;
   color: var(--at-text) !important;
-}
-
-/* Global kill — but exclude admin-gradient-* and SVG */
-html.admin-mode .admin-layout-shell *:not(.admin-gradient):not(.admin-gradient *):not(svg):not(svg *),
-html.admin-mode .admin-main-shell *:not(.admin-gradient):not(.admin-gradient *):not(svg):not(svg *) {
-  background-image: none !important;
 }
 
 /* ═══ ADMIN GRADIENT CLASSES — Controlled gradients ═══ */
@@ -344,14 +331,12 @@ html.admin-mode .admin-hero-glow {
 }
 
 /* ═══ UNIFIED CARDS — glass treatment ═══ */
-html.admin-mode .admin-main-shell :is(.panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
-  background: var(--at-panel) !important;
-  border-color: var(--at-border) !important;
-}
-
-html.admin-mode .admin-main-shell .admin-quote-studio {
-  background: transparent !important;
-  border-color: transparent !important;
+/* Només apliquem fons fosc a classes genèriques .panel/.card,
+   NO a utilities Tailwind (rounded-xl etc.) que tenen colors propis. */
+html.admin-mode .admin-main-shell > .panel,
+html.admin-mode .admin-main-shell > .card {
+  background: var(--at-panel);
+  border-color: var(--at-border);
 }
 
 /* ─── Inputs ─────────────────────────────────────────────────────────── */
@@ -371,16 +356,10 @@ html.admin-mode .admin-main-shell :is(input, textarea)::placeholder {
 }
 
 /* ─── Buttons ────────────────────────────────────────────────────────── */
-html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
-  background: var(--at-raised) !important;
-  border-color: var(--at-border-strong) !important;
-  color: var(--at-text) !important;
+/* Els botons admin tenen els seus propis estils via classes CSS.
+   Només apliquem transició base, sense sobreescriure colors. */
+html.admin-mode .admin-main-shell :is(button, [role='button']) {
   transition: all 0.2s ease-out;
-}
-
-html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors):hover {
-  background: color-mix(in oklab, var(--at-raised) 75%, var(--at-brand) 25%) !important;
-  border-color: var(--at-brand) !important;
 }
 
 /* ═══ PIPELINE STATUS COLORS ═══ */

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function CalendarSyncButton({ bookingId }: { bookingId: string }) {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
     setMessage(null);
     setIsError(false);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/calendar-sync`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/calendar-sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, ProposalDTO, ProposalStatus } from '@/lib/customer-hub/dto';
 import { labelEstatPressupost } from '@/lib/customer-hub/labels';
 import { formatDateSimple } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
@@ -36,7 +37,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
     setConfirmingId(null);
 
     try {
-      const res = await fetch(`/api/admin/proposals/${proposalId}/send`, {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -62,7 +63,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
       const payload: Record<string, unknown> = { status };
       if (status === 'ACCEPTED') payload.acceptedAt = new Date().toISOString();
 
-      const res = await fetch(`/api/admin/proposals/${proposalId}`, {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposalId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -293,7 +294,7 @@ function ProposalCard({
     setContractBusy(true);
     setContractError(null);
     try {
-      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract`, {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -323,7 +324,7 @@ function ProposalCard({
     setContractBusy(true);
     setContractError(null);
     try {
-      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract/send`, {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -343,7 +344,7 @@ function ProposalCard({
     setContractBusy(true);
     setContractError(null);
     try {
-      const res = await fetch(`/api/admin/proposals/${proposal.id}/contract`, {
+      const res = await fetchWithCsrf(`/api/admin/proposals/${proposal.id}/contract`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

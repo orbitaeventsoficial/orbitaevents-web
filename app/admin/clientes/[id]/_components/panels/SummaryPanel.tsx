@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import { formatDate, formatDateFull, formatDateShort, formatDateSimple } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY PANEL MILLORAT
@@ -70,7 +71,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/customers/${data.customer.id}`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${data.customer.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

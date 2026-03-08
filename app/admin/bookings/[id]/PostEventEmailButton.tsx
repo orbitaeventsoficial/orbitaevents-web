@@ -14,10 +14,11 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
     setError(null);
 
     try {
+      const formData = new FormData();
+      formData.append('bookingId', bookingId);
       const res = await fetch('/api/admin/emails/send-post-event', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId }),
+        body: formData,
       });
 
       if (!res.ok) {

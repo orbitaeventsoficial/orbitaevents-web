@@ -5,6 +5,7 @@ import { formatDateTime } from '@/lib/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/customers/${data.customer.id}/activities`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${data.customer.id}/activities`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

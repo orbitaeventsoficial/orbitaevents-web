@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type SavedView = {
   id: string;
@@ -38,7 +39,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/leads/views', {
+      const res = await fetchWithCsrf('/api/admin/leads/views', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, query: currentQuery }),
@@ -60,7 +61,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/leads/views?id=${encodeURIComponent(id)}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/views?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
       });
       const data = await res.json().catch(() => ({}));

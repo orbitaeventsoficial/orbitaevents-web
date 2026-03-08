@@ -388,9 +388,11 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     const diffMs = new Date(nextEventRaw.eventDate).getTime() - now.getTime();
     const daysUntil = Math.max(0, Math.ceil(diffMs / 86400000));
     // Checklist state for next event
-    const checklistSetting = await prisma.setting.findUnique({
-      where: { key: `booking.checklist.${nextEventRaw.id}` },
-    }).catch(() => null);
+    const checklistSetting = await cachedQuery(
+      `admin:dashboard:checklist-setting:${nextEventRaw.id}`,
+      () => prisma.setting.findUnique({ where: { key: `booking.checklist.${nextEventRaw.id}` } }),
+      CacheTTL.SHORT
+    ).catch(() => null);
     let checklistDone = 0;
     let checklistTotal = 7; // default items count
     if (checklistSetting?.value) {
@@ -430,19 +432,23 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const [monthlyRevenueData, eventTypeData] = await Promise.all([
     cachedQuery('admin:dashboard:monthly-revenue-12', async () => {
       const currentYear = now.getFullYear();
-      const data: { label: string; current: number; previous: number }[] = [];
-      for (let m = 0; m < 12; m++) {
+      // Totes les 24 queries en paral·lel (12 mesos × 2 anys)
+      const allQueries = Array.from({ length: 12 }, (_, m) => {
         const curStart = new Date(currentYear, m, 1);
         const curEnd = new Date(currentYear, m + 1, 0, 23, 59, 59, 999);
         const prevStart = new Date(currentYear - 1, m, 1);
         const prevEnd = new Date(currentYear - 1, m + 1, 0, 23, 59, 59, 999);
-        const [cur, prev] = await Promise.all([
+        return Promise.all([
           prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: curStart, lte: curEnd } }, _sum: { total: true } }),
           prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: prevStart, lte: prevEnd } }, _sum: { total: true } }),
         ]);
-        data.push({ label: monthLabels[m], current: Number(cur._sum.total) || 0, previous: Number(prev._sum.total) || 0 });
-      }
-      return data;
+      });
+      const results = await Promise.all(allQueries);
+      return results.map(([cur, prev], m) => ({
+        label: monthLabels[m],
+        current: Number(cur._sum.total) || 0,
+        previous: Number(prev._sum.total) || 0,
+      }));
     }, CacheTTL.MEDIUM).catch(() => monthLabels.map((l) => ({ label: l, current: 0, previous: 0 }))),
     cachedQuery('admin:dashboard:event-type-dist', async () => {
       const groups = await prisma.booking.groupBy({

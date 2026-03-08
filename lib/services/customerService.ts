@@ -1,19 +1,20 @@
 /**
- * CUSTOMER SERVICE - Supabase Version
- * =====================================
- * Gestió de clients amb Supabase
- * Esquema actualitzat amb UUID
+ * CUSTOMER SERVICE - Prisma Version
+ * ==================================
+ * Gestió de clients amb Prisma
  */
 
+import { prisma } from '@/lib/prisma';
+import type { Customer } from '@prisma/client';
 import {
-  supabaseAdmin,
   normalizeEmail,
   normalizeName,
   normalizePhone,
   normalizeInstagram,
   capitalizeName,
-  type Customer,
-} from '@/lib/supabase';
+} from '@/lib/utils/normalize';
+
+export type { Customer };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -43,166 +44,106 @@ export interface UpsertCustomerResult {
 /**
  * Buscar client per email
  */
-// Camps essencials per a consultes de customers
-const CUSTOMER_SELECT_FIELDS = 'id, email, name, name_normalized, phone, phone_normalized, city, instagram, how_found_us, is_vip, consent_marketing, consent_marketing_date, consent_data_processing, consent_data_processing_date, total_events, first_contact_date, last_contact_date, created_at, updated_at';
-
 export async function findCustomerByEmail(email: string): Promise<Customer | null> {
-  if (!supabaseAdmin) return null;
   const normalizedEmail = normalizeEmail(email);
-
-  const { data, error } = await supabaseAdmin
-    .from('customers')
-    .select(CUSTOMER_SELECT_FIELDS)
-    .eq('email', normalizedEmail)
-    .single();
-
-  if (error || !data) return null;
-  return data as Customer;
+  return prisma.customer.findUnique({
+    where: { emailNormalized: normalizedEmail },
+  });
 }
 
 /**
  * Crear o actualitzar client
  */
 export async function upsertCustomer(input: UpsertCustomerInput): Promise<UpsertCustomerResult> {
-  if (!supabaseAdmin) {
-    throw new Error('Database not configured');
-  }
   const normalizedEmail = normalizeEmail(input.email);
-
-  // Buscar si ja existeix
   const existing = await findCustomerByEmail(normalizedEmail);
 
   if (existing) {
-    // Actualitzar
-    const updateData: Record<string, unknown> = {
-      last_contact_date: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const updateData: Record<string, unknown> = {};
 
-    // Actualitzar només camps nous
     if (input.name && !existing.name) {
       updateData.name = capitalizeName(input.name);
-      updateData.name_normalized = normalizeName(input.name);
+      updateData.nameNormalized = normalizeName(input.name);
     }
     if (input.phone && !existing.phone) {
       updateData.phone = input.phone;
-      updateData.phone_normalized = normalizePhone(input.phone);
+      updateData.phoneNormalized = normalizePhone(input.phone);
     }
-    if (input.city && !existing.city) {
-      updateData.city = input.city;
+    if (input.city) {
+      updateData.preferredLocale = existing.preferredLocale;
     }
     if (input.instagram && !existing.instagram) {
       updateData.instagram = normalizeInstagram(input.instagram);
     }
-    if (input.howFoundUs && !existing.how_found_us) {
-      updateData.how_found_us = input.howFoundUs;
+    if (input.consentMarketing && !existing.marketingConsent) {
+      updateData.marketingConsent = true;
+      updateData.marketingConsentDate = new Date();
+    }
+    if (input.consentDataProcessing && !existing.gdprConsent) {
+      updateData.gdprConsent = true;
+      updateData.gdprConsentDate = new Date();
     }
 
-    // Actualitzar consentiments si són nous
-    if (input.consentMarketing && !existing.consent_marketing) {
-      updateData.consent_marketing = true;
-      updateData.consent_marketing_date = new Date().toISOString();
-    }
-    if (input.consentDataProcessing && !existing.consent_data_processing) {
-      updateData.consent_data_processing = true;
-      updateData.consent_data_processing_date = new Date().toISOString();
-    }
+    const updated = await prisma.customer.update({
+      where: { id: existing.id },
+      data: updateData,
+    });
 
-    const { data: updated } = await supabaseAdmin
-      .from('customers')
-      .update(updateData)
-      .eq('id', existing.id)
-      .select()
-      .single();
-
-    return {
-      customer: (updated as Customer) || existing,
-      isNew: false,
-    };
+    return { customer: updated, isNew: false };
   }
 
   // Crear nou client
-  const now = new Date().toISOString();
-  const customerData = {
-    email: normalizedEmail,
-    name: input.name ? capitalizeName(input.name) : null,
-    name_normalized: input.name ? normalizeName(input.name) : null,
-    phone: input.phone || null,
-    phone_normalized: input.phone ? normalizePhone(input.phone) : null,
-    city: input.city || null,
-    instagram: input.instagram ? normalizeInstagram(input.instagram) : null,
-    how_found_us: input.howFoundUs || null,
-    consent_marketing: input.consentMarketing || false,
-    consent_marketing_date: input.consentMarketing ? now : null,
-    consent_data_processing: input.consentDataProcessing || false,
-    consent_data_processing_date: input.consentDataProcessing ? now : null,
-    first_contact_date: now,
-    last_contact_date: now,
-    created_at: now,
-    updated_at: now,
-  };
+  const customer = await prisma.customer.create({
+    data: {
+      email: normalizedEmail,
+      emailNormalized: normalizedEmail,
+      name: input.name ? capitalizeName(input.name) : 'Sense nom',
+      nameNormalized: input.name ? normalizeName(input.name) : 'sense nom',
+      phone: input.phone || null,
+      phoneNormalized: input.phone ? normalizePhone(input.phone) : null,
+      instagram: input.instagram ? normalizeInstagram(input.instagram) : null,
+      gdprConsent: input.consentDataProcessing || false,
+      gdprConsentDate: input.consentDataProcessing ? new Date() : null,
+      marketingConsent: input.consentMarketing || false,
+      marketingConsentDate: input.consentMarketing ? new Date() : null,
+    },
+  });
 
-  const { data: created, error } = await supabaseAdmin
-    .from('customers')
-    .insert(customerData)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Error creant client: ${error.message}`);
-  }
-
-  return {
-    customer: created as Customer,
-    isNew: true,
-  };
+  return { customer, isNew: true };
 }
 
 /**
  * Obtenir client per ID
  */
 export async function getCustomerById(id: string): Promise<Customer | null> {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin
-    .from('customers')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error || !data) return null;
-  return data as Customer;
+  return prisma.customer.findUnique({ where: { id } });
 }
 
 /**
  * Buscar clients
  */
 export async function searchCustomers(query: string, limit = 20): Promise<Customer[]> {
-  if (!supabaseAdmin) return [];
-  const normalizedQuery = query.toLowerCase().trim();
-
-  const { data, error } = await supabaseAdmin
-    .from('customers')
-    .select('*')
-    .or(`email.ilike.%${normalizedQuery}%,name_normalized.ilike.%${normalizedQuery}%,phone_normalized.ilike.%${normalizedQuery}%`)
-    .limit(limit);
-
-  if (error) return [];
-  return (data as Customer[]) || [];
+  const q = query.toLowerCase().trim();
+  return prisma.customer.findMany({
+    where: {
+      OR: [
+        { emailNormalized: { contains: q } },
+        { nameNormalized: { contains: q } },
+        { phoneNormalized: { contains: q } },
+      ],
+    },
+    take: limit,
+  });
 }
 
 /**
  * Obtenir tots els clients
  */
 export async function getAllCustomers(limit = 100): Promise<Customer[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from('customers')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (error) return [];
-  return (data as Customer[]) || [];
+  return prisma.customer.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
 }
 
 /**
@@ -212,42 +153,26 @@ export async function updateCustomer(
   id: string,
   updates: Partial<Customer>
 ): Promise<Customer | null> {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin
-    .from('customers')
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error || !data) return null;
-  return data as Customer;
+  return prisma.customer.update({
+    where: { id },
+    data: updates,
+  });
 }
 
 /**
- * Log activitat del client (ara usa audit_log)
+ * Log activitat del client
  */
 export async function logCustomerActivity(
   customerId: string,
   action: string,
   details?: Record<string, unknown>,
-  ipAddress?: string,
-  userAgent?: string
 ): Promise<void> {
-  if (!supabaseAdmin) return;
-  await supabaseAdmin.from('audit_log').insert({
-    actor_type: 'customer',
-    actor_id: customerId,
-    action,
-    resource_type: 'customer',
-    resource_id: customerId,
-    metadata: details,
-    ip_address: ipAddress,
-    user_agent: userAgent,
-    created_at: new Date().toISOString(),
+  await prisma.customerActivity.create({
+    data: {
+      customerId,
+      action,
+      details: (details as any) || undefined,
+    },
   });
 }
 
@@ -263,16 +188,28 @@ export async function recordConsent(
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {
-  if (!supabaseAdmin) return;
-  await supabaseAdmin.from('consent_records').insert({
-    customer_id: customerId,
-    consent_type: consentType,
-    granted,
-    source,
-    legal_text_version: legalTextVersion,
-    ip_address: ipAddress,
-    user_agent: userAgent,
-    created_at: new Date().toISOString(),
+  // Map string to ConsentType enum
+  const consentTypeMap: Record<string, string> = {
+    'gdpr': 'GDPR_BASIC',
+    'marketing': 'MARKETING_EMAIL',
+    'marketing_email': 'MARKETING_EMAIL',
+    'marketing_sms': 'MARKETING_SMS',
+    'marketing_whatsapp': 'MARKETING_WHATSAPP',
+  };
+
+  const mappedType = consentTypeMap[consentType.toLowerCase()] || 'GDPR_BASIC';
+
+  await prisma.consentRecord.create({
+    data: {
+      customerId,
+      consentType: mappedType as any,
+      granted,
+      grantedAt: granted ? new Date() : null,
+      source,
+      consentVersion: legalTextVersion,
+      ipAddress: ipAddress || null,
+      userAgent: userAgent || null,
+    },
   });
 }
 
@@ -280,17 +217,11 @@ export async function recordConsent(
  * Obtenir estadístiques de clients
  */
 export async function getCustomerStats() {
-  if (!supabaseAdmin) return { total: 0, vip: 0, marketing: 0, withEvents: 0 };
-  const { data: all } = await supabaseAdmin
-    .from('customers')
-    .select('id, is_vip, consent_marketing, total_events');
+  const [total, marketing, withEvents] = await Promise.all([
+    prisma.customer.count(),
+    prisma.customer.count({ where: { marketingConsent: true } }),
+    prisma.customer.count({ where: { totalEvents: { gt: 0 } } }),
+  ]);
 
-  if (!all) return { total: 0, vip: 0, marketing: 0, withEvents: 0 };
-
-  const total = all.length;
-  const vip = all.filter(c => c.is_vip).length;
-  const marketing = all.filter(c => c.consent_marketing).length;
-  const withEvents = all.filter(c => c.total_events > 0).length;
-
-  return { total, vip, marketing, withEvents };
+  return { total, vip: 0, marketing, withEvents };
 }

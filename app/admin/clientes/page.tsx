@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import ExportCsvButton from '../components/ExportCsvButton';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -307,7 +308,7 @@ export default function AdminContactesPage() {
     setActionLoading(true);
 
     try {
-      const response = await fetch('/api/admin/customers', {
+      const response = await fetchWithCsrf('/api/admin/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

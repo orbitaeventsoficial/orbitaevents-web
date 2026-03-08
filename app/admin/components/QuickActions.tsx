@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type CronSummary = {
   processed: number;
@@ -66,7 +67,7 @@ export default function QuickActions() {
     setRunAllSummary(null);
     setDailySummary(null);
     try {
-      const res = await fetch('/api/admin/automation/run-all', {
+      const res = await fetchWithCsrf('/api/admin/automation/run-all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -89,7 +90,7 @@ export default function QuickActions() {
     setRunAllSummary(null);
     setDailySummary(null);
     try {
-      const res = await fetch('/api/admin/automation/daily-summary/run', {
+      const res = await fetchWithCsrf('/api/admin/automation/daily-summary/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

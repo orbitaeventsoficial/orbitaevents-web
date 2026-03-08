@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function CalendarTokenManager({
   baseUrl,
@@ -19,7 +20,7 @@ export default function CalendarTokenManager({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/integrations/calendar-token', {
+      const res = await fetchWithCsrf('/api/admin/integrations/calendar-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

@@ -13,6 +13,7 @@ import { generateQuotePDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { z } from 'zod';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -828,7 +829,7 @@ export default function PresupuestoPdfStudio({
 
     const url = proposalId ? `/api/admin/proposals/${proposalId}` : '/api/admin/proposals';
     const method = proposalId ? 'PATCH' : 'POST';
-    const res = await fetch(url, {
+    const res = await fetchWithCsrf(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1072,7 +1073,7 @@ export default function PresupuestoPdfStudio({
       const savedProposalId = await saveProposalDraft('SENT');
       const targetProposalId = savedProposalId || proposalId;
       if (targetProposalId) {
-        await fetch(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
+        await fetchWithCsrf(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
       }
 
       setMessage(`Pressupost enviat correctament a ${clientEmail.trim()}.`);

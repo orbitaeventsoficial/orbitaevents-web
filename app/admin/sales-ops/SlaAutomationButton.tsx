@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Result = {
   staleLeads: number;
@@ -18,7 +19,7 @@ export default function SlaAutomationButton() {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch('/api/admin/automation/enforce-sla', {
+      const res = await fetchWithCsrf('/api/admin/automation/enforce-sla', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

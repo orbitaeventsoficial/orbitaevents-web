@@ -36,10 +36,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'maps.googleapis.com',
       },
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-      },
     ],
   },
 
@@ -75,10 +71,10 @@ const nextConfig = {
           // En desarrollo permitimos unsafe-eval para el hot reload de Next.js
           scriptSrc,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
-          "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
+          "img-src 'self' data: blob: https://orbitaevents.com https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.es wss://ws-us3.pusher.com https://challenges.cloudflare.com",
+          "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.es wss://ws-us3.pusher.com https://challenges.cloudflare.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },
