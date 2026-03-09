@@ -7,32 +7,89 @@
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { log } from '@/lib/logger';
+import { prisma } from '@/lib/prisma';
 
-// Configuració IMAP - DonDominio
-const IMAP_ALLOW_INSECURE = process.env.IMAP_ALLOW_INSECURE === 'true';
-const IMAP_HOST = (process.env.IMAP_HOST || '').trim();
-const IMAP_PORT_RAW = (process.env.IMAP_PORT || '').trim();
-const IMAP_USER = (process.env.IMAP_USER || '').trim();
-const IMAP_PASS = (process.env.IMAP_PASS || '').trim();
-const IMAP_SECURE =
-  process.env.IMAP_SECURE === 'true' ||
-  (!process.env.IMAP_SECURE && IMAP_PORT_RAW === '993');
+// Interfície de configuració IMAP
+interface ImapConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: { user: string; pass: string };
+  logger: false;
+  tls: { rejectUnauthorized: boolean };
+}
 
-const IMAP_PORT = parseInt(IMAP_PORT_RAW, 10);
+/**
+ * Obtenir configuració IMAP: env vars primer, BD (Settings) com a fallback
+ */
+async function getImapConfig(): Promise<ImapConfig> {
+  let host = (process.env.IMAP_HOST || '').trim();
+  let portRaw = (process.env.IMAP_PORT || '').trim();
+  let user = (process.env.IMAP_USER || '').trim();
+  let pass = (process.env.IMAP_PASS || '').trim();
+  const allowInsecure = process.env.IMAP_ALLOW_INSECURE === 'true';
 
-const IMAP_CONFIG = {
-  host: IMAP_HOST,
-  port: IMAP_PORT,
-  secure: IMAP_SECURE,
-  auth: {
-    user: IMAP_USER,
-    pass: IMAP_PASS,
-  },
-  logger: false as const,
-  tls: {
-    rejectUnauthorized: !IMAP_ALLOW_INSECURE, // Permetre desactivar verificació només si cal
-  },
-};
+  // Fallback a Settings BD si env vars no estan configurades
+  if (!host || !user || !pass) {
+    try {
+      const settings = await prisma.setting.findMany({
+        where: { key: { startsWith: 'imap.' } },
+      });
+      const map: Record<string, string> = {};
+      for (const s of settings) map[s.key] = s.value;
+
+      if (!host && map['imap.host']) host = map['imap.host'];
+      if (!portRaw && map['imap.port']) portRaw = map['imap.port'];
+      if (!user && map['imap.user']) user = map['imap.user'];
+      if (!pass && map['imap.pass']) pass = map['imap.pass'];
+    } catch (e) {
+      log.error('Error llegint config IMAP de BD', e instanceof Error ? e : undefined);
+    }
+  }
+
+  const port = parseInt(portRaw || '993', 10);
+  const secure = process.env.IMAP_SECURE === 'true' ||
+    (!process.env.IMAP_SECURE && String(port) === '993');
+
+  return {
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+    logger: false as const,
+    tls: { rejectUnauthorized: !allowInsecure },
+  };
+}
+
+/**
+ * Obtenir config actual (per mostrar a l'admin, sense password)
+ */
+export async function getImapConfigSafe(): Promise<{
+  host: string; port: number; user: string; secure: boolean; configured: boolean; source: 'env' | 'db' | 'none';
+}> {
+  const envHost = (process.env.IMAP_HOST || '').trim();
+  const envUser = (process.env.IMAP_USER || '').trim();
+  const envPass = (process.env.IMAP_PASS || '').trim();
+
+  if (envHost && envUser && envPass) {
+    const portRaw = (process.env.IMAP_PORT || '993').trim();
+    const port = parseInt(portRaw, 10);
+    return { host: envHost, port, user: envUser, secure: port === 993, configured: true, source: 'env' };
+  }
+
+  try {
+    const settings = await prisma.setting.findMany({ where: { key: { startsWith: 'imap.' } } });
+    const map: Record<string, string> = {};
+    for (const s of settings) map[s.key] = s.value;
+
+    if (map['imap.host'] && map['imap.user'] && map['imap.pass']) {
+      const port = parseInt(map['imap.port'] || '993', 10);
+      return { host: map['imap.host'], port, user: map['imap.user'], secure: port === 993, configured: true, source: 'db' };
+    }
+  } catch { /* ignore */ }
+
+  return { host: '', port: 993, user: '', secure: true, configured: false, source: 'none' };
+}
 
 export interface EmailMessage {
   id: string;
@@ -63,10 +120,11 @@ export interface EmailMessage {
  * Connectar al servidor IMAP
  */
 export async function connectIMAP(): Promise<ImapFlow> {
-  if (!IMAP_HOST || !IMAP_PORT || Number.isNaN(IMAP_PORT) || !IMAP_USER || !IMAP_PASS) {
-    throw new Error('IMAP not configured');
+  const config = await getImapConfig();
+  if (!config.host || !config.port || Number.isNaN(config.port) || !config.auth.user || !config.auth.pass) {
+    throw new Error('IMAP not configured — configura les credencials a /admin/inbox/settings');
   }
-  const client = new ImapFlow(IMAP_CONFIG);
+  const client = new ImapFlow(config);
   await client.connect();
   return client;
 }
