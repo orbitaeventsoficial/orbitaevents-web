@@ -1,13 +1,29 @@
 #!/usr/bin/env node
 
 /**
- * Sync Google Reviews - Build Script
- * Se ejecuta durante el build para obtener resenas de Google.
+ * Sync Google Reviews - Build Script + Cron
+ * S'executa durant el build i/o via cron diari per obtenir ressenyes de Google.
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+// Carrega .env si existeix (per execució local / scripts)
+const __dirname2 = dirname(fileURLToPath(import.meta.url));
+const envPath = join(__dirname2, '..', '.env');
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const value = trimmed.slice(eqIdx + 1).trim();
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

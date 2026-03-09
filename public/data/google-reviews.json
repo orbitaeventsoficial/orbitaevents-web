@@ -1,6 +1,71 @@
 {
-  "lastUpdated": "2026-02-18T18:08:38.574Z",
+  "lastUpdated": "2026-03-09T10:56:31.824Z",
   "rating": 5,
-  "total": 12,
-  "reviews": []
+  "total": 16,
+  "reviews": [
+    {
+      "author_name": "Luna Gonzalez",
+      "rating": 5,
+      "text": "Muy profesional , se adapto al estilo musical que deseabamos ademas de ser muy amable . El evento salio super bien Gracias a su rapida respuesta. Lo más imporatante que la gente bailo mucho. Repetiremos.",
+      "time": 1768153428,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIygbMyayQ7td3jm6hKYiFZJP7-rxmSuh4yl7mLnnVWKsKebA=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "Javier Garrido",
+      "rating": 5,
+      "text": "Organizamos un evento, y fue todo genial, la gente quedó muy contenta. Muy recomendable.",
+      "time": 1768213329,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocLfEPs5b9KymyDzu1BukMg1giSUmIWEO-2O_8nlSqWrOhvq5w=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "Anabel Calzado",
+      "rating": 5,
+      "text": "Lo pasamos genial, totalmente recomendable, buen montaje y se adapta a tus gustos, genial 🥳🎇👌",
+      "time": 1771425535,
+      "relative_time_description": "2 semanas atrás",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIj1NI03FwzUrY2qbbJLdC7UL0_qATy3oAD9auxFZIM8DLS-g=s120-c-rp-mo-ba3-br100"
+    },
+    {
+      "author_name": "GASTON GUEDES",
+      "rating": 5,
+      "text": "10/10 uno de los mejores dj la verdad, la pasamos super bien, uno de lo mejores animando y siguiéndonos con la fiesta, lo super recomiendo!!!",
+      "time": 1768573114,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocJXc99SsJJjDT-GwFmO7slCFJPZAYI31-Q3G0HN1nuVllQalls=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "Raquel Vilarejo tortajada",
+      "rating": 5,
+      "text": "Todo perfecto lo contraté un par de veces para diferentes eventos y todo un acierto, Carles encantador, no dudaré en volverlo a llamar!!!",
+      "time": 1767987039,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocK-x0E2D3ffq3eTr0huqpxPAML61nZxYauCHooL-Qt4iGm4uA=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "Ana Fernandez Calzado",
+      "rating": 5,
+      "text": "Contratamos a òrbita events para un cumpleaños y fue un verdadero acierto, buena música, se adapta a todo y buena animación, sin duda volveremos a contar con el",
+      "time": 1771853904,
+      "relative_time_description": "una semana atrás",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocL1dUooNX965ljcsyKHgR26JABQWtJD-NXusttotrz0nRuK6g=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "Laia Mestre",
+      "rating": 5,
+      "text": "Ahir a la nit ens va acompanyar en una celebració amb amics, durant el sopar va posar música ambient molt xula i després vam disfrutar ballant amb bona música! Molt recomenable!",
+      "time": 1770547387,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjV_-q4WVZoNHM6zHeVuAekARmdE3LrYxysKU7B08OucONlcpS0=s120-c-rp-mo-br100"
+    },
+    {
+      "author_name": "marta quincoces riera",
+      "rating": 5,
+      "text": "La Meva experiencia amb órbita events..va ser brutal vaig participar a un tardeo ..que la música va ser inmillorable..amb una empatía fora de serie !!! El día seguent em feia malt tot de tant ballar !!!!!",
+      "time": 1767990068,
+      "relative_time_description": "Hace un mes",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocL-7DhpkYu8JGNUylvy-RH-aGkYZhwuWUC7v8AOh6Z00f0iHg=s120-c-rp-mo-br100"
+    }
+  ]
 }

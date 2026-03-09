@@ -171,12 +171,30 @@ export const SITE_CONFIG = {
     citiesCovered: 2,
     recommendRate: 100,
     peoplesDancing: 5000,
-    avgRating: 5.0,
-    reviewCount: 50,
+    avgRating: (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const data = require('../../public/data/google-reviews.json');
+        return data.rating || 5.0;
+      } catch { return 5.0; }
+    })(),
+    reviewCount: (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const data = require('../../public/data/google-reviews.json');
+        return data.total || 0;
+      } catch { return 0; }
+    })(),
     responseTime: '2h',
 
-    // Fecha de ultima actualizacion
-    lastUpdated: '2026-02-18',
+    // S'actualitza automàticament des de public/data/google-reviews.json
+    lastUpdated: (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const data = require('../../public/data/google-reviews.json');
+        return data.lastUpdated?.split('T')[0] || new Date().toISOString().split('T')[0];
+      } catch { return new Date().toISOString().split('T')[0]; }
+    })(),
   },
 
   // ============================================

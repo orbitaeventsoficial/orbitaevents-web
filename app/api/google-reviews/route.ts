@@ -210,6 +210,26 @@ async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpda
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// OBTENIR RESSENYES DEL CACHE CRON (BD Setting cache.googleReviews)
+// ═══════════════════════════════════════════════════════════════════════════
+async function getReviewsFromCache(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string; total?: number; rating?: number }> {
+  if (shouldSkipDb()) return { reviews: [] };
+  try {
+    const cached = await prisma.setting.findUnique({ where: { key: 'cache.googleReviews' } });
+    if (!cached?.value) return { reviews: [] };
+    const data = JSON.parse(cached.value);
+    const reviews: GoogleReview[] = (data.reviews || []).map((r: Record<string, unknown>) => ({
+      ...r,
+      source: 'json' as const,
+      language: (r.language as string) || 'es',
+    }));
+    return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
+  } catch {
+    return { reviews: [] };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // OBTENIR RESSENYES DE LA BASE DE DADES
 // ═══════════════════════════════════════════════════════════════════════════
 async function getReviewsFromDatabase(): Promise<GoogleReview[]> {
@@ -304,15 +324,16 @@ async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
 // ═══════════════════════════════════════════════════════════════════════════
 export async function GET() {
   try {
-    // Obtenir ressenyes de totes les fonts
-    const [jsonData, dbReviews, googleReviews, gbpReviews] = await Promise.all([
+    // Obtenir ressenyes de totes les fonts en paral·lel
+    const [jsonData, dbReviews, googleReviews, gbpReviews, cachedData] = await Promise.all([
       getReviewsFromJson(),
       getReviewsFromDatabase(),
       getReviewsFromGoogle(),
       getReviewsFromBusinessProfile(),
+      getReviewsFromCache(),
     ]);
 
-    // Prioritat: Google API > JSON estàtic > Database
+    // Prioritat: GBP API > Google Places > Cache cron > JSON deploy > Database
     let allReviews: GoogleReview[] = [];
     let source: 'google' | 'database' | 'json' | 'mixed' = 'database';
 
@@ -322,12 +343,22 @@ export async function GET() {
     } else if (googleReviews.length > 0) {
       allReviews = [...googleReviews, ...dbReviews];
       source = dbReviews.length > 0 ? 'mixed' : 'google';
+    } else if (cachedData.reviews.length > 0) {
+      allReviews = [...cachedData.reviews, ...dbReviews];
+      source = dbReviews.length > 0 ? 'mixed' : 'json';
     } else if (jsonData.reviews.length > 0) {
       allReviews = [...jsonData.reviews, ...dbReviews];
       source = dbReviews.length > 0 ? 'mixed' : 'json';
     } else {
       allReviews = dbReviews;
       source = 'database';
+    }
+
+    // Usar total/rating del cache o JSON (el que sigui més recent)
+    if (cachedData.total && cachedData.total > (jsonData.total || 0)) {
+      jsonData.total = cachedData.total;
+      jsonData.rating = cachedData.rating;
+      jsonData.lastUpdated = cachedData.lastUpdated;
     }
 
     // Ordenar per data i filtrar per rating mínim
