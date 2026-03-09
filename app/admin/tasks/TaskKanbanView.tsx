@@ -131,7 +131,7 @@ export default function TaskKanbanView() {
           onDragLeave={() => { if (dragOverStatus === col.status) setDragOverStatus(null); }}
           onDrop={(e) => { e.preventDefault(); handleDrop(col.status); }}
           className={`rounded-2xl border flex min-h-[320px] flex-col transition-all ${col.toneClass} ${
-            dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50' : ''
+            dragOverStatus === col.status ? 'admin-drop-active' : ''
           }`}
         >
           {/* Header */}
@@ -145,7 +145,7 @@ export default function TaskKanbanView() {
           {/* Cards */}
           <div className="flex-1 p-2 space-y-2">
             {dragOverStatus === col.status && (
-              <div className="rounded-xl border border-dashed px-2 py-1 text-center text-[10px]">
+              <div className="admin-drag-placeholder rounded-xl px-2 py-3 text-center text-[10px]">
                 Deixa anar aquí
               </div>
             )}
@@ -160,7 +160,8 @@ export default function TaskKanbanView() {
                 draggable
                 onDragStart={(e) => { e.dataTransfer.setData('text/plain', task.id); e.dataTransfer.effectAllowed = 'move'; setDraggingId(task.id); }}
                 onDragEnd={() => { setDraggingId(null); setDragOverStatus(null); }}
-                className={`rounded-xl border p-3 transition-all hover:brightness-105 cursor-grab active:cursor-grabbing ${col.cardTone}`}
+                data-dragging={draggingId === task.id || undefined}
+                className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 cursor-grab active:cursor-grabbing ${col.cardTone}`}
               >
                 <p className="text-sm font-semibold line-clamp-2">{task.title}</p>
 

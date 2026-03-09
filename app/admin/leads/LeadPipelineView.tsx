@@ -300,7 +300,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               void handleDropOnColumn(col.status);
             }}
             className={`min-w-0 rounded-2xl border flex min-h-[320px] flex-col transition-all ${col.toneClass} ${
-              dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50' : ''
+              dragOverStatus === col.status ? 'admin-drop-active' : ''
             }`}
           >
             {/* Column header */}
@@ -318,7 +318,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             {/* Cards */}
             <div className="flex-1 p-2 space-y-2">
               {dragOverStatus === col.status && (
-                <div className="admin-leads-dropzone rounded-xl border border-dashed px-2 py-1 text-center text-[10px]">
+                <div className="admin-drag-placeholder rounded-xl px-2 py-3 text-center text-[10px]">
                   Deixa anar aquí
                 </div>
               )}
@@ -340,6 +340,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                   columnLabel={col.label}
                   cardToneClass={col.cardToneClass}
                   updatingId={updatingId}
+                  isDragging={draggingLeadId === lead.id}
                   onMoveStatus={moveLeadStatus}
                   onDragStart={setDraggingLeadId}
                   onDragEnd={() => {
@@ -393,6 +394,7 @@ function PipelineCard({
   columnLabel,
   cardToneClass,
   updatingId,
+  isDragging,
   onMoveStatus,
   onDragStart,
   onDragEnd,
@@ -402,6 +404,7 @@ function PipelineCard({
   columnLabel: string;
   cardToneClass: string;
   updatingId: string | null;
+  isDragging: boolean;
   onMoveStatus: (id: string, status: string) => Promise<void>;
   onDragStart: (leadId: string) => void;
   onDragEnd: () => void;
@@ -423,7 +426,8 @@ function PipelineCard({
         onDragStart(lead.id);
       }}
       onDragEnd={onDragEnd}
-      className={`rounded-xl border p-3 transition-all hover:brightness-105 ${cardToneClass} ${
+      data-dragging={isDragging || undefined}
+      className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 ${cardToneClass} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >

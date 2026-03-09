@@ -657,12 +657,12 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('available'); }}
               onDragLeave={() => setDropZone((p) => p === 'available' ? null : p)}
               onDrop={dropOut}
-              className={`rounded-xl border p-3 ${dropZone === 'available' ? 'border-rose-400/60 bg-rose-500/10' : 'border-white/10 bg-white/[0.03]'}`}
+              className={`rounded-xl border p-3 transition-all ${dropZone === 'available' ? 'admin-drop-active border-rose-400/60 bg-rose-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
               <p className="mb-2 text-sm font-semibold">Disponibles ({available.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-xl border p-2">
+                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -680,12 +680,12 @@ export default function EditPackForm({
               onDragOver={(e) => { e.preventDefault(); setDropZone('included'); }}
               onDragLeave={() => setDropZone((p) => p === 'included' ? null : p)}
               onDrop={dropIn}
-              className={`rounded-xl border p-3 ${dropZone === 'included' ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03]'}`}
+              className={`rounded-xl border p-3 transition-all ${dropZone === 'included' ? 'admin-drop-active border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
               <p className="mb-2 text-sm font-semibold">Inclosos ({included.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-xl border p-2">
+                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -721,9 +721,9 @@ export default function EditPackForm({
                   </article>
                 ))}
                 {included.length === 0 && (
-                  <p className="rounded-xl border border-dashed p-4 text-center text-sm">
+                  <div className="admin-drag-placeholder rounded-xl p-4 text-center text-sm">
                     Arrossega aquí els elements del pack.
-                  </p>
+                  </div>
                 )}
               </div>
             </div>
