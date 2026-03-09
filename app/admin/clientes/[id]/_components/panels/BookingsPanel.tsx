@@ -32,12 +32,18 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
 }
 
 export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
+  const now = new Date();
+  const upcoming = data.bookings.filter((b) => b.date && new Date(b.date) >= now && b.status !== 'CANCELLED');
+  const past = data.bookings.filter((b) => !b.date || new Date(b.date) < now || b.status === 'CANCELLED');
+
   return (
     <section className="rounded-2xl border p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Reserves / Dates</h2>
-          <p className="text-sm">Planificació d&apos;esdeveniments del client.</p>
+          <p className="text-sm">
+            {data.bookings.length} total · {upcoming.length} properes · {past.length} passades
+          </p>
         </div>
         <Link
           href={`/admin/bookings/new?customerId=${data.customer.id}`}
@@ -53,7 +59,11 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
             Sense reserves. Crea la primera reserva del client.
           </p>
         ) : (
-          data.bookings.map((booking) => {
+          <>
+          {upcoming.length > 0 && (
+            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300">Properes ({upcoming.length})</p>
+          )}
+          {upcoming.map((booking) => {
             const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-white/10 bg-white/5 text-white/60';
 
             return (
@@ -66,16 +76,26 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                   </span>
                 </div>
 
-                {/* Event type + data + horari */}
+                {/* Event type + data + horari + countdown */}
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   {booking.eventType && (
-                    <span className="">{EVENT_TYPE_LABELS[booking.eventType] || booking.eventType}</span>
+                    <span>{EVENT_TYPE_LABELS[booking.eventType] || booking.eventType}</span>
                   )}
-                  <span className="">
+                  <span>
                     {booking.date
                       ? formatDateFull(booking.date)
                       : 'Sense data'}
                   </span>
+                  {booking.date && new Date(booking.date) >= now && booking.status !== 'CANCELLED' && (() => {
+                    const days = Math.ceil((new Date(booking.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    return (
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        days <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/50'
+                      }`}>
+                        {days === 0 ? 'AVUI' : `${days}d`}
+                      </span>
+                    );
+                  })()}
                   {(booking.startTime || booking.endTime) && (
                     <span className="">
                       {booking.startTime || '?'} – {booking.endTime || '?'}
@@ -125,7 +145,30 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 </div>
               </div>
             );
-          })
+          })}
+          {past.length > 0 && (
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-white/40">Passades / Cancel·lades ({past.length})</p>
+          )}
+          {past.map((booking) => {
+            const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-white/10 bg-white/5 text-white/60';
+            return (
+              <div key={booking.id} className="rounded-xl border border-white/5 p-4 opacity-60">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold">{booking.reference || booking.id.slice(0, 8)}</p>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusColor}`}>
+                    {labelEstatReserva(booking.status)}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
+                <div className="mt-2 border-t border-white/5 pt-2">
+                  <Link href={`/admin/bookings/${booking.id}`} className="text-xs">
+                    Obrir fitxa →
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+          </>
         )}
       </div>
     </section>

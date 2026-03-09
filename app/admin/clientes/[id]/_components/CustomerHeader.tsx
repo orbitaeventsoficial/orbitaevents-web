@@ -84,6 +84,24 @@ const STATUS_STYLES: Record<HubStatus | 'default', { bg: string; text: string; b
   },
 };
 
+const AVATAR_COLORS: Record<HubStatus | 'default', string> = {
+  LEAD: 'bg-gradient-to-br from-white/20 to-white/5',
+  NEGOTIATION: 'bg-gradient-to-br from-amber-500/30 to-amber-600/10',
+  CONFIRMED: 'bg-gradient-to-br from-emerald-500/30 to-emerald-600/10',
+  POSTEVENT: 'bg-gradient-to-br from-indigo-500/30 to-indigo-600/10',
+  LOST: 'bg-gradient-to-br from-rose-500/30 to-rose-600/10',
+  default: 'bg-gradient-to-br from-white/20 to-white/5',
+};
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() || '')
+    .join('');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
@@ -180,11 +198,18 @@ export default function CustomerHeader({
   }, [id, refresh]);
 
   return (
-    <header className="sticky top-0 z-30 border-b backdrop-blur">
-      <div className="mx-auto max-w-7xl px-4 py-3 space-y-3">
+    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur bg-gradient-to-b from-black/80 to-transparent">
+      <div className="mx-auto max-w-7xl px-4 py-4 space-y-4">
         {/* Top row: Navigation + Status + Name */}
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="flex items-start gap-4 min-w-0">
+            {/* Avatar */}
+            <div
+              className={`hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white/90 shadow-lg ring-1 ring-white/10 ${AVATAR_COLORS[status] || AVATAR_COLORS.default}`}
+            >
+              {getInitials(data.customer.name)}
+            </div>
+            <div className="min-w-0 flex-1">
             {/* Breadcrumb + Status */}
             <div className="flex items-center gap-2 flex-wrap">
               <Link
@@ -281,6 +306,7 @@ export default function CustomerHeader({
                 </a>
               )}
             </div>
+            </div>
           </div>
 
           {/* CTAs */}
@@ -342,23 +368,30 @@ export default function CustomerHeader({
         <div className="grid gap-3 lg:grid-cols-2">
           <div className="rounded-xl border p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider">On està aquest client</p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex items-center overflow-x-auto">
               {stageOrder.map((stage, idx) => {
                 const isCurrent = stage === status;
                 const isDone = status !== 'LOST' && idx < currentStageIndex;
+                const isLost = stage === 'LOST' && status === 'LOST';
                 return (
-                  <span
-                    key={stage}
-                    className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
-                      isCurrent
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                        : isDone
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : 'bg-white/5 text-white/40 border border-white/10'
-                    }`}
-                  >
-                    {stageLabel[stage]}
-                  </span>
+                  <div key={stage} className="flex items-center">
+                    {idx > 0 && (
+                      <div className={`h-px w-4 sm:w-8 shrink-0 ${isDone ? 'bg-emerald-500/40' : 'bg-white/10'}`} />
+                    )}
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap ${
+                        isCurrent
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
+                          : isDone
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            : isLost
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : 'bg-white/5 text-white/40 border border-white/10'
+                      }`}
+                    >
+                      {isDone && '✓ '}{stageLabel[stage]}
+                    </span>
+                  </div>
                 );
               })}
             </div>

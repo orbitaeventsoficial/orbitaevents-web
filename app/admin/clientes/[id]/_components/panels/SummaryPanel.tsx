@@ -236,6 +236,64 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         </div>
       </div>
 
+      {/* Resum financer visual */}
+      {((data.kpis.totalQuoted ?? 0) > 0 || (data.kpis.totalPaid ?? 0) > 0) && (() => {
+        const quoted = data.kpis.totalQuoted ?? 0;
+        const paid = data.kpis.totalPaid ?? 0;
+        const pct = quoted > 0 ? Math.round((paid / quoted) * 100) : 0;
+        return (
+          <div className="rounded-2xl border p-5">
+            <h2 className="text-lg font-semibold">Resum financer</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider">Pressupostat</p>
+                <p className="mt-1 text-2xl font-semibold">{fmtMoney(quoted)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider">Cobrat</p>
+                <p className="mt-1 text-2xl font-semibold text-emerald-300">{fmtMoney(paid)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider">Marge estimat</p>
+                <p className="mt-1 text-2xl font-semibold text-cyan-300">{fmtMoney(data.kpis.marginEstimated)}</p>
+              </div>
+            </div>
+            {quoted > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span>Cobrament</span>
+                  <span>{pct}%</span>
+                </div>
+                <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+                    style={{ width: `${Math.min(100, pct)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Countdown pròxim event */}
+      {nextEvent && nextEvent.date && (
+        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-cyan-300">Pròxim esdeveniment</p>
+              <p className="mt-1 text-lg font-semibold">{nextEvent.reference || 'Reserva'}</p>
+              <p className="text-sm">{formatDateFull(nextEvent.date)}{nextEvent.startTime && ` · ${nextEvent.startTime}`}</p>
+              {nextEvent.location && <p className="text-xs mt-1">{nextEvent.location}</p>}
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-cyan-300">{getDaysUntil(nextEvent.date)}</p>
+              <p className="text-xs">dies</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pròxima acció / Pròxim esdeveniment */}
       <div className="grid gap-4 sm:grid-cols-2">
         <ActionCard
@@ -502,6 +560,18 @@ function QuickAction({
       {label}
     </a>
   );
+}
+
+function fmtMoney(value?: number): string {
+  if (typeof value !== 'number') return '—';
+  return `${value.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€`;
+}
+
+function getDaysUntil(dateStr: string): number {
+  const target = new Date(dateStr);
+  const now = new Date();
+  const diffMs = target.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 }
 
 function formatRelativeDate(dateStr: string): string {

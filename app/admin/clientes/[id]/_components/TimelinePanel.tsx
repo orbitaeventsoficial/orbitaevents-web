@@ -157,7 +157,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
             onClick={() => setFilter(opt.key)}
             className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors ${
               filter === opt.key
-                ? 'bg-white/10 text-black'
+                ? 'bg-white text-black'
                 : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/80'
             }`}
           >

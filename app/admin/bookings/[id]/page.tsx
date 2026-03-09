@@ -15,6 +15,7 @@ import InvoiceSection from './InvoiceSection';
 import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
+import BookingSectionNav from './BookingSectionNav';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -296,28 +297,48 @@ export default async function BookingDetailPage({ params }: PageProps) {
       title={`Reserva ${booking.reference}`}
       back={{ href: '/admin/bookings', label: 'Reserves' }}
       subtitle={
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
-            {statusConf.label}
-          </span>
-          <span className="text-sm">{eventType} · {formatDate(booking.eventDate)}</span>
-          {customer && (
-            <Link
-              href={`/admin/clientes/${customer.id}`}
-              className="ap-btn ap-btn--secondary"
-            >
-              👤 Fitxa Client
-            </Link>
-          )}
-          {booking.lead && (
-            <Link
-              href={`/admin/leads/${booking.lead.id}`}
-              className="ap-btn ap-btn--secondary"
-            >
-              📥 Entrada original
-            </Link>
-          )}
-        </div>
+        (() => {
+          const daysUntil = Math.ceil((booking.eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+          const isPast = daysUntil < 0;
+          const isToday = daysUntil === 0;
+          const isSoon = daysUntil > 0 && daysUntil <= 7;
+          return (
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
+                {statusConf.label}
+              </span>
+              <span className="text-sm">{eventType} · {formatDate(booking.eventDate)}</span>
+              {!isPast && !isToday && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                  isSoon ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-white/10 text-white/60'
+                }`}>
+                  {daysUntil} {daysUntil === 1 ? 'dia' : 'dies'}
+                </span>
+              )}
+              {isToday && booking.status !== 'COMPLETED' && (
+                <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 animate-pulse">
+                  AVUI
+                </span>
+              )}
+              {customer && (
+                <Link
+                  href={`/admin/clientes/${customer.id}`}
+                  className="ap-btn ap-btn--secondary"
+                >
+                  Fitxa Client
+                </Link>
+              )}
+              {booking.lead && (
+                <Link
+                  href={`/admin/leads/${booking.lead.id}`}
+                  className="ap-btn ap-btn--secondary"
+                >
+                  Entrada original
+                </Link>
+              )}
+            </div>
+          );
+        })()
       }
       actions={
         <BookingStatusChanger
@@ -382,8 +403,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </div>
       </section>
 
+      <BookingSectionNav />
+
       {/* Client Info */}
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-client" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -467,7 +490,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Event Info */}
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-event" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -502,7 +525,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Services */}
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-serveis" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
@@ -565,15 +588,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Equipament assignat */}
-      <BookingInventorySection bookingId={booking.id} />
+      <div id="sec-equipament" className="scroll-mt-28">
+        <BookingInventorySection bookingId={booking.id} />
+      </div>
 
-      <ClientPortalAccessPanel
-        bookingId={booking.id}
-        initialActive={activePortalAccess}
-      />
+      <div id="sec-portal" className="scroll-mt-28">
+        <ClientPortalAccessPanel
+          bookingId={booking.id}
+          initialActive={activePortalAccess}
+        />
+      </div>
 
       {/* Pricing */}
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-finances" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -621,6 +648,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       )}
 
       {/* Margin + Travel Cost (editable) */}
+      <div id="sec-marge" className="scroll-mt-28">
       <BookingMarginCard
         bookingId={booking.id}
         total={Number(booking.total)}
@@ -644,8 +672,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
         fixedOperationalCost={profitabilityConfig.fixedOperationalCost}
         targetMarginPct={targetMarginPct}
       />
+      </div>
 
       {/* Document Flow: Pressupost → Contracte → Factura */}
+      <div id="sec-documents" className="scroll-mt-28">
       <DocumentFlowSection
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         proposals={(booking.proposals as any[]).map((p) => ({
@@ -681,6 +711,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           createdAt: inv.createdAt.toISOString(),
         }))}
       />
+      </div>
 
       {/* Notes */}
       {booking.notes && (
@@ -690,7 +721,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-comunicacions" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">Historial de comunicacions</h2>
         {recentCommRows.length === 0 ? (
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
@@ -722,7 +753,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Activity timeline */}
       {activityTimeline.length > 0 && (
-        <section className="rounded-xl border border-white/10 shadow-sm p-6">
+        <section id="sec-historial" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
           <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
           <div className="relative pl-6 space-y-0">
             <div className="absolute left-2 top-1 bottom-1 w-px bg-white/10" />

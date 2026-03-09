@@ -206,13 +206,6 @@ export default async function BookingsPage({
         <BookingViewToggle />
       </div>
 
-      {/* Info Alert */}
-      <div className="rounded-2xl border admin-card-glass p-3 text-center sm:p-4">
-        <p className="text-xs sm:text-sm">
-          <strong>Auto:</strong> Quan passa a <span className="font-semibold">COMPLETED</span>, les stats públiques s&apos;actualitzen.
-        </p>
-      </div>
-
       {/* Kanban View */}
       {isKanban && (
         <BookingPipelineViewWrapper />
@@ -303,8 +296,18 @@ export default async function BookingsPage({
                       {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                     </span>
                   </div>
-                  <span className="font-medium">
+                  <span className="font-medium flex items-center gap-1.5">
                     {formatDateShort(booking.eventDate)}
+                    {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
+                      const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
+                      return (
+                        <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+                          d === 0 ? 'bg-cyan-500/20 text-cyan-300' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
+                        }`}>
+                          {d === 0 ? 'AVUI' : `${d}d`}
+                        </span>
+                      );
+                    })()}
                   </span>
                 </div>
                 <div className="mt-3">
@@ -384,9 +387,21 @@ export default async function BookingsPage({
                       <td className="px-4 py-3 text-xs text-center whitespace-nowrap">{eventType}</td>
                       <td className="px-4 py-3 text-center">
                         <div className="font-medium text-xs">{formatDate(booking.eventDate)}</div>
-                        {booking.eventStartTime && (
-                          <div className="text-xs">{booking.eventStartTime}</div>
-                        )}
+                        <div className="flex items-center justify-center gap-1 mt-0.5">
+                          {booking.eventStartTime && (
+                            <span className="text-xs">{booking.eventStartTime}</span>
+                          )}
+                          {!isPast && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (() => {
+                            const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
+                            return (
+                              <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+                                d === 0 ? 'bg-cyan-500/20 text-cyan-300' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
+                              }`}>
+                                {d === 0 ? 'AVUI' : `${d}d`}
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium">

@@ -1,5 +1,32 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-10 sessió 8 — Redisseny UX Fitxa Client + Reserves "ben pensades"
+
+### Fet
+1. **CustomerHeader redesign**: Avatar amb inicials (gradient per estat), fons gradient, stepper visual amb línies connectors i checkmarks (✓) per fases completades, ombra glow a fase activa
+2. **SummaryPanel enriquit**: Nou "Resum financer" (pressupostat/cobrat/marge + barra de progrés cobrament %). Countdown visual al pròxim event (dies grans + detalls)
+3. **BookingsPanel millorat**: Agrupació properes vs passades/cancel·lades. Countdown per dies a cada reserva. Passades en opacitat reduïda. Resum "X total · Y properes · Z passades"
+4. **BookingSectionNav**: Nou component sticky amb IntersectionObserver — navegació ràpida per 10 seccions (Client, Event, Serveis, Equipament, Portal, Finances, Marge, Documents, Comunicacions, Historial). Cada secció amb `scroll-mt-28` i `id`
+5. **Booking detail countdown**: Badge al subtítol amb dies fins l'event (ambre si ≤7d, cyan pulsant si AVUI)
+6. **Booking list countdown**: Badges de dies tant a mobile cards com a desktop table
+7. **TimelinePanel fix**: Filtre actiu era invisible (text-black sobre bg-white/10) → corregit a bg-white text-black
+8. **Neteja**: Eliminada alerta informativa innecessària del llistat de reserves
+
+### Raonament
+- L'usuari va demanar explícitament fitxa client i reserves "ben pensades" — centrat en UX pràctica per un DJ que gestiona events
+- Avatar dóna identitat visual ràpida al client, stepper amb connectors mostra el progrés de forma clara
+- Resum financer amb barra de progrés permet veure d'un cop d'ull quant falta cobrar
+- Countdown és la informació més important per a qui gestiona events — quants dies falten
+- Section nav resol el problema de la pàgina de reserva monolítica (800+ línies, 15 seccions) — ara pots saltar directament
+- Agrupació properes/passades al BookingsPanel evita confusió entre events actius i històrics
+
+### Stats
+- Build: OK, tsc: 0 errors, tests: 167 (tots passen)
+- Fitxers modificats: CustomerHeader.tsx, SummaryPanel.tsx, BookingsPanel.tsx, TimelinePanel.tsx, bookings/[id]/page.tsx, bookings/page.tsx
+- Fitxers creats: BookingSectionNav.tsx
+
+---
+
 ## 2026-03-09 sessió 7 — Emails i18n complets + Vista diària + Firma + Form extraction
 
 ### Fet
