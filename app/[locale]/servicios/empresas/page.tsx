@@ -104,7 +104,7 @@ export default async function EmpresasPage({ params }: PageProps) {
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        offers={packs.map((pack) => ({
+        offers={packs.map((pack: { name: string; priceValue: number; slug: string; tagline: string }) => ({
           '@type': 'Offer',
           name: pack.name,
           price: String(pack.priceValue),

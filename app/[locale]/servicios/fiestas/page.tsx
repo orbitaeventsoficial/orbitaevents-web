@@ -116,7 +116,7 @@ export default async function FiestasPage({ params }: PageProps) {
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        offers={packs.map((pack) => ({
+        offers={packs.map((pack: { name: string; priceValue: number; slug: string; tagline: string }) => ({
           '@type': 'Offer',
           price: String(pack.priceValue),
           priceCurrency: 'EUR',

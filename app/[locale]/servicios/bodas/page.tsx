@@ -93,7 +93,7 @@ export default async function BodasPage({ params }: PageProps) {
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
-        offers={packs.map((p) => ({
+        offers={packs.map((p: { name: string; priceValue: number; slug: string; tagline: string }) => ({
           '@type': 'Offer',
           name: p.name,
           price: String(p.priceValue),

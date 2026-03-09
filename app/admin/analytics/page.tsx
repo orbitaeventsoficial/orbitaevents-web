@@ -155,7 +155,7 @@ async function getOperationalKpis() {
       proposalsSentOrAccepted > 0 ? (proposalsAccepted / proposalsSentOrAccepted) * 100 : 0;
     const avgFirstContactHours =
       contactedLeads.length > 0
-        ? contactedLeads.reduce((sum, row) => {
+        ? contactedLeads.reduce((sum: number, row: { createdAt: Date; contactedAt: Date | null }) => {
             if (!row.contactedAt) return sum;
             return sum + (row.contactedAt.getTime() - row.createdAt.getTime()) / (1000 * 60 * 60);
           }, 0) / contactedLeads.length
@@ -637,7 +637,7 @@ export default async function AnalyticsPage() {
             <p className="mt-1 text-xs">{data.leads.thisYear} entrades aquest any</p>
           </div>
           <div className="p-4 space-y-3">
-            {data.leads.bySource.map((source) => {
+            {data.leads.bySource.map((source: { source: string; _count: number }) => {
               const percentage = data.leads.total > 0
                 ? (source._count / data.leads.total * 100).toFixed(1)
                 : '0';
@@ -673,7 +673,7 @@ export default async function AnalyticsPage() {
             <p className="mt-1 text-xs">Estat de les entrades</p>
           </div>
           <div className="p-4 space-y-3">
-            {data.leads.conversionByMonth.map((status) => {
+            {data.leads.conversionByMonth.map((status: { status: string; _count: number }) => {
               const percentage = data.leads.thisYear > 0
                 ? (status._count / data.leads.thisYear * 100).toFixed(1)
                 : 0;
@@ -717,7 +717,7 @@ export default async function AnalyticsPage() {
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {data.bookings.byEventType.map((type) => {
+            {data.bookings.byEventType.map((type: { eventType: string; _count: number }) => {
               const config = ANALYTICS_EVENT_LABELS[type.eventType] || { label: type.eventType, icon: '📅' };
               return (
                 <div

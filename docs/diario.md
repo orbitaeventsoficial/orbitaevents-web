@@ -1,5 +1,57 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 2 — Pressupostos funcionals + Lockfile + Type errors + Dossier
+
+### Objectiu
+Fer que els pressupostos FUNCIONIN de debò: que es puguin trobar, llistar, filtrar i editar. Arreglar el build a Railway (lockfile). Crear dossier permanent per no re-auditar.
+
+### Canvis
+
+#### 1. Lockfile sense Supabase (fix build Railway)
+- **Causa**: `pnpm-lock.yaml` encara tenia 18 línies de `@supabase/supabase-js` però `package.json` ja no.
+- **Fix**: `pnpm install --lockfile-only --no-frozen-lockfile` → lockfile regenerat, 0 refs supabase.
+- **Impacte**: El build a Railway fallava amb `ERR_PNPM_OUTDATED_LOCKFILE`.
+
+#### 2. Pressupostos carreguen des de la BD
+- **Causa**: Quan obries `/admin/presupuestos?proposalId=XXX`, el `PresupuestoPdfStudio` rebia l'ID però MAI feia fetch del snapshot guardat. Tots els camps apareixien buits.
+- **Fix**: Afegit `useEffect` que fa `GET /api/admin/proposals/[id]` i restaura TOTS els camps: pack, preu, extras, client, dates, condicions, marca.
+- **Fitxer**: `PresupuestoPdfStudio.tsx` (75 línies noves)
+
+#### 3. Llistat de pressupostos millorat
+- **Abans**: Només 20 últims en una llista plana, sense filtres, sense accions.
+- **Ara**: Component `ProposalsList.tsx` (nou) amb:
+  - 5 stats cards clicables (Total, Esborranys, Enviats, Acceptats, Rebutjats)
+  - Valor total acceptat visible
+  - Cerca per client/referència
+  - Filtre per estat (clic a la card)
+  - Taula completa amb: referència (link editar), client (link hub), badge estat amb color, import, data relativa
+  - Menú accions: editar, marcar enviat, acceptat/rebutjat, fitxa client, entrada
+  - Pressupostos antics (LeadDocument) en collapsable
+- **Pàgina**: `presupuestos/page.tsx` reescrit — sense paràmetres mostra el llistat, amb paràmetres mostra l'editor.
+
+#### 4. Type errors preexistents arreglats (9 fitxers)
+Amb Prisma regenerat correctament, el build strict revela callbacks `.map()` sense tipus:
+- `bodas/page.tsx`, `discomovil/page.tsx`, `fiestas/page.tsx`, `empresas/page.tsx` — `packs.map((p)` → tipat
+- `analytics/page.tsx` — 3 `.reduce()`/`.map()` tipats (bySource, conversionByMonth, byEventType)
+- `bookings/[id]/page.tsx` — 8 callbacks tipats (commLogs, activityLogs, extras, inventory, invoices, proposals)
+
+#### 5. Dossier permanent creat
+- **Fitxer**: `docs/estat-admin.md` — referència completa de l'admin (64 pàgines, 132 API, 5 crons, 37 serveis)
+- **Objectiu**: NO re-auditar cada sessió. Consultar el dossier i actualitzar només el que canvia.
+- **Enllaç al diari**: Aquí sota.
+
+### Referència
+- Estat complet de l'admin: `docs/estat-admin.md`
+- Full de ruta de millores: al final del dossier (4 prioritats altes, 4 mitjanes, 4 baixes)
+
+### Verificació
+- `next build`: OK (236 pàgines)
+- `prisma generate`: OK
+- Lockfile: 0 refs supabase
+- tsc: 0 errors nous
+
+---
+
 ## 2026-03-09 — Auditoria de bugs funcionals + correcció CSS + rendiment
 
 ### Objectiu

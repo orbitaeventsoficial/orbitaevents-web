@@ -524,6 +524,87 @@ export default function PresupuestoPdfStudio({
     }
   }, [draftLoaded]);
 
+  // Load existing proposal from API when opened with proposalId
+  useEffect(() => {
+    if (!initialProposalId || !draftLoaded) return;
+    let cancelled = false;
+
+    async function loadProposal() {
+      try {
+        const res = await fetch(`/api/admin/proposals/${initialProposalId}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        const snap = data?.proposal?.snapshot;
+        if (!snap || cancelled) return;
+
+        // Restore all state from snapshot
+        if (snap.locale) setLocale(snap.locale as Locale);
+        if (snap.eventType) setEventType(snap.eventType as ServiceSlug);
+        if (snap.packId) setPackId(snap.packId);
+        if (snap.packName) setPackName(snap.packName);
+        if (typeof snap.basePrice === 'number') setBasePrice(snap.basePrice);
+        if (typeof snap.durationHours === 'number') setDurationHours(snap.durationHours);
+        if (Array.isArray(snap.features)) setFeaturesText(snap.features.join('\n'));
+        if (Array.isArray(snap.conditions)) setConditionsText(snap.conditions.join('\n'));
+        if (snap.whyChooseUs) setWhyChooseUs(snap.whyChooseUs);
+
+        // Customer
+        if (snap.customer) {
+          if (snap.customer.customerId) setCustomerId(snap.customer.customerId);
+          if (snap.customer.name) setClientName(snap.customer.name);
+          if (snap.customer.email) setClientEmail(snap.customer.email);
+          if (snap.customer.phone) setClientPhone(snap.customer.phone);
+          if (snap.customer.contact) setClientContact(snap.customer.contact);
+        }
+
+        // Event
+        if (snap.event) {
+          if (snap.event.date) setEventDate(snap.event.date);
+          if (snap.event.schedule) setEventSchedule(snap.event.schedule);
+          if (snap.event.location) setEventLocation(snap.event.location);
+          if (typeof snap.event.guests === 'number') setGuests(snap.event.guests);
+        }
+
+        // Pricing
+        if (snap.pricing) {
+          if (typeof snap.pricing.travelKm === 'number') setTravelKm(snap.pricing.travelKm);
+          if (typeof snap.pricing.discount === 'number') setDiscount(snap.pricing.discount);
+          if (snap.pricing.discountReason) setDiscountReason(snap.pricing.discountReason);
+        }
+
+        // Extras
+        if (snap.extras) {
+          if (Array.isArray(snap.extras.preset)) {
+            setSelectedExtras(snap.extras.preset.map((e: { id: string }) => e.id));
+          }
+          if (Array.isArray(snap.extras.custom)) {
+            setCustomExtras(snap.extras.custom.map((e: { id: string; name: string; price: number }) => ({
+              id: e.id, name: e.name, price: e.price,
+            })));
+          }
+        }
+
+        // Brand
+        if (snap.brand) {
+          if (snap.brand.brandName) setBrandName(snap.brand.brandName);
+          if (snap.brand.brandWebsite) setBrandWebsite(snap.brand.brandWebsite);
+          if (snap.brand.brandEmail) setBrandEmail(snap.brand.brandEmail);
+          if (snap.brand.brandPhone) setBrandPhone(snap.brand.brandPhone);
+          if (snap.brand.brandTagline) setBrandTagline(snap.brand.brandTagline);
+        }
+
+        // Validity
+        if (data.proposal?.validityDays) setValidityDays(data.proposal.validityDays);
+      } catch (error) {
+        console.error('Error loading proposal:', error);
+      }
+    }
+
+    void loadProposal();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProposalId, draftLoaded]);
+
   useEffect(() => {
     if (packId === CUSTOM_PACK_ID || !selectedPack) return;
     const looksLikeI18nKey = (value: string) =>

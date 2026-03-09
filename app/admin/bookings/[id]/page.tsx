@@ -257,7 +257,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
   const bAny = booking as Record<string, unknown>;
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
-  const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
+  const extrasTotal = booking.extras?.reduce((sum: number, e: { price?: number | null; quantity?: number | null }) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
   const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
   const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
   const marginTargetRaw = Number(marginTargetSetting?.value);
@@ -265,27 +265,27 @@ export default async function BookingDetailPage({ params }: PageProps) {
     ? (marginTargetRaw > 1 ? marginTargetRaw : marginTargetRaw * 100)
     : 35;
   const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
-  const assignedItemIds = (booking.inventory || []).map((assigned) => assigned.itemId);
+  const assignedItemIds = (booking.inventory || []).map((assigned: { itemId: string }) => assigned.itemId);
   const usageByItem = assignedItemIds.length > 0
     ? new Map(
         (await prisma.inventoryUsage.groupBy({
           by: ['itemId'],
           where: { itemId: { in: assignedItemIds } },
           _sum: { hoursUsed: true },
-        })).map((row) => [row.itemId, row._sum.hoursUsed || 0])
+        })).map((row: { itemId: string; _sum: { hoursUsed: number | null } }) => [row.itemId, row._sum.hoursUsed || 0] as [string, number])
       )
     : new Map<string, number>();
-  const inventoryCostReal = (booking.inventory || []).reduce((sum, assigned) => {
+  const inventoryCostReal = (booking.inventory || []).reduce((sum: number, assigned: { item: { purchasePrice: number | null; expectedLifeHours: number | null }; quantity: number | null }) => {
     const perHour = calculateCostPerHour(assigned.item.purchasePrice, assigned.item.expectedLifeHours);
     return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
   }, 0);
-  const remainingHoursList = (booking.inventory || []).map((assigned) => {
+  const remainingHoursList = (booking.inventory || []).map((assigned: { item: { expectedLifeHours: number | null; name: string }; itemId: string }) => {
     const expectedLifeHours = assigned.item.expectedLifeHours || 2000;
-    const used = usageByItem.get(assigned.itemId) || 0;
+    const used = Number(usageByItem.get(assigned.itemId) || 0);
     return Math.max(0, expectedLifeHours - used);
   });
   const inventoryRemainingHoursAvg = remainingHoursList.length > 0
-    ? remainingHoursList.reduce((acc, n) => acc + n, 0) / remainingHoursList.length
+    ? remainingHoursList.reduce((acc: number, n: number) => acc + n, 0) / remainingHoursList.length
     : null;
   const inventoryRemainingHoursMin = remainingHoursList.length > 0
     ? Math.min(...remainingHoursList)
@@ -530,7 +530,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
         {booking.extras.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium">Extras</p>
-            {booking.extras.map((extra) => {
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {booking.extras.map((extra: any) => {
               const extraTranslation = getPackTranslation(
                 extra.extra.translations as Array<{ locale: string; name: string; tagline?: string | null }>,
                 booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
@@ -646,7 +647,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Document Flow: Pressupost → Contracte → Factura */}
       <DocumentFlowSection
-        proposals={booking.proposals.map((p) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        proposals={(booking.proposals as any[]).map((p) => ({
           id: p.id,
           reference: p.reference,
           status: p.status,
@@ -656,7 +658,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
           contractPdfUrl: p.contractPdfUrl,
           contractSignedAt: p.contractSignedAt?.toISOString() || null,
         }))}
-        invoices={booking.invoices.map((inv) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoices={(booking.invoices as any[]).map((inv) => ({
           id: inv.id,
           reference: inv.reference,
           status: inv.status,
@@ -667,7 +670,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Invoice */}
       <InvoiceSection
         bookingId={booking.id}
-        invoices={booking.invoices.map((inv) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoices={(booking.invoices as any[]).map((inv) => ({
           id: inv.id,
           reference: inv.reference,
           status: inv.status,
@@ -702,7 +706,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {recentCommRows.map((row) => (
+                {recentCommRows.map((row: { id: string; createdAt: Date; action: string; flow: string; channel: string }) => (
                   <tr key={row.id} className="border-b border-white/10 hover:bg-white/[0.03] transition-colors">
                     <td className="px-2 py-2 whitespace-nowrap">{formatDateTimeFull(row.createdAt)}</td>
                     <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
@@ -722,7 +726,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
           <div className="relative pl-6 space-y-0">
             <div className="absolute left-2 top-1 bottom-1 w-px bg-white/10" />
-            {activityTimeline.map((entry) => (
+            {activityTimeline.map((entry: { id: string; createdAt: Date; icon: string; label: string; description: string }) => (
               <div key={entry.id} className="relative flex items-start gap-3 py-2.5">
                 <span className="absolute -left-4 top-3 w-2 h-2 rounded-full bg-white/30 ring-2 ring-black" />
                 <span className="text-base leading-none">{entry.icon}</span>
