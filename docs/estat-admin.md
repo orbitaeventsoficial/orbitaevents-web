@@ -136,7 +136,7 @@
 1. ~~**Llistat pressupostos millorat**~~ ✅ Fet (2026-03-09)
 2. ~~**Calendari vista setmanal**~~ ✅ Fet (2026-03-09) — toggle mes/setmana
 3. **Templates email editables** — ara hardcoded al codi
-4. **Configuració IMAP des de l'admin** — ara cal tocar Railway
+4. ~~**Configuració IMAP des de l'admin**~~ ✅ Fet (2026-03-09) — formulari editable + test connexió
 
 ### Prioritat MITJANA (millores significatives)
 5. ~~**Gestió disponibilitat**~~ ✅ Fet (2026-03-09) — bloquejar/desbloquejar inline al calendari

@@ -65,6 +65,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '⭐', label: 'Ressenyes Google', href: '/admin/google-reviews' },
       { icon: '✅', label: 'Testimonis (aprovar)', href: '/admin/ressenyes' },
       { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
+      { icon: '✉️', label: 'Plantilles email', href: '/admin/email-templates' },
     ],
   },
   {

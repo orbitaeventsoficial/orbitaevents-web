@@ -1497,3 +1497,24 @@ model BlogPostTranslation {
   @@unique([postId, locale])
   @@map("blog_post_translations")
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PLANTILLES EMAIL
+// ═══════════════════════════════════════════════════════════════════════════
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  slug        String   // ex: "booking_confirmation", "post_event", "payment_reminder"
+  locale      String   // "ca", "es", "en"
+  subject     String
+  bodyHtml    String   @db.Text
+  description String?  // Descripció per l'admin
+  variables   String?  // JSON: variables disponibles, ex: ["clientName","reference","eventDate"]
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@unique([slug, locale])
+  @@index([slug])
+  @@map("email_templates")
+}
