@@ -1,5 +1,36 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 3 — Ressenyes Google automàtiques
+
+### Problema
+Les ressenyes noves de Google no es reflectien al web. El `google-reviews.json` estava buit (`reviews: []`).
+
+### Causa
+El script `sync-reviews.mjs` no carregava les variables d'entorn (`.env`) quan s'executava com a script Node. `SERPAPI_KEY` existeix però el script no la veia → retornava 0 ressenyes.
+
+### Solució (3 nivells)
+1. **Fix immediat**: Script carrega `.env` automàticament → 8 ressenyes de 5★ sincronitzades (16 total a Google)
+2. **Automatització**: Nou cron `reviews-sync` que sincronitza via SerpAPI i guarda a BD (`cache.googleReviews`)
+3. **Stats dinàmiques**: `site-config.ts` ara llegeix `avgRating` i `reviewCount` del JSON sincronitzat (abans hardcoded 50)
+
+### Flux ara
+```
+Cron diari reviews-sync → SerpAPI → BD (Setting cache.googleReviews)
+                                    ↓
+API /api/google-reviews ← llegeix cache BD + JSON deploy + testimonis BD
+                                    ↓
+Web pública ← GoogleReviewsRotating + OpinionesClient
+```
+
+### Fitxers
+- `scripts/sync-reviews.mjs` — carrega .env automàticament
+- `app/api/cron/reviews-sync/route.ts` — NOU: cron SerpAPI → BD
+- `app/api/google-reviews/route.ts` — nova font `getReviewsFromCache()`
+- `app/config/site-config.ts` — stats dinàmiques
+- `public/data/google-reviews.json` — 8 ressenyes reals
+
+---
+
 ## 2026-03-09 sessió 2 — Pressupostos funcionals + Lockfile + Type errors + Dossier
 
 ### Objectiu

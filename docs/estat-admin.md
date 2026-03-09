@@ -106,6 +106,7 @@
 | `invoice-sync` | Diari | Sync Holded |
 | `pack-pricing-check` | Diari | Alertes preus divergents >15% |
 | `post-event` | Diari | Emails post-event auto |
+| `reviews-sync` | Diari | SerpAPI → ressenyes Google a BD |
 
 ## Serveis clau (lib/services/)
 
