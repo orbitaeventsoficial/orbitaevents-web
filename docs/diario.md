@@ -1,5 +1,49 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 7 — Emails i18n complets + Vista diària + Firma + Form extraction
+
+### Fet
+1. **lib/email.ts — i18n complet**: 3 funcions internacionalitzades a ca/es/en:
+   - `sendPrivacyVerificationEmail`: Tota la UX de verificació RGPD (etiquetes drets, CTA, legal)
+   - `sendPrivacyRequestCompletedEmail`: Resultat processament sol·licitud RGPD
+   - `sendTestimonialApprovedEmail`: Email al client quan s'aprova el testimonial (descompte, CTA)
+   - Noves constants: `PRIVACY_REQUEST_LABELS`, `PRIVACY_COPY`, `TESTIMONIAL_COPY` — tot tipat per `EmailLocale`
+2. **Firma professional email**: `getEmailSignatureHtml()` i `getEmailSignatureText()` exportades des de `lib/email.ts`. S'injecta automàticament a tots els emails enviats des del compose admin (`/api/admin/emails/send`).
+3. **Vista diària calendari**: `CalendarDayClient.tsx` — timeline per hores (06:00-23:00), bloquejar/desbloquejar dia, resum lateral amb detalls de reserves. Toggle Mes/Setmana/Dia a les 3 vistes.
+4. **Bookings form extraction**: `NewBookingForm.tsx` (1045 línies) extret de `new/page.tsx` (ara 5 línies wrapper). Segueix el patró Blog (`BlogEditorForm` + mode prop).
+5. **Callers actualitzats**: `privacy/request/route.ts` passa `locale`, `start-process/route.ts` passa `preferredLocale` a testimonials.
+6. **Scripts audit**: 17 scripts revisats — tots actius i funcionals, cap obsolet.
+7. **Blog form**: Ja estava unificat (`BlogEditorForm.tsx` amb mode prop) — confirmat.
+
+### Commits
+- `45096df` — feat: emails i18n complets + vista diària calendari + firma email + form extraction
+
+### Raonament
+- L'usuari va dir "fesho tot el que quedi pendent" — executat tot el que estava al llistat de tasques pendents.
+- Emails de privacitat/testimonials eren l'últim punt d'i18n pendent — ara TOT enviat des del sistema està en l'idioma del client.
+- La vista diària és la tercera opció del calendari (Mes/Setmana/Dia) — completa el sistema de vistes.
+- L'extracció del form de bookings segueix el patró consolidat del projecte.
+
+---
+
+## TASQUES PENDENTS (actualitzat)
+
+### Alta prioritat
+1. **Canvas editor**: L'usuari va preguntar "i canvas?" — editor visual no implementat.
+2. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real Business API.
+3. **Fitxa client ben pensada**: Redissenyar `/admin/clientes/[id]` amb UX millorada.
+4. **Reserves ben pensades**: Redissenyar UX reserves (llistat + fitxa).
+
+### Mitjana prioritat
+5. **Tot al mòbil**: Millores mòbil específiques a l'admin.
+6. **estat-admin.md**: Actualitzar roadmap (email templates fets, calendari diària feta).
+
+### Baixa prioritat
+7. **Multi-user (rols i permisos)**: Roadmap futur.
+8. **GDPR UI admin**: API existeix, falta pàgina admin.
+
+---
+
 ## 2026-03-09 sessió 6 — PDF Studio D&D + Contractes unificats + Emails idioma client + Auto-traducció
 
 ### Fet
