@@ -386,7 +386,7 @@ export default function InventoryListClient() {
                     key={item.id}
                     type="button"
                     onClick={() => addItemToBundle(item.id)}
-                    className="w-full text-left rounded-xl border px-2 py-1 text-xs"
+                    className="w-full text-left rounded-xl border px-3 py-2 text-xs"
                   >
                     + {item.code} · {item.name}
                   </button>
@@ -394,9 +394,9 @@ export default function InventoryListClient() {
               </div>
               <div className="max-h-24 overflow-auto space-y-1">
                 {selectedBundleItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-xl border px-2 py-1 text-xs">
-                    <span className="">{item.code} · {item.name}</span>
-                    <button type="button" onClick={() => removeItemFromBundle(item.id)} className="">Treure</button>
+                  <div key={item.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-xs">
+                    <span>{item.code} · {item.name}</span>
+                    <button type="button" onClick={() => removeItemFromBundle(item.id)} className="px-2 py-1 rounded-lg hover:bg-white/10 transition-colors">Treure</button>
                   </div>
                 ))}
               </div>

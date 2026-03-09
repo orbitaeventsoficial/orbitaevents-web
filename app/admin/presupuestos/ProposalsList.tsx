@@ -221,8 +221,8 @@ export default function ProposalsList({
       </div>
 
       {/* Proposals table */}
-      <div className="rounded-2xl border overflow-hidden">
-        <table className="w-full text-sm" aria-label="Llistat de pressupostos">
+      <div className="rounded-2xl border overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
           <thead>
             <tr className="border-b bg-white/[0.03]">
               <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Ref.</th>
@@ -269,7 +269,7 @@ export default function ProposalsList({
                   </td>
                   <td className="px-4 py-3 text-right">
                     <details className="relative inline-block">
-                      <summary className="cursor-pointer rounded-lg px-2 py-1 hover:bg-white/10 transition-colors list-none">
+                      <summary className="cursor-pointer rounded-xl px-3 py-2 hover:bg-white/10 transition-colors list-none">
                         <span aria-hidden="true">⋯</span>
                         <span className="sr-only">Accions</span>
                       </summary>
