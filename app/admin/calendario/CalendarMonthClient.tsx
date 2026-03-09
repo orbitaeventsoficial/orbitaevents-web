@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { EVENT_TYPE_PLAIN, formatDateShort, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type CalendarApiDay = {
   reservas: {
@@ -136,6 +137,42 @@ export default function CalendarMonthClient() {
   const [dragOverDateKey, setDragOverDateKey] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [changingDateForBooking, setChangingDateForBooking] = useState<string | null>(null);
+  const [blockingDate, setBlockingDate] = useState(false);
+  const [blockNote, setBlockNote] = useState('');
+  const [showBlockForm, setShowBlockForm] = useState(false);
+
+  const blockDay = useCallback(async (dateKey: string, note?: string) => {
+    setBlockingDate(true);
+    try {
+      const res = await fetchWithCsrf('/api/admin/availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: `${dateKey}T12:00:00.000Z`, note: note || null }),
+      });
+      if (!res.ok) throw new Error('Error bloquejant dia');
+      toast.success(`Dia ${formatDateShort(dateKey)} bloquejat`);
+      setRefreshKey((k) => k + 1);
+      setShowBlockForm(false);
+      setBlockNote('');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error bloquejant dia');
+    } finally {
+      setBlockingDate(false);
+    }
+  }, [toast]);
+
+  const unblockDay = useCallback(async (dateKey: string) => {
+    try {
+      const res = await fetchWithCsrf(`/api/admin/availability?date=${dateKey}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Error desbloquejant dia');
+      toast.success(`Dia ${formatDateShort(dateKey)} desbloquejat`);
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error desbloquejant dia');
+    }
+  }, [toast]);
 
   const moveBookingToDate = useCallback(async (bookingId: string, newDateKey: string) => {
     try {
@@ -604,15 +641,60 @@ export default function CalendarMonthClient() {
                 >
                   + Nova reserva
                 </Link>
-                <Link
-                  href={`/admin/bloqueos/new?date=${selectedDayData.key}`}
-                  className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
-                >
-                  Bloquejar dia
-                </Link>
+                {selectedDayData.payload?.bloqueos?.length ? (
+                  <button
+                    type="button"
+                    onClick={() => unblockDay(selectedDayData.key!)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-emerald-400 transition-all hover:bg-emerald-500/20 active:scale-[0.98]"
+                  >
+                    Desbloquejar dia
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowBlockForm((v) => !v)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/20 active:scale-[0.98]"
+                  >
+                    Bloquejar dia
+                  </button>
+                )}
               </div>
             )}
           </div>
+
+          {/* Formulari bloqueig inline */}
+          {showBlockForm && selectedDayData.key && (
+            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
+              <div className="flex-1 min-w-[200px]">
+                <label htmlFor="block-note" className="block text-xs font-medium mb-1">
+                  Motiu del bloqueig (opcional)
+                </label>
+                <input
+                  id="block-note"
+                  type="text"
+                  value={blockNote}
+                  onChange={(e) => setBlockNote(e.target.value)}
+                  placeholder="p.ex. Vacances, manteniment..."
+                  className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={blockingDate}
+                onClick={() => blockDay(selectedDayData.key!, blockNote)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+              >
+                {blockingDate ? 'Bloquejant...' : 'Confirmar bloqueig'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowBlockForm(false); setBlockNote(''); }}
+                className="inline-flex items-center rounded-xl border px-3 py-2 text-sm transition-all active:scale-[0.98]"
+              >
+                Cancel·lar
+              </button>
+            </div>
+          )}
 
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {/* Reserves */}
@@ -718,14 +800,22 @@ export default function CalendarMonthClient() {
                   selectedDayData.payload.bloqueos.map((b) => (
                     <div
                       key={b.id}
-                      className="rounded-xl border px-3 py-2.5"
+                      className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2.5"
                     >
-                      <div className="font-medium text-sm">
-                        Bloqueig
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-medium text-sm">
+                          Bloqueig
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => unblockDay(b.fecha.slice(0, 10))}
+                          className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                        >
+                          Desbloquejar
+                        </button>
                       </div>
                       <div className="mt-1 text-xs">
-                        {b.motivo ?? 'Sense motiu especificat'}
-                        {b.notas ? ` · ${b.notas}` : ''}
+                        {b.notas || b.motivo || 'Sense motiu especificat'}
                       </div>
                     </div>
                   ))
