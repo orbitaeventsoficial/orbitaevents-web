@@ -1,6 +1,6 @@
 # Estat de l'Admin Òrbita Events — Referència Permanent
 
-> Última actualització: 2026-03-09
+> Última actualització: 2026-03-09 (sessió 4)
 > NO cal re-auditar cada sessió. Només actualitzar les seccions que canvien.
 
 ## Resum
@@ -17,7 +17,7 @@
 | Leads | ✅ Molt complet | Kanban, scoring, flux guiat, workspace, vistes desades |
 | Reserves | ✅ Molt complet | Kanban, marge, portal client, contracte, factura |
 | Clients Hub | ✅ Molt complet | 9 panells, timeline, KPIs |
-| Calendari | ⚠️ Parcial | Vista mensual + bloqueig dies inline, falta vista setmanal |
+| Calendari | ✅ Complet | Vista mensual + setmanal, bloqueig dies inline, drag&drop |
 | Tasques | ✅ Complet | Kanban + llista, checklist diari |
 | Emails | ✅ Complet | Auto + IMAP + post-event |
 | Finances | ✅ Molt complet | Tresoreria, marge, CAC, MITECO, Holded |
@@ -29,7 +29,7 @@
 | Analítica | ✅ Complet | GA4, Ads, KPIs operatius |
 | Configuració | ✅ Complet | Empresa, Holded, integracions, plantilles |
 | Canvas | ✅ Complet | Generador imatges promo |
-| Crons (5) | ✅ Complet | Comercial, fuel, invoices, pricing, post-event |
+| Crons (6) | ✅ Complet | Comercial, fuel, invoices, pricing, post-event, reviews-sync + pàgina monitoratge |
 
 ## Pàgines per ruta
 
@@ -134,14 +134,14 @@
 
 ### Prioritat ALTA (funcionalitat trencada o absent)
 1. ~~**Llistat pressupostos millorat**~~ ✅ Fet (2026-03-09)
-2. **Calendari vista setmanal** — ara només mensual
+2. ~~**Calendari vista setmanal**~~ ✅ Fet (2026-03-09) — toggle mes/setmana
 3. **Templates email editables** — ara hardcoded al codi
 4. **Configuració IMAP des de l'admin** — ara cal tocar Railway
 
 ### Prioritat MITJANA (millores significatives)
 5. ~~**Gestió disponibilitat**~~ ✅ Fet (2026-03-09) — bloquejar/desbloquejar inline al calendari
 6. **WhatsApp integrat** — historial visible a l'admin
-7. **Logs de crons visuals** — ara només al tauler parcialment
+7. ~~**Logs de crons visuals**~~ ✅ Fet (2026-03-09) — /admin/crons amb estat visual
 8. ~~**Aprovació testimonis a la nav**~~ ✅ Fet (2026-03-09)
 
 ### Prioritat BAIXA (nice to have)

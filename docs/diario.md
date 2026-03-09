@@ -1,5 +1,21 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 4 — Calendari complet + Crons monitoratge
+
+### Fet
+1. **Calendari bloqueig/desbloqueig inline**: API `/api/admin/availability` (GET/POST/DELETE). Substituït link mort `/admin/bloqueos/new` per botons funcionals amb formulari de nota opcional.
+2. **Vista setmanal calendari**: Nou `CalendarWeekClient.tsx` amb 7 columnes, reserves detallades, bloqueig inline. Toggle mes/setmana a la barra superior.
+3. **Monitoratge crons**: Nova pàgina `/admin/crons` amb estat visual de tots 6 crons. Cards resum, detall expandible (últim run, estat, resum, missatge error).
+4. **Logging unificat crons**: Afegit `saveRunStatus()` a invoice-sync, pack-pricing-check, post-event, reviews-sync. Tots guarden `lastRun/lastStatus/lastSummary/lastMessage` a Settings.
+5. **Nav actualitzada**: Afegits Testimonis (aprovar) + Crons a la navegació.
+
+### Raonament
+- El calendari era funcionalitat trencada visible — link mort que trencava l'experiència.
+- Vista setmanal molt demanada per veure detall diari de la setmana en curs.
+- Crons invisibles = incertesa — ara l'admin veu l'estat de tot amb un cop d'ull.
+
+---
+
 ## 2026-03-09 sessió 3 — Ressenyes Google automàtiques
 
 ### Problema
