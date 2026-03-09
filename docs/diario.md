@@ -1,5 +1,55 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 6 — PDF Studio D&D + Contractes unificats + Emails idioma client + Auto-traducció
+
+### Fet
+1. **PDF Studio drag & drop**: Seccions del formulari reordenables amb `SortableList`. Cada secció col·lapsable (▸/▾). Ordre persistent a localStorage draft. Icona de drag handle (☰) a cada secció.
+2. **PDF Studio: mode contracte unificat**: Selector "Tipus de document" (Pressupost / Contracte). Secció "Dades del contracte" amb camps legals (NIF, IBAN, dipòsit %, política cancel·lació, clàusules). Genera contracte PDF usant `generateContractPDF()` existent.
+3. **Auto-traducció plantilles email**: Botó "Traduir des del CA → ES/EN" a l'editor de plantilles. Agafa subject + blocs de text i els tradueix via `/api/admin/translate` (DeepL + Google fallback). Només visible quan l'idioma actiu no és català.
+4. **Emails en idioma preferit del client** — 4 fitxers corregits:
+   - `paymentReminderService.ts`: Recordatoris pagament ara en ca/es/en segons `booking.preferredLocale`
+   - `commercialSequenceService.ts`: Follow-ups comercials ara en ca/es/en segons `lead.preferredLocale` (abans tot en castellà fix)
+   - `bookings/[id]/status/route.ts`: Email portal accés (COMPLETED) ara en idioma del client
+   - `bookings/[id]/communications/route.ts`: Tots els emails de comunicació (pagament, post-event, general) en idioma del client
+
+### Auditoria completa d'idiomes als emails (resultat de l'agent explorador)
+- **Correctes** (ja usaven `preferredLocale`): quote, send-post-event, cron/post-event, send genèric, contact form
+- **Corregits en aquesta sessió**: paymentReminder, commercialSequence, status portal, communications
+- **Pendents menors**: `lib/email.ts` (privacitat/testimonials en castellà fix — ús intern poc freqüent)
+
+### Commits
+- `3685cf7` — feat: PDF Studio drag & drop + emails en idioma del client (6 fitxers, +610 −536 línies)
+
+### Raonament
+- L'usuari va dir "superimportantissim que sigui drag and drop" pel PDF Studio — implementat amb SortableList reutilitzable.
+- "El més important és que surti en l'idioma preferit del client" — auditoria exhaustiva de tots els punts d'enviament d'email, 4 fitxers corregits.
+- Unificar pressupost + contracte al mateix editor evita que l'usuari hagi de navegar a llocs diferents.
+
+---
+
+## TASQUES PENDENTS (prioritzades)
+
+### Alta prioritat
+1. **Safata d'entrada completa**: Paperera/arxiu d'emails, enviar email com a Òrbita (compose), firma professional d'email. Ara només es poden llegir emails IMAP.
+2. **Canvas editor**: L'usuari va preguntar "i canvas?" — editor visual tipus canvas per composar materials visuals. No implementat.
+3. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real (Business API o link-based).
+4. **Fitxa client ben pensada**: L'usuari va dir "que la fitxa de client estigui pensada" — redissenyar la pàgina `/admin/clientes/[id]` amb UX millorada.
+5. **Reserves ben pensades**: L'usuari va dir "que les reserves estiguin pensades" — redissenyar la UX de reserves.
+
+### Mitjana prioritat
+6. **Tot al mòbil**: PWA existeix però no s'han fet millores mòbil específiques aquesta sessió.
+7. **Bookings new form extraction**: 520+ línies inline, candidat per extreure component (com BlogEditorForm).
+8. **lib/email.ts testimonials/privacitat**: Emails de testimonial aprovats i verificació GDPR segueixen en castellà fix.
+9. **scripts/ cleanup**: Revisar scripts potencialment no mantinguts (check-packs-i18n.ts, autofix-*.ts).
+10. **estat-admin.md**: Actualitzar roadmap — email templates ja estan fets però no reflectit.
+
+### Baixa prioritat
+11. **Vista diària calendari**: Setmanal i mensual existeixen, falta diària.
+12. **Multi-user (rols i permisos)**: Roadmap futur.
+13. **GDPR UI admin**: API existeix, falta pàgina admin.
+
+---
+
 ## 2026-03-09 sessió 5 — IMAP + Plantilles email + Drag & Drop global + Auditoria codi
 
 ### Fet
