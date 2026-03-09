@@ -20,10 +20,17 @@
 - Section nav resol el problema de la pàgina de reserva monolítica (800+ línies, 15 seccions) — ara pots saltar directament
 - Agrupació properes/passades al BookingsPanel evita confusió entre events actius i històrics
 
+9. **Canvas integrat a ressenyes**: Botons "Canvas Story" i "Canvas Post" per a testimonials aprovats. Previsualització inline + descàrrega PNG. API testimonials ara retorna discountCode associat
+10. **Responsive mòbil**: ProposalsList amb overflow-x-auto + min-w-[600px]. Touch targets corregits a InventoryListClient (px-2→px-3, botó "Treure" amb hover)
+
+### Commits
+- `7c8c473` — feat: redisseny UX fitxa client + reserves "ben pensades"
+- `afead81` — feat: integració canvas a pàgina de ressenyes
+- `d21bfe9` — fix: millores responsive mòbil
+
 ### Stats
 - Build: OK, tsc: 0 errors, tests: 167 (tots passen)
-- Fitxers modificats: CustomerHeader.tsx, SummaryPanel.tsx, BookingsPanel.tsx, TimelinePanel.tsx, bookings/[id]/page.tsx, bookings/page.tsx
-- Fitxers creats: BookingSectionNav.tsx
+- 11 fitxers modificats, 1 fitxer creat (BookingSectionNav.tsx)
 
 ---
 
@@ -53,23 +60,20 @@
 
 ---
 
-## TASQUES PENDENTS (actualitzat sessió 7)
+## TASQUES PENDENTS (actualitzat sessió 8)
 
 ### Alta prioritat
-1. **Canvas editor**: L'usuari va preguntar "i canvas?" — editor visual per composar materials visuals. No implementat.
-2. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real Business API (enviar/rebre dins l'admin).
-3. **Fitxa client ben pensada**: Redissenyar `/admin/clientes/[id]` — l'usuari va dir "que estigui pensada". Timeline, resum financer, historial comunicacions, docs, tot en una vista.
-4. **Reserves ben pensades**: Redissenyar UX reserves (llistat + fitxa) — l'usuari va dir "que estiguin pensades".
+1. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real Business API (enviar/rebre dins l'admin).
 
 ### Mitjana prioritat
-5. **Tot al mòbil**: PWA existeix, però millores mòbil específiques a l'admin (responsive tables, touch targets, bottom nav).
-6. **estat-admin.md**: Actualitzar roadmap (email templates fets, calendari diària feta, inbox funcional, PDF Studio D&D).
-7. **Safata d'entrada — paperera**: Eliminar emails funciona (DELETE IMAP), però no hi ha carpeta paperera per recuperar-los. Compose, respondre i firma ja funcionen.
+2. **estat-admin.md**: Actualitzar roadmap (email templates fets, calendari diària feta, inbox funcional, PDF Studio D&D, canvas integrat, fitxa client redissenyada, reserves redissenyades).
+3. **Safata d'entrada — paperera**: Eliminar emails funciona (DELETE IMAP), però no hi ha carpeta paperera per recuperar-los.
+4. **Canvas editor avançat**: Generació d'imatges funciona (3 APIs + integració ressenyes). Potencialment afegir editor visual drag & drop.
 
 ### Baixa prioritat
-8. **Multi-user (rols i permisos)**: Roadmap futur.
-9. **GDPR UI admin**: API existeix (`privacyService.ts`), falta pàgina admin per gestionar sol·licituds.
-10. **Inventory new form**: Usar `InventoryItemEditor` també per crear (ara només per editar). Formulari inline a `new/page.tsx`.
+5. **Multi-user (rols i permisos)**: Roadmap futur.
+6. **GDPR UI admin**: API existeix (`privacyService.ts`), falta pàgina admin per gestionar sol·licituds.
+7. **Inventory new form**: Usar `InventoryItemEditor` també per crear (ara només per editar).
 
 ---
 
