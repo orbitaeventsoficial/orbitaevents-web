@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       ? { isApproved: true }
       : {};
 
-  const testimonials = await prisma.customerTestimonial.findMany({
+  const rawTestimonials = await prisma.customerTestimonial.findMany({
     where,
     include: {
       customer: {
@@ -34,6 +34,24 @@ export async function GET(req: NextRequest) {
     take: limit,
     skip: offset,
   });
+
+  // Resolve discount codes for testimonials that have one
+  const discountCodeIds = rawTestimonials
+    .map((t) => t.discountCodeId)
+    .filter((id): id is string => id !== null);
+  const discountCodesMap = discountCodeIds.length > 0
+    ? new Map(
+        (await prisma.customerDiscountCode.findMany({
+          where: { id: { in: discountCodeIds } },
+          select: { id: true, code: true, discountPercent: true },
+        })).map((dc) => [dc.id, { code: dc.code, discountPercent: dc.discountPercent }])
+      )
+    : new Map<string, { code: string; discountPercent: number }>();
+
+  const testimonials = rawTestimonials.map((t) => ({
+    ...t,
+    discountCode: t.discountCodeId ? discountCodesMap.get(t.discountCodeId) || null : null,
+  }));
 
   return NextResponse.json({ ok: true, testimonials });
 }

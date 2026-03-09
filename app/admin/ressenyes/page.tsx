@@ -10,6 +10,9 @@ type Testimonial = {
   rating: number;
   createdAt: string;
   isApproved: boolean;
+  eventType?: string;
+  canvasImageUrl?: string | null;
+  discountCode?: { code: string; discountPercent: number } | null;
   customer: {
     name: string;
     email: string;
@@ -25,6 +28,7 @@ export default function AdminRessenyesPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<StatusTab>('pending');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [canvasPreview, setCanvasPreview] = useState<{ id: string; url: string } | null>(null);
 
   const activeList = useMemo(
     () => (activeTab === 'pending' ? pending : approved),
@@ -70,6 +74,41 @@ export default function AdminRessenyesPage() {
     } finally {
       setBusyId(null);
     }
+  };
+
+  const generateCanvas = (t: Testimonial, preset: string = 'story') => {
+    const params = new URLSearchParams({
+      name: t.customer.name,
+      text: t.text,
+      rating: String(t.rating),
+      preset,
+    });
+    if (t.eventType) params.set('eventType', t.eventType);
+    if (t.discountCode) {
+      params.set('code', t.discountCode.code);
+      params.set('discount', String(t.discountCode.discountPercent));
+    }
+    const url = `/api/canvas/testimonial?${params.toString()}`;
+    setCanvasPreview({ id: t.id, url });
+  };
+
+  const downloadCanvas = (t: Testimonial, preset: string = 'story') => {
+    const params = new URLSearchParams({
+      name: t.customer.name,
+      text: t.text,
+      rating: String(t.rating),
+      preset,
+    });
+    if (t.eventType) params.set('eventType', t.eventType);
+    if (t.discountCode) {
+      params.set('code', t.discountCode.code);
+      params.set('discount', String(t.discountCode.discountPercent));
+    }
+    const url = `/api/canvas/testimonial?${params.toString()}`;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `orbita-ressenya-${t.customer.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+    link.click();
   };
 
   if (loading) {
@@ -159,7 +198,54 @@ export default function AdminRessenyesPage() {
               >
                 Eliminar
               </button>
+              {t.isApproved && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => generateCanvas(t, 'story')}
+                    className="px-4 py-2 rounded-full border border-amber-500/30 text-amber-300 text-sm font-semibold transition-colors hover:bg-amber-500/10"
+                  >
+                    Canvas Story
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => generateCanvas(t, 'instagram')}
+                    className="px-4 py-2 rounded-full border border-amber-500/30 text-amber-300 text-sm font-semibold transition-colors hover:bg-amber-500/10"
+                  >
+                    Canvas Post
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => downloadCanvas(t, 'story')}
+                    className="px-4 py-2 rounded-full border border-white/10 text-sm font-semibold transition-colors hover:bg-white/5"
+                  >
+                    Descarregar
+                  </button>
+                </>
+              )}
             </div>
+
+            {/* Canvas preview */}
+            {canvasPreview?.id === t.id && (
+              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-amber-300">Previsualització Canvas</p>
+                  <button
+                    type="button"
+                    onClick={() => setCanvasPreview(null)}
+                    className="text-xs hover:underline"
+                  >
+                    Tancar
+                  </button>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={canvasPreview.url}
+                  alt={`Canvas de ${t.customer.name}`}
+                  className="max-h-[400px] rounded-xl mx-auto"
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
