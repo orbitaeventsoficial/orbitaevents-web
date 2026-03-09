@@ -216,6 +216,68 @@ export default function TemplateEditorClient({
     );
   };
 
+  const [translating, setTranslating] = useState(false);
+
+  const autoTranslateFromCa = async () => {
+    if (locale === 'ca') { toast.error('Ja estàs en català'); return; }
+    setTranslating(true);
+    try {
+      // 1. Carregar la versió catalana
+      const caRes = await fetch(`/api/admin/email-templates/${slug}?locale=ca`);
+      if (!caRes.ok) throw new Error('No s\'ha trobat la plantilla en català');
+      const caData = await caRes.json();
+      const caSubject = caData.resolved?.subject || '';
+      const caBlocks = caData.template?.bodyHtml ? htmlToBlocks(caData.template.bodyHtml) : [];
+
+      // 2. Recollir tots els textos a traduir
+      const textsToTranslate: string[] = [];
+      if (caSubject) textsToTranslate.push(caSubject);
+      for (const block of caBlocks) {
+        if (block.data.text) textsToTranslate.push(block.data.text);
+        if (block.data.subtitle) textsToTranslate.push(block.data.subtitle);
+      }
+      // Also translate current blocks if they have text (from the ca loaded content)
+      const currentTexts: string[] = [];
+      if (subject) currentTexts.push(subject);
+      for (const block of blocks) {
+        if (block.data.text) currentTexts.push(block.data.text);
+        if (block.data.subtitle) currentTexts.push(block.data.subtitle);
+      }
+      const allTexts = [...new Set([...textsToTranslate, ...currentTexts])].filter(Boolean);
+
+      if (allTexts.length === 0) { toast.error('No hi ha contingut per traduir'); return; }
+
+      // 3. Traduir via API
+      const trRes = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts: allTexts, targetLanguages: [locale] }),
+      });
+      const trData = await trRes.json().catch(() => ({}));
+      if (!trRes.ok || !trData?.ok) throw new Error('Error de traducció');
+
+      const map = trData.translationsByText as Record<string, Record<string, string>>;
+      const t = (text: string) => map[text]?.[locale] || text;
+
+      // 4. Aplicar traduccions
+      if (subject) setSubject(t(subject));
+      setBlocks((prev) => prev.map((block) => ({
+        ...block,
+        data: {
+          ...block.data,
+          ...(block.data.text ? { text: t(block.data.text) } : {}),
+          ...(block.data.subtitle ? { subtitle: t(block.data.subtitle) } : {}),
+        },
+      })));
+
+      toast.success(`Traduït a ${locale.toUpperCase()} automàticament`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error traduint');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const selectedBlock = blocks.find((b) => b.id === selectedBlockId);
 
   if (loading) {
@@ -255,6 +317,16 @@ export default function TemplateEditorClient({
             className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
           />
         </div>
+        {locale !== 'ca' && (
+          <button
+            type="button"
+            disabled={translating}
+            onClick={autoTranslateFromCa}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-300 transition-all hover:bg-amber-500/20 disabled:opacity-50 active:scale-[0.98]"
+          >
+            {translating ? 'Traduint...' : `Traduir des del CA → ${locale.toUpperCase()}`}
+          </button>
+        )}
         <button
           type="button"
           disabled={saving}

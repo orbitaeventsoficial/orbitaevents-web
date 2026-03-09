@@ -187,16 +187,22 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
           if (existing.clientEmail && !existing.clientEmail.includes('@leads.orbitaevents.local')) {
             const portalUrl = portalResult.url;
+            const loc = (existing.preferredLocale || 'ca').toLowerCase();
+            const portalCopy = loc.startsWith('en')
+              ? { subject: 'Your access portal — Òrbita Events', title: 'Your event is complete!', greeting: `Hi ${existing.clientName},`, body: 'Thank you for trusting Òrbita Events. You now have access to your personalised portal.', cta: 'Access my portal', footer: 'This link is personal and will expire in 30 days.' }
+              : loc.startsWith('es')
+              ? { subject: 'Tu portal de acceso — Òrbita Events', title: '¡Tu evento se ha completado!', greeting: `Hola ${existing.clientName},`, body: 'Gracias por confiar en Òrbita Events. Ya tienes acceso a tu portal personalizado.', cta: 'Acceder a mi portal', footer: 'Este enlace es personal y caducará en 30 días.' }
+              : { subject: 'El teu portal d\'accés — Òrbita Events', title: 'El teu event s\'ha completat!', greeting: `Hola ${existing.clientName},`, body: 'Gràcies per confiar en Òrbita Events. Ja tens accés al teu portal personalitzat.', cta: 'Accedir al meu portal', footer: 'Aquest enllaç és personal i caducarà en 30 dies.' };
             await sendEmail({
               to: existing.clientEmail,
-              subject: 'El teu portal d\'accés — Òrbita Events',
+              subject: portalCopy.subject,
               html: `
                 <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px;border-radius:12px">
-                  <h2 style="margin:0 0 12px 0;color:#f8fafc">El teu event s'ha completat!</h2>
-                  <p>Hola ${existing.clientName},</p>
-                  <p>Gràcies per confiar en Òrbita Events. Ja tens accés al teu portal personalitzat.</p>
-                  <p style="margin:20px 0"><a href="${portalUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Accedir al meu portal</a></p>
-                  <p style="font-size:12px;color:#94a3b8">Aquest enllaç és personal i caducarà en 30 dies.</p>
+                  <h2 style="margin:0 0 12px 0;color:#f8fafc">${portalCopy.title}</h2>
+                  <p>${portalCopy.greeting}</p>
+                  <p>${portalCopy.body}</p>
+                  <p style="margin:20px 0"><a href="${portalUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">${portalCopy.cta}</a></p>
+                  <p style="font-size:12px;color:#94a3b8">${portalCopy.footer}</p>
                 </div>
               `,
             });

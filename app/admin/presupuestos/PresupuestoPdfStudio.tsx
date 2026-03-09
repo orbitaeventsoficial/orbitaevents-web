@@ -9,11 +9,30 @@ import {
   type PackDefinition,
   type ServiceSlug,
 } from '@/app/config/packs-config';
-import { generateQuotePDF } from '@/lib/pdf-utils';
+import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { z } from 'zod';
 import { fetchWithCsrf } from '@/lib/csrf';
+import SortableList from '@/app/admin/components/SortableList';
+
+type DocMode = 'quote' | 'contract';
+
+type SectionId = 'config' | 'client' | 'brand' | 'pack' | 'extras-catalog' | 'extras-custom' | 'contract';
+
+const SECTION_LABELS: Record<SectionId, string> = {
+  config: 'Configuració',
+  client: 'Client i esdeveniment',
+  brand: 'Marca i identitat',
+  pack: 'Pack i condicions',
+  'extras-catalog': 'Extres del catàleg',
+  'extras-custom': 'Extres personalitzats',
+  contract: 'Dades del contracte',
+};
+
+const DEFAULT_SECTION_ORDER: SectionId[] = [
+  'config', 'client', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
+];
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -266,6 +285,30 @@ export default function PresupuestoPdfStudio({
   const [autosaving, setAutosaving] = useState(false);
   const [autosaveTick, setAutosaveTick] = useState(0);
   const [allowBrandOverride, setAllowBrandOverride] = useState(false);
+  const [docMode, setDocMode] = useState<DocMode>('quote');
+  // Contract-specific fields
+  const [companyLegalName, setCompanyLegalName] = useState('');
+  const [companyNIF, setCompanyNIF] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
+  const [companyIBAN, setCompanyIBAN] = useState('');
+  const [clientNIF, setClientNIF] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
+  const [depositPct, setDepositPct] = useState(30);
+  const [depositDueDays, setDepositDueDays] = useState(7);
+  const [finalPaymentDays, setFinalPaymentDays] = useState(7);
+  const [cancellationPolicy, setCancellationPolicy] = useState(
+    'Cancel·lació fins a 30 dies: 100% devolució. 15-30 dies: 50%. Menys de 15 dies: no reemborsable.'
+  );
+  const [additionalClauses, setAdditionalClauses] = useState('');
+  const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER);
+  const [collapsedSections, setCollapsedSections] = useState<Set<SectionId>>(new Set());
+  const toggleCollapse = useCallback((id: SectionId) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
   const [pricingCatalog, setPricingCatalog] = useState<PricingCatalogState>({
     packNamesBySlug: {},
     extraNamesBySlug: {},
@@ -449,7 +492,7 @@ export default function PresupuestoPdfStudio({
           body: JSON.stringify({ destination }),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s’ha pogut calcular la distància');
+        if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
         const nextKm = Number(data.roundTripKm || 0);
         setTravelKm(nextKm);
         setDistanceMessage(
@@ -459,7 +502,7 @@ export default function PresupuestoPdfStudio({
       } catch (error) {
         console.error('Error calculating distance:', error);
         setTravelKm(0);
-        setDistanceMessage('No s’ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
+        setDistanceMessage('No s\'ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
       } finally {
         setCalculatingDistance(false);
       }
@@ -517,6 +560,10 @@ export default function PresupuestoPdfStudio({
       if (typeof draft.brandEmail === 'string') setBrandEmail(draft.brandEmail);
       if (typeof draft.brandPhone === 'string') setBrandPhone(draft.brandPhone);
       if (typeof draft.brandTagline === 'string') setBrandTagline(draft.brandTagline);
+      if (Array.isArray(draft.sectionOrder)) {
+        const valid = (draft.sectionOrder as string[]).filter((id): id is SectionId => id in SECTION_LABELS);
+        if (valid.length === DEFAULT_SECTION_ORDER.length) setSectionOrder(valid);
+      }
     } catch (error) {
       console.warn('Corrupted local draft, ignoring:', error);
     } finally {
@@ -648,6 +695,7 @@ export default function PresupuestoPdfStudio({
         brandEmail,
         brandPhone,
         brandTagline,
+        sectionOrder,
       };
       window.localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(draft));
     }, 650);
@@ -682,6 +730,7 @@ export default function PresupuestoPdfStudio({
     brandEmail,
     brandPhone,
     brandTagline,
+    sectionOrder,
   ]);
 
   // ─── Customer search autocomplete ───────────────────────────────
@@ -917,7 +966,7 @@ export default function PresupuestoPdfStudio({
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
-      throw new Error(data?.error || 'No s’ha pogut guardar el pressupost');
+      throw new Error(data?.error || 'No s\'ha pogut guardar el pressupost');
     }
     if (!proposalId && data?.proposal?.id) {
       setProposalId(data.proposal.id);
@@ -1050,6 +1099,75 @@ export default function PresupuestoPdfStudio({
     );
   }
 
+  async function buildContract() {
+    if (!selectedPack) return null;
+    const subtotal = Math.max(0, basePrice + extrasPrice + travelCharge);
+    const discountSafe = Math.max(0, discount);
+    const vatRate = 21;
+    const base = Math.max(0, subtotal - discountSafe);
+    const vatAmount = base * (vatRate / 100);
+    const finalTotal = base + vatAmount;
+    const depositAmount = finalTotal * (depositPct / 100);
+    const eventDateObj = eventDate ? new Date(eventDate) : new Date();
+    const now = new Date();
+
+    const contractExtras = [
+      ...mappedSelectedExtras.map((e) => ({ name: e.name, price: e.price || 0, quantity: 1 })),
+      ...customExtras.map((e) => ({ name: e.name, price: e.price, quantity: 1 })),
+    ];
+    if (travelCharge > 0) {
+      contractExtras.push({ name: `Desplaçament (${travelKm.toFixed(0)} km)`, price: travelCharge, quantity: 1 });
+    }
+
+    const depositDue = new Date(now);
+    depositDue.setDate(depositDue.getDate() + depositDueDays);
+    const finalDue = new Date(eventDateObj);
+    finalDue.setDate(finalDue.getDate() - finalPaymentDays);
+
+    return generateContractPDF({
+      contractReference: `CTR-${Date.now().toString(36).toUpperCase()}`,
+      contractDate: now,
+      companyName: brandName.trim() || 'Òrbita Events',
+      companyLegalName: companyLegalName.trim() || brandName.trim() || 'Òrbita Events',
+      companyNIF: companyNIF.trim(),
+      companyAddress: companyAddress.trim(),
+      companyIBAN: companyIBAN.trim(),
+      companyPhone: brandPhone.trim(),
+      companyEmail: brandEmail.trim(),
+      clientName: clientName.trim(),
+      clientNIF: clientNIF.trim() || undefined,
+      clientAddress: clientAddress.trim() || undefined,
+      clientEmail: clientEmail.trim(),
+      clientPhone: clientPhone.trim() || undefined,
+      eventType: SERVICE_LABEL[eventType],
+      eventDate: eventDateObj,
+      eventTime: eventSchedule.trim() || undefined,
+      eventLocation: eventLocation.trim(),
+      guestCount: guests,
+      packName: packName.trim(),
+      packPrice: basePrice,
+      djHours: durationHours,
+      extras: contractExtras.length > 0 ? contractExtras : undefined,
+      subtotal,
+      discount: discountSafe,
+      vatRate,
+      vatAmount,
+      total: finalTotal,
+      depositAmount,
+      depositDueDate: depositDue,
+      finalPaymentDue: finalDue,
+      cancellationPolicy: cancellationPolicy.trim(),
+      additionalClauses: additionalClauses.trim() || undefined,
+    }, locale, {
+      logoDataUrl: logoDataUrl || undefined,
+      brandName: brandName.trim() || undefined,
+      website: brandWebsite.trim() || undefined,
+      contactEmail: brandEmail.trim() || undefined,
+      contactPhone: brandPhone.trim() || undefined,
+      tagline: brandTagline.trim() || undefined,
+    });
+  }
+
   async function downloadPdf() {
     if (!selectedPack) return;
     if (!validateBeforeGenerate(false)) return;
@@ -1058,14 +1176,15 @@ export default function PresupuestoPdfStudio({
 
     try {
       await saveProposalDraft('DRAFT');
-      const doc = await buildPdf();
-      if (!doc) throw new Error('No s’ha pogut generar el PDF');
+      const doc = docMode === 'contract' ? await buildContract() : await buildPdf();
+      if (!doc) throw new Error('No s\'ha pogut generar el PDF');
 
-      const fileName = `pressupost-${(clientName || 'client').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+      const prefix = docMode === 'contract' ? 'contracte' : 'pressupost';
+      const fileName = `${prefix}-${(clientName || 'client').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
       doc.save(fileName);
-      setMessage('PDF generat correctament.');
+      setMessage(`${docMode === 'contract' ? 'Contracte' : 'Pressupost'} generat correctament.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No s’ha pogut generar el PDF');
+      setMessage(error instanceof Error ? error.message : 'No s\'ha pogut generar el PDF');
     } finally {
       setGenerating(false);
     }
@@ -1078,14 +1197,14 @@ export default function PresupuestoPdfStudio({
     setMessage(null);
     try {
       await saveProposalDraft('DRAFT');
-      const doc = await buildPdf();
-      if (!doc) throw new Error('No s’ha pogut generar el PDF');
+      const doc = docMode === 'contract' ? await buildContract() : await buildPdf();
+      if (!doc) throw new Error('No s\'ha pogut generar el PDF');
       doc.autoPrint();
       const url = doc.output('bloburl');
       window.open(url, '_blank');
       setMessage('PDF preparat per imprimir.');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No s’ha pogut preparar la impressio');
+      setMessage(error instanceof Error ? error.message : 'No s\'ha pogut preparar la impressió');
     } finally {
       setGenerating(false);
     }
@@ -1148,7 +1267,7 @@ export default function PresupuestoPdfStudio({
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data?.error || 'No s’ha pogut enviar el pressupost');
+        throw new Error(data?.error || 'No s\'ha pogut enviar el pressupost');
       }
 
       const savedProposalId = await saveProposalDraft('SENT');
@@ -1208,464 +1327,239 @@ export default function PresupuestoPdfStudio({
   const inputClass =
     'admin-quote-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2';
 
+  function renderSectionContent(sectionId: SectionId) {
+    switch (sectionId) {
+      case 'config':
+        return (
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm">
+              Tipus de document
+              <select className={inputClass} value={docMode} onChange={(e) => setDocMode(e.target.value as DocMode)}>
+                <option value="quote">Pressupost</option>
+                <option value="contract">Contracte</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              Idioma preferit del client
+              <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
+                <option value="ca">Català</option>
+                <option value="es">Castellà</option>
+                <option value="en">Anglès</option>
+              </select>
+              <span className="mt-1 block text-xs">Aquest idioma s&apos;aplica directament al PDF i a l&apos;enviament.</span>
+            </label>
+            <label className="text-sm">
+              Tipus d&apos;esdeveniment
+              <select className={inputClass} value={eventType} onChange={(e) => { const next = e.target.value as ServiceSlug; setEventType(next); setSelectedExtras([]); reloadPackValues('', next); }}>
+                {ALL_SERVICES.map((service) => (<option key={service} value={service}>{SERVICE_LABEL[service]}</option>))}
+              </select>
+            </label>
+            <label className="text-sm md:col-span-2">
+              Pack base
+              <select className={inputClass} value={packId} onChange={(e) => { const nextPackId = e.target.value; if (nextPackId === CUSTOM_PACK_ID) { setPackId(CUSTOM_PACK_ID); if (!packName.trim()) setPackName(studioText.customServiceName); return; } reloadPackValues(nextPackId); }}>
+                <option value={CUSTOM_PACK_ID}>{studioText.customServiceName}</option>
+                {packs.map((pack) => (<option key={pack.id} value={pack.id}>{pack.name} ({pack.price})</option>))}
+              </select>
+              <span className="mt-1 block text-xs">Si tries servei personalitzat, pots definir nom, preu, hores i característiques manualment.</span>
+            </label>
+          </div>
+        );
+
+      case 'client':
+        return (
+          <>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {sectionStatus.clientOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.clientWarn}</span>) : null}
+              </div>
+              {!isCustomerScoped && (<button type="button" onClick={() => setShowCustomerPicker(!showCustomerPicker)} className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5">+ Cercar client</button>)}
+              {isCustomerScoped && !initialCustomerId && (<button type="button" onClick={clearSelectedCustomer} className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5">Canviar client</button>)}
+            </div>
+            {showCustomerPicker && (
+              <div className="mb-4 rounded-xl border p-3">
+                <input className={inputClass} placeholder="Cerca per nom, email o telèfon..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} autoFocus />
+                {searchingCustomers && <p className="mt-2 text-xs">Cercant...</p>}
+                {customerResults.length > 0 && (
+                  <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
+                    {customerResults.filter((c) => c.id !== customerId).map((c) => (
+                      <button key={c.id} type="button" onClick={() => selectCustomer(c)} className="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5">
+                        <div><span className="font-medium">{c.name}</span><span className="ml-2 text-xs opacity-60">{c.email}</span></div>
+                        {c.phone && <span className="text-xs opacity-50">{c.phone}</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {customerSearch.trim().length >= 2 && !searchingCustomers && customerResults.length === 0 && (<p className="mt-2 text-xs opacity-60">Cap resultat trobat</p>)}
+              </div>
+            )}
+            {isCustomerScoped && (
+              <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
+                <span className="text-emerald-400">&#10003;</span>
+                <span className="font-medium">{clientName}</span>
+                <span className="text-xs opacity-60">{clientEmail}</span>
+              </div>
+            )}
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm md:col-span-2">Logotip (PNG/JPG)<input className={inputClass} type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => onLogoChange(e.target.files?.[0] || null)} disabled={isCustomerScoped && !allowBrandOverride} /></label>
+              <label className="text-sm">Persona de contacte<input className={inputClass} value={clientContact} onChange={(e) => setClientContact(e.target.value)} readOnly={isCustomerScoped} /></label>
+              <label className="text-sm">Nom del client<input className={inputClass} value={clientName} onChange={(e) => setClientName(e.target.value)} readOnly={isCustomerScoped} /></label>
+              <label className="text-sm">Correu del client<input className={inputClass} type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} readOnly={isCustomerScoped} /></label>
+              <label className="text-sm">Telèfon del client<input className={inputClass} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} readOnly={isCustomerScoped} /></label>
+              <div className="md:col-span-2 mt-2 flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide">Esdeveniment</span>
+                {sectionStatus.eventOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.eventWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.eventWarn}</span>) : null}
+              </div>
+              <label className="text-sm">Data d&apos;emissió<input className={inputClass} type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} /></label>
+              <label className="text-sm">Data de l&apos;esdeveniment<input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} /></label>
+              <label className="text-sm">Horari aproximat<input className={inputClass} value={eventSchedule} onChange={(e) => setEventSchedule(e.target.value)} placeholder="Ex.: 20:00 - 03:00" /></label>
+              <label className="text-sm md:col-span-2">Lloc de l&apos;esdeveniment<input className={inputClass} value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} placeholder="Ex.: Masia Can X, Girona" /><span className="mt-1 block text-xs">{calculatingDistance ? 'Calculant ruta automàticament...' : distanceMessage || 'La ruta es calcula automàticament amb aquesta adreça.'}</span></label>
+              <label className="text-sm">Convidats<input className={inputClass} type="number" min={0} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 0)} /></label>
+            </div>
+          </>
+        );
+
+      case 'brand':
+        return (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              {sectionStatus.brandOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.brandWarn}</span>) : null}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm">Marca / Empresa<input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
+              <label className="text-sm">Web de la marca<input className={inputClass} value={brandWebsite} onChange={(e) => setBrandWebsite(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
+              <label className="text-sm">Correu de la marca<input className={inputClass} value={brandEmail} onChange={(e) => setBrandEmail(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
+              <label className="text-sm">Telèfon de la marca<input className={inputClass} value={brandPhone} onChange={(e) => setBrandPhone(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
+              <label className="text-sm md:col-span-2">Eslògan del peu<input className={inputClass} value={brandTagline} onChange={(e) => setBrandTagline(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
+            </div>
+          </>
+        );
+
+      case 'pack':
+        return (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              {sectionStatus.packOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.packWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.packWarn}</span>) : null}
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <label className="text-sm md:col-span-2">Nom visible del pack<input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} /></label>
+              <label className="text-sm">Durada (h)<input className={inputClass} type="number" min={1} max={24} value={durationHours} onChange={(e) => setDurationHours(Number(e.target.value) || 1)} /></label>
+              <label className="text-sm">Validesa (dies)<input className={inputClass} type="number" min={1} max={90} value={validityDays} onChange={(e) => setValidityDays(Math.max(1, Number(e.target.value) || 15))} /></label>
+              <label className="text-sm">Preu base (€)<input className={inputClass} type="number" min={0} value={basePrice} onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))} /></label>
+              <label className="text-sm">Descompte (€)<input className={inputClass} type="number" min={0} value={discount} onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))} /></label>
+              <label className="text-sm">Motiu del descompte<input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} /></label>
+              <label className="text-sm md:col-span-3">Característiques del pack (una per línia)<textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} /></label>
+              <label className="text-sm md:col-span-3">Condicions (una per línia)<textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} /></label>
+              <label className="text-sm md:col-span-3">Explicació comercial: per què triar-nos<textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} /></label>
+            </div>
+          </>
+        );
+
+      case 'extras-catalog':
+        return (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {compatibleExtras.map((extra) => (
+              <label key={extra.id} className="flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
+                <input type="checkbox" checked={selectedExtras.includes(extra.id)} onChange={() => toggleExtra(extra.id)} />
+                <span className="flex-1">{extra.name}</span>
+                <span className="text-xs">{extra.price ? `+${extra.price}€${extra.id === OPERATOR_PDF_EXTRA_ID ? '/h' : ''}` : 'Consultar'}</span>
+              </label>
+            ))}
+          </div>
+        );
+
+      case 'extras-custom':
+        return (
+          <>
+            <div className="grid gap-3 md:grid-cols-[1fr_160px_auto]">
+              <input className={inputClass} placeholder="Nom de l'extra" value={customExtraName} onChange={(e) => setCustomExtraName(e.target.value)} />
+              <input className={inputClass} type="number" min={0} value={customExtraPrice} onChange={(e) => setCustomExtraPrice(Number(e.target.value) || 0)} />
+              <button type="button" onClick={addCustomExtra} className="rounded-xl border px-4 py-2 text-sm font-semibold">Afegir</button>
+            </div>
+            {customExtras.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {customExtras.map((extra) => (
+                  <div key={extra.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm">
+                    <span>{extra.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span>+{extra.price}€</span>
+                      <button type="button" onClick={() => removeCustomExtra(extra.id)} className="rounded-md border px-2 py-1 text-xs">Treure</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        );
+
+      case 'contract':
+        if (docMode !== 'contract') return <p className="text-xs opacity-50">Selecciona mode &quot;Contracte&quot; a Configuració per activar.</p>;
+        return (
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-sm">Raó social<input className={inputClass} value={companyLegalName} onChange={(e) => setCompanyLegalName(e.target.value)} placeholder="Nom legal de l'empresa" /></label>
+            <label className="text-sm">NIF empresa<input className={inputClass} value={companyNIF} onChange={(e) => setCompanyNIF(e.target.value)} /></label>
+            <label className="text-sm md:col-span-2">Adreça fiscal empresa<input className={inputClass} value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} /></label>
+            <label className="text-sm md:col-span-2">IBAN<input className={inputClass} value={companyIBAN} onChange={(e) => setCompanyIBAN(e.target.value)} placeholder="ES00 0000 0000 0000 0000 0000" /></label>
+            <label className="text-sm">NIF client<input className={inputClass} value={clientNIF} onChange={(e) => setClientNIF(e.target.value)} /></label>
+            <label className="text-sm">Adreça client<input className={inputClass} value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} /></label>
+            <label className="text-sm">Dipòsit (%)<input className={inputClass} type="number" min={0} max={100} value={depositPct} onChange={(e) => setDepositPct(Number(e.target.value) || 30)} /></label>
+            <label className="text-sm">Dies per pagar dipòsit<input className={inputClass} type="number" min={1} value={depositDueDays} onChange={(e) => setDepositDueDays(Number(e.target.value) || 7)} /></label>
+            <label className="text-sm">Dies pagament final (abans event)<input className={inputClass} type="number" min={1} value={finalPaymentDays} onChange={(e) => setFinalPaymentDays(Number(e.target.value) || 7)} /></label>
+            <label className="text-sm md:col-span-2">Política de cancel·lació<textarea rows={3} className={inputClass} value={cancellationPolicy} onChange={(e) => setCancellationPolicy(e.target.value)} /></label>
+            <label className="text-sm md:col-span-2">Clàusules addicionals<textarea rows={3} className={inputClass} value={additionalClauses} onChange={(e) => setAdditionalClauses(e.target.value)} placeholder="Opcional" /></label>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  }
+
+  function getSectionBorderTone(sectionId: SectionId): string {
+    switch (sectionId) {
+      case 'client': return sectionStatus.clientOk ? 'border-emerald-500/30' : sectionStatus.clientWarn ? 'border-amber-500/30' : '';
+      case 'brand': return sectionStatus.brandOk ? 'border-emerald-500/30' : sectionStatus.brandWarn ? 'border-amber-500/30' : '';
+      case 'pack': return sectionStatus.packOk ? 'border-emerald-500/30' : sectionStatus.packWarn ? 'border-amber-500/30' : '';
+      default: return '';
+    }
+  }
+
   return (
     <section className="admin-quote-studio grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="admin-quote-studio-form space-y-5 rounded-2xl border p-5">
         {isCustomerScoped && (
           <div className="rounded-xl border px-3 py-2 text-xs">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
-            {autosaving
-              ? ' Guardant...'
-              : autosaveTick > 0
-                ? ' Guardat.'
-                : ''}
+            {autosaving ? ' Guardant...' : autosaveTick > 0 ? ' Guardat.' : ''}
             <div className="mt-2 flex items-center gap-2 text-[11px]">
-              <input
-                id="brand-override"
-                type="checkbox"
-                checked={allowBrandOverride}
-                onChange={(e) => setAllowBrandOverride(e.target.checked)}
-              />
-              <label htmlFor="brand-override" className="cursor-pointer">
-                Permetre override de marca/logo només per aquest pressupost
-              </label>
+              <input id="brand-override" type="checkbox" checked={allowBrandOverride} onChange={(e) => setAllowBrandOverride(e.target.checked)} />
+              <label htmlFor="brand-override" className="cursor-pointer">Permetre override de marca/logo només per aquest pressupost</label>
             </div>
           </div>
         )}
-        <div className="rounded-2xl border p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide">Configuració del pressupost</p>
-          <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm">
-            Idioma preferit del client
-            <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-              <option value="ca">Català</option>
-              <option value="es">Castellà</option>
-              <option value="en">Anglès</option>
-            </select>
-            <span className="mt-1 block text-xs">
-              Aquest idioma s&apos;aplica directament al PDF i a l&apos;enviament.
-            </span>
-          </label>
 
-          <label className="text-sm">
-            Tipus d'esdeveniment
-            <select
-              className={inputClass}
-              value={eventType}
-              onChange={(e) => {
-                const next = e.target.value as ServiceSlug;
-                setEventType(next);
-                setSelectedExtras([]);
-                reloadPackValues('', next);
-              }}
-            >
-              {ALL_SERVICES.map((service) => (
-                <option key={service} value={service}>
-                  {SERVICE_LABEL[service]}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="text-sm md:col-span-2">
-            Pack base
-            <select
-              className={inputClass}
-              value={packId}
-              onChange={(e) => {
-                const nextPackId = e.target.value;
-                if (nextPackId === CUSTOM_PACK_ID) {
-                  setPackId(CUSTOM_PACK_ID);
-                  if (!packName.trim()) setPackName(studioText.customServiceName);
-                  return;
-                }
-                reloadPackValues(nextPackId);
-              }}
-            >
-              <option value={CUSTOM_PACK_ID}>{studioText.customServiceName}</option>
-              {packs.map((pack) => (
-                <option key={pack.id} value={pack.id}>
-                  {pack.name} ({pack.price})
-                </option>
-              ))}
-            </select>
-            <span className="mt-1 block text-xs">
-              Si tries servei personalitzat, pots definir nom, preu, hores i característiques manualment.
-            </span>
-          </label>
-          </div>
-        </div>
-
-        <div className={`rounded-2xl border p-4 ${sectionStatus.clientOk ? 'border-emerald-500/30' : sectionStatus.clientWarn ? 'border-amber-500/30' : ''}`}>
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wide">Client i esdeveniment</p>
-              {sectionStatus.clientOk ? (
-                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
-              ) : sectionStatus.clientWarn ? (
-                <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.clientWarn}</span>
-              ) : null}
-            </div>
-            {!isCustomerScoped && (
-              <button
-                type="button"
-                onClick={() => setShowCustomerPicker(!showCustomerPicker)}
-                className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5"
-              >
-                + Cercar client
-              </button>
-            )}
-            {isCustomerScoped && !initialCustomerId && (
-              <button
-                type="button"
-                onClick={clearSelectedCustomer}
-                className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5"
-              >
-                Canviar client
-              </button>
-            )}
-          </div>
-
-          {/* Customer search dropdown */}
-          {showCustomerPicker && (
-            <div className="mb-4 rounded-xl border p-3">
-              <input
-                className={inputClass}
-                placeholder="Cerca per nom, email o telèfon..."
-                value={customerSearch}
-                onChange={(e) => setCustomerSearch(e.target.value)}
-                autoFocus
-              />
-              {searchingCustomers && <p className="mt-2 text-xs">Cercant...</p>}
-              {customerResults.length > 0 && (
-                <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
-                  {customerResults
-                    .filter((c) => c.id !== customerId)
-                    .map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => selectCustomer(c)}
-                        className="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5"
-                      >
-                        <div>
-                          <span className="font-medium">{c.name}</span>
-                          <span className="ml-2 text-xs opacity-60">{c.email}</span>
-                        </div>
-                        {c.phone && <span className="text-xs opacity-50">{c.phone}</span>}
-                      </button>
-                    ))}
-                  {customerResults.length > 0 && customerResults.every((c) => c.id === customerId) && (
-                    <p className="py-2 text-center text-xs opacity-60">Client ja seleccionat</p>
-                  )}
+        <SortableList
+          items={sectionOrder}
+          keyFn={(id) => id}
+          onReorder={(newOrder) => setSectionOrder(newOrder)}
+          className="space-y-4"
+          placeholderHeight={60}
+          renderItem={(sectionId, _idx, { isDragging }) => {
+            const isCollapsed = collapsedSections.has(sectionId);
+            const borderTone = getSectionBorderTone(sectionId);
+            return (
+              <div className={`rounded-2xl border p-4 transition-all ${borderTone} ${isDragging ? 'opacity-40' : ''}`}>
+                <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing select-none">
+                  <span className="text-white/20 text-sm" aria-hidden>&#9776;</span>
+                  <p className="flex-1 text-xs font-semibold uppercase tracking-wide">{SECTION_LABELS[sectionId]}</p>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); toggleCollapse(sectionId); }} className="rounded-lg px-2 py-1 text-xs hover:bg-white/5 transition-colors" aria-label={isCollapsed ? 'Expandir secció' : 'Col·lapsar secció'}>
+                    {isCollapsed ? '▸' : '▾'}
+                  </button>
                 </div>
-              )}
-              {customerSearch.trim().length >= 2 && !searchingCustomers && customerResults.length === 0 && (
-                <p className="mt-2 text-xs opacity-60">Cap resultat trobat</p>
-              )}
-            </div>
-          )}
-
-          {/* Selected customer badge */}
-          {isCustomerScoped && (
-            <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
-              <span className="text-emerald-400">&#10003;</span>
-              <span className="font-medium">{clientName}</span>
-              <span className="text-xs opacity-60">{clientEmail}</span>
-            </div>
-          )}
-
-          <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm md:col-span-2">
-            Logotip (PNG/JPG)
-            <input
-              className={inputClass}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={(e) => onLogoChange(e.target.files?.[0] || null)}
-              disabled={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          <label className="text-sm">
-            Persona de contacte
-            <input
-              className={inputClass}
-              value={clientContact}
-              onChange={(e) => setClientContact(e.target.value)}
-              readOnly={isCustomerScoped}
-            />
-          </label>
-          <label className="text-sm">
-            Nom del client
-            <input
-              className={inputClass}
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              readOnly={isCustomerScoped}
-            />
-          </label>
-          <label className="text-sm">
-            Correu del client
-            <input
-              className={inputClass}
-              type="email"
-              value={clientEmail}
-              onChange={(e) => setClientEmail(e.target.value)}
-              readOnly={isCustomerScoped}
-            />
-          </label>
-          <label className="text-sm">
-            Telèfon del client
-            <input
-              className={inputClass}
-              value={clientPhone}
-              onChange={(e) => setClientPhone(e.target.value)}
-              readOnly={isCustomerScoped}
-            />
-          </label>
-          <div className="md:col-span-2 mt-2 flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide">Esdeveniment</span>
-            {sectionStatus.eventOk ? (
-              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
-            ) : sectionStatus.eventWarn ? (
-              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.eventWarn}</span>
-            ) : null}
-          </div>
-          <label className="text-sm">
-            Data d&apos;emissió
-            <input className={inputClass} type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
-          </label>
-          <label className="text-sm">
-            Data de l&apos;esdeveniment
-            <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
-          </label>
-          <label className="text-sm">
-            Horari aproximat
-            <input
-              className={inputClass}
-              value={eventSchedule}
-              onChange={(e) => setEventSchedule(e.target.value)}
-              placeholder="Ex.: 20:00 - 03:00"
-            />
-          </label>
-          <label className="text-sm md:col-span-2">
-            Lloc de l&apos;esdeveniment
-            <input
-              className={inputClass}
-              value={eventLocation}
-              onChange={(e) => setEventLocation(e.target.value)}
-              placeholder="Ex.: Masia Can X, Girona"
-            />
-            <span className="mt-1 block text-xs">
-              {calculatingDistance ? 'Calculant ruta automàticament...' : distanceMessage || 'La ruta es calcula automàticament amb aquesta adreça.'}
-            </span>
-          </label>
-          <label className="text-sm">
-            Convidats
-            <input className={inputClass} type="number" min={0} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 0)} />
-          </label>
-          </div>
-        </div>
-
-        <div className={`rounded-2xl border p-4 ${sectionStatus.brandOk ? 'border-emerald-500/30' : sectionStatus.brandWarn ? 'border-amber-500/30' : ''}`}>
-          <div className="mb-3 flex items-center gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide">Marca i identitat</p>
-            {sectionStatus.brandOk ? (
-              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
-            ) : sectionStatus.brandWarn ? (
-              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.brandWarn}</span>
-            ) : null}
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm">
-            Marca / Empresa
-            <input
-              className={inputClass}
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
-              readOnly={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          <label className="text-sm">
-            Web de la marca
-            <input
-              className={inputClass}
-              value={brandWebsite}
-              onChange={(e) => setBrandWebsite(e.target.value)}
-              readOnly={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          <label className="text-sm">
-            Correu de la marca
-            <input
-              className={inputClass}
-              value={brandEmail}
-              onChange={(e) => setBrandEmail(e.target.value)}
-              readOnly={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          <label className="text-sm">
-            Telèfon de la marca
-            <input
-              className={inputClass}
-              value={brandPhone}
-              onChange={(e) => setBrandPhone(e.target.value)}
-              readOnly={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          <label className="text-sm md:col-span-2">
-            Eslògan del peu
-            <input
-              className={inputClass}
-              value={brandTagline}
-              onChange={(e) => setBrandTagline(e.target.value)}
-              readOnly={isCustomerScoped && !allowBrandOverride}
-            />
-          </label>
-          </div>
-        </div>
-
-        <div className={`rounded-2xl border p-4 ${sectionStatus.packOk ? 'border-emerald-500/30' : sectionStatus.packWarn ? 'border-amber-500/30' : ''}`}>
-          <div className="mb-3 flex items-center gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide">Pack i condicions</p>
-            {sectionStatus.packOk ? (
-              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
-            ) : sectionStatus.packWarn ? (
-              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.packWarn}</span>
-            ) : null}
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-          <label className="text-sm md:col-span-2">
-            Nom visible del pack
-            <input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} />
-          </label>
-          <label className="text-sm">
-            Durada (h)
-            <input
-              className={inputClass}
-              type="number"
-              min={1}
-              max={24}
-              value={durationHours}
-              onChange={(e) => setDurationHours(Number(e.target.value) || 1)}
-            />
-          </label>
-          <label className="text-sm">
-            Validesa (dies)
-            <input
-              className={inputClass}
-              type="number"
-              min={1}
-              max={90}
-              value={validityDays}
-              onChange={(e) => setValidityDays(Math.max(1, Number(e.target.value) || 15))}
-            />
-          </label>
-          <label className="text-sm">
-            Preu base (€)
-            <input
-              className={inputClass}
-              type="number"
-              min={0}
-              value={basePrice}
-              onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))}
-            />
-          </label>
-          <label className="text-sm">
-            Descompte (€)
-            <input
-              className={inputClass}
-              type="number"
-              min={0}
-              value={discount}
-              onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))}
-            />
-          </label>
-          <label className="text-sm">
-            Motiu del descompte
-            <input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} />
-          </label>
-          <label className="text-sm md:col-span-3">
-            Característiques del pack (una per línia)
-            <textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} />
-          </label>
-          <label className="text-sm md:col-span-3">
-            Condicions (una per línia)
-            <textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} />
-          </label>
-          <label className="text-sm md:col-span-3">
-            Explicació comercial: per què triar-nos
-            <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
-          </label>
-          </div>
-        </div>
-
-        <div className="space-y-3 rounded-xl border p-4">
-          <h3 className="text-sm font-semibold">Extres del catàleg</h3>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {compatibleExtras.map((extra) => (
-              <label key={extra.id} className="flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={selectedExtras.includes(extra.id)}
-                  onChange={() => toggleExtra(extra.id)}
-                />
-                <span className="flex-1">{extra.name}</span>
-                <span className="text-xs">
-                  {extra.price
-                    ? `+${extra.price}€${extra.id === OPERATOR_PDF_EXTRA_ID ? '/h' : ''}`
-                    : 'Consultar'}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-3 rounded-xl border p-4">
-          <h3 className="text-sm font-semibold">Extres personalitzats</h3>
-          <div className="grid gap-3 md:grid-cols-[1fr_160px_auto]">
-            <input
-              className={inputClass}
-              placeholder="Nom de l'extra"
-              value={customExtraName}
-              onChange={(e) => setCustomExtraName(e.target.value)}
-            />
-            <input
-              className={inputClass}
-              type="number"
-              min={0}
-              value={customExtraPrice}
-              onChange={(e) => setCustomExtraPrice(Number(e.target.value) || 0)}
-            />
-            <button
-              type="button"
-              onClick={addCustomExtra}
-              className="rounded-xl border px-4 py-2 text-sm font-semibold"
-            >
-              Afegir
-            </button>
-          </div>
-
-          {customExtras.length > 0 && (
-            <div className="space-y-2">
-              {customExtras.map((extra) => (
-                <div key={extra.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm">
-                  <span className="">{extra.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="">+{extra.price}€</span>
-                    <button
-                      type="button"
-                      onClick={() => removeCustomExtra(extra.id)}
-                      className="rounded-md border px-2 py-1 text-xs"
-                    >
-                      Treure
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {!isCollapsed && <div className="mt-3">{renderSectionContent(sectionId)}</div>}
+              </div>
+            );
+          }}
+        />
 
         <div className={`admin-quote-actions rounded-xl border p-3 ${sectionStatus.allOk ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
           {sectionStatus.allOk ? (
