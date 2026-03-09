@@ -17,11 +17,11 @@
 | Leads | ✅ Molt complet | Kanban, scoring, flux guiat, workspace, vistes desades |
 | Reserves | ✅ Molt complet | Kanban, marge, portal client, contracte, factura |
 | Clients Hub | ✅ Molt complet | 9 panells, timeline, KPIs |
-| Calendari | ⚠️ Parcial | Només vista mensual, sense bloqueig dies |
+| Calendari | ⚠️ Parcial | Vista mensual + bloqueig dies inline, falta vista setmanal |
 | Tasques | ✅ Complet | Kanban + llista, checklist diari |
 | Emails | ✅ Complet | Auto + IMAP + post-event |
 | Finances | ✅ Molt complet | Tresoreria, marge, CAC, MITECO, Holded |
-| Pressupostos | ⚠️ Parcial | Editor PDF complet, llistat bàsic sense filtres |
+| Pressupostos | ✅ Complet | Editor PDF + llistat amb filtres, cerca, accions, stats |
 | Packs | ✅ Complet | Motor preus, health, extras |
 | Inventari | ✅ Complet | Items, fotos, cost/hora, bundles |
 | Sales Ops | ✅ Complet | SLA, seqüències, auditoria, plans |
@@ -133,16 +133,16 @@
 ## Què falta (full de ruta)
 
 ### Prioritat ALTA (funcionalitat trencada o absent)
-1. **Llistat pressupostos millorat** — filtres, estats, accions ràpides
+1. ~~**Llistat pressupostos millorat**~~ ✅ Fet (2026-03-09)
 2. **Calendari vista setmanal** — ara només mensual
 3. **Templates email editables** — ara hardcoded al codi
 4. **Configuració IMAP des de l'admin** — ara cal tocar Railway
 
 ### Prioritat MITJANA (millores significatives)
-5. **Gestió disponibilitat** — bloquejar dies al calendari
+5. ~~**Gestió disponibilitat**~~ ✅ Fet (2026-03-09) — bloquejar/desbloquejar inline al calendari
 6. **WhatsApp integrat** — historial visible a l'admin
 7. **Logs de crons visuals** — ara només al tauler parcialment
-8. **Aprovació testimonis a la nav** — `/admin/ressenyes` no surt a nav
+8. ~~**Aprovació testimonis a la nav**~~ ✅ Fet (2026-03-09)
 
 ### Prioritat BAIXA (nice to have)
 9. **Multi-usuari** — rols i permisos

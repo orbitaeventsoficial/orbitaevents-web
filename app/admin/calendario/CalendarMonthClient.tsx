@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { EVENT_TYPE_PLAIN, formatDateShort, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
@@ -123,6 +124,7 @@ function isToday(date: Date): boolean {
 
 export default function CalendarMonthClient() {
   const toast = useToast();
+  const router = useRouter();
   const today = useMemo(() => new Date(), []);
   const [monthYear, setMonthYear] = useState<MonthYear>({
     year: today.getFullYear(),
@@ -366,6 +368,20 @@ export default function CalendarMonthClient() {
           >
             Mes següent →
           </button>
+          <div className="flex rounded-xl border overflow-hidden ml-2">
+            <span
+              className="inline-flex items-center px-3 py-2 text-sm font-medium bg-white/10"
+            >
+              Mes
+            </span>
+            <button
+              type="button"
+              onClick={() => router.push('/admin/calendario?view=week')}
+              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+            >
+              Setmana
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col items-start gap-1 text-sm md:items-end">
