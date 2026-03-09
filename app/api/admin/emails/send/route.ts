@@ -1,6 +1,6 @@
 // app/api/admin/emails/send/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
@@ -29,7 +29,7 @@ const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
 
 function bodyToHtml(body: string): string {
   const escaped = escapeHtml(body.trim());
-  return `<p style="white-space:pre-line;font-family:'Segoe UI',Arial,sans-serif;">${escaped}</p>`;
+  return `<p style="white-space:pre-line;font-family:'Segoe UI',Arial,sans-serif;">${escaped}</p>${getEmailSignatureHtml()}`;
 }
 
 function normalizeLocale(locale?: string | null): string {

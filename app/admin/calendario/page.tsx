@@ -1,5 +1,6 @@
 import CalendarMonthClient from './CalendarMonthClient';
 import CalendarWeekClient from './CalendarWeekClient';
+import CalendarDayClient from './CalendarDayClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export default function CalendarioPage({
 }: {
   searchParams: { view?: string };
 }) {
-  const view = searchParams.view === 'week' ? 'week' : 'month';
-
-  return view === 'week' ? <CalendarWeekClient /> : <CalendarMonthClient />;
+  if (searchParams.view === 'day') return <CalendarDayClient />;
+  if (searchParams.view === 'week') return <CalendarWeekClient />;
+  return <CalendarMonthClient />;
 }

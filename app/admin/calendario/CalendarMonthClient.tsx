@@ -381,6 +381,13 @@ export default function CalendarMonthClient() {
             >
               Setmana
             </button>
+            <button
+              type="button"
+              onClick={() => router.push('/admin/calendario?view=day')}
+              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+            >
+              Dia
+            </button>
           </div>
         </div>
 

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const customer = await prisma.customer.findUnique({
       where: { id: customerId },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, preferredLocale: true },
     });
 
     if (!customer) {
@@ -148,7 +148,7 @@ async function sendReviewRequestEmail(customer: { name: string; email: string },
 }
 
 async function sendPostEventSequence(
-  customer: { name: string; email: string },
+  customer: { name: string; email: string; preferredLocale?: string | null },
   bookingId?: string
 ) {
   const cleanName = (customer.name || 'CLIENT')
@@ -183,6 +183,7 @@ async function sendPostEventSequence(
     rating: 5,
     discountCode,
     discountPercent: 10,
+    locale: customer.preferredLocale || undefined,
   });
 
   return { emailSent: true, type: 'post_event', discountCode };

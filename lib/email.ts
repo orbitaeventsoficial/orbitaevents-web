@@ -271,6 +271,170 @@ export async function sendEmailWithTimeout(
   }
 }
 
+/**
+ * Genera firma professional HTML per als emails enviats des de l'admin.
+ */
+export function getEmailSignatureHtml(): string {
+  return `
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e7e5e4;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#334155;line-height:1.5;">
+      <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:top;padding-right:14px;">
+            <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px;background:#111827;padding:4px;" />
+          </td>
+          <td style="vertical-align:top;">
+            <div style="font-weight:700;font-size:14px;color:#111827;">Òrbita Events</div>
+            <div style="margin-top:2px;font-size:12px;color:#64748b;">${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}</div>
+            <div style="margin-top:2px;font-size:12px;"><a href="${EMAIL_CONTACT_WEB}" style="color:#0f172a;text-decoration:none;">${EMAIL_CONTACT_WEB}</a></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
+
+/**
+ * Genera firma en text pla.
+ */
+export function getEmailSignatureText(): string {
+  return `\n---\nÒrbita Events\n${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}\n${EMAIL_CONTACT_WEB}`;
+}
+
+type EmailLocale = 'ca' | 'es' | 'en';
+
+function normalizeEmailLocale(value?: string | null): EmailLocale {
+  const raw = String(value || '').toLowerCase();
+  if (raw.startsWith('en')) return 'en';
+  if (raw.startsWith('ca')) return 'ca';
+  return 'es';
+}
+
+function toIntlLocaleEmail(locale: EmailLocale): string {
+  if (locale === 'ca') return 'ca-ES';
+  if (locale === 'en') return 'en-GB';
+  return 'es-ES';
+}
+
+const PRIVACY_REQUEST_LABELS: Record<EmailLocale, Record<string, string>> = {
+  ca: {
+    ACCESS: 'Dret d\'accés',
+    RECTIFICATION: 'Dret de rectificació',
+    ERASURE: 'Dret de supressió',
+    RESTRICTION: 'Dret de limitació',
+    PORTABILITY: 'Dret de portabilitat',
+    OBJECTION: 'Dret d\'oposició',
+    AUTOMATED: 'Decisions automatitzades',
+  },
+  es: {
+    ACCESS: 'Derecho de acceso',
+    RECTIFICATION: 'Derecho de rectificación',
+    ERASURE: 'Derecho de supresión',
+    RESTRICTION: 'Derecho de limitación',
+    PORTABILITY: 'Derecho de portabilidad',
+    OBJECTION: 'Derecho de oposición',
+    AUTOMATED: 'Decisiones automatizadas',
+  },
+  en: {
+    ACCESS: 'Right of access',
+    RECTIFICATION: 'Right to rectification',
+    ERASURE: 'Right to erasure',
+    RESTRICTION: 'Right to restriction',
+    PORTABILITY: 'Right to data portability',
+    OBJECTION: 'Right to object',
+    AUTOMATED: 'Automated decisions',
+  },
+};
+
+const PRIVACY_COPY: Record<EmailLocale, {
+  portalTitle: string;
+  verifyTitle: string;
+  greeting: (name: string) => string;
+  received: (label: string) => string;
+  verifyInstructions: string;
+  verifyCta: string;
+  linkValid: string;
+  linkIgnore: string;
+  reference: string;
+  legalDeadline: string;
+  linkFallback: string;
+  allRights: string;
+  gdprNote: string;
+  processed: string;
+  rejected: string;
+  processedBody: (label: string) => string;
+  rejectedBody: (label: string) => string;
+  notes: string;
+  downloadCta: string;
+  contactNote: string;
+}> = {
+  ca: {
+    portalTitle: 'Portal de privacitat',
+    verifyTitle: 'Verifica la teva sol·licitud',
+    greeting: (name) => `Hola <strong>${escapeHtml(name)}</strong>,`,
+    received: (label) => `Hem rebut la teva sol·licitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong>.`,
+    verifyInstructions: 'Per verificar la teva identitat i processar la sol·licitud, fes clic al botó següent:',
+    verifyCta: 'Verificar sol·licitud',
+    linkValid: 'Aquest enllaç és vàlid durant <strong>7 dies</strong>.',
+    linkIgnore: 'Si no has sol·licitat això, pots ignorar aquest email.',
+    reference: 'Referència:',
+    legalDeadline: 'Termini legal de resposta:',
+    linkFallback: 'Si el botó no funciona, copia i enganxa aquest enllaç al navegador:',
+    allRights: 'Òrbita Events. Tots els drets reservats.',
+    gdprNote: 'Aquest email ha estat enviat en resposta a una sol·licitud RGPD.',
+    processed: 'Sol·licitud processada',
+    rejected: 'Sol·licitud rebutjada',
+    processedBody: (label) => `T\'informem que la teva sol·licitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong> ha estat <strong>processada correctament</strong>.`,
+    rejectedBody: (label) => `T\'informem que la teva sol·licitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong> ha estat <strong>rebutjada</strong>.`,
+    notes: 'Notes:',
+    downloadCta: 'Descarregar les teves dades',
+    contactNote: 'Si tens qualsevol dubte o necessites més informació, contacta\'ns a',
+  },
+  es: {
+    portalTitle: 'Portal de privacidad',
+    verifyTitle: 'Verifica tu solicitud',
+    greeting: (name) => `Hola <strong>${escapeHtml(name)}</strong>,`,
+    received: (label) => `Hemos recibido tu solicitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong>.`,
+    verifyInstructions: 'Para verificar tu identidad y procesar la solicitud, haz clic en el siguiente botón:',
+    verifyCta: 'Verificar solicitud',
+    linkValid: 'Este enlace es válido durante <strong>7 días</strong>.',
+    linkIgnore: 'Si no has solicitado esto, puedes ignorar este email.',
+    reference: 'Referencia:',
+    legalDeadline: 'Plazo legal de respuesta:',
+    linkFallback: 'Si el botón no funciona, copia y pega este enlace en el navegador:',
+    allRights: 'Òrbita Events. Todos los derechos reservados.',
+    gdprNote: 'Este email ha sido enviado en respuesta a una solicitud RGPD.',
+    processed: 'Solicitud procesada',
+    rejected: 'Solicitud rechazada',
+    processedBody: (label) => `Te informamos que tu solicitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong> ha sido <strong>procesada correctamente</strong>.`,
+    rejectedBody: (label) => `Te informamos que tu solicitud de <strong style="color: #DAA520;">${escapeHtml(label)}</strong> ha sido <strong>rechazada</strong>.`,
+    notes: 'Notas:',
+    downloadCta: 'Descargar tus datos',
+    contactNote: 'Si tienes cualquier duda o necesitas más información, contáctanos en',
+  },
+  en: {
+    portalTitle: 'Privacy portal',
+    verifyTitle: 'Verify your request',
+    greeting: (name) => `Hi <strong>${escapeHtml(name)}</strong>,`,
+    received: (label) => `We have received your <strong style="color: #DAA520;">${escapeHtml(label)}</strong> request.`,
+    verifyInstructions: 'To verify your identity and process your request, please click the button below:',
+    verifyCta: 'Verify request',
+    linkValid: 'This link is valid for <strong>7 days</strong>.',
+    linkIgnore: 'If you did not request this, you can safely ignore this email.',
+    reference: 'Reference:',
+    legalDeadline: 'Legal response deadline:',
+    linkFallback: 'If the button does not work, copy and paste this link into your browser:',
+    allRights: 'Òrbita Events. All rights reserved.',
+    gdprNote: 'This email was sent in response to a GDPR request.',
+    processed: 'Request processed',
+    rejected: 'Request rejected',
+    processedBody: (label) => `We inform you that your <strong style="color: #DAA520;">${escapeHtml(label)}</strong> request has been <strong>successfully processed</strong>.`,
+    rejectedBody: (label) => `We inform you that your <strong style="color: #DAA520;">${escapeHtml(label)}</strong> request has been <strong>rejected</strong>.`,
+    notes: 'Notes:',
+    downloadCta: 'Download your data',
+    contactNote: 'If you have any questions or need more information, contact us at',
+  },
+};
+
 export async function sendPrivacyVerificationEmail(params: {
   to: string;
   name: string;
@@ -278,28 +442,23 @@ export async function sendPrivacyVerificationEmail(params: {
   requestId: string;
   verificationToken: string;
   legalDeadline: Date;
+  locale?: string;
 }): Promise<void> {
   const { to, name, requestType, requestId, verificationToken, legalDeadline } = params;
-
-  const REQUEST_TYPE_LABELS: Record<string, string> = {
-    ACCESS: "Derecho de acceso",
-    RECTIFICATION: 'Derecho de rectificacion',
-    ERASURE: 'Derecho de supresion',
-    RESTRICTION: 'Derecho de limitacion',
-    PORTABILITY: 'Derecho de portabilidad',
-    OBJECTION: 'Derecho de oposicion',
-    AUTOMATED: 'Decisiones automatizadas',
-  };
+  const locale = normalizeEmailLocale(params.locale);
+  const t = PRIVACY_COPY[locale];
+  const labels = PRIVACY_REQUEST_LABELS[locale];
+  const intlLocale = toIntlLocaleEmail(locale);
 
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com'}/api/privacy/verify?token=${verificationToken}`;
-  const requestLabel = REQUEST_TYPE_LABELS[requestType] || requestType;
+  const requestLabel = labels[requestType] || requestType;
 
   await sendEmail({
     to,
-    subject: sanitizeHeader(`Verifica tu solicitud de ${requestLabel} - Orbita Events`),
+    subject: sanitizeHeader(`${t.verifyTitle} — ${requestLabel} — Òrbita Events`),
     html: `
       <!DOCTYPE html>
-      <html>
+      <html lang="${locale}">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -307,22 +466,18 @@ export async function sendPrivacyVerificationEmail(params: {
       <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
         <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
           <div style="background: linear-gradient(135deg, #DAA520, #B8860B); padding: 30px; text-align: center;">
-            <h1 style="color: #000; margin: 0; font-size: 24px;">Orbita Events</h1>
-            <p style="color: rgba(0,0,0,0.7); margin: 8px 0 0 0; font-size: 14px;">Portal de privacidad</p>
+            <h1 style="color: #000; margin: 0; font-size: 24px;">Òrbita Events</h1>
+            <p style="color: rgba(0,0,0,0.7); margin: 8px 0 0 0; font-size: 14px;">${escapeHtml(t.portalTitle)}</p>
           </div>
 
           <div style="padding: 30px; color: #e5e5e5;">
-            <h2 style="color: #DAA520; margin-top: 0;">Verifica tu solicitud</h2>
+            <h2 style="color: #DAA520; margin-top: 0;">${escapeHtml(t.verifyTitle)}</h2>
 
-            <p style="font-size: 16px; line-height: 1.6;">Hola <strong>${escapeHtml(name)}</strong>,</p>
+            <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
 
-            <p style="font-size: 16px; line-height: 1.6;">
-              Hemos recibido tu solicitud de <strong style="color: #DAA520;">${escapeHtml(requestLabel)}</strong>.
-            </p>
+            <p style="font-size: 16px; line-height: 1.6;">${t.received(requestLabel)}</p>
 
-            <p style="font-size: 16px; line-height: 1.6;">
-              Para verificar tu identidad y procesar la solicitud, haz clic en el siguiente boton:
-            </p>
+            <p style="font-size: 16px; line-height: 1.6;">${escapeHtml(t.verifyInstructions)}</p>
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${verificationUrl}"
@@ -334,36 +489,36 @@ export async function sendPrivacyVerificationEmail(params: {
                         font-weight: bold;
                         font-size: 16px;
                         display: inline-block;">
-                Verificar solicitud
+                ${escapeHtml(t.verifyCta)}
               </a>
             </div>
 
             <p style="color: #a3a3a3; font-size: 14px; line-height: 1.6;">
-              Este enlace es valido durante <strong>7 dias</strong>.
-              Si no has solicitado esto, puedes ignorar este email.
+              ${t.linkValid}
+              ${escapeHtml(t.linkIgnore)}
             </p>
 
             <div style="background: rgba(218,165,32,0.1); border: 1px solid rgba(218,165,32,0.3); border-radius: 12px; padding: 16px; margin: 24px 0;">
               <p style="margin: 0 0 8px 0; font-size: 12px; color: #a3a3a3;">
-                <strong style="color: #DAA520;">Referencia:</strong> ${escapeHtml(requestId)}
+                <strong style="color: #DAA520;">${escapeHtml(t.reference)}</strong> ${escapeHtml(requestId)}
               </p>
               <p style="margin: 0; font-size: 12px; color: #a3a3a3;">
-                <strong style="color: #DAA520;">Plazo legal de respuesta:</strong> ${legalDeadline.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                <strong style="color: #DAA520;">${escapeHtml(t.legalDeadline)}</strong> ${legalDeadline.toLocaleDateString(intlLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
 
             <p style="color: #666; font-size: 12px; word-break: break-all;">
-              Si el boton no funciona, copia y pega este enlace en el navegador:<br>
+              ${escapeHtml(t.linkFallback)}<br>
               <a href="${verificationUrl}" style="color: #DAA520;">${verificationUrl}</a>
             </p>
           </div>
 
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Orbita Events. Todos los derechos reservados.
+              ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
             </p>
             <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
-              Este email ha sido enviado en respuesta a una solicitud RGPD.
+              ${escapeHtml(t.gdprNote)}
             </p>
           </div>
         </div>
@@ -380,28 +535,24 @@ export async function sendPrivacyRequestCompletedEmail(params: {
   result: 'approved' | 'rejected';
   notes?: string;
   downloadUrl?: string;
+  locale?: string;
 }): Promise<void> {
   const { to, name, requestType, result, notes, downloadUrl } = params;
+  const locale = normalizeEmailLocale(params.locale);
+  const t = PRIVACY_COPY[locale];
+  const labels = PRIVACY_REQUEST_LABELS[locale];
 
-  const REQUEST_TYPE_LABELS: Record<string, string> = {
-    ACCESS: "Derecho de acceso",
-    RECTIFICATION: 'Derecho de rectificacion',
-    ERASURE: 'Derecho de supresion',
-    RESTRICTION: 'Derecho de limitacion',
-    PORTABILITY: 'Derecho de portabilidad',
-    OBJECTION: 'Derecho de oposicion',
-    AUTOMATED: 'Decisiones automatizadas',
-  };
-
-  const requestLabel = REQUEST_TYPE_LABELS[requestType] || requestType;
+  const requestLabel = labels[requestType] || requestType;
   const isApproved = result === 'approved';
+  const headerTitle = isApproved ? t.processed : t.rejected;
+  const bodyText = isApproved ? t.processedBody(requestLabel) : t.rejectedBody(requestLabel);
 
   await sendEmail({
     to,
-    subject: sanitizeHeader(`${isApproved ? 'Solicitud procesada' : 'Solicitud rechazada'} - ${requestLabel} - Orbita Events`),
+    subject: sanitizeHeader(`${headerTitle} — ${requestLabel} — Òrbita Events`),
     html: `
       <!DOCTYPE html>
-      <html>
+      <html lang="${locale}">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -410,22 +561,19 @@ export async function sendPrivacyRequestCompletedEmail(params: {
         <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
           <div style="background: ${isApproved ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #ef4444, #dc2626)'}; padding: 30px; text-align: center;">
             <h1 style="color: #fff; margin: 0; font-size: 24px;">
-              ${isApproved ? 'Solicitud procesada' : 'Solicitud rechazada'}
+              ${escapeHtml(headerTitle)}
             </h1>
           </div>
 
           <div style="padding: 30px; color: #e5e5e5;">
-            <p style="font-size: 16px; line-height: 1.6;">Hola <strong>${escapeHtml(name)}</strong>,</p>
+            <p style="font-size: 16px; line-height: 1.6;">${t.greeting(name)}</p>
 
-            <p style="font-size: 16px; line-height: 1.6;">
-              Te informamos que tu solicitud de <strong style="color: #DAA520;">${escapeHtml(requestLabel)}</strong>
-              ha sido <strong>${isApproved ? 'procesada correctamente' : 'rechazada'}</strong>.
-            </p>
+            <p style="font-size: 16px; line-height: 1.6;">${bodyText}</p>
 
             ${notes ? `
             <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin: 24px 0;">
               <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
-                <strong style="color: #fff;">Notas:</strong><br>
+                <strong style="color: #fff;">${escapeHtml(t.notes)}</strong><br>
                 ${escapeHtml(notes)}
               </p>
             </div>
@@ -442,20 +590,20 @@ export async function sendPrivacyRequestCompletedEmail(params: {
                         font-weight: bold;
                         font-size: 16px;
                         display: inline-block;">
-                Descargar tus datos
+                ${escapeHtml(t.downloadCta)}
               </a>
             </div>
             ` : ''}
 
             <p style="font-size: 14px; line-height: 1.6; color: #a3a3a3;">
-              Si tienes cualquier duda o necesitas mas informacion, contactanos en
+              ${escapeHtml(t.contactNote)}
               <a href="mailto:${SITE_CONFIG.business.email}" style="color: #DAA520;">${SITE_CONFIG.business.email}</a>
             </p>
           </div>
 
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Orbita Events. Todos los derechos reservados.
+              ${new Date().getFullYear()} ${escapeHtml(t.allRights)}
             </p>
           </div>
         </div>
@@ -465,6 +613,60 @@ export async function sendPrivacyRequestCompletedEmail(params: {
   });
 }
 
+const TESTIMONIAL_COPY: Record<EmailLocale, {
+  trustHeader: string;
+  subject: (pct: number) => string;
+  giftAlt: (pct: number) => string;
+  imgFallback: string;
+  greeting: (name: string) => string;
+  approved: string;
+  exclusiveCode: string;
+  discount: (pct: number) => string;
+  validity: string;
+  share: string;
+  viewServices: string;
+}> = {
+  ca: {
+    trustHeader: 'GRÀCIES PER CONFIAR EN NOSALTRES',
+    subject: (pct) => `Gràcies per la teva opinió! Aquí tens el teu ${pct}% de descompte — Òrbita Events`,
+    giftAlt: (pct) => `El teu regal de ${pct}% de descompte`,
+    imgFallback: 'Veure regal',
+    greeting: (name) => `Hola ${name}!`,
+    approved: 'La teva opinió ha estat aprovada i publicada. Ens fa molta il·lusió llegir-te.',
+    exclusiveCode: 'El teu codi exclusiu',
+    discount: (pct) => `${pct}% DESCOMPTE`,
+    validity: 'Vàlid durant 6 mesos per al teu pròxim esdeveniment',
+    share: 'Comparteix aquest codi amb amics i família. Si organitzen un event amb nosaltres, tots hi guanyeu.',
+    viewServices: 'Veure els nostres serveis',
+  },
+  es: {
+    trustHeader: 'GRACIAS POR CONFIAR EN NOSOTROS',
+    subject: (pct) => `Gracias por tu opinión! Aquí tienes tu ${pct}% de descuento — Òrbita Events`,
+    giftAlt: (pct) => `Tu regalo de ${pct}% de descuento`,
+    imgFallback: 'Ver regalo',
+    greeting: (name) => `Hola ${name}!`,
+    approved: 'Tu opinión ha sido aprobada y publicada. Nos hace mucha ilusión leerte.',
+    exclusiveCode: 'Tu código exclusivo',
+    discount: (pct) => `${pct}% DESCUENTO`,
+    validity: 'Válido durante 6 meses para tu próximo evento',
+    share: 'Comparte este código con amigos y familia. Si organizan un evento con nosotros, todos ganáis.',
+    viewServices: 'Ver nuestros servicios',
+  },
+  en: {
+    trustHeader: 'THANK YOU FOR TRUSTING US',
+    subject: (pct) => `Thanks for your review! Here's your ${pct}% discount — Òrbita Events`,
+    giftAlt: (pct) => `Your ${pct}% discount gift`,
+    imgFallback: 'View gift',
+    greeting: (name) => `Hi ${name}!`,
+    approved: 'Your review has been approved and published. We love reading your feedback.',
+    exclusiveCode: 'Your exclusive code',
+    discount: (pct) => `${pct}% DISCOUNT`,
+    validity: 'Valid for 6 months for your next event',
+    share: 'Share this code with friends and family. If they book an event with us, everyone wins.',
+    viewServices: 'View our services',
+  },
+};
+
 export async function sendTestimonialApprovedEmail(params: {
   to: string;
   name: string;
@@ -472,8 +674,11 @@ export async function sendTestimonialApprovedEmail(params: {
   discountCode: string;
   discountPercent?: number;
   eventType?: string;
+  locale?: string;
 }): Promise<void> {
   const { to, name, rating, discountCode, discountPercent = 10, eventType } = params;
+  const locale = normalizeEmailLocale(params.locale);
+  const t = TESTIMONIAL_COPY[locale];
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
   const canvasParams = new URLSearchParams({
@@ -485,13 +690,14 @@ export async function sendTestimonialApprovedEmail(params: {
   });
   if (eventType) canvasParams.append('eventType', eventType);
   const canvasUrl = `${baseUrl}/api/canvas/rating?${canvasParams.toString()}`;
+  const firstName = name.split(' ')[0] || name;
 
   await sendEmail({
     to,
-    subject: `Gracias por tu opinion! Aqui tienes tu ${discountPercent}% de descuento - Orbita Events`,
+    subject: t.subject(discountPercent),
     html: `
       <!DOCTYPE html>
-      <html>
+      <html lang="${locale}">
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -500,44 +706,44 @@ export async function sendTestimonialApprovedEmail(params: {
         <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
           <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 40px; text-align: center;">
             <h1 style="color: #FFB800; margin: 0; font-size: 28px; font-weight: 300;">
-              <span style="font-weight: 800;">ORBITA</span> EVENTS
+              <span style="font-weight: 800;">ÒRBITA</span> EVENTS
             </h1>
             <p style="color: rgba(255,255,255,0.6); margin: 12px 0 0 0; font-size: 14px; letter-spacing: 2px;">
-              GRACIAS POR CONFIAR EN NOSOTROS
+              ${escapeHtml(t.trustHeader)}
             </p>
           </div>
 
           <div style="text-align: center; padding: 0;">
-            <img src="${canvasUrl}" alt="Tu regalo de ${discountPercent}% de descuento" style="width: 100%; max-width: 600px; display: block; border: 0; outline: none; text-decoration: none;" />
+            <img src="${canvasUrl}" alt="${escapeHtml(t.giftAlt(discountPercent))}" style="width: 100%; max-width: 600px; display: block; border: 0; outline: none; text-decoration: none;" />
           </div>
           <div style="padding: 12px 24px; background: #121212; text-align: center; font-size: 12px; color: #9ca3af;">
-            Si no ves la imagen, abrela aqui: <a href="${canvasUrl}" style="color: #FFB800; text-decoration: none;">Ver regalo</a>
+            <a href="${canvasUrl}" style="color: #FFB800; text-decoration: none;">${escapeHtml(t.imgFallback)}</a>
           </div>
 
           <div style="padding: 30px; color: #e5e5e5;">
-            <h2 style="color: #FFB800; margin-top: 0; text-align: center;">Hola ${name.split(' ')[0]}!</h2>
+            <h2 style="color: #FFB800; margin-top: 0; text-align: center;">${escapeHtml(t.greeting(firstName))}</h2>
 
             <p style="font-size: 16px; line-height: 1.6; text-align: center;">
-              Tu opinion ha sido aprobada y publicada. Nos hace mucha ilusion leerte.
+              ${escapeHtml(t.approved)}
             </p>
 
             <div style="background: rgba(255,184,0,0.1); border: 2px solid rgba(255,184,0,0.3); border-radius: 16px; padding: 24px; margin: 24px 0; text-align: center;">
               <p style="margin: 0 0 8px 0; font-size: 14px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 2px;">
-                Tu codigo exclusivo
+                ${escapeHtml(t.exclusiveCode)}
               </p>
               <p style="margin: 0; font-size: 36px; font-weight: 800; color: #FFB800; letter-spacing: 4px;">
                 ${escapeHtml(discountCode)}
               </p>
               <p style="margin: 12px 0 0 0; font-size: 24px; font-weight: 700; color: #fff;">
-                ${discountPercent}% DESCUENTO
+                ${escapeHtml(t.discount(discountPercent))}
               </p>
               <p style="margin: 12px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.5);">
-                Valido durante 6 meses para tu proximo evento
+                ${escapeHtml(t.validity)}
               </p>
             </div>
 
             <p style="font-size: 14px; line-height: 1.6; color: #a3a3a3; text-align: center;">
-              Comparte este codigo con amigos y familia. Si organizan un evento con nosotros, todos ganais.
+              ${escapeHtml(t.share)}
             </p>
 
             <div style="text-align: center; margin: 30px 0;">
@@ -550,17 +756,17 @@ export async function sendTestimonialApprovedEmail(params: {
                         font-weight: bold;
                         font-size: 16px;
                         display: inline-block;">
-                Ver nuestros servicios
+                ${escapeHtml(t.viewServices)}
               </a>
             </div>
           </div>
 
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              ${new Date().getFullYear()} Orbita Events. Todos los derechos reservados.
+              ${new Date().getFullYear()} Òrbita Events
             </p>
             <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
-              ${SITE_CONFIG.business.phone} - ${SITE_CONFIG.business.email}
+              ${SITE_CONFIG.business.phone} · ${SITE_CONFIG.business.email}
             </p>
           </div>
         </div>

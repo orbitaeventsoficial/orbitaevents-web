@@ -133,6 +133,7 @@ export async function POST(req: NextRequest) {
         requestId: request.id,
         verificationToken: request.verificationToken,
         legalDeadline: request.legalDeadline,
+        locale: resolveLocale(req),
       });
 
       await logPrivacyAction({
