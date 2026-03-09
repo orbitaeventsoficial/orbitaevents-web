@@ -55,7 +55,12 @@ interface ItemData {
   minStock: number | null;
 }
 
-export default function InventoryItemEditor({ item }: { item: ItemData }) {
+interface InventoryItemEditorProps {
+  item?: ItemData;
+  mode?: 'create' | 'edit';
+}
+
+export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryItemEditorProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,22 +68,22 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
   const { confirm, dialogProps } = useConfirmDialog();
 
   const [form, setForm] = useState({
-    name: item.name,
-    description: item.description || '',
-    category: item.category,
-    watts: item.watts?.toString() || '',
-    value: item.value.toString(),
-    status: item.status,
-    condition: item.condition,
-    notes: item.notes || '',
-    purchaseDate: item.purchaseDate
+    name: item?.name || '',
+    description: item?.description || '',
+    category: item?.category || 'SOUND',
+    watts: item?.watts?.toString() || '',
+    value: item?.value?.toString() || '',
+    status: item?.status || 'AVAILABLE',
+    condition: item?.condition || 'GOOD',
+    notes: item?.notes || '',
+    purchaseDate: item?.purchaseDate
       ? new Date(item.purchaseDate).toISOString().split('T')[0]
       : '',
-    purchasePrice: item.purchasePrice?.toString() || '',
-    expectedLifeHours: (item.expectedLifeHours || 2000).toString(),
-    isConsumable: item.isConsumable,
-    stockQuantity: item.stockQuantity?.toString() || '',
-    minStock: item.minStock?.toString() || '',
+    purchasePrice: item?.purchasePrice?.toString() || '',
+    expectedLifeHours: (item?.expectedLifeHours || 2000).toString(),
+    isConsumable: item?.isConsumable || false,
+    stockQuantity: item?.stockQuantity?.toString() || '',
+    minStock: item?.minStock?.toString() || '',
   });
 
   const updateField = (field: string, value: string | boolean) => {
@@ -114,27 +119,35 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         expectedLifeHours: form.expectedLifeHours ? parseFloat(form.expectedLifeHours) : null,
       };
 
-      const res = await fetch(`/api/admin/inventory/${item.id}`, {
-        method: 'PATCH',
+      const url = mode === 'create' ? '/api/admin/inventory' : `/api/admin/inventory/${item!.id}`;
+      const method = mode === 'create' ? 'POST' : 'PATCH';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || 'Error desant canvis');
+        throw new Error(data?.error || 'Error desant');
       }
 
-      setSuccess(true);
-      router.refresh();
+      if (mode === 'create') {
+        router.push('/admin/inventory');
+      } else {
+        setSuccess(true);
+        router.refresh();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
       setSaving(false);
     }
-  }, [form, item.id, router]);
+  }, [form, item, mode, router]);
 
   const handleDelete = useCallback(async () => {
+    if (mode === 'create' || !item) return;
     const ok = await confirm({ title: 'Eliminar element', message: 'Segur que vols eliminar/retirar aquest element?', confirmLabel: 'Eliminar', variant: 'danger' });
     if (!ok) return;
 
@@ -152,7 +165,7 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     }
-  }, [item.id, router]);
+  }, [item, mode, router, confirm]);
 
   return (
     <div className="space-y-4">
@@ -169,7 +182,7 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
 
       {/* Informació bàsica */}
       <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Editar element</h2>
+        <h2 className="text-sm font-semibold">{mode === 'create' ? 'Nou element' : 'Editar element'}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="inv-name" className="text-xs">Nom *</label>
@@ -273,6 +286,47 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
         </div>
       </div>
 
+      {/* Consumible + estoc */}
+      <div className="rounded-2xl border p-5 space-y-4">
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.isConsumable}
+              onChange={(e) => updateField('isConsumable', e.target.checked)}
+              className="w-4 h-4 rounded"
+            />
+            <span className="text-sm">Es consumible</span>
+          </label>
+        </div>
+        {form.isConsumable && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="inv-stock" className="text-xs">Estoc actual</label>
+              <input
+                id="inv-stock"
+                type="number"
+                min={0}
+                value={form.stockQuantity}
+                onChange={(e) => updateField('stockQuantity', e.target.value)}
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="inv-min-stock" className="text-xs">Estoc mínim</label>
+              <input
+                id="inv-min-stock"
+                type="number"
+                min={0}
+                value={form.minStock}
+                onChange={(e) => updateField('minStock', e.target.value)}
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Amortització */}
       <div className="rounded-2xl border p-5 space-y-4">
         <h2 className="text-sm font-semibold">Amortització</h2>
@@ -332,15 +386,26 @@ export default function InventoryItemEditor({ item }: { item: ItemData }) {
           disabled={saving || !form.name || !form.value}
           className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {saving ? 'Desant...' : 'Desar canvis'}
+          {saving ? 'Desant...' : mode === 'create' ? 'Crear element' : 'Desar canvis'}
         </button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="rounded-xl border px-4 py-3 text-sm transition-colors"
-        >
-          Eliminar
-        </button>
+        {mode === 'edit' && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="rounded-xl border px-4 py-3 text-sm transition-colors"
+          >
+            Eliminar
+          </button>
+        )}
+        {mode === 'create' && (
+          <button
+            type="button"
+            onClick={() => router.push('/admin/inventory')}
+            className="rounded-xl border px-4 py-3 text-sm transition-colors"
+          >
+            Cancel·lar
+          </button>
+        )}
       </div>
       <ConfirmDialog {...dialogProps} />
     </div>

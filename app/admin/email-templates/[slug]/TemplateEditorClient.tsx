@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import SortableList from '../../components/SortableList';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS DE BLOCS
@@ -139,9 +140,6 @@ export default function TemplateEditorClient({
   const [variables, setVariables] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [draggedBlockType, setDraggedBlockType] = useState<BlockType | null>(null);
-  const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
-  const [dropTarget, setDropTarget] = useState<number | null>(null);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const previewRef = useRef<HTMLIFrameElement>(null);
 
@@ -212,15 +210,6 @@ export default function TemplateEditorClient({
     if (selectedBlockId === id) setSelectedBlockId(null);
   };
 
-  const moveBlock = (fromIdx: number, toIdx: number) => {
-    setBlocks((prev) => {
-      const next = [...prev];
-      const [moved] = next.splice(fromIdx, 1);
-      next.splice(toIdx > fromIdx ? toIdx - 1 : toIdx, 0, moved);
-      return next;
-    });
-  };
-
   const updateBlockData = (id: string, field: string, value: string) => {
     setBlocks((prev) =>
       prev.map((b) => (b.id === id ? { ...b, data: { ...b.data, [field]: value } } : b))
@@ -288,9 +277,8 @@ export default function TemplateEditorClient({
                 onDragStart={(e) => {
                   e.dataTransfer.setData('text/plain', cat.type);
                   e.dataTransfer.effectAllowed = 'copy';
-                  setDraggedBlockType(cat.type);
                 }}
-                onDragEnd={() => setDraggedBlockType(null)}
+                onDragEnd={() => {}}
                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 cursor-grab active:cursor-grabbing transition-all hover:bg-white/10 hover:border-white/20"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-sm font-bold">
@@ -331,59 +319,28 @@ export default function TemplateEditorClient({
         {/* Columna 2: Blocs de l'email (drop zone + reorder) */}
         <div className="space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-white/50">Contingut de l&apos;email</h3>
-          <div
-            className="min-h-[400px] rounded-2xl border border-dashed border-white/10 p-3 space-y-1"
-            onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = draggedBlockType ? 'copy' : 'move'; }}
-            onDrop={(e) => {
-              e.preventDefault();
-              const type = e.dataTransfer.getData('text/plain');
-              if (type && BLOCK_CATALOG.some((c) => c.type === type)) {
-                addBlock(type as BlockType, dropTarget ?? undefined);
+          <SortableList
+            items={blocks}
+            keyFn={(b) => b.id}
+            onReorder={setBlocks}
+            onExternalDrop={(data, idx) => {
+              if (BLOCK_CATALOG.some((c) => c.type === data)) {
+                addBlock(data as BlockType, idx);
               }
-              setDropTarget(null);
-              setDraggedBlockType(null);
             }}
-          >
-            {blocks.length === 0 && (
-              <div className="flex items-center justify-center h-48 text-sm text-white/20">
-                Arrossega blocs aquí per construir l&apos;email
-              </div>
-            )}
-            {blocks.map((block, idx) => {
+            acceptExternalType="text/plain"
+            className="min-h-[400px] rounded-2xl border border-dashed border-white/10 p-3 space-y-1"
+            placeholderHeight={44}
+            renderItem={(block, _idx, { isDragging }) => {
               const catInfo = BLOCK_CATALOG.find((c) => c.type === block.type);
               const isSelected = selectedBlockId === block.id;
-
               return (
                 <div
-                  key={block.id}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('block-id', block.id);
-                    e.dataTransfer.effectAllowed = 'move';
-                    setDraggedBlockId(block.id);
-                  }}
-                  onDragEnd={() => setDraggedBlockId(null)}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    if (draggedBlockId && draggedBlockId !== block.id) {
-                      setDropTarget(idx);
-                    }
-                  }}
-                  onDrop={(e) => {
-                    const sourceId = e.dataTransfer.getData('block-id');
-                    if (sourceId) {
-                      e.stopPropagation();
-                      const fromIdx = blocks.findIndex((b) => b.id === sourceId);
-                      if (fromIdx !== -1) moveBlock(fromIdx, idx);
-                    }
-                    setDropTarget(null);
-                    setDraggedBlockId(null);
-                  }}
                   onClick={() => setSelectedBlockId(block.id)}
                   className={[
                     'group flex items-center gap-2 rounded-xl border p-2.5 cursor-grab active:cursor-grabbing transition-all',
                     isSelected ? 'border-cyan-500/40 bg-cyan-500/5' : 'border-white/10 bg-white/[0.02] hover:border-white/20',
-                    dropTarget === idx ? 'border-t-2 border-t-amber-400' : '',
+                    isDragging ? 'opacity-40' : '',
                   ].join(' ')}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-xs font-bold flex-shrink-0">
@@ -405,8 +362,8 @@ export default function TemplateEditorClient({
                   </button>
                 </div>
               );
-            })}
-          </div>
+            }}
+          />
         </div>
 
         {/* Columna 3: Preview + editor del bloc seleccionat */}

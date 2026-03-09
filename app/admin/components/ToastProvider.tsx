@@ -1,7 +1,30 @@
 'use client';
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
-import { Toast } from './AdminUI';
+
+// ── Toast inline (before: imported from AdminUI.tsx) ──
+
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+const TOAST_STYLES: Record<ToastType, { bg: string; icon: string }> = {
+  success: { bg: 'bg-emerald-500/20 border-emerald-500/30', icon: '✅' },
+  error: { bg: 'bg-rose-500/20 border-rose-500/30', icon: '❌' },
+  warning: { bg: 'bg-amber-500/20 border-amber-500/30', icon: '⚠️' },
+  info: { bg: 'bg-sky-500/20 border-sky-500/30', icon: 'ℹ️' },
+};
+
+function Toast({ type, message, onClose }: { type: ToastType; message: string; onClose?: () => void }) {
+  const style = TOAST_STYLES[type];
+  return (
+    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl admin-card-glass`}>
+      <span className="text-lg">{style.icon}</span>
+      <p className="text-sm">{message}</p>
+      {onClose && (
+        <button type="button" onClick={onClose} className="ml-2">✕</button>
+      )}
+    </div>
+  );
+}
 
 type ToastItem = {
   id: number;

@@ -1,5 +1,53 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-09 sessió 5 — IMAP + Plantilles email + Drag & Drop global + Auditoria codi
+
+### Fet
+1. **IMAP configurable des d'admin**: `lib/imap.ts` refactoritzat — config dinàmica (env vars primer, BD Settings fallback). Nova pàgina `/admin/inbox/settings` amb `ImapSettingsClient.tsx` (formulari, test connexió, guardar). Eliminats `InboxSettingsClient.tsx` (Gmail OAuth legacy) i `lib/gmail.ts` (codi mort).
+2. **Connexió IMAP verificada**: DonDominio `imap.dondominio.com:993`, info@orbitaevents.com — 15 emails, 13 no llegits, 5 carpetes.
+3. **Sistema plantilles email editables**: Model `EmailTemplate` a Prisma. `emailTemplateService.ts` amb 8 plantilles × 3 idiomes (ca/es/en), disseny fosc professional. API routes + editor visual amb blocs drag & drop (6 tipus: heading, text, button, info_table, highlight, divider). Preview en temps real via iframe.
+4. **CSS drag & drop global**: Classes a `admin-theme.css` — `.admin-drag-placeholder` (silueta lluminosa color corporatiu), `[data-dragging]`, `.admin-drag-item`, `.admin-drag-inserted`. Tot amb CSS variables (`--at-brand`, `--at-brand-glow`), `prefers-reduced-motion` respectat.
+5. **SortableList.tsx**: Component reutilitzable drag & drop genèric. Encara no integrat a cap component existent.
+6. **Nav actualitzada**: Afegit "Plantilles email" a secció Contingut.
+
+### Auditoria codi completa (3 auditors en paral·lel)
+
+#### A. Components admin (`app/admin/components/`) — 21 fitxers, 2.849 línies
+- **20/21 actius** (95.2%)
+- **1 "okupa"**: `SortableList.tsx` (195 línies) — creat però no importat enlloc encara (pendent d'integrar)
+- **Possible consolidació**: `ui.tsx` i `AdminUI.tsx` podrien unificar-se (pattern dual)
+- **Components més crítics**: `AdminPage` (59 importadors), `ToastProvider` (21), `ConfirmDialog` (14), `AdminLoadingSkeleton` (57 loading.tsx)
+
+#### B. Formularis duplicats
+- **Blog new/edit**: 416 + 396 línies quasi idèntiques → **PENDENT extreure `BlogEditorForm.tsx`** (com FAQ fa amb `FaqEditorForm`)
+- **Inventory new**: 372 línies inline form, però `[id]/page.tsx` usa `InventoryItemEditor` separat → **PENDENT unificar**
+- **Bookings new**: 520+ línies inline, no extret → candidat futur
+- **FAQ**: ✅ ja consolidat (`FaqEditorForm` amb mode prop)
+- **Packs**: ✅ acceptable (NewPackForm simple vs EditPackForm complex, workflows molt diferents)
+- **Cap component old/legacy/backup trobat**
+- **Tots els *Client.tsx correctament parellats amb page.tsx**
+
+#### C. Codi mort lib/API
+- **0 fitxers lib/ orfes** — tots importats
+- **0 rutes API sense crides** — totes cridades des de client/server/cron
+- **0 fitxers legacy** (old/backup/v2/copy)
+- **Repo molt net** després de 2 migracions (Supabase→Railway, C:→D:) i múltiples auditories
+- **Scripts**: `scripts/` potencialment amb scripts no mantinguts (check-packs-i18n.ts, autofix-*.ts) — revisar en futura sessió
+
+### Accions pendents d'aquesta auditoria
+1. ~~SortableList.tsx~~ → integrar als components amb drag & drop existents (leads, bookings, tasks, email editor)
+2. Blog new/edit → extreure BlogEditorForm.tsx reutilitzable
+3. Inventory new → usar InventoryItemEditor per crear també
+4. ui.tsx + AdminUI.tsx → valorar consolidació
+
+### Raonament
+- L'usuari va demanar explícitament "no vull okupas al repo" i "formularis triplicats" — auditoria exhaustiva necessària.
+- El repo està sorprenentment net (95%+ components actius, 0 rutes mortes) gràcies a les auditories anteriors.
+- Els duplicats principals són Blog i Inventory (patró new/edit no consolidat), totalment resoluble amb el patró FAQ (FaqEditorForm amb mode prop).
+- SortableList.tsx es manté perquè s'integrarà pròximament — no és codi mort sinó codi preparat.
+
+---
+
 ## 2026-03-09 sessió 4 — Calendari complet + Crons monitoratge
 
 ### Fet
