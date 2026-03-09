@@ -20,6 +20,17 @@ function isAuthorized(request: NextRequest): boolean {
   return timingSafeEqual(expected, received);
 }
 
+async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {
+  const now = new Date().toISOString();
+  const prefix = 'automation.packPricing';
+  await Promise.all([
+    prisma.setting.upsert({ where: { key: `${prefix}.lastRun` }, update: { value: now }, create: { key: `${prefix}.lastRun`, value: now, type: 'STRING', category: 'automation' } }),
+    prisma.setting.upsert({ where: { key: `${prefix}.lastStatus` }, update: { value: status }, create: { key: `${prefix}.lastStatus`, value: status, type: 'STRING', category: 'automation' } }),
+    prisma.setting.upsert({ where: { key: `${prefix}.lastSummary` }, update: { value: JSON.stringify(summary) }, create: { key: `${prefix}.lastSummary`, value: JSON.stringify(summary), type: 'JSON', category: 'automation' } }),
+    ...(message ? [prisma.setting.upsert({ where: { key: `${prefix}.lastMessage` }, update: { value: message }, create: { key: `${prefix}.lastMessage`, value: message, type: 'STRING', category: 'automation' } })] : []),
+  ]);
+}
+
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
   if (!isAuthorized(request)) {
@@ -86,11 +97,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    await saveRunStatus('ok', { reviewed, tasksCreated });
+
     return NextResponse.json({ ok: true, reviewed, tasksCreated });
   } catch (error) {
     log.error('pack-pricing-check cron failed', error, {
       context: { requestId, endpoint: 'cron/pack-pricing-check' },
     });
+    await saveRunStatus('error', {}, error instanceof Error ? error.message : 'Error desconegut').catch(() => {});
     return NextResponse.json({ ok: false, error: 'Pack pricing check failed' }, { status: 500 });
   }
 }

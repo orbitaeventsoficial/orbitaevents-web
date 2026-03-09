@@ -73,6 +73,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
       { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
+      { icon: '🔄', label: 'Crons', href: '/admin/crons' },
       { icon: '🎛️', label: 'Features', href: '/admin/features' },
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
       { icon: '📊', label: 'Estadístiques web', href: '/admin/stats' },

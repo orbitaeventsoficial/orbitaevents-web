@@ -25,6 +25,17 @@ function isAuthorized(request: NextRequest, requestId: string): boolean {
   return timingSafeEqual(expected, received);
 }
 
+async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {
+  const now = new Date().toISOString();
+  const prefix = 'automation.invoiceSync';
+  await Promise.all([
+    prisma.setting.upsert({ where: { key: `${prefix}.lastRun` }, update: { value: now }, create: { key: `${prefix}.lastRun`, value: now, type: 'STRING', category: 'automation' } }),
+    prisma.setting.upsert({ where: { key: `${prefix}.lastStatus` }, update: { value: status }, create: { key: `${prefix}.lastStatus`, value: status, type: 'STRING', category: 'automation' } }),
+    prisma.setting.upsert({ where: { key: `${prefix}.lastSummary` }, update: { value: JSON.stringify(summary) }, create: { key: `${prefix}.lastSummary`, value: JSON.stringify(summary), type: 'JSON', category: 'automation' } }),
+    ...(message ? [prisma.setting.upsert({ where: { key: `${prefix}.lastMessage` }, update: { value: message }, create: { key: `${prefix}.lastMessage`, value: message, type: 'STRING', category: 'automation' } })] : []),
+  ]);
+}
+
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
 
@@ -105,12 +116,14 @@ export async function GET(request: NextRequest) {
     }
 
     log.info('Cron invoice-sync completat', { context: { summary } });
+    await saveRunStatus('ok', summary);
 
     return NextResponse.json({ ok: true, summary });
   } catch (error) {
     log.error('Cron invoice-sync error global', error, {
       context: { requestId },
     });
+    await saveRunStatus('error', summary, error instanceof Error ? error.message : 'Error desconegut').catch(() => {});
     return NextResponse.json({ ok: false, error: 'Error executant cron' }, { status: 500 });
   }
 }

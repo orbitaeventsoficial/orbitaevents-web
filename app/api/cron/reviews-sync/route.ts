@@ -73,6 +73,17 @@ function upsertSetting(key: string, value: string, category: string) {
   });
 }
 
+async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {
+  const now = new Date().toISOString();
+  const prefix = 'automation.reviewsSync';
+  await Promise.all([
+    upsertSetting(`${prefix}.lastRun`, now, 'automation'),
+    upsertSetting(`${prefix}.lastStatus`, status, 'automation'),
+    prisma.setting.upsert({ where: { key: `${prefix}.lastSummary` }, update: { value: JSON.stringify(summary) }, create: { key: `${prefix}.lastSummary`, value: JSON.stringify(summary), type: 'JSON', category: 'automation' } }),
+    ...(message ? [upsertSetting(`${prefix}.lastMessage`, message, 'automation')] : []),
+  ]);
+}
+
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
 
@@ -108,6 +119,8 @@ export async function GET(request: NextRequest) {
       context: { requestId },
     });
 
+    await saveRunStatus('ok', { rating: data.rating, total: data.total, synced: data.reviews.length });
+
     return NextResponse.json({
       ok: true,
       rating: data.rating,
@@ -118,6 +131,7 @@ export async function GET(request: NextRequest) {
     log.error('reviews-sync: Error', error instanceof Error ? error : undefined, {
       context: { requestId },
     });
+    await saveRunStatus('error', {}, error instanceof Error ? error.message : 'Error intern').catch(() => {});
     return NextResponse.json({ ok: false, error: 'Error intern' }, { status: 500 });
   }
 }

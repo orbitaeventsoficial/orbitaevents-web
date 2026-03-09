@@ -49,6 +49,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {
+    const ts = new Date().toISOString();
+    const prefix = 'automation.postEvent';
+    await Promise.all([
+      prisma.setting.upsert({ where: { key: `${prefix}.lastRun` }, update: { value: ts }, create: { key: `${prefix}.lastRun`, value: ts, type: 'STRING', category: 'automation' } }),
+      prisma.setting.upsert({ where: { key: `${prefix}.lastStatus` }, update: { value: status }, create: { key: `${prefix}.lastStatus`, value: status, type: 'STRING', category: 'automation' } }),
+      prisma.setting.upsert({ where: { key: `${prefix}.lastSummary` }, update: { value: JSON.stringify(summary) }, create: { key: `${prefix}.lastSummary`, value: JSON.stringify(summary), type: 'JSON', category: 'automation' } }),
+      ...(message ? [prisma.setting.upsert({ where: { key: `${prefix}.lastMessage` }, update: { value: message }, create: { key: `${prefix}.lastMessage`, value: message, type: 'STRING', category: 'automation' } })] : []),
+    ]);
+  }
+
   const results: ProcessedResult[] = [];
   const now = new Date();
 
@@ -131,11 +142,14 @@ export async function GET(request: NextRequest) {
       errors: results.filter(r => r.status === 'error').length,
     };
 
+    await saveRunStatus('ok', summary);
+
     return NextResponse.json({ ok: true, timestamp: now.toISOString(), summary, results });
   } catch (error) {
     log.error('Error en cron post-event:', error, {
       context: { requestId, endpoint: 'cron/post-event:GET' },
     });
+    await saveRunStatus('error', {}, error instanceof Error ? error.message : 'Error desconegut').catch(() => {});
     return NextResponse.json({ error: 'Error processant esdeveniments', details: error instanceof Error ? error.message : 'Error desconegut' }, { status: 500 });
   }
 }
