@@ -1,5 +1,26 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-10 — Balanç final del projecte
+
+### Estat: PROJECTE COMPLETAT (95%)
+
+**Full de ruta original: 12/14 tasques fetes.** Les 2 pendents són nice-to-haves:
+- WhatsApp integrat → ja funciona amb `getWhatsAppUrl()`, faltaria historial dins l'admin (requereix Business API de pagament)
+- Multi-usuari → només necessari si més d'una persona usa l'admin
+
+**Xifres finals:**
+- 64 pàgines admin, 132 API routes, 6 crons, 28 scripts
+- 3 idiomes (ca/es/en), PWA, Railway PostgreSQL
+- ~19.000 LOC TypeScript, schema Prisma 1.417 línies
+- Motor de costos unificat (costEngine), tresoreria, pipeline, CAC
+- PDF Studio, contractes, facturació Holded
+- Privacitat RGPD, safata paperera IMAP, ressenyes amb canvas
+- Fitxa client hub, kanban reserves, calendari diari, countdown events
+
+**Decisió:** Declarar el projecte acabat. Usar-lo amb clients reals i afegir funcionalitats quan siguin necessàries de debò, no per perfeccionisme.
+
+---
+
 ## 2026-03-10 sessió 9 — Privacitat RGPD + Safata paperera IMAP
 
 ### Fet
