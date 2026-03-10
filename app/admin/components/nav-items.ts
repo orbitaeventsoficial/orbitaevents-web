@@ -26,14 +26,13 @@ export function getPriorityItems(newLeadsCount: number): NavItem[] {
 
 export const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Comercial',
+    title: 'Operacions',
     defaultOpen: true,
     items: [
-      { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
-      { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📄', label: 'Pressupostos', href: '/admin/presupuestos' },
+      { icon: '💶', label: 'Finances', href: '/admin/economia' },
+      { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops' },
-      { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
     ],
   },
   {
@@ -44,15 +43,6 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
       { icon: '💰', label: 'Preus', href: '/admin/pricing' },
       { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
-      { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
-    ],
-  },
-  {
-    title: 'Finances',
-    defaultOpen: false,
-    items: [
-      { icon: '💶', label: 'Economia', href: '/admin/economia' },
-      { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
     ],
   },
   {
@@ -60,18 +50,22 @@ export const NAV_SECTIONS: NavSection[] = [
     defaultOpen: false,
     items: [
       { icon: '📰', label: 'Blog', href: '/admin/blog' },
-      { icon: '❓', label: 'FAQ', href: '/admin/faq' },
-      { icon: '✏️', label: 'Textos', href: '/admin/text-manager' },
-      { icon: '⭐', label: 'Ressenyes Google', href: '/admin/google-reviews' },
-      { icon: '✅', label: 'Testimonis (aprovar)', href: '/admin/ressenyes' },
-      { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
+      { icon: '✅', label: 'Ressenyes', href: '/admin/ressenyes' },
+      { icon: '🤖', label: 'Correus', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
       { icon: '✉️', label: 'Plantilles email', href: '/admin/email-templates' },
     ],
   },
   {
-    title: 'Configuració',
+    title: 'Avançat',
     defaultOpen: false,
     items: [
+      { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
+      { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
+      { icon: '❓', label: 'FAQ', href: '/admin/faq' },
+      { icon: '✏️', label: 'Textos', href: '/admin/text-manager' },
+      { icon: '⭐', label: 'Ressenyes Google', href: '/admin/google-reviews' },
+      { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
+      { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
       { icon: '🔒', label: 'Privacitat RGPD', href: '/admin/privacy' },
       { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
       { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },

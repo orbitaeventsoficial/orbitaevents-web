@@ -912,10 +912,7 @@ export default function ConfiguradorClient() {
     return (
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center mb-8">
-          <div className="inline-block px-4 py-2 rounded-full bg-red-500/20 text-red-400 text-sm font-bold mb-4 animate-pulse">
-            ⏰ {t('step4.offerExpires')}
-          </div>
-          <h2 className="text-5xl font-display font-black text-white mb-4">
+          <h2 className="text-4xl font-display font-black text-white mb-4">
             {t('step4.title')}
           </h2>
           <p className="text-xl text-text-muted">
@@ -923,48 +920,23 @@ export default function ConfiguradorClient() {
           </p>
         </div>
 
-        {/* Comparació de preus */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Sense oferta */}
-          <div className="p-6 rounded-xl bg-bg-surface border border-border opacity-60">
-            <div className="text-center">
-              <p className="text-text-muted mb-2">{t('step4.laterPrice')}</p>
-              <p className="text-3xl font-black text-white line-through">{priceWithoutDiscount}€</p>
-              <p className="text-sm text-text-muted mt-2">{t('step4.normalPrice')}</p>
-            </div>
-          </div>
-
-          {/* Amb oferta */}
-          <div className="p-6 rounded-xl bg-gradient-to-br from-oe-gold/20 to-oe-gold/5 border-2 border-oe-gold ring-4 ring-oe-gold/30">
-            <div className="text-center">
-              <div className="inline-block px-3 py-1 rounded-full bg-oe-gold text-black text-xs font-bold mb-3">
-                🔥 {t('step4.bookToday')}
-              </div>
-              <p className="text-sm text-text-muted mb-2">{t('step4.finalPrice')}</p>
-              <p className="text-5xl font-black text-oe-gold mb-2">{finalPrice}€</p>
-              <p className="text-green-400 font-bold flex items-center justify-center gap-1">
+        {/* Resum del preu */}
+        <div className="p-6 rounded-xl bg-gradient-to-br from-oe-gold/10 to-oe-gold/5 border border-oe-gold/30">
+          <div className="text-center">
+            <p className="text-sm text-text-muted mb-2">{t('step4.finalPrice')}</p>
+            <p className="text-5xl font-black text-oe-gold mb-2">{finalPrice}€</p>
+            {earlyBirdDiscount > 0 && (
+              <p className="text-green-400 text-sm font-medium flex items-center justify-center gap-1">
                 <TrendingDown className="w-4 h-4" />
                 {t('step4.youSave', { amount: earlyBirdDiscount })}
+                <span className="text-text-muted ml-1">({t('step4.normalPrice')}: {priceWithoutDiscount}€)</span>
               </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Urgència visual */}
-        <div className="p-6 rounded-xl bg-red-500/10 border border-red-500/50">
-          <div className="flex items-start gap-4">
-            <Clock className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
-            <div>
-              <h4 className="text-white font-bold mb-2">{t('step4.whyOffer')}</h4>
-              <p className="text-text-muted text-sm leading-relaxed">
-                {t('step4.whyOfferText')}
-              </p>
-            </div>
+            )}
           </div>
         </div>
 
         {/* Garantia */}
-        <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/50">
+        <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/30">
           <div className="flex items-start gap-4">
             <Zap className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
             <div>

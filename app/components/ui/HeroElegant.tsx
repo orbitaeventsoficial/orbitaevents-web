@@ -7,39 +7,19 @@ import { useState, useEffect } from 'react';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
-import HeroUrgencyBadge from './HeroUrgencyBadge';
-// ═══════════════════════════════════════════════════════════════════════════
-// HERO ELEGANT v2.0 - Conversió màxima, mobile-first, amb traduccions
-// ═══════════════════════════════════════════════════════════════════════════
-
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
   const tCommon = useTranslations('common');
   const rotatingTexts = t.raw('rotatingTexts') as string[];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [heroVariant, setHeroVariant] = useState<'a' | 'b'>('a');
 
-  // Rotar textos cada 5 segons (més lent per millor lectura)
+  // Rotate every 4s
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % rotatingTexts.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, [rotatingTexts.length]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const key = 'hero-ab-variant-v1';
-    const stored = window.localStorage.getItem(key);
-    const variant = stored === 'a' || stored === 'b'
-      ? (stored as 'a' | 'b')
-      : (Math.random() < 0.5 ? 'a' : 'b');
-    setHeroVariant(variant);
-    if (!stored) {
-      window.localStorage.setItem(key, variant);
-    }
-    trackCTAClick(`hero_ab_impression_${variant}`, 'hero_elegant');
-  }, []);
 
   return (
     <section aria-label="Hero" className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
@@ -59,8 +39,6 @@ export default function HeroElegant() {
         >
           <source src="/video/Herovideo.mp4" type="video/mp4" />
         </video>
-
-        {/* Overlay - Més fosc per llegibilitat */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-[#0A0A0A]/60 to-[#0A0A0A]" />
       </div>
 
@@ -72,139 +50,110 @@ export default function HeroElegant() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-3xl mx-auto text-center"
         >
-          {/* Badge diferenciador - LA VENTAJA COMPETITIVA */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 mb-4 md:mb-5 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20"
-          >
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 mb-4 md:mb-5 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
             <span className="text-amber-500 text-lg">{t('badgeEmoji')}</span>
             <span className="text-amber-400 text-sm font-medium tracking-wide">
               {t('badge')}
             </span>
-          </motion.div>
+          </div>
 
-          {/* Títol - BRUTAL i curt amb text rotatiu */}
-          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight text-center">
+          {/* Title — direct, with rotating service type */}
+          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight">
             {t('title1')}
             <br />
             <span className="relative block w-full min-h-[1.2em]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentIndex}
-                  initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
-                  transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
-                  className="relative block w-full text-center"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }}
+                  className="relative block w-full text-center bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent"
+                  style={{
+                    filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.3))',
+                  }}
                 >
-                  {/* Text amb gradient i glow */}
-                  <span
-                    className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent"
-                    style={{
-                      textShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 0 80px rgba(251, 191, 36, 0.2)',
-                      filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.3))',
-                    }}
-                  >
-                    {rotatingTexts[currentIndex]}
-                  </span>
-
+                  {rotatingTexts[currentIndex]}
                 </motion.span>
               </AnimatePresence>
             </span>
           </h1>
 
-          {/* Subtítol - CONCÍS */}
-          <p className="text-lg md:text-xl text-white/70 mb-4 max-w-xl mx-auto">
-            {heroVariant === 'a' ? t('subtitle') : t('subtitleAlt')}
-            <span className="hidden md:inline"> {heroVariant === 'a' ? t('subtitleLocation') : t('subtitleLocationAlt')}</span>
+          {/* Subtitle — territory + promise */}
+          <p className="text-lg md:text-xl text-white/70 mb-6 md:mb-8 max-w-xl mx-auto">
+            {t('subtitle')}
           </p>
 
-          {/* Badge de Urgencia - Halloween / Món Màgic */}
-          <div className="mb-5 md:mb-6">
-            <HeroUrgencyBadge />
-          </div>
-
-          {/* CTAs - WhatsApp principal + Configurador */}
+          {/* CTAs — Packs primary, Configurator secondary */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8">
 
-            {/* CTA Principal - WhatsApp */}
-            <a
-              href={WHATSAPP_URL_WITH_MESSAGE(t('whatsappMessage'))}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                trackWhatsAppClick('hero_elegant');
-                trackCTAClick(`hero_whatsapp_primary_${heroVariant}`, 'hero_elegant');
-              }}
-              className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 rounded-2xl order-1"
+            {/* CTA Principal — Packs */}
+            <Link
+              href="/packs"
+              onClick={() => trackCTAClick('hero_packs_primary', 'hero_elegant')}
+              className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 rounded-2xl"
             >
-              {/* Glow de fondo pulsante */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl"
-                animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
-
-              {/* Efecto de shine */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                animate={{ x: ['-200%', '200%'] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-              />
-
-              {/* Contenido del botón */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl" />
               <span className="relative z-10 text-zinc-900 font-black text-lg flex items-center gap-2">
-                <span>{tCommon('buttons.whatsapp')}</span>
+                <span>{t('ctaPacks')}</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </span>
+            </Link>
 
-              {/* Shadow pulsante */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            </a>
-
-            {/* CTA Secundari - Configurador */}
+            {/* CTA Secundari — Configurador */}
             <Link
               href="/configurador"
-              onClick={() => trackCTAClick(`hero_configurator_secondary_${heroVariant}`, 'hero_elegant')}
-              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium px-8 py-4 rounded-xl border border-white/10 hover:border-white/20 transition-all order-2"
+              onClick={() => trackCTAClick('hero_configurator_secondary', 'hero_elegant')}
+              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-semibold px-8 py-4 rounded-xl border border-white/20 hover:border-white/30 transition-all"
             >
-              <span>{t('ctaContact')}</span>
+              <span>{t('ctaConfigurator')}</span>
               <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
           </div>
 
-          {/* Social Proof - UNA sola mètrica potent + logos */}
+          {/* Social Proof + WhatsApp */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex flex-col items-center gap-4"
+            className="flex flex-col items-center gap-3"
           >
-            {/* Rating destacat */}
+            {/* Rating */}
             <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-              <span className="text-white font-semibold">{t('rating')}</span>
-              <span className="text-white/60">·</span>
-              <span className="text-white/60 text-sm">{t('socialProof')}</span>
+              <span className="text-white font-semibold text-sm">{t('rating')}</span>
+              <span className="text-white/40">·</span>
+              <span className="text-white/50 text-sm">{t('socialProof')}</span>
             </div>
 
+            {/* WhatsApp — auxiliary link */}
+            <a
+              href={WHATSAPP_URL_WITH_MESSAGE(t('whatsappMessage'))}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('hero_elegant')}
+              className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-[#25D366] transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.613.613l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.352 0-4.556-.725-6.379-1.963l-.447-.305-2.948.988.988-2.948-.305-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              <span>{tCommon('buttons.whatsapp')}</span>
+            </a>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Scroll indicator - Subtil */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.4 }}
