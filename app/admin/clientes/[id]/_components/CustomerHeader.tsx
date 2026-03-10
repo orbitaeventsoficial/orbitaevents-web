@@ -13,7 +13,7 @@ import { formatDate, formatNumber } from '@/lib/constants';
 // TYPES I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads';
+type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
 
 const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: CustomerHubDTO) => number | null }> = [
   { key: 'summary', label: 'Resum', icon: '📊' },
@@ -49,6 +49,7 @@ const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: Cus
     icon: '📋',
     badge: (data) => (data.leads || []).length || null,
   },
+  { key: 'privacy', label: 'Privacitat', icon: '🔒' },
 ];
 
 const STATUS_STYLES: Record<HubStatus | 'default', { bg: string; text: string; border: string }> = {

@@ -44,6 +44,10 @@ const LeadsPanel = dynamic(() => import('./panels/LeadsPanel'), {
   loading: () => <PanelSkeleton />,
 });
 
+const PrivacyPanel = dynamic(() => import('./panels/PrivacyPanel'), {
+  loading: () => <PanelSkeleton />,
+});
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTEXT PER COMPARTIR REFRESH ENTRE COMPONENTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -148,7 +152,7 @@ function TimelineSkeleton() {
 // TABS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads';
+type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
 
 const TABS: Array<{ key: TabKey; label: string; icon: string }> = [
   { key: 'summary', label: 'Resum', icon: '📊' },
@@ -159,6 +163,7 @@ const TABS: Array<{ key: TabKey; label: string; icon: string }> = [
   { key: 'tasks', label: 'Tasques', icon: '✅' },
   { key: 'discounts', label: 'Descomptes', icon: '🏷️' },
   { key: 'leads', label: 'Entrades', icon: '📋' },
+  { key: 'privacy', label: 'Privacitat', icon: '🔒' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -237,6 +242,12 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         return (
           <PanelErrorBoundary panelName="Entrades vinculades">
             <LeadsPanel data={data} />
+          </PanelErrorBoundary>
+        );
+      case 'privacy':
+        return (
+          <PanelErrorBoundary panelName="Privacitat">
+            <PrivacyPanel />
           </PanelErrorBoundary>
         );
       default:

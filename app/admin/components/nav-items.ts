@@ -72,6 +72,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: 'Configuració',
     defaultOpen: false,
     items: [
+      { icon: '🔒', label: 'Privacitat RGPD', href: '/admin/privacy' },
       { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
       { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
       { icon: '🔄', label: 'Crons', href: '/admin/crons' },

@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { deleteEmail, fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
+import { deleteEmail, fetchEmailByUid, getTrashFolderPath, markAsRead, markAsUnread, moveToFolder, restoreFromTrash } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -92,6 +92,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (action === 'markUnread') {
       const success = await markAsUnread(uidNum);
+      return NextResponse.json({ ok: success });
+    }
+
+    if (action === 'moveToTrash') {
+      const sourceFolder = body.folder || 'INBOX';
+      const trashPath = await getTrashFolderPath();
+      if (!trashPath) {
+        return NextResponse.json({ ok: false, error: 'No s\'ha trobat la carpeta paperera al servidor' }, { status: 500 });
+      }
+      const success = await moveToFolder(uidNum, trashPath, sourceFolder);
+      return NextResponse.json({ ok: success });
+    }
+
+    if (action === 'restore') {
+      const success = await restoreFromTrash(uidNum);
       return NextResponse.json({ ok: success });
     }
 

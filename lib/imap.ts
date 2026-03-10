@@ -363,6 +363,59 @@ export async function deleteEmail(uid: number, folder: string = 'INBOX'): Promis
 }
 
 /**
+ * Obtenir el path de la carpeta paperera
+ */
+export async function getTrashFolderPath(): Promise<string | null> {
+  const client = await connectIMAP();
+
+  try {
+    const all = await client.list();
+    const trash = all.find(
+      (f) =>
+        f.specialUse === '\\Trash' ||
+        /trash|papelera|eliminados|deleted/i.test(f.path || '')
+    );
+    return trash?.path || null;
+  } finally {
+    await client.logout();
+  }
+}
+
+/**
+ * Moure un email d'una carpeta a una altra
+ */
+export async function moveToFolder(uid: number, targetFolder: string, sourceFolder: string = 'INBOX'): Promise<boolean> {
+  const client = await connectIMAP();
+
+  try {
+    const mailbox = await client.getMailboxLock(sourceFolder);
+
+    try {
+      await client.messageMove([uid], targetFolder, { uid: true });
+      return true;
+    } finally {
+      mailbox.release();
+    }
+  } catch (error) {
+    log.error('Failed to move email', error, {
+      context: { uid, sourceFolder, targetFolder }
+    });
+    return false;
+  } finally {
+    await client.logout();
+  }
+}
+
+/**
+ * Restaurar email de la paperera a INBOX
+ */
+export async function restoreFromTrash(uid: number): Promise<boolean> {
+  const trashPath = await getTrashFolderPath();
+  if (!trashPath) return false;
+  return moveToFolder(uid, 'INBOX', trashPath);
+}
+
+/**
  * Obtenir carpetes disponibles
  */
 export async function listFolders(): Promise<string[]> {

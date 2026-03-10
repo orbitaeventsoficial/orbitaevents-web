@@ -84,10 +84,13 @@ export default function InboxClient({
   const router = useRouter();
 
   // State
-  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails'>('leads');
+  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails' | 'trash'>('leads');
   const [imapEmails, setImapEmails] = useState<ImapEmail[]>([]);
+  const [trashEmails, setTrashEmails] = useState<ImapEmail[]>([]);
+  const [trashCount, setTrashCount] = useState(0);
   const [imapUnread, setImapUnread] = useState(0);
   const [loadingImap, setLoadingImap] = useState(false);
+  const [loadingTrash, setLoadingTrash] = useState(false);
   const [imapError, setImapError] = useState<string | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<UnifiedEmail | null>(null);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
@@ -164,18 +167,60 @@ export default function InboxClient({
     }
   }, []);
 
+  const loadTrashEmails = useCallback(async () => {
+    setLoadingTrash(true);
+    try {
+      const params = new URLSearchParams({ folder: 'Trash', action: 'countTotal' });
+      const countRes = await fetch(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
+      const countData = await countRes.json().catch(() => ({}));
+      if (countRes.ok) setTrashCount(countData.total || 0);
+
+      const listParams = new URLSearchParams({ folder: 'Trash', limit: '50', _t: String(Date.now()) });
+      const res = await fetch(`/api/admin/inbox/messages?${listParams}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setTrashEmails(data.emails || []);
+        setTrashCount(data.total || 0);
+      }
+    } catch (error) {
+      console.error('Error loading trash:', error);
+    } finally {
+      setLoadingTrash(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!imapConfigured) return;
     if (activeTab === 'leads') return;
+    if (activeTab === 'trash') {
+      if (trashEmails.length === 0) loadTrashEmails();
+      return;
+    }
     if (imapEmails.length > 0) return;
     loadImapEmails();
-  }, [imapConfigured, activeTab, imapEmails.length, loadImapEmails]);
+  }, [imapConfigured, activeTab, imapEmails.length, trashEmails.length, loadImapEmails, loadTrashEmails]);
 
   // Filtrar emails
+  // Emails de la paperera en format unificat
+  const trashUnified: UnifiedEmail[] = useMemo(() => {
+    return trashEmails.map((email) => ({
+      id: email.id,
+      type: 'imap' as const,
+      from: email.from.address,
+      fromName: email.from.name || email.from.address.split('@')[0],
+      subject: email.subject,
+      preview: email.bodyText?.slice(0, 150) || '',
+      date: new Date(email.date),
+      read: email.isRead,
+      imapData: email,
+    }));
+  }, [trashEmails]);
+
   const deferredQuery = useDeferredValue(searchQuery);
   const queryLower = deferredQuery.trim().toLowerCase();
   const filteredEmails = useMemo(() => {
-    return emails.filter((email) => {
+    const source = activeTab === 'trash' ? trashUnified : emails;
+    return source.filter((email) => {
       if (activeTab === 'leads' && email.type !== 'lead') return false;
       if (activeTab === 'emails' && email.type !== 'imap') return false;
       if (filter === 'unread' && email.read) return false;
@@ -189,7 +234,7 @@ export default function InboxClient({
       }
       return true;
     });
-  }, [emails, activeTab, filter, queryLower]);
+  }, [emails, trashUnified, activeTab, filter, queryLower]);
 
   function handleReply(email: UnifiedEmail) {
     setReplyTo(email);
@@ -245,7 +290,7 @@ export default function InboxClient({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok || !data?.lead?.id) {
-        setFlashMessage({ type: 'error', text: data?.error || 'No s’ha pogut importar el lead' });
+        setFlashMessage({ type: 'error', text: data?.error || "No s'ha pogut importar el lead" });
         return;
       }
 
@@ -263,9 +308,66 @@ export default function InboxClient({
     }
   }
 
-  async function handleDeleteImapEmail(email: UnifiedEmail) {
+  async function handleMoveToTrash(email: UnifiedEmail) {
     if (email.type !== 'imap' || !email.imapData?.uid) return;
-    const ok = await confirm({ title: 'Eliminar email', message: 'Segur que vols eliminar aquest email?', confirmLabel: 'Eliminar', variant: 'danger' });
+    const ok = await confirm({ title: 'Moure a paperera', message: 'Segur que vols moure aquest email a la paperera?', confirmLabel: 'Moure', variant: 'warning' });
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'moveToTrash' }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        setFlashMessage({ type: 'error', text: data?.error || 'No s\'ha pogut moure a la paperera' });
+        return;
+      }
+
+      setImapEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
+      setSelectedEmail((prev) => (prev?.id === email.id ? null : prev));
+      setImapUnread((prev) => Math.max(0, prev - (email.read ? 0 : 1)));
+      setTrashCount((prev) => prev + 1);
+      setTrashEmails([]); // Reset per forçar recàrrega
+      setFlashMessage({ type: 'success', text: 'Email mogut a la paperera' });
+    } catch (error) {
+      console.error('Error moving to trash:', error);
+      setFlashMessage({ type: 'error', text: 'Error movent a la paperera' });
+    }
+  }
+
+  async function handleRestoreEmail(email: UnifiedEmail) {
+    if (email.type !== 'imap' || !email.imapData?.uid) return;
+
+    try {
+      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore' }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        setFlashMessage({ type: 'error', text: data?.error || 'No s\'ha pogut restaurar l\'email' });
+        return;
+      }
+
+      setTrashEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
+      setTrashCount((prev) => Math.max(0, prev - 1));
+      setSelectedEmail((prev) => (prev?.id === email.id ? null : prev));
+      setImapEmails([]); // Reset per forçar recàrrega
+      setFlashMessage({ type: 'success', text: 'Email restaurat a la safata d\'entrada' });
+    } catch (error) {
+      console.error('Error restoring email:', error);
+      setFlashMessage({ type: 'error', text: 'Error restaurant email' });
+    }
+  }
+
+  async function handleDeletePermanently(email: UnifiedEmail) {
+    if (email.type !== 'imap' || !email.imapData?.uid) return;
+    const ok = await confirm({ title: 'Eliminar permanentment', message: 'Aquesta acció és irreversible. Segur?', confirmLabel: 'Eliminar', variant: 'danger' });
     if (!ok) return;
 
     try {
@@ -275,16 +377,16 @@ export default function InboxClient({
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data?.ok) {
-        setFlashMessage({ type: 'error', text: data?.error || 'No s’ha pogut eliminar l’email' });
+        setFlashMessage({ type: 'error', text: data?.error || 'No s\'ha pogut eliminar l\'email' });
         return;
       }
 
-      setImapEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
+      setTrashEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
+      setTrashCount((prev) => Math.max(0, prev - 1));
       setSelectedEmail((prev) => (prev?.id === email.id ? null : prev));
-      setImapUnread((prev) => Math.max(0, prev - (email.read ? 0 : 1)));
-      setFlashMessage({ type: 'success', text: 'Email eliminat correctament' });
+      setFlashMessage({ type: 'success', text: 'Email eliminat permanentment' });
     } catch (error) {
-      console.error('Error deleting IMAP email:', error);
+      console.error('Error deleting email permanently:', error);
       setFlashMessage({ type: 'error', text: 'Error eliminant email' });
     }
   }
@@ -331,20 +433,31 @@ export default function InboxClient({
             📋 Entrades web ({initialLeads.length})
           </button>
           {imapConfigured && (
-            <button
-              onClick={() => setActiveTab('emails')}
-              type="button"
-              className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                activeTab === 'emails' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
-              }`}
-            >
-              📧 Emails ({imapEmails.length})
-              {imapUnread > 0 && (
-                <span className="ml-2 px-2 py-0.5 text-xs rounded-full">
-                  {imapUnread}
-                </span>
-              )}
-            </button>
+            <>
+              <button
+                onClick={() => setActiveTab('emails')}
+                type="button"
+                className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  activeTab === 'emails' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                }`}
+              >
+                📧 Emails ({imapEmails.length})
+                {imapUnread > 0 && (
+                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full">
+                    {imapUnread}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('trash')}
+                type="button"
+                className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  activeTab === 'trash' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                }`}
+              >
+                🗑️ Paperera {trashCount > 0 && `(${trashCount})`}
+              </button>
+            </>
           )}
         </div>
 
@@ -382,12 +495,12 @@ export default function InboxClient({
 
         {imapConfigured && (
           <button
-            onClick={loadImapEmails}
-            disabled={loadingImap}
+            onClick={activeTab === 'trash' ? loadTrashEmails : loadImapEmails}
+            disabled={loadingImap || loadingTrash}
             type="button"
             className="w-full mt-4 px-3 py-2 border rounded-xl text-sm transition-colors disabled:opacity-50"
           >
-            {loadingImap ? '⏳ Carregant...' : '🔄 Actualitzar'}
+            {loadingImap || loadingTrash ? '⏳ Carregant...' : '🔄 Actualitzar'}
           </button>
         )}
 
@@ -439,7 +552,7 @@ export default function InboxClient({
         )}
 
         <div className="flex-1 overflow-y-auto">
-          {loadingImap && imapEmails.length === 0 ? (
+          {(loadingImap && imapEmails.length === 0) || (loadingTrash && trashEmails.length === 0) ? (
             <div className="p-8 text-center">
               <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full mx-auto mb-4" />
               <p>Carregant emails...</p>
@@ -633,7 +746,7 @@ export default function InboxClient({
                     📋 Veure lead
                   </button>
                 )}
-                {selectedEmail.type === 'imap' && (
+                {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
                   <>
                     <button
                       onClick={() => handleImportLeadFromEmail(selectedEmail)}
@@ -643,11 +756,29 @@ export default function InboxClient({
                       ➕ Crear/actualitzar lead
                     </button>
                     <button
-                      onClick={() => handleDeleteImapEmail(selectedEmail)}
+                      onClick={() => handleMoveToTrash(selectedEmail)}
                       type="button"
                       className="px-4 py-2 border rounded-xl transition-colors"
                     >
-                      🗑️ Eliminar email
+                      🗑️ Paperera
+                    </button>
+                  </>
+                )}
+                {selectedEmail.type === 'imap' && activeTab === 'trash' && (
+                  <>
+                    <button
+                      onClick={() => handleRestoreEmail(selectedEmail)}
+                      type="button"
+                      className="px-4 py-2 border rounded-xl transition-colors"
+                    >
+                      ↩️ Restaurar
+                    </button>
+                    <button
+                      onClick={() => handleDeletePermanently(selectedEmail)}
+                      type="button"
+                      className="px-4 py-2 border rounded-xl transition-colors"
+                    >
+                      ❌ Eliminar permanent
                     </button>
                   </>
                 )}

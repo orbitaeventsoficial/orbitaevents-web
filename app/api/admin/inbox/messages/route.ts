@@ -9,6 +9,7 @@ import { log } from '@/lib/logger';
 import {
   fetchEmails,
   countUnread,
+  countTotal,
   testConnection,
 } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
@@ -21,6 +22,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action') || 'list';
+  const folder = searchParams.get('folder') || 'INBOX';
   const limitRaw = parseInt(searchParams.get('limit') || '50');
   const offsetRaw = parseInt(searchParams.get('offset') || '0');
   const onlyUnread = searchParams.get('unread') === 'true';
@@ -36,12 +38,19 @@ export async function GET(request: NextRequest) {
 
     // Comptar no llegits
     if (action === 'count') {
-      const count = await countUnread();
+      const count = await countUnread(folder);
       return NextResponse.json({ unread: count });
+    }
+
+    // Comptar total (per paperera o altres carpetes)
+    if (action === 'countTotal') {
+      const total = await countTotal(folder);
+      return NextResponse.json({ total });
     }
 
     // Obtenir emails
     const emails = await fetchEmails({
+      folder,
       limit,
       offset,
       onlyUnread,
@@ -78,7 +87,7 @@ export async function GET(request: NextRequest) {
       emails: formattedEmails,
       total: totalCount,
       unread: unreadCount,
-      folder: 'INBOX',
+      folder,
     });
 
   } catch (error) {
