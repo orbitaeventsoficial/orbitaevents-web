@@ -137,24 +137,72 @@
 - ✅ Dashboard queries seqüencials→paral·leles
 - ✅ Pressupostos carreguen snapshot quan s'editen
 
-## Què falta (full de ruta)
+## Full de ruta v1 (COMPLETAT — 12/14)
 
-### Prioritat ALTA (funcionalitat trencada o absent)
-1. ~~**Llistat pressupostos millorat**~~ ✅ Fet (2026-03-09)
-2. ~~**Calendari vista setmanal**~~ ✅ Fet (2026-03-09) — toggle mes/setmana
-3. ~~**Templates email editables**~~ ✅ Fet — /admin/email-templates, editor visual blocs, preview, auto-traducció
-4. ~~**Configuració IMAP des de l'admin**~~ ✅ Fet (2026-03-09) — formulari editable + test connexió
+> Tasques originals. 12 fetes, 2 nice-to-haves pendents (WhatsApp historial, multi-usuari).
 
-### Prioritat MITJANA (millores significatives)
-5. ~~**Gestió disponibilitat**~~ ✅ Fet (2026-03-09) — bloquejar/desbloquejar inline al calendari
-6. **WhatsApp integrat** — historial visible a l'admin
-7. ~~**Logs de crons visuals**~~ ✅ Fet (2026-03-09) — /admin/crons amb estat visual
-8. ~~**Aprovació testimonis a la nav**~~ ✅ Fet (2026-03-09)
+1. ~~Llistat pressupostos millorat~~ ✅ | 2. ~~Calendari setmanal~~ ✅ | 3. ~~Templates email~~ ✅ | 4. ~~Config IMAP~~ ✅
+5. ~~Gestió disponibilitat~~ ✅ | 6. WhatsApp historial (nice-to-have) | 7. ~~Logs crons~~ ✅ | 8. ~~Aprovació testimonis~~ ✅
+9. Multi-usuari (nice-to-have) | 10. ~~Editor emails~~ ✅ | 11. ~~Vista diària~~ ✅ | 12. ~~Privacitat RGPD~~ ✅ | 13. ~~Scripts admin~~ ✅ | 14. ~~Seed plantilles~~ ✅
 
-### Prioritat BAIXA (nice to have)
-9. **Multi-usuari** — rols i permisos
-10. ~~**Editor visual emails**~~ ✅ Fet — Editor blocs visual a /admin/email-templates/[slug]
-11. ~~**Vista diària calendari**~~ ✅ Fet (2026-03-09) — CalendarDayClient.tsx
-12. ~~**Privacitat GDPR UI**~~ ✅ Fet (2026-03-10) — /admin/privacy + PrivacyPanel a fitxa client
-13. ~~**Pàgina scripts admin**~~ ✅ Fet (2026-03-10) — /admin/scripts, 25 scripts catalogats
-14. ~~**Seed plantilles email**~~ ✅ Fet (2026-03-10) — 24 plantilles (8×3 idiomes) a BD
+---
+
+## Full de ruta v2 — "La Millor Web del Món"
+
+### FASE 1 — Impacte visual (web pública) 🎬
+> Que qualsevol que entri digui "uau"
+
+| # | Tasca | Fitxer principal | Estat |
+|---|-------|-----------------|-------|
+| P1 | **Hero cinematogràfic** — typewriter lletra per lletra, 1 CTA únic, entrada seqüencial badge→títol→sub→CTA→proof | `HeroElegant.tsx` | ❌ |
+| P3 | **Portfolio cinematogràfic** — scroll horitzontal desktop, stories per event (foto+vídeo+testimoni+xifres), parallax | `PortfolioShowcase.tsx` | ❌ |
+| P4 | **Comptadors dinàmics** — connectats a BD real, API `/api/public/stats` amb cache 1h | `StatsSection.tsx` | ❌ |
+
+### FASE 2 — Conversió (configurador + urgència) 🎯
+> Convertir visites en leads qualificats
+
+| # | Tasca | Fitxer principal | Estat |
+|---|-------|-----------------|-------|
+| P2 | **Configurador amb ambient** — canvi colors/imatges per tipus, disponibilitat real integrada, preu persistent visible | `configurador/client.tsx` | ❌ |
+| P5 | **Social pressure + countdown** — "X persones mirant", countdown early-bird, "queden N dissabtes" | `CalendarioUrgencia.tsx` | ❌ |
+
+### FASE 3 — Eines de negoci noves 💰
+> Funcionalitats que fan guanyar diners
+
+| # | Tasca | Fitxer principal | Estat |
+|---|-------|-----------------|-------|
+| F1 | **Col·laboradors** — Model Prisma, CRUD admin, comissions (model net o descompte), integració costEngine, pressupost col·lab, report | `admin/collaborators/` | ❌ |
+| F2 | **Configurador de costos D&D** — drag & drop components (DJ/hora, altaveu, llum...), cost real des inventari, marge suggerit, guardar + PDF | `admin/cost-calculator/` | ❌ |
+
+### FASE 4 — Admin intel·ligent 🧠
+> L'admin "parla" i anticipa
+
+| # | Tasca | Fitxer principal | Estat |
+|---|-------|-----------------|-------|
+| A1 | **Insights narratius** — textos interpretatius al dashboard ("3 leads calents sense resposta"), comparativa setmanal, widget meteo | `admin/page.tsx` | ❌ |
+| A5 | **Timeline comunicació unificat** — un sol fil cronològic per client (email+WhatsApp+notes+trucades) | `UnifiedTimeline.tsx` | ❌ |
+| A6 | **Auto-triggers** — pressupost acceptat→contracte auto, welcome email immediat, checklist pre-event per tipus | `automationTriggers.ts` | ❌ |
+
+### Detall: F1 — Col·laboradors
+
+**Problema:** Treballem amb col·laboradors que revenen els nostres serveis. Dos models possibles:
+- **Model A (Preu net + comissió):** Donem el nostre preu, el col·laborador afegeix la seva comissió. Transparent, però no controlem PVP final.
+- **Model B (Descompte col·laborador):** Li fem un 10% menys, ell s'emporta el 10%. Controlem PVP, menys marge nostre.
+
+**Implementació:**
+- Model Prisma: `Collaborator` (nom, email, tlf, % comissió, model A/B, actiu) + `CollaboratorBooking` (relació + comissió + import)
+- Pàgina admin `/admin/collaborators` amb CRUD + reserves + KPIs
+- Integració costEngine: marge NET descomptant comissió
+- Pressupost PDF versió col·laborador
+- Report: facturació directa vs via col·laboradors
+
+### Detall: F2 — Configurador de costos personalitzat
+
+**Problema:** Ens demanen pressupostos a mida que no encaixen en cap pack. Ex: "DJ 3h sense altaveus", "Només il·luminació 5h". Cal saber cost real i marge ABANS de donar preu.
+
+**Implementació:**
+- Pàgina admin `/admin/cost-calculator`
+- Components arrossegables: DJ (€/hora), altaveu (€/unitat), llum (€/unitat), cabina foto, transport (€/km), tècnic extra, hores extres
+- Cost de cada component tret de l'inventari (amortització real + tarifa horària)
+- Sumatori temps real: cost total, preu suggerit (marge configurable), marge brut/net
+- Guardar com a pressupost personalitzat → generar PDF → enviar client

@@ -5225,6 +5225,28 @@
         "bodas": "Weddings",
         "empreses": "Corporate",
         "privades": "Private parties"
+      },
+      "stories": {
+        "discomovil": {
+          "title": "Mobile disco parties",
+          "desc": "Professional sound, lights and DJ for private parties and celebrations"
+        },
+        "halloween": {
+          "title": "Halloween nights",
+          "desc": "Themed decoration, special effects and terrifying atmosphere"
+        },
+        "monMagic": {
+          "title": "Kids Magic World",
+          "desc": "Magic shows, entertainment and fun for the little ones"
+        },
+        "bodas": {
+          "title": "Dream weddings",
+          "desc": "DJ, lighting and production for the most special day"
+        },
+        "empreses": {
+          "title": "Corporate events",
+          "desc": "Professional technical production for companies and brands"
+        }
       }
     }
   },

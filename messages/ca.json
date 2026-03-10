@@ -5477,6 +5477,28 @@
         "bodas": "Bodas",
         "empreses": "Empreses",
         "privades": "Privades"
+      },
+      "stories": {
+        "discomovil": {
+          "title": "Festes amb discomòbil",
+          "desc": "So professional, llums i DJ per a festes privades i celebracions"
+        },
+        "halloween": {
+          "title": "Nits de Halloween",
+          "desc": "Decoració temàtica, efectes especials i ambient terrorífic"
+        },
+        "monMagic": {
+          "title": "Món Màgic infantil",
+          "desc": "Espectacles de màgia, animació i diversió per als més petits"
+        },
+        "bodas": {
+          "title": "Casaments de somni",
+          "desc": "DJ, il·luminació i producció per al dia més especial"
+        },
+        "empreses": {
+          "title": "Events corporatius",
+          "desc": "Producció tècnica professional per a empreses i marques"
+        }
       }
     }
   },

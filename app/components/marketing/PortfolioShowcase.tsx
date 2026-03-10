@@ -1,169 +1,258 @@
 'use client';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PORTFOLIO SHOWCASE (DESKTOP) - Òrbita Events
-// Grid de fotos reals de tots els events amb hover elegant
+// PORTFOLIO SHOWCASE — Cinematic horizontal scroll
+// Each category = a visual "story" with overlay info
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
-const CATEGORY_CONFIGS = [
+// ─── Event Stories Data ─────────────────────────────────────────────────────
+
+interface EventStory {
+  id: string;
+  category: string;
+  photos: string[];
+  /** Translation key for overlay text */
+  overlayKey: string;
+}
+
+const EVENT_STORIES: EventStory[] = [
   {
-    id: 'all' as const,
-    emoji: '📋',
-    photos: [
-      '/img/portfolio/discomovil/discomovil-01.avif',
-      '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
-      '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
-      '/img/portfolio/discomovil/discomovil-05.avif',
-      '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-05.avif',
-      '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
-    ],
-  },
-  {
-    id: 'discomovil' as const,
-    emoji: '🎧',
-    photos: Array.from({ length: 9 }, (_, i) =>
+    id: 'discomovil',
+    category: 'discomovil',
+    photos: Array.from({ length: 10 }, (_, i) =>
       `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`
     ),
+    overlayKey: 'discomovil',
   },
   {
-    id: 'halloween' as const,
-    emoji: '🎃',
-    photos: Array.from({ length: 9 }, (_, i) =>
+    id: 'halloween',
+    category: 'halloween',
+    photos: Array.from({ length: 10 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`
     ),
+    overlayKey: 'halloween',
   },
   {
-    id: 'monMagic' as const,
-    emoji: '🪄',
+    id: 'monMagic',
+    category: 'monMagic',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`
     ),
+    overlayKey: 'monMagic',
   },
   {
-    id: 'bodas' as const,
-    emoji: '💍',
+    id: 'bodas',
+    category: 'bodas',
     photos: Array.from({ length: 4 }, (_, i) =>
       `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`
     ),
+    overlayKey: 'bodas',
   },
   {
-    id: 'empreses' as const,
-    emoji: '🏢',
+    id: 'empreses',
+    category: 'empreses',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`
     ),
+    overlayKey: 'empreses',
   },
-] as const;
+];
 
-type CategoryId = (typeof CATEGORY_CONFIGS)[number]['id'];
+// ─── Featured card (large) ──────────────────────────────────────────────────
+
+function StoryCard({
+  story,
+  photoIndex,
+  t,
+  reduceMotion,
+  featured,
+}: {
+  story: EventStory;
+  photoIndex: number;
+  t: ReturnType<typeof useTranslations>;
+  reduceMotion: boolean | null;
+  featured?: boolean;
+}) {
+  const src = story.photos[photoIndex % story.photos.length];
+  const categoryName = t(`categories.${story.overlayKey}`);
+
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.5 }}
+      className={`relative flex-shrink-0 overflow-hidden rounded-2xl group cursor-pointer ${
+        featured
+          ? 'w-[85vw] md:w-[600px] h-[50vh] md:h-[420px]'
+          : 'w-[70vw] md:w-[400px] h-[45vh] md:h-[360px]'
+      }`}
+    >
+      <Image
+        src={src}
+        alt={`${categoryName} - Òrbita Events`}
+        fill
+        sizes={featured ? '(max-width: 768px) 85vw, 600px' : '(max-width: 768px) 70vw, 400px'}
+        className="object-cover group-hover:scale-110 transition-transform duration-[1.2s] ease-out"
+        loading="lazy"
+      />
+
+      {/* Dark gradient overlay — always visible */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+      {/* Hover glow */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-amber-500/10 to-transparent" />
+
+      {/* Bottom info overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">
+            {categoryName}
+          </span>
+        </div>
+        <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-1">
+          {t(`stories.${story.overlayKey}.title`)}
+        </h3>
+        <p className="text-white/60 text-sm line-clamp-2">
+          {t(`stories.${story.overlayKey}.desc`)}
+        </p>
+      </div>
+
+      {/* Photo count badge */}
+      <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-medium">
+        {story.photos.length} fotos
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function PortfolioShowcase() {
   const t = useTranslations('homePage.portfolio');
-  const [activeId, setActiveId] = useState<CategoryId>('all');
   const reduceMotion = useReducedMotion();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const active = CATEGORY_CONFIGS.find((c) => c.id === activeId) ?? CATEGORY_CONFIGS[0];
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 20);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 20);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    return () => el.removeEventListener('scroll', updateScrollState);
+  }, [updateScrollState]);
+
+  const scroll = useCallback((direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = direction === 'left' ? -420 : 420;
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  }, []);
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/30 to-transparent pointer-events-none" />
+    <section className="relative py-16 md:py-28 overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/[0.03] blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-orange-500/[0.02] blur-[100px] pointer-events-none" />
 
-      <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header */}
+      {/* Header */}
+      <div className="container mx-auto px-6 max-w-7xl mb-12">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
-          <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
-            {t('sectionLabel')}
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-3">
-            {t('title')}{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              {t('titleHighlight')}
+          <div>
+            <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
+              {t('sectionLabel')}
             </span>
-          </h2>
-          <p className="text-white/50 text-lg">{t('subtitle')}</p>
-        </motion.div>
+            <h2 className="text-4xl md:text-5xl font-black text-white">
+              {t('title')}{' '}
+              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                {t('titleHighlight')}
+              </span>
+            </h2>
+            <p className="text-white/50 text-lg mt-3 max-w-lg">{t('subtitle')}</p>
+          </div>
 
-        {/* Filter tabs */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
-        >
-          {CATEGORY_CONFIGS.map((cat) => (
+          {/* Desktop scroll arrows */}
+          <div className="hidden md:flex items-center gap-2">
             <button
-              key={cat.id}
-              onClick={() => setActiveId(cat.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all ${
-                activeId === cat.id
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
-                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
-              }`}
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              aria-label="Anterior"
+              className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/30 transition-all disabled:opacity-20 disabled:cursor-default"
             >
-              {cat.emoji} {t(`categories.${cat.id}`)}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-          ))}
-        </motion.div>
-
-        {/* Photo grid */}
-        <motion.div
-          key={activeId}
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="grid grid-cols-3 gap-3 md:gap-4"
-        >
-          {active.photos.map((src, i) => (
-            <motion.div
-              key={src}
-              initial={reduceMotion ? false : { opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={reduceMotion ? { duration: 0 } : { delay: i * 0.04 }}
-              className={`relative overflow-hidden rounded-2xl bg-zinc-900 group cursor-pointer ${
-                i === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square'
-              }`}
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              aria-label="Següent"
+              className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/30 transition-all disabled:opacity-20 disabled:cursor-default"
             >
-              <Image
-                src={src}
-                alt={`Event ${i + 1}`}
-                fill
-                sizes={i === 0 ? '(max-width: 768px) 66vw, 500px' : '(max-width: 768px) 33vw, 250px'}
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                loading={i < 3 ? 'eager' : 'lazy'}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </motion.div>
-          ))}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </motion.div>
+      </div>
 
-        {/* CTA */}
+      {/* Horizontal scroll — cinematic cards */}
+      <div
+        ref={scrollRef}
+        className="flex gap-5 overflow-x-auto scroll-smooth px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 snap-x snap-mandatory scrollbar-hide"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {EVENT_STORIES.map((story, i) => (
+          <StoryCard
+            key={story.id}
+            story={story}
+            photoIndex={0}
+            t={t}
+            reduceMotion={reduceMotion}
+            featured={i === 0}
+          />
+        ))}
+      </div>
+
+      {/* Fade edges */}
+      <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-[#0A0A0A] to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-[#0A0A0A] to-transparent pointer-events-none z-10" />
+
+      {/* CTA */}
+      <div className="container mx-auto px-6 max-w-7xl mt-10">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-10"
+          className="text-center"
         >
           <Link
             href="/portfolio"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all group"
           >
             {t('viewAll')}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
@@ -172,4 +261,3 @@ export default function PortfolioShowcase() {
     </section>
   );
 }
-

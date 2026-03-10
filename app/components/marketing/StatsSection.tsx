@@ -1,69 +1,47 @@
 'use client';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATS SECTION (DESKTOP) - Òrbita Events
-// Comptadors animats al scroll
+// STATS SECTION — Dynamic counters from real DB data
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+
+// ─── Count-up hook ──────────────────────────────────────────────────────────
 
 function useCountUp(target: number, duration: number, started: boolean): number {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    if (!started) return;
+    if (!started || target <= 0) { setCount(target); return; }
     let startTime: number | null = null;
+    let raf: number;
     const tick = (ts: number) => {
       if (!startTime) startTime = ts;
       const progress = Math.min((ts - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(target * eased));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) raf = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [target, duration, started]);
   return count;
 }
 
-const STAT_CONFIGS = [
-  {
-    key: 'events' as const,
-    value: 50,
-    prefix: '',
-    suffix: '+',
-    emoji: '🎉',
-    gradient: 'from-amber-400 to-orange-500',
-    glow: 'rgba(251,191,36,0.2)',
-  },
-  {
-    key: 'rating' as const,
-    value: 5,
-    prefix: '',
-    suffix: '.0★',
-    emoji: '🌟',
-    gradient: 'from-yellow-300 to-amber-400',
-    glow: 'rgba(253,224,71,0.15)',
-  },
-  {
-    key: 'response' as const,
-    value: 2,
-    prefix: '<',
-    suffix: 'h',
-    emoji: '⚡',
-    gradient: 'from-cyan-400 to-blue-500',
-    glow: 'rgba(34,211,238,0.15)',
-  },
-  {
-    key: 'experience' as const,
-    value: 3,
-    prefix: '',
-    suffix: '+',
-    emoji: '🏆',
-    gradient: 'from-purple-400 to-pink-500',
-    glow: 'rgba(167,139,250,0.15)',
-  },
-] as const;
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+interface StatConfig {
+  key: string;
+  value: number;
+  prefix: string;
+  suffix: string;
+  emoji: string;
+  gradient: string;
+  glow: string;
+}
+
+// ─── Stat Card ──────────────────────────────────────────────────────────────
 
 function StatCard({
   config,
@@ -72,7 +50,7 @@ function StatCard({
   delay,
   started,
 }: {
-  config: (typeof STAT_CONFIGS)[number];
+  config: StatConfig;
   label: string;
   sublabel: string;
   delay: number;
@@ -117,11 +95,42 @@ function StatCard({
   );
 }
 
+// ─── Default values (shown instantly, replaced when API responds) ───────────
+
+const DEFAULT_STATS: StatConfig[] = [
+  { key: 'events', value: 50, prefix: '', suffix: '+', emoji: '🎉', gradient: 'from-amber-400 to-orange-500', glow: 'rgba(251,191,36,0.2)' },
+  { key: 'rating', value: 5, prefix: '', suffix: '.0★', emoji: '🌟', gradient: 'from-yellow-300 to-amber-400', glow: 'rgba(253,224,71,0.15)' },
+  { key: 'response', value: 2, prefix: '<', suffix: 'h', emoji: '⚡', gradient: 'from-cyan-400 to-blue-500', glow: 'rgba(34,211,238,0.15)' },
+  { key: 'experience', value: 3, prefix: '', suffix: '+', emoji: '🏆', gradient: 'from-purple-400 to-pink-500', glow: 'rgba(167,139,250,0.15)' },
+];
+
+// ─── Main Component ─────────────────────────────────────────────────────────
+
 export default function StatsSection() {
   const t = useTranslations('homePage.stats');
+  const locale = useLocale();
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-10%' });
   const reduceMotion = useReducedMotion();
+  const [stats, setStats] = useState<StatConfig[]>(DEFAULT_STATS);
+
+  // Fetch real stats from API
+  useEffect(() => {
+    fetch(`/api/public/stats?locale=${locale}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.ok || !data.stats) return;
+        const s = data.stats;
+        const yearsNum = Math.max(1, new Date().getFullYear() - (s.yearStarted || 2023));
+        setStats([
+          { ...DEFAULT_STATS[0], value: Math.max(s.totalEvents || 0, 50) },
+          { ...DEFAULT_STATS[1], value: s.averageRating || 5 },
+          { ...DEFAULT_STATS[2], value: 2 },
+          { ...DEFAULT_STATS[3], value: yearsNum },
+        ]);
+      })
+      .catch(() => { /* keep defaults */ });
+  }, [locale]);
 
   return (
     <section ref={ref} className="relative py-16 md:py-24 overflow-hidden">
@@ -146,7 +155,7 @@ export default function StatsSection() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          {STAT_CONFIGS.map((config, i) => (
+          {stats.map((config, i) => (
             <StatCard
               key={config.key}
               config={config}

@@ -1,14 +1,148 @@
 # Diari de treball — Òrbita Events
 
-## 2026-03-10 — Balanç final del projecte
+## 2026-03-11 — Fase "La Millor Web del Món"
 
-### Estat: PROJECTE COMPLETAT (95%)
+### Context
+Sessió de revisió visual completa (28 pàgines admin capturades + revisades). Tot OK excepte un fix menor a Google Reviews (contrast text ressenyes). Commit `47e67ba`.
+
+Després, exercici de visió: imaginar la millor plataforma d'events possible i comparar-la amb l'estat actual. Resultat: l'admin és molt robust (4/6 àrees DONE), però la **web pública necessita un salt qualitatiu** cap a experiència immersiva/cinematogràfica. A més, 2 funcionalitats noves de negoci: **col·laboradors** i **configurador de costos personalitzat**.
+
+### Anàlisi de Gaps — Ideal vs. Actual
+
+#### WEB PÚBLICA
+
+| # | Àrea | Estat | Què existeix | Què falta |
+|---|------|-------|-------------|-----------|
+| P1 | Hero cinematogràfic | 🟡 PARCIAL | Vídeo fullscreen, text rotatiu (swap paraula), 2 CTAs, social proof | Animació lletra per lletra (typewriter), reduir a 1 sol CTA potent, entrada seqüencial cinematogràfica |
+| P2 | Configurador visual immersiu | 🟡 PARCIAL | 4 passos funcionals, preu temps real, descomptes, PDF, extras, Turnstile | Canvi d'ambient per tipus (colors/imatges), disponibilitat real del calendari integrada, preview visual (no formulari), preu persistent visible |
+| P3 | Portfolio cinematogràfic | 🟡 PARCIAL | Grid fotos + filtres per categoria, imatges .avif, scroll horitzontal al mòbil | Stories per event individual (fotos+vídeo+testimoni+xifres), scroll horitzontal cinematogràfic a desktop, narrativa/context per foto |
+| P4 | Prova social imbatible | 🟡 PARCIAL | Comptadors animats, ressenyes Google rotatives, logos marquee | Mapa interactiu d'events, logos amb hover que mostra l'event, ressenyes amb context ("Boda 150 convidats a Mas X"), comptadors connectats a BD |
+| P5 | Urgència intel·ligent | 🟡 PARCIAL | Calendari real amb semàfors (verd/ambre/vermell), popup flash offer, exit intent | "X persones mirant aquesta data" (social pressure), countdown early-bird visible, alerta "només queden N dissabtes" |
+
+#### ADMIN (BACK-OFFICE)
+
+| # | Àrea | Estat | Què existeix | Què falta |
+|---|------|-------|-------------|-----------|
+| A1 | Dashboard parlant | 🟡 PARCIAL | 10 KPIs, gràfiques, radar, alertes, pilot automàtic, previsions | Insights narratius ("Aquesta setmana +23% leads"), widget meteo per events de la setmana |
+| A2 | Pipeline kanban | ✅ FET | Kanban 6 columnes, D&D, scoring, auto-nurturing, SLA, WhatsApp, timeline | Cadència multi-step completa (ara 2 steps: 24h i 48h) |
+| A3 | Calendari producció | ✅ FET | 3 vistes (mes/setmana/dia), D&D, bloqueig, Google Sync, conflictes inventari | Warning visual pre-drag, conflictes temporals (hores, no només equips) |
+| A4 | Finances sense Excel | ✅ FET | costEngine, flux quote→contract→invoice→payment, tresoreria, MITECO, Holded, CAC | Auto-trigger entre passos (ara manual), **col·laboradors** (nou), **configurador cost personalitzat** (nou) |
+| A5 | Comunicació centralitzada | 🟡 PARCIAL | Inbox IMAP, email plantilles, WhatsApp enviar, CommunicationPanel per reserva | Timeline unificat multi-canal (email+WhatsApp+notes en un sol fil), recepció WhatsApp |
+| A6 | Automatitzacions | ✅ FET | 6 crons, follow-up, reminders, post-event, SLA, portal client | Welcome email immediat (ara espera 24h), contracte auto-generat quan client accepta, checklist pre-event auto per tipus |
+
+### Funcionalitats noves demanades
+
+#### F1. Col·laboradors (Economia)
+**Problema:** Treballo amb col·laboradors (altres DJs/empreses) que venen els meus serveis. Necessito decidir i gestionar:
+- **Model A — Preu net + comissió:** Li dono el meu preu, ell afegeix la seva comissió. Avantatge: transparent. Inconvenient: no controlo el preu final al client.
+- **Model B — Descompte col·laborador:** Li dono un 10% menys, ell s'emporta el 10%. Avantatge: controlo el preu final. Inconvenient: menys marge per a mi.
+
+**Implementació necessària:**
+- Model `Collaborator` a Prisma (nom, email, telèfon, comissió %, model A o B, actiu)
+- Taula `CollaboratorBooking` (relació col·laborador ↔ reserva, comissió aplicada, import pagat)
+- Panell admin `/admin/collaborators` amb CRUD + llistat reserves + KPIs (facturació via col·lab, comissions pagades, marges)
+- Integració al costEngine: quan una reserva ve d'un col·laborador, calcular marge NET (descomptat la comissió)
+- Opció de generar pressupost "per al col·laborador" (amb preu col·lab, no PVP)
+- Report: "Quant he facturat via col·laboradors vs directe?"
+
+#### F2. Configurador de cost personalitzat (Admin)
+**Problema:** Em demanen pressupostos a mida que no encaixen en cap pack. Exemple: "DJ 3h sense altaveus" o "Només il·luminació per 5h". Necessito saber el cost real i el marge ABANS de donar preu.
+**Implementació necessària:**
+- Pàgina admin `/admin/cost-calculator` — drag & drop visual
+- Arrossegar components individuals: DJ (per hora), altaveus (per unitat), llums (per unitat), cabina foto, transport (km), tècnic extra, hores extres
+- Cada component treu el cost de l'inventari (amortització) + la tarifa horària
+- Sumatori en temps real: cost total, preu suggerit (amb marge configurable), marge brut/net
+- Poder guardar la configuració com a "Pressupost personalitzat" i enviar PDF
+- Connexió amb inventari existent (lib/services/costEngine.ts + inventari Prisma)
+
+### Full de ruta v2 — "La Millor Web del Món"
+
+#### FASE 1 — Impacte visual immediat (web pública)
+> Objectiu: que qualsevol que entri digui "uau"
+
+1. **P1 — Hero cinematogràfic**
+   - Animació typewriter lletra per lletra al títol
+   - Reducció a 1 CTA únic ("Crea el teu event")
+   - Entrada seqüencial: badge → títol → subtítol → CTA → social proof (amb delays)
+   - Transició suau entre serveis rotatius (no swap brusc)
+   - Fitxer: `app/components/ui/HeroElegant.tsx`
+
+2. **P3 — Portfolio cinematogràfic**
+   - Scroll horitzontal a desktop (no grid vertical)
+   - Cada event com una "story": foto principal + overlay amb nom, data, convidats, testimoni
+   - Transició parallax suau entre events
+   - Fitxer: `app/components/marketing/PortfolioShowcase.tsx`
+
+3. **P4 — Comptadors dinàmics**
+   - Connectar comptadors a dades reals de la BD (total events, rating, etc.)
+   - API `/api/public/stats` amb cache 1h
+   - Fitxer: `app/components/marketing/StatsSection.tsx`
+
+#### FASE 2 — Configurador visual + urgència
+> Objectiu: convertir visites en leads qualificats
+
+4. **P2 — Configurador amb ambient**
+   - Canvi de paleta de colors/imatges de fons segons tipus d'event seleccionat
+   - Consulta disponibilitat real dins el configurador (marca dies ocupats al selector de data)
+   - Barra lateral persistent amb preu acumulat visible sempre
+   - Fitxer: `app/[locale]/configurador/client.tsx`
+
+5. **P5 — Social pressure + countdown**
+   - Badge "X persones mirant aquesta data" (pot ser estimat, no cal temps real)
+   - Countdown visual early-bird ("Reserva abans del 15/04 i estalvia 15%")
+   - "Només queden N dissabtes al [mes]" amb número destacat
+   - Fitxers: `CalendarioUrgencia.tsx`, configurador
+
+#### FASE 3 — Negoci: Col·laboradors + Cost calculator
+> Objectiu: noves eines per guanyar diners
+
+6. **F1 — Gestió de col·laboradors**
+   - Model Prisma: `Collaborator`, `CollaboratorBooking`
+   - Panell admin amb CRUD, llistat reserves, KPIs, report comparatiu
+   - Integració costEngine per marge net real
+   - Pressupost PDF versió col·laborador
+   - Fitxers nous: `prisma/schema.prisma`, `app/admin/collaborators/`, `lib/services/collaboratorService.ts`
+
+7. **F2 — Configurador de costos drag & drop**
+   - Pàgina admin interactiva per construir pressupostos a mida
+   - Components arrossegables (DJ/hora, altaveu, llum, fotomató, transport/km, tècnic)
+   - Cost calculat des de l'inventari + amortització real
+   - Marge suggerit configurable, guardar com a pressupost, generar PDF
+   - Fitxers nous: `app/admin/cost-calculator/`, `app/admin/cost-calculator/CostCalculatorClient.tsx`
+
+#### FASE 4 — Admin intel·ligent
+> Objectiu: que l'admin "parli" i anticipi
+
+8. **A1 — Insights narratius al dashboard**
+   - Capa de text que interpreta les dades: "Tens 3 leads calents sense resposta des de dimarts"
+   - Comparativa setmanal automàtica: "+30% leads vs setmana passada"
+   - Widget meteo per als events dels pròxims 3 dies (API OpenWeatherMap)
+   - Fitxer: `app/admin/page.tsx`, `lib/services/dashboardInsights.ts`
+
+9. **A5 — Timeline comunicació unificat**
+   - Un sol fil cronològic per client: emails enviats/rebuts + WhatsApp + notes manuals + trucades
+   - Fitxer: `app/admin/clientes/[id]/_components/UnifiedTimeline.tsx`
+
+10. **A6 — Auto-triggers entre passos**
+    - Pressupost acceptat → genera contracte automàticament
+    - Welcome email immediat al crear lead (no esperar 24h)
+    - Checklist pre-event auto-generada per tipus d'event (boda ≠ festa)
+    - Fitxer: `lib/services/automationTriggers.ts`
+
+### Decisió
+Començar per la **Fase 1** (impacte visual) perquè és el que veu el client final i el que converteix visites en diners. Després Fase 3 (col·laboradors + cost calculator) perquè són eines de negoci directes.
+
+---
+
+## 2026-03-10 — Balanç final del projecte (v1)
+
+### Estat: PROJECTE COMPLETAT (95%) — Ara iniciant v2 "La Millor Web del Món"
 
 **Full de ruta original: 12/14 tasques fetes.** Les 2 pendents són nice-to-haves:
 - WhatsApp integrat → ja funciona amb `getWhatsAppUrl()`, faltaria historial dins l'admin (requereix Business API de pagament)
 - Multi-usuari → només necessari si més d'una persona usa l'admin
 
-**Xifres finals:**
+**Xifres finals v1:**
 - 64 pàgines admin, 132 API routes, 6 crons, 28 scripts
 - 3 idiomes (ca/es/en), PWA, Railway PostgreSQL
 - ~19.000 LOC TypeScript, schema Prisma 1.417 línies
@@ -16,8 +150,6 @@
 - PDF Studio, contractes, facturació Holded
 - Privacitat RGPD, safata paperera IMAP, ressenyes amb canvas
 - Fitxa client hub, kanban reserves, calendari diari, countdown events
-
-**Decisió:** Declarar el projecte acabat. Usar-lo amb clients reals i afegir funcionalitats quan siguin necessàries de debò, no per perfeccionisme.
 
 ---
 

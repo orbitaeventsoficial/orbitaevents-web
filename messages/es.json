@@ -5225,6 +5225,28 @@
         "bodas": "Bodas",
         "empreses": "Empresas",
         "privades": "Privadas"
+      },
+      "stories": {
+        "discomovil": {
+          "title": "Fiestas con discoteca móvil",
+          "desc": "Sonido profesional, luces y DJ para fiestas privadas y celebraciones"
+        },
+        "halloween": {
+          "title": "Noches de Halloween",
+          "desc": "Decoración temática, efectos especiales y ambiente terrorífico"
+        },
+        "monMagic": {
+          "title": "Mundo Mágico infantil",
+          "desc": "Espectáculos de magia, animación y diversión para los más pequeños"
+        },
+        "bodas": {
+          "title": "Bodas de ensueño",
+          "desc": "DJ, iluminación y producción para el día más especial"
+        },
+        "empreses": {
+          "title": "Eventos corporativos",
+          "desc": "Producción técnica profesional para empresas y marcas"
+        }
       }
     }
   },
