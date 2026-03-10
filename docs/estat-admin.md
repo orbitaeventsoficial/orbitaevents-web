@@ -87,6 +87,9 @@
 ### Legal
 - `/admin/privacy` — Privacitat RGPD (KPIs, ARCO, audit)
 
+### Scripts i eines
+- `/admin/scripts` — Catàleg visual de 25+ scripts (seed/sync/check/report/fix/audit)
+
 ### Configuració
 - `/admin/settings` — Hub configuració
 - `/admin/settings/company` — Empresa + Holded
@@ -150,6 +153,8 @@
 
 ### Prioritat BAIXA (nice to have)
 9. **Multi-usuari** — rols i permisos
-10. **Editor visual emails** — drag & drop
+10. ~~**Editor visual emails**~~ ✅ Fet — Editor blocs visual a /admin/email-templates/[slug]
 11. ~~**Vista diària calendari**~~ ✅ Fet (2026-03-09) — CalendarDayClient.tsx
 12. ~~**Privacitat GDPR UI**~~ ✅ Fet (2026-03-10) — /admin/privacy + PrivacyPanel a fitxa client
+13. ~~**Pàgina scripts admin**~~ ✅ Fet (2026-03-10) — /admin/scripts, 25 scripts catalogats
+14. ~~**Seed plantilles email**~~ ✅ Fet (2026-03-10) — 24 plantilles (8×3 idiomes) a BD

@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { AdminPage } from '../components/AdminPage';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { AdminPage, AdminKpiRow, AdminKpi } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateTime } from '@/lib/constants';
 
 type Testimonial = {
@@ -21,6 +23,24 @@ type Testimonial = {
 
 type StatusTab = 'pending' | 'approved';
 
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} de 5 estrelles`}>
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fill = Math.min(1, Math.max(0, rating - star + 1));
+        return (
+          <span
+            key={star}
+            className={`text-sm ${fill >= 1 ? 'text-amber-400' : fill > 0 ? 'text-amber-400/50' : 'text-white/10'}`}
+          >
+            ★
+          </span>
+        );
+      })}
+      <span className="ml-1.5 text-xs font-semibold text-white/50">{rating.toFixed(1)}</span>
+    </div>
+  );
+}
 
 export default function AdminRessenyesPage() {
   const [pending, setPending] = useState<Testimonial[]>([]);
@@ -29,13 +49,20 @@ export default function AdminRessenyesPage() {
   const [activeTab, setActiveTab] = useState<StatusTab>('pending');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [canvasPreview, setCanvasPreview] = useState<{ id: string; url: string } | null>(null);
+  const toast = useToast();
 
   const activeList = useMemo(
     () => (activeTab === 'pending' ? pending : approved),
     [activeTab, pending, approved]
   );
 
-  const load = async () => {
+  const avgRating = useMemo(() => {
+    const all = [...pending, ...approved];
+    if (all.length === 0) return 0;
+    return all.reduce((sum, t) => sum + t.rating, 0) / all.length;
+  }, [pending, approved]);
+
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [pendingRes, approvedRes] = await Promise.all([
@@ -54,29 +81,50 @@ export default function AdminRessenyesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const updateStatus = async (id: string, action: 'approve' | 'hide' | 'delete') => {
     setBusyId(id);
+
+    // Optimistic update
+    const item = [...pending, ...approved].find((t) => t.id === id);
+    if (action === 'approve' && item) {
+      setPending((prev) => prev.filter((t) => t.id !== id));
+      setApproved((prev) => [{ ...item, isApproved: true }, ...prev]);
+    } else if (action === 'hide' && item) {
+      setApproved((prev) => prev.filter((t) => t.id !== id));
+      setPending((prev) => [{ ...item, isApproved: false }, ...prev]);
+    } else if (action === 'delete') {
+      setPending((prev) => prev.filter((t) => t.id !== id));
+      setApproved((prev) => prev.filter((t) => t.id !== id));
+    }
+
     try {
-      const res = await fetch('/api/admin/testimonials', {
+      const res = await fetchWithCsrf('/api/admin/testimonials', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, action }),
       });
       if (res.ok) {
-        await load();
+        const labels = { approve: 'Ressenya aprovada', hide: 'Ressenya amagada', delete: 'Ressenya eliminada' };
+        toast.success(labels[action]);
+      } else {
+        toast.error("No s'ha pogut actualitzar la ressenya");
+        await load(); // Revert on error
       }
+    } catch {
+      toast.error("Error de connexio");
+      await load(); // Revert on error
     } finally {
       setBusyId(null);
     }
   };
 
-  const generateCanvas = (t: Testimonial, preset: string = 'story') => {
+  const buildCanvasParams = (t: Testimonial, preset: string) => {
     const params = new URLSearchParams({
       name: t.customer.name,
       text: t.text,
@@ -88,27 +136,20 @@ export default function AdminRessenyesPage() {
       params.set('code', t.discountCode.code);
       params.set('discount', String(t.discountCode.discountPercent));
     }
-    const url = `/api/canvas/testimonial?${params.toString()}`;
-    setCanvasPreview({ id: t.id, url });
+    return `/api/canvas/testimonial?${params.toString()}`;
+  };
+
+  const generateCanvas = (t: Testimonial, preset: string = 'story') => {
+    setCanvasPreview({ id: t.id, url: buildCanvasParams(t, preset) });
   };
 
   const downloadCanvas = (t: Testimonial, preset: string = 'story') => {
-    const params = new URLSearchParams({
-      name: t.customer.name,
-      text: t.text,
-      rating: String(t.rating),
-      preset,
-    });
-    if (t.eventType) params.set('eventType', t.eventType);
-    if (t.discountCode) {
-      params.set('code', t.discountCode.code);
-      params.set('discount', String(t.discountCode.discountPercent));
-    }
-    const url = `/api/canvas/testimonial?${params.toString()}`;
+    const url = buildCanvasParams(t, preset);
     const link = document.createElement('a');
     link.href = url;
     link.download = `orbita-ressenya-${t.customer.name.replace(/\s+/g, '-').toLowerCase()}.png`;
     link.click();
+    toast.success('Imatge descarregada');
   };
 
   if (loading) {
@@ -123,6 +164,18 @@ export default function AdminRessenyesPage() {
     <AdminPage
       title="Ressenyes"
       subtitle="Aprova o amaga opinions rebudes del web."
+      kpis={
+        <AdminKpiRow>
+          <AdminKpi label="Pendents" value={pending.length} tone={pending.length > 0 ? 'warning' : 'success'} />
+          <AdminKpi label="Aprovades" value={approved.length} tone="success" />
+          <AdminKpi label="Total" value={pending.length + approved.length} />
+          <AdminKpi
+            label="Nota mitjana"
+            value={avgRating > 0 ? `${avgRating.toFixed(1)} ★` : '—'}
+            tone={avgRating >= 4 ? 'success' : avgRating >= 3 ? 'warning' : 'danger'}
+          />
+        </AdminKpiRow>
+      }
     >
 
       <div className="flex gap-2">
@@ -152,8 +205,10 @@ export default function AdminRessenyesPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {activeList.length === 0 && (
-          <div className="rounded-2xl border admin-card-glass p-6">
-            No hi ha ressenyes en aquest estat.
+          <div className="rounded-2xl border admin-card-glass p-6 text-center text-white/40">
+            {activeTab === 'pending'
+              ? 'Cap ressenya pendent. Tot al dia!'
+              : 'Cap ressenya aprovada encara.'}
           </div>
         )}
 
@@ -161,14 +216,39 @@ export default function AdminRessenyesPage() {
           <div key={t.id} className="rounded-2xl border admin-card-glass p-6">
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
-                <div className="text-base font-semibold">{t.customer.name}</div>
-                <div className="text-sm">{t.customer.email}</div>
-                <div className="text-xs mt-1">{formatDateTime(t.createdAt)}</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-500/10 flex items-center justify-center text-xs font-bold">
+                    {t.customer.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">{t.customer.name}</div>
+                    <div className="text-xs text-white/40">{t.customer.email}</div>
+                  </div>
+                </div>
+                <div className="text-xs text-white/30 mt-1.5 ml-10">
+                  {formatDateTime(t.createdAt)}
+                  {t.eventType && (
+                    <span className="ml-2 px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/40">
+                      {t.eventType}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="font-bold text-sm">★ {t.rating.toFixed(1)}</div>
+              <StarRating rating={t.rating} />
             </div>
 
-            <p className="mt-4 whitespace-pre-wrap">&quot;{t.text}&quot;</p>
+            <blockquote className="mt-4 pl-4 border-l-2 border-amber-500/20 text-white/70 italic whitespace-pre-wrap leading-relaxed">
+              {t.text}
+            </blockquote>
+
+            {t.discountCode && (
+              <div className="mt-3 text-xs text-white/30 flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono">
+                  {t.discountCode.code}
+                </span>
+                <span>-{t.discountCode.discountPercent}%</span>
+              </div>
+            )}
 
             <div className="mt-4 flex flex-wrap gap-2">
               {t.isApproved ? (
@@ -177,6 +257,7 @@ export default function AdminRessenyesPage() {
                   onClick={() => updateStatus(t.id, 'hide')}
                   className="admin-reviews-action admin-reviews-action--neutral px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   aria-busy={busyId === t.id}
+                  disabled={busyId === t.id}
                 >
                   Amagar
                 </button>
@@ -186,6 +267,7 @@ export default function AdminRessenyesPage() {
                   onClick={() => updateStatus(t.id, 'approve')}
                   className="admin-reviews-action admin-reviews-action--ok px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   aria-busy={busyId === t.id}
+                  disabled={busyId === t.id}
                 >
                   Aprovar
                 </button>
@@ -195,6 +277,7 @@ export default function AdminRessenyesPage() {
                 onClick={() => updateStatus(t.id, 'delete')}
                 className="admin-reviews-action admin-reviews-action--danger px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                 aria-busy={busyId === t.id}
+                disabled={busyId === t.id}
               >
                 Eliminar
               </button>

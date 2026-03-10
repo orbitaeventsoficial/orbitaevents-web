@@ -154,6 +154,32 @@ const SCRIPTS: ScriptInfo[] = [
     args: '<slug> <preu>',
   },
 
+  // ── CHECK (verificació) — nous ──
+  {
+    name: 'Leads estancats',
+    file: 'scripts/check-stale-leads.ts',
+    command: 'npx tsx scripts/check-stale-leads.ts',
+    category: 'check',
+    description: 'Detecta leads que necessiten atenció: sense contactar (>48h), sense seguiment (>7d), negociacions estancades (>14d), events propers sense confirmar.',
+  },
+  {
+    name: 'Qualitat de dades',
+    file: 'scripts/check-data-quality.ts',
+    command: 'npx tsx scripts/check-data-quality.ts',
+    category: 'check',
+    description: 'Auditoria de qualitat: camps buits, emails duplicats, reserves amb data passada activa, inventari sobreutilitzat, settings buides.',
+  },
+
+  // ── REPORT (informes) — nous ──
+  {
+    name: 'Informe mensual',
+    file: 'scripts/monthly-report.ts',
+    command: 'npx tsx scripts/monthly-report.ts',
+    category: 'report',
+    description: 'Resum mes actual vs anterior: leads, reserves, ingressos, conversio, fonts. Accepta mes: npx tsx scripts/monthly-report.ts 2026-02',
+    args: '<YYYY-MM>',
+  },
+
   // ── AUDIT (auditoria) ──
   {
     name: 'Autofix master',

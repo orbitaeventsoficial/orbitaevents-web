@@ -5,15 +5,22 @@
 ### Fet
 1. **Commit privacitat**: Pàgina admin `/admin/privacy` (KPIs RGPD, sol·licituds ARCO, audit log), API audit + consentiments, PrivacyPanel a fitxa client, nav actualitzada
 2. **Safata paperera IMAP**: Tab "Paperera" a la safata d'entrada, 3 funcions noves a `lib/imap.ts` (`getTrashFolderPath`, `moveToFolder`, `restoreFromTrash`), API inbox amb suport `folder` param, accions `moveToTrash`/`restore` al PATCH, botó "Eliminar" reconvertit a "Moure a paperera", restaurar i eliminar permanent des de la paperera
-3. **Templates email editables**: (en curs)
+3. **Templates email a BD**: 24 plantilles (8 slugs × 3 idiomes) seedejades a la BD. Fix params async Next.js 14 a editor/API plantilles.
+4. **Pàgina admin scripts**: `/admin/scripts` — catàleg visual de 28 scripts organitzats en 6 categories (seed/sync/check/report/fix/audit), amb descripció i botó copiar comanda. Link afegit a la nav.
+5. **11+3 scripts nous**: health-check, stats-report, export-backup, cleanup-orphans, recalculate-scores, recalculate-margins, check-payment-status, sync-fuel-price, update-pack-prices, reset-email-templates, seed-email-templates, check-stale-leads, monthly-report, check-data-quality
+6. **Ressenyes millorades**: KPIs (pendents/aprovades/nota mitjana), CSRF protection, toast feedback, optimistic updates, component StarRating visual, avatar inicials, blockquote estilitzat, badge tipus event, badge descompte
+7. **Scripts addicionals**: `check-stale-leads.ts` (leads estancats >48h/7d/14d), `monthly-report.ts` (informe mensual comparatiu), `check-data-quality.ts` (auditoria qualitat dades)
 
 ### Raonament
 - Privacitat RGPD era una necessitat legal pendent — ara l'admin pot gestionar consentiments, sol·licituds ARCO i veure l'audit trail
 - La paperera IMAP és un patró UX estàndard — evita pèrdua accidental d'emails, permet recuperar-los
 - El botó "Eliminar" ara és "Moure a paperera" (més segur, reversible)
+- Scripts: automatitzar manteniment, reportatge i auditoria estalvia temps i evita oblits
+- Ressenyes: CSRF protegeix contra atacs, optimistic updates fan la UI instant, KPIs donen context
 
 ### Commits
 - `18236a0` — feat: panell privacitat RGPD + safata paperera IMAP
+- `471be3d` — feat: scripts automatització + pàgina admin scripts + seed plantilles email
 
 ---
 
