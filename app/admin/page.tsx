@@ -509,7 +509,7 @@ export default async function AdminDashboard() {
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Esdeveniment'}
                       </p>
                     </div>
-                    <svg className="admin-cr-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="admin-cr-chevron" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -558,7 +558,7 @@ export default async function AdminDashboard() {
                     {lead.status}
                   </span>
                   <span className="admin-cr-meta admin-cr-desktop-only-inline">{timeAgo(new Date(lead.createdAt))}</span>
-                  <svg className="admin-cr-chevron admin-cr-mobile-only-inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="admin-cr-chevron admin-cr-mobile-only-inline" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>

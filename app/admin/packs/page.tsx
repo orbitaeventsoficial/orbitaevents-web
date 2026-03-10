@@ -88,7 +88,7 @@ export default async function PacksPage() {
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="ap-btn ap-btn--primary"
+            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-400 transition-colors"
           >
             + Nou Pack
           </Link>
@@ -99,13 +99,13 @@ export default async function PacksPage() {
       <nav className="flex flex-wrap gap-2">
         <Link
           href="/admin/packs"
-          className="admin-packs-tab admin-packs-tab--active inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
+          className="inline-flex items-center rounded-full border border-amber-400/50 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200"
         >
           Packs
         </Link>
         <Link
           href="/admin/packs/extras"
-          className="admin-packs-tab admin-packs-tab--idle inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium"
+          className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/10"
         >
           Extres
         </Link>
@@ -117,25 +117,25 @@ export default async function PacksPage() {
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{packs.length}</p>
         </div>
-        <div className="admin-packs-stat admin-packs-stat--ok rounded-2xl border p-4">
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="admin-packs-stat admin-packs-stat--warn rounded-2xl border p-4">
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="admin-packs-stat admin-packs-stat--info rounded-2xl border p-4">
+        <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`admin-packs-stat rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-packs-stat--danger' : 'admin-packs-stat--ok'}`}>
+        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'border-rose-500/30 bg-rose-500/10' : 'border-emerald-500/30 bg-emerald-500/10'}`}>
           <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold">{pricingAlertsCount}</p>
         </div>
@@ -164,8 +164,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
-                      ? 'admin-packs-card admin-packs-card--featured'
-                      : 'admin-packs-card admin-packs-card--normal'
+                      ? 'ring-1 ring-amber-500/20 border-amber-500/30'
+                      : 'border-white/10'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -278,13 +278,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
+                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
+                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -318,8 +318,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border admin-card-glass overflow-hidden ${
                     pack.isFeatured
-                      ? 'admin-packs-card admin-packs-card--featured'
-                      : 'admin-packs-card admin-packs-card--normal'
+                      ? 'ring-1 ring-amber-500/20 border-amber-500/30'
+                      : 'border-white/10'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -432,13 +432,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border hover:bg-white/50/50 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border hover:bg-white/50/50 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari
                     </Link>

@@ -42,7 +42,17 @@ function HeroSkeleton() {
 }
 
 function SectionSkeleton() {
-  return <div className="py-16 bg-[#0A0A0A] animate-pulse" />;
+  return (
+    <div className="py-16 bg-[#0A0A0A]">
+      <div className="max-w-5xl mx-auto px-4 space-y-4">
+        <div className="h-6 w-48 rounded-lg bg-white/5 animate-pulse mx-auto" />
+        <div className="h-4 w-72 rounded-lg bg-white/5 animate-pulse mx-auto" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+          {[1,2,3].map(i => <div key={i} className="h-32 rounded-xl bg-white/[0.03] animate-pulse" />)}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -63,8 +73,11 @@ const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioU
 });
 const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/GoogleReviewsRotating'), {
   ssr: false, // Uses localStorage
+  loading: () => <SectionSkeleton />,
 });
-const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'));
+const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'), {
+  loading: () => <SectionSkeleton />,
+});
 const StatsSection = dynamic(() => import('@/app/components/marketing/StatsSection'), {
   loading: () => <SectionSkeleton />,
 });
@@ -74,8 +87,12 @@ const ProcessSection = dynamic(() => import('@/app/components/marketing/ProcessS
 const PortfolioShowcase = dynamic(() => import('@/app/components/marketing/PortfolioShowcase'), {
   loading: () => <SectionSkeleton />,
 });
-const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'));
-const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'));
+const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
+  loading: () => <SectionSkeleton />,
+});
+const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), {
+  loading: () => <SectionSkeleton />,
+});
 const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
   loading: () => <SectionSkeleton />,
 });

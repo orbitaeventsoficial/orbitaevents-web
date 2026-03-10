@@ -486,7 +486,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           aria-controls="admin-mobile-sidebar"
           className="admin-icon-btn admin-icon-btn--left"
         >
-          <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -526,7 +526,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             className="admin-icon-btn admin-icon-btn--notif"
             aria-label="Notificacions"
           >
-            <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notificationsCount > 0 && (
@@ -576,7 +576,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setSidebarOpen(false)}
                 className="admin-icon-btn"
               >
-                <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -635,7 +635,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                   <p className="admin-mobile-sidebar-foot-title">Admin</p>
                   <p className="admin-mobile-sidebar-foot-subtitle">Configuració del compte</p>
                 </div>
-                <svg className="admin-cr-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="admin-cr-chevron" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
