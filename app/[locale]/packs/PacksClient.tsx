@@ -67,7 +67,7 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
         </div>
 
         {/* Pack cards */}
-        <div className={`grid gap-6 mb-16 ${sorted.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' : 'md:grid-cols-3'}`}>
+        <div className={`grid gap-6 mb-16 ${sorted.length <= 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' : sorted.length === 3 ? 'md:grid-cols-3 max-w-5xl mx-auto' : 'md:grid-cols-3'}`}>
           {sorted.map((pack) => {
             const features = pack.features || [];
             const isPopular = pack.popular;
