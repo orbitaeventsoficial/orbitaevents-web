@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function DbReconnectButton() {
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,7 @@ export default function DbReconnectButton() {
     setMessage(null);
     setIsError(false);
     try {
-      const res = await fetch('/api/admin/system/db-reconnect', {
+      const res = await fetchWithCsrf('/api/admin/system/db-reconnect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

@@ -7,6 +7,7 @@ import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface BlogPost {
   id: string;
@@ -43,7 +44,7 @@ export default function BlogAdminPage() {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/blog?locale=${locale}&page=${page}&limit=20`);
+      const res = await fetchWithCsrf(`/api/admin/blog?locale=${locale}&page=${page}&limit=20`);
       const data = await res.json();
       setPosts(data.posts || []);
       setTotal(data.pagination?.total || 0);
@@ -72,7 +73,7 @@ export default function BlogAdminPage() {
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/blog?id=${id}`, {
+      const res = await fetchWithCsrf(`/api/admin/blog?id=${id}`, {
         method: 'DELETE',
       });
 
@@ -90,7 +91,7 @@ export default function BlogAdminPage() {
 
   const handleTogglePublish = async (post: BlogPost) => {
     try {
-      const res = await fetch(`/api/admin/blog`, {
+      const res = await fetchWithCsrf(`/api/admin/blog`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

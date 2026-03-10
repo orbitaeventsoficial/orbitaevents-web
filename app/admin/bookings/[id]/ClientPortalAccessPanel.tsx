@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { formatDateTimeFull } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type ActivePortal = {
   id: string;
@@ -60,7 +61,7 @@ export default function ClientPortalAccessPanel({
     setIsError(false);
 
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/portal-access`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/portal-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +113,7 @@ export default function ClientPortalAccessPanel({
     setIsError(false);
 
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/portal-access`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/portal-access`, {
         method: 'DELETE',
       });
       const data = await res.json().catch(() => ({}));

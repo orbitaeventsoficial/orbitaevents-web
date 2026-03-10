@@ -21,6 +21,7 @@ import {
   calculateLifeRemainingPercent,
 } from '@/lib/inventory-utils';
 import { formatNumber } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface InventoryItem {
   id: string;
@@ -78,7 +79,7 @@ export default function InventoryListClient() {
       if (filterCategory) params.set('category', filterCategory);
       if (filterStatus) params.set('status', filterStatus);
 
-      const res = await fetch(`/api/admin/inventory?${params}`);
+      const res = await fetchWithCsrf(`/api/admin/inventory?${params}`);
       if (!res.ok) {
         console.error('[Inventory] API error:', res.status);
         return;
@@ -107,7 +108,7 @@ export default function InventoryListClient() {
 
   const loadBundles = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/inventory/bundles');
+      const res = await fetchWithCsrf('/api/admin/inventory/bundles');
       if (!res.ok) return;
       const data = await res.json();
       const next = Array.isArray(data?.bundles)
@@ -170,7 +171,7 @@ export default function InventoryListClient() {
 
   const handleStatusChange = useCallback(async (itemId: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/admin/inventory/${itemId}`, {
+      const res = await fetchWithCsrf(`/api/admin/inventory/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -190,7 +191,7 @@ export default function InventoryListClient() {
     setBundles(nextBundles);
     setSavingBundles(true);
     try {
-      const res = await fetch('/api/admin/inventory/bundles', {
+      const res = await fetchWithCsrf('/api/admin/inventory/bundles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bundles: nextBundles }),

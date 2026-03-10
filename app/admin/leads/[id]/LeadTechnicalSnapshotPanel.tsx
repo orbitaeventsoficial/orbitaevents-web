@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type SnapshotAction = 'save_document' | 'send_email';
 
@@ -31,7 +32,7 @@ export default function LeadTechnicalSnapshotPanel({
     setBusy(action);
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/snapshot`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/snapshot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

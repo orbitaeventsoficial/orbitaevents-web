@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAllPacks } from '@/app/config/packs-config';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Props {
   leadId: string;
@@ -83,7 +84,7 @@ export default function LeadActionsEnhanced({
     setOptimisticStatus(newStatus);
 
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -118,7 +119,7 @@ export default function LeadActionsEnhanced({
     setError(null);
     
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/quote`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/quote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

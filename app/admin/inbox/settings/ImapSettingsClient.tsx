@@ -35,7 +35,7 @@ export default function ImapSettingsClient() {
 
   const loadConfig = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/inbox/settings');
+      const res = await fetchWithCsrf('/api/admin/inbox/settings');
       if (!res.ok) throw new Error('Error carregant config');
       const data = await res.json();
       setConfig(data.config);

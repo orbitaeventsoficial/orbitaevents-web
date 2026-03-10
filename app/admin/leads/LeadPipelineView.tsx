@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, SOURCE_LABELS, PRIORITY_LABELS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type PipelineFilters = {
   status: string[];
@@ -105,7 +106,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const fetchPipeline = useCallback(async () => {
     try {
       const qs = filterQuery ? `&${filterQuery}` : '';
-      const res = await fetch(`/api/admin/leads?limit=500&pipeline=true${qs}`, { credentials: 'include' });
+      const res = await fetchWithCsrf(`/api/admin/leads?limit=500&pipeline=true${qs}`, { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant pipeline');
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
@@ -167,7 +168,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     setLeadStatusInState(leadId, newStatus);
     setUpdatingId(leadId);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

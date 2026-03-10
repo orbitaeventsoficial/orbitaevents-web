@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface CoverageArea {
   city: string;
@@ -37,7 +38,7 @@ export default function CoveragePage() {
 
   async function loadAreas() {
     try {
-      const res = await fetch('/api/admin/coverage');
+      const res = await fetchWithCsrf('/api/admin/coverage');
       const data = await res.json();
       if (data.ok) {
         setAreas(data.areas);
@@ -54,7 +55,7 @@ export default function CoveragePage() {
 
     setAdding(true);
     try {
-      const res = await fetch('/api/admin/coverage', {
+      const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,7 +82,7 @@ export default function CoveragePage() {
     if (!ok) return;
 
     try {
-      const res = await fetch('/api/admin/coverage', {
+      const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'remove', city }),
@@ -98,7 +99,7 @@ export default function CoveragePage() {
 
   async function toggleArea(city: string, enabled: boolean) {
     try {
-      const res = await fetch('/api/admin/coverage', {
+      const res = await fetchWithCsrf('/api/admin/coverage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'toggle', city, enabled }),

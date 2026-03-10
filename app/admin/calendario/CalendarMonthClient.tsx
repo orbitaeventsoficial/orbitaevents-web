@@ -178,7 +178,7 @@ export default function CalendarMonthClient() {
 
   const moveBookingToDate = useCallback(async (bookingId: string, newDateKey: string) => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ eventDate: `${newDateKey}T12:00:00.000Z` }),
@@ -239,7 +239,7 @@ export default function CalendarMonthClient() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(
+        const res = await fetchWithCsrf(
           `/api/admin/calendario/mes?from=${fromStr}&to=${toStr}`,
         );
         if (!res.ok) {

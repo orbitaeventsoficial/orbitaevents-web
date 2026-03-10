@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -19,7 +20,7 @@ export default function LeadQuickStatus({
     if (saving || nextStatus === currentStatus) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),

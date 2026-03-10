@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Feature {
   key: string;
@@ -23,7 +24,7 @@ export default function FeaturesPage() {
 
   async function loadFeatures() {
     try {
-      const res = await fetch('/api/admin/features');
+      const res = await fetchWithCsrf('/api/admin/features');
       const data = await res.json();
       if (data.ok) {
         setFeatures(data.features);
@@ -38,7 +39,7 @@ export default function FeaturesPage() {
   async function toggleFeature(key: string, enabled: boolean) {
     setSaving(key);
     try {
-      const res = await fetch('/api/admin/features', {
+      const res = await fetchWithCsrf('/api/admin/features', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, enabled }),

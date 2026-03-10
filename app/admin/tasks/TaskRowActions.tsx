@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function TaskRowActions({
   taskId,
@@ -22,7 +23,7 @@ export default function TaskRowActions({
     if (saving) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/tasks/${taskId}`, {
+      const res = await fetchWithCsrf(`/api/admin/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: isDone ? 'OPEN' : 'DONE' }),

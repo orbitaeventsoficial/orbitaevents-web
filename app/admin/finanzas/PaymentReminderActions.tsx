@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function PaymentReminderActions({
   bookingId,
@@ -18,7 +19,7 @@ export default function PaymentReminderActions({
   async function sendEmailReminder() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/communications`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/communications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send_email', flow: 'PAYMENT' }),
@@ -33,7 +34,7 @@ export default function PaymentReminderActions({
   async function markWhatsAppSent() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/communications`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/communications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'log_sent', flow: 'PAYMENT', channel: 'whatsapp' }),
@@ -48,7 +49,7 @@ export default function PaymentReminderActions({
   async function sendWhatsAppApi() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/communications`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/communications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send_whatsapp', flow: 'PAYMENT' }),

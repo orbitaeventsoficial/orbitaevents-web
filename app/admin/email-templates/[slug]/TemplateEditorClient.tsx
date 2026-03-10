@@ -146,7 +146,7 @@ export default function TemplateEditorClient({
   const loadTemplate = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/email-templates/${slug}?locale=${locale}`);
+      const res = await fetchWithCsrf(`/api/admin/email-templates/${slug}?locale=${locale}`);
       if (!res.ok) throw new Error('Error carregant');
       const data = await res.json();
 
@@ -223,7 +223,7 @@ export default function TemplateEditorClient({
     setTranslating(true);
     try {
       // 1. Carregar la versió catalana
-      const caRes = await fetch(`/api/admin/email-templates/${slug}?locale=ca`);
+      const caRes = await fetchWithCsrf(`/api/admin/email-templates/${slug}?locale=ca`);
       if (!caRes.ok) throw new Error('No s\'ha trobat la plantilla en català');
       const caData = await caRes.json();
       const caSubject = caData.resolved?.subject || '';
@@ -248,7 +248,7 @@ export default function TemplateEditorClient({
       if (allTexts.length === 0) { toast.error('No hi ha contingut per traduir'); return; }
 
       // 3. Traduir via API
-      const trRes = await fetch('/api/admin/translate', {
+      const trRes = await fetchWithCsrf('/api/admin/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ texts: allTexts, targetLanguages: [locale] }),

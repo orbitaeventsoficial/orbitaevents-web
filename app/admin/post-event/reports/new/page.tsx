@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../../../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function NewReportPage() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function NewReportPage() {
 
   useEffect(() => {
     if (bookingId) {
-      fetch(`/api/admin/bookings/${bookingId}`)
+      fetchWithCsrf(`/api/admin/bookings/${bookingId}`)
         .then(res => res.json())
         .then(data => {
           if (data.booking) {
@@ -34,7 +35,7 @@ export default function NewReportPage() {
         })
         .catch(err => log.error('Error loading booking', err));
 
-      fetch(`/api/admin/bookings/${bookingId}/inventory`)
+      fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`)
         .then(res => res.json())
         .then(data => {
           if (data.assignedItems) {
@@ -53,7 +54,7 @@ export default function NewReportPage() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const res = await fetch('/api/admin/post-event/reports', {
+      const res = await fetchWithCsrf('/api/admin/post-event/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

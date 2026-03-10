@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Props {
   bookingId: string;
@@ -46,7 +47,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
     setError(null);
 
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

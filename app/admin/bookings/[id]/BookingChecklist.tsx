@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface ChecklistItem {
   id: string;
@@ -18,7 +19,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/checklist`, { credentials: 'include' });
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, { credentials: 'include' });
       const data = await res.json();
       if (data.ok) setItems(data.items);
     } catch {
@@ -33,7 +34,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   async function save(updated: ChecklistItem[]) {
     setItems(updated);
     try {
-      await fetch(`/api/admin/bookings/${bookingId}/checklist`, {
+      await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

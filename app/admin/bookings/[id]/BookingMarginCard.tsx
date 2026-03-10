@@ -8,6 +8,7 @@ import { formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
 import Tooltip from '@/app/admin/components/Tooltip';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -113,7 +114,7 @@ export default function BookingMarginCard({
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -140,7 +141,7 @@ export default function BookingMarginCard({
 
   const persistDistance = useCallback(async (nextDistanceKm: number) => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,7 +160,7 @@ export default function BookingMarginCard({
     setCalculatingDistance(true);
     setDistanceMessage(null);
     try {
-      const res = await fetch('/api/admin/maps/distance', {
+      const res = await fetchWithCsrf('/api/admin/maps/distance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ destination }),

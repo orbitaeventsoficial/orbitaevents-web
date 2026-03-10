@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type KanbanTask = {
   id: string;
@@ -51,7 +52,7 @@ export default function TaskKanbanView() {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/tasks?limit=200&kanban=true', { credentials: 'include' });
+      const res = await fetchWithCsrf('/api/admin/tasks?limit=200&kanban=true', { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant tasques');
       const data = await res.json();
       const rows: KanbanTask[] = (data?.tasks || data?.data || []).map((t: Record<string, unknown>) => ({
@@ -88,7 +89,7 @@ export default function TaskKanbanView() {
     setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: newStatus as KanbanTask['status'] } : t)));
 
     try {
-      const res = await fetch(`/api/admin/tasks/${taskId}`, {
+      const res = await fetchWithCsrf(`/api/admin/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

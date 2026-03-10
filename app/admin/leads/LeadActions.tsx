@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface LeadActionsProps {
   leadId: string;
@@ -33,7 +34,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
         method: 'DELETE',
       });
 
@@ -54,7 +55,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     if (statusUpdating || nextStatus === currentStatus) return;
     setStatusUpdating(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
@@ -75,7 +76,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     if (priorityUpdating || nextPriority === currentPriority) return;
     setPriorityUpdating(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priority: nextPriority }),

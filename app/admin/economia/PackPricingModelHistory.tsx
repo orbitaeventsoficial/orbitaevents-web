@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { formatDateTimeFull } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type PackHistoryEntry = {
   id: string;
@@ -58,7 +59,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
     setRestoringId(entry.id);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/pricing/model-config', {
+      const res = await fetchWithCsrf('/api/admin/pricing/model-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: entry.after }),

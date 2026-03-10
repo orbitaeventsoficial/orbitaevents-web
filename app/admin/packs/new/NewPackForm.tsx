@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const inputClass = 'w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/90';
 
@@ -23,7 +24,7 @@ export default function NewPackForm() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/packs', {
+      const res = await fetchWithCsrf('/api/admin/packs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

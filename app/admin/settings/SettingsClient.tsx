@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { formatDateSimple, formatNumber } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Setting = {
   id: string;
@@ -114,7 +115,7 @@ export default function SettingsClient({
         return;
       }
 
-      const response = await fetch('/api/admin/settings', {
+      const response = await fetchWithCsrf('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

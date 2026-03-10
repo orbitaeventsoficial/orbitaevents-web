@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { AdminPage } from '../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const SOURCE_OPTIONS = [
   { value: 'PHONE', label: 'Telèfon', icon: '📞' },
@@ -130,7 +131,7 @@ export default function IntakePage() {
     const timer = setTimeout(async () => {
       setCheckingDuplicates(true);
       try {
-        const res = await fetch('/api/admin/customers/check-duplicates', {
+        const res = await fetchWithCsrf('/api/admin/customers/check-duplicates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: debounceName, email: debounceEmail, phone: debouncePhone }),
@@ -182,7 +183,7 @@ export default function IntakePage() {
         priority: form.priority,
       };
 
-      const res = await fetch('/api/admin/leads', {
+      const res = await fetchWithCsrf('/api/admin/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -106,7 +107,7 @@ export default function LeadGuidedFlow({
     setStatus(nextStatus);
 
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
@@ -137,7 +138,7 @@ export default function LeadGuidedFlow({
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 2);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/tasks`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

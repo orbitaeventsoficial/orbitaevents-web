@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { BOOKING_STATUS_CONFIG, formatDateShort, formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type PipelineBooking = {
   id: string;
@@ -51,7 +52,7 @@ export default function BookingPipelineView() {
 
   const fetchBookings = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/bookings?limit=500&pipeline=true', { credentials: 'include' });
+      const res = await fetchWithCsrf('/api/admin/bookings?limit=500&pipeline=true', { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant reserves');
       const data = await res.json();
       const rows = data?.data?.bookings || data?.bookings || data?.data || [];
@@ -96,7 +97,7 @@ export default function BookingPipelineView() {
     setUpdatingId(bookingId);
 
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

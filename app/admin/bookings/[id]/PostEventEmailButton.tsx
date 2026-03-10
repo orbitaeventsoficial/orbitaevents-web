@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { log } from '@/lib/logger';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function PostEventEmailButton({ bookingId }: { bookingId: string }) {
   const [sending, setSending] = useState(false);
@@ -16,7 +17,7 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
     try {
       const formData = new FormData();
       formData.append('bookingId', bookingId);
-      const res = await fetch('/api/admin/emails/send-post-event', {
+      const res = await fetchWithCsrf('/api/admin/emails/send-post-event', {
         method: 'POST',
         body: formData,
       });

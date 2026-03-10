@@ -122,7 +122,7 @@ export default function CalendarWeekClient() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/admin/calendario/mes?from=${fromStr}&to=${toStr}`);
+        const res = await fetchWithCsrf(`/api/admin/calendario/mes?from=${fromStr}&to=${toStr}`);
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const json = (await res.json()) as CalendarApiResponse;
         if (!cancelled) setData(json);

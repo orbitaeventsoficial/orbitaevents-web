@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadTask = {
   id: string;
@@ -83,7 +84,7 @@ export default function LeadWorkspace({
   );
 
   const refreshActivities = async () => {
-    const res = await fetch(`/api/admin/leads/${leadId}/activities`);
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/activities`);
     if (!res.ok) return;
     const data = await res.json();
     setActivities(data.activities || []);
@@ -92,7 +93,7 @@ export default function LeadWorkspace({
   const addTask = async () => {
     if (!taskTitle.trim() || loadingTask) return;
     setLoadingTask(true);
-    const res = await fetch(`/api/admin/leads/${leadId}/tasks`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/tasks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -112,7 +113,7 @@ export default function LeadWorkspace({
   };
 
   const updateTask = async (taskId: string, status: string) => {
-    const res = await fetch(`/api/admin/leads/${leadId}/tasks/${taskId}`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/tasks/${taskId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -124,7 +125,7 @@ export default function LeadWorkspace({
   };
 
   const deleteTask = async (taskId: string) => {
-    const res = await fetch(`/api/admin/leads/${leadId}/tasks/${taskId}`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/tasks/${taskId}`, {
       method: 'DELETE',
     });
     if (!res.ok) { toast.error('Error eliminant tasca'); return; }
@@ -141,7 +142,7 @@ export default function LeadWorkspace({
     formData.append('type', docType);
     formData.append('createdBy', 'Admin');
 
-    const res = await fetch(`/api/admin/leads/${leadId}/documents`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/documents`, {
       method: 'POST',
       body: formData,
     });
@@ -159,7 +160,7 @@ export default function LeadWorkspace({
     if (confirmingActivityId !== activityId) { setConfirmingActivityId(activityId); return; }
     setConfirmingActivityId(null);
 
-    const res = await fetch(`/api/admin/leads/${leadId}/activities/${activityId}`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/activities/${activityId}`, {
       method: 'DELETE',
     });
     if (!res.ok) { toast.error('Error eliminant activitat'); return; }
@@ -169,7 +170,7 @@ export default function LeadWorkspace({
   const cleanDuplicateActivities = async () => {
     if (cleaningActivities) return;
     setCleaningActivities(true);
-    const res = await fetch(`/api/admin/leads/${leadId}/activities`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/activities`, {
       method: 'DELETE',
     });
     setCleaningActivities(false);
@@ -182,7 +183,7 @@ export default function LeadWorkspace({
     if (confirmingDocumentId !== documentId) { setConfirmingDocumentId(documentId); return; }
     setConfirmingDocumentId(null);
     setDeletingDocumentId(documentId);
-    const res = await fetch(`/api/admin/leads/${leadId}/documents/${documentId}`, {
+    const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/documents/${documentId}`, {
       method: 'DELETE',
     });
     setDeletingDocumentId(null);

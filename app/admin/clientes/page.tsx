@@ -176,7 +176,7 @@ export default function AdminContactesPage() {
       });
       if (search) params.set('q', search);
 
-      const response = await fetch(`/api/admin/customers?${params.toString()}`, {
+      const response = await fetchWithCsrf(`/api/admin/customers?${params.toString()}`, {
         credentials: 'include',
       });
 
@@ -272,7 +272,7 @@ export default function AdminContactesPage() {
     const timeout = window.setTimeout(async () => {
       setCheckingDuplicates(true);
       try {
-        const res = await fetch('/api/admin/customers/check-duplicates', {
+        const res = await fetchWithCsrf('/api/admin/customers/check-duplicates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -375,7 +375,7 @@ export default function AdminContactesPage() {
     setActionLoading(true);
 
     try {
-      const response = await fetch('/api/admin/start-process', {
+      const response = await fetchWithCsrf('/api/admin/start-process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

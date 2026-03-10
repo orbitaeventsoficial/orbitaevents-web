@@ -118,7 +118,7 @@ export default function CalendarDayClient() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/admin/calendario/mes?from=${dateKey}&to=${nextDay}`);
+        const res = await fetchWithCsrf(`/api/admin/calendario/mes?from=${dateKey}&to=${nextDay}`);
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const json = (await res.json()) as CalendarApiResponse;
         if (!cancelled) setData(json);

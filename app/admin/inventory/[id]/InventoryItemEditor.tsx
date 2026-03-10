@@ -7,6 +7,7 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const CATEGORIES = [
   { value: 'SOUND', label: 'So', icon: '🔊' },
@@ -122,7 +123,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       const url = mode === 'create' ? '/api/admin/inventory' : `/api/admin/inventory/${item!.id}`;
       const method = mode === 'create' ? 'POST' : 'PATCH';
 
-      const res = await fetch(url, {
+      const res = await fetchWithCsrf(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -152,7 +153,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/inventory/${item.id}`, {
+      const res = await fetchWithCsrf(`/api/admin/inventory/${item.id}`, {
         method: 'DELETE',
       });
 

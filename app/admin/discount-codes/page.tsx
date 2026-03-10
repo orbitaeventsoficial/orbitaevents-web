@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type DiscountCode = {
   id: string;
@@ -70,7 +71,7 @@ export default function DiscountCodesPage() {
 
   const loadCodes = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/discount-codes');
+      const res = await fetchWithCsrf('/api/admin/discount-codes');
       if (res.ok) {
         const data = await res.json();
         setCodes(data.codes || []);
@@ -113,7 +114,7 @@ export default function DiscountCodesPage() {
         isAccumulative: form.isAccumulative,
       };
 
-      const res = await fetch('/api/admin/discount-codes', {
+      const res = await fetchWithCsrf('/api/admin/discount-codes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -137,7 +138,7 @@ export default function DiscountCodesPage() {
 
   const toggleActive = async (id: string, active: boolean) => {
     try {
-      await fetch(`/api/admin/discount-codes`, {
+      await fetchWithCsrf(`/api/admin/discount-codes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ _action: 'toggle', id, isActive: !active }),

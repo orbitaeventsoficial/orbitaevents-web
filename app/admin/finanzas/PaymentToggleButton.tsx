@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type PaymentField = 'depositPaid' | 'remainingPaid';
 
@@ -32,7 +33,7 @@ export default function PaymentToggleButton({
         payload.remainingPaidAt = nextValue ? new Date().toISOString() : null;
       }
 
-      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { QuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 function toLines(text: string): string[] {
   return text
@@ -32,7 +33,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/settings/quote-template', {
+      const res = await fetchWithCsrf('/api/admin/settings/quote-template', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

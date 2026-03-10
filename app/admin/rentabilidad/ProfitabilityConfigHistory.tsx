@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { formatDateTimeFull } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type HistoryEntry = {
   id: string;
@@ -69,7 +70,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
     setRestoringId(entry.id);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/reports/profitability/config', {
+      const res = await fetchWithCsrf('/api/admin/reports/profitability/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: entry.after }),

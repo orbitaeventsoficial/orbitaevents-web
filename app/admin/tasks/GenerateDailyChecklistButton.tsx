@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function GenerateDailyChecklistButton() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function GenerateDailyChecklistButton() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/tasks/daily-checklist', {
+      const res = await fetchWithCsrf('/api/admin/tasks/daily-checklist', {
         method: 'POST',
       });
       const data = await res.json().catch(() => ({}));

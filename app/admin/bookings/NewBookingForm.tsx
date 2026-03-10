@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Pack = {
   id: string;
@@ -135,8 +136,8 @@ export default function NewBookingForm() {
     async function load() {
       try {
         const [packsRes, extrasRes] = await Promise.all([
-          fetch('/api/admin/packs'),
-          fetch('/api/admin/extras'),
+          fetchWithCsrf('/api/admin/packs'),
+          fetchWithCsrf('/api/admin/extras'),
         ]);
 
         if (packsRes.ok) {
@@ -164,7 +165,7 @@ export default function NewBookingForm() {
           setExtras(normalizedExtras);
         }
 
-        const fuelRes = await fetch('/api/admin/fuel/reference');
+        const fuelRes = await fetchWithCsrf('/api/admin/fuel/reference');
         if (fuelRes.ok) {
           const fuelData = await fuelRes.json();
           const referenceValue = Number(fuelData?.costPerKm || 0);
@@ -176,7 +177,7 @@ export default function NewBookingForm() {
 
         // Pre-fill from lead
         if (leadId) {
-          const leadRes = await fetch(`/api/admin/leads/${leadId}`);
+          const leadRes = await fetchWithCsrf(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
             const lData = await leadRes.json();
             const lead = lData.lead || lData.data;
@@ -332,7 +333,7 @@ export default function NewBookingForm() {
     }
     setValidatingCode(true);
     try {
-      const res = await fetch(`/api/public/discount-code?code=${encodeURIComponent(code.trim())}`);
+      const res = await fetchWithCsrf(`/api/public/discount-code?code=${encodeURIComponent(code.trim())}`);
       if (res.ok) {
         const data = await res.json();
         setDiscountValidation(data);
@@ -363,7 +364,7 @@ export default function NewBookingForm() {
     setDistanceMessage(null);
 
     try {
-      const res = await fetch('/api/admin/maps/distance', {
+      const res = await fetchWithCsrf('/api/admin/maps/distance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ destination }),
@@ -411,7 +412,7 @@ export default function NewBookingForm() {
     const controller = new AbortController();
     (async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithCsrf(
           `/api/admin/bookings?fromDate=${form.eventDate}&toDate=${form.eventDate}&limit=10`,
           { signal: controller.signal }
         );
@@ -479,7 +480,7 @@ export default function NewBookingForm() {
         travelCost: internalTravelCost || undefined,
       };
 
-      const res = await fetch('/api/admin/bookings', {
+      const res = await fetchWithCsrf('/api/admin/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function SendPostEventButton({ bookingId }: { bookingId: string }) {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
       const formData = new FormData();
       formData.set('bookingId', bookingId);
 
-      const res = await fetch('/api/admin/emails/send-post-event', {
+      const res = await fetchWithCsrf('/api/admin/emails/send-post-event', {
         method: 'POST',
         body: formData,
       });

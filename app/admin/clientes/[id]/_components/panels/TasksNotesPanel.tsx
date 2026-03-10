@@ -5,6 +5,7 @@ import { formatDate } from '@/lib/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
     setBusyTaskId(taskId);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/tasks/${taskId}`, {
+      const res = await fetchWithCsrf(`/api/admin/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: done ? 'DONE' : 'OPEN' }),
@@ -48,7 +49,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
     setBusyTaskId(taskId);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/tasks/${taskId}`, {
+      const res = await fetchWithCsrf(`/api/admin/tasks/${taskId}`, {
         method: 'DELETE',
       });
       const payload = await res.json().catch(() => ({}));

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const DELETABLE_STATUSES = new Set(['PENDING', 'CANCELLED']);
 
@@ -41,7 +42,7 @@ export default function BookingActions({
     setConfirmingDelete(false);
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/bookings/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
         throw new Error(payload?.error || 'Error eliminant reserva');
@@ -59,7 +60,7 @@ export default function BookingActions({
     if (isUpdatingStatus || nextStatus === status) return;
     setIsUpdatingStatus(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${id}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),

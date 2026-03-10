@@ -44,7 +44,7 @@ export default function QuickActions() {
     setRunAllSummary(null);
     setDailySummary(null);
     try {
-      const res = await fetch('/api/admin/emails/run-cron', {
+      const res = await fetchWithCsrf('/api/admin/emails/run-cron', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

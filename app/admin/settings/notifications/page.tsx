@@ -59,7 +59,7 @@ export default function SettingsNotificationsPage() {
 
   const fetchConfig = async () => {
     try {
-      const res = await fetch('/api/admin/test-notifications');
+      const res = await fetchWithCsrf('/api/admin/test-notifications');
       const data = await res.json();
       setConfig(data.config);
       setInstructions(data.instructions);
@@ -75,7 +75,7 @@ export default function SettingsNotificationsPage() {
     setTestResult(null);
     
     try {
-      const res = await fetch('/api/admin/test-notifications', {
+      const res = await fetchWithCsrf('/api/admin/test-notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
@@ -19,7 +20,7 @@ export default function LeadQuickPriority({
     if (saving || nextPriority === currentPriority) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priority: nextPriority }),

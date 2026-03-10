@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Stat {
   key: string;
@@ -30,7 +31,7 @@ export default function StatsPage() {
 
   async function loadStats() {
     try {
-      const res = await fetch('/api/admin/stats');
+      const res = await fetchWithCsrf('/api/admin/stats');
       const data = await res.json();
       if (data.ok) {
         setStats(data.stats);
@@ -50,7 +51,7 @@ export default function StatsPage() {
   async function saveStat(key: string) {
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/stats', {
+      const res = await fetchWithCsrf('/api/admin/stats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, fallback: parseFloat(editValue) }),
@@ -74,7 +75,7 @@ export default function StatsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/stats', {
+      const res = await fetchWithCsrf('/api/admin/stats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, resetToCalculated: true }),

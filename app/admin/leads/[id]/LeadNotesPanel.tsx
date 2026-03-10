@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadNoteItem = {
   id: string;
@@ -40,7 +41,7 @@ export default function LeadNotesPanel({
     setDeletingId(noteId);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/notes?noteId=${noteId}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/notes?noteId=${noteId}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -61,7 +62,7 @@ export default function LeadNotesPanel({
     setError(null);
     setSuccess(null);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/notes`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/notes`, {
         method: 'PUT',
       });
       const data = await res.json().catch(() => ({}));

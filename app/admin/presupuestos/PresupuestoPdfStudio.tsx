@@ -183,7 +183,7 @@ async function translateBatchForPdf(texts: string[], locale: Locale): Promise<Ma
   if (toFetch.length === 0) return result;
 
   try {
-    const res = await fetch('/api/admin/translate', {
+    const res = await fetchWithCsrf('/api/admin/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -331,7 +331,7 @@ export default function PresupuestoPdfStudio({
     const tryLoadLogo = async () => {
       for (const url of candidates) {
         try {
-          const res = await fetch(url);
+          const res = await fetchWithCsrf(url);
           if (!res.ok) continue;
           const blob = await res.blob();
           const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -356,7 +356,7 @@ export default function PresupuestoPdfStudio({
 
     const loadPricingCatalog = async () => {
       try {
-        const res = await fetch(`/api/admin/pricing?locale=${locale}`);
+        const res = await fetchWithCsrf(`/api/admin/pricing?locale=${locale}`);
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok || cancelled) return;
 
@@ -486,7 +486,7 @@ export default function PresupuestoPdfStudio({
     const timer = window.setTimeout(async () => {
       setCalculatingDistance(true);
       try {
-        const res = await fetch('/api/admin/maps/distance', {
+        const res = await fetchWithCsrf('/api/admin/maps/distance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ destination }),
@@ -578,7 +578,7 @@ export default function PresupuestoPdfStudio({
 
     async function loadProposal() {
       try {
-        const res = await fetch(`/api/admin/proposals/${initialProposalId}`);
+        const res = await fetchWithCsrf(`/api/admin/proposals/${initialProposalId}`);
         if (!res.ok || cancelled) return;
         const data = await res.json();
         const snap = data?.proposal?.snapshot;
@@ -742,7 +742,7 @@ export default function PresupuestoPdfStudio({
     const timer = window.setTimeout(async () => {
       setSearchingCustomers(true);
       try {
-        const res = await fetch(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { credentials: 'include' });
+        const res = await fetchWithCsrf(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { credentials: 'include' });
         const data = await res.json().catch(() => ({}));
         const apiCustomers = Array.isArray(data?.data?.customers)
           ? data.data.customers
@@ -1243,7 +1243,7 @@ export default function PresupuestoPdfStudio({
         });
       }
 
-      const response = await fetch('/api/admin/emails/quote', {
+      const response = await fetchWithCsrf('/api/admin/emails/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

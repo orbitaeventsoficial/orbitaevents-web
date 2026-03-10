@@ -6,6 +6,7 @@ import DOMPurify from 'dompurify';
 import { getEventLabel, formatDateShort, formatDateTimeFull, formatDateSimple, DEFAULT_LOCALE } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface LeadData {
   id: string;
@@ -139,7 +140,7 @@ export default function InboxClient({
 
     try {
       const params = new URLSearchParams({ limit: '50', _t: String(Date.now()) });
-      const res = await fetch(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const data = await res.json();
       const message = data?.details
         ? `${data?.error || 'Error carregant emails'}: ${data.details}`
@@ -171,12 +172,12 @@ export default function InboxClient({
     setLoadingTrash(true);
     try {
       const params = new URLSearchParams({ folder: 'Trash', action: 'countTotal' });
-      const countRes = await fetch(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
+      const countRes = await fetchWithCsrf(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const countData = await countRes.json().catch(() => ({}));
       if (countRes.ok) setTrashCount(countData.total || 0);
 
       const listParams = new URLSearchParams({ folder: 'Trash', limit: '50', _t: String(Date.now()) });
-      const res = await fetch(`/api/admin/inbox/messages?${listParams}`, { cache: 'no-store' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages?${listParams}`, { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         setTrashEmails(data.emails || []);
@@ -248,7 +249,7 @@ export default function InboxClient({
 
     setLoadingSelected(true);
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, { cache: 'no-store' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok || !data?.email) return;
 
@@ -276,7 +277,7 @@ export default function InboxClient({
     if (email.type !== 'imap' || !email.imapData?.uid) return;
 
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}/lead`, {
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}/lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -314,7 +315,7 @@ export default function InboxClient({
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'moveToTrash' }),
@@ -342,7 +343,7 @@ export default function InboxClient({
     if (email.type !== 'imap' || !email.imapData?.uid) return;
 
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'restore' }),
@@ -371,7 +372,7 @@ export default function InboxClient({
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
         method: 'DELETE',
       });
       const data = await res.json().catch(() => ({}));
@@ -862,7 +863,7 @@ function ComposeModal({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-      const res = await fetch('/api/admin/emails/send', {
+      const res = await fetchWithCsrf('/api/admin/emails/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1061,7 +1062,7 @@ function QuoteModal({
     setSending(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/emails/quote', {
+      const res = await fetchWithCsrf('/api/admin/emails/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -233,7 +234,7 @@ export default function TextManagerPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/admin/text-manager');
+      const response = await fetchWithCsrf('/api/admin/text-manager');
       const data = await response.json();
 
       if (data.ok) {
@@ -323,7 +324,7 @@ export default function TextManagerPage() {
 
       let translationsByText: Record<string, Record<string, string>> = {};
       if (uniqueTexts.length > 0) {
-        const translateResponse = await fetch('/api/admin/translate', {
+        const translateResponse = await fetchWithCsrf('/api/admin/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ texts: uniqueTexts, targetLanguages: ['es', 'ca', 'en'] })
@@ -342,17 +343,17 @@ export default function TextManagerPage() {
       }
 
       const responses = await Promise.all([
-        fetch('/api/admin/text-manager', {
+        fetchWithCsrf('/api/admin/text-manager', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modifications: allModifications.es, locale: 'es' })
         }),
-        fetch('/api/admin/text-manager', {
+        fetchWithCsrf('/api/admin/text-manager', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modifications: allModifications.ca, locale: 'ca' })
         }),
-        fetch('/api/admin/text-manager', {
+        fetchWithCsrf('/api/admin/text-manager', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modifications: allModifications.en, locale: 'en' })

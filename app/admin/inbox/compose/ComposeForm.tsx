@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { EVENT_TYPE_LABELS, formatDateSimple } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Lead {
   id: string;
@@ -134,7 +135,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
       setSending(true);
       try {
-        const res = await fetch('/api/admin/emails/quote', {
+        const res = await fetchWithCsrf('/api/admin/emails/quote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -171,7 +172,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
       setSending(true);
       try {
-        const res = await fetch('/api/admin/emails/send', {
+        const res = await fetchWithCsrf('/api/admin/emails/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

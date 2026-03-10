@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 function divergencePct(publicPrice: number, recommendedPrice: number): number {
   if (!Number.isFinite(recommendedPrice) || recommendedPrice <= 0) return 0;
@@ -50,7 +51,7 @@ export default function PackPriceQuickEditor({
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`/api/admin/packs/${packId}`, {
+      const res = await fetchWithCsrf(`/api/admin/packs/${packId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

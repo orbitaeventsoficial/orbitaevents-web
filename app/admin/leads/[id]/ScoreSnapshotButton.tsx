@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
   const [saving, setSaving] = useState(false);
@@ -10,7 +11,7 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/score`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

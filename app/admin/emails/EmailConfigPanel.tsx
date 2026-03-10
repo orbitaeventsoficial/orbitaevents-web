@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { log } from '@/lib/logger';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function EmailConfigPanel() {
   const [config, setConfig] = useState({
@@ -24,7 +25,7 @@ export default function EmailConfigPanel() {
     setSaving(true);
     setError(null);
     try {
-      const response = await fetch('/api/admin/settings', {
+      const response = await fetchWithCsrf('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailConfig: config }),

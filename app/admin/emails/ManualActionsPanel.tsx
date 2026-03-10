@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function ManualActionsPanel() {
   const [runningCron, setRunningCron] = useState(false);
@@ -18,7 +19,7 @@ export default function ManualActionsPanel() {
 
     try {
       // Use admin-protected endpoint instead of exposing CRON_SECRET
-      const res = await fetch('/api/admin/emails/run-cron', {
+      const res = await fetchWithCsrf('/api/admin/emails/run-cron', {
         method: 'POST',
       });
 
@@ -50,7 +51,7 @@ export default function ManualActionsPanel() {
     setReminderResult(null);
 
     try {
-      const res = await fetch('/api/admin/emails/testimonials-reminder', {
+      const res = await fetchWithCsrf('/api/admin/emails/testimonials-reminder', {
         method: 'POST',
       });
       const data = await res.json();
@@ -89,7 +90,7 @@ export default function ManualActionsPanel() {
     setTestResult(null);
 
     try {
-      const res = await fetch('/api/admin/emails/test', {
+      const res = await fetchWithCsrf('/api/admin/emails/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: testEmail }),

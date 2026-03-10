@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import { formatCurrency, formatDate } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -143,7 +144,7 @@ export default function PricingAdminPage() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/pricing?locale=ca');
+      const res = await fetchWithCsrf('/api/admin/pricing?locale=ca');
       const data = await res.json();
       if (data.ok) {
         setExtras(data.data.extras);
@@ -163,7 +164,7 @@ export default function PricingAdminPage() {
   async function savePrice(extraId: string) {
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/pricing', {
+      const res = await fetchWithCsrf('/api/admin/pricing', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extraId, price: editPrice }),

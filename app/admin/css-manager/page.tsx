@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const EXAMPLE_CSS = `/* Exemple: admin pastel i semàfors */
 html.admin-mode .admin-layout-shell {
@@ -378,7 +379,7 @@ export default function AdminCssManagerPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/admin/css', { cache: 'no-store' });
+        const res = await fetchWithCsrf('/api/admin/css', { cache: 'no-store' });
         const data = await res.json().catch(() => ({}));
         if (!cancelled) {
           const loadedCss = typeof data?.css === 'string' ? data.css : '';
@@ -402,7 +403,7 @@ export default function AdminCssManagerPage() {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/css', {
+      const res = await fetchWithCsrf('/api/admin/css', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ css }),

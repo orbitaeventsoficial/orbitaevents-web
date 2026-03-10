@@ -10,6 +10,7 @@
 import { useCallback, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // Constants alineades amb lib/inventory-image-constants.ts
 // (importació directa no possible aquí perquè és codi de client-browser)
@@ -121,7 +122,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
       const formData = new FormData();
       formData.append('file', blob, `${itemCode}.webp`);
 
-      const res = await fetch(`/api/admin/inventory/${itemId}/photo`, {
+      const res = await fetchWithCsrf(`/api/admin/inventory/${itemId}/photo`, {
         method: 'POST',
         body: formData,
       });
@@ -156,7 +157,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
   const handleRemovePhoto = useCallback(async () => {
     setUploading(true);
     try {
-      const res = await fetch(`/api/admin/inventory/${itemId}/photo`, {
+      const res = await fetchWithCsrf(`/api/admin/inventory/${itemId}/photo`, {
         method: 'DELETE',
       });
 

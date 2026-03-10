@@ -66,8 +66,8 @@ export default function AdminRessenyesPage() {
     setLoading(true);
     try {
       const [pendingRes, approvedRes] = await Promise.all([
-        fetch('/api/admin/testimonials?status=pending', { cache: 'no-store' }),
-        fetch('/api/admin/testimonials?status=approved', { cache: 'no-store' }),
+        fetchWithCsrf('/api/admin/testimonials?status=pending', { cache: 'no-store' }),
+        fetchWithCsrf('/api/admin/testimonials?status=approved', { cache: 'no-store' }),
       ]);
 
       if (pendingRes.ok) {

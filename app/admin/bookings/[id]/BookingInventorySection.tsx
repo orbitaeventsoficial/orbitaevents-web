@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const CATEGORY_LABELS: Record<string, string> = {
   SOUND: '🔊 So',
@@ -100,7 +101,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       const params = new URLSearchParams();
       if (query) params.set('search', query);
 
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory?${params}`);
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory?${params}`);
       if (!res.ok) throw new Error('Error carregant inventari');
 
       const data = await res.json();
@@ -132,7 +133,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   const handleAssign = useCallback(async (itemId: string) => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId }),
@@ -156,7 +157,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   const handleAssignPack = useCallback(async () => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'pack' }),
@@ -186,7 +187,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       return;
     }
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'bundle', bundleId: selectedBundleId }),
@@ -214,7 +215,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     if (!ok) return;
 
     try {
-      const res = await fetch(
+      const res = await fetchWithCsrf(
         `/api/admin/bookings/${bookingId}/inventory?assignmentId=${assignmentId}`,
         { method: 'DELETE' }
       );
@@ -232,7 +233,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   const handleToggleCheckout = useCallback(async (assignment: Assignment) => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -250,7 +251,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   const handleCheckin = useCallback(async (assignment: Assignment, conditionAfter: string) => {
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/inventory`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -21,7 +21,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/leads/views', { cache: 'no-store' });
+      const res = await fetchWithCsrf('/api/admin/leads/views', { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'Error carregant vistes');

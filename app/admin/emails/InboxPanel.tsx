@@ -5,6 +5,7 @@ import { formatDateShort, formatDateTimeFull, DEFAULT_LOCALE } from '@/lib/const
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface EmailMessage {
   id: string;
@@ -77,7 +78,7 @@ export default function InboxPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/inbox/messages?limit=${limit}&offset=${page * limit}`);
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages?limit=${limit}&offset=${page * limit}`);
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Error carregant emails');
@@ -119,7 +120,7 @@ export default function InboxPanel() {
     if (!email.isRead) {
       // Marcar com a llegit
       try {
-        await fetch(`/api/admin/inbox/messages/${email.uid}`, {
+        await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'markRead' }),
@@ -139,7 +140,7 @@ export default function InboxPanel() {
     if (!ok) return;
 
     try {
-      const res = await fetch(`/api/admin/inbox/messages/${uid}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${uid}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error eliminant');
 
       // Actualitzar llista

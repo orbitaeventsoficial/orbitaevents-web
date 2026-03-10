@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function RunCommercialSequencesButton() {
   const [running, setRunning] = useState(false);
@@ -10,7 +11,7 @@ export default function RunCommercialSequencesButton() {
     setRunning(true);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/automation/commercial-sequences/run', {
+      const res = await fetchWithCsrf('/api/admin/automation/commercial-sequences/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

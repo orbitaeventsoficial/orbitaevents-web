@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function ProfitabilityConfigEditor({ initial }: { initial: ProfitabilityConfig }) {
   const [form, setForm] = useState<ProfitabilityConfig>(initial);
@@ -26,7 +27,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/reports/profitability/config', {
+      const res = await fetchWithCsrf('/api/admin/reports/profitability/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: form }),

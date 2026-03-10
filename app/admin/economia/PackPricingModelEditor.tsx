@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
@@ -26,7 +27,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch('/api/admin/pricing/model-config', {
+      const res = await fetchWithCsrf('/api/admin/pricing/model-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: form }),

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 interface FieldDef {
   key: string;
@@ -49,7 +50,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
     setMessage(null);
     try {
       const settings = Object.entries(values).map(([key, value]) => ({ key, value }));
-      const res = await fetch('/api/admin/settings', {
+      const res = await fetchWithCsrf('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ settings }),
@@ -68,7 +69,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
     setTestingHolded(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/invoices?limit=1');
+      const res = await fetchWithCsrf('/api/admin/invoices?limit=1');
       if (res.ok) {
         setMessage({ type: 'ok', text: 'Connexio amb Holded funciona correctament' });
       } else {

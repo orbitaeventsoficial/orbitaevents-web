@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatDateTime } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type FlowKey = 'PAYMENT' | 'POST_EVENT' | 'GENERAL';
 
@@ -36,7 +37,7 @@ export default function CommunicationPanel({
   async function run(action: 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded', flow: FlowKey, channel?: 'email' | 'whatsapp') {
     setLoading(flow);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/communications`, {
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/communications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, flow, channel }),

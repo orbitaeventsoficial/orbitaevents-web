@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../help-content';
 import { LEAD_STATUS_LABELS as STATUS_LABELS, PRIORITY_LABELS, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type LeadProfile = {
   id: string;
@@ -81,7 +82,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     setDeleting(true);
     setStatus(null);
     try {
-      const res = await fetch(`/api/admin/leads/${lead.id}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -126,7 +127,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         preferredLocale: form.preferredLocale || 'ca',
       };
 
-      const res = await fetch(`/api/admin/leads/${lead.id}`, {
+      const res = await fetchWithCsrf(`/api/admin/leads/${lead.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

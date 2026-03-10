@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../../components/AdminPage';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function NewTaskPage() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/tasks', {
+      const res = await fetchWithCsrf('/api/admin/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

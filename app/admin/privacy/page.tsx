@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTime } from '@/lib/constants';
 import Link from 'next/link';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type PrivacyStats = {
   consents: { total: number; active: number };
@@ -93,7 +94,7 @@ export default function AdminPrivacyPage() {
   const loadAudit = async () => {
     setAuditLoading(true);
     try {
-      const res = await fetch('/api/admin/privacy/audit?limit=100', { cache: 'no-store' });
+      const res = await fetchWithCsrf('/api/admin/privacy/audit?limit=100', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setAuditLogs(data.data || []);
@@ -109,8 +110,8 @@ export default function AdminPrivacyPage() {
     setLoading(true);
     try {
       const [statsRes, reqRes] = await Promise.all([
-        fetch('/api/admin/privacy/stats', { cache: 'no-store' }),
-        fetch(`/api/admin/privacy/requests?status=${statusFilter === 'pending' ? 'VERIFIED' : statusFilter === 'completed' ? 'COMPLETED' : 'all'}`, { cache: 'no-store' }),
+        fetchWithCsrf('/api/admin/privacy/stats', { cache: 'no-store' }),
+        fetchWithCsrf(`/api/admin/privacy/requests?status=${statusFilter === 'pending' ? 'VERIFIED' : statusFilter === 'completed' ? 'COMPLETED' : 'all'}`, { cache: 'no-store' }),
       ]);
 
       if (statsRes.ok) {
@@ -136,7 +137,7 @@ export default function AdminPrivacyPage() {
   const processRequest = async (id: string, action: 'approve' | 'reject') => {
     setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/privacy/requests/${id}/process`, {
+      const res = await fetchWithCsrf(`/api/admin/privacy/requests/${id}/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, notes: processNotes[id] || '' }),

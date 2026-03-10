@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ALL_SERVICES, type ExtraDefinition, type ServiceSlug } from '@/config/packs-config';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 const SERVICE_LABELS: Record<ServiceSlug, string> = {
   bodas: 'Bodes',
@@ -47,7 +48,7 @@ export default function ExtrasConfiguratorClient() {
     async function load() {
       try {
         setLoading(true);
-        const res = await fetch('/api/admin/extras', { cache: 'no-store' });
+        const res = await fetchWithCsrf('/api/admin/extras', { cache: 'no-store' });
         const data = await res.json();
         if (!active) return;
         setExtras(Array.isArray(data?.config) ? data.config : []);
@@ -92,7 +93,7 @@ export default function ExtrasConfiguratorClient() {
     try {
       setSaving(true);
       setError(null);
-      const res = await fetch('/api/admin/extras', {
+      const res = await fetchWithCsrf('/api/admin/extras', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ config: extras }),

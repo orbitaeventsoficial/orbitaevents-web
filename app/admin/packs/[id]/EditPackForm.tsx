@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
 
@@ -211,7 +212,7 @@ export default function EditPackForm({
     let cancelled = false;
     const loadBundles = async () => {
       try {
-        const res = await fetch('/api/admin/inventory/bundles');
+        const res = await fetchWithCsrf('/api/admin/inventory/bundles');
         if (!res.ok) return;
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
@@ -351,7 +352,7 @@ export default function EditPackForm({
         throw new Error('Els preus han de ser superiors a 0€.');
       }
 
-      const response = await fetch(`/api/admin/packs/${pack.id}`, {
+      const response = await fetchWithCsrf(`/api/admin/packs/${pack.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
