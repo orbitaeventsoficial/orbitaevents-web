@@ -579,11 +579,12 @@ export async function generateQuotePDF(
     const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
     const phone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
     doc.setDrawColor(...border);
-    doc.line(left, 282, left + contentWidth, 282);
+    doc.line(left, 278, left + contentWidth, 278);
     doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.text(`${website} · ${email} · ${phone}`, left, 287);
+    doc.setFontSize(7);
+    doc.text(`${t.disclaimer} · ${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left, 282.5);
+    doc.text(`${website} · ${email} · ${phone}`, left, 286.5);
   };
 
   drawHeader(false);
@@ -806,12 +807,6 @@ export async function generateQuotePDF(
     doc.text(whyLines, left + 4, y + 11);
     y += boxHeight + 1.5;
   }
-
-  ensureSpace(8);
-  doc.setTextColor(...muted);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix} · ${t.disclaimer}`, left, y);
 
   // Add footer to ALL pages (not just the last one)
   const totalPages = doc.internal.pages.length - 1;

@@ -312,24 +312,28 @@
       }
     }
 
-    startBtn.addEventListener("click", async () => {
+    function handleStart(e) {
+      if (e) e.preventDefault();
       try {
-        // Amagar overlay immediatament (no bloquejar l'entrada)
         overlay.style.display = "none";
         cardRoot.setAttribute("aria-hidden", "false");
-        // iOS requereix gest d'usuari: demanem permís també aquí
-        await requestMotionPermission();
+        requestMotionPermission().catch(function(){});
         playWaterSound();
-      } catch (e) {
-        // En cas d'error, assegurar que l'overlay s'amaga igualment
+      } catch (ex) {
         overlay.style.display = "none";
         cardRoot.setAttribute("aria-hidden", "false");
       }
-    });
+    }
 
-    motionBtn.addEventListener("click", async () => {
-      await requestMotionPermission();
-    });
+    function handleMotion(e) {
+      if (e) e.preventDefault();
+      requestMotionPermission().catch(function(){});
+    }
+
+    startBtn.addEventListener("click", handleStart);
+    startBtn.addEventListener("touchend", handleStart);
+    motionBtn.addEventListener("click", handleMotion);
+    motionBtn.addEventListener("touchend", handleMotion);
 
     // Bombolla al tocar la targeta
     cardRoot.addEventListener("pointerdown", async () => {

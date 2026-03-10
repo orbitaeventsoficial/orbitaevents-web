@@ -897,8 +897,8 @@ export default function EspaiSensorial() {
       />
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-30 p-4">
-        <div className="flex justify-between items-center">
+      <header className="fixed top-0 left-0 right-0 z-30 px-4 pt-[env(safe-area-inset-top,16px)] pb-2">
+        <div className="flex justify-between items-center mt-2">
           <motion.button
             onClick={exit}
             whileHover={{ scale: 1.05 }}

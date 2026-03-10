@@ -2453,6 +2453,10 @@
         "sparklers-fountain": {
           "name": "Fonts d'Espurnes (4 unitats)",
           "description": "Fonts pirotècniques d'interior per a moments clau"
+        },
+        "caps-mobils-extra": {
+          "name": "Caps Mòbils Extra (x2)",
+          "description": "2 caps mòbils LED addicionals per ampliar la il·luminació"
         }
       }
     },

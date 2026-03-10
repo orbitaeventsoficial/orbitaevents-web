@@ -2868,6 +2868,10 @@
         "sparklers-fountain": {
           "name": "Spark Fountains (4 units)",
           "description": "Indoor pyrotechnic fountains for key moments"
+        },
+        "caps-mobils-extra": {
+          "name": "Extra Moving Heads (x2)",
+          "description": "2 additional LED moving heads to enhance the lighting"
         }
       }
     },

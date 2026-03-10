@@ -2868,6 +2868,10 @@
         "sparklers-fountain": {
           "name": "Fuentes de Chispas (4 unidades)",
           "description": "Fuentes pirotécnicas de interior para momentos clave"
+        },
+        "caps-mobils-extra": {
+          "name": "Cabezas Móviles Extra (x2)",
+          "description": "2 cabezas móviles LED adicionales para ampliar la iluminación"
         }
       }
     },
