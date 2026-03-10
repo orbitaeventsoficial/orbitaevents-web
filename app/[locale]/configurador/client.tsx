@@ -437,10 +437,10 @@ export default function ConfiguradorClient() {
   // PAS 1: Tipus d'esdeveniment
   const renderStep1 = () => {
     const services = [
-      { slug: 'bodas', icon: '💒' },
-      { slug: 'fiestas', icon: '🎉' },
-      { slug: 'discomovil', icon: '🎵' },
-      { slug: 'empresas', icon: '💼' },
+      { slug: 'bodas', icon: '💒', ideal: t('step1.idealBodas') },
+      { slug: 'fiestas', icon: '🎉', ideal: t('step1.idealFiestas') },
+      { slug: 'discomovil', icon: '🎵', ideal: t('step1.idealDiscomovil') },
+      { slug: 'empresas', icon: '💼', ideal: t('step1.idealEmpresas') },
     ];
 
     return (
@@ -472,6 +472,7 @@ export default function ConfiguradorClient() {
                 <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-oe-gold transition-colors">
                   {t(`step1.eventTypes.${service.slug}`)}
                 </h3>
+                <p className="text-white/40 text-xs mb-3">{service.ideal}</p>
                 <p className="text-text-muted text-sm mb-4">{t('step1.from')} {minPrice}€</p>
                 <div className="flex items-center text-oe-gold text-sm font-bold">
                   {t('step1.viewPacks')} <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -520,18 +521,21 @@ export default function ConfiguradorClient() {
               } ${localizedPack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
             >
               {localizedPack.popular && (
-                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold via-yellow-300 to-oe-gold text-black text-xs font-bold mb-4 animate-pulse">
-                  ⚡ {t('step2.mostSold')}
+                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
+                  {t('step2.mostSold')}
                 </div>
               )}
               {localizedPack.highlight && (
-                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold via-oe-gold-bright to-oe-gold text-black text-xs font-bold mb-4 shadow-oe-gold animate-pulse">
-                  ⭐ {t('step2.premium')}
+                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
+                  {t('step2.premium')}
                 </div>
               )}
 
               <h3 className="text-2xl font-bold text-white mb-2">{localizedPack.name}</h3>
-              <p className="text-text-muted text-sm mb-4">{localizedPack.tagline}</p>
+              <p className="text-text-muted text-sm mb-2">{localizedPack.tagline}</p>
+              {localizedPack.ideal && (
+                <p className="text-white/40 text-xs mb-4">{t('step2.recommendedFor')}: {localizedPack.ideal}</p>
+              )}
 
               <div className="mb-6">
                 <div className="text-4xl font-black text-oe-gold mb-1">{localizedPack.price}</div>
@@ -1081,8 +1085,8 @@ export default function ConfiguradorClient() {
                 </>
               ) : (
                 <>
-                  <span className="animate-pulse"><FileText className="w-6 h-6" /></span>
-                  {t('step4.reserveWithDiscount', { amount: earlyBirdDiscount })}
+                  <FileText className="w-6 h-6" />
+                  {t('step4.requestProposal')}
                 </>
               )}
             </button>

@@ -83,10 +83,8 @@ function validateForm(data: FormData, t: (key: string) => string): FormErrors {
     errors.eventType = t('validation.eventTypeRequired');
   }
 
-  // Data (obligatòria i futura)
-  if (!data.eventDate) {
-    errors.eventDate = t('validation.dateRequired');
-  } else {
+  // Data (opcional, però si s'informa ha de ser futura)
+  if (data.eventDate) {
     const selectedDate = new Date(data.eventDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -95,10 +93,7 @@ function validateForm(data: FormData, t: (key: string) => string): FormErrors {
     }
   }
 
-  // Ciutat / ubicació (obligatori)
-  if (!data.location.trim()) {
-    errors.location = t('validation.locationRequired');
-  }
+  // Ciutat / ubicació (opcional)
 
   // Privacitat (obligatori)
   if (!data.acceptPrivacy) {
