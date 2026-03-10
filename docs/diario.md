@@ -1,5 +1,22 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-10 sessió 9 — Privacitat RGPD + Safata paperera IMAP
+
+### Fet
+1. **Commit privacitat**: Pàgina admin `/admin/privacy` (KPIs RGPD, sol·licituds ARCO, audit log), API audit + consentiments, PrivacyPanel a fitxa client, nav actualitzada
+2. **Safata paperera IMAP**: Tab "Paperera" a la safata d'entrada, 3 funcions noves a `lib/imap.ts` (`getTrashFolderPath`, `moveToFolder`, `restoreFromTrash`), API inbox amb suport `folder` param, accions `moveToTrash`/`restore` al PATCH, botó "Eliminar" reconvertit a "Moure a paperera", restaurar i eliminar permanent des de la paperera
+3. **Templates email editables**: (en curs)
+
+### Raonament
+- Privacitat RGPD era una necessitat legal pendent — ara l'admin pot gestionar consentiments, sol·licituds ARCO i veure l'audit trail
+- La paperera IMAP és un patró UX estàndard — evita pèrdua accidental d'emails, permet recuperar-los
+- El botó "Eliminar" ara és "Moure a paperera" (més segur, reversible)
+
+### Commits
+- `18236a0` — feat: panell privacitat RGPD + safata paperera IMAP
+
+---
+
 ## 2026-03-10 sessió 8 — Redisseny UX Fitxa Client + Reserves "ben pensades"
 
 ### Fet

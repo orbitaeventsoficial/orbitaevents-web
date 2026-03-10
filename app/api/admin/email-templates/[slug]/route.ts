@@ -8,13 +8,14 @@ export const dynamic = 'force-dynamic';
 // GET - Obtenir una plantilla per slug + locale
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
+  const { slug: rawSlug } = await params;
   const locale = req.nextUrl.searchParams.get('locale') || 'ca';
-  const slug = params.slug as TemplateSlug;
+  const slug = rawSlug as TemplateSlug;
 
   // Obtenir de BD si existeix
   const dbTemplate = await prisma.emailTemplate.findUnique({

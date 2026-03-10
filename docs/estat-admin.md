@@ -16,10 +16,11 @@
 | Tauler | ✅ Complet | 10 KPIs, gràfiques, radar, alertes, pilot automàtic |
 | Leads | ✅ Molt complet | Kanban, scoring, flux guiat, workspace, vistes desades |
 | Reserves | ✅ Molt complet | Kanban, marge, portal client, contracte, factura |
-| Clients Hub | ✅ Molt complet | 9 panells, timeline, KPIs |
+| Clients Hub | ✅ Molt complet | 9 panells + privacitat, timeline, KPIs |
+| Privacitat RGPD | ✅ Complet | KPIs, sol·licituds ARCO, audit log, consentiments |
 | Calendari | ✅ Complet | Vista mensual + setmanal, bloqueig dies inline, drag&drop |
 | Tasques | ✅ Complet | Kanban + llista, checklist diari |
-| Emails | ✅ Complet | Auto + IMAP + post-event |
+| Emails | ✅ Complet | Auto + IMAP + post-event + paperera |
 | Finances | ✅ Molt complet | Tresoreria, marge, CAC, MITECO, Holded |
 | Pressupostos | ✅ Complet | Editor PDF + llistat amb filtres, cerca, accions, stats |
 | Packs | ✅ Complet | Motor preus, health, extras |
@@ -83,6 +84,9 @@
 - `/admin/google-reviews` — Ressenyes Google
 - `/admin/ressenyes` — Testimonis
 
+### Legal
+- `/admin/privacy` — Privacitat RGPD (KPIs, ARCO, audit)
+
 ### Configuració
 - `/admin/settings` — Hub configuració
 - `/admin/settings/company` — Empresa + Holded
@@ -135,7 +139,7 @@
 ### Prioritat ALTA (funcionalitat trencada o absent)
 1. ~~**Llistat pressupostos millorat**~~ ✅ Fet (2026-03-09)
 2. ~~**Calendari vista setmanal**~~ ✅ Fet (2026-03-09) — toggle mes/setmana
-3. **Templates email editables** — ara hardcoded al codi
+3. ~~**Templates email editables**~~ ✅ Fet — /admin/email-templates, editor visual blocs, preview, auto-traducció
 4. ~~**Configuració IMAP des de l'admin**~~ ✅ Fet (2026-03-09) — formulari editable + test connexió
 
 ### Prioritat MITJANA (millores significatives)
@@ -147,5 +151,5 @@
 ### Prioritat BAIXA (nice to have)
 9. **Multi-usuari** — rols i permisos
 10. **Editor visual emails** — drag & drop
-11. **Vista diària calendari**
-12. **Privacitat GDPR UI** — API existeix sense pàgina admin
+11. ~~**Vista diària calendari**~~ ✅ Fet (2026-03-09) — CalendarDayClient.tsx
+12. ~~**Privacitat GDPR UI**~~ ✅ Fet (2026-03-10) — /admin/privacy + PrivacyPanel a fitxa client

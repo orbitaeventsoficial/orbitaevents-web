@@ -80,6 +80,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
       { icon: '📊', label: 'Estadístiques web', href: '/admin/stats' },
       { icon: '🎨', label: 'Tema admin', href: '/admin/css-manager' },
+      { icon: '🛠️', label: 'Scripts i eines', href: '/admin/scripts' },
     ],
   },
 ];

@@ -7,21 +7,22 @@ export const metadata = {
   title: 'Editor plantilla email — Òrbita Admin',
 };
 
-export default function TemplateEditorPage({
+export default async function TemplateEditorPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: { locale?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ locale?: string }>;
 }) {
-  const locale = searchParams.locale || 'ca';
+  const { slug } = await params;
+  const { locale } = await searchParams;
 
   return (
     <AdminPage
       title="Editor de plantilla"
       back={{ href: '/admin/email-templates', label: 'Plantilles' }}
     >
-      <TemplateEditorClient slug={params.slug} initialLocale={locale} />
+      <TemplateEditorClient slug={slug} initialLocale={locale || 'ca'} />
     </AdminPage>
   );
 }
