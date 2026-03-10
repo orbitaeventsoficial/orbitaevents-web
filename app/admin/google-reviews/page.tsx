@@ -156,11 +156,11 @@ export default function GoogleReviewsAdminPage() {
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-black/60/[0.07] transition-colors"
+                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-colors"
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white font-bold flex-shrink-0">
                     {review.author_name.charAt(0)}
                   </div>
 
@@ -173,7 +173,7 @@ export default function GoogleReviewsAdminPage() {
 
                     <div className="flex items-center gap-1 mb-3">
                       {[...Array(5)].map((_, i) => (
-                        <svg key={i} className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                         </svg>
                       ))}
