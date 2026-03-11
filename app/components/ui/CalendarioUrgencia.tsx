@@ -502,6 +502,32 @@ interface CalendarioUrgenciaProps {
   showFullCalendar?: boolean;
 }
 
+// ─── Early-bird countdown ─────────────────────────────────────────────────
+
+function EarlyBirdCountdown({ t }: { t: CalendarTranslations }) {
+  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Early-bird: fins el dia 15 del mes actual (o el pròxim mes si ja ha passat)
+    const now = new Date();
+    let target = new Date(now.getFullYear(), now.getMonth(), 15);
+    if (now > target) {
+      target = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+    }
+    const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    setDaysLeft(diff);
+  }, []);
+
+  if (daysLeft === null || daysLeft <= 0) return null;
+
+  return (
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
+      <span>⏰</span>
+      <span>{t('earlyBird', { days: daysLeft })}</span>
+    </div>
+  );
+}
+
 export default function CalendarioUrgencia({
   className = '',
   showFullCalendar = false
@@ -639,8 +665,26 @@ export default function CalendarioUrgencia({
         </div>
       )}
 
+      {/* Social pressure + early-bird countdown */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 mb-2">
+        {/* Social pressure */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-white/60 text-sm">
+          <span className="flex -space-x-1.5">
+            {[...Array(3)].map((_, i) => (
+              <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0A0A0A] flex items-center justify-center text-[8px] text-black font-bold">
+                {String.fromCharCode(65 + Math.floor(Math.random() * 26))}
+              </span>
+            ))}
+          </span>
+          <span>{t('socialPressure')}</span>
+        </div>
+
+        {/* Early-bird countdown */}
+        <EarlyBirdCountdown t={t} />
+      </div>
+
       {/* CTA final */}
-      <div className="mt-8 flex flex-col items-center justify-center text-center">
+      <div className="mt-6 flex flex-col items-center justify-center text-center">
         <h4 className="text-xl md:text-2xl font-bold text-white mb-2 text-center">
           {t('cta.title')}
         </h4>

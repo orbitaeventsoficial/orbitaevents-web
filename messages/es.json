@@ -1883,6 +1883,8 @@
       "changePack": "Cambiar paquete",
       "date": "Fecha aproximada",
       "dateNote": "Verificaremos la disponibilidad real al contactar",
+      "dateBooked": "Esta fecha ya está reservada. Puedes elegir otra o consultarnos.",
+      "dateAvailable": "¡Esta fecha está disponible!",
       "guests": "Número de invitados",
       "extras": "Mejora tu experiencia",
       "extrasDiscount": "15% de descuento en extras",
@@ -3970,7 +3972,9 @@
       "blocked": "Bloqueado",
       "noData": "Sin datos"
     },
-    "viewCalendar": "Ver calendario completo"
+    "viewCalendar": "Ver calendario completo",
+    "socialPressure": "8 personas mirando fechas esta semana",
+    "earlyBird": "Reserva en {days} días y ahorra un 15%"
   },
   "stickyCta": {
     "requestQuote": "Pide tu presupuesto",

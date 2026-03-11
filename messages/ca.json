@@ -1533,6 +1533,8 @@
       "changePack": "Canvia el paquet",
       "date": "Data aproximada",
       "dateNote": "Verificarem la disponibilitat real en contactar",
+      "dateBooked": "Aquesta data ja està reservada. Pots triar una altra o consultar-nos.",
+      "dateAvailable": "Aquesta data està disponible!",
       "guests": "Nombre de convidats",
       "extras": "Millora la teva experiència",
       "extrasDiscount": "15% de descompte en extres",
@@ -3068,7 +3070,9 @@
       "blocked": "Bloquejat",
       "noData": "Sense dades"
     },
-    "viewCalendar": "Veure calendari complet"
+    "viewCalendar": "Veure calendari complet",
+    "socialPressure": "8 persones mirant dates aquesta setmana",
+    "earlyBird": "Reserva en {days} dies i estalvia un 15%"
   },
   "stickyCta": {
     "requestQuote": "Demana el teu pressupost",

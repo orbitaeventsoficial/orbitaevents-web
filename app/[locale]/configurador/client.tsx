@@ -38,6 +38,31 @@ const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   empresas: ['empresas'],
 };
 
+// ─── Ambient visual per tipus d'event ─────────────────────────────────────
+
+const EVENT_AMBIENTS: Record<EventType, { gradient: string; accent: string; glow: string }> = {
+  bodas: {
+    gradient: 'from-rose-500/8 via-transparent to-transparent',
+    accent: 'rose-400',
+    glow: 'rgba(244,63,94,0.06)',
+  },
+  fiestas: {
+    gradient: 'from-fuchsia-500/8 via-transparent to-transparent',
+    accent: 'fuchsia-400',
+    glow: 'rgba(217,70,239,0.06)',
+  },
+  discomovil: {
+    gradient: 'from-cyan-500/8 via-transparent to-transparent',
+    accent: 'cyan-400',
+    glow: 'rgba(34,211,238,0.06)',
+  },
+  empresas: {
+    gradient: 'from-blue-500/8 via-transparent to-transparent',
+    accent: 'blue-400',
+    glow: 'rgba(59,130,246,0.06)',
+  },
+};
+
 interface ConfigState {
   eventType: EventType | null;
   selectedPack: any | null;
@@ -123,6 +148,7 @@ export default function ConfiguradorClient() {
   const [discountCodeLoading, setDiscountCodeLoading] = useState(false);
   const [discountCodeError, setDiscountCodeError] = useState('');
   const [appliedDiscountCode, setAppliedDiscountCode] = useState<AppliedDiscountCode | null>(null);
+  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
 
   const getLocalizedPack = (pack: any) => {
     // Els packs ja vénen amb text real (no claus i18n) gràcies a packs-config + packs-db
@@ -208,6 +234,25 @@ export default function ConfiguradorClient() {
       active = false;
     };
   }, []);
+
+  // Fetch booked dates from availability API
+  useEffect(() => {
+    fetch(`/api/public/availability?locale=${locale}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.ok || !data.data?.monthlyAvailability) return;
+        const dates = new Set<string>();
+        for (const month of data.data.monthlyAvailability) {
+          for (const sat of month.saturdayDates || []) {
+            if (sat.status === 'booked' || sat.status === 'blocked') {
+              dates.add(sat.date);
+            }
+          }
+        }
+        setBookedDates(dates);
+      })
+      .catch(() => { /* keep empty */ });
+  }, [locale]);
 
   const getDiscountCodeErrorText = (reason: string) => {
     switch (reason) {
@@ -612,7 +657,19 @@ export default function ConfiguradorClient() {
               className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
               min={minDate}
             />
-            {config.date && (
+            {config.date && bookedDates.has(config.date) && (
+              <p className="mt-2 text-xs text-red-400 flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3 h-3" />
+                {t('step3.dateBooked')}
+              </p>
+            )}
+            {config.date && !bookedDates.has(config.date) && (
+              <p className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
+                <CheckCircle className="w-3 h-3" />
+                {t('step3.dateAvailable')}
+              </p>
+            )}
+            {!config.date && (
               <p className="mt-2 text-xs text-text-muted flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {t('step3.dateNote')}
@@ -1125,9 +1182,18 @@ export default function ConfiguradorClient() {
     );
   };
 
+  const ambient = config.eventType ? EVENT_AMBIENTS[config.eventType] : null;
+
   return (
-    <div className="min-h-screen bg-bg-main py-20 overflow-x-hidden">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-bg-main py-20 overflow-x-hidden">
+      {/* Ambient background glow — changes per event type */}
+      {ambient && (
+        <div
+          className="fixed inset-0 pointer-events-none transition-opacity duration-1000 opacity-100"
+          style={{ background: `radial-gradient(ellipse at 50% 0%, ${ambient.glow}, transparent 60%)` }}
+        />
+      )}
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Progress Steps con glow fucsia */}
         <nav aria-label={t('step1.title')} className="mb-16 flex justify-center">
           <div className="flex items-center gap-2 sm:gap-4">

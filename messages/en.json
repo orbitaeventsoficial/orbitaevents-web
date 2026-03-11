@@ -1883,6 +1883,8 @@
       "changePack": "Change package",
       "date": "Approximate date",
       "dateNote": "We will verify actual availability upon contact",
+      "dateBooked": "This date is already booked. You can choose another or contact us.",
+      "dateAvailable": "This date is available!",
       "guests": "Number of guests",
       "extras": "Improve your experience",
       "extrasDiscount": "15% discount on extras",
@@ -3970,7 +3972,9 @@
       "blocked": "Blocked",
       "noData": "No data"
     },
-    "viewCalendar": "See full calendar"
+    "viewCalendar": "See full calendar",
+    "socialPressure": "8 people checking dates this week",
+    "earlyBird": "Book within {days} days and save 15%"
   },
   "stickyCta": {
     "requestQuote": "Request your quote",
