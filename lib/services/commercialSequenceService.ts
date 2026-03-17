@@ -3,7 +3,11 @@ import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { log } from '@/lib/logger';
 
-type SequenceRunSummary = {
+// ---------------------------------------------------------------------------
+// Tipus
+// ---------------------------------------------------------------------------
+
+export type SequenceRunSummary = {
   generatedAt: string;
   scanned: number;
   matched: number;
@@ -11,53 +15,130 @@ type SequenceRunSummary = {
   sentEmail: number;
   sentWhatsapp: number;
   skippedNoChannel: number;
+  skippedNotReady: number;
+  exhausted: number;
   errors: number;
 };
 
 type Locale = 'ca' | 'es' | 'en';
 
-const SEQ_COPY: Record<Locale, Record<'NEW_24H' | 'QUOTE_48H', {
+type NurturingStepDef = {
+  step: number;
+  /** Hores des de la creació del lead (pas 1) o des de l'últim nurturing (pas 2+) */
+  delayHours: number;
+  channel: 'EMAIL';
+  templateSlug: string;
+};
+
+// ---------------------------------------------------------------------------
+// Cadència configurable — es pot canviar aquí sense tocar la BD
+// ---------------------------------------------------------------------------
+
+export const DEFAULT_NURTURING_CADENCE: NurturingStepDef[] = [
+  { step: 1, delayHours: 24,  channel: 'EMAIL', templateSlug: 'follow-up-1' },
+  { step: 2, delayHours: 72,  channel: 'EMAIL', templateSlug: 'follow-up-2' },    // 3 dies
+  { step: 3, delayHours: 168, channel: 'EMAIL', templateSlug: 'follow-up-3' },    // 7 dies
+  { step: 4, delayHours: 336, channel: 'EMAIL', templateSlug: 'follow-up-4' },    // 14 dies
+  { step: 5, delayHours: 720, channel: 'EMAIL', templateSlug: 'follow-up-last' }, // 30 dies — últim intent
+];
+
+// ---------------------------------------------------------------------------
+// Còpies per a cada pas × idioma
+// ---------------------------------------------------------------------------
+
+type StepCopy = {
   subject: (eventType: string) => string;
   text: (firstName: string) => string;
   activity: string;
-}>> = {
+};
+
+const STEP_COPY: Record<Locale, Record<string, StepCopy>> = {
   ca: {
-    NEW_24H: {
+    'follow-up-1': {
       subject: (et) => `Seguiment de la teva sol·licitud · ${et}`,
       text: (name) => `Hola ${name}, t'escrivim per avançar amb el teu esdeveniment. Si vols, avui mateix et proposem una opció concreta.`,
-      activity: 'Follow-up automàtic',
+      activity: 'Follow-up automàtic (pas 1)',
     },
-    QUOTE_48H: {
+    'follow-up-2': {
       subject: (et) => `Seguiment pressupost · ${et}`,
-      text: (name) => `Hola ${name}, has pogut revisar el pressupost? Si vols, ajustem la proposta i tanquem data.`,
-      activity: 'Follow-up automàtic',
+      text: (name) => `Hola ${name}, has pogut revisar la nostra proposta? Si vols, ajustem els detalls i tanquem data.`,
+      activity: 'Follow-up automàtic (pas 2)',
+    },
+    'follow-up-3': {
+      subject: (et) => `Encara tens temps de reservar · ${et}`,
+      text: (name) => `Hola ${name}, les dates disponibles es van omplint. Si t'interessa, podem guardar-te la data provisionalment sense compromís.`,
+      activity: 'Follow-up automàtic (pas 3)',
+    },
+    'follow-up-4': {
+      subject: (et) => `Última disponibilitat · ${et}`,
+      text: (name) => `Hola ${name}, volem assegurar-nos que no et quedis sense la data que necessites. Tens algun dubte que puguem resoldre?`,
+      activity: 'Follow-up automàtic (pas 4)',
+    },
+    'follow-up-last': {
+      subject: (et) => `Tanquem sol·licitud · ${et}`,
+      text: (name) => `Hola ${name}, com que no hem rebut resposta, tanquem la teva sol·licitud. Si en el futur necessites alguna cosa, escriu-nos sense compromís!`,
+      activity: 'Follow-up automàtic (últim pas)',
     },
   },
   es: {
-    NEW_24H: {
+    'follow-up-1': {
       subject: (et) => `Seguimiento de tu solicitud · ${et}`,
       text: (name) => `Hola ${name}, te escribimos para avanzar con tu evento. Si quieres, hoy mismo te proponemos una opción concreta.`,
-      activity: 'Follow-up automático',
+      activity: 'Follow-up automático (paso 1)',
     },
-    QUOTE_48H: {
+    'follow-up-2': {
       subject: (et) => `Seguimiento presupuesto · ${et}`,
-      text: (name) => `Hola ${name}, ¿pudiste revisar el presupuesto? Si quieres, ajustamos propuesta y cerramos fecha.`,
-      activity: 'Follow-up automático',
+      text: (name) => `Hola ${name}, ¿pudiste revisar nuestra propuesta? Si quieres, ajustamos los detalles y cerramos fecha.`,
+      activity: 'Follow-up automático (paso 2)',
+    },
+    'follow-up-3': {
+      subject: (et) => `Aún tienes tiempo de reservar · ${et}`,
+      text: (name) => `Hola ${name}, las fechas disponibles se van llenando. Si te interesa, podemos guardarte la fecha provisionalmente sin compromiso.`,
+      activity: 'Follow-up automático (paso 3)',
+    },
+    'follow-up-4': {
+      subject: (et) => `Última disponibilidad · ${et}`,
+      text: (name) => `Hola ${name}, queremos asegurarnos de que no te quedes sin la fecha que necesitas. ¿Tienes alguna duda que podamos resolver?`,
+      activity: 'Follow-up automático (paso 4)',
+    },
+    'follow-up-last': {
+      subject: (et) => `Cerramos solicitud · ${et}`,
+      text: (name) => `Hola ${name}, como no hemos recibido respuesta, cerramos tu solicitud. Si en el futuro necesitas algo, escríbenos sin compromiso.`,
+      activity: 'Follow-up automático (último paso)',
     },
   },
   en: {
-    NEW_24H: {
+    'follow-up-1': {
       subject: (et) => `Follow-up on your request · ${et}`,
       text: (name) => `Hi ${name}, we're writing to move forward with your event. If you'd like, we can propose a specific option today.`,
-      activity: 'Automatic follow-up',
+      activity: 'Automatic follow-up (step 1)',
     },
-    QUOTE_48H: {
+    'follow-up-2': {
       subject: (et) => `Quote follow-up · ${et}`,
-      text: (name) => `Hi ${name}, have you been able to review the quote? We're happy to adjust the proposal and lock in a date.`,
-      activity: 'Automatic follow-up',
+      text: (name) => `Hi ${name}, have you been able to review our proposal? We're happy to adjust the details and lock in a date.`,
+      activity: 'Automatic follow-up (step 2)',
+    },
+    'follow-up-3': {
+      subject: (et) => `Still time to book · ${et}`,
+      text: (name) => `Hi ${name}, available dates are filling up. If you're interested, we can hold your date provisionally with no commitment.`,
+      activity: 'Automatic follow-up (step 3)',
+    },
+    'follow-up-4': {
+      subject: (et) => `Last availability · ${et}`,
+      text: (name) => `Hi ${name}, we want to make sure you don't miss out on the date you need. Do you have any questions we can help with?`,
+      activity: 'Automatic follow-up (step 4)',
+    },
+    'follow-up-last': {
+      subject: (et) => `Closing your request · ${et}`,
+      text: (name) => `Hi ${name}, since we haven't heard back, we're closing your request. If you need anything in the future, feel free to reach out!`,
+      activity: 'Automatic follow-up (final step)',
     },
   },
 };
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function normalizeLocale(value?: string | null): Locale {
   const raw = String(value || '').toLowerCase();
@@ -76,36 +157,37 @@ function safePhone(input?: string | null): string | null {
   return normalized || null;
 }
 
-async function wasRecentlyExecuted(leadId: string, sequence: string): Promise<boolean> {
-  const recent = await prisma.adminLog.findFirst({
-    where: {
-      action: 'COMM_SEQUENCE_EXEC',
-      entity: 'lead',
-      entityId: leadId,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-  if (!recent) return false;
-  const details = (recent.details && typeof recent.details === 'object'
-    ? (recent.details as Record<string, unknown>)
-    : {}) as Record<string, unknown>;
-  if (details.sequence !== sequence) return false;
-  return recent.createdAt > hoursAgo(20);
+/**
+ * Determina si el lead està a punt per rebre el següent pas de la cadència.
+ * - Pas 1: delayHours des de creació del lead
+ * - Pas 2+: delayHours des de l'últim nurturing enviat
+ */
+function isReadyForNextStep(
+  lead: { createdAt: Date; lastNurturingAt: Date | null; nurturingStep: number },
+  nextStepDef: NurturingStepDef,
+): boolean {
+  const referenceDate = lead.nurturingStep === 0
+    ? lead.createdAt
+    : lead.lastNurturingAt ?? lead.createdAt;
+
+  const threshold = hoursAgo(nextStepDef.delayHours);
+  return referenceDate <= threshold;
 }
 
+// ---------------------------------------------------------------------------
+// Funció principal
+// ---------------------------------------------------------------------------
+
 export async function runCommercialSequences(): Promise<SequenceRunSummary> {
+  const cadence = DEFAULT_NURTURING_CADENCE;
+  const maxStep = cadence.length;
+
+  // Buscar leads actius que no han acabat la cadència
   const candidates = await prisma.lead.findMany({
     where: {
-      OR: [
-        {
-          status: 'NEW',
-          createdAt: { lte: hoursAgo(24) },
-        },
-        {
-          status: 'QUOTE_SENT',
-          updatedAt: { lte: hoursAgo(48) },
-        },
-      ],
+      status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
+      nurturingDone: false,
+      nurturingStep: { lt: maxStep },
     },
     select: {
       id: true,
@@ -115,6 +197,9 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
       eventType: true,
       status: true,
       preferredLocale: true,
+      createdAt: true,
+      nurturingStep: true,
+      lastNurturingAt: true,
     },
     take: 500,
   });
@@ -127,24 +212,40 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
     sentEmail: 0,
     sentWhatsapp: 0,
     skippedNoChannel: 0,
+    skippedNotReady: 0,
+    exhausted: 0,
     errors: 0,
   };
 
   for (const lead of candidates) {
-    const sequence: 'NEW_24H' | 'QUOTE_48H' = lead.status === 'NEW' ? 'NEW_24H' : 'QUOTE_48H';
-    const recentlyRun = await wasRecentlyExecuted(lead.id, sequence);
-    if (recentlyRun) continue;
+    const nextStepIndex = lead.nurturingStep; // 0-based index into cadence
+    const nextStepDef = cadence[nextStepIndex];
+    if (!nextStepDef) continue;
+
+    // Comprovar si ja ha passat prou temps
+    if (!isReadyForNextStep(lead, nextStepDef)) {
+      summary.skippedNotReady += 1;
+      continue;
+    }
 
     summary.matched += 1;
     const locale = normalizeLocale(lead.preferredLocale);
-    const t = SEQ_COPY[locale][sequence];
+    const templateSlug = nextStepDef.templateSlug;
+    const copy = STEP_COPY[locale][templateSlug];
+    if (!copy) {
+      log.error(`Còpia no trobada per slug=${templateSlug} locale=${locale}`, null);
+      summary.errors += 1;
+      continue;
+    }
+
     const firstName = lead.name.split(' ')[0] || lead.name;
-    const subject = t.subject(lead.eventType);
-    const text = t.text(firstName);
+    const subject = copy.subject(lead.eventType);
+    const text = copy.text(firstName);
     const phone = safePhone(lead.phone);
     let channelUsed: 'email' | 'whatsapp' | null = null;
 
     try {
+      // Intentar WhatsApp primer (com abans)
       if (phone) {
         const wa = await sendWhatsAppText({ to: phone, text });
         if (wa.ok) {
@@ -153,6 +254,7 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
         }
       }
 
+      // Fallback a email
       if (!channelUsed && lead.email) {
         await sendEmail({
           to: lead.email,
@@ -167,14 +269,39 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
         summary.skippedNoChannel += 1;
       } else {
         summary.executed += 1;
+
+        const isLastStep = nextStepDef.step === maxStep;
+        const newStep = lead.nurturingStep + 1;
+
+        // Actualitzar lead: incrementar pas + marcar com a fet si era l'últim
+        await prisma.lead.update({
+          where: { id: lead.id },
+          data: {
+            nurturingStep: newStep,
+            lastNurturingAt: new Date(),
+            nurturingDone: isLastStep,
+          },
+        });
+
+        if (isLastStep) {
+          summary.exhausted += 1;
+        }
+
         await prisma.leadActivity.create({
           data: {
             leadId: lead.id,
             type: channelUsed === 'email' ? 'EMAIL' : 'WHATSAPP',
-            title: t.activity,
-            description: `${sequence} · canal ${channelUsed}`,
+            title: copy.activity,
+            description: `Pas ${nextStepDef.step}/${maxStep} (${templateSlug}) · canal ${channelUsed}`,
             createdBy: 'Sequence Bot',
-            metadata: { sequence, channel: channelUsed, locale },
+            metadata: {
+              step: nextStepDef.step,
+              totalSteps: maxStep,
+              templateSlug,
+              channel: channelUsed,
+              locale,
+              delayHours: nextStepDef.delayHours,
+            },
           },
         });
       }
@@ -184,12 +311,20 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
           action: 'COMM_SEQUENCE_EXEC',
           entity: 'lead',
           entityId: lead.id,
-          details: { sequence, channel: channelUsed, locale },
+          details: {
+            step: nextStepDef.step,
+            totalSteps: maxStep,
+            templateSlug,
+            channel: channelUsed,
+            locale,
+          },
         },
       });
     } catch (error) {
       summary.errors += 1;
-      log.error('runCommercialSequences item error', error, { context: { leadId: lead.id, sequence } });
+      log.error('runCommercialSequences error al lead', error, {
+        context: { leadId: lead.id, step: nextStepDef.step, templateSlug },
+      });
     }
   }
 

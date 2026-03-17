@@ -420,6 +420,11 @@ model Lead {
   contactedAt      DateTime?
   convertedAt      DateTime?
 
+  // Nurturing: seqüència de follow-ups automàtics
+  nurturingStep    Int        @default(0) // 0 = cap follow-up enviat, 1..N = pas actual
+  lastNurturingAt  DateTime?              // Quan es va enviar l'últim follow-up
+  nurturingDone    Boolean    @default(false) // True quan s'ha completat tota la cadència
+
   // Cache de scoring (actualitzat pel cron commercial-daily)
   cachedScore      Int?
   cachedScoreAt    DateTime?

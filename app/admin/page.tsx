@@ -6,6 +6,7 @@ import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-da
 import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants';
 import { EVENT_TYPE_LABELS } from '@/lib/constants';
 import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
+import WeatherWidget from './components/WeatherWidget';
 
 interface RadialProgressProps {
   value: number;        // 0-100
@@ -850,6 +851,9 @@ export default async function AdminDashboard() {
           })}
         </div>
       )}
+
+      {/* ═══ TEMPS PRÒXIMS EVENTS ═══ */}
+      <WeatherWidget />
 
       {d.alerts.length > 0 && (
         <div className="admin-cr-alert-grid">

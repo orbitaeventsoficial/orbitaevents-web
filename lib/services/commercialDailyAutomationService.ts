@@ -83,6 +83,7 @@ export async function runCommercialDailyAutomation() {
         <li>Seqüències executades: <strong>${sequences.executed}</strong></li>
         <li>Enviaments email: <strong>${sequences.sentEmail}</strong></li>
         <li>Enviaments WhatsApp: <strong>${sequences.sentWhatsapp}</strong></li>
+        <li>Leads esgotats (cadència completa): <strong>${sequences.exhausted}</strong></li>
         <li>Tasques SLA creades: <strong>${sla.createdTasks}</strong></li>
         <li>Recordatoris pagament: <strong>${paymentReminders.sent}</strong> enviats de ${paymentReminders.checked} revisats</li>
         <li>Comunicacions 24h: <strong>${commSent24h}</strong></li>
@@ -100,7 +101,7 @@ export async function runCommercialDailyAutomation() {
   if (waTo) {
     const waText = [
       `📊 Resum comercial ${new Date().toLocaleDateString('ca-ES')}`,
-      `Seqüències: ${sequences.executed}`,
+      `Seqüències: ${sequences.executed} · Esgotats: ${sequences.exhausted}`,
       `Email: ${sequences.sentEmail} · WA: ${sequences.sentWhatsapp}`,
       `Tasques SLA: ${sla.createdTasks}`,
       `Pagaments: ${paymentReminders.sent}/${paymentReminders.checked} recordatoris`,
