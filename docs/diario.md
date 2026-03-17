@@ -37,6 +37,23 @@ availability, fuel/reference, finance/alerts, leads/[id]/score, bookings/[id]/ca
 - `bceebf3` — feat: "La Millor Web del Món" v2 + neteja post-Codex + qualitat
 - `21f358e` — feat: widget meteo + cadència nurturing
 
+### Canvas editor D&D
+- `CanvasEditorClient.tsx` — editor visual complet amb D&D (pointer events)
+- 4 plantilles (Promo Event, Oferta Flash, Testimoni, Buit), 3 formats (story/post/horitzontal)
+- Elements: text (font, mida, pes, alineació), rectangle, cercle, línia — tots arrossegables i redimensionables
+- Panel propietats, panel capes amb ordre Z, paleta colors, dreceres teclat
+- `/api/canvas/custom` — renderitza el disseny com a PNG (ImageResponse, edge runtime)
+
+### API key OpenWeatherMap
+- Afegida al `.env` local: `OPENWEATHERMAP_API_KEY=6b04...`
+- Pendent afegir a Railway (Variables al dashboard web)
+
+### Commits
+- `bceebf3` — feat: "La Millor Web del Món" v2 + neteja post-Codex + qualitat
+- `21f358e` — feat: widget meteo + cadència nurturing
+- `37317fe` — docs: diari sessió 4
+- `4ced261` — feat: canvas editor D&D
+
 ### Build OK, tsc 0 errors, 246 tests
 
 ---
@@ -85,7 +102,7 @@ Implementació de les 4 fases del full de ruta v2 definit a la sessió anterior.
 2. **estat-admin.md**: Actualitzar roadmap complet — moltes seccions obsoletes (email templates, calendari diària, inbox, PDF Studio D&D, canvas, fitxa client, reserves, privacitat, "La Millor Web del Món" tot fet).
 
 ### Mitjana prioritat
-3. **Canvas editor avançat**: Generació d'imatges funciona (3 APIs + integració ressenyes). Potencialment afegir editor visual drag & drop.
+3. ~~**Canvas editor avançat**~~: ✅ Editor D&D complet a `/admin/canvas` — 4 plantilles, 3 formats, elements arrossegables, export PNG.
 4. ~~**Inventory new form**~~: ✅ Ja estava fet — `InventoryItemEditor` ja suporta `mode="create"`.
 5. ~~**Tests**~~: ✅ De 156→246 tests (+90). costEngine (42), dashboardInsights (39), automationTriggers (8), commercialScoring fixes (5).
 
