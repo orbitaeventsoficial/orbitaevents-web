@@ -231,12 +231,12 @@ function buildCommercialSummary(text: string): string | undefined {
   const guests = extractGuestCount(text);
   const items = extractRequestedItems(text);
 
-  const lines: string[] = [`Interés detectado: ${intent}`];
-  if (date) lines.push(`Fecha detectada: ${date.toLocaleDateString('es-ES')}`);
-  if (schedule) lines.push(`Horario detectado: ${schedule}`);
-  if (guests) lines.push(`Invitados detectados: ${guests}`);
-  if (budget) lines.push(`Presupuesto detectado: ${budget}`);
-  if (items) lines.push(`Material solicitado: ${items}`);
+  const lines: string[] = [`Interès detectat: ${intent}`];
+  if (date) lines.push(`Data detectada: ${date.toLocaleDateString('ca-ES')}`);
+  if (schedule) lines.push(`Horari detectat: ${schedule}`);
+  if (guests) lines.push(`Convidats detectats: ${guests}`);
+  if (budget) lines.push(`Pressupost detectat: ${budget}`);
+  if (items) lines.push(`Material sol·licitat: ${items}`);
   return lines.join('\n');
 }
 

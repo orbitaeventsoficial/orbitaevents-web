@@ -929,7 +929,7 @@ export async function sendTestimonialsReminderEmail(params: {
   const { to, pendingCount, testimonials, dashboardUrl } = params;
   const previewRows = testimonials
     .map((t) => {
-      const date = t.createdAt.toLocaleDateString('es-ES', {
+      const date = t.createdAt.toLocaleDateString('ca-ES', {
         day: '2-digit',
         month: 'short',
       });
@@ -1096,7 +1096,7 @@ export async function sendTestimonialReceivedEmail(params: {
  */
 export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
   const eventDate = new Date(booking.eventDate);
-  const formattedDate = eventDate.toLocaleDateString('es-ES', {
+  const formattedDate = eventDate.toLocaleDateString(toIntlLocaleEmail((booking.preferredLocale || 'ca') as EmailLocale), {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -1250,7 +1250,7 @@ export async function sendBookingConfirmation(booking: BookingEmailModel): Promi
  */
 export async function sendBookingNotificationToAdmin(booking: BookingEmailModel): Promise<void> {
   const eventDate = new Date(booking.eventDate);
-  const formattedDate = eventDate.toLocaleDateString('es-ES', {
+  const formattedDate = eventDate.toLocaleDateString('ca-ES', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',

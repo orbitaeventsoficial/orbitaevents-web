@@ -185,7 +185,7 @@ export async function processLeadTechnicalSnapshot(input: {
   });
 
   if (input.action === 'save_document') {
-    const title = `Snapshot técnico ${new Date().toLocaleString('es-ES')}`;
+    const title = `Snapshot tècnic ${new Date().toLocaleString('ca-ES')}`;
     const fileUrl = `data:application/json;charset=utf-8,${encodeURIComponent(snapshotJson)}`;
     const doc = await prisma.leadDocument.create({
       data: {

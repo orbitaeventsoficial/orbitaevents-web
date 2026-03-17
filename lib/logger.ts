@@ -30,7 +30,7 @@ const EMOJI = {
 
 function formatForConsole(entry: LogEntry): string {
   const emoji = EMOJI[entry.level];
-  const time = new Date(entry.timestamp).toLocaleTimeString('es-ES');
+  const time = new Date(entry.timestamp).toLocaleTimeString('ca-ES');
   return `${emoji} [${time}] ${entry.message}`;
 }
 

@@ -96,7 +96,7 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
 
     const eventLabel = getEventLabel(lead.eventType);
     const sourceLabel = lookupSource(lead.source);
-    const timestamp = new Date().toLocaleString('es-ES', {
+    const timestamp = new Date().toLocaleString('ca-ES', {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
       timeStyle: 'short'
@@ -399,7 +399,7 @@ function generateAdminEmailHTML(
       <div class="highlight-box">
         <div class="field-label">Pack Seleccionat</div>
         <div class="field-value">${escapeHtml(lead.packName)}</div>
-        ${lead.estimatedPrice ? `<div class="price">${lead.estimatedPrice.toLocaleString('es-ES')}€</div>` : ''}
+        ${lead.estimatedPrice ? `<div class="price">${lead.estimatedPrice.toLocaleString('ca-ES')}€</div>` : ''}
       </div>
       ` : ''}
 

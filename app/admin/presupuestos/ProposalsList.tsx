@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { formatDate, formatCurrency } from '@/lib/constants';
 
 type ProposalItem = {
   id: string;
@@ -42,13 +43,6 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('ca-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
 
 function relativeDate(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -183,7 +177,7 @@ export default function ProposalsList({
       {/* Revenue accepted */}
       {totalValue > 0 && (
         <div className="rounded-xl border px-4 py-2 text-sm">
-          Valor acceptat: <strong className="">{totalValue.toLocaleString('ca-ES', { minimumFractionDigits: 2 })}€</strong>
+          Valor acceptat: <strong className="">{formatCurrency(totalValue)}</strong>
         </div>
       )}
 
@@ -262,7 +256,7 @@ export default function ProposalsList({
                     <StatusBadge status={p.status} />
                   </td>
                   <td className="px-4 py-3 text-right font-medium tabular-nums">
-                    {p.total.toLocaleString('ca-ES', { minimumFractionDigits: 2 })}€
+                    {formatCurrency(p.total)}
                   </td>
                   <td className="px-4 py-3 text-right opacity-60 hidden md:table-cell">
                     {relativeDate(p.createdAt)}

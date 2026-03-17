@@ -75,7 +75,7 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
       try {
         const route = await calculateGoogleMapsDistance({ destination });
         body.distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
-      } catch {}
+      } catch (err) { console.error('[bookingRoute] Google Maps distance failed:', err); }
     }
   }
 

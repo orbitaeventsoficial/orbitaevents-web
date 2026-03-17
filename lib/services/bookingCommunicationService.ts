@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
+import { toIntlLocale } from '@/lib/constants';
 
 export type BookingCommAction = 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded';
 export type BookingCommChannel = 'email' | 'whatsapp';
@@ -67,7 +68,7 @@ function buildEmailContent(flow: BookingCommFlow, booking: {
   preferredLocale?: string;
 }) {
   const locale = normalizeCommLocale(booking.preferredLocale);
-  const intlLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES';
+  const intlLocale = toIntlLocale(locale);
   const firstName = booking.clientName.split(' ')[0] || booking.clientName;
   const t = COMM_COPY[locale][flow];
 

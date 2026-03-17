@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
 import PaymentToggleButton from '../finanzas/PaymentToggleButton';
 import PaymentReminderActions from '../finanzas/PaymentReminderActions';
-import { formatDateSimple, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateSimple, formatDateFull, formatCurrency, DEFAULT_LOCALE } from '@/lib/constants';
 import ExportCsvButton from '../components/ExportCsvButton';
 import ProfitabilityConfigEditor from '../rentabilidad/ProfitabilityConfigEditor';
 import ProfitabilityConfigHistory from '../rentabilidad/ProfitabilityConfigHistory';
@@ -167,9 +167,7 @@ interface EconomiaClientProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function money(value: number) {
-  return new Intl.NumberFormat(DEFAULT_LOCALE, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
-}
+const money = formatCurrency;
 
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;

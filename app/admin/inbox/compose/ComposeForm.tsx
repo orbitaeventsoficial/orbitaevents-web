@@ -320,7 +320,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                       }`}
                     >
                         <p className="font-semibold">{name}</p>
-                        <p className="font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
+                        <p className="font-bold mt-1">{pack.price.toLocaleString('ca-ES')}€</p>
                       </button>
                     );
                   })}

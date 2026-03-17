@@ -163,7 +163,7 @@ export async function sendAdminTestEmail(email?: string) {
   }
 
   const recipient = email || process.env.CONTACT_TO || SITE_CONFIG.business.email;
-  const timestamp = new Date().toLocaleString('es-ES', {
+  const timestamp = new Date().toLocaleString('ca-ES', {
     timeZone: 'Europe/Madrid',
     dateStyle: 'full',
     timeStyle: 'medium',

@@ -77,20 +77,20 @@ function buildEventPayload(booking: BookingData) {
   const title = `${booking.reference} · ${booking.clientName} · ${booking.eventType}`;
   const location = [booking.eventVenue, booking.eventLocation].filter(Boolean).join(' · ');
   const paymentStatus = booking.depositPaid && booking.remainingPaid
-    ? 'Pago completo'
+    ? 'Pagament complet'
     : booking.depositPaid
-      ? 'Pago parcial'
-      : 'Pago pendiente';
+      ? 'Pagament parcial'
+      : 'Pagament pendent';
 
   const description = [
     `Reserva: ${booking.reference}`,
     `Cliente: ${booking.clientName}`,
     `Email: ${booking.clientEmail}`,
     `Tel: ${booking.clientPhone}`,
-    `Estado CRM: ${booking.status}`,
-    `Total: ${booking.total.toLocaleString('es-ES')}€`,
-    `Cobro: ${paymentStatus}`,
-    booking.notes ? `Notas: ${booking.notes}` : null,
+    `Estat CRM: ${booking.status}`,
+    `Total: ${booking.total.toLocaleString('ca-ES')}€`,
+    `Cobrament: ${paymentStatus}`,
+    booking.notes ? `Notes: ${booking.notes}` : null,
   ]
     .filter(Boolean)
     .join('\n');
@@ -158,7 +158,7 @@ async function getAccessToken(refreshToken: string): Promise<string> {
 
   const tokenData = await tokenRes.json().catch(() => ({} as Record<string, unknown>));
   const accessToken = typeof tokenData.access_token === 'string' ? tokenData.access_token : null;
-  if (!accessToken) throw new Error('Google no devolvió access token');
+  if (!accessToken) throw new Error('Google no ha retornat access token');
   return accessToken;
 }
 

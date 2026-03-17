@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
-import { formatDate, formatDateFull, formatDateShort, formatDateSimple } from '@/lib/constants';
+import { formatDate, formatDateFull, formatDateShort, formatDateSimple, formatCurrency } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -247,15 +247,15 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <div>
                 <p className="text-xs uppercase tracking-wider">Pressupostat</p>
-                <p className="mt-1 text-2xl font-semibold">{fmtMoney(quoted)}</p>
+                <p className="mt-1 text-2xl font-semibold">{formatCurrency(quoted)}</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wider">Cobrat</p>
-                <p className="mt-1 text-2xl font-semibold">{fmtMoney(paid)}</p>
+                <p className="mt-1 text-2xl font-semibold">{formatCurrency(paid)}</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wider">Marge estimat</p>
-                <p className="mt-1 text-2xl font-semibold">{fmtMoney(data.kpis.marginEstimated)}</p>
+                <p className="mt-1 text-2xl font-semibold">{formatCurrency(data.kpis.marginEstimated)}</p>
               </div>
             </div>
             {quoted > 0 && (
@@ -562,10 +562,6 @@ function QuickAction({
   );
 }
 
-function fmtMoney(value?: number): string {
-  if (typeof value !== 'number') return '—';
-  return `${value.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€`;
-}
 
 function getDaysUntil(dateStr: string): number {
   const target = new Date(dateStr);
