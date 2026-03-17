@@ -1,46 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { getAppBaseUrl } from '@/lib/site';
+import {
+  exchangeGoogleOAuthCode,
+  upsertIntegrationSettings,
+  verifyGoogleOAuthState,
+} from '@/lib/services/googleOAuthService';
 
 export const dynamic = 'force-dynamic';
-
-const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-const STATE_TTL_SECONDS = 10 * 60;
-
-function verifyState(state: string, secret: string): boolean {
-  const parts = state.split('.');
-  if (parts.length !== 2) return false;
-  const [payload, sig] = parts;
-  const [tsPart, nonce] = payload.split(':');
-  const ts = Number(tsPart);
-  if (!nonce) return false;
-  if (!Number.isFinite(ts)) return false;
-  const age = Math.floor(Date.now() / 1000) - ts;
-  if (age < 0 || age > STATE_TTL_SECONDS) return false;
-  const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
-  return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
-}
-
-type TokenResponse = {
-  access_token?: string;
-  refresh_token?: string;
-};
-
-async function upsertSetting(key: string, value: string, label: string) {
-  await prisma.setting.upsert({
-    where: { key },
-    update: { value, type: 'STRING', category: 'integrations', label },
-    create: { key, value, type: 'STRING', category: 'integrations', label },
-  });
-}
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID || process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET || process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   const redirectUri =
     process.env.GOOGLE_ADS_OAUTH_REDIRECT_URI ||
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orbitaevents.com'}/api/google-ads/oauth/callback`;
+    `${getAppBaseUrl()}/api/google-ads/oauth/callback`;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(
@@ -60,31 +34,17 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (!code || !state || !verifyState(state, clientSecret)) {
+  if (!code || !state || !verifyGoogleOAuthState(state, clientSecret)) {
     return NextResponse.json({ ok: false, error: 'Invalid OAuth state' }, { status: 400 });
   }
 
   try {
-    const body = new URLSearchParams({
+    const tokenData = await exchangeGoogleOAuthCode({
       code,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
+      clientId,
+      clientSecret,
+      redirectUri,
     });
-
-    const tokenRes = await fetch(TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-    });
-
-    if (!tokenRes.ok) {
-      const text = await tokenRes.text();
-      throw new Error(`Token exchange failed: ${text}`);
-    }
-
-    const tokenData = (await tokenRes.json()) as TokenResponse;
     if (!tokenData.access_token) {
       throw new Error('No access token returned by Google');
     }
@@ -92,17 +52,17 @@ export async function GET(req: NextRequest) {
       throw new Error('Google no ha retornat refresh token. Revoca permisos i torna a connectar amb consent.');
     }
 
-    await Promise.all([
-      upsertSetting(
-        'integrations.googleAds.refreshToken',
-        tokenData.refresh_token,
-        'Google Ads OAuth refresh token'
-      ),
-      upsertSetting(
-        'integrations.googleAds.connectedAt',
-        new Date().toISOString(),
-        'Google Ads connection timestamp'
-      ),
+    await upsertIntegrationSettings([
+      {
+        key: 'integrations.googleAds.refreshToken',
+        value: tokenData.refresh_token,
+        label: 'Google Ads OAuth refresh token',
+      },
+      {
+        key: 'integrations.googleAds.connectedAt',
+        value: new Date().toISOString(),
+        label: 'Google Ads connection timestamp',
+      },
     ]);
 
     return NextResponse.redirect(new URL(successUrl, req.url));

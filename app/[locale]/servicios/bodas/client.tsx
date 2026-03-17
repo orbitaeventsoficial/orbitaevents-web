@@ -9,8 +9,10 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { getPacksByService, EXTRAS, type ExtraDefinition, type PackDefinition } from '@/config/packs-config';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
 import { usePacks } from '@/lib/hooks/usePacks';
+import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
+import { getWeddingCoverageZones } from '@/lib/services/weddingCoverage';
 
 interface ConfigState {
   selectedPack: PackDefinition | null;
@@ -18,51 +20,21 @@ interface ConfigState {
   numGuests: number;
 }
 
-// Helper per obtenir text traduït de l'extra
-function isI18nKey(value: string): boolean {
-  return /^(configurator|pages|services|extras)\./.test(value);
+type AnalyticsValue = string | number | boolean | undefined;
+type AnalyticsParams = Record<string, AnalyticsValue>;
+type GtagWindow = Window & { gtag?: (command: 'event', action: string, params?: AnalyticsParams) => void };
+
+function trackServiceEvent(action: string, params: AnalyticsParams) {
+  if (typeof window === 'undefined') return;
+  const gtag = (window as GtagWindow).gtag;
+  if (!gtag) return;
+  gtag('event', action, params);
 }
 
-function humanizeKeyFallback(value: string): string {
-  if (!value || !isI18nKey(value)) return value;
-  const parts = value.split('.');
-  const last = parts[parts.length - 1] || value;
-  const prev = parts.length > 1 ? parts[parts.length - 2] : '';
-
-  if (/^f\d+$/i.test(last)) {
-    const n = last.slice(1);
-    return `Característica ${n}`;
-  }
-
-  const semantic = new Set(['name', 'tagline', 'ideal', 'description', 'title']);
-  const token = semantic.has(last) && prev ? prev : last;
-  return token
-    .replace(/[-_]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (m) => m.toUpperCase());
-}
-
-function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
-  try {
-    const key = `extras.${extraId}.${field}`;
-    const translated = t(key);
-    // Si retorna la clau, usar fallback
-    if (translated !== key) return translated;
-    if (isI18nKey(fallback)) {
-      const nested = t(fallback);
-      if (nested !== fallback) return nested;
-    }
-    return fallback;
-  } catch {
-    return fallback;
-  }
-}
 
 export default function BodasClientV2() {
   const t = useTranslations('pages.weddings');
-  const tConfigurator = useTranslations('configurator');
-  const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
+  const messages = useMessages();
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('bodas'), []);
   const { packs: weddingPacks } = usePacks({
@@ -79,53 +51,19 @@ export default function BodasClientV2() {
 
   const [showSummary, setShowSummary] = useState(false);
 
-  const getConfiguratorKey = (pack: PackDefinition, suffix: string) => {
-    const base = pack.i18nBaseKey || `configurator.step2.packs.${pack.id}`;
-    const normalizedBase = base.startsWith('configurator.') ? base.slice('configurator.'.length) : base;
-    return `${normalizedBase}.${suffix}`;
-  };
 
-  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
-    const fallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
-    try {
-      const key = getConfiguratorKey(pack, field);
-      const translated = tConfigurator(key);
-      return humanizeKeyFallback(translated !== key ? translated : fallback);
-    } catch {
-      return humanizeKeyFallback(fallback);
-    }
-  };
 
-  const getPackFeatures = (pack: PackDefinition) => {
-    return (pack.features || []).map((feature, index) => {
-      try {
-        const key = getConfiguratorKey(pack, `features.f${index + 1}`);
-        const translated = tConfigurator(key);
-        return humanizeKeyFallback(translated !== key ? translated : feature);
-      } catch {
-        return humanizeKeyFallback(feature);
-      }
-    });
-  };
 
   useEffect(() => {
     let active = true;
 
     async function loadExtras() {
       try {
-        const res = await fetch('/api/public/extras', { cache: 'no-store' });
+        const res = await fetch(`/api/public/extras?locale=${locale}`, { cache: 'no-store' });
         const data = await res.json();
         if (!active) return;
         if (Array.isArray(data?.extras)) {
-          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
-            const fallback = EXTRAS.find((item) => item.id === extra.id);
-            return {
-              ...extra,
-              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
-              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
-            };
-          });
-          setExtrasCatalog(normalized);
+          setExtrasCatalog(data.extras as ExtraDefinition[]);
         }
       } catch {
         // Fallback a EXTRAS del config
@@ -136,16 +74,10 @@ export default function BodasClientV2() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [locale]);
 
-  const weddingExtras = useMemo(() => {
-    return extrasCatalog.filter((extra) => {
-      if (!extra.compatibleWith) return true;
-      if (extra.compatibleWith.length === 0) return false;
-      return extra.compatibleWith.includes('bodas');
-    });
-  }, [extrasCatalog]);
-
+  const weddingExtras = useMemo(() => filterCompatibleExtras(extrasCatalog, 'bodas'), [extrasCatalog]);
+  const coverageZones = useMemo(() => getWeddingCoverageZones(messages, t), [messages, t]);
   // Calcular total
   const packPrice = config.selectedPack?.priceValue || 0;
   const extrasPrice = Array.from(config.selectedExtras).reduce((sum, id) => {
@@ -178,14 +110,11 @@ export default function BodasClientV2() {
   const selectPack = (pack: PackDefinition) => {
     setConfig(prev => ({ ...prev, selectedPack: pack }));
     
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'bodas_pack_select', {
-        pack_id: pack.id,
-        pack_name: getPackText(pack, 'name'),
-        price: pack.priceValue,
-      });
-    }
+    trackServiceEvent('bodas_pack_select', {
+      pack_id: pack.id,
+      pack_name: pack.name,
+      price: pack.priceValue,
+    });
   };
 
   // Toggle extra
@@ -200,15 +129,12 @@ export default function BodasClientV2() {
       return { ...prev, selectedExtras: newExtras };
     });
 
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      const extra = weddingExtras.find(e => e.id === extraId);
-      (window as any).gtag('event', 'bodas_extra_toggle', {
-        extra_id: extraId,
-        extra_name: extra?.name,
-        action: config.selectedExtras.has(extraId) ? 'remove' : 'add',
-      });
-    }
+    const extra = weddingExtras.find(e => e.id === extraId);
+    trackServiceEvent('bodas_extra_toggle', {
+      extra_id: extraId,
+      extra_name: extra?.name,
+      action: config.selectedExtras.has(extraId) ? 'remove' : 'add',
+    });
   };
 
   // Ir al configurador con pack pre-seleccionado
@@ -224,18 +150,14 @@ export default function BodasClientV2() {
       extras: selectedExtrasIds,
     });
 
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'bodas_pack_to_configurator', {
-        pack_id: config.selectedPack.id,
-        num_extras: config.selectedExtras.size,
-        num_guests: config.numGuests,
-      });
-    }
+    trackServiceEvent('bodas_pack_to_configurator', {
+      pack_id: config.selectedPack.id,
+      num_extras: config.selectedExtras.size,
+      num_guests: config.numGuests,
+    });
 
     window.location.href = `/configurador?${params.toString()}`;
   };
-
   return (
     <div className="min-h-screen bg-bg-main">
       {/* HERO with background image */}
@@ -309,9 +231,9 @@ export default function BodasClientV2() {
                 <span className="font-bold text-oe-gold">{t('recommended')}:</span>
               </div>
               <div className="text-lg text-text-primary">
-                <strong>{getPackText(recommendedPack, 'name')}</strong> - {recommendedPack.priceValue}€
+                <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
               </div>
-              <p className="text-sm text-text-muted mt-1">{getPackText(recommendedPack, 'tagline')}</p>
+              <p className="text-sm text-text-muted mt-1">{recommendedPack.tagline}</p>
             </motion.div>
           )}
         </div>
@@ -367,8 +289,8 @@ export default function BodasClientV2() {
 
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-text-primary">{getPackText(pack, 'name')}</h3>
-                    <p className="text-sm text-text-muted">{getPackText(pack, 'tagline')}</p>
+                    <h3 className="text-2xl font-bold text-text-primary">{pack.name}</h3>
+                    <p className="text-sm text-text-muted">{pack.tagline}</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
@@ -378,11 +300,11 @@ export default function BodasClientV2() {
                   </div>
 
                   <div className="text-sm text-text-muted">
-                    👥 {getPackText(pack, 'ideal')}
+                    👥 {pack.ideal || ''}
                   </div>
 
                   <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {getPackFeatures(pack).slice(0, 5).map((feature, idx) => (
+                    {(pack.features || []).slice(0, 5).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <Check className="w-4 h-4 text-oe-gold flex-shrink-0 mt-0.5" />
                         {feature}
@@ -475,10 +397,10 @@ export default function BodasClientV2() {
                   <div className="space-y-3 mt-4">
                     <div className="text-4xl mb-2">{extra.icon}</div>
                     <h4 className="text-lg font-bold text-text-primary pr-8">
-                      {getExtraText(tMobile, extra.id, 'name', extra.name)}
+                      {extra.name}
                     </h4>
                     <p className="text-sm text-text-muted">
-                      {getExtraText(tMobile, extra.id, 'description', extra.description)}
+                      {extra.description}
                     </p>
 
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
@@ -529,7 +451,7 @@ export default function BodasClientV2() {
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
                   <div>
                     <div className="text-xs sm:text-sm text-[var(--oe-gold)] font-semibold">
-                      {config.selectedPack ? getPackText(config.selectedPack, 'name') : ''}
+                      {config.selectedPack?.name || ''}
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-xs sm:text-sm text-white/70">
@@ -616,40 +538,34 @@ export default function BodasClientV2() {
           <p className="text-text-muted mt-2">{t('coverage.subtitle')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link
-            href="/servicios/dj-bodas-maresme"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🏖️</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.maresme.name')}</div>
-            <div className="text-xs text-text-muted">{t('coverage.zones.maresme.desc')}</div>
-          </Link>
-          <Link
-            href="/servicios/dj-bodas-girona"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🏛️</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.girona.name')}</div>
-            <div className="text-xs text-text-muted">{t('coverage.zones.girona.desc')}</div>
-          </Link>
-          <Link
-            href="/servicios/dj-bodas-costa-brava"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🌊</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.costaBrava.name')}</div>
-            <div className="text-xs text-text-muted">{t('coverage.zones.costaBrava.desc')}</div>
-          </Link>
-          <Link
-            href="/servicios/dj-bodas-valles"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🏡</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.valles.name')}</div>
-            <div className="text-xs text-text-muted">{t('coverage.zones.valles.desc')}</div>
-          </Link>
+          {coverageZones.map((zone) => (
+            <Link
+              key={zone.href}
+              href={zone.href}
+              className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+            >
+              <div className="text-2xl mb-2">{zone.icon}</div>
+              <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{zone.name}</div>
+              <div className="text-xs text-text-muted">{zone.desc}</div>
+            </Link>
+          ))}
         </div>
       </section>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

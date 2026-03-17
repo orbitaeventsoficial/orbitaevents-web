@@ -9,12 +9,8 @@ import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
-import { generateContractNumber, type ContractData } from '@/lib/services/documentService';
+import { type ContractData } from '@/lib/services/documentService';
 import { log } from '@/lib/logger';
-
-// ============================================
-// COMPANY CONFIG (carrega de Settings DB amb fallback)
-// ============================================
 
 async function getCompanyConfig() {
   const settings = await prisma.setting.findMany({
@@ -32,13 +28,15 @@ async function getCompanyConfig() {
   };
 }
 
-// ============================================
-// DEFAULT TERMS & CONDITIONS
-// ============================================
-
 type SupportedLocale = 'ca' | 'es' | 'en';
 
-export function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): string {
+function generateContractNumber(): string {
+  const year = new Date().getFullYear();
+  const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
+  return `CTR-${year}-${timestamp}`;
+}
+
+function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): string {
   const policies: Record<SupportedLocale, string> = {
     ca: [
       '1. Cancel·lació amb més de 60 dies d\'antelació: es retorna el 100% de l\'aval.',
@@ -65,7 +63,7 @@ export function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): st
   return policies[locale];
 }
 
-export function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
+function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
   const terms: Record<SupportedLocale, string> = {
     ca: [
       `Reserva: La data queda confirmada amb el pagament del 30% d'aval.`,
@@ -101,10 +99,6 @@ export function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): st
   return terms[locale];
 }
 
-// ============================================
-// RENDER CONTRACT PDF (lectura pura — no modifica BD)
-// ============================================
-
 async function renderContractPDF(proposalId: string): Promise<{
   contractReference: string;
   pdfBuffer: Buffer;
@@ -133,7 +127,6 @@ async function renderContractPDF(proposalId: string): Promise<{
   const eventDate = proposal.booking?.eventDate || new Date(snapshot.eventDate as string || Date.now());
   const depositAmount = proposal.depositAmount ?? Math.round(proposal.total * 0.3 * 100) / 100;
 
-  // Deposit due: 7 dies des d'ara o 30 dies abans de l'event (el que vingui primer, però mai al passat)
   const now = new Date();
   const thirtyBefore = new Date(eventDate);
   thirtyBefore.setDate(thirtyBefore.getDate() - 30);
@@ -142,7 +135,6 @@ async function renderContractPDF(proposalId: string): Promise<{
   const candidateDeposit = thirtyBefore < sevenFromNow ? thirtyBefore : sevenFromNow;
   const depositDueDate = proposal.depositDueDate || (candidateDeposit < now ? sevenFromNow : candidateDeposit);
 
-  // Final payment: 7 dies abans de l'event (mai abans del depositDueDate ni al passat)
   let finalPaymentDue = proposal.finalPaymentDue || new Date(eventDate);
   if (!proposal.finalPaymentDue) {
     finalPaymentDue = new Date(eventDate);
@@ -155,13 +147,10 @@ async function renderContractPDF(proposalId: string): Promise<{
   const additionalClauses = proposal.additionalClauses || getDefaultTermsAndConditions(locale);
 
   const company = await getCompanyConfig();
-
-  // Pack name: usar traduccions, no slug
   const packTranslation = proposal.booking?.pack?.translations?.find(t => t.locale === locale)
     || proposal.booking?.pack?.translations?.[0];
   const packName = (snapshot.packName as string) || packTranslation?.name || proposal.booking?.pack?.slug || '';
 
-  // Extras: usar traduccions, no slugs
   const extras = proposal.booking?.extras?.map(be => {
     const extraTranslation = be.extra.translations?.find(t => t.locale === locale)
       || be.extra.translations?.[0];
@@ -175,7 +164,6 @@ async function renderContractPDF(proposalId: string): Promise<{
   const pdfData: ContractPdfData = {
     contractReference,
     contractDate: now,
-
     companyName: company.name,
     companyLegalName: company.legalName,
     companyNIF: company.nif,
@@ -183,13 +171,11 @@ async function renderContractPDF(proposalId: string): Promise<{
     companyIBAN: company.iban,
     companyPhone: company.phone,
     companyEmail: company.email,
-
     clientName: proposal.customer.name,
     clientNIF: proposal.customer.dni || undefined,
     clientAddress: undefined,
     clientEmail: proposal.customer.email,
     clientPhone: proposal.customer.phone || undefined,
-
     eventType: (snapshot.eventType as string) || proposal.booking?.eventType || 'OTHER',
     eventDate,
     eventTime: (snapshot.eventTime as string) || proposal.booking?.eventStartTime || undefined,
@@ -200,17 +186,14 @@ async function renderContractPDF(proposalId: string): Promise<{
     packPrice: (snapshot.packPrice as number) || proposal.booking?.pack?.price || 0,
     djHours: (snapshot.djHours as number) || proposal.booking?.pack?.djHours || 0,
     extras,
-
     subtotal: proposal.subtotal,
     discount: proposal.discount,
     vatRate: proposal.vatRate,
     vatAmount: proposal.vatAmount,
     total: proposal.total,
-
     depositAmount,
     depositDueDate,
     finalPaymentDue,
-
     cancellationPolicy,
     additionalClauses,
   };
@@ -222,17 +205,9 @@ async function renderContractPDF(proposalId: string): Promise<{
   return { contractReference, pdfBuffer, depositAmount, depositDueDate, finalPaymentDue, cancellationPolicy, additionalClauses };
 }
 
-// ============================================
-// GENERATE CONTRACT FROM PROPOSAL (primera vegada)
-// ============================================
-
-export async function generateContractFromProposal(proposalId: string): Promise<{
-  contractReference: string;
-  pdfBuffer: Buffer;
-}> {
+export async function generateContractFromProposal(proposalId: string): Promise<{ contractReference: string; pdfBuffer: Buffer; }> {
   const result = await renderContractPDF(proposalId);
 
-  // Només persistim si és la primera generació
   await prisma.proposal.update({
     where: { id: proposalId },
     data: {
@@ -247,13 +222,8 @@ export async function generateContractFromProposal(proposalId: string): Promise<
   });
 
   log.info(`Contracte generat: ${result.contractReference} per proposta ${proposalId}`);
-
   return { contractReference: result.contractReference, pdfBuffer: result.pdfBuffer };
 }
-
-// ============================================
-// SEND CONTRACT BY EMAIL
-// ============================================
 
 export async function sendContract(proposalId: string): Promise<void> {
   const proposal = await prisma.proposal.findUniqueOrThrow({
@@ -264,15 +234,11 @@ export async function sendContract(proposalId: string): Promise<void> {
   if (!proposal.contractReference || !proposal.contractStatus) {
     throw new Error('Cal generar el contracte primer');
   }
-
   if (proposal.contractStatus === 'SIGNED') {
     throw new Error('El contracte ja està signat');
   }
 
-  // Renderitzar PDF sense modificar BD
   const { pdfBuffer } = await renderContractPDF(proposalId);
-
-  // Lazy import email to avoid circular deps
   const { sendEmail } = await import('@/lib/email');
 
   const locale = (proposal.locale || 'ca') as SupportedLocale;
@@ -283,45 +249,23 @@ export async function sendContract(proposalId: string): Promise<void> {
   };
 
   const bodies: Record<SupportedLocale, string> = {
-    ca: `<p>Hola ${proposal.customer.name},</p>
-<p>T'enviem el contracte de serveis per al teu esdeveniment. Si us plau, revisa'l i confirma'ns que tot és correcte.</p>
-<p>Un cop estiguis d'acord, pots procedir amb el pagament de l'aval per confirmar la reserva.</p>
-<p>Qualsevol dubte, no dubtis a contactar-nos.</p>
-<p>Gràcies per confiar en Òrbita Events!</p>`,
-    es: `<p>Hola ${proposal.customer.name},</p>
-<p>Te enviamos el contrato de servicios para tu evento. Por favor, revísalo y confírmanos que todo está correcto.</p>
-<p>Una vez estés de acuerdo, puedes proceder con el pago de la señal para confirmar la reserva.</p>
-<p>Cualquier duda, no dudes en contactarnos.</p>
-<p>¡Gracias por confiar en Òrbita Events!</p>`,
-    en: `<p>Hello ${proposal.customer.name},</p>
-<p>Please find attached the service agreement for your event. Please review it and confirm everything is correct.</p>
-<p>Once you agree, you can proceed with the deposit payment to confirm the booking.</p>
-<p>If you have any questions, don't hesitate to reach out.</p>
-<p>Thank you for choosing Òrbita Events!</p>`,
+    ca: `<p>Hola ${proposal.customer.name},</p><p>T'enviem el contracte de serveis per al teu esdeveniment. Si us plau, revisa'l i confirma'ns que tot és correcte.</p><p>Un cop estiguis d'acord, pots procedir amb el pagament de l'aval per confirmar la reserva.</p><p>Qualsevol dubte, no dubtis a contactar-nos.</p><p>Gràcies per confiar en Òrbita Events!</p>`,
+    es: `<p>Hola ${proposal.customer.name},</p><p>Te enviamos el contrato de servicios para tu evento. Por favor, revísalo y confírmanos que todo está correcto.</p><p>Una vez estés de acuerdo, puedes proceder con el pago de la señal para confirmar la reserva.</p><p>Cualquier duda, no dudes en contactarnos.</p><p>¡Gracias por confiar en Òrbita Events!</p>`,
+    en: `<p>Hello ${proposal.customer.name},</p><p>Please find attached the service agreement for your event. Please review it and confirm everything is correct.</p><p>Once you agree, you can proceed with the deposit payment to confirm the booking.</p><p>If you have any questions, don't hesitate to reach out.</p><p>Thank you for choosing Òrbita Events!</p>`,
   };
 
   await sendEmail({
     to: proposal.customer.email,
     subject: subjects[locale],
     html: bodies[locale],
-    attachments: [
-      {
-        filename: `contracte-${proposal.contractReference}.pdf`,
-        content: pdfBuffer,
-        contentType: 'application/pdf',
-      },
-    ],
+    attachments: [{ filename: `contracte-${proposal.contractReference}.pdf`, content: pdfBuffer, contentType: 'application/pdf' }],
   });
 
   await prisma.proposal.update({
     where: { id: proposalId },
-    data: {
-      contractStatus: 'SENT',
-      contractSentAt: new Date(),
-    },
+    data: { contractStatus: 'SENT', contractSentAt: new Date() },
   });
 
-  // Log activity on lead if linked
   if (proposal.leadId) {
     await prisma.leadActivity.create({
       data: {
@@ -332,7 +276,6 @@ export async function sendContract(proposalId: string): Promise<void> {
       },
     });
 
-    // Also create LeadDocument
     await prisma.leadDocument.create({
       data: {
         leadId: proposal.leadId,
@@ -347,26 +290,15 @@ export async function sendContract(proposalId: string): Promise<void> {
   log.info(`Contracte enviat: ${proposal.contractReference} a ${proposal.customer.email}`);
 }
 
-// ============================================
-// MARK CONTRACT AS SIGNED
-// ============================================
-
-export async function markContractSigned(
-  proposalId: string,
-  signedBy: string
-): Promise<void> {
-  const proposal = await prisma.proposal.findUniqueOrThrow({
-    where: { id: proposalId },
-  });
+export async function markContractSigned(proposalId: string, signedBy: string): Promise<void> {
+  const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId } });
 
   if (!proposal.contractReference) {
     throw new Error('No hi ha contracte generat per aquesta proposta');
   }
-
   if (proposal.contractStatus === 'SIGNED') {
     throw new Error('El contracte ja està signat');
   }
-
   if (proposal.contractStatus === 'CANCELLED') {
     throw new Error('No es pot signar un contracte cancel·lat');
   }
@@ -381,4 +313,41 @@ export async function markContractSigned(
   });
 
   log.info(`Contracte signat: ${proposal.contractReference} per ${signedBy}`);
+}
+
+export async function cancelContract(proposalId: string) {
+  const proposal = await prisma.proposal.findUniqueOrThrow({
+    where: { id: proposalId },
+    select: { contractStatus: true, contractReference: true, leadId: true },
+  });
+
+  if (!proposal.contractStatus || !proposal.contractReference) {
+    return { status: 400, body: { ok: false, error: 'No hi ha contracte generat' } };
+  }
+  if (proposal.contractStatus === 'SIGNED') {
+    return { status: 400, body: { ok: false, error: 'No es pot cancel·lar un contracte ja signat' } };
+  }
+  if (proposal.contractStatus === 'CANCELLED') {
+    return { status: 400, body: { ok: false, error: 'El contracte ja està cancel·lat' } };
+  }
+
+  await prisma.proposal.update({
+    where: { id: proposalId },
+    data: { contractStatus: 'CANCELLED' },
+  });
+
+  log.info(`Contracte cancel·lat: ${proposal.contractReference}`);
+
+  if (proposal.leadId) {
+    await prisma.leadActivity.create({
+      data: {
+        leadId: proposal.leadId,
+        type: 'SYSTEM',
+        title: 'Contracte cancel·lat',
+        description: `Contracte ${proposal.contractReference} cancel·lat`,
+      },
+    });
+  }
+
+  return { status: 200, body: { ok: true, status: 'CANCELLED' } };
 }

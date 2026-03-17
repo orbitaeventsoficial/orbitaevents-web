@@ -1,21 +1,20 @@
 'use client';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MOBILE PORTFOLIO SHOWCASE - Òrbita Events
-// Galeria de fotos reals amb pestanyes per categoria + scroll horitzontal
+// MOBILE PORTFOLIO SHOWCASE - Orbita Events
+// Pestanyes de categoria + grid tocable cap a la galeria real
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { useMobile } from './MobileAppShell';
-
-// ── Dades de categories (estils i fotos, no text) ──────────────────────────
+import { Link } from '@/lib/navigation';
 
 const CATEGORIES = [
   {
     id: 'discomovil' as const,
+    slug: 'discomovil',
     emoji: '🎧',
     accent: 'from-amber-500 to-orange-500',
     border: 'border-amber-500/50',
@@ -27,6 +26,7 @@ const CATEGORIES = [
   },
   {
     id: 'halloween' as const,
+    slug: 'fiestas-tematicas-halloween',
     emoji: '🎃',
     accent: 'from-orange-600 to-red-700',
     border: 'border-orange-500/50',
@@ -38,6 +38,7 @@ const CATEGORIES = [
   },
   {
     id: 'monMagic' as const,
+    slug: 'fiestas-tematicas-mon-magic',
     emoji: '🪄',
     accent: 'from-purple-600 to-pink-600',
     border: 'border-purple-500/50',
@@ -49,6 +50,7 @@ const CATEGORIES = [
   },
   {
     id: 'bodas' as const,
+    slug: 'bodas',
     emoji: '💍',
     accent: 'from-pink-500 to-rose-500',
     border: 'border-pink-500/50',
@@ -60,6 +62,7 @@ const CATEGORIES = [
   },
   {
     id: 'empreses' as const,
+    slug: 'eventos-empresa',
     emoji: '🏢',
     accent: 'from-blue-500 to-cyan-500',
     border: 'border-blue-500/50',
@@ -71,6 +74,7 @@ const CATEGORIES = [
   },
   {
     id: 'privades' as const,
+    slug: 'fiestas-privadas',
     emoji: '🎉',
     accent: 'from-emerald-500 to-teal-500',
     border: 'border-emerald-500/50',
@@ -84,10 +88,7 @@ const CATEGORIES = [
 
 type CategoryId = (typeof CATEGORIES)[number]['id'];
 
-// ── Component principal ────────────────────────────────────────────────────
-
 export default function MobilePortfolioShowcase() {
-  const { locale } = useMobile();
   const t = useTranslations('homePage.portfolio');
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState<CategoryId>('discomovil');
@@ -97,7 +98,6 @@ export default function MobilePortfolioShowcase() {
 
   const handleTabClick = (id: CategoryId, index: number) => {
     setActiveId(id);
-    // Scroll the tab into view
     if (tabsRef.current) {
       const tab = tabsRef.current.children[index] as HTMLButtonElement;
       tab?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -106,10 +106,8 @@ export default function MobilePortfolioShowcase() {
 
   return (
     <section className="py-14 relative overflow-hidden">
-      {/* Ambient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(251,191,36,0.04),transparent_70%)] pointer-events-none" />
 
-      {/* Header */}
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -127,17 +125,16 @@ export default function MobilePortfolioShowcase() {
         </h2>
       </motion.div>
 
-      {/* Category tabs — horizontal scroll */}
       <div
         ref={tabsRef}
-        className="flex gap-2.5 px-6 overflow-x-auto scrollbar-none pb-1 mb-6 snap-x snap-mandatory"
+        className="flex gap-2.5 px-6 overflow-x-auto scrollbar-none pb-1 mb-6 snap-x snap-proximity"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {CATEGORIES.map((cat, i) => (
           <button
             key={cat.id}
             onClick={() => handleTabClick(cat.id, i)}
-            className={`flex-shrink-0 whitespace-nowrap snap-start px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-95 ${
+            className={`flex-shrink-0 whitespace-nowrap snap-center px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-95 ${
               activeId === cat.id
                 ? `${cat.bg} ${cat.border} ${cat.text}`
                 : 'bg-white/5 border-white/10 text-white/60'
@@ -148,66 +145,74 @@ export default function MobilePortfolioShowcase() {
         ))}
       </div>
 
-      {/* Photos grid — horizontal scroll */}
       <motion.div
         key={activeId}
-        initial={reduceMotion ? false : { opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.25 }}
-        className="flex gap-3 px-6 overflow-x-auto scrollbar-none pb-2"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+        className="px-6"
       >
-        {active.photos.map((src, i) => (
-          <div
-            key={src}
-            className="relative flex-shrink-0 w-52 h-64 rounded-2xl overflow-hidden bg-zinc-900 shadow-xl"
-          >
-            <Image
-              src={src}
-              alt={`${t(`categories.${active.id}`)} ${i + 1}`}
-              fill
-              sizes="208px"
-              className="object-cover"
-              loading={i < 2 ? 'eager' : 'lazy'}
-            />
-            {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          </div>
-        ))}
+        <div className="grid grid-cols-2 gap-3">
+          {active.photos.slice(0, 4).map((src, i) => (
+            <Link
+              key={src}
+              href={`/portfolio/${active.slug}`}
+              className={`group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-xl ${
+                i === 0 ? 'col-span-2 h-64' : 'h-48'
+              }`}
+            >
+              <Image
+                src={src}
+                alt={`${t(`categories.${active.id}`)} ${i + 1}`}
+                fill
+                sizes={i === 0 ? '100vw' : '50vw'}
+                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                loading={i < 2 ? 'eager' : 'lazy'}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+              {i === 0 ? (
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="inline-flex items-center gap-2 mb-1.5 rounded-full bg-black/35 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-sm">
+                    {t(`categories.${active.id}`)}
+                  </div>
+                  <p className="text-sm text-white/70">{t('viewPortfolio')}</p>
+                </div>
+              ) : null}
+            </Link>
+          ))}
 
-        {/* "See more" card */}
-        <a
-          href={`/${locale}/portfolio`}
-          className="relative flex-shrink-0 w-44 h-64 rounded-2xl overflow-hidden bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform"
-        >
-          <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.accent} flex items-center justify-center`}>
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </div>
-          <div className="text-center px-4">
-            <p className="text-white font-bold text-sm">{t('viewPortfolio')}</p>
-            <p className="text-white/50 text-xs mt-0.5">{t('viewPortfolioDesc')}</p>
-          </div>
-        </a>
+          <Link
+            href={`/portfolio/${active.slug}`}
+            className="relative overflow-hidden rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 min-h-48 active:scale-95 transition-transform"
+          >
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.accent} flex items-center justify-center`}>
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+            <div className="text-center px-4">
+              <p className="text-white font-bold text-sm">{t('viewPortfolio')}</p>
+              <p className="text-white/50 text-xs mt-0.5">{t('viewPortfolioDesc')}</p>
+            </div>
+          </Link>
+        </div>
       </motion.div>
 
-      {/* Bottom CTA */}
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         className="text-center mt-8 px-6"
       >
-        <a
-          href={`/${locale}/portfolio`}
+        <Link
+          href="/portfolio"
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium hover:bg-white/10 active:scale-95 transition-all"
         >
           <span>{t('viewAll')}</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-        </a>
+        </Link>
       </motion.div>
     </section>
   );

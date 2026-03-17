@@ -203,7 +203,7 @@ export default function ManualActionsPanel() {
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
               aria-label="Email de prova"
-              className="flex-1 px-3 py-2 text-sm rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="flex-1 px-3 py-2 text-sm rounded-xl border "
             />
             <button
               onClick={sendTestEmail}
@@ -261,3 +261,4 @@ export default function ManualActionsPanel() {
     </section>
   );
 }
+

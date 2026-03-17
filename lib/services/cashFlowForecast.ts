@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import { getProfitabilityConfig } from './profitabilityService';
 import { computeBookingFinancialSummary } from './costEngine';
 
-export interface CashFlowMonth {
+interface CashFlowMonth {
   month: string; // "2026-03"
   income: number;
   costs: number;

@@ -63,7 +63,7 @@ export default function ProcessSection() {
                 transition={
                   reduceMotion
                     ? { duration: 0 }
-                    : { delay: i * 0.15, type: 'spring', damping: 20 }
+                    : { delay: i * 0.12, duration: 0.34, ease: [0.22, 1, 0.36, 1] }
                 }
                 className="relative p-7 rounded-3xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-colors group"
               >

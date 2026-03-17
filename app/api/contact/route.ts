@@ -5,12 +5,11 @@ import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { z } from 'zod';
 import { sendEmailWithTimeout } from '@/lib/email';
-import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
-import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
+import { persistContactLead } from '@/lib/services/contactLeadCaptureService';
 import { toIntlLocale } from '@/lib/constants';
 
 type Locale = 'ca' | 'es' | 'en';
@@ -352,134 +351,25 @@ export async function POST(req: NextRequest) {
 
     const eventLabel = EVENT_TYPE_LABELS[locale][event.toLowerCase()] || event;
 
-    let _savedLeadId: string | null = null;
+    const mappedEventType = mapEventType(event);
+    const leadSource = determineSource(packId, packName);
 
-    try {
-      const existingLead = clientEmail ? await prisma.lead.findFirst({
-        where: { email: clientEmail },
-      }) : null;
-
-      if (existingLead) {
-        const updatedLead = await prisma.lead.update({
-          where: { id: existingLead.id },
-          data: {
-            name,
-            phone: clientPhone || existingLead.phone,
-            eventType: mapEventType(event),
-            eventDate: eventDate ? new Date(eventDate) : existingLead.eventDate,
-            guestCount: parsedGuests || existingLead.guestCount,
-            budget: estimatedPrice ? `${estimatedPrice} EUR` : existingLead.budget,
-            message: message || existingLead.message,
-            interestedPackId: packId || existingLead.interestedPackId,
-            interestedExtras: extras && extras.length > 0 ? extras : existingLead.interestedExtras,
-            source: determineSource(packId, packName),
-            preferredLocale: formLocale || locale || existingLead.preferredLocale,
-            updatedAt: new Date(),
-          }
-        });
-        _savedLeadId = updatedLead.id;
-
-        await prisma.leadNote.create({
-          data: {
-            leadId: updatedLead.id,
-            content: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
-          }
-        });
-      } else {
-        const emailForDb = clientEmail || `phone-${clientPhone}@leads.orbitaevents.local`;
-
-        const newLead = await prisma.lead.create({
-          data: {
-            name,
-            email: emailForDb,
-            phone: clientPhone,
-            eventType: mapEventType(event),
-            eventDate: eventDate ? new Date(eventDate) : null,
-            guestCount: parsedGuests,
-            budget: estimatedPrice ? `${estimatedPrice} EUR` : null,
-            message,
-            interestedPackId: packId,
-            interestedExtras: extras || [],
-            source: determineSource(packId, packName),
-            status: 'NEW',
-            priority: 'MEDIUM',
-            preferredLocale: formLocale || locale || 'ca',
-          }
-        });
-        _savedLeadId = newLead.id;
-
-        await prisma.leadNote.create({
-          data: {
-            leadId: newLead.id,
-            content: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
-          }
-        });
-      }
-
-      // Crear/actualitzar Customer automàticament si tenim email vàlid
-      if (_savedLeadId && clientEmail && !clientEmail.endsWith('@leads.orbitaevents.local')) {
-        try {
-          const emailNorm = normalizeEmail(clientEmail);
-          const nameNorm = normalizeName(name);
-          const phoneNorm = clientPhone ? normalizePhone(clientPhone) : null;
-
-          const customer = await prisma.customer.upsert({
-            where: { emailNormalized: emailNorm },
-            update: {
-              name,
-              nameNormalized: nameNorm,
-              phone: clientPhone || undefined,
-              phoneNormalized: phoneNorm || undefined,
-              preferredLocale: formLocale || locale || 'ca',
-            },
-            create: {
-              email: clientEmail.toLowerCase().trim(),
-              emailNormalized: emailNorm,
-              name,
-              nameNormalized: nameNorm,
-              phone: clientPhone || null,
-              phoneNormalized: phoneNorm,
-              source: determineSource(packId, packName),
-              preferredLocale: formLocale || locale || 'ca',
-            },
-          });
-
-          // Enllaçar lead amb customer
-          await prisma.lead.update({
-            where: { id: _savedLeadId },
-            data: { customerId: customer.id },
-          });
-
-          // Registrar activitat
-          await prisma.customerActivity.create({
-            data: {
-              customerId: customer.id,
-              action: 'LEAD_CREATED',
-              details: {
-                leadId: _savedLeadId,
-                eventType: mapEventType(event),
-                source: determineSource(packId, packName),
-                packName: packName || undefined,
-              },
-            },
-          });
-        } catch (customerError) {
-          log.error('Error creant/actualitzant customer des del formulari de contacte', customerError);
-        }
-      }
-
-    } catch (dbError) {
-      log.error('Error guardant lead a la base de dades', dbError, {
-        context: {
-          eventType: event,
-          source: determineSource(packId, packName),
-          hasEmail: !!clientEmail,
-          hasPhone: !!clientPhone,
-        }
-      });
-      // No interrompem el flux — l'admin rep l'email igualment
-    }
-
+    const { leadId: _savedLeadId } = await persistContactLead({
+      name,
+      clientEmail,
+      clientPhone,
+      eventType: mappedEventType,
+      eventDate,
+      guestCount: parsedGuests,
+      estimatedPrice,
+      message,
+      packId,
+      extras,
+      source: leadSource,
+      preferredLocale: formLocale || locale || 'ca',
+      updateNote: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
+      createNote: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
+    });
     if (_savedLeadId && clientEmail) {
       try {
         const { notifyNewLead } = await import('@/lib/services/notificationService');
@@ -490,12 +380,12 @@ export async function POST(req: NextRequest) {
             name,
             email: clientEmail,
             phone: clientPhone,
-            eventType: mapEventType(event),
+            eventType: mappedEventType,
             eventDate: eventDate ? new Date(eventDate) : undefined,
             guestCount: parsedGuests,
             budget: estimatedPrice ? `${estimatedPrice} EUR` : undefined,
             message,
-            source: determineSource(packId, packName),
+            source: leadSource,
             packName,
             createdAt: new Date(),
           })
@@ -738,3 +628,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+

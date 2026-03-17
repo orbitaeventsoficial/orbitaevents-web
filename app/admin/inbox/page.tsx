@@ -131,7 +131,7 @@ export default async function InboxPage() {
   return (
     <AdminPage
       title="Inbox"
-      subtitle={<>{stats.unreadLeads} leads nous · {stats.todayLeads} avui{imapConfigured && ' · 📧 Correu connectat'}</>}
+      subtitle={imapConfigured ? 'Safata unificada de correu i entrades' : 'Entrades web i correu en una sola safata'}
       actions={<>
         <Link href="/admin/inbox/compose" className="ap-btn ap-btn--primary">✏️ Nou email</Link>
         <Link href="/admin/inbox/settings" className="ap-btn ap-btn--secondary">⚙️ Configuració</Link>
@@ -152,7 +152,7 @@ export default async function InboxPage() {
                 IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASS
               </code>
               <p className="text-sm mt-2">
-                Mentrestant, pots veure els <strong>leads del formulari web</strong> aquí sota.
+                Mentrestant, la safata només mostrarà les entrades web disponibles.
               </p>
             </div>
           </div>
@@ -169,6 +169,7 @@ export default async function InboxPage() {
     </AdminPage>
   );
 }
+
 
 
 

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
 
-export type ExecutiveReport = {
+type ExecutiveReport = {
   generatedAt: string;
   period: {
     monthStart: string;
@@ -151,4 +151,5 @@ export async function buildExecutiveReport(): Promise<ExecutiveReport> {
       })),
   };
 }
+
 

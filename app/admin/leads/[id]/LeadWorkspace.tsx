@@ -367,7 +367,7 @@ export default function LeadWorkspace({
                       type="button"
                       onClick={() => deleteDocument(doc.id)}
                       disabled={deletingDocumentId === doc.id}
-                      className={`rounded-xl border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDocumentId === doc.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                      className={`rounded-xl border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDocumentId === doc.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
                     >
                       {deletingDocumentId === doc.id ? 'Eliminant...' : confirmingDocumentId === doc.id ? 'Segur?' : 'Eliminar'}
                     </button>
@@ -414,7 +414,7 @@ export default function LeadWorkspace({
                     <button
                       type="button"
                       onClick={() => deleteActivity(activity.id)}
-                      className={`rounded-xl border px-2 py-1 text-xs font-medium ${confirmingActivityId === activity.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                      className={`rounded-xl border px-2 py-1 text-xs font-medium ${confirmingActivityId === activity.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
                     >
                       {confirmingActivityId === activity.id ? 'Segur?' : 'Eliminar'}
                     </button>
@@ -428,4 +428,5 @@ export default function LeadWorkspace({
     </div>
   );
 }
+
 

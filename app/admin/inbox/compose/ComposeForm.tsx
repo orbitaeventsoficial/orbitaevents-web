@@ -402,7 +402,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                       aria-pressed={locale === l.code}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                         locale === l.code
-                          ? 'bg-cyan-500/20 text-cyan-300 border-2 border-cyan-500/50'
+                          ? 'admin-tone-soft-info border-2 border-cyan-500/50'
                           : 'bg-white/5 text-white/60 border-2 border-transparent hover:bg-white/10'
                       }`}
                     >
@@ -473,7 +473,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               aria-busy={sending}
               className={`px-6 py-2 rounded-xl font-medium transition-colors ${
                 sent
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  ? 'admin-tone-soft-success border border-emerald-500/30'
                   : sending
                   ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
                   : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
@@ -487,3 +487,4 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     </div>
   );
 }
+

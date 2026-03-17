@@ -7,6 +7,8 @@
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { escapeHtml } from '@/lib/utils/sanitize';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 // ============================================
 // TIPUS
@@ -56,7 +58,7 @@ export interface QuoteExtra {
   quantity: number;
 }
 
-export interface QuoteTemplateOverrides {
+interface QuoteTemplateOverrides {
   introTitle?: string;
   introSubtitle?: string;
   ctaTitle?: string;
@@ -94,7 +96,7 @@ const COMPANY_INFO = {
   phoneDisplay: SITE_CONFIG.business.phoneDisplay,
   email: SITE_CONFIG.business.email,
   web: 'www.orbitaevents.com',
-  logoUrl: `${(process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`,
+  logoUrl: `${(getAppBaseUrl()).replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`,
   iban: process.env.COMPANY_IBAN || 'Pendent de configurar',
 };
 
@@ -106,12 +108,6 @@ export function generateQuoteNumber(): string {
   const year = new Date().getFullYear();
   const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
   return `PRE-${year}-${timestamp}`;
-}
-
-export function generateContractNumber(): string {
-  const year = new Date().getFullYear();
-  const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
-  return `CTR-${year}-${timestamp}`;
 }
 
 // ============================================
@@ -571,3 +567,5 @@ export function createQuoteFromLead(
     notes: lead.message || undefined,
   };
 }
+
+

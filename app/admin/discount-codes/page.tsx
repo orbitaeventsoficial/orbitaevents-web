@@ -83,7 +83,7 @@ export default function DiscountCodesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadCodes();
@@ -264,7 +264,7 @@ export default function DiscountCodesPage() {
                 min={0}
                 value={form.value}
                 onChange={(e) => updateField('value', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function DiscountCodesPage() {
                 type="date"
                 value={form.validUntil}
                 onChange={(e) => updateField('validUntil', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
             <div>
@@ -289,7 +289,7 @@ export default function DiscountCodesPage() {
                 value={form.maxUses}
                 onChange={(e) => updateField('maxUses', e.target.value)}
                 placeholder="Il·limitat"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
             <div>
@@ -301,7 +301,7 @@ export default function DiscountCodesPage() {
                 value={form.minOrderValue}
                 onChange={(e) => updateField('minOrderValue', e.target.value)}
                 placeholder="Sense mínim"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
           </div>
@@ -314,7 +314,7 @@ export default function DiscountCodesPage() {
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               placeholder="Descripció interna del codi..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
 
@@ -398,7 +398,7 @@ export default function DiscountCodesPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           c.isActive && !expired && !maxReached
-                            ? 'bg-emerald-500/20 text-emerald-300'
+                            ? 'admin-tone-soft-success'
                             : 'bg-white/5 text-white/40'
                         }`}
                       >
@@ -435,3 +435,6 @@ export default function DiscountCodesPage() {
     </AdminPage>
   );
 }
+
+
+

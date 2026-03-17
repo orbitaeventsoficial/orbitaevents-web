@@ -1,21 +1,11 @@
-"use client";
-/**
- * FiestasClient.tsx - VERSIÓN LIMPIA
- * ==================================
- * 
- * REGLAS:
- * - TODO sale de packs-config.ts
- * - CTAs llevan al formulario de contacto (NO WhatsApp)
- * - Oferta Flash configurada en packs-config
- * 
- * @author Manolo - Arquitecto Digital
- */
+'use client';
+
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check, PartyPopper } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
   getPacksByService,
@@ -24,11 +14,21 @@ import {
 } from '@/config/packs-config';
 import { usePacks } from '@/lib/hooks/usePacks';
 
+type AnalyticsValue = string | number | boolean | undefined;
+type AnalyticsParams = Record<string, AnalyticsValue>;
+type GtagWindow = Window & { gtag?: (command: 'event', action: string, params?: AnalyticsParams) => void };
+
+function trackServiceEvent(action: string, params: AnalyticsParams) {
+  if (typeof window === 'undefined') return;
+  const gtag = (window as GtagWindow).gtag;
+  if (!gtag) return;
+  gtag('event', action, params);
+}
+
+
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
-  const tPages = useTranslations('pages');
-  const tConfigurator = useTranslations('configurator');
-  const tRoot = useTranslations();
+  const messages = useMessages();
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('fiestas'), []);
   const fallbackDiscoPacks = useMemo(() => getPacksByService('discomovil'), []);
@@ -55,97 +55,7 @@ export default function FiestasClient() {
     return Array.from(deduped.values());
   }, [fiestaPacks, discomovilPacks]);
 
-  const normalizePackBaseKey = (baseKey: string) => {
-    const noConfigurator = baseKey.startsWith('configurator.')
-      ? baseKey.slice('configurator.'.length)
-      : baseKey;
-    if (noConfigurator.startsWith('pages.parties.discoPacks.')) {
-      return noConfigurator.replace('pages.parties.discoPacks.', 'services.mobile.discoPacks.');
-    }
-    return noConfigurator;
-  };
 
-  const humanizeKeyFallback = (value: string): string => {
-    if (!value || !value.includes('.')) return value;
-    const token = value.split('.').pop() || value;
-    return token
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, (m) => m.toUpperCase());
-  };
-
-  const getTranslatedByCandidates = (candidates: string[], fallback: string): string => {
-    for (const key of candidates) {
-      try {
-        const translated = tRoot(key as any);
-        if (translated && translated !== key) return translated;
-      } catch {
-        // keep trying
-      }
-      if (key.startsWith('configurator.')) {
-        const nested = key.slice('configurator.'.length);
-        try {
-          const translated = tConfigurator(nested);
-          if (translated && translated !== nested) return translated;
-        } catch {
-          // keep trying
-        }
-      }
-      if (key.startsWith('pages.mobile.')) {
-        const nested = key.slice('pages.'.length);
-        try {
-          const translated = tPages(nested);
-          if (translated && translated !== nested) return translated;
-        } catch {
-          // keep trying
-        }
-      }
-    }
-    return fallback;
-  };
-
-  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
-    const rawFallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
-    const isKeyLike = /^(configurator|pages|services)\./.test(rawFallback);
-    const fallback = isKeyLike
-      ? (field === 'name'
-        ? pack.id.replace(/-/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase())
-        : '')
-      : rawFallback;
-
-    const baseKey = normalizePackBaseKey(pack.i18nBaseKey || `step2.packs.${pack.id}`);
-    const candidates = [
-      baseKey.startsWith('step2.') ? `configurator.${baseKey}.${field}` : '',
-      `${baseKey}.${field}`,
-      `services.mobile.discoPacks.${pack.id}.${field}`,
-      `pages.mobile.discoPacks.${pack.id}.${field}`,
-      `configurator.step2.packs.${pack.id}.${field}`,
-      `pages.parties.discoPacks.${pack.id}.${field}`,
-    ].filter(Boolean);
-
-    const translated = getTranslatedByCandidates(candidates, fallback);
-    return humanizeKeyFallback(translated);
-  };
-
-  const getPackFeatures = (pack: PackDefinition): string[] => {
-    const fallbackFeatures = pack.features.filter((feature) => !feature.startsWith('pages.'));
-    const baseKey = normalizePackBaseKey(pack.i18nBaseKey || `step2.packs.${pack.id}`);
-
-    return fallbackFeatures.map((feature, index) => {
-      const candidates = [
-        baseKey.startsWith('step2.') ? `configurator.${baseKey}.features.f${index + 1}` : '',
-        baseKey.startsWith('step2.') ? `configurator.${baseKey}.features.${index}` : '',
-        `${baseKey}.features.f${index + 1}`,
-        `${baseKey}.features.${index}`,
-        `services.mobile.discoPacks.${pack.id}.features.${index}`,
-        `services.mobile.discoPacks.${pack.id}.features.f${index + 1}`,
-        `pages.mobile.discoPacks.${pack.id}.features.${index}`,
-        `configurator.step2.packs.${pack.id}.features.f${index + 1}`,
-      ].filter(Boolean);
-
-      const translated = getTranslatedByCandidates(candidates, feature);
-      return humanizeKeyFallback(translated);
-    });
-  };
 
   const flashPack = allPacks.find((pack) => pack.isFlash);
   const regularPacks = allPacks.filter(p => !p.isFlash);
@@ -175,19 +85,16 @@ export default function FiestasClient() {
   // Analytics al cambiar número de invitados
   const handleGuestsChange = (value: number) => {
     setNumGuests(value);
-    
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'guests_slider_change', {
-        num_guests: value,
-      });
-    }
+    trackServiceEvent('guests_slider_change', {
+      num_guests: value,
+    });
   };
 
   // Generar URL del formulario con parámetros
   const getContactUrl = (pack: PackDefinition) => {
     const params = new URLSearchParams({
       servicio: 'fiestas',
-      pack: getPackText(pack, 'name'),
+      pack: pack.name,
       precio: pack.priceValue.toString(),
       invitados: numGuests.toString(),
     });
@@ -272,7 +179,7 @@ export default function FiestasClient() {
           >
             <div className="flex items-center gap-2 text-oe-gold-light font-bold">
               <Zap className="w-5 h-5" fill="currentColor" />
-              {t('flashAccess')} {(flashPack ? getPackText(flashPack, 'name') : OFERTA_FLASH.nombre)}!
+              {t('flashAccess')} {(flashPack ? flashPack.name : OFERTA_FLASH.nombre)}!
             </div>
             <p className="text-sm text-text-muted mt-1">
               {t('upToGuests', { max: flashMaxGuests })} {flashPack?.flashDiscount ?? OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
@@ -294,7 +201,7 @@ export default function FiestasClient() {
                 <span className="font-bold text-purple-300">{t('recommendedFor', { guests: numGuests })}</span>
               </div>
               <div className="text-lg">
-                <strong>{getPackText(recommendedPack, 'name')}</strong> - {recommendedPack.price}
+                <strong>{recommendedPack.name}</strong> - {recommendedPack.price}
               </div>
             </motion.div>
           )}
@@ -320,8 +227,8 @@ export default function FiestasClient() {
             <div className="grid md:grid-cols-2 gap-8 mt-4">
               {/* Info */}
               <div className="space-y-4">
-                <h3 className="text-4xl font-bold">{getPackText(flashPack, 'name')}</h3>
-                <p className="text-xl text-text-muted">{getPackText(flashPack, 'tagline')}</p>
+                <h3 className="text-4xl font-bold">{flashPack.name}</h3>
+                <p className="text-xl text-text-muted">{flashPack.tagline}</p>
 
                 {/* Precio */}
                 <div className="flex items-baseline gap-4">
@@ -353,7 +260,7 @@ export default function FiestasClient() {
               {/* Features + CTA */}
               <div className="space-y-6">
                 <ul className="space-y-3">
-                  {getPackFeatures(flashPack).map((feature, idx) => (
+                  {(flashPack.features || []).map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-oe-gold/20 border border-oe-gold flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Check className="w-3 h-3 text-oe-gold-light" />
@@ -428,8 +335,8 @@ export default function FiestasClient() {
                 {/* Contenido */}
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold">{getPackText(pack, 'name')}</h3>
-                    <p className="text-sm text-text-muted">{getPackText(pack, 'tagline')}</p>
+                    <h3 className="text-2xl font-bold">{pack.name}</h3>
+                    <p className="text-sm text-text-muted">{pack.tagline}</p>
                   </div>
 
                   {/* Precio */}
@@ -453,15 +360,15 @@ export default function FiestasClient() {
 
                   {/* Features */}
                   <ul className="space-y-2 pt-4 border-t border-border">
-                    {getPackFeatures(pack).slice(0, 5).map((feature, idx) => (
+                    {(pack.features || []).slice(0, 5).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <span className="text-oe-gold flex-shrink-0">✓</span>
                         {feature}
                       </li>
                     ))}
-                    {getPackFeatures(pack).length > 5 && (
+                    {(pack.features || []).length > 5 && (
                       <li className="text-sm text-oe-gold">
-                        +{getPackFeatures(pack).length - 5} {t('more')}
+                        +{(pack.features || []).length - 5} {t('more')}
                       </li>
                     )}
                   </ul>
@@ -550,3 +457,4 @@ export default function FiestasClient() {
     </div>
   );
 }
+

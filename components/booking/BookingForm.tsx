@@ -114,8 +114,8 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
       setTimeout(() => {
         router.push(`/reserva-confirmada?ref=${data.data.reference}`);
       }, 2000);
-    } catch (err: any) {
-      setError(err.message || 'Error al procesar la reserva. Por favor, intenta de nuevo.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al procesar la reserva. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -483,3 +483,5 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
     </form>
   );
 }
+
+

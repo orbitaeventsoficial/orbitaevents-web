@@ -314,7 +314,7 @@ export default function TemplateEditorClient({
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
           />
         </div>
         {locale !== 'ca' && (
@@ -322,7 +322,7 @@ export default function TemplateEditorClient({
             type="button"
             disabled={translating}
             onClick={autoTranslateFromCa}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-300 transition-all hover:bg-amber-500/20 disabled:opacity-50 active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all disabled:opacity-50 active:scale-[0.98]"
           >
             {translating ? 'Traduint...' : `Traduir des del CA → ${locale.toUpperCase()}`}
           </button>
@@ -331,7 +331,7 @@ export default function TemplateEditorClient({
           type="button"
           disabled={saving}
           onClick={saveTemplate}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white transition-all hover:bg-cyan-500 disabled:opacity-50 active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
         >
           {saving ? 'Guardant...' : 'Guardar'}
         </button>
@@ -377,7 +377,7 @@ export default function TemplateEditorClient({
                       navigator.clipboard.writeText(`{{${v}}}`);
                       toast.success(`{{${v}}} copiat!`);
                     }}
-                    className="rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-400 hover:bg-cyan-500/20 transition-colors"
+                    className="rounded-lg border px-2 py-0.5 text-[10px] font-mono transition-colors"
                     title={`Clic per copiar {{${v}}}`}
                   >
                     {`{{${v}}}`}
@@ -427,7 +427,7 @@ export default function TemplateEditorClient({
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); removeBlock(block.id); }}
-                    className="opacity-0 group-hover:opacity-100 rounded-lg p-1 text-xs text-rose-400 hover:bg-rose-500/10 transition-all"
+                    className="opacity-0 group-hover:opacity-100 rounded-lg p-1 text-xs transition-all"
                     aria-label="Eliminar bloc"
                   >
                     ✕
@@ -442,8 +442,8 @@ export default function TemplateEditorClient({
         <div className="space-y-3">
           {/* Editor del bloc seleccionat */}
           {selectedBlock && (
-            <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-cyan-400">
+            <div className="rounded-2xl border p-4 space-y-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide">
                 Editar: {BLOCK_CATALOG.find((c) => c.type === selectedBlock.type)?.label}
               </h3>
 
@@ -455,14 +455,14 @@ export default function TemplateEditorClient({
                       value={selectedBlock.data.text || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'text', e.target.value)}
                       rows={4}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50"
+                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                     />
                   ) : (
                     <input
                       type="text"
                       value={selectedBlock.data.text || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'text', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50"
+                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                     />
                   )}
                 </div>
@@ -477,7 +477,7 @@ export default function TemplateEditorClient({
                     onChange={(e) => updateBlockData(selectedBlock.id, 'size', e.target.value)}
                     min={14}
                     max={48}
-                    className="w-24 rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50"
+                    className="w-24 rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                   />
                 </div>
               )}
@@ -490,7 +490,7 @@ export default function TemplateEditorClient({
                       type="text"
                       value={selectedBlock.data.url || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'url', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50"
+                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                     />
                   </div>
                   <div>
@@ -513,7 +513,7 @@ export default function TemplateEditorClient({
                     onChange={(e) => updateBlockData(selectedBlock.id, 'rows', e.target.value)}
                     rows={6}
                     placeholder="Referència:#{{reference}}\nData:{{eventDate}}"
-                    className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-xs font-mono focus:ring-1 focus:ring-cyan-500/50"
+                    className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-xs font-mono "
                   />
                 </div>
               )}
@@ -526,7 +526,7 @@ export default function TemplateEditorClient({
                       type="text"
                       value={selectedBlock.data.subtitle || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'subtitle', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50"
+                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                     />
                   </div>
                   <div>
@@ -544,7 +544,7 @@ export default function TemplateEditorClient({
           )}
 
           {/* Preview */}
-          <div className="rounded-2xl border overflow-hidden">
+          <div className="rounded-2xl border p-0 overflow-hidden">
             <div className="px-4 py-2 border-b border-white/5 text-xs font-semibold uppercase tracking-wide text-white/40">
               Preview
             </div>
@@ -561,3 +561,6 @@ export default function TemplateEditorClient({
     </div>
   );
 }
+
+
+

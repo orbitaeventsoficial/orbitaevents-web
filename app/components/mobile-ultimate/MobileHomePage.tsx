@@ -41,6 +41,7 @@ import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { CLIENT_LOGOS } from '@/app/config/client-logos';
+import { hasSeenMobileIntro, markMobileIntroSeen } from '@/lib/intro';
 
 // Lazy load HeroPortalLogo
 const HeroPortalLogo = dynamic(
@@ -75,7 +76,7 @@ function QuickFeatures() {
             initial={reduceMotion ? false : { opacity: 0, y: 30, scale: 0.8 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true }}
-            transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, type: 'spring', damping: 20 }}
+            transition={reduceMotion ? { duration: 0 } : { delay: i * 0.08, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             whileTap={{ scale: 0.95 }}
             className="relative group p-5 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden"
           >
@@ -171,7 +172,7 @@ function GuaranteeSection() {
               initial={reduceMotion ? false : { opacity: 0, x: -30, scale: 0.9 }}
               whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={reduceMotion ? { duration: 0 } : { delay: i * 0.15, type: 'spring', damping: 20 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               whileTap={{ scale: 0.98 }}
               className="relative group"
             >
@@ -581,10 +582,7 @@ export default function MobileHomePage() {
   const [introFinished, setIntroFinished] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen the intro in this session
-    const hasSeenIntro = sessionStorage.getItem('orbita-mobile-intro-seen');
-
-    if (!hasSeenIntro) {
+    if (!hasSeenMobileIntro(sessionStorage)) {
       setShowIntro(true);
     } else {
       setIntroFinished(true);
@@ -597,8 +595,7 @@ export default function MobileHomePage() {
     const fallbackTimer = window.setTimeout(() => {
       setShowIntro(false);
       setIntroFinished(true);
-      sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
-      window.dispatchEvent(new Event('orbita-mobile-intro-complete'));
+      markMobileIntroSeen(sessionStorage, window);
     }, 2200);
 
     return () => window.clearTimeout(fallbackTimer);
@@ -607,8 +604,7 @@ export default function MobileHomePage() {
   const handleIntroFinish = () => {
     setShowIntro(false);
     setIntroFinished(true);
-    sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
-    window.dispatchEvent(new Event('orbita-mobile-intro-complete'));
+    markMobileIntroSeen(sessionStorage, window);
   };
 
   return (
@@ -666,3 +662,6 @@ export default function MobileHomePage() {
     </MobileErrorBoundary>
   );
 }
+
+
+

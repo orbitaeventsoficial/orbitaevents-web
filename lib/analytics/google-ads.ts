@@ -34,6 +34,23 @@ type GoogleAdsSeriesRow = {
   conversions: number;
 };
 
+type GoogleAdsSearchResult = {
+  customer?: { currencyCode?: string; currency_code?: string };
+  campaign?: { id?: string | number; name?: string; status?: string };
+  segments?: { date?: string; device?: string };
+  metrics?: {
+    impressions?: string | number;
+    clicks?: string | number;
+    costMicros?: string | number;
+    cost_micros?: string | number;
+    conversions?: string | number;
+    conversionsValue?: string | number;
+    conversions_value?: string | number;
+    ctr?: string | number;
+  };
+};
+type GoogleAdsSearchChunk = { results?: GoogleAdsSearchResult[] };
+
 export type GoogleAdsReport = {
   totals: GoogleAdsTotals;
   previousTotals: GoogleAdsTotals;
@@ -162,7 +179,7 @@ async function searchStream(
   config: GoogleAdsConfig,
   accessToken: string,
   query: string
-): Promise<any[]> {
+): Promise<GoogleAdsSearchResult[]> {
   const endpoint = `https://googleads.googleapis.com/v18/customers/${config.customerId}/googleAds:searchStream`;
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
@@ -185,7 +202,7 @@ async function searchStream(
     throw new Error(`Google Ads API ${response.status}: ${body.slice(0, 400)}`);
   }
 
-  const chunks = (await response.json()) as Array<{ results?: any[] }>;
+  const chunks = (await response.json()) as GoogleAdsSearchChunk[];
   return chunks.flatMap((chunk) => chunk.results || []);
 }
 
@@ -333,3 +350,4 @@ export async function getGoogleAdsReport(): Promise<GoogleAdsReport | null> {
   };
 }
 import { prisma } from '@/lib/prisma';
+

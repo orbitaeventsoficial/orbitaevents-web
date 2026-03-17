@@ -57,9 +57,9 @@ export default function EmailTemplatesClient() {
           <div className="text-[10px] uppercase tracking-wide text-white/50">Total plantilles</div>
           <div className="text-2xl font-bold">{templates.length}</div>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+        <div className="rounded-2xl border p-4">
           <div className="text-[10px] uppercase tracking-wide text-white/50">Personalitzades</div>
-          <div className="text-2xl font-bold text-emerald-400">{customized}</div>
+          <div className="text-2xl font-bold">{customized}</div>
         </div>
         <div className="rounded-2xl border p-4">
           <div className="text-[10px] uppercase tracking-wide text-white/50">Idiomes</div>

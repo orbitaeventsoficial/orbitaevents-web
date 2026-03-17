@@ -1,12 +1,14 @@
 // app/robots.ts
 import type { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/lib/site';
+
 
 /**
  * Genera el archivo robots.txt optimizado para SEO.
  * Permite indexacion completa y referencia sitemap.
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
+  const baseUrl = getSiteUrl();
 
   return {
     rules: [

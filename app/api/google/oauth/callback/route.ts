@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import {
+  exchangeGoogleOAuthCode,
+  upsertIntegrationSetting,
+  upsertIntegrationSettings,
+  verifyGoogleOAuthState,
+} from '@/lib/services/googleOAuthService';
 
 export const dynamic = 'force-dynamic';
 
-const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const ACCOUNT_API = 'https://mybusinessaccountmanagement.googleapis.com/v1/accounts';
 const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
-const STATE_TTL_SECONDS = 10 * 60;
 
 function normalizeRedirectUri(uri: string): string {
   return uri.trim().replace(/\/+$/, '');
@@ -20,36 +22,6 @@ function resolveRedirectUri(req: NextRequest): string {
     return normalizeRedirectUri(envUri);
   }
   return normalizeRedirectUri(new URL('/api/google/oauth/callback', req.url).toString());
-}
-
-function verifyState(state: string, secret: string): boolean {
-  const parts = state.split('.');
-  if (parts.length !== 2) return false;
-  const [payload, sig] = parts;
-  const [tsPart, nonce] = payload.split(':');
-  const ts = Number(tsPart);
-  if (!nonce) return false;
-  if (!Number.isFinite(ts)) return false;
-  const age = Math.floor(Date.now() / 1000) - ts;
-  if (age < 0 || age > STATE_TTL_SECONDS) return false;
-  const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
-  return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
-}
-
-type TokenResponse = {
-  access_token?: string;
-  refresh_token?: string;
-  expires_in?: number;
-  token_type?: string;
-  scope?: string;
-};
-
-async function upsertSetting(key: string, value: string, label: string) {
-  await prisma.setting.upsert({
-    where: { key },
-    update: { value, type: 'STRING', category: 'integrations', label },
-    create: { key, value, type: 'STRING', category: 'integrations', label },
-  });
 }
 
 async function fetchJson(url: string, token: string) {
@@ -85,7 +57,7 @@ export async function GET(req: NextRequest) {
   }
 
   const secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || '';
-  if (!code || !state || !secret || !verifyState(state, secret)) {
+  if (!code || !state || !secret || !verifyGoogleOAuthState(state, secret)) {
     return NextResponse.json(
       { ok: false, error: 'Invalid OAuth state' },
       { status: 400 }
@@ -93,26 +65,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const body = new URLSearchParams({
+    const tokenData = await exchangeGoogleOAuthCode({
       code,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
+      clientId,
+      clientSecret,
+      redirectUri,
     });
-
-    const tokenRes = await fetch(TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-    });
-
-    if (!tokenRes.ok) {
-      const text = await tokenRes.text();
-      throw new Error(`Token exchange failed: ${text}`);
-    }
-
-    const tokenData = (await tokenRes.json()) as TokenResponse;
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
 
@@ -121,7 +79,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (refreshToken) {
-      await upsertSetting('integrations.google.refreshToken', refreshToken, 'Google OAuth refresh token');
+      await upsertIntegrationSetting('integrations.google.refreshToken', refreshToken, 'Google OAuth refresh token');
     }
 
     const accounts = await fetchJson(ACCOUNT_API, accessToken);
@@ -142,11 +100,11 @@ export async function GET(req: NextRequest) {
     const accountId = accountName.split('/').pop() || '';
     const locationId = locationName.split('/').pop() || '';
 
-    await Promise.all([
-      upsertSetting('integrations.google.accountId', accountId, 'Google Business account id'),
-      upsertSetting('integrations.google.locationId', locationId, 'Google Business location id'),
-      upsertSetting('integrations.google.locationName', locationName, 'Google Business location name'),
-      upsertSetting('integrations.google.connectedAt', new Date().toISOString(), 'Google connection timestamp'),
+    await upsertIntegrationSettings([
+      { key: 'integrations.google.accountId', value: accountId, label: 'Google Business account id' },
+      { key: 'integrations.google.locationId', value: locationId, label: 'Google Business location id' },
+      { key: 'integrations.google.locationName', value: locationName, label: 'Google Business location name' },
+      { key: 'integrations.google.connectedAt', value: new Date().toISOString(), label: 'Google connection timestamp' },
     ]);
 
     return NextResponse.redirect(new URL(nextUrl, req.url));

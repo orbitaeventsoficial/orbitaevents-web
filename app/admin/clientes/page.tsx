@@ -517,7 +517,7 @@ export default function AdminContactesPage() {
 
       {/* Customers List */}
       {!loading && customers.length > 0 && (
-        <div className="rounded-2xl border admin-card-glass overflow-hidden">
+        <div className="rounded-2xl border p-0 admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
@@ -542,7 +542,7 @@ export default function AdminContactesPage() {
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap">
+                        <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                           {customer.name}
                           {customer.is_vip && (
                             <span className="px-2 py-0.5 text-xs rounded-full font-medium">VIP</span>
@@ -575,7 +575,7 @@ export default function AdminContactesPage() {
                   <td className="p-4 hidden lg:table-cell text-center">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' :
-                      customer.source === 'web' ? 'bg-emerald-500/20 text-emerald-300' :
+                      customer.source === 'web' ? 'admin-tone-soft-success' :
                       customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
                       'bg-white/5 text-white/40'
                     }`}>
@@ -589,10 +589,10 @@ export default function AdminContactesPage() {
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${
                         priority.level === 'ALTA'
-                          ? 'bg-rose-500/20 text-rose-300'
+                          ? 'admin-tone-soft-danger'
                           : priority.level === 'MITJANA'
                             ? 'bg-amber-500/20 text-amber-300'
-                            : 'bg-emerald-500/20 text-emerald-300'
+                            : 'admin-tone-soft-success'
                       }`}
                       title={priority.hint}
                     >
@@ -710,7 +710,7 @@ export default function AdminContactesPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                          dup.matchScore >= 80 ? 'bg-rose-500/20 text-rose-300' :
+                          dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
                           dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
                           'bg-white/5 text-white/40'
                         }`}>
@@ -729,7 +729,7 @@ export default function AdminContactesPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label htmlFor="nc-name" className="block text-sm mb-2">Nom <span className="text-rose-400">*</span></label>
+                    <label htmlFor="nc-name" className="block text-sm mb-2">Nom <span className="">*</span></label>
                     <input
                       id="nc-name"
                       type="text"
@@ -744,7 +744,7 @@ export default function AdminContactesPage() {
                   </div>
 
                   <div className="col-span-2">
-                    <label htmlFor="nc-email" className="block text-sm mb-2">Email <span className="text-rose-400">*</span></label>
+                    <label htmlFor="nc-email" className="block text-sm mb-2">Email <span className="">*</span></label>
                     <input
                       id="nc-email"
                       type="email"
@@ -957,3 +957,5 @@ export default function AdminContactesPage() {
     </AdminPage>
   );
 }
+
+

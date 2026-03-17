@@ -121,7 +121,7 @@ export default function BlogAdminPage() {
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
             aria-label="Idioma"
-            className="rounded-xl border px-4 py-2 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="rounded-xl border px-4 py-2 "
           >
             <option value="es">Castellà</option>
             <option value="ca">Català</option>
@@ -229,7 +229,7 @@ export default function BlogAdminPage() {
                           aria-pressed={post.isPublished}
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             post.isPublished
-                              ? 'bg-emerald-500/20 text-emerald-300'
+                              ? 'admin-tone-soft-success'
                               : 'bg-yellow-500/20 text-yellow-300'
                           }`}
                         >
@@ -298,3 +298,5 @@ export default function BlogAdminPage() {
     </AdminPage>
   );
 }
+
+

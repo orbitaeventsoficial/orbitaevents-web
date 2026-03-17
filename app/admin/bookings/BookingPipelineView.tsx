@@ -29,10 +29,10 @@ type PipelineColumn = {
 };
 
 const COLUMNS_DEF: Omit<PipelineColumn, 'bookings'>[] = [
-  { status: 'PENDING', label: 'Pendents', toneClass: 'border-yellow-500/30 bg-yellow-500/5', cardTone: 'border-yellow-500/20 bg-yellow-500/10' },
-  { status: 'CONFIRMED', label: 'Confirmades', toneClass: 'border-emerald-500/30 bg-emerald-500/5', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
-  { status: 'PREPARING', label: 'Preparant', toneClass: 'border-blue-500/30 bg-blue-500/5', cardTone: 'border-blue-500/20 bg-blue-500/10' },
-  { status: 'COMPLETED', label: 'Completades', toneClass: 'border-teal-500/30 bg-teal-500/5', cardTone: 'border-teal-500/20 bg-teal-500/10' },
+  { status: 'PENDING', label: 'Pendents', toneClass: '', cardTone: 'border-yellow-500/20 bg-yellow-500/10' },
+  { status: 'CONFIRMED', label: 'Confirmades', toneClass: '', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
+  { status: 'PREPARING', label: 'Preparant', toneClass: '', cardTone: 'border-blue-500/20 bg-blue-500/10' },
+  { status: 'COMPLETED', label: 'Completades', toneClass: '', cardTone: 'border-teal-500/20 bg-teal-500/10' },
 ];
 
 function getMarginColor(pct: number | null): string {
@@ -75,7 +75,7 @@ export default function BookingPipelineView() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
@@ -262,7 +262,7 @@ export default function BookingPipelineView() {
                         </span>
                       )}
                       {!booking.depositPaid && (
-                        <span className="inline-flex items-center rounded-full border border-rose-500/30 bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-medium text-rose-300">
+                        <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium">
                           Paga pendent
                         </span>
                       )}
@@ -291,3 +291,5 @@ export default function BookingPipelineView() {
     </div>
   );
 }
+
+

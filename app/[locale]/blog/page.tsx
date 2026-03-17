@@ -9,6 +9,9 @@ import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
 import { toIntlLocale } from '@/lib/constants';
+import { getPublicBlogPosts, type PublicBlogPost } from '@/lib/blog-public';
+import { absoluteUrl } from '@/lib/site';
+
 
 export const revalidate = 3600;
 
@@ -27,26 +30,14 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   };
 }
 
-interface BlogPost {
-  id: string;
-  slug: string;
-  category: string;
-  featuredImage?: string;
-  publishedAt?: string;
-  readingTime?: number;
-  translations: { title: string; excerpt: string }[];
-}
+async function getPosts(locale: string): Promise<PublicBlogPost[]> {
+  if (!process.env.DATABASE_URL) {
+    return [];
+  }
 
-async function getPosts(locale: string): Promise<BlogPost[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const res = await fetch(
-      `${baseUrl}/api/public/blog?locale=${locale}&page=1&limit=9`,
-      { next: { revalidate: 3600 } }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.posts || [];
+    const { posts } = await getPublicBlogPosts(locale, 1, 9);
+    return posts;
   } catch {
     return [];
   }
@@ -67,7 +58,7 @@ function PostCard({
   readMoreLabel,
   minutesUnit,
 }: {
-  post: BlogPost;
+  post: PublicBlogPost;
   locale: string;
   readMoreLabel: string;
   minutesUnit: string;
@@ -140,8 +131,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
   const t = await getTranslations({ locale, namespace: 'blog' });
   const posts = await getPosts(locale);
 
-  // JSON-LD CollectionPage schema for blog index
-  const canonicalUrl = `https://orbitaevents.com/${locale}/blog`;
+  const canonicalUrl = absoluteUrl(`/${locale}/blog`);
   const collectionJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -157,7 +147,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
       name: SITE_CONFIG.business.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://orbitaevents.com/img/orbitawordmark.svg',
+        url: absoluteUrl('/img/orbitawordmark.svg'),
       },
     },
     ...(posts.length > 0
@@ -167,7 +157,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
             itemListElement: posts.map((post, index) => ({
               '@type': 'ListItem',
               position: index + 1,
-              url: `https://orbitaevents.com/${locale}/blog/${post.slug}`,
+              url: absoluteUrl(`/${locale}/blog/${post.slug}`),
               name: post.translations[0]?.title || post.slug,
             })),
           },
@@ -181,72 +171,70 @@ export default async function BlogPage({ params }: { params: { locale: string } 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
       />
-    <main className="min-h-screen bg-[#0A0A0A]">
-      <BlogTracking page="index" />
-      {/* Hero */}
-      <section className="relative pt-32 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-[#0A0A0A]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.06),transparent_60%)]" />
-        <div className="relative container mx-auto px-4 text-center">
-          <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-            📝 {t('badge')}
-          </span>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            {t('title1')}{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              {t('title2')}
+      <main className="min-h-screen bg-[#0A0A0A]">
+        <BlogTracking page="index" />
+        <section className="relative pt-32 pb-16 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-[#0A0A0A]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.06),transparent_60%)]" />
+          <div className="relative container mx-auto px-4 text-center">
+            <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
+              📝 {t('badge')}
             </span>
-          </h1>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">{t('subtitle')}</p>
-        </div>
-      </section>
-
-      {/* Grid */}
-      <section className="container mx-auto px-4 pb-24">
-        {posts.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-6">✍️</div>
-            <h2 className="text-2xl font-bold text-white mb-3">{t('empty.title')}</h2>
-            <p className="text-white/60 mb-8">{t('empty.subtitle')}</p>
-            <Link
-              href="/contacto"
-              data-blog-cta="blog_empty_contact"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-xl transition-colors"
-            >
-              {t('empty.cta')}
-            </Link>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+              {t('title1')}{' '}
+              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                {t('title2')}
+              </span>
+            </h1>
+            <p className="text-lg text-white/60 max-w-2xl mx-auto">{t('subtitle')}</p>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  locale={locale}
-                  readMoreLabel={t('readMore')}
-                  minutesUnit={t('minutesUnit')}
-                />
-              ))}
-            </div>
+        </section>
 
-            <div className="mt-16 text-center border-t border-white/10 pt-16">
-              <p className="text-white/60 mb-6">{t('ctaText')}</p>
+        <section className="container mx-auto px-4 pb-24">
+          {posts.length === 0 ? (
+            <div className="text-center py-24">
+              <div className="text-6xl mb-6">✍️</div>
+              <h2 className="text-2xl font-bold text-white mb-3">{t('empty.title')}</h2>
+              <p className="text-white/60 mb-8">{t('empty.subtitle')}</p>
               <Link
-                href="/configurador"
-                data-blog-cta="blog_footer_configurator"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
+                href="/contacto"
+                data-blog-cta="blog_empty_contact"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-xl transition-colors"
               >
-                {t('ctaButton')}
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                {t('empty.cta')}
               </Link>
             </div>
-          </>
-        )}
-      </section>
-    </main>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    locale={locale}
+                    readMoreLabel={t('readMore')}
+                    minutesUnit={t('minutesUnit')}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-16 text-center border-t border-white/10 pt-16">
+                <p className="text-white/60 mb-6">{t('ctaText')}</p>
+                <Link
+                  href="/configurador"
+                  data-blog-cta="blog_footer_configurator"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
+                >
+                  {t('ctaButton')}
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </>
+          )}
+        </section>
+      </main>
     </>
   );
 }

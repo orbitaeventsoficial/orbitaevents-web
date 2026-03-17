@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
 import { timingSafeEqual } from 'crypto';
+import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
+import { writeGoogleReviewsCache } from '@/lib/services/googleReviewsCacheService';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -65,25 +66,6 @@ async function fetchFromSerpAPI(): Promise<{ rating: number; total: number; revi
   };
 }
 
-function upsertSetting(key: string, value: string, category: string) {
-  return prisma.setting.upsert({
-    where: { key },
-    update: { value },
-    create: { key, value, category, type: 'STRING' },
-  });
-}
-
-async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?: string) {
-  const now = new Date().toISOString();
-  const prefix = 'automation.reviewsSync';
-  await Promise.all([
-    upsertSetting(`${prefix}.lastRun`, now, 'automation'),
-    upsertSetting(`${prefix}.lastStatus`, status, 'automation'),
-    prisma.setting.upsert({ where: { key: `${prefix}.lastSummary` }, update: { value: JSON.stringify(summary) }, create: { key: `${prefix}.lastSummary`, value: JSON.stringify(summary), type: 'JSON', category: 'automation' } }),
-    ...(message ? [upsertSetting(`${prefix}.lastMessage`, message, 'automation')] : []),
-  ]);
-}
-
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
 
@@ -101,25 +83,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'SerpAPI no ha retornat resultats' });
     }
 
-    // Guardem el JSON a la BD com a Setting (sempre disponible, sense dependre del filesystem)
-    const reviewsJson = JSON.stringify({
-      lastUpdated: new Date().toISOString(),
+    await writeGoogleReviewsCache({
       rating: data.rating,
       total: data.total,
       reviews: data.reviews,
     });
 
-    await Promise.all([
-      upsertSetting('cache.googleReviews', reviewsJson, 'cache'),
-      upsertSetting('stats.googleRating', String(data.rating), 'stats'),
-      upsertSetting('stats.googleReviewCount', String(data.total), 'stats'),
-    ]);
-
     log.info(`reviews-sync: ${data.reviews.length} ressenyes sincronitzades (${data.total} total, ${data.rating}★)`, {
       context: { requestId },
     });
 
-    await saveRunStatus('ok', { rating: data.rating, total: data.total, synced: data.reviews.length });
+    await saveCronRunStatus({ prefix: 'automation.reviewsSync', status: 'ok', summary: { rating: data.rating, total: data.total, synced: data.reviews.length } });
 
     return NextResponse.json({
       ok: true,
@@ -131,7 +105,7 @@ export async function GET(request: NextRequest) {
     log.error('reviews-sync: Error', error instanceof Error ? error : undefined, {
       context: { requestId },
     });
-    await saveRunStatus('error', {}, error instanceof Error ? error.message : 'Error intern').catch(() => {});
+    await saveCronRunStatus({ prefix: 'automation.reviewsSync', status: 'error', summary: {}, message: error instanceof Error ? error.message : 'Error intern' }).catch(() => {});
     return NextResponse.json({ ok: false, error: 'Error intern' }, { status: 500 });
   }
 }

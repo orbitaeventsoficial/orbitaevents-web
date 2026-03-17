@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Baix Llobregat desde ${MIN_PRICE}€. Hospitalet, Cornellà, Sant Boi, El Prat. Desplazamiento incluido.`,
   keywords: ['DJ bodas Baix Llobregat', 'DJ bodas Hospitalet', 'DJ bodas Cornellà', 'DJ bodas Sant Boi', 'bodas Baix Llobregat'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-baix-llobregat' },
   openGraph: {
     title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€`,

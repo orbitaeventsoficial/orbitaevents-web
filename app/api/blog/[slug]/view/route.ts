@@ -1,6 +1,6 @@
 // app/api/blog/[slug]/view/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { incrementPublicBlogPostView } from '@/lib/services/publicBlogService';
 
 export async function POST(
   _req: NextRequest,
@@ -12,10 +12,7 @@ export async function POST(
       return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
     }
 
-    await prisma.blogPost.updateMany({
-      where: { slug, isPublished: true },
-      data: { viewCount: { increment: 1 } },
-    });
+    await incrementPublicBlogPostView(slug);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

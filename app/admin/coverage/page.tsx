@@ -5,12 +5,8 @@ import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import type { CoverageArea } from '@/lib/coverage';
 
-interface CoverageArea {
-  city: string;
-  province: string;
-  enabled: boolean;
-}
 
 const PROVINCES = [
   'Barcelona',
@@ -157,13 +153,13 @@ export default function CoveragePage() {
             onChange={(e) => setNewCity(e.target.value)}
             placeholder="Nom de la ciutat"
             aria-label="Nom de la ciutat"
-            className="flex-1 px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="flex-1 px-4 py-2 rounded-xl border "
           />
           <select
             value={newProvince}
             onChange={(e) => setNewProvince(e.target.value)}
             aria-label="Província"
-            className="px-4 py-2 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="px-4 py-2 rounded-xl border "
           >
             {PROVINCES.map(p => (
               <option key={p} value={p}>{p}</option>
@@ -203,7 +199,7 @@ export default function CoveragePage() {
                         type="button"
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           area.enabled
-                            ? 'bg-emerald-500/20 text-emerald-300'
+                            ? 'admin-tone-soft-success'
                             : 'bg-white/10 text-white/40'
                         }`}
                       >
@@ -227,3 +223,6 @@ export default function CoveragePage() {
     </AdminPage>
   );
 }
+
+
+

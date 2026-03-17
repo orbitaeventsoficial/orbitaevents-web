@@ -13,7 +13,7 @@ import { log } from '@/lib/logger';
 /**
  * Tipos de eventos principales
  */
-export type EventCategory = 
+type EventCategory = 
   | 'Contact'
   | 'Pack Selection'
   | 'Engagement'
@@ -22,7 +22,7 @@ export type EventCategory =
   | 'Calculator'
   | 'CTA';
 
-export type EventName = 
+type EventName = 
   | 'generate_lead'
   | 'contact_whatsapp'
   | 'contact_phone'
@@ -295,3 +295,4 @@ export const trackPageView = (pagePath: string, pageTitle: string): void => {
 export const initAnalytics = (): void => {
   // Initialize analytics (empty for now - scripts are loaded in layout)
 };
+

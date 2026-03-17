@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en La Selva desde ${MIN_PRICE}€. Blanes, Lloret, Santa Coloma, Hostalric. Costa y interior de Girona.`,
   keywords: ['DJ bodas La Selva', 'DJ bodas Blanes', 'DJ bodas Lloret', 'DJ bodas Santa Coloma', 'bodas La Selva Girona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-selva' },
   openGraph: {
     title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€`,

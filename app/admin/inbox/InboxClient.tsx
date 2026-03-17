@@ -85,7 +85,7 @@ export default function InboxClient({
   const router = useRouter();
 
   // State
-  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails' | 'trash'>('leads');
+  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails' | 'trash'>('all');
   const [imapEmails, setImapEmails] = useState<ImapEmail[]>([]);
   const [trashEmails, setTrashEmails] = useState<ImapEmail[]>([]);
   const [trashCount, setTrashCount] = useState(0);
@@ -101,6 +101,7 @@ export default function InboxClient({
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loadingSelected, setLoadingSelected] = useState(false);
+  const [emailDetailsByUid, setEmailDetailsByUid] = useState<Record<number, ImapEmail>>({});
   const { confirm, dialogProps } = useConfirmDialog();
 
   // Convertir leads a format unificat
@@ -139,7 +140,7 @@ export default function InboxClient({
     setImapError(null);
 
     try {
-      const params = new URLSearchParams({ limit: '50', _t: String(Date.now()) });
+      const params = new URLSearchParams({ limit: '25', _t: String(Date.now()) });
       const res = await fetchWithCsrf(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const data = await res.json();
       const message = data?.details
@@ -176,7 +177,7 @@ export default function InboxClient({
       const countData = await countRes.json().catch(() => ({}));
       if (countRes.ok) setTrashCount(countData.total || 0);
 
-      const listParams = new URLSearchParams({ folder: 'Trash', limit: '50', _t: String(Date.now()) });
+      const listParams = new URLSearchParams({ folder: 'Trash', limit: '25', _t: String(Date.now()) });
       const res = await fetchWithCsrf(`/api/admin/inbox/messages?${listParams}`, { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
@@ -192,7 +193,6 @@ export default function InboxClient({
 
   useEffect(() => {
     if (!imapConfigured) return;
-    if (activeTab === 'leads') return;
     if (activeTab === 'trash') {
       if (trashEmails.length === 0) loadTrashEmails();
       return;
@@ -220,10 +220,10 @@ export default function InboxClient({
   const deferredQuery = useDeferredValue(searchQuery);
   const queryLower = deferredQuery.trim().toLowerCase();
   const filteredEmails = useMemo(() => {
-    const source = activeTab === 'trash' ? trashUnified : emails;
+    let source = activeTab === 'trash' ? trashUnified : emails;
+    if (activeTab === 'leads') source = emails.filter((e) => e.type === 'lead');
+    if (activeTab === 'emails') source = emails.filter((e) => e.type === 'imap');
     return source.filter((email) => {
-      if (activeTab === 'leads' && email.type !== 'lead') return false;
-      if (activeTab === 'emails' && email.type !== 'imap') return false;
       if (filter === 'unread' && email.read) return false;
       if (queryLower) {
         return (
@@ -1157,4 +1157,5 @@ function QuoteModal({
     </div>
   );
 }
+
 

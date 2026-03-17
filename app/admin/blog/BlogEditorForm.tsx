@@ -205,7 +205,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
     <>
       {flashMessage && (
         <div
-          className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+          className={`mb-6 rounded-xl border p-4 text-sm ${
             flashMessage.type === 'success'
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
               : 'border-rose-500/30 bg-rose-500/10 text-rose-200'
@@ -245,7 +245,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                   }
                 }}
                 placeholder="el-meu-post"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 "
                 required
               />
               <p className="mt-1 text-xs text-white/50">Es genera automàticament des del títol si ho deixes buit</p>
@@ -257,7 +257,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 type="text"
                 value={formData.author}
                 onChange={(e) => setFormData((prev) => ({ ...prev, author: e.target.value }))}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white "
               />
             </div>
             <div>
@@ -266,7 +266,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 id="blog-category"
                 value={formData.category}
                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white "
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -281,7 +281,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 value={formData.tags}
                 onChange={(e) => setFormData((prev) => ({ ...prev, tags: e.target.value }))}
                 placeholder="dj, bodes, música"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 "
               />
             </div>
             <div className="sm:col-span-2">
@@ -292,7 +292,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 value={formData.featuredImage}
                 onChange={(e) => setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))}
                 placeholder="https://..."
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 "
               />
             </div>
             <div>
@@ -303,7 +303,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 min={1}
                 value={formData.readingTime}
                 onChange={(e) => setFormData((prev) => ({ ...prev, readingTime: Number(e.target.value || 5) }))}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white "
               />
             </div>
             <div className="flex items-end">
@@ -332,7 +332,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                   onClick={() => setActiveLocale(l)}
                   className={`rounded-xl px-3 py-1.5 text-sm ${
                     activeLocale === l
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                      ? 'admin-tone-soft-info border border-cyan-500/40'
                       : 'border border-white/10 text-white/40'
                   }`}
                 >
@@ -351,7 +351,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 value={formData.translations[activeLocale].title}
                 onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white "
               />
             </div>
             <div>
@@ -362,7 +362,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 onChange={(e) => updateTranslation(activeLocale, 'excerpt', e.target.value)}
                 rows={3}
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white "
               />
             </div>
             <div>
@@ -373,7 +373,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
                 rows={12}
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-mono text-sm text-white focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-mono text-sm text-white "
               />
             </div>
             <div>
@@ -384,7 +384,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 value={formData.translations[activeLocale].metaTitle}
                 onChange={(e) => updateTranslation(activeLocale, 'metaTitle', e.target.value)}
                 placeholder="Si està buit, s'usarà el títol"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 "
               />
             </div>
             <div>
@@ -395,7 +395,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
                 onChange={(e) => updateTranslation(activeLocale, 'metaDescription', e.target.value)}
                 rows={2}
                 placeholder="Si està buida, s'usarà l'extracte"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50 "
               />
             </div>
           </div>
@@ -423,3 +423,6 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
     </>
   );
 }
+
+
+

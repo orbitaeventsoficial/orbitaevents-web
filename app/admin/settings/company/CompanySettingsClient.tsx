@@ -87,7 +87,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
       {/* Dades Empresa */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl">
             <span className="text-lg">🏢</span>
           </div>
           <div>
@@ -104,7 +104,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
                 value={values[field.key] || ''}
                 onChange={(e) => handleChange(field.key, e.target.value)}
                 placeholder={field.placeholder}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm transition-colors focus:border-cyan-500/40 focus:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm transition-colors focus:bg-white/[0.08] focus:outline-none focus:ring-2"
               />
               {field.description && (
                 <p className="mt-1 text-[11px] text-white/35">{field.description}</p>
@@ -117,7 +117,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
       {/* Holded */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl">
             <span className="text-lg">📊</span>
           </div>
           <div>
@@ -160,7 +160,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
               value={values[HOLDED_API_FIELD.key] || ''}
               onChange={(e) => handleChange(HOLDED_API_FIELD.key, e.target.value)}
               placeholder={HOLDED_API_FIELD.placeholder}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 pr-20 text-sm font-mono transition-colors focus:border-cyan-500/40 focus:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 pr-20 text-sm font-mono transition-colors focus:bg-white/[0.08] focus:outline-none focus:ring-2"
             />
             <button
               type="button"
@@ -178,11 +178,11 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
             type="button"
             onClick={testHolded}
             disabled={testingHolded || !values['holded.apiKey']}
-            className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/30 px-4 py-2 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {testingHolded ? (
               <>
-                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-cyan-300" />
                 Provant...
               </>
             ) : (
@@ -198,7 +198,7 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
           type="button"
           onClick={save}
           disabled={saving}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:from-cyan-500 hover:to-blue-500 hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? (
             <>

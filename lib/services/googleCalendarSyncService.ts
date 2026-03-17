@@ -10,7 +10,7 @@ const EVENT_KEY_PREFIX = 'integrations.googleCalendar.bookingEvent.';
 type SyncStatus = 'synced' | 'deleted' | 'skipped' | 'error';
 type SyncAction = 'upsert' | 'delete';
 
-export interface CalendarSyncResult {
+interface CalendarSyncResult {
   ok: boolean;
   status: SyncStatus;
   action?: SyncAction;

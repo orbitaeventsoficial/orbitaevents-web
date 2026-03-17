@@ -27,6 +27,11 @@ type Ga4RealtimeRow = {
   dimension: string;
   value: number;
 };
+type Ga4ApiRow = {
+  dimensionValues?: Array<{ value?: string | null }> | null;
+  metricValues?: Array<{ value?: string | null }> | null;
+};
+
 
 type Ga4Report = {
   totals: Ga4Totals;
@@ -141,15 +146,15 @@ function toNumber(value?: string | null): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function mapRows(rows: any[], dimensionIndex = 0, metricIndex = 0): Ga4Row[] {
+function mapRows(rows: Ga4ApiRow[], dimensionIndex = 0, metricIndex = 0): Ga4Row[] {
   return rows.map((row) => ({
     dimension: row.dimensionValues?.[dimensionIndex]?.value || 'Unknown',
-    secondary: row.dimensionValues?.[dimensionIndex + 1]?.value,
+    secondary: row.dimensionValues?.[dimensionIndex + 1]?.value ?? undefined,
     value: toNumber(row.metricValues?.[metricIndex]?.value),
   }));
 }
 
-function mapRealtimeRows(rows: any[], dimensionIndex = 0, metricIndex = 0): Ga4RealtimeRow[] {
+function mapRealtimeRows(rows: Ga4ApiRow[], dimensionIndex = 0, metricIndex = 0): Ga4RealtimeRow[] {
   return rows.map((row) => ({
     dimension: row.dimensionValues?.[dimensionIndex]?.value || 'Unknown',
     value: toNumber(row.metricValues?.[metricIndex]?.value),
@@ -315,3 +320,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
     realtimeFallback,
   };
 }
+
+
+
+

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { requireAuth } from '@/lib/auth';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest) {
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET || process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   const redirectUri =
     process.env.GOOGLE_ADS_OAUTH_REDIRECT_URI ||
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orbitaevents.com'}/api/google-ads/oauth/callback`;
+    `${getAppBaseUrl()}/api/google-ads/oauth/callback`;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(

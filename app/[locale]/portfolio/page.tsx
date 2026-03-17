@@ -5,11 +5,13 @@ import Image from "next/image";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { getTranslations } from 'next-intl/server';
+import { getSiteUrl } from '@/lib/site';
+
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.portfolio' });
-  const base = 'https://orbitaevents.com';
+  const base = getSiteUrl();
 
   return {
     title: t('title'),

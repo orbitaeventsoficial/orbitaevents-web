@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { hasForbiddenAdminCss, sanitizeAdminCss } from '@/lib/admin-css';
-
-const CSS_KEY = 'admin.css.custom';
+import { getAdminCustomCss, saveAdminCustomCss } from '@/lib/services/adminCustomCssService';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,15 +10,8 @@ export async function GET(req: NextRequest) {
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
 
-  const setting = await prisma.setting.findUnique({
-    where: { key: CSS_KEY },
-    select: { value: true },
-  });
-
-  return NextResponse.json({
-    ok: true,
-    css: setting?.value || '',
-  });
+  const css = await getAdminCustomCss();
+  return NextResponse.json({ ok: true, css });
 }
 
 export async function PUT(req: NextRequest) {
@@ -31,37 +21,7 @@ export async function PUT(req: NextRequest) {
   if (permissionError) return permissionError;
 
   const body = await req.json().catch(() => null) as { css?: string } | null;
-  const rawCss = typeof body?.css === 'string' ? body.css : '';
-  const sanitizedCss = sanitizeAdminCss(rawCss);
-  const hadForbiddenRules = hasForbiddenAdminCss(rawCss);
-
-  await prisma.setting.upsert({
-    where: { key: CSS_KEY },
-    update: {
-      value: sanitizedCss,
-      type: 'STRING',
-      category: 'config',
-      label: 'Custom CSS admin',
-      description: 'CSS custom aplicat només al panell admin',
-    },
-    create: {
-      key: CSS_KEY,
-      value: sanitizedCss,
-      type: 'STRING',
-      category: 'config',
-      label: 'Custom CSS admin',
-      description: 'CSS custom aplicat només al panell admin',
-    },
-  });
-
-  await prisma.adminLog.create({
-    data: {
-      action: 'UPDATE',
-      entity: 'setting',
-      entityId: CSS_KEY,
-      details: { key: CSS_KEY, size: sanitizedCss.length, hadForbiddenRules },
-    },
-  });
+  const { hadForbiddenRules } = await saveAdminCustomCss(typeof body?.css === 'string' ? body.css : '');
 
   return NextResponse.json({ ok: true, sanitized: hadForbiddenRules });
 }

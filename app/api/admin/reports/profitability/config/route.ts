@@ -6,7 +6,6 @@ import {
   normalizeProfitabilityConfig,
   upsertProfitabilityConfig,
 } from '@/lib/services/profitabilityService';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -30,24 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const incoming = normalizeProfitabilityConfig(body?.config);
-    const previous = await getProfitabilityConfig();
-    const saved = await upsertProfitabilityConfig(incoming);
-    const role = getAdminRole(req);
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'setting',
-        entityId: 'finance.profitabilityConfig',
-        details: {
-          key: 'finance.profitabilityConfig',
-          role,
-          before: previous,
-          after: saved,
-        },
-      },
-    });
-
+    const saved = await upsertProfitabilityConfig(incoming, getAdminRole(req));
     return NextResponse.json({ ok: true, config: saved });
   } catch (error) {
     log.error('Error updating profitability config', error);

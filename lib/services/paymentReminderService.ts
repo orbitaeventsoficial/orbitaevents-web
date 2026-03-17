@@ -14,7 +14,7 @@ import { log } from '@/lib/logger';
 const REMINDER_DAYS_BEFORE_EVENT = 14;
 const MIN_DAYS_BETWEEN_REMINDERS = 7;
 
-export interface PaymentReminderResult {
+interface PaymentReminderResult {
   checked: number;
   sent: number;
   skipped: number;

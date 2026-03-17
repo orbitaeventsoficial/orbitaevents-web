@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTime } from '@/lib/constants';
 import Link from 'next/link';
@@ -91,7 +91,7 @@ export default function AdminPrivacyPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [auditLoading, setAuditLoading] = useState(false);
 
-  const loadAudit = async () => {
+  const loadAudit = useCallback(async () => {
     setAuditLoading(true);
     try {
       const res = await fetchWithCsrf('/api/admin/privacy/audit?limit=100', { cache: 'no-store' });
@@ -104,9 +104,9 @@ export default function AdminPrivacyPage() {
     } finally {
       setAuditLoading(false);
     }
-  };
+  }, []);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const [statsRes, reqRes] = await Promise.all([
@@ -127,12 +127,12 @@ export default function AdminPrivacyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
 
   useEffect(() => {
     if (pageTab === 'requests') load();
     else loadAudit();
-  }, [statusFilter, pageTab]);
+  }, [load, loadAudit, pageTab]);
 
   const processRequest = async (id: string, action: 'approve' | 'reject') => {
     setBusyId(id);
@@ -187,15 +187,15 @@ export default function AdminPrivacyPage() {
             <p className="text-xs opacity-60">Consentiments totals</p>
           </div>
           <div className="rounded-2xl border admin-card-glass p-4">
-            <p className="text-2xl font-bold text-emerald-400">{stats.consents.active}</p>
+            <p className="text-2xl font-bold">{stats.consents.active}</p>
             <p className="text-xs opacity-60">Consentiments actius</p>
           </div>
           <div className="rounded-2xl border admin-card-glass p-4">
-            <p className="text-2xl font-bold text-amber-400">{stats.requests.pending}</p>
+            <p className="text-2xl font-bold">{stats.requests.pending}</p>
             <p className="text-xs opacity-60">Sol·licituds pendents</p>
           </div>
           <div className="rounded-2xl border admin-card-glass p-4">
-            <p className="text-2xl font-bold text-emerald-400">{stats.requests.completed}</p>
+            <p className="text-2xl font-bold">{stats.requests.completed}</p>
             <p className="text-xs opacity-60">Completades</p>
           </div>
           <div className={`rounded-2xl border p-4 ${stats.requests.urgent > 0 ? 'border-red-500/30 bg-red-500/5' : 'admin-card-glass'}`}>
@@ -207,7 +207,7 @@ export default function AdminPrivacyPage() {
 
       {/* Action message */}
       {actionMsg && (
-        <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200">
+        <div className="rounded-xl border px-4 py-2 text-sm">
           {actionMsg}
         </div>
       )}
@@ -300,7 +300,7 @@ export default function AdminPrivacyPage() {
                   </div>
                   {r.customer && (
                     <div className="mt-1">
-                      <Link href={`/admin/clientes/${r.customer.id}`} className="text-sm text-cyan-400 hover:underline">
+                      <Link href={`/admin/clientes/${r.customer.id}`} className="text-sm hover:underline">
                         {r.customer.name}
                       </Link>
                       <span className="text-sm opacity-50 ml-2">{r.customer.email}</span>
@@ -328,7 +328,7 @@ export default function AdminPrivacyPage() {
 
               {/* Completed info */}
               {r.status === 'COMPLETED' && r.processedAt && (
-                <div className="mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-sm">
+                <div className="mt-3 rounded-xl border px-4 py-2 text-sm">
                   Processada el {formatDateTime(r.processedAt)}
                   {r.processedBy && <span className="opacity-60"> per {r.processedBy}</span>}
                   {r.responseNotes && <p className="mt-1 opacity-70">{r.responseNotes}</p>}
@@ -336,7 +336,7 @@ export default function AdminPrivacyPage() {
               )}
 
               {r.status === 'REJECTED' && r.processedAt && (
-                <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-2 text-sm">
+                <div className="mt-3 rounded-xl border px-4 py-2 text-sm">
                   Rebutjada el {formatDateTime(r.processedAt)}
                   {r.responseNotes && <p className="mt-1 opacity-70">{r.responseNotes}</p>}
                 </div>
@@ -349,7 +349,7 @@ export default function AdminPrivacyPage() {
                     placeholder="Notes (opcional)..."
                     value={processNotes[r.id] || ''}
                     onChange={(e) => setProcessNotes((prev) => ({ ...prev, [r.id]: e.target.value }))}
-                    className="w-full rounded-xl border bg-white/5 px-4 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50 resize-none"
+                    className="w-full rounded-xl border bg-white/5 px-4 py-2 text-sm  resize-none"
                     rows={2}
                     aria-label="Notes per a la sol·licitud"
                   />
@@ -358,7 +358,7 @@ export default function AdminPrivacyPage() {
                       type="button"
                       onClick={() => processRequest(r.id, 'approve')}
                       disabled={busyId === r.id}
-                      className="px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-300 text-sm font-semibold transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
+                      className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors disabled:opacity-50"
                     >
                       {busyId === r.id ? 'Processant...' : 'Aprovar i processar'}
                     </button>
@@ -366,7 +366,7 @@ export default function AdminPrivacyPage() {
                       type="button"
                       onClick={() => processRequest(r.id, 'reject')}
                       disabled={busyId === r.id}
-                      className="px-4 py-2 rounded-full border border-red-500/30 text-red-300 text-sm font-semibold transition-colors hover:bg-red-500/10 disabled:opacity-50"
+                      className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors disabled:opacity-50"
                     >
                       Rebutjar
                     </button>
@@ -468,3 +468,6 @@ export default function AdminPrivacyPage() {
     </AdminPage>
   );
 }
+
+
+

@@ -5,13 +5,15 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import AnimacionInfantilClient from './AnimacionInfantilClient';
+import { getSiteUrl } from '@/lib/site';
+
 
 
 export const metadata: Metadata = {
   title: 'Animació Infantil Barcelona | Festes Infantils Professionals | Òrbita Events',
   description:
     'Animació infantil professional per a festes, comunions i esdeveniments. Jocs, pintacares, màgia, globoflèxia, tallers i música infantil. Barcelona i Girona.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/animacion-infantil' },
   openGraph: {
     title: 'Animació Infantil | Festes per als Més Petits',

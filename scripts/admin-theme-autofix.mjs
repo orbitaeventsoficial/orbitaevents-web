@@ -51,6 +51,14 @@ function hasOverflowGuard(tokens) {
   return tokens.some((token) => /^(?:[a-z]+:)*(?:truncate|break-words|break-all|overflow-hidden|text-ellipsis|min-w-0)$/.test(token));
 }
 
+function isLikelyShellContainer(tokens) {
+  return tokens.some((token) => /^(?:[a-z]+:)*(?:flex|inline-flex|grid|inline-grid|table|overflow-hidden|overflow-x-auto|overflow-y-auto|divide-y|divide-x)$/.test(token));
+}
+
+function isCompactPrimitive(tokens) {
+  return tokens.some((token) => /^(?:[a-z]+:)*(?:h|w|min-h|min-w|max-h|max-w|size)-/.test(token));
+}
+
 async function walk(dir, acc = []) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -110,7 +118,7 @@ async function run() {
       const hasBorder = tokens.some((t) => /^(?:[a-z]+:)*border(?:-[a-z0-9/.\[\]-]+)?$/.test(t));
       const usesNowrap = tokens.some((t) => /^(?:[a-z]+:)*whitespace-nowrap$/.test(t));
 
-      if (hasRoundedCard && hasBorder && !hasPaddingToken(tokens)) {
+      if (hasRoundedCard && hasBorder && !hasPaddingToken(tokens) && !isLikelyShellContainer(tokens) && !isCompactPrimitive(tokens)) {
         totalUiRisks += 1;
         uiRiskLogs.push({
           file: path.relative(ROOT, file),
@@ -223,3 +231,6 @@ run().catch((error) => {
   console.error('[admin-theme-autofix] crash:', error instanceof Error ? error.message : String(error));
   process.exit(2);
 });
+
+
+

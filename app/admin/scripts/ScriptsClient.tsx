@@ -325,14 +325,14 @@ export default function ScriptsClient() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm">{s.name}</span>
                         {s.danger && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full border">
                             destructiu
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-white/50 mt-1 leading-relaxed">{s.description}</p>
                       <div className="mt-2 flex items-center gap-2">
-                        <code className="text-[11px] font-mono bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-cyan-400">
+                        <code className="text-[11px] font-mono bg-white/5 border border-white/10 rounded-lg px-2 py-1">
                           {s.command}
                         </code>
                         <button
@@ -368,7 +368,7 @@ export default function ScriptsClient() {
           <li>Obre un terminal a la carpeta del projecte</li>
           <li>Copia la comanda clicant el botó &quot;Copiar&quot;</li>
           <li>Enganxa i executa al terminal</li>
-          <li>Els scripts amb <code className="text-cyan-400">--fix</code> modifiquen dades — primer executa sense per veure el report</li>
+          <li>Els scripts amb <code className="">--fix</code> modifiquen dades — primer executa sense per veure el report</li>
         </ol>
       </div>
     </div>

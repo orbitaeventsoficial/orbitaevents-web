@@ -300,7 +300,7 @@ export default function CalendarWeekClient() {
                   <button
                     type="button"
                     onClick={() => unblockDay(key)}
-                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
+                    className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors"
                   >
                     Desbloquejar
                   </button>
@@ -317,19 +317,19 @@ export default function CalendarWeekClient() {
 
               {/* Formulari bloqueig inline */}
               {blockingDate === key && (
-                <div className="mb-2 flex flex-col gap-1.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-2">
+                <div className="mb-2 flex flex-col gap-1.5 rounded-xl border p-2">
                   <input
                     type="text"
                     value={blockNote}
                     onChange={(e) => setBlockNote(e.target.value)}
                     placeholder="Motiu..."
-                    className="w-full rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs focus:ring-1 focus:ring-cyan-500/50"
+                    className="w-full rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs "
                   />
                   <div className="flex gap-1">
                     <button
                       type="button"
                       onClick={() => blockDay(key, blockNote)}
-                      className="flex-1 rounded-lg bg-rose-600 px-2 py-1 text-[10px] font-medium text-white hover:bg-rose-500"
+                      className="flex-1 rounded-lg px-2 py-1 text-[10px] font-medium text-white"
                     >
                       Confirmar
                     </button>
@@ -348,9 +348,9 @@ export default function CalendarWeekClient() {
               {hasBloqueos && dayData.bloqueos.map((b) => (
                 <div
                   key={b.id}
-                  className="mb-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-2.5 py-2 text-xs"
+                  className="mb-2 rounded-xl border px-2.5 py-2 text-xs"
                 >
-                  <div className="font-semibold text-rose-400">Bloquejat</div>
+                  <div className="font-semibold">Bloquejat</div>
                   {(b.notas || b.motivo) && (
                     <div className="mt-0.5 text-white/60">{b.notas || b.motivo}</div>
                   )}
@@ -363,7 +363,7 @@ export default function CalendarWeekClient() {
                   <Link
                     key={r.id}
                     href={`/admin/bookings/${r.id}`}
-                    className="block rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-2 transition-all hover:bg-emerald-500/20"
+                    className="block rounded-xl border px-2.5 py-2 transition-all"
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xs font-semibold truncate">
@@ -409,3 +409,4 @@ export default function CalendarWeekClient() {
     </AdminPage>
   );
 }
+

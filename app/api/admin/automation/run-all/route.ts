@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
-import { runCommercialSequences } from '@/lib/services/commercialSequenceService';
-import { enforceLeadSla } from '@/lib/services/slaAutomationService';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
+import { runAllAdminAutomations } from '@/lib/services/adminAutomationService';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,26 +17,7 @@ export async function POST(req: NextRequest) {
   const requestId = getRequestId(req);
 
   try {
-    const [sequences, sla] = await Promise.all([
-      runCommercialSequences(),
-      enforceLeadSla(),
-    ]);
-
-    const summary = {
-      generatedAt: new Date().toISOString(),
-      sequences,
-      sla,
-    };
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'AUTOMATION_RUN_ALL',
-        entity: 'automation',
-        entityId: 'run-all',
-        details: JSON.parse(JSON.stringify(summary)),
-      },
-    });
-
+    const summary = await runAllAdminAutomations();
     return NextResponse.json({ ok: true, summary });
   } catch (error) {
     log.error('Error running all automations', error, {

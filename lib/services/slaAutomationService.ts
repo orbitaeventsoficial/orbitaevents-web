@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
+import { createUniversalTask } from '@/lib/services/tasks/taskCreation';
 
 const SLA_HOURS = 24;
 
-export interface SlaAutomationSummary {
+interface SlaAutomationSummary {
   slaHours: number;
   staleLeads: number;
   createdTasks: number;
@@ -63,54 +64,36 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
     const due = new Date();
     due.setHours(due.getHours() + 4);
 
-    await prisma.$transaction(async (tx) => {
-      const createdLegacyTask = await tx.leadTask.create({
-        data: {
-          leadId: lead.id,
-          title: '[AUTO][SLA] Contactar lead en riesgo',
-          description: `Lead NEW con más de ${SLA_HOURS}h sin contacto. Ejecutar llamada/WhatsApp hoy.`,
-          dueDate: due,
-          priority: 'URGENT',
-          status: 'OPEN',
-          createdBy: 'SLA Bot',
-          assignedTo: lead.assignedTo || null,
-        },
-      });
-
-      await tx.task.create({
-        data: {
-          legacyLeadTaskId: createdLegacyTask.id,
-          customerId: lead.customerId || null,
-          leadId: lead.id,
-          title: createdLegacyTask.title,
-          description: createdLegacyTask.description,
-          dueDate: createdLegacyTask.dueDate,
-          priority: createdLegacyTask.priority,
-          status: createdLegacyTask.status,
-          assignedTo: createdLegacyTask.assignedTo,
-          createdBy: createdLegacyTask.createdBy,
-        },
-      });
-
-      await tx.leadActivity.create({
-        data: {
-          leadId: lead.id,
-          type: 'TASK',
-          title: 'SLA incumplido: tarea automática creada',
-          description: `Se crea tarea automática al superar ${SLA_HOURS}h en estado NEW.`,
-          createdBy: 'SLA Bot',
-          metadata: { slaHours: SLA_HOURS },
-        },
-      });
-
-      if (lead.priority === 'LOW' || lead.priority === 'MEDIUM') {
-        await tx.lead.update({
-          where: { id: lead.id },
-          data: { priority: 'HIGH' },
-        });
-        escalatedPriority += 1;
-      }
+    await createUniversalTask({
+      customerId: lead.customerId || null,
+      leadId: lead.id,
+      title: '[AUTO][SLA] Contactar lead en riesgo',
+      description: `Lead NEW con más de ${SLA_HOURS}h sin contacto. Ejecutar llamada/WhatsApp hoy.`,
+      dueDate: due,
+      priority: 'URGENT',
+      status: 'OPEN',
+      createdBy: 'SLA Bot',
+      assignedTo: lead.assignedTo || null,
     });
+
+    await prisma.leadActivity.create({
+      data: {
+        leadId: lead.id,
+        type: 'TASK',
+        title: 'SLA incumplido: tarea automática creada',
+        description: `Se crea tarea automática al superar ${SLA_HOURS}h en estado NEW.`,
+        createdBy: 'SLA Bot',
+        metadata: { slaHours: SLA_HOURS },
+      },
+    });
+
+    if (lead.priority === 'LOW' || lead.priority === 'MEDIUM') {
+      await prisma.lead.update({
+        where: { id: lead.id },
+        data: { priority: 'HIGH' },
+      });
+      escalatedPriority += 1;
+    }
 
     createdTasks += 1;
   }

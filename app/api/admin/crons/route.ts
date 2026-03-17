@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { readCronRunStatuses } from '@/lib/services/cronRunStatusService';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,51 +17,7 @@ export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
-  // Fetch all automation.* settings in one query
-  const settings = await prisma.setting.findMany({
-    where: { key: { startsWith: 'automation.' } },
-  });
-
-  const settingsMap: Record<string, string> = {};
-  for (const s of settings) {
-    settingsMap[s.key] = s.value;
-  }
-
-  const crons = CRON_PREFIXES.map((cron) => {
-    const lastRun = settingsMap[`${cron.prefix}.lastRun`] || null;
-    const lastStatus = settingsMap[`${cron.prefix}.lastStatus`] || null;
-    const lastSummaryRaw = settingsMap[`${cron.prefix}.lastSummary`] || null;
-    const lastMessage = settingsMap[`${cron.prefix}.lastMessage`] || null;
-
-    let lastSummary = null;
-    if (lastSummaryRaw) {
-      try { lastSummary = JSON.parse(lastSummaryRaw); } catch { lastSummary = lastSummaryRaw; }
-    }
-
-    // Calculate health: ok if ran in last 26 hours (daily crons with margin)
-    let health: 'ok' | 'warning' | 'error' | 'unknown' = 'unknown';
-    if (lastRun) {
-      const hoursSinceRun = (Date.now() - new Date(lastRun).getTime()) / (1000 * 60 * 60);
-      if (lastStatus === 'error') {
-        health = 'error';
-      } else if (hoursSinceRun <= 26) {
-        health = 'ok';
-      } else {
-        health = 'warning';
-      }
-    }
-
-    return {
-      id: cron.id,
-      label: cron.label,
-      frequency: cron.frequency,
-      lastRun,
-      lastStatus,
-      lastSummary,
-      lastMessage,
-      health,
-    };
-  });
+  const crons = await readCronRunStatuses(CRON_PREFIXES);
 
   return NextResponse.json({ ok: true, crons });
 }

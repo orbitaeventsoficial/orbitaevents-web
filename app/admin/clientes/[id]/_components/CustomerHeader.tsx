@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
 import { labelEstatClient } from '@/lib/customer-hub/labels';
@@ -117,6 +118,7 @@ export default function CustomerHeader({
   setTab: (tab: TabKey) => void;
 }) {
   const { refresh } = useHubContext();
+  const router = useRouter();
   const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -130,6 +132,8 @@ export default function CustomerHeader({
   const lastContactText = data.kpis.lastContactAt
     ? formatRelativeTime(data.kpis.lastContactAt)
     : 'mai contactat';
+
+  const hasProtectedData = data.bookings.length > 0 || data.proposals.length > 0;
 
   const stageOrder: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
   const currentStageIndex = stageOrder.indexOf(status);
@@ -196,10 +200,10 @@ export default function CustomerHeader({
     } finally {
       setActionLoading(null);
     }
-  }, [id, refresh]);
+  }, [id, refresh, toast]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur bg-gradient-to-b from-black/80 to-transparent">
+    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur from-black/80 to-transparent">
       <div className="mx-auto max-w-7xl px-4 py-4 space-y-4">
         {/* Top row: Navigation + Status + Name */}
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -382,11 +386,11 @@ export default function CustomerHeader({
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap ${
                         isCurrent
-                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
+                          ? 'admin-tone-soft-info border border-cyan-500/40 shadow-sm shadow-cyan-500/20'
                           : isDone
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            ? 'admin-tone-soft-success border border-emerald-500/40'
                             : isLost
-                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              ? 'admin-tone-soft-danger border border-rose-500/40'
                               : 'bg-white/5 text-white/40 border border-white/10'
                       }`}
                     >
@@ -553,3 +557,7 @@ function formatRelativeTime(dateStr: string): string {
   if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
   return formatDate(dateStr);
 }
+
+
+
+

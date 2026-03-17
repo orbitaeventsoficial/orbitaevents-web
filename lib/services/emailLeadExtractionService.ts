@@ -1,6 +1,6 @@
 import type { EventType } from '@prisma/client';
 
-export type ExtractedLeadData = {
+type ExtractedLeadData = {
   name: string;
   email: string;
   phone?: string;
@@ -307,3 +307,4 @@ export function extractLeadDataFromEmail(input: {
     importantUnknowns: extractImportantUnknowns(body),
   };
 }
+

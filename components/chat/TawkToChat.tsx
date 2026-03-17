@@ -7,6 +7,16 @@
 
 import { useEffect } from 'react';
 
+type TawkApi = {
+  onLoad?: () => void;
+  setAttributes?: (attributes: { name?: string }) => void;
+};
+
+type TawkWindow = Window & {
+  Tawk_API?: TawkApi;
+  Tawk_LoadStart?: Date;
+};
+
 interface TawkToChatProps {
   /**
    * Your Tawk.to Property ID
@@ -47,7 +57,8 @@ export function TawkToChat({
     }
 
     // Don't load if already loaded
-    if (typeof window !== 'undefined' && (window as any).Tawk_API) {
+    const tawkWindow = window as TawkWindow;
+    if (tawkWindow.Tawk_API) {
       return;
     }
 
@@ -67,19 +78,21 @@ export function TawkToChat({
       }
 
       // Initialize Tawk API
-      (window as any).Tawk_API = (window as any).Tawk_API || {};
-      (window as any).Tawk_LoadStart = new Date();
+      tawkWindow.Tawk_API = tawkWindow.Tawk_API || {};
+      tawkWindow.Tawk_LoadStart = new Date();
 
       // Optional: Customize widget
-      (window as any).Tawk_API.onLoad = function () {
+      if (tawkWindow.Tawk_API) {
+        tawkWindow.Tawk_API.onLoad = function () {
         // Set visitor name if available (from cookies/localStorage)
         const visitorName = localStorage.getItem('visitor_name');
         if (visitorName) {
-          (window as any).Tawk_API.setAttributes({
+          tawkWindow.Tawk_API?.setAttributes?.({
             name: visitorName,
           });
         }
-      };
+        };
+      }
     }, loadDelay);
 
     return () => {
@@ -91,3 +104,4 @@ export function TawkToChat({
 }
 
 // Optional: Hook for programmatic control
+

@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
 import { z } from 'zod';
+import { updateCustomerHubStatus } from '@/lib/services/customerStatusService';
 
 const statusSchema = z.object({
   status: z.enum(['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST']),
 });
 
-/**
- * PATCH /api/admin/customers/[id]/status
- * Canvia l'estat del client manualment (actualitza leads relacionats)
- */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -34,70 +30,8 @@ export async function PATCH(
       );
     }
 
-    const { status } = parsed.data;
-    const customerId = params.id;
-
-    // Mapeig d'estat Hub a estat Lead
-    const leadStatusMap: Record<string, string> = {
-      LEAD: 'NEW',
-      NEGOTIATION: 'NEGOTIATING',
-      CONFIRMED: 'WON',
-      POSTEVENT: 'WON',
-      LOST: 'LOST',
-    };
-    const leadStatus = leadStatusMap[status] || 'NEW';
-
-    // Actualitzar tots els leads del client
-    const leads = await prisma.lead.findMany({
-      where: { customerId },
-      select: { id: true },
-    });
-    const leadIds = leads.map((l: any) => l.id);
-
-    await prisma.lead.updateMany({
-      where: { customerId },
-      data: { status: leadStatus as any },
-    });
-
-    // Filtre per bookings vinculats directament o via lead
-    const bookingFilter = leadIds.length > 0
-      ? { OR: [{ customerId }, { leadId: { in: leadIds } }] }
-      : { customerId };
-
-    // Si és CONFIRMED, actualitzar bookings a CONFIRMED
-    if (status === 'CONFIRMED') {
-      await prisma.booking.updateMany({
-        where: { ...bookingFilter, status: 'PENDING' },
-        data: { status: 'CONFIRMED' },
-      });
-    }
-
-    // Si és POSTEVENT, marcar bookings actius com COMPLETED
-    if (status === 'POSTEVENT') {
-      await prisma.booking.updateMany({
-        where: { ...bookingFilter, status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
-        data: { status: 'COMPLETED' },
-      });
-    }
-
-    // Si és LOST, marcar bookings com CANCELLED
-    if (status === 'LOST') {
-      await prisma.booking.updateMany({
-        where: { ...bookingFilter, status: { in: ['PENDING', 'CONFIRMED'] } },
-        data: { status: 'CANCELLED' },
-      });
-    }
-
-    // Registrar activitat
-    await prisma.customerActivity.create({
-      data: {
-        customerId,
-        action: 'STATUS_CHANGED',
-        details: { newStatus: status },
-      },
-    });
-
-    return NextResponse.json({ ok: true, status });
+    const result = await updateCustomerHubStatus(params.id, parsed.data.status);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error canviant estat del client', error, {
       context: { requestId, customerId: params.id },

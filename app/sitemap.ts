@@ -2,10 +2,12 @@
 import type { MetadataRoute } from 'next';
 import { locales, defaultLocale } from '@/i18n';
 import { getEnabledZoneLandingSlugs } from '@/lib/coverage';
+import { getSiteUrl } from '@/lib/site';
+
 
 async function getBlogSlugs(): Promise<{ slug: string; updatedAt?: string }[]> {
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
+    const base = getSiteUrl();
     const res = await fetch(`${base}/api/public/blog?limit=50&locale=es`, {
       next: { revalidate: 3600 },
     });
@@ -34,7 +36,7 @@ const PORTFOLIO_SLUGS = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
+  const base = getSiteUrl();
   const now = new Date();
   const [enabledZoneSlugs, blogSlugs] = await Promise.all([
     getEnabledZoneLandingSlugs(),

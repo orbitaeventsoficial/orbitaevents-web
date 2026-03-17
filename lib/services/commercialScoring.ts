@@ -11,7 +11,7 @@ type ScoreInput = {
   source?: string | null;
 };
 
-export type LeadScoreResult = {
+type LeadScoreResult = {
   score: number;
   probability: number;
   band: 'LOW' | 'MEDIUM' | 'HIGH';

@@ -21,6 +21,7 @@ export default function TurnstileWidget({
 }: TurnstileWidgetProps) {
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const isDev = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
     // Reset on unmount
@@ -32,12 +33,12 @@ export default function TurnstileWidget({
     };
   }, []);
 
-  if (!siteKey) {
+  if (!siteKey || isDev) {
     // En desarrollo sin Turnstile configurado, mostrar placeholder
     if (process.env.NODE_ENV === 'development') {
       return (
         <div className="p-4 border border-yellow-500/30 bg-yellow-500/10 rounded-xl text-yellow-400 text-sm">
-          ⚠️ Turnstile no configurado (dev mode)
+          ⚠️ Turnstile desactivado en local (dev mode)
           <br />
           <button
             type="button"
@@ -70,3 +71,5 @@ export default function TurnstileWidget({
     </div>
   );
 }
+
+

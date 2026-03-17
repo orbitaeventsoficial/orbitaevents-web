@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
 
@@ -27,11 +28,6 @@ interface InventoryItem {
   expectedLifeHours: number | null;
 }
 
-interface InventoryBundle {
-  id: string;
-  name: string;
-  itemIds: string[];
-}
 
 interface PackInventoryRow {
   itemId: string;
@@ -73,6 +69,11 @@ type PricingModel = {
   supportOperatorMinDjHours: number;
   supportOperatorMinWatts: number;
   fixedPackCost: number;
+};
+type RawBundleResponse = {
+  id?: string | number | null;
+  name?: string | null;
+  itemIds?: Array<string | number | null>;
 };
 
 const TABS: Array<{ id: EditorTab; label: string; icon: string }> = [
@@ -217,10 +218,10 @@ export default function EditPackForm({
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
         const next = Array.isArray(data?.bundles)
-          ? data.bundles.map((b: any) => ({
+          ? data.bundles.map((b: RawBundleResponse) => ({
               id: String(b.id || ''),
               name: String(b.name || ''),
-              itemIds: Array.isArray(b.itemIds) ? b.itemIds.map((id: any) => String(id)) : [],
+              itemIds: Array.isArray(b.itemIds) ? b.itemIds.map((id) => String(id)) : [],
             })).filter((b: InventoryBundle) => b.id && b.name)
           : [];
         setBundles(next);
@@ -785,4 +786,6 @@ export default function EditPackForm({
     </form>
   );
 }
+
+
 

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import {
-  DEFAULT_FUEL_COST_PER_KM,
+  DEFAULT_VEHICLE_COST_PER_KM,
   DEFAULT_VEHICLE_CONSUMPTION_L100,
   DEFAULT_MAINTENANCE_COST_PER_KM,
   calculateEffectiveVehicleCostPerKm,
@@ -130,6 +130,34 @@ export async function refreshFuelReferenceNow(): Promise<{
   };
 }
 
+
+type FuelRefreshSummary = {
+  generatedAt: string;
+  costPerKm: number;
+  pricePerLiter: number;
+  sourceDate: string | null;
+};
+
+export async function runFuelDailyRefresh(): Promise<FuelRefreshSummary> {
+  const refreshed = await refreshFuelReferenceNow();
+  const summary: FuelRefreshSummary = {
+    generatedAt: new Date().toISOString(),
+    costPerKm: refreshed.costPerKm,
+    pricePerLiter: refreshed.pricePerLiter,
+    sourceDate: refreshed.sourceDate,
+  };
+
+  await prisma.adminLog.create({
+    data: {
+      action: 'AUTOMATION_FUEL_REFRESH',
+      entity: 'automation',
+      entityId: 'fuel-daily',
+      details: summary,
+    },
+  });
+
+  return summary;
+}
 export async function getFuelCostPerKmReference(): Promise<{
   costPerKm: number;
   updatedAt: string | null;
@@ -154,7 +182,7 @@ export async function getFuelCostPerKmReference(): Promise<{
     } catch (error) {
       console.error('[FuelReference] Error refrescant preu combustible:', error);
       return {
-        costPerKm: Number.isFinite(costValue) && costValue > 0 ? costValue : DEFAULT_FUEL_COST_PER_KM,
+        costPerKm: Number.isFinite(costValue) && costValue > 0 ? costValue : DEFAULT_VEHICLE_COST_PER_KM,
         updatedAt,
       };
     }
@@ -204,7 +232,7 @@ export async function getEffectiveVehicleCostPerKm(): Promise<{
   // Si no tenim preu MITECO, retornem el fallback clàssic
   if (safeFuelPrice === 0) {
     return {
-      costPerKm: DEFAULT_FUEL_COST_PER_KM,
+      costPerKm: DEFAULT_VEHICLE_COST_PER_KM,
       fuelPricePerLiter: 0,
       consumptionL100: safeConsumption,
       maintenanceCostPerKm: safeMaintenance,
@@ -226,3 +254,5 @@ export async function getEffectiveVehicleCostPerKm(): Promise<{
     updatedAt: updatedAtSetting?.value || null,
   };
 }
+
+

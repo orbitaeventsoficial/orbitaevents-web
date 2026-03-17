@@ -403,20 +403,20 @@ export default async function LeadsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border overflow-hidden admin-card-glass">
+      <section className="hidden lg:block rounded-2xl border p-0 overflow-hidden admin-card-glass">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1120px] text-sm" aria-label="Pipeline d'entrades">
             <thead className="border-b">
               <tr>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Contacte</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Origen</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Temps pendent</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Prioritat</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Client</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Contacte</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Tipus</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Origen</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Data</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Temps pendent</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Estat</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Prioritat</th>
+                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -439,7 +439,7 @@ export default async function LeadsPage({
                     <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap">
+                          <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[180px]">
                             {lead.name}
                           </Link>
                           {lead.customerId && (
@@ -459,12 +459,12 @@ export default async function LeadsPage({
                           {lead.email}
                         </a>
                         {lead.phone && (
-                          <a href={`tel:${lead.phone}`} className="text-xs whitespace-nowrap inline-block">📱 {lead.phone}</a>
+                          <a href={`tel:${lead.phone}`} className="text-xs whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[220px]">📱 {lead.phone}</a>
                         )}
                       </td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">{eventType}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{eventType}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">
                         {lead.eventDate
                           ? formatDate(lead.eventDate)
                           : '—'}
@@ -473,23 +473,23 @@ export default async function LeadsPage({
                         {(() => {
                           const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
                           return (
-                            <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${pending.className}`}>
+                            <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${pending.className}`}>
                               {pending.label}
                             </span>
                           );
                         })()}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">
-                        <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.badgeClass}`}>
+                        <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${statusConf.badgeClass}`}>
                           {statusConf.label}
                         </span>
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">
-                        <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${priorityConf.badgeClass}`}>
+                        <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${priorityConf.badgeClass}`}>
                           {priorityConf.label}
                         </span>
                       </td>
-                      <td className="px-3 xl:px-4 py-3 text-center whitespace-nowrap">
+                      <td className="px-3 xl:px-4 py-3 text-center whitespace-nowrap overflow-hidden text-ellipsis">
                         <LeadActions
                           leadId={lead.id}
                           leadName={lead.name}
@@ -551,3 +551,5 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
+
+

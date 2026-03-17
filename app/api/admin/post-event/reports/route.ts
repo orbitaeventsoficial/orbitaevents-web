@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
+import { createAdminPostEventReport } from '@/lib/services/postEventReportAdminService';
 
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
@@ -9,77 +9,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const {
-      bookingId,
-      eventSummary,
-      setupTime,
-      startTime,
-      endTime,
-      soundQuality,
-      danceFloorLevel,
-      musicStyles,
-      incidents,
-      notes,
-      status,
-    } = body;
+    const result = await createAdminPostEventReport(body);
+    const report = result.body.ok && 'report' in result.body ? result.body.report : null;
 
-    if (!bookingId) {
-      return NextResponse.json({ ok: false, error: 'bookingId es requerido' }, { status: 400 });
+    if (report) {
+      log.info(`Created post-event report for booking ${body.bookingId}`, {
+        reportId: report.id,
+        status: report.status,
+      });
     }
 
-    // Check if booking exists
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-    });
-
-    if (!booking) {
-      return NextResponse.json({ ok: false, error: 'Reserva no trobada' }, { status: 404 });
-    }
-
-    // Check if report already exists for this booking
-    const existingReport = await prisma.postEventReport.findUnique({
-      where: { bookingId },
-    });
-
-    if (existingReport) {
-      return NextResponse.json({ ok: false, error: 'Ja existeix un informe per aquesta reserva' }, { status: 400 });
-    }
-
-    // Create the report - map form fields to schema fields
-    const report = await prisma.postEventReport.create({
-      data: {
-        bookingId,
-        actualStartTime: startTime || null,
-        actualEndTime: endTime || null,
-        soundQuality: soundQuality ? parseInt(soundQuality) : null,
-        maxDancefloor: danceFloorLevel ? parseInt(danceFloorLevel) * 20 : null, // Convert 1-5 to percentage
-        mainStyle: musicStyles || null,
-        incidentDescription: incidents || null,
-        hadIncidents: !!incidents && incidents.trim() !== '',
-        lessonsLearned: eventSummary || null,
-        whatToImprove: notes || null,
-        status: status || 'DRAFT',
-        completedAt: status === 'COMPLETED' ? new Date() : null,
-        genresWorked: [],
-        genresFailed: [],
-        lightingUsed: [],
-        effectsUsed: [],
-        gamesPlayed: [],
-      },
-    });
-
-    // Log the action
-    log.info(`Created post-event report for booking ${bookingId}`, {
-      reportId: report.id,
-      status: report.status,
-    });
-
-    return NextResponse.json({ ok: true, report });
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error creating post-event report:', error as Error);
-    return NextResponse.json(
-      { ok: false, error: 'Error creant informe' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Error creant informe' }, { status: 500 });
   }
 }

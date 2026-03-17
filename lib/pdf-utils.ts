@@ -12,6 +12,7 @@ import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { log } from '@/lib/logger';
 import { toIntlLocale } from '@/lib/constants';
+import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 import { ORBITA_LOGO_BASE64 } from './logo-base64';
 import { ORBITA_LOGO_TEXT_DRETA_BASE64 } from './logo-wordmark-base64';
 
@@ -300,7 +301,7 @@ export async function generateServiceBrochure(
   });
 
   y = checkPageBreak(doc, y, 80, headerTitle);
-  const compatibleExtras = EXTRAS.filter((e) => !e.compatibleWith || e.compatibleWith.includes(service)).slice(0, 8);
+  const compatibleExtras = filterCompatibleExtras(EXTRAS, service).slice(0, 8);
 
   if (compatibleExtras.length > 0) {
     doc.setTextColor(...COLORS.gold);
@@ -1343,3 +1344,6 @@ export async function downloadImages(
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }
+
+
+

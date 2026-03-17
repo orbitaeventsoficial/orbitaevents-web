@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { requireAuth } from '@/lib/auth';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest) {
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   // Usar redirect URI específica para Gmail o la genérica
   const redirectUri = process.env.GMAIL_OAUTH_REDIRECT_URI ||
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orbitaevents.com'}/api/gmail/oauth/callback`;
+    `${getAppBaseUrl()}/api/gmail/oauth/callback`;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(

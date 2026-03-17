@@ -118,19 +118,19 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
 
       {/* Success */}
       {successMsg && (
-        <div className="mt-2 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-300" role="status">
+        <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="status">
           <span>✓</span>
           <span className="flex-1">{successMsg}</span>
-          <button type="button" onClick={() => setSuccessMsg(null)} className="text-emerald-400/50 hover:text-emerald-400">✕</button>
+          <button type="button" onClick={() => setSuccessMsg(null)} className="">✕</button>
         </div>
       )}
 
       {/* Error */}
       {error && (
-        <div className="mt-2 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-xs text-rose-300" role="alert">
+        <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
           <span>⚠️</span>
           <span className="flex-1">{error}</span>
-          <button type="button" onClick={() => setError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+          <button type="button" onClick={() => setError(null)} className="">✕</button>
         </div>
       )}
 

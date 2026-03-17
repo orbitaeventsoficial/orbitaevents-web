@@ -332,7 +332,7 @@ export default async function AnalyticsPage() {
               </Link>
               <span
                 className={`rounded-full border border-white/10 px-3 py-1 text-xs ${
-                  ga4Ready ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                  ga4Ready ? 'admin-tone-soft-success' : 'admin-tone-soft-danger'
               }`}
             >
               {ga4Ready ? '● Actiu' : '● Pendent'}
@@ -426,7 +426,7 @@ export default async function AnalyticsPage() {
 
         {ga4 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-2xl border">
+            <div className="rounded-2xl border p-0">
               <div className="border-b px-4 py-3 text-sm font-semibold">Pàgines principals</div>
               <div className="space-y-2 p-4 text-sm">
                 {ga4.pages.map((row) => (
@@ -437,7 +437,7 @@ export default async function AnalyticsPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border">
+            <div className="rounded-2xl border p-0">
               <div className="border-b px-4 py-3 text-sm font-semibold">Fonts</div>
               <div className="space-y-2 p-4 text-sm">
                 {ga4.sources.map((row) => (
@@ -448,7 +448,7 @@ export default async function AnalyticsPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border">
+            <div className="rounded-2xl border p-0">
               <div className="border-b px-4 py-3 text-sm font-semibold">
                 Temps real (top)
               </div>
@@ -474,7 +474,7 @@ export default async function AnalyticsPage() {
         )}
 
         {ga4 && (
-          <div className="mt-4 rounded-2xl border">
+          <div className="mt-4 rounded-2xl border p-0">
             <div className="border-b px-4 py-3 text-sm font-semibold">
               Paraules de cerca (GA4)
             </div>
@@ -631,7 +631,7 @@ export default async function AnalyticsPage() {
       {/* Entrades Section */}
       <section className="grid gap-6 lg:grid-cols-2">
         {/* Entrades per Font */}
-        <div className="overflow-hidden rounded-2xl border">
+        <div className="overflow-hidden rounded-2xl border p-0">
           <div className="border-b p-4">
             <h3 className="font-semibold">Entrades per origen</h3>
             <p className="mt-1 text-xs">{data.leads.thisYear} entrades aquest any</p>
@@ -667,7 +667,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Conversió d'entrades */}
-        <div className="overflow-hidden rounded-2xl border">
+        <div className="overflow-hidden rounded-2xl border p-0">
           <div className="border-b p-4">
             <h3 className="font-semibold">Conversió d&apos;entrades</h3>
             <p className="mt-1 text-xs">Estat de les entrades</p>
@@ -711,7 +711,7 @@ export default async function AnalyticsPage() {
       </section>
 
       {/* Esdeveniments per tipus */}
-      <section className="overflow-hidden rounded-2xl border">
+      <section className="overflow-hidden rounded-2xl border p-0">
         <div className="border-b p-4">
           <h3 className="font-semibold">Reserves per tipus d&apos;esdeveniment</h3>
         </div>
@@ -738,7 +738,7 @@ export default async function AnalyticsPage() {
       </section>
 
       {/* GTM Control Center */}
-      <section className="overflow-hidden rounded-2xl border">
+      <section className="overflow-hidden rounded-2xl border p-0">
         <div className="border-b p-4">
           <h2 className="text-lg font-semibold">GTM · Centre de control</h2>
           <p className="text-xs">Gestió d&apos;etiquetes, activadors i accessos ràpids</p>
@@ -751,7 +751,7 @@ export default async function AnalyticsPage() {
             </div>
             <span
               className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
-                gtmReady ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                gtmReady ? 'admin-tone-soft-success' : 'admin-tone-soft-danger'
               }`}
             >
               {gtmReady ? '● Actiu' : '● Desactivat'}
@@ -803,3 +803,5 @@ export default async function AnalyticsPage() {
     </AdminPage>
   );
 }
+
+

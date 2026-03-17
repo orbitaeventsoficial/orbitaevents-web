@@ -519,7 +519,7 @@ function CobramentFiltersSection({
             placeholder="Cerca referència o client..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none"
+            className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:outline-none"
           />
           <ExportCsvButton
             data={csvData}
@@ -561,13 +561,13 @@ function CobramentFiltersSection({
 
       {/* Bulk actions */}
       {selected.size > 0 && (
-        <section className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex flex-wrap items-center gap-3">
+        <section className="rounded-xl border p-3 flex flex-wrap items-center gap-3">
           <span className="text-sm font-medium">{selected.size} seleccionat{selected.size !== 1 ? 's' : ''}</span>
           <button
             type="button"
             onClick={() => bulkMarkPaid('depositPaid')}
             disabled={bulkBusy}
-            className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+            className="rounded-xl border px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {bulkBusy ? '...' : 'Marcar dipòsit pagat'}
           </button>
@@ -575,7 +575,7 @@ function CobramentFiltersSection({
             type="button"
             onClick={() => bulkMarkPaid('remainingPaid')}
             disabled={bulkBusy}
-            className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-50"
+            className="rounded-xl border px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {bulkBusy ? '...' : 'Marcar resta pagada'}
           </button>
@@ -586,7 +586,7 @@ function CobramentFiltersSection({
           >
             Netejar selecció
           </button>
-          {bulkError && <p className="text-xs text-rose-400">{bulkError}</p>}
+          {bulkError && <p className="text-xs">{bulkError}</p>}
         </section>
       )}
 
@@ -1336,8 +1336,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         {props.cashFlow.map((row) => (
                           <tr key={row.month} className="hover:bg-white/[0.03]">
                             <td className="px-3 py-2 font-medium">{row.month}</td>
-                            <td className="px-3 py-2 text-right text-emerald-300">{money(row.income)}</td>
-                            <td className="px-3 py-2 text-right text-rose-300">{money(row.costs)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.income)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.costs)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                               {money(row.netFlow)}
                             </td>
@@ -1379,8 +1379,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <tr key={row.month} className="hover:bg-white/[0.03]">
                             <td className="px-3 py-2 font-medium">{row.month}</td>
                             <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
-                            <td className="px-3 py-2 text-right text-amber-300">{money(row.pipeline)}</td>
-                            <td className="px-3 py-2 text-right font-bold text-emerald-300">{money(row.combined)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
+                            <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1535,9 +1535,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       <p className="text-[11px] uppercase tracking-wide">Manteniment</p>
                       <p className="text-lg font-bold">{props.vehicleConfig.maintenanceCostPerKm.toFixed(2)} €/km</p>
                     </div>
-                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+                    <div className="rounded-xl border p-3">
                       <p className="text-[11px] uppercase tracking-wide">Cost efectiu per km</p>
-                      <p className="text-lg font-bold text-emerald-300">{props.vehicleConfig.effectiveCostPerKm.toFixed(3)} €/km</p>
+                      <p className="text-lg font-bold">{props.vehicleConfig.effectiveCostPerKm.toFixed(3)} €/km</p>
                       {props.vehicleConfig.updatedAt && (
                         <p className="text-[11px]">Act: {formatDateSimple(props.vehicleConfig.updatedAt)}</p>
                       )}

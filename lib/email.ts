@@ -6,6 +6,8 @@
 import nodemailer from 'nodemailer';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 interface SendEmailOptions {
   to: string;
@@ -18,7 +20,50 @@ interface SendEmailOptions {
   brandingStyle?: 'hero' | 'soft';
 }
 
-const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
+type BookingEmailTranslation = {
+  locale: string;
+  name: string;
+};
+
+type BookingEmailPack = {
+  slug: string;
+  price: number;
+  extraHourPrice?: number | null;
+  translations: BookingEmailTranslation[];
+};
+
+type BookingEmailExtra = {
+  slug: string;
+  translations: BookingEmailTranslation[];
+};
+
+type BookingEmailExtraLine = {
+  price: number;
+  extra: BookingEmailExtra;
+};
+
+type BookingEmailModel = {
+  id: string;
+  reference: string;
+  preferredLocale: string;
+  eventDate: string | Date;
+  eventStartTime?: string | null;
+  eventEndTime?: string | null;
+  eventLocation: string;
+  eventVenue?: string | null;
+  guestCount: number;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  eventType: string;
+  total: number;
+  extraHours: number;
+  notes?: string | null;
+  pack: BookingEmailPack;
+  extras: BookingEmailExtraLine[];
+};
+
+const APP_BASE_URL = (getAppBaseUrl()).replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
 const EMAIL_CONTACT_PHONE = SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
 const EMAIL_CONTACT_EMAIL = SITE_CONFIG.business.email;
@@ -450,7 +495,7 @@ export async function sendPrivacyVerificationEmail(params: {
   const labels = PRIVACY_REQUEST_LABELS[locale];
   const intlLocale = toIntlLocaleEmail(locale);
 
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com'}/api/privacy/verify?token=${verificationToken}`;
+  const verificationUrl = `${getAppBaseUrl()}/api/privacy/verify?token=${verificationToken}`;
   const requestLabel = labels[requestType] || requestType;
 
   await sendEmail({
@@ -680,7 +725,7 @@ export async function sendTestimonialApprovedEmail(params: {
   const locale = normalizeEmailLocale(params.locale);
   const t = TESTIMONIAL_COPY[locale];
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const baseUrl = getAppBaseUrl();
   const canvasParams = new URLSearchParams({
     name,
     rating: String(rating * 2),
@@ -788,7 +833,7 @@ export async function sendTestimonialAdminNotification(params: {
 }): Promise<void> {
   const { customerName, customerEmail, rating, comment, discountCode, discountPercent, hasPhoto, hasVideo } = params;
   const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const baseUrl = getAppBaseUrl();
 
   const stars = '*'.repeat(Math.min(5, Math.max(1, rating)));
   const mediaIndicators = [
@@ -960,7 +1005,7 @@ export async function sendTestimonialReceivedEmail(params: {
   discountPercent: number;
 }): Promise<void> {
   const { to, name, rating, discountCode, discountPercent } = params;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const baseUrl = getAppBaseUrl();
   const firstName = name.split(' ')[0];
 
   const ratingBadge = rating >= 5 ? 'Excelente' : rating >= 4 ? 'Genial' : rating >= 3 ? 'Bien' : 'Gracias';
@@ -1049,7 +1094,7 @@ export async function sendTestimonialReceivedEmail(params: {
 /**
  * Send booking confirmation email to client
  */
-export async function sendBookingConfirmation(booking: any): Promise<void> {
+export async function sendBookingConfirmation(booking: BookingEmailModel): Promise<void> {
   const eventDate = new Date(booking.eventDate);
   const formattedDate = eventDate.toLocaleDateString('es-ES', {
     weekday: 'long',
@@ -1059,15 +1104,15 @@ export async function sendBookingConfirmation(booking: any): Promise<void> {
   });
 
   const packName =
-    booking.pack.translations.find((t: any) => t.locale === booking.preferredLocale)?.name ||
+    booking.pack.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
     booking.pack.slug;
 
   let extrasHtml = '';
   if (booking.extras && booking.extras.length > 0) {
     extrasHtml = booking.extras
-      .map((extra: any) => {
+      .map((extra: BookingEmailExtraLine) => {
         const extraName =
-          extra.extra.translations.find((t: any) => t.locale === booking.preferredLocale)?.name ||
+          extra.extra.translations.find((t: BookingEmailTranslation) => t.locale === booking.preferredLocale)?.name ||
           extra.extra.slug;
         return `<li>${escapeHtml(extraName)} - ${extra.price}€</li>`;
       })
@@ -1203,7 +1248,7 @@ export async function sendBookingConfirmation(booking: any): Promise<void> {
 /**
  * Send booking notification to admin
  */
-export async function sendBookingNotificationToAdmin(booking: any): Promise<void> {
+export async function sendBookingNotificationToAdmin(booking: BookingEmailModel): Promise<void> {
   const eventDate = new Date(booking.eventDate);
   const formattedDate = eventDate.toLocaleDateString('es-ES', {
     weekday: 'long',
@@ -1268,3 +1313,4 @@ export async function sendBookingNotificationToAdmin(booking: any): Promise<void
     `,
   });
 }
+

@@ -368,7 +368,7 @@ export default function CalendarMonthClient() {
           >
             Mes següent →
           </button>
-          <div className="flex rounded-xl border overflow-hidden ml-2">
+          <div className="flex rounded-xl border p-0 overflow-hidden ml-2">
             <span
               className="inline-flex items-center px-3 py-2 text-sm font-medium bg-white/10"
             >
@@ -480,7 +480,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl border px-3 sm:px-4 py-2.5 text-sm">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl border p-0 px-3 sm:px-4 py-2.5 text-sm">
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm border" />
@@ -510,7 +510,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Graella del calendari */}
-      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border">
+      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border p-0">
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -668,7 +668,7 @@ export default function CalendarMonthClient() {
                   <button
                     type="button"
                     onClick={() => unblockDay(selectedDayData.key!)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-emerald-400 transition-all hover:bg-emerald-500/20 active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
                   >
                     Desbloquejar dia
                   </button>
@@ -676,7 +676,7 @@ export default function CalendarMonthClient() {
                   <button
                     type="button"
                     onClick={() => setShowBlockForm((v) => !v)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/20 active:scale-[0.98]"
+                    className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
                   >
                     Bloquejar dia
                   </button>
@@ -687,7 +687,7 @@ export default function CalendarMonthClient() {
 
           {/* Formulari bloqueig inline */}
           {showBlockForm && selectedDayData.key && (
-            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
+            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border p-3">
               <div className="flex-1 min-w-[200px]">
                 <label htmlFor="block-note" className="block text-xs font-medium mb-1">
                   Motiu del bloqueig (opcional)
@@ -698,14 +698,14 @@ export default function CalendarMonthClient() {
                   value={blockNote}
                   onChange={(e) => setBlockNote(e.target.value)}
                   placeholder="p.ex. Vacances, manteniment..."
-                  className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                  className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
                 />
               </div>
               <button
                 type="button"
                 disabled={blockingDate}
                 onClick={() => blockDay(selectedDayData.key!, blockNote)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
               >
                 {blockingDate ? 'Bloquejant...' : 'Confirmar bloqueig'}
               </button>
@@ -823,7 +823,7 @@ export default function CalendarMonthClient() {
                   selectedDayData.payload.bloqueos.map((b) => (
                     <div
                       key={b.id}
-                      className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2.5"
+                      className="rounded-xl border px-3 py-2.5"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="font-medium text-sm">
@@ -867,3 +867,5 @@ export default function CalendarMonthClient() {
     </AdminPage>
   );
 }
+
+

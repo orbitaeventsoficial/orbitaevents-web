@@ -101,7 +101,7 @@ export default function FAQClient({
       {/* Categories Tabs */}
       <section className="sticky top-16 z-20 bg-zinc-950/90 backdrop-blur-sm border-b border-white/10 py-4">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-proximity">
             {categories.map((cat) => (
               <button
                 key={cat.key}

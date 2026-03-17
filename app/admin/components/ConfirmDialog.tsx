@@ -14,7 +14,6 @@ interface ConfirmDialogProps {
   title: string;
   message: string;
   confirmLabel?: string;
-  cancelLabel?: string;
   variant?: ConfirmVariant;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
@@ -81,15 +80,15 @@ export function useConfirmDialog() {
     []
   );
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = () => {
     state.resolve?.(true);
     setState((s) => ({ ...s, open: false, resolve: null }));
-  }, [state.resolve]);
+  };
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     state.resolve?.(false);
     setState((s) => ({ ...s, open: false, resolve: null }));
-  }, [state.resolve]);
+  };
 
   const dialogProps: ConfirmDialogProps = {
     open: state.open,
@@ -112,9 +111,7 @@ export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirmar',
-  cancelLabel = 'Cancel·lar',
-  variant = 'danger',
+  confirmLabel = 'Confirmar',  variant = 'danger',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -194,7 +191,7 @@ export default function ConfirmDialog({
             disabled={busy}
             className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
           >
-            {cancelLabel}
+            Cancel·lar
           </button>
           <button
             ref={confirmRef}
@@ -218,3 +215,9 @@ export default function ConfirmDialog({
     document.body
   );
 }
+
+
+
+
+
+

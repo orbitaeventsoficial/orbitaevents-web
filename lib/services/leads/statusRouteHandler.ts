@@ -15,7 +15,7 @@ const VALID_STATUSES = [
 
 type LeadStatus = (typeof VALID_STATUSES)[number];
 
-export async function handleLeadStatusPatch(req: NextRequest, leadId: string, deprecated = false) {
+export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
@@ -154,13 +154,7 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string, de
       });
     }
 
-    const response = NextResponse.json({ ok: true, lead: updatedLead });
-    if (deprecated) {
-      response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/status`);
-    }
-
-    return response;
+    return NextResponse.json({ ok: true, lead: updatedLead });
   } catch (error) {
     log.error('Error actualitzant estat del lead:', error);
     return NextResponse.json({ error: 'Error actualitzant estat' }, { status: 500 });

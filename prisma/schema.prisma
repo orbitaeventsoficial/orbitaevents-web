@@ -641,6 +641,7 @@ model Booking {
   invoices           Invoice[]
   tasks              Task[]
   portalAccesses     ClientPortalAccess[]
+  collaboratorBookings CollaboratorBooking[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -1517,4 +1518,89 @@ model EmailTemplate {
   @@unique([slug, locale])
   @@index([slug])
   @@map("email_templates")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COL·LABORADORS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Collaborator {
+  id               String   @id @default(cuid())
+  name             String
+  company          String?
+  email            String?
+  phone            String?
+  commissionPct    Float    @default(10)  // % comissió
+  pricingModel     CollaboratorPricingModel @default(DISCOUNT) // Model de preus
+  notes            String?  @db.Text
+  isActive         Boolean  @default(true)
+
+  bookings         CollaboratorBooking[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("collaborators")
+}
+
+model CollaboratorBooking {
+  id               String        @id @default(cuid())
+  collaboratorId   String
+  collaborator     Collaborator  @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  bookingId        String
+  booking          Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  commissionPct    Float         // % comissió aplicat
+  commissionAmount Float         // Import comissió en €
+  collaboratorPrice Float?       // Preu que veu el col·laborador (si model DISCOUNT)
+  isPaid           Boolean       @default(false)
+  paidAt           DateTime?
+
+  createdAt        DateTime      @default(now())
+
+  @@unique([collaboratorId, bookingId])
+  @@index([bookingId])
+  @@map("collaborator_bookings")
+}
+
+enum CollaboratorPricingModel {
+  NET_PLUS_COMMISSION  // Preu net: col·lab afegeix la seva comissió
+  DISCOUNT             // Descompte: col·lab rep preu amb X% menys
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRESSUPOSTOS PERSONALITZATS (Cost Calculator)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model CustomQuote {
+  id               String   @id @default(cuid())
+  name             String   // "DJ 3h sense altaveus - Client X"
+  clientName       String?
+  clientEmail      String?
+
+  // Components (JSON array)
+  components       Json     // [{ type: "dj", hours: 3, unitCost: 25, total: 75 }, ...]
+
+  // Totals
+  totalCost        Float    // Cost real total
+  suggestedPrice   Float    // Preu suggerit (cost + marge)
+  marginPct        Float    // Marge aplicat
+  finalPrice       Float?   // Preu final (si es modifica manualment)
+
+  // Estat
+  status           CustomQuoteStatus @default(DRAFT)
+  sentAt           DateTime?
+  notes            String?  @db.Text
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("custom_quotes")
+}
+
+enum CustomQuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
 }

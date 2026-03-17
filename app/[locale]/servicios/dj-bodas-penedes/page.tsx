@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Penedès desde ${MIN_PRICE}€. Vilafranca, Sant Sadurní, Sitges. Especialistas en bodas en bodegas y viñedos.`,
   keywords: ['DJ bodas Penedès', 'DJ bodas Vilafranca', 'DJ bodas Sant Sadurní', 'DJ bodas bodegas', 'bodas viñedos Penedès'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-penedes' },
   openGraph: {
     title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€`,

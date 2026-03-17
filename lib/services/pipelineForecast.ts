@@ -10,7 +10,7 @@
 import { prisma } from '@/lib/prisma';
 import { scoreLead, estimateLeadAmount } from './commercialScoring';
 
-export interface ForecastMonth {
+interface ForecastMonth {
   month: string;
   historicalAvg: number;
   pipeline: number;

@@ -124,7 +124,8 @@ function QuoteMenu() {
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            exit={{ opacity: 0, y: 14 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 flex flex-col gap-3 z-50"
           >
             {actions.map((action, i) => (
@@ -136,13 +137,13 @@ function QuoteMenu() {
                   opacity: 1, 
                   y: 0, 
                   scale: 1,
-                  transition: reduceMotion ? { duration: 0 } : { delay: i * 0.1 }
+                  transition: reduceMotion ? { duration: 0 } : { duration: 0.22, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }
                 }}
                 exit={{ 
                   opacity: 0, 
                   y: 20, 
                   scale: 0.8,
-                  transition: reduceMotion ? { duration: 0 } : { delay: (actions.length - i) * 0.05 }
+                  transition: reduceMotion ? { duration: 0 } : { duration: 0.18, delay: (actions.length - i) * 0.03, ease: [0.22, 1, 0.36, 1] }
                 }}
                 whileTap={{ scale: 0.95 }}
                 onTapStart={() => haptic('light')}
@@ -166,7 +167,7 @@ function QuoteMenu() {
       >
         <motion.span
           animate={reduceMotion ? { rotate: 0 } : { rotate: isOpen ? 45 : 0 }}
-          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 300 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           className="inline-flex text-black"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -298,7 +299,7 @@ export default function MobileBottomNav() {
       role="navigation"
       initial={reduceMotion ? false : { y: 100 }}
       animate={{ y: 0 }}
-      transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, delay: 0.5 }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.34, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
       className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
     >
       {/* Background with blur */}

@@ -88,7 +88,7 @@ export default async function PacksPage() {
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-400 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-black transition-colors"
           >
             + Nou Pack
           </Link>
@@ -99,7 +99,7 @@ export default async function PacksPage() {
       <nav className="flex flex-wrap gap-2">
         <Link
           href="/admin/packs"
-          className="inline-flex items-center rounded-full border border-amber-400/50 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200"
+          className="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
         >
           Packs
         </Link>
@@ -117,19 +117,19 @@ export default async function PacksPage() {
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{packs.length}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+        <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+        <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-4">
+        <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.reduce((sum, p) => sum + p._count.bookings, 0)}

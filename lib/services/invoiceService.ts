@@ -298,3 +298,84 @@ export async function refreshHoldedStatus(invoiceId: string): Promise<void> {
     });
   }
 }
+
+type InvoiceSyncSummary = {
+  autoCreated: number;
+  retried: number;
+  refreshed: number;
+  errors: number;
+};
+
+export async function runInvoiceSyncCron(): Promise<InvoiceSyncSummary> {
+  const summary: InvoiceSyncSummary = {
+    autoCreated: 0,
+    retried: 0,
+    refreshed: 0,
+    errors: 0,
+  };
+
+  const completedBookings = await prisma.booking.findMany({
+    where: {
+      status: 'COMPLETED',
+      depositPaid: true,
+      remainingPaid: true,
+      invoices: { none: { status: { not: 'CANCELLED' } } },
+      customerId: { not: null },
+    },
+    select: { id: true, reference: true },
+    take: 20,
+  });
+
+  for (const booking of completedBookings) {
+    try {
+      await createInvoiceFromBooking(booking.id);
+      summary.autoCreated++;
+      log.info(`Cron invoice-sync: factura auto-creada per reserva ${booking.reference}`);
+    } catch (error) {
+      summary.errors++;
+      log.error(`Cron invoice-sync: error creant factura per ${booking.reference}`, error);
+    }
+  }
+
+  if (!isHoldedEnabled()) {
+    return summary;
+  }
+
+  const errorInvoices = await prisma.invoice.findMany({
+    where: { status: 'SYNC_ERROR' },
+    select: { id: true, reference: true },
+    take: 10,
+  });
+
+  for (const invoice of errorInvoices) {
+    try {
+      await retryHoldedSync(invoice.id);
+      summary.retried++;
+      log.info(`Cron invoice-sync: reintentat ${invoice.reference}`);
+    } catch (error) {
+      summary.errors++;
+      log.error(`Cron invoice-sync: error reintentant ${invoice.reference}`, error);
+    }
+  }
+
+  const syncedInvoices = await prisma.invoice.findMany({
+    where: {
+      status: 'SYNCED',
+      holdedInvoiceId: { not: null },
+    },
+    select: { id: true, reference: true },
+    take: 20,
+  });
+
+  for (const invoice of syncedInvoices) {
+    try {
+      await refreshHoldedStatus(invoice.id);
+      summary.refreshed++;
+    } catch (error) {
+      summary.errors++;
+      log.error(`Cron invoice-sync: error refrescant ${invoice.reference}`, error);
+    }
+  }
+
+  return summary;
+}

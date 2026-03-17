@@ -51,7 +51,7 @@ async function holdedFetch(endpoint: string, options: RequestInit = {}): Promise
 // CONTACTS
 // ============================================
 
-export interface HoldedContact {
+interface HoldedContact {
   id: string;
   name: string;
   email?: string;
@@ -121,21 +121,21 @@ export async function findOrCreateHoldedContact(data: {
 // INVOICES
 // ============================================
 
-export interface HoldedInvoiceItem {
+interface HoldedInvoiceItem {
   name: string;
   units: number;
   subtotal: number;
   tax: number; // 21 for 21%
 }
 
-export interface CreateHoldedInvoiceData {
+interface CreateHoldedInvoiceData {
   contactId: string;
   description?: string;
   items: HoldedInvoiceItem[];
   notes?: string;
 }
 
-export interface HoldedInvoiceResult {
+interface HoldedInvoiceResult {
   id: string;
   invoiceNum?: string;
   status?: string;
@@ -197,3 +197,4 @@ export async function getHoldedInvoiceStatus(
     return null;
   }
 }
+

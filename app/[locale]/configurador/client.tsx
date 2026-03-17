@@ -1,8 +1,8 @@
 "use client";
 
 // app/configurador/client.tsx
-import { EXTRAS, OFFERS, getAllPacks, type ExtraDefinition, type ServiceSlug } from '@/config/packs-config';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { OFFERS, getAllPacks, type ExtraDefinition, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -13,7 +13,6 @@ import {
   FileText,
   Sparkles,
   Tag,
-  Clock,
   Zap,
   AlertCircle,
   TrendingDown,
@@ -22,9 +21,12 @@ import {
   Download,
 } from 'lucide-react';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
+import { useBookedDates } from '@/lib/hooks/useBookedDates';
+import { useConfiguratorExtras } from '@/lib/hooks/useConfiguratorExtras';
+import { useConfiguratorLeadForm } from '@/lib/hooks/useConfiguratorLeadForm';
 import { usePacks } from '@/lib/hooks/usePacks';
+import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 import { generateQuotePDF } from '@/lib/pdf-utils';
-import { fetchWithCsrf } from '@/lib/csrf';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
 import { getWhatsAppUrl } from '@/config/site-config';
@@ -38,34 +40,49 @@ const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   empresas: ['empresas'],
 };
 
+const EVENT_TYPE_CARDS: Array<{
+  slug: EventType;
+  icon: string;
+  idealKey: 'step1.idealBodas' | 'step1.idealFiestas' | 'step1.idealDiscomovil' | 'step1.idealEmpresas';
+}> = [
+  { slug: 'bodas', icon: '💒', idealKey: 'step1.idealBodas' },
+  { slug: 'fiestas', icon: '🎉', idealKey: 'step1.idealFiestas' },
+  { slug: 'discomovil', icon: '🎵', idealKey: 'step1.idealDiscomovil' },
+  { slug: 'empresas', icon: '💼', idealKey: 'step1.idealEmpresas' },
+];
 // ─── Ambient visual per tipus d'event ─────────────────────────────────────
 
-const EVENT_AMBIENTS: Record<EventType, { gradient: string; accent: string; glow: string }> = {
-  bodas: {
-    gradient: 'from-rose-500/8 via-transparent to-transparent',
-    accent: 'rose-400',
-    glow: 'rgba(244,63,94,0.06)',
-  },
-  fiestas: {
-    gradient: 'from-fuchsia-500/8 via-transparent to-transparent',
-    accent: 'fuchsia-400',
-    glow: 'rgba(217,70,239,0.06)',
-  },
-  discomovil: {
-    gradient: 'from-cyan-500/8 via-transparent to-transparent',
-    accent: 'cyan-400',
-    glow: 'rgba(34,211,238,0.06)',
-  },
-  empresas: {
-    gradient: 'from-blue-500/8 via-transparent to-transparent',
-    accent: 'blue-400',
-    glow: 'rgba(59,130,246,0.06)',
-  },
+const EVENT_AMBIENTS: Record<EventType, { glow: string }> = {
+  bodas: { glow: 'rgba(244,63,94,0.06)' },
+  fiestas: { glow: 'rgba(217,70,239,0.06)' },
+  discomovil: { glow: 'rgba(34,211,238,0.06)' },
+  empresas: { glow: 'rgba(59,130,246,0.06)' },
 };
 
+function getPacksForEventType(packs: PackDefinition[], eventType: EventType | null): PackDefinition[] {
+  if (!eventType) return [];
+
+  const allowedServices = EVENT_TYPE_SERVICE_MAP[eventType];
+  const deduped = new Map<string, PackDefinition>();
+
+  for (const pack of packs) {
+    if (!allowedServices.includes(pack.service)) continue;
+    const key = pack.slug || pack.id;
+    if (!deduped.has(key)) {
+      deduped.set(key, pack);
+    }
+  }
+
+  return Array.from(deduped.values());
+}
+
+function getMinPriceForEventType(packs: PackDefinition[], eventType: EventType): number {
+  const availablePacks = getPacksForEventType(packs, eventType);
+  return availablePacks.length > 0 ? Math.min(...availablePacks.map((pack) => pack.priceValue)) : 0;
+}
 interface ConfigState {
   eventType: EventType | null;
-  selectedPack: any | null;
+  selectedPack: PackDefinition | null;
   date: string;
   guests: number;
   extras: string[];
@@ -81,50 +98,497 @@ interface AppliedDiscountCode {
   isAccumulative?: boolean;
 }
 
-// Helper per obtenir text traduït de l'extra
-function isI18nKey(value: string): boolean {
-  return /^(configurator|pages|services|extras)\./.test(value);
+interface PricingSummary {
+  basePrice: number;
+  extrasPrice: number;
+  subtotal: number;
+  discount: number;
+  discountReason: string;
+  total: number;
 }
 
-function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
-  try {
-    const key = `extras.${extraId}.${field}`;
-    const translated = t(key);
-    // Si retorna la clau, usar fallback
-    if (translated !== key) return translated;
-    if (isI18nKey(fallback)) {
-      const nested = t(fallback);
-      if (nested !== fallback) return nested;
+interface ClosingPricingSummary {
+  earlyBirdDiscount: number;
+  priceWithoutDiscount: number;
+  finalPrice: number;
+}
+
+function calculatePricingSummary(
+  config: ConfigState,
+  extrasCatalog: ExtraDefinition[],
+  appliedDiscountCode: AppliedDiscountCode | null,
+  discountCodeReason: string
+): PricingSummary {
+  const basePrice = config.selectedPack?.priceValue || 0;
+  const extrasPrice = config.extras.reduce((sum, extraId) => {
+    const extra = extrasCatalog.find((candidate) => candidate.id === extraId);
+    return sum + (extra?.price || 0);
+  }, 0);
+  const subtotal = basePrice + extrasPrice;
+  const applicableOffers: Array<{ discount: number; reason: string }> = [];
+
+  if (config.appliedOffer === 'early-bird' && subtotal >= (OFFERS.earlyBird.minAmount || 0)) {
+    applicableOffers.push({
+      discount: Math.round((subtotal * (OFFERS.earlyBird.discount || 0)) / 100),
+      reason: OFFERS.earlyBird.name,
+    });
+  }
+
+  if (config.extras.length >= (OFFERS.combo.minExtras || 3)) {
+    applicableOffers.push({
+      discount: Math.round((extrasPrice * (OFFERS.combo.discount || 0)) / 100),
+      reason: OFFERS.combo.name,
+    });
+  }
+
+  if (config.date) {
+    const eventMonth = new Date(config.date).getMonth() + 1;
+    const seasonalMonths: readonly number[] = OFFERS.seasonal.months ?? [];
+    if (seasonalMonths.includes(eventMonth)) {
+      applicableOffers.push({
+        discount: Math.round((subtotal * (OFFERS.seasonal.discount || 0)) / 100),
+        reason: OFFERS.seasonal.name,
+      });
     }
-    return fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function humanizeKeyFallback(value: string): string {
-  if (!value || !isI18nKey(value)) return value;
-  const parts = value.split('.');
-  const last = parts[parts.length - 1] || value;
-  const prev = parts.length > 1 ? parts[parts.length - 2] : '';
-
-  if (/^f\d+$/i.test(last)) {
-    const n = last.slice(1);
-    return `Característica ${n}`;
   }
 
-  const semantic = new Set(['name', 'tagline', 'ideal', 'description', 'title']);
-  const token = semantic.has(last) && prev ? prev : last;
-  return token
-    .replace(/[-_]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (m) => m.toUpperCase());
+  if (appliedDiscountCode) {
+    const codeDiscount =
+      appliedDiscountCode.type === 'PERCENTAGE'
+        ? Math.round((subtotal * appliedDiscountCode.value) / 100)
+        : Math.round(appliedDiscountCode.value);
+
+    if (codeDiscount > 0) {
+      applicableOffers.push({
+        discount: codeDiscount,
+        reason: discountCodeReason,
+      });
+    }
+  }
+
+  const bestOffer = applicableOffers.sort((a, b) => b.discount - a.discount)[0];
+  const discount = bestOffer?.discount || 0;
+  const discountReason = bestOffer?.reason || '';
+
+  return {
+    basePrice,
+    extrasPrice,
+    subtotal,
+    discount,
+    discountReason,
+    total: subtotal - discount,
+  };
 }
 
+function calculateClosingPricing(pricing: PricingSummary): ClosingPricingSummary {
+  const potentialEarlyBird = Math.round((pricing.subtotal * (OFFERS.earlyBird.discount || 10)) / 100);
+  const earlyBirdDiscount = Math.max(pricing.discount, potentialEarlyBird);
+
+  return {
+    earlyBirdDiscount,
+    priceWithoutDiscount: pricing.subtotal,
+    finalPrice: pricing.subtotal - earlyBirdDiscount,
+  };
+}
+
+function toggleExtraSelection(selectedExtras: string[], extraId: string, checked: boolean): string[] {
+  if (checked) {
+    return selectedExtras.includes(extraId) ? selectedExtras : [...selectedExtras, extraId];
+  }
+
+  return selectedExtras.filter((id) => id !== extraId);
+}
+
+function filterUnavailableExtras(selectedExtras: string[], availableExtras: ExtraDefinition[]): string[] {
+  const allowed = new Set(availableExtras.map((extra) => extra.id));
+  return selectedExtras.filter((id) => allowed.has(id));
+}
+
+function getSelectedExtraNames(extraIds: string[], extrasCatalog: ExtraDefinition[]): string[] {
+  return extraIds
+    .map((id) => extrasCatalog.find((extra) => extra.id === id)?.name)
+    .filter(Boolean) as string[];
+}
+
+type ConfiguratorTranslations = ReturnType<typeof useTranslations<'configurator'>>;
+
+interface Step4SuccessCardProps {
+  t: ConfiguratorTranslations;
+  locale: 'ca' | 'es' | 'en';
+  config: ConfigState;
+  extrasCatalog: ExtraDefinition[];
+  pricing: PricingSummary;
+  closingPricing: ClosingPricingSummary;
+  clientName: string;
+  onDownload: (total: number) => void;
+}
+
+function Step4SuccessCard({
+  t,
+  locale,
+  config,
+  extrasCatalog,
+  pricing,
+  closingPricing,
+  clientName,
+  onDownload,
+}: Step4SuccessCardProps) {
+  const selectedEvent = config.eventType || t('eventFallback');
+  const earlyBirdDiscount = closingPricing.earlyBirdDiscount;
+  const finalPrice = closingPricing.finalPrice;
+
+  return (
+    <motion.div
+      className="p-8 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-600/5 border-2 border-green-500/50 text-center"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+    >
+      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+        <CheckCircle className="w-12 h-12 text-green-400" />
+      </div>
+      <h3 className="text-3xl font-bold text-white mb-4">{t('step4.successTitle')}</h3>
+      <p className="text-xl text-white/80 mb-2">{t('step4.successMessage')}</p>
+      <p className="text-green-400 font-bold text-lg mb-6">
+        {t('step4.youSaved', { amount: closingPricing.earlyBirdDiscount })}
+      </p>
+      <p className="text-white/60 text-sm mb-6">{t('step4.checkEmail')}</p>
+
+      <button
+        onClick={async () => {
+          const selectedPack = config.selectedPack;
+          if (!selectedPack) return;
+
+          const extrasNames = getSelectedExtraNames(config.extras, extrasCatalog);
+
+          const doc = await generateQuotePDF({
+            eventType: selectedEvent,
+            pack: selectedPack,
+            date: config.date,
+            guests: config.guests,
+            extras: extrasNames,
+            extrasCatalog,
+            basePrice: pricing.basePrice,
+            extrasPrice: pricing.extrasPrice,
+            discount: earlyBirdDiscount,
+            discountReason: pricing.discountReason || t('step4.bookToday'),
+            total: finalPrice,
+            clientName,
+          }, locale);
+
+          doc.save(`orbita-pressupost-${Date.now()}.pdf`);
+          onDownload(finalPrice);
+        }}
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-oe-gold text-black font-bold hover:bg-oe-gold-bright transition-colors"
+      >
+        <Download className="w-5 h-5" />
+        {t('step4.downloadPDF')}
+      </button>
+    </motion.div>
+  );
+}
+
+interface Step4LeadFormProps {
+  t: ConfiguratorTranslations;
+  formData: { name: string; contact: string };
+  formError: string;
+  sending: boolean;
+  turnstileToken: string | null;
+  finalPrice: number;
+  packName?: string | null;
+  onSubmit: (event: React.FormEvent) => Promise<void>;
+  onReviewConfig: () => void;
+  onNameChange: (value: string) => void;
+  onContactChange: (value: string) => void;
+  onTurnstileSuccess: (token: string) => void;
+  onTurnstileClear: () => void;
+  onWhatsAppClick: () => void;
+}
+
+function Step4LeadForm({
+  t,
+  formData,
+  formError,
+  sending,
+  turnstileToken,
+  finalPrice,
+  packName,
+  onSubmit,
+  onReviewConfig,
+  onNameChange,
+  onContactChange,
+  onTurnstileSuccess,
+  onTurnstileClear,
+  onWhatsAppClick,
+}: Step4LeadFormProps) {
+  return (
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div className="p-6 rounded-2xl bg-gradient-to-br from-oe-gold/5 to-oe-gold/10 border-2 border-oe-gold/30">
+        <h3 className="text-2xl font-bold text-white mb-4 text-center">🎉 {t('step4.lastStep')}</h3>
+
+        {formError && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">
+            {formError}
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-white font-semibold mb-2">
+              {t('step4.yourName')}
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              autoComplete="name"
+              aria-required="true"
+              value={formData.name}
+              onChange={(e) => onNameChange(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
+              placeholder={t('step4.namePlaceholder')}
+              required
+              disabled={sending}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="contact" className="block text-white font-semibold mb-2">
+              {t('step4.emailOrPhone')}
+            </label>
+            <input
+              type="text"
+              id="contact"
+              name="contact"
+              autoComplete="email tel"
+              aria-required="true"
+              value={formData.contact}
+              onChange={(e) => onContactChange(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
+              placeholder={t('step4.contactPlaceholder')}
+              required
+              disabled={sending}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="pt-2">
+        <p className="text-xs text-text-muted mb-2">{t('step4.captchaExplanation')}</p>
+        <TurnstileWidget
+          onSuccess={onTurnstileSuccess}
+          onError={onTurnstileClear}
+          onExpire={onTurnstileClear}
+          theme="dark"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={sending || !turnstileToken}
+        className="w-full btn-primary sm:text-xl text-lg sm:py-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {sending ? (
+          <>
+            <div className="w-6 h-6 border-4 border-black/30 border-t-black rounded-full animate-spin" />
+            {t('step4.sending')}
+          </>
+        ) : (
+          <>
+            <FileText className="w-6 h-6" />
+            {t('step4.requestProposal')}
+          </>
+        )}
+      </button>
+
+      <button
+        type="button"
+        onClick={onReviewConfig}
+        className="w-full text-text-muted hover:text-white text-sm underline"
+      >
+        {t('step4.reviewConfig')}
+      </button>
+
+      <div className="text-center pt-4 border-t border-border">
+        <p className="text-xs text-text-muted mb-2">{t('step4.preferWhatsApp')}</p>
+        <a
+          href={getWhatsAppUrl('configurador', { packName: packName ?? undefined, precio: finalPrice })}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] transition-colors"
+          onClick={onWhatsAppClick}
+        >
+          💬 {t('step4.contactWhatsApp')}
+        </a>
+      </div>
+    </form>
+  );
+}
+
+interface Step3DiscountCodePanelProps {
+  t: ConfiguratorTranslations;
+  dateLocale: string;
+  discountCodeInput: string;
+  discountCodeLoading: boolean;
+  discountCodeError: string;
+  appliedDiscountCode: AppliedDiscountCode | null;
+  onInputChange: (value: string) => void;
+  onApply: () => void;
+  onClear: () => void;
+}
+
+function Step3DiscountCodePanel({
+  t,
+  dateLocale,
+  discountCodeInput,
+  discountCodeLoading,
+  discountCodeError,
+  appliedDiscountCode,
+  onInputChange,
+  onApply,
+  onClear,
+}: Step3DiscountCodePanelProps) {
+  return (
+    <div className="p-6 rounded-xl bg-bg-surface border border-border">
+      <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+        <Tag className="w-5 h-5 text-oe-gold" />
+        {t('step3.discountCode')}
+      </h3>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          aria-label={t('step3.discountCode')}
+          value={discountCodeInput}
+          onChange={(e) => onInputChange(e.target.value)}
+          placeholder={t('step3.discountCodePlaceholder')}
+          className="flex-1 px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
+        />
+        <button
+          type="button"
+          onClick={onApply}
+          disabled={discountCodeLoading || !discountCodeInput.trim()}
+          aria-busy={discountCodeLoading}
+          className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
+        >
+          {discountCodeLoading ? t('step3.validatingCode') : t('step3.applyCode')}
+        </button>
+        {appliedDiscountCode && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="px-4 py-3 rounded-lg border border-border text-white"
+          >
+            {t('step3.removeCode')}
+          </button>
+        )}
+      </div>
+      {discountCodeError && (
+        <p className="mt-2 text-sm text-red-400">{discountCodeError}</p>
+      )}
+      {appliedDiscountCode && !discountCodeError && (
+        <p className="mt-2 text-sm text-emerald-400">
+          {t('step3.activeCode', {
+            code: appliedDiscountCode.code,
+            date: new Date(appliedDiscountCode.expiresAt).toLocaleDateString(dateLocale),
+          })}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface Step3PricingSummaryCardProps {
+  t: ConfiguratorTranslations;
+  pricing: PricingSummary;
+  extrasCount: number;
+  onContinue: () => void;
+}
+
+function Step3PricingSummaryCard({ t, pricing, extrasCount, onContinue }: Step3PricingSummaryCardProps) {
+  const hasExtrasPrice = pricing.extrasPrice > 0;
+  const hasPricingDiscount = pricing.discount > 0;
+  return (
+    <div className="p-8 rounded-2xl bg-gradient-to-br from-oe-gold/10 to-oe-gold/5 border-2 border-oe-gold/50">
+      <h3 className="text-2xl font-bold text-white mb-4">{t('step3.summary')}</h3>
+
+      <div className="space-y-2 mb-4">
+        <div className="flex justify-between text-text-muted">
+          <span>{t('step3.basePrice')}</span>
+          <span>{pricing.basePrice}€</span>
+        </div>
+        {hasExtrasPrice && (
+          <div className="flex justify-between text-text-muted">
+            <span>{t('step3.extrasPrice', { count: extrasCount })}</span>
+            <span>{pricing.extrasPrice}€</span>
+          </div>
+        )}
+        {hasPricingDiscount && (
+          <div className="flex justify-between text-green-400 font-bold">
+            <span className="flex items-center gap-1">
+              <Tag className="w-4 h-4" />
+              {pricing.discountReason}:
+            </span>
+            <span>-{pricing.discount}€</span>
+          </div>
+        )}
+        <div className="border-t border-border pt-2 mt-2 flex justify-between items-center">
+          <span className="text-xl font-bold text-white">{t('step3.total')}</span>
+          <span className="text-3xl font-black text-oe-gold">{pricing.total}€</span>
+        </div>
+      </div>
+
+      <button
+        onClick={onContinue}
+        className="w-full btn-primary text-lg py-4 flex items-center justify-center gap-2"
+      >
+        {t('step3.continue')}
+        <ChevronRight className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
+interface ProgressStepsNavProps {
+  currentStep: number;
+  labels: [string, string, string, string];
+}
+
+function ProgressStepsNav({ currentStep, labels }: ProgressStepsNavProps) {
+  return (
+    <nav aria-label={labels[0]} className="mb-16 flex justify-center">
+      <div className="flex items-center gap-2 sm:gap-4">
+        {([
+          { n: 1, label: labels[0] },
+          { n: 2, label: labels[1] },
+          { n: 3, label: labels[2] },
+          { n: 4, label: labels[3] },
+        ] as const).map(({ n: stepNumber, label }) => (
+          <div key={stepNumber} className="flex items-center gap-2 sm:gap-4">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                aria-current={currentStep === stepNumber ? 'step' : undefined}
+                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all ${
+                  currentStep >= stepNumber
+                    ? 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]'
+                    : 'bg-bg-surface text-text-muted border border-border'
+                }`}
+              >
+                {currentStep > stepNumber ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : stepNumber}
+                {currentStep === stepNumber && (
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 blur-lg" />
+                )}
+              </div>
+              <span className="hidden sm:block text-[10px] text-text-muted max-w-[80px] text-center truncate">{label}</span>
+            </div>
+            {stepNumber < 4 && (
+              <div className={`h-0.5 w-6 sm:w-12 ${currentStep > stepNumber ? 'bg-gradient-to-r from-purple-500 to-fuchsia-500' : 'bg-border'}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    </nav>
+  );
+}
 export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
-  const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const dateLocale = toIntlLocale(locale);
   const { track } = useAnalytics();
@@ -142,117 +606,63 @@ export default function ConfiguradorClient() {
     extras: [],
     appliedOffer: null,
   });
-  const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
-  const [minDate, setMinDate] = useState(''); // Hydration-safe
+  const extrasCatalog = useConfiguratorExtras(locale);
+  const [minDate, setMinDate] = useState('');
   const [discountCodeInput, setDiscountCodeInput] = useState('');
   const [discountCodeLoading, setDiscountCodeLoading] = useState(false);
   const [discountCodeError, setDiscountCodeError] = useState('');
   const [appliedDiscountCode, setAppliedDiscountCode] = useState<AppliedDiscountCode | null>(null);
-  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
+  const bookedDates = useBookedDates(locale);
+  const selectedPack = config.selectedPack;
+  const selectedPackId = selectedPack?.id || '';
+  const selectedEvent = config.eventType || t('eventFallback');
+  const selectedDate = config.date;
+  const extrasCount = config.extras.length;
+  const isDateBooked = selectedDate ? bookedDates.has(selectedDate) : false;
+  const trimmedDiscountCode = discountCodeInput.trim();
+  const discountCodeReason = appliedDiscountCode ? t('step3.discountCodeReason', { code: appliedDiscountCode.code }) : '';
+  const pricing = useMemo(() => calculatePricingSummary(config, extrasCatalog, appliedDiscountCode, discountCodeReason), [config, extrasCatalog, appliedDiscountCode, discountCodeReason]);
+  const closingPricing = useMemo(() => calculateClosingPricing(pricing), [pricing]);
+  const earlyBirdDiscount = closingPricing.earlyBirdDiscount;
+  const finalPrice = closingPricing.finalPrice;
+  const hasExtrasPrice = pricing.extrasPrice > 0;
+  const hasPricingDiscount = pricing.discount > 0;
 
-  const getLocalizedPack = (pack: any) => {
-    // Els packs ja vénen amb text real (no claus i18n) gràcies a packs-config + packs-db
-    // Si encara queda alguna clau i18n, intentem traduir-la
-    const fallbackPack = fallbackPacks.find((item) => item.id === pack.id || item.slug === pack.slug);
-
-    const resolveName = (value: string) => {
-      if (!isI18nKey(value)) return value;
-      if (fallbackPack && !isI18nKey(fallbackPack.name)) return fallbackPack.name;
-      return humanizeKeyFallback(value);
-    };
-
-    const resolveTagline = (value: string) => {
-      if (!isI18nKey(value)) return value;
-      if (fallbackPack && !isI18nKey(fallbackPack.tagline)) return fallbackPack.tagline;
-      return humanizeKeyFallback(value);
-    };
-
-    const features = (pack.features || []).map((feature: string, index: number) => {
-      if (!isI18nKey(feature)) return feature;
-      if (fallbackPack?.features?.[index] && !isI18nKey(fallbackPack.features[index])) {
-        return fallbackPack.features[index];
-      }
-      return humanizeKeyFallback(feature);
-    });
-
-    return {
-      ...pack,
-      name: resolveName(pack.name || ''),
-      tagline: resolveTagline(pack.tagline || ''),
-      features,
-    };
+  const updateConfig = (updates: Partial<ConfigState>) => {
+    setConfig((prev) => ({ ...prev, ...updates }));
   };
 
-  const getPacksForEventType = useCallback((eventType: EventType | null) => {
-    if (!eventType) return [];
-    const allowedServices = EVENT_TYPE_SERVICE_MAP[eventType];
-    const byService = allPacks.filter((pack) => allowedServices.includes(pack.service));
+  const selectEventType = (eventType: EventType) => {
+    updateConfig({ eventType });
+  };
 
-    // Deduplicar per slug (BD pot tenir duplicats del config estàtic)
-    const deduped = new Map<string, any>();
-    for (const pack of byService) {
-      const key = pack.slug || pack.id;
-      if (!deduped.has(key)) {
-        deduped.set(key, pack);
-      }
-    }
+  const selectPack = (selectedPack: PackDefinition) => {
+    updateConfig({ selectedPack });
+  };
 
-    return Array.from(deduped.values());
-  }, [allPacks]);
+  const setEventDate = (date: string) => {
+    updateConfig({ date });
+  };
+
+  const setGuestCount = (guests: number) => {
+    updateConfig({ guests });
+  };
+
+  const setSelectedExtras = (extras: string[]) => {
+    updateConfig({ extras });
+  };
+
+  const toggleExtra = (extraId: string, checked: boolean) => {
+    setConfig((prev) => ({
+      ...prev,
+      extras: toggleExtraSelection(prev.extras, extraId, checked),
+    }));
+  };
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
     setMinDate(new Date().toISOString().split('T')[0]);
   }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadExtras() {
-      try {
-        const res = await fetch('/api/public/extras', { cache: 'no-store' });
-        const data = await res.json();
-        if (!active) return;
-        if (Array.isArray(data?.extras)) {
-          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
-            const fallback = EXTRAS.find((item) => item.id === extra.id);
-            return {
-              ...extra,
-              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
-              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
-            };
-          });
-          setExtrasCatalog(normalized);
-        }
-      } catch (error) {
-        console.error('[Configurador] Error carregant extres:', error);
-      }
-    }
-
-    loadExtras();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  // Fetch booked dates from availability API
-  useEffect(() => {
-    fetch(`/api/public/availability?locale=${locale}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data?.ok || !data.data?.monthlyAvailability) return;
-        const dates = new Set<string>();
-        for (const month of data.data.monthlyAvailability) {
-          for (const sat of month.saturdayDates || []) {
-            if (sat.status === 'booked' || sat.status === 'blocked') {
-              dates.add(sat.date);
-            }
-          }
-        }
-        setBookedDates(dates);
-      })
-      .catch(() => { /* keep empty */ });
-  }, [locale]);
 
   const getDiscountCodeErrorText = (reason: string) => {
     switch (reason) {
@@ -323,16 +733,17 @@ export default function ConfiguradorClient() {
 
     if (service && packId) {
       // Carrega el pack seleccionat
-      const packs = getPacksForEventType(service);
-      const selectedPack = packs.find(p => p.id === packId);
+      const packs = getPacksForEventType(allPacks, service);
+      const selectedPack = packs.find((pack) => pack.id === packId);
 
       if (selectedPack) {
-        const initialGuests = guestsParam ? parseInt(guestsParam) : 50;
+        const parsedGuests = guestsParam ? Number.parseInt(guestsParam, 10) : Number.NaN;
+        const initialGuests = Number.isFinite(parsedGuests) ? parsedGuests : 50;
         const initialExtras = extrasParam ? extrasParam.split(',').filter(Boolean) : [];
 
         setConfig({
           eventType: service,
-          selectedPack: selectedPack,
+          selectedPack,
           date: '',
           guests: initialGuests,
           extras: initialExtras,
@@ -352,7 +763,7 @@ export default function ConfiguradorClient() {
     } else {
       track('View_Configurador');
     }
-  }, [getPacksForEventType, track]);
+  }, [allPacks, track]);
 
   // Scroll al top quan canvies de pas o selecciones pack
   useEffect(() => {
@@ -362,133 +773,24 @@ export default function ConfiguradorClient() {
 
   const availableExtras = useMemo(() => {
     if (!config.eventType) return [];
-    return extrasCatalog.filter((extra) => {
-      if (!extra.compatibleWith) return true;
-      if (extra.compatibleWith.length === 0) return false;
-      return extra.compatibleWith.includes(config.eventType as ServiceSlug);
-    });
+    return filterCompatibleExtras(extrasCatalog, config.eventType);
   }, [extrasCatalog, config.eventType]);
+  const hasAvailableExtras = availableExtras.length > 0;
+  const hasComboDiscount = extrasCount >= (OFFERS.combo.minExtras || 3);
 
   useEffect(() => {
     if (!config.eventType) return;
-    const allowed = new Set(availableExtras.map((extra) => extra.id));
-    if (config.extras.some((id) => !allowed.has(id))) {
-      setConfig((prev) => ({
-        ...prev,
-        extras: prev.extras.filter((id) => allowed.has(id)),
-      }));
+
+    const filteredExtras = filterUnavailableExtras(config.extras, availableExtras);
+    if (filteredExtras.length !== extrasCount) {
+      setSelectedExtras(filteredExtras);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableExtras, config.eventType, config.extras]);
-
-  // 💰 Càlcul de preu amb descomptes
-  const calculatePricing = () => {
-    let basePrice = config.selectedPack?.priceValue || 0;
-    let extrasPrice = 0;
-    let discount = 0;
-    let discountReason = '';
-
-    // Calcula extres
-    config.extras.forEach((extraId) => {
-      const extra = extrasCatalog.find((e) => e.id === extraId);
-      if (extra?.price) extrasPrice += extra.price;
-    });
-
-    const subtotal = basePrice + extrasPrice;
-
-    // Aplica descomptes (prioritat: guanya el descompte més alt)
-    const applicableOffers = [];
-
-    // 1. Early Bird (reserva inmediata)
-    if (config.appliedOffer === 'early-bird' && subtotal >= (OFFERS.earlyBird.minAmount || 0)) {
-      applicableOffers.push({
-        discount: Math.round((subtotal * (OFFERS.earlyBird.discount || 0)) / 100),
-        reason: OFFERS.earlyBird.name,
-        priority: 1,
-      });
-    }
-
-    // 2. Combo d'extres (3 o més)
-    if (config.extras.length >= (OFFERS.combo.minExtras || 3)) {
-      applicableOffers.push({
-        discount: Math.round((extrasPrice * (OFFERS.combo.discount || 0)) / 100),
-        reason: OFFERS.combo.name,
-        priority: 2,
-      });
-    }
-
-    // 3. Temporada baixa
-    if (config.date) {
-      const eventMonth = new Date(config.date).getMonth() + 1;
-      const seasonalMonths: readonly number[] = OFFERS.seasonal.months ?? [];
-      if (seasonalMonths.includes(eventMonth)) {
-        applicableOffers.push({
-          discount: Math.round((subtotal * (OFFERS.seasonal.discount || 0)) / 100),
-          reason: OFFERS.seasonal.name,
-          priority: 3,
-        });
-      }
-    }
-
-    // 4. Codi promocional vàlid (si existeix)
-    if (appliedDiscountCode) {
-      const codeDiscount =
-        appliedDiscountCode.type === 'PERCENTAGE'
-          ? Math.round((subtotal * appliedDiscountCode.value) / 100)
-          : Math.round(appliedDiscountCode.value);
-
-      if (codeDiscount > 0) {
-        applicableOffers.push({
-          discount: codeDiscount,
-          reason: t('step3.discountCodeReason', { code: appliedDiscountCode.code }),
-          priority: 4,
-        });
-      }
-    }
-
-    // Selecciona el millor descompte
-    if (applicableOffers.length > 0) {
-      const bestOffer = applicableOffers.sort((a, b) => b.discount - a.discount)[0];
-      discount = bestOffer.discount;
-      discountReason = bestOffer.reason;
-    }
-
-    const total = subtotal - discount;
-
-    return { basePrice, extrasPrice, subtotal, discount, discountReason, total };
-  };
-
-  // Genera URL del formulari amb les dades del configurador (unused però conservat per referència futura)
-  const _getContactUrl = (): string => {
-    const pricing = calculatePricing();
-    const extrasNames = config.extras
-      .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
-      .filter(Boolean)
-      .join(', ');
-
-    const params = new URLSearchParams({
-      servicio: config.eventType || '',
-      pack: config.selectedPack?.name || '',
-      precio: pricing.total.toString(),
-      invitados: config.guests.toString(),
-      fecha: config.date || '',
-      extras: extrasNames,
-      descuento: pricing.discount > 0 ? `${pricing.discountReason}: -${pricing.discount}€` : '',
-      fromConfigurador: 'true',
-    });
-
-    return `/contacto?${params.toString()}`;
-  };
 
   // PAS 1: Tipus d'esdeveniment
   const renderStep1 = () => {
-    const services = [
-      { slug: 'bodas', icon: '💒', ideal: t('step1.idealBodas') },
-      { slug: 'fiestas', icon: '🎉', ideal: t('step1.idealFiestas') },
-      { slug: 'discomovil', icon: '🎵', ideal: t('step1.idealDiscomovil') },
-      { slug: 'empresas', icon: '💼', ideal: t('step1.idealEmpresas') },
-    ];
-
-    return (
+        return (
       <div className="space-y-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl sm:text-5xl font-display font-black text-white mb-4">
@@ -498,16 +800,15 @@ export default function ConfiguradorClient() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service) => {
-            const packs = getPacksForEventType(service.slug as EventType);
-            const minPrice = packs.length > 0 ? Math.min(...packs.map((p) => p.priceValue)) : 0;
+          {EVENT_TYPE_CARDS.map((service) => {
+            const minPrice = getMinPriceForEventType(allPacks, service.slug);
 
             return (
               <button
                 key={service.slug}
                 aria-pressed={config.eventType === service.slug}
                 onClick={() => {
-                  setConfig({ ...config, eventType: service.slug as EventType });
+                  selectEventType(service.slug);
                   setStep(2);
                   track('Configurador_Step1_EventType', { type: service.slug });
                 }}
@@ -517,7 +818,7 @@ export default function ConfiguradorClient() {
                 <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-oe-gold transition-colors">
                   {t(`step1.eventTypes.${service.slug}`)}
                 </h3>
-                <p className="text-white/40 text-xs mb-3">{service.ideal}</p>
+                <p className="text-white/40 text-xs mb-3">{t(service.idealKey)}</p>
                 <p className="text-text-muted text-sm mb-4">{t('step1.from')} {minPrice}€</p>
                 <div className="flex items-center text-oe-gold text-sm font-bold">
                   {t('step1.viewPacks')} <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -532,10 +833,12 @@ export default function ConfiguradorClient() {
 
   // PAS 2: Selecció de pack
   const renderStep2 = () => {
-    const packs = getPacksForEventType(config.eventType);
-    if (!packs || packs.length === 0) return null;
+    if (!config.eventType) return null;
 
-    const serviceName = t(`step1.eventTypes.${config.eventType || 'bodas'}`);
+    const packs = getPacksForEventType(allPacks, config.eventType);
+    if (packs.length === 0) return null;
+
+    const serviceName = t(`step1.eventTypes.${config.eventType}`);
 
     return (
       <div className="space-y-8">
@@ -552,44 +855,41 @@ export default function ConfiguradorClient() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {packs.map((pack) => {
-            const localizedPack = getLocalizedPack(pack);
-            const safeFeatures = (localizedPack.features || []).map((feature: string) =>
-              isI18nKey(feature) ? humanizeKeyFallback(feature) : feature
-            );
+            const safeFeatures = pack.features || [];
             return (
             <div
-              key={localizedPack.id}
+              key={pack.id}
               className={`group p-8 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                config.selectedPack?.id === localizedPack.id
+                selectedPackId === pack.id
                   ? 'border-oe-gold bg-oe-gold/5 shadow-oe-gold'
                   : 'border-border bg-bg-surface hover:border-oe-gold/50 hover:shadow-lg'
-              } ${localizedPack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
+              } ${pack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
             >
-              {localizedPack.popular && (
+              {pack.popular && (
                 <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
                   {t('step2.mostSold')}
                 </div>
               )}
-              {localizedPack.highlight && (
+              {pack.highlight && (
                 <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
                   {t('step2.premium')}
                 </div>
               )}
 
-              <h3 className="text-2xl font-bold text-white mb-2">{localizedPack.name}</h3>
-              <p className="text-text-muted text-sm mb-2">{localizedPack.tagline}</p>
-              {localizedPack.ideal && (
-                <p className="text-white/40 text-xs mb-4">{t('step2.recommendedFor')}: {localizedPack.ideal}</p>
+              <h3 className="text-2xl font-bold text-white mb-2">{pack.name}</h3>
+              <p className="text-text-muted text-sm mb-2">{pack.tagline}</p>
+              {pack.ideal && (
+                <p className="text-white/40 text-xs mb-4">{t('step2.recommendedFor')}: {pack.ideal}</p>
               )}
 
               <div className="mb-6">
-                <div className="text-4xl font-black text-oe-gold mb-1">{localizedPack.price}</div>
-                <div className="text-text-muted text-sm">{localizedPack.duration}</div>
+                <div className="text-4xl font-black text-oe-gold mb-1">{pack.price}</div>
+                <div className="text-text-muted text-sm">{pack.duration}</div>
               </div>
 
               <ul className="space-y-2 mb-6">
                 {safeFeatures.slice(0, 4).map((feature: string, index: number) => (
-                  <li key={`${localizedPack.id}-feature-${index}`} className="flex items-start text-sm text-text-muted">
+                  <li key={`${pack.id}-feature-${index}`} className="flex items-start text-sm text-text-muted">
                     <Check className="w-4 h-4 text-oe-gold mr-2 mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
@@ -601,17 +901,17 @@ export default function ConfiguradorClient() {
 
               <button
                 onClick={() => {
-                  setConfig({ ...config, selectedPack: localizedPack });
+                  selectPack(pack);
                   setStep(3);
-                  track('Configurador_Step2_PackSelected', { pack: localizedPack.id, price: localizedPack.priceValue });
+                  track('Configurador_Step2_PackSelected', { pack: pack.id, price: pack.priceValue });
                 }}
                 className={`w-full py-3 rounded-xl font-bold transition-all ${
-                  config.selectedPack?.id === localizedPack.id
+                  selectedPackId === pack.id
                     ? 'bg-oe-gold text-black'
                     : 'bg-bg-main text-white hover:bg-oe-gold hover:text-black'
                 }`}
               >
-                {config.selectedPack?.id === localizedPack.id ? t('step2.selected') : t('step2.select')}
+                {selectedPackId === pack.id ? t('step2.selected') : t('step2.select')}
               </button>
             </div>
           )})}
@@ -622,7 +922,6 @@ export default function ConfiguradorClient() {
 
   // PAS 3: Detalls i extres
   const renderStep3 = () => {
-    const pricing = calculatePricing();
 
     return (
       <div className="max-w-4xl mx-auto space-y-8">
@@ -653,23 +952,23 @@ export default function ConfiguradorClient() {
               type="date"
               autoComplete="off"
               value={config.date}
-              onChange={(e) => setConfig({ ...config, date: e.target.value })}
+              onChange={(e) => setEventDate(e.target.value)}
               className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
               min={minDate}
             />
-            {config.date && bookedDates.has(config.date) && (
+            {selectedDate && isDateBooked && (
               <p className="mt-2 text-xs text-red-400 flex items-center gap-1 font-medium">
                 <AlertCircle className="w-3 h-3" />
                 {t('step3.dateBooked')}
               </p>
             )}
-            {config.date && !bookedDates.has(config.date) && (
+            {selectedDate && !isDateBooked && (
               <p className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
                 {t('step3.dateAvailable')}
               </p>
             )}
-            {!config.date && (
+            {!selectedDate && (
               <p className="mt-2 text-xs text-text-muted flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {t('step3.dateNote')}
@@ -691,7 +990,7 @@ export default function ConfiguradorClient() {
               type="number"
               autoComplete="off"
               value={config.guests}
-              onChange={(e) => setConfig({ ...config, guests: parseInt(e.target.value) || 0 })}
+              onChange={(e) => setGuestCount(Number.parseInt(e.target.value, 10) || 0)}
               min="10"
               max="1000"
               className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
@@ -706,7 +1005,7 @@ export default function ConfiguradorClient() {
               <Sparkles className="w-6 h-6 text-oe-gold" />
               {t('step3.extras')}
             </h3>
-            {config.extras.length >= (OFFERS.combo.minExtras || 3) && (
+            {hasComboDiscount && (
               <span className="text-xs bg-gradient-to-r from-fuchsia-500/20 to-purple-500/20 text-fuchsia-400 px-3 py-1 rounded-full font-bold border border-fuchsia-500/30 shadow-[0_0_15px_rgba(217,70,239,0.3)]">
                 ✨ {t('step3.extrasDiscount')}
               </span>
@@ -732,14 +1031,7 @@ export default function ConfiguradorClient() {
                       name={`extra-${extra.id}`}
                       checked={config.extras.includes(extra.id)}
                       onChange={(e) => {
-                        if (e.target.checked) {
-                          setConfig({ ...config, extras: [...config.extras, extra.id] });
-                        } else {
-                          setConfig({
-                            ...config,
-                            extras: config.extras.filter((id) => id !== extra.id),
-                          });
-                        }
+                        toggleExtra(extra.id, e.target.checked);
                       }}
                       className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
                     />
@@ -750,10 +1042,10 @@ export default function ConfiguradorClient() {
                   <div className="flex-1 min-w-0">
                     <div className="text-white font-semibold flex items-center gap-2">
                       <span>{extra.icon}</span>
-                      {getExtraText(tMobile, extra.id, 'name', extra.name)}
+                      {extra.name}
                     </div>
                     <div className="text-text-muted text-xs mt-1">
-                      {getExtraText(tMobile, extra.id, 'description', extra.description)}
+                      {extra.description}
                     </div>
                     <div className="text-oe-gold text-sm font-bold mt-1">
                       {extra.price !== null ? `+${extra.price}€` : t('step3.toConsult')}
@@ -772,7 +1064,7 @@ export default function ConfiguradorClient() {
                 )}
                 </label>
               ))}
-            {availableExtras.length === 0 && (
+            {!hasAvailableExtras && (
                 <div className="col-span-full text-center py-8 text-white/60">
                   {t('step3.noExtras')}
                 </div>
@@ -801,7 +1093,7 @@ export default function ConfiguradorClient() {
             <button
               type="button"
               onClick={applyDiscountCode}
-              disabled={discountCodeLoading || !discountCodeInput.trim()}
+              disabled={discountCodeLoading || !trimmedDiscountCode}
               aria-busy={discountCodeLoading}
               className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
             >
@@ -839,13 +1131,13 @@ export default function ConfiguradorClient() {
               <span>{t('step3.basePrice')}</span>
               <span>{pricing.basePrice}€</span>
             </div>
-            {pricing.extrasPrice > 0 && (
+            {hasExtrasPrice && (
               <div className="flex justify-between text-text-muted">
-                <span>{t('step3.extrasPrice', { count: config.extras.length })}</span>
+                <span>{t('step3.extrasPrice', { count: extrasCount })}</span>
                 <span>{pricing.extrasPrice}€</span>
               </div>
             )}
-            {pricing.discount > 0 && (
+            {hasPricingDiscount && (
               <div className="flex justify-between text-green-400 font-bold">
                 <span className="flex items-center gap-1">
                   <Tag className="w-4 h-4" />
@@ -876,99 +1168,48 @@ export default function ConfiguradorClient() {
   };
 
   // Estat del formulari inline
-  const [formData, setFormData] = useState({ name: '', contact: '' });
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const {
+    formData,
+    sending,
+    sent,
+    formError,
+    turnstileToken,
+    updateField,
+    clearError,
+    setTurnstileToken,
+    submitForm,
+  } = useConfiguratorLeadForm({
+    buildPayload: (leadFormData, token) => ({
+      name: leadFormData.name,
+      contact: leadFormData.contact,
+      event: selectedEvent,
+      message: t('requestMessage', { amount: earlyBirdDiscount }),
+      packId: selectedPackId,
+      packName: selectedPack?.name,
+      estimatedPrice: finalPrice,
+      eventDate: config.date,
+      guests: config.guests,
+      extras: getSelectedExtraNames(config.extras, extrasCatalog),
+      turnstileToken: token,
+    }),
+    onSuccess: () => {
+      track('Configurador_DirectSubmit_Success', {
+        packId: selectedPackId,
+        finalPrice,
+        discount: earlyBirdDiscount,
+      });
+    },
+    validate: {
+      errorName: t('step4.errorName'),
+      errorContact: t('step4.errorContact'),
+      errorCaptcha: t('step4.errorCaptcha'),
+      errorSend: t('step4.errorSend'),
+    },
+  });
 
   // 🔥 PAS 4 NOU: oferta de tancament amb formulari inline
   const renderStep4 = () => {
-    const pricing = calculatePricing();
-
-    // Calcula el descompte early bird SEMPRE (sobre subtotal)
-    // Si ja hi ha descompte aplicat, aplica el més alt
-    const potentialEarlyBird = Math.round((pricing.subtotal * (OFFERS.earlyBird.discount || 10)) / 100);
-
-    // Usa el descompte més alt entre l'actual i l'early bird
-    const earlyBirdDiscount = Math.max(pricing.discount, potentialEarlyBird);
-
-    // Preu sense descompte (per mostrar "preu normal")
-    const priceWithoutDiscount = pricing.subtotal;
-
-    // Preu final amb el millor descompte
-    const finalPrice = pricing.subtotal - earlyBirdDiscount;
-
-    // Envia sol·licitud directa
-    const handleDirectSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      if (!formData.name || formData.name.length < 2) {
-        setFormError(t('step4.errorName'));
-        return;
-      }
-
-      if (!formData.contact || formData.contact.length < 5) {
-        setFormError(t('step4.errorContact'));
-        return;
-      }
-
-      if (!turnstileToken) {
-        setFormError(t('step4.errorCaptcha'));
-        return;
-      }
-
-      setSending(true);
-      setFormError('');
-
-      let timeoutId: ReturnType<typeof setTimeout> | null = null;
-      const controller = new AbortController();
-
-      timeoutId = setTimeout(() => {
-        controller.abort();
-      }, 15000);
-
-      try {
-        const extrasArray = config.extras
-          .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
-          .filter(Boolean) as string[];
-
-        const response = await fetchWithCsrf('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            name: formData.name,
-            contact: formData.contact,
-            event: config.eventType || t('eventFallback'),
-            message: t('requestMessage', { amount: earlyBirdDiscount }),
-            packId: config.selectedPack?.id,
-            packName: config.selectedPack?.name,
-            estimatedPrice: finalPrice,
-            eventDate: config.date,
-            guests: config.guests,
-            extras: extrasArray,
-            turnstileToken,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('REQUEST_SEND_ERROR');
-        }
-
-        setSent(true);
-        track('Configurador_DirectSubmit_Success', {
-          packId: config.selectedPack?.id,
-          finalPrice,
-          discount: earlyBirdDiscount,
-        });
-      } catch (error) {
-        setFormError(t('step4.errorSend'));
-        setSending(false);
-      } finally {
-        if (timeoutId) clearTimeout(timeoutId);
-      }
-    };
+    const priceWithoutDiscount = closingPricing.priceWithoutDiscount;
 
     return (
       <div className="max-w-3xl mx-auto space-y-8">
@@ -1009,167 +1250,38 @@ export default function ConfiguradorClient() {
           </div>
         </div>
 
-        {/* Formulari inline o missatge d'èxit */}
+        {/* Formulari inline o missatge d'exit */}
         {sent ? (
-          <motion.div
-            className="p-8 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-600/5 border-2 border-green-500/50 text-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
-              <CheckCircle className="w-12 h-12 text-green-400" />
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-4">{t('step4.successTitle')}</h3>
-            <p className="text-xl text-white/80 mb-2">
-              {t('step4.successMessage')}
-            </p>
-            <p className="text-green-400 font-bold text-lg mb-6">
-              {t('step4.youSaved', { amount: earlyBirdDiscount })}
-            </p>
-            <p className="text-white/60 text-sm mb-6">
-              {t('step4.checkEmail')}
-            </p>
-
-            {/* Download PDF Button */}
-            <button
-              onClick={async () => {
-                const extrasNames = config.extras
-                  .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
-                  .filter(Boolean) as string[];
-
-                  const doc = await generateQuotePDF({
-                    eventType: config.eventType || t('eventFallback'),
-                    pack: config.selectedPack,
-                    date: config.date,
-                    guests: config.guests,
-                    extras: extrasNames,
-                    extrasCatalog,
-                    basePrice: pricing.basePrice,
-                    extrasPrice: pricing.extrasPrice,
-                    discount: earlyBirdDiscount,
-                  discountReason: pricing.discountReason || t('step4.bookToday'),
-                  total: finalPrice,
-                  clientName: formData.name,
-                }, locale);
-
-                doc.save(`orbita-pressupost-${Date.now()}.pdf`);
-                track('Configurador_DownloadPDF', { total: finalPrice });
-              }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-oe-gold text-black font-bold hover:bg-oe-gold-bright transition-colors"
-            >
-              <Download className="w-5 h-5" />
-              {t('step4.downloadPDF')}
-            </button>
-          </motion.div>
+          <Step4SuccessCard
+            t={t}
+            locale={locale}
+            config={config}
+            extrasCatalog={extrasCatalog}
+            pricing={pricing}
+            closingPricing={closingPricing}
+            clientName={formData.name}
+            onDownload={(total) => track('Configurador_DownloadPDF', { total })}
+          />
         ) : (
-          <form onSubmit={handleDirectSubmit} className="space-y-6">
-            {/* Formulari de contacte ràpid */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-oe-gold/5 to-oe-gold/10 border-2 border-oe-gold/30">
-              <h3 className="text-2xl font-bold text-white mb-4 text-center">
-                🎉 {t('step4.lastStep')}
-              </h3>
-
-              {formError && (
-                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">
-                  {formError}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block text-white font-semibold mb-2">
-                    {t('step4.yourName')}
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    autoComplete="name"
-                    aria-required="true"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
-                    placeholder={t('step4.namePlaceholder')}
-                    required
-                    disabled={sending}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="contact" className="block text-white font-semibold mb-2">
-                    {t('step4.emailOrPhone')}
-                  </label>
-                  <input
-                    type="text"
-                    id="contact"
-                    name="contact"
-                    autoComplete="email tel"
-                    aria-required="true"
-                    value={formData.contact}
-                    onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
-                    placeholder={t('step4.contactPlaceholder')}
-                    required
-                    disabled={sending}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Turnstile CAPTCHA */}
-            <div className="pt-2">
-              <p className="text-xs text-text-muted mb-2">{t('step4.captchaExplanation')}</p>
-              <TurnstileWidget
-                onSuccess={(token) => {
-                  setTurnstileToken(token);
-                  setFormError('');
-                }}
-                onError={() => setTurnstileToken(null)}
-                onExpire={() => setTurnstileToken(null)}
-                theme="dark"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={sending || !turnstileToken}
-              className="w-full btn-primary sm:text-xl text-lg sm:py-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {sending ? (
-                <>
-                  <div className="w-6 h-6 border-4 border-black/30 border-t-black rounded-full animate-spin" />
-                  {t('step4.sending')}
-                </>
-              ) : (
-                <>
-                  <FileText className="w-6 h-6" />
-                  {t('step4.requestProposal')}
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStep(3)}
-              className="w-full text-text-muted hover:text-white text-sm underline"
-            >
-              {t('step4.reviewConfig')}
-            </button>
-
-            {/* WhatsApp fallback */}
-            <div className="text-center pt-4 border-t border-border">
-              <p className="text-xs text-text-muted mb-2">{t('step4.preferWhatsApp')}</p>
-              <a
-                href={getWhatsAppUrl('configurador', { packName: config.selectedPack?.name, precio: finalPrice })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] transition-colors"
-                onClick={() => track('Configurador_WhatsApp_Fallback', { step: 4, packId: config.selectedPack?.id })}
-              >
-                💬 {t('step4.contactWhatsApp')}
-              </a>
-            </div>
-          </form>
+          <Step4LeadForm
+            t={t}
+            formData={formData}
+            formError={formError}
+            sending={sending}
+            turnstileToken={turnstileToken}
+            finalPrice={finalPrice}
+            packName={selectedPack?.name}
+            onSubmit={submitForm}
+            onReviewConfig={() => setStep(3)}
+            onNameChange={(value) => updateField('name', value)}
+            onContactChange={(value) => updateField('contact', value)}
+            onTurnstileSuccess={(token) => {
+              setTurnstileToken(token);
+              clearError();
+            }}
+            onTurnstileClear={() => setTurnstileToken(null)}
+            onWhatsAppClick={() => track('Configurador_WhatsApp_Fallback', { step: 4, packId: selectedPackId })}
+          />
         )}
 
         {/* Social proof - usando datos reales del config */}
@@ -1194,37 +1306,10 @@ export default function ConfiguradorClient() {
         />
       )}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Progress Steps con glow fucsia */}
-        <nav aria-label={t('step1.title')} className="mb-16 flex justify-center">
-          <div className="flex items-center gap-2 sm:gap-4">
-            {([
-              { n: 1, label: t('step1.title') },
-              { n: 2, label: 'Pack' },
-              { n: 3, label: t('step3.title') },
-              { n: 4, label: t('step4.lastStep') },
-            ] as const).map(({ n: s, label }) => (
-              <div key={s} className="flex items-center gap-2 sm:gap-4">
-                <div className="flex flex-col items-center gap-1">
-                  <div
-                    aria-current={step === s ? 'step' : undefined}
-                    className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all ${
-                      step >= s
-                        ? 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]'
-                        : 'bg-bg-surface text-text-muted border border-border'
-                    }`}
-                  >
-                    {step > s ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : s}
-                    {step === s && (
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 blur-lg" />
-                    )}
-                  </div>
-                  <span className="hidden sm:block text-[10px] text-text-muted max-w-[80px] text-center truncate">{label}</span>
-                </div>
-                {s < 4 && <div className={`h-0.5 w-6 sm:w-12 ${step > s ? 'bg-gradient-to-r from-purple-500 to-fuchsia-500' : 'bg-border'}`} />}
-              </div>
-            ))}
-          </div>
-        </nav>
+        <ProgressStepsNav
+          currentStep={step}
+          labels={[t('step1.title'), 'Pack', t('step3.title'), t('step4.lastStep')]}
+        />
 
         {/* Steps Content */}
         {step === 1 && renderStep1()}
@@ -1235,6 +1320,27 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -7,6 +7,8 @@ import FAQ from '@/components/seo/FAQ';
 import nextDynamic from 'next/dynamic';
 
 import { getDbPacks } from '@/lib/packs-db';
+import { getSiteUrl } from '@/lib/site';
+
 
 
 const BodasClient = nextDynamic(() => import('./client'));
@@ -25,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: t('meta.description', { price: minPrice }),
     keywords:
       'dj bodas barcelona, dj boda girona, dj bodas maresme, dj bodas costa brava, sonido bodas, musica boda, efectos especiales bodas',
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/servicios/bodas' },
     openGraph: {
       title: t('meta.ogTitle', { price: minPrice }),

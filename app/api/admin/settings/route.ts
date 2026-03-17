@@ -1,47 +1,24 @@
-// app/api/admin/settings/route.ts
-// API per gestionar configuracions globals
 import { NextRequest, NextResponse } from 'next/server';
+import { SettingType } from '@prisma/client';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { createAdminSetting, listAdminSettings, updateAdminSettings } from '@/lib/services/adminSettingsService';
 
 export const dynamic = 'force-dynamic';
 
-// GET - Obtenir totes les configuracions o per categoria
 export async function GET(req: NextRequest) {
-  // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
-
-    const settings = await prisma.setting.findMany({
-      where: category ? { category } : undefined,
-      orderBy: [{ category: 'asc' }, { key: 'asc' }],
-    });
-
-    // Transformar a objecte per fàcil accés
-    const settingsMap = settings.reduce((acc, s) => {
-      if (!acc[s.category]) acc[s.category] = {};
-
-      // Parsejar valor segons tipus
-      let value: string | number | boolean | object = s.value;
-      if (s.type === 'NUMBER') value = parseFloat(s.value);
-      if (s.type === 'BOOLEAN') value = s.value === 'true';
-      if (s.type === 'JSON') {
-        try { value = JSON.parse(s.value); } catch { /* mantenir string */ }
-      }
-
-      acc[s.category][s.key] = value;
-      return acc;
-    }, {} as Record<string, Record<string, unknown>>);
+    const result = await listAdminSettings(category);
 
     return NextResponse.json({
       ok: true,
-      settings: category ? settingsMap[category] || {} : settingsMap,
-      raw: settings,
+      settings: result.settings,
+      raw: result.raw,
     });
   } catch (error) {
     log.error('Error obtenint settings:', error);
@@ -52,15 +29,13 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PUT - Actualitzar una o més configuracions
 export async function PUT(req: NextRequest) {
-  // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const body = await req.json();
-    const { settings } = body as { settings: { key: string; value: string | number | boolean }[] };
+    const { settings } = body as { settings: { key: string; value: string | number | boolean | object }[] };
 
     if (!settings || !Array.isArray(settings)) {
       return NextResponse.json(
@@ -69,31 +44,11 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const results = await Promise.all(
-      settings.map(async ({ key, value }) => {
-        const stringValue = typeof value === 'object'
-          ? JSON.stringify(value)
-          : String(value);
-
-        return prisma.setting.update({
-          where: { key },
-          data: { value: stringValue },
-        });
-      })
-    );
-
-    // Log d'administració
-    await prisma.adminLog.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'setting',
-        details: { keys: settings.map(s => s.key) },
-      },
-    });
+    const updated = await updateAdminSettings(settings);
 
     return NextResponse.json({
       ok: true,
-      updated: results.length,
+      updated,
     });
   } catch (error) {
     log.error('Error actualitzant settings:', error);
@@ -104,15 +59,20 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// POST - Crear nova configuració
 export async function POST(req: NextRequest) {
-  // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const body = await req.json();
-    const { key, value, type, category, label, description } = body;
+    const { key, value, type, category, label, description } = body as {
+      key?: string;
+      value?: string | number | boolean | object;
+      type?: SettingType;
+      category?: string;
+      label?: string;
+      description?: string;
+    };
 
     if (!key || !category) {
       return NextResponse.json(
@@ -121,15 +81,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const setting = await prisma.setting.create({
-      data: {
-        key,
-        value: String(value || ''),
-        type: type || 'STRING',
-        category,
-        label,
-        description,
-      },
+    const setting = await createAdminSetting({
+      key,
+      value: value ?? '',
+      type,
+      category,
+      label,
+      description,
     });
 
     return NextResponse.json({
@@ -144,3 +102,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

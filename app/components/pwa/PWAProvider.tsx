@@ -1,5 +1,7 @@
 'use client';
 
+type StandaloneNavigator = Navigator & { standalone?: boolean };
+
 /**
  * PWAProvider.tsx
  *
@@ -60,30 +62,43 @@ export function PWAProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
-    // Solo registrar en producción
-    if (process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          log.debug('PWA Service Worker registered', { scope: registration.scope });
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const shouldRegisterServiceWorker = process.env.NODE_ENV === 'production' && !isLocalhost;
 
-          // Escuchar actualizaciones
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Nueva versión disponible
-                  log.info('PWA new version available');
-                }
-              });
-            }
-          });
+    if (!shouldRegisterServiceWorker) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .then(() => {
+          log.debug('PWA Service Worker disabled for local runtime');
         })
         .catch((error) => {
-          log.error('PWA Service Worker registration failed', error);
+          log.error('PWA Service Worker cleanup failed', error);
         });
+      return;
     }
+
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        log.debug('PWA Service Worker registered', { scope: registration.scope });
+
+        // Escuchar actualizaciones
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Nueva versión disponible
+                log.info('PWA new version available');
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        log.error('PWA Service Worker registration failed', error);
+      });
   }, []);
 
   // Detectar modo standalone
@@ -92,7 +107,7 @@ export function PWAProvider({ children }: { children: ReactNode }) {
 
     const isStandaloneMode =
       window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
+      (window.navigator as StandaloneNavigator).standalone === true;
 
     setIsStandalone(isStandaloneMode);
     setIsInstalled(isStandaloneMode);
@@ -274,3 +289,5 @@ export function PWAInstallButton({ className = '' }: { className?: string }) {
     </button>
   );
 }
+
+

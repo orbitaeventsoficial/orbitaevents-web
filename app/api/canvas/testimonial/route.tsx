@@ -7,9 +7,40 @@
 
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { CANVAS_PRESETS, translateEventType } from '@/lib/services/canvasService';
 import { getInitials, getFirstName } from '@/lib/utils/normalize';
 import { log } from '@/lib/logger';
+
+const CANVAS_PRESETS = {
+  instagramStory: {
+    width: 1080,
+    height: 1920,
+    backgroundColor: '#0a0a0a',
+    accentColor: '#f97316',
+    textColor: '#ffffff',
+  },
+  instagramPost: {
+    width: 1080,
+    height: 1080,
+    backgroundColor: '#0a0a0a',
+    accentColor: '#f97316',
+    textColor: '#ffffff',
+  },
+} as const;
+
+function translateEventType(eventType?: string): string {
+  const translations: Record<string, string> = {
+    WEDDING: 'Boda',
+    BIRTHDAY: 'Aniversari',
+    CORPORATE: 'Corporatiu',
+    COMMUNION: 'Comunió',
+    BAPTISM: 'Bateig',
+    GRADUATION: 'Graduació',
+    ANNIVERSARY: 'Aniversari',
+    PRIVATE_PARTY: 'Festa Privada',
+    OTHER: 'Esdeveniment',
+  };
+  return eventType ? translations[eventType] || 'Esdeveniment' : 'Esdeveniment';
+}
 
 export const runtime = 'edge';
 
@@ -17,7 +48,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Obtenir paràmetres
     const name = searchParams.get('name') || 'Client';
     const text = searchParams.get('text') || 'Gràcies per confiar en nosaltres!';
     const rating = parseInt(searchParams.get('rating') || '5');
@@ -26,27 +56,22 @@ export async function GET(request: NextRequest) {
     const eventType = searchParams.get('eventType');
     const preset = (searchParams.get('preset') || 'instagramStory') as keyof typeof CANVAS_PRESETS;
 
-    // Obtenir configuració del preset
     const config = CANVAS_PRESETS[preset] || CANVAS_PRESETS.instagramStory;
     const { width, height, backgroundColor, accentColor, textColor } = config;
 
-    // Processar dades
     const firstName = getFirstName(name);
     const initials = getInitials(name);
 
-    // Truncar text si és massa llarg
     const maxTextLength = height > 1200 ? 250 : 120;
     const truncatedText = text.length > maxTextLength
       ? text.slice(0, maxTextLength) + '...'
       : text;
 
-    // Generar estrelles
     const stars = Array(5)
       .fill(null)
       .map((_, i) => (i < rating ? '★' : '☆'))
       .join(' ');
 
-    // Estils dinàmics segons preset
     const isStory = height > width;
     const baseFontSize = isStory ? 1 : 0.7;
 
@@ -65,7 +90,6 @@ export async function GET(request: NextRequest) {
             fontFamily: 'Inter, sans-serif',
           }}
         >
-          {/* Logo */}
           <div
             style={{
               display: 'flex',
@@ -94,7 +118,6 @@ export async function GET(request: NextRequest) {
             </span>
           </div>
 
-          {/* Avatar / Inicials */}
           <div
             style={{
               width: `${120 * baseFontSize}px`,
@@ -118,7 +141,6 @@ export async function GET(request: NextRequest) {
             </span>
           </div>
 
-          {/* Nom */}
           <div
             style={{
               fontSize: `${36 * baseFontSize}px`,
@@ -130,7 +152,6 @@ export async function GET(request: NextRequest) {
             {firstName}
           </div>
 
-          {/* Tipus d'event */}
           {eventType && (
             <div
               style={{
@@ -143,7 +164,6 @@ export async function GET(request: NextRequest) {
             </div>
           )}
 
-          {/* Estrelles */}
           <div
             style={{
               fontSize: `${40 * baseFontSize}px`,
@@ -155,7 +175,6 @@ export async function GET(request: NextRequest) {
             {stars}
           </div>
 
-          {/* Testimoni */}
           <div
             style={{
               fontSize: `${28 * baseFontSize}px`,
@@ -170,7 +189,6 @@ export async function GET(request: NextRequest) {
             "{truncatedText}"
           </div>
 
-          {/* Separador */}
           <div
             style={{
               width: `${100 * baseFontSize}px`,
@@ -180,7 +198,6 @@ export async function GET(request: NextRequest) {
             }}
           />
 
-          {/* Codi de descompte */}
           <div
             style={{
               display: 'flex',
@@ -223,11 +240,10 @@ export async function GET(request: NextRequest) {
             </span>
           </div>
 
-          {/* Footer */}
           <div
             style={{
               position: 'absolute',
-              bottom: isStory ? '40px' : '20px',
+              bottom: '40px',
               fontSize: `${20 * baseFontSize}px`,
               color: 'rgba(255, 255, 255, 0.5)',
             }}
@@ -241,11 +257,8 @@ export async function GET(request: NextRequest) {
         height,
       }
     );
-  } catch (error: unknown) {
-    log.error('Failed to generate canvas', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(`Error generating image: ${message}`, {
-      status: 500,
-    });
+  } catch (error) {
+    log.error('Error generant canvas testimonial', error);
+    return new Response('Error generant imatge', { status: 500 });
   }
 }

@@ -8,6 +8,8 @@ import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { absoluteUrl, getSiteUrl } from '@/lib/site';
+
 
 export const revalidate = 3600;
 
@@ -41,7 +43,7 @@ export async function generateMetadata({
     ? `Read real reviews from our clients. ${SITE_CONFIG.stats.reviewCount}+ verified Google reviews. Rating ${SITE_CONFIG.stats.avgRating}/5. DJ and events in Barcelona & Girona.`
     : `Lee las opiniones reales de nuestros clientes. ${SITE_CONFIG.stats.reviewCount}+ reseñas verificadas en Google. Valoración ${SITE_CONFIG.stats.avgRating}/5. DJ y eventos en Barcelona y Girona.`;
 
-  const base = 'https://orbitaevents.com';
+  const base = getSiteUrl();
   return {
     title,
     description,
@@ -84,7 +86,7 @@ export default async function OpinionesPage({
   const aggregateRatingSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://orbitaevents.com/#organization',
+    '@id': absoluteUrl('/#organization'),
     name: 'Orbita Events',
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -104,13 +106,13 @@ export default async function OpinionesPage({
         '@type': 'ListItem',
         position: 1,
         name: isCA ? 'Inici' : isEN ? 'Home' : 'Inicio',
-        item: `https://orbitaevents.com/${locale}`,
+        item: absoluteUrl(`/${locale}`),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: isCA ? 'Opinions' : isEN ? 'Reviews' : 'Opiniones',
-        item: `https://orbitaevents.com/${locale}/opiniones`,
+        item: absoluteUrl(`/${locale}/opiniones`),
       },
     ],
   };

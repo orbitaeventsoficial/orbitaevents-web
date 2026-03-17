@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
-import { z } from 'zod';
-
-const bulkPaymentSchema = z.object({
-  bookingIds: z.array(z.string()).min(1).max(100),
-  field: z.enum(['depositPaid', 'remainingPaid']),
-  value: z.boolean(),
-});
+import { updateBulkBookingPayment } from '@/lib/services/bookingBulkPaymentService';
 
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
@@ -21,25 +14,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { bookingIds, field, value } = bulkPaymentSchema.parse(body);
-
-    const now = new Date();
-    const timestampField = field === 'depositPaid' ? 'depositPaidAt' : 'remainingPaidAt';
-    const data: Record<string, unknown> = {
-      [field]: value,
-      [timestampField]: value ? now : null,
-    };
-
-    const result = await prisma.booking.updateMany({
-      where: { id: { in: bookingIds } },
-      data,
-    });
-
-    log.info(`Bulk payment update: ${field}=${value} per ${result.count} reserves`, {
-      context: { requestId, bookingIds },
-    });
-
-    return NextResponse.json({ ok: true, updated: result.count });
+    const result = await updateBulkBookingPayment(body, { requestId });
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error bulk payment', error, {
       context: { requestId, endpoint: 'admin/bookings/bulk-payment:POST' },

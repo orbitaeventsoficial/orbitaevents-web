@@ -8,7 +8,7 @@
 import { prisma } from '@/lib/prisma';
 import { getProfitabilityConfig } from './profitabilityService';
 
-export interface CacChannelRow {
+interface CacChannelRow {
   channel: string;
   totalLeads: number;
   wonLeads: number;

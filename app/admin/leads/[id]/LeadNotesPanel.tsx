@@ -115,7 +115,7 @@ export default function LeadNotesPanel({
                   type="button"
                   onClick={() => deleteNote(note.id)}
                   disabled={deletingId === note.id}
-                  className={`rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDeleteId === note.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                  className={`rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDeleteId === note.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
                 >
                   {deletingId === note.id ? 'Eliminant...' : confirmingDeleteId === note.id ? 'Segur?' : 'Eliminar'}
                 </button>
@@ -128,4 +128,5 @@ export default function LeadNotesPanel({
     </section>
   );
 }
+
 

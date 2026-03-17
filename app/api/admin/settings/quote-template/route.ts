@@ -6,7 +6,6 @@ import {
   normalizeQuoteTemplate,
   upsertQuoteTemplateSettings,
 } from '@/lib/services/quoteTemplateService';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -39,16 +38,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const payload = normalizeQuoteTemplate(body?.template);
     const saved = await upsertQuoteTemplateSettings(payload);
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'setting',
-        entityId: 'quotes.template',
-        details: { key: 'quotes.template' },
-      },
-    });
-
     return NextResponse.json({ ok: true, template: saved });
   } catch (error) {
     log.error('Error updating quote template settings', error);

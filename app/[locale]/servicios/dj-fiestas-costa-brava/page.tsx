@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en la Costa Brava desde ${MIN_PRICE}€. Lloret de Mar, Tossa, Platja d'Aro, Roses y toda la costa. Equipo profesional resistente a exteriores.`,
   keywords: ['DJ fiestas Costa Brava', 'DJ fiesta Lloret de Mar', 'DJ fiesta Tossa de Mar', "DJ fiesta Platja d'Aro", 'DJ cumpleaños Costa Brava'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-fiestas-costa-brava' },
   openGraph: {
     title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€`,

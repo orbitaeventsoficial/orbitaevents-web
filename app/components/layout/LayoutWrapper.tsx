@@ -7,23 +7,10 @@
 
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { trackPageView } from '@/app/lib/analytics';
-
-// Detectar bots para no mostrarles la intro (mejor métricas Lighthouse)
-function isBot(): boolean {
-  if (typeof navigator === 'undefined') return true;
-  const ua = navigator.userAgent.toLowerCase();
-  const botPatterns = [
-    'googlebot', 'lighthouse', 'pagespeed', 'chrome-lighthouse',
-    'gtmetrix', 'pingdom', 'webpagetest', 'yandex', 'bingbot',
-    'slurp', 'duckduckbot', 'baiduspider', 'facebookexternalhit',
-    'twitterbot', 'rogerbot', 'linkedinbot', 'embedly', 'showyoubot',
-    'outbrain', 'pinterest', 'applebot', 'semrush', 'ahrefsbot',
-    'mj12bot', 'dotbot', 'petalbot', 'bytespider', 'headlesschrome',
-  ];
-  return botPatterns.some(bot => ua.includes(bot));
-}
+import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, MOBILE_INTRO_COMPLETE_EVENT, MOBILE_INTRO_STORAGE_KEY } from '@/lib/intro';
 
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
 const Header = dynamic(
@@ -51,11 +38,6 @@ const CookieConsent = dynamic(
   { ssr: false }
 );
 
-const HeroPortalLogo = dynamic(
-  () => import('@/app/components/ui/HeroPortalLogo'),
-  { ssr: false }
-);
-
 const FlashOfferPopup = dynamic(
   () => import('@/app/components/ui/FlashOfferPopup'),
   { ssr: false }
@@ -73,9 +55,6 @@ const Footer = dynamic(
 // Pàgines immersives sense header/footer
 const IMMERSIVE_PAGES = ['/sensorial', '/respira'];
 
-// Pàgines on mostrar la intro
-const INTRO_PAGES = ['/', '/ca', '/es'];
-
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
@@ -83,7 +62,6 @@ const INTRO_PAGES = ['/', '/ca', '/es'];
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [showIntro, setShowIntro] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const [hideHeaderOnMobileIntro, setHideHeaderOnMobileIntro] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
 
@@ -92,63 +70,72 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const overlay = document.getElementById('intro-overlay');
     if (overlay) {
       overlay.style.opacity = '0';
-      overlay.style.pointerEvents = 'none'; // Allow touch through immediately
-      setTimeout(() => {
+      overlay.style.pointerEvents = 'none';
+      window.setTimeout(() => {
+        if (!overlay.isConnected) return;
         overlay.style.display = 'none';
       }, 400);
     }
+    document.documentElement.style.overflow = '';
     document.documentElement.style.overflowY = 'auto';
-    document.body.style.overflowY = 'auto';
     document.documentElement.style.height = 'auto';
+    document.body.style.overflow = '';
+    document.body.style.overflowY = 'auto';
     document.body.style.height = 'auto';
     document.body.style.position = 'relative';
     document.documentElement.classList.add('scroll-unlocked');
     document.body.classList.add('scroll-unlocked');
     document.body.classList.remove('hero-loading');
-    document.body.style.overflow = '';
     document.body.classList.add('intro-done');
+    document.documentElement.dataset.orbitaIntroMode = 'none';
   }, []);
 
-  // Evitar hydration mismatch + gestionar intro
+  // Gestiona la intro usando la misma decision que se calcula en el bootstrap inicial.
   useEffect(() => {
-    setIsMounted(true);
+const introMode = getClientIntroMode({
+      pathname,
+      search: window.location.search,
+      isMobileViewport: window.innerWidth < 1024,
+      reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      userAgent: window.navigator.userAgent,
+      hasSeenDesktopIntro: sessionStorage.getItem('orbita-intro-seen'),
+    });
+
+    document.documentElement.dataset.orbitaIntroMode = introMode;
+
+    if (introMode === 'none') {
+      setShowIntro(false);
+      setHideHeaderOnMobileIntro(false);
+      removeOverlay();
+      return;
+    }
+
     const failsafeId = window.setTimeout(() => {
       const overlay = document.getElementById('intro-overlay');
       if (overlay && overlay.style.display !== 'none') {
         overlay.style.opacity = '0';
         overlay.style.pointerEvents = 'none';
-        setTimeout(() => {
+        window.setTimeout(() => {
           overlay.style.display = 'none';
         }, 400);
       }
       document.body.classList.remove('hero-loading');
       document.body.style.overflow = '';
       document.body.classList.add('intro-done');
+      document.documentElement.dataset.orbitaIntroMode = 'none';
     }, 6000);
 
-    const isHomePage = INTRO_PAGES.some(page => pathname === page);
-    const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
-    const isBotUser = isBot();
-    const isMobileViewport = window.innerWidth < 1024;
-
-    // En móvil usamos la intro específica del MobileHomePage
-    if (isMobileViewport) {
+    if (introMode === 'mobile') {
       setShowIntro(false);
-      sessionStorage.setItem('orbita-intro-seen', 'true');
       removeOverlay();
       window.clearTimeout(failsafeId);
       return;
     }
 
-    // No mostrar intro a bots (Lighthouse, Googlebot, etc.) para mejores métricas
-    if (isHomePage && !hasSeenIntro && !isBotUser) {
-      // Mostrar intro - l'overlay es queda
-      setShowIntro(true);
-    } else {
-      // No mostrar intro - treure overlay immediatament
-      removeOverlay();
-      window.clearTimeout(failsafeId);
-    }
+    setShowIntro(true);
+    document.body.classList.add('hero-loading');
+
+    return () => window.clearTimeout(failsafeId);
   }, [pathname, removeOverlay]);
 
   useEffect(() => {
@@ -163,27 +150,19 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }, []);
 
   useEffect(() => {
-    if (showIntro) {
-      document.documentElement.classList.remove('scroll-unlocked');
-      document.body.classList.remove('scroll-unlocked');
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflowY = 'hidden';
-      return;
-    }
-
-    const id = window.setTimeout(() => {
-      document.documentElement.style.overflowY = 'auto';
-      document.body.style.overflowY = 'auto';
-      document.documentElement.style.height = 'auto';
-      document.body.style.height = 'auto';
-      document.body.style.position = 'relative';
-      document.documentElement.classList.add('scroll-unlocked');
-      document.body.classList.add('scroll-unlocked');
-      document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.documentElement.style.overflowY = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.overflow = '';
+    document.body.style.overflowY = 'auto';
+    document.body.style.height = 'auto';
+    document.body.style.position = '';
+    document.documentElement.classList.add('scroll-unlocked');
+    document.body.classList.add('scroll-unlocked');
+    if (!showIntro) {
       document.body.classList.remove('hero-loading');
-    }, 0);
-
-    return () => window.clearTimeout(id);
+      document.body.classList.add('intro-done');
+    }
   }, [showIntro]);
 
   useEffect(() => {
@@ -200,7 +179,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }, [pathname]);
 
   useEffect(() => {
-    const isHomePage = INTRO_PAGES.some(page => pathname === page);
+    const isHomePage = isIntroPage(pathname);
     if (!isHomePage) {
       setHideHeaderOnMobileIntro(false);
       return;
@@ -212,8 +191,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       return;
     }
 
-    const hasSeenMobileIntro = sessionStorage.getItem('orbita-mobile-intro-seen');
-    if (hasSeenMobileIntro) {
+    if (hasSeenMobileIntro(sessionStorage)) {
       setHideHeaderOnMobileIntro(false);
       return;
     }
@@ -222,7 +200,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     // Use storage event listener instead of polling for better performance
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'orbita-mobile-intro-seen' && e.newValue) {
+      if (e.key === MOBILE_INTRO_STORAGE_KEY && e.newValue) {
         setHideHeaderOnMobileIntro(false);
       }
     };
@@ -233,11 +211,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     };
 
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('orbita-mobile-intro-complete', handleIntroComplete);
+    window.addEventListener(MOBILE_INTRO_COMPLETE_EVENT, handleIntroComplete);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('orbita-mobile-intro-complete', handleIntroComplete);
+      window.removeEventListener(MOBILE_INTRO_COMPLETE_EVENT, handleIntroComplete);
     };
   }, [pathname]);
 
@@ -245,16 +223,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
     sessionStorage.setItem('orbita-intro-seen', 'true');
+    document.documentElement.dataset.orbitaIntroMode = 'none';
     // Treure overlay amb fade
     removeOverlay();
   }, [removeOverlay]);
 
   // Comprovar si és pàgina immersiva
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
-  const isHomePage = INTRO_PAGES.some(page => pathname === page);
-  const hideChromeForMobileHome = false;
-  const showMobileBottomNav = isMobileViewport && !isHomePage ? true : isMobileViewport;
-  const showDesktopBottomNav = !isMobileViewport;
   const isIntroActive = showIntro || hideHeaderOnMobileIntro;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -270,7 +245,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   return (
     <>
       {/* Intro animada (només home, primer cop) - 4s total */}
-      {showIntro && isMounted && (
+      {showIntro && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
           totalMs={4000}
@@ -295,9 +270,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {/* Footer */}
       {!isIntroActive && <Footer />}
 
-      {/* Bottom Navigation - Mobile only */}
-      {!isIntroActive && showDesktopBottomNav && <BottomNav />}
-      {!isIntroActive && showMobileBottomNav && <MobileBottomNav />}
+      {/* Bottom Navigation */}
+      {!isIntroActive && (isMobileViewport ? <MobileBottomNav /> : <BottomNav />)}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
       {!isIntroActive && <FloatingCTAs />}
@@ -310,3 +284,10 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     </>
   );
 }
+
+
+
+
+
+
+

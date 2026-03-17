@@ -217,7 +217,7 @@ export default function AdminRessenyesPage() {
             <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-500/10 flex items-center justify-center text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
                     {t.customer.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -237,13 +237,13 @@ export default function AdminRessenyesPage() {
               <StarRating rating={t.rating} />
             </div>
 
-            <blockquote className="mt-4 pl-4 border-l-2 border-amber-500/20 text-white/70 italic whitespace-pre-wrap leading-relaxed">
+            <blockquote className="mt-4 pl-4 border-l-2 text-white/70 italic whitespace-pre-wrap leading-relaxed">
               {t.text}
             </blockquote>
 
             {t.discountCode && (
               <div className="mt-3 text-xs text-white/30 flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono">
+                <span className="px-1.5 py-0.5 rounded border font-mono">
                   {t.discountCode.code}
                 </span>
                 <span>-{t.discountCode.discountPercent}%</span>
@@ -286,14 +286,14 @@ export default function AdminRessenyesPage() {
                   <button
                     type="button"
                     onClick={() => generateCanvas(t, 'story')}
-                    className="px-4 py-2 rounded-full border border-amber-500/30 text-amber-300 text-sm font-semibold transition-colors hover:bg-amber-500/10"
+                    className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   >
                     Canvas Story
                   </button>
                   <button
                     type="button"
                     onClick={() => generateCanvas(t, 'instagram')}
-                    className="px-4 py-2 rounded-full border border-amber-500/30 text-amber-300 text-sm font-semibold transition-colors hover:bg-amber-500/10"
+                    className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   >
                     Canvas Post
                   </button>
@@ -310,9 +310,9 @@ export default function AdminRessenyesPage() {
 
             {/* Canvas preview */}
             {canvasPreview?.id === t.id && (
-              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+              <div className="mt-4 rounded-xl border p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-amber-300">Previsualització Canvas</p>
+                  <p className="text-sm font-semibold">Previsualització Canvas</p>
                   <button
                     type="button"
                     onClick={() => setCanvasPreview(null)}

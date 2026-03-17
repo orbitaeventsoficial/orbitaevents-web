@@ -51,7 +51,7 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
         {sent ? 'Enviat!' : loading ? 'Enviant...' : 'Envia ara'}
       </button>
       {error && (
-        <span className="text-xs text-rose-400" role="alert">
+        <span className="text-xs" role="alert">
           {error}
         </span>
       )}

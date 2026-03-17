@@ -1,8 +1,8 @@
 // app/api/testimonials/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { listApprovedPublicTestimonials, submitPublicTestimonial } from '@/lib/services/publicTestimonialService';
 
 type Locale = 'ca' | 'es' | 'en';
 const MESSAGES: Record<Locale, Record<string, string>> = {
@@ -36,7 +36,6 @@ function resolveLocale(request: NextRequest): Locale {
   return 'es';
 }
 
-// Validation schema
 const testimonialSchema = z.object({
   rating: z.number().min(1).max(5),
   comment: z.string().min(10),
@@ -51,131 +50,28 @@ const testimonialSchema = z.object({
   bookingRef: z.string().optional(),
 });
 
-function generateDiscountCode(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = 'OE-';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
-function normalizeString(str: string): string {
-  return str
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
-
 export async function POST(request: NextRequest) {
   const t = MESSAGES[resolveLocale(request)];
   try {
     const body = await request.json();
     const data = testimonialSchema.parse(body);
 
-    const emailNormalized = data.email.toLowerCase().trim();
-    const nameNormalized = normalizeString(data.name);
-    const phoneNormalized = data.phone?.replace(/\D/g, '') || null;
-
-    // Find or create customer
-    let customer = await prisma.customer.findUnique({
-      where: { emailNormalized },
-    });
-
-    if (!customer) {
-      customer = await prisma.customer.create({
-        data: {
-          email: data.email,
-          emailNormalized,
-          name: data.name,
-          nameNormalized,
-          phone: data.phone || null,
-          phoneNormalized,
-          gdprConsent: true,
-          gdprConsentDate: new Date(),
-        },
-      });
-    }
-
-    // Calculate discount percentage
-    let discountPercent = 5; // Base
-    if (data.photoUrl) discountPercent += 5;
-    if (data.videoUrl) discountPercent += 10;
-    if (data.allowGoogleShare) discountPercent += 5;
-
-    // Generate unique discount code
-    let discountCode = generateDiscountCode();
-    let codeExists = true;
-    let attempts = 0;
-
-    while (codeExists && attempts < 10) {
-      const existing = await prisma.customerDiscountCode.findUnique({
-        where: { code: discountCode },
-      });
-      if (!existing) {
-        codeExists = false;
-      } else {
-        discountCode = generateDiscountCode();
-        attempts++;
-      }
-    }
-
-    // Create testimonial
-    const testimonial = await prisma.customerTestimonial.create({
-      data: {
-        customerId: customer.id,
-        text: data.comment,
-        rating: data.rating,
-        photoUrl: data.photoUrl || null,
-        showName: true,
-        showPhoto: data.consentPhotoPublication,
-        isApproved: false, // Requires admin approval
-      },
-    });
-
-    // Create discount code
-    const validUntil = new Date();
-    validUntil.setMonth(validUntil.getMonth() + 6);
-
-    await prisma.customerDiscountCode.create({
-      data: {
-        customerId: customer.id,
-        code: discountCode,
-        discountPercent,
-        validFrom: new Date(),
-        validUntil,
-        maxUses: 1,
-        sourceType: 'TESTIMONIAL',
-        sourceId: testimonial.id,
-        isActive: true,
-      },
-    });
-
-    // Update testimonial with discount code ID
-    await prisma.customerTestimonial.update({
-      where: { id: testimonial.id },
-      data: { discountCodeId: discountCode },
-    });
-
-    // Log activity
-    await prisma.customerActivity.create({
-      data: {
-        customerId: customer.id,
-        action: 'TESTIMONIAL_SUBMITTED',
-        details: {
-          testimonialId: testimonial.id,
-          rating: data.rating,
-          discountCode,
-          discountPercent,
-        },
-      },
+    const result = await submitPublicTestimonial({
+      rating: data.rating,
+      comment: data.comment,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      photoUrl: data.photoUrl || undefined,
+      videoUrl: data.videoUrl || undefined,
+      allowGoogleShare: data.allowGoogleShare,
+      consentPhotoPublication: data.consentPhotoPublication,
     });
 
     return NextResponse.json({
       success: true,
-      discountCode,
-      discountPercent,
+      discountCode: result.discountCode,
+      discountPercent: result.discountPercent,
       message: t.success,
     });
   } catch (error) {
@@ -195,51 +91,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: Fetch approved testimonials for public display
 export async function GET(request: NextRequest) {
   const t = MESSAGES[resolveLocale(request)];
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const locale = resolveLocale(request);
 
-    const testimonials = await prisma.customerTestimonial.findMany({
-      where: {
-        isApproved: true,
-      },
-      include: {
-        customer: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    });
-
-    const total = await prisma.customerTestimonial.count({
-      where: { isApproved: true },
-    });
-
-    const formattedTestimonials = testimonials.map((testimonial) => ({
-      id: testimonial.id,
-      name: testimonial.showName ? testimonial.customer.name : t.verifiedCustomer,
-      text: testimonial.text,
-      rating: testimonial.rating,
-      photoUrl: testimonial.showPhoto ? testimonial.photoUrl : null,
-      eventType: testimonial.eventType,
-      createdAt: testimonial.createdAt,
-    }));
-
-    return NextResponse.json({
-      testimonials: formattedTestimonials,
-      total,
-      hasMore: offset + limit < total,
-    });
+    const result = await listApprovedPublicTestimonials(limit, offset, locale);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error fetching testimonials', error);
     return NextResponse.json(

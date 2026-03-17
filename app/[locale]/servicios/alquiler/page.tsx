@@ -3,6 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
+import { getSiteUrl } from '@/lib/site';
+
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
@@ -13,7 +15,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title,
     description,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/servicios/alquiler' },
     openGraph: {
       title,

@@ -18,11 +18,7 @@ interface BookingMarginProps {
   extraHours: number;
   extraHourPrice: number;
   distanceKm: number | null;
-  /** @deprecated renamed to vehicleCostPerKm */
-  fuelCostPerKm?: number | null;
   vehicleCostPerKm?: number | null;
-  travelCost: number | null;
-  source: string;
   eventLocation?: string | null;
   eventVenue?: string | null;
   inventoryCostReal?: number | null;
@@ -45,10 +41,7 @@ export default function BookingMarginCard({
   extraHours,
   extraHourPrice,
   distanceKm: initialDistanceKm,
-  fuelCostPerKm: legacyFuelCostPerKm,
   vehicleCostPerKm: initialVehicleCostPerKm,
-  travelCost: initialTravelCost,
-  source,
   eventLocation,
   eventVenue,
   inventoryCostReal,
@@ -66,7 +59,7 @@ export default function BookingMarginCard({
 
   // Editable travel fields
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
-  const resolvedCostPerKm = initialVehicleCostPerKm ?? legacyFuelCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
+  const resolvedCostPerKm = initialVehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
   const [vehicleCostPerKm] = useState(resolvedCostPerKm);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -270,7 +263,7 @@ export default function BookingMarginCard({
 
       {/* On va cada euro — desglossament del benefici */}
       {total > 0 && (
-        <div className="mb-6 rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-4">
+        <div className="mb-6 rounded-xl border p-4">
           <h3 className="text-sm font-semibold mb-1">On va cada euro d'aquest bolo</h3>
           <p className="text-[11px] mb-3">Desglossament pràctic: què es queda l'empresa, què s'ha de reservar, i què és benefici net.</p>
           <div className="space-y-2 text-xs">
@@ -280,7 +273,7 @@ export default function BookingMarginCard({
                 <span className="font-medium">Combustible (benzina)</span>
                 <p className="text-[10px]">Pot «Gasolina» — usar per repostar la furgoneta</p>
               </div>
-              <span className="shrink-0 font-semibold text-orange-300">
+              <span className="shrink-0 font-semibold">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.55 : 0)}
               </span>
             </div>
@@ -290,7 +283,7 @@ export default function BookingMarginCard({
                 <span className="font-medium">Manteniment vehicle</span>
                 <p className="text-[10px]">Pot «Vehicle» — rodes, oli, revisió, assegurança, ITV</p>
               </div>
-              <span className="shrink-0 font-semibold text-orange-300">
+              <span className="shrink-0 font-semibold">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.45 : 0)}
               </span>
             </div>
@@ -300,7 +293,7 @@ export default function BookingMarginCard({
                 <span className="font-medium">Amortització equip (so, llum, etc.)</span>
                 <p className="text-[10px]">Pot «Equip» — per quan calgui comprar recanvis o equip nou</p>
               </div>
-              <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(packCostUsed)}</span>
+              <span className="shrink-0 font-semibold">{formatCurrency(packCostUsed)}</span>
             </div>
             {/* Cost operacional */}
             <div className="flex items-start justify-between gap-2">
@@ -308,7 +301,7 @@ export default function BookingMarginCard({
                 <span className="font-medium">Costos operatius fixes</span>
                 <p className="text-[10px]">Pot «Operacions» — assegurança RC, llicències, material fungible</p>
               </div>
-              <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(fixedOperationalCost)}</span>
+              <span className="shrink-0 font-semibold">{formatCurrency(fixedOperationalCost)}</span>
             </div>
             {/* Extres */}
             {extrasCost > 0 && (
@@ -317,7 +310,7 @@ export default function BookingMarginCard({
                   <span className="font-medium">Cost extres</span>
                   <p className="text-[10px]">Pot «Extres» — productes i material addicional</p>
                 </div>
-                <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(extrasCost)}</span>
+                <span className="shrink-0 font-semibold">{formatCurrency(extrasCost)}</span>
               </div>
             )}
             {/* Hores extra */}
@@ -327,14 +320,14 @@ export default function BookingMarginCard({
                   <span className="font-medium">Cost hores extra</span>
                   <p className="text-[10px]">Pot «Personal» — compensació per hores extra treballades</p>
                 </div>
-                <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(extraHoursCost)}</span>
+                <span className="shrink-0 font-semibold">{formatCurrency(extraHoursCost)}</span>
               </div>
             )}
             {/* Separador */}
             <div className="border-t border-white/10 pt-2 mt-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="font-bold text-emerald-300">Benefici net (el que queda per a tu)</span>
+                  <span className="font-bold">Benefici net (el que queda per a tu)</span>
                   <p className="text-[10px]">Compte corrent de l'empresa — sou, inversions, estalvi</p>
                 </div>
                 <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -467,3 +460,7 @@ export default function BookingMarginCard({
     </section>
   );
 }
+
+
+
+

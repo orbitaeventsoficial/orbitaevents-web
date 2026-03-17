@@ -1,11 +1,13 @@
 // app/layout.tsx
-// Root layout - Passthrough for i18n routing
-// IMPORTANT: HTML structure is in [locale]/layout.tsx to support i18n
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import caMessages from '@/messages/ca.json';
+import { getSiteUrl } from '@/lib/site';
+import { inter, plusJakarta, jetbrains } from '@/app/fonts';
 
-const homeMeta = (caMessages as Record<string, any>)?.homePage?.meta || {};
+type HomeMeta = { title?: string; description?: string; keywords?: string[]; ogTitle?: string; ogDescription?: string; ogImageAlt?: string };
+
+const homeMeta: HomeMeta = (caMessages as { homePage?: { meta?: HomeMeta } })?.homePage?.meta || {};
 const homeKeywords = Array.isArray(homeMeta.keywords) ? homeMeta.keywords : [];
 
 export const viewport: Viewport = {
@@ -20,14 +22,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: homeMeta.title || 'Òrbita Events',
     template: '%s | Òrbita Events',
   },
   description: homeMeta.description || 'Experiències immersives per esdeveniments',
   keywords: homeKeywords,
-  authors: [{ name: 'Òrbita Events', url: 'https://orbitaevents.com' }],
+  authors: [{ name: 'Òrbita Events', url: getSiteUrl() }],
   creator: 'Òrbita Events',
   publisher: 'Òrbita Events',
   openGraph: {
@@ -79,7 +81,22 @@ export const metadata: Metadata = {
   classification: 'Events & Entertainment',
 };
 
-// Root layout is a passthrough - actual HTML structure is in [locale]/layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <html
+      lang="ca"
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
+      <body
+        className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
+    </html>
+  );
 }
+
+
+

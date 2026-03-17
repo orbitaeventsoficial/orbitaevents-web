@@ -112,10 +112,10 @@ const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: stri
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  AVAILABLE: { label: 'Disponible', color: 'bg-emerald-500/20 text-emerald-300' },
+  AVAILABLE: { label: 'Disponible', color: 'admin-tone-soft-success' },
   IN_USE: { label: 'En ús', color: 'bg-blue-500/20 text-blue-300' },
   MAINTENANCE: { label: 'Manteniment', color: 'bg-yellow-500/20 text-yellow-300' },
-  BROKEN: { label: 'Avariat', color: 'bg-rose-500/20 text-rose-300' },
+  BROKEN: { label: 'Avariat', color: 'admin-tone-soft-danger' },
   RETIRED: { label: 'Retirat', color: 'bg-white/5 text-white/40' },
 };
 
@@ -463,7 +463,7 @@ export default function PricingAdminPage() {
                     <p className="text-xs mb-2">Últimes vendes:</p>
                     <div className="flex gap-2 overflow-x-auto pb-1">
                       {extra.recentSales.map((sale, i) => (
-                        <span key={i} className="px-2 py-1 rounded text-xs whitespace-nowrap border">
+                        <span key={i} className="px-2 py-1 rounded text-xs whitespace-nowrap overflow-hidden text-ellipsis border">
                           {sale.bookingRef} · {formatDate(sale.date)}
                         </span>
                       ))}
@@ -596,12 +596,12 @@ export default function PricingAdminPage() {
               placeholder="Cerca per nom o codi..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="flex-1 px-4 py-2.5 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="flex-1 px-4 py-2.5 rounded-xl border "
             />
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="px-4 py-2.5 rounded-xl border "
             >
               <option value="all">Totes les categories</option>
               {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
@@ -656,7 +656,7 @@ export default function PricingAdminPage() {
                       <p className="text-xs mb-2">Últims esdeveniments:</p>
                       <div className="flex gap-2 overflow-x-auto">
                         {item.recentUsage.map((usage, i) => (
-                          <span key={i} className="px-2 py-1 rounded text-xs whitespace-nowrap border">
+                          <span key={i} className="px-2 py-1 rounded text-xs whitespace-nowrap overflow-hidden text-ellipsis border">
                             {usage.bookingRef} · {formatDate(usage.date)}
                           </span>
                         ))}
@@ -716,5 +716,8 @@ function StatCard({
     </div>
   );
 }
+
+
+
 
 

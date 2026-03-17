@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
+import { getAdminProposalById, updateAdminProposal } from '@/lib/services/proposalAdminService';
 import { z } from 'zod';
 
 const updateProposalSchema = z.object({
@@ -17,7 +17,7 @@ const updateProposalSchema = z.object({
   vatRate: z.number().min(0).optional(),
   vatAmount: z.number().min(0).optional(),
   total: z.number().min(0).optional(),
-  snapshot: z.record(z.any()).optional(),
+  snapshot: z.record(z.unknown()).optional(),
   pdfUrl: z.string().url().optional(),
   pdfKey: z.string().optional(),
   sentAt: z.string().datetime().nullable().optional(),
@@ -34,20 +34,8 @@ export async function GET(req: NextRequest, { params }: Params) {
   const requestId = getRequestId(req);
 
   try {
-    const proposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
-      include: {
-        customer: { select: { id: true, name: true, email: true } },
-        lead: { select: { id: true, name: true, email: true } },
-        booking: { select: { id: true, reference: true, status: true } },
-      },
-    });
-
-    if (!proposal) {
-      return NextResponse.json({ ok: false, error: 'Pressupost no trobat' }, { status: 404 });
-    }
-
-    return NextResponse.json({ ok: true, proposal });
+    const result = await getAdminProposalById(params.id);
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error obtenint pressupost', error, {
       context: { requestId, endpoint: 'admin/proposals/[id]:GET', proposalId: params.id },
@@ -62,7 +50,6 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
   const requestId = getRequestId(req);
-  let customerIdForLog: string | undefined;
 
   try {
     const body = await req.json();
@@ -71,30 +58,17 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return NextResponse.json({ ok: false, error: 'Dades invàlides', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const data = parsed.data;
-    const proposal = await prisma.proposal.update({
-      where: { id: params.id },
-      data: {
-        ...data,
-        sentAt: data.sentAt === undefined ? undefined : data.sentAt ? new Date(data.sentAt) : null,
-        acceptedAt: data.acceptedAt === undefined ? undefined : data.acceptedAt ? new Date(data.acceptedAt) : null,
-      },
-      include: {
-        customer: { select: { id: true, name: true, email: true } },
-      },
-    });
-    customerIdForLog = proposal.customerId;
-
-    return NextResponse.json({ ok: true, proposal });
+    const result = await updateAdminProposal(params.id, parsed.data);
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error actualitzant pressupost', error, {
       context: {
         requestId,
         endpoint: 'admin/proposals/[id]:PATCH',
         proposalId: params.id,
-        customerId: customerIdForLog,
       },
     });
     return NextResponse.json({ ok: false, error: 'Error actualitzant pressupost' }, { status: 500 });
   }
 }
+

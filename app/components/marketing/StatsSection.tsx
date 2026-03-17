@@ -66,7 +66,7 @@ function StatCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={
-        reduceMotion ? { duration: 0 } : { delay, type: 'spring', damping: 20 }
+        reduceMotion ? { duration: 0 } : { delay, duration: 0.32, ease: [0.22, 1, 0.36, 1] }
       }
       className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 text-center overflow-hidden group hover:border-white/20 transition-colors"
       style={{

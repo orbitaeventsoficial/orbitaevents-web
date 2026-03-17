@@ -1816,8 +1816,10 @@
             "f1": "Professional DJ 3 hours (Final dance only)",
             "f2": "PRO Sound 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
             "f3": "Dance floor lighting (LED multieffects + 2x Bash LED spots)",
-            "f4": "Smoke machine"
-          }
+            "f4": "Smoke machine",
+            "f5": "Setup and teardown included"
+          },
+          "ideal": "Weddings with final dance"
         },
         "bodas-premium": {
           "name": "Signature (Full Day)",
@@ -1828,7 +1830,8 @@
             "f3": "PRO lighting: 4 moving heads 150W LED",
             "f4": "Ambient lighting (LED balls)",
             "f5": "Smoke machine"
-          }
+          },
+          "ideal": "Full-day weddings"
         },
         "bodas-luxury": {
           "name": "Royal Wedding (Full FX)",
@@ -1838,7 +1841,8 @@
             "f2": "Audiophile sound 4000W EV ETX 2000W",
             "f3": "Synchronized light show (4 moving heads 150W LED)",
             "f4": "Low fog machine effect (Dancing in the clouds)"
-          }
+          },
+          "ideal": "VIP weddings"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
@@ -2134,7 +2138,12 @@
     "customNeedsSub": "We do custom events. Tell us what you have in mind and we'll propose.",
     "contactUs": "Talk to us",
     "allInclude": "All packs include",
-    "allIncludeItems": ["Setup and teardown", "Dedicated professional DJ", "Quality sound (EV 4000W)", "Prior coordination with you"],
+    "allIncludeItems": [
+      "Setup and teardown",
+      "Dedicated professional DJ",
+      "Quality sound (EV 4000W)",
+      "Prior coordination with you"
+    ],
     "tab_bodas": "Weddings",
     "tab_festes": "Parties",
     "tab_empresas": "Corporate",
@@ -3974,7 +3983,10 @@
     },
     "viewCalendar": "See full calendar",
     "socialPressure": "8 people checking dates this week",
-    "earlyBird": "Book within {days} days and save 15%"
+    "earlyBird": "Book within {days} days and save 15%",
+    "modal": {
+      "whatsappMsg": "Hello! I want to book the date {date} for my event. Can you send me more information?"
+    }
   },
   "stickyCta": {
     "requestQuote": "Request your quote",

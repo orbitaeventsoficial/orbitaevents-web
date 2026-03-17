@@ -10,6 +10,7 @@
 
 import { NextResponse } from 'next/server';
 import { getDbPacks } from '@/lib/packs-db';
+import type { ServiceSlug } from '@/app/config/packs-config';
 
 // No cache to reflect admin changes immediately.
 export const revalidate = 0;
@@ -23,11 +24,12 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const serviceParam = searchParams.get('service');
   const allowedServices = new Set(['bodas', 'fiestas', 'discomovil', 'empresas']);
-  const service = serviceParam && allowedServices.has(serviceParam) ? serviceParam : undefined;
+  const service: ServiceSlug | undefined =
+    serviceParam && allowedServices.has(serviceParam) ? (serviceParam as ServiceSlug) : undefined;
   const locale = searchParams.get('locale') || 'ca';
 
   const packs = await getDbPacks({
-    service: service as any,
+    service,
     locale,
   });
 
@@ -42,3 +44,4 @@ export async function GET(req: Request) {
     },
   });
 }
+

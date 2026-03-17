@@ -24,7 +24,7 @@ import type { Customer, Prisma } from '@prisma/client';
 // TIPUS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export interface MatchReason {
+interface MatchReason {
   field: string;
   type: 'exact' | 'similar' | 'partial';
   value1: string;
@@ -32,25 +32,25 @@ export interface MatchReason {
   score: number;
 }
 
-export interface DuplicateMatch {
+interface DuplicateMatch {
   customer: Customer;
   matchScore: number;
   matchReasons: MatchReason[];
 }
 
-export interface DuplicateGroup {
+interface DuplicateGroup {
   primaryCustomer: Customer;
   duplicates: DuplicateMatch[];
   suggestedAction: 'auto_merge' | 'review' | 'ignore';
 }
 
-export interface MergeResult {
+interface MergeResult {
   mergedCustomer: Customer;
   deletedIds: string[];
   fieldsUpdated: string[];
 }
 
-export interface CustomerInput {
+interface CustomerInput {
   email?: string;
   name?: string;
   phone?: string;
@@ -467,3 +467,4 @@ function getSuggestedAction(
   if (maxScore >= 50) return 'review'; // Cal revisar
   return 'ignore'; // Probablement no és duplicat
 }
+

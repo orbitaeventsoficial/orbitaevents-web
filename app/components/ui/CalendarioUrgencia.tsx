@@ -83,6 +83,8 @@ const DAYS_SHORT: Record<CalendarLocale, string[]> = {
   en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 };
 
+const SOCIAL_PROOF_INITIALS = ['G', 'I', 'X'] as const;
+
 
 // Traduccions per reasons
 const getReasonText = (reason: string | undefined, t: CalendarTranslations): string | undefined => {
@@ -666,13 +668,14 @@ export default function CalendarioUrgencia({
       )}
 
       {/* Social pressure + early-bird countdown */}
+      {/* Social pressure + early-bird countdown */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6 mb-2">
         {/* Social pressure */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 text-white/60 text-sm">
           <span className="flex -space-x-1.5">
-            {[...Array(3)].map((_, i) => (
+            {SOCIAL_PROOF_INITIALS.map((initial, i) => (
               <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0A0A0A] flex items-center justify-center text-[8px] text-black font-bold">
-                {String.fromCharCode(65 + Math.floor(Math.random() * 26))}
+                {initial}
               </span>
             ))}
           </span>

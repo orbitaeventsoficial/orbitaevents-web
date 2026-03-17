@@ -1,6 +1,7 @@
 // lib/hooks/usePacks.ts
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { PackDefinition, ServiceSlug } from '@/config/packs-config';
+import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 
 type PacksState = {
   packs: PackDefinition[];
@@ -14,8 +15,22 @@ export function usePacks(options: {
   fallback?: PackDefinition[];
 }) {
   const { service, locale, fallback = [] } = options;
+  const localizedFallback = useMemo(
+    () =>
+      fallback.map((pack) => ({
+        ...pack,
+        name: resolvePackI18nKey(pack.name, locale),
+        tagline: resolvePackI18nKey(pack.tagline, locale),
+        emotion: resolvePackI18nKey(pack.emotion || pack.tagline || '', locale),
+        features: resolvePackI18nFeatures(pack.features || [], locale),
+        badge: pack.badge ? resolvePackI18nKey(pack.badge, locale) : null,
+        ideal: resolvePackI18nKey(pack.ideal || '', locale),
+      })),
+    [fallback, locale]
+  );
+
   const [state, setState] = useState<PacksState>({
-    packs: fallback,
+    packs: localizedFallback,
     loading: true,
     error: null,
   });
@@ -42,14 +57,14 @@ export function usePacks(options: {
         const remotePacks = Array.isArray(data.packs) ? data.packs : [];
 
         setState({
-          packs: remotePacks.length > 0 ? remotePacks : fallback,
+          packs: remotePacks.length > 0 ? remotePacks : localizedFallback,
           loading: false,
           error: null,
         });
       } catch (error) {
         if (!active) return;
         setState({
-          packs: fallback,
+          packs: localizedFallback,
           loading: false,
           error: error instanceof Error ? error.message : 'Error carregant packs',
         });
@@ -61,7 +76,7 @@ export function usePacks(options: {
     return () => {
       active = false;
     };
-  }, [service, locale, fallback]);
+  }, [service, locale, localizedFallback]);
 
   return state;
 }

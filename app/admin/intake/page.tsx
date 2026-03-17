@@ -203,7 +203,7 @@ export default function IntakePage() {
     } finally {
       setSubmitting(false);
     }
-  }, [form, duplicates]);
+  }, [form, duplicates, duplicateOverride, toast]);
 
   return (
     <AdminPage
@@ -283,7 +283,7 @@ export default function IntakePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                    dup.matchScore >= 80 ? 'bg-rose-500/20 text-rose-300' :
+                    dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
                     dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
                     'bg-white/5 text-white/40'
                   }`}>
@@ -341,7 +341,7 @@ export default function IntakePage() {
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Nom i cognom"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -352,7 +352,7 @@ export default function IntakePage() {
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="client@exemple.com"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -363,7 +363,7 @@ export default function IntakePage() {
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -422,7 +422,7 @@ export default function IntakePage() {
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -433,7 +433,7 @@ export default function IntakePage() {
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Lloc de celebració"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -446,7 +446,7 @@ export default function IntakePage() {
                 value={form.guestCount}
                 onChange={(e) => updateField('guestCount', e.target.value)}
                 placeholder="100"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
             <div>
@@ -457,7 +457,7 @@ export default function IntakePage() {
                 value={form.budget}
                 onChange={(e) => updateField('budget', e.target.value)}
                 placeholder="2.000€"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
           </div>
@@ -502,3 +502,6 @@ export default function IntakePage() {
     </AdminPage>
   );
 }
+
+
+

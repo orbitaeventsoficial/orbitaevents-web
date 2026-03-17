@@ -8,13 +8,13 @@
  */
 
 import type { ProfitabilityConfig } from './profitabilityService';
-import { DEFAULT_PROFITABILITY_CONFIG, getProfitabilityConfig } from './profitabilityService';
+import { DEFAULT_PROFITABILITY_CONFIG } from './profitabilityService';
 import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from './travelCost';
 import { getMarginTone, type MarginTone } from '@/lib/margin-utils';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface BookingCostInput {
+interface BookingCostInput {
   total: number;
   packPrice: number;
   extrasTotal: number;
@@ -28,7 +28,7 @@ export interface BookingCostInput {
   inventoryCostReal?: number | null;
 }
 
-export interface BookingFinancialSummary {
+interface BookingFinancialSummary {
   // Costos desglossats
   packCost: number;
   packCostIsReal: boolean;
@@ -107,16 +107,6 @@ export function computeBookingFinancialSummary(
 }
 
 /**
- * Versió async que carrega la config de BD automàticament.
- */
-export async function getBookingFinancialSummary(
-  input: BookingCostInput,
-): Promise<BookingFinancialSummary> {
-  const config = await getProfitabilityConfig();
-  return computeBookingFinancialSummary(input, config);
-}
-
-/**
  * Calcula el marge % simplificat (sense CAC) per a llistes/dashboards.
  * Substitueix calculateSimpleMarginPct quan es vol usar costEngine.
  */
@@ -129,3 +119,6 @@ export function computeSimpleMarginPct(
   if (input.total <= 0) return 0;
   return ((input.total - summary.directCost) / input.total) * 100;
 }
+
+
+

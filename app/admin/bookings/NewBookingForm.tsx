@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -48,6 +48,22 @@ type LeadData = {
   guestCount: number | null;
   budget: string | null;
   customerId: string | null;
+};
+
+type RawExtraConfig = {
+  id?: string | number | null;
+  slug?: string | null;
+  price?: number | string | null;
+  priceType?: string | null;
+  name?: string | null;
+};
+
+type BookingConflictRow = {
+  id: string;
+  reference: string;
+  clientName: string;
+  eventStartTime?: string | null;
+  status: string;
 };
 
 // Derived from centralized EVENT_TYPE_PLAIN and EVENT_TYPE_ICONS constants.
@@ -155,7 +171,7 @@ export default function NewBookingForm() {
               : Array.isArray(eData?.data)
                 ? eData.data
                 : [];
-          const normalizedExtras: Extra[] = rawConfig.map((item: any) => ({
+          const normalizedExtras: Extra[] = rawConfig.map((item: RawExtraConfig) => ({
             id: String(item.id || item.slug || ''),
             slug: String(item.slug || item.id || ''),
             price: Number(item.price || 0),
@@ -213,7 +229,7 @@ export default function NewBookingForm() {
   // Travel cost calculation
   const internalTravelCost = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
-    const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_FUEL_COST_PER_KM;
+    const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_VEHICLE_COST_PER_KM;
     return calculateTravelCost(km, rate, INCLUDED_TRAVEL_KM);
   }, [form.distanceKm, form.fuelCostPerKm]);
   const travelCharge = useMemo(() => {
@@ -418,10 +434,10 @@ export default function NewBookingForm() {
         );
         if (!res.ok) return;
         const data = await res.json();
-        const active = (data.bookings || []).filter(
-          (b: any) => ['PENDING', 'CONFIRMED', 'PREPARING'].includes(b.status)
+        const active = ((data.bookings || []) as BookingConflictRow[]).filter(
+          (b) => ['PENDING', 'CONFIRMED', 'PREPARING'].includes(b.status)
         );
-        setDateConflicts(active.map((b: any) => ({
+        setDateConflicts(active.map((b) => ({
           id: b.id,
           reference: b.reference,
           clientName: b.clientName,
@@ -548,7 +564,7 @@ export default function NewBookingForm() {
               type="text"
               value={form.clientName}
               onChange={(e) => updateField('clientName', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -558,7 +574,7 @@ export default function NewBookingForm() {
               type="email"
               value={form.clientEmail}
               onChange={(e) => updateField('clientEmail', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -568,7 +584,7 @@ export default function NewBookingForm() {
               type="tel"
               value={form.clientPhone}
               onChange={(e) => updateField('clientPhone', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         </div>
@@ -612,7 +628,7 @@ export default function NewBookingForm() {
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -622,7 +638,7 @@ export default function NewBookingForm() {
               type="time"
               value={form.eventStartTime}
               onChange={(e) => updateField('eventStartTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -632,7 +648,7 @@ export default function NewBookingForm() {
               type="time"
               value={form.eventEndTime}
               onChange={(e) => updateField('eventEndTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -644,24 +660,24 @@ export default function NewBookingForm() {
               onChange={(e) => updateField('guestCount', e.target.value)}
               placeholder="100"
               min={1}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         </div>
 
         {dateConflicts.length > 0 && (
-          <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-3">
-            <p className="text-sm font-semibold text-amber-300">
+          <div className="rounded-xl border-2 p-3">
+            <p className="text-sm font-semibold">
               Ja {dateConflicts.length === 1 ? 'hi ha 1 reserva' : `hi ha ${dateConflicts.length} reserves`} el {form.eventDate}
             </p>
             <ul className="mt-1.5 space-y-0.5">
               {dateConflicts.map((c) => (
-                <li key={c.id} className="text-xs text-amber-200/70">
+                <li key={c.id} className="text-xs">
                   {c.reference} · {c.clientName}{c.eventStartTime ? ` · ${c.eventStartTime}` : ''}
                 </li>
               ))}
             </ul>
-            <p className="text-[10px] text-amber-200/50 mt-1.5">Pots continuar si els horaris no es solapen.</p>
+            <p className="text-[10px] mt-1.5">Pots continuar si els horaris no es solapen.</p>
           </div>
         )}
 
@@ -674,7 +690,7 @@ export default function NewBookingForm() {
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Ciutat o comarca"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -685,7 +701,7 @@ export default function NewBookingForm() {
               value={form.eventVenue}
               onChange={(e) => updateField('eventVenue', e.target.value)}
               placeholder="Nom de la finca, restaurant..."
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         </div>
@@ -751,7 +767,7 @@ export default function NewBookingForm() {
               max="10"
               value={form.extraHours}
               onChange={(e) => updateField('extraHours', e.target.value)}
-              className="mt-1 w-24 rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-24 rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         )}
@@ -819,7 +835,7 @@ export default function NewBookingForm() {
                 value={form.distanceKm}
                 onChange={(e) => updateField('distanceKm', e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm "
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">km</span>
             </div>
@@ -874,7 +890,7 @@ export default function NewBookingForm() {
               min="0"
               value={form.discount}
               onChange={(e) => updateField('discount', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -971,7 +987,7 @@ export default function NewBookingForm() {
             </div>
             {internalTravelCost > 0 && (
               <p className="text-[11px] pt-1 border-t">
-                * Cost intern estimat de transport: {internalTravelCost.toFixed(2)} € (coeficient {DEFAULT_FUEL_COST_PER_KM.toFixed(2)} €/km sobre km extra).
+                * Cost intern estimat de transport: {internalTravelCost.toFixed(2)} € (coeficient {DEFAULT_VEHICLE_COST_PER_KM.toFixed(2)} €/km sobre km extra).
               </p>
             )}
           </div>
@@ -1044,3 +1060,9 @@ export default function NewBookingForm() {
     </AdminPage>
   );
 }
+
+
+
+
+
+

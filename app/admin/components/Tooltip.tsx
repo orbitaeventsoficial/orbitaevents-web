@@ -7,11 +7,10 @@ import { useId } from 'react';
 
 interface TooltipProps {
   text: string;
-  position?: 'top' | 'bottom';
   children: React.ReactNode;
 }
 
-export default function Tooltip({ text, position = 'top', children }: TooltipProps) {
+export default function Tooltip({ text, children }: TooltipProps) {
   const id = useId();
 
   return (
@@ -20,10 +19,11 @@ export default function Tooltip({ text, position = 'top', children }: TooltipPro
       <span
         id={id}
         role="tooltip"
-        className={`admin-tooltip-bubble admin-tooltip-bubble--${position}`}
+        className="admin-tooltip-bubble admin-tooltip-bubble--top"
       >
         {text}
       </span>
     </span>
   );
 }
+

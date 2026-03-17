@@ -13,7 +13,7 @@ import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import InfoTooltip from '@/app/admin/components/InfoTooltip';
-import { ADMIN_HELP } from '@/app/admin/help-content';
+import { ADMIN_HELP } from '@/app/admin/components/adminHelpGlossary';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +33,8 @@ export async function generateMetadata({ params }: Props) {
 }
 
 import { LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber } from '@/lib/constants';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 const PRIORITY_LABELS = Object.fromEntries(
   Object.entries(PRIORITY_CONFIG).map(([k, v]) => [k, { label: v.label, color: `${v.bg} ${v.text}` }])
@@ -117,7 +119,7 @@ export default async function LeadDetailPage({ params }: Props) {
   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
   const priorityConf = PRIORITY_LABELS[lead.priority] || PRIORITY_LABELS.MEDIUM;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const baseUrl = getAppBaseUrl();
   const reviewUrl = lead.booking?.reviewToken
     ? `${baseUrl}/${lead.preferredLocale || 'es'}/valoracio?token=${lead.booking.reviewToken}&ref=${lead.booking.reference}`
     : null;
@@ -780,3 +782,4 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
+

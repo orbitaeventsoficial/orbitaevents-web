@@ -96,7 +96,7 @@ function StatCard({ config, label, sublabel, delay, started }: StatCardProps) {
       transition={
         reduceMotion
           ? { duration: 0 }
-          : { delay, type: 'spring', damping: 18, stiffness: 100 }
+          : { delay, duration: 0.34, ease: [0.22, 1, 0.36, 1] }
       }
       className="relative flex flex-col items-center justify-center p-5 rounded-3xl border border-white/10 text-center overflow-hidden"
       style={{

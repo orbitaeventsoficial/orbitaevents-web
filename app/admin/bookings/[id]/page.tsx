@@ -30,6 +30,44 @@ interface PageProps {
   params: { id: string };
 }
 
+type BookingExtraRow = {
+  id: string;
+  price: number;
+  quantity: number | null;
+  extra: {
+    slug: string;
+    translations: Array<{ locale: string; name: string; tagline?: string | null }>;
+  };
+};
+
+type BookingProposalRow = {
+  id: string;
+  reference: string;
+  status: string;
+  pdfUrl: string | null;
+  contractStatus: string | null;
+  contractReference: string | null;
+  contractPdfUrl: string | null;
+  contractSignedAt: Date | null;
+};
+
+type BookingInvoiceRow = {
+  id: string;
+  reference: string;
+  status: string;
+  total: number;
+  holdedInvoiceUrl: string | null;
+  holdedSyncError: string | null;
+  createdAt: Date;
+};
+
+type BookingNumericCompat = {
+  extraHours?: number;
+  distanceKm?: number | null;
+  vehicleCostPerKm?: number | null;
+  fuelCostPerKm?: number | null;
+};
+
 async function getBooking(id: string) {
   try {
     const booking = await prisma.booking.findUnique({
@@ -256,10 +294,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
     };
   });
 
-  const bAny = booking as Record<string, unknown>;
+  const bookingCompat = booking as BookingNumericCompat;
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal = booking.extras?.reduce((sum: number, e: { price?: number | null; quantity?: number | null }) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
-  const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
+  const extraHours = typeof bookingCompat.extraHours === 'number' ? bookingCompat.extraHours : 0;
   const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
   const marginTargetRaw = Number(marginTargetSetting?.value);
   const targetMarginPct = Number.isFinite(marginTargetRaw)
@@ -316,7 +354,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 </span>
               )}
               {isToday && booking.status !== 'COMPLETED' && (
-                <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 animate-pulse">
+                <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold admin-tone-soft-info border animate-pulse">
                   AVUI
                 </span>
               )}
@@ -553,8 +591,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         {booking.extras.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium">Extras</p>
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {booking.extras.map((extra: any) => {
+            {booking.extras.map((extra: BookingExtraRow) => {
               const extraTranslation = getPackTranslation(
                 extra.extra.translations as Array<{ locale: string; name: string; tagline?: string | null }>,
                 booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
@@ -565,7 +602,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                     <p className="font-medium">
                       {extraTranslation?.name || extra.extra.slug}
                     </p>
-                    {extra.quantity > 1 && (
+                    {(extra.quantity ?? 0) > 1 && (
                       <p className="text-xs">x{extra.quantity}</p>
                     )}
                   </div>
@@ -656,10 +693,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
         extrasTotal={extrasTotal}
         extraHours={extraHours}
         extraHourPrice={extraHourPrice}
-        distanceKm={typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null}
-        fuelCostPerKm={typeof bAny.fuelCostPerKm === 'number' ? bAny.fuelCostPerKm : null}
-        travelCost={typeof bAny.travelCost === 'number' ? bAny.travelCost : null}
-        source={booking.lead?.source || 'UNKNOWN'}
+        distanceKm={typeof bookingCompat.distanceKm === 'number' ? bookingCompat.distanceKm : null}
+        vehicleCostPerKm={typeof bookingCompat.vehicleCostPerKm === 'number' ? bookingCompat.vehicleCostPerKm : typeof bookingCompat.fuelCostPerKm === 'number' ? bookingCompat.fuelCostPerKm : null}
         eventLocation={booking.eventLocation}
         eventVenue={booking.eventVenue}
         inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
@@ -677,8 +712,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Document Flow: Pressupost → Contracte → Factura */}
       <div id="sec-documents" className="scroll-mt-28">
       <DocumentFlowSection
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        proposals={(booking.proposals as any[]).map((p) => ({
+        proposals={(booking.proposals as BookingProposalRow[]).map((p) => ({
           id: p.id,
           reference: p.reference,
           status: p.status,
@@ -688,8 +722,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           contractPdfUrl: p.contractPdfUrl,
           contractSignedAt: p.contractSignedAt?.toISOString() || null,
         }))}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        invoices={(booking.invoices as any[]).map((inv) => ({
+        invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
           id: inv.id,
           reference: inv.reference,
           status: inv.status,
@@ -700,8 +733,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Invoice */}
       <InvoiceSection
         bookingId={booking.id}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        invoices={(booking.invoices as any[]).map((inv) => ({
+        invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
           id: inv.id,
           reference: inv.reference,
           status: inv.status,
@@ -739,7 +771,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <tbody>
                 {recentCommRows.map((row: { id: string; createdAt: Date; action: string; flow: string; channel: string }) => (
                   <tr key={row.id} className="border-b border-white/10 hover:bg-white/[0.03] transition-colors">
-                    <td className="px-2 py-2 whitespace-nowrap">{formatDateTimeFull(row.createdAt)}</td>
+                    <td className="px-2 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{formatDateTimeFull(row.createdAt)}</td>
                     <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
                     <td className="px-2 py-2">{row.flow}</td>
                     <td className="px-2 py-2">{row.channel}</td>
@@ -767,7 +799,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                     <p className="text-xs opacity-50 mt-0.5">{entry.description}</p>
                   )}
                 </div>
-                <span className="text-xs opacity-40 whitespace-nowrap shrink-0">
+                <span className="text-xs opacity-40 whitespace-nowrap overflow-hidden text-ellipsis shrink-0">
                   {formatDateTimeFull(entry.createdAt)}
                 </span>
               </div>
@@ -828,3 +860,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
+
+
+
+
+
+
+
+
+

@@ -3,7 +3,7 @@ import { env } from '@/lib/env';
 const DISTANCE_MATRIX_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json';
 const DEFAULT_BASE_ADDRESS = 'Granollers, Barcelona';
 
-export type DistanceCalculation = {
+type DistanceCalculation = {
   origin: string;
   destination: string;
   originResolved: string;
@@ -13,7 +13,7 @@ export type DistanceCalculation = {
   durationText: string | null;
 };
 
-export function getOrbitaBaseAddress(): string {
+function getOrbitaBaseAddress(): string {
   return (env.ORBITA_BASE_ADDRESS || DEFAULT_BASE_ADDRESS).trim();
 }
 
@@ -75,3 +75,4 @@ export async function calculateGoogleMapsDistance(input: {
     durationText: element.duration?.text || null,
   };
 }
+

@@ -1,4 +1,4 @@
-export type AdminRole = 'OWNER' | 'MANAGER' | 'VIEWER';
+﻿import type { AdminRole } from '@/lib/auth';
 
 const CONTENT_ALLOWED: AdminRole[] = ['OWNER', 'MANAGER'];
 

@@ -1,7 +1,5 @@
 export const INCLUDED_TRAVEL_KM = 50;
 export const DEFAULT_VEHICLE_COST_PER_KM = 0.19;
-/** @deprecated Use DEFAULT_VEHICLE_COST_PER_KM */
-export const DEFAULT_FUEL_COST_PER_KM = DEFAULT_VEHICLE_COST_PER_KM;
 export const TRAVEL_BLOCK_KM = 40;
 export const TRAVEL_BLOCK_EUR = 20;
 export const DEFAULT_VEHICLE_CONSUMPTION_L100 = 8.5;
@@ -73,3 +71,4 @@ export function calculateEffectiveVehicleCostPerKm(
   const fuelComponent = (safeFuel * safeConsumption) / 100;
   return round2(fuelComponent + safeMaintenance);
 }
+

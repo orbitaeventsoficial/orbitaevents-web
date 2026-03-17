@@ -6,8 +6,6 @@ import { useAdminHelpMode } from './AdminHelpMode';
 
 type InfoTooltipProps = {
   text: string;
-  alwaysEnabled?: boolean;
-  side?: 'top' | 'right' | 'bottom' | 'left';
 };
 
 type Pos = { top: number; left: number; transformOrigin: string };
@@ -16,9 +14,9 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right' }: InfoTooltipProps) {
+export default function InfoTooltip({ text }: InfoTooltipProps) {
   const { enabled } = useAdminHelpMode();
-  const shouldRender = alwaysEnabled || enabled;
+  const shouldRender = enabled;
 
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -69,8 +67,8 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     const canRight = vw - br.right >= pr.width + gap + padding;
     const canLeft = br.left >= pr.width + gap + padding;
 
-    const order: Array<InfoTooltipProps['side']> = [side, 'top', 'right', 'bottom', 'left'];
-    let chosen: InfoTooltipProps['side'] = side;
+    const order: Array<'right' | 'top' | 'bottom' | 'left'> = ['right', 'top', 'bottom', 'left'];
+    let chosen: 'right' | 'top' | 'bottom' | 'left' = 'right';
 
     for (const s of order) {
       if (s === 'top' && canTop) { chosen = 'top'; break; }
@@ -105,7 +103,7 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     left = clamp(left, padding, vw - pr.width - padding);
 
     setPos({ top, left, transformOrigin });
-  }, [side]);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -164,3 +162,7 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     </span>
   );
 }
+
+
+
+

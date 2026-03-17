@@ -1,4 +1,5 @@
 // app/admin/emails/page.tsx
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { formatDateTime, formatDateSimple } from '@/lib/constants';
@@ -16,6 +17,8 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Emails Automàtics | Òrbita Admin',
 };
+
+type RecentEmailActivity = Prisma.CustomerActivityGetPayload<{ include: { customer: true } }>;
 
 async function getEmailStats() {
   const now = new Date();
@@ -80,7 +83,7 @@ async function getEmailStats() {
         where: { createdAt: { gte: thirtyDaysAgo } },
       })
     ),
-    safe('recentActivity', [] as Awaited<ReturnType<typeof prisma.customerActivity.findMany>>, () =>
+    safe('recentActivity', [] as RecentEmailActivity[], () =>
       prisma.customerActivity.findMany({
         where: {
           action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED', 'DISCOUNT_CODE_GENERATED', 'LEAD_EMAIL_SENT'] },
@@ -274,7 +277,7 @@ export default async function EmailsAdminPage() {
 
           {/* Recent Activity */}
           <RecentEmailsTable
-            activities={stats.recentActivity.map((activity: any) => ({
+            activities={stats.recentActivity.map((activity) => ({
               ...activity,
               customer: activity.customer ?? null,
               details: activity.details as Record<string, unknown> | undefined
@@ -314,3 +317,6 @@ export default async function EmailsAdminPage() {
     </AdminPage>
   );
 }
+
+
+

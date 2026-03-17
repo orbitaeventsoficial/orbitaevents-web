@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
-import { enforceLeadSla, getSlaSnapshot } from '@/lib/services/slaAutomationService';
+import { getSlaSnapshot } from '@/lib/services/slaAutomationService';
+import { enforceSlaAutomation } from '@/lib/services/adminAutomationService';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,26 +23,12 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'automation');
   if (permissionError) return permissionError;
-
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
 
   try {
-    const summary = await enforceLeadSla();
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'AUTOMATION_SLA_ENFORCED',
-        entity: 'lead',
-        entityId: 'bulk',
-        details: JSON.parse(JSON.stringify(summary)),
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      ...summary,
-    });
+    const summary = await enforceSlaAutomation();
+    return NextResponse.json({ ok: true, ...summary });
   } catch (error) {
     log.error('Error enforcing SLA automation', error);
     return NextResponse.json(

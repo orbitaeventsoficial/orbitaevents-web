@@ -1466,8 +1466,10 @@
             "f1": "DJ professional 3 hores (Només ball final)",
             "f2": "So PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
             "f3": "Il·luminació de pista (Multiefectes LED + 2x Focus Bash LED)",
-            "f4": "Màquina de fum"
-          }
+            "f4": "Màquina de fum",
+            "f5": "Muntatge i desmuntatge inclosos"
+          },
+          "ideal": "Casaments amb ball final"
         },
         "bodas-premium": {
           "name": "Signature (Dia Complet)",
@@ -1478,7 +1480,8 @@
             "f3": "Il·luminació PRO: 4 caps mòbils 150W LED",
             "f4": "Il·luminació ambiental (Boles LED)",
             "f5": "Màquina de fum"
-          }
+          },
+          "ideal": "Casaments dia complet"
         },
         "bodas-luxury": {
           "name": "Royal Wedding (Full FX)",
@@ -1488,7 +1491,8 @@
             "f2": "So audiòfil 4000W EV ETX 2000W",
             "f3": "Show de llums sincronitzat (4 caps mòbils 150W LED)",
             "f4": "Efecte màquina de fum baix (Ball entre núvols)"
-          }
+          },
+          "ideal": "Casaments VIP"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
@@ -1784,7 +1788,12 @@
     "customNeedsSub": "Fem esdeveniments a mida. Explica'ns què tens al cap i et proposem.",
     "contactUs": "Parla amb nosaltres",
     "allInclude": "Tots els packs inclouen",
-    "allIncludeItems": ["Muntatge i desmuntatge", "DJ professional dedicat", "So de qualitat (EV 4000W)", "Coordinació prèvia amb tu"],
+    "allIncludeItems": [
+      "Muntatge i desmuntatge",
+      "DJ professional dedicat",
+      "So de qualitat (EV 4000W)",
+      "Coordinació prèvia amb tu"
+    ],
     "tab_bodas": "Casaments",
     "tab_festes": "Festes",
     "tab_empresas": "Empresa",
@@ -3072,7 +3081,10 @@
     },
     "viewCalendar": "Veure calendari complet",
     "socialPressure": "8 persones mirant dates aquesta setmana",
-    "earlyBird": "Reserva en {days} dies i estalvia un 15%"
+    "earlyBird": "Reserva en {days} dies i estalvia un 15%",
+    "modal": {
+      "whatsappMsg": "Hola! Vull reservar la data {date} per al meu event. Em podeu enviar més informació?"
+    }
   },
   "stickyCta": {
     "requestQuote": "Demana el teu pressupost",

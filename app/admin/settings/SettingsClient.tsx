@@ -221,7 +221,7 @@ export default function SettingsClient({
                           <div className="space-y-2">
                             {setting.type === 'BOOLEAN' ? (
                               <select
-                                className="rounded-xl border px-3 py-1.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                                className="rounded-xl border px-3 py-1.5 text-sm "
                                 value={draftValue || 'false'}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               >
@@ -230,13 +230,13 @@ export default function SettingsClient({
                               </select>
                             ) : setting.type === 'JSON' ? (
                               <textarea
-                                className="rounded-xl border px-3 py-1.5 text-sm w-64 h-24 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                                className="rounded-xl border px-3 py-1.5 text-sm w-64 h-24 "
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               />
                             ) : (
                               <input
-                                className="rounded-xl border px-3 py-1.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                                className="rounded-xl border px-3 py-1.5 text-sm "
                                 type={setting.type === 'NUMBER' ? 'number' : 'text'}
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
@@ -293,5 +293,6 @@ export default function SettingsClient({
     </div>
   );
 }
+
 
 

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
+import { createAdminProposal, listAdminProposals } from '@/lib/services/proposalAdminService';
 
 const createProposalSchema = z.object({
   customerId: z.string().min(1),
@@ -20,23 +20,10 @@ const createProposalSchema = z.object({
   vatRate: z.number().min(0).default(21),
   vatAmount: z.number().min(0),
   total: z.number().min(0),
-  snapshot: z.record(z.any()),
+  snapshot: z.record(z.unknown()),
   pdfUrl: z.string().url().optional(),
   pdfKey: z.string().optional(),
 });
-
-async function generateProposalReference(): Promise<string> {
-  const year = new Date().getFullYear();
-  const prefix = `PROP-${year}-`;
-  const last = await prisma.proposal.findFirst({
-    where: { reference: { startsWith: prefix } },
-    orderBy: { reference: 'desc' },
-    select: { reference: true },
-  });
-  const current = last?.reference.split('-').pop();
-  const next = Number.isFinite(Number(current)) ? Number(current) + 1 : 1;
-  return `${prefix}${String(next).padStart(4, '0')}`;
-}
 
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
@@ -45,28 +32,13 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const customerId = searchParams.get('customerId') || undefined;
-    const leadId = searchParams.get('leadId') || undefined;
-    const bookingId = searchParams.get('bookingId') || undefined;
-    const status = searchParams.get('status');
-
-    const proposals = await prisma.proposal.findMany({
-      where: {
-        ...(customerId ? { customerId } : {}),
-        ...(leadId ? { leadId } : {}),
-        ...(bookingId ? { bookingId } : {}),
-        ...(status && Object.values(ProposalStatus).includes(status as ProposalStatus)
-          ? { status: status as ProposalStatus }
-          : {}),
-      },
-      include: {
-        customer: { select: { id: true, name: true, email: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 200,
+    const result = await listAdminProposals({
+      customerId: searchParams.get('customerId') || undefined,
+      leadId: searchParams.get('leadId') || undefined,
+      bookingId: searchParams.get('bookingId') || undefined,
+      status: searchParams.get('status'),
     });
-
-    return NextResponse.json({ ok: true, proposals });
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint pressupostos', error, {
       context: { requestId, endpoint: 'admin/proposals:GET' },
@@ -90,40 +62,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Dades invàlides', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const data = parsed.data;
-    customerIdForLog = data.customerId;
-    const reference = await generateProposalReference();
-    const customer = await prisma.customer.findUnique({
-      where: { id: data.customerId },
-      select: { preferredLocale: true },
-    });
-    const resolvedLocale = (data.locale || customer?.preferredLocale || 'ca').toLowerCase();
-
-    const proposal = await prisma.proposal.create({
-      data: {
-        reference,
-        customerId: data.customerId,
-        leadId: data.leadId,
-        bookingId: data.bookingId,
-        status: data.status ?? 'DRAFT',
-        locale: resolvedLocale,
-        currency: data.currency,
-        validityDays: data.validityDays,
-        subtotal: data.subtotal,
-        discount: data.discount,
-        vatRate: data.vatRate,
-        vatAmount: data.vatAmount,
-        total: data.total,
-        snapshot: data.snapshot,
-        pdfUrl: data.pdfUrl,
-        pdfKey: data.pdfKey,
-      },
-      include: {
-        customer: { select: { id: true, name: true, email: true } },
-      },
-    });
-
-    return NextResponse.json({ ok: true, proposal }, { status: 201 });
+    customerIdForLog = parsed.data.customerId;
+    const result = await createAdminProposal(parsed.data);
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
     log.error('Error creant pressupost', error, {
       context: { requestId, endpoint: 'admin/proposals:POST', customerId: customerIdForLog },
@@ -131,3 +72,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Error creant pressupost' }, { status: 500 });
   }
 }
+

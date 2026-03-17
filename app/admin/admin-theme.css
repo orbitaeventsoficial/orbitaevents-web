@@ -1,7 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   ADMIN THEME — Òrbita Events
-   Visual potent: glassmorphism, gradients selectius, micro-animacions
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* Admin theme tokens and shell styling for the /admin experience. */
 
 /* ─── Variables ─────────────────────────────────────────────────────────── */
 html.admin-mode {
@@ -36,55 +33,7 @@ html.admin-mode {
   --at-glass-shine: rgba(255, 255, 255, 0.04);
 }
 
-html.admin-mode .admin-layout-shell {
-  --admin-surface: var(--at-surface);
-  --admin-panel: var(--at-panel);
-  --admin-border: var(--at-border);
-  --admin-text: var(--at-text);
-  --admin-muted: var(--at-muted);
-  --admin-primary: var(--at-brand);
-  --admin-success: var(--at-success);
-  --admin-warning: var(--at-warning);
-  --admin-danger: var(--at-danger);
-}
 
-/* ─── Base ──────────────────────────────────────────────────────────────── */
-html.admin-mode .admin-layout-body,
-html.admin-mode .admin-layout-shell,
-html.admin-mode .admin-main,
-html.admin-mode .admin-main-shell {
-  background: var(--at-bg) !important;
-  color: var(--at-text) !important;
-}
-
-html.admin-mode .admin-main-shell {
-  font-size: 15.5px;
-}
-
-/* ─── Typography ────────────────────────────────────────────────────────── */
-html.admin-mode .admin-main-shell h1,
-html.admin-mode .admin-main-shell .admin-page-title {
-  color: var(--at-text) !important;
-  font-size: clamp(1.55rem, 1.35rem + 0.8vw, 2rem) !important;
-  line-height: 1.15;
-}
-
-html.admin-mode .admin-main-shell h2 {
-  color: var(--at-text) !important;
-  font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.45rem) !important;
-}
-
-html.admin-mode .admin-main-shell h3 {
-  color: var(--at-text) !important;
-  font-size: clamp(1.05rem, 0.98rem + 0.25vw, 1.2rem) !important;
-}
-
-html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt, span) {
-  color: var(--at-muted);
-}
-html.admin-mode .admin-main-shell :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) {
-  color: var(--at-subtle) !important;
-}
 
 /* ─── Shell chrome ──────────────────────────────────────────────────────── */
 html.admin-mode .admin-mobile-header,
@@ -102,232 +51,6 @@ html.admin-mode .admin-mobile-sidebar {
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   border-color: var(--at-glass-border) !important;
   border-right: 1px solid var(--at-glass-border) !important;
-}
-
-/* Logo glow */
-html.admin-mode .admin-sidebar-logo-wrap,
-html.admin-mode .admin-mobile-sidebar-logo {
-  box-shadow: 0 0 20px var(--at-brand-glow), 0 0 40px rgba(193, 139, 44, 0.06);
-}
-
-/* Active nav item — gradient lateral */
-html.admin-mode .admin-layout-shell .admin-nav-item--active {
-  background: linear-gradient(90deg, rgba(193, 139, 44, 0.22) 0%, rgba(193, 139, 44, 0.04) 100%) !important;
-  border-color: rgba(193, 139, 44, 0.35) !important;
-}
-
-/* Idle nav items */
-html.admin-mode .admin-layout-shell .admin-nav-item--idle,
-html.admin-mode .admin-layout-shell .admin-nav-section-btn,
-html.admin-mode .admin-layout-shell .admin-recent-chip--idle {
-  background: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%) !important;
-  border-color: var(--admin-border) !important;
-  color: var(--admin-text) !important;
-  transition: all 0.2s ease-out;
-}
-
-html.admin-mode .admin-layout-shell .admin-nav-item--idle:hover,
-html.admin-mode .admin-layout-shell .admin-nav-section-btn:hover,
-html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
-  background: color-mix(in oklab, var(--admin-panel) 64%, var(--admin-primary) 36%) !important;
-  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
-  color: var(--admin-text) !important;
-}
-
-/* Nav section separators — gradient line */
-html.admin-mode .admin-nav-section {
-  border-top: 1px solid transparent;
-  border-image: linear-gradient(90deg, transparent 5%, var(--at-border) 50%, transparent 95%) 1;
-}
-
-/* ─── GRADIENT CONTROL ──────────────────────────────────────────────────
-   Només neutralitza gradients de la web pública que es filtrin a l'admin.
-   No toquem res dins .admin-main-shell (els components admin controlen
-   els seus propis colors). ──── */
-html.admin-mode .admin-layout-shell .gradient-text-gold,
-html.admin-mode .admin-layout-shell .title-gradient {
-  background: none !important;
-  -webkit-text-fill-color: currentColor !important;
-  color: var(--at-text) !important;
-}
-
-/* ═══ ADMIN GRADIENT CLASSES — Controlled gradients ═══ */
-html.admin-mode .admin-gradient.admin-gradient--hero {
-  background-image: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(193, 139, 44, 0.12) 0%, transparent 70%) !important;
-}
-html.admin-mode .admin-gradient.admin-gradient--gold {
-  background-image: linear-gradient(135deg, rgba(193, 139, 44, 0.15) 0%, transparent 60%) !important;
-}
-html.admin-mode .admin-gradient.admin-gradient--sidebar-sep {
-  background-image: linear-gradient(90deg, transparent, var(--at-border), transparent) !important;
-  height: 1px !important;
-}
-
-/* ═══ GLASS CARDS — 3 nivells d'elevació ═══ */
-html.admin-mode .admin-card-glass {
-  background: var(--at-glass-bg) !important;
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid var(--at-glass-border) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 var(--at-glass-shine);
-}
-
-html.admin-mode .admin-card-glass--raised {
-  background: rgba(35, 42, 49, 0.8) !important;
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--at-glass-shine);
-}
-
-html.admin-mode .admin-card-glass--elevated {
-  background: rgba(44, 53, 62, 0.75) !important;
-  backdrop-filter: blur(24px) saturate(1.6);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-/* ═══ METRIC CARD GLOW — hover glow per accent ═══ */
-html.admin-mode .admin-ui-metric-card {
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
-}
-
-html.admin-mode .admin-ui-metric-card:hover {
-  transform: scale(1.015);
-}
-
-html.admin-mode .admin-ui-metric-card--cyan:hover {
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.12), 0 0 40px rgba(34, 211, 238, 0.06) !important;
-  border-color: rgba(34, 211, 238, 0.3) !important;
-}
-html.admin-mode .admin-ui-metric-card--emerald:hover {
-  box-shadow: 0 0 20px rgba(52, 211, 153, 0.12), 0 0 40px rgba(52, 211, 153, 0.06) !important;
-  border-color: rgba(52, 211, 153, 0.3) !important;
-}
-html.admin-mode .admin-ui-metric-card--rose:hover {
-  box-shadow: 0 0 20px rgba(244, 114, 182, 0.12), 0 0 40px rgba(244, 114, 182, 0.06) !important;
-  border-color: rgba(244, 114, 182, 0.3) !important;
-}
-html.admin-mode .admin-ui-metric-card--amber:hover {
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.12), 0 0 40px rgba(251, 191, 36, 0.06) !important;
-  border-color: rgba(251, 191, 36, 0.3) !important;
-}
-html.admin-mode .admin-ui-metric-card--purple:hover {
-  box-shadow: 0 0 20px rgba(167, 139, 250, 0.12), 0 0 40px rgba(167, 139, 250, 0.06) !important;
-  border-color: rgba(167, 139, 250, 0.3) !important;
-}
-html.admin-mode .admin-ui-metric-card--sky:hover {
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.12), 0 0 40px rgba(96, 165, 250, 0.06) !important;
-  border-color: rgba(96, 165, 250, 0.3) !important;
-}
-
-/* Metric value — mono font */
-html.admin-mode .admin-ui-metric-value {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ═══ STAGGERED ENTRY ANIMATION ═══ */
-html.admin-mode .admin-stagger-item {
-  opacity: 0;
-  transform: translateY(12px);
-  animation: adminFadeInUp 0.45s ease-out forwards;
-}
-html.admin-mode .admin-stagger-item:nth-child(1) { animation-delay: 0.04s; }
-html.admin-mode .admin-stagger-item:nth-child(2) { animation-delay: 0.08s; }
-html.admin-mode .admin-stagger-item:nth-child(3) { animation-delay: 0.12s; }
-html.admin-mode .admin-stagger-item:nth-child(4) { animation-delay: 0.16s; }
-html.admin-mode .admin-stagger-item:nth-child(5) { animation-delay: 0.20s; }
-html.admin-mode .admin-stagger-item:nth-child(6) { animation-delay: 0.24s; }
-html.admin-mode .admin-stagger-item:nth-child(7) { animation-delay: 0.28s; }
-html.admin-mode .admin-stagger-item:nth-child(8) { animation-delay: 0.32s; }
-html.admin-mode .admin-stagger-item:nth-child(9) { animation-delay: 0.36s; }
-html.admin-mode .admin-stagger-item:nth-child(10) { animation-delay: 0.40s; }
-
-@keyframes adminFadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ═══ MICRO-ANIMATIONS ═══ */
-/* Card hover scale */
-html.admin-mode .admin-main-shell .admin-cr-radar-card,
-html.admin-mode .admin-main-shell .admin-cr-step,
-html.admin-mode .admin-main-shell .admin-cr-mini-card,
-html.admin-mode .admin-main-shell .admin-cr-stat-box,
-html.admin-mode .admin-main-shell .admin-ui-card {
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-}
-
-html.admin-mode .admin-main-shell .admin-cr-radar-card:hover,
-html.admin-mode .admin-main-shell .admin-cr-step:hover,
-html.admin-mode .admin-main-shell .admin-cr-mini-card:hover {
-  transform: scale(1.012);
-}
-
-/* Progress bar animation */
-html.admin-mode .admin-progress-animated {
-  animation: adminProgressFill 0.8s ease-out forwards;
-  transform-origin: left;
-}
-
-@keyframes adminProgressFill {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-/* Radial progress ring animation */
-@keyframes adminRingFill {
-  from { stroke-dashoffset: var(--ring-circumference, 282.7); }
-  to { stroke-dashoffset: var(--ring-offset, 0); }
-}
-
-html.admin-mode .admin-radial-ring {
-  animation: adminRingFill 0.8s ease-out forwards;
-}
-
-/* Glow pulse for urgent items */
-@keyframes adminGlowPulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.15); }
-  50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-}
-
-html.admin-mode .admin-glow-pulse {
-  animation: adminGlowPulse 2s ease-in-out infinite;
-}
-
-/* ═══ DASHBOARD HERO HEADER ═══ */
-html.admin-mode .admin-hero-header {
-  position: relative;
-  padding: 1.75rem 1.5rem 1.5rem;
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-html.admin-mode .admin-hero-title {
-  font-family: var(--font-display, system-ui);
-  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.2rem) !important;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--at-text) !important;
-}
-
-html.admin-mode .admin-hero-subtitle {
-  font-size: 0.95rem;
-  color: var(--at-muted) !important;
-  margin-top: 0.25rem;
-}
-
-html.admin-mode .admin-hero-glow {
-  position: absolute;
-  top: -30%;
-  left: -10%;
-  width: 50%;
-  height: 160%;
-  background: radial-gradient(ellipse, rgba(193, 139, 44, 0.1) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 /* ═══ UNIFIED CARDS — glass treatment ═══ */
@@ -539,4 +262,23 @@ html.admin-mode .admin-drag-inserted {
     transition: none;
     animation: none;
   }
+}
+
+
+
+
+/* ─── Semantic tone utilities ───────────────────────────────────────────── */
+html.admin-mode .admin-tone-soft-danger {
+  background: color-mix(in oklab, var(--at-danger) 35%, transparent) !important;
+  color: #f6b7bf !important;
+}
+
+html.admin-mode .admin-tone-soft-success {
+  background: color-mix(in oklab, var(--at-success) 35%, transparent) !important;
+  color: #b9ebc6 !important;
+}
+
+html.admin-mode .admin-tone-soft-info {
+  background: color-mix(in oklab, var(--at-info) 35%, transparent) !important;
+  color: #b7d8f3 !important;
 }

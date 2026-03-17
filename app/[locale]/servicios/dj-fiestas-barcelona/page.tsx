@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en Barcelona desde ${MIN_PRICE}€. Cumpleaños, aniversarios, despedidas y celebraciones privadas. Equipo profesional, presupuesto en 2h.`,
   keywords: ['DJ fiestas Barcelona', 'DJ fiesta cumpleaños Barcelona', 'DJ fiesta privada Barcelona', 'DJ Barcelona precio', 'contratar DJ Barcelona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-fiestas-barcelona' },
   openGraph: {
     title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€`,

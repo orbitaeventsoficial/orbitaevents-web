@@ -1,6 +1,8 @@
 // app/components/seo/ServiceJsonLD.tsx
 // 🔥 MANOLO VERSION - Optimizado para conversión SEO
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 type AggregateRating = {
   '@type': 'AggregateRating';
@@ -46,7 +48,7 @@ export default function ServiceJsonLD({
   aggregateRating,
   offers, // 🔥 Prop opcional para múltiples ofertas
 }: Props) {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
+  const base = getSiteUrl();
   const url = `${base}${slugPath}`;
 
   // 🔥 LÓGICA: Si hay offers custom, úsalos. Si no, genera el default simple

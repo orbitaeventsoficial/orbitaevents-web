@@ -8,7 +8,7 @@
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { toIntlLocale } from '@/lib/constants';
 
-export type PostEventLocale = 'ca' | 'es' | 'en';
+type PostEventLocale = 'ca' | 'es' | 'en';
 
 export function normalizeLocale(locale?: string | null): PostEventLocale {
   const raw = String(locale || 'ca').trim().toLowerCase();
@@ -195,3 +195,4 @@ export function generatePostEventEmail(params: {
 </html>
   `;
 }
+

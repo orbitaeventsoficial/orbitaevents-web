@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Garraf | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Garraf desde ${MIN_PRICE}€. Sitges, Vilanova, Cubelles. Especialistas en bodas de costa y chiringuitos.`,
   keywords: ['DJ bodas Garraf', 'DJ bodas Sitges', 'DJ bodas Vilanova', 'DJ bodas costa', 'bodas playa Garraf'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-garraf' },
   openGraph: {
     title: `DJ Bodas Garraf | Desde ${MIN_PRICE}€`,

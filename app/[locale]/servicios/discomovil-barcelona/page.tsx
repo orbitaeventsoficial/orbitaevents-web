@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `Discomóvil Barcelona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en Barcelona desde ${MIN_PRICE}€. DJ profesional para fiestas privadas, cumpleaños y celebraciones. Sonido 4000W + iluminación completa. Presupuesto en 2h.`,
   keywords: ['discomovil Barcelona', 'discomóvil precio Barcelona', 'DJ fiesta Barcelona', 'discomóvil cumpleaños Barcelona', 'alquiler discomovil Barcelona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/discomovil-barcelona' },
   openGraph: {
     title: `Discomóvil Barcelona | Desde ${MIN_PRICE}€`,

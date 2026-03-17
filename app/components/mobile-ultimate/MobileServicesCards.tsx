@@ -87,7 +87,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: index * 0.1, type: 'spring', damping: 20 }}
+        transition={{ delay: index * 0.08, duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Image with enhanced effects */}
         <div className="absolute inset-0 pointer-events-none z-0">

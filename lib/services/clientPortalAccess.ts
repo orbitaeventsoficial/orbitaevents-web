@@ -1,7 +1,8 @@
 import { createHash, randomBytes } from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { getAppBaseUrl } from '@/lib/site';
 
-const DEFAULT_BASE_URL = 'https://orbitaevents.com';
+
 const DEFAULT_EXPIRY_DAYS = 30;
 const SUPPORTED_LOCALES = new Set(['ca', 'es', 'en']);
 const portalAccessRepo = prisma.clientPortalAccess;
@@ -16,11 +17,11 @@ export type PortalPersonalization = {
   showPostEvent?: boolean;
 };
 
-export function hashPortalToken(token: string): string {
+function hashPortalToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
-export function generatePortalToken(): string {
+function generatePortalToken(): string {
   return randomBytes(32).toString('base64url');
 }
 
@@ -29,8 +30,8 @@ export function normalizePortalLocale(locale: string | null | undefined): string
   return SUPPORTED_LOCALES.has(normalized) ? normalized : 'ca';
 }
 
-export function buildClientPortalUrl(token: string, locale: string): string {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || DEFAULT_BASE_URL).replace(/\/$/, '');
+function buildClientPortalUrl(token: string, locale: string): string {
+  const baseUrl = getAppBaseUrl();
   return `${baseUrl}/${normalizePortalLocale(locale)}/portal/${token}`;
 }
 
@@ -195,3 +196,5 @@ export async function markPortalAccessHit(input: {
     console.error('[ClientPortal] Error actualitzant accés:', error);
   }
 }
+
+

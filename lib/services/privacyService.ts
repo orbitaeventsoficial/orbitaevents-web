@@ -25,7 +25,7 @@ import type {
 // TIPUS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export interface ConsentInput {
+interface ConsentInput {
   customerId?: string;
   email?: string;
   consentType: ConsentType;
@@ -39,7 +39,7 @@ export interface ConsentInput {
   rawConsent?: Record<string, unknown>;
 }
 
-export interface DataRequestInput {
+interface DataRequestInput {
   requesterEmail: string;
   requesterName: string;
   requesterPhone?: string;
@@ -49,7 +49,7 @@ export interface DataRequestInput {
   reason?: string;
 }
 
-export interface AuditLogInput {
+interface AuditLogInput {
   entityType: string;
   entityId: string;
   action: PrivacyAction;
@@ -820,3 +820,4 @@ export async function checkGdprCompliance(customerId: string) {
     isCompliant: hasGdprConsent,
   };
 }
+

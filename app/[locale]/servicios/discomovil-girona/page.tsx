@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `Discomóvil Girona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en Girona desde ${MIN_PRICE}€. Girona ciudad, Figueres, Olot, Costa Brava. DJ profesional + equipo completo para fiestas y celebraciones.`,
   keywords: ['discomovil Girona', 'discomóvil Costa Brava', 'DJ fiesta Girona', 'discomóvil Figueres', 'DJ fiestas provincia Girona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/discomovil-girona' },
   openGraph: {
     title: `Discomóvil Girona | Desde ${MIN_PRICE}€`,

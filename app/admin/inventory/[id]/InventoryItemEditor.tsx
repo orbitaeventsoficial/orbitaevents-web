@@ -192,7 +192,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -232,7 +232,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               id="inv-category"
               value={form.category}
               onChange={(e) => updateField('category', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -270,7 +270,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               min={0}
               value={form.watts}
               onChange={(e) => updateField('watts', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -281,7 +281,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               min={0}
               value={form.value}
               onChange={(e) => updateField('value', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 min={0}
                 value={form.stockQuantity}
                 onChange={(e) => updateField('stockQuantity', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
             <div>
@@ -321,7 +321,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
                 min={0}
                 value={form.minStock}
                 onChange={(e) => updateField('minStock', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
               />
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               min={0}
               value={form.purchasePrice}
               onChange={(e) => updateField('purchasePrice', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -350,7 +350,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               type="date"
               value={form.purchaseDate}
               onChange={(e) => updateField('purchaseDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
           <div>
@@ -361,7 +361,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               min={0}
               value={form.expectedLifeHours}
               onChange={(e) => updateField('expectedLifeHours', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
         </div>
@@ -412,3 +412,4 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
     </div>
   );
 }
+

@@ -6,7 +6,9 @@ import caMessages from '@/messages/ca.json';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function NotFound() {
-  const t = (caMessages as Record<string, any>).notFound || {};
+  type NotFoundMessages = { title?: string; description?: string; backToHome?: string };
+
+  const t: NotFoundMessages = (caMessages as { notFound?: NotFoundMessages }).notFound || {};
 
   return (
     <html lang="ca">
@@ -92,3 +94,5 @@ export default function NotFound() {
     </html>
   );
 }
+
+

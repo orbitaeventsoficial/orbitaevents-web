@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `Discomóvil Vallès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en el Vallès desde ${MIN_PRICE}€. Granollers, Mollet, Sabadell, Terrassa, Cerdanyola. DJ profesional + equipo completo para fiestas privadas.`,
   keywords: ['discomovil Vallès', 'discomóvil Granollers', 'DJ fiesta Sabadell', 'discomóvil Terrassa', 'DJ fiestas Vallès Occidental Oriental'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/discomovil-valles' },
   openGraph: {
     title: `Discomóvil Vallès | Desde ${MIN_PRICE}€`,

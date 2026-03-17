@@ -39,13 +39,23 @@ async function convertToCanonical(inputName, index) {
   return { inputName, targetName };
 }
 
+async function writeFileIfChanged(targetPath, content) {
+  const current = await fs.readFile(targetPath, 'utf8').catch(() => null);
+  if (current === content) {
+    return false;
+  }
+
+  await fs.writeFile(targetPath, content, 'utf8');
+  return true;
+}
+
 async function writeConfig(canonicalFiles) {
   const logoPaths = canonicalFiles
     .map((name) => `  '/img/logos/${name}',`)
     .join('\n');
 
   const content = `export const CLIENT_LOGOS = [\n${logoPaths}\n] as const;\n`;
-  await fs.writeFile(CONFIG_PATH, content, 'utf8');
+  return writeFileIfChanged(CONFIG_PATH, content);
 }
 
 async function run() {
@@ -74,21 +84,21 @@ async function run() {
       return aIndex - bIndex;
     });
 
-  await writeConfig(finalFiles);
+  const configUpdated = await writeConfig(finalFiles);
 
   if (converted.length === 0) {
-    console.log('No new logos to convert. client-logos.ts refreshed.');
+    console.log(configUpdated ? 'No new logos to convert. client-logos.ts updated.' : 'No new logos to convert. client-logos.ts unchanged.');
     return;
   }
 
   for (const item of converted) {
     console.log(`${item.inputName} -> ${item.targetName}`);
   }
-  console.log(`Updated ${CONFIG_PATH}`);
+
+  console.log(configUpdated ? `Updated ${CONFIG_PATH}` : `${CONFIG_PATH} unchanged`);
 }
 
 run().catch((error) => {
   console.error('sync-client-logos failed:', error);
   process.exit(1);
 });
-

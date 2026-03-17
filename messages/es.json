@@ -1816,8 +1816,10 @@
             "f1": "DJ profesional 3 horas (Solo baile final)",
             "f2": "Sonido PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
             "f3": "Iluminación de pista (Multiefectos LED + 2x Focos Bash LED)",
-            "f4": "Máquina de humo"
-          }
+            "f4": "Máquina de humo",
+            "f5": "Montaje y desmontaje incluidos"
+          },
+          "ideal": "Bodas con baile final"
         },
         "bodas-premium": {
           "name": "Signature (Día Completo)",
@@ -1828,7 +1830,8 @@
             "f3": "Iluminación PRO: 4 Cabezas Móviles 150W LED",
             "f4": "Iluminación ambiental (Bolas LED)",
             "f5": "Máquina de humo"
-          }
+          },
+          "ideal": "Bodas de día completo"
         },
         "bodas-luxury": {
           "name": "Royal Wedding (Full FX)",
@@ -1838,7 +1841,8 @@
             "f2": "Sonido audiófilo 4000W EV ETX 2000W",
             "f3": "Show de luces sincronizado (4 Cabezas Móviles 150W LED)",
             "f4": "Efecto máquina de humo bajo (Baile en las nubes)"
-          }
+          },
+          "ideal": "Bodas VIP"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
@@ -2134,7 +2138,12 @@
     "customNeedsSub": "Hacemos eventos a medida. Cuéntanos qué tienes en mente y te proponemos.",
     "contactUs": "Habla con nosotros",
     "allInclude": "Todos los packs incluyen",
-    "allIncludeItems": ["Montaje y desmontaje", "DJ profesional dedicado", "Sonido de calidad (EV 4000W)", "Coordinación previa contigo"],
+    "allIncludeItems": [
+      "Montaje y desmontaje",
+      "DJ profesional dedicado",
+      "Sonido de calidad (EV 4000W)",
+      "Coordinación previa contigo"
+    ],
     "tab_bodas": "Bodas",
     "tab_festes": "Fiestas",
     "tab_empresas": "Empresa",
@@ -3974,7 +3983,10 @@
     },
     "viewCalendar": "Ver calendario completo",
     "socialPressure": "8 personas mirando fechas esta semana",
-    "earlyBird": "Reserva en {days} días y ahorra un 15%"
+    "earlyBird": "Reserva en {days} días y ahorra un 15%",
+    "modal": {
+      "whatsappMsg": "Hola! Quiero reservar la fecha {date} para mi evento. ¿Podéis enviarme más información?"
+    }
   },
   "stickyCta": {
     "requestQuote": "Pide tu presupuesto",

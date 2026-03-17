@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import Client from './client';
 import { getDbPacks } from '@/lib/packs-db';
+import { getSiteUrl } from '@/lib/site';
+
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
   packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: t('meta.title', { price: minPrice }),
     description: t('meta.description', { price: minPrice }),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/servicios/discomovil' },
     openGraph: {
       title: t('meta.ogTitle', { price: minPrice }),

@@ -4,10 +4,10 @@
  * POST - Crear nou codi
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { createAdminDiscountCode, listAdminDiscountCodes } from '@/lib/services/discountCodeAdminService';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,20 +30,8 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    const codes = await prisma.discountCode.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const stats = {
-      total: codes.length,
-      active: codes.filter((c) => c.isActive).length,
-      expired: codes.filter(
-        (c) => c.validUntil < new Date()
-      ).length,
-      totalUses: codes.reduce((sum, c) => sum + c.currentUses, 0),
-    };
-
-    return NextResponse.json({ ok: true, codes, stats });
+    const result = await listAdminDiscountCodes();
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint codis de descompte:', error);
     return NextResponse.json(
@@ -68,46 +56,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = parsed.data;
-    const normalizedCode = data.code.trim().toUpperCase();
-
-    // Check uniqueness
-    const existing = await prisma.discountCode.findUnique({
-      where: { code: normalizedCode },
-    });
-    if (existing) {
-      return NextResponse.json(
-        { error: `El codi "${normalizedCode}" ja existeix` },
-        { status: 409 }
-      );
-    }
-
-    const code = await prisma.discountCode.create({
-      data: {
-        code: normalizedCode,
-        type: data.type,
-        value: data.value,
-        description: data.description,
-        validFrom: data.validFrom ? new Date(data.validFrom) : new Date(),
-        validUntil: new Date(data.validUntil),
-        maxUses: data.maxUses,
-        minOrderValue: data.minOrderValue,
-        applicablePacks: data.applicablePacks || [],
-        isAccumulative: data.isAccumulative,
-        sourceType: data.sourceType || 'MANUAL',
-      },
-    });
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'CREATE',
-        entity: 'discountCode',
-        entityId: code.id,
-        details: { code: normalizedCode, type: data.type, value: data.value },
-      },
-    });
-
-    return NextResponse.json({ ok: true, code });
+    const result = await createAdminDiscountCode(parsed.data);
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error creant codi de descompte:', error);
     return NextResponse.json(

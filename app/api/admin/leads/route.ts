@@ -2,15 +2,14 @@
 // API per gestionar leads (nou model)
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { getPipelineLeads } from '@/lib/services/leads/pipeline';
+import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
 
 export const dynamic = 'force-dynamic';
 
-// Enum validation helpers
 const VALID_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const;
 const VALID_EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
 const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
@@ -64,15 +63,14 @@ const leadSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
 });
 
-// GET - Llistar leads amb filtres
 export async function GET(req: NextRequest) {
-  // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);
     const pipelineMode = searchParams.get('pipeline') === 'true';
+
     if (pipelineMode) {
       const pipelineLimit = safeParseInt(searchParams.get('limit'), 200, 1, 500);
       const statusParams = searchParams.getAll('status').filter(isValidStatus);
@@ -115,16 +113,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: true, data: { leads } });
     }
 
-    // Si només vol el comptador de leads nous
     const countOnly = searchParams.get('countOnly') === 'true';
     if (countOnly) {
-      const count = await prisma.lead.count({
-        where: {
-          status: 'NEW',
-          NOT: { email: { contains: '@leads.orbitaevents.local' } },
-        },
-      });
-      return NextResponse.json({ ok: true, count });
+      const result = await countNewAdminLeads();
+      return NextResponse.json(result);
     }
 
     const statusParam = searchParams.get('status');
@@ -134,53 +126,16 @@ export async function GET(req: NextRequest) {
     const page = safeParseInt(searchParams.get('page'), 1, 1);
     const limit = safeParseInt(searchParams.get('limit'), 25, 1, 200);
 
-    const where = {
-      ...(isValidStatus(statusParam) && { status: statusParam }),
-      ...(isValidEventType(eventTypeParam) && { eventType: eventTypeParam }),
-      ...(isValidPriority(priorityParam) && { priority: priorityParam }),
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' as const } },
-          { email: { contains: search, mode: 'insensitive' as const } },
-          { phone: { contains: search } },
-        ],
-      }),
-    };
-
-    const [leads, total] = await Promise.all([
-      prisma.lead.findMany({
-        where,
-        include: {
-          notes: { orderBy: { createdAt: 'desc' }, take: 3 },
-          booking: { select: { id: true, reference: true, status: true } },
-        },
-        orderBy: [
-          { priority: 'desc' },
-          { createdAt: 'desc' },
-        ],
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.lead.count({ where }),
-    ]);
-
-    // Estadístiques
-    const stats = await prisma.lead.groupBy({
-      by: ['status'],
-      _count: true,
-    });
-
-    return NextResponse.json({
-      ok: true,
-      leads,
-      total,
+    const result = await listAdminLeads({
+      status: isValidStatus(statusParam) ? statusParam : null,
+      eventType: isValidEventType(eventTypeParam) ? eventTypeParam : null,
+      priority: isValidPriority(priorityParam) ? priorityParam : null,
+      search,
       page,
-      totalPages: Math.ceil(total / limit),
-      stats: stats.reduce((acc, s) => {
-        acc[s.status] = s._count;
-        return acc;
-      }, {} as Record<string, number>),
+      limit,
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint leads:', error);
     return NextResponse.json(
@@ -190,9 +145,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - Crear nou lead
 export async function POST(req: NextRequest) {
-  // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
 
@@ -207,29 +160,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = parsed.data;
-
-    const lead = await prisma.lead.create({
-      data: {
-        ...data,
-        eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
-        interestedExtras: data.interestedExtras || [],
-      },
-    });
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'CREATE',
-        entity: 'lead',
-        entityId: lead.id,
-        details: { name: lead.name, eventType: lead.eventType },
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      lead,
-    });
+    const result = await createAdminLead(parsed.data);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error creant lead:', error);
     return NextResponse.json(

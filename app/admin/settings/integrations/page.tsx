@@ -4,6 +4,8 @@ import CalendarTokenManager from './CalendarTokenManager';
 import IntegrationSetupWizard from './IntegrationSetupWizard';
 import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
+import { getAppBaseUrl } from '@/lib/site';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +13,7 @@ function BoolBadge({ ok }: { ok: boolean }) {
   return (
     <span
       className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-        ok ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
+        ok ? 'admin-tone-soft-success' : 'bg-amber-500/20 text-amber-300'
       }`}
     >
       {ok ? 'Connectat' : 'Pendent'}
@@ -41,7 +43,7 @@ export default async function IntegrationsPage() {
   });
 
   const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
+  const baseUrl = (getAppBaseUrl()).replace(/\/+$/, '');
   const missingImapVars = [
     !process.env.IMAP_HOST ? 'IMAP_HOST' : null,
     !process.env.IMAP_PORT ? 'IMAP_PORT' : null,
@@ -199,3 +201,4 @@ export default async function IntegrationsPage() {
     </AdminPage>
   );
 }
+

@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -85,7 +85,8 @@ class AudioEngine {
 
   async start(frequencies: number[]) {
     if (!this.ctx) {
-      const AC = window.AudioContext || (window as any).webkitAudioContext;
+      type AudioContextWindow = Window & { webkitAudioContext?: typeof AudioContext };
+      const AC = window.AudioContext || (window as AudioContextWindow).webkitAudioContext;
       if (!AC) return;
       this.ctx = new AC();
     }
@@ -452,7 +453,7 @@ function InteractiveCanvas({
 // MODAL D'EXPLICACIÓ (PER QUÈ EXISTEIX AQUESTA PÀGINA)
 // ============================================================
 
-function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: string; t: (key: string, values?: Record<string, string>) => string }) {
+function ExplanationModal({ onClose, color, t, tRich }: { onClose: () => void; color: string; t: (key: string, values?: Record<string, string>) => string; tRich: (key: string) => ReactNode }) {
   const [step, setStep] = useState(0);
 
   const steps = [
@@ -461,7 +462,7 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
       titleKey: 'tutorial.step1.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step1.p1') }} />
+          <p>{tRich('tutorial.step1.p1')}</p>
           <p>{t('tutorial.step1.p2')}</p>
           <p className="text-white/50 text-sm italic">
             {t('tutorial.step1.p3')}
@@ -474,12 +475,12 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
       titleKey: 'tutorial.step2.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step2.intro') }} />
+          <p>{tRich('tutorial.step2.intro')}</p>
           <ul className="space-y-2 ml-4">
-            <li dangerouslySetInnerHTML={{ __html: '🖱️ ' + t('tutorial.step2.click') }} />
-            <li dangerouslySetInnerHTML={{ __html: '↔️ ' + t('tutorial.step2.drag') }} />
-            <li dangerouslySetInnerHTML={{ __html: '🚀 ' + t('tutorial.step2.throw') }} />
-            <li dangerouslySetInnerHTML={{ __html: '🏀 ' + t('tutorial.step2.bounce') }} />
+            <li>🖱️ {tRich('tutorial.step2.click')}</li>
+            <li>↔️ {tRich('tutorial.step2.drag')}</li>
+            <li>🚀 {tRich('tutorial.step2.throw')}</li>
+            <li>🏀 {tRich('tutorial.step2.bounce')}</li>
           </ul>
           <p className="text-white/50 text-sm">
             {t('tutorial.step2.cursor')}
@@ -492,7 +493,7 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
       titleKey: 'tutorial.step3.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step3.intro') }} />
+          <p>{tRich('tutorial.step3.intro')}</p>
           <div className="grid grid-cols-4 gap-2 text-center text-2xl">
             {['🌊', '🦄', '🚀', '🎃', '🐠', '🌈', '🎄', '🦁', '🍭', '🐉', '❄️', '🪩'].map((e, i) => (
               <motion.span
@@ -516,9 +517,9 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
       titleKey: 'tutorial.step4.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p1') }} />
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p2') }} />
-          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p3') }} />
+          <p>{tRich('tutorial.step4.p1')}</p>
+          <p>{tRich('tutorial.step4.p2')}</p>
+          <p>{tRich('tutorial.step4.p3')}</p>
           <p className="text-white/50 text-sm">
             {t('tutorial.step4.p4')}
           </p>
@@ -851,6 +852,10 @@ export default function EspaiSensorial() {
   const color = theme.colors[0];
   const bg = theme.bg;
 
+  const tRich = useCallback((key: string) => t.rich(key, {
+    strong: (chunks) => <strong className="font-semibold text-white">{chunks}</strong>,
+  }), [t]);
+
   useEffect(() => {
     setTimeout(() => setReady(true), 300);
   }, []);
@@ -989,9 +994,12 @@ export default function EspaiSensorial() {
       {/* Modal explicació */}
       <AnimatePresence>
         {showExplanation && (
-          <ExplanationModal onClose={() => setShowExplanation(false)} color={color} t={t} />
+          <ExplanationModal onClose={() => setShowExplanation(false)} color={color} t={t} tRich={tRich} />
         )}
       </AnimatePresence>
     </main>
   );
 }
+
+
+

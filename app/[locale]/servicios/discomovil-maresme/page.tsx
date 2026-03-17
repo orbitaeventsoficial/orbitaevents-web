@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `Discomóvil Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Pineda, Arenys, Canet y toda la costa. DJ profesional + equipo completo para fiestas privadas.`,
   keywords: ['discomovil Maresme', 'discomóvil Mataró', 'DJ fiesta Maresme', 'discomóvil Calella', 'DJ fiestas costa Maresme'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/discomovil-maresme' },
   openGraph: {
     title: `Discomóvil Maresme | Desde ${MIN_PRICE}€`,

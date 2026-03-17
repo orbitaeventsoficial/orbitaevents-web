@@ -36,11 +36,25 @@ export function ContactDesktop() {
 
   useEffect(() => {
     setBusinessHours(isBusinessHours());
+    let rafId: number | null = null;
+    const desktopRevealOffset = 560;
+
     const handleScroll = () => {
-      setIsVisible(window.scrollY > 400);
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        setIsVisible(window.scrollY > desktopRevealOffset);
+        rafId = null;
+      });
     };
+
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
   }, []);
 
   // Mostrar tooltip després de 3 segons
@@ -58,9 +72,10 @@ export function ContactDesktop() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          initial={{ opacity: 0, scale: 0.92, y: 28 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          exit={{ opacity: 0, scale: 0.92, y: 24 }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           className="fixed bottom-8 right-8 z-40 hidden md:flex md:flex-col md:items-end gap-3"
         >
           {/* Botó Telèfon - Només en horari d'atenció */}
@@ -68,10 +83,10 @@ export function ContactDesktop() {
             {businessHours && (
               <motion.a
                 key="phone-btn"
-                initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                initial={{ opacity: 0, scale: 0.92, x: 16 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                transition={{ delay: 0.1 }}
+                exit={{ opacity: 0, scale: 0.92, x: 16 }}
+                transition={{ duration: 0.32, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
                 href={`tel:${SITE_CONFIG.business.phone}`}
                 onClick={() => {
                   trackPhoneClick('floating_desktop');
@@ -99,9 +114,10 @@ export function ContactDesktop() {
             <AnimatePresence>
               {showTooltip && (
                 <motion.div
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
+                  exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-[#111] border border-white/10 rounded-lg px-4 py-2 whitespace-nowrap pointer-events-none"
                 >
                   <div className="flex items-center gap-2 text-sm">
@@ -177,22 +193,19 @@ export function BottomBarMobile() {
         // LÒGICA MILLORADA:
         // - NO mostrar mentre estem al Hero (primer viewport)
         // - SÍ mostrar quan hem passat el 70% del viewport (el Hero ja no es veu)
-        const heroPassed = currentScrollY > viewportHeight * 0.7;
+        const heroPassed = currentScrollY > viewportHeight * 0.82;
+        const scrollDiff = currentScrollY - lastScrollYRef.current;
 
         if (!heroPassed) {
-          // Encara veiem el Hero - AMAGAR la barra sticky
           setIsVisible(false);
           lastScrollYRef.current = currentScrollY;
           scrollRaf.current = null;
           return;
         }
 
-        // Ja hem passat el Hero - mostrar/amagar segons direcció scroll
-        if (currentScrollY > lastScrollYRef.current && currentScrollY > viewportHeight) {
-          // Scroll down - amagar
+        if (scrollDiff > 18 && currentScrollY > viewportHeight * 1.05) {
           setIsVisible(false);
-        } else {
-          // Scroll up - mostrar
+        } else if (scrollDiff < -10 || currentScrollY <= viewportHeight) {
           setIsVisible(true);
         }
 
@@ -225,7 +238,7 @@ export function BottomBarMobile() {
             initial={reduceMotion ? false : { y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, stiffness: 200 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >

@@ -82,7 +82,9 @@ export default function HeaderChampion() {
   // Refs per scroll sense temblor
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
-  const scrollThreshold = 10;
+  const hideThreshold = 24;
+  const showThreshold = 16;
+  const minHideOffset = 140;
 
   // Scroll handler optimitzat
   const handleScroll = useCallback(() => {
@@ -90,21 +92,22 @@ export default function HeaderChampion() {
 
     ticking.current = true;
 
-    requestAnimationFrame(() => {
-      const currentScrollY = window.scrollY;
+        requestAnimationFrame(() => {
+      const currentScrollY = Math.max(window.scrollY, 0);
       const scrollDiff = currentScrollY - lastScrollY.current;
+      const isNearTop = currentScrollY < 48;
 
-      if (Math.abs(scrollDiff) > scrollThreshold) {
-        if (scrollDiff > 0 && currentScrollY > 100) {
-          setIsVisible(false);
-          setActiveDropdown(null);
-        } else {
-          setIsVisible(true);
-        }
-        lastScrollY.current = currentScrollY;
+      if (isNearTop) {
+        setIsVisible(true);
+      } else if (scrollDiff > hideThreshold && currentScrollY > minHideOffset) {
+        setIsVisible(false);
+        setActiveDropdown(null);
+      } else if (scrollDiff < -showThreshold) {
+        setIsVisible(true);
       }
 
-      setIsScrolled(currentScrollY > 50);
+      lastScrollY.current = currentScrollY;
+      setIsScrolled(currentScrollY > 36);
       ticking.current = false;
     });
   }, []);
@@ -135,11 +138,11 @@ export default function HeaderChampion() {
         role="banner"
         className={`
           fixed top-0 left-0 right-0 z-50
-          transition-all duration-300 ease-out
-          ${isVisible ? 'translate-y-0' : '-translate-y-full'}
+                    transition-[transform,opacity,background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+          ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-[108%] opacity-0'}
           ${isScrolled
-            ? 'bg-zinc-950/98 backdrop-blur-xl shadow-xl shadow-black/30 border-b border-zinc-800/50'
-            : 'bg-zinc-950/80 backdrop-blur-md'
+            ? 'bg-zinc-950/94 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-zinc-800/60'
+            : 'bg-zinc-950/76 backdrop-blur-lg border-b border-transparent'
           }
         `}
         style={{

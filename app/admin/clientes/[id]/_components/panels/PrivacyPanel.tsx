@@ -113,7 +113,7 @@ export default function PrivacyPanel() {
               <div key={c.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
                   <span className="text-sm font-medium">{CONSENT_LABELS[c.consentType] || c.consentType}</span>
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300">
+                  <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                     Actiu
                   </span>
                   <p className="text-xs opacity-50 mt-0.5">
@@ -136,7 +136,7 @@ export default function PrivacyPanel() {
                 <div key={c.id} className="flex items-center justify-between rounded-xl border p-3 opacity-50">
                   <div>
                     <span className="text-sm font-medium">{CONSENT_LABELS[c.consentType] || c.consentType}</span>
-                    <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-300">
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                       Revocat
                     </span>
                     <p className="text-xs opacity-50 mt-0.5">
@@ -175,7 +175,7 @@ export default function PrivacyPanel() {
                     <p className="mt-1 text-xs opacity-60">{r.description}</p>
                   )}
                   {r.legalDeadline && r.status !== 'COMPLETED' && r.status !== 'REJECTED' && (
-                    <p className="mt-1 text-xs text-amber-400">
+                    <p className="mt-1 text-xs">
                       Deadline: {formatDateTime(r.legalDeadline)}
                     </p>
                   )}

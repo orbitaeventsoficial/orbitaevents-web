@@ -80,20 +80,13 @@ export type PackPricingModelConfig = {
   alertDivergencePct: number;
 };
 
-function round2(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
+function round2(value: number): number { return Math.round(value * 100) / 100; }
+function clamp(value: number, min: number, max: number): number { return Math.max(min, Math.min(max, value)); }
 function normalizePercent(input: number | null | undefined, fallback: number): number {
   if (input == null || !Number.isFinite(input)) return fallback;
   if (input > 1) return clamp(input / 100, 0, 1);
   return clamp(input, 0, 1);
 }
-
 async function getNumberSetting(key: string): Promise<number | null> {
   const setting = await prisma.setting.findUnique({ where: { key } });
   if (!setting) return null;
@@ -102,23 +95,7 @@ async function getNumberSetting(key: string): Promise<number | null> {
 }
 
 export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
-  const [
-    marginTargetPctRaw,
-    laborCostPerHourRaw,
-    socialSecurityPctRaw,
-    withholdingPctRaw,
-    operatorNetCostPerHourRaw,
-    specialistNetCostPerHourRaw,
-    operatorCostPerHourRaw,
-    specialistCostPerHourRaw,
-    specialistServicesRaw,
-    supportOperatorMinGuestsRaw,
-    supportOperatorMinDjHoursRaw,
-    supportOperatorMinWattsRaw,
-    specialistMultiplierRaw,
-    fixedPackCostRaw,
-    alertDivergencePctRaw,
-  ] = await Promise.all([
+  const [marginTargetPctRaw, laborCostPerHourRaw, socialSecurityPctRaw, withholdingPctRaw, operatorNetCostPerHourRaw, specialistNetCostPerHourRaw, operatorCostPerHourRaw, specialistCostPerHourRaw, specialistServicesRaw, supportOperatorMinGuestsRaw, supportOperatorMinDjHoursRaw, supportOperatorMinWattsRaw, specialistMultiplierRaw, fixedPackCostRaw, alertDivergencePctRaw] = await Promise.all([
     getNumberSetting('pricing.pack.marginTargetPct'),
     getNumberSetting('pricing.pack.laborCostPerHour'),
     getNumberSetting('pricing.pack.socialSecurityPct'),
@@ -140,32 +117,12 @@ export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
   const baseLabor = Math.max(0, laborCostPerHourRaw ?? DEFAULT_LABOR_COST_PER_HOUR);
   const specialistMultiplier = Math.max(1, specialistMultiplierRaw ?? DEFAULT_SPECIALIST_MULTIPLIER);
   const fallbackOperatorGross = Math.max(0, operatorCostPerHourRaw ?? baseLabor);
-  const operatorNetCostPerHour = Math.max(
-    0,
-    operatorNetCostPerHourRaw ?? (fallbackOperatorGross / (1 + socialSecurityPct))
-  );
-  const operatorCostPerHour = Math.max(
-    0,
-    operatorCostPerHourRaw ?? round2(operatorNetCostPerHour * (1 + socialSecurityPct))
-  );
-  const fallbackSpecialistGross = Math.max(
-    0,
-    specialistCostPerHourRaw ?? (operatorCostPerHour * specialistMultiplier)
-  );
-  const specialistNetCostPerHour = Math.max(
-    0,
-    specialistNetCostPerHourRaw ?? (fallbackSpecialistGross / (1 + socialSecurityPct))
-  );
-  const specialistCostPerHour = Math.max(
-    0,
-    specialistCostPerHourRaw ?? round2(specialistNetCostPerHour * (1 + socialSecurityPct))
-  );
-  const specialistServices = new Set(
-    (specialistServicesRaw?.value || DEFAULT_SPECIALIST_SERVICES.join(','))
-      .split(',')
-      .map((token) => token.trim().toLowerCase())
-      .filter(Boolean)
-  );
+  const operatorNetCostPerHour = Math.max(0, operatorNetCostPerHourRaw ?? (fallbackOperatorGross / (1 + socialSecurityPct)));
+  const operatorCostPerHour = Math.max(0, operatorCostPerHourRaw ?? round2(operatorNetCostPerHour * (1 + socialSecurityPct)));
+  const fallbackSpecialistGross = Math.max(0, specialistCostPerHourRaw ?? (operatorCostPerHour * specialistMultiplier));
+  const specialistNetCostPerHour = Math.max(0, specialistNetCostPerHourRaw ?? (fallbackSpecialistGross / (1 + socialSecurityPct)));
+  const specialistCostPerHour = Math.max(0, specialistCostPerHourRaw ?? round2(specialistNetCostPerHour * (1 + socialSecurityPct)));
+  const specialistServices = new Set((specialistServicesRaw?.value || DEFAULT_SPECIALIST_SERVICES.join(',')).split(',').map((token) => token.trim().toLowerCase()).filter(Boolean));
 
   return {
     marginTargetPct: clamp(marginTargetPctRaw ?? DEFAULT_MARGIN_TARGET_PCT, 0.1, 0.9),
@@ -186,18 +143,11 @@ export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
 
 function normalizeSpecialistServices(raw: unknown): string[] {
   if (!raw) return [];
-  if (Array.isArray(raw)) {
-    return raw
-      .map((value) => String(value || '').trim().toLowerCase())
-      .filter(Boolean);
-  }
-  return String(raw)
-    .split(',')
-    .map((value) => value.trim().toLowerCase())
-    .filter(Boolean);
+  if (Array.isArray(raw)) return raw.map((value) => String(value || '').trim().toLowerCase()).filter(Boolean);
+  return String(raw).split(',').map((value) => value.trim().toLowerCase()).filter(Boolean);
 }
 
-export function toEditablePackPricingModelConfig(config: PricingModelConfig): PackPricingModelConfig {
+function toEditablePackPricingModelConfig(config: PricingModelConfig): PackPricingModelConfig {
   return {
     marginTargetPct: config.marginTargetPct,
     socialSecurityPct: config.socialSecurityPct,
@@ -220,7 +170,7 @@ export async function getPackPricingModelConfigEditable(): Promise<PackPricingMo
   return toEditablePackPricingModelConfig(config);
 }
 
-export async function upsertPackPricingModelConfig(input: Partial<PackPricingModelConfig>): Promise<PackPricingModelConfig> {
+export async function upsertPackPricingModelConfig(input: Partial<PackPricingModelConfig>, role?: string | null): Promise<PackPricingModelConfig> {
   const current = await getPackPricingModelConfigEditable();
   const candidate: PackPricingModelConfig = {
     marginTargetPct: clamp(Number(input.marginTargetPct ?? current.marginTargetPct), 0.1, 0.9),
@@ -254,31 +204,23 @@ export async function upsertPackPricingModelConfig(input: Partial<PackPricingMod
     { key: 'pricing.pack.alertDivergencePct', value: String(candidate.alertDivergencePct), label: 'Llindar alerta divergència', description: 'Diferència % a partir de la qual salta alerta de PVP vs recomanat' },
   ];
 
-  await prisma.$transaction(
-    payload.map((row) => {
-      const settingType = row.key === 'pricing.pack.specialistServices' ? 'STRING' : 'NUMBER';
-      return (
-      prisma.setting.upsert({
-        where: { key: row.key },
-        update: {
-          value: row.value,
-          type: settingType,
-          category: 'pricing',
-          label: row.label,
-          description: row.description,
-        },
-        create: {
-          key: row.key,
-          value: row.value,
-          type: settingType,
-          category: 'pricing',
-          label: row.label,
-          description: row.description,
-        },
-      })
-      );
-    })
-  );
+  await prisma.$transaction(payload.map((row) => {
+    const settingType = row.key === 'pricing.pack.specialistServices' ? 'STRING' : 'NUMBER';
+    return prisma.setting.upsert({
+      where: { key: row.key },
+      update: { value: row.value, type: settingType, category: 'pricing', label: row.label, description: row.description },
+      create: { key: row.key, value: row.value, type: settingType, category: 'pricing', label: row.label, description: row.description },
+    });
+  }));
+
+  await prisma.adminLog.create({
+    data: {
+      action: 'UPDATE',
+      entity: 'setting',
+      entityId: 'pricing.pack.modelConfig',
+      details: { role, before: current, after: candidate },
+    },
+  }).catch(() => undefined);
 
   return candidate;
 }
@@ -305,23 +247,16 @@ export function computePackPricingHealth(pack: PackWithInventory, config: Pricin
   const laborNetAfterWithholdingPerHourUsed = round2(laborCostPerHourUsed * (1 - config.withholdingPct));
   const laborTier: 'mixed' = 'mixed';
 
-  const baseCost = (inventoryCostPerHour * Math.max(pack.djHours, 1))
-    + (laborCostPerHourUsed * Math.max(pack.djHours, 1))
-    + config.fixedPackCost;
-
+  const baseCost = (inventoryCostPerHour * Math.max(pack.djHours, 1)) + (laborCostPerHourUsed * Math.max(pack.djHours, 1)) + config.fixedPackCost;
   const recommendedPrice = round2(baseCost / (1 - config.marginTargetPct));
   const publicPrice = round2(pack.price);
-  const divergencePct = recommendedPrice > 0
-    ? round2(((publicPrice - recommendedPrice) / recommendedPrice) * 100)
-    : 0;
+  const divergencePct = recommendedPrice > 0 ? round2(((publicPrice - recommendedPrice) / recommendedPrice) * 100) : 0;
   const baseExtraHourCost = inventoryCostPerHour + laborCostPerHourUsed;
   const recommendedExtraHourPrice = round2(baseExtraHourCost / (1 - config.marginTargetPct));
   const baseOperatorExtraHourCost = inventoryCostPerHour + config.operatorCostPerHour;
   const recommendedOperatorExtraHourPrice = round2(baseOperatorExtraHourCost / (1 - config.marginTargetPct));
   const publicExtraHourPrice = round2(pack.extraHourPrice || 0);
-  const extraHourDivergencePct = recommendedExtraHourPrice > 0
-    ? round2(((publicExtraHourPrice - recommendedExtraHourPrice) / recommendedExtraHourPrice) * 100)
-    : 0;
+  const extraHourDivergencePct = recommendedExtraHourPrice > 0 ? round2(((publicExtraHourPrice - recommendedExtraHourPrice) / recommendedExtraHourPrice) * 100) : 0;
 
   const packAlert = Math.abs(divergencePct) >= config.alertDivergencePct;
   const extraHourAlert = Math.abs(extraHourDivergencePct) >= config.alertDivergencePct;
@@ -355,61 +290,23 @@ export async function getPackPricingAlertsCount(): Promise<number> {
     prisma.pack.findMany({
       where: { isActive: true },
       select: {
-        id: true,
-        service: true,
-        price: true,
-        extraHourPrice: true,
-        djHours: true,
-        maxGuests: true,
-        soundWatts: true,
-        inventory: {
-          select: {
-            quantity: true,
-            item: {
-              select: {
-                purchasePrice: true,
-                expectedLifeHours: true,
-              },
-            },
-          },
-        },
+        id: true, service: true, price: true, extraHourPrice: true, djHours: true, maxGuests: true, soundWatts: true,
+        inventory: { select: { quantity: true, item: { select: { purchasePrice: true, expectedLifeHours: true } } } },
       },
     }),
   ]);
 
-  return packs
-    .map((pack) => computePackPricingHealth(pack, config))
-    .filter((row) => row.hasAlert)
-    .length;
+  return packs.map((pack) => computePackPricingHealth(pack, config)).filter((row) => row.hasAlert).length;
 }
 
-export async function syncPackPublicPricesToRecommended(): Promise<{
-  updated: number;
-  reviewed: number;
-}> {
+export async function syncPackPublicPricesToRecommended(): Promise<{ updated: number; reviewed: number; }> {
   const [config, packs] = await Promise.all([
     getPackPricingModelConfig(),
     prisma.pack.findMany({
       where: { isActive: true },
       select: {
-        id: true,
-        service: true,
-        price: true,
-        extraHourPrice: true,
-        djHours: true,
-        maxGuests: true,
-        soundWatts: true,
-        inventory: {
-          select: {
-            quantity: true,
-            item: {
-              select: {
-                purchasePrice: true,
-                expectedLifeHours: true,
-              },
-            },
-          },
-        },
+        id: true, service: true, price: true, extraHourPrice: true, djHours: true, maxGuests: true, soundWatts: true,
+        inventory: { select: { quantity: true, item: { select: { purchasePrice: true, expectedLifeHours: true } } } },
       },
     }),
   ]);
@@ -418,29 +315,12 @@ export async function syncPackPublicPricesToRecommended(): Promise<{
   const toUpdate = rows.filter((row) => row.hasAlert && row.recommendedPrice > 0);
 
   for (const row of toUpdate) {
-    await prisma.pack.update({
-      where: { id: row.packId },
-      data: {
-        price: row.recommendedPrice,
-        extraHourPrice: row.recommendedExtraHourPrice,
-      },
-    });
+    await prisma.pack.update({ where: { id: row.packId }, data: { price: row.recommendedPrice, extraHourPrice: row.recommendedExtraHourPrice } });
   }
 
   await prisma.adminLog.create({
-    data: {
-      action: 'UPDATE',
-      entity: 'pricing',
-      entityId: 'pack-auto-sync',
-      details: {
-        reviewed: rows.length,
-        updated: toUpdate.length,
-      },
-    },
+    data: { action: 'UPDATE', entity: 'pricing', entityId: 'pack-auto-sync', details: { reviewed: rows.length, updated: toUpdate.length } },
   });
 
-  return {
-    updated: toUpdate.length,
-    reviewed: rows.length,
-  };
+  return { updated: toUpdate.length, reviewed: rows.length };
 }

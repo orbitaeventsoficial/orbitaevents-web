@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Empordà desde ${MIN_PRICE}€. Figueres, Roses, Cadaqués, L'Escala. Especialistas en bodas con encanto empordanés.`,
   keywords: ['DJ bodas Empordà', 'DJ bodas Figueres', 'DJ bodas Roses', 'DJ bodas Costa Brava', 'bodas Empordà'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-emporda' },
   openGraph: {
     title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€`,

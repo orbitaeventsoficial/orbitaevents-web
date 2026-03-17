@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
+import { createLeadTaskForRoute, listLeadTasksForRoute } from '@/lib/services/leadTaskRouteService';
 
 interface Params {
   params: { id: string };
@@ -18,15 +18,12 @@ const taskSchema = z.object({
   createdBy: z.string().optional(),
 });
 
-export async function GET(_req: NextRequest, { params }: Params) {
-  const authError = requireAuth(_req);
+export async function GET(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const tasks = await prisma.leadTask.findMany({
-      where: { leadId: params.id },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json({ ok: true, tasks });
+    const result = await listLeadTasksForRoute(params.id);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint tasques', error);
     return NextResponse.json({ error: 'Error obtenint tasques' }, { status: 500 });
@@ -43,78 +40,8 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Dades invàlides', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const data = parsed.data;
-    const dueDate = data.dueDate ? new Date(data.dueDate) : null;
-
-    const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
-      select: { customerId: true },
-    });
-
-    const task = await prisma.leadTask.create({
-      data: {
-        leadId: params.id,
-        title: data.title,
-        description: data.description,
-        dueDate,
-        status: data.status ?? 'OPEN',
-        priority: data.priority ?? 'MEDIUM',
-        assignedTo: data.assignedTo,
-        createdBy: data.createdBy,
-      },
-    });
-
-    // Dual-write: keep universal task table in sync (non-blocking for legacy compatibility).
-    try {
-      const prismaAny = prisma as any;
-      await prismaAny.task.upsert({
-        where: { legacyLeadTaskId: task.id },
-        update: {
-          customerId: lead?.customerId ?? null,
-          leadId: params.id,
-          title: task.title,
-          description: task.description,
-          dueDate: task.dueDate,
-          status: task.status,
-          priority: task.priority,
-          assignedTo: task.assignedTo,
-          createdBy: task.createdBy,
-          completedAt: task.completedAt,
-        },
-        create: {
-          legacyLeadTaskId: task.id,
-          customerId: lead?.customerId ?? null,
-          leadId: params.id,
-          title: task.title,
-          description: task.description,
-          dueDate: task.dueDate,
-          status: task.status,
-          priority: task.priority,
-          assignedTo: task.assignedTo,
-          createdBy: task.createdBy,
-          completedAt: task.completedAt,
-        },
-      });
-    } catch (syncError) {
-      log.warn('No s\'ha pogut sincronitzar task universal', {
-        leadId: params.id,
-        taskId: task.id,
-        error: syncError instanceof Error ? syncError.message : String(syncError),
-      });
-    }
-
-    await prisma.leadActivity.create({
-      data: {
-        leadId: params.id,
-        type: 'TASK',
-        title: 'Tasca creada',
-        description: data.title,
-        metadata: { taskId: task.id, status: task.status, priority: task.priority },
-        createdBy: data.createdBy ?? 'Admin',
-      },
-    });
-
-    return NextResponse.json({ ok: true, task });
+    const result = await createLeadTaskForRoute(params.id, parsed.data);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error creant tasca', error);
     return NextResponse.json({ error: 'Error creant tasca' }, { status: 500 });

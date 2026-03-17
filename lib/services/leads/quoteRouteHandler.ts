@@ -1,51 +1,11 @@
-/**
- * Lead quote handlers (shared by legacy and leads routes)
- */
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from '@/lib/services/documentService';
-import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
-import type { PackDefinition } from '@/config/packs-config';
+import { resolveQuotePack } from '@/lib/services/quotes/quotePack';
 import { requireAuth } from '@/lib/auth';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
-
-type QuotePack = {
-  name: string;
-  price: number;
-  djHours: number;
-  extraHourPrice: number;
-  description: string;
-};
-
-function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
-  if (!pack) {
-    return {
-      name: 'Servei DJ Professional',
-      price: 500,
-      djHours: 4,
-      extraHourPrice: 80,
-      description: 'Servei DJ complet amb so i il·luminació',
-    };
-  }
-
-  const djHours = pack.durationHours ?? 4;
-  return {
-    name: pack.name,
-    price: pack.priceValue ?? 500,
-    djHours,
-    extraHourPrice: 80,
-    description: pack.emotion || pack.tagline || pack.name,
-  };
-}
-
-async function resolvePack(packKey: string, locale?: string): Promise<QuotePack> {
-  const pack = await getDbPackByCode(packKey, locale || 'ca');
-  if (pack) return packToQuotePack(pack);
-
-  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'ca' });
-  return packToQuotePack(fallback[0]);
-}
+import { getAppBaseUrl } from '@/lib/site';
 
 type LeadQuoteRow = {
   id: string;
@@ -95,7 +55,7 @@ function parsePositiveNumber(value: string | null): number | null {
   return num;
 }
 
-export async function handleLeadQuoteGet(req: NextRequest, leadId: string, deprecated = false) {
+export async function handleLeadQuoteGet(req: NextRequest, leadId: string) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
@@ -109,7 +69,7 @@ export async function handleLeadQuoteGet(req: NextRequest, leadId: string, depre
 
     const { searchParams } = new URL(req.url);
     const packKey = searchParams.get('packId')?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
-    const basePack = await resolvePack(packKey, lead.preferredLocale || 'ca');
+    const basePack = await resolveQuotePack(packKey, lead.preferredLocale || 'ca');
     const customPrice = parsePositiveNumber(searchParams.get('customPrice'));
     const customHours = parsePositiveNumber(searchParams.get('customHours'));
     const packData = {
@@ -129,30 +89,23 @@ export async function handleLeadQuoteGet(req: NextRequest, leadId: string, depre
       conditions: template.conditions,
     });
 
-    const response = new NextResponse(html, {
+    return new NextResponse(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
-
-    if (deprecated) {
-      response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/quote`);
-    }
-
-    return response;
   } catch (error) {
     log.error('Error generant pressupost:', error);
     return NextResponse.json({ error: 'Error generant pressupost' }, { status: 500 });
   }
 }
 
-export async function handleLeadQuotePost(req: NextRequest, leadId: string, deprecated = false) {
+export async function handleLeadQuotePost(req: NextRequest, leadId: string) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const template = await getQuoteTemplateSettings();
     const body = await req.json().catch(() => ({}));
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || getAppBaseUrl();
 
     const lead = await fetchLeadForQuote(leadId);
     if (!lead) {
@@ -160,7 +113,7 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string, depr
     }
 
     const packKey = body.packId?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
-    const basePack = await resolvePack(packKey, lead.preferredLocale || 'ca');
+    const basePack = await resolveQuotePack(packKey, lead.preferredLocale || 'ca');
 
     const packData = {
       ...basePack,
@@ -240,20 +193,13 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string, depr
       conditions: template.conditions,
     });
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       quoteNumber,
       total: quoteData.total,
       html,
       message: 'Pressupost generat correctament',
     });
-
-    if (deprecated) {
-      response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/quote`);
-    }
-
-    return response;
   } catch (error) {
     log.error('Error generant pressupost:', error);
     return NextResponse.json({ error: 'Error generant pressupost' }, { status: 500 });

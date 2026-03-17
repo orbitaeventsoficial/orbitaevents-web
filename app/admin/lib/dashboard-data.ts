@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+﻿import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
@@ -7,6 +7,7 @@ import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { formatDateSimple } from '@/lib/constants';
+import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -104,7 +105,7 @@ export interface DashboardData {
   // Lists
   recentLeads: { id: string; name: string; email: string; eventType: string | null; status: string; createdAt: Date }[];
   upcomingBookings: { id: string; clientName: string; eventDate: Date; eventType: string | null }[];
-  upcomingTasks: { id: string; title: string; dueDate: Date | null; status: string; lead: { id: string; name: string } }[];
+  upcomingTasks: { id: string; title: string; dueDate: Date | null; status: string; lead: { id: string; name: string } | null }[];
   commandLeads: { id: string; name: string; status: string; priority: string; createdAt: Date }[];
   commandBookings: { id: string; reference: string | null; clientName: string; status: string; eventDate: Date }[];
   recentAdminLogs: { id: string; action: string; entity: string; createdAt: Date }[];
@@ -211,7 +212,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:activity', () => prisma.customerActivity.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:admin-logs', () => prisma.adminLog.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, entity: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:tasks:upcoming', () => prisma.leadTask.findMany({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }, take: 6, orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }], select: { id: true, title: true, dueDate: true, status: true, lead: { select: { id: true, name: true } } } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:tasks:upcoming', () => prisma.task.findMany({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }, take: 6, orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }], select: { id: true, title: true, dueDate: true, status: true, lead: { select: { id: true, name: true } } } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:leads:stale:${dayKey}`, () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:hot', () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] }, priority: { in: ['HIGH', 'URGENT'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:quotes-in-flight', () => prisma.lead.count({ where: { status: { in: ['QUOTE_SENT', 'NEGOTIATING'] } } }), CacheTTL.SHORT).catch(() => 0),
@@ -388,20 +389,13 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     const diffMs = new Date(nextEventRaw.eventDate).getTime() - now.getTime();
     const daysUntil = Math.max(0, Math.ceil(diffMs / 86400000));
     // Checklist state for next event
-    const checklistSetting = await cachedQuery(
+    const checklistItems = await cachedQuery(
       `admin:dashboard:checklist-setting:${nextEventRaw.id}`,
-      () => prisma.setting.findUnique({ where: { key: `booking.checklist.${nextEventRaw.id}` } }),
+      () => getBookingChecklist(nextEventRaw.id),
       CacheTTL.SHORT
-    ).catch(() => null);
-    let checklistDone = 0;
-    let checklistTotal = 7; // default items count
-    if (checklistSetting?.value) {
-      try {
-        const items = JSON.parse(checklistSetting.value) as Array<{ checked: boolean }>;
-        checklistTotal = items.length;
-        checklistDone = items.filter((i) => i.checked).length;
-      } catch { /* use defaults */ }
-    }
+    ).catch(() => DEFAULT_BOOKING_CHECKLIST_ITEMS);
+    const checklistTotal = checklistItems.length;
+    const checklistDone = checklistItems.filter((item) => item.checked).length;
     nextEvent = {
       id: nextEventRaw.id,
       reference: nextEventRaw.reference,
@@ -538,3 +532,4 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     timeline, alerts, activities, healthItems, cronMap,
   };
 }
+

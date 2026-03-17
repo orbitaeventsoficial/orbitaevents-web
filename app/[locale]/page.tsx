@@ -8,6 +8,8 @@ import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { getSiteUrl } from '@/lib/site';
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SKELETON COMPONENTS - Para loading states rápidos
@@ -114,7 +116,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'homePage' });
 
-  const base = 'https://orbitaevents.com';
+  const base = getSiteUrl();
   return {
     title: t('meta.title'),
     description: t('meta.description'),
@@ -143,7 +145,7 @@ export default function HomePage() {
   return (
     <HomePageWrapper>
       {/* Desktop: Contingut elegant */}
-      <main className="min-h-screen bg-[#0A0A0A]">
+      <div className="min-h-screen bg-[#0A0A0A]">
         {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
         <div data-section-id="hero">
           <HeroElegant />
@@ -200,8 +202,9 @@ export default function HomePage() {
         <div data-section-id="cta">
           <CTAFinal />
         </div>
-      </main>
+      </div>
       <HomepageScrollTracker />
     </HomePageWrapper>
   );
 }
+

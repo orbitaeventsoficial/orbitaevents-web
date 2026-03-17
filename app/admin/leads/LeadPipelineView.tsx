@@ -117,7 +117,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     } finally {
       setLoading(false);
     }
-  }, [filterQuery]);
+  }, [filterQuery, toast]);
 
   useEffect(() => {
     fetchPipeline();
@@ -270,7 +270,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               <button
                 type="button"
                 onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}
-                className="rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[10px] font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
+                className="rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors"
               >
                 Netejar
               </button>
@@ -473,10 +473,10 @@ function PipelineCard({
           const score = lead.cachedScore ?? estimateScore(lead);
           if (score === null) return null;
           const scoreColor = score > 70
-            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+            ? 'admin-tone-soft-success border-emerald-500/30'
             : score > 40
               ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-              : 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+              : 'admin-tone-soft-danger border-rose-500/30';
           return (
             <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`} title="Score de qualitat">
               {score}
@@ -486,9 +486,9 @@ function PipelineCard({
         {/* Dies sense resposta */}
         {(() => {
           const daysSince = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / 86400000);
-          const daysColor = daysSince <= 2 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' :
+          const daysColor = daysSince <= 2 ? 'admin-tone-soft-success border-emerald-500/30' :
             daysSince <= 5 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
-            'bg-rose-500/20 text-rose-300 border-rose-500/30';
+            'admin-tone-soft-danger border-rose-500/30';
           return (
             <span className={`inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${daysColor}`}>
               {daysSince}d
@@ -497,7 +497,7 @@ function PipelineCard({
         })()}
         {/* Budget prominent */}
         {lead.budget && (
-          <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+          <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold">
             {lead.budget}
           </span>
         )}
@@ -527,7 +527,7 @@ function PipelineCard({
         {lead.booking && (
           <Link
             href={`/admin/bookings/${lead.booking.id}`}
-            className="inline-flex items-center gap-0.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300 hover:bg-sky-500/25"
+            className="inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
           >
             📋 {lead.booking.reference}
           </Link>
@@ -537,4 +537,8 @@ function PipelineCard({
     </div>
   );
 }
+
+
+
+
 

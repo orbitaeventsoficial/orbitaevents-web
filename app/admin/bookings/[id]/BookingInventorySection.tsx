@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 const CATEGORY_LABELS: Record<string, string> = {
   SOUND: '🔊 So',
@@ -62,11 +63,6 @@ interface PackTemplateItem {
   item: InventoryItem;
 }
 
-interface InventoryBundle {
-  id: string;
-  name: string;
-  itemIds: string[];
-}
 
 interface SkippedDetail {
   reason: 'NOT_FOUND' | 'ALREADY_ASSIGNED' | 'OVERLAP' | string;
@@ -307,9 +303,9 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         </div>
       </div>
       {message && (
-        <div className="mb-3 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-xs text-rose-300" role="alert">
+        <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
           <span className="flex-1">{message}</span>
-          <button type="button" onClick={() => setMessage(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+          <button type="button" onClick={() => setMessage(null)} className="">✕</button>
         </div>
       )}
       {skippedDetails.length > 0 && (
@@ -384,7 +380,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                   onClick={() => handleToggleCheckout(a)}
                   className={`rounded-xl px-2 py-1 text-xs font-medium transition-all ${
                     a.checkedOut
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+                      ? 'admin-tone-soft-success border border-emerald-400/30'
                       : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'
                   }`}
                 >
@@ -436,7 +432,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cercar per nom o codi..."
-            className="w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="w-full rounded-xl border px-3 py-2.5 text-sm "
             autoFocus
           />
 
@@ -475,3 +471,6 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     </section>
   );
 }
+
+
+

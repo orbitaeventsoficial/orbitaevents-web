@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminRole, requireAuth, requirePermission } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import {
   getPackPricingModelConfigEditable,
@@ -27,23 +26,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const previous = await getPackPricingModelConfigEditable();
-    const saved = await upsertPackPricingModelConfig(body?.config || {});
-    const role = getAdminRole(req);
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'setting',
-        entityId: 'pricing.pack.modelConfig',
-        details: {
-          role,
-          before: previous,
-          after: saved,
-        },
-      },
-    });
-
+    const saved = await upsertPackPricingModelConfig(body?.config || {}, getAdminRole(req));
     return NextResponse.json({ ok: true, config: saved });
   } catch (error) {
     log.error('Error updating pack pricing model config', error);
@@ -53,4 +36,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

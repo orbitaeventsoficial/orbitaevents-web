@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Pineda y toda la costa. Cumpleaños, aniversarios y fiestas privadas con equipo profesional.`,
   keywords: ['DJ fiestas Maresme', 'DJ fiesta Mataró', 'DJ fiesta Calella', 'DJ cumpleaños Maresme', 'contratar DJ Maresme'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-fiestas-maresme' },
   openGraph: {
     title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€`,

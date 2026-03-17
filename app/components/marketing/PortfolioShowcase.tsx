@@ -1,29 +1,27 @@
 'use client';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PORTFOLIO SHOWCASE — Cinematic horizontal scroll
-// Each category = a visual "story" with overlay info
+// PORTFOLIO SHOWCASE — Visual story grid
+// Cada categoria és una targeta clicable cap a la seva galeria
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
-// ─── Event Stories Data ─────────────────────────────────────────────────────
-
 interface EventStory {
   id: string;
+  slug: string;
   category: string;
   photos: string[];
-  /** Translation key for overlay text */
   overlayKey: string;
 }
 
 const EVENT_STORIES: EventStory[] = [
   {
     id: 'discomovil',
+    slug: 'discomovil',
     category: 'discomovil',
     photos: Array.from({ length: 10 }, (_, i) =>
       `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`
@@ -32,6 +30,7 @@ const EVENT_STORIES: EventStory[] = [
   },
   {
     id: 'halloween',
+    slug: 'fiestas-tematicas-halloween',
     category: 'halloween',
     photos: Array.from({ length: 10 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`
@@ -40,6 +39,7 @@ const EVENT_STORIES: EventStory[] = [
   },
   {
     id: 'monMagic',
+    slug: 'fiestas-tematicas-mon-magic',
     category: 'monMagic',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`
@@ -48,6 +48,7 @@ const EVENT_STORIES: EventStory[] = [
   },
   {
     id: 'bodas',
+    slug: 'bodas',
     category: 'bodas',
     photos: Array.from({ length: 4 }, (_, i) =>
       `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`
@@ -56,6 +57,7 @@ const EVENT_STORIES: EventStory[] = [
   },
   {
     id: 'empreses',
+    slug: 'eventos-empresa',
     category: 'empreses',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`
@@ -63,8 +65,6 @@ const EVENT_STORIES: EventStory[] = [
     overlayKey: 'empreses',
   },
 ];
-
-// ─── Featured card (large) ──────────────────────────────────────────────────
 
 function StoryCard({
   story,
@@ -83,100 +83,71 @@ function StoryCard({
   const categoryName = t(`categories.${story.overlayKey}`);
 
   return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={reduceMotion ? { duration: 0 } : { duration: 0.5 }}
-      className={`relative flex-shrink-0 overflow-hidden rounded-2xl group cursor-pointer ${
-        featured
-          ? 'w-[85vw] md:w-[600px] h-[50vh] md:h-[420px]'
-          : 'w-[70vw] md:w-[400px] h-[45vh] md:h-[360px]'
+    <Link
+      href={`/portfolio/${story.slug}`}
+      className={`group relative block overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_28px_100px_rgba(0,0,0,0.34)] ${
+        featured ? 'xl:col-span-2' : ''
       }`}
     >
-      <Image
-        src={src}
-        alt={`${categoryName} - Òrbita Events`}
-        fill
-        sizes={featured ? '(max-width: 768px) 85vw, 600px' : '(max-width: 768px) 70vw, 400px'}
-        className="object-cover group-hover:scale-110 transition-transform duration-[1.2s] ease-out"
-        loading="lazy"
-      />
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.985, y: 14 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        className={`relative overflow-hidden ${
+          featured ? 'h-[24rem] md:h-[28rem]' : 'h-[20rem] md:h-[22rem]'
+        }`}
+      >
+        <Image
+          src={src}
+          alt={`${categoryName} - Orbita Events`}
+          fill
+          sizes={featured ? '(max-width: 1280px) 100vw, 66vw' : '(max-width: 1280px) 100vw, 33vw'}
+          className="object-cover transition-transform duration-[1.1s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
+          loading="lazy"
+        />
 
-      {/* Dark gradient overlay — always visible */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/24 to-transparent" />
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-gradient-to-t from-amber-500/10 to-transparent" />
 
-      {/* Hover glow */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-amber-500/10 to-transparent" />
-
-      {/* Bottom info overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">
-            {categoryName}
-          </span>
+        <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-medium">
+          {story.photos.length} fotos
         </div>
-        <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-1">
-          {t(`stories.${story.overlayKey}.title`)}
-        </h3>
-        <p className="text-white/60 text-sm line-clamp-2">
-          {t(`stories.${story.overlayKey}.desc`)}
-        </p>
-      </div>
 
-      {/* Photo count badge */}
-      <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-medium">
-        {story.photos.length} fotos
-      </div>
-    </motion.div>
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">
+              {categoryName}
+            </span>
+          </div>
+          <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-1">
+            {t(`stories.${story.overlayKey}.title`)}
+          </h3>
+          <p className="text-white/60 text-sm line-clamp-2">
+            {t(`stories.${story.overlayKey}.desc`)}
+          </p>
+        </div>
+      </motion.div>
+    </Link>
   );
 }
-
-// ─── Main Component ─────────────────────────────────────────────────────────
 
 export default function PortfolioShowcase() {
   const t = useTranslations('homePage.portfolio');
   const reduceMotion = useReducedMotion();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 20);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 20);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    updateScrollState();
-    el.addEventListener('scroll', updateScrollState, { passive: true });
-    return () => el.removeEventListener('scroll', updateScrollState);
-  }, [updateScrollState]);
-
-  const scroll = useCallback((direction: 'left' | 'right') => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const amount = direction === 'left' ? -420 : 420;
-    el.scrollBy({ left: amount, behavior: 'smooth' });
-  }, []);
 
   return (
     <section className="relative py-16 md:py-28 overflow-hidden">
-      {/* Ambient background glow */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/[0.03] blur-[120px] pointer-events-none" />
       <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-orange-500/[0.02] blur-[100px] pointer-events-none" />
 
-      {/* Header */}
       <div className="container mx-auto px-6 max-w-7xl mb-12">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+          className="flex flex-col gap-6"
         >
           <div>
             <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
@@ -188,58 +159,26 @@ export default function PortfolioShowcase() {
                 {t('titleHighlight')}
               </span>
             </h2>
-            <p className="text-white/50 text-lg mt-3 max-w-lg">{t('subtitle')}</p>
-          </div>
-
-          {/* Desktop scroll arrows */}
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => scroll('left')}
-              disabled={!canScrollLeft}
-              aria-label="Anterior"
-              className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/30 transition-all disabled:opacity-20 disabled:cursor-default"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => scroll('right')}
-              disabled={!canScrollRight}
-              aria-label="Següent"
-              className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/30 transition-all disabled:opacity-20 disabled:cursor-default"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+            <p className="text-white/50 text-lg mt-3 max-w-2xl">{t('subtitle')}</p>
           </div>
         </motion.div>
       </div>
 
-      {/* Horizontal scroll — cinematic cards */}
-      <div
-        ref={scrollRef}
-        className="flex gap-5 overflow-x-auto scroll-smooth px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 snap-x snap-mandatory scrollbar-hide"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {EVENT_STORIES.map((story, i) => (
-          <StoryCard
-            key={story.id}
-            story={story}
-            photoIndex={0}
-            t={t}
-            reduceMotion={reduceMotion}
-            featured={i === 0}
-          />
-        ))}
+      <div className="container mx-auto px-6 max-w-7xl">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {EVENT_STORIES.map((story, i) => (
+            <StoryCard
+              key={story.id}
+              story={story}
+              photoIndex={0}
+              t={t}
+              reduceMotion={reduceMotion}
+              featured={i === 0}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Fade edges */}
-      <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-[#0A0A0A] to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-[#0A0A0A] to-transparent pointer-events-none z-10" />
-
-      {/* CTA */}
       <div className="container mx-auto px-6 max-w-7xl mt-10">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}

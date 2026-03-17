@@ -61,12 +61,12 @@ function StaggerItem({
 }) {
   return (
     <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={
         reduceMotion
           ? { duration: 0 }
-          : { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }
+          : { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }
       }
     >
       {children}
@@ -94,10 +94,10 @@ export default function HeroElegant() {
   return (
     <section
       aria-label="Hero"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden"
+      className="relative min-h-[100svh] flex items-center justify-center overflow-x-hidden pointer-events-none"
     >
       {/* Background Video */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <video
           autoPlay
           muted
@@ -107,19 +107,19 @@ export default function HeroElegant() {
           aria-hidden="true"
           disablePictureInPicture
           poster="/img/hero-poster.webp"
-          className="w-full h-full object-cover scale-105"
+          className="w-full h-full object-cover scale-105 pointer-events-none"
           style={{ filter: 'brightness(0.7) saturate(1.1)' }}
         >
           <source src="/video/Herovideo.mp4" type="video/mp4" />
         </video>
         {/* Gradient overlay — stronger for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#0A0A0A]" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/70 via-black/50 to-[#0A0A0A]" />
         {/* Subtle noise texture */}
-        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')]" />
       </div>
 
       {/* Content — staggered entrance */}
-      <div className="relative z-10 container mx-auto px-5 py-24 md:py-32">
+      <div className="relative z-10 container mx-auto px-5 py-24 md:py-32 pointer-events-none">
         <div className="max-w-3xl mx-auto text-center">
 
           {/* 1. Badge — enters first */}
@@ -144,7 +144,7 @@ export default function HeroElegant() {
                     initial={reduceMotion ? false : { opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={reduceMotion ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                     className="relative block w-full text-center"
                   >
                     <TypewriterText
@@ -169,7 +169,7 @@ export default function HeroElegant() {
             <Link
               href="/configurador"
               onClick={() => trackCTAClick('hero_configurator_primary', 'hero_elegant')}
-              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-10 py-5 rounded-2xl transition-transform hover:scale-[1.03] active:scale-[0.98]"
+              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-10 py-5 rounded-2xl transition-transform hover:scale-[1.03] active:scale-[0.98] pointer-events-auto"
             >
               {/* Animated gradient bg */}
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 bg-[length:200%_100%] rounded-2xl animate-[shimmer_3s_ease-in-out_infinite]" />
@@ -207,7 +207,7 @@ export default function HeroElegant() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick('hero_elegant')}
-                className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-[#25D366] transition-colors duration-300"
+                className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-[#25D366] transition-colors duration-300 pointer-events-auto"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.613.613l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.352 0-4.556-.725-6.379-1.963l-.447-.305-2.948.988.988-2.948-.305-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
                 <span>{tCommon('buttons.whatsapp')}</span>
@@ -221,7 +221,7 @@ export default function HeroElegant() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.4 }}
-        transition={reduceMotion ? { duration: 0 } : { delay: 2.2 }}
+        transition={reduceMotion ? { duration: 0 } : { delay: 1.9, duration: 0.4 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
       >
         <motion.div
@@ -235,3 +235,6 @@ export default function HeroElegant() {
     </section>
   );
 }
+
+
+

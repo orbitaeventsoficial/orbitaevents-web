@@ -155,7 +155,7 @@ function TaskColumn({
                   type="button"
                   onClick={() => onDelete(task.id)}
                   disabled={busyTaskId === task.id}
-                  className={`rounded border px-2 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === task.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+                  className={`rounded border px-2 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === task.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
                 >
                   {confirmingDeleteId === task.id ? 'Segur?' : 'Eliminar'}
                 </button>
@@ -172,3 +172,4 @@ function TaskColumn({
     </div>
   );
 }
+

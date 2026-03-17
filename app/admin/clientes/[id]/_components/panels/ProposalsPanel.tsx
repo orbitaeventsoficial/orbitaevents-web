@@ -527,7 +527,7 @@ function ProposalCard({
           </div>
 
           {contractError && (
-            <p className="mt-2 text-xs text-rose-400">{contractError}</p>
+            <p className="mt-2 text-xs">{contractError}</p>
           )}
         </div>
       )}

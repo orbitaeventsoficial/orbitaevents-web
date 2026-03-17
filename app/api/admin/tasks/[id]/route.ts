@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { deleteAdminTask, updateAdminTask } from '@/lib/services/tasks/taskAdminService';
 
 interface Params {
   params: { id: string };
@@ -20,6 +20,7 @@ const updateTaskSchema = z.object({
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
   try {
     const parsed = updateTaskSchema.safeParse(await req.json());
     if (!parsed.success) {
@@ -28,25 +29,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         { status: 400 }
       );
     }
-    const payload = parsed.data;
-    const updateData: Record<string, unknown> = { ...payload };
-    if (payload.dueDate !== undefined) {
-      updateData.dueDate = payload.dueDate ? new Date(payload.dueDate) : null;
-    }
-    if (payload.status === 'DONE') {
-      updateData.completedAt = new Date();
-    }
-    if (payload.status && payload.status !== 'DONE') {
-      updateData.completedAt = null;
-    }
 
-    const prismaAny = prisma as any;
-    const task = await prismaAny.task.update({
-      where: { id: params.id },
-      data: updateData,
-    });
-
-    return NextResponse.json({ ok: true, task });
+    return NextResponse.json(await updateAdminTask(params.id, parsed.data));
   } catch (error) {
     log.error('Error actualitzant tasca universal', error, {
       context: { taskId: params.id },
@@ -58,10 +42,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
   try {
-    const prismaAny = prisma as any;
-    await prismaAny.task.delete({ where: { id: params.id } });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json(await deleteAdminTask(params.id));
   } catch (error) {
     log.error('Error eliminant tasca universal', error, {
       context: { taskId: params.id },
@@ -69,4 +52,3 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: false, error: 'Error eliminant tasca' }, { status: 500 });
   }
 }
-

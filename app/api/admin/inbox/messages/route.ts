@@ -56,18 +56,11 @@ export async function GET(request: NextRequest) {
       onlyUnread,
     });
 
-    const filterDomain = 'orbitaevents.com';
-    const filteredEmails = emails.filter((email) => {
-      const from = email.from?.address?.toLowerCase() || '';
-      const to = email.to?.map((t) => t.address.toLowerCase()) || [];
-      return from.includes(filterDomain) || to.some((addr) => addr.includes(filterDomain));
-    });
-
-    const totalCount = filteredEmails.length;
-    const unreadCount = filteredEmails.filter((email) => !email.isRead).length;
+    const totalCount = emails.length;
+    const unreadCount = emails.filter((email) => !email.isRead).length;
 
     // Convertir format Gmail a format esperat pel frontend
-    const formattedEmails = filteredEmails.map(email => ({
+    const formattedEmails = emails.map(email => ({
       id: email.id,
       uid: email.uid,
       messageId: email.messageId,
@@ -109,3 +102,4 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
+

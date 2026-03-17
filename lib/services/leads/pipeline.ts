@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
-export type PipelineLead = {
+type PipelineLead = {
   id: string;
   name: string;
   email: string;
@@ -51,3 +51,4 @@ export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereIn
     },
   });
 }
+

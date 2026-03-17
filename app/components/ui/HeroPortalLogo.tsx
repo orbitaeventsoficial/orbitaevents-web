@@ -104,7 +104,7 @@ export default function HeroPortalLogo({
           onClick={isMobile ? handleSkip : undefined}
           style={{
             zIndex: 9999,
-            background: 'radial-gradient(ellipse 100% 100% at 50% 40%, #0f0f0f 0%, #000 100%)',
+            background: '#000',
             cursor: isMobile ? 'pointer' : 'default',
           }}
           initial={{ opacity: 1 }}
@@ -145,7 +145,7 @@ export default function HeroPortalLogo({
             transition={{
               duration: 0.7,
               ease: [0.16, 1, 0.3, 1],
-              scale: { type: 'spring', stiffness: 200, damping: 20 }
+              scale: { duration: 0.38, ease: [0.22, 1, 0.36, 1] }
             }}
           >
             <svg
@@ -273,3 +273,4 @@ export default function HeroPortalLogo({
     </AnimatePresence>
   );
 }
+

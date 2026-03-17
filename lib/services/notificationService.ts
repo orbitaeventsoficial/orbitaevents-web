@@ -10,6 +10,8 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { getEventLabel, SOURCE_LABELS } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { absoluteUrl } from '@/lib/site';
+
 
 /** Case-insensitive label lookup for source labels */
 function lookupSource(key: string): string {
@@ -20,7 +22,7 @@ function lookupSource(key: string): string {
 // TIPUS
 // ============================================
 
-export interface LeadNotificationData {
+interface LeadNotificationData {
   id: string;
   name: string;
   email: string;
@@ -36,7 +38,7 @@ export interface LeadNotificationData {
   createdAt: Date;
 }
 
-export interface NotificationResult {
+interface NotificationResult {
   success: boolean;
   channel: 'email' | 'whatsapp' | 'webhook';
   error?: string;
@@ -154,7 +156,7 @@ ${lead.message ? `💬 "${lead.message}"` : ''}
 ${lead.packName ? `📦 Pack: ${lead.packName}` : ''}
 ${lead.estimatedPrice ? `💵 Estimat: ${lead.estimatedPrice}€` : ''}
 
-🔗 Admin: https://orbitaevents.com/admin/leads/${lead.id}`;
+🔗 Admin: ${absoluteUrl(`/admin/leads/${lead.id}`)}`;
 
       await fetch(process.env.WHATSAPP_WEBHOOK_URL, {
         method: 'POST',
@@ -206,7 +208,7 @@ async function sendWhatsAppAPI(lead: LeadNotificationData): Promise<Notification
         to: process.env.ADMIN_WHATSAPP?.replace(/[^\d]/g, '') || SITE_CONFIG.business.phone.replace(/[^\d]/g, ''),
         type: 'text',
         text: {
-          body: `🚀 NOU LEAD: ${lead.name}\n${eventLabel}\n${lead.phone || lead.email}\n\nAdmin: https://orbitaevents.com/admin/leads/${lead.id}`
+          body: `🚀 NOU LEAD: ${lead.name}\n${eventLabel}\n${lead.phone || lead.email}\n\nAdmin: ${absoluteUrl(`/admin/leads/${lead.id}`)}`
         }
       }),
     });
@@ -234,7 +236,7 @@ function generateWhatsAppLink(lead: LeadNotificationData): string {
   const message = `🚀 NOU LEAD: ${lead.name} - ${eventLabel}
 📱 ${lead.phone || 'Sense telèfon'}
 📧 ${lead.email}
-🔗 https://orbitaevents.com/admin/leads/${lead.id}`;
+🔗 ${absoluteUrl(`/admin/leads/${lead.id}`)}`;
 
   const adminPhone = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');
   return `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
@@ -276,7 +278,7 @@ async function sendLeadWebhook(lead: LeadNotificationData): Promise<Notification
           estimatedPrice: lead.estimatedPrice,
           source: lead.source,
           createdAt: lead.createdAt,
-          adminUrl: `https://orbitaevents.com/admin/leads/${lead.id}`,
+          adminUrl: absoluteUrl(`/admin/leads/${lead.id}`),
         },
       }),
     });
@@ -409,7 +411,7 @@ function generateAdminEmailHTML(
       ` : ''}
 
       <!-- CTAs -->
-      <a href="https://orbitaevents.com/admin/leads/${lead.id}" class="cta-button">
+      <a href="${absoluteUrl(`/admin/leads/${lead.id}`)}" class="cta-button">
         📋 Veure Lead a l'Admin
       </a>
 
@@ -436,26 +438,3 @@ function generateAdminEmailHTML(
   `;
 }
 
-// ============================================
-// NOTIFICACIÓ CANVI D'ESTAT
-// ============================================
-
-export async function notifyLeadStatusChange(
-  lead: LeadNotificationData,
-  oldStatus: string,
-  newStatus: string,
-  note?: string
-): Promise<void> {
-  // Només notifiquem canvis importants
-  const importantChanges = ['WON', 'LOST'];
-
-  if (importantChanges.includes(newStatus)) {
-    // Podríem enviar notificació
-    log.info('Lead status changed to important state', {
-      leadId: lead.id,
-      oldStatus,
-      newStatus,
-      note
-    });
-  }
-}

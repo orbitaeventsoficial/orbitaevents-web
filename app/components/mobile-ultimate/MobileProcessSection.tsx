@@ -65,7 +65,7 @@ export default function MobileProcessSection() {
               transition={
                 reduceMotion
                   ? { duration: 0 }
-                  : { delay: i * 0.14, type: 'spring', damping: 20 }
+                  : { delay: i * 0.1, duration: 0.32, ease: [0.22, 1, 0.36, 1] }
               }
               className="relative flex gap-4 pb-7 last:pb-0"
             >

@@ -10,6 +10,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { getPacksByService, EXTRAS, type ExtraDefinition, type PackDefinition } from '@/config/packs-config';
 import { usePacks } from '@/lib/hooks/usePacks';
+import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 
 interface ConfigState {
   selectedPack: PackDefinition | null;
@@ -18,76 +19,20 @@ interface ConfigState {
   extraHours: number;
 }
 
-// Helper per obtenir text traduït del pack
-function getPackText(t: ReturnType<typeof useTranslations>, packId: string, field: 'name' | 'tagline' | 'ideal', fallback: string): string {
-  try {
-    const key = `discoPacks.${packId}.${field}`;
-    const translated = t(key);
-    const candidate = translated === key ? fallback : translated;
-    if (!candidate.includes('.')) return candidate;
-    const token = field === 'name' || field === 'tagline' || field === 'ideal' ? packId : candidate;
-    return token
-      .replace(/[-_]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, (m) => m.toUpperCase());
-  } catch {
-    if (!fallback.includes('.')) return fallback;
-    return packId
-      .replace(/[-_]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, (m) => m.toUpperCase());
-  }
+type AnalyticsValue = string | number | boolean | undefined;
+type AnalyticsParams = Record<string, AnalyticsValue>;
+type GtagWindow = Window & { gtag?: (command: 'event', action: string, params?: AnalyticsParams) => void };
+
+function trackServiceEvent(action: string, params: AnalyticsParams) {
+  if (typeof window === 'undefined') return;
+  const gtag = (window as GtagWindow).gtag;
+  if (!gtag) return;
+  gtag('event', action, params);
 }
 
-function getPackFeatures(t: ReturnType<typeof useTranslations>, packId: string, fallbackFeatures: string[]): string[] {
-  try {
-    const features: string[] = [];
-    for (let i = 0; i < fallbackFeatures.length; i++) {
-      const key = `discoPacks.${packId}.features.${i}`;
-      const translated = t(key);
-      const candidate = translated === key ? fallbackFeatures[i] : translated;
-      if (!candidate.includes('.')) {
-        features.push(candidate);
-        continue;
-      }
-      const normalized = fallbackFeatures[i]
-        .replace(/.*\./, '')
-        .replace(/^f(\d+)$/i, 'Característica $1')
-        .replace(/[-_]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      features.push(normalized.charAt(0).toUpperCase() + normalized.slice(1));
-    }
-    return features;
-  } catch {
-    return fallbackFeatures;
-  }
-}
-
-// Helper per obtenir text traduït de l'extra
-function isI18nKey(value: string): boolean {
-  return value.startsWith('pages.') || value.startsWith('extras.');
-}
-
-function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
-  try {
-    const key = `extras.${extraId}.${field}`;
-    const translated = t(key);
-    // Si retorna la clau, usar fallback
-    if (translated !== key) return translated;
-    if (isI18nKey(fallback)) {
-      const nested = t(fallback);
-      if (nested !== fallback) return nested;
-    }
-    return fallback;
-  } catch {
-    return fallback;
-  }
-}
 
 export default function DiscomovilClientV2() {
+
   const t = useTranslations('pages.mobile');
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('discomovil'), []);
@@ -111,19 +56,11 @@ export default function DiscomovilClientV2() {
 
     async function loadExtras() {
       try {
-        const res = await fetch('/api/public/extras', { cache: 'no-store' });
+        const res = await fetch(`/api/public/extras?locale=${locale}`, { cache: 'no-store' });
         const data = await res.json();
         if (!active) return;
         if (Array.isArray(data?.extras)) {
-          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
-            const fallback = EXTRAS.find((item) => item.id === extra.id);
-            return {
-              ...extra,
-              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
-              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
-            };
-          });
-          setExtrasCatalog(normalized);
+          setExtrasCatalog(data.extras as ExtraDefinition[]);
         }
       } catch {
         // Fallback a EXTRAS del config
@@ -134,15 +71,9 @@ export default function DiscomovilClientV2() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [locale]);
 
-  const discoExtras = useMemo(() => {
-    return extrasCatalog.filter((extra) => {
-      if (!extra.compatibleWith) return true;
-      if (extra.compatibleWith.length === 0) return false;
-      return extra.compatibleWith.includes('discomovil');
-    });
-  }, [extrasCatalog]);
+  const discoExtras = useMemo(() => filterCompatibleExtras(extrasCatalog, 'discomovil'), [extrasCatalog]);
 
   // Calcular total
   const packPrice = config.selectedPack?.priceValue || 0;
@@ -179,14 +110,11 @@ export default function DiscomovilClientV2() {
   const selectPack = (pack: PackDefinition) => {
     setConfig(prev => ({ ...prev, selectedPack: pack }));
     
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'discomovil_pack_select', {
-        pack_id: pack.id,
-        pack_name: pack.name,
-        price: pack.priceValue,
-      });
-    }
+    trackServiceEvent('discomovil_pack_select', {
+      pack_id: pack.id,
+      pack_name: pack.name,
+      price: pack.priceValue,
+    });
   };
 
   // Toggle extra
@@ -201,15 +129,12 @@ export default function DiscomovilClientV2() {
       return { ...prev, selectedExtras: newExtras };
     });
 
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      const extra = discoExtras.find(e => e.id === extraId);
-      (window as any).gtag('event', 'discomovil_extra_toggle', {
-        extra_id: extraId,
-        extra_name: extra?.name,
-        action: config.selectedExtras.has(extraId) ? 'remove' : 'add',
-      });
-    }
+    const extra = discoExtras.find(e => e.id === extraId);
+    trackServiceEvent('discomovil_extra_toggle', {
+      extra_id: extraId,
+      extra_name: extra?.name,
+      action: config.selectedExtras.has(extraId) ? 'remove' : 'add',
+    });
   };
 
   // Ir al configurador con pack pre-seleccionado
@@ -225,21 +150,16 @@ export default function DiscomovilClientV2() {
       extras: selectedExtrasIds,
     });
 
-    // Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'discomovil_pack_to_configurator', {
-        pack_id: config.selectedPack.id,
-        num_extras: config.selectedExtras.size,
-        num_guests: config.numGuests,
-      });
-    }
+    trackServiceEvent('discomovil_pack_to_configurator', {
+      pack_id: config.selectedPack.id,
+      num_extras: config.selectedExtras.size,
+      num_guests: config.numGuests,
+    });
 
     window.location.href = `/configurador?${params.toString()}`;
   };
-
   return (
     <div className="min-h-screen bg-bg-main">
-      {/* Header */}
       <section className="py-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6">
           <Flame className="w-4 h-4 text-oe-gold" />
@@ -295,9 +215,9 @@ export default function DiscomovilClientV2() {
                 <span className="font-bold text-oe-gold">{t('recommended')}</span>
               </div>
               <div className="text-lg text-text-primary">
-                <strong>{getPackText(t, recommendedPack.id, 'name', recommendedPack.name)}</strong> - {recommendedPack.priceValue}€
+                <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
               </div>
-              <p className="text-sm text-text-muted mt-1">{getPackText(t, recommendedPack.id, 'tagline', recommendedPack.tagline)}</p>
+              <p className="text-sm text-text-muted mt-1">{recommendedPack.tagline}</p>
             </motion.div>
           )}
         </div>
@@ -353,8 +273,8 @@ export default function DiscomovilClientV2() {
 
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-text-primary">{getPackText(t, pack.id, 'name', pack.name)}</h3>
-                    <p className="text-sm text-text-muted">{getPackText(t, pack.id, 'tagline', pack.tagline)}</p>
+                    <h3 className="text-2xl font-bold text-text-primary">{pack.name}</h3>
+                    <p className="text-sm text-text-muted">{pack.tagline}</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
@@ -364,11 +284,11 @@ export default function DiscomovilClientV2() {
                   </div>
 
                   <div className="text-sm text-text-muted">
-                    👥 {getPackText(t, pack.id, 'ideal', pack.ideal || '')} · ⏰ {pack.duration}
+                    👥 {pack.ideal || ''} · ⏰ {pack.duration}
                   </div>
 
                   <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {getPackFeatures(t, pack.id, pack.features).slice(0, 6).map((feature, idx) => (
+                    {(pack.features || []).slice(0, 6).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <Check className="w-4 h-4 text-oe-gold flex-shrink-0 mt-0.5" />
                         {feature}
@@ -499,10 +419,10 @@ export default function DiscomovilClientV2() {
                   <div className="space-y-3 mt-4">
                     <div className="text-4xl mb-2">{extra.icon}</div>
                     <h4 className="text-lg font-bold text-text-primary pr-8">
-                      {getExtraText(t, extra.id, 'name', extra.name)}
+                      {extra.name}
                     </h4>
                     <p className="text-sm text-text-muted">
-                      {getExtraText(t, extra.id, 'description', extra.description)}
+                      {extra.description}
                     </p>
 
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
@@ -553,7 +473,7 @@ export default function DiscomovilClientV2() {
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
                   <div>
                     <div className="text-xs sm:text-sm text-[var(--oe-gold)] font-semibold">
-                      {config.selectedPack ? getPackText(t, config.selectedPack.id, 'name', config.selectedPack.name) : ''}
+                      {config.selectedPack?.name || ''}
                     </div>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 mt-1">
                       <span>{config.numGuests} {t('people')}</span>
@@ -674,3 +594,9 @@ export default function DiscomovilClientV2() {
     </div>
   );
 }
+
+
+
+
+
+

@@ -156,13 +156,13 @@ export default function ImapSettingsClient() {
             </div>
           </div>
           {connection?.ok && (
-            <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-400">
+            <span className="rounded-full px-3 py-1 text-xs font-semibold">
               ONLINE
             </span>
           )}
         </div>
         {connection && !connection.ok && connection.error && (
-          <p className="mt-2 text-sm text-rose-400">{connection.error}</p>
+          <p className="mt-2 text-sm">{connection.error}</p>
         )}
       </div>
 
@@ -210,7 +210,7 @@ export default function ImapSettingsClient() {
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 placeholder="imap.dondominio.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
               />
             </div>
             <div>
@@ -222,7 +222,7 @@ export default function ImapSettingsClient() {
                 onChange={(e) => setPort(e.target.value)}
                 placeholder="993"
                 min={1}
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
               />
             </div>
             <div>
@@ -233,7 +233,7 @@ export default function ImapSettingsClient() {
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 placeholder="info@orbitaevents.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
               />
             </div>
             <div>
@@ -244,7 +244,7 @@ export default function ImapSettingsClient() {
                 value={pass}
                 onChange={(e) => setPass(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
               />
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function ImapSettingsClient() {
               type="button"
               disabled={saving}
               onClick={saveConfig}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-cyan-500 disabled:opacity-50 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
             >
               {saving ? 'Guardant...' : 'Guardar i connectar'}
             </button>
@@ -292,7 +292,7 @@ export default function ImapSettingsClient() {
         <h3 className="text-sm font-semibold uppercase tracking-wide mb-2">Com funciona</h3>
         <ul className="space-y-1.5 text-sm text-white/70">
           <li>• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
-          <li>• Només es mostren correus enviats o rebuts per <strong className="text-white/90">orbitaevents.com</strong>.</li>
+          <li>• La safata mostra tots els correus disponibles al compte IMAP configurat.</li>
           <li>• Les credencials es guarden xifrades a la base de dades.</li>
           <li>• Si tens variables d&apos;entorn configurades a Railway, tenen prioritat.</li>
         </ul>
@@ -300,3 +300,5 @@ export default function ImapSettingsClient() {
     </div>
   );
 }
+
+

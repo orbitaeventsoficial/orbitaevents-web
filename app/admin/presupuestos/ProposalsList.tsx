@@ -182,14 +182,14 @@ export default function ProposalsList({
 
       {/* Revenue accepted */}
       {totalValue > 0 && (
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-sm">
-          Valor acceptat: <strong className="text-emerald-300">{totalValue.toLocaleString('ca-ES', { minimumFractionDigits: 2 })}€</strong>
+        <div className="rounded-xl border px-4 py-2 text-sm">
+          Valor acceptat: <strong className="">{totalValue.toLocaleString('ca-ES', { minimumFractionDigits: 2 })}€</strong>
         </div>
       )}
 
       {/* Action message */}
       {actionMsg && (
-        <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200">
+        <div className="rounded-xl border px-4 py-2 text-sm">
           {actionMsg}
         </div>
       )}
@@ -201,7 +201,7 @@ export default function ProposalsList({
           placeholder="Cerca per client, referència..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] rounded-xl border bg-white/5 px-4 py-2 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+          className="flex-1 min-w-[200px] rounded-xl border bg-white/5 px-4 py-2 text-sm "
           aria-label="Cercar pressupostos"
         />
         {statusFilter && (
@@ -214,7 +214,7 @@ export default function ProposalsList({
         )}
         <Link
           href="/admin/presupuestos"
-          className="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-500 transition-colors"
+          className="rounded-xl px-4 py-2 text-sm font-medium text-white transition-colors"
         >
           + Nou pressupost
         </Link>
@@ -246,7 +246,7 @@ export default function ProposalsList({
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
-                      className="font-medium text-cyan-400 hover:underline"
+                      className="font-medium hover:underline"
                     >
                       {p.reference}
                     </Link>
@@ -293,13 +293,13 @@ export default function ProposalsList({
                           <>
                             <button
                               onClick={() => handleStatus(p.id, 'ACCEPTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-500/10 text-emerald-300 transition-colors"
+                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
                             >
                               ✅ Acceptat
                             </button>
                             <button
                               onClick={() => handleStatus(p.id, 'REJECTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-red-500/10 text-red-300 transition-colors"
+                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
                             >
                               ❌ Rebutjat
                             </button>
@@ -341,7 +341,7 @@ export default function ProposalsList({
             {quotes.map((q) => (
               <div key={q.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
-                  <a href={q.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-cyan-400 hover:underline">
+                  <a href={q.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
                     {q.title}
                   </a>
                   <p className="text-xs opacity-50">
@@ -362,3 +362,4 @@ export default function ProposalsList({
     </section>
   );
 }
+

@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Arenys de Mar, Vilassar. Desplazamiento incluido.`,
   keywords: ['DJ bodas Maresme', 'DJ bodas Mataró', 'DJ bodas Calella', 'DJ bodas Arenys de Mar', 'bodas Maresme'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-maresme' },
   openGraph: {
     title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€`,

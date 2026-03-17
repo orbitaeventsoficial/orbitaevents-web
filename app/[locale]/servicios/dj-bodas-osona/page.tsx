@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Osona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Osona desde ${MIN_PRICE}€. Vic, Manlleu, Torelló, Centelles. Especialistas en masías y entornos rurales.`,
   keywords: ['DJ bodas Osona', 'DJ bodas Vic', 'DJ bodas Manlleu', 'DJ bodas Torelló', 'bodas masías Osona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-osona' },
   openGraph: {
     title: `DJ Bodas Osona | Desde ${MIN_PRICE}€`,

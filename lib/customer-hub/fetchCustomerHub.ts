@@ -1,7 +1,15 @@
-import { prisma } from '@/lib/prisma';
+import type { CustomerDiscountCode, Proposal } from '@prisma/client';
 import type { CustomerHubDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
 import { resolveActiveDocument } from './proposalActive';
 import { buildTimeline } from './timeline';
+import {
+  type CustomerHubActivityLite,
+  type CustomerHubTaskLite,
+  fetchCustomerHubCollections,
+  fetchCustomerHubCustomerBase,
+  fetchCustomerHubLeads,
+  resolveCustomerHubCustomerId,
+} from './data';
 
 function deriveHubStatus(input: {
   leadStatuses: string[];
@@ -9,191 +17,89 @@ function deriveHubStatus(input: {
   manualStatus?: HubStatus | null;
 }): HubStatus {
   if (input.manualStatus) return input.manualStatus;
-  if (input.bookingStatuses.some((s) => s === 'COMPLETED')) return 'POSTEVENT';
-  if (input.bookingStatuses.some((s) => s === 'CONFIRMED' || s === 'PREPARING')) return 'CONFIRMED';
-  if (input.leadStatuses.some((s) => s === 'WON')) return 'CONFIRMED';
-  if (input.leadStatuses.some((s) => s === 'NEGOTIATING' || s === 'QUOTE_SENT' || s === 'CONTACTED')) {
+  if (input.bookingStatuses.some((status) => status === 'COMPLETED')) return 'POSTEVENT';
+  if (input.bookingStatuses.some((status) => status === 'CONFIRMED' || status === 'PREPARING')) return 'CONFIRMED';
+  if (input.leadStatuses.some((status) => status === 'WON')) return 'CONFIRMED';
+  if (input.leadStatuses.some((status) => status === 'NEGOTIATING' || status === 'QUOTE_SENT' || status === 'CONTACTED')) {
     return 'NEGOTIATION';
   }
-  if (input.leadStatuses.some((s) => s === 'LOST')) return 'LOST';
+  if (input.leadStatuses.some((status) => status === 'LOST')) return 'LOST';
   return 'LEAD';
 }
 
 export async function fetchCustomerHub(customerId: string): Promise<CustomerHubDTO> {
-  const db = prisma as any;
-  const resolvedCustomerId = await resolveCustomerId(db, customerId);
+  const resolvedCustomerId = await resolveCustomerHubCustomerId(customerId);
   if (!resolvedCustomerId) throw new Error('Customer not found');
 
-  const customerBase: any = await db.customer.findUnique({
-    where: { id: resolvedCustomerId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      createdAt: true,
-    },
-  });
-
+  const customerBase = await fetchCustomerHubCustomerBase(resolvedCustomerId);
   if (!customerBase) throw new Error('Customer not found');
 
-  const leads: any[] = await safeQuery(() =>
-    db.lead.findMany({
-      where: { customerId: resolvedCustomerId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        activities: { orderBy: { createdAt: 'desc' }, take: 60 },
-        tasks: { orderBy: { createdAt: 'desc' }, take: 60 },
-        booking: { select: { id: true, reference: true, status: true, total: true } },
-      },
-    }),
-    []
-  );
+  const leads = await fetchCustomerHubLeads(resolvedCustomerId);
+  const leadIds = leads.map((lead) => lead.id);
 
-  const leadIds = leads.map((l: any) => l.id);
+  const { proposals, bookingsRows, customerTasks, activityLog, customerDiscountCodes } =
+    await fetchCustomerHubCollections(resolvedCustomerId, leadIds);
 
-  const proposals: any[] = await safeQuery(() =>
-    db.proposal.findMany({
-      where: { customerId: resolvedCustomerId },
-      orderBy: { createdAt: 'desc' },
-      take: 80,
-    }),
-    []
-  );
-
-  const bookingsRaw: any[] = await safeQuery(
-    () =>
-      db.booking.findMany({
-        where: { customerId: resolvedCustomerId },
-        orderBy: { createdAt: 'desc' },
-        take: 80,
-        include: { pack: { include: { translations: true } } },
-      }),
-    []
-  );
-
-  const bookingsFallbackRaw: any[] =
-    bookingsRaw.length > 0 || leadIds.length === 0
-      ? []
-      : await safeQuery(
-          () =>
-            db.booking.findMany({
-              where: { leadId: { in: leadIds } },
-              orderBy: { createdAt: 'desc' },
-              take: 80,
-              include: { pack: { include: { translations: true } } },
-            }),
-          []
-        );
-
-  const bookingsRows = bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw;
-
-  const customerTasks: any[] = await safeQuery(
-    () =>
-      db.task.findMany({
-        where: { customerId: resolvedCustomerId },
-        orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }],
-        take: 120,
-      }),
-    []
-  );
-
-  const activityLog: any[] = await safeQuery(
-    () =>
-      db.customerActivity.findMany({
-        where: { customerId: resolvedCustomerId },
-        orderBy: { createdAt: 'desc' },
-        take: 120,
-      }),
-    []
-  );
-
-  const customerDiscountCodes: any[] = await safeQuery(
-    () =>
-      db.customerDiscountCode.findMany({
-        where: { customerId: resolvedCustomerId },
-        orderBy: { createdAt: 'desc' },
-        take: 50,
-      }),
-    []
-  );
-
-  const proposalsMapped = proposals.map((p: any) => ({
-    id: p.id,
-    reference: p.reference,
-    status: p.status as 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED',
-    total: Number(p.total || 0),
-    createdAt: p.createdAt.toISOString(),
-    sentAt: p.sentAt?.toISOString(),
-    acceptedAt: p.acceptedAt?.toISOString(),
-    snapshot: (p.snapshot as Record<string, unknown> | null) || undefined,
-    contractReference: p.contractReference || null,
-    contractStatus: p.contractStatus || null,
-    contractSentAt: p.contractSentAt?.toISOString() || null,
-    contractSignedAt: p.contractSignedAt?.toISOString() || null,
+  const proposalsMapped = proposals.map((proposal: Proposal) => ({
+    id: proposal.id,
+    reference: proposal.reference,
+    status: proposal.status as 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED',
+    total: Number(proposal.total || 0),
+    createdAt: proposal.createdAt.toISOString(),
+    sentAt: proposal.sentAt?.toISOString(),
+    acceptedAt: proposal.acceptedAt?.toISOString(),
+    snapshot: (proposal.snapshot as Record<string, unknown> | null) || undefined,
+    contractReference: proposal.contractReference || null,
+    contractStatus: proposal.contractStatus || null,
+    contractSentAt: proposal.contractSentAt?.toISOString() || null,
+    contractSignedAt: proposal.contractSignedAt?.toISOString() || null,
   }));
 
-  const bookings = bookingsRows.map((b: any) => {
-    // Resoldre nom del pack amb traduccions
-    let packName = b.pack?.name || undefined;
-    if (b.pack?.translations?.length > 0) {
-      const caTranslation = b.pack.translations.find((t: any) => t.locale === 'ca');
-      const esTranslation = b.pack.translations.find((t: any) => t.locale === 'es');
+  const bookings = bookingsRows.map((bookingRow) => {
+    let packName = bookingRow.pack?.slug || undefined;
+    if (bookingRow.pack?.translations?.length) {
+      const caTranslation = bookingRow.pack.translations.find((translation) => translation.locale === 'ca');
+      const esTranslation = bookingRow.pack.translations.find((translation) => translation.locale === 'es');
       packName = caTranslation?.name || esTranslation?.name || packName;
     }
 
     return {
-      id: b.id,
-      reference: b.reference,
-      date: b.eventDate?.toISOString(),
-      startTime: b.eventStartTime || undefined,
-      endTime: b.eventEndTime || undefined,
-      status: b.status,
-      location: b.eventLocation || undefined,
-      venue: b.eventVenue || undefined,
-      depositAmount: typeof b.depositAmount === 'number' ? b.depositAmount : undefined,
-      totalAmount: typeof b.total === 'number' ? b.total : undefined,
-      eventType: b.eventType || undefined,
+      id: bookingRow.id,
+      reference: bookingRow.reference,
+      date: bookingRow.eventDate?.toISOString(),
+      startTime: bookingRow.eventStartTime || undefined,
+      endTime: bookingRow.eventEndTime || undefined,
+      status: bookingRow.status,
+      location: bookingRow.eventLocation || undefined,
+      venue: bookingRow.eventVenue || undefined,
+      depositAmount: typeof bookingRow.depositAmount === 'number' ? bookingRow.depositAmount : undefined,
+      totalAmount: typeof bookingRow.total === 'number' ? bookingRow.total : undefined,
+      eventType: bookingRow.eventType || undefined,
       packName,
-      guestCount: typeof b.guestCount === 'number' ? b.guestCount : undefined,
-      depositPaid: b.depositPaid ?? undefined,
-      remainingPaid: b.remainingPaid ?? undefined,
-      discountCode: b.discountCode || undefined,
+      guestCount: typeof bookingRow.guestCount === 'number' ? bookingRow.guestCount : undefined,
+      depositPaid: bookingRow.depositPaid ?? undefined,
+      remainingPaid: bookingRow.remainingPaid ?? undefined,
+      discountCode: bookingRow.discountCode || undefined,
     };
   });
 
   const tasks: TaskDTO[] = customerTasks.length > 0
-    ? customerTasks.map((task: any) => ({
-      id: task.id,
-      title: task.title,
-      dueDate: task.dueDate?.toISOString(),
-      done: task.status === 'DONE',
-      priority:
-        task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
-          ? task.priority
-          : undefined,
-      leadId: task.leadId || undefined,
-    }))
-    : leads.flatMap((lead: any) =>
-      lead.tasks.map((task: any) => ({
-        id: task.id,
-        title: task.title,
-        dueDate: task.dueDate?.toISOString(),
-        done: task.status === 'DONE',
-        priority:
-          task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
-            ? task.priority
-            : undefined,
-        leadId: lead.id,
-      }))
-    );
+    ? customerTasks.map((task) => mapTask(task))
+    : leads.flatMap((lead) => lead.tasks.map((task) => mapTask(task, lead.id)));
 
-  const leadMessages: MessageDTO[] = leads.flatMap((lead: any) =>
+  const leadMessages: MessageDTO[] = leads.flatMap((lead) =>
     lead.activities
-      .filter((activity: any) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
-      .map((activity: any) => ({
+      .filter((activity) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
+      .map((activity) => ({
         id: activity.id,
-        channel: activity.type === 'EMAIL' ? 'EMAIL' : activity.type === 'WHATSAPP' ? 'WHATSAPP' : activity.type === 'CALL' ? 'CALL' : 'NOTE',
+        channel:
+          activity.type === 'EMAIL'
+            ? 'EMAIL'
+            : activity.type === 'WHATSAPP'
+              ? 'WHATSAPP'
+              : activity.type === 'CALL'
+                ? 'CALL'
+                : 'NOTE',
         subject: activity.title || undefined,
         bodyPreview: activity.description || undefined,
         createdAt: activity.createdAt.toISOString(),
@@ -202,12 +108,15 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       }))
   );
 
-  const customerNotes: MessageDTO[] = activityLog.map((a: any) => ({
-    id: `ca-${a.id}`,
+  const customerNotes: MessageDTO[] = activityLog.map((activity) => ({
+    id: `ca-${activity.id}`,
     channel: 'NOTE',
-    subject: a.action,
-    bodyPreview: typeof a.details === 'object' ? JSON.stringify(a.details).slice(0, 160) : undefined,
-    createdAt: a.createdAt.toISOString(),
+    subject: activity.action,
+    bodyPreview:
+      activity.details && typeof activity.details === 'object'
+        ? JSON.stringify(activity.details).slice(0, 160)
+        : undefined,
+    createdAt: activity.createdAt.toISOString(),
   }));
 
   const messages = [...leadMessages, ...customerNotes]
@@ -215,31 +124,42 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     .slice(0, 120);
 
   const active = resolveActiveDocument(proposalsMapped);
-  const activeProposal = active.proposalId ? proposalsMapped.find((p: any) => p.id === active.proposalId) : undefined;
+  const activeProposal = active.proposalId
+    ? proposalsMapped.find((proposal) => proposal.id === active.proposalId)
+    : undefined;
 
-  const totalQuoted = proposalsMapped.reduce((sum: number, p: any) => sum + (p.total || 0), 0);
-  const totalPaid = bookingsRows.reduce((sum: number, b: any) => {
+  const totalQuoted = proposalsMapped.reduce((sum, proposal) => sum + (proposal.total || 0), 0);
+  const totalPaid = bookingsRows.reduce((sum, bookingRow) => {
     let paid = 0;
-    if (b.depositPaid && typeof b.depositAmount === 'number') paid += b.depositAmount;
-    if (b.remainingPaid && typeof b.total === 'number' && typeof b.depositAmount === 'number') {
-      paid += b.total - b.depositAmount;
+    if (bookingRow.depositPaid && typeof bookingRow.depositAmount === 'number') paid += bookingRow.depositAmount;
+    if (
+      bookingRow.remainingPaid &&
+      typeof bookingRow.total === 'number' &&
+      typeof bookingRow.depositAmount === 'number'
+    ) {
+      paid += bookingRow.total - bookingRow.depositAmount;
     }
     return sum + paid;
   }, 0);
+
   const marginEstimated =
-    activeProposal && typeof activeProposal.snapshot?.costTotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
+    activeProposal &&
+    typeof activeProposal.snapshot?.costTotal === 'number' &&
+    typeof activeProposal.snapshot?.total === 'number'
       ? Number(activeProposal.snapshot.total) - Number(activeProposal.snapshot.costTotal)
-      : activeProposal && typeof activeProposal.snapshot?.subtotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
+      : activeProposal &&
+          typeof activeProposal.snapshot?.subtotal === 'number' &&
+          typeof activeProposal.snapshot?.total === 'number'
         ? Number(activeProposal.snapshot.total) * 0.35
         : undefined;
 
   const nextEventDate = bookings
-    .filter((b: any) => b.date && b.status !== 'CANCELLED')
-    .sort((a: any, b: any) => ((a.date || '') > (b.date || '') ? 1 : -1))[0]?.date;
+    .filter((booking) => booking.date && booking.status !== 'CANCELLED')
+    .sort((a, b) => ((a.date || '') > (b.date || '') ? 1 : -1))[0]?.date;
 
   const status = deriveHubStatus({
-    leadStatuses: leads.map((l: any) => l.status),
-    bookingStatuses: bookingsRows.map((b: any) => b.status),
+    leadStatuses: leads.map((lead) => lead.status),
+    bookingStatuses: bookingsRows.map((bookingRow) => bookingRow.status),
     manualStatus: resolveManualStatus(activityLog),
   });
 
@@ -248,36 +168,36 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     bookings,
     tasks,
     messages,
-    customerActivities: activityLog.map((a: any) => ({
-      id: a.id,
-      action: a.action,
-      createdAt: a.createdAt,
+    customerActivities: activityLog.map((activity) => ({
+      id: activity.id,
+      action: activity.action,
+      createdAt: activity.createdAt,
     })),
-    leadActivities: leads.flatMap((lead: any) =>
-      lead.activities.map((a: any) => ({
-        id: a.id,
-        type: a.type,
-        title: a.title,
-        createdAt: a.createdAt,
+    leadActivities: leads.flatMap((lead) =>
+      lead.activities.map((activity) => ({
+        id: activity.id,
+        type: activity.type,
+        title: activity.title,
+        createdAt: activity.createdAt,
         leadId: lead.id,
       }))
     ),
   });
 
-  const discountCodes: DiscountCodeDTO[] = (customerDiscountCodes || []).map((dc: any) => ({
-    id: dc.id,
-    code: dc.code,
-    discountPercent: dc.discountPercent,
-    validFrom: dc.validFrom?.toISOString(),
-    validUntil: dc.validUntil?.toISOString(),
-    maxUses: dc.maxUses,
-    currentUses: dc.currentUses,
-    sourceType: dc.sourceType,
-    isActive: dc.isActive,
-    usedAt: dc.usedAt?.toISOString(),
+  const discountCodes: DiscountCodeDTO[] = customerDiscountCodes.map((discountCode: CustomerDiscountCode) => ({
+    id: discountCode.id,
+    code: discountCode.code,
+    discountPercent: discountCode.discountPercent,
+    validFrom: discountCode.validFrom?.toISOString() || '',
+    validUntil: discountCode.validUntil?.toISOString() || '',
+    maxUses: discountCode.maxUses,
+    currentUses: discountCode.currentUses,
+    sourceType: discountCode.sourceType,
+    isActive: discountCode.isActive,
+    usedAt: discountCode.usedAt?.toISOString(),
   }));
 
-  const leadsDTO: LeadDTO[] = leads.map((lead: any) => ({
+  const leadsDTO: LeadDTO[] = leads.map((lead) => ({
     id: lead.id,
     name: lead.name,
     email: lead.email,
@@ -287,7 +207,12 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     priority: lead.priority,
     createdAt: lead.createdAt.toISOString(),
     booking: lead.booking
-      ? { id: lead.booking.id, reference: lead.booking.reference, status: lead.booking.status, total: lead.booking.total }
+      ? {
+          id: lead.booking.id,
+          reference: lead.booking.reference,
+          status: lead.booking.status,
+          total: lead.booking.total,
+        }
       : undefined,
   }));
 
@@ -318,81 +243,27 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   };
 }
 
-async function resolveCustomerId(db: any, entityId: string): Promise<string | null> {
-  const customer = await db.customer.findUnique({
-    where: { id: entityId },
-    select: { id: true },
-  });
-  if (customer?.id) return customer.id;
-
-  const lead = await safeQuery(
-    () => db.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
-    null
-  );
-  if (lead?.customerId) return lead.customerId;
-
-  const booking = await safeQuery(
-    () => db.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
-    null
-  );
-  if (booking?.leadId) {
-    const bookingLead = await safeQuery(
-      () => db.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
-      null
-    );
-    if (bookingLead?.customerId) return bookingLead.customerId;
-  }
-
-  const proposal = await safeQuery(
-    () => db.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
-    null
-  );
-  if (proposal?.customerId) return proposal.customerId;
-
-  const task = await safeQuery(
-    () => db.task.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
-    null
-  );
-  if (task?.customerId) return task.customerId;
-
-  const [leadTask, leadActivity, leadDocument] = await Promise.all([
-    safeQuery(
-      () => db.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
-      null
-    ),
-    safeQuery(
-      () => db.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
-      null
-    ),
-    safeQuery(
-      () => db.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
-      null
-    ),
-  ]);
-
-  const fallbackLeadId = leadTask?.leadId || leadActivity?.leadId || leadDocument?.leadId;
-  if (!fallbackLeadId) return null;
-
-  const fallbackLead = await safeQuery(
-    () => db.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
-    null
-  );
-
-  return fallbackLead?.customerId || null;
+function mapTask(task: CustomerHubTaskLite, leadIdOverride?: string): TaskDTO {
+  return {
+    id: task.id,
+    title: task.title,
+    dueDate: task.dueDate?.toISOString(),
+    done: task.status === 'DONE',
+    priority:
+      task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
+        ? task.priority
+        : undefined,
+    leadId: leadIdOverride || task.leadId || undefined,
+  };
 }
 
-async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
-  try {
-    return await query();
-  } catch (error) {
-    console.error('[CustomerHub] safeQuery error:', error);
-    return fallback;
-  }
-}
-
-function resolveManualStatus(activities: Array<{ action?: string; details?: unknown }>): HubStatus | null {
-  const lastStatusChange = activities.find((activity) => activity?.action === 'STATUS_CHANGED');
-  const raw = (lastStatusChange?.details as { newStatus?: string } | null)?.newStatus;
+function resolveManualStatus(activities: CustomerHubActivityLite[]): HubStatus | null {
+  const lastStatusChange = activities.find((activity) => activity.action === 'STATUS_CHANGED');
+  const details = lastStatusChange?.details;
+  const raw =
+    details && typeof details === 'object' && 'newStatus' in details
+      ? (details as { newStatus?: string }).newStatus
+      : undefined;
   if (!raw) return null;
   const allowed: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
   return allowed.includes(raw as HubStatus) ? (raw as HubStatus) : null;

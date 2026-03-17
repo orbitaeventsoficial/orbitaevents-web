@@ -12,28 +12,38 @@ type ConsentState = {
   marketing: boolean;
 };
 
+const EMPTY_CONSENT: ConsentState = {
+  analytics: false,
+  marketing: false,
+};
+
 const readConsent = (): ConsentState => {
-  if (typeof window === 'undefined') return { analytics: false, marketing: false };
+  if (typeof window === 'undefined') return EMPTY_CONSENT;
+
   try {
     const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!stored) return { analytics: false, marketing: false };
+    if (!stored) return EMPTY_CONSENT;
+
     const parsed = JSON.parse(stored) as { analytics?: boolean; marketing?: boolean };
     return {
       analytics: Boolean(parsed.analytics),
       marketing: Boolean(parsed.marketing),
     };
   } catch {
-    return { analytics: false, marketing: false };
+    return EMPTY_CONSENT;
   }
 };
 
 export default function ConsentScripts() {
-  const [consent, setConsent] = useState<ConsentState>(() => readConsent());
+  const [consent, setConsent] = useState<ConsentState>(EMPTY_CONSENT);
 
   useEffect(() => {
     const update = () => setConsent(readConsent());
+
+    update();
     window.addEventListener('storage', update);
     window.addEventListener('orbita-consent-update', update);
+
     return () => {
       window.removeEventListener('storage', update);
       window.removeEventListener('orbita-consent-update', update);

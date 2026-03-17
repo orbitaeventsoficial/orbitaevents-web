@@ -26,9 +26,9 @@ type KanbanColumn = {
 };
 
 const COLUMNS_DEF: Omit<KanbanColumn, 'tasks'>[] = [
-  { status: 'OPEN', label: 'Obertes', toneClass: 'border-sky-500/30 bg-sky-500/5', cardTone: 'border-sky-500/20 bg-sky-500/10' },
-  { status: 'IN_PROGRESS', label: 'En curs', toneClass: 'border-amber-500/30 bg-amber-500/5', cardTone: 'border-amber-500/20 bg-amber-500/10' },
-  { status: 'DONE', label: 'Fetes', toneClass: 'border-emerald-500/30 bg-emerald-500/5', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
+  { status: 'OPEN', label: 'Obertes', toneClass: '', cardTone: 'border-sky-500/20 bg-sky-500/10' },
+  { status: 'IN_PROGRESS', label: 'En curs', toneClass: '', cardTone: 'border-amber-500/20 bg-amber-500/10' },
+  { status: 'DONE', label: 'Fetes', toneClass: '', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
 ];
 
 function getDueDateColor(dueDate: string | null): string {

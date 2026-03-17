@@ -146,7 +146,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
             onChange={(e) => setNewLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
             placeholder="Nou ítem..."
-            className="flex-1 px-3 py-2 text-sm rounded-xl border border-white/10 bg-white/5 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="flex-1 px-3 py-2 text-sm rounded-xl border border-white/10 bg-white/5 "
             autoFocus
           />
           <button type="button" onClick={addItem} className="px-3 py-2 text-sm rounded-xl bg-white/10 hover:bg-white/15 font-medium">
@@ -168,3 +168,4 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
     </section>
   );
 }
+

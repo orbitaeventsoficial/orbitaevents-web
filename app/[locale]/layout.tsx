@@ -16,10 +16,8 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
-import { inter, plusJakarta, jetbrains } from '@/app/fonts';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getAllPacks, getMinPriceByService } from '@/config/packs-config';
-import '@/app/globals.css';
 
 // Components
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
@@ -27,6 +25,9 @@ import { PWAProvider } from '@/app/components/pwa/PWAProvider';
 import ConsentScripts from '@/app/components/legal/ConsentScripts.client';
 import WebVitalsReporter from '@/app/components/analytics/WebVitalsReporter';
 import ExitIntentModal from '@/app/components/ui/ExitIntentModal';
+import { absoluteUrl, getSiteUrl } from '@/lib/site';
+import { buildIntroBootstrapScript } from '@/lib/intro';
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 // JSON-LD STRUCTURED DATA - SEO MILLORAT
@@ -50,16 +51,18 @@ const BODAS_PRICE = getMinPriceByService('bodas');
 const DISCO_PRICE = getMinPriceByService('discomovil');
 const FIESTAS_PRICE = getMinPriceByService('fiestas');
 
+const INTRO_BOOTSTRAP_SCRIPT = buildIntroBootstrapScript();
+
 const JSON_LD_ORGANIZATION = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  '@id': 'https://orbitaevents.com/#organization',
+  '@id': absoluteUrl('/#organization'),
   name: 'Orbita Events',
   alternateName: ['Orbita Events', 'Orbita Events Barcelona', 'DJ Bodas Barcelona', 'Discomóvil Barcelona'],
   slogan: 'Creamos la experiencia completa que imaginas',
   description:
     'DJ profesional y tematización completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminación LED y efectos especiales.',
-  url: 'https://orbitaevents.com',
+  url: getSiteUrl(),
   foundingDate: '2023',
   knowsAbout: [
     'DJ para bodas',
@@ -75,14 +78,14 @@ const JSON_LD_ORGANIZATION = {
   ],
   logo: {
     '@type': 'ImageObject',
-    url: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
+    url: absoluteUrl('/img/logoplanetatextdreta.svg'),
     width: 280,
     height: 80,
   },
   image: [
-    'https://orbitaevents.com/og-default.jpg',
-    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.avif',
-    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+    absoluteUrl('/og-default.jpg'),
+    absoluteUrl('/img/portfolio/bodas/bodas-01.avif'),
+    absoluteUrl('/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'),
   ],
   telephone: SITE_CONFIG.business.phone,
   email: SITE_CONFIG.business.email,
@@ -143,14 +146,14 @@ const JSON_LD_ORGANIZATION = {
           description:
             'DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y baile final.',
           provider: {
-            '@id': 'https://orbitaevents.com/#organization',
+            '@id': absoluteUrl('/#organization'),
           },
         },
         price: String(BODAS_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: `${new Date().getFullYear()}-12-31`,
         availability: 'https://schema.org/InStock',
-        url: 'https://orbitaevents.com/servicios/bodas',
+        url: absoluteUrl('/servicios/bodas'),
       },
       {
         '@type': 'Offer',
@@ -160,14 +163,14 @@ const JSON_LD_ORGANIZATION = {
           description:
             'Discomóvil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebración.',
           provider: {
-            '@id': 'https://orbitaevents.com/#organization',
+            '@id': absoluteUrl('/#organization'),
           },
         },
         price: String(DISCO_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: `${new Date().getFullYear()}-12-31`,
         availability: 'https://schema.org/InStock',
-        url: 'https://orbitaevents.com/servicios/discomovil',
+        url: absoluteUrl('/servicios/discomovil'),
       },
       {
         '@type': 'Offer',
@@ -177,14 +180,14 @@ const JSON_LD_ORGANIZATION = {
           description:
             'Tematización completa para fiestas: Halloween, años 80, mundo mágico y más. Decoración, efectos y ambientación.',
           provider: {
-            '@id': 'https://orbitaevents.com/#organization',
+            '@id': absoluteUrl('/#organization'),
           },
         },
         price: String(FIESTAS_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: `${new Date().getFullYear()}-12-31`,
         availability: 'https://schema.org/InStock',
-        url: 'https://orbitaevents.com/servicios/fiestas',
+        url: absoluteUrl('/servicios/fiestas'),
       },
     ],
   },
@@ -193,7 +196,7 @@ const JSON_LD_ORGANIZATION = {
       '@type': 'ReserveAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://orbitaevents.com/contacto',
+        urlTemplate: absoluteUrl('/contacto'),
         inLanguage: ['es', 'ca'],
         actionPlatform: [
           'http://schema.org/DesktopWebPlatform',
@@ -243,7 +246,7 @@ export const metadata: Metadata = {
     'animacion bodas',
     'efectos especiales eventos',
   ],
-  authors: [{ name: 'Orbita Events', url: 'https://orbitaevents.com' }],
+  authors: [{ name: 'Orbita Events', url: getSiteUrl() }],
   creator: 'Orbita Events',
   publisher: 'Orbita Events',
   formatDetection: {
@@ -251,10 +254,10 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   openGraph: {
     type: 'website',
-    url: 'https://orbitaevents.com',
+    url: getSiteUrl(),
     siteName: 'Orbita Events',
     title: 'Experiencias inmersivas para eventos | DJ + tematización Barcelona',
     description:
@@ -295,12 +298,12 @@ export const metadata: Metadata = {
   },
   category: 'entertainment',
   alternates: {
-    canonical: 'https://orbitaevents.com',
+    canonical: getSiteUrl(),
     languages: {
-      'es': 'https://orbitaevents.com',
-      'ca': 'https://orbitaevents.com/ca',
-      'en': 'https://orbitaevents.com/en',
-      'x-default': 'https://orbitaevents.com',
+      'es': getSiteUrl(),
+      'ca': absoluteUrl('/ca'),
+      'en': absoluteUrl('/en'),
+      'x-default': getSiteUrl(),
     },
   },
 };
@@ -351,43 +354,8 @@ export default async function LocaleLayout({
 
   // Carregar missatges
   const messages = await getMessages();
-
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
-      suppressHydrationWarning
-    >
-      <head>
-        {/* GTM consent defaults — inline script (tiny, no external fetch, no render-block) */}
-        {process.env.NEXT_PUBLIC_GTM_ID && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`,
-            }}
-          />
-        )}
-
-        {/* Preconnects per performance - recursos externs */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* Preload critical resources for LCP - Hero (desktop + mobile) */}
-        <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
-        <link rel="preload" href="/img/hero-poster-mobile.webp" as="image" type="image/webp" media="(max-width: 768px)" fetchPriority="high" />
-
-        {/* Favicons */}
-        <link rel="icon" href="/favicon.ico" sizes="48x48" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />
-
-        {/* JSON-LD moved to body to prevent Next.js head duplication issue */}
-      </head>
-      <body
-        className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
-        suppressHydrationWarning
-      >
+    <>
         {/* JSON-LD Structured Data - In body to prevent Next.js head duplication */}
         <script
           type="application/ld+json"
@@ -399,7 +367,7 @@ export default async function LocaleLayout({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             name: 'Orbita Events',
-            url: 'https://orbitaevents.com',
+            url: getSiteUrl(),
           }) }}
         />
 
@@ -434,24 +402,13 @@ export default async function LocaleLayout({
             background: '#000',
             zIndex: 9998,
             transition: 'opacity 0.4s ease-out',
+            display: 'block',
+            pointerEvents: 'auto',
+            opacity: 1,
           }}
           aria-hidden="true"
         />
-        {/* Failsafe: Si JS falla, amagar overlay després de 5s */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              setTimeout(function() {
-                var o = document.getElementById('intro-overlay');
-                if (o && o.style.display !== 'none') {
-                  o.style.opacity = '0';
-                  o.style.pointerEvents = 'none';
-                  setTimeout(function() { o.style.display = 'none'; }, 400);
-                }
-              }, 5000);
-            `,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOTSTRAP_SCRIPT }} />
         {/* Noscript: Si JS desactivat, amagar overlay i mostrar contingut */}
         <noscript>
           <style>{`
@@ -468,7 +425,11 @@ export default async function LocaleLayout({
         <ConsentScripts />
         <WebVitalsReporter />
         <ExitIntentModal />
-      </body>
-    </html>
+    </>
   );
 }
+
+
+
+
+

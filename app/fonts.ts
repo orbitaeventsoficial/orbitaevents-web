@@ -51,11 +51,3 @@ export const jetbrains = JetBrains_Mono({
   preload: false, // No crítica per first paint
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// EXPORT COMBINAT PER AL LAYOUT
-// ═══════════════════════════════════════════════════════════════════════════
-export const fontVariables = `${inter.variable} ${plusJakarta.variable} ${jetbrains.variable}`;
-
-// Per compatibilitat amb codi existent
-export const outfit = plusJakarta;
-export const space = inter;

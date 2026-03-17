@@ -214,7 +214,7 @@ export default function FlashOfferPopup() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 flex items-center justify-center z-[101] p-4 pointer-events-none"
           >
             <div className={`relative w-full max-w-xs bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-2xl border ${accentClasses.border} shadow-2xl ${accentClasses.shadow} overflow-hidden pointer-events-auto`}>

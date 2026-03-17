@@ -3,7 +3,7 @@ import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { log } from '@/lib/logger';
 
-export type SequenceRunSummary = {
+type SequenceRunSummary = {
   generatedAt: string;
   scanned: number;
   matched: number;

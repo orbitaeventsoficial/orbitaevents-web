@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 type AdminHelpModeContextValue = {
   enabled: boolean;
-  setEnabled: (value: boolean) => void;
   toggle: () => void;
 };
 
@@ -16,7 +15,6 @@ export function AdminHelpModeProvider({ children }: { children: React.ReactNode 
   const value = useMemo(
     () => ({
       enabled,
-      setEnabled,
       toggle: () => setEnabled((prev) => !prev),
     }),
     [enabled]

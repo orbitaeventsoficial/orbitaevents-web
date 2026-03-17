@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from 'react';
+import { absoluteUrl } from '@/lib/site';
+
 
 export default function Breadcrumbs({ items }: { items: Array<{ name: string; url: string }> }) {
   const json = useMemo(
@@ -11,7 +13,7 @@ export default function Breadcrumbs({ items }: { items: Array<{ name: string; ur
         '@type': 'ListItem',
         position: i + 1,
         name: it.name,
-        item: `https://orbitaevents.com${it.url}`,
+        item: absoluteUrl(it.url),
       })),
     }),
     [items]

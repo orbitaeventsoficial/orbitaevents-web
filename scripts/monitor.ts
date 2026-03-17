@@ -13,7 +13,7 @@
 // - Alerta si hi ha problemes
 // ═══════════════════════════════════════════════════════════════════════════
 
-const BASE_URL = process.env.SITE_URL || 'https://orbitaevents.com';
+const BASE_URL = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
 
 interface EndpointCheck {
   url: string;

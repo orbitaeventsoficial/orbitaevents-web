@@ -4,11 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { listAvailabilityRange } from '@/lib/services/publicAvailabilityService';
 
-
-// Cache for 15 minutes
 export const revalidate = 900;
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +14,7 @@ interface AvailabilityResponse {
   success: boolean;
   data?: {
     dates: Array<{
-      date: string; // ISO date string (YYYY-MM-DD)
+      date: string;
       status: 'AVAILABLE' | 'BOOKED' | 'BLOCKED';
       note?: string;
     }>;
@@ -30,17 +28,9 @@ interface AvailabilityResponse {
   error?: string;
 }
 
-/**
- * GET /api/availability
- * Query params:
- *   - from: Start date (ISO) - defaults to today
- *   - to: End date (ISO) - defaults to today + 12 months
- */
 export async function GET(request: NextRequest): Promise<NextResponse<AvailabilityResponse>> {
   try {
     const searchParams = request.nextUrl.searchParams;
-
-    // Parse date range
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -53,7 +43,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<Availabili
     const from = fromParam ? new Date(fromParam) : today;
     const to = toParam ? new Date(toParam) : defaultTo;
 
-    // Validate dates
     if (isNaN(from.getTime()) || isNaN(to.getTime())) {
       return NextResponse.json(
         {
@@ -74,7 +63,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<Availabili
       );
     }
 
-    // Limit to max 18 months
     const maxMonths = 18;
     const maxTo = new Date(from);
     maxTo.setMonth(maxTo.getMonth() + maxMonths);
@@ -89,52 +77,18 @@ export async function GET(request: NextRequest): Promise<NextResponse<Availabili
       );
     }
 
-    // Fetch availability from database
-    const availability = await prisma.availability.findMany({
-      where: {
-        date: {
-          gte: from,
-          lte: to,
-        },
-      },
-      select: {
-        date: true,
-        status: true,
-        note: true,
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
-
-    // Convert to response format
-    const dates = availability.map((item) => ({
-      date: item.date.toISOString().split('T')[0],
-      status: item.status as 'AVAILABLE' | 'BOOKED' | 'BLOCKED',
-      note: item.note || undefined,
-    }));
-
-    // Calculate summary
-    const summary = {
-      total: dates.length,
-      available: dates.filter((d) => d.status === 'AVAILABLE').length,
-      booked: dates.filter((d) => d.status === 'BOOKED').length,
-      blocked: dates.filter((d) => d.status === 'BLOCKED').length,
-    };
+    const result = await listAvailabilityRange(from, to);
 
     log.info('Availability fetched', {
       from: from.toISOString(),
       to: to.toISOString(),
-      total: summary.total,
+      total: result.summary.total,
     });
 
     return NextResponse.json(
       {
         success: true,
-        data: {
-          dates,
-          summary,
-        },
+        data: result,
       },
       {
         headers: {

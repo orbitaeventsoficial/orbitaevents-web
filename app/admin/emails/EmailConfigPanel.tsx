@@ -64,7 +64,7 @@ export default function EmailConfigPanel() {
             type="text"
             value={config.googleReviewUrl}
             onChange={(e) => setConfig({ ...config, googleReviewUrl: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="w-full px-3 py-2 text-sm rounded-xl border "
           />
         </div>
 
@@ -76,7 +76,7 @@ export default function EmailConfigPanel() {
             id="ec-post-delay"
             value={config.postEventDelay}
             onChange={(e) => setConfig({ ...config, postEventDelay: Number(e.target.value) })}
-            className="w-full px-3 py-2 text-sm rounded-xl border focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="w-full px-3 py-2 text-sm rounded-xl border "
           >
             <option value={1}>1 dia</option>
             <option value={2}>2 dies</option>
@@ -151,7 +151,7 @@ export default function EmailConfigPanel() {
           aria-busy={saving}
           className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
             saved
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              ? 'admin-tone-soft-success border border-emerald-500/30'
               : saving
               ? 'bg-white/5 text-white/30 border border-white/10'
               : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
@@ -163,4 +163,6 @@ export default function EmailConfigPanel() {
     </section>
   );
 }
+
+
 

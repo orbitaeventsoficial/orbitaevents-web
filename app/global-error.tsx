@@ -12,7 +12,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = (caMessages as Record<string, any>).errorPage || {};
+  type ErrorPageMessages = { title?: string; defaultMessage?: string; tryAgain?: string; backToHome?: string; errorCode?: string };
+
+  const t: ErrorPageMessages = (caMessages as { errorPage?: ErrorPageMessages }).errorPage || {};
 
   useEffect(() => {
     Sentry.captureException(error);
@@ -41,3 +43,7 @@ export default function GlobalError({
     </html>
   );
 }
+
+
+
+

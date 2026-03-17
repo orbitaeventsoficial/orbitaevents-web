@@ -1,6 +1,6 @@
-export type BadgeColor = 'orange' | 'blue' | 'green' | 'red';
+type BadgeColor = 'orange' | 'blue' | 'green' | 'red';
 
-export interface NavItem {
+interface NavItem {
   icon: string;
   label: string;
   href: string;
@@ -8,7 +8,7 @@ export interface NavItem {
   badgeColor?: BadgeColor;
 }
 
-export interface NavSection {
+interface NavSection {
   title: string;
   defaultOpen: boolean;
   items: NavItem[];
@@ -30,7 +30,9 @@ export const NAV_SECTIONS: NavSection[] = [
     defaultOpen: true,
     items: [
       { icon: '📄', label: 'Pressupostos', href: '/admin/presupuestos' },
+      { icon: '🧮', label: 'Calculadora costos', href: '/admin/cost-calculator' },
       { icon: '💶', label: 'Finances', href: '/admin/economia' },
+      { icon: '🤝', label: 'Col·laboradors', href: '/admin/collaborators' },
       { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops' },
     ],
@@ -78,3 +80,4 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
 ];
+

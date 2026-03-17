@@ -25,6 +25,7 @@ import { motion, AnimatePresence, useTransform, useMotionValue } from 'framer-mo
 import { useLocale, useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
 import { WHATSAPP_URL } from '@/lib/constants';
+type StandaloneNavigator = Navigator & { standalone?: boolean };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTEXT - Estado global del móvil
@@ -79,10 +80,10 @@ function FloatingHeader({
     <AnimatePresence>
       {isVisible && scrollProgress > 0.1 && (
         <motion.header
-          initial={{ y: -100, opacity: 0 }}
+          initial={{ y: -96, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          exit={{ y: -96, opacity: 0 }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           className="fixed top-0 left-0 right-0 z-50 safe-top"
         >
           <div className="mx-3 mt-2 px-4 py-3 bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl">
@@ -211,7 +212,7 @@ function SplashScreen({ onComplete }: { onComplete: () => void }) {
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', damping: 15 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
         className="relative"
       >
         {/* Glow */}
@@ -301,7 +302,7 @@ export default function MobileAppShell({
   // Detectar PWA
   useEffect(() => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const isIOSStandalone = (window.navigator as any).standalone === true;
+    const isIOSStandalone = (window.navigator as StandaloneNavigator).standalone === true;
     setIsPWA(isStandalone || isIOSStandalone);
   }, []);
 
@@ -329,10 +330,14 @@ export default function MobileAppShell({
         const currentScrollY = window.scrollY || 0;
         setScrollY(currentScrollY);
 
-        // Mostrar header al hacer scroll up, ocultar al scroll down
-        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                const scrollDiff = currentScrollY - lastScrollY.current;
+        const isNearTop = currentScrollY < 72;
+
+        if (isNearTop) {
+          setIsHeaderVisible(true);
+        } else if (scrollDiff > 18 && currentScrollY > 144) {
           setIsHeaderVisible(false);
-        } else {
+        } else if (scrollDiff < -12) {
           setIsHeaderVisible(true);
         }
 
@@ -406,3 +411,4 @@ export default function MobileAppShell({
     </MobileContext.Provider>
   );
 }
+

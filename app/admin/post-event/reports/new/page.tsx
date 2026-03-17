@@ -8,6 +8,13 @@ import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../../../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
 
+type BookingSummary = {
+  id: string;
+  clientName: string;
+  eventDate: string;
+  eventLocation: string | null;
+};
+
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,7 +22,7 @@ export default function NewReportPage() {
 
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [booking, setBooking] = useState<any>(null);
+  const [booking, setBooking] = useState<BookingSummary | null>(null);
   const [inventoryItems, setInventoryItems] = useState<Array<{
     id: string;
     inventoryItem: { id: string; code: string; name: string; category: string; condition: string };
@@ -141,9 +148,9 @@ export default function NewReportPage() {
       )}
 
       {formError && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-3 text-sm text-rose-300 flex items-center justify-between" role="alert">
+        <div className="rounded-xl border px-4 py-3 text-sm flex items-center justify-between" role="alert">
           <span>{formError}</span>
-          <button type="button" onClick={() => setFormError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+          <button type="button" onClick={() => setFormError(null)} className="">✕</button>
         </div>
       )}
       <form onSubmit={handleSubmit} className="border border-white/10 rounded-xl p-6 space-y-6">
@@ -296,6 +303,7 @@ export default function NewReportPage() {
     </AdminPage>
   );
 }
+
 
 
 

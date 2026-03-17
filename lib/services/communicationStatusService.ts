@@ -4,7 +4,7 @@ type AdminLogLike = {
   details?: unknown;
 };
 
-export interface FlowStatus {
+interface FlowStatus {
   state: 'FALTA_ENVIAR' | 'ENVIADO' | 'RESPONDIDO';
   sentAt: Date | null;
   respondedAt: Date | null;

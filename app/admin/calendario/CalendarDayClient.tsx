@@ -45,10 +45,10 @@ const CALENDAR_EVENT_LABELS: Record<string, string> = {
 
 const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
   PENDING: { label: 'Pendent', cls: 'bg-amber-500/20 text-amber-300' },
-  CONFIRMED: { label: 'Confirmat', cls: 'bg-emerald-500/20 text-emerald-300' },
+  CONFIRMED: { label: 'Confirmat', cls: 'admin-tone-soft-success' },
   PREPARING: { label: 'Preparant', cls: 'bg-blue-500/20 text-blue-300' },
   COMPLETED: { label: 'Completat', cls: 'bg-white/10 text-white/50' },
-  CANCELLED: { label: 'Cancel·lat', cls: 'bg-rose-500/20 text-rose-300' },
+  CANCELLED: { label: 'Cancel·lat', cls: 'admin-tone-soft-danger' },
 };
 
 function formatKey(date: Date): string {
@@ -234,12 +234,12 @@ export default function CalendarDayClient() {
 
       {loading && !data && (
         <div className="flex items-center justify-center py-24">
-          <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
         </div>
       )}
 
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-rose-300 text-sm mb-6">
+        <div className="rounded-xl border p-4 text-sm mb-6">
           {error}
         </div>
       )}
@@ -248,11 +248,11 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-white/10 overflow-hidden">
+            <div className="rounded-2xl border border-white/10 p-0 overflow-hidden">
               <div className={`px-5 py-3 border-b border-white/10 flex items-center justify-between ${isBlocked ? 'bg-rose-500/10' : isTodayDate ? 'bg-cyan-500/10' : 'bg-white/[0.02]'}`}>
                 <div className="flex items-center gap-2">
-                  {isBlocked && <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />}
-                  {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />}
+                  {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
+                  {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
                   {!isBlocked && dayData.reservas.length === 0 && <span className="w-2.5 h-2.5 rounded-full bg-white/20" />}
                   <span className="text-sm font-medium">
                     {isBlocked ? 'Dia bloquejat' : `${dayData.reservas.length} reserv${dayData.reservas.length === 1 ? 'a' : 'es'}`}
@@ -260,7 +260,7 @@ export default function CalendarDayClient() {
                 </div>
                 <div className="flex items-center gap-2">
                   {isBlocked ? (
-                    <button onClick={unblockDay} type="button" className="text-xs px-3 py-1 rounded-xl border border-rose-500/30 text-rose-300 hover:bg-rose-500/10 transition-colors">
+                    <button onClick={unblockDay} type="button" className="text-xs px-3 py-1 rounded-xl border transition-colors">
                       Desbloquejar
                     </button>
                   ) : (
@@ -274,7 +274,7 @@ export default function CalendarDayClient() {
                   )}
                   <Link
                     href={`/admin/bookings/new?date=${dateKey}`}
-                    className="text-xs px-3 py-1 rounded-xl border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 transition-colors"
+                    className="text-xs px-3 py-1 rounded-xl border transition-colors"
                   >
                     + Nova reserva
                   </Link>
@@ -288,12 +288,12 @@ export default function CalendarDayClient() {
                     value={blockNote}
                     onChange={(e) => setBlockNote(e.target.value)}
                     placeholder="Motiu del bloqueig (opcional)"
-                    className="flex-1 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                    className="flex-1 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm "
                   />
                   <button
                     onClick={() => blockDay(blockNote)}
                     type="button"
-                    className="px-4 py-2 rounded-xl bg-rose-500/20 text-rose-300 text-sm font-medium hover:bg-rose-500/30 transition-colors"
+                    className="px-4 py-2 rounded-xl admin-tone-soft-danger text-sm font-medium transition-colors"
                   >
                     Bloquejar
                   </button>
@@ -391,8 +391,8 @@ export default function CalendarDayClient() {
 
             {/* Blockage details */}
             {dayData.bloqueos.length > 0 && (
-              <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-5">
-                <h3 className="text-sm font-semibold mb-2 text-rose-300">Bloquejos</h3>
+              <div className="rounded-2xl border p-5">
+                <h3 className="text-sm font-semibold mb-2">Bloquejos</h3>
                 {dayData.bloqueos.map((b) => (
                   <div key={b.id} className="text-sm text-white/60">
                     {b.motivo || b.notas || 'Sense motiu'}
@@ -434,7 +434,7 @@ export default function CalendarDayClient() {
                 <p className="text-white/30 text-sm">Dia lliure</p>
                 <Link
                   href={`/admin/bookings/new?date=${dateKey}`}
-                  className="inline-block mt-3 px-4 py-2 rounded-xl border border-cyan-500/30 text-cyan-300 text-sm hover:bg-cyan-500/10 transition-colors"
+                  className="inline-block mt-3 px-4 py-2 rounded-xl border text-sm transition-colors"
                 >
                   + Nova reserva
                 </Link>
@@ -446,3 +446,6 @@ export default function CalendarDayClient() {
     </AdminPage>
   );
 }
+
+
+

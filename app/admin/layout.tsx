@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
 import { ToastProvider } from './components/ToastProvider';
-import FloatingAddButton from './components/FloatingAddButton';
 import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
@@ -16,18 +15,79 @@ import './admin-theme.css';
 const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
   ssr: false,
 });
-const AdminHelpLegend = dynamicImport(() => import('./components/AdminHelpLegend'), {
+const AdminHelpOverlay = dynamicImport(() => import('./components/AdminHelpOverlay'), {
   ssr: false,
 });
-const AdminHelpInspector = dynamicImport(() => import('./components/AdminHelpInspector'), {
-  ssr: false,
-});
+
+const FAB_ITEMS = [
+  { icon: '👥', label: 'Entrada rapida', href: '/admin/leads' },
+  { icon: '📋', label: 'Reserva', href: '/admin/bookings/new' },
+  { icon: '📝', label: 'Tasca', href: '/admin/tasks/new' },
+  { icon: '📄', label: 'Pressupost', href: '/admin/presupuestos' },
+] as const;
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
  * Estil sobri i professional amb focus en llegibilitat
  * Mobile-first design amb bottom navigation
  */
+
+function FloatingAddButton() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const toggle = useCallback(() => setOpen((prev) => !prev), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
+      {open && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-2">
+          {FAB_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-black/80 px-4 py-2.5 text-sm font-medium text-white/90 shadow-lg backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
+            >
+              <span className="text-base">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label="Accions rapides"
+        aria-expanded={open}
+        className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${open ? 'bg-white/20 rotate-45' : 'bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400'}`}
+      >
+        <span className="text-2xl font-bold text-white transition-transform">+</span>
+      </button>
+    </div>
+  );
+}
 
 function SidebarItem({
   icon,
@@ -213,10 +273,18 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Register service worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => { /* silent */ });
+    if (!('serviceWorker' in navigator)) return;
+
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    if (isLocalhost) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .catch(() => { /* silent */ });
+      return;
     }
+
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* silent */ });
   }, []);
 
   useEffect(() => {
@@ -314,9 +382,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       packs: 'Packs',
       analytics: 'Analítica',
       'sales-ops': 'Operativa de vendes',
-      rentabilidad: 'Rendibilitat',
       catalog: 'Catàleg',
-      finanzas: 'Finances',
       emails: 'Correus automàtics',
       inbox: 'Safata (IMAP)',
       calendario: 'Calendari',
@@ -324,7 +390,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       integrations: 'Integracions',
       quotes: 'Plantilla pressupostos',
       inventory: 'Inventari',
-      contactes: 'Fitxa client',
       clientes: 'Clients',
       mensajes: 'Missatges',
       ressenyes: 'Ressenyes',
@@ -334,15 +399,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       coverage: 'Cobertura',
       features: 'Features',
       stats: 'Estadístiques',
-      mapa: 'Mapa Admin',
       blog: 'Blog',
-      canvas: 'Canvas',
-      translations: 'Traduccions',
       'text-manager': 'Textos PRO',
       'css-manager': 'CSS PRO',
       'post-event': 'Post-esdeveniment',
       'google-reviews': 'Ressenyes de Google',
-      'google-ads': 'Google Ads',
     };
     const isDynamicId =
       /^[a-f0-9]{24}$/i.test(page) || // Mongo-like id
@@ -351,7 +412,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
     if (isDynamicId) {
       const detailByParent: Record<string, string> = {
-        contactes: 'Fitxa client',
         inventory: 'Fitxa inventari',
         bookings: 'Fitxa reserva',
         leads: 'Fitxa entrada',
@@ -414,8 +474,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.
             </div>
           )}
-          {helpModeEnabled && <AdminHelpLegend />}
-          {helpModeEnabled && <AdminHelpInspector />}
+          {helpModeEnabled && <AdminHelpOverlay />}
           {/* Desktop Sidebar */}
           <aside className="admin-sidebar">
         {/* Logo */}
@@ -756,5 +815,10 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+
+
+
+
+
 
 

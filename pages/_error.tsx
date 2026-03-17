@@ -10,8 +10,9 @@ function CustomError({ statusCode }: ErrorProps) {
 }
 
 CustomError.getInitialProps = ({ res, err }: NextPageContext) => {
-  const statusCode = res ? res.statusCode : err ? (err as any).statusCode ?? 500 : 404;
+  const statusCode = res ? res.statusCode : err && typeof err === 'object' && 'statusCode' in err ? Number((err as { statusCode?: number }).statusCode ?? 500) : 404;
   return { statusCode };
 };
 
 export default CustomError;
+

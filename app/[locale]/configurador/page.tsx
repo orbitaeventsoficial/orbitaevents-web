@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import nextDynamic from 'next/dynamic';
+import { getSiteUrl } from '@/lib/site';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -53,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: tMeta('title'),
     description: tMeta('description'),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/configurador' },
     openGraph: {
       title: tMeta('ogTitle'),

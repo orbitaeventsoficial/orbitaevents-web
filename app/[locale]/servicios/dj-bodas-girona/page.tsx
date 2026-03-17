@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Girona | Ciudad y Provincia | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Girona desde ${MIN_PRICE}€. Cobertura en Girona ciudad, Figueres, Olot, Banyoles, Salt. Sonido profesional 4000W, iluminación y efectos. Presupuesto gratis.`,
   keywords: ['DJ bodas Girona', 'DJ bodas Figueres', 'DJ bodas Olot', 'DJ boda Banyoles', 'DJ matrimonio Girona', 'discomóvil Girona'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-girona' },
   openGraph: {
     title: `DJ Bodas Girona | Desde ${MIN_PRICE}€`,

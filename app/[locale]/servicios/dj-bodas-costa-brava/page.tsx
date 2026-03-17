@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Costa Brava | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en la Costa Brava desde ${MIN_PRICE}€. Cadaqués, Tossa, Lloret, Begur y toda la costa. Sonido profesional resistente a exteriores.`,
   keywords: ['DJ bodas Costa Brava', 'DJ bodas Cadaqués', 'DJ bodas Tossa de Mar', 'DJ bodas Begur', 'bodas playa Costa Brava'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-costa-brava' },
   openGraph: {
     title: `DJ Bodas Costa Brava | Desde ${MIN_PRICE}€`,

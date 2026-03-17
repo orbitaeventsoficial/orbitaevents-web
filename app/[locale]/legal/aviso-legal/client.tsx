@@ -21,7 +21,7 @@ export default function AvisoLegalClient() {
               <li><strong className="text-white">{t('section1.ubicacion')}</strong> {business.address.city}, {business.address.region}, {business.address.country}</li>
               <li><strong className="text-white">{t('section1.email')}</strong> <a href={`mailto:${business.email}`} className="text-oe-gold hover:underline">{business.email}</a></li>
               <li><strong className="text-white">{t('section1.telefono')}</strong> <a href={`tel:${business.phone}`} className="text-oe-gold hover:underline">{business.phoneDisplay}</a></li>
-              <li><strong className="text-white">{t('section1.sitioWeb')}</strong> <a href="https://orbitaevents.com" className="text-oe-gold hover:underline">orbitaevents.com</a></li>
+              <li><strong className="text-white">{t('section1.sitioWeb')}</strong> <a href={SITE_CONFIG.web.url} className="text-oe-gold hover:underline">{SITE_CONFIG.web.domain}</a></li>
               <li className="text-white/60 text-sm mt-4">{t('section1.datosCompletos')}</li>
             </ul>
           </section>

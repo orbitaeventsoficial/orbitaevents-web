@@ -96,9 +96,9 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
   return (
     <div className="flex flex-col items-end gap-1">
       {actionError && (
-        <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-2 py-1 text-[10px] text-rose-300">
+        <div className="flex items-center gap-2 rounded-xl border px-2 py-1 text-[10px]">
           <span>{actionError}</span>
-          <button type="button" onClick={() => setActionError(null)} className="text-rose-400/50 hover:text-rose-400">✕</button>
+          <button type="button" onClick={() => setActionError(null)} className="">✕</button>
         </div>
       )}
     <div className="flex items-center justify-end gap-2">
@@ -154,7 +154,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         className={`inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors
           ${hasBooking
             ? 'bg-white/[0.03] text-white/30 cursor-not-allowed border border-white/10'
-            : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30'
+            : 'admin-tone-soft-danger hover:bg-rose-500/30 border border-rose-500/30'
           }`}
         title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Elimina entrada'}
       >
@@ -165,4 +165,5 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     </div>
   );
 }
+
 

@@ -1,6 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // CONFIGURACION DE IDIOMAS - ORBITA EVENTS
 
@@ -136,3 +136,4 @@ async function mergeDbTranslations(
   translationCache.set(locale, loadPromise);
   return loadPromise;
 }
+

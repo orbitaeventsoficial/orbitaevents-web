@@ -86,17 +86,17 @@ export default function CronsClient() {
     <div className="space-y-4">
       {/* Resum */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:p-4">
+        <div className="rounded-2xl border p-3 sm:p-4">
           <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Correctes</div>
-          <div className="text-2xl sm:text-3xl font-bold text-emerald-400">{healthCounts.ok}</div>
+          <div className="text-2xl sm:text-3xl font-bold">{healthCounts.ok}</div>
         </div>
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4">
+        <div className="rounded-2xl border p-3 sm:p-4">
           <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Retardats</div>
-          <div className="text-2xl sm:text-3xl font-bold text-amber-400">{healthCounts.warning}</div>
+          <div className="text-2xl sm:text-3xl font-bold">{healthCounts.warning}</div>
         </div>
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-3 sm:p-4">
+        <div className="rounded-2xl border p-3 sm:p-4">
           <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Errors</div>
-          <div className="text-2xl sm:text-3xl font-bold text-rose-400">{healthCounts.error}</div>
+          <div className="text-2xl sm:text-3xl font-bold">{healthCounts.error}</div>
         </div>
         <div className="rounded-2xl border p-3 sm:p-4">
           <div className="text-[10px] sm:text-xs uppercase tracking-wide text-white/50">Mai executat</div>
@@ -164,7 +164,7 @@ export default function CronsClient() {
                   {cron.lastMessage && (
                     <div className="flex gap-2">
                       <span className="text-white/40 w-24 flex-shrink-0">Missatge:</span>
-                      <span className="text-rose-400">{cron.lastMessage}</span>
+                      <span className="">{cron.lastMessage}</span>
                     </div>
                   )}
                   {summaryLines.length > 0 && (

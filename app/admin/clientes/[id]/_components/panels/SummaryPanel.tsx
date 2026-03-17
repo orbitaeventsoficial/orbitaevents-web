@@ -251,11 +251,11 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wider">Cobrat</p>
-                <p className="mt-1 text-2xl font-semibold text-emerald-300">{fmtMoney(paid)}</p>
+                <p className="mt-1 text-2xl font-semibold">{fmtMoney(paid)}</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wider">Marge estimat</p>
-                <p className="mt-1 text-2xl font-semibold text-cyan-300">{fmtMoney(data.kpis.marginEstimated)}</p>
+                <p className="mt-1 text-2xl font-semibold">{fmtMoney(data.kpis.marginEstimated)}</p>
               </div>
             </div>
             {quoted > 0 && (
@@ -266,7 +266,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 </div>
                 <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(100, pct)}%` }}
                   />
                 </div>
@@ -278,16 +278,16 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       {/* Countdown pròxim event */}
       {nextEvent && nextEvent.date && (
-        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-5">
+        <div className="rounded-2xl border p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-wider text-cyan-300">Pròxim esdeveniment</p>
+              <p className="text-xs uppercase tracking-wider">Pròxim esdeveniment</p>
               <p className="mt-1 text-lg font-semibold">{nextEvent.reference || 'Reserva'}</p>
               <p className="text-sm">{formatDateFull(nextEvent.date)}{nextEvent.startTime && ` · ${nextEvent.startTime}`}</p>
               {nextEvent.location && <p className="text-xs mt-1">{nextEvent.location}</p>}
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-cyan-300">{getDaysUntil(nextEvent.date)}</p>
+              <p className="text-3xl font-bold">{getDaysUntil(nextEvent.date)}</p>
               <p className="text-xs">dies</p>
             </div>
           </div>

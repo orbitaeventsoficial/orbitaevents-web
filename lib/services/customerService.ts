@@ -14,13 +14,8 @@ import {
   capitalizeName,
 } from '@/lib/utils/normalize';
 
-export type { Customer };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// TIPUS
-// ═══════════════════════════════════════════════════════════════════════════
-
-export interface UpsertCustomerInput {
+interface UpsertCustomerInput {
   email: string;
   name?: string;
   phone?: string;
@@ -32,28 +27,18 @@ export interface UpsertCustomerInput {
   source?: string;
 }
 
-export interface UpsertCustomerResult {
+interface UpsertCustomerResult {
   customer: Customer;
   isNew: boolean;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// FUNCIONS
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Buscar client per email
- */
-export async function findCustomerByEmail(email: string): Promise<Customer | null> {
+async function findCustomerByEmail(email: string): Promise<Customer | null> {
   const normalizedEmail = normalizeEmail(email);
   return prisma.customer.findUnique({
     where: { emailNormalized: normalizedEmail },
   });
 }
 
-/**
- * Crear o actualitzar client
- */
 export async function upsertCustomer(input: UpsertCustomerInput): Promise<UpsertCustomerResult> {
   const normalizedEmail = normalizeEmail(input.email);
   const existing = await findCustomerByEmail(normalizedEmail);
@@ -92,7 +77,6 @@ export async function upsertCustomer(input: UpsertCustomerInput): Promise<Upsert
     return { customer: updated, isNew: false };
   }
 
-  // Crear nou client
   const customer = await prisma.customer.create({
     data: {
       email: normalizedEmail,
@@ -112,16 +96,6 @@ export async function upsertCustomer(input: UpsertCustomerInput): Promise<Upsert
   return { customer, isNew: true };
 }
 
-/**
- * Obtenir client per ID
- */
-export async function getCustomerById(id: string): Promise<Customer | null> {
-  return prisma.customer.findUnique({ where: { id } });
-}
-
-/**
- * Buscar clients
- */
 export async function searchCustomers(query: string, limit = 20): Promise<Customer[]> {
   const q = query.toLowerCase().trim();
   return prisma.customer.findMany({
@@ -136,92 +110,3 @@ export async function searchCustomers(query: string, limit = 20): Promise<Custom
   });
 }
 
-/**
- * Obtenir tots els clients
- */
-export async function getAllCustomers(limit = 100): Promise<Customer[]> {
-  return prisma.customer.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-  });
-}
-
-/**
- * Actualitzar client
- */
-export async function updateCustomer(
-  id: string,
-  updates: Partial<Customer>
-): Promise<Customer | null> {
-  return prisma.customer.update({
-    where: { id },
-    data: updates,
-  });
-}
-
-/**
- * Log activitat del client
- */
-export async function logCustomerActivity(
-  customerId: string,
-  action: string,
-  details?: Record<string, unknown>,
-): Promise<void> {
-  await prisma.customerActivity.create({
-    data: {
-      customerId,
-      action,
-      details: (details as any) || undefined,
-    },
-  });
-}
-
-/**
- * Registrar consentiment
- */
-export async function recordConsent(
-  customerId: string,
-  consentType: string,
-  granted: boolean,
-  source: string,
-  legalTextVersion: string,
-  ipAddress?: string,
-  userAgent?: string
-): Promise<void> {
-  // Map string to ConsentType enum
-  const consentTypeMap: Record<string, string> = {
-    'gdpr': 'GDPR_BASIC',
-    'marketing': 'MARKETING_EMAIL',
-    'marketing_email': 'MARKETING_EMAIL',
-    'marketing_sms': 'MARKETING_SMS',
-    'marketing_whatsapp': 'MARKETING_WHATSAPP',
-  };
-
-  const mappedType = consentTypeMap[consentType.toLowerCase()] || 'GDPR_BASIC';
-
-  await prisma.consentRecord.create({
-    data: {
-      customerId,
-      consentType: mappedType as any,
-      granted,
-      grantedAt: granted ? new Date() : null,
-      source,
-      consentVersion: legalTextVersion,
-      ipAddress: ipAddress || null,
-      userAgent: userAgent || null,
-    },
-  });
-}
-
-/**
- * Obtenir estadístiques de clients
- */
-export async function getCustomerStats() {
-  const [total, marketing, withEvents] = await Promise.all([
-    prisma.customer.count(),
-    prisma.customer.count({ where: { marketingConsent: true } }),
-    prisma.customer.count({ where: { totalEvents: { gt: 0 } } }),
-  ]);
-
-  return { total, vip: 0, marketing, withEvents };
-}

@@ -1,0 +1,341 @@
+import { EventType } from '@prisma/client';
+import { log } from '@/lib/logger';
+import { prisma } from '@/lib/prisma';
+import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
+
+const OPERATOR_EXTRA_ID = '__operator_extra__';
+const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
+const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
+
+function normalizeEventType(eventType: string): EventType {
+  return Object.values(EventType).includes(eventType as EventType) ? (eventType as EventType) : EventType.OTHER;
+}
+
+
+type BookingExtraInput = {
+  extraId: string;
+  quantity?: number;
+  price: number;
+};
+
+type BookingCreateInput = {
+  leadId?: string;
+  customerId?: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  eventType: string;
+  eventDate: string;
+  eventStartTime?: string;
+  eventEndTime?: string;
+  eventLocation: string;
+  eventVenue?: string;
+  guestCount: number;
+  packId: string;
+  extraHours?: number;
+  extras?: BookingExtraInput[];
+  discount?: number;
+  discountCode?: string;
+  notes?: string;
+  distanceKm?: number;
+  fuelCostPerKm?: number;
+  travelCost?: number;
+};
+
+type BookingCreationResult = {
+  status: number;
+  body: Record<string, unknown>;
+};
+
+async function generateReference(): Promise<string> {
+  const year = new Date().getFullYear();
+  const prefix = `OE-${year}-`;
+
+  const lastBooking = await prisma.booking.findFirst({
+    where: { reference: { startsWith: prefix } },
+    orderBy: { reference: 'desc' },
+  });
+
+  let nextNumber = 1;
+  if (lastBooking) {
+    const raw = lastBooking.reference.split('-').pop();
+    const lastNumber = Number.parseInt(raw || '0', 10) || 0;
+    nextNumber = lastNumber + 1;
+  }
+
+  return `${prefix}${String(nextNumber).padStart(3, '0')}`;
+}
+
+async function ensureOperatorSupportExtraId(): Promise<string> {
+  const existing = await prisma.extra.findUnique({
+    where: { slug: OPERATOR_EXTRA_SLUG },
+    select: { id: true },
+  });
+  if (existing) return existing.id;
+
+  const created = await prisma.extra.create({
+    data: {
+      slug: OPERATOR_EXTRA_SLUG,
+      priceType: 'PER_HOUR',
+      price: 0,
+      isActive: true,
+      translations: {
+        create: [
+          { locale: 'ca', name: 'Operari de suport (hora)', description: 'Suport operatiu addicional per hora' },
+          { locale: 'es', name: 'Operario de soporte (hora)', description: 'Soporte operativo adicional por hora' },
+          { locale: 'en', name: 'Support operator (hour)', description: 'Additional operational support per hour' },
+        ],
+      },
+    },
+    select: { id: true },
+  });
+  return created.id;
+}
+
+async function resolveExtraId(input: string): Promise<string | null> {
+  if (input === OPERATOR_EXTRA_ID) {
+    return ensureOperatorSupportExtraId();
+  }
+
+  const byId = await prisma.extra.findUnique({
+    where: { id: input },
+    select: { id: true },
+  });
+  if (byId) return byId.id;
+
+  const bySlug = await prisma.extra.findUnique({
+    where: { slug: input },
+    select: { id: true },
+  });
+  return bySlug?.id || null;
+}
+
+async function assignPackInventory(bookingId: string, packId: string) {
+  try {
+    const packInventory = await prisma.packInventory.findMany({
+      where: { packId },
+      include: { item: true },
+    });
+
+    for (const row of packInventory) {
+      const overlapping = await prisma.bookingInventory.count({
+        where: {
+          itemId: row.itemId,
+          bookingId: { not: bookingId },
+          booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+        },
+      });
+      if (overlapping > 0) continue;
+
+      await prisma.bookingInventory.upsert({
+        where: { bookingId_itemId: { bookingId, itemId: row.itemId } },
+        create: {
+          bookingId,
+          itemId: row.itemId,
+          quantity: Math.max(1, Number(row.quantity || 1)),
+          conditionBefore: row.item.condition,
+        },
+        update: {
+          quantity: Math.max(1, Number(row.quantity || 1)),
+        },
+      });
+    }
+  } catch (assignError) {
+    log.warn('No s’ha pogut auto-assignar inventari del pack a la reserva', {
+      context: {
+        bookingId,
+        packId,
+        error: assignError instanceof Error ? assignError.message : String(assignError),
+      },
+    });
+  }
+}
+
+export async function createBookingFromInput(data: BookingCreateInput): Promise<BookingCreationResult> {
+  let linkedCustomerId: string | null = data.customerId || null;
+
+  if (!linkedCustomerId && data.leadId) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: data.leadId },
+      select: { customerId: true },
+    });
+    linkedCustomerId = lead?.customerId || null;
+  }
+
+  if (!linkedCustomerId) {
+    const byEmail = await prisma.customer.findUnique({
+      where: { emailNormalized: data.clientEmail.trim().toLowerCase() },
+      select: { id: true },
+    });
+    linkedCustomerId = byEmail?.id || null;
+  }
+
+  const pack = await prisma.pack.findUnique({ where: { id: data.packId } });
+  if (!pack) {
+    return { status: 404, body: { error: 'Pack no trobat' } };
+  }
+
+  const eventDate = new Date(data.eventDate);
+  if (Number.isNaN(eventDate.getTime())) {
+    return { status: 400, body: { error: 'Data de l\'esdeveniment invàlida' } };
+  }
+
+  const packPrice = pack.price;
+  const extraHoursPrice = (data.extraHours || 0) * pack.extraHourPrice;
+  const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
+  const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
+
+  let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+  if (distanceKm == null) {
+    const destination = [data.eventVenue || '', data.eventLocation || ''].filter(Boolean).join(', ').trim();
+    if (destination) {
+      try {
+        const route = await calculateGoogleMapsDistance({ destination });
+        distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
+      } catch {
+        distanceKm = null;
+      }
+    }
+  }
+
+  const fuelReference = await getFuelCostPerKmReference();
+  const fuelCostPerKm = sanitizeNonNegative(
+    data.fuelCostPerKm ?? fuelReference.costPerKm,
+    DEFAULT_VEHICLE_COST_PER_KM
+  );
+  const travelCost = distanceKm != null ? calculateTravelCost(distanceKm, fuelCostPerKm) : null;
+  const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
+  const subtotal = subtotalBase + travelCharge;
+  const discount = data.discount || 0;
+  const vatRate = 21;
+  const baseAfterDiscount = subtotal - discount;
+  const vatAmount = baseAfterDiscount * (vatRate / 100);
+  const total = baseAfterDiscount + vatAmount;
+  const depositAmount = Math.round(total * 0.3);
+  const reference = await generateReference();
+
+  const resolvedExtras = data.extras
+    ? (await Promise.all(
+        data.extras.map(async (extra) => {
+          const resolvedId = await resolveExtraId(extra.extraId);
+          if (!resolvedId) return null;
+          return {
+            extraId: resolvedId,
+            quantity: extra.quantity || 1,
+            price: extra.price,
+          };
+        })
+      )).filter((extra): extra is { extraId: string; quantity: number; price: number } => extra !== null)
+    : [];
+
+  const booking = await prisma.booking.create({
+    data: {
+      reference,
+      leadId: data.leadId,
+      customerId: linkedCustomerId,
+      clientName: data.clientName,
+      clientEmail: data.clientEmail,
+      clientPhone: data.clientPhone,
+      eventType: normalizeEventType(data.eventType),
+      eventDate,
+      eventStartTime: data.eventStartTime,
+      eventEndTime: data.eventEndTime,
+      eventLocation: data.eventLocation,
+      eventVenue: data.eventVenue,
+      guestCount: data.guestCount,
+      packId: data.packId,
+      extraHours: data.extraHours || 0,
+      distanceKm,
+      fuelCostPerKm,
+      travelCost,
+      subtotal,
+      discount,
+      discountCode: data.discountCode,
+      vatRate,
+      vatAmount,
+      total,
+      depositAmount,
+      remainingAmount: total - depositAmount,
+      notes: data.notes,
+      extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
+    },
+    include: {
+      pack: true,
+      extras: { include: { extra: true } },
+    },
+  });
+
+  await assignPackInventory(booking.id, booking.packId);
+
+  if (linkedCustomerId) {
+    await prisma.customerActivity.create({
+      data: {
+        customerId: linkedCustomerId,
+        action: 'BOOKING_CREATED',
+        details: {
+          bookingId: booking.id,
+          reference: booking.reference,
+          eventDate: booking.eventDate,
+          eventType: booking.eventType,
+          status: booking.status,
+        },
+      },
+    });
+
+    const prepDueDate = new Date(booking.eventDate);
+    prepDueDate.setDate(prepDueDate.getDate() - 7);
+
+    await prisma.task.create({
+      data: {
+        customerId: linkedCustomerId,
+        bookingId: booking.id,
+        leadId: data.leadId || null,
+        title: `Preparar reserva ${booking.reference}`,
+        description: 'Revisa horaris, ubicació, inventari, extres i confirmació final amb client.',
+        dueDate: prepDueDate,
+        status: 'OPEN',
+        priority: 'HIGH',
+        createdBy: 'system:auto-booking-create',
+      },
+    });
+  }
+
+  if (data.leadId) {
+    await prisma.lead.update({
+      where: { id: data.leadId },
+      data: {
+        status: 'WON',
+        convertedAt: new Date(),
+      },
+    });
+  }
+
+  await prisma.availability.upsert({
+    where: { date: eventDate },
+    create: {
+      date: eventDate,
+      status: 'BOOKED',
+      bookingId: booking.id,
+    },
+    update: {
+      status: 'BOOKED',
+      bookingId: booking.id,
+    },
+  });
+
+  await prisma.adminLog.create({
+    data: {
+      action: 'CREATE',
+      entity: 'booking',
+      entityId: booking.id,
+      details: { reference, clientName: data.clientName, total },
+    },
+  });
+
+  return { status: 200, body: { ok: true, booking } };
+}
+
+
+

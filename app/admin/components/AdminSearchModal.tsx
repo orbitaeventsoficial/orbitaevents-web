@@ -52,7 +52,7 @@ function getRecentItems(): RecentItem[] {
   }
 }
 
-export function addRecentItem(item: RecentItem) {
+function addRecentItem(item: RecentItem) {
   if (typeof window === 'undefined') return;
   try {
     const items = getRecentItems().filter((i) => i.href !== item.href);
@@ -316,3 +316,4 @@ export default function AdminSearchModal({
     </div>
   );
 }
+

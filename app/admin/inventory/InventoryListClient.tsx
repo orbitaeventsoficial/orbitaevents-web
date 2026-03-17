@@ -22,6 +22,7 @@ import {
 } from '@/lib/inventory-utils';
 import { formatNumber } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 interface InventoryItem {
   id: string;
@@ -49,7 +50,6 @@ interface Stats {
 }
 
 type ViewMode = 'list' | 'grid';
-type InventoryBundle = { id: string; name: string; itemIds: string[] };
 
 export default function InventoryListClient() {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -273,7 +273,7 @@ export default function InventoryListClient() {
       subtitle={`${items.length} elements · ${formatNumber(totalValue)}€ valor total`}
       actions={
         <div className="flex gap-2">
-          <div className="flex rounded-xl border overflow-hidden">
+          <div className="flex rounded-xl border p-0 overflow-hidden">
             <button
               type="button"
               onClick={() => toggleView('list')}
@@ -433,7 +433,7 @@ export default function InventoryListClient() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cercar per nom o codi..."
-          className="w-full rounded-xl border px-4 py-3 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+          className="w-full rounded-xl border px-4 py-3 text-sm "
         />
 
         <div className="grid gap-2 sm:grid-cols-3">
@@ -442,7 +442,7 @@ export default function InventoryListClient() {
             <select
               value={filterCategory ?? ''}
               onChange={(e) => setFilterCategory(e.target.value || null)}
-              className="w-full rounded-xl border px-2 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="w-full rounded-xl border px-2 py-1.5 text-xs "
             >
               <option value="">Totes</option>
               {categories.map((cat) => {
@@ -462,7 +462,7 @@ export default function InventoryListClient() {
             <select
               value={filterStatus ?? ''}
               onChange={(e) => setFilterStatus(e.target.value || null)}
-              className="w-full rounded-xl border px-2 py-1.5 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="w-full rounded-xl border px-2 py-1.5 text-xs "
             >
               <option value="">Tots</option>
               {statuses.map((st) => (
@@ -498,7 +498,7 @@ export default function InventoryListClient() {
               <Link
                 key={item.id}
                 href={`/admin/inventory/${item.id}`}
-                className="group rounded-2xl border overflow-hidden transition-all"
+                className="group rounded-2xl border p-0 overflow-hidden transition-all"
               >
                 {/* Foto */}
                 <div className="aspect-video relative overflow-hidden">
@@ -555,7 +555,7 @@ export default function InventoryListClient() {
         </section>
       ) : (
         /* Vista Llista (taula) */
-        <section className="rounded-2xl border admin-card-glass overflow-hidden">
+        <section className="rounded-2xl border p-0 admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm" aria-label="Inventari d'equipament">
               <thead className="border-b">
@@ -660,3 +660,6 @@ export default function InventoryListClient() {
     </AdminPage>
   );
 }
+
+
+

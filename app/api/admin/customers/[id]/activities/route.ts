@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { createCustomerActivityNote, listCustomerActivities } from '@/lib/services/customerActivityService';
 
 interface Params {
   params: { id: string };
@@ -18,12 +18,8 @@ export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const activities = await prisma.customerActivity.findMany({
-      where: { customerId: params.id },
-      orderBy: { createdAt: 'desc' },
-      take: 120,
-    });
-    return NextResponse.json({ ok: true, activities });
+    const result = await listCustomerActivities(params.id);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint activitats de client', error, {
       context: { customerId: params.id, endpoint: 'admin/customers/[id]/activities:GET' },
@@ -45,26 +41,9 @@ export async function POST(req: NextRequest, { params }: Params) {
         { status: 400 }
       );
     }
-    const action = parsed.data.action?.trim() || 'NOTE_ADDED';
-    const note = parsed.data.note.trim();
 
-    const customer = await prisma.customer.findUnique({
-      where: { id: params.id },
-      select: { id: true },
-    });
-    if (!customer) {
-      return NextResponse.json({ ok: false, error: 'Client no trobat' }, { status: 404 });
-    }
-
-    const activity = await prisma.customerActivity.create({
-      data: {
-        customerId: params.id,
-        action,
-        details: { note },
-      },
-    });
-
-    return NextResponse.json({ ok: true, activity }, { status: 201 });
+    const result = await createCustomerActivityNote(params.id, parsed.data);
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error creant activitat de client', error, {
       context: { customerId: params.id, endpoint: 'admin/customers/[id]/activities:POST' },
@@ -72,4 +51,3 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: false, error: 'Error creant activitat' }, { status: 500 });
   }
 }
-

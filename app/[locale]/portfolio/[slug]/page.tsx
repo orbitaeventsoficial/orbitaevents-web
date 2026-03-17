@@ -5,6 +5,8 @@ import { getTranslations } from 'next-intl/server';
 import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { SimpleGallery } from "@/app/components/GalleryPro";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
+import { getSiteUrl } from '@/lib/site';
+
 
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: metaTitle,
     description: metaDescription,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: `/portfolio/${slug}` },
     openGraph: {
       title: metaTitle,

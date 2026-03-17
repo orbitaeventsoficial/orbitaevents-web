@@ -1,61 +1,77 @@
 // === NORMALIZADOR DE CARPETAS + RENOMBRADOR + GENERADOR DE CONFIG ===
-// AUTO-GENERATED — NO EDITAR A MÀ
+// AUTO-GENERATED — NO EDITAR A MANO
 
-import { promises as fs } from "fs";
-import path from "path";
+import { promises as fs } from 'fs';
+import path from 'path';
 
-const BASE = path.join(process.cwd(), "public", "img", "portfolio");
-const OUTPUT = path.join(process.cwd(), "app", "config", "portfolio-images.ts");
+const BASE = path.join(process.cwd(), 'public', 'img', 'portfolio');
+const OUTPUT = path.join(process.cwd(), 'app', 'config', 'portfolio-images.ts');
 
-const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"];
-
-// -----------------------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------------------
+const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
+const PRIORITY_ORDER = [
+  'bodas',
+  'discomovil',
+  'eventos-empresa',
+  'fiestas-infantiles',
+  'fiestas-privadas',
+  'produccion-tecnica',
+  'alquiler-equipo',
+];
 
 const slugify = (name) =>
   name
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 
 const humanize = (name) => {
-  const clean = name.replace(/[_\-]+/g, " ").trim();
+  const clean = name.replace(/[_\-]+/g, ' ').trim();
   return clean.charAt(0).toUpperCase() + clean.slice(1);
 };
 
 const altFor = (file, categoryName) => {
-  const base = file.replace(/\.[^.]+$/, "");
+  const base = file.replace(/\.[^.]+$/, '');
   const clean = base
-    .replace(/[_\-]+/g, " ")
+    .replace(/[_\-]+/g, ' ')
     .replace(/\d+/g, (m) => ` ${m}`)
     .trim();
 
-  const pretty =
-    clean.charAt(0).toUpperCase() + clean.slice(1);
-
+  const pretty = clean.charAt(0).toUpperCase() + clean.slice(1);
   return `${categoryName} – ${pretty}`;
 };
 
 function isImageFile(file) {
-  return IMAGE_EXTENSIONS.some((ext) =>
-    file.toLowerCase().endsWith(ext)
-  );
+  return IMAGE_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext));
 }
 
-// -----------------------------------------------------------------------------
-// 1) Renombrador de imágenes dentro de cada carpeta
-// -----------------------------------------------------------------------------
+async function exists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function writeFileIfChanged(targetPath, content) {
+  const current = await fs.readFile(targetPath, 'utf8').catch(() => null);
+  if (current === content) {
+    return false;
+  }
+
+  await fs.mkdir(path.dirname(targetPath), { recursive: true });
+  await fs.writeFile(targetPath, content, 'utf8');
+  return true;
+}
 
 async function renameImagesInFolder(folderPath, folderName) {
   const entries = await fs.readdir(folderPath, { withFileTypes: true });
 
   const images = entries
-    .filter((e) => e.isFile() && isImageFile(e.name))
-    // Orden por nombre (si quieres ordenar por fecha: cambiar a mtime)
+    .filter((entry) => entry.isFile() && isImageFile(entry.name))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   if (images.length === 0) return;
@@ -63,28 +79,22 @@ async function renameImagesInFolder(folderPath, folderName) {
   console.log(`📂 Renombrando ${images.length} imágenes en ${folderName}`);
 
   let index = 1;
-
-  for (const img of images) {
-    const oldName = img.name;
+  for (const image of images) {
+    const oldName = image.name;
     const ext = path.extname(oldName).toLowerCase();
-    const num = String(index).padStart(2, "0");
+    const num = String(index).padStart(2, '0');
     const newName = `${folderName}-${num}${ext}`;
 
     if (newName !== oldName) {
       const oldPath = path.join(folderPath, oldName);
       const newPath = path.join(folderPath, newName);
-
       console.log(`   ✏️ ${oldName} → ${newName}`);
       await fs.rename(oldPath, newPath);
     }
 
-    index++;
+    index += 1;
   }
 }
-
-// -----------------------------------------------------------------------------
-// 2) Normaliza TODAS las carpetas e imágenes del portfolio
-// -----------------------------------------------------------------------------
 
 async function normalizePortfolio() {
   if (!(await exists(BASE))) {
@@ -93,37 +103,16 @@ async function normalizePortfolio() {
   }
 
   const entries = await fs.readdir(BASE, { withFileTypes: true });
-
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-
-    const folderName = entry.name;
-    const folderPath = path.join(BASE, folderName);
-
-    await renameImagesInFolder(folderPath, folderName);
+    await renameImagesInFolder(path.join(BASE, entry.name), entry.name);
   }
 }
 
-// -----------------------------------------------------------------------------
-// 3) Generador de la config de categorías + imágenes
-// -----------------------------------------------------------------------------
-
 async function generateConfig() {
   const dirs = await fs.readdir(BASE, { withFileTypes: true });
-
   const categories = [];
   const imagesBySlug = {};
-
-  // Orden deseado: alquiler-equipo debe ir AL FINAL
-  const PRIORITY_ORDER = [
-    'bodas',
-    'discomovil',
-    'eventos-empresa',
-    'fiestas-infantiles',
-    'fiestas-privadas',
-    'produccion-tecnica',
-    'alquiler-equipo', // AL FINAL
-  ];
 
   for (const dir of dirs) {
     if (!dir.isDirectory()) continue;
@@ -131,83 +120,50 @@ async function generateConfig() {
     const folder = dir.name;
     const slug = slugify(folder);
     const display = humanize(folder);
-
     const fullPath = path.join(BASE, folder);
     const files = await fs.readdir(fullPath);
 
-    const imgs = files
-      .filter((f) => isImageFile(f))
-      .map((f) => ({
-        src: `/img/portfolio/${folder}/${f}`,
-        alt: altFor(f, display),
+    const images = files
+      .filter((file) => isImageFile(file))
+      .map((file) => ({
+        src: `/img/portfolio/${folder}/${file}`,
+        alt: altFor(file, display),
       }));
 
-    if (imgs.length === 0) continue;
+    if (images.length === 0) continue;
 
     categories.push({
       slug,
       name: display,
-      cover: imgs[0].src, // primera imagen como portada
+      cover: images[0].src,
     });
 
-    imagesBySlug[slug] = imgs;
+    imagesBySlug[slug] = images;
   }
 
-  // Ordenar categorías según PRIORITY_ORDER
   categories.sort((a, b) => {
     const indexA = PRIORITY_ORDER.indexOf(a.slug);
     const indexB = PRIORITY_ORDER.indexOf(b.slug);
-
-    // Si ambos están en la lista de prioridad, ordenar según esa lista
-    if (indexA !== -1 && indexB !== -1) {
-      return indexA - indexB;
-    }
-    // Si solo uno está en la lista, ese va primero
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
     if (indexA !== -1) return -1;
     if (indexB !== -1) return 1;
-    // Si ninguno está, mantener orden alfabético
     return a.slug.localeCompare(b.slug);
   });
 
-  const output = `// AUTO-GENERATED — NO EDITAR A MANO
-
-export const PORTFOLIO_CATEGORIES = ${JSON.stringify(categories, null, 2)};
-
-export const PORTFOLIO_IMAGES = ${JSON.stringify(imagesBySlug, null, 2)};
-`;
-
-  await fs.mkdir(path.dirname(OUTPUT), { recursive: true });
-  await fs.writeFile(OUTPUT, output, "utf8");
-
-  console.log("✔ Config generada:", OUTPUT);
+  const output = `// AUTO-GENERATED — NO EDITAR A MANO\n\nexport const PORTFOLIO_CATEGORIES = ${JSON.stringify(categories, null, 2)};\n\nexport const PORTFOLIO_IMAGES = ${JSON.stringify(imagesBySlug, null, 2)};\n`;
+  const updated = await writeFileIfChanged(OUTPUT, output);
+  console.log(updated ? `✔ Config generada: ${OUTPUT}` : `✔ Config sin cambios: ${OUTPUT}`);
 }
-
-// -----------------------------------------------------------------------------
-// Utils
-// -----------------------------------------------------------------------------
-
-async function exists(path) {
-  try {
-    await fs.access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// MAIN
-// -----------------------------------------------------------------------------
 
 async function run() {
-  console.log("🔄 Normalizando portfolio (carpetas + nombres)...");
+  console.log('🔄 Normalizando portfolio (carpetas + nombres)...');
   await normalizePortfolio();
 
-  console.log("📝 Generando configuración del portfolio...");
+  console.log('📝 Generando configuración del portfolio...');
   await generateConfig();
 }
 
 run().catch((err) => {
-  console.error("❌ ERROR en generate-portfolio-config.mjs", err);
+  console.error('❌ ERROR en generate-portfolio-config.mjs', err);
   process.exit(1);
 });

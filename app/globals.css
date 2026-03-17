@@ -1,17 +1,4 @@
-/**
- * ═══════════════════════════════════════════════════════════════════════════
- * ÒRBITA EVENTS - GLOBALS.CSS v3.0 OPTIMITZAT
- * ═══════════════════════════════════════════════════════════════════════════
- * 
- * CANVIS PRINCIPALS:
- * - Tipografia millorada: Plus Jakarta Sans (títols) + Inter (text)
- * - Variables CSS organitzades
- * - Animacions optimitzades per performance
- * - Mobile-first approach
- * - Reducció de 2800 a ~800 línies
- * 
- * ═══════════════════════════════════════════════════════════════════════════
- */
+/* Global design tokens, utilities, and shared app styles. */
 
 @tailwind base;
 @tailwind components;
@@ -123,8 +110,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
-    overscroll-behavior: none; /* Prevent bounce on both axes */
-    -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
@@ -137,8 +124,20 @@
     color: var(--text-primary);
     min-height: 100dvh;
     overflow-x: hidden;
-    overscroll-behavior: none; /* Prevent bounce on both axes */
-    position: relative; /* iOS fix for overscroll */
+    overflow-y: auto;
+  }
+
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   /* Checkbox natiu: evita el blau per defecte del navegador */
@@ -178,18 +177,17 @@
     transition: opacity 0.4s ease-out;
   }
 
-  /* Classe legacy per compatibilitat */
+  body.hero-loading {
+    overflow: visible !important;
+    background: #000 !important;
+  }
+
   body.hero-loading #main-content,
   body.hero-loading header,
   body.hero-loading footer,
   body.hero-loading .floating-ctas {
     visibility: hidden !important;
     opacity: 0 !important;
-  }
-
-  body.hero-loading {
-    overflow: hidden !important;
-    background: #000 !important;
   }
 
   /* NOSCRIPT: Si no hi ha JS, mostrar contingut directament */
@@ -214,35 +212,6 @@
     }
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     TYPOGRAPHY HIERARCHY
-     ══════════════════════════════════════════════════════════════════════════ */
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display), system-ui, sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
-    text-wrap: balance;
-    color: var(--text-primary);
-  }
-
-  h1 {
-    font-size: clamp(2.25rem, 7vw, 4.5rem);
-    font-weight: 800;
-    letter-spacing: -0.035em;
-  }
-
-  h2 {
-    font-size: clamp(1.75rem, 5vw, 3rem);
-    letter-spacing: -0.03em;
-  }
-
-  h3 {
-    font-size: clamp(1.25rem, 3vw, 1.875rem);
-    letter-spacing: -0.02em;
-  }
-
   p {
     max-width: 70ch;
   }
@@ -257,16 +226,6 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     FOCUS STATES (Accessibility)
-     ══════════════════════════════════════════════════════════════════════════ */
-
-  *:focus-visible {
-    outline: 2px solid var(--oe-gold);
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
-
-  /* ══════════════════════════════════════════════════════════════════════════
      LINKS
      ══════════════════════════════════════════════════════════════════════════ */
 
@@ -274,47 +233,6 @@
     transition: color var(--transition-fast), opacity var(--transition-fast);
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     SCROLLBAR
-     ══════════════════════════════════════════════════════════════════════════ */
-
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--bg-main);
-  }
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--oe-gold) 0%, var(--oe-gold-dark) 100%);
-  border-radius: var(--radius-full);
-  border: 2px solid var(--bg-main);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--oe-gold-light);
-}
-}
-
-/* Hide scrollbars globally (remove golden bars) */
-* {
-  scrollbar-width: none !important;
-}
-
-*::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: transparent !important;
-  border: 0 !important;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent !important;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -496,19 +414,6 @@
   .text-mono {
     font-family: var(--font-mono), monospace;
     font-feature-settings: 'tnum';
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     HIDE SCROLLBAR
-     ───────────────────────────────────────────────────────────────────────── */
-
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -747,16 +652,17 @@ canvas,
    FIX: ELIMINAR EFECTE DE REBOT AL SCROLL (overscroll-behavior)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* Prevent bounce/rubber-banding at scroll boundaries */
+/* Keep document scroll native and predictable */
 html,
-body,
-main,
-section,
-div[class*="container"],
-div[class*="wrapper"] {
-  overscroll-behavior: none !important;
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
+body {
+  overscroll-behavior: auto !important;
+  overscroll-behavior-y: auto !important;
+  overscroll-behavior-x: auto !important;
+  height: auto !important;
+}
+
+#main-content {
+  overflow: visible !important;
 }
 
 /* Prevent images from blocking scroll on mobile */
@@ -1015,14 +921,6 @@ html:not(.admin-mode) .btn-secondary:hover {
 }
 
 /* -----------------------------------------------------------------------------
-   FIX 7: BADGE "NÚMEROS REALS" - ELIMINAR ICONA DUPLICADA SI CAL
-   ----------------------------------------------------------------------------- */
-/* Això s'ha de fer al component, però si hi ha CSS: */
-.badge-icon + .badge-icon {
-  display: none; /* Amaga segona icona duplicada */
-}
-
-/* -----------------------------------------------------------------------------
    FIX 8: TIPOGRAFIA SORA
    ----------------------------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6,
@@ -1030,7 +928,7 @@ h1, h2, h3, h4, h5, h6,
 .title,
 [class*="title"],
 [class*="heading"] {
-  font-family: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  font-family: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -1051,7 +949,7 @@ button {
 [class*="countdown"],
 [class*="timer"],
 [class*="stat"] {
-  font-family: 'JetBrains Mono', 'SF Mono', monospace !important;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
 }
 
 /* -----------------------------------------------------------------------------
@@ -1110,34 +1008,6 @@ textarea::placeholder {
    ============================================================================= */
 
 /* =============================================================================
-   TELON NEGRE INICIAL - EVITAR FLASH BLANC
-   ============================================================================= */
-html, body {
-    background-color: #000000 !important;
-  }
-
-  html.scroll-unlocked,
-  body.scroll-unlocked {
-    overflow: auto !important;
-    overscroll-behavior: auto !important;
-  }
-
-  html.scroll-unlocked main,
-  html.scroll-unlocked section,
-  html.scroll-unlocked div[class*="container"],
-  html.scroll-unlocked div[class*="wrapper"] {
-    overscroll-behavior: auto !important;
-  }
-
-/* =============================================================================
-   SAFE AREAS PER iPHONE/ANDROID
-   ============================================================================= */
-.pt-safe-area { padding-top: env(safe-area-inset-top); }
-.pb-safe-area { padding-bottom: env(safe-area-inset-bottom); }
-.pl-safe-area { padding-left: env(safe-area-inset-left); }
-.pr-safe-area { padding-right: env(safe-area-inset-right); }
-
-/* =============================================================================
    MOBILE EXPERIENCE STYLES
    ============================================================================= */
 @media (max-width: 767px) {
@@ -1163,31 +1033,6 @@ body.mobile-experience-active {
   overscroll-behavior: auto !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   MOBILE BRUTAL - EXPERIENCE PREMIUM
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-/* Touch targets mínim 44px (Apple HIG) */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Elimina el delay de 300ms en tocs */
-* {
-  touch-action: manipulation;
-}
-
-/* Scroll suau natiu */
-html {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Prevenir zoom accidental en inputs */
-input, select, textarea {
-  font-size: 16px !important;
-}
 
 /* Bottom CTA Bar */
 .bottom-cta-bar {
@@ -1214,121 +1059,18 @@ input, select, textarea {
   @apply snap-center;
 }
 
-/* Safe areas iPhone X+ */
-.safe-area-inset-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-
 /* ═══════════════════════════════════════════════════════════════
-   MOBILE ULTIMATE - Safe area classes
+   Safe area classes
    ═══════════════════════════════════════════════════════════════ */
 .safe-top { padding-top: env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 .safe-left { padding-left: env(safe-area-inset-left); }
 .safe-right { padding-right: env(safe-area-inset-right); }
 
-/* Hide scrollbar (mobile) */
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 /* Tap scale effect */
 .tap-scale:active {
   transform: scale(0.97);
   transition: transform 0.1s ease;
-}
-
-/* 3D perspective for cards */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-/* Note: .hide-scrollbar i .scrollbar-hide unificats a @layer utilities */
-
-/* Respectar preferències d'usuari */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Mobile/Desktop visibility - UNIFIED (768px = Tailwind md:) */
-/* Note: .desktop-only i .mobile-only ja estan definits a @layer utilities amb 1024px
-   Aquí usem 768px per coherència amb Tailwind md: breakpoint */
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   ELEGANT THEME - Paleta sofisticada
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-:root {
-  /* Colors primaris - Daurat sofisticat */
-  --color-gold: #C9A962;
-  --color-gold-light: #D4B978;
-  --color-gold-dark: #A68B4B;
-  --color-gold-muted: rgba(201, 169, 98, 0.15);
-
-  /* Fons - Negres profunds */
-  --color-bg-primary: #0A0A0A;
-  --color-bg-secondary: #111111;
-  --color-bg-card: #141414;
-
-  /* Textos */
-  --color-text-secondary: #A0A0A0;
-  --color-text-muted: #666666;
-
-  /* Borders subtils */
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-hover: rgba(201, 169, 98, 0.3);
-}
-
-/* Títols amb gradient daurat */
-.title-gradient {
-  background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-dark) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Botó primari elegant */
-.btn-primary-elegant {
-  background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
-  color: var(--color-bg-primary);
-  font-weight: 600;
-  padding: 14px 28px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: all 300ms ease;
-  box-shadow: 0 4px 20px rgba(201, 169, 98, 0.15);
-}
-
-.btn-primary-elegant:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(201, 169, 98, 0.25);
-}
-
-/* Card elegant */
-.card-elegant {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  transition: all 300ms ease;
-}
-
-.card-elegant:hover {
-  border-color: var(--color-border-hover);
-  transform: translateY(-4px);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -1892,7 +1634,7 @@ html.admin-mode {
   color-scheme: dark;
 }
 
-/* Alias compatibilitat amb layout.tsx ENFORCED_ADMIN_FLAT_CSS */
+/* Tokens puente del layout admin */
 html.admin-mode .admin-layout-shell {
   --admin-surface:  var(--at-surface);
   --admin-panel:    var(--at-panel);
@@ -3613,3 +3355,9 @@ html.admin-mode .ap-empty-action {
   html.admin-mode .ap-card-body { padding: 1rem 1.125rem; }
   html.admin-mode .ap-page { gap: 1.25rem; }
 }
+
+
+
+
+
+

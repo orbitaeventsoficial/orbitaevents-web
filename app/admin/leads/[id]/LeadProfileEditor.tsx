@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
-import { ADMIN_HELP } from '../../help-content';
+import { ADMIN_HELP } from '../../components/adminHelpGlossary';
 import { LEAD_STATUS_LABELS as STATUS_LABELS, PRIORITY_LABELS, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -158,7 +158,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             type="button"
             onClick={handleDeleteLead}
             disabled={deleting || saving}
-            className={`rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+            className={`rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
           >
             {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : 'Eliminar registre'}
           </button>
@@ -406,5 +406,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     </section>
   );
 }
+
+
 
 

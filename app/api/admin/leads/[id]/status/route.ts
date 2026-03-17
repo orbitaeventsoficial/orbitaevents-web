@@ -6,5 +6,6 @@ interface Params {
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
-  return handleLeadStatusPatch(req, params.id, false);
+  return handleLeadStatusPatch(req, params.id);
 }
+

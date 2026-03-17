@@ -7,286 +7,52 @@
 
 import { NextRequest } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 import { verifyCsrf } from '@/lib/csrf';
-import { normalizeDni } from '@/lib/utils/normalize';
-import { findDuplicates } from '@/lib/services/deduplicationService';
+import { createCustomerFromInput } from '@/lib/services/customerCreationService';
+import { listAdminCustomers } from '@/lib/services/customerListService';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * GET - Obtenir clients
- */
 export async function GET(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
 
   try {
     const { searchParams } = new URL(request.url);
-    const includeStats = searchParams.get('stats') === 'true';
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '25', 10);
-    const q = (searchParams.get('q') || '').trim();
-    const skip = (page - 1) * limit;
-    const where = q
-      ? {
-          OR: [
-            { id: { contains: q, mode: 'insensitive' as const } },
-            { name: { contains: q, mode: 'insensitive' as const } },
-            { nameNormalized: { contains: q, mode: 'insensitive' as const } },
-            { email: { contains: q, mode: 'insensitive' as const } },
-            { emailNormalized: { contains: q, mode: 'insensitive' as const } },
-            { phone: { contains: q } },
-            { phoneNormalized: { contains: q } },
-            { dni: { contains: q, mode: 'insensitive' as const } },
-            { dniNormalized: { contains: q, mode: 'insensitive' as const } },
-            { instagram: { contains: q, mode: 'insensitive' as const } },
-            { instagramNormalized: { contains: q, mode: 'insensitive' as const } },
-            {
-              discountCodes: {
-                some: {
-                  code: { contains: q, mode: 'insensitive' as const },
-                },
-              },
-            },
-          ],
-        }
-      : undefined;
+    const result = await listAdminCustomers({
+      includeStats: searchParams.get('stats') === 'true',
+      page: parseInt(searchParams.get('page') || '1', 10),
+      limit: parseInt(searchParams.get('limit') || '25', 10),
+      q: (searchParams.get('q') || '').trim(),
+    });
 
-    // Query paginada
-    const [customers, total] = await Promise.all([
-      prisma.customer.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        include: {
-          _count: {
-            select: {
-              testimonials: true,
-              discountCodes: true,
-            },
-          },
-        },
-      }),
-      prisma.customer.count({ where }),
-    ]);
-
-    let responseData: Record<string, unknown> = {
-      customers,
-      page,
-      limit,
-      total,
-      totalPages: Math.max(1, Math.ceil(total / limit)),
-      q,
-    };
-
-    if (includeStats) {
-      // Stats amb queries a la BD en comptes de filtrar en memòria
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-      const [total, withEvents, recentMonth, withGdpr, vip] = await Promise.all([
-        prisma.customer.count(),
-        prisma.customer.count({ where: { totalEvents: { gt: 0 } } }),
-        prisma.customer.count({ where: { createdAt: { gt: oneMonthAgo } } }),
-        prisma.customer.count({ where: { gdprConsent: true } }),
-        prisma.customer.count({ where: { totalSpent: { gte: 2000 } } }),
-      ]);
-
-      responseData.stats = {
-        total,
-        withEvents,
-        recentMonth,
-        withGdpr,
-        vip,
-      };
-    }
-
-    return successResponse(responseData);
+    return successResponse(result);
   } catch (error) {
     log.error('Error obtenint clients:', error);
     return ApiErrors.internal('Error obtenint clients');
   }
 }
 
-/**
- * POST - Crear client
- */
 export async function POST(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
 
-  // CSRF Protection for state-changing operations
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
 
   try {
     const body = await request.json();
-    const { name, email, phone, instagram, preferredLocale, dni, source, notes } = body;
+    const result = await createCustomerFromInput(body);
 
-    if (!name || !email) {
-      return ApiErrors.badRequest('Nom i email són obligatoris');
+    if (result.status >= 400) {
+      if (result.status === 400) return ApiErrors.badRequest(String(result.body.error || 'Error creant client'));
+      if (result.status === 409) return ApiErrors.conflict(String(result.body.error || 'Conflicte creant client'));
+      return ApiErrors.internal(String(result.body.error || 'Error creant client'));
     }
 
-    const emailNormalized = email.toLowerCase().trim();
-
-    // Comprovar si ja existeix per email
-    const existing = await prisma.customer.findUnique({
-      where: { emailNormalized },
-    });
-
-    if (existing) {
-      return ApiErrors.conflict('Ja existeix un client amb aquest email');
-    }
-
-    // Normalitzar DNI i comprovar duplicat
-    const dniNormalized = dni ? normalizeDni(dni) : null;
-    if (dniNormalized) {
-      const existingByDni = await prisma.customer.findUnique({
-        where: { dniNormalized },
-      });
-      if (existingByDni) {
-        return ApiErrors.conflict(`Ja existeix un client amb aquest DNI/NIF: ${existingByDni.name}`);
-      }
-    }
-
-    // Normalitzar nom (sense accents, lowercase)
-    const nameNormalized = name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-
-    // Normalitzar telèfon
-    const phoneNormalized = phone
-      ? phone.replace(/\D/g, '')
-      : null;
-
-    // Normalitzar Instagram
-    const instagramNormalized = instagram
-      ? instagram.replace('@', '').toLowerCase().trim()
-      : null;
-
-    // Validar source contra el enum
-    const validSources = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'];
-    const customerSource = validSources.includes(source) ? source : 'OTHER';
-
-    const initialNotes = typeof notes === 'string' ? notes.trim() : '';
-
-    // Crear client + activitat + tasca guia inicial (tot en transacció)
-    const customer = await prisma.$transaction(async (tx) => {
-      const created = await tx.customer.create({
-        data: {
-          name: name.trim(),
-          nameNormalized,
-          email: emailNormalized,
-          emailNormalized,
-          phone: phone?.trim() || null,
-          phoneNormalized,
-          instagram: instagram?.trim() || null,
-          instagramNormalized,
-          dni: dni?.trim() || null,
-          dniNormalized,
-          preferredLocale: preferredLocale || 'es',
-          source: customerSource,
-          gdprConsent: true,
-          gdprConsentDate: new Date(),
-        },
-      });
-
-      await tx.customerActivity.create({
-        data: {
-          customerId: created.id,
-          action: 'CUSTOMER_CREATED',
-          details: {
-            source: customerSource,
-            preferredLocale: preferredLocale || 'es',
-            hasInitialNotes: Boolean(initialNotes),
-          },
-        },
-      });
-
-      if (initialNotes) {
-        await tx.customerActivity.create({
-          data: {
-            customerId: created.id,
-            action: 'INITIAL_NOTES',
-            details: { notes: initialNotes },
-          },
-        });
-      }
-
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 1);
-
-      await tx.task.create({
-        data: {
-          customerId: created.id,
-          title: 'Validar fitxa inicial del client',
-          description: initialNotes
-            ? `Revisa les notes inicials i defineix el següent pas comercial.\n\nNotes:\n${initialNotes}`
-            : 'Confirma dades de contacte, tipus d’esdeveniment i següent acció comercial.',
-          dueDate,
-          status: 'OPEN',
-          priority: 'HIGH',
-          createdBy: 'system:auto-customer-create',
-        },
-      });
-
-      return created;
-    });
-
-    let duplicateWarnings: Awaited<ReturnType<typeof findDuplicates>> = [];
-    try {
-      duplicateWarnings = await findDuplicates(
-        {
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone || undefined,
-          instagram: customer.instagram || undefined,
-        },
-        customer.id
-      );
-
-      if (duplicateWarnings.length > 0) {
-        await prisma.customerActivity.create({
-          data: {
-            customerId: customer.id,
-            action: 'DUPLICATE_WARNING',
-            details: {
-              count: duplicateWarnings.length,
-              topScore: duplicateWarnings[0]?.matchScore || 0,
-              topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
-                id: dup.customer.id,
-                name: dup.customer.name,
-                score: dup.matchScore,
-              })),
-            },
-          },
-        });
-      }
-    } catch (dupError) {
-      log.warn('No s’ha pogut completar la detecció automàtica de duplicats', {
-        error: dupError instanceof Error ? dupError.message : String(dupError),
-      });
-    }
-
-    return successResponse(
-      {
-        ...customer,
-        duplicateWarnings: duplicateWarnings.slice(0, 5).map((dup) => ({
-          id: dup.customer.id,
-          name: dup.customer.name,
-          email: dup.customer.email,
-          score: dup.matchScore,
-        })),
-      },
-      'Client creat correctament',
-      201
-    );
+    return successResponse(result.body, result.message || 'Client creat correctament', result.status);
   } catch (error) {
     log.error('Error creant client:', error);
     return ApiErrors.internal('Error creant client');

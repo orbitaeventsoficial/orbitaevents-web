@@ -27,13 +27,13 @@ const STEP_STYLES = {
     card: 'border-emerald-500/40 bg-emerald-500/10',
     dot: 'bg-emerald-500',
     label: 'text-emerald-400',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    badge: 'admin-tone-soft-success border-emerald-500/30',
   },
   active: {
     card: 'border-cyan-500/40 bg-cyan-500/10',
     dot: 'bg-cyan-500 animate-pulse',
     label: 'text-cyan-400',
-    badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    badge: 'admin-tone-soft-info border-cyan-500/30',
   },
   pending: {
     card: 'border-white/10 bg-white/[0.02]',
@@ -140,7 +140,7 @@ export default function DocumentFlowSection({
       <div className="relative mb-6">
         <div className="absolute top-3 left-6 right-6 h-0.5 bg-white/10" />
         <div
-          className="absolute top-3 left-6 h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500"
+          className="absolute top-3 left-6 h-0.5 transition-all duration-500"
           style={{
             width: invoicePaid ? 'calc(100% - 3rem)' :
               hasInvoice ? 'calc(83% - 2.5rem)' :
@@ -194,7 +194,7 @@ export default function DocumentFlowSection({
                 href={step.link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[10px] font-medium text-cyan-400 hover:text-cyan-300 transition-colors mt-2"
+                className="inline-flex items-center gap-1 text-[10px] font-medium transition-colors mt-2"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -208,3 +208,4 @@ export default function DocumentFlowSection({
     </section>
   );
 }
+

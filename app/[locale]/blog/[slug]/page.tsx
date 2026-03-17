@@ -10,40 +10,19 @@ import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
 import { toIntlLocale } from '@/lib/constants';
+import { getPublicBlogPost, type PublicBlogPost } from '@/lib/blog-public';
+import { absoluteUrl, getSiteUrl } from '@/lib/site';
+
 
 export const revalidate = 3600;
 
-interface BlogTranslation {
-  title: string;
-  excerpt: string;
-  content: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
+async function getPost(slug: string, locale: string): Promise<PublicBlogPost | null> {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
 
-interface BlogPost {
-  id: string;
-  slug: string;
-  author: string;
-  category: string;
-  tags: string[];
-  featuredImage?: string;
-  publishedAt?: string;
-  updatedAt?: string;
-  readingTime?: number;
-  translations: BlogTranslation[];
-}
-
-async function getPost(slug: string, locale: string): Promise<BlogPost | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const res = await fetch(
-      `${baseUrl}/api/public/blog?slug=${slug}&locale=${locale}`,
-      { next: { revalidate: 3600 } }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.post || null;
+    return await getPublicBlogPost(slug, locale);
   } catch {
     return null;
   }
@@ -75,7 +54,6 @@ export async function generateMetadata({
   };
 }
 
-// Render HTML content from DB (content stored as HTML in the seed)
 function BlogContent({ html }: { html: string }) {
   return (
     <div
@@ -120,8 +98,7 @@ export default async function BlogPostPage({
   const categoryColor = CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general;
   const yearsExperience = SITE_CONFIG.stats.yearsExperience;
 
-  // JSON-LD for blog post (BlogPosting schema)
-  const canonicalUrl = `https://orbitaevents.com/${locale}/blog/${slug}`;
+  const canonicalUrl = absoluteUrl(`/${locale}/blog/${slug}`);
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -132,17 +109,17 @@ export default async function BlogPostPage({
     author: {
       '@type': 'Organization',
       name: SITE_CONFIG.business.name,
-      url: 'https://orbitaevents.com',
+      url: getSiteUrl(),
     },
     publisher: {
       '@type': 'Organization',
       name: SITE_CONFIG.business.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://orbitaevents.com/img/orbitawordmark.svg',
+        url: absoluteUrl('/img/orbitawordmark.svg'),
       },
     },
-    image: post.featuredImage || 'https://orbitaevents.com/og-default.jpg',
+    image: post.featuredImage || absoluteUrl('/og-default.jpg'),
     url: canonicalUrl,
     mainEntityOfPage: {
       '@type': 'WebPage',
@@ -159,7 +136,6 @@ export default async function BlogPostPage({
 
       <main className="min-h-screen bg-[#0A0A0A]">
         <BlogTracking page="post" slug={slug} />
-        {/* Hero */}
         <section className="relative pt-24 pb-0 overflow-hidden">
           {post.featuredImage && (
             <div className="absolute inset-0 h-[500px]">
@@ -176,7 +152,6 @@ export default async function BlogPostPage({
           )}
 
           <div className="relative container mx-auto px-4 max-w-4xl pt-8 pb-12">
-            {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-white/50 mb-8">
               <Link href="/" className="hover:text-white transition-colors">{tBlog('post.breadcrumbHome')}</Link>
               <span>/</span>
@@ -185,7 +160,6 @@ export default async function BlogPostPage({
               <span className="text-white/80 truncate max-w-[200px]">{translation.title}</span>
             </nav>
 
-            {/* Category + meta */}
             <div className="flex items-center gap-3 mb-6 flex-wrap">
               <span className={`px-3 py-1 rounded-full text-xs font-semibold border capitalize ${categoryColor}`}>
                 {post.category}
@@ -201,25 +175,21 @@ export default async function BlogPostPage({
               <span className="text-white/50 text-sm">✍️ {tBlog('post.byAuthor', { author: post.author })}</span>
             </div>
 
-            {/* Title */}
             <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-6">
               {translation.title}
             </h1>
 
-            {/* Excerpt */}
             <p className="text-xl text-white/60 leading-relaxed border-l-4 border-amber-500/40 pl-6">
               {translation.excerpt}
             </p>
           </div>
         </section>
 
-        {/* Content */}
         <section className="container mx-auto px-4 max-w-4xl pb-24">
           <div className="border-t border-white/10 pt-12">
-            <BlogContent html={translation.content} />
+            <BlogContent html={translation.content || ''} />
           </div>
 
-          {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
@@ -233,7 +203,6 @@ export default async function BlogPostPage({
             </div>
           )}
 
-          {/* CTA */}
           <div className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
             <h3 className="text-2xl font-bold text-white mb-3">
               {tBlog('post.ctaTitle')}

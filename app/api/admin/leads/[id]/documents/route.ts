@@ -1,42 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { uploadFile } from '@/lib/storage';
 import { requireAuth } from '@/lib/auth';
-import type { LeadDocumentType } from '@prisma/client';
-
-const MAX_SIZE_BYTES = 8 * 1024 * 1024;
-const ALLOWED_TYPES = new Set([
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.ms-excel',
-]);
-const ALLOWED_DOC_TYPES = new Set([
-  'QUOTE',
-  'CONTRACT',
-  'INVOICE',
-  'IMAGE',
-  'FILE',
-  'OTHER',
-]);
+import { listLeadDocuments, uploadLeadDocument } from '@/lib/services/leadDocumentService';
 
 interface Params {
   params: { id: string };
 }
 
-export async function GET(_req: NextRequest, { params }: Params) {
-  const authError = requireAuth(_req);
+export async function GET(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const documents = await prisma.leadDocument.findMany({
-      where: { leadId: params.id },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json({ ok: true, documents });
+    const result = await listLeadDocuments(params.id);
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint documents', error);
     return NextResponse.json({ error: 'Error obtenint documents' }, { status: 500 });
@@ -47,64 +23,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const title = String(formData.get('title') || '').trim();
-    const rawType = String(formData.get('type') || 'FILE').trim().toUpperCase();
-    const createdBy = String(formData.get('createdBy') || 'Admin');
-
-    if (!file) {
-      return NextResponse.json({ error: 'Falta el fitxer' }, { status: 400 });
-    }
-    if (!title) {
-      return NextResponse.json({ error: 'Falta el títol' }, { status: 400 });
-    }
-    if (!ALLOWED_DOC_TYPES.has(rawType)) {
-      return NextResponse.json({ error: 'Tipus de document no permès' }, { status: 400 });
-    }
-
-    const type = rawType as LeadDocumentType;
-    if (!ALLOWED_TYPES.has(file.type)) {
-      return NextResponse.json({ error: 'Tipus de fitxer no permès' }, { status: 400 });
-    }
-    if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json({ error: 'Fitxer massa gran' }, { status: 413 });
-    }
-
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).slice(2, 8);
-    const ext = file.name.split('.').pop() || 'bin';
-    const path = `leads/${params.id}/documents/${timestamp}-${random}.${ext}`;
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const result = await uploadFile(path, buffer);
-
-    const doc = await prisma.leadDocument.create({
-      data: {
-        leadId: params.id,
-        type,
-        source: 'MANUAL',
-        title,
-        fileUrl: result.publicUrl,
-        filePath: result.path,
-        mimeType: file.type,
-        size: file.size,
-        createdBy,
-      },
-    });
-
-    await prisma.leadActivity.create({
-      data: {
-        leadId: params.id,
-        type: 'DOCUMENT',
-        title: 'Document afegit',
-        description: title,
-        metadata: { documentId: doc.id, type: doc.type },
-        createdBy,
-      },
-    });
-
-    return NextResponse.json({ ok: true, document: doc });
+    const result = await uploadLeadDocument(params.id, await req.formData());
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error afegint document', error);
     return NextResponse.json({ error: 'Error afegint document' }, { status: 500 });

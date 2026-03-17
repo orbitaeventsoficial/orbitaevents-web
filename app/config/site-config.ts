@@ -242,7 +242,9 @@ export const SITE_CONFIG = {
 /**
  * Genera URL de WhatsApp con mensaje predefinido
  */
-export function getWhatsAppUrl(messageType: keyof typeof SITE_CONFIG.whatsapp.messages = 'general', customData?: any): string {
+type WhatsAppMessageData = { packName?: string; precio?: number };
+
+export function getWhatsAppUrl(messageType: keyof typeof SITE_CONFIG.whatsapp.messages = 'general', customData?: WhatsAppMessageData): string {
   const { number, messages } = SITE_CONFIG.whatsapp;
 
   let message: string;
@@ -292,5 +294,7 @@ export function isFeatureEnabled(feature: keyof typeof SITE_CONFIG.features): bo
 // ============================================
 // TIPOS EXPORTADOS
 // ============================================
-export type SocialPlatform = keyof typeof SITE_CONFIG.social;
-export type WhatsAppMessageType = keyof typeof SITE_CONFIG.whatsapp.messages;
+type SocialPlatform = keyof typeof SITE_CONFIG.social;
+type WhatsAppMessageType = keyof typeof SITE_CONFIG.whatsapp.messages;
+
+

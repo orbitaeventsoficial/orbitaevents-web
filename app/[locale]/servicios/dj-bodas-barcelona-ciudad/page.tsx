@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Barcelona Ciudad | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Barcelona ciudad desde ${MIN_PRICE}€. Eixample, Gràcia, Sarrià, Ciutat Vella. Desplazamiento incluido en toda la ciudad.`,
   keywords: ['DJ bodas Barcelona', 'DJ bodas Eixample', 'DJ bodas Gràcia', 'DJ bodas Sarrià', 'bodas Barcelona ciudad'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-barcelona-ciudad' },
   openGraph: {
     title: `DJ Bodas Barcelona Ciudad | Desde ${MIN_PRICE}€`,

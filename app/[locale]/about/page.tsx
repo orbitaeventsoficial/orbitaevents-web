@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import { getTranslations } from 'next-intl/server';
 import TeamMembersGrid from '@/components/about/TeamMembersGrid';
+import { getSiteUrl } from '@/lib/site';
+
 
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -11,7 +13,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('meta.title'),
     description: t('meta.description'),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/about' },
   };
 }

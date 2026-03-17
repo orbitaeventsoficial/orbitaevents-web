@@ -1,12 +1,12 @@
 import { log } from '@/lib/logger';
 import { normalizePhone } from '@/lib/utils/normalize';
 
-export interface WhatsAppSendInput {
+interface WhatsAppSendInput {
   to: string;
   text: string;
 }
 
-export interface WhatsAppSendResult {
+interface WhatsAppSendResult {
   ok: boolean;
   providerMessageId?: string;
   error?: string;
@@ -53,3 +53,4 @@ export async function sendWhatsAppText(input: WhatsAppSendInput): Promise<WhatsA
     return { ok: false, error: 'Excepción enviando WhatsApp' };
   }
 }
+

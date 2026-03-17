@@ -6,6 +6,8 @@
  */
 
 import { z } from 'zod';
+import { getSiteUrl } from '@/lib/site';
+
 
 // Schema for server-side env vars (not exposed to client)
 const serverSchema = z.object({
@@ -114,6 +116,6 @@ export const getEnv = {
   isDev: () => process.env.NODE_ENV === 'development',
   isProd: () => process.env.NODE_ENV === 'production',
   isTest: () => process.env.NODE_ENV === 'test',
-  siteUrl: () => process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com',
+  siteUrl: () => getSiteUrl(),
   databaseUrl: () => process.env.DATABASE_URL,
 };

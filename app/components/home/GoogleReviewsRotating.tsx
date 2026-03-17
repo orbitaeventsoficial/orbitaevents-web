@@ -97,10 +97,10 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, scale: 0.98, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.985, y: 8 }}
+      transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
       className="relative bg-gradient-to-br from-white/8 to-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl shadow-amber-500/10 max-w-4xl mx-auto"
     >
       {/* Quote icon */}
@@ -225,7 +225,7 @@ export default function GoogleReviewsRotating({ showFooterCta = true }: { showFo
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.05),transparent_70%)]" />
         <div className="relative container mx-auto px-4 text-center max-w-2xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
@@ -284,7 +284,7 @@ export default function GoogleReviewsRotating({ showFooterCta = true }: { showFo
       <div className="relative container mx-auto px-4">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-12"
@@ -362,7 +362,7 @@ export default function GoogleReviewsRotating({ showFooterCta = true }: { showFo
 
         {showFooterCta && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mt-16"

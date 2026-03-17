@@ -116,7 +116,7 @@ export default function InvoiceSection({
             type="button"
             onClick={createInvoice}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 px-3.5 py-2 text-xs font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {busy ? <Spinner /> : '+'}
             Crear factura
@@ -139,13 +139,13 @@ export default function InvoiceSection({
 
           {/* Sync error */}
           {activeInvoice.status === 'SYNC_ERROR' && activeInvoice.holdedSyncError && (
-            <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5">
-              <p className="text-xs text-rose-300 mb-2.5">{activeInvoice.holdedSyncError}</p>
+            <div className="rounded-xl border p-3.5">
+              <p className="text-xs mb-2.5">{activeInvoice.holdedSyncError}</p>
               <button
                 type="button"
                 onClick={() => retrySync(activeInvoice.id)}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 px-3 py-1.5 text-xs font-semibold text-rose-200 transition-colors hover:bg-rose-500/10 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 {busy ? <Spinner /> : '🔄'}
                 Reintentar sync
@@ -174,7 +174,7 @@ export default function InvoiceSection({
                 type="button"
                 onClick={() => markPaid(activeInvoice.id)}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 {busy ? <Spinner /> : '✓'}
                 Marcar pagada
@@ -197,10 +197,10 @@ export default function InvoiceSection({
       )}
 
       {error && (
-        <div className="mt-3 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2">
-          <span className="text-rose-400 text-xs">⚠️</span>
-          <p className="text-xs text-rose-300 flex-1">{error}</p>
-          <button type="button" onClick={() => setError(null)} className="text-rose-400/50 hover:text-rose-400 text-xs">✕</button>
+        <div className="mt-3 flex items-center gap-2 rounded-xl border px-3 py-2">
+          <span className="text-xs">⚠️</span>
+          <p className="text-xs flex-1">{error}</p>
+          <button type="button" onClick={() => setError(null)} className="text-xs">✕</button>
         </div>
       )}
 

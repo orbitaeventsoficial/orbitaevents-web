@@ -136,7 +136,7 @@ export default function BookingFilters() {
               setSearch('');
               router.push('/admin/bookings');
             }}
-            className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
+            className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             Netejar filtres
           </button>

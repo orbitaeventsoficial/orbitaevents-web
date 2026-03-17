@@ -1,12 +1,11 @@
-import { prisma } from '@/lib/prisma';
-import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
-import type { LeadTaskStatus, Prisma } from '@prisma/client';
+import type { LeadTaskStatus } from '@prisma/client';
 import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
 import TaskRowActions from './TaskRowActions';
 import GenerateDailyChecklistButton from './GenerateDailyChecklistButton';
 import TaskKanbanView from './TaskKanbanView';
+import { fetchAdminTaskList } from '@/lib/services/tasks/taskList';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +55,7 @@ export default async function TasksPage({
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const viewParam = Array.isArray(searchParams?.view) ? searchParams?.view[0] : searchParams?.view;
-  const isKanban = viewParam === 'list' ? false : true; // default kanban
+  const isKanban = viewParam === 'list' ? false : true;
   const statusParam = Array.isArray(searchParams?.status) ? searchParams?.status[0] : searchParams?.status;
   const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
   const customerIdParam = Array.isArray(searchParams?.customerId) ? searchParams?.customerId[0] : searchParams?.customerId;
@@ -67,99 +66,13 @@ export default async function TasksPage({
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  let tasks: Array<{
-    id: string;
-    title: string;
-    status: LeadTaskStatus;
-    dueDate: Date | null;
-    lead?: { id: string; name: string };
-    customer?: { id: string; name: string };
-  }> = [];
-  let total = 0;
-
-  try {
-    const where = {
-      ...(status ? { status: { equals: status } } : {}),
-      ...(customerId ? { customerId } : {}),
-      NOT: [
-        {
-          createdBy: 'system:daily-checklist',
-          status: { in: ['OPEN', 'IN_PROGRESS'] as LeadTaskStatus[] },
-          dueDate: { lt: todayStart },
-        },
-        {
-          createdBy: 'system:daily-checklist',
-          status: 'CANCELLED' as LeadTaskStatus,
-        },
-      ],
-    };
-    const [rows, count] = await Promise.all([
-      prisma.task.findMany({
-        where,
-        orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-        take: limit,
-        skip: (page - 1) * limit,
-        include: {
-          lead: { select: { id: true, name: true } },
-          customer: { select: { id: true, name: true } },
-        },
-      }),
-      prisma.task.count({ where }),
-    ]);
-    tasks = rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      status: row.status,
-      dueDate: row.dueDate,
-      lead: row.lead ? { id: row.lead.id, name: row.lead.name } : undefined,
-      customer: row.customer ? { id: row.customer.id, name: row.customer.name } : undefined,
-    }));
-    total = count;
-  } catch (error) {
-    log.error('[Tasks] Error carregant tasques universals, fallback legacy:', error);
-    const where: Prisma.LeadTaskWhereInput = {
-      ...(status ? { status: { equals: status } } : {}),
-      ...(customerId ? { lead: { customerId } } : {}),
-      NOT: [
-        {
-          createdBy: 'system:daily-checklist',
-          status: { in: ['OPEN', 'IN_PROGRESS'] },
-          dueDate: { lt: todayStart },
-        },
-        {
-          createdBy: 'system:daily-checklist',
-          status: 'CANCELLED',
-        },
-      ],
-    };
-    const [legacyRows, legacyCount] = await Promise.all([
-      prisma.leadTask.findMany({
-        where,
-        orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-        take: limit,
-        skip: (page - 1) * limit,
-        include: {
-          lead: {
-            select: {
-              id: true,
-              name: true,
-              customer: { select: { id: true, name: true } },
-            },
-          },
-        },
-      }),
-      prisma.leadTask.count({ where }),
-    ]);
-    tasks = legacyRows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      status: row.status,
-      dueDate: row.dueDate,
-      lead: { id: row.lead.id, name: row.lead.name },
-      customer: row.lead.customer ? { id: row.lead.customer.id, name: row.lead.customer.name } : undefined,
-    }));
-    total = legacyCount;
-  }
+  const { tasks, total } = await fetchAdminTaskList({
+    status,
+    customerId,
+    page,
+    limit,
+    todayStart,
+  });
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const buildHref = (targetPage: number) => {
@@ -198,14 +111,12 @@ export default async function TasksPage({
         </>
       }
     >
-      {/* Vista Kanban */}
       {isKanban && (
         <AdminSection>
           <TaskKanbanView />
         </AdminSection>
       )}
 
-      {/* Vista Llista */}
       {!isKanban && (
         <>
           <AdminSection compact>
@@ -272,7 +183,6 @@ export default async function TasksPage({
         </>
       )}
 
-      {/* Paginació (només vista llista) */}
       {!isKanban && totalPages > 1 && (
         <div className="flex items-center justify-between ap-subtitle">
           <span>Pàgina {page} de {totalPages}</span>

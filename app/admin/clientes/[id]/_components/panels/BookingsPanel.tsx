@@ -61,7 +61,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
         ) : (
           <>
           {upcoming.length > 0 && (
-            <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300">Properes ({upcoming.length})</p>
+            <p className="text-xs font-semibold uppercase tracking-wider">Properes ({upcoming.length})</p>
           )}
           {upcoming.map((booking) => {
             const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-white/10 bg-white/5 text-white/60';

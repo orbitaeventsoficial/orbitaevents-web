@@ -120,7 +120,7 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className={`inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
+          className={`inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50 ${confirmingDelete ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
         >
           {isDeleting ? 'Eliminant...' : confirmingDelete ? 'Segur?' : 'Eliminar'}
         </button>
@@ -128,3 +128,4 @@ export default function BookingActions({
     </div>
   );
 }
+

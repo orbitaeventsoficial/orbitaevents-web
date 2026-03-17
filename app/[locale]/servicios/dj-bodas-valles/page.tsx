@@ -6,6 +6,8 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
+import { getSiteUrl } from '@/lib/site';
+
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Vallès desde ${MIN_PRICE}€. Granollers, Sabadell, Terrassa, Mollet. DJ local con desplazamiento incluido.`,
   keywords: ['DJ bodas Vallès', 'DJ bodas Granollers', 'DJ bodas Sabadell', 'DJ bodas Terrassa', 'bodas Vallès Oriental'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-valles' },
   openGraph: {
     title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€`,

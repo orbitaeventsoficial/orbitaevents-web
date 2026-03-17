@@ -1,32 +1,202 @@
-export type HelpEntry = {
+type HelpEntryId =
+  | 'lead'
+  | 'client'
+  | 'leadSource'
+  | 'leadStatus'
+  | 'leadPriority'
+  | 'leadScore'
+  | 'leadLandingPage'
+  | 'leadUtmSource'
+  | 'leadUtmMedium'
+  | 'leadUtmCampaign'
+  | 'leadAttribution'
+  | 'pipeline'
+  | 'cac'
+  | 'conversion'
+  | 'postEvent'
+  | 'inboxImport'
+  | 'task'
+  | 'document'
+  | 'quote'
+  | 'booking'
+  | 'billing'
+  | 'leadEditorSource'
+  | 'leadEditorLanding'
+  | 'leadEditorUtmSource'
+  | 'leadEditorUtmMedium'
+  | 'leadEditorUtmCampaign';
+
+type HelpEntry = {
+  id: HelpEntryId;
   term: string;
   description: string;
   keywords: string[];
 };
 
-export const HELP_ENTRIES: HelpEntry[] = [
-  { term: 'Entrada', description: 'Persona que ha preguntat, però encara NO és client tancat.', keywords: ['entrada', 'entrades', 'lead', 'leads'] },
-  { term: 'Client', description: 'Persona que ja tens guardada com a client (pot tenir diversos esdeveniments).', keywords: ['client', 'cliente', 'clients'] },
-  { term: 'Origen', description: 'D’on ha vingut el contacte. Exemple: Web, WhatsApp, Wallapop.', keywords: ['origen', 'source', 'canal'] },
-  { term: 'Estat entrada', description: 'En quin punt està la venda: nova, contactada, pressupost, negociació, guanyada o perduda.', keywords: ['estat', 'estado', 'status', 'estat entrada', 'estat lead'] },
-  { term: 'Prioritat', description: 'Quina urgència té. Alta = mirar-ho abans.', keywords: ['prioritat', 'prioridad', 'priority'] },
-  { term: 'Puntuació entrada', description: 'Nota automàtica (0-100) per saber si és una entrada forta o fluixa.', keywords: ['puntuacio entrada', 'lead score', 'score'] },
-  { term: 'Landing', description: 'Pàgina exacta on estava abans d’enviar el formulari.', keywords: ['landing', 'landing page'] },
-  { term: 'UTM source', description: 'Nom curt de la font. Exemple: google, instagram.', keywords: ['utm source'] },
-  { term: 'UTM medium', description: 'Tipus de canal. Exemple: anuncio, social, email.', keywords: ['utm medium'] },
-  { term: 'UTM campaign', description: 'Nom de campanya. Exemple: estiu-2026.', keywords: ['utm campaign'] },
-  { term: 'Atribució', description: 'A quin canal li donem el mèrit de portar l’entrada.', keywords: ['atribucio', 'atribución', 'attribution'] },
-  { term: 'Pipeline', description: 'Camí de la venda, de primer contacte fins tancament.', keywords: ['pipeline', 'embudo'] },
-  { term: 'CAC', description: 'Quant et costa aconseguir un client en un canal.', keywords: ['cac', 'coste adquisicion', 'cost d’adquisicio'] },
-  { term: 'Conversió', description: 'De 100 entrades, quantes acaben reservant.', keywords: ['conversio', 'conversión', 'conversion'] },
-  { term: 'Post-esdeveniment', description: 'Tot el que fas després de l’esdeveniment: informe, valoració i seguiment.', keywords: ['post-event', 'post evento', 'postevento', 'post-esdeveniment'] },
-  { term: 'Importació de bústia', description: 'Passar un correu a la fitxa d’entrada automàticament.', keywords: ['inbox', 'imap', 'importat', 'importado'] },
-  { term: 'Tasca', description: 'Cosa pendent de fer (trucar, enviar pressupost, etc.).', keywords: ['tasca', 'task', 'tarea'] },
-  { term: 'Document', description: 'Arxiu guardat de l’entrada o client (pressupost, contracte, factura...).', keywords: ['document', 'documento', 'archivo'] },
-  { term: 'Pressupost', description: 'Proposta econòmica que envies al client abans de tancar.', keywords: ['pressupost', 'presupuesto', 'quote'] },
-  { term: 'Reserva', description: 'Event ja confirmat i vinculat a un client.', keywords: ['reserva', 'booking'] },
-  { term: 'Facturació', description: 'Imports cobrats i pendents de cobrar.', keywords: ['facturacio', 'facturación', 'revenue', 'ingresos'] },
-];
+const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
+  lead: {
+    id: 'lead',
+    term: 'Entrada',
+    description: 'Persona que ha preguntat, pero encara no es client tancat.',
+    keywords: ['entrada', 'entrades', 'lead', 'leads'],
+  },
+  client: {
+    id: 'client',
+    term: 'Client',
+    description: 'Persona que ja tens guardada com a client i pot tenir diversos esdeveniments.',
+    keywords: ['client', 'cliente', 'clients'],
+  },
+  leadSource: {
+    id: 'leadSource',
+    term: 'Origen',
+    description: "Canal d'entrada del lead: web, whatsapp, instagram, wallapop, recomanacio, etc.",
+    keywords: ['origen', 'source', 'canal'],
+  },
+  leadStatus: {
+    id: 'leadStatus',
+    term: 'Estat entrada',
+    description: 'Fase comercial actual del lead: nou, contactat, pressupost enviat, negociacio, guanyat o perdut.',
+    keywords: ['estat', 'estado', 'status', 'estat entrada', 'estat lead'],
+  },
+  leadPriority: {
+    id: 'leadPriority',
+    term: 'Prioritat',
+    description: "Nivell d'urgencia comercial per prioritzar seguiment i tasques.",
+    keywords: ['prioritat', 'prioridad', 'priority'],
+  },
+  leadScore: {
+    id: 'leadScore',
+    term: 'Puntuacio entrada',
+    description: 'Puntuacio automatica de qualitat comercial segons les dades del lead i la fase actual del proces.',
+    keywords: ['puntuacio entrada', 'lead score', 'score'],
+  },
+  leadLandingPage: {
+    id: 'leadLandingPage',
+    term: 'Landing',
+    description: "URL de la pagina on era l'usuari abans d'enviar el formulari.",
+    keywords: ['landing', 'landing page'],
+  },
+  leadUtmSource: {
+    id: 'leadUtmSource',
+    term: 'UTM source',
+    description: 'Font de transit o campanya: google, instagram, newsletter, referral...',
+    keywords: ['utm source'],
+  },
+  leadUtmMedium: {
+    id: 'leadUtmMedium',
+    term: 'UTM medium',
+    description: 'Tipus de canal de captacio: cpc, social, email, organic...',
+    keywords: ['utm medium'],
+  },
+  leadUtmCampaign: {
+    id: 'leadUtmCampaign',
+    term: 'UTM campaign',
+    description: 'Nom de la campanya de captacio o promocio.',
+    keywords: ['utm campaign'],
+  },
+  leadAttribution: {
+    id: 'leadAttribution',
+    term: 'Atribucio',
+    description: "Dades de marketing per saber d'on arriba el lead i quina campanya funciona millor.",
+    keywords: ['atribucio', 'atribucion', 'attribution'],
+  },
+  pipeline: {
+    id: 'pipeline',
+    term: 'Pipeline',
+    description: 'Cami de la venda, de primer contacte fins tancament.',
+    keywords: ['pipeline', 'embudo'],
+  },
+  cac: {
+    id: 'cac',
+    term: 'CAC',
+    description: 'Quant et costa aconseguir un client en un canal.',
+    keywords: ['cac', 'coste adquisicion', 'cost d’adquisicio'],
+  },
+  conversion: {
+    id: 'conversion',
+    term: 'Conversio',
+    description: 'De 100 entrades, quantes acaben reservant.',
+    keywords: ['conversio', 'conversion', 'conversión'],
+  },
+  postEvent: {
+    id: 'postEvent',
+    term: 'Post-esdeveniment',
+    description: 'Tot el que fas despres de l\'esdeveniment: informe, valoracio i seguiment.',
+    keywords: ['post-event', 'post evento', 'postevento', 'post-esdeveniment'],
+  },
+  inboxImport: {
+    id: 'inboxImport',
+    term: 'Importacio de bustia',
+    description: 'Passar un correu a la fitxa d\'entrada automaticament.',
+    keywords: ['inbox', 'imap', 'importat', 'importado'],
+  },
+  task: {
+    id: 'task',
+    term: 'Tasca',
+    description: 'Cosa pendent de fer: trucar, enviar pressupost, etc.',
+    keywords: ['tasca', 'task', 'tarea'],
+  },
+  document: {
+    id: 'document',
+    term: 'Document',
+    description: 'Arxiu guardat del lead o client: pressupost, contracte, factura...',
+    keywords: ['document', 'documento', 'archivo'],
+  },
+  quote: {
+    id: 'quote',
+    term: 'Pressupost',
+    description: 'Proposta economica que envies al client abans de tancar.',
+    keywords: ['pressupost', 'presupuesto', 'quote'],
+  },
+  booking: {
+    id: 'booking',
+    term: 'Reserva',
+    description: 'Event ja confirmat i vinculat a un client.',
+    keywords: ['reserva', 'booking'],
+  },
+  billing: {
+    id: 'billing',
+    term: 'Facturacio',
+    description: 'Imports cobrats i pendents de cobrar.',
+    keywords: ['facturacio', 'facturacion', 'revenue', 'ingresos'],
+  },
+  leadEditorSource: {
+    id: 'leadEditorSource',
+    term: 'Origen',
+    description: 'Canal pel qual ha arribat el lead: web, whatsapp, instagram, wallapop, etc.',
+    keywords: ['origen editor', 'canal lead'],
+  },
+  leadEditorLanding: {
+    id: 'leadEditorLanding',
+    term: 'Landing page',
+    description: "Pagina exacta on l'usuari estava quan va enviar el formulari.",
+    keywords: ['landing editor'],
+  },
+  leadEditorUtmSource: {
+    id: 'leadEditorUtmSource',
+    term: 'UTM source',
+    description: 'Font de la campanya, per exemple google, instagram o newsletter.',
+    keywords: ['utm source editor'],
+  },
+  leadEditorUtmMedium: {
+    id: 'leadEditorUtmMedium',
+    term: 'UTM medium',
+    description: 'Tipus de canal de captacio, per exemple cpc, social, email o organic.',
+    keywords: ['utm medium editor'],
+  },
+  leadEditorUtmCampaign: {
+    id: 'leadEditorUtmCampaign',
+    term: 'UTM campaign',
+    description: 'Nom de la campanya de marketing o promocio.',
+    keywords: ['utm campaign editor'],
+  },
+};
+
+export const HELP_ENTRIES = Object.values(HELP_ENTRY_DEFS);
+
+export const ADMIN_HELP = Object.freeze(
+  Object.fromEntries(HELP_ENTRIES.map((entry) => [entry.id, entry.description])) as Record<HelpEntryId, string>
+);
 
 function normalize(value: string): string {
   return value
@@ -72,3 +242,5 @@ export function matchHelpEntry(text: string): HelpEntry | null {
 
   return best?.entry || null;
 }
+
+

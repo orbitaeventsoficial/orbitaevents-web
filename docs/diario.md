@@ -2538,3 +2538,2021 @@ Auditoria exhaustiva de bugs a tot el projecte: pàgines públiques, admin, API 
 - També es netegen resultats quan la resposta no és vàlida.
 - Resultat esperat: la cerca torna a llistar clients i es poden seleccionar.
 
+---
+
+## Sessió 2026-03-11 — Seed d'exemple + diagnòstic admin
+
+### Objectiu
+L'usuari reporta errors (toasts d'error apilats a moltes pàgines admin, "no funciona massa bé en general") i demana dades d'exemple completes per verificar que tot funciona end-to-end.
+
+### Feina feta
+
+#### 1. Script seed-exemple.js
+- Creat `scripts/seed-exemple.js` — script idempotent que crea dades d'exemple completes:
+  - 1 client: `[EXEMPLE] Maria Garcia` (email, telèfon, Instagram, DNI, GDPR consent)
+  - 1 lead: `[EXEMPLE] Joan Puig` (score 78, WON, 3 notes de seguiment, contactedAt/convertedAt)
+  - 1 reserva: `OE-EXEMPLE-001` (1200€, 45km, 6.75€ viatge, 1h extra, dipòsit 300€ pagat, Sala Razzmatazz)
+  - 1 pressupost: `OE-PROP-EXEMPLE-001` (ACCEPTED, snapshot complet amb pack + 3 extras)
+  - 3 tasques: pagament restant, preparar equip, recordatori email
+  - 7 activitats timeline: 30 dies d'historial (creació → lead → nota → pressupost → reserva → dipòsit → nota)
+- Tot marcat amb prefix `[EXEMPLE]` i `createdBy: 'system:exemple-seed'`
+- Neteja automàtica d'exemples anteriors abans de crear-ne de nous
+- **Problemes resolts durant la creació**:
+  - `Lead.notes` és relació `LeadNote[]`, no string → usat `message` + `notes: { create: [...] }`
+  - `Pack.active` no existeix → és `isActive`
+  - `Pack` requereix `djHours`, `soundWatts`, `translations` com a relació nested
+  - `Booking` requereix `packId`, `subtotal`, `vatRate`, `vatAmount` (no opcionals)
+  - `Proposal` usa `snapshot` (Json), no `quoteData`; requereix `subtotal`, `vatRate`, `vatAmount`, `total`
+
+#### 2. Diagnòstic toasts d'error
+- **Anàlisi exhaustiva** de tots els auto-fetches de l'admin:
+  - `layout.tsx:loadAdminCss()` → catch silenciós, no toast
+  - `useAdminAlerts.ts` → 3 fetches (leads, packs, finance), catch silenciós, no toast
+  - `clientes/page.tsx` → `setError()` inline, no toast
+  - `CustomerHubClient.tsx` → `setRefreshError()` inline, no toast
+- **Conclusió**: Cap auto-fetch genera `toast.error()`. Els toasts que l'usuari veia probablement eren d'accions manuals (crear client, enviar pressupost) fallant per CSRF expirat o problema de xarxa puntual.
+
+#### 3. Verificació completa
+- **Build**: OK (233 pàgines)
+- **APIs testades** (totes 200): customers, leads, bookings, dashboard, tasks, finance/alerts, css
+- **Pàgines testades** (totes 200): /admin, /admin/clientes, /admin/bookings, /admin/leads, /admin/presupuestos, /admin/tasks
+- **PDF Studio**: Existeix a `/admin/presupuestos?customerId=X` — es mostra quan s'accedeix amb un client seleccionat
+
+#### 4. CSS cleanup — instruccions escrites per a continuació
+- Auditoria completa feta: 16+ conflictes i duplicats identificats
+- Instruccions pas a pas escrites directament als fitxers CSS (10 passos):
+  - `app/globals.css` — bloc de comentari al principi amb PAS 1 a PAS 9 + VERIFICACIÓ FINAL
+  - `app/admin/admin-theme.css` — bloc de comentari amb 3 esborrats concrets
+- **No s'ha aplicat cap canvi CSS** — només les instruccions. Qui continuï (ChatGPT o altre) pot seguir els passos i fer build entre cadascun.
+- Objectiu: 3615→~2900 línies, zero conflictes, zero duplicats
+
+### Fitxers modificats
+- `scripts/seed-exemple.js` (nou)
+- `app/globals.css` (instruccions de neteja al principi)
+- `app/admin/admin-theme.css` (instruccions de neteja al principi)
+- `docs/diario.md` (aquest fitxer)
+
+
+---
+
+## 2026-03-11 — Poda estructural admin + reducció a esquelet operatiu
+
+### Objectiu
+Aquesta fase no busca embellir. Busca deixar el projecte amb menys andamis històrics i més estructura real:
+- eliminar codi mort clar
+- col·lapsar duplicació activa
+- deixar una sola font de veritat quan es pugui
+- preparar el terreny per al maquillatge visual posterior
+
+### Borrat segur aplicat
+
+#### Rutes i capes admin eliminades
+- `app/admin/canvas/*`
+- `app/admin/contactes/*`
+- `app/admin/finanzas/*`
+- `app/admin/google-ads/*`
+- `app/admin/mapa/*`
+- `app/admin/rentabilidad/*`
+- `app/admin/theme/*`
+- `app/admin/translations/*`
+- `app/admin/[id]/page.tsx`
+- `app/api/canvas/event-photo/route.tsx`
+
+#### Components i utilitats mortes eliminades
+- `app/admin/leads/LeadColorCustomizer.tsx`
+- `app/admin/leads/LeadSavedViews.tsx`
+- `app/components/seo/BreadcrumbSchema.tsx`
+- `lib/sanitize.ts`
+- `lib/sanitize-server.ts`
+- `lib/performance.ts`
+- `app/admin/help-content.ts`
+- `app/lib/prisma.ts`
+
+### Recompostes estructurals fetes
+
+#### Ajuda admin unificada
+- `app/admin/components/adminHelpGlossary.ts` passa a ser la font única de:
+  - glossary entries
+  - texts `ADMIN_HELP`
+  - `matchHelpEntry()`
+- eliminat el mòdul paral·lel `help-content.ts`
+
+#### Prisma amb una sola implementació real
+- `lib/prisma.ts` deixa de ser re-export i passa a ser la implementació singleton única
+- eliminat `app/lib/prisma.ts`
+
+#### Hardcode estructural de base URL centralitzat
+- creat `lib/site.ts`
+- substituïts fallbacks repetits tipus `process.env... || 'https://orbitaevents.com'`
+- aplicat a metadata, OAuth, emails, canonicals i diverses rutes/serveis
+
+#### Helpers de pressupost col·lapsats
+Nou mòdul:
+- `lib/services/quotes/quotePack.ts`
+
+Centralitza:
+- `QuotePack`
+- `packToQuotePack()`
+- `resolveQuotePack()`
+
+Consumidors reconnectats:
+- `lib/services/leads/quoteRouteHandler.ts`
+- `app/api/admin/emails/quote/route.ts`
+- `app/api/admin/emails/send/route.ts`
+
+#### Parsing de pressupost col·lapsat
+Nou mòdul:
+- `lib/services/quotes/quoteParsing.ts`
+
+Centralitza:
+- `mapLeadEventType()`
+- `parseDateOrNull()`
+- `normalizeQuoteLocale()`
+
+Consumidors reconnectats:
+- `app/api/admin/emails/quote/route.ts`
+- `app/api/admin/proposals/[id]/send/route.ts`
+
+#### Follow-up de pressupost col·lapsat
+Nou servei:
+- `lib/services/tasks/quoteFollowUp.ts`
+
+Centralitza la creació de tasca de seguiment de pressupost amb degradació:
+- primer intenta `task` universal
+- si no està disponible, cau a `leadTask` legacy
+
+Consumidors reconnectats:
+- `app/api/admin/emails/quote/route.ts`
+- `app/api/admin/proposals/[id]/send/route.ts`
+
+### CSS / sistema visual
+- neteja prèvia de residus a `app/globals.css` i `app/admin/admin-theme.css`
+- eliminació de hardcodes visuals al checker admin
+- objectiu complert en aquesta fase: treure color hardcodejat de classes admin i reduir soroll del checker
+
+### Lectura tècnica actual
+La gran capa que encara segueix viva és la dualitat:
+- `task`
+- `leadTask`
+
+Encara no s'ha amputat perquè continua tenint consumidors reals en:
+- `app/admin/tasks/page.tsx`
+- `app/admin/lib/dashboard-data.ts`
+- `app/api/admin/leads/[id]/tasks/*`
+- `lib/services/slaAutomationService.ts`
+
+Però ja s'ha reduït part de la duplicació al voltant dels pressupostos i s'ha preparat aquesta compatibilitat perquè la següent poda sigui més segura.
+
+### Següent pas recomanat
+- extreure la sync `leadTask <-> task` a un servei petit compartit
+- aprimar les rutes `app/api/admin/leads/[id]/tasks/*`
+- fer que el model universal domini més punts del flux
+- només després començar a tallar legacy de tasques de debò
+
+### Actualització 2026-03-11 — Sync legacy de tasques reescrita
+- Reescrites les rutes:
+  - `app/api/admin/leads/[id]/tasks/route.ts`
+  - `app/api/admin/leads/[id]/tasks/[taskId]/route.ts`
+- Ja no contenen la sync universal duplicada incrustada dins de cada handler.
+- Nova capa compartida:
+  - `lib/services/tasks/legacyLeadTaskSync.ts`
+
+#### Què centralitza aquest nou servei
+- `syncLegacyLeadTaskToUniversal()`
+- `updateUniversalTaskFromLegacy()`
+- `deleteUniversalTaskFromLegacy()`
+- warning homogeni quan la sync falla
+
+#### Efecte de la reescriptura
+- menys soroll a les rutes
+- compatibilitat `leadTask -> task` encapsulada en un sol lloc
+- millor base per continuar tallant la capa legacy més endavant
+
+#### Estat després d'aquesta passada
+- la dualitat `task / leadTask` continua viva
+- però ara un tros important de la compatibilitat ja no està escampat
+- següent objectiu: revisar `app/admin/tasks/page.tsx` i `app/admin/lib/dashboard-data.ts` per empènyer més el model universal
+
+### Actualització 2026-03-11 — Dashboard més centrat en task universal
+- `app/admin/lib/dashboard-data.ts` ja no carrega `upcomingTasks` des de `leadTask`.
+- La query `admin:dashboard:tasks:upcoming` passa a llegir de `prisma.task`.
+- El tipus de `upcomingTasks` s'ajusta perquè `lead` pugui ser `null` en el model universal.
+
+#### Efecte
+- una dependència global menys respecte a la capa legacy
+- el dashboard s'acosta més al model `task` com a font de veritat
+- es redueix la superfície pendent abans de poder tallar més `leadTask`
+
+### Actualització 2026-03-11 — commercial-daily sense decisió directa de models
+- `app/api/cron/commercial-daily/route.ts` ja no decideix directament entre `task` i `leadTask`.
+- Nova peça compartida:
+  - `lib/services/tasks/taskMetrics.ts`
+
+#### Què centralitza
+- `countOpenTasksUniversalOrLegacy()`
+
+#### Efecte
+- el cron diari queda més net
+- la decisió de compatibilitat es mou fora de la route
+- es continua reduint la superfície on el legacy està escampat
+
+### Actualització 2026-03-11 — SLA sense dual-write incrustat
+- `lib/services/slaAutomationService.ts` ja no conté la creació dual `leadTask + task` dins del servei.
+- Nova capa compartida:
+  - `lib/services/tasks/taskCreation.ts`
+
+#### Què centralitza
+- `createUniversalTask()`
+- `createLegacyLeadTaskWithMirror()`
+
+#### Efecte
+- la creació de tasques queda més coherent
+- SLA deixa de carregar una capa interna duplicada
+- el legacy continua existint, però més arraconat i reusable
+
+### Actualització 2026-03-11 — Neteja de tasques absorbida al DELETE de lead
+- `app/api/admin/leads/[id]/route.ts` ja no porta incrustat el borrat dual `leadTask + task`.
+- Nova peça compartida:
+  - `lib/services/tasks/taskCleanup.ts`
+
+#### Què centralitza
+- `deleteLeadTasksUniversalOrLegacy()`
+
+#### Efecte
+- una ruta activa menys amb compatibilitat legacy escampada
+- més coherència dins del clúster `lib/services/tasks/*`
+
+### Actualització 2026-03-11 — Inversió de model a tasques de lead
+- Les rutes:
+  - `app/api/admin/leads/[id]/tasks/route.ts`
+  - `app/api/admin/leads/[id]/tasks/[taskId]/route.ts`
+  deixen de tenir `leadTask` com a font primària.
+
+- Nova capa:
+  - `lib/services/tasks/leadTaskFacade.ts`
+
+#### Què fa ara aquesta capa
+- `GET` llegeix tasques des de `task`
+- `POST` crea `task` com a primari
+- `PATCH/DELETE` operen sobre `task`
+- `leadTask` queda com a mirall de compatibilitat via `legacyLeadTaskId`
+
+#### Ajustos finals de consistència
+- control de `TASK_NOT_FOUND` amb resposta `404`
+- correcció del contracte Prisma perquè l'update no depengui d'un `where` no únic
+- el mirall legacy queda determinista i sense consultes sobrants
+
+#### Efecte
+- aquest és el primer canvi real on la font de veritat es desplaça de la capa antiga a la nova
+- la compatibilitat legacy continua existint, però ja no governa aquestes rutes
+
+### Actualització 2026-03-11 — Mètriques de tasques simplificades al model universal
+- lib/services/tasks/taskMetrics.ts queda com a mètrica simple sobre 	ask.
+- pp/api/cron/commercial-daily/route.ts s'ajusta perquè consumeixi countOpenTasks() i deixi enrere el nom/transició antiga.
+
+#### Efecte
+- el cron diari queda alineat amb la font universal actual
+- es tanca una incoherència interna després de la simplificació del servei
+- la compatibilitat legacy continua més arraconada dins del clúster de tasques
+
+### Actualització 2026-03-12 — Clúster de tasques més prim i universal
+- lib/services/tasks/taskList.ts queda sense fallback legacy i treballa només sobre 	ask.
+- lib/services/tasks/quoteFollowUp.ts passa a crear només tasques universals.
+- lib/services/slaAutomationService.ts deixa d'usar el camí amb mirall legacy i crea només 	ask.
+- lib/services/tasks/taskCreation.ts es redueix al helper universal.
+- S'elimina lib/services/tasks/legacyLeadTaskSync.ts, que ja no tenia consumidors.
+
+#### Efecte
+- el clúster de tasques es redueix i es fa més directe
+- cau compatibilitat antiga que ja no governava cap flux actiu
+- leadTask queda encara més arraconat com a mirall residual
+
+### Actualització 2026-03-12 — Mirall legacy de tasques gairebé desactivat
+- lib/services/tasks/leadTaskFacade.ts deixa de crear o actualitzar leadTask com a mirall.
+- Les operacions create/update queden en 	ask pur.
+- Es manté només la neteja de residus antics quan una tasca antiga encara té legacyLeadTaskId.
+- lib/customer-hub/fetchCustomerHub.ts deixa de consultar leadTask directament i resol antics IDs via 	ask.legacyLeadTaskId.
+
+#### Efecte
+- ja no hi ha dual-write actiu cap a leadTask
+- la capa antiga queda reduïda a compatibilitat residual i neteja
+- el model 	ask queda consolidat com a centre real del flux
+
+### Actualització 2026-03-12 — Capa deprecated tallada a rutes de lead
+- lib/services/leads/statusRouteHandler.ts deixa de carregar el paràmetre deprecated i els headers de compatibilitat.
+- lib/services/leads/quoteRouteHandler.ts també queda sense la via deprecated ni etiquetes de reemplaç.
+- Les rutes admin de status i quote passen a cridar aquests handlers amb el contracte directe.
+
+#### Efecte
+- menys compatibilitat ornamental sense consumidors reals
+- handlers més nets i amb una sola responsabilitat activa
+- es redueix una altra capa transitòria fora del clúster de tasques
+
+### Actualització 2026-03-12 — Cost de viatge amb una sola constant base
+- es retira l'alias deprecated DEFAULT_FUEL_COST_PER_KM.
+- NewBookingForm, APIs de bookings i uelReferenceService passen a usar DEFAULT_VEHICLE_COST_PER_KM.
+- el contracte visible de BD (uelCostPerKm) no es toca encara; només es talla la capa nominal duplicada.
+
+#### Efecte
+- menys nomenclatura duplicada dins del càlcul de viatges
+- es manté compatibilitat de dades sense seguir arrossegant alias de codi
+
+### Actualització 2026-03-12 — Booking margin amb compatibilitat més ben tancada
+- BookingMarginCard deixa d'acceptar el prop alias uelCostPerKm.
+- el fallback cap a dades antigues queda concentrat només a pp/admin/bookings/[id]/page.tsx.
+- el component interior treballa ja només amb ehicleCostPerKm.
+
+#### Efecte
+- una capa menys de compatibilitat repartida dins del UI
+- el component queda més net i amb un contracte més directe
+
+### Actualització 2026-03-12 — Neteja de tasques amb nom ja no transitori
+- lib/services/tasks/taskCleanup.ts passa de deleteLeadTasksUniversalOrLegacy() a deleteLeadTasks().
+- la ruta pp/api/admin/leads/[id]/route.ts es posa al dia amb aquest contracte directe.
+- es retira també un comentari vell de compatibilitat dins del DELETE del lead.
+
+#### Efecte
+- menys nomenclatura de transició quan el comportament ja és clar
+- una altra capa verbal legacy fora del camí principal
+
+### Actualització 2026-03-12 — Restes declaratives de compatibilitat més netes
+- pp/globals.css manté el comportament existent però deixa de presentar dos blocs com a "legacy/compatibilitat".
+- es reetiqueten com a estat de càrrega del hero i com a tokens pont del layout admin.
+
+#### Efecte
+- menys llenguatge transitori en capes que encara existeixen per motius reals
+- la base CSS queda més honesta respecte al seu paper actual
+
+### Actualització 2026-03-12 — Capa canvas col·lapsada
+- pp/api/canvas/testimonial/route.tsx absorbeix els últims presets i la traducció d'event que penjaven de canvasService.
+- s'elimina lib/services/canvasService.ts, que ja no funcionava com a servei real sinó com a contenidor per una sola route.
+
+#### Efecte
+- una capa menys entre la ruta activa i la seva pròpia lògica
+- menys codi mort/exportat sense consumidors reals
+
+### Actualització 2026-03-12 — query-cache reduït al que s'usa de veritat
+- lib/query-cache.ts queda només amb cachedQuery i CacheTTL.
+- cauen la capa pública morta: invalidacions, stats, CacheKeys i helpers interns sense consumidors.
+
+#### Efecte
+- menys API ornamental al voltant d'un servei que s'estava usant de forma molt més simple
+- la utilitat queda més honesta i més petita
+
+### Actualització 2026-03-12 — Props mortes fora de BookingMarginCard
+- BookingMarginCard deixa de rebre 	ravelCost i source, perquè ja no s'usaven dins del component.
+- la pàgina pp/admin/bookings/[id]/page.tsx també deixa de passar aquests valors.
+
+#### Efecte
+- menys soroll al contracte del component
+- menys dades circulant sense efecte real
+
+### Actualització 2026-03-12 — costEngine i customerService amb menys API morta
+- lib/services/costEngine.ts perd getBookingFinancialSummary(), que no tenia consumidors.
+- lib/services/customerService.ts deixa fora getAllCustomers() i getCustomerStats(), sense ús real.
+- indCustomerByEmail() passa a helper intern en lloc d'export públic.
+
+#### Efecte
+- menys superfície de servei sense valor pràctic
+- menys punts de manteniment falsament públics
+
+### Actualització 2026-03-12 — customerService encara més estret
+- lib/services/customerService.ts es redueix als usos reals: upsertCustomer() i searchCustomers().
+- cauen exports públics sense consumidors: getCustomerById, updateCustomer, logCustomerActivity i recordConsent.
+
+#### Efecte
+- menys API falsa dins d'un servei que ja no necessitava ser tan ample
+- menys punts de manteniment sense valor actual
+
+### Actualització 2026-03-12 — clientPortalAccess amb menys helper públic
+- hashPortalToken() i generatePortalToken() deixen de ser exports públics a lib/services/clientPortalAccess.ts.
+- continuen existint, però només com a detalls interns del servei.
+
+#### Efecte
+- menys API pública sense consumidors externs
+- el servei exposa més clarament només les operacions reals del portal client
+
+- Se estrechó otra capa de superficie muerta sin tocar comportamiento visible: Tooltip quedó fijo a posición superior, InfoTooltip perdió lwaysEnabled y side porque no tenían consumidores reales, ConfirmDialog perdió cancelLabel, y costEngine.ts quedó limpio del residuo literal que había dejado una edición previa.
+
+- Se siguió estrechando la API pública: uildClientPortalUrl() en clientPortalAccess.ts y getOrbitaBaseAddress() en googleMapsDistance.ts pasaron a helpers internos porque no tenían consumidores externos; el comportamiento quedó igual y solo cayó superficie sobrante.
+
+- Siguió la poda de superficie pública en constantes: TEMPLATE_SLUGS, QUOTE_TEMPLATE_SETTING_KEY e INVENTORY_BUNDLES_SETTING_KEY pasaron a ser internas porque no tenían consumidores fuera de su módulo.
+
+- También se cerró la API del servicio de contratos: getDefaultCancellationPolicy() y getDefaultTermsAndConditions() dejaron de exportarse porque solo se usaban dentro de contractService.ts.
+
+- Se podó otra capa fina: HELP_ENTRY_DEFS y ddRecentItem() pasaron a internos, y 
+otifyLeadStatusChange() salió de 
+otificationService.ts porque no tenía ningún consumidor real y solo dejaba ruido muerto.
+
+- Cayó otra capa muerta del sistema visual admin: BtnPrimary, BtnSecondary y BtnDanger salieron de AdminPage.tsx porque no tenían consumidores reales en el repo.
+
+- Otra poda de AdminPage.tsx: AdminGrid, AdminCard, AdminTabs, AdminStatusBadge y AdminAlert salieron porque no tenían consumidores reales fuera del propio archivo.
+
+- AdminTable también salió de AdminPage.tsx por falta total de consumidores, y se limpiaron comentarios/ejemplos que seguían nombrando subcomponentes ya podados.
+
+- Se siguió cerrando superficie en packPricingHealth.ts: 	oEditablePackPricingModelConfig() pasó a helper interno porque solo la usaba el propio módulo.
+
+- pp/admin/components/ui.tsx también se estrechó: Button quedó reducido al contrato real que usa el dashboard (ariant, icon, label), saliendo href, onClick, disabled y size que no tenían consumidores.
+
+- Otra poda pequeña en presupuestos: packToQuotePack() pasó a helper interno de quotePack.ts; la API pública se queda en 
+esolveQuotePack(), que es la que realmente usa el repo.
+
+- generateContractNumber() dejó de ser API pública de documentService.ts: se movió a contractService.ts, que era su único consumidor real.
+
+- Se colapsaron pp/admin/components/ui.tsx y pp/admin/components/Charts.tsx dentro de pp/admin/page.tsx, porque ya solo tenían un consumidor real. Las dos capas se borraron y el dashboard quedó autosuficiente.
+
+- RadialProgress.tsx se absorbió dentro de pp/admin/page.tsx; era un componente puro con un único consumidor real, así que la capa separada dejó de tener sentido.
+
+### Actualitzacio 2026-03-12 — Overlay d'ajuda de l'admin unificat
+- app/admin/components/AdminHelpLegend.tsx i app/admin/components/AdminHelpInspector.tsx es col·lapsen dins de app/admin/components/AdminHelpOverlay.tsx.
+- app/admin/layout.tsx passa de carregar dues peces dinamques a carregar-ne una de sola.
+- app/admin/components/AdminHelpMode.tsx perd la API sobrant: el context ja no exposa setEnabled() i es queda amb enabled + toggle().
+
+#### Efecte
+- una capa menys dins del sistema d'ajuda de l'admin
+- menys imports dinamics i menys fitxers per a la mateixa funcionalitat
+- contracte mes honest del context de help mode
+
+### Actualitzacio 2026-03-12 — FloatingAddButton absorbit pel layout admin
+- app/admin/layout.tsx absorbeix FloatingAddButton i el seu menu d'accions rapides.
+- s'elimina app/admin/components/FloatingAddButton.tsx, que ja nomes tenia un consumidor real.
+
+#### Efecte
+- una capa menys dins del shell de l'admin
+- el layout concentra les peces flotants que ell mateix renderitza
+
+### Actualitzacio 2026-03-12 — Selectors rapids d'estat unificats
+- app/admin/components/LeadStatusQuickActions.tsx i app/admin/components/BookingStatusQuickActions.tsx es col·lapsen en app/admin/components/StatusQuickSelect.tsx.
+- app/admin/page.tsx deixa de mantenir dos wrappers gairebe identics i passa a injectar nomes ruta, titol i opcions.
+
+#### Efecte
+- menys duplicacio real dins del dashboard admin
+- una sola peca client per al patro de canvi rapid d'estat
+
+### Actualitzacio 2026-03-12 — Prisma encara mes honest
+- lib/prisma.ts deixa d'exportar el type PrismaClient, que ja no tenia cap consumidor real.
+- el fitxer es queda nomes amb la singleton que usa el repo.
+
+#### Efecte
+- menys API ornamental en una peca nuclear
+- la capa de Prisma queda encara mes directa
+
+### Actualitzacio 2026-03-12 — API de tipus encara mes estreta
+- lib/services/customerService.ts deixa d'exportar el type Customer, que no tenia consumidors externs.
+- lib/services/communicationStatusService.ts deixa d'exportar FlowStatus, que nomes s'usava com a detall intern del modul.
+
+#### Efecte
+- menys superfície pública fictícia
+- serveis una mica més honestos i més petits
+
+### Actualitzacio 2026-03-12 — Tipus interns fora de la API publica
+- lib/services/emailTemplateService.ts deixa TemplateVariables i ResolvedTemplate com a tipus interns del modul.
+- lib/services/slaAutomationService.ts deixa SlaAutomationSummary com a tipus intern, perquè no tenia consumidors externs.
+
+#### Efecte
+- menys contractes publics ficticis
+- serveis una mica mes tancats i mes honestos
+
+### Actualitzacio 2026-03-12 — Aliases i tipus redundants fora
+- lib/services/profitabilityService.ts perd ProfitabilityConfigInput, que era nomes un alias redundant de ProfitabilityConfig.
+- lib/services/googleCalendarSyncService.ts deixa CalendarSyncResult com a tipus intern del modul.
+
+#### Efecte
+- menys soroll de tipus duplicats
+- API de servei una mica mes curta i directa
+
+### Actualitzacio 2026-03-12 — Contracte InventoryBundle unificat
+- es crea lib/inventory-bundles-contract.ts com a font unica de veritat per al tipus InventoryBundle.
+- lib/services/inventoryBundles.ts i les pantalles d'admin que el duplicaven passen a consumir aquest contracte compartit.
+
+#### Efecte
+- menys duplicacio de contracte entre servei i UI
+- una sola definicio per als lots d'inventari
+
+### Actualitzacio 2026-03-12 — Tipus de rendibilitat tancats dins del servei
+- lib/services/profitabilityService.ts deixa ProfitabilityRow i ProfitabilityReport com a tipus interns.
+- fora del servei nomes s'utilitza el valor retornat o tipus locals adaptats a cada pantalla.
+
+#### Efecte
+- menys contractes exportats sense necessitat real
+- el servei de rendibilitat queda una mica mes encapsulat
+
+### Actualitzacio 2026-03-12 — Tipus del glossari d'ajuda tancats
+- app/admin/components/adminHelpGlossary.ts deixa HelpEntryId i HelpEntry com a tipus interns.
+- el modul continua exposant nomes el que realment consumeix la resta del repo: HELP_ENTRIES, ADMIN_HELP i matchHelpEntry().
+
+#### Efecte
+- menys tipus publicats sense cap consumidor extern
+- glossari d'ajuda una mica mes encapsulat
+
+### Actualitzacio 2026-03-12 — Tipus interns tancats al clúster de tasques
+- lib/services/tasks/taskCreation.ts deixa UniversalTaskCreateInput com a tipus intern del modul.
+- lib/services/tasks/taskList.ts deixa AdminTaskListItem com a tipus intern del modul.
+
+#### Efecte
+- menys soroll de tipus exportats dins del subsistema de tasques
+- API del clúster una mica mes estreta i directa
+
+### Actualitzacio 2026-03-12 — QuotePack tancat dins del modul
+- lib/services/quotes/quotePack.ts deixa QuotePack com a tipus intern.
+- fora del modul nomes es consumeix resolveQuotePack() i el valor retornat, no el contracte de tipus.
+
+#### Efecte
+- menys tipus exportats sense consum real
+- modul de packs per pressupost una mica mes compacte
+
+### Actualitzacio 2026-03-12 — QuoteTemplateOverrides tancat dins de documentService
+- lib/services/documentService.ts deixa QuoteTemplateOverrides com a tipus intern del modul.
+- fora del modul nomes es consumeix generateQuoteHTML() i les dades de pressupost, no aquest contracte concret.
+
+#### Efecte
+- menys tipus exportats sense consum extern
+- documentService una mica mes compacte
+
+### Actualitzacio 2026-03-12 — emailTemplateService amb API mes honesta
+- lib/services/emailTemplateService.ts deixa TemplateSlug i TEMPLATE_VARIABLES com a detall intern del modul.
+- s'exposen helpers publics mes honestos: isTemplateSlug() i getTemplateVariables().
+- les rutes admin de plantilles passen a consumir aquests helpers en lloc de tocar la taula interna directament.
+
+#### Efecte
+- menys acoblament extern a l'estructura interna del servei
+- validacio i variables de plantilla concentrades dins del modul
+
+### Actualitzacio 2026-03-12 — Resultats de servei tancats a modul
+- lib/services/commercialScoring.ts deixa LeadScoreResult com a tipus intern.
+- lib/services/commercialSequenceService.ts deixa SequenceRunSummary com a tipus intern.
+- lib/services/googleMapsDistance.ts deixa DistanceCalculation com a tipus intern.
+
+#### Efecte
+- menys tipus exportats sense consum extern
+- serveis petits una mica mes nets i menys ornamentals
+
+### Actualitzacio 2026-03-12 — Mes tipus de resultat tancats als seus serveis
+- lib/services/cashFlowForecast.ts deixa CashFlowMonth com a tipus intern.
+- lib/services/pipelineForecast.ts deixa ForecastMonth com a tipus intern.
+- lib/services/cacAnalysis.ts deixa CacChannelRow com a tipus intern.
+- lib/services/paymentReminderService.ts deixa PaymentReminderResult com a tipus intern.
+
+#### Efecte
+- menys tipus exportats sense consum extern real
+- serveis de previsio i recordatoris una mica mes nets
+
+### Actualitzacio 2026-03-12 — Mes contractes interns en serveis petits
+- lib/services/leadSnapshotService.ts deixa LeadSnapshotInput com a tipus intern del modul.
+- lib/services/whatsappService.ts deixa WhatsAppSendResult com a tipus intern del modul.
+
+#### Efecte
+- menys contractes exportats sense consum extern
+- serveis petits una mica mes tancats
+
+### Actualitzacio 2026-03-12 — Mes contractes interns en reporting i Holded
+- lib/services/executiveReportService.ts deixa ExecutiveReport com a tipus intern del modul.
+- lib/services/holdedService.ts deixa HoldedContact, HoldedInvoiceItem, CreateHoldedInvoiceData i HoldedInvoiceResult com a contractes interns.
+
+#### Efecte
+- menys superficie publica ornamental en serveis de reporting i integracio
+- els moduls segueixen exposant helpers reals, no taules de tipus internes
+
+### Actualitzacio 2026-03-12 — Mes contractes locals tancats als seus moduls
+- lib/services/emailLeadExtractionService.ts deixa ExtractedLeadData com a tipus intern.
+- lib/services/postEventEmailService.ts deixa PostEventLocale com a tipus intern.
+
+#### Efecte
+- menys contractes exportats sense consum extern real
+- serveis de parsing i email post-event una mica mes secs
+
+### Actualitzacio 2026-03-12 — Mes inputs interns en serveis de client i privacitat
+- lib/services/customerService.ts deixa UpsertCustomerInput i UpsertCustomerResult com a contractes interns.
+- lib/services/privacyService.ts deixa ConsentInput, DataRequestInput i AuditLogInput com a contractes interns.
+
+#### Efecte
+- menys API publica falsa en serveis de client i privacitat
+- els moduls continuen exposant funcions reals, no tipus ornamentals
+
+### Actualitzacio 2026-03-12 — Mes contractes interns en deduplicacio, costos i WhatsApp
+- lib/services/deduplicationService.ts deixa MatchReason, DuplicateMatch, DuplicateGroup, MergeResult i CustomerInput com a contractes interns.
+- lib/services/costEngine.ts deixa BookingCostInput i BookingFinancialSummary com a contractes interns.
+- lib/services/whatsappService.ts deixa WhatsAppSendInput com a contracte intern.
+
+#### Efecte
+- menys superficie publica falsa en serveis operatius
+- els moduls continuen exposant les funcions reals sense arrossegar tipus locals
+
+### Actualitzacio 2026-03-12 — Ultims contractes locals tancats en notificacions i pipeline
+- lib/services/notificationService.ts deixa LeadNotificationData i NotificationResult com a contractes interns.
+- lib/services/leads/pipeline.ts deixa PipelineLead com a tipus intern.
+
+#### Efecte
+- la superficie publica restant queda mes a prop de contracte real de domini
+- menys tipus de servei exportats sense necessitat externa
+
+### Actualitzacio 2026-03-12 — Contractes locals tancats al modul de navegacio admin
+- app/admin/components/nav-items.ts deixa BadgeColor, NavItem i NavSection com a contractes interns.
+
+#### Efecte
+- la navegacio admin exposa nomes dades i helpers reals
+- menys tipus locals sortint innecessariament del modul
+
+### Actualitzacio 2026-03-12 — Contractes locals tancats en rutes API
+- app/api/admin/bookings/[id]/checklist/route.ts deixa ChecklistItem com a contracte intern.
+- app/api/google-reviews/route.ts deixa GoogleReview i GoogleReviewsResponse com a contractes interns.
+
+#### Efecte
+- les rutes API exposen dades, no tipus locals innecessaris
+- ZoneConfig es mante public a ZoneLandingPage perque si que es contracte real entre moduls
+
+### Actualitzacio 2026-03-12 — Ultims tipus locals tancats a app/lib i app/config
+- app/lib/analytics.ts deixa EventCategory i EventName com a tipus interns.
+- app/config/site-config.ts deixa SocialPlatform i WhatsAppMessageType com a tipus interns.
+
+#### Efecte
+- la capa app conserva nomes contractes exportats que realment connecten moduls
+- menys soroll de tipus derivats sortint sense necessitat
+
+### Actualitzacio 2026-03-12 — AdminRole unificat en una sola font de veritat
+- lib/admin-role.ts deixa de redefinir AdminRole i passa a importar-lo de lib/auth.ts.
+
+#### Efecte
+- un sol contracte real per al rol d'admin
+- menys risc de divergencia entre permisos i helpers de contingut
+
+### Actualitzacio 2026-03-12 — Cobertura recentrada en el servei compartit
+- app/api/admin/coverage/route.ts passa a reutilitzar getCoverageAreas() i el contracte CoverageArea de lib/coverage.ts.
+- app/admin/coverage/page.tsx deixa de redefinir CoverageArea i importa el tipus compartit.
+
+#### Efecte
+- una sola font de veritat per a les arees de cobertura
+- menys risc de divergencia entre servei, ruta i pantalla admin
+
+### Actualitzacio 2026-03-12 — Extras configurator recentrat en servei compartit
+- nou servei: lib/services/extrasConfiguratorService.ts amb defaults, sanitize, lectura i persistencia.
+- app/api/admin/extras/route.ts deixa de fer de servei i passa a ser transport prim cap a aquesta capa.
+
+#### Efecte
+- menys logica de configuracio incrustada a la ruta
+- una sola font de veritat per al configurador d'extres del admin
+
+### Actualitzacio 2026-03-12 — Included extras recentrat en servei compartit
+- nou servei: lib/services/includedExtrasService.ts amb sanitize, lectura i persistencia del mapa slug -> extraIds.
+- app/api/admin/packs/included-extras/route.ts deixa de fer de mini-servei i passa a delegar-hi.
+
+#### Efecte
+- menys logica JSON incrustada a la ruta
+- una sola font de veritat per als extres inclosos per pack
+
+### Actualitzacio 2026-03-12 — Tema admin recentrat en servei compartit
+- nou servei: lib/services/adminThemeService.ts amb defaults, validacio, lectura, persistencia i generacio de CSS admin.
+- app/api/admin/theme/route.ts deixa de concentrar la logica de tema i passa a delegar-hi, mantenint nomes auth, missatges i resposta.
+
+#### Efecte
+- menys logica de configuracio i CSS incrustada a la ruta
+- una sola font de veritat per al tema admin i el seu CSS derivat
+
+### Actualitzacio 2026-03-12 — Calendar feed token recentrat en servei compartit
+- nou servei: lib/services/calendarFeedTokenService.ts amb lectura i regeneracio del token ICS.
+- app/api/admin/integrations/calendar-token/route.ts deixa de persistir directament i passa a delegar-hi.
+
+#### Efecte
+- menys logica de configuracio incrustada a la ruta
+- una sola font de veritat per al token del feed de calendari
+
+### Actualitzacio 2026-03-12 — CSS custom admin recentrat en servei compartit
+- nou servei: lib/services/adminCustomCssService.ts amb lectura, sanitize i persistencia del CSS custom del panell.
+- app/api/admin/css/route.ts deixa de gestionar directament el setting i passa a delegar-hi.
+
+#### Efecte
+- menys logica de setting incrustada a la ruta
+- una sola font de veritat per al CSS custom admin
+
+### Actualitzacio 2026-03-12 — Booking checklist recentrat en servei compartit
+- nou servei: lib/services/bookingChecklistService.ts amb defaults, sanitize, lectura i persistencia de la checklist per reserva.
+- app/api/admin/bookings/[id]/checklist/route.ts deixa de fer de mini-servei i passa a delegar-hi.
+
+#### Efecte
+- menys logica JSON incrustada a la ruta
+- una sola font de veritat per a la checklist manual de cada booking
+
+### Actualitzacio 2026-03-12 — Dashboard recentrat en el servei de booking checklist
+- app/admin/lib/dashboard-data.ts deixa de parsejar manualment booking.checklist.* i passa a reutilitzar bookingChecklistService.ts.
+
+#### Efecte
+- la ruta i el dashboard comparteixen la mateixa logica per a defaults i parseig de checklist
+- menys divergencia oculta en l'estat del proxim bolo
+
+### Actualitzacio 2026-03-12 — Dashboard recentrat en el servei de booking checklist
+- app/admin/lib/dashboard-data.ts deixa de parsejar manualment booking.checklist.* i passa a reutilitzar bookingChecklistService.ts.
+
+#### Efecte
+- la ruta i el dashboard comparteixen la mateixa logica per a defaults i parseig de checklist
+- menys divergencia oculta en l'estat del proxim bolo
+
+### Actualitzacio 2026-03-12 — Vistes guardades de leads recentrades en servei compartit
+- nou servei: lib/services/leadSavedViewsService.ts amb key per usuari, parseig, sanejat, lectura, persistencia i creacio de vistes.
+- app/api/admin/leads/views/route.ts deixa de fer de mini-servei i passa a delegar-hi.
+
+#### Efecte
+- menys logica JSON incrustada a la ruta
+- una sola font de veritat per a les vistes guardades de leads
+
+### Actualitzacio 2026-03-12 — Estat de cron recentrat en helper compartit
+- nou servei: lib/services/cronRunStatusService.ts per persistir lastRun, lastStatus, lastSummary i lastMessage a partir d'un prefix.
+- reenganxades a aquest helper: cron/commercial-daily, cron/post-event, cron/invoice-sync, cron/pack-pricing-check, cron/fuel-daily i admin/emails/run-cron.
+
+#### Efecte
+- menys duplicacio transversal entre crons
+- una sola font de veritat per a l'estat persistent de les automatitzacions
+
+### Actualitzacio 2026-03-12 — Tancament de residus locals als crons
+- eliminades les funcions saveRunStatus que havien quedat residuals a post-event, invoice-sync i pack-pricing-check despres de l'extraccio del helper compartit.
+
+#### Efecte
+- el helper de cron no conviu amb duplicats locals sobrants
+- la simplificacio transversal queda realment tancada
+
+### Actualitzacio 2026-03-12 — Tancament final de l'estat de cron compartit
+- eliminat el saveRunStatus residual de post-event.
+- admin/emails/run-cron passa a usar saveCronRunStatus tambe en el cami d'error.
+- cron/reviews-sync queda migrat al helper compartit.
+
+#### Efecte
+- la capa d'estat de cron queda unificada de veritat
+- desapareixen les restes de l'implementacio antiga repartides entre rutes
+
+### Actualitzacio 2026-03-12 — Eliminat l'ultim residu local de l'estat de cron
+- app/api/cron/reviews-sync/route.ts ja no conserva el saveRunStatus local i queda només amb saveCronRunStatus.
+
+#### Efecte
+- la capa de persistencia d'estat dels crons queda finalment unificada
+- no queden helpers locals redundants en aquest front
+
+### Actualitzacio 2026-03-12 — Callbacks OAuth de Google recentrades en servei compartit
+- nou servei: lib/services/googleOAuthService.ts amb verifyGoogleOAuthState(), exchangeGoogleOAuthCode(), upsertIntegrationSetting() i upsertIntegrationSettings().
+- reenganxades a aquest servei: app/api/google/oauth/callback/route.ts, app/api/google-calendar/oauth/callback/route.ts, app/api/gmail/oauth/callback/route.ts i app/api/google-ads/oauth/callback/route.ts.
+- eliminats de les rutes els clons locals de verifyState, TokenResponse, TOKEN_URL i upsertSetting.
+
+#### Efecte
+- menys duplicacio transversal en la capa d'integracions OAuth
+- una sola font de veritat per a l'intercanvi del codi, la validacio de state i la persistencia de settings d'integracio
+
+### Actualitzacio 2026-03-12 — Lectura de crons recentrada en el servei compartit
+- lib/services/cronRunStatusService.ts guanya readCronRunStatus() i readCronRunStatuses(), amb parseig compartit de lastSummary i calcul de health.
+- app/api/admin/crons/route.ts deixa de construir el mapa de settings i passa a delegar la lectura al servei compartit.
+- app/api/admin/test-notifications/route.ts deixa de parsejar automation.commercial.last* a ma i usa readCronRunStatus().
+
+#### Efecte
+- la capa de crons queda unificada tant en escriptura com en lectura al servidor
+- desapareix mes logica ad hoc de claus i JSON entre rutes d'admin
+
+### Actualitzacio 2026-03-12 — Configuracio IMAP d'inbox recentrada en servei compartit
+- nou servei: lib/services/imapSettingsService.ts amb normalitzacio, test puntual de credencials, persistencia a settings i lectura segura de la configuracio.
+- app/api/admin/inbox/settings/route.ts deixa de portar ImapFlow, prisma.setting.upsert i la validacio de guardat incrustats.
+
+#### Efecte
+- la ruta d'inbox deixa de fer de mini-servei de configuracio IMAP
+- una sola capa compartida governa lectura, prova i persistencia de settings IMAP
+
+### Actualitzacio 2026-03-12 — Features admin recentrades en servei compartit
+- nou servei: lib/services/adminFeaturesService.ts amb definicio central, lectura de l'estat i actualitzacio amb log d'admin.
+- app/api/admin/features/route.ts deixa de portar AVAILABLE_FEATURES, prisma.setting i prisma.adminLog incrustats.
+
+#### Efecte
+- la ruta de features deixa de fer de mini-servei de configuracio
+- una sola font de veritat governa definicio i persistencia de funcionalitats del front/admin
+
+### Actualitzacio 2026-03-12 — Stats admin recentrades en servei compartit
+- nou servei: lib/services/adminStatsService.ts amb definicio central, calcul des de BD, lectura de fallbacks manuals i persistencia/reset amb log d'admin.
+- app/api/admin/stats/route.ts deixa de portar STATS_DEFINITION, calculateStats i prisma.* incrustats.
+
+#### Efecte
+- la ruta de stats deixa de fer de mini-servei mixt de calcul i configuracio
+- una sola font de veritat governa les estadistiques admin i els seus overrides manuals
+
+### Actualitzacio 2026-03-12 — Settings generals admin recentrats en servei compartit
+- nou servei: lib/services/adminSettingsService.ts amb lectura tipada, parseig JSON, actualitzacio batch i creacio de settings.
+- app/api/admin/settings/route.ts deixa de portar prisma.setting i el parseig de valors incrustats.
+
+#### Efecte
+- la ruta general de settings deixa de fer de mini-servei de lectura i persistencia
+- una sola capa compartida governa el contracte generic de configuracio admin
+
+### Actualitzacio 2026-03-12 — Coverage recentrada del tot al modul compartit
+- lib/coverage.ts guanya ensureCoverageAreasSetting() i saveCoverageAreas(), a mes del sanejat de les arees.
+- app/api/admin/coverage/route.ts deixa de tocar prisma.setting directament i delega la persistencia al modul de coverage.
+
+#### Efecte
+- la ruta de coverage deixa de fer de mini-servei de JSON/configuracio
+- una sola font de veritat governa lectura, bootstrap i guardat de coverage.areas
+
+### Actualitzacio 2026-03-12 — Dashboard alineat amb el servei generic de settings
+- app/api/admin/dashboard/route.ts deixa de llegir category='stats' directament des de prisma.setting.
+- ara reutilitza listAdminSettings('stats') des de lib/services/adminSettingsService.ts per construir publicStats.
+
+#### Efecte
+- desapareix l'ultima lectura ad hoc de settings de stats dins del dashboard
+- el panell aprofita la mateixa capa compartida que ja governa la configuracio admin
+
+### Actualitzacio 2026-03-12 — Eliminats els ultims residus de serialitzacio forçada en automatitzacions
+- details: JSON.parse(JSON.stringify(summary)) substituit per details: summary a:
+  - app/api/admin/automation/run-all/route.ts
+  - app/api/admin/automation/enforce-sla/route.ts
+  - app/api/cron/commercial-daily/route.ts
+  - app/api/cron/fuel-daily/route.ts
+
+#### Efecte
+- desapareix un patro de parche antic en logs d'automatitzacio
+- es tanca la fase amb menys soroll intern i sense serialitzacio ornamental
+
+- Back: eliminada la configuración duplicada de Google Reviews en app/api/google-reviews/route.ts; la ruta ya depende solo de lib/services/googleBusinessIntegrationService.ts.
+
+- Back: admin/translate recentrado en lib/services/adminTranslationService.ts; la ruta ya no concentra validación, detección y traducción.
+
+- Back: executive report send recentrado en lib/services/executiveReportDispatchService.ts; la ruta ya no mezcla email, WhatsApp y adminLog.
+
+- Back: flujo post-event unificado en lib/services/postEventDispatchService.ts; admin/emails/send-post-event ya no reimplementa la lógica de booking/email/token.
+
+- Back: cron/post-event y admin/emails/run-cron ya delegan el envío a lib/services/postEventDispatchService.ts; la duplicación del flujo post-event queda concentrada.
+
+- Back: reescritas limpio cron/post-event y admin/emails/run-cron sobre postEventDispatchService.ts tras cerrar la duplicación residual.
+
+- Back: test-notifications y admin/emails/test convergen en lib/services/adminTestNotificationService.ts; diagnóstico y correo de prueba ya no viven en dos rutas.
+
+- Back: commercial-daily recentrado en lib/services/commercialDailyAutomationService.ts; cron y admin/automation/daily-summary/run ya comparten núcleo y se elimina el self-fetch interno.
+
+- Back: run-all, commercial-sequences y enforce-sla convergen en lib/services/adminAutomationService.ts; se elimina la repetición de orquestación y adminLog en rutas.
+
+- Back: bookings/[id]/communications recentrado en lib/services/bookingCommunicationService.ts; la ruta ya no mezcla parseo, templates por flujo, envíos y adminLog.
+
+- Back: auto-portal al completar booking unificado en lib/services/bookingPortalCompletionService.ts; bookings/[id] y bookings/[id]/status ya no duplican portal+email+adminLog.
+
+- Back: admin/start-process recentrado en lib/services/customerProcessService.ts; la ruta ya no contiene los flujos review_request, post_event, welcome y promo.
+
+- Back: transiciones de estado de booking recentradas en lib/services/bookingStatusTransitionService.ts; bookings/[id] y bookings/[id]/status ya comparten side effects de status.
+
+- Back: admin/emails/send recentrado en lib/services/adminEmailSendService.ts; la ruta ya no mezcla branding, adjuntos de presupuesto y trazas de lead/customer.
+
+- Back: admin/emails/quote recentrado en lib/services/adminQuoteEmailService.ts; la ruta ya no concentra extras, lead/customer trail, envío ni copia admin.
+
+- Back: bookings/[id]/inventory recentrado en lib/services/bookingInventoryService.ts; la ruta ya no mezcla view, asignación, lotes, checkin y liberación de stock.
+
+- Back: bookings/[id] adelgazado con lib/services/bookingRouteService.ts; recomputes de viaje y delete permitido ya no viven incrustados en la ruta.
+- Back: `app/api/admin/leads/[id]/route.ts` ya delega `PATCH` y `DELETE` en `lib/services/leadRouteService.ts`; la ruta deja de mezclar cleanup, transiciones de estado y `adminLog` con la validación HTTP.
+- Back: `app/api/admin/bookings/route.ts` ya delega el `POST` completo en `lib/services/bookingCreationService.ts`; referencia, extras especiales, cálculo de viaje, autoasignación de inventario y side effects de cliente/lead ya no viven incrustados en la ruta.
+- Back: `app/api/admin/customers/[id]/route.ts` ya delega `PATCH` y `DELETE` en `lib/services/customerRouteService.ts`; normalización, conflicto de email, actividad y anonimización GDPR salen de la ruta.
+- Back: `app/api/admin/customers/route.ts` ya delega el `POST` en `lib/services/customerCreationService.ts`; creación transaccional, notas iniciales, tarea guía y detección de duplicados ya no viven incrustadas en la ruta.
+- Back: `app/api/admin/leads/route.ts` ya delega el listado estándar y el `POST` en `lib/services/leadAdminService.ts`; el modo pipeline sigue aparte en `lib/services/leads/pipeline.ts`, y la ruta deja de mezclar `groupBy`, `create` y `adminLog` con el HTTP.
+- Back: `app/api/admin/pricing/route.ts` ya delega en `lib/services/pricingAdminService.ts`; el dashboard de precios y la actualización de extras salen de la ruta y quedan recentrados en una sola capa.
+- Back: `app/api/admin/inventory/route.ts` ya delega en `lib/services/inventoryAdminService.ts`; listado, estadísticas, autogeneración de código y creación con `adminLog` salen de la ruta.
+- Back: `app/api/admin/packs/route.ts` ya delega en `lib/services/packAdminService.ts`; traducción completada, pricing health, creación y `adminLog` salen de la ruta.
+- Back: `app/api/admin/blog/route.ts` ya delega el CRUD en `lib/services/blogAdminService.ts`; la ruta deja de cargar listados, publicación, transacción de traducciones y borrado por su cuenta.
+- Back: `app/api/admin/proposals/route.ts` ya delega en `lib/services/proposalAdminService.ts`; numeración, lookup de cliente, listado y creación dejan de vivir incrustados en la ruta.
+- Back: `app/api/admin/testimonials/route.ts` ya delega en `lib/services/testimonialAdminService.ts`; listado con cupones resueltos y moderación dejan de vivir en la ruta.
+- Back: `app/api/admin/customers/check-duplicates/route.ts` ya delega en `lib/services/customerDuplicateCheckService.ts`; el mapeo de duplicados sale de la ruta.
+- Back: `app/api/admin/availability/route.ts` ya delega en `lib/services/availabilityAdminService.ts`; listado, bloqueo y desbloqueo de días salen de la ruta.
+- Back: `app/api/admin/customers/[id]/status/route.ts` ya delega en `lib/services/customerStatusService.ts`; la propagación de estado a leads, bookings y actividad sale de la ruta.
+- Back: `app/api/admin/customers/[id]/activities/route.ts` ya delega en `lib/services/customerActivityService.ts`; listado y creación de notas salen de la ruta.
+- Back: `app/api/admin/events/route.ts` ya delega en `lib/services/adminEventsService.ts`; listado post-event y marcado de envío salen de la ruta.
+- Back: `app/api/admin/privacy/requests/[id]/process/route.ts` ya delega en `lib/services/privacyRequestAdminService.ts`; rechazo, aprobación, exportación, anonimización y revocación de consentimientos salen de la ruta.
+- Back: `app/api/admin/privacy/requests/route.ts` ya delega en `lib/services/privacyRequestListService.ts`; filtros y listado salen de la ruta.
+- Back: `app/api/admin/customers/[id]/consents/route.ts` ya delega en `lib/services/customerConsentService.ts`; consulta de consentimientos y solicitudes sale de la ruta.
+- Back: `app/api/admin/inbox/messages/[uid]/lead/route.ts` ya delega en `lib/services/inboxLeadImportService.ts`; extracción, deduplicación e importación de lead salen de la ruta.
+- Back: `app/api/admin/leads/[id]/documents/route.ts` ya delega en `lib/services/leadDocumentService.ts`; listado, upload, validación y actividad salen de la ruta.
+- Back: `app/api/admin/leads/[id]/notes/route.ts` ya delega en `lib/services/leadNoteService.ts`; creación, limpieza de duplicados y borrado salen de la ruta.
+- Back: `app/api/admin/leads/[id]/activities/route.ts` ya delega en `lib/services/leadActivityService.ts`; listado, creación y limpieza de duplicados salen de la ruta.
+- Back: `app/api/admin/leads/[id]/tasks/route.ts` y `app/api/admin/leads/[id]/tasks/[taskId]/route.ts` ya delegan en `lib/services/leadTaskRouteService.ts`; creación, actualización, borrado y actividad salen de las rutas.
+- Back: `app/api/admin/search/route.ts` ya delega en `lib/services/adminSearchService.ts`; búsqueda cruzada de leads, bookings y clientes sale de la ruta.
+- Back: `app/api/admin/customers/route.ts` ya delega el `GET` en `lib/services/customerListService.ts`; listado y estadísticas salen de la ruta.
+- Back: `app/api/admin/discount-codes/route.ts` ya delega en `lib/services/discountCodeAdminService.ts`; listado, creación y `adminLog` salen de la ruta.
+
+
+## 2026-03-13 - Reescritura clara del tramo anterior
+
+- Back: se consolidaron varias rutas admin hacia servicios compartidos para quitar negocio de los handlers.
+- FAQ: `app/api/admin/faq/route.ts` y `app/api/admin/faq/[id]/route.ts` ya delegan en `lib/services/faqAdminService.ts`.
+- Colaboradores: `app/api/admin/collaborators/route.ts` y `app/api/admin/collaborators/[id]/route.ts` ya delegan en `lib/services/collaboratorAdminService.ts`.
+- Presupuestos personalizados: `app/api/admin/custom-quotes/route.ts` y `app/api/admin/custom-quotes/[id]/route.ts` ya delegan en `lib/services/customQuoteAdminService.ts`.
+- Inventario: `app/api/admin/inventory/[id]/route.ts` y `app/api/admin/inventory/[id]/photo/route.ts` ya delegan en `lib/services/inventoryAdminService.ts`.
+- Facturas: `app/api/admin/invoices/route.ts` y `app/api/admin/invoices/[id]/route.ts` ya delegan en `lib/services/invoiceAdminService.ts`.
+- Calendario mes: `app/api/admin/calendario/mes/route.ts` ya delega en `lib/services/adminCalendarMonthService.ts`.
+- Leads: `score`, `snapshot`, `documents/[documentId]` y `activities/[activityId]` ya delegan en `leadScoreAdminService`, `leadSnapshotService`, `leadDocumentService` y `leadActivityService`.
+- Packs y proposals: `app/api/admin/packs/[id]/route.ts`, `app/api/admin/packs/sync/route.ts`, `app/api/admin/proposals/[id]/route.ts`, `app/api/admin/proposals/[id]/send/route.ts` y `app/api/admin/proposals/[id]/contract/route.ts` ya delegan en `packAdminService`, `proposalAdminService`, `proposalDispatchService` y `contractService`.
+- Dashboard, tasks y privacidad: `app/api/admin/dashboard/route.ts`, `app/api/admin/tasks/route.ts`, `app/api/admin/tasks/[id]/route.ts`, `app/api/admin/privacy/audit/route.ts` y `app/api/admin/privacy/requests/[id]/process/route.ts` ya delegan en servicios compartidos.
+- Bookings: `app/api/admin/bookings/route.ts`, `app/api/admin/bookings/[id]/route.ts` y `app/api/admin/bookings/[id]/status/route.ts` ya quedaron recentradas en `bookingListService` y `bookingRouteService`.
+- Ajustes/settings: `css`, `theme`, `pricing/model-config`, `settings/quote-template` y `reports/profitability/config` ya no arrastran lógica residual ni `adminLog` suelto en las rutas.
+
+## 2026-03-13 - Remate de build y contratos Prisma
+
+- Qué se ha cambiado:
+  - `proposalAdminService` normaliza `snapshot` como JSON Prisma válido en create/update.
+  - `taskAdminService` usa `LeadTaskStatus` real en vez de strings sueltos.
+- Por qué:
+  - el build estaba cayendo por contratos Prisma flojos y enums mal tipados.
+- Qué error o warning salió:
+  - errores de tipos Prisma en persistencia de `snapshot` y en filtros/updates de tareas.
+- En qué estado quedó después:
+  - `pnpm build` volvió a pasar y la fase pasó de bloqueos de tipos a warnings de lint.
+
+## 2026-03-13 - customer-hub y warning cleanup inicial
+
+- Qué se ha cambiado:
+  - `lib/customer-hub/fetchCustomerHub.ts` se reescribió con tipos Prisma/DTO reales.
+  - se corrigieron el fallback de pack por `slug` y la nullability de `leadId` en `resolveCustomerId`.
+- Por qué:
+  - `customer-hub` concentraba uno de los mayores clústeres de `any` y además afloró deuda real de modelo.
+- Qué error o warning salió:
+  - uso de `pack.name` en un modelo que no tiene ese campo.
+  - estrechez de tipos por `leadId: string | null`.
+- En qué estado quedó después:
+  - el módulo quedó tipado, el build siguió sano y ese clúster dejó de ser un bloqueo.
+
+## 2026-03-13 - booking, public packs y PDF studio
+
+- Qué se ha cambiado:
+  - `app/api/booking/route.ts` ya no usa `any` para extras ni `eventType as any`.
+  - `app/api/public/packs/route.ts` ya usa `ServiceSlug` real.
+  - `app/admin/presupuestos/PresupuestoPdfStudio.tsx` se rehizo con tipos compartidos para pricing, distancia y customer search.
+- Por qué:
+  - eran focos muy rentables de warnings y además el PDF Studio arrastraba mapeos frágiles y residuos de reemplazos previos.
+- Qué error o warning salió:
+  - `@typescript-eslint/no-explicit-any` en mapeos de packs, extras y clientes.
+  - varios bordes mecánicos de compilación al rehacer el bloque del PDF Studio (`PricingCatalogResponse` faltante y líneas residuales duplicadas).
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - `PresupuestoPdfStudio.tsx` ya no aparece en el listado de warnings.
+
+## 2026-03-13 - Estado actual de warnings
+
+- Qué se ha cambiado:
+  - además de lo anterior, se han ido limpiando warnings menores del front y del back en tandas cortas verificadas por build.
+- Por qué:
+  - la fase estructural ya está cerrada y ahora el trabajo con mejor retorno es bajar ruido de lint real sin tocar producto.
+- Qué error o warning salió:
+  - quedan warnings concentrados en `MobileAppShell`, `PWAProvider`, `configurador`, `servicios/*/client.tsx` y varios servicios con payloads flojos.
+- En qué estado quedó después:
+  - el repo está en remate fino: build pasando, sin bloqueos estructurales, y los warnings ya mucho más concentrados.
+
+## 2026-03-13 - configurador y PWA sin bloqueos de build
+
+- Qué se ha cambiado:
+  - `app/[locale]/configurador/client.tsx` ahora hace guard de `selectedPack` antes de generar el PDF y normaliza `packId` del tracking para no pasar `undefined`.
+  - `app/components/mobile-ultimate/MobileAppShell.tsx` recupera el alias `StandaloneNavigator` que había quedado fuera del alcance del fichero.
+- Por qué:
+  - al seguir quitando `any` del configurador y de la capa PWA aparecieron dos bordes reales de tipos: un `PackDefinition | null` entrando donde hacía falta un pack real y un cast a `StandaloneNavigator` sin alias visible.
+- Qué error o warning salió:
+  - `Type 'PackDefinition | null' is not assignable to type 'PackDefinition'` en `generateQuotePDF(...)`.
+  - `Type 'string | undefined' is not assignable to type 'string | number | boolean'` en el tracking del fallback a WhatsApp.
+  - `Cannot find name 'StandaloneNavigator'` en `MobileAppShell.tsx`.
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - el clúster de `configurador` ya no está bloqueando el build.
+  - el trabajo pendiente vuelve a estar concentrado en warnings de `no-explicit-any`, sobre todo en `servicios/*/client.tsx`, analytics, email y varios servicios de bookings.
+
+## 2026-03-13 - analytics tipado en servicios y recompostura de bodas/discomovil
+
+- Qué se ha cambiado:
+  - `app/[locale]/servicios/bodas/client.tsx`, `app/[locale]/servicios/discomovil/client.tsx` y `app/[locale]/servicios/fiestas/FiestasClient.tsx` ahora usan `trackServiceEvent()` con tipos explícitos en vez de casts a `window as any`.
+  - en `bodas` y `discomovil` se recompusieron los bloques de `toggleExtra`, `goToConfigurator` y el arranque del `return` para dejar los componentes otra vez estructuralmente sanos tras la sustitución de analytics.
+- Por qué:
+  - era uno de los clústeres más rentables de warnings repetidos de `no-explicit-any` y además quedó deuda mecánica al reemplazar varios bloques casi iguales en dos pantallas grandes.
+- Qué error o warning salió:
+  - warnings repetidos por `window as any` / `gtag` en `bodas`, `discomovil` y `fiestas`.
+  - errores de sintaxis temporales en `bodas` y `discomovil` (`Unexpected token`, `Return statement is not allowed here`, cierres de `return` y bloques mal recompuestos) mientras se reordenaban esos tramos.
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - el clúster de `servicios/*/client.tsx` ya no aparece en el listado de warnings.
+  - los warnings restantes vuelven a estar concentrados en `app/config/*`, `app/error*`, chat/analytics/email y varios servicios del dominio bookings.
+
+## 2026-03-13 - app config, error boundaries y remate de build
+
+- Qué se ha cambiado:
+  - `app/config/equipment-config.ts` ya no deja `specs` abiertas a `any`; el índice ahora queda acotado a valores string opcionales.
+  - `app/config/site-config.ts` tipa `getWhatsAppUrl()` con `WhatsAppMessageData` en vez de `customData?: any`.
+  - `app/error.tsx` y `app/global-error.tsx` pasaron de `Record<string, any>` a un contrato explícito `ErrorPageMessages` alineado con las claves reales (`title`, `defaultMessage`, `tryAgain`, `backToHome`, `errorCode`).
+- Por qué:
+  - tras limpiar `servicios/*/client.tsx`, el siguiente retorno barato estaba en warnings sueltos de config y error boundaries, donde había `any` mecánicos y casts amplios sin necesidad.
+- Qué error o warning salió:
+  - warnings de `no-explicit-any` en `equipment-config`, `site-config`, `app/error.tsx` y `app/global-error.tsx`.
+  - al endurecer el tipo de mensajes aparecieron bordes reales de claves usadas en runtime (`tryAgain` y luego `errorCode`) que no estaban en el contrato inicial.
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - los warnings restantes ya no incluyen `equipment-config`, `site-config`, `app/error.tsx` ni `app/global-error.tsx`.
+  - el listado pendiente queda concentrado en `app/layout.tsx`, `app/not-found.tsx`, `sensorial`, `_error`, chat/analytics/email y varios servicios del dominio bookings.
+## 2026-03-13 - not-found y servicios de email/admin sin bloqueos de build
+
+- Qué se ha cambiado:
+  - pp/not-found.tsx ya tipa las claves reales que usa (	itle, description, ackToHome) en vez de un contrato antiguo que no coincidía con el render.
+  - lib/services/adminEmailSendService.ts ahora usa AdminEmailPayload explícito en vez de un Record<string, unknown> improvisado o ny.
+  - lib/services/adminQuoteEmailService.ts ahora usa AdminQuoteEmailPayload explícito y deja de arrastrar una entrada opaca para todo el flujo de presupuesto por email.
+  - lib/services/adminEventsService.ts ya normaliza status a BookingStatus antes de consultar y deja fuera el cast status as any.
+  - lib/services/tasks/taskCreation.ts ya crea tareas con prisma.task.create(...) directo, sin el wrapper const prismaAny = prisma as any.
+- Por qué:
+  - tras cerrar la fase estructural y volver a tener pnpm build pasando, el siguiente retorno real estaba en bordes de tipos y ny mecánicos que seguían ensuciando servicios del admin y el layout global de errores.
+- Qué error o warning salió:
+  - pp/not-found.tsx rompió build por usar 	.description con un tipo NotFoundMessages que no declaraba esa clave.
+  - al endurecer dminEmailSendService.ts con una firma demasiado genérica apareció un borde real: esolvedLeadId ya no se aceptaba como string por Prisma.
+  - seguían vivos los warnings de ny en dminEventsService.ts y 	askCreation.ts.
+- En qué estado quedó después:
+  - pnpm build vuelve a pasar completo.
+  - pp/not-found.tsx ya no bloquea compilación.
+  - dminEmailSendService.ts, dminQuoteEmailService.ts, dminEventsService.ts y 	askCreation.ts dejaron de ser focos activos de build y de 
+o-explicit-any.
+  - el ruido pendiente queda más concentrado en BookingForm, TawkToChat, analytics, lib/email.ts y varios servicios del dominio bookings.
+## 2026-03-13 - chat y booking creation sin casts flojos
+
+- Qué se ha cambiado:
+  - `components/chat/TawkToChat.tsx` ya define `TawkApi` y `TawkWindow`, deja de depender de `window as any` y protege el alta de `onLoad`/`setAttributes` con un shape mínimo explícito.
+  - `lib/services/bookingCreationService.ts` ya importa `EventType` del cliente Prisma y normaliza `data.eventType` con `normalizeEventType()` en vez de seguir con `eventType as any`.
+- Por qué:
+  - tras limpiar `BookingForm` y analytics, el siguiente retorno rápido estaba en dos focos muy pequeños pero muy visibles en el lint: el widget de Tawk y la creación pública de bookings.
+- Qué error o warning salió:
+  - en `TawkToChat.tsx` primero seguían vivos varios `window as any`; al endurecerlo apareció un borde real porque `TawkWindow` no había quedado insertado en cabecera.
+  - en `bookingCreationService.ts` el cambio a `normalizeEventType()` dejó un borde temporal porque el helper tampoco había quedado insertado en el fichero.
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - `TawkToChat.tsx` y `bookingCreationService.ts` ya no aparecen en el listado de warnings.
+  - el ruido pendiente queda concentrado sobre todo en `lib/email.ts`, `bookingInventoryService.ts`, `bookingRouteService.ts`, `bookingStatusTransitionService.ts`, `customerStatusService.ts`, `packAdminService.ts` y `proposalDispatchService.ts`.
+## 2026-03-13 - enums reales en estados de cliente y booking
+
+- Qué se ha cambiado:
+  - `lib/services/customerStatusService.ts` ahora usa `LeadStatus` y `BookingStatus` reales del cliente Prisma en vez de strings con `as any`.
+  - `lib/services/bookingStatusTransitionService.ts` ahora trabaja con arrays activas de `BookingStatus` tipadas y ya no mete `ACTIVE_BOOKING_STATUSES as any` ni `INVENTORY_ACTIVE_STATUSES as any` en queries.
+- Por qué:
+  - después de cerrar `TawkToChat` y `bookingCreationService`, el siguiente retorno claro estaba en los servicios de estado: eran `any` mecánicos, repetidos y muy baratos de convertir a enums de dominio reales.
+- Qué error o warning salió:
+  - en `customerStatusService.ts` el warning venía de `leadStatus as any`.
+  - en `bookingStatusTransitionService.ts` los warnings venían de filtros `status: { in: ... as any }` dentro de side effects de booking.
+- En qué estado quedó después:
+  - `pnpm build` vuelve a pasar completo.
+  - `customerStatusService.ts` y `bookingStatusTransitionService.ts` ya no aparecen en el listado de warnings.
+  - el ruido pendiente se concentra todavía más en `lib/email.ts`, `bookingInventoryService.ts`, `bookingRouteService.ts`, `packAdminService.ts` y `proposalDispatchService.ts`.
+
+## 2026-03-13 - bookings, packs e inventario otra vez en build limpio
+
+- Qué se ha cambiado:
+  - pp/api/admin/bookings/[id]/route.ts ahora valida el payload de borrado con DeleteBookingPayload e isDeleteBookingPayload() antes de delegar en deleteBookingIfAllowed().
+  - lib/services/bookingRouteService.ts se corrigió para reflejar mejor el shape real de la reserva (guestCount) y se quitaron comprobaciones frágiles con includes(...) sobre enums estrechos, pasando a comparaciones directas en deleteBookingIfAllowed().
+  - lib/services/bookingInventoryService.ts recuperó sus tipos auxiliares (InventoryAssignmentFailure, InventoryBundleSelection), normaliza category con 
+ormalizeInventoryCategory(), usa ItemStatus/BookingStatus reales y dejó fuera el último category as any del filtro de inventario disponible.
+  - lib/services/proposalDispatchService.ts dejó de reconstruir snapshot con Record<string, any> y ahora usa ProposalSnapshot tipado para snapshot, snapshot.customer y snapshot.event.
+  - lib/services/packAdminService.ts volvió a declarar PackInventoryInput en el ámbito correcto para la normalización de input.inventory.
+- Por qué:
+  - el build ya no estaba cayendo por arquitectura sino por bordes tipados destapados al endurecer servicios: payloads de borrado, enums estrechos, tipos auxiliares fuera de ámbito y restos de ny en snapshots/configuración de packs e inventario.
+- Qué error o warning salió:
+  - pp/api/admin/bookings/[id]/route.ts rompía por pasar un ooking opcional y débilmente tipado a deleteBookingIfAllowed().
+  - ookingRouteService.ts fue sacando varios bordes reales al endurecer el contrato local: faltaba guestCount y además TypeScript no aceptaba includes(...) con ManagedBookingStatus frente a arrays estrechos de BookingStatus.
+  - ookingInventoryService.ts rompió primero por no encontrar InventoryAssignmentFailure, luego por categorías no válidas del enum Prisma y después por otro includes(...) demasiado estrecho; además seguía quedando un category as any en el filtro.
+  - packAdminService.ts rompió porque PackInventoryInput no estaba realmente declarado donde se usaba.
+- En qué estado quedó después:
+  - pnpm build vuelve a pasar completo.
+  - proposalDispatchService.ts, packAdminService.ts, ookingRouteService.ts y los bordes de tipos asociados ya no bloquean build.
+  - el repo vuelve a estar en estado compilable con el remate fino concentrado sobre todo en warnings de lib/email.ts y ya no en errores de tipos repartidos por bookings/packs/inventario.
+
+## 2026-03-13 - email, packs e inventario sin residuos de tipado en build
+
+- Qué se ha cambiado:
+  - lib/services/packAdminService.ts recuperó PackInventoryInput en el ámbito correcto para la normalización de input.inventory.
+  - lib/services/bookingInventoryService.ts terminó de sustituir el filtro antiguo de categorías/estado por 
+ormalizedCategory, ItemStatus y BookingStatus reales, dejando fuera el último category as any y las comprobaciones frágiles con literales sueltos.
+  - lib/email.ts ahora usa un contrato explícito BookingEmailModel con sus tipos auxiliares (BookingEmailTranslation, BookingEmailPack, BookingEmailExtra, BookingEmailExtraLine) para sendBookingConfirmation() y sendBookingNotificationToAdmin().
+  - en lib/email.ts también salieron los ny de callbacks internos (	ranslations.find(...), xtras.map(...)) al alinearlos con ese contrato de email.
+- Por qué:
+  - tras volver a estado compilable, el último retorno claro estaba en los warnings/roturas finales que quedaban concentrados en packAdminService, ookingInventoryService y el clúster de ny en lib/email.ts.
+- Qué error o warning salió:
+  - packAdminService.ts rompía build por usar PackInventoryInput fuera de ámbito.
+  - ookingInventoryService.ts seguía arrastrando el último category as any y varios bordes de enums/literales estrechos mientras se endurecía el filtro.
+  - lib/email.ts concentraba el último grupo claro de 
+o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
+- En qué estado quedó después:
+  - pnpm build vuelve a pasar completo.
+  - el clúster de warnings de packAdminService, ookingInventoryService y lib/email.ts ya no aparece en build.
+  - el repo queda otra vez en un punto mucho más limpio: sin el laberinto estructural anterior y con el remate fino de tipado también bastante drenado.
+
+## 2026-03-13 - booking detail y proposals sin loose typing residual
+
+- Qué se ha cambiado:
+  - pp/admin/bookings/[id]/page.tsx ahora usa contratos locales (BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat) en vez de ny[] y Record<string, unknown> para extras, proposals, invoices y compatibilidad numérica (xtraHours, distanceKm, ehicleCostPerKm, uelCostPerKm).
+  - pp/api/admin/proposals/route.ts y pp/api/admin/proposals/[id]/route.ts sustituyen z.record(z.any()) por z.record(z.unknown()) en snapshot.
+- Por qué:
+  - después de dejar el build limpio, aún quedaban restos muy localizados y baratos de corregir: casts sueltos en la ficha de reserva y validaciones de proposals demasiado permisivas para algo que ya no necesitaba ny.
+- Qué error o warning salió:
+  - no salió un bloqueo nuevo de build; esta tanda venía de barrido fino con g para cazar los últimos ny/z.any() obvios.
+- En qué estado quedó después:
+  - pnpm build vuelve a pasar completo.
+  - la ficha de booking ya no arrastra esos ny locales visibles.
+  - proposals ya no valida snapshots con z.any().
+  - el repo queda todavía más seco y la fase siguiente ya es casi solo inspección fina, no saneado estructural.
+
+## 2026-03-13 - booking detail rematado sin any residuales
+
+### Que se ha cambiado
+- Se ha verificado y rematado [page.tsx](/D:/orbitaevents/app/admin/bookings/[id]/page.tsx) para que los bloques de extras, proposals e invoices queden usando tipos locales reales (`BookingExtraRow`, `BookingProposalRow`, `BookingInvoiceRow`) sin residuos de `any` ni casts sueltos.
+- Se ha vuelto a comprobar también que [route.ts](/D:/orbitaevents/app/api/admin/proposals/route.ts) y [route.ts](/D:/orbitaevents/app/api/admin/proposals/[id]/route.ts) ya no arrastran `z.any()`.
+
+### Por que
+- Era el ultimo foco local que seguia dando la sensacion de tipado flojo dentro del detalle de booking, pese a que el build ya pasaba.
+- Convenia dejarlo cerrado de verdad antes de seguir con otra pasada global fina.
+
+### Que error o warning salio
+- No salio un error nuevo de build.
+- La comprobacion directa con `rg` ya no devolvio coincidencias de `@typescript-eslint/no-explicit-any`, `any` ni `z.any()` en esos archivos.
+
+### En que estado quedo despues
+- [page.tsx](/D:/orbitaevents/app/admin/bookings/[id]/page.tsx) queda sin esos residuos de loose typing en los bloques de documento y extras.
+- `pnpm build` vuelve a pasar completo.
+- A partir de aqui ya no queda saneado gordo en esta zona; lo siguiente es revision global fina del repo.
+
+## 2026-03-13 - comentarios ornamentales y banners viejos fuera
+
+### Que se ha cambiado
+- Se ha eliminado la cabecera decorativa antigua de [FiestasClient.tsx](/D:/orbitaevents/app/[locale]/servicios/fiestas/FiestasClient.tsx), que seguia arrastrando texto de "VERSION LIMPIA", una regla vieja tipo TODO y una firma ornamental.
+- Se ha eliminado tambien la firma vieja de [equipment-config.ts](/D:/orbitaevents/app/config/equipment-config.ts).
+
+### Por que
+- Ya no aportaban contexto tecnico real y solo metian ruido visual y deuda textual en archivos activos.
+- En esta fase ya no estamos anadiendo capas; toca dejar el codigo seco tambien a nivel de comentarios y residuos ornamentales.
+
+### Que error o warning salio
+- No salio error de build; era limpieza textual segura.
+- El barrido especifico de `VERSIÓN LIMPIA`, `Arquitecto Digital`, `TODO sale de packs-config` y `@author` quedo sin coincidencias despues del corte.
+
+### En que estado quedo despues
+- Ambos archivos quedan sin banners ni firmas sobrantes.
+- Ya no quedan residuos ornamentales obvios de este tipo en `app`, `lib` y `components` segun el barrido aplicado.
+
+## 2026-03-13 - cierre de fase con lint limpio y adelgazamiento final
+
+### Que se ha cambiado
+- Se ha ejecutado `pnpm lint` sobre el estado actual del repo.
+- Se ha hecho una pasada final de residuos tecnicos para buscar patrones reales de `any`, `z.any()`, `TODO`, `FIXME`, `deprecated`, banners ornamentales y trazas de depuracion borrables.
+- Se ha refrescado la metrica global del diff para medir el adelgazamiento real del repo.
+
+### Por que
+- Despues de dejar `pnpm build` limpio, faltaba una senal fuerte de acabado fino: confirmar que tampoco quedaban warnings de lint ni residuos mecanicos claros.
+- Tambien convenia cerrar esta fase con una cifra objetiva de reduccion del repo.
+
+### Que error o warning salio
+- `pnpm lint` no saco warnings ni errores.
+- El barrido estricto de TypeScript ya no devolvio patrones reales de `: any`, `as any`, `<any>` ni `z.any()`.
+- La ultima busqueda de `console.log` y similares solo saco usos legitimos en `scripts/*` y el `console.debug` controlado de `logger`, no basura de producto.
+- `git diff --shortstat` devolvio: `349 files changed, 8353 insertions(+), 20042 deletions(-)`.
+
+### En que estado quedo despues
+- El repo queda con `pnpm build` limpio y `pnpm lint` limpio.
+- El adelgazamiento neto queda en `11689` lineas menos respecto al inicio de esta gran fase.
+- Ya no queda otra pasada de poda segura con retorno claro; lo que sigue a partir de aqui ya es otra fase distinta (acabado, producto o rediseño), no drenaje estructural.
+
+## 2026-03-13 - leadTask ya no conserva naming de transicion
+
+### Que se ha cambiado
+- Se han renombrado en [leadTaskFacade.ts](/D:/orbitaevents/lib/services/tasks/leadTaskFacade.ts) las funciones `createLeadTaskPrimary`, `updateLeadTaskPrimary` y `deleteLeadTaskPrimary` a `createLeadTask`, `updateLeadTask` y `deleteLeadTask`.
+- Se ha actualizado [leadTaskRouteService.ts](/D:/orbitaevents/lib/services/leadTaskRouteService.ts) para consumir esos nombres ya sin la coletilla de transicion.
+- Se ha corregido ademas el efecto colateral del corte anterior en [FiestasClient.tsx](/D:/orbitaevents/app/[locale]/servicios/fiestas/FiestasClient.tsx), restaurando `use client`, y se ha dejado bien formada la cabecera de [equipment-config.ts](/D:/orbitaevents/app/config/equipment-config.ts).
+
+### Por que
+- `leadTask` ya no tiene ninguna escritura viva en el repo. Solo queda para borrado historico y una resolucion legacy puntual, asi que el sufijo `Primary` ya no describia nada real.
+- Convenia dejar ese clust er con nombres honestos antes de dar por agotada la poda estructural.
+
+### Que error o warning salio
+- Al quitar antes una cabecera vieja en `FiestasClient`, se elimino tambien por error `use client`, y el build cayo con el error de Client Component.
+- Tras restaurarlo y corregir la cabecera de `equipment-config`, `pnpm build` volvio a pasar completo.
+- La verificacion de busqueda confirmo que ya no quedan referencias a `createLeadTaskPrimary`, `updateLeadTaskPrimary` ni `deleteLeadTaskPrimary`.
+- La compatibilidad residual de `leadTask` queda reducida a:
+  - borrado historico en [taskCleanup.ts](/D:/orbitaevents/lib/services/tasks/taskCleanup.ts)
+  - borrado de espejo legacy en [leadTaskFacade.ts](/D:/orbitaevents/lib/services/tasks/leadTaskFacade.ts)
+  - resolucion por `legacyLeadTaskId` en [fetchCustomerHub.ts](/D:/orbitaevents/lib/customer-hub/fetchCustomerHub.ts)
+
+### En que estado quedo despues
+- El dominio de tareas ya no arrastra naming de migracion.
+- `leadTask` queda oficialmente en modo compatibilidad residual, no como modelo vivo.
+- `pnpm build` sigue limpio despues del cambio.
+
+## 2026-03-13 - generadores idempotentes y base de line endings
+
+### Que se ha cambiado
+- Se ha reescrito [sync-client-logos.mjs](/D:/orbitaevents/scripts/sync-client-logos.mjs) para que `client-logos.ts` solo se escriba si el contenido cambia.
+- Se ha reescrito [generate-portfolio-config.mjs](/D:/orbitaevents/scripts/generate-portfolio-config.mjs) para que `portfolio-images.ts` solo se escriba si el contenido cambia.
+- Se ha anadido [\.gitattributes](/D:/orbitaevents/.gitattributes) con una base minima: LF para codigo y configuracion, CRLF solo para scripts nativos de Windows.
+
+### Por que
+- El build seguia ensuciando el diff aunque no hubiese cambios reales en logos ni portfolio.
+- Tambien seguian apareciendo avisos recurrentes de LF/CRLF por falta de una politica explicita de line endings en el repo.
+
+### Que error o warning salio
+- No salio error funcional.
+- La verificacion del build confirmo ahora mensajes honestos:
+  - `client-logos.ts unchanged`
+  - `Config sin cambios: ...portfolio-images.ts`
+- `git diff --name-only -- app/config/client-logos.ts app/config/portfolio-images.ts` ya no devolvio archivos modificados, solo los avisos de line endings previos del working copy.
+
+### En que estado quedo despues
+- Los generadores ya no reescriben ficheros invariantes en cada build.
+- El repo queda con una base explicita para futuros LF/CRLF, aunque no se ha hecho una normalizacion masiva del working tree en esta fase.
+- `pnpm build` sigue pasando limpio despues del cambio.
+
+## 2026-03-13 - cuatro rutas admin mas sin Prisma directo
+
+### Que se ha cambiado
+- Se ha extendido [customerRouteService.ts](/D:/orbitaevents/lib/services/customerRouteService.ts) con `getCustomerDetail()`.
+- Se ha extendido [leadRouteService.ts](/D:/orbitaevents/lib/services/leadRouteService.ts) con `getLeadDetail()`.
+- Se ha extendido [leadAdminService.ts](/D:/orbitaevents/lib/services/leadAdminService.ts) con `countNewAdminLeads()`.
+- Se ha extendido [postEventDispatchService.ts](/D:/orbitaevents/lib/services/postEventDispatchService.ts) con `listPendingPostEventBookings()`.
+- Se han adelgazado para consumir esos servicios:
+  - [customers/[id]/route.ts](/D:/orbitaevents/app/api/admin/customers/[id]/route.ts)
+  - [leads/[id]/route.ts](/D:/orbitaevents/app/api/admin/leads/[id]/route.ts)
+  - [leads/route.ts](/D:/orbitaevents/app/api/admin/leads/route.ts)
+  - [emails/run-cron/route.ts](/D:/orbitaevents/app/api/admin/emails/run-cron/route.ts)
+
+### Por que
+- Eran de las pocas rutas admin que aun mantenian Prisma directo para lectura o conteo, rompiendo el patron ya dominante de `route thin / service thick`.
+- Tenian buen retorno porque no exigian un dominio nuevo: encajaban directamente en servicios que ya existian.
+
+### Que error o warning salio
+- No salio un error nuevo de build.
+- El barrido de `app/api/admin` para `@/lib/prisma`, `prisma.`, `db.` y `new PrismaClient` ya no devolvio coincidencias despues del recentering de esta tanda.
+- `pnpm build` volvio a pasar completo.
+
+### En que estado quedo despues
+- `customers/[id]`, `leads/[id]`, `leads` y `emails/run-cron` quedan ya sin acceso directo a Prisma en la ruta.
+- El patron del back queda aun mas uniforme: autenticacion/validacion en ruta, lectura/escritura y workflow en servicio.
+- Esta zona del admin ya no tiene residuos obvios del modelo anterior.
+
+## 2026-03-13 - blog publico, recent bookings y cron post-event recentrados
+
+### Que se ha cambiado
+- Se ha creado [publicBlogService.ts](/D:/orbitaevents/lib/services/publicBlogService.ts) para concentrar el listado y detalle publico del blog.
+- Se ha creado [recentBookingsService.ts](/D:/orbitaevents/lib/services/recentBookingsService.ts) para concentrar el feed publico de reservas recientes y live notifications.
+- Se ha reenganchado [cron/post-event/route.ts](/D:/orbitaevents/app/api/cron/post-event/route.ts) al helper compartido `listPendingPostEventBookings()` de [postEventDispatchService.ts](/D:/orbitaevents/lib/services/postEventDispatchService.ts).
+- Se han adelgazado estas rutas para consumir servicio en vez de Prisma directo:
+  - [blog/route.ts](/D:/orbitaevents/app/api/blog/route.ts)
+  - [blog/[slug]/route.ts](/D:/orbitaevents/app/api/blog/[slug]/route.ts)
+  - [recent-bookings/route.ts](/D:/orbitaevents/app/api/recent-bookings/route.ts)
+  - [cron/post-event/route.ts](/D:/orbitaevents/app/api/cron/post-event/route.ts)
+
+### Por que
+- Eran rutas publicas y de cron con buen retorno: lectura y workflow ya muy encapsulables sin abrir un dominio nuevo.
+- Convenia seguir reduciendo acceso a Prisma directo tambien fuera del admin, no solo dentro del panel.
+
+### Que error o warning salio
+- No salio error de build.
+- `pnpm build` siguio pasando completo tras la tanda.
+- El barrido global de `app/api` para Prisma directo ya no devuelve `blog`, `blog/[slug]`, `recent-bookings` ni `cron/post-event`.
+
+### En que estado quedo despues
+- El blog publico y el feed de reservas recientes quedan recentrados en servicio compartido.
+- El cron post-event ya reutiliza tambien la misma capa de lookup de reservas pendientes que la ruta admin.
+- La superficie con Prisma directo fuera del admin sigue existiendo, pero ya queda concentrada en menos frentes y mas especificos.
+
+## 2026-03-13 - lecturas publicas de testimonios y reviews mas recentradas
+
+### Que se ha cambiado
+- Se ha creado [publicTestimonialService.ts](/D:/orbitaevents/lib/services/publicTestimonialService.ts) para concentrar:
+  - listado publico de testimonios aprobados
+  - listado de testimonios aprobados de base de datos para reseñas mezcladas
+- Se ha reenganchado [testimonials/route.ts](/D:/orbitaevents/app/api/testimonials/route.ts) en su `GET` a `listApprovedPublicTestimonials()`.
+- Se ha reenganchado [google-reviews/route.ts](/D:/orbitaevents/app/api/google-reviews/route.ts) para que su capa de reseñas de BBDD use `listApprovedDatabaseReviews()` en vez de consultar `customerTestimonial` directamente.
+
+### Por que
+- `testimonials` y `google-reviews` seguian compartiendo dominio de reseñas aprobadas, pero lo resolvian con queries separadas dentro de las rutas.
+- Tenia buen retorno recentrar al menos la parte de lectura publica antes de tocar el POST pesado de testimonios.
+
+### Que error o warning salio
+- El primer intento dejo un residuo viejo en `google-reviews`, y el build cayo porque seguia existiendo una referencia a `prisma` sin import.
+- Se corrigio sustituyendo el bloque por rango de lineas, que aqui resulto mas fiable que el reemplazo regex.
+- Despues de la correccion, `pnpm build` volvio a pasar completo.
+
+### En que estado quedo despues
+- La lectura publica de testimonios aprobados ya no esta duplicada entre handlers.
+- `google-reviews` queda mas delgada en su parte de BBDD, aunque sigue siendo una ruta grande por la mezcla de cache, JSON, Google Places y GBP.
+- `testimonials` sigue teniendo Prisma directo en `POST`, pero su `GET` ya no arrastra esa lectura dentro de la ruta.
+
+## 2026-03-13 - envio publico de testimonios fuera de la ruta
+
+- qué se ha cambiado
+  - se amplió [publicTestimonialService.ts](/D:/orbitaevents/lib/services/publicTestimonialService.ts) con `submitPublicTestimonial()` para mover fuera de la ruta la creación/búsqueda de cliente, la reserva del código de descuento, la creación del testimonio y la actividad asociada.
+  - [route.ts](/D:/orbitaevents/app/api/testimonials/route.ts) dejó de importar Prisma y ahora delega el `POST` y el `GET` al servicio compartido.
+  - la lectura de reviews en [route.ts](/D:/orbitaevents/app/api/google-reviews/route.ts) ya venía apoyándose en `listApprovedDatabaseReviews()` y quedó verificada otra vez en esta pasada.
+
+- por qué
+  - `app/api/testimonials/route.ts` seguía siendo un handler gordo con lógica de cliente, testimonial, descuento y actividad incrustada.
+  - era el siguiente residuo claro después de limpiar la capa de lectura pública de testimonios y reviews.
+
+- qué error o warning salió
+  - no salió un error nuevo de compilación, pero el barrido seguía marcando Prisma directo en `app/api/testimonials/route.ts`.
+  - durante la extracción, el riesgo real era romper el flujo transaccional de creación de testimonio y código descuento.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/testimonials/route.ts app/api/google-reviews/route.ts lib/services/publicTestimonialService.ts` ya no devuelve Prisma directo en la ruta pública de testimonios ni en google-reviews; el acceso queda concentrado en [publicTestimonialService.ts](/D:/orbitaevents/lib/services/publicTestimonialService.ts).
+  - el dominio público de testimonios queda ahora más consistente: lectura y escritura viven en la misma capa de servicio y la ruta vuelve a ser fina.
+
+## 2026-03-13 - extras publicos y validacion publica de descuentos fuera de ruta
+
+- qué se ha cambiado
+  - se creó [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) para centralizar la lectura de extras públicos desde BD con fallback al config estático.
+  - se creó [publicDiscountCodeService.ts](/D:/orbitaevents/lib/services/publicDiscountCodeService.ts) para centralizar la validación pública de códigos de descuento de cliente, globales y de feedback.
+  - [route.ts](/D:/orbitaevents/app/api/public/extras/route.ts) dejó de importar Prisma y ahora delega en `listPublicExtras()`.
+  - [route.ts](/D:/orbitaevents/app/api/public/discount-code/route.ts) dejó de importar Prisma y ahora delega en `validatePublicDiscountCode()`.
+
+- por qué
+  - ambas rutas seguían haciendo lectura y validación de negocio directamente dentro del handler.
+  - eran dos residuos públicos pequeños con retorno rápido después de recentrar testimonios y reviews.
+
+- qué error o warning salió
+  - no salió un error nuevo de build, pero el barrido global de `app/api` seguía marcando Prisma directo en esas rutas.
+  - el riesgo real era mover la lógica de fallback de extras y la validación multifuente de descuentos sin cambiar el contrato público.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/public/extras/route.ts app/api/public/discount-code/route.ts lib/services/publicExtrasService.ts lib/services/publicDiscountCodeService.ts` ya no devuelve Prisma directo en las rutas; queda concentrado en [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) y [publicDiscountCodeService.ts](/D:/orbitaevents/lib/services/publicDiscountCodeService.ts).
+  - el borde público del configurador y de descuentos queda ahora más uniforme: handlers finos y servicio compartido con la lógica real.
+
+## 2026-03-13 - disponibilidad publica y feed simple recentrados
+
+- qué se ha cambiado
+  - se creó [publicAvailabilityService.ts](/D:/orbitaevents/lib/services/publicAvailabilityService.ts) para concentrar la lectura de disponibilidad simple por rango, el resumen público de sábados/escasez y el fallback cuando no hay base de datos.
+  - [route.ts](/D:/orbitaevents/app/api/availability/route.ts) dejó de importar Prisma y ahora delega el rango simple en `listAvailabilityRange()`.
+  - [route.ts](/D:/orbitaevents/app/api/public/availability/route.ts) dejó de importar Prisma y ahora delega el resumen público/fallback en `buildPublicAvailability()` y `generateFallbackPublicAvailability()`.
+
+- por qué
+  - ambas rutas seguían montando fechas, consultas, sets y cálculo de disponibilidad dentro del handler.
+  - después de limpiar testimonios, descuentos y extras públicos, `availability` era el siguiente bloque pequeño con mejor retorno antes de atacar rutas más gordas como `contact`.
+
+- qué error o warning salió
+  - no apareció un error nuevo de build, pero el barrido global de `app/api` seguía marcando Prisma directo en las dos rutas de disponibilidad.
+  - el riesgo real era mover el cálculo de escasez y el fallback sin cambiar el contrato público que consume el front.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/availability/route.ts app/api/public/availability/route.ts lib/services/publicAvailabilityService.ts` ya no devuelve Prisma directo en las rutas; queda concentrado en [publicAvailabilityService.ts](/D:/orbitaevents/lib/services/publicAvailabilityService.ts).
+  - la disponibilidad pública queda ahora más coherente: handler fino y una sola capa para rango simple, resumen público y fallback.
+
+## 2026-03-13 - contador publico de views del blog fuera del handler
+
+- qué se ha cambiado
+  - se amplió [publicBlogService.ts](/D:/orbitaevents/lib/services/publicBlogService.ts) con `incrementPublicBlogPostView()` para recentrar también el contador de visitas.
+  - [route.ts](/D:/orbitaevents/app/api/blog/[slug]/view/route.ts) dejó de importar Prisma y ahora delega el incremento al servicio compartido.
+
+- por qué
+  - `blog/[slug]/view` seguía siendo un handler mínimo pero todavía con acceso directo a BD.
+  - después de availability, era un corte pequeño y limpio antes de volver a rutas más pesadas.
+
+- qué error o warning salió
+  - no apareció un error nuevo de build; el residuo era puramente estructural: Prisma directo en una ruta pública muy simple.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/blog/[slug]/view/route.ts lib/services/publicBlogService.ts` ya no devuelve Prisma directo en la ruta; queda concentrado en [publicBlogService.ts](/D:/orbitaevents/lib/services/publicBlogService.ts).
+  - el dominio público de blog queda más coherente: listado, detalle y contador viven ya en la misma capa de servicio.
+
+## 2026-03-13 - feed ICS del calendario fuera del handler
+
+- qué se ha cambiado
+  - se amplió [calendarFeedTokenService.ts](/D:/orbitaevents/lib/services/calendarFeedTokenService.ts) con `buildCalendarFeedIcs()` y los helpers internos de escape/formato ICS.
+  - [route.ts](/D:/orbitaevents/app/api/calendar/feed/[token]/route.ts) dejó de consultar reservas y construir el ICS dentro del handler; ahora solo valida el token y delega en el servicio.
+
+- por qué
+  - el feed de calendario ya validaba el token con servicio, pero seguía haciendo consulta de bookings y composición completa del fichero ICS dentro de la ruta.
+  - era un corte intermedio limpio antes de entrar en piezas bastante más gordas como `contact` o `booking`.
+
+- qué error o warning salió
+  - no apareció un error nuevo de build; el residuo era estructural: Prisma directo y lógica de serialización ICS aún incrustados en la ruta.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/calendar/feed/[token]/route.ts lib/services/calendarFeedTokenService.ts` ya no devuelve Prisma directo en la ruta; queda concentrado en [calendarFeedTokenService.ts](/D:/orbitaevents/lib/services/calendarFeedTokenService.ts).
+  - el feed ICS queda ahora coherente con el resto del repo: handler fino y lógica real de token + construcción del feed en una sola capa de servicio.
+
+## 2026-03-13 - reserva publica fuera del handler
+
+- qué se ha cambiado
+  - se creó [publicBookingService.ts](/D:/orbitaevents/lib/services/publicBookingService.ts) para concentrar la creación pública de reservas: pack y extras, cálculo económico, control de disponibilidad, transacción de booking y envío de emails.
+  - [route.ts](/D:/orbitaevents/app/api/booking/route.ts) dejó de importar Prisma y ahora se limita a rate limit, validación básica y delegación en `createPublicBooking()`.
+
+- por qué
+  - `app/api/booking/route.ts` seguía siendo un handler público bastante cargado, con acceso directo a BD, lógica transaccional y side effects de correo.
+  - era el siguiente bloque público con buen retorno antes de entrar en `contact`, que sigue siendo todavía más grande.
+
+- qué error o warning salió
+  - no apareció un error nuevo de build; el residuo era estructural: lógica completa de reserva todavía incrustada en la ruta.
+  - el punto delicado era no romper el contrato que esperan `sendBookingConfirmation()` y `sendBookingNotificationToAdmin()`, así que el servicio conserva el include de pack/extras con traducciones.
+
+- y en qué estado quedó después
+  - `pnpm build` volvió a pasar completo.
+  - el barrido `rg '@/lib/prisma|prisma\.|db\.|new PrismaClient' app/api/booking/route.ts lib/services/publicBookingService.ts` ya no devuelve Prisma directo en la ruta; queda concentrado en [publicBookingService.ts](/D:/orbitaevents/lib/services/publicBookingService.ts).
+  - la reserva pública queda ahora alineada con el resto del repo: handler fino y servicio dedicado para la lógica real de creación.
+
+## 2026-03-13 - persistencia de contacto fuera de la ruta
+
+- qué se ha cambiado
+  - se creó [contactLeadCaptureService.ts](/D:/orbitaevents/lib/services/contactLeadCaptureService.ts) para concentrar la persistencia del lead de contacto: búsqueda por email, update/create del lead, creación de nota, alta o actualización de customer y actividad asociada.
+  - [route.ts](/D:/orbitaevents/app/api/contact/route.ts) dejó de tocar Prisma para esa parte y ahora delega en persistContactLead(), manteniendo en la ruta la validación, Turnstile, rate limit, notificación y composición de correos.
+
+- por qué
+  - pp/api/contact/route.ts seguía siendo el handler público más cargado que quedaba: además de validar y enviar notificaciones, aún llevaba toda la persistencia de lead/customer dentro del mismo bloque.
+  - después de recentrar booking, calendario, disponibilidad, extras, descuentos y testimonios públicos, contact era el siguiente corte lógico con más retorno.
+
+- qué error o warning salió
+  - durante la extracción quedó una sustitución a medias en la ruta: se añadió la llamada a persistContactLead() pero seguía colgado el bloque viejo con prisma, lo que rompía pnpm build con Cannot find name 'prisma' en pp/api/contact/route.ts.
+  - el riesgo real era cerrar la extracción sin tocar el contrato público del formulario ni romper la parte de notificación/correo.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g '@/lib/prisma|prisma\.|normalizeEmail|normalizeName|normalizePhone|persistContactLead' app/api/contact/route.ts lib/services/contactLeadCaptureService.ts ya no devuelve Prisma ni normalización directa en la ruta; queda concentrado en [contactLeadCaptureService.ts](/D:/orbitaevents/lib/services/contactLeadCaptureService.ts).
+  - el formulario público de contacto queda ahora más alineado con el resto del repo: handler fino para validación y side effects, servicio dedicado para la persistencia real de lead/customer.
+
+## 2026-03-13 - cron de revision de pricing de packs fuera del handler
+
+- qué se ha cambiado
+  - se creó [packPricingCheckService.ts](/D:/orbitaevents/lib/services/packPricingCheckService.ts) para concentrar la revisión de divergencias de precio en packs activos, la creación de tareas abiertas y el dminLog del cron.
+  - [route.ts](/D:/orbitaevents/app/api/cron/pack-pricing-check/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en unPackPricingCheck().
+
+- por qué
+  - tras cerrar contact, el barrido de pp/api seguía mostrando Prisma directo en tres crons: uel-daily, invoice-sync y pack-pricing-check.
+  - pack-pricing-check era el siguiente corte con mejor retorno porque mezclaba lectura de packs, cálculo de salud, búsqueda de tareas abiertas, creación de tareas y dminLog dentro del handler.
+
+- qué error o warning salió
+  - no salió un error nuevo de build; el residuo era estructural: Prisma directo y workflow completo del cron todavía incrustados en la ruta.
+  - el punto delicado era mantener exactamente el mismo contrato de salida del cron y el mismo criterio de creación de tareas abiertas por divergencia.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/pack-pricing-check/route.ts lib/services/packPricingCheckService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [packPricingCheckService.ts](/D:/orbitaevents/lib/services/packPricingCheckService.ts).
+  - el cron queda ahora alineado con el resto del repo: handler fino y servicio dedicado para lectura, cálculo, creación de tareas y trazabilidad.
+
+## 2026-03-13 - cron diario de combustible fuera del handler
+
+- qué se ha cambiado
+  - se amplió [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts) con unFuelDailyRefresh() para concentrar el refresco diario, la composición del summary y el dminLog del cron.
+  - [route.ts](/D:/orbitaevents/app/api/cron/fuel-daily/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en unFuelDailyRefresh().
+
+- por qué
+  - tras cerrar pack-pricing-check, el barrido de pp/api seguía mostrando Prisma directo en uel-daily e invoice-sync.
+  - uel-daily era el corte corto con mejor retorno: ya usaba un servicio para refrescar la referencia, pero seguía creando el dminLog y el summary del cron dentro del handler.
+
+- qué error o warning salió
+  - no salió un error nuevo de build; el residuo era estructural: la ruta seguía cargando Prisma solo para el dminLog del cron.
+  - el punto delicado era mantener el mismo summary y el mismo saveCronRunStatus() sin tocar el contrato del endpoint.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/fuel-daily/route.ts lib/services/fuelReferenceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts).
+  - el cron diario de combustible queda ahora alineado con el resto: handler fino y servicio único para refresco, summary y trazabilidad.
+
+## 2026-03-13 - cron de sincronizacion de facturas fuera del handler
+
+- qué se ha cambiado
+  - se amplió [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts) con unInvoiceSyncCron() para concentrar la creación automática de facturas, los reintentos de sync con Holded, el refresh de estado y el summary del cron.
+  - [route.ts](/D:/orbitaevents/app/api/cron/invoice-sync/route.ts) dejó de importar Prisma y ahora solo hace auth, logging, saveCronRunStatus() y delegación en unInvoiceSyncCron().
+
+- por qué
+  - tras cerrar uel-daily, invoice-sync era el último cron gordo con Prisma directo dentro del handler.
+  - seguía mezclando lookup de reservas completadas, búsqueda de facturas con error o sincronizadas, reintentos, refresco de estado y summary del cron dentro de la ruta.
+
+- qué error o warning salió
+  - no salió un error nuevo de build; el residuo era estructural: workflow completo del cron todavía incrustado en la ruta.
+  - el punto delicado era mantener el mismo comportamiento parcial tolerante a errores por factura, sin perder el summary que consume saveCronRunStatus().
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/invoice-sync/route.ts lib/services/invoiceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts).
+  - el cron de facturas queda ahora alineado con el resto: handler fino y servicio único para el workflow de creación, reintento y refresco.
+
+## 2026-03-13 - health check tecnico recentrado fuera de la ruta
+
+- qué se ha cambiado
+  - se creó [healthCheckService.ts](/D:/orbitaevents/lib/services/healthCheckService.ts) para concentrar la composición del estado base, la comprobación de base de datos, el estado de Sentry, la finalización del health status y el fallback técnico.
+  - [route.ts](/D:/orbitaevents/app/api/health/route.ts) dejó de montar directamente la comprobación de BD y ahora solo delega en el servicio para GET y conserva HEAD mínimo.
+
+- por qué
+  - tras recentrar contact, ooking, calendar/feed, uel-daily, invoice-sync y pack-pricing-check, el último Prisma directo que quedaba en pp/api era pi/health.
+  - aunque era un endpoint técnico legítimo, seguía siendo la última ruta de pp/api con chequeo directo de BD en el propio handler.
+
+- qué error o warning salió
+  - al extraerlo, pnpm build falló una vez porque Prisma.sql se estaba usando desde import type, lo que rompía healthCheckService.ts.
+  - se corrigió cambiando el import a import { Prisma } from '@prisma/client' y se rehizo la verificación.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g '@/lib/prisma|prisma\.' app/api ya no devuelve uso directo de Prisma en rutas de pp/api.
+  - el borde HTTP queda completamente fino: pp/api sin acceso directo a Prisma y con lógica técnica o de dominio recentrada en servicios compartidos.
+
+## 2026-03-13 - ultimo fallback legacy de tareas mas encapsulado
+
+- qué se ha cambiado
+  - se añadió indLeadTaskLinkByTaskOrLegacyId() a [leadTaskFacade.ts](/D:/orbitaevents/lib/services/tasks/leadTaskFacade.ts) para resolver de forma unificada una tarea por id actual o por legacyLeadTaskId.
+  - [fetchCustomerHub.ts](/D:/orbitaevents/lib/customer-hub/fetchCustomerHub.ts) dejó de montar por su cuenta el fallback mirroredLegacyTask y ahora delega ese lookup residual en la capa 	asks.
+
+- por qué
+  - tras dejar pp/api sin Prisma directo, el siguiente residuo con olor real ya no estaba en rutas sino en el clúster final de compatibilidad 	ask/leadTask.
+  - customer-hub seguía siendo el único sitio fuera de lib/services/tasks/* que conocía explícitamente legacyLeadTaskId y hacía el fallback manual.
+
+- qué error o warning salió
+  - no salió un error nuevo de build; el residuo era estructural: compatibilidad legacy todavía desperdigada fuera del clúster de tareas.
+  - el punto delicado era no perder la resolución de customerId cuando el ntityId todavía apunta a una antigua leadTask espejada en 	ask.legacyLeadTaskId.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - el barrido g 'legacyLeadTaskId|findLeadTaskLinkByTaskOrLegacyId|mirroredLegacyTask' lib/customer-hub lib/services/tasks confirma que customer-hub ya usa el helper compartido y el fallback manual mirroredLegacyTask ha desaparecido.
+  - la compatibilidad residual de leadTask queda más arrinconada dentro de lib/services/tasks/* y deja menos conocimiento legacy disperso por el repo.
+
+## 2026-03-13 - compatibilidad de extras por servicio mas centrada
+
+- qué se ha cambiado
+  - se creó [extrasCompatibility.ts](/D:/orbitaevents/lib/extrasCompatibility.ts) con isExtraCompatibleWithService() y ilterCompatibleExtras() para concentrar la regla compartida de compatibilidad de extras por servicio.
+  - se reengancharon al helper compartido:
+    - [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx)
+    - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/bodas/client.tsx)
+    - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/discomovil/client.tsx)
+    - [pdf-utils.ts](/D:/orbitaevents/lib/pdf-utils.ts)
+  - [PresupuestoPdfStudio.tsx](/D:/orbitaevents/app/admin/presupuestos/PresupuestoPdfStudio.tsx) se dejó como estaba en ese punto concreto para no perder tiempo en un falso borde raro del compilador; allí se mantuvo el filtro inline.
+
+- por qué
+  - el barrido fino ya no estaba sacando deuda gorda, pero sí una duplicación muy clara de la misma condición compatibleWith repartida entre front, PDF y admin.
+  - tenía buen retorno porque era una regla pequeña, estable y fácil de reutilizar sin tocar comportamiento de negocio.
+
+- qué error o warning salió
+  - la primera pasada dejó dos bordes de build por imports que no habían entrado bien en [PresupuestoPdfStudio.tsx](/D:/orbitaevents/app/admin/presupuestos/PresupuestoPdfStudio.tsx) y [pdf-utils.ts](/D:/orbitaevents/lib/pdf-utils.ts).
+  - en PresupuestoPdfStudio no compensaba seguir persiguiendo un borde raro del compilador para un beneficio tan pequeño, así que ese archivo se devolvió al filtro inline y se mantuvo el helper en el resto.
+  - en pdf-utils faltaba solo el import efectivo del helper, y se corrigió.
+
+- y en qué estado quedó después
+  - pnpm build volvió a pasar completo.
+  - la lógica compartida de compatibilidad de extras queda ya recentrada en [extrasCompatibility.ts](/D:/orbitaevents/lib/extrasCompatibility.ts) para front y utilidades PDF, con un único punto todavía inline en [PresupuestoPdfStudio.tsx](/D:/orbitaevents/app/admin/presupuestos/PresupuestoPdfStudio.tsx).
+  - la tanda queda cerrada sin dejar el build roto ni introducir otra capa rara.
+## 2026-03-13 - reinicio limpio del servidor dev por chunk corrupto
+
+- que se ha cambiado
+  - se ha eliminado la llamada manual a overlay.parentNode?.removeChild(overlay) en [LayoutWrapper.tsx](/D:/orbitaevents/app/components/layout/LayoutWrapper.tsx)
+  - se ha parado el 
+ext dev que estaba sirviendo chunks corruptos
+  - se ha borrado D:\orbitaevents\.next y se ha relanzado el servidor limpio en http://localhost:3000
+- por que
+  - el runtime estaba lanzando NotFoundError: Failed to execute 'removeChild' on 'Node'
+  - despues salio Cannot find module './7083.js', que es sintoma de .next mezclado/corrupto
+- que error o warning salio
+  - emoveChild ... node to be removed is not a child of this node
+  - Cannot find module './7083.js' desde webpack-runtime.js
+- y en que estado quedo despues
+  - pnpm build sigue pasando
+  - el servidor local vuelve a responder 200 en http://localhost:3000
+  - el overlay de intro ya no intenta borrar nodos del DOM a mano
+## 2026-03-13 - customer-hub menos monolitico
+
+- que se ha cambiado
+  - se creó [data.ts](/D:/orbitaevents/lib/customer-hub/data.ts) para sacar de [fetchCustomerHub.ts](/D:/orbitaevents/lib/customer-hub/fetchCustomerHub.ts) la resolución de customerId, los safeQuery() y las cargas agrupadas de cliente, leads, proposals, bookings, tasks, actividad y discount codes.
+  - [fetchCustomerHub.ts](/D:/orbitaevents/lib/customer-hub/fetchCustomerHub.ts) quedó reducido a composición de DTOs, KPIs, timeline y estado del hub, en vez de concentrar también toda la orquestación de queries.
+
+- por que
+  - customer-hub seguía siendo uno de los módulos más cargados fuera de rutas: demasiados safeQuery, demasiada resolución fallback y demasiadas cargas mezcladas con la transformación final.
+  - ya no era basura muerta, pero sí un monolito claro con retorno real de recomposición.
+
+- que error o warning salio
+  - al sacar esolveCustomerId apareció un borde de tipos en [data.ts](/D:/orbitaevents/lib/customer-hub/data.ts): ooking.leadId seguía como string | null al entrar en prisma.lead.findUnique.
+  - se corrigió fijando primero ookingLeadId dentro de la rama protegida.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - customer-hub quedó con una separación más honesta entre carga de datos y composición de respuesta.
+  - el siguiente remate fino ya no está aquí, sino en residuos más pequeños como el inline de compatibilidad de extras en [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx) o la compatibilidad residual final de leadTask.
+## 2026-03-13 - scroll publico sin interceptor de rueda
+
+- que se ha cambiado
+  - se eliminó de [LayoutWrapper.tsx](/D:/orbitaevents/app/components/layout/LayoutWrapper.tsx) el `useEffect` que interceptaba `wheel` sobre `#main-content` y hacía `preventDefault()` + `window.scrollBy(...)`.
+  - se recompiló con `pnpm build` y se reinició el servidor local en `http://localhost:3000`.
+
+- por que
+  - seguías reportando que el scroll solo funcionaba sobre el header y no sobre el contenido de páginas largas.
+  - ese wheel bridge se había quedado como parche defensivo y ya era más probable que bloquease scroll normal que que lo arreglase.
+
+- que error o warning salio
+  - no salió error nuevo de build; el problema era de interacción en runtime.
+  - el único borde operativo fue que el primer relanzado de `next start` no se quedó residente y hubo que levantarlo con `pwsh` como host.
+
+- y en que estado quedo despues
+  - `pnpm build` volvió a pasar completo.
+  - el servidor local vuelve a responder `200` en `http://localhost:3000`.
+  - el contenido público ya no tiene un interceptor manual de rueda encima de `main-content`.
+## 2026-03-13 - configurador alineado con el helper de extras
+
+- que se ha cambiado
+  - [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx) dejó de usar la condición inline `extra.compatibleWith.includes(...)`.
+  - ahora `availableExtras` reutiliza [filterCompatibleExtras()]( /D:/orbitaevents/lib/extrasCompatibility.ts ) igual que ya hacían las páginas de servicio y las utilidades PDF.
+
+- por que
+  - después de extraer la regla compartida de compatibilidad de extras seguía quedando un residuo claro en el configurador: importaba el helper pero no lo usaba.
+  - era un cierre pequeño pero limpio para evitar volver a tener dos lógicas equivalentes conviviendo.
+
+- que error o warning salio
+  - no salió error nuevo de código; la verificación fue directa con `pnpm build`.
+
+- y en que estado quedo despues
+  - `pnpm build` volvió a pasar completo.
+  - la compatibilidad de extras queda centralizada en [extrasCompatibility.ts](/D:/orbitaevents/lib/extrasCompatibility.ts) en configurador, páginas de servicio y utilidades PDF.
+## 2026-03-14 - service worker local desactivado para evitar chunks viejos
+
+- que se ha cambiado
+  - [PWAProvider.tsx](/D:/orbitaevents/app/components/pwa/PWAProvider.tsx) ya no registra `sw.js` en `localhost` ni en `127.0.0.1`.
+  - en local, el provider ahora llama a `navigator.serviceWorker.getRegistrations()` y hace `unregister()` de cualquier registro previo.
+  - [layout.tsx](/D:/orbitaevents/app/admin/layout.tsx) quedó alineado con la misma política: en localhost limpia registros previos y no vuelve a registrar `sw.js`.
+  - se recompiló con `pnpm build` y se relanzó `next start` en `http://localhost:3000`.
+
+- por que
+  - el navegador estaba pidiendo chunks con hashes viejos (`Loading chunk 103 failed`) aunque la build actual ya servía otro nombre de fichero.
+  - eso encaja con cache de service worker/PWA local, no con un fallo del build actual.
+  - mientras el service worker siga vivo en localhost, cada rebuild local puede volver a dejar assets `_next` obsoletos en cache.
+
+- que error o warning salio
+  - el navegador seguía intentando cargar `/_next/static/chunks/103-8c5dfc9b3555b9f9.js`, pero en la build actual el fichero real era `103-0773548d97fdf79b.js`.
+  - la comprobación del servidor confirmó además que `3000` estaba sirviendo `next start`, no `next dev`, así que el fallo ya no era del overlay de desarrollo sino de cache cliente.
+
+- y en que estado quedo despues
+  - `pnpm build` volvió a pasar completo.
+  - `http://localhost:3000` vuelve a responder `200` con `next start`.
+  - a partir de ahora localhost ya no debería volver a registrar `sw.js`, y el navegador podrá soltar los chunks viejos una vez se limpie el registro anterior.
+## 2026-03-14 - extras publicos blindados y cliente aplanado
+
+- que se ha cambiado
+  - [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) se reescribió como una capa única de resolución para extras públicos.
+  - se añadió un registro canónico de extras con alias de slug, metadata visual (`icon`, `category`, `compatibleWith`, `popular`, `premium`) y traducciones por locale (`ca`, `es`, `en`).
+  - la API pública ya no depende de que la BD traiga un slug histórico exacto ni de que el texto venga resuelto; si llega una clave i18n cruda o un slug alias, el servicio devuelve nombre y descripción reales.
+  - [route.ts](/D:/orbitaevents/app/api/public/extras/route.ts) deja de caer a `ca` por defecto en error y reutiliza el `locale` de la request también en el fallback.
+  - los tres clientes que consumen extras quedaron aplanados:
+    - [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx)
+    - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/bodas/client.tsx)
+    - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/discomovil/client.tsx)
+  - esos clientes ahora piden `/api/public/extras?locale=${locale}` y dejan de normalizar nombre/descripcion por su cuenta; hacen `setExtrasCatalog(data.extras)` directamente.
+  - también se corrigieron los `useEffect` para incluir `locale` en dependencias.
+
+- por que
+  - el leak de `pages.mobile.extras.*` no venía solo de una traducción ausente, sino de una mezcla de capas: slugs nuevos en BD (`extra-hour`, `low-fog`, `co2-cannon`, etc.), slugs históricos en config/mensajes (`hora-extra`, `humo-bajo`, `co2-gun`, etc.) y normalización repetida en cliente.
+  - mientras cada cliente intentara "adivinar" el fallback por su cuenta, la UI seguía frágil y era fácil volver a enseñar claves crudas o metadata incoherente.
+  - el cambio bueno era mover toda esa fragilidad a una sola capa de borde y cerrar ahí la resolución.
+
+- que error o warning salio
+  - en la primera pasada de reemplazo se rompieron las tres llamadas `fetch()` porque la URL quedó sin backticks y el build cayó con `Unknown regular expression flags` en los clientes de configurador, bodas y discomóvil.
+  - se corrigió explícitamente archivo por archivo.
+  - después quedaron tres warnings de `react-hooks/exhaustive-deps` porque esos efectos ya dependían de `locale`; también se corrigieron.
+
+- y en que estado quedo despues
+  - `pnpm build` vuelve a pasar completo.
+  - la resolución de extras públicos queda recentrada en una sola capa.
+  - el cliente ya no intenta reinterpretar slugs/traducciones de extras por su cuenta.
+  - la estructura queda bastante más plana: BD -> `publicExtrasService` -> cliente, sin otra normalización intermedia compitiendo.
+## 2026-03-14 - header y scroll con aparicion mas suave
+
+- que se ha cambiado
+  - [HeaderChampion.tsx](/D:/orbitaevents/app/components/ui/HeaderChampion.tsx) ya no cambia de visible a oculto con un umbral minimo y directo.
+  - el header principal ahora usa histéresis simple de scroll: umbral mayor para ocultarse, umbral menor para reaparecer y protección cerca del top.
+  - la transición visual del header desktop pasó de 	ransition-all duration-300 ease-out a una transición más larga y específica sobre 	ransform, opacity, ackground-color, ackdrop-filter, ox-shadow y order-color.
+  - el estado oculto ya no corta tan seco: sale con -translate-y-[108%] y opacity-0 en vez de limitarse a subir de golpe.
+  - [MobileAppShell.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileAppShell.tsx) quedó alineado con la misma lógica de scroll: umbrales más amplios, protección cerca del top y entrada/salida del floating header con easing suave en vez de spring brusco.
+
+- por que
+  - reportaste que el scroll general se sentía brusco y que la aparición del header pegaba un cambio demasiado seco.
+  - el problema no era tanto el scroll nativo como la respuesta del header al scroll: ocultaba y mostraba demasiado rápido, con demasiado poco desplazamiento y con una animación demasiado agresiva.
+  - la forma buena de suavizarlo no era meter otra capa de JS de scroll, sino hacer que el header cambie de estado con más criterio y una transición visual menos cortante.
+
+- que error o warning salio
+  - al primer intento, el reemplazo automático dejó vivo un residuo del bloque viejo en [HeaderChampion.tsx](/D:/orbitaevents/app/components/ui/HeaderChampion.tsx) y pnpm build cayó con Cannot find name 'scrollThreshold'. Did you mean 'showThreshold'?.
+  - se corrigió limpiando el bloque viejo completo y dejando solo la lógica nueva.
+  - después de eso, pnpm build volvió a pasar completo.
+
+- y en que estado quedo despues
+  - pnpm build vuelve a pasar completo.
+  - el header principal debería entrar y salir con bastante menos brusquedad.
+  - el floating header móvil queda también más contenido y menos nervioso al cambiar de dirección de scroll.
+  - la suavización se ha hecho sin añadir capas nuevas ni helpers extra; solo afinando la lógica y la transición en los dos puntos que realmente mandan.
+## 2026-03-14 - ctas flotantes mas tardias y menos nerviosas
+
+- que se ha cambiado
+  - [FloatingCTAs.tsx](/D:/orbitaevents/app/components/ui/FloatingCTAs.tsx) deja de mostrar la CTA desktop tan pronto y con una entrada tan seca.
+  - la CTA desktop ahora espera más scroll real antes de aparecer (desktopRevealOffset = 560) y usa equestAnimationFrame para no recalcular el estado a pelo en cada evento.
+  - la entrada/salida de la CTA desktop, el botón de teléfono y el tooltip de WhatsApp se suavizaron con escalas menos agresivas y easing más estable.
+  - la bottom bar móvil también se retrasó: ya no entra tan pronto al salir del hero y usa un criterio de scroll más amplio para ocultarse/mostrarse.
+  - la animación de la barra móvil dejó el spring brusco y pasó a una transición temporal más controlada con opacidad.
+
+- por que
+  - tras suavizar el header seguía quedando un foco claro de sensación brusca: las CTAs flotantes aparecían con demasiado protagonismo y demasiado pronto, lo que endurecía la lectura del scroll aunque el scroll nativo estuviera bien.
+  - ese tipo de capa flotante da la impresión de interfaz nerviosa si se activa con umbrales demasiado bajos o con animaciones demasiado secas.
+
+- que error o warning salio
+  - en la primera pasada, parte del archivo seguía conservando el bloque viejo y la revisión del propio fichero reveló que todavía convivían dos comportamientos distintos.
+  - se corrigió rehaciendo los reemplazos con regex y volviendo a verificar con pnpm build.
+  - después de eso, pnpm build volvió a pasar completo.
+
+- y en que estado quedo despues
+  - pnpm build vuelve a pasar completo.
+  - las CTAs flotantes entran más tarde y con menos violencia visual.
+  - la sensación general de scroll debería quedar más calmada porque ya no compiten tanto header y CTAs por reaccionar a cada gesto pequeño.
+## 2026-03-14 - carruseles y chips con snap mas natural
+
+- que se ha cambiado
+  - [PortfolioShowcase.tsx](/D:/orbitaevents/app/components/marketing/PortfolioShowcase.tsx) dejó de forzar scroll-smooth y snap-mandatory en el carrusel horizontal principal.
+  - ese carrusel ahora usa snap-proximity, que deja de empujar tanto cada gesto a una posición forzada.
+  - [MobilePortfolioShowcase.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobilePortfolioShowcase.tsx) también dejó snap-mandatory y pasó a snap-proximity.
+  - además, las pestañas horizontales del portfolio móvil dejaron snap-start y pasaron a snap-center, para que el encaje visual se sienta menos seco al deslizar.
+  - [faq/client.tsx](/D:/orbitaevents/app/[locale]/faq/client.tsx) dejó también el snap-mandatory en la barra sticky de categorías.
+
+- por que
+  - después de suavizar header y CTAs seguía quedando otra fuente clara de sensación dura: varios bloques horizontales seguían obligando el desplazamiento con snap demasiado agresivo.
+  - eso no rompe el scroll vertical, pero sí hace que la navegación táctil y horizontal se sienta más rígida de lo necesario.
+  - la mejor solución aquí era aflojar el snapping, no meter otra lógica de scroll encima.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con revisión directa de clases y pnpm build completo.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - portfolio desktop, portfolio móvil y la barra de categorías de FAQ ya no fuerzan el desplazamiento con tanta violencia.
+  - la sensación general de scroll debería quedar más natural porque se han quitado varios puntos de fricción artificial repartidos por el front.
+## 2026-03-14 - entradas del hero y reviews menos teatrales
+
+- que se ha cambiado
+  - [HeroElegant.tsx](/D:/orbitaevents/app/components/ui/HeroElegant.tsx) ya no entra con tanto recorrido vertical ni con una duración tan larga en los bloques principales.
+  - el stagger del hero quedó más corto y con easing más limpio, y el texto rotatorio también cambia con una transición menos pesada.
+  - [GoogleReviewsRotating.tsx](/D:/orbitaevents/app/components/home/GoogleReviewsRotating.tsx) dejó la tarjeta de review con escala demasiado marcada al entrar y salir.
+  - las reviews ahora entran con menos salto, menos escala y un timing bastante más contenido.
+
+- por que
+  - después de suavizar header, CTAs y snapping seguían quedando dos focos muy visibles de sensación teatral: el hero principal y las tarjetas de reviews.
+  - eso no rompía nada, pero sí mantenía una lectura algo brusca del front aunque el scroll estuviera mejor.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con revisión directa de valores de animación y pnpm build completo.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - el hero y el bloque de reviews deberían sentirse menos enfáticos y menos bruscos en la entrada.
+  - la sensación global del home queda un poco más calmada sin añadir otra capa de lógica.
+## 2026-03-14 - navegacion inferior con menos spring seco
+
+- que se ha cambiado
+  - [BottomNav.tsx](/D:/orbitaevents/app/components/ui/BottomNav.tsx) dejó el indicador activo con spring duro y pasó a una transición temporal más limpia.
+  - [MobileBottomNav.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileBottomNav.tsx) dejó de entrar con spring brusco en la barra principal y en el menú rápido de acciones.
+  - los botones del menú rápido móvil también redujeron delays y pasaron a duraciones más cortas y uniformes.
+
+- por que
+  - en la navegación inferior seguía habiendo pequeños tirones que no rompían UX, pero sí daban una sensación de interfaz demasiado elástica en móvil.
+  - esa capa se nota mucho porque vive pegada al dedo y cualquier spring demasiado fuerte hace que el producto se sienta menos fino.
+
+- que error o warning salio
+  - no salió error nuevo de build.
+  - hubo un primer intento fallido por quoting en el reemplazo automático, y se rehizo con cambios más pequeños hasta verificarlo bien.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - la navegación inferior desktop y móvil queda menos nerviosa y más consistente con el resto del suavizado del front.
+## 2026-03-14 - galeria del home sin pseudo carrusel cortado
+
+- que se ha cambiado
+  - [PortfolioShowcase.tsx](/D:/orbitaevents/app/components/marketing/PortfolioShowcase.tsx) dejó de ser una tira horizontal de tarjetas anchas con flechas laterales.
+  - cada tarjeta ahora es un [Link](/D:/orbitaevents/app/components/marketing/PortfolioShowcase.tsx) real a su galería correspondiente de `/portfolio/[slug]`.
+  - las categorias del bloque quedaron alineadas con slugs reales del portfolio: `discomovil`, `bodas`, `eventos-empresa`, `fiestas-tematicas-halloween` y `fiestas-tematicas-mon-magic`.
+  - el layout pasó a grid, con la primera tarjeta destacada y el resto apilado de forma visible, sin corte lateral por diseño.
+
+- por que
+  - reportaste dos problemas claros en ese bloque del home: al hacer click no ibas a ningún sitio y las fotos se quedaban cortadas a la derecha.
+  - el problema no era solo un detalle visual; el componente estaba montado como pseudo carrusel decorativo y por eso daba sensación de galería rota o a medias.
+  - la forma buena de arreglarlo era aplanar la capa, no parchear el carrusel: grid visible y enlace real.
+
+- que error o warning salio
+  - el parche inicial se interrumpió y luego la sandbox de Windows devolvió error al intentar reaplicar con apply_patch.
+  - se rehizo la reescritura completa del componente por escritura directa y después se verificó con pnpm build.
+
+- y en que estado quedo despues
+  - pnpm build vuelve a pasar completo.
+  - la galería del home ya no depende de scroll horizontal ni de flechas para mostrarse entera.
+  - cada card tiene un destino real y la sección debería sentirse bastante más clara y utilizable.
+## 2026-03-14 - portfolio movil alineado con la galeria limpia
+
+- que se ha cambiado
+  - [MobilePortfolioShowcase.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobilePortfolioShowcase.tsx) dejó la tira horizontal de fotos como capa secundaria compitiendo con la limpieza del desktop.
+  - cada categoria móvil ahora también resuelve a un slug real de portfolio: `discomovil`, `bodas`, `eventos-empresa`, `fiestas-privadas`, `fiestas-tematicas-halloween` y `fiestas-tematicas-mon-magic`.
+  - las fotos visibles pasan a un grid tocable con destino real a `/portfolio/[slug]` en vez de quedarse como simples tarjetas visuales dentro de otra tira horizontal.
+  - la CTA final de cada categoria también apunta a la misma galería real, no a una capa distinta.
+
+- por que
+  - después de aplanar la galería desktop seguía existiendo el riesgo de que móvil mantuviera otro patrón paralelo y volviera la sensación de capas compitiendo.
+  - la forma buena de blindarlo era dejar el mismo principio en ambos lados: categoria visible, fotos visibles y destino real.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con pnpm build completo tras reescribir el componente.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - desktop y móvil quedan bastante más alineados en la galería del home.
+  - la sección ya no depende de una tira horizontal para sugerir una galería que luego no llevaba a ningún sitio claro.
+## 2026-03-14 - banner de cookies y popup de oferta con entrada menos seca
+
+- que se ha cambiado
+  - [CookieConsent.client.tsx](/D:/orbitaevents/app/components/legal/CookieConsent.client.tsx) dejó la entrada con spring directo desde demasiado abajo.
+  - el banner ahora entra con menos recorrido vertical y una transición temporal más limpia, y el panel de ajustes también abrió/cerró con un tiempo corto y consistente.
+  - [FlashOfferPopup.tsx](/D:/orbitaevents/app/components/ui/FlashOfferPopup.tsx) dejó el popup principal con escala demasiado baja y un spring demasiado duro.
+  - el popup ahora entra y sale con menos salto, menos compresión visual y una transición más corta y controlada.
+
+- por que
+  - después de aplanar la galería del home seguían quedando dos elementos muy visibles que podían dar sensación de interfaz demasiado elástica: el banner de cookies y el popup de oferta.
+  - no estaban rotos, pero sí endurecían la percepción general del front al aparecer por encima del contenido.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con pnpm build completo tras ajustar ambas transiciones.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - el banner de cookies y el popup de oferta deberían sentirse menos bruscos y menos teatrales al entrar.
+  - la capa flotante del front queda un poco más coherente con el resto del suavizado ya hecho.
+## 2026-03-14 - stats, proceso y servicios moviles con menos resorte
+
+- que se ha cambiado
+  - [StatsSection.tsx](/D:/orbitaevents/app/components/marketing/StatsSection.tsx) y [ProcessSection.tsx](/D:/orbitaevents/app/components/marketing/ProcessSection.tsx) dejaron de entrar con springs viejos en las tarjetas principales.
+  - [MobileStatsSection.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileStatsSection.tsx) y [MobileProcessSection.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileProcessSection.tsx) también pasaron a duraciones temporales más limpias y con menos delay.
+  - [MobileServicesCards.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileServicesCards.tsx) dejó la card principal con spring de entrada innecesario.
+  - [FloatingCTAs.tsx](/D:/orbitaevents/app/components/ui/FloatingCTAs.tsx) remató el resorte residual que quedaba en la CTA flotante desktop.
+
+- por que
+  - tras suavizar header, CTAs, portfolio, cookies y popup de oferta seguían quedando varios bloques centrales del home y móvil con comportamiento demasiado elástico.
+  - no eran fallos funcionales, pero sí mantenían una sensación de interfaz menos refinada de lo que ya permitía la base limpia.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con pnpm build completo después de aplicar la tanda a todas las superficies visibles implicadas.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - stats, proceso y cards de servicios deberían sentirse menos nerviosos y más coherentes con el resto del suavizado del front.
+  - ya quedan menos springs heredados sueltos en superficies principales del producto.
+## 2026-03-14 - hero y movil con los ultimos springs viejos fuera
+
+- que se ha cambiado
+  - [MobileHeroUltimate.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileHeroUltimate.tsx) dejó el resorte residual en la entrada de las estrellas de prueba social.
+  - [MobileHomePage.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileHomePage.tsx) también dejó dos bloques con springs heredados en entradas principales.
+  - [MobileAppShell.tsx](/D:/orbitaevents/app/components/mobile-ultimate/MobileAppShell.tsx) perdió el pequeño spring que todavía quedaba en una de sus transiciones.
+  - [HeroPortalLogo.tsx](/D:/orbitaevents/app/components/ui/HeroPortalLogo.tsx) dejó el scale con resorte y pasó a una transición temporal limpia.
+  - [FlashOfferPopup.tsx](/D:/orbitaevents/app/components/ui/FlashOfferPopup.tsx) quedó rematado del todo para no conservar ese spring viejo residual.
+
+- por que
+  - tras varias pasadas el front ya estaba bastante calmado, pero seguían quedando pequeños restos de comportamiento elástico justo en hero y móvil, que son dos superficies muy sensibles para la percepción de pulido.
+  - la idea aquí ya no era cambiar UX, sino cerrar los restos inconsistentes del lenguaje de movimiento.
+
+- que error o warning salio
+  - no salió error nuevo de código.
+  - la verificación se hizo con pnpm build completo tras limpiar la familia hero/móvil.
+
+- y en que estado quedo despues
+  - pnpm build volvió a pasar completo.
+  - el hero, la intro y varias entradas móviles quedan más uniformes con el resto del suavizado hecho en el front.
+  - ya van quedando muy pocos springs heredados en superficies principales visibles.
+## 2026-03-14 - bodas y configurador con una sola capa de resolucion para textos fragiles
+
+- que se ha cambiado
+  - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/bodas/client.tsx) dejó de depender de claves rígidas de `coverage.zones.*` repartidas entre componente y mensajes.
+  - se añadió una resolución segura para cobertura dentro del propio cliente de bodas y la sección quedó aplanada a una sola capa: `coverageZones`.
+  - se eliminó el bloque duplicado viejo de las cards de cobertura que seguía renderizando `t('coverage.zones.*')` directamente.
+  - [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) ahora resuelve también nombres y descripciones cuando cae al fallback de config, no solo cuando hay BD.
+  - [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx) dejó de reinterpretar nombres y descripciones de extras en cliente.
+  - salió la capa duplicada `getExtraText(...)` + `useTranslations('pages.mobile')` del configurador; el UI ahora pinta `extra.name` y `extra.description` ya resueltos.
+
+- por que
+  - `bodas` estaba fallando por lotería de capas: el componente pedía unas claves de cobertura que no estaban garantizadas en mensajes, y además coexistía un bloque viejo duplicado.
+  - el configurador enseñaba claves crudas como `pages.mobile.extras.*` porque una rama del sistema devolvía extras ya resueltos y otra devolvía config crudo, mientras el cliente intentaba arreglarlo por su cuenta.
+  - la forma sana aquí era una sola capa de resolución por responsabilidad: cobertura de bodas por un lado, textos de extras por otro.
+
+- que error o warning salio
+  - durante la corrección de bodas salió un error temporal de compilación por una línea mal interpolada en el helper seguro.
+  - una vez corregido, `pnpm build` volvió a pasar.
+  - el barrido final ya no encontró `pages.mobile.extras`, `getExtraText(` ni `useTranslations('pages.mobile')` en el configurador.
+
+- y en que estado quedo despues
+  - `pnpm build` pasa completo tras la limpieza.
+  - `bodas` queda con una sola capa para la cobertura y sin el bloque duplicado viejo compitiendo por debajo.
+  - la API pública de extras ya entrega textos resueltos también cuando usa fallback estático.
+  - el configurador dejó de adivinar y ahora consume directamente datos finales de extras.
+## 2026-03-14 - discomovil y extras publicos con menos loteria de capas
+
+- que se ha cambiado
+  - [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) ya no devuelve `EXTRAS` crudo cuando no hay extras en BD.
+  - incluso en fallback de config ahora pasa por la misma resolución que usa la rama de base de datos y entrega `name`, `description`, `icon`, `price` y compatibilidad ya cerrados.
+  - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/discomovil/client.tsx) dejó de resolver nombres y descripciones de extras en cliente.
+  - salió el helper local de traducción de extras de `discomovil`; la UI ahora pinta `extra.name` y `extra.description` directamente.
+
+- por que
+  - seguía existiendo el mismo olor que en el configurador: una rama devolvía extras bien resueltos y otra podía devolver config crudo, mientras el cliente intentaba reparar esa incoherencia por su cuenta.
+  - eso es precisamente la clase de capas superpuestas que acababan convirtiendo el repo en una lotería.
+
+- que error o warning salio
+  - no salió error nuevo de compilación.
+  - la verificación se hizo con `pnpm build` completo.
+  - el barrido final ya no encontró `getExtraText(` ni el bloque de helper de extras en `discomovil/client.tsx`.
+
+- y en que estado quedo despues
+  - `pnpm build` volvió a pasar completo.
+  - la API pública de extras queda más coherente porque ya resuelve también la rama de fallback estático.
+  - `discomovil` consume ahora una sola capa de datos finales para extras, sin reinterpretación duplicada en cliente.
+
+## 2026-03-14 - packs y extras con menos resolucion duplicada en clientes
+
+- que se ha cambiado
+  - [usePacks.ts](/D:/orbitaevents/lib/hooks/usePacks.ts) ahora localiza el fallback de packs en un solo sitio con `resolvePackI18nKey()` y `resolvePackI18nFeatures()` antes de que llegue a cliente.
+  - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/discomovil/client.tsx) ya no mantiene `getPackText()` ni `getPackFeatures()` locales; consume `pack.name`, `pack.tagline`, `pack.ideal` y `pack.features` ya resueltos.
+  - [publicExtrasService.ts](/D:/orbitaevents/lib/services/publicExtrasService.ts) expone el resolvedor compartido de extras para no duplicar la misma logica en otra rama.
+  - [extrasConfiguratorService.ts](/D:/orbitaevents/lib/services/extrasConfiguratorService.ts) ya no clona `EXTRAS` en crudo; usa el mismo resolvedor final que el borde publico.
+  - [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx) ya no arrastra `getLocalizedPack()` ni la humanizacion local de features; consume el pack ya resuelto.
+
+- por que
+  - seguia habiendo dos olores claros: fallback de packs resuelto en cada cliente y fallback de extras crudo en admin/config.
+  - eso hacia que una capa trajera texto listo, otra trajera claves o config crudo, y el componente intentara arreglarlo otra vez.
+  - la maniobra buena aqui era recentrar la resolucion en el hook/servicio y quitar helpers locales, no añadir otro parche encima.
+
+- que error o warning salio
+  - al cortar el helper del configurador se rompio la cabecera del componente y `pnpm build` cayo con `Return statement is not allowed here` en [client.tsx](/D:/orbitaevents/app/[locale]/configurador/client.tsx).
+  - antes de eso, el barrido seguia detectando helpers locales (`isI18nKey`, `humanizeKeyFallback`, `getPackText`, `getPackFeatures`) como señal de capa duplicada.
+
+- y en que estado quedo despues
+  - reparado el configurador, `pnpm build` vuelve a pasar completo.
+  - `discomovil` y `configurador` consumen packs ya resueltos en vez de reinterpretarlos.
+  - `extrasConfiguratorService` ya no es una rama aparte devolviendo `EXTRAS.map(...)` crudo.
+  - el borde de packs/extras queda mas plano: resolucion unica y cliente pintando.
+
+## 2026-03-14 - fiestas y packs de bodas sin helper local duplicado
+
+- que se ha cambiado
+  - [FiestasClient.tsx](/D:/orbitaevents/app/[locale]/servicios/fiestas/FiestasClient.tsx) ya no mantiene `normalizePackBaseKey()`, `getMessageByPath()`, `getPackText()` ni `getPackFeatures()` para los packs.
+  - [client.tsx](/D:/orbitaevents/app/[locale]/servicios/bodas/client.tsx) ya no resuelve textos de pack con `getConfiguratorKey()`, `getPackText()` ni `getPackFeatures()`; la capa local que queda ahi es solo la cobertura/zones, no los packs.
+  - ambas pantallas ahora consumen `pack.name`, `pack.tagline`, `pack.ideal` y `pack.features` como contrato ya resuelto desde `usePacks` + `/api/public/packs`.
+
+- por que
+  - despues de recentrar `usePacks`, seguir manteniendo helpers de pack dentro de `fiestas` y `bodas` era volver a resolver lo mismo una segunda vez.
+  - eso era justo el patron que queriamos cortar: dato resuelto en borde, helper local reinterpretando, y luego UI pintando otra cosa segun de donde hubiera venido.
+
+- que error o warning salio
+  - el barrido seguia detectando `getPackText()` / `getPackFeatures()` en ambas pantallas como señal clara de capa duplicada.
+  - en `bodas` solo ha quedado `humanizeKeyFallback()` ligado a la resolucion defensiva de zonas de cobertura, no a packs.
+
+- y en que estado quedo despues
+  - `fiestas` y la parte de packs de `bodas` quedaron mas planas.
+  - `pnpm build` vuelve a pasar completo despues del corte.
+  - la resolucion de packs ya queda mas uniforme en `configurador`, `discomovil`, `fiestas` y `bodas`.
+
+## 2026-03-14 - coverage de bodas en un servicio compartido
+
+- que se ha cambiado
+  - nuevo [lib/services/weddingCoverage.ts](/D:/orbitaevents/lib/services/weddingCoverage.ts) que encapsula `getWeddingCoverageZones()` y mantiene la lógica de fallback (`isI18nKey`, `humanizeKeyFallback`, `getMessageByPath`) en un único punto.
+  - [bodas/client.tsx](/D:/orbitaevents/app/[locale]/servicios/bodas/client.tsx) ahora importa `getWeddingCoverageZones()` y no alberga helpers extra ni arrays duplicados; la lista de zonas viene resuelta del servicio.
+
+- por que
+  - la capa anterior repetía las mismas protecciones, generaba variables `
+` en el código y rompía `build` al mezclar helpers inline y lógica ad-hoc.
+  - necesitábamos una única fuente para resolver los mensajes de cobertura, así el UI solo consume valores finales.
+
+- que error o warning salio
+  - el paso anterior arrojaba `Expected unicode escape` en `bodas/client.tsx` y en la nueva librería porque el helpers inline estaba mezclando `
+` textuales.
+  - la compilación fallaba hasta que movimos la lógica a un servicio limpio y corregimos el `isI18nKey` y la definición de `getWeddingCoverageZones()`.
+
+- y en que estado quedo despues
+  - `pnpm build` vuelve a pasar completo.
+  - `bodas` muestra una sola lista de zonas resuelta por el servicio y el frontend ya no interpreta claves por su cuenta.
+  - la antiseptic layer del coverage quedó en `lib/services/weddingCoverage.ts` y el componente se mantiene plano.
+
+## 2026-03-14 - criterio de trabajo: no fragmentar fichas que forman una sola unidad
+
+- que se ha decidido
+  - queda fijado como criterio constante de trabajo que no se separara una ficha o bloque solo para adelgazar archivo si esa pieza comparte el mismo estado, la misma semantica y el mismo ciclo de interaccion.
+  - si una misma ficha representa una unidad funcional, debe seguir junta aunque internamente sea larga.
+  - las extracciones se haran solo cuando haya una frontera real de responsabilidad: calculo de negocio, fetch/efectos, shell/layout o bloques reutilizables de verdad.
+
+- por que
+  - fragmentar una misma ficha en subcomponentes artificiales dispersa contexto, obliga a pasar demasiadas props y hace mas dificil leer la pieza real de negocio.
+  - eso mete mas friccion de la que quita, y convierte una unidad coherente en varias piezas acopladas sin necesidad.
+  - la limpieza buena no es mover JSX por deporte, sino quitar capas duplicadas, basura y responsabilidades cruzadas.
+
+- como se aplica a partir de ahora
+  - no se partiran fichas o secciones coherentes solo por reducir lineas.
+  - si algo se extrae, tendra que ganar claridad estructural real y no romper la lectura de conjunto.
+  - dentro del configurador y en el resto del front, se mantendran juntas las piezas que pertenezcan a la misma ficha y se sacara fuera solo la logica transversal o duplicada.
+
+- y en que estado queda como norma
+  - esto no es una nota puntual: queda registrado como principio constante para las siguientes limpiezas.
+  - el criterio operativo pasa a ser mantener la unidad funcional intacta y recortar solo capas sobrantes de verdad.
+
+## 2026-03-14 - criterio adicional: extraer no es bueno por si mismo
+
+- que se ha decidido
+  - se deja fijado que extraer bloques o subcomponentes no se considera una mejora por defecto.
+  - solo se considera una maniobra buena cuando existe una frontera real de responsabilidad y la extraccion mejora la claridad estructural sin romper una unidad funcional.
+
+- por que
+  - adelgazar un archivo a base de separar piezas que pertenecen a la misma ficha no es una mejora tecnica real.
+  - si una extraccion obliga a pasar demasiadas props o rompe la lectura natural del bloque, entonces no es la mejor solucion aunque deje menos lineas en el componente principal.
+
+- como se aplica a partir de ahora
+  - se mantendran juntas las fichas coherentes aunque sean largas.
+  - se sacara fuera solo lo transversal, duplicado o claramente separado por responsabilidad.
+  - en el configurador, el criterio pasa a ser limpiar capas, restos y recalculos innecesarios antes que trocear mas JSX.
+
+- y en que estado queda como norma
+  - este criterio queda registrado como constante de trabajo junto al anterior.
+  - la referencia operativa deja de ser reducir tamaño de archivo y pasa a ser conservar unidades funcionales y quitar complejidad sobrante real.

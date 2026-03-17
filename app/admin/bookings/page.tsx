@@ -251,7 +251,6 @@ export default async function BookingsPage({
                       <Link
                         href={`/admin/clientes/${booking.customerId}`}
                         className="font-medium mt-2 truncate block"
-                        onClick={(e) => e.stopPropagation()}
                       >
                         {booking.clientName} 👤
                       </Link>
@@ -302,7 +301,7 @@ export default async function BookingsPage({
                       const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
                       return (
                         <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
-                          d === 0 ? 'bg-cyan-500/20 text-cyan-300' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
+                          d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
                         }`}>
                           {d === 0 ? 'AVUI' : `${d}d`}
                         </span>
@@ -325,20 +324,20 @@ export default async function BookingsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border admin-card-glass overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de reserves">
             <thead className="border-b">
               <tr>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Pack</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Total</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Marge</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Client</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Data</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Pack</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Total</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Marge</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Estat</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -384,7 +383,7 @@ export default async function BookingsPage({
                           </Link>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-center whitespace-nowrap">{eventType}</td>
+                      <td className="px-4 py-3 text-xs text-center whitespace-nowrap overflow-hidden text-ellipsis">{eventType}</td>
                       <td className="px-4 py-3 text-center">
                         <div className="font-medium text-xs">{formatDate(booking.eventDate)}</div>
                         <div className="flex items-center justify-center gap-1 mt-0.5">
@@ -395,7 +394,7 @@ export default async function BookingsPage({
                             const d = Math.ceil((new Date(booking.eventDate).getTime() - Date.now()) / 864e5);
                             return (
                               <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
-                                d === 0 ? 'bg-cyan-500/20 text-cyan-300' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
+                                d === 0 ? 'admin-tone-soft-info' : d <= 7 ? 'bg-amber-500/20 text-amber-300' : 'bg-white/10 text-white/40'
                               }`}>
                                 {d === 0 ? 'AVUI' : `${d}d`}
                               </span>
@@ -502,3 +501,7 @@ export default async function BookingsPage({
     </AdminPage>
   );
 }
+
+
+
+

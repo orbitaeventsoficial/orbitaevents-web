@@ -2,16 +2,15 @@
 // API per gestionar inventari
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { z } from 'zod';
 import { InventoryCategory, ItemStatus } from '@prisma/client';
-import { generateNextCode } from '@/lib/inventory-utils';
+import { createInventoryItem, listInventoryAdminData } from '@/lib/services/inventoryAdminService';
 
 export const dynamic = 'force-dynamic';
 
 const inventorySchema = z.object({
-  code: z.string().optional(), // Ara és opcional: si no s'envia, s'auto-genera
+  code: z.string().optional(),
   name: z.string().min(1),
   description: z.string().optional(),
   category: z.enum([
@@ -32,74 +31,18 @@ const inventorySchema = z.object({
   expectedLifeHours: z.number().optional(),
 });
 
-// GET - Llistar inventari amb filtres
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get('category');
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
-
-    const validCategory = category && Object.values(InventoryCategory).includes(category as InventoryCategory)
-      ? (category as InventoryCategory)
-      : undefined;
-    const validStatus = status && Object.values(ItemStatus).includes(status as ItemStatus)
-      ? (status as ItemStatus)
-      : undefined;
-
-    const items = await prisma.inventoryItem.findMany({
-      where: {
-        ...(validCategory && { category: validCategory }),
-        ...(validStatus && { status: validStatus }),
-        ...(search && {
-          OR: [
-            { code: { contains: search, mode: 'insensitive' } },
-            { name: { contains: search, mode: 'insensitive' } },
-          ],
-        }),
-      },
-      include: {
-        packItems: {
-          include: { pack: { select: { id: true, slug: true } } },
-        },
-        usageHistory: {
-          select: { hoursUsed: true },
-        },
-        _count: {
-          select: {
-            bookingItems: true,
-            usageHistory: true,
-          },
-        },
-      },
-      orderBy: [{ category: 'asc' }, { code: 'asc' }],
+    const result = await listInventoryAdminData({
+      category: searchParams.get('category'),
+      status: searchParams.get('status'),
+      search: searchParams.get('search'),
     });
-
-    // Afegir hores acumulades a cada element
-    const itemsWithHours = items.map((item) => ({
-      ...item,
-      totalHoursUsed: item.usageHistory.reduce((sum, u) => sum + (u.hoursUsed || 0), 0),
-    }));
-
-    // Estadístiques per categoria
-    const stats = await prisma.inventoryItem.groupBy({
-      by: ['category'],
-      _count: true,
-      _sum: { value: true },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      items: itemsWithHours,
-      stats: stats.reduce((acc, s) => {
-        acc[s.category] = { count: s._count, totalValue: s._sum.value || 0 };
-        return acc;
-      }, {} as Record<string, { count: number; totalValue: number }>),
-      total: items.length,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint inventari:', error);
     return NextResponse.json(
@@ -109,7 +52,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - Crear nou element d'inventari
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -125,67 +67,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = parsed.data;
-
-    // Auto-generar codi si no s'envia
-    let code = data.code?.trim().toUpperCase();
-    if (!code) {
-      const existingItems = await prisma.inventoryItem.findMany({
-        where: { category: data.category as InventoryCategory },
-        select: { code: true },
-      });
-      code = generateNextCode(
-        data.category as InventoryCategory,
-        existingItems.map((i) => i.code)
-      );
-    }
-
-    // Verificar codi únic
-    const existing = await prisma.inventoryItem.findUnique({
-      where: { code },
+    const result = await createInventoryItem({
+      ...parsed.data,
+      category: parsed.data.category as InventoryCategory,
+      status: parsed.data.status as ItemStatus | undefined,
     });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: `El codi ${code} ja existeix` },
-        { status: 409 }
-      );
-    }
-
-    const item = await prisma.inventoryItem.create({
-      data: {
-        code,
-        name: data.name,
-        description: data.description,
-        category: data.category as InventoryCategory,
-        watts: data.watts,
-        value: data.value,
-        status: data.status as ItemStatus | undefined,
-        condition: data.condition as any,
-        isConsumable: data.isConsumable,
-        stockQuantity: data.stockQuantity,
-        minStock: data.minStock,
-        imageUrl: data.imageUrl,
-        notes: data.notes,
-        purchaseDate: data.purchaseDate ? new Date(data.purchaseDate) : undefined,
-        purchasePrice: data.purchasePrice,
-        expectedLifeHours: data.expectedLifeHours,
-      },
-    });
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'CREATE',
-        entity: 'inventory',
-        entityId: item.id,
-        details: { code: item.code, name: item.name },
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      item,
-    });
+    return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error creant element inventari:', error);
     return NextResponse.json(

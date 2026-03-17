@@ -48,6 +48,36 @@ type PricingCatalogState = {
   extraDescriptionsBySlug: Record<string, string>;
 };
 
+type PricingCatalogPack = {
+  slug?: string;
+  name?: string;
+};
+
+type PricingCatalogExtra = {
+  slug?: string;
+  name?: string;
+  description?: string | null;
+};
+
+type PricingCatalogCustomer = {
+  id: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+};
+
+type PricingCatalogResponse = {
+  ok?: boolean;
+  error?: string;
+  oneWayKm?: number;
+  roundTripKm?: number;
+  data?: {
+    packs?: PricingCatalogPack[];
+    extras?: PricingCatalogExtra[];
+    customers?: PricingCatalogCustomer[];
+  };
+};
+
 type StudioProps = {
   initialCustomerId?: string;
   initialCustomerName?: string;
@@ -357,25 +387,34 @@ export default function PresupuestoPdfStudio({
     const loadPricingCatalog = async () => {
       try {
         const res = await fetchWithCsrf(`/api/admin/pricing?locale=${locale}`);
-        const data = await res.json().catch(() => ({}));
+        const data: PricingCatalogResponse = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok || cancelled) return;
 
         const packNamesBySlug = Object.fromEntries(
           (data?.data?.packs || [])
-            .filter((pack: any) => typeof pack?.slug === 'string' && typeof pack?.name === 'string')
-            .map((pack: any) => [pack.slug, pack.name.trim()])
+            .filter(
+              (pack): pack is Required<Pick<PricingCatalogPack, 'slug' | 'name'>> =>
+                typeof pack?.slug === 'string' && typeof pack?.name === 'string'
+            )
+            .map((pack) => [pack.slug, pack.name.trim()])
         ) as Record<string, string>;
 
         const extraNamesBySlug = Object.fromEntries(
           (data?.data?.extras || [])
-            .filter((extra: any) => typeof extra?.slug === 'string' && typeof extra?.name === 'string')
-            .map((extra: any) => [extra.slug, extra.name.trim()])
+            .filter(
+              (extra): extra is Required<Pick<PricingCatalogExtra, 'slug' | 'name'>> =>
+                typeof extra?.slug === 'string' && typeof extra?.name === 'string'
+            )
+            .map((extra) => [extra.slug, extra.name.trim()])
         ) as Record<string, string>;
 
         const extraDescriptionsBySlug = Object.fromEntries(
           (data?.data?.extras || [])
-            .filter((extra: any) => typeof extra?.slug === 'string' && typeof extra?.description === 'string')
-            .map((extra: any) => [extra.slug, String(extra.description || '').trim()])
+            .filter(
+              (extra): extra is Required<Pick<PricingCatalogExtra, 'slug' | 'description'>> =>
+                typeof extra?.slug === 'string' && typeof extra?.description === 'string'
+            )
+            .map((extra) => [extra.slug, String(extra.description || '').trim()])
         ) as Record<string, string>;
 
         setPricingCatalog({ packNamesBySlug, extraNamesBySlug, extraDescriptionsBySlug });
@@ -491,7 +530,7 @@ export default function PresupuestoPdfStudio({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ destination }),
         });
-        const data = await res.json().catch(() => ({}));
+        const data: PricingCatalogResponse = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
         const nextKm = Number(data.roundTripKm || 0);
         setTravelKm(nextKm);
@@ -743,18 +782,18 @@ export default function PresupuestoPdfStudio({
       setSearchingCustomers(true);
       try {
         const res = await fetchWithCsrf(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`, { credentials: 'include' });
-        const data = await res.json().catch(() => ({}));
+        const data: PricingCatalogResponse = await res.json().catch(() => ({}));
         const apiCustomers = Array.isArray(data?.data?.customers)
           ? data.data.customers
           : [];
 
         if (res.ok && Array.isArray(apiCustomers)) {
           setCustomerResults(
-            apiCustomers.map((c: any) => ({
-              id: c.id,
-              name: c.name || '',
-              email: c.email || '',
-              phone: c.phone || '',
+            apiCustomers.map((customer) => ({
+              id: customer.id,
+              name: customer.name || '',
+              email: customer.email || '',
+              phone: customer.phone || '',
             }))
           );
         } else {
@@ -1370,7 +1409,7 @@ export default function PresupuestoPdfStudio({
           <>
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {sectionStatus.clientOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.clientWarn}</span>) : null}
+                {sectionStatus.clientOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.clientWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.clientWarn}</span>) : null}
               </div>
               {!isCustomerScoped && (<button type="button" onClick={() => setShowCustomerPicker(!showCustomerPicker)} className="flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5">+ Cercar client</button>)}
               {isCustomerScoped && !initialCustomerId && (<button type="button" onClick={clearSelectedCustomer} className="rounded-xl border px-3 py-1.5 text-xs transition-colors hover:bg-white/5">Canviar client</button>)}
@@ -1393,8 +1432,8 @@ export default function PresupuestoPdfStudio({
               </div>
             )}
             {isCustomerScoped && (
-              <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
-                <span className="text-emerald-400">&#10003;</span>
+              <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
+                <span className="">&#10003;</span>
                 <span className="font-medium">{clientName}</span>
                 <span className="text-xs opacity-60">{clientEmail}</span>
               </div>
@@ -1407,7 +1446,7 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm">Telèfon del client<input className={inputClass} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} readOnly={isCustomerScoped} /></label>
               <div className="md:col-span-2 mt-2 flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide">Esdeveniment</span>
-                {sectionStatus.eventOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.eventWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.eventWarn}</span>) : null}
+                {sectionStatus.eventOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.eventWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.eventWarn}</span>) : null}
               </div>
               <label className="text-sm">Data d&apos;emissió<input className={inputClass} type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} /></label>
               <label className="text-sm">Data de l&apos;esdeveniment<input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} /></label>
@@ -1422,7 +1461,7 @@ export default function PresupuestoPdfStudio({
         return (
           <>
             <div className="mb-3 flex items-center gap-2">
-              {sectionStatus.brandOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.brandWarn}</span>) : null}
+              {sectionStatus.brandOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.brandWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.brandWarn}</span>) : null}
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm">Marca / Empresa<input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} readOnly={isCustomerScoped && !allowBrandOverride} /></label>
@@ -1438,7 +1477,7 @@ export default function PresupuestoPdfStudio({
         return (
           <>
             <div className="mb-3 flex items-center gap-2">
-              {sectionStatus.packOk ? (<span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>) : sectionStatus.packWarn ? (<span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.packWarn}</span>) : null}
+              {sectionStatus.packOk ? (<span className="rounded-full px-2 py-0.5 text-[10px]">OK</span>) : sectionStatus.packWarn ? (<span className="rounded-full px-2 py-0.5 text-[10px]">{sectionStatus.packWarn}</span>) : null}
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               <label className="text-sm md:col-span-2">Nom visible del pack<input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} /></label>
@@ -1563,11 +1602,11 @@ export default function PresupuestoPdfStudio({
 
         <div className={`admin-quote-actions rounded-xl border p-3 ${sectionStatus.allOk ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
           {sectionStatus.allOk ? (
-            <div className="mb-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400">
+            <div className="mb-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm">
               <span>&#10003;</span> Tot correcte — el pressupost està llest per generar o enviar.
             </div>
           ) : (
-            <div className="mb-3 rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+            <div className="mb-3 rounded-xl px-3 py-2 text-sm">
               Revisa els camps marcats abans de continuar:
               <ul className="mt-1 list-inside list-disc text-xs">
                 {sectionStatus.clientWarn && <li>{sectionStatus.clientWarn}</li>}
@@ -1609,7 +1648,7 @@ export default function PresupuestoPdfStudio({
             Netejar esborrany
           </button>
           </div>
-          {validationError && <p className="mt-2 text-sm text-amber-400">{validationError}</p>}
+          {validationError && <p className="mt-2 text-sm">{validationError}</p>}
           {message && (
             <p className={`mt-2 text-sm ${message.includes('correctament') || message.includes('generat') || message.includes('preparat') ? 'text-emerald-400' : 'text-amber-400'}`}>
               {message}
@@ -1689,5 +1728,14 @@ export default function PresupuestoPdfStudio({
     </section>
   );
 }
+
+
+
+
+
+
+
+
+
 
 

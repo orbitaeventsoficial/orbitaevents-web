@@ -1,19 +1,5 @@
 /**
  * INVENTARIO REAL DE EQUIPAMIENTO - ÒRBITA EVENTS
- *
- * FILOSOFÍA: "Lo que no tengo, lo alquilo. No hay problema"
- * - Equipment PROPIO está listado aquí con quantity > 0
- * - Equipment de ALQUILER tiene nota "Alquiler disponible - consultar precio"
- * - Si añades nuevo equipment → añádelo al array correspondiente
- * - Si vendes/quitas equipment → elimínalo del array
- *
- * SISTEMA AUTO-ACTUALIZABLE:
- * - Los componentes leen de aquí automáticamente
- * - Los packs referencian IDs de este archivo
- * - Las FAQs se generan desde aquí
- *
- * ÚLTIMA ACTUALIZACIÓN: 27/11/2025
- * @author Manolo - Arquitecto Digital
  */
 
 // ============================================
@@ -31,7 +17,7 @@ export interface Equipment {
     power?: string;
     coverage?: string;
     connectivity?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
   };
   images?: string[]; // Rutas a fotos reales del equipo
   description: string;
@@ -351,3 +337,5 @@ export function validateInventory(): string[] {
 // ============================================
 
 export default ALL_EQUIPMENT;
+
+

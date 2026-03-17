@@ -14,8 +14,10 @@
 
 import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
+import { getGoogleBusinessIntegrationConfig } from '@/lib/services/googleBusinessIntegrationService';
+import { readGoogleReviewsCache } from '@/lib/services/googleReviewsCacheService';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { listApprovedDatabaseReviews } from '@/lib/services/publicTestimonialService';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -32,7 +34,7 @@ function shouldSkipDb(): boolean {
   );
 }
 
-export interface GoogleReview {
+interface GoogleReview {
   author_name: string;
   author_url?: string;
   language: string;
@@ -44,41 +46,34 @@ export interface GoogleReview {
   source: 'google' | 'database' | 'json';
   eventType?: string;
 }
-
-type GoogleIntegrationConfig = {
-  refreshToken?: string;
-  accountId?: string;
-  locationId?: string;
-  locationName?: string;
-};
-
-async function getGoogleIntegrationConfig(): Promise<GoogleIntegrationConfig | null> {
-  if (shouldSkipDb()) return null;
-  if (!process.env.DATABASE_URL) return null;
-  const settings = await prisma.setting.findMany({
-    where: {
-      key: {
-        in: [
-          'integrations.google.refreshToken',
-          'integrations.google.accountId',
-          'integrations.google.locationId',
-          'integrations.google.locationName',
-        ],
-      },
-    },
-  });
-
-  const map = settings.reduce<Record<string, string>>((acc, s) => {
-    acc[s.key] = s.value;
-    return acc;
-  }, {});
-
-  return {
-    refreshToken: map['integrations.google.refreshToken'],
-    accountId: map['integrations.google.accountId'],
-    locationId: map['integrations.google.locationId'],
-    locationName: map['integrations.google.locationName'],
+interface GoogleBusinessProfileReview {
+  createTime?: string;
+  comment?: string;
+  starRating?: string | number;
+  reviewer?: {
+    displayName?: string;
+    profilePhotoUrl?: string;
   };
+}
+
+interface StaticGoogleReview extends Partial<GoogleReview> {
+  author_name?: string;
+  rating?: number;
+  text?: string;
+  time?: number;
+  relative_time_description?: string;
+  language?: string;
+}
+
+interface GooglePlacesReview {
+  author_name: string;
+  author_url?: string;
+  profile_photo_url?: string;
+  rating: number;
+  text: string;
+  time: number;
+  relative_time_description: string;
+  language?: string;
 }
 
 async function refreshGoogleAccessToken(refreshToken: string): Promise<string | null> {
@@ -118,7 +113,7 @@ function mapStarRating(rating?: string | number): number {
 }
 
 async function getReviewsFromBusinessProfile(): Promise<GoogleReview[]> {
-  const config = await getGoogleIntegrationConfig();
+  const config = await getGoogleBusinessIntegrationConfig();
   if (!config?.refreshToken || !config.accountId || !config.locationId) {
     return [];
   }
@@ -140,7 +135,7 @@ async function getReviewsFromBusinessProfile(): Promise<GoogleReview[]> {
     }
 
     const data = await reviewsRes.json();
-    const reviews = (data.reviews || []).map((review: any) => {
+    const reviews = (data.reviews || []).map((review: GoogleBusinessProfileReview) => {
       const createdAt = review.createTime ? new Date(review.createTime) : new Date();
       return {
         author_name: review.reviewer?.displayName || 'Google User',
@@ -162,7 +157,7 @@ async function getReviewsFromBusinessProfile(): Promise<GoogleReview[]> {
   }
 }
 
-export interface GoogleReviewsResponse {
+interface GoogleReviewsResponse {
   rating: number;
   user_ratings_total: number;
   reviews: GoogleReview[];
@@ -196,7 +191,7 @@ async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpda
     const content = await fs.readFile(jsonPath, 'utf-8');
     const data = JSON.parse(content);
     
-    const reviews: GoogleReview[] = (data.reviews || []).map((r: any) => ({
+    const reviews: GoogleReview[] = (data.reviews || []).map((r: StaticGoogleReview) => ({
       ...r,
       source: 'json' as const,
       language: 'ca',
@@ -214,19 +209,14 @@ async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpda
 // ═══════════════════════════════════════════════════════════════════════════
 async function getReviewsFromCache(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string; total?: number; rating?: number }> {
   if (shouldSkipDb()) return { reviews: [] };
-  try {
-    const cached = await prisma.setting.findUnique({ where: { key: 'cache.googleReviews' } });
-    if (!cached?.value) return { reviews: [] };
-    const data = JSON.parse(cached.value);
-    const reviews: GoogleReview[] = (data.reviews || []).map((r: Record<string, unknown>) => ({
-      ...r,
-      source: 'json' as const,
-      language: (r.language as string) || 'es',
-    }));
-    return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
-  } catch {
-    return { reviews: [] };
-  }
+  const data = await readGoogleReviewsCache();
+  if (!data) return { reviews: [] };
+  const reviews: GoogleReview[] = (data.reviews || []).map((r) => ({
+    ...r,
+    source: 'json' as const,
+    language: r.language || 'es',
+  }));
+  return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -235,46 +225,24 @@ async function getReviewsFromCache(): Promise<{ reviews: GoogleReview[]; lastUpd
 async function getReviewsFromDatabase(): Promise<GoogleReview[]> {
   if (shouldSkipDb()) return [];
   try {
-    const testimonials = await prisma.customerTestimonial.findMany({
-      where: {
-        isApproved: true,
-        showName: true,
-      },
-      include: {
-        customer: {
-          select: {
-            name: true,
-            email: true,
-            source: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 20,
-    });
+    const testimonials = await listApprovedDatabaseReviews();
 
-    return testimonials
-      .filter(t => !t.customer.email?.includes('@reviews.orbitaevents.com')) // Excloure les de Google (ja estan al JSON)
-      .map((t) => ({
-        author_name: t.customer.name,
-        rating: t.rating,
-        text: t.text,
-        time: Math.floor(t.createdAt.getTime() / 1000),
-        relative_time_description: getRelativeTime(t.createdAt),
-        language: 'ca',
-        source: 'database' as const,
-        eventType: t.eventType || undefined,
-        profile_photo_url: t.photoUrl || undefined,
-      }));
+    return testimonials.map((testimonial) => ({
+      author_name: testimonial.customer.name,
+      rating: testimonial.rating,
+      text: testimonial.text,
+      time: Math.floor(testimonial.createdAt.getTime() / 1000),
+      relative_time_description: getRelativeTime(testimonial.createdAt),
+      language: 'ca',
+      source: 'database' as const,
+      eventType: testimonial.eventType || undefined,
+      profile_photo_url: testimonial.photoUrl || undefined,
+    }));
   } catch (error) {
     log.error('[Reviews] Error obtenint de BBDD:', error);
     return [];
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
 // OBTENIR RESSENYES DE GOOGLE PLACES API (opcional, de pagament)
 // ═══════════════════════════════════════════════════════════════════════════
 async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
@@ -302,7 +270,7 @@ async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
       return [];
     }
 
-    return data.result.reviews.map((review: any) => ({
+    return (data.result.reviews as GooglePlacesReview[]).map((review) => ({
       author_name: review.author_name,
       author_url: review.author_url,
       profile_photo_url: review.profile_photo_url,
@@ -415,3 +383,8 @@ export async function GET() {
     );
   }
 }
+
+
+
+
+
