@@ -1,5 +1,46 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-17 sessió 4 — Qualitat + Meteo + Cadència nurturing
+
+### Tests (+90 nous, 156→246)
+- `costEngine.test.ts` — 42 tests (desglossament costos, CAC, marge, col·laboradors, edge cases)
+- `dashboardInsightsService.test.ts` — 39 tests (11 tipus d'insight, fronteres, combinacions)
+- `automationTriggers.test.ts` — 8 tests (exports, tipus)
+- `commercialScoring.test.ts` — 5 strings castellà→català corregits als tests
+
+### Índexos BD (12 nous a 9 models)
+InventoryUsage (itemId, bookingId), Availability (bookingId), PostEventReport (bookingId), ClientSurvey (bookingId), ClientFeedback (bookingId), DiscountCode (code), LiveNotification (createdAt), CollaboratorBooking (+collaboratorId), CustomQuote (status, createdAt). Aplicats via `db push`.
+
+### ISR pàgines públiques (9 fitxers)
+- `revalidate = 3600`: about, faq, portfolio, experiencias, boda-halloween
+- `revalidate = 86400`: privacidad, cookies, aviso-legal, terminos
+
+### Logger a 8 API routes crítiques
+availability, fuel/reference, finance/alerts, leads/[id]/score, bookings/[id]/calendar-sync, maps/distance, packs/price-alerts, crons
+
+### Widget meteo dashboard
+- `weatherService.ts` — OpenWeatherMap API, cache 1h, fallback graceful si no hi ha API key
+- `WeatherWidget.tsx` — fila de cards amb emoji meteo, temp, pluja, client, data
+- API route `/api/admin/weather` amb auth
+
+### Cadència nurturing 5 passos (era 2)
+- Nous camps Lead: `nurturingStep`, `lastNurturingAt`, `nurturingDone`
+- 5 passos: 24h → 72h → 7d → 14d → 30d (copy en ca/es/en, progressiu)
+- `commercialSequenceService.ts` reescrit: tracking directe al Lead (no AdminLog)
+- Últim pas marca `nurturingDone = true` (tanca la sol·licitud)
+
+### Documentació
+- `estat-admin.md` actualitzat: 57 pàgines, 148 API, 6 crons, ~120 serveis, v2 roadmap ✅
+- Diari: seccions pendents obsoletes eliminades, nova secció pendents actualitzada
+
+### Commits
+- `bceebf3` — feat: "La Millor Web del Món" v2 + neteja post-Codex + qualitat
+- `21f358e` — feat: widget meteo + cadència nurturing
+
+### Build OK, tsc 0 errors, 246 tests
+
+---
+
 ## 2026-03-17 sessió 3 — "La Millor Web del Món" — Fases 1-4 completes
 
 ### Context
@@ -50,7 +91,7 @@ Implementació de les 4 fases del full de ruta v2 definit a la sessió anterior.
 
 ### Baixa prioritat
 6. **Multi-user (rols i permisos)**: Roadmap futur. Només necessari si més d'una persona usa l'admin.
-7. **Widget meteo**: Previst a la visió original d'A1 però no implementat (API OpenWeatherMap per events dels pròxims 3 dies).
+7. ~~**Widget meteo**~~: ✅ Implementat — weatherService.ts + WeatherWidget.tsx al dashboard (OpenWeatherMap, cache 1h).
 8. **WhatsApp recepció**: Rebre missatges WhatsApp dins el timeline unificat (requereix webhook Business API).
 
 ### Completat recentment (sessió 17/03)
