@@ -95,7 +95,7 @@ export default function CollaboratorsClient() {
       setForm(EMPTY_FORM);
       load();
     } catch {
-      toast.error('Error guardant');
+      toast.error('Error desant');
     }
   };
 
@@ -234,7 +234,7 @@ export default function CollaboratorsClient() {
                 : `Li dones el teu preu net. Ell hi afegeix la seva comissió (${form.commissionPct}% recomanat).`}
             </p>
             <button type="submit" className="px-6 py-2.5 rounded-xl text-black font-bold transition-colors">
-              {editingId ? 'Guardar' : 'Crear'}
+              {editingId ? 'Desar' : 'Crear'}
             </button>
           </div>
         </form>

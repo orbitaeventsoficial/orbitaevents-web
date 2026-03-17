@@ -17,12 +17,12 @@ export async function sendWhatsAppText(input: WhatsAppSendInput): Promise<WhatsA
   const token = process.env.WHATSAPP_API_TOKEN;
 
   if (!apiUrl || !token) {
-    return { ok: false, error: 'WHATSAPP_API_URL/WHATSAPP_API_TOKEN no configurados' };
+    return { ok: false, error: 'WHATSAPP_API_URL/WHATSAPP_API_TOKEN no configurats' };
   }
 
   const to = normalizePhone(input.to);
   if (!to) {
-    return { ok: false, error: 'Teléfono inválido' };
+    return { ok: false, error: 'Telèfon no vàlid' };
   }
 
   try {

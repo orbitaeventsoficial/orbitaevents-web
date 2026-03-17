@@ -2,6 +2,7 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import InboxClient from './InboxClient';
@@ -24,7 +25,7 @@ async function getLeads() {
       'admin:inbox:leads:50',
       () => prisma.lead.findMany({
         where: {
-          email: { not: { contains: '@leads.orbitaevents.local' } },
+          email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
         },
         select: {
           id: true,
@@ -62,17 +63,17 @@ async function getStats() {
       `admin:inbox:stats:${startToday.toISOString().slice(0, 10)}`,
       () => Promise.all([
         prisma.lead.count({
-          where: { email: { not: { contains: '@leads.orbitaevents.local' } } },
+          where: { email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } },
         }),
         prisma.lead.count({
           where: {
-            email: { not: { contains: '@leads.orbitaevents.local' } },
+            email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
             status: 'NEW',
           },
         }),
         prisma.lead.count({
           where: {
-            email: { not: { contains: '@leads.orbitaevents.local' } },
+            email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
             createdAt: { gte: startToday },
           },
         }),
@@ -119,10 +120,7 @@ async function getQuotePacks(): Promise<QuotePackOption[]> {
   }
 }
 
-// Verificar si IMAP està configurat
-function isImapConfigured(): boolean {
-  return !!(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
-}
+import { isImapConfigured } from '@/lib/env';
 
 export default async function InboxPage() {
   const [leads, stats, quotePacks] = await Promise.all([getLeads(), getStats(), getQuotePacks()]);

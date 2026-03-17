@@ -120,5 +120,37 @@ export function computeSimpleMarginPct(
   return ((input.total - summary.directCost) / input.total) * 100;
 }
 
+// ─── Col·laboradors ────────────────────────────────────────────────────────
+
+interface CollaboratorCostInput {
+  commissionPct: number;
+  pricingModel: 'NET_PLUS_COMMISSION' | 'DISCOUNT';
+}
+
+/**
+ * Calcula el marge NET d'una reserva amb col·laborador.
+ * Descompta la comissió del col·laborador del marge.
+ */
+export function computeCollaboratorNetMargin(
+  summary: BookingFinancialSummary,
+  collaborator: CollaboratorCostInput,
+): { netMarginAfterCommission: number; commissionAmount: number; collaboratorPrice: number; marginPctAfterCommission: number } {
+  const commissionAmount =
+    collaborator.pricingModel === 'DISCOUNT'
+      ? Math.round(summary.total * (collaborator.commissionPct / 100))
+      : Math.round(summary.total * (collaborator.commissionPct / 100));
+
+  const collaboratorPrice =
+    collaborator.pricingModel === 'DISCOUNT'
+      ? summary.total - commissionAmount
+      : summary.total; // en model NET, el col·lab rep el preu net
+
+  const netMarginAfterCommission = summary.netMargin - commissionAmount;
+  const marginPctAfterCommission =
+    summary.total > 0 ? (netMarginAfterCommission / summary.total) * 100 : 0;
+
+  return { netMarginAfterCommission, commissionAmount, collaboratorPrice, marginPctAfterCommission };
+}
+
 
 

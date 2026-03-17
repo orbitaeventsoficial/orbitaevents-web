@@ -236,7 +236,7 @@ export default function ContactFormComplete({
           window.location.href = `${localePrefix}/gracias`;
         }, 1000); // Pequeño delay para que se vea el success
       } else {
-        throw new Error('Error al enviar');
+        throw new Error('Error en enviar');
       }
     } catch {
       setSubmitStatus('error');

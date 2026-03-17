@@ -966,7 +966,7 @@ export async function generateContractPDF(
       signProvider: 'El Prestador',
       signClient: 'El Cliente',
       signDate: 'Fecha de firma',
-      signName: 'Nombre y apellidos',
+      signName: 'Nom i cognoms',
       sign: 'Firma',
     },
     en: {

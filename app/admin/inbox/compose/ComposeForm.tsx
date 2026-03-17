@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { EVENT_TYPE_LABELS, formatDateSimple } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, formatDateSimple, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Lead {
@@ -320,7 +320,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                       }`}
                     >
                         <p className="font-semibold">{name}</p>
-                        <p className="font-bold mt-1">{pack.price.toLocaleString('ca-ES')}€</p>
+                        <p className="font-bold mt-1">{formatCurrency(pack.price)}</p>
                       </button>
                     );
                   })}

@@ -13,9 +13,9 @@ export async function GET(req: NextRequest) {
     const stats = await listAdminStats();
     return NextResponse.json({ ok: true, stats });
   } catch (error) {
-    log.error('Error obteniendo estadísticas:', error);
+    log.error('Error obtenint estadístiques:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error obteniendo estadísticas' },
+      { ok: false, error: 'Error obtenint estadístiques' },
       { status: 500 }
     );
   }
@@ -35,14 +35,14 @@ export async function POST(req: NextRequest) {
 
     if (!key) {
       return NextResponse.json(
-        { ok: false, error: 'Key es requerido' },
+        { ok: false, error: 'El camp key és obligatori' },
         { status: 400 }
       );
     }
 
     if (!isAdminStatKey(key)) {
       return NextResponse.json(
-        { ok: false, error: 'Estadística no válida' },
+        { ok: false, error: 'Estadística no vàlida' },
         { status: 400 }
       );
     }
@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
     const result = await updateAdminStatFallback({ key, fallback, resetToCalculated });
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error actualizando estadística';
-    const status = message === 'Fallback debe ser un número positivo' ? 400 : 500;
+    const message = error instanceof Error ? error.message : 'Error actualitzant estadística';
+    const status = message === 'El fallback ha de ser un número positiu' ? 400 : 500;
 
     if (status === 500) {
-      log.error('Error actualizando estadística:', error);
+      log.error('Error actualitzant estadística:', error);
     }
 
     return NextResponse.json(

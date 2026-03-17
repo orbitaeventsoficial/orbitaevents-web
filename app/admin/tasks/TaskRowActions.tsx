@@ -54,7 +54,7 @@ export default function TaskRowActions({
         disabled={saving}
         className="rounded border px-2 py-1 text-xs font-medium disabled:opacity-60"
       >
-        {saving ? 'Guardant...' : isDone ? 'Reobrir' : 'Marcar feta'}
+        {saving ? 'Desant...' : isDone ? 'Reobrir' : 'Marcar feta'}
       </button>
     </div>
   );

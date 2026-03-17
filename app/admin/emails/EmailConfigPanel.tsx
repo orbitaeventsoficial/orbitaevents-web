@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { log } from '@/lib/logger';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function EmailConfigPanel() {
-  const [config, setConfig] = useState({
-    googleReviewUrl: 'https://g.page/r/CXcgbvANsXSzEBI/review',
+  const [config, setConfig] = useState<{ googleReviewUrl: string; postEventDelay: number; enablePostEvent: boolean; enableCanvas: boolean; enableLeadConfirmation: boolean; discountBase: number; discountPhoto: number; discountVideo: number; discountGoogle: number }>({
+    googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
     postEventDelay: 1,
     enablePostEvent: true,
     enableCanvas: true,

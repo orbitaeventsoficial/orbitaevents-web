@@ -1,5 +1,6 @@
 // app/admin/inbox/compose/page.tsx
 import { prisma } from '@/lib/prisma';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import ComposeForm from './ComposeForm';
 
@@ -13,7 +14,7 @@ async function getLeadsAndPacks(customerId?: string) {
   const [leads, packs] = await Promise.all([
     prisma.lead.findMany({
       where: {
-        email: { not: { contains: '@leads.orbitaevents.local' } },
+        email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
         status: { in: ['NEW', 'CONTACTED', 'NEGOTIATING'] },
       },
       select: {

@@ -148,21 +148,21 @@ function detectErrorType(error: unknown): {
       case 'P2025': // Record not found
         return {
           code: ApiErrorCode.NOT_FOUND,
-          userMessage: 'El recurso solicitado no fue encontrado',
+          userMessage: 'El recurs sol·licitat no s\'ha trobat',
           statusCode: 404,
         };
 
       case 'P2003': // Foreign key constraint
         return {
           code: ApiErrorCode.VALIDATION_ERROR,
-          userMessage: 'No se puede completar la operación debido a relaciones de datos',
+          userMessage: 'No es pot completar l\'operació per relacions de dades',
           statusCode: 400,
         };
 
       default:
         return {
           code: ApiErrorCode.DATABASE_ERROR,
-          userMessage: 'Error en la base de datos',
+          userMessage: 'Error a la base de dades',
           statusCode: 500,
         };
     }
@@ -172,7 +172,7 @@ function detectErrorType(error: unknown): {
   if (error instanceof Prisma.PrismaClientInitializationError) {
     return {
       code: ApiErrorCode.DATABASE_ERROR,
-      userMessage: 'No se puede conectar a la base de datos',
+      userMessage: 'No es pot connectar a la base de dades',
       statusCode: 503,
     };
   }
@@ -181,7 +181,7 @@ function detectErrorType(error: unknown): {
   if (error instanceof TypeError && error.message.includes('fetch')) {
     return {
       code: ApiErrorCode.EXTERNAL_SERVICE_ERROR,
-      userMessage: 'Error al conectar con servicio externo',
+      userMessage: 'Error connectant amb servei extern',
       statusCode: 502,
     };
   }
@@ -193,7 +193,7 @@ function detectErrorType(error: unknown): {
     if (message.includes('unauthorized') || message.includes('not authenticated')) {
       return {
         code: ApiErrorCode.UNAUTHORIZED,
-        userMessage: 'No estás autenticado. Por favor, inicia sesión',
+        userMessage: 'No estàs autenticat. Si us plau, inicia sessió',
         statusCode: 401,
       };
     }
@@ -201,7 +201,7 @@ function detectErrorType(error: unknown): {
     if (message.includes('forbidden') || message.includes('permission')) {
       return {
         code: ApiErrorCode.FORBIDDEN,
-        userMessage: 'No tienes permisos para realizar esta acción',
+        userMessage: 'No tens permisos per realitzar aquesta acció',
         statusCode: 403,
       };
     }
@@ -209,7 +209,7 @@ function detectErrorType(error: unknown): {
     if (message.includes('not found')) {
       return {
         code: ApiErrorCode.NOT_FOUND,
-        userMessage: 'Recurso no encontrado',
+        userMessage: 'Recurs no trobat',
         statusCode: 404,
       };
     }
@@ -217,7 +217,7 @@ function detectErrorType(error: unknown): {
     if (message.includes('rate limit')) {
       return {
         code: ApiErrorCode.RATE_LIMIT_EXCEEDED,
-        userMessage: 'Demasiadas solicitudes. Por favor, intenta más tarde',
+        userMessage: 'Massa sol·licituds. Si us plau, torna-ho a provar més tard',
         statusCode: 429,
       };
     }
@@ -226,7 +226,7 @@ function detectErrorType(error: unknown): {
   // Default fallback
   return {
     code: ApiErrorCode.INTERNAL_ERROR,
-    userMessage: 'Ha ocurrido un error inesperado. Por favor, intenta de nuevo',
+    userMessage: 'S\'ha produït un error inesperat. Si us plau, torna-ho a provar',
     statusCode: 500,
   };
 }
@@ -256,11 +256,11 @@ export function validationError(
  * Not found error helper
  */
 export function notFoundError(
-  resource: string = 'Recurso'
+  resource: string = 'Recurs'
 ): NextResponse<ApiErrorResponse> {
   return NextResponse.json(
     {
-      error: `${resource} no encontrado`,
+      error: `${resource} no trobat`,
       code: ApiErrorCode.NOT_FOUND,
       timestamp: new Date().toISOString(),
     },
@@ -272,7 +272,7 @@ export function notFoundError(
  * Unauthorized error helper
  */
 export function unauthorizedError(
-  message: string = 'No autorizado'
+  message: string = 'No autoritzat'
 ): NextResponse<ApiErrorResponse> {
   return NextResponse.json(
     {
@@ -292,7 +292,7 @@ export function rateLimitError(
 ): NextResponse<ApiErrorResponse> {
   const response = NextResponse.json(
     {
-      error: 'Demasiadas solicitudes. Por favor, intenta más tarde',
+      error: 'Massa sol·licituds. Torna-ho a provar més tard',
       code: ApiErrorCode.RATE_LIMIT_EXCEEDED,
       message: retryAfter
         ? `Intenta de nuevo en ${retryAfter} segundos`

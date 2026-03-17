@@ -87,16 +87,16 @@ export async function upsertProfitabilityConfig(input: ProfitabilityConfig, role
       value: JSON.stringify(normalized),
       type: 'JSON',
       category: 'pricing',
-      label: 'Config rentabilidad',
-      description: 'Ratios de coste y CAC por canal para reporte de rentabilidad',
+      label: 'Config rendibilitat',
+      description: 'Ràtios de cost i CAC per canal per a informe de rendibilitat',
     },
     create: {
       key: 'finance.profitabilityConfig',
       value: JSON.stringify(normalized),
       type: 'JSON',
       category: 'pricing',
-      label: 'Config rentabilidad',
-      description: 'Ratios de coste y CAC por canal para reporte de rentabilidad',
+      label: 'Config rendibilitat',
+      description: 'Ràtios de cost i CAC per canal per a informe de rendibilitat',
     },
   });
 

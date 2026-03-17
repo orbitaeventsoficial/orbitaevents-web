@@ -168,7 +168,7 @@ export async function saveTextManagerModifications(input: {
   }, [] as ReturnType<typeof prisma.translation.upsert>[]);
 
   if (operations.length === 0) {
-    return { ok: false as const, status: 400, body: { ok: false, error: 'No hay cambios válidos para guardar' } };
+    return { ok: false as const, status: 400, body: { ok: false, error: 'No hi ha canvis vàlids per desar' } };
   }
 
   await prisma.$transaction(operations);
@@ -180,7 +180,7 @@ export async function saveTextManagerModifications(input: {
       ok: true,
       updated: updatedCount,
       locale,
-      message: `${updatedCount} textos actualizados en la BD`,
+      message: `${updatedCount} textos actualitzats a la BD`,
     },
   };
 }
@@ -217,10 +217,10 @@ export async function runTextManagerAction(action: string) {
       };
     }
     case 'validate':
-      return { ok: true, action: 'validate', valid: true, message: 'Validación OK (JSON base + DB)' };
+      return { ok: true, action: 'validate', valid: true, message: 'Validació OK (JSON base + BD)' };
     case 'restore':
-      return { ok: false, status: 400, body: { ok: false, error: 'Restore no disponible: ahora se guarda en BD' } };
+      return { ok: false, status: 400, body: { ok: false, error: 'Restore no disponible: ara es desa a BD' } };
     default:
-      return { ok: false, status: 400, body: { ok: false, error: `Acción desconocida: ${action}` } };
+      return { ok: false, status: 400, body: { ok: false, error: `Acció desconeguda: ${action}` } };
   }
 }

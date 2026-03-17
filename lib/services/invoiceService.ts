@@ -273,7 +273,7 @@ export async function markInvoiceAsPaid(invoiceId: string): Promise<void> {
 // CHECK HOLDED STATUS
 // ============================================
 
-export async function refreshHoldedStatus(invoiceId: string): Promise<void> {
+async function refreshHoldedStatus(invoiceId: string): Promise<void> {
   const invoice = await prisma.invoice.findUniqueOrThrow({
     where: { id: invoiceId },
   });

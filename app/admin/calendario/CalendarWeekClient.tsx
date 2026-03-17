@@ -14,7 +14,7 @@ type CalendarApiDay = {
     leadId?: string | null;
     customerId?: string | null;
     fechaEvento: string;
-    clienteNombre?: string | null;
+    clientName?: string | null;
     ubicacion?: string | null;
     estado?: string | null;
     eventType?: string | null;
@@ -367,7 +367,7 @@ export default function CalendarWeekClient() {
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xs font-semibold truncate">
-                        {r.clienteNombre || 'Client'}
+                        {r.clientName || 'Client'}
                       </span>
                       {r.estado && (
                         <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase bg-white/10">

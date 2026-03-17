@@ -7,6 +7,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
 import { deleteBookingIfAllowed, getBookingDetail, updateBookingDetail } from '@/lib/services/bookingRouteService';
 import type { ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
+import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 
 interface Params {
   params: { id: string };
@@ -89,6 +90,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const result = await updateBookingDetail(params.id, { ...parseResult.data });
     customerIdForLog = result.customerId ?? null;
+
+    // Auto-trigger: booking confirmed → pre-event checklist
+    if (parseResult.data.status === 'CONFIRMED') {
+      dispatchAutoTrigger({ type: 'booking.confirmed', bookingId: params.id }).catch(() => {});
+    }
+
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error actualitzant reserva', error, {

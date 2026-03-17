@@ -141,10 +141,10 @@ export default function HeroElegant() {
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentIndex}
-                    initial={reduceMotion ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={reduceMotion ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    initial={reduceMotion ? false : { opacity: 0, y: 20, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    exit={reduceMotion ? undefined : { opacity: 0, y: -20, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     className="relative block w-full text-center"
                   >
                     <TypewriterText

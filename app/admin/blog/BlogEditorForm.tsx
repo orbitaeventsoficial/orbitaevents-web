@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Locale = 'es' | 'ca';
 
@@ -167,7 +168,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
 
       if (mode === 'edit') payload.id = postId;
 
-      const res = await fetch('/api/admin/blog', {
+      const res = await fetchWithCsrf('/api/admin/blog', {
         method: mode === 'create' ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

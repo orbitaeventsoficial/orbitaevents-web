@@ -135,12 +135,12 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Error guardant');
+        throw new Error(data.error || 'Error desant');
       }
 
-      setStatus('Guardat correctament');
+      setStatus('Desat correctament');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Error guardant');
+      setStatus(error instanceof Error ? error.message : 'Error desant');
     } finally {
       setSaving(false);
     }
@@ -169,7 +169,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             aria-busy={saving}
             className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {saving ? 'Guardant...' : 'Desar canvis'}
+            {saving ? 'Desant...' : 'Desar canvis'}
           </button>
         </div>
       </div>

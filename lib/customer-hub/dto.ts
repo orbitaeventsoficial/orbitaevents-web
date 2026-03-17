@@ -70,6 +70,7 @@ export type TaskDTO = {
 export type MessageDTO = {
   id: string;
   channel: 'EMAIL' | 'NOTE' | 'WHATSAPP' | 'CALL';
+  direction?: 'OUTBOUND' | 'INBOUND';
   subject?: string;
   bodyPreview?: string;
   sentAt?: string;
@@ -86,6 +87,9 @@ export type TimelineEventType =
   | 'TASK_CREATED'
   | 'TASK_DONE'
   | 'MESSAGE_SENT'
+  | 'EMAIL_RECEIVED'
+  | 'WHATSAPP_SENT'
+  | 'PHONE_CALL'
   | 'NOTE_ADDED'
   | 'ACTIVITY';
 

@@ -4,32 +4,32 @@ import { log } from '@/lib/logger';
 const STATS_DEFINITION = [
   {
     key: 'stats.events_completed',
-    label: 'Eventos Realizados',
-    description: 'Total de eventos completados con éxito',
+    label: 'Esdeveniments Realitzats',
+    description: 'Total d\'esdeveniments completats amb èxit',
     icon: 'party',
   },
   {
     key: 'stats.people_entertained',
-    label: 'Personas Entretenidas',
-    description: 'Total de invitados en todos los eventos',
+    label: 'Persones Entretingudes',
+    description: 'Total de convidats en tots els esdeveniments',
     icon: 'people',
   },
   {
     key: 'stats.years_experience',
-    label: 'Años de Experiencia',
-    description: 'Años desde el primer evento (calculado automáticamente)',
+    label: 'Anys d\'Experiència',
+    description: 'Anys des del primer esdeveniment (calculat automàticament)',
     icon: 'calendar',
   },
   {
     key: 'stats.satisfaction_percent',
-    label: 'Satisfacción (%)',
-    description: 'Porcentaje de clientes satisfechos',
+    label: 'Satisfacció (%)',
+    description: 'Percentatge de clients satisfets',
     icon: 'star',
   },
   {
     key: 'stats.rating_average',
-    label: 'Rating Promedio',
-    description: 'Valoración media de 1-5 estrellas',
+    label: 'Valoració Mitjana',
+    description: 'Valoració mitjana d\'1-5 estrelles',
     icon: 'sparkle',
   },
 ] as const;
@@ -130,7 +130,7 @@ export async function updateAdminStatFallback(input: {
 }) {
   const definition = getStatDefinition(input.key);
   if (!definition) {
-    throw new Error('Estadística no válida');
+    throw new Error('Estadística no vàlida');
   }
 
   if (input.resetToCalculated) {
@@ -147,7 +147,7 @@ export async function updateAdminStatFallback(input: {
   }
 
   if (typeof input.fallback !== 'number' || input.fallback < 0) {
-    throw new Error('Fallback debe ser un número positivo');
+    throw new Error('El fallback ha de ser un número positiu');
   }
 
   await prisma.setting.upsert({

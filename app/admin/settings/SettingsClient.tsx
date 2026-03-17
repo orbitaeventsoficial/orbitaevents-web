@@ -125,7 +125,7 @@ export default function SettingsClient({
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        throw new Error(payload?.error || 'Error guardant configuracio');
+        throw new Error(payload?.error || 'Error desant configuració');
       }
 
       setSettings((prev) => {
@@ -141,7 +141,7 @@ export default function SettingsClient({
 
       cancelEdit();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error guardant configuracio');
+      setError(err instanceof Error ? err.message : 'Error desant configuració');
     } finally {
       setSavingKey(null);
     }
@@ -259,7 +259,7 @@ export default function SettingsClient({
                                 type="button"
                                 aria-busy={isSaving}
                               >
-                                {isSaving ? 'Guardant...' : 'Desar'}
+                                {isSaving ? 'Desant...' : 'Desar'}
                               </button>
                             </div>
                           </div>

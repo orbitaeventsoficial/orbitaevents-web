@@ -69,7 +69,11 @@ export default function LeadNotesPanel({
       if (!res.ok) throw new Error(data.error || 'No s’han pogut netejar duplicats');
       if ((data.deleted || 0) > 0) {
         setSuccess(`S'han eliminat ${data.deleted} notes duplicades.`);
-        window.location.reload();
+        const refreshRes = await fetchWithCsrf(`/api/admin/leads/${leadId}/notes`);
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json().catch(() => ({}));
+          if (Array.isArray(refreshData.notes)) setNotes(refreshData.notes);
+        }
       } else {
         setSuccess('No hi havia notes duplicades.');
       }

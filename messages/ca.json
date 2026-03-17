@@ -1695,6 +1695,31 @@
       "q3": "Com puc deixar una ressenya?",
       "a3": "Pots deixar la teva ressenya al nostre perfil de Google Business o enviar-la per correu a {email}. Cada opinió compta i ens ajuda a millorar.",
       "a3WithGoogleUrl": "Pots fer-ho des del nostre perfil de Google Business o enviant-la per correu a {email}. Cada opinió compta i ens ajuda a seguir millorant."
+    },
+    "ui": {
+      "verifiedBadge": "Verificat",
+      "heroBadge": "⭐ Ressenyes verificades",
+      "heroTitlePrefix": "El que diuen",
+      "heroTitleAccent": "els nostres clients",
+      "ratingWord": "valoració",
+      "reviewsWord": "ressenyes",
+      "introWithCount": "Més de {count} famílies i empreses han confiat en nosaltres. Llegeix les seves experiències i, si ja ens coneixes, deixa la teva.",
+      "introNoCount": "Famílies i empreses han confiat en nosaltres. Llegeix les seves experiències i, si ja ens coneixes, deixa la teva.",
+      "knownTitle": "Ja ens coneixes?",
+      "knownDescription": "Deixa la teva valoració i obtén fins a un 25% de descompte per al teu pròxim esdeveniment",
+      "knownButton": "Deixa la meva opinió i obtén descompte",
+      "webOpinionsTitle": "Opinions del nostre web",
+      "webOpinionsSubtitle": "Testimonis verificats de clients",
+      "googleTitle": "Ressenyes de Google",
+      "googleSubtitle": "Opinions verificades de Google Business",
+      "googleCta": "Veure-les totes a Google",
+      "emptyState": "Encara no hi ha ressenyes disponibles. Sigues la primera persona a deixar la teva opinió.",
+      "finalTitlePrefix": "Vols viure una experiència",
+      "finalTitleAccent": "inoblidable",
+      "finalWithCount": "Uneix-te a les més de {count} famílies que han confiat en nosaltres",
+      "finalNoCount": "Uneix-te a les famílies que han confiat en nosaltres",
+      "configureEvent": "Configura el teu esdeveniment",
+      "contact": "Contacta"
     }
   },
   "reviews": {
@@ -3081,6 +3106,7 @@
     },
     "viewCalendar": "Veure calendari complet",
     "socialPressure": "8 persones mirant dates aquesta setmana",
+    "saturdaysWarning": "Només queden {count} dissabtes lliures!",
     "earlyBird": "Reserva en {days} dies i estalvia un 15%",
     "modal": {
       "whatsappMsg": "Hola! Vull reservar la data {date} per al meu event. Em podeu enviar més informació?"
@@ -5515,7 +5541,9 @@
           "title": "Events corporatius",
           "desc": "Producció tècnica professional per a empreses i marques"
         }
-      }
+      },
+      "viewStory": "Veure story",
+      "swipeHint": "Llisca per veure més"
     }
   },
   "privacyPortal": {

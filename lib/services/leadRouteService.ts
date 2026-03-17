@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma';
-import { deleteLeadTasks } from '@/lib/services/tasks/taskCleanup';
 
 type LeadPatchInput = Record<string, unknown>;
 
@@ -145,7 +144,8 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
   await prisma.$transaction(async (tx) => {
     await tx.leadNote.deleteMany({ where: { leadId: id } });
     await tx.leadActivity.deleteMany({ where: { leadId: id } });
-    await deleteLeadTasks(tx, id);
+    await tx.task.deleteMany({ where: { leadId: id } });
+    await tx.leadTask.deleteMany({ where: { leadId: id } });
     await tx.leadDocument.deleteMany({ where: { leadId: id } });
     await tx.lead.delete({
       where: { id },

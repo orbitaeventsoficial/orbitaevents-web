@@ -20,7 +20,7 @@ import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAcce
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import Tooltip from '@/app/admin/components/Tooltip';
 
@@ -319,7 +319,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
     return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
   }, 0);
   const remainingHoursList = (booking.inventory || []).map((assigned: { item: { expectedLifeHours: number | null; name: string }; itemId: string }) => {
-    const expectedLifeHours = assigned.item.expectedLifeHours || 2000;
+    const expectedLifeHours = assigned.item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
     const used = Number(usageByItem.get(assigned.itemId) || 0);
     return Math.max(0, expectedLifeHours - used);
   });

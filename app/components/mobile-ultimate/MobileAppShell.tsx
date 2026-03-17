@@ -21,6 +21,7 @@
  */
 
 import { useState, useEffect, useRef, createContext, useContext, ReactNode, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useTransform, useMotionValue } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
@@ -274,6 +275,7 @@ export default function MobileAppShell({
   showSplash = true 
 }: MobileAppShellProps) {
   const locale = useLocale();
+  const router = useRouter();
   const [isPWA, setIsPWA] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [showSplashScreen, setShowSplashScreen] = useState(showSplash);
@@ -381,7 +383,7 @@ export default function MobileAppShell({
     try {
       // Simular refresh
       await new Promise(resolve => setTimeout(resolve, 1000));
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       log.error('Page refresh error', error);
     }

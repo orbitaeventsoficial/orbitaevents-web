@@ -41,7 +41,7 @@ export async function getAdminFaqById(id: string) {
   });
 
   if (!faq) {
-    return { status: 404, body: { ok: false, error: 'FAQ no encontrado' } };
+    return { status: 404, body: { ok: false, error: 'FAQ no trobat' } };
   }
 
   return { status: 200, body: { ok: true, faq } };

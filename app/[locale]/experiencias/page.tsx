@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
 
+export const revalidate = 3600;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('experiences');
   return {

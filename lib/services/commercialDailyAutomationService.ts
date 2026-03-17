@@ -8,7 +8,6 @@ import { scoreLead } from '@/lib/services/commercialScoring';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { countOpenTasks } from '@/lib/services/tasks/taskMetrics';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 
 export async function runCommercialDailyAutomation() {
@@ -57,7 +56,7 @@ export async function runCommercialDailyAutomation() {
     prisma.adminLog.count({ where: { action: 'COMM_SENT', createdAt: { gte: since24h } } }),
     prisma.adminLog.count({ where: { action: 'COMM_RESPONDED', createdAt: { gte: since24h } } }),
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
-    countOpenTasks(),
+    prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
   ]);
 
   const responseRate = commSent24h > 0 ? commResponded24h / commSent24h : 0;

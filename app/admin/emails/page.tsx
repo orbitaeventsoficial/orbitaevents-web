@@ -2,9 +2,10 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { formatDateTime, formatDateSimple } from '@/lib/constants';
+import { formatDateTime, formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
 import RecentEmailsTable from './RecentEmailsTable';
@@ -53,7 +54,7 @@ async function getEmailStats() {
     safe('leadsWithEmail', 0, () =>
       prisma.lead.count({
         where: {
-          email: { not: { contains: '@leads.orbitaevents.local' } },
+          email: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
           createdAt: { gte: thirtyDaysAgo },
         },
       })
@@ -69,7 +70,7 @@ async function getEmailStats() {
           status: 'COMPLETED',
           eventDate: { lte: twoDaysAgo },
           postEventEmailSent: false,
-          clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
+          clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
         },
       })
     ),
@@ -153,7 +154,7 @@ async function getPendingPostEventBookings() {
           lte: twoDaysAgo,
         },
         postEventEmailSent: false,
-        clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
+        clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
       },
       select: {
         id: true,
@@ -301,11 +302,11 @@ export default async function EmailsAdminPage() {
             </p>
             <div className="rounded-xl p-3 break-all">
               <code className="text-xs">
-                https://g.page/r/CXcgbvANsXSzEBI/review
+                {SITE_CONFIG.reviews.googleReviewUrl}
               </code>
             </div>
             <a
-              href="https://g.page/r/CXcgbvANsXSzEBI/review"
+              href={SITE_CONFIG.reviews.googleReviewUrl}
               target="_blank" rel="noopener noreferrer"
               className="mt-4 block w-full text-center px-4 py-2 rounded-xl text-white shadow-lg transition-colors text-sm font-medium"
             >

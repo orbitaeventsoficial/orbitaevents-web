@@ -70,7 +70,7 @@ export default function ImapSettingsClient() {
       });
       const data = await res.json();
       if (data.ok) {
-        toast.success('Connexió IMAP exitosa!');
+        toast.success('Connexió IMAP correcta!');
         setConnection({ ok: true });
       } else {
         toast.error(data.error || 'Error de connexió');
@@ -97,7 +97,7 @@ export default function ImapSettingsClient() {
       });
       const data = await res.json();
       if (data.ok) {
-        toast.success('Configuració IMAP guardada');
+        toast.success('Configuració IMAP desada');
         if (data.connection?.ok) {
           setConnection({ ok: true });
         } else {
@@ -106,7 +106,7 @@ export default function ImapSettingsClient() {
         setShowForm(false);
         await loadConfig();
       } else {
-        toast.error(data.error || 'Error guardant');
+        toast.error(data.error || 'Error desant');
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error');
@@ -264,7 +264,7 @@ export default function ImapSettingsClient() {
               onClick={saveConfig}
               className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
             >
-              {saving ? 'Guardant...' : 'Guardar i connectar'}
+              {saving ? 'Desant...' : 'Desa i connecta'}
             </button>
             {showForm && (
               <button

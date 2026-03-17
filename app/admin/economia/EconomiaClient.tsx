@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
-import PaymentToggleButton from '../finanzas/PaymentToggleButton';
-import PaymentReminderActions from '../finanzas/PaymentReminderActions';
+import PaymentToggleButton from './PaymentToggleButton';
+import PaymentReminderActions from './PaymentReminderActions';
 import { formatDateSimple, formatDateFull, formatCurrency, DEFAULT_LOCALE } from '@/lib/constants';
 import ExportCsvButton from '../components/ExportCsvButton';
-import ProfitabilityConfigEditor from '../rentabilidad/ProfitabilityConfigEditor';
-import ProfitabilityConfigHistory from '../rentabilidad/ProfitabilityConfigHistory';
+import ProfitabilityConfigEditor from './ProfitabilityConfigEditor';
+import ProfitabilityConfigHistory from './ProfitabilityConfigHistory';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import PackPricingModelEditor from './PackPricingModelEditor';
@@ -404,6 +405,7 @@ function CobramentFiltersSection({
   dueSoonDepositCount: number;
   dueSoonRemainingCount: number;
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<PaymentFilter>('pendents');
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -478,7 +480,7 @@ function CobramentFiltersSection({
         return;
       }
       setSelected(new Set());
-      window.location.reload();
+      router.refresh();
     } catch {
       setBulkError('Error de connexió');
     } finally {

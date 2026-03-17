@@ -1,9 +1,9 @@
 /**
- * CONFIGURACION CENTRALIZADA DE ORBITA EVENTS
+ * CONFIGURACIÓ CENTRALITZADA D'ÒRBITA EVENTS
  *
- * REGLA DE ORO: Todos los datos fijos del negocio viven aqui.
- * Si cambias el telefono, el email o cualquier dato de contacto,
- * solo lo cambias aqui. El resto se actualiza automaticamente.
+ * REGLA D'OR: Totes les dades fixes del negoci viuen aquí.
+ * Si canvies el telèfon, l'email o qualsevol dada de contacte,
+ * només ho canvies aquí. La resta s'actualitza automàticament.
  */
 
 export const SITE_CONFIG = {

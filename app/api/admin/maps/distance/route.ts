@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { log } from '@/lib/logger';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
       ...result,
     });
   } catch (error) {
+    log.error('Error calculant distància Google Maps', error, { context: { endpoint: 'POST /api/admin/maps/distance' } });
     const msg = error instanceof Error ? error.message : 'DISTANCE_CALCULATION_FAILED';
     return NextResponse.json(
       { ok: false, error: msg },

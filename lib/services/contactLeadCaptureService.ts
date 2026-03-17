@@ -2,6 +2,7 @@ import type { EventType, LeadSource, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 
 type PersistContactLeadInput = {
   name: string;
@@ -61,7 +62,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
         },
       });
     } else {
-      const emailForDb = input.clientEmail || `phone-${input.clientPhone}@leads.orbitaevents.local`;
+      const emailForDb = input.clientEmail || `phone-${input.clientPhone}${PLACEHOLDER_EMAIL_DOMAIN}`;
 
       const newLead = await prisma.lead.create({
         data: {
@@ -91,7 +92,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
       });
     }
 
-    if (savedLeadId && input.clientEmail && !input.clientEmail.endsWith('@leads.orbitaevents.local')) {
+    if (savedLeadId && input.clientEmail && !input.clientEmail.endsWith(PLACEHOLDER_EMAIL_DOMAIN)) {
       try {
         const emailNorm = normalizeEmail(input.clientEmail);
         const nameNorm = normalizeName(input.name);
@@ -142,7 +143,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
       }
     }
   } catch (dbError) {
-    log.error('Error guardant lead a la base de dades', dbError, {
+    log.error('Error desant lead a la base de dades', dbError, {
       context: {
         eventType: input.eventType,
         source: input.source,

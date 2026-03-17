@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 type EventType = 'WEDDING' | 'BIRTHDAY' | 'CORPORATE' | 'COMMUNION' | 'BAPTISM' | 'GRADUATION' | 'ANNIVERSARY' | 'PRIVATE_PARTY' | 'OTHER';
@@ -38,7 +39,7 @@ export async function countNewAdminLeads() {
   const count = await prisma.lead.count({
     where: {
       status: 'NEW',
-      NOT: { email: { contains: '@leads.orbitaevents.local' } },
+      NOT: { email: { contains: PLACEHOLDER_EMAIL_DOMAIN } },
     },
   });
 

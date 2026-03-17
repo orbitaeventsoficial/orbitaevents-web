@@ -283,7 +283,7 @@ export default async function PacksPage() {
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}/inventory`}
+                      href={`/admin/packs/${pack.id}`}
                     className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari
@@ -437,7 +437,7 @@ export default async function PacksPage() {
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}/inventory`}
+                      href={`/admin/packs/${pack.id}`}
                     className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari

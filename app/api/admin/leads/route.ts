@@ -7,6 +7,7 @@ import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { getPipelineLeads } from '@/lib/services/leads/pipeline';
 import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
+import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 
 export const dynamic = 'force-dynamic';
 
@@ -161,6 +162,12 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await createAdminLead(parsed.data);
+
+    // Auto-trigger: welcome email task
+    if (result?.lead?.id) {
+      dispatchAutoTrigger({ type: 'lead.created', leadId: result.lead.id }).catch(() => {});
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     log.error('Error creant lead:', error);

@@ -13,7 +13,7 @@ type Booking = {
   leadId?: string | null;
   customerId?: string | null;
   fechaEvento: string;
-  clienteNombre?: string | null;
+  clientName?: string | null;
   ubicacion?: string | null;
   estado?: string | null;
   eventType?: string | null;
@@ -335,7 +335,7 @@ export default function CalendarDayClient() {
                               {b.startH === hour && (
                                 <>
                                   <span className="font-medium text-white/80">{resolveServiceLabel(b)}</span>
-                                  {b.clienteNombre && <span className="text-white/40 ml-2">{b.clienteNombre}</span>}
+                                  {b.clientName && <span className="text-white/40 ml-2">{b.clientName}</span>}
                                 </>
                               )}
                             </Link>
@@ -357,7 +357,7 @@ export default function CalendarDayClient() {
                         className="block px-3 py-2 rounded-xl border border-white/10 mb-1 hover:bg-white/[0.03] transition-colors"
                       >
                         <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
-                        {b.clienteNombre && <span className="text-xs text-white/40 ml-2">{b.clienteNombre}</span>}
+                        {b.clientName && <span className="text-xs text-white/40 ml-2">{b.clientName}</span>}
                       </Link>
                     ))}
                   </div>
@@ -414,8 +414,8 @@ export default function CalendarDayClient() {
                     <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
                   </div>
-                  {b.clienteNombre && (
-                    <p className="text-sm text-white/60">{b.clienteNombre}</p>
+                  {b.clientName && (
+                    <p className="text-sm text-white/60">{b.clientName}</p>
                   )}
                   {b.ubicacion && (
                     <p className="text-xs text-white/40 mt-1">{b.ubicacion}</p>

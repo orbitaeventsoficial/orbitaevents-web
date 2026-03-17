@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDate, formatCurrency } from '@/lib/constants';
 
@@ -61,6 +62,7 @@ export default function ProposalsList({
   proposals: ProposalItem[];
   quotes: QuoteItem[];
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [actionMsg, setActionMsg] = useState<string | null>(null);
@@ -101,7 +103,7 @@ export default function ProposalsList({
         setActionMsg('Pressupost marcat com a enviat');
         setTimeout(() => setActionMsg(null), 3000);
         // Refresh the page to see updated status
-        window.location.reload();
+        router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
         setActionMsg(data?.error || 'Error enviant');
@@ -125,7 +127,7 @@ export default function ProposalsList({
       if (res.ok) {
         setActionMsg(`Estat canviat a ${STATUS_CONFIG[status]?.label || status}`);
         setTimeout(() => setActionMsg(null), 3000);
-        window.location.reload();
+        router.refresh();
       }
     } catch {
       setActionMsg('Error canviant estat');

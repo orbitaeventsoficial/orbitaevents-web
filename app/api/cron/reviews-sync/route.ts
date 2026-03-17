@@ -8,7 +8,7 @@ import { writeGoogleReviewsCache } from '@/lib/services/googleReviewsCacheServic
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-const PLACE_ID = 'ChIJe39Xr8t/iUcRdyBu8A2xdLM';
+const PLACE_ID = process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID || 'ChIJe39Xr8t/iUcRdyBu8A2xdLM';
 
 function isAuthorized(request: NextRequest, requestId: string): boolean {
   const authHeader = request.headers.get('authorization');

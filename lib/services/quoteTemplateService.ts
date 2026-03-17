@@ -90,7 +90,7 @@ export async function upsertQuoteTemplateSettings(input: QuoteTemplateSettings):
       description: 'Configuració visual i operativa dels pressupostos enviats',
     },
   }).catch(() => {
-    throw new Error('No se pudo guardar la plantilla de presupuesto');
+    throw new Error('No s\'ha pogut desar la plantilla de pressupost');
   });
 
   await prisma.adminLog.create({

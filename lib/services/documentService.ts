@@ -95,7 +95,7 @@ const COMPANY_INFO = {
   phone: SITE_CONFIG.business.phone,
   phoneDisplay: SITE_CONFIG.business.phoneDisplay,
   email: SITE_CONFIG.business.email,
-  web: 'www.orbitaevents.com',
+  web: `www.${SITE_CONFIG.web.domain}`,
   logoUrl: `${(getAppBaseUrl()).replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`,
   iban: process.env.COMPANY_IBAN || 'Pendent de configurar',
 };

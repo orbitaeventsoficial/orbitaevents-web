@@ -20,7 +20,7 @@ import {
   CONDITION_LABELS,
   calculateLifeRemainingPercent,
 } from '@/lib/inventory-utils';
-import { formatNumber } from '@/lib/constants';
+import { formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
@@ -535,7 +535,7 @@ export default function InventoryListClient() {
                   </div>
                   {item.purchasePrice && (
                     <p className="text-[11px]">
-                      Resten aprox. {Math.max(0, (item.expectedLifeHours || 2000) - item.totalHoursUsed).toFixed(0)}h útils
+                      Resten aprox. {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h útils
                     </p>
                   )}
                   {/* Barra de vida */}
@@ -609,7 +609,7 @@ export default function InventoryListClient() {
                           <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
                           {item.purchasePrice && (
                             <p className="">
-                              ↓ {Math.max(0, (item.expectedLifeHours || 2000) - item.totalHoursUsed).toFixed(0)}h restants
+                              ↓ {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h restants
                             </p>
                           )}
                         </div>

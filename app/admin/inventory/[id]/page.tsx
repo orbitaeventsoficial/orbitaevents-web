@@ -13,7 +13,7 @@ import {
   STATUS_CONFIG,
   CONDITION_LABELS,
 } from '@/lib/inventory-utils';
-import { formatDate, formatNumber } from '@/lib/constants';
+import { formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
@@ -93,7 +93,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
   const currentValue = calculateCurrentValue(item.purchasePrice, item.totalHoursUsed, item.expectedLifeHours);
   const costPerHour = calculateCostPerHour(item.purchasePrice, item.expectedLifeHours);
   const lifeRemaining = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
-  const expectedLifeHours = item.expectedLifeHours || 2000;
+  const expectedLifeHours = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
   const remainingHours = Math.max(0, expectedLifeHours - item.totalHoursUsed);
 
   return (
@@ -122,7 +122,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             {formatNumber(item.totalHoursUsed)}h
           </p>
           <p className="text-xs mt-1">
-            de {formatNumber(item.expectedLifeHours || 2000)}h vida útil
+            de {formatNumber(item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS)}h vida útil
           </p>
         </div>
         <div className="rounded-2xl border admin-card-glass p-4">

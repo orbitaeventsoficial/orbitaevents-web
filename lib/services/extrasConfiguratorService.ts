@@ -64,7 +64,7 @@ export async function saveExtrasConfiguratorConfig(input: unknown): Promise<Extr
       type: 'JSON',
       category: 'config',
       label: 'Extras configurador',
-      description: 'Listado de extras mostrado en el configurador',
+      description: 'Llistat d\'extras mostrat al configurador',
     },
     update: {
       value: JSON.stringify(config),

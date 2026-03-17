@@ -3,6 +3,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { getAppBaseUrl } from '@/lib/site';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import {
   generatePostEventEmail,
   getPostEventSubject,
@@ -82,7 +83,7 @@ export async function sendPostEventEmailForBooking(
   const name = booking.clientName;
   const locale = normalizeLocale(booking.lead?.preferredLocale || booking.preferredLocale);
 
-  if (!email || email.includes('@leads.orbitaevents.local')) {
+  if (!email || email.includes(PLACEHOLDER_EMAIL_DOMAIN)) {
     return {
       bookingId: booking.id,
       clientName: name,

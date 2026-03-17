@@ -52,11 +52,11 @@ const EVENT_TYPE_CARDS: Array<{
 ];
 // ─── Ambient visual per tipus d'event ─────────────────────────────────────
 
-const EVENT_AMBIENTS: Record<EventType, { glow: string }> = {
-  bodas: { glow: 'rgba(244,63,94,0.06)' },
-  fiestas: { glow: 'rgba(217,70,239,0.06)' },
-  discomovil: { glow: 'rgba(34,211,238,0.06)' },
-  empresas: { glow: 'rgba(59,130,246,0.06)' },
+const EVENT_AMBIENTS: Record<EventType, { glow: string; gradient: string; accent: string; accentBorder: string }> = {
+  bodas: { glow: 'rgba(244,63,94,0.08)', gradient: 'from-rose-500/10 via-pink-500/5 to-transparent', accent: 'text-rose-400', accentBorder: 'border-rose-500/30' },
+  fiestas: { glow: 'rgba(217,70,239,0.08)', gradient: 'from-purple-500/10 via-fuchsia-500/5 to-transparent', accent: 'text-fuchsia-400', accentBorder: 'border-fuchsia-500/30' },
+  discomovil: { glow: 'rgba(34,211,238,0.08)', gradient: 'from-cyan-500/10 via-blue-500/5 to-transparent', accent: 'text-cyan-400', accentBorder: 'border-cyan-500/30' },
+  empresas: { glow: 'rgba(59,130,246,0.08)', gradient: 'from-blue-500/10 via-indigo-500/5 to-transparent', accent: 'text-blue-400', accentBorder: 'border-blue-500/30' },
 };
 
 function getPacksForEventType(packs: PackDefinition[], eventType: EventType | null): PackDefinition[] {
@@ -1295,16 +1295,57 @@ export default function ConfiguradorClient() {
   };
 
   const ambient = config.eventType ? EVENT_AMBIENTS[config.eventType] : null;
+  const showStickyPrice = step >= 2 && config.selectedPack && step < 4;
 
   return (
     <div className="relative min-h-screen bg-bg-main py-20 overflow-x-hidden">
       {/* Ambient background glow — changes per event type */}
       {ambient && (
-        <div
-          className="fixed inset-0 pointer-events-none transition-opacity duration-1000 opacity-100"
-          style={{ background: `radial-gradient(ellipse at 50% 0%, ${ambient.glow}, transparent 60%)` }}
-        />
+        <>
+          <div
+            className="fixed inset-0 pointer-events-none transition-all duration-1000 opacity-100"
+            style={{ background: `radial-gradient(ellipse at 50% 0%, ${ambient.glow}, transparent 60%)` }}
+          />
+          <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 bg-gradient-to-b ${ambient.gradient}`} />
+        </>
       )}
+
+      {/* Sticky price bar — visible from step 2 onwards */}
+      {showStickyPrice && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 backdrop-blur-xl">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-white/60 text-sm hidden sm:inline">
+                {config.selectedPack?.name}
+              </span>
+              {config.extras.length > 0 && (
+                <span className="text-white/40 text-xs">
+                  +{config.extras.length} extras
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              {hasPricingDiscount && (
+                <span className="text-white/40 text-sm line-through">
+                  {pricing.subtotal}€
+                </span>
+              )}
+              <span className="text-2xl font-black text-oe-gold">
+                {pricing.total}€
+              </span>
+              {step === 3 && (
+                <button
+                  onClick={() => { setStep(4); track('Configurador_Step3_Continue'); }}
+                  className="px-5 py-2 rounded-xl bg-oe-gold text-black font-bold text-sm hover:bg-oe-gold-bright transition-colors"
+                >
+                  {t('step3.continue')}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ProgressStepsNav
           currentStep={step}
@@ -1317,6 +1358,9 @@ export default function ConfiguradorClient() {
         {step === 3 && renderStep3()}
         {step === 4 && renderStep4()}
       </div>
+
+      {/* Bottom spacing for sticky bar */}
+      {showStickyPrice && <div className="h-16" />}
     </div>
   );
 }

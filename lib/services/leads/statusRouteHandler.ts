@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 
 const VALID_STATUSES = [
   'NEW',
@@ -61,7 +62,7 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
 
     let linkedCustomerId = existingLead.customerId ?? null;
 
-    if (!linkedCustomerId && existingLead.email && !existingLead.email.endsWith('@leads.orbitaevents.local')) {
+    if (!linkedCustomerId && existingLead.email && !existingLead.email.endsWith(PLACEHOLDER_EMAIL_DOMAIN)) {
       const emailNormalized = normalizeEmail(existingLead.email);
       const phoneNormalized = existingLead.phone ? normalizePhone(existingLead.phone) : null;
       const nameNormalized = normalizeName(existingLead.name);

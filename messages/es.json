@@ -2045,6 +2045,31 @@
       "q3": "¿Cómo puedo dejar una reseña?",
       "a3": "Puedes dejar tu reseña en nuestro perfil de Google Business o enviarla por correo a {email}. Cada opinión cuenta y nos ayuda a mejorar.",
       "a3WithGoogleUrl": "Puedes hacerlo desde nuestro perfil de Google Business o enviándola por correo a {email}. Cada opinión cuenta y nos ayuda a seguir mejorando."
+    },
+    "ui": {
+      "verifiedBadge": "Verificado",
+      "heroBadge": "⭐ Reseñas verificadas",
+      "heroTitlePrefix": "Lo que dicen",
+      "heroTitleAccent": "nuestros clientes",
+      "ratingWord": "valoración",
+      "reviewsWord": "reseñas",
+      "introWithCount": "Más de {count} familias y empresas han confiado en nosotros. Lee sus experiencias y, si ya nos conoces, deja la tuya.",
+      "introNoCount": "Familias y empresas han confiado en nosotros. Lee sus experiencias y, si ya nos conoces, deja la tuya.",
+      "knownTitle": "¿Ya nos conoces?",
+      "knownDescription": "Deja tu valoración y obtén hasta un 25% de descuento para tu próximo evento",
+      "knownButton": "Dejar mi opinión y obtener descuento",
+      "webOpinionsTitle": "Opiniones de nuestra web",
+      "webOpinionsSubtitle": "Testimonios verificados de clientes",
+      "googleTitle": "Reseñas de Google",
+      "googleSubtitle": "Opiniones verificadas de Google Business",
+      "googleCta": "Ver todas en Google",
+      "emptyState": "¡Aún no hay reseñas disponibles. Sé el primero en dejar tu opinión!",
+      "finalTitlePrefix": "¿Quieres vivir una experiencia",
+      "finalTitleAccent": "inolvidable",
+      "finalWithCount": "Únete a las más de {count} familias que han confiado en nosotros",
+      "finalNoCount": "Únete a las familias que han confiado en nosotros",
+      "configureEvent": "Configura tu evento",
+      "contact": "Contactar"
     }
   },
   "reviews": {
@@ -3983,6 +4008,7 @@
     },
     "viewCalendar": "Ver calendario completo",
     "socialPressure": "8 personas mirando fechas esta semana",
+    "saturdaysWarning": "¡Solo quedan {count} sábados libres!",
     "earlyBird": "Reserva en {days} días y ahorra un 15%",
     "modal": {
       "whatsappMsg": "Hola! Quiero reservar la fecha {date} para mi evento. ¿Podéis enviarme más información?"
@@ -5263,7 +5289,9 @@
           "title": "Eventos corporativos",
           "desc": "Producción técnica profesional para empresas y marcas"
         }
-      }
+      },
+      "viewStory": "Ver story",
+      "swipeHint": "Desliza para ver más"
     }
   },
   "privacyPortal": {

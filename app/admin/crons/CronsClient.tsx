@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../components/ToastProvider';
+import { formatDateTimeFull } from '@/lib/constants';
 
 interface CronInfo {
   id: string;
@@ -150,7 +151,7 @@ export default function CronsClient() {
                   {cron.lastRun && (
                     <div className="flex gap-2">
                       <span className="text-white/40 w-24 flex-shrink-0">Últim run:</span>
-                      <span>{new Date(cron.lastRun).toLocaleString('ca-ES')}</span>
+                      <span>{formatDateTimeFull(cron.lastRun)}</span>
                     </div>
                   )}
                   {cron.lastStatus && (

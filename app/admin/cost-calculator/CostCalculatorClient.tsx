@@ -135,12 +135,12 @@ export default function CostCalculatorClient() {
         }),
       });
       if (!res.ok) throw new Error();
-      toast.success('Pressupost guardat');
+      toast.success('Pressupost desat');
       setQuoteName('');
       setClientName('');
       setComponents([]);
     } catch {
-      toast.error('Error guardant');
+      toast.error('Error desant');
     } finally {
       setSaving(false);
     }
@@ -303,7 +303,7 @@ export default function CostCalculatorClient() {
                   onClick={handleSave} disabled={saving}
                   className="px-6 py-2.5 rounded-xl text-black font-bold transition-colors disabled:opacity-50"
                 >
-                  {saving ? 'Guardant...' : 'Guardar pressupost'}
+                  {saving ? 'Desant...' : 'Desar pressupost'}
                 </button>
               </div>
             </div>

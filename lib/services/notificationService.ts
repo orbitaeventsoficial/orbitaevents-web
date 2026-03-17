@@ -8,7 +8,7 @@
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { getEventLabel, SOURCE_LABELS } from '@/lib/constants';
+import { getEventLabel, SOURCE_LABELS, formatDateSimple, formatDate, formatCurrency } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import { absoluteUrl } from '@/lib/site';
 
@@ -147,7 +147,7 @@ ${lead.email.includes('temp-') ? '' : `📧 ${lead.email}`}
 ${lead.phone ? `📱 ${lead.phone}` : ''}
 
 🎉 *${eventLabel}*
-${lead.eventDate ? `📅 ${new Date(lead.eventDate).toLocaleDateString('ca-ES')}` : ''}
+${lead.eventDate ? `📅 ${formatDateSimple(lead.eventDate)}` : ''}
 ${lead.guestCount ? `👥 ${lead.guestCount} convidats` : ''}
 ${lead.budget ? `💰 ${lead.budget}` : ''}
 
@@ -375,7 +375,7 @@ function generateAdminEmailHTML(
         ${lead.eventDate ? `
         <div class="stat-box">
           <div class="stat-value">📅</div>
-          <div class="stat-label">${new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+          <div class="stat-label">${formatDate(lead.eventDate)}</div>
         </div>
         ` : ''}
         ${lead.guestCount ? `
@@ -399,7 +399,7 @@ function generateAdminEmailHTML(
       <div class="highlight-box">
         <div class="field-label">Pack Seleccionat</div>
         <div class="field-value">${escapeHtml(lead.packName)}</div>
-        ${lead.estimatedPrice ? `<div class="price">${lead.estimatedPrice.toLocaleString('ca-ES')}€</div>` : ''}
+        ${lead.estimatedPrice ? `<div class="price">${formatCurrency(lead.estimatedPrice)}</div>` : ''}
       </div>
       ` : ''}
 

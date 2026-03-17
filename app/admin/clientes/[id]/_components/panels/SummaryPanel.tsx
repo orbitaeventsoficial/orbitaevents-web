@@ -78,7 +78,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || !payload?.ok) {
-        throw new Error(payload?.error || "No s'ha pogut guardar");
+        throw new Error(payload?.error || "No s'ha pogut desar");
       }
       setEditing(false);
       router.refresh();

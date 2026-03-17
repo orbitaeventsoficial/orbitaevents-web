@@ -149,7 +149,7 @@ function TaskColumn({
                   disabled={busyTaskId === task.id}
                   className="rounded border px-2 py-1 text-xs disabled:opacity-60"
                 >
-                  {busyTaskId === task.id ? 'Guardant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}
+                  {busyTaskId === task.id ? 'Desant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}
                 </button>
                 <button
                   type="button"

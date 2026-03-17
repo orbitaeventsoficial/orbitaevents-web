@@ -217,10 +217,10 @@ function extractRequestedItems(text: string): string | undefined {
 
 function inferIntent(text: string): string {
   const input = text.toLowerCase();
-  if (/(contratar|contractar|reserva|cerrar|tancar|confirmar)/.test(input)) return 'Contratación';
-  if (/(presupuesto|pressupost|quote|precio|preu)/.test(input)) return 'Solicitud de presupuesto';
-  if (/(info|informaci[oó]n|consulta|consultar)/.test(input)) return 'Solicitud de información';
-  return 'Contacto comercial';
+  if (/(contratar|contractar|reserva|cerrar|tancar|confirmar)/.test(input)) return 'Contractació';
+  if (/(presupuesto|pressupost|quote|precio|preu)/.test(input)) return 'Sol·licitud de pressupost';
+  if (/(info|informaci[oó]n|consulta|consultar)/.test(input)) return 'Sol·licitud d\'informació';
+  return 'Contacte comercial';
 }
 
 function buildCommercialSummary(text: string): string | undefined {

@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { VIP_SPEND_THRESHOLD } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import ExportCsvButton from '../components/ExportCsvButton';
@@ -205,7 +206,7 @@ export default function AdminContactesPage() {
         source: item.source ? String(item.source).toLowerCase() : undefined,
         total_events: typeof item.totalEvents === 'number' ? item.totalEvents : 0,
         total_spent: typeof item.totalSpent === 'number' ? item.totalSpent : 0,
-        is_vip: typeof item.totalSpent === 'number' ? item.totalSpent >= 2000 : false,
+        is_vip: typeof item.totalSpent === 'number' ? item.totalSpent >= VIP_SPEND_THRESHOLD : false,
         created_at: String(item.createdAt || ''),
       }));
 

@@ -119,3 +119,12 @@ export const getEnv = {
   siteUrl: () => getSiteUrl(),
   databaseUrl: () => process.env.DATABASE_URL,
 };
+
+// ── Integration checks ──────────────────────────────────────────────
+export function isImapConfigured(): boolean {
+  return !!(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
+}
+
+export function isSmtpConfigured(): boolean {
+  return !!(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM);
+}

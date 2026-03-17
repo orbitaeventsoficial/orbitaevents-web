@@ -15,7 +15,7 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
       name: 'Servei DJ Professional',
       price: 500,
       djHours: 4,
-      extraHourPrice: 80,
+      extraHourPrice: 75,
       description: 'Servei DJ complet amb so i il·luminació',
     };
   }
@@ -24,7 +24,7 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
     name: pack.name,
     price: pack.priceValue ?? 500,
     djHours: pack.durationHours ?? 4,
-    extraHourPrice: 80,
+    extraHourPrice: pack.extraHourPrice ?? 75,
     description: pack.emotion || pack.tagline || pack.name,
   };
 }

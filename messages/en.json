@@ -2045,6 +2045,31 @@
       "q3": "How can I leave a review?",
       "a3": "You can leave your review on our Google Business profile or send it by email to {email}. Every opinion counts and helps us improve.",
       "a3WithGoogleUrl": "You can do it from our Google Business profile or by sending it by email to {email}. Every opinion counts and helps us continue improving."
+    },
+    "ui": {
+      "verifiedBadge": "Verified",
+      "heroBadge": "⭐ Verified reviews",
+      "heroTitlePrefix": "What",
+      "heroTitleAccent": "our clients say",
+      "ratingWord": "rating",
+      "reviewsWord": "reviews",
+      "introWithCount": "Over {count} families and companies have trusted us. Read their experiences and, if you already know us, share yours.",
+      "introNoCount": "Families and companies have trusted us. Read their experiences and, if you already know us, share yours.",
+      "knownTitle": "Already worked with us?",
+      "knownDescription": "Leave your review and get up to 25% off your next event",
+      "knownButton": "Leave my review and get a discount",
+      "webOpinionsTitle": "Reviews from our website",
+      "webOpinionsSubtitle": "Verified customer testimonials",
+      "googleTitle": "Google reviews",
+      "googleSubtitle": "Verified reviews from Google Business",
+      "googleCta": "View all on Google",
+      "emptyState": "No reviews are available yet. Be the first to share your experience.",
+      "finalTitlePrefix": "Want to live an",
+      "finalTitleAccent": "unforgettable experience",
+      "finalWithCount": "Join the {count}+ families that have trusted us",
+      "finalNoCount": "Join the families that have trusted us",
+      "configureEvent": "Build your event",
+      "contact": "Contact"
     }
   },
   "reviews": {
@@ -3983,6 +4008,7 @@
     },
     "viewCalendar": "See full calendar",
     "socialPressure": "8 people checking dates this week",
+    "saturdaysWarning": "Only {count} free Saturdays left!",
     "earlyBird": "Book within {days} days and save 15%",
     "modal": {
       "whatsappMsg": "Hello! I want to book the date {date} for my event. Can you send me more information?"
@@ -5263,7 +5289,9 @@
           "title": "Corporate events",
           "desc": "Professional technical production for companies and brands"
         }
-      }
+      },
+      "viewStory": "View story",
+      "swipeHint": "Swipe to see more"
     }
   },
   "privacyPortal": {

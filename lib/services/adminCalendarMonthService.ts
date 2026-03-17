@@ -6,7 +6,7 @@ type CalendarDay = {
     leadId: string | null;
     customerId: string | null;
     fechaEvento: string;
-    clienteNombre: string | null;
+    clientName: string | null;
     ubicacion: string | null;
     estado: string | null;
     eventType: string | null;
@@ -101,7 +101,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
       leadId: booking.leadId ?? null,
       customerId: booking.customerId ?? null,
       fechaEvento: booking.eventDate.toISOString(),
-      clienteNombre: booking.clientName,
+      clientName: booking.clientName,
       ubicacion: booking.eventVenue || booking.eventLocation,
       estado: booking.status,
       eventType: booking.eventType,

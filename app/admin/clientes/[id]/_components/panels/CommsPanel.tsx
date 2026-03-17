@@ -29,12 +29,12 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || !payload?.ok) {
-        throw new Error(payload?.error || 'No s’ha pogut guardar la nota');
+        throw new Error(payload?.error || 'No s’ha pogut desar la nota');
       }
       setNote('');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error guardant la nota');
+      setError(err instanceof Error ? err.message : 'Error desant la nota');
     } finally {
       setSaving(false);
     }
@@ -96,7 +96,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             disabled={saving || !note.trim()}
             className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
           >
-            {saving ? 'Guardant...' : 'Desa nota'}
+            {saving ? 'Desant...' : 'Desa nota'}
           </button>
         </div>
       </div>

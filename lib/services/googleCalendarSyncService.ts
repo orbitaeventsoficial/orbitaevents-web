@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { formatCurrency } from '@/lib/constants';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_CAL_API = 'https://www.googleapis.com/calendar/v3';
@@ -88,7 +89,7 @@ function buildEventPayload(booking: BookingData) {
     `Email: ${booking.clientEmail}`,
     `Tel: ${booking.clientPhone}`,
     `Estat CRM: ${booking.status}`,
-    `Total: ${booking.total.toLocaleString('ca-ES')}€`,
+    `Total: ${formatCurrency(booking.total)}`,
     `Cobrament: ${paymentStatus}`,
     booking.notes ? `Notes: ${booking.notes}` : null,
   ]
@@ -136,7 +137,7 @@ async function getAccessToken(refreshToken: string): Promise<string> {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   if (!clientId || !clientSecret) {
-    throw new Error('Google OAuth client no configurado');
+    throw new Error('Google OAuth client no configurat');
   }
 
   const body = new URLSearchParams({
@@ -216,7 +217,7 @@ export async function syncBookingToGoogleCalendar(
       ok: false,
       status: 'error',
       bookingId,
-      error: 'Reserva no encontrada',
+      error: 'Reserva no trobada',
     };
   }
 

@@ -5,6 +5,7 @@ import { verifyCsrf } from '@/lib/csrf';
 import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { getAdminProposalById, updateAdminProposal } from '@/lib/services/proposalAdminService';
+import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
 import { z } from 'zod';
 
 const updateProposalSchema = z.object({
@@ -59,6 +60,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const result = await updateAdminProposal(params.id, parsed.data);
+
+    // Auto-trigger: proposal accepted → generate contract
+    if (parsed.data.acceptedAt || parsed.data.status === 'ACCEPTED') {
+      dispatchAutoTrigger({ type: 'proposal.accepted', proposalId: params.id }).catch(() => {});
+    }
+
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     log.error('Error actualitzant pressupost', error, {

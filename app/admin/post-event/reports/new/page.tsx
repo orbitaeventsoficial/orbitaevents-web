@@ -290,7 +290,7 @@ export default function NewReportPage() {
             disabled={loading}
             className="flex-1 px-6 py-3 text-white rounded-xl font-medium disabled:opacity-50"
           >
-            {loading ? 'Guardant...' : '💾 Desar Informe'}
+            {loading ? 'Desant...' : 'Desar informe'}
           </button>
           <Link
             href="/admin/post-event"

@@ -67,8 +67,8 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
     await createUniversalTask({
       customerId: lead.customerId || null,
       leadId: lead.id,
-      title: '[AUTO][SLA] Contactar lead en riesgo',
-      description: `Lead NEW con más de ${SLA_HOURS}h sin contacto. Ejecutar llamada/WhatsApp hoy.`,
+      title: '[AUTO][SLA] Contactar lead en risc',
+      description: `Lead NEW amb més de ${SLA_HOURS}h sense contacte. Executar trucada/WhatsApp avui.`,
       dueDate: due,
       priority: 'URGENT',
       status: 'OPEN',
@@ -80,8 +80,8 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
       data: {
         leadId: lead.id,
         type: 'TASK',
-        title: 'SLA incumplido: tarea automática creada',
-        description: `Se crea tarea automática al superar ${SLA_HOURS}h en estado NEW.`,
+        title: 'SLA incomplert: tasca automàtica creada',
+        description: `Es crea tasca automàtica en superar ${SLA_HOURS}h en estat NEW.`,
         createdBy: 'SLA Bot',
         metadata: { slaHours: SLA_HOURS },
       },

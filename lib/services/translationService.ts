@@ -229,3 +229,7 @@ export function detectContentLanguage(text: string): DetectSuccess | DetectFailu
     detectedLanguage: detectLanguage(text),
   };
 }
+
+// Aliases — anteriorment duplicats a adminTranslationService.ts
+export { translateContent as translateAdminContent };
+export { detectContentLanguage as detectAdminContentLanguage };

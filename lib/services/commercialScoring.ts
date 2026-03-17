@@ -56,21 +56,21 @@ export function scoreLead(input: ScoreInput): LeadScoreResult {
   const budget = parseBudgetValue(input.budget);
   if (budget >= 2000) {
     score += 14;
-    reasons.push('Budget alto');
+    reasons.push('Pressupost alt');
   } else if (budget >= 800) {
     score += 8;
-    reasons.push('Budget medio');
+    reasons.push('Pressupost mitjà');
   } else if (budget > 0) {
     score += 3;
   } else {
-    riskFlags.push('Sin presupuesto');
+    riskFlags.push('Sense pressupost');
   }
 
   if (input.phone) {
     score += 8;
-    reasons.push('Tiene teléfono');
+    reasons.push('Té telèfon');
   } else {
-    riskFlags.push('Sin teléfono');
+    riskFlags.push('Sense telèfon');
   }
 
   if (input.eventDate) {
@@ -79,16 +79,16 @@ export function scoreLead(input: ScoreInput): LeadScoreResult {
     );
     if (daysToEvent >= 7 && daysToEvent <= 120) {
       score += 10;
-      reasons.push('Fecha viable');
+      reasons.push('Data viable');
     } else if (daysToEvent < 0) {
       score -= 20;
-      riskFlags.push('Evento en pasado');
+      riskFlags.push('Esdeveniment passat');
     } else if (daysToEvent <= 3) {
       score -= 6;
-      riskFlags.push('Evento muy inminente');
+      riskFlags.push('Esdeveniment molt imminent');
     }
   } else {
-    riskFlags.push('Sin fecha de evento');
+    riskFlags.push('Sense data d\'esdeveniment');
   }
 
   if (input.eventLocation) score += 4;
@@ -98,15 +98,15 @@ export function scoreLead(input: ScoreInput): LeadScoreResult {
   const staleHours = (Date.now() - new Date(input.updatedAt).getTime()) / (1000 * 60 * 60);
   if (staleHours > 72 && !['WON', 'LOST'].includes(input.status)) {
     score -= 12;
-    riskFlags.push('Sin seguimiento 72h+');
+    riskFlags.push('Sense seguiment 72h+');
   } else if (staleHours > 24 && ['NEW', 'CONTACTED'].includes(input.status)) {
     score -= 6;
-    riskFlags.push('Seguimiento lento');
+    riskFlags.push('Seguiment lent');
   }
 
   if (input.source === 'REFERRAL') {
     score += 6;
-    reasons.push('Lead referido');
+    reasons.push('Lead referit');
   }
   if (input.source === 'WHATSAPP') score += 2;
 

@@ -5,6 +5,7 @@ import StatusQuickSelect from './components/StatusQuickSelect';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
 import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants';
 import { EVENT_TYPE_LABELS } from '@/lib/constants';
+import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
 
 interface RadialProgressProps {
   value: number;        // 0-100
@@ -464,6 +465,29 @@ export const dynamic = 'force-dynamic';
 export default async function AdminDashboard() {
   const d = await fetchDashboardData();
 
+  const insights = generateDashboardInsights({
+    leadsThisMonth: d.leadsThisMonth,
+    staleLeadsCount: d.staleLeadsCount,
+    hotLeadsCount: d.hotLeadsCount,
+    conversionRate: d.conversionRate,
+    bookingsConfirmed: d.bookingsConfirmed,
+    bookingsThisMonth: d.bookingsThisMonth,
+    avgMarginPct: d.avgMarginPct,
+    cashFlowNet30: d.cashFlowNet30,
+    pipelineWeighted30: d.pipelineWeighted30,
+    pendingPayments: d.pendingPayments,
+    revenueThisMonth: d.revenueThisMonth,
+    revenueTarget: d.revenueTarget,
+    nextEvent: d.nextEvent ? {
+      daysUntil: d.nextEvent.daysUntil,
+      clientName: d.nextEvent.clientName,
+      depositPaid: d.nextEvent.depositPaid,
+      remainingPaid: d.nextEvent.remainingPaid,
+    } : null,
+    inventoryMaintenance: d.inventoryMaintenance,
+    inventoryBroken: d.inventoryBroken,
+  });
+
   const pilotToday = [
     {
       id: 'leads',
@@ -803,6 +827,27 @@ export default async function AdminDashboard() {
           <Link href="/admin/ressenyes" className="admin-cr-banner-action">
             <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
+        </div>
+      )}
+
+      {/* ─── Insights narratius ─────────────────────────────────────── */}
+      {insights.length > 0 && (
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 space-y-3">
+          <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Què necessites saber avui</p>
+          {insights.map((insight) => {
+            const colors = {
+              success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+              warning: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+              danger: 'bg-red-500/10 border-red-500/20 text-red-400',
+              info: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+            };
+            return (
+              <div key={insight.id} className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${colors[insight.type]}`}>
+                <span className="text-lg flex-shrink-0">{insight.icon}</span>
+                <p className="text-sm font-medium leading-relaxed">{insight.text}</p>
+              </div>
+            );
+          })}
         </div>
       )}
 

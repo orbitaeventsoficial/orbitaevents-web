@@ -1,6 +1,5 @@
 /**
- * API: Sincronizar Packs del Config a la Base de Datos
- * ====================================================
+ * API: Sincronitzar Packs del Config a la Base de Dades
  * POST /api/admin/packs/sync
  */
 
@@ -18,8 +17,8 @@ export async function POST(req: NextRequest) {
   try {
     return NextResponse.json(await syncAdminPacksFromConfig());
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error sincronizando packs';
-    log.error('Error en sincronización de packs:', error);
+    const message = error instanceof Error ? error.message : 'Error sincronitzant packs';
+    log.error('Error en sincronització de packs:', error);
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }

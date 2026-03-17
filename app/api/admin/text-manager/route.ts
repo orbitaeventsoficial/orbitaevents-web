@@ -11,9 +11,9 @@ export async function GET(req: NextRequest) {
   try {
     return NextResponse.json(await getTextManagerPayload());
   } catch (error) {
-    log.error('Error leyendo textos:', error);
+    log.error('Error llegint textos:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error leyendo archivos de traducción' },
+      { ok: false, error: 'Error llegint fitxers de traducció' },
       { status: 500 }
     );
   }
@@ -32,9 +32,9 @@ export async function PUT(req: NextRequest) {
     });
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
-    log.error('Error guardando textos:', error);
+    log.error('Error desant textos:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error guardando modificaciones' },
+      { ok: false, error: 'Error desant modificacions' },
       { status: 500 }
     );
   }
@@ -53,9 +53,9 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json(result);
   } catch (error) {
-    log.error('Error en operación:', error);
+    log.error('Error en operació:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error en operación' },
+      { ok: false, error: 'Error en l\'operació' },
       { status: 500 }
     );
   }

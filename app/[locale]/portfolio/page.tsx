@@ -7,6 +7,7 @@ import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { getTranslations } from 'next-intl/server';
 import { getSiteUrl } from '@/lib/site';
 
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;

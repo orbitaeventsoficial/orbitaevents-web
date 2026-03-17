@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { issueClientPortalAccess, getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { sendEmail } from '@/lib/email';
 import { log } from '@/lib/logger';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 
 function getPortalCopy(locale: string | null | undefined, clientName: string) {
   const loc = (locale || 'ca').toLowerCase();
@@ -35,7 +36,7 @@ function getPortalCopy(locale: string | null | undefined, clientName: string) {
   };
 }
 
-export async function ensureCompletedBookingPortalAccess(options: {
+async function ensureCompletedBookingPortalAccess(options: {
   bookingId: string;
   preferredLocale?: string | null;
   clientEmail?: string | null;
@@ -51,7 +52,7 @@ export async function ensureCompletedBookingPortalAccess(options: {
     createdBy: 'system:auto-completed',
   });
 
-  if (options.clientEmail && !options.clientEmail.includes('@leads.orbitaevents.local')) {
+  if (options.clientEmail && !options.clientEmail.includes(PLACEHOLDER_EMAIL_DOMAIN)) {
     const portalCopy = getPortalCopy(options.preferredLocale, options.clientName);
     await sendEmail({
       to: options.clientEmail,

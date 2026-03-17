@@ -41,7 +41,7 @@ async function testImapCredentials(config: { host: string; port: number; user: s
     });
     await client.connect();
     await client.logout();
-    return { ok: true as const, message: 'Connexió exitosa' };
+    return { ok: true as const, message: 'Connexió correcta' };
   } catch (error) {
     return {
       ok: false as const,

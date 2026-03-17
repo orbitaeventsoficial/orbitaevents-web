@@ -6,138 +6,60 @@ export default function NotFound() {
   const t = useTranslations('notFound');
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#0a0a0a',
-      padding: '1rem'
-    }}>
-      <div style={{
-        maxWidth: '42rem',
-        textAlign: 'center',
-        color: 'white'
-      }}>
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4">
+      <div className="max-w-[42rem] text-center text-white">
         {/* 404 */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{
-            fontSize: '9rem',
-            fontWeight: 900,
-            color: 'rgba(215, 184, 110, 0.2)',
-            margin: 0,
-            marginBottom: '1rem'
-          }}>
+        <div className="mb-8">
+          <h1 className="text-[5rem] sm:text-[9rem] font-black text-[rgba(215,184,110,0.2)] leading-none mb-4">
             404
           </h1>
-          <div style={{
-            width: '6rem',
-            height: '0.25rem',
-            backgroundColor: 'var(--oe-gold)',
-            margin: '0 auto',
-            borderRadius: '9999px'
-          }} />
+          <div className="w-24 h-1 bg-[var(--oe-gold)] mx-auto rounded-full" />
         </div>
 
-        {/* Título */}
-        <h2 style={{
-          fontSize: '2.5rem',
-          fontWeight: 900,
-          marginBottom: '1rem'
-        }}>
+        <h2 className="text-4xl sm:text-[2.5rem] font-black mb-4">
           {t('title')}
         </h2>
 
-        {/* Descripción */}
-        <p style={{
-          fontSize: '1.25rem',
-          color: 'rgba(255, 255, 255, 0.6)',
-          marginBottom: '2rem',
-          lineHeight: '1.75'
-        }}>
+        <p className="text-xl text-white/60 mb-8 leading-relaxed">
           {t('description')}
           <br />
           {t('descriptionExtra')}
         </p>
 
-        {/* Botones */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          marginBottom: '3rem',
-          alignItems: 'center'
-        }}>
+        <div className="flex flex-col gap-4 mb-12 items-center">
           <Link
             href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '1rem 2rem',
-              backgroundColor: 'var(--oe-gold)',
-              color: '#000',
-              fontWeight: 700,
-              borderRadius: '0.75rem',
-              textDecoration: 'none',
-              fontSize: '1.125rem'
-            }}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[var(--oe-gold)] text-black font-bold rounded-xl text-lg no-underline hover:scale-105 hover:shadow-[0_0_30px_rgba(215,184,110,0.5)] transition-all"
           >
             {t('backToHome')}
           </Link>
 
           <Link
             href="/servicios"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '1rem 2rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              color: 'white',
-              fontWeight: 700,
-              borderRadius: '0.75rem',
-              textDecoration: 'none',
-              border: '1px solid rgba(215, 184, 110, 0.3)',
-              fontSize: '1.125rem'
-            }}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 text-white font-bold rounded-xl text-lg no-underline border border-[rgba(215,184,110,0.3)] hover:bg-white/10 transition-colors"
           >
             {t('viewServices')}
           </Link>
         </div>
 
-        {/* Links útiles */}
-        <div style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          paddingTop: '2rem'
-        }}>
-          <p style={{
-            fontSize: '0.875rem',
-            color: 'rgba(255, 255, 255, 0.6)',
-            marginBottom: '1rem'
-          }}>
+        <div className="border-t border-white/10 pt-8">
+          <p className="text-sm text-white/60 mb-4">
             {t('lookingFor')}
           </p>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: '1rem',
-            fontSize: '0.875rem'
-          }}>
-            <Link href="/servicios/bodas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link href="/servicios/bodas" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.djWeddings')}
             </Link>
-            <Link href="/servicios/discomovil" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+            <Link href="/servicios/discomovil" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.discomovil')}
             </Link>
-            <Link href="/servicios/fiestas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+            <Link href="/servicios/fiestas" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.parties')}
             </Link>
-            <Link href="/servicios/empresas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+            <Link href="/servicios/empresas" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.corporate')}
             </Link>
-            <Link href="/contacto" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+            <Link href="/contacto" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.contact')}
             </Link>
           </div>

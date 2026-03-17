@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
+import { formatDateTimeFull } from '@/lib/constants';
 
 interface LeadSnapshotInput {
   lead: {
@@ -144,7 +145,7 @@ export async function processLeadTechnicalSnapshot(input: {
   });
 
   if (!lead) {
-    return { status: 404, body: { ok: false, error: 'Lead no encontrado' } };
+    return { status: 404, body: { ok: false, error: 'Lead no trobat' } };
   }
 
   const snapshotJson = serializeLeadTechnicalSnapshot({
@@ -185,7 +186,7 @@ export async function processLeadTechnicalSnapshot(input: {
   });
 
   if (input.action === 'save_document') {
-    const title = `Snapshot tècnic ${new Date().toLocaleString('ca-ES')}`;
+    const title = `Snapshot tècnic ${formatDateTimeFull(new Date())}`;
     const fileUrl = `data:application/json;charset=utf-8,${encodeURIComponent(snapshotJson)}`;
     const doc = await prisma.leadDocument.create({
       data: {
@@ -204,7 +205,7 @@ export async function processLeadTechnicalSnapshot(input: {
       data: {
         leadId: lead.id,
         type: 'DOCUMENT',
-        title: 'Snapshot técnico guardado',
+        title: 'Instantània tècnica desada',
         description: title,
         metadata: { documentId: doc.id },
         createdBy: 'Sistema',
@@ -215,7 +216,7 @@ export async function processLeadTechnicalSnapshot(input: {
   }
 
   const recipient = input.recipient || process.env.CONTACT_TO?.trim() || SITE_CONFIG.business.email;
-  const subject = `Snapshot técnico lead ${lead.name} (${lead.id})`;
+  const subject = `Instantània tècnica lead ${lead.name} (${lead.id})`;
 
   await sendEmail({
     to: recipient,
@@ -232,8 +233,8 @@ export async function processLeadTechnicalSnapshot(input: {
     data: {
       leadId: lead.id,
       type: 'EMAIL',
-      title: 'Snapshot técnico enviado',
-      description: `Enviado a ${recipient}`,
+      title: 'Instantània tècnica enviada',
+      description: `Enviat a ${recipient}`,
       metadata: { recipient, kind: 'technical_snapshot' },
       createdBy: 'Sistema',
     },
@@ -242,7 +243,7 @@ export async function processLeadTechnicalSnapshot(input: {
   await prisma.leadNote.create({
     data: {
       leadId: lead.id,
-      content: `📩 Snapshot técnico enviado a ${recipient}`,
+      content: `📩 Instantània tècnica enviada a ${recipient}`,
     },
   });
 

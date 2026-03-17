@@ -179,7 +179,7 @@ export default function PricingAdminPage() {
       }
     } catch (error) {
       log.error('Error:', error);
-      setMessage({ type: 'error', text: 'Error guardant preu' });
+      setMessage({ type: 'error', text: 'Error desant preu' });
     }
     setSaving(false);
   }

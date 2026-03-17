@@ -100,11 +100,11 @@ export default function ExtrasConfiguratorClient() {
       });
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
-        throw new Error(payload?.error || 'Error guardant');
+        throw new Error(payload?.error || 'Error desant');
       }
       setIsDefault(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error guardant');
+      setError(err instanceof Error ? err.message : 'Error desant');
     } finally {
       setSaving(false);
     }
@@ -146,7 +146,7 @@ export default function ExtrasConfiguratorClient() {
             disabled={saving}
             className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {saving ? 'Guardant…' : 'Desar canvis'}
+            {saving ? 'Desant…' : 'Desar canvis'}
           </button>
         </div>
       </div>

@@ -1005,7 +1005,7 @@ export default function PresupuestoPdfStudio({
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
-      throw new Error(data?.error || 'No s\'ha pogut guardar el pressupost');
+      throw new Error(data?.error || 'No s\'ha pogut desar el pressupost');
     }
     if (!proposalId && data?.proposal?.id) {
       setProposalId(data.proposal.id);
@@ -1568,7 +1568,7 @@ export default function PresupuestoPdfStudio({
         {isCustomerScoped && (
           <div className="rounded-xl border px-3 py-2 text-xs">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
-            {autosaving ? ' Guardant...' : autosaveTick > 0 ? ' Guardat.' : ''}
+            {autosaving ? ' Desant...' : autosaveTick > 0 ? ' Desat.' : ''}
             <div className="mt-2 flex items-center gap-2 text-[11px]">
               <input id="brand-override" type="checkbox" checked={allowBrandOverride} onChange={(e) => setAllowBrandOverride(e.target.checked)} />
               <label htmlFor="brand-override" className="cursor-pointer">Permetre override de marca/logo només per aquest pressupost</label>

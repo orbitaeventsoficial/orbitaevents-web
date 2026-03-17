@@ -28,6 +28,9 @@ const EVENT_TYPE_FILTER: Record<TimelineEventType, TimelineFilter> = {
   TASK_CREATED: 'tasks',
   TASK_DONE: 'tasks',
   MESSAGE_SENT: 'comms',
+  EMAIL_RECEIVED: 'comms',
+  WHATSAPP_SENT: 'comms',
+  PHONE_CALL: 'comms',
   NOTE_ADDED: 'comms',
   ACTIVITY: 'comms',
 };
@@ -41,6 +44,9 @@ const EVENT_ICONS: Partial<Record<TimelineEventType, string>> = {
   TASK_CREATED: '📝',
   TASK_DONE: '✓',
   MESSAGE_SENT: '✉️',
+  EMAIL_RECEIVED: '📩',
+  WHATSAPP_SENT: '💬',
+  PHONE_CALL: '📞',
   NOTE_ADDED: '📌',
   ACTIVITY: '•',
 };
@@ -54,6 +60,9 @@ const EVENT_COLORS: Partial<Record<TimelineEventType, string>> = {
   TASK_CREATED: 'border-l-amber-500',
   TASK_DONE: 'border-l-emerald-500',
   MESSAGE_SENT: 'border-l-violet-500',
+  EMAIL_RECEIVED: 'border-l-violet-400',
+  WHATSAPP_SENT: 'border-l-green-500',
+  PHONE_CALL: 'border-l-sky-500',
   NOTE_ADDED: 'border-l-white/20',
   ACTIVITY: 'border-l-white/10',
 };

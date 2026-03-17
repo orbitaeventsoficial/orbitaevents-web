@@ -37,13 +37,13 @@ const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
   lead: {
     id: 'lead',
     term: 'Entrada',
-    description: 'Persona que ha preguntat, pero encara no es client tancat.',
+    description: 'Persona que ha preguntat, però encara no és client tancat.',
     keywords: ['entrada', 'entrades', 'lead', 'leads'],
   },
   client: {
     id: 'client',
     term: 'Client',
-    description: 'Persona que ja tens guardada com a client i pot tenir diversos esdeveniments.',
+    description: 'Persona que ja tens desada com a client i pot tenir diversos esdeveniments.',
     keywords: ['client', 'cliente', 'clients'],
   },
   leadSource: {
@@ -139,7 +139,7 @@ const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
   document: {
     id: 'document',
     term: 'Document',
-    description: 'Arxiu guardat del lead o client: pressupost, contracte, factura...',
+    description: 'Arxiu desat del lead o client: pressupost, contracte, factura...',
     keywords: ['document', 'documento', 'archivo'],
   },
   quote: {

@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import TeamMembersGrid from '@/components/about/TeamMembersGrid';
 import { getSiteUrl } from '@/lib/site';
 
-
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;

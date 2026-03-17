@@ -336,11 +336,11 @@ export async function syncAdminPacksFromConfig() {
     }
   }, { timeout: 20000 });
 
-  log.info(`Sincronización completada: ${created} creados, ${updated} actualizados`);
+  log.info(`Sincronització completada: ${created} creats, ${updated} actualitzats`);
 
   return {
     ok: true,
-    message: 'Sincronización completada',
+    message: 'Sincronització completada',
     stats: {
       total: configPacks.length,
       created,

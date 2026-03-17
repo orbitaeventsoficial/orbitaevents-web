@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { detectAdminContentLanguage, translateAdminContent } from '@/lib/services/adminTranslationService';
+import { detectAdminContentLanguage, translateAdminContent } from '@/lib/services/translationService';
 
 export const dynamic = 'force-dynamic';
 

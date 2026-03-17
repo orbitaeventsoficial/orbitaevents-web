@@ -71,11 +71,20 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
   }
 
   for (const m of input.messages) {
+    const channelType = m.channel === 'NOTE' ? 'NOTE_ADDED'
+      : m.channel === 'WHATSAPP' ? 'WHATSAPP_SENT'
+      : m.channel === 'CALL' ? 'PHONE_CALL'
+      : m.direction === 'INBOUND' ? 'EMAIL_RECEIVED'
+      : 'MESSAGE_SENT';
+    const channelIcon = m.channel === 'WHATSAPP' ? 'WhatsApp: '
+      : m.channel === 'CALL' ? 'Trucada: '
+      : m.direction === 'INBOUND' ? 'Email rebut: '
+      : '';
     events.push({
       id: `msg:${m.id}`,
-      type: m.channel === 'NOTE' ? 'NOTE_ADDED' : 'MESSAGE_SENT',
+      type: channelType,
       at: m.sentAt || m.createdAt,
-      title: m.subject || m.bodyPreview || 'Comunicació',
+      title: `${channelIcon}${m.subject || m.bodyPreview || 'Comunicació'}`,
       link: m.leadId ? { label: 'Veure entrada', href: `/admin/leads/${m.leadId}` } : undefined,
     });
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { getPendingTestimonialsReminderCount } from '@/lib/services/testimonialReminderAdminService';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,10 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    return NextResponse.json(await getPendingTestimonialsReminderCount());
+    const pendingCount = await prisma.customerTestimonial.count({
+      where: { isApproved: false },
+    });
+    return NextResponse.json({ ok: true, pendingCount });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error desconegut';
     return NextResponse.json({ ok: false, error: message }, { status: 500 });

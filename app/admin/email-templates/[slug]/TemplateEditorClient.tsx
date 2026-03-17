@@ -186,8 +186,8 @@ export default function TemplateEditorClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug, locale, subject, bodyHtml }),
       });
-      if (!res.ok) throw new Error('Error guardant');
-      toast.success('Plantilla guardada!');
+      if (!res.ok) throw new Error('Error desant');
+      toast.success('Plantilla desada!');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
@@ -292,7 +292,7 @@ export default function TemplateEditorClient({
 
   return (
     <div className="space-y-4">
-      {/* Barra superior: locale + subject + guardar */}
+      {/* Barra superior: locale + subject + desar */}
       <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-4 sm:flex-row sm:items-end">
         <div className="flex gap-2">
           {['ca', 'es', 'en'].map((l) => (
@@ -334,7 +334,7 @@ export default function TemplateEditorClient({
           onClick={saveTemplate}
           className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
         >
-          {saving ? 'Guardant...' : 'Guardar'}
+          {saving ? 'Desant...' : 'Desa'}
         </button>
       </div>
 

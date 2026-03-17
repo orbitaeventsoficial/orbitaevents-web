@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
@@ -86,7 +87,7 @@ const LOCALES = ['ca', 'es', 'en'] as const;
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const calcCostHour = (price: number | null, life: number | null) =>
-  !price || price <= 0 ? 0 : round2(price / (life && life > 0 ? life : 2000));
+  !price || price <= 0 ? 0 : round2(price / (life && life > 0 ? life : DEFAULT_EXPECTED_LIFE_HOURS));
 const divPct = (pub: number, rec: number) => (rec > 0 ? ((pub - rec) / rec) * 100 : 0);
 const semClass = (d: number, t: number) => Math.abs(d) >= t ? 'border-rose-500/40 bg-rose-500/15 text-rose-200' : Math.abs(d) >= t * 0.5 ? 'border-amber-500/40 bg-amber-500/15 text-amber-200' : 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200';
 const eur = (v: number) => `${round2(v).toFixed(2)}€`;
@@ -347,7 +348,7 @@ export default function EditPackForm({
     e.preventDefault(); setLoading(true); setError(null); setInfo(null); setSuccess(false);
     try {
       if (packInventory.length === 0) {
-        throw new Error('El pack no es pot guardar buit. Afegeix inventari (manual o compositor automàtic).');
+        throw new Error('El pack no es pot desar buit. Afegeix inventari (manual o compositor automàtic).');
       }
       if (Number(formData.price) <= 0 || Number(formData.extraHourPrice) <= 0) {
         throw new Error('Els preus han de ser superiors a 0€.');
@@ -781,7 +782,7 @@ export default function EditPackForm({
 
       <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border p-3 backdrop-blur">
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>
-        <button type="submit" disabled={loading} className="rounded-xl px-6 py-2 text-sm font-medium text-white disabled:opacity-50">{loading ? 'Guardant...' : 'Desar canvis'}</button>
+        <button type="submit" disabled={loading} className="rounded-xl px-6 py-2 text-sm font-medium text-white disabled:opacity-50">{loading ? 'Desant...' : 'Desar canvis'}</button>
       </div>
     </form>
   );

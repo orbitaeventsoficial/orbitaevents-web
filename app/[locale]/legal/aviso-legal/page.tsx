@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import nextDynamic from 'next/dynamic';
 
+export const revalidate = 86400;
+
 const AvisoLegalClient = nextDynamic(() => import('./client'));
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {

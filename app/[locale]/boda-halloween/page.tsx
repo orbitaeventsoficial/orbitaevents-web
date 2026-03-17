@@ -4,6 +4,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events',

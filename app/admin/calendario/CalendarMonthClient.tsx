@@ -14,7 +14,7 @@ type CalendarApiDay = {
     leadId?: string | null;
     customerId?: string | null;
     fechaEvento: string;
-    clienteNombre?: string | null;
+    clientName?: string | null;
     ubicacion?: string | null;
     estado?: string | null;
     eventType?: string | null;
@@ -606,10 +606,10 @@ export default function CalendarMonthClient() {
                               onClick={(event) => event.stopPropagation()}
                               className="hover:underline"
                             >
-                              {r.clienteNombre || 'Client'}
+                              {r.clientName || 'Client'}
                             </Link>
                           ) : (
-                            r.clienteNombre || 'Client'
+                            r.clientName || 'Client'
                           )}
                         </div>
                         <div className="truncate">
@@ -735,7 +735,7 @@ export default function CalendarMonthClient() {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="font-medium text-sm">
-                          {r.clienteNombre ?? 'Client sense nom'}
+                          {r.clientName ?? 'Client sense nom'}
                         </div>
                         {r.estado && (
                           <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
@@ -855,7 +855,7 @@ export default function CalendarMonthClient() {
             <div className="mt-4 rounded-xl border p-4">
               <h3 className="text-sm font-semibold">Fitxa de l&apos;esdeveniment</h3>
               <div className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
-                <p><span className="">Client:</span> {selectedDayData.payload.reservas[0].clienteNombre || '-'}</p>
+                <p><span className="">Client:</span> {selectedDayData.payload.reservas[0].clientName || '-'}</p>
                 <p><span className="">Horari:</span> {resolveTimeLabel(selectedDayData.payload.reservas[0])}</p>
                 <p><span className="">Servei:</span> {resolveServiceLabel(selectedDayData.payload.reservas[0])}</p>
                 <p><span className="">Ubicació:</span> {selectedDayData.payload.reservas[0].ubicacion || '-'}</p>

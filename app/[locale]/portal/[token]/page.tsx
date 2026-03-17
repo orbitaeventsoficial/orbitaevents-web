@@ -91,7 +91,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     portalActive: 'Activo',
     postEventDone: 'Informe completado',
     postEventProgress: 'En progreso',
-    openQuote: 'Abrir presupuesto',
+    openQuote: 'Obrir pressupost',
     feedbackSent: 'Feedback enviado',
     pendingClose: 'Pendiente de cierre',
     trackingStatus: 'Estado de seguimiento',

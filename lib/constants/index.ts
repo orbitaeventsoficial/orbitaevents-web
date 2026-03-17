@@ -213,3 +213,16 @@ export function formatCurrency(amount: number | null | undefined, locale = 'ca-E
 export function getEventLabel(eventType: string, fallback?: string): string {
   return EVENT_TYPE_PLAIN[eventType] || EVENT_TYPE_PLAIN[eventType.toUpperCase()] || fallback || eventType;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUSINESS DEFAULTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Default expected life hours for inventory items */
+export const DEFAULT_EXPECTED_LIFE_HOURS = 2000;
+
+/** Sentinel email domain for leads without a real email */
+export const PLACEHOLDER_EMAIL_DOMAIN = '@leads.orbitaevents.local';
+
+/** Minimum total spent (EUR) to consider a customer VIP */
+export const VIP_SPEND_THRESHOLD = 2000;

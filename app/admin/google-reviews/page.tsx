@@ -11,6 +11,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTimeFull } from '@/lib/constants';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 interface GoogleReview {
   author_name: string;
@@ -198,7 +199,7 @@ export default function GoogleReviewsAdminPage() {
           <li>• No es poden editar ni eliminar ressenyes (són de Google Business)</li>
         </ul>
         <a
-          href="https://g.page/r/CXcgbvANsXSzEBE/review"
+          href={SITE_CONFIG.reviews.googleReviewUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-4 inline-flex items-center gap-2 px-4 py-2 border rounded-xl text-white font-medium transition-colors"

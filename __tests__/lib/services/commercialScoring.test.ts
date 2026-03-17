@@ -95,21 +95,21 @@ describe('commercialScoring', () => {
       const senseBudget = scoreLead(baseLead({ status: 'CONTACTED' }));
       const ambBudget = scoreLead(baseLead({ status: 'CONTACTED', budget: '2500' }));
       expect(ambBudget.score).toBeGreaterThan(senseBudget.score);
-      expect(ambBudget.reasons).toContain('Budget alto');
+      expect(ambBudget.reasons).toContain('Pressupost alt');
     });
 
     it('tenir telèfon indica interès real (+8 punts)', () => {
       const senseTel = scoreLead(baseLead({ status: 'CONTACTED' }));
       const ambTel = scoreLead(baseLead({ status: 'CONTACTED', phone: '+34699000111' }));
       expect(ambTel.score).toBeGreaterThan(senseTel.score);
-      expect(ambTel.reasons).toContain('Tiene teléfono');
+      expect(ambTel.reasons).toContain('Té telèfon');
     });
 
     it('lead referit (boca-orella) té bonus perquè sol convertir millor', () => {
       const normal = scoreLead(baseLead({ status: 'CONTACTED' }));
       const referit = scoreLead(baseLead({ status: 'CONTACTED', source: 'REFERRAL' }));
       expect(referit.score).toBeGreaterThan(normal.score);
-      expect(referit.reasons).toContain('Lead referido');
+      expect(referit.reasons).toContain('Lead referit');
     });
 
     // --- Penalitzacions ---
@@ -121,7 +121,7 @@ describe('commercialScoring', () => {
         eventDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 dies enrere
       }));
       expect(passat.score).toBeLessThan(futur.score);
-      expect(passat.riskFlags).toContain('Evento en pasado');
+      expect(passat.riskFlags).toContain('Esdeveniment passat');
     });
 
     it('sense seguiment >72h: penalització per descuit', () => {
@@ -131,7 +131,7 @@ describe('commercialScoring', () => {
         updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 dies sense tocar
       }));
       expect(abandonat.score).toBeLessThan(recent.score);
-      expect(abandonat.riskFlags).toContain('Sin seguimiento 72h+');
+      expect(abandonat.riskFlags).toContain('Sense seguiment 72h+');
     });
 
     // --- Clamping (límits de seguretat) ---

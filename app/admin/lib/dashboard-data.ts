@@ -6,7 +6,8 @@ import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatDateSimple } from '@/lib/constants';
+import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -170,11 +171,9 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   seriesStart.setHours(0, 0, 0, 0);
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const ga4Status = getGa4ConfigStatus();
-  const imapConfigured = Boolean(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
+  const imapConfigured = isImapConfigured();
   const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
-  const smtpConfigured = Boolean(
-    process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM
-  );
+  const smtpConfigured = isSmtpConfigured();
 
   const [ga4, profitConfig] = await Promise.all([
     Promise.race([getGa4Report().catch(() => null), timeoutPromise(3000)]),
@@ -205,7 +204,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:leads:won', () => prisma.lead.count({ where: { status: 'WON' } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:leads:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.lead.findMany({ where: { createdAt: { gte: seriesStart } }, select: { createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:bookings:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.booking.findMany({ where: { eventDate: { gte: seriesStart } }, select: { eventDate: true, status: true, total: true } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: '@leads.orbitaevents.local' } } } }), CacheTTL.SHORT).catch(() => 0),
+    cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage', 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
     prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
     cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),

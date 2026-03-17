@@ -120,7 +120,7 @@ export default function NewTaskPage() {
             disabled={saving || !title.trim()}
             className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {saving ? 'Guardant...' : 'Crear tasca'}
+            {saving ? 'Creant...' : 'Crear tasca'}
           </button>
           <Link
             href={customerId ? `/admin/clientes/${customerId}?tab=tasks` : '/admin/tasks'}

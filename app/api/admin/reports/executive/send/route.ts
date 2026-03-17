@@ -19,6 +19,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     log.error('Error sending executive report', error);
-    return NextResponse.json({ ok: false, error: 'Error enviando executive report' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Error enviant informe executiu' }, { status: 500 });
   }
 }

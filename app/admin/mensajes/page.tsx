@@ -130,7 +130,7 @@ export default async function MensajesPage() {
           🔵 Veure noves ({data.pendingLeads})
         </Link>
         <a
-          href="https://wa.me/34600000000"
+          href="https://wa.me/34699121023"
           target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
         >

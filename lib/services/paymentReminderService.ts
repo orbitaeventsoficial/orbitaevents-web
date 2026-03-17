@@ -8,6 +8,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { formatCurrency, formatDateFull } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
@@ -123,7 +124,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
         continue;
       }
 
-      if (!booking.clientEmail || booking.clientEmail.includes('@leads.orbitaevents.local')) {
+      if (!booking.clientEmail || booking.clientEmail.includes(PLACEHOLDER_EMAIL_DOMAIN)) {
         result.skipped++;
         continue;
       }

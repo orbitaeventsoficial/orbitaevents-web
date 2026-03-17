@@ -8,6 +8,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 
 const CATEGORIES = [
   { value: 'SOUND', label: 'So', icon: '🔊' },
@@ -81,7 +82,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
       ? new Date(item.purchaseDate).toISOString().split('T')[0]
       : '',
     purchasePrice: item?.purchasePrice?.toString() || '',
-    expectedLifeHours: (item?.expectedLifeHours || 2000).toString(),
+    expectedLifeHours: (item?.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS).toString(),
     isConsumable: item?.isConsumable || false,
     stockQuantity: item?.stockQuantity?.toString() || '',
     minStock: item?.minStock?.toString() || '',

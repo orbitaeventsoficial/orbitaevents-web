@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 export default function SyncButton() {
+  const router = useRouter();
   const [syncing, setSyncing] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
   const [result, setResult] = useState<{
@@ -30,10 +32,7 @@ export default function SyncButton() {
       setResult(data);
 
       if (data.ok) {
-        // Recargar la página después de 2 segundos para ver los nuevos packs
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        setTimeout(() => router.refresh(), 2000);
       }
     } catch (error) {
       setResult({

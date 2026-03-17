@@ -1,5 +1,220 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-17 sessió 3 — "La Millor Web del Món" — Fases 1-4 completes
+
+### Context
+Implementació de les 4 fases del full de ruta v2 definit a la sessió anterior. 10 tasques, totes completades en una sessió. Build OK, tsc 0 errors.
+
+### Fase 1 — Impacte visual (web pública)
+- **P1 — Hero cinematogràfic**: Millorada transició text rotatiu (slide-up + blur en comptes d'opacity simple). Typewriter, stagger i 1 CTA ja existien.
+- **P3 — Portfolio cinematogràfic**: Reescrit completament. Grid vertical → scroll horitzontal amb snap. Cards amb auto-rotate fotos on hover, dots indicador, accents per categoria, parallax al títol, botons scroll desktop, hint swipe mòbil. Traduccions `viewStory` i `swipeHint` afegides (ca/es/en).
+- **P4 — Comptadors dinàmics**: Ja existia i connectava a BD real via `/api/public/stats`. Verificat i tancat.
+
+### Fase 2 — Configurador + urgència
+- **P2 — Configurador amb ambient**: `EVENT_AMBIENTS` ampliat (glow + gradient + accent + accentBorder per tipus). Gradient de fons dinàmic que canvia amb el tipus d'event. **Barra de preu sticky** afegida (visible des del pas 2, mostra pack + extras + preu + descompte + botó continuar).
+- **P5 — Social pressure**: Afegit LED pulsant verd ("persones mirant"), alerta "Només queden N dissabtes!" quan ≤5, i dissabtes warning a les traduccions (ca/es/en). CalendarioUrgencia ja tenia early-bird countdown i avatars.
+
+### Fase 3 — Negoci
+- **F1 — Col·laboradors**: Codex ja havia creat: model Prisma (Collaborator + CollaboratorBooking), CollaboratorsClient amb CRUD + KPIs, API routes, collaboratorAdminService. Jo he afegit `computeCollaboratorNetMargin()` al costEngine per calcular marge net descomptant la comissió del col·laborador.
+- **F2 — Configurador costos D&D**: Codex ja havia creat: CostCalculatorClient amb D&D HTML5, 12 components arrossegables, càlcul marge configurable, guardar pressupost via API custom-quotes.
+
+### Fase 4 — Admin intel·ligent
+- **A1 — Insights narratius**: Creat `dashboardInsightsService.ts` — genera fins a 5 insights prioritzats en català (leads estancats, hot leads, conversió, pagaments pendents, marge baix, pròxim event, objectiu mensual, inventari avariat, cash flow negatiu). Integrat al dashboard (`admin/page.tsx`) com a secció "Què necessites saber avui" amb colors per tipus.
+- **A5 — Timeline unificat**: Afegits tipus `EMAIL_RECEIVED`, `WHATSAPP_SENT`, `PHONE_CALL` al DTO i TimelinePanel. El buildTimeline ara detecta canal (EMAIL/WHATSAPP/CALL/NOTE) i direcció (INBOUND/OUTBOUND) per classificar. Icones i colors diferenciats per canal.
+- **A6 — Auto-triggers**: Creat `automationTriggers.ts` amb 3 triggers:
+  - `proposal.accepted` → auto-genera contracte DRAFT
+  - `lead.created` → crea tasca "welcome email" immediata
+  - `booking.confirmed` → crea checklist pre-event amb ítems per tipus d'event
+  Integrats a les API routes: bookings/[id], proposals/[id], leads.
+
+### Raonament
+- Fase 1: El hero i stats ja estaven quasi fets; el portfolio era el canvi gran (scroll horitzontal és molt més cinematogràfic que un grid).
+- Fase 2: L'ambient visual dóna context emocional al configurador; la barra sticky elimina la fricció del "no sé quant costa".
+- Fase 3: Codex va fer la feina bruta; la integració al costEngine era la peça que faltava per calcular marges reals.
+- Fase 4: Els insights narratius converteixen dades en accions ("tens 3 leads sense resposta" > mirar un KPI). Els auto-triggers eliminen passos manuals repetitius.
+
+### Build: OK, tsc: 0 errors
+
+---
+
+## TASQUES PENDENTS (actualitzat 2026-03-17)
+
+### Alta prioritat
+1. **WhatsApp Business API**: `whatsappService.ts` existeix (link-based). Falta integració real per enviar/rebre dins l'admin. Requereix compte Business API de pagament.
+2. **estat-admin.md**: Actualitzar roadmap complet — moltes seccions obsoletes (email templates, calendari diària, inbox, PDF Studio D&D, canvas, fitxa client, reserves, privacitat, "La Millor Web del Món" tot fet).
+
+### Mitjana prioritat
+3. **Canvas editor avançat**: Generació d'imatges funciona (3 APIs + integració ressenyes). Potencialment afegir editor visual drag & drop.
+4. ~~**Inventory new form**~~: ✅ Ja estava fet — `InventoryItemEditor` ja suporta `mode="create"`.
+5. ~~**Tests**~~: ✅ De 156→246 tests (+90). costEngine (42), dashboardInsights (39), automationTriggers (8), commercialScoring fixes (5).
+
+### Baixa prioritat
+6. **Multi-user (rols i permisos)**: Roadmap futur. Només necessari si més d'una persona usa l'admin.
+7. **Widget meteo**: Previst a la visió original d'A1 però no implementat (API OpenWeatherMap per events dels pròxims 3 dies).
+8. **WhatsApp recepció**: Rebre missatges WhatsApp dins el timeline unificat (requereix webhook Business API).
+
+### Completat recentment (sessió 17/03)
+- ✅ "La Millor Web del Món" v2 — 10/10 tasques (Fases 1-4)
+- ✅ Neteja profunda post-Codex (castellà, duplicats, constants, nano-serveis)
+- ✅ Auto-triggers (proposal→contract, lead→welcome, booking→checklist)
+- ✅ Insights narratius dashboard
+- ✅ Timeline comunicació unificat multi-canal
+- ✅ Col·laboradors + Cost calculator (Codex + costEngine integració)
+
+---
+
+## 2026-03-17 — Neteja profunda post-Codex + Unificació estructural
+
+### Context
+Codex (OpenAI) va reorganitzar el repo (~385 fitxers, -12.972 línies netes, 85 serveis nous) però va deixar el build trencat i castellà enterrat arreu. Sessió de neteja exhaustiva per arreglar-ho tot i anar més enllà.
+
+### Build fix
+- **configurador/client.tsx**: 3 errors TS (variables fora de scope en sub-components extrets per Codex). Arreglats reordenant declaracions i afegint derivacions locals.
+- **InboxClient.tsx**: Tipus union massa estret per `activeTab`. Expandit a incloure 'leads'|'emails'.
+
+### Unificació opiniones + valoracio (Task #11)
+**Per què**: Dos formularis de testimonials idèntics duplicats — `opiniones/client.tsx` (951 línies, hardcoded castellà) i `valoracio/client.tsx` (472 línies, hardcoded català). Total: ~1400 línies fent el mateix.
+
+- **Creat**: `app/components/reviews/TestimonialForm.tsx` — component compartit i18n amb `useTranslations('testimonialForm')`. ~230 línies.
+- **valoracio/client.tsx**: 472→27 línies (wrapper simple amb Suspense)
+- **opiniones/client.tsx**: 951→455 línies. Eliminat el TestimonialForm duplicat (305 línies), SuccessState duplicat (31 línies), FormData duplicat (11 línies), RatingStars simplificat (ja no necessita interactive/onChange).
+- **UI_COPY→messages JSON**: 100 línies de traduccions inline (ca/es/en) mogudes a `messages/*.json` sota `opinionsPage.ui`. Ara usa `useTranslations('opinionsPage.ui')`.
+- **Total eliminat**: ~850 línies de codi duplicat/redundant.
+
+### Eliminació adminTranslationService duplicat
+**Per què**: `adminTranslationService.ts` era una còpia quasi exacta de `translationService.ts` (~194 línies duplicades). Mateixos constants, mateixos helpers, mateixa lògica.
+
+- Afegits aliases `translateAdminContent` i `detectAdminContentLanguage` a `translationService.ts`
+- Actualitzada la importació a `api/admin/translate/route.ts`
+- **Eliminat**: `lib/services/adminTranslationService.ts` (194 línies)
+- Eliminat `translateContent` i `detectContentLanguage` exportats però mai importats (codi mort)
+
+### clienteNombre → clientName (Task #8)
+**Per què**: Camp espanyol residual als components de calendari. El schema Prisma ja diu `clientName`.
+
+- `adminCalendarMonthService.ts`: tipus + mapping
+- `CalendarDayClient.tsx`: 5 refs
+- `CalendarWeekClient.tsx`: 2 refs
+- `CalendarMonthClient.tsx`: 5 refs
+
+### Castellà enterrat → Català (exhaustiu)
+**api-error-handler.ts** (10 strings):
+- "Recurso no encontrado" → "Recurs no trobat"
+- "No se puede completar..." → "No es pot completar..."
+- "Error en la base de datos" → "Error a la base de dades"
+- "No autorizado" → "No autoritzat"
+- "Demasiadas solicitudes" → "Massa sol·licituds"
+- I 5 més
+
+**Serveis backend** (6 strings):
+- `googleCalendarSyncService.ts`: "Reserva no encontrada" → "Reserva no trobada"
+- `leadSnapshotService.ts`: "Lead no encontrado" → "Lead no trobat"
+- `adminStatsService.ts`: "Estadística no válida" → "Estadística no vàlida"
+- `faqAdminService.ts`: "FAQ no encontrado" → "FAQ no trobat"
+- `quoteTemplateService.ts`: "No se pudo guardar..." → "No s'ha pogut desar..."
+- `textManagerService.ts`: "No hay cambios válidos..." → "No hi ha canvis vàlids per desar"
+- `profitabilityService.ts`: labels castellans → català
+
+**Admin UI** (2 botons):
+- `CostCalculatorClient.tsx`: "Guardar pressupost" → "Desar pressupost"
+- `CollaboratorsClient.tsx`: "Guardar" → "Desar"
+
+**Frontend públic**:
+- `ContactFormComplete.tsx`: "Error al enviar" → "Error en enviar"
+
+### not-found.tsx inline styles → Tailwind (Task #10)
+- `app/[locale]/not-found.tsx`: 137 línies d'inline styles convertides a classes Tailwind
+- `app/not-found.tsx`: manté inline styles (genera HTML propi fora del layout)
+
+### "Guardant..."→"Desant..." (Task #7, 10 fitxers)
+Tots els loading states de l'admin canviats per coherència amb el verb "Desar":
+- CommsPanel, TasksNotesPanel, PresupuestoPdfStudio, ExtrasConfiguratorClient
+- LeadProfileEditor, post-event/new, TaskRowActions, SettingsClient
+- tasks/new ("Creant..." per a creació), EditPackForm
+
+### window.location.reload/href→router (Task #9)
+- `LeadNotesPanel.tsx`: reload→re-fetch local de notes via API
+- `SyncButton.tsx`: reload→`router.refresh()` + afegit useRouter
+- `blog/page.tsx`: 3× `window.location.href`→`router.push()` + afegit useRouter
+- `MobileAppShell.tsx`: `window.location.reload()`→`router.refresh()` + afegit useRouter (MobileErrorBoundary mantingut com a legítim)
+
+### Catch buits crons
+Revisats tots els catch dels 6 crons — tots ja tenen `log.error`. OK.
+
+### tsc: 0 errors, build OK (233 pàgines)
+### Grep verificació final: 0 "Guardant", 0 window.location a admin, 0 clienteNombre, 0 catch buits crons
+
+### Castellanismes → català (sessió 2)
+- **commercialScoring.ts**: 12 strings riskFlags/reasons (Budget alto→Pressupost alt, Sin teléfono→Sense telèfon, etc.)
+- **adminStatsService.ts**: 10 labels/descriptions (Eventos Realizados→Esdeveniments Realitzats, etc.)
+- **leadSnapshotService.ts**: 4 títols activitat (Snapshot técnico→Instantània tècnica)
+- **packAdminService.ts**: missatge sincronització (Sincronización→Sincronització)
+- **textManagerService.ts**: 3 missatges (actualizados→actualitzats, etc.)
+- **text-manager/route.ts**: 3 errors API (leyendo→llegint, guardando→desant)
+- **whatsappService.ts**: 2 errors (Teléfono inválido→Telèfon no vàlid)
+- **emailLeadExtractionService.ts**: 2 categories (Contratación→Contractació)
+- **imapSettingsService.ts**: exitosa→correcta
+- **googleCalendarSyncService.ts**: configurado→configurat
+- **extrasConfiguratorService.ts**: Listado→Llistat
+- **contactLeadCaptureService.ts**: guardant→desant (log)
+- **adminHelpGlossary.ts**: pero→però, es→és, guardada→desada, guardat→desat
+- **TemplateEditorClient.tsx**: guardada→desada
+- **ImapSettingsClient.tsx**: exitosa→correcta, guardada→desada, guardant→desant
+- **14 fitxers admin**: guardar/guardant/guardat→desar/desant/desat (19 instàncies)
+- Total: **~50 strings castellanes→català** en 22 fitxers
+
+### Simplificació rutes i codi mort
+- **7 directoris buits eliminats**: canvas, duplicats, mapa, theme, translations (migració C→D)
+- **2 directoris reubicats**: finanzas i rentabilidad → components moguts a economia/ (on s'importen)
+- **Nav simplificada**: 17→15 ítems. Eliminats: Integracions (redundant amb settings), Catàleg (redundant amb packs/inventari/preus), Google Reviews (accessible des de ressenyes), Missatges (accessible des de leads). Secció Avançat dividida en Avançat + Configuració.
+- **Links 404 arreglats**: 2× `/admin/packs/[id]/inventory` → `/admin/packs/[id]` (ruta inexistent)
+- **Dead exports eliminats**: `ensureCompletedBookingPortalAccess` (bookingPortalCompletionService), `refreshHoldedStatus` (invoiceService) — funcions internes que estaven exportades innecessàriament
+- **API morta eliminada**: `/api/admin/theme` + `adminThemeService.ts` (ruta sense cap cridador)
+- **Verificació final**: tsc 0 errors, build OK, 0 `guardar/guardant` a admin, 0 castellanismes detectables
+
+### Passada exhaustiva — hardcodes, duplicats i neteja profunda
+- **Google Review URL unificada**: 4 codis diferents en 6 fitxers → tots usen `SITE_CONFIG.reviews.googleReviewUrl`
+- **extraHourPrice**: fallback 80€→75€ a quotePack.ts, ara llegeix `pack.extraHourPrice` de BD
+- **PLACE_ID**: hardcoded a cron reviews-sync → ara usa `process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID`
+- **BlogEditorForm**: POST/PUT sense CSRF → afegit `fetchWithCsrf`
+- **Telèfon placeholder**: `34600000000` a mensajes → corregit al real
+- **IMAP/SMTP checks centralitzats**: `isImapConfigured()` i `isSmtpConfigured()` exportats des de `lib/env.ts`, 3 llocs duplicats eliminats
+- **Directori buit `admin/[id]`**: eliminat
+- **Castellà API routes**: stats (5 strings), packs/sync (2), reports/executive (1), adminStatsService (1)
+- **Comentari site-config.ts**: traduït a català
+- Build: OK, tsc: 0 errors
+
+### Centralització formatejadors i constants (sessió 3)
+**Per què**: `.toLocaleString('ca-ES')` i `@leads.orbitaevents.local` escampats arreu sense usar els formatters centralitzats de `lib/constants`.
+
+- **`formatCurrency()` centralitzat**: Substituïts 4 `.toLocaleString('ca-ES')` + `€` manuals per `formatCurrency()` (googleCalendarSyncService, notificationService, ComposeForm)
+- **`formatDateTimeFull()`/`formatDate()`/`formatDateSimple()` centralitzats**: 4 substitucions (leadSnapshotService, notificationService, CronsClient)
+- **`DEFAULT_EXPECTED_LIFE_HOURS = 2000`**: Constant nova. 6 hardcodes `|| 2000` unificats en 5 fitxers (bookings/[id], InventoryListClient, InventoryItemEditor, inventory/[id], EditPackForm)
+- **`VIP_SPEND_THRESHOLD = 2000`**: Constant nova. Llindar VIP a clientes/page.tsx
+- **`PLACEHOLDER_EMAIL_DOMAIN = '@leads.orbitaevents.local'`**: Constant nova. 16 hardcodes en 10 fitxers → tots usen la constant (emails/page, inbox/page, inbox/compose, dashboard-data, contactLeadCaptureService, bookingPortalCompletionService, leadAdminService, statusRouteHandler, paymentReminderService, postEventDispatchService)
+- **`www.orbitaevents.com` hardcoded**: documentService → `www.${SITE_CONFIG.web.domain}`
+
+### Compactació de capes — serveis nano inlinats (sessió 3 cont.)
+**Per què**: 9 serveis de 7-41 línies amb un sol caller cadascun — capes innecessàries que compliquen la navegació del codi sense afegir valor.
+
+**Serveis eliminats (inlinats al caller):**
+- `testimonialReminderAdminService.ts` (9 línies) → inline a API route
+- `customerConsentService.ts` (16 línies) → inline a API route
+- `dbReconnectService.ts` (22 línies) → inline a API route
+- `privacyAuditService.ts` (24 línies) → inline a API route
+- `tasks/taskMetrics.ts` (7 línies) → inline a commercialDailyAutomationService
+- `tasks/taskCleanup.ts` (9 línies) → inline a leadRouteService
+- `customerDuplicateCheckService.ts` (39 línies) → inline a API route
+- `bookingBulkPaymentService.ts` (41 línies) → inline a API route
+
+**Codi mort eliminat:**
+- `customerService.ts` (112 línies) — zero callers, substituït per customerListService
+
+**Total eliminat**: 9 fitxers, ~280 línies de codi + indireccions
+- Build: OK, tsc: 0 errors
+
+---
+
 ## 2026-03-11 — Fase "La Millor Web del Món"
 
 ### Context
@@ -237,21 +452,6 @@ Començar per la **Fase 1** (impacte visual) perquè és el que veu el client fi
 
 ---
 
-## TASQUES PENDENTS (actualitzat sessió 8)
-
-### Alta prioritat
-1. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real Business API (enviar/rebre dins l'admin).
-
-### Mitjana prioritat
-2. **estat-admin.md**: Actualitzar roadmap (email templates fets, calendari diària feta, inbox funcional, PDF Studio D&D, canvas integrat, fitxa client redissenyada, reserves redissenyades).
-3. **Safata d'entrada — paperera**: Eliminar emails funciona (DELETE IMAP), però no hi ha carpeta paperera per recuperar-los.
-4. **Canvas editor avançat**: Generació d'imatges funciona (3 APIs + integració ressenyes). Potencialment afegir editor visual drag & drop.
-
-### Baixa prioritat
-5. **Multi-user (rols i permisos)**: Roadmap futur.
-6. **GDPR UI admin**: API existeix (`privacyService.ts`), falta pàgina admin per gestionar sol·licituds.
-7. **Inventory new form**: Usar `InventoryItemEditor` també per crear (ara només per editar).
-
 ---
 
 ## 2026-03-09 sessió 6 — PDF Studio D&D + Contractes unificats + Emails idioma client + Auto-traducció
@@ -280,27 +480,6 @@ Començar per la **Fase 1** (impacte visual) perquè és el que veu el client fi
 - Unificar pressupost + contracte al mateix editor evita que l'usuari hagi de navegar a llocs diferents.
 
 ---
-
-## TASQUES PENDENTS (prioritzades)
-
-### Alta prioritat
-1. **Safata d'entrada completa**: Paperera/arxiu d'emails, enviar email com a Òrbita (compose), firma professional d'email. Ara només es poden llegir emails IMAP.
-2. **Canvas editor**: L'usuari va preguntar "i canvas?" — editor visual tipus canvas per composar materials visuals. No implementat.
-3. **WhatsApp integrat**: `whatsappService.ts` existeix però és bàsic. Falta integració real (Business API o link-based).
-4. **Fitxa client ben pensada**: L'usuari va dir "que la fitxa de client estigui pensada" — redissenyar la pàgina `/admin/clientes/[id]` amb UX millorada.
-5. **Reserves ben pensades**: L'usuari va dir "que les reserves estiguin pensades" — redissenyar la UX de reserves.
-
-### Mitjana prioritat
-6. **Tot al mòbil**: PWA existeix però no s'han fet millores mòbil específiques aquesta sessió.
-7. **Bookings new form extraction**: 520+ línies inline, candidat per extreure component (com BlogEditorForm).
-8. **lib/email.ts testimonials/privacitat**: Emails de testimonial aprovats i verificació GDPR segueixen en castellà fix.
-9. **scripts/ cleanup**: Revisar scripts potencialment no mantinguts (check-packs-i18n.ts, autofix-*.ts).
-10. **estat-admin.md**: Actualitzar roadmap — email templates ja estan fets però no reflectit.
-
-### Baixa prioritat
-11. **Vista diària calendari**: Setmanal i mensual existeixen, falta diària.
-12. **Multi-user (rols i permisos)**: Roadmap futur.
-13. **GDPR UI admin**: API existeix, falta pàgina admin.
 
 ---
 

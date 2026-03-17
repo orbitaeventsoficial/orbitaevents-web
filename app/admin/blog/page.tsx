@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
@@ -39,6 +39,7 @@ export default function BlogAdminPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { confirm, dialogProps } = useConfirmDialog();
 
   const fetchPosts = useCallback(async () => {
@@ -128,7 +129,7 @@ export default function BlogAdminPage() {
           </select>
 
           <button
-            onClick={() => (window.location.href = '/admin/blog/new')}
+            onClick={() => (router.push('/admin/blog/new'))}
             type="button"
             className="ap-btn ap-btn--primary flex items-center gap-2"
           >
@@ -171,7 +172,7 @@ export default function BlogAdminPage() {
         <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <p className="">Encara no hi ha posts</p>
           <button
-            onClick={() => (window.location.href = '/admin/blog/new')}
+            onClick={() => (router.push('/admin/blog/new'))}
             type="button"
             className="mt-4"
           >
@@ -244,7 +245,7 @@ export default function BlogAdminPage() {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() =>
-                              (window.location.href = `/admin/blog/edit/${post.id}`)
+                              (router.push(`/admin/blog/edit/${post.id}`))
                             }
                             type="button"
                             className="rounded-xl p-2 transition-colors"
