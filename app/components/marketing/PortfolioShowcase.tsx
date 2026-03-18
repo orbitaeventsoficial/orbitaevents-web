@@ -113,7 +113,7 @@ function StoryCard({
       }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setPhotoIdx(0); }}
-      className="relative flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[38vw] xl:w-[32vw] snap-center"
+      className="relative flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[38vw] xl:w-[32vw]"
     >
       <Link
         href={`/portfolio/${story.slug}`}
@@ -350,7 +350,7 @@ export default function PortfolioShowcase() {
         onTouchStart={handleUserInteraction}
         onMouseDown={handleUserInteraction}
         onWheel={handleUserInteraction}
-        className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 snap-x snap-mandatory scrollbar-hide"
+        className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 scrollbar-hide scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {EVENT_STORIES.map((story, i) => (
