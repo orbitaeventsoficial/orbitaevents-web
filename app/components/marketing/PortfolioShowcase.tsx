@@ -88,15 +88,15 @@ function StoryCard({
   const [photoIdx, setPhotoIdx] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Auto-rotate photos every 3s on hover
+  // Auto-rotate photos every 3s always
   const [isHovered, setIsHovered] = useState(false);
   useEffect(() => {
-    if (!isHovered || reduceMotion) return;
+    if (reduceMotion) return;
     const interval = setInterval(() => {
       setPhotoIdx((prev) => (prev + 1) % story.photos.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [isHovered, story.photos.length, reduceMotion]);
+  }, [story.photos.length, reduceMotion]);
 
   const src = story.photos[photoIdx];
   const categoryName = t(`categories.${story.overlayKey}`);
@@ -242,6 +242,36 @@ export default function PortfolioShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const interactionTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-scroll carousel cada 5s
+  useEffect(() => {
+    if (reduceMotion || isUserInteracting) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const interval = setInterval(() => {
+      const cardWidth = el.querySelector(':scope > *')?.clientWidth || 400;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+
+      if (el.scrollLeft >= maxScroll - 10) {
+        // Tornar al principi
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: cardWidth + 20, behavior: 'smooth' });
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [reduceMotion, isUserInteracting]);
+
+  // Pausar auto-scroll quan l'usuari interactua (touch/mouse)
+  const handleUserInteraction = useCallback(() => {
+    setIsUserInteracting(true);
+    if (interactionTimer.current) clearTimeout(interactionTimer.current);
+    interactionTimer.current = setTimeout(() => setIsUserInteracting(false), 10000);
+  }, []);
 
   // Parallax title on scroll
   const { scrollYProgress } = useScroll({
@@ -268,9 +298,10 @@ export default function PortfolioShowcase() {
   const scroll = useCallback((direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
+    handleUserInteraction();
     const cardWidth = el.querySelector(':scope > *')?.clientWidth || 400;
     el.scrollBy({ left: direction === 'right' ? cardWidth + 20 : -(cardWidth + 20), behavior: 'smooth' });
-  }, []);
+  }, [handleUserInteraction]);
 
   return (
     <section ref={sectionRef} className="relative py-16 md:py-28 overflow-hidden">
@@ -313,6 +344,9 @@ export default function PortfolioShowcase() {
       {/* Horizontal scroll container */}
       <div
         ref={scrollRef}
+        onTouchStart={handleUserInteraction}
+        onMouseDown={handleUserInteraction}
+        onWheel={handleUserInteraction}
         className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 snap-x snap-mandatory scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
