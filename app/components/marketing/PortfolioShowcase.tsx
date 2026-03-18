@@ -98,7 +98,6 @@ function StoryCard({
     return () => clearInterval(interval);
   }, [story.photos.length, reduceMotion]);
 
-  const src = story.photos[photoIdx];
   const categoryName = t(`categories.${story.overlayKey}`);
 
   return (
@@ -120,16 +119,20 @@ function StoryCard({
         href={`/portfolio/${story.slug}`}
         className="group relative block overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_32px_100px_rgba(0,0,0,0.4)]"
       >
-        {/* Photo with parallax-like scale on hover */}
+        {/* Photos with crossfade — totes apilades, opacity transition */}
         <div className="relative h-[28rem] md:h-[32rem] overflow-hidden">
-          <Image
-            src={src}
-            alt={`${categoryName} - Orbita Events`}
-            fill
-            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 32vw"
-            className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
-            loading="lazy"
-          />
+          {story.photos.map((photo, i) => (
+            <Image
+              key={photo}
+              src={photo}
+              alt={`${categoryName} - Orbita Events`}
+              fill
+              sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 32vw"
+              className="object-cover transition-all duration-[1.5s] ease-in-out group-hover:scale-110"
+              style={{ opacity: i === photoIdx ? 1 : 0 }}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
 
           {/* Gradient overlays */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
