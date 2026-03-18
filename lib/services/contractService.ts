@@ -36,7 +36,7 @@ function generateContractNumber(): string {
   return `CTR-${year}-${timestamp}`;
 }
 
-function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): string {
+export function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): string {
   const policies: Record<SupportedLocale, string> = {
     ca: [
       '1. Cancel·lació amb més de 60 dies d\'antelació: es retorna el 100% de l\'aval.',
@@ -63,7 +63,7 @@ function getDefaultCancellationPolicy(locale: SupportedLocale = 'ca'): string {
   return policies[locale];
 }
 
-function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
+export function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
   const terms: Record<SupportedLocale, string> = {
     ca: [
       `Reserva: La data queda confirmada amb el pagament del 30% d'aval.`,

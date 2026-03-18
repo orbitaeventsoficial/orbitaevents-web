@@ -34,6 +34,8 @@ import {
   sendContract,
   markContractSigned,
   cancelContract,
+  getDefaultCancellationPolicy,
+  getDefaultTermsAndConditions,
 } from '@/lib/services/contractService';
 
 // ── Helpers ─────────────────────────────────────────────────────────────
@@ -474,5 +476,160 @@ describe('cancelContract', () => {
     await cancelContract('prop-1');
 
     expect(mockPrisma.leadActivity.create).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// getDefaultCancellationPolicy
+// ─────────────────────────────────────────────────────────────────────────
+describe('getDefaultCancellationPolicy', () => {
+  it('retorna política en català per defecte', () => {
+    const policy = getDefaultCancellationPolicy();
+    expect(policy).toContain('Cancel·lació amb més de 60 dies');
+    expect(policy).toContain('Cancel·lació entre 30 i 60 dies');
+    expect(policy).toContain('Cancel·lació amb menys de 30 dies');
+    expect(policy).toContain('Cancel·lació per part del prestador');
+    expect(policy).toContain('Canvi de data');
+  });
+
+  it('retorna política en castellà', () => {
+    const policy = getDefaultCancellationPolicy('es');
+    expect(policy).toContain('Cancelación con más de 60 días');
+    expect(policy).toContain('Cancelación entre 30 y 60 días');
+    expect(policy).toContain('señal no es reembolsable');
+    expect(policy).toContain('Cambio de fecha');
+  });
+
+  it('retorna política en anglès', () => {
+    const policy = getDefaultCancellationPolicy('en');
+    expect(policy).toContain('Cancellation more than 60 days');
+    expect(policy).toContain('deposit is non-refundable');
+    expect(policy).toContain('Date change');
+  });
+
+  it('conté 5 clàusules numerades', () => {
+    for (const locale of ['ca', 'es', 'en'] as const) {
+      const policy = getDefaultCancellationPolicy(locale);
+      expect(policy).toContain('1.');
+      expect(policy).toContain('2.');
+      expect(policy).toContain('3.');
+      expect(policy).toContain('4.');
+      expect(policy).toContain('5.');
+    }
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// getDefaultTermsAndConditions
+// ─────────────────────────────────────────────────────────────────────────
+describe('getDefaultTermsAndConditions', () => {
+  it('retorna termes en català per defecte', () => {
+    const terms = getDefaultTermsAndConditions();
+    expect(terms).toContain('Reserva:');
+    expect(terms).toContain('Pagament final:');
+    expect(terms).toContain('Desplaçament:');
+    expect(terms).toContain('Hores extres:');
+    expect(terms).toContain('Equip tècnic:');
+    expect(terms).toContain('Responsabilitat per danys:');
+    expect(terms).toContain('Alimentació:');
+    expect(terms).toContain('Soroll:');
+  });
+
+  it('retorna termes en castellà', () => {
+    const terms = getDefaultTermsAndConditions('es');
+    expect(terms).toContain('Reserva:');
+    expect(terms).toContain('Pago final:');
+    expect(terms).toContain('Desplazamiento:');
+    expect(terms).toContain('Horas extras:');
+    expect(terms).toContain('Equipo técnico:');
+  });
+
+  it('retorna termes en anglès', () => {
+    const terms = getDefaultTermsAndConditions('en');
+    expect(terms).toContain('Booking:');
+    expect(terms).toContain('Final payment:');
+    expect(terms).toContain('Travel:');
+    expect(terms).toContain('Extra hours:');
+    expect(terms).toContain('Technical equipment:');
+  });
+
+  // ── Noves clàusules ──────────────────────────────────────────────────
+
+  describe('clàusula Reserva de data (48h)', () => {
+    it('inclou reserva 48h en català', () => {
+      const terms = getDefaultTermsAndConditions('ca');
+      expect(terms).toContain('Reserva de data:');
+      expect(terms).toContain('48 hores');
+      expect(terms).toContain('30% d\'aval');
+      expect(terms).toContain('la data quedarà lliure');
+    });
+
+    it('inclou reserva 48h en castellà', () => {
+      const terms = getDefaultTermsAndConditions('es');
+      expect(terms).toContain('Reserva de fecha:');
+      expect(terms).toContain('48 horas');
+      expect(terms).toContain('30% de señal');
+      expect(terms).toContain('la fecha quedará libre');
+    });
+
+    it('inclou reserva 48h en anglès', () => {
+      const terms = getDefaultTermsAndConditions('en');
+      expect(terms).toContain('Date reservation:');
+      expect(terms).toContain('48 hours');
+      expect(terms).toContain('30% deposit');
+      expect(terms).toContain('date will become available');
+    });
+  });
+
+  describe('clàusula Propietat intel·lectual', () => {
+    it('inclou propietat intel·lectual en català', () => {
+      const terms = getDefaultTermsAndConditions('ca');
+      expect(terms).toContain('Propietat intel·lectual:');
+      expect(terms).toContain('fotografies i vídeos');
+      expect(terms).toContain('fins promocionals');
+      expect(terms).toContain('indicació expressa en contrari');
+    });
+
+    it('inclou propietat intel·lectual en castellà', () => {
+      const terms = getDefaultTermsAndConditions('es');
+      expect(terms).toContain('Propiedad intelectual:');
+      expect(terms).toContain('fotografías y vídeos');
+      expect(terms).toContain('fines promocionales');
+      expect(terms).toContain('indicación expresa en contrario');
+    });
+
+    it('inclou propietat intel·lectual en anglès', () => {
+      const terms = getDefaultTermsAndConditions('en');
+      expect(terms).toContain('Intellectual property:');
+      expect(terms).toContain('Photographs and videos');
+      expect(terms).toContain('promotional purposes');
+      expect(terms).toContain('expressly indicated otherwise');
+    });
+  });
+
+  it('conté 10 clàusules en cada idioma', () => {
+    for (const locale of ['ca', 'es', 'en'] as const) {
+      const terms = getDefaultTermsAndConditions(locale);
+      // Each clause is separated by newline
+      const clauses = terms.split('\n').filter(Boolean);
+      expect(clauses).toHaveLength(10);
+    }
+  });
+
+  it('inclou distància de desplaçament correcta (50 km)', () => {
+    // INCLUDED_TRAVEL_KM is mocked to 100, so 100/2 = 50
+    const terms = getDefaultTermsAndConditions('ca');
+    expect(terms).toContain('50 km');
+  });
+
+  it('les clàusules noves passen al PDF via additionalClauses', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal());
+
+    await generateContractFromProposal('prop-1');
+
+    const updateCall = mockPrisma.proposal.update.mock.calls[0][0];
+    expect(updateCall.data.additionalClauses).toContain('Reserva de data:');
+    expect(updateCall.data.additionalClauses).toContain('Propietat intel·lectual:');
+    expect(updateCall.data.additionalClauses).toContain('48 hores');
   });
 });
