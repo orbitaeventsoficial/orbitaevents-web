@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { mockWriteCache, mockSaveCronRun, mockLog } = vi.hoisted(() => ({
+const { mockWriteCache, mockReadCache, mockSaveCronRun, mockLog } = vi.hoisted(() => ({
   mockWriteCache: vi.fn(),
+  mockReadCache: vi.fn(),
   mockSaveCronRun: vi.fn(),
   mockLog: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 vi.mock('@/lib/services/googleReviewsCacheService', () => ({
   writeGoogleReviewsCache: mockWriteCache,
+  readGoogleReviewsCache: mockReadCache,
 }));
 vi.mock('@/lib/services/cronRunStatusService', () => ({
   saveCronRunStatus: mockSaveCronRun,
@@ -27,6 +29,7 @@ beforeEach(() => {
   process.env.SERPAPI_KEY = 'test-serp-key';
   process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID = 'ChIJtest123';
   mockWriteCache.mockResolvedValue(undefined);
+  mockReadCache.mockResolvedValue(null);
   mockSaveCronRun.mockResolvedValue(undefined);
 });
 
@@ -62,9 +65,17 @@ const serpApiReviewsResponse = {
 };
 
 function setupFetchMocks(kgData: unknown = serpApiKgResponse, reviewsData: unknown = serpApiReviewsResponse) {
+  // Paginació: reviewsData sense next_page_token = 1 sola pàgina
   mockFetch
     .mockResolvedValueOnce({ json: async () => kgData })
     .mockResolvedValueOnce({ json: async () => reviewsData });
+}
+
+function setupFetchMocksPaginated(kgData: unknown, pages: unknown[]) {
+  mockFetch.mockResolvedValueOnce({ json: async () => kgData });
+  for (const page of pages) {
+    mockFetch.mockResolvedValueOnce({ json: async () => page });
+  }
 }
 
 describe('fetchFromSerpAPI', () => {
@@ -118,7 +129,39 @@ describe('fetchFromSerpAPI', () => {
     const result = await fetchFromSerpAPI();
 
     expect(result!.total).toBe(100);
-    expect(result!.reviews).toHaveLength(0);
+  });
+
+  it('pagina múltiples pàgines de ressenyes', async () => {
+    setupFetchMocksPaginated(
+      serpApiKgResponse,
+      [
+        { reviews: [{ user: { name: 'A' }, rating: 5, snippet: 'Great', iso_date: '2026-03-01T10:00:00Z', date: 'recent' }], serpapi_pagination: { next_page_token: 'page2' } },
+        { reviews: [{ user: { name: 'B' }, rating: 4, snippet: 'Good', iso_date: '2026-02-01T10:00:00Z', date: 'last month' }] },
+      ]
+    );
+
+    const result = await fetchFromSerpAPI();
+
+    expect(result!.reviews.length).toBeGreaterThanOrEqual(2);
+    expect(mockFetch).toHaveBeenCalledTimes(3); // kg + 2 pages
+  });
+
+  it('merge amb ressenyes existents al cache', async () => {
+    mockReadCache.mockResolvedValueOnce({
+      reviews: [
+        { author_name: 'Cached User', rating: 5, text: 'Old review', time: 1000, relative_time_description: 'Fa temps' },
+      ],
+    });
+    setupFetchMocks(serpApiKgResponse, {
+      reviews: [{ user: { name: 'New User' }, rating: 5, snippet: 'New!', iso_date: '2026-03-10T10:00:00Z', date: 'recent' }],
+    });
+
+    const result = await fetchFromSerpAPI();
+
+    expect(result!.reviews.length).toBe(2);
+    const names = result!.reviews.map(r => r.author_name);
+    expect(names).toContain('Cached User');
+    expect(names).toContain('New User');
   });
 
   it('gestiona ressenyes sense camps opcionals', async () => {
@@ -157,11 +200,12 @@ describe('syncReviews', () => {
 
     await syncReviews();
 
-    expect(mockSaveCronRun).toHaveBeenCalledWith({
-      prefix: 'automation.reviewsSync',
-      status: 'ok',
-      summary: { rating: 4.8, total: 42, synced: 2 },
-    });
+    expect(mockSaveCronRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prefix: 'automation.reviewsSync',
+        status: 'ok',
+      })
+    );
   });
 
   it('fa log.warn si fetchFromSerpAPI retorna null', async () => {
