@@ -3,21 +3,44 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
-// ─── Portfolio carousel images ──────────────────────────────────────────────
+// ─── Pool complet d'imatges portfolio per al carousel ────────────────────────
 
-const HERO_SLIDES = [
-  { src: '/img/portfolio/discomovil/discomovil-01.avif', alt: 'Discomòbil Òrbita Events' },
-  { src: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-03.avif', alt: 'Festa Halloween' },
-  { src: '/img/portfolio/bodas/bodas-01.avif', alt: 'Boda Òrbita Events' },
-  { src: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif', alt: 'Món Màgic' },
-  { src: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', alt: 'Event empresa' },
-  { src: '/img/portfolio/discomovil/discomovil-05.avif', alt: 'Discomòbil festa' },
+const ALL_PORTFOLIO_IMAGES = [
+  // Discomòbil
+  ...Array.from({ length: 20 }, (_, i) => `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`),
+  // Bodas
+  ...Array.from({ length: 4 }, (_, i) => `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`),
+  // Festes privades
+  ...Array.from({ length: 12 }, (_, i) => `/img/portfolio/fiestas-privadas/fiestas-privadas-${String(i + 1).padStart(2, '0')}.avif`),
+  // Halloween
+  ...Array.from({ length: 7 }, (_, i) => `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`),
+  // Món Màgic
+  ...Array.from({ length: 5 }, (_, i) => `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`),
+  // Empreses
+  ...Array.from({ length: 8 }, (_, i) => `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`),
+  // Festes infantils
+  ...Array.from({ length: 5 }, (_, i) => `/img/portfolio/fiestas-infantiles/fiestas-infantiles-${String(i + 1).padStart(2, '0')}.avif`),
+  // Producció tècnica
+  ...Array.from({ length: 4 }, (_, i) => `/img/portfolio/produccion-tecnica/produccion-tecnica-${String(i + 1).padStart(2, '0')}.avif`),
+  // Alquiler equip
+  ...Array.from({ length: 4 }, (_, i) => `/img/portfolio/alquiler-equipo/alquiler-equipo-${String(i + 1).padStart(2, '0')}.avif`),
 ];
+
+const HERO_SLIDE_COUNT = 8;
+
+function shuffleAndPick(arr: string[], count: number): string[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+}
 
 // ─── Stagger wrapper ────────────────────────────────────────────────────────
 
@@ -55,6 +78,9 @@ export default function HeroElegant() {
   const [slideIndex, setSlideIndex] = useState(0);
   const reduceMotion = useReducedMotion();
 
+  // Escollir imatges aleatòries un sol cop per sessió
+  const heroSlides = useMemo(() => shuffleAndPick(ALL_PORTFOLIO_IMAGES, HERO_SLIDE_COUNT), []);
+
   // Rotate text every 4s
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,10 +92,10 @@ export default function HeroElegant() {
   // Rotate background slides every 5s (offset from text)
   useEffect(() => {
     const interval = setInterval(() => {
-      setSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+      setSlideIndex((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
 
   return (
     <section
@@ -78,21 +104,21 @@ export default function HeroElegant() {
     >
       {/* ── Background carousel ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {/* Portfolio image slides with crossfade — all eager-loaded */}
-        {HERO_SLIDES.map((slide, i) => (
+        {/* Portfolio image slides with crossfade */}
+        {heroSlides.map((src, i) => (
           <div
-            key={slide.src}
+            key={src}
             className="absolute inset-0 transition-opacity duration-[2s] ease-in-out will-change-[opacity]"
             style={{ opacity: i === slideIndex ? 1 : 0 }}
           >
             <Image
-              src={slide.src}
-              alt={slide.alt}
+              src={src}
+              alt="Òrbita Events"
               fill
               className="object-cover"
               style={{ filter: 'brightness(0.55) saturate(1.15)' }}
               sizes="100vw"
-              priority
+              priority={i < 2}
               quality={75}
             />
           </div>
@@ -109,7 +135,7 @@ export default function HeroElegant() {
 
       {/* ── Slide indicators ── */}
       <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 flex items-center gap-1.5 pointer-events-none">
-        {HERO_SLIDES.map((_, i) => (
+        {heroSlides.map((_, i) => (
           <div
             key={i}
             className={`h-0.5 rounded-full transition-all duration-700 ${
@@ -139,7 +165,7 @@ export default function HeroElegant() {
               <h1 className="text-[2.75rem] leading-[0.95] md:text-7xl lg:text-[5.5rem] font-black text-white tracking-tight">
                 {t('title1')}
                 <br />
-                <span className="relative inline-block min-h-[1.15em] mt-1 md:mt-2">
+                <span className="relative inline-block min-h-[2.3em] mt-1 md:mt-2">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={textIndex}
