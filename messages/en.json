@@ -371,7 +371,7 @@
     ]
   },
   "trust": {
-    "headline": "+2 years creating unique experiences",
+    "headline": "+3 years creating unique experiences",
     "subheadline": "Complete experiences in Barcelona and Girona. Professionalism and dedication in every detail.",
     "clients": "They have trusted us"
   },
@@ -1241,7 +1241,7 @@
       "experience": {
         "title": "Experience from within",
         "description": "We have been working on events for years. We know how a wedding works BEFORE the music starts. We know the times, the nerves, the unforeseen events.",
-        "highlight": "+2 years of experience"
+        "highlight": "+3 years of experience"
       },
       "timing": {
         "title": "We understand the times",
@@ -2412,7 +2412,7 @@
         "imageAlt": "Orbita Events Services Barcelona"
       },
       "hero": {
-        "badge": "+2 years · Barcelona and Girona",
+        "badge": "+3 years · Barcelona and Girona",
         "title": "Our Services",
         "titleHighlight": "For Your Unforgettable Event",
         "subtitle": "Professional DJ, synchronized lighting and special effects to make your event memorable.",
@@ -2540,7 +2540,7 @@
         "party": "Party"
       },
       "badge": "Wedding experience",
-      "badgeYears": "2+ years in the sector",
+      "badgeYears": "3+ years in the sector",
       "heroTitle": "DJ for Weddings in Barcelona",
       "heroSubtitle": "Complete personalized experience: music, lighting and effects tailored to your story. Instant quote.",
       "coverage": {
@@ -2731,7 +2731,7 @@
       "title": "Discommobile",
       "subtitle": "Professional DJ wherever you need it",
       "description": "Complete mobile disco service with professional sound and lighting.",
-      "badgeYears": "2+ years in the sector",
+      "badgeYears": "3+ years in the sector",
       "heroTitle": "Discomovil Barcelona",
       "heroSubtitle": "Music adapted in real time, ambient lighting and special effects. Much more than playing music. Instant quote.",
       "guestsQuestion": "How many people are you expecting?",
@@ -3891,85 +3891,28 @@
     "addTo": "Added to any service"
   },
   "servicesGrid": {
-    "subtitle": "What makes us different",
-    "title": "Experiences that no one else offers",
-    "description": "We are not just DJs. We transform your event into a complete experience with decoration, effects and setting.",
-    "viewMore": "See more",
-    "notFound": "Do you want another theme?",
-    "contact": "We create it for you",
-    "items": {
-      "halloween": {
-        "title": "🎃 Halloween theme",
-        "description": "Horror nights with complete decoration",
-        "price": "From €600",
-        "badge": "🔥 Season {year}",
-        "href": "/halloween-theme",
-        "features": [
-          "Theme DJ",
-          "Complete decoration",
-          "Smoke + FX",
-          "2 giant ghosts"
-        ]
+    "title": "We don't play music. We create worlds.",
+    "description": "DJ + sound + lights + theming + production. All in one. The only team in Barcelona and Girona that does it all together.",
+    "viewMore": "Discover",
+    "pillars": {
+      "dj": {
+        "title": "DJ + Professional Sound",
+        "desc": "The dance floor packed all night. We read the room, adapt the music live and bring real club gear.",
+        "highlights": ["Club equipment", "LED lights sync", "Smoke + CO2 + Confetti"]
       },
-      "monMagic": {
-        "title": "🪄 Magic World",
-        "description": "Magic school experience",
-        "price": "From €600",
-        "badge": "✨ Unique experience",
-        "href": "/tematica-mon-magic",
-        "features": [
-          "Envelopes with sealing wax",
-          "floating candles",
-          "Complete decoration",
-          "Setting"
-        ]
+      "theming": {
+        "title": "Full Theming",
+        "desc": "Halloween, Wizarding World, tropical, 80s... We transform the entire space. Decoration, props, atmosphere. Nobody else does it like this.",
+        "highlights": ["Immersive décor", "Theme props", "Scenography"]
       },
-      "casaments": {
-        "title": "💒 Weddings",
-        "description": "The most special day deserves to be perfect",
-        "price": "From €550",
-        "badge": "",
-        "href": "/services/weddings",
-        "features": [
-          "Professional DJ",
-          "Sound + Lights",
-          "Coordination"
-        ]
-      },
-      "festes": {
-        "title": "🎉 Private Parties",
-        "description": "The party they will always remember",
-        "price": "From €250",
-        "badge": "",
-        "href": "/services/parties",
-        "features": [
-          "Discommobile",
-          "LED lights",
-          "Effects",
-          "All inclusive"
-        ]
-      },
-      "empreses": {
-        "title": "🏢 Companies",
-        "description": "Impact corporate events",
-        "price": "From €400",
-        "badge": "",
-        "href": "/services/companies",
-        "features": [
-          "Audiovisual",
-          "wireless microphone",
-          "Branding",
-          "Bill"
-        ]
+      "production": {
+        "title": "Technical Production",
+        "desc": "Corporate events, presentations, festivals. Audiovisual, architectural lighting, microphones, streaming.",
+        "highlights": ["HD Audiovisual", "Architectural lighting", "Streaming"]
       }
     },
-    "ctaButton": "Contact us",
-    "mobileCta": {
-      "ready": "Ready for your event?",
-      "response": "Response in <2h - Free quote",
-      "whatsapp": "WhatsApp",
-      "prices": "See prices"
-    }
+    "weDoIt": "We do it for:",
+    "eventTypes": ["Weddings", "Private parties", "Corporate", "Birthdays", "Halloween", "Communions", "Festivals"]
   },
   "offerModal": {
     "ariaLabel": "Last minute offer",
@@ -4440,10 +4383,10 @@
       "whatsapp": "Write to us on WhatsApp",
       "contactForm": "Contact form",
       "call": "Call us: 699 121 023",
-      "trustYears": "🎯 +2 years of experience",
+      "trustYears": "🎯 +3 years of experience",
       "trustLocation": "📍 Barcelona and Girona",
       "trustResponse": "⚡ Response in 2 hours",
-      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before"
+      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before · Date reserved for 48h"
     },
     "testimonis": {
       "0": {
@@ -4516,7 +4459,7 @@
       "swipeHint": "← Swipe to see more photos"
     },
     "gallery": {
-      "sectionTitle": "2+ years experience",
+      "sectionTitle": "3+ years experience",
       "title": "Experiences",
       "titleHighlight": "real",
       "viewAll": "See the entire portfolio"
@@ -4550,7 +4493,7 @@
       "whatsapp": "direct WhatsApp",
       "budget": "Request a quote",
       "call": "Call us",
-      "trustYears": "2+ years",
+      "trustYears": "3+ years",
       "trustLocation": "BCN + Girona",
       "trustResponse": "2h response"
     }
@@ -4931,7 +4874,7 @@
   },
   "seoJsonLd": {
     "organization": {
-      "description": "Professional events in Barcelona and Girona: weddings, private parties, corporate events. Professional DJ, party theming and special effects. +2 years of experience."
+      "description": "Professional events in Barcelona and Girona: weddings, private parties, corporate events. Professional DJ, party theming and special effects. +3 years of experience."
     },
     "services": {
       "bodas": {
@@ -6300,7 +6243,7 @@
         "limited": "🔥 It's over!",
         "available": "✓ Available"
       },
-      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before"
+      "guarantee": "✓ No-obligation quote · 100% refund if cancelled 60+ days before · Date reserved for 48h"
     },
     "heroVideo": {
       "badge": "✨ Creators of Immersive Experiences",

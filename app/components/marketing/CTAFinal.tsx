@@ -40,6 +40,7 @@ export default function CTAFinal() {
   const { currentMonthAvailable, data: availData } = useAvailability();
   const { stats } = usePublicStats();
   const responseValue = stats.responseTime ? `<${stats.responseTime}` : '<2h';
+  const displayEvents = Math.max(stats.totalEvents || 0, 50);
 
   const monthName = availData.monthlyAvailability[0]?.monthName || '';
   const satStatus: 'scarce' | 'limited' | 'available' =
@@ -162,7 +163,7 @@ export default function CTAFinal() {
           >
             <span className="flex items-center gap-2 justify-center">
               <span className="text-xl">🎯</span>
-              <span><strong className="text-white">+{stats.totalEvents}</strong> {t('events')}</span>
+              <span><strong className="text-white">+{displayEvents}</strong> {t('events')}</span>
             </span>
             <span className="hidden sm:block w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2 justify-center">

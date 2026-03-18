@@ -1,185 +1,161 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 
-// Solo tres puertas principales: Bodas / Fiestas / Empresas
-const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
+// ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
 
-// Imagenes de fondo por servicio (portfolio)
-const SERVICE_IMAGES: Record<string, string> = {
-  casaments: '/img/portfolio/bodas/bodas-01.avif',
-  festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
-  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
-};
+function IconDJ() {
+  return (
+    <svg className="w-8 h-8" fill="none" viewBox="0 0 32 32" stroke="currentColor" strokeWidth={1.5}>
+      <circle cx="16" cy="16" r="12" />
+      <circle cx="16" cy="16" r="5" />
+      <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+      <path d="M16 4v3M16 25v3M4 16h3M25 16h3" strokeLinecap="round" />
+    </svg>
+  );
+}
 
-// Estilos por servicio
-const SERVICE_STYLES: Record<string, { overlay: string; accent: string; hoverGlow: string }> = {
-  casaments: {
-    overlay: 'from-pink-950/80 via-black/70 to-black/90',
-    accent: 'text-pink-400',
-    hoverGlow: 'hover:shadow-pink-500/30',
-  },
-  festes: {
-    overlay: 'from-purple-950/80 via-black/70 to-black/90',
-    accent: 'text-purple-400',
-    hoverGlow: 'hover:shadow-purple-500/30',
-  },
-  empreses: {
-    overlay: 'from-blue-950/80 via-black/70 to-black/90',
-    accent: 'text-blue-400',
-    hoverGlow: 'hover:shadow-blue-500/30',
-  },
-};
+function IconTheme() {
+  return (
+    <svg className="w-8 h-8" fill="none" viewBox="0 0 32 32" stroke="currentColor" strokeWidth={1.5}>
+      <path d="M16 3l3 7h7l-5.5 4.5 2 7L16 17l-6.5 4.5 2-7L6 10h7l3-7z" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
-// Hrefs por servicio
-const SERVICE_HREFS: Record<string, string> = {
-  casaments: '/servicios/bodas',
-  festes: '/servicios/fiestas',
-  empreses: '/servicios/empresas',
-};
+function IconProduction() {
+  return (
+    <svg className="w-8 h-8" fill="none" viewBox="0 0 32 32" stroke="currentColor" strokeWidth={1.5}>
+      <rect x="4" y="8" width="24" height="16" rx="2" />
+      <path d="M13 14l6 3-6 3V14z" fill="currentColor" stroke="none" />
+      <path d="M8 27h16M12 24h8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// ─── Main ───────────────────────────────────────────────────────────────────
 
 export default function ServicesGridElegant() {
   const t = useTranslations('servicesGrid');
+  const reduceMotion = useReducedMotion();
+
+  const pillars = [
+    {
+      key: 'dj',
+      Icon: IconDJ,
+      accent: 'from-amber-500 to-orange-500',
+      accentLight: 'text-amber-400',
+      glowColor: 'rgba(251, 191, 36, 0.08)',
+      href: '/servicios/fiestas',
+    },
+    {
+      key: 'theming',
+      Icon: IconTheme,
+      accent: 'from-purple-500 to-pink-500',
+      accentLight: 'text-purple-400',
+      glowColor: 'rgba(168, 85, 247, 0.08)',
+      href: '/portfolio',
+    },
+    {
+      key: 'production',
+      Icon: IconProduction,
+      accent: 'from-cyan-500 to-blue-500',
+      accentLight: 'text-cyan-400',
+      glowColor: 'rgba(6, 182, 212, 0.08)',
+      href: '/servicios/empresas',
+    },
+  ];
 
   return (
-    <section className="py-6 md:py-10 bg-gradient-to-b from-black to-zinc-950">
-      <div className="container mx-auto px-4">
-        {/* Header */}
+    <section className="py-16 md:py-24 bg-[#0A0A0A] relative overflow-hidden">
+      {/* Ambient */}
+      <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/[0.02] blur-[120px] pointer-events-none" />
+
+      <div className="container mx-auto px-6 max-w-5xl">
+        {/* Header — direct, no fluff */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-14 md:mb-20"
         >
-          <span className="text-orange-400 text-sm font-medium tracking-wider uppercase">
-            {t('subtitle')}
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+          <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
             {t('title')}
           </h2>
-          <p className="text-white/60 max-w-2xl mx-auto">
+          <p className="text-white/50 text-base md:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
             {t('description')}
           </p>
         </motion.div>
 
-        {/* Grid de serveis */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {SERVICE_KEYS.map((key, index) => {
-            const styles = SERVICE_STYLES[key];
-            const href = SERVICE_HREFS[key];
-            const image = SERVICE_IMAGES[key];
-            const badge = t(`items.${key}.badge`, { year: new Date().getFullYear() });
-            const features = t.raw(`items.${key}.features`) as string[];
-
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`
-                  relative group
-                  ${index < 2 ? 'lg:col-span-1 md:col-span-1' : ''}
-                `}
-              >
-                <Link href={href}>
-                  <div
-                    className={`
-                      relative h-full min-h-[280px] rounded-2xl overflow-hidden
-                      border border-white/10
-                      hover:border-white/30
-                      transition-all duration-300
-                      hover:shadow-xl ${styles.hoverGlow}
-                      cursor-pointer
-                    `}
-                  >
-                    {/* Imagen de fondo */}
-                    <Image
-                      src={image}
-                      alt={t(`items.${key}.title`)}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 90vw"
-                      quality={70}
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-
-                    {/* Overlay gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-t ${styles.overlay}`} />
-
-                    {/* Badge si existe */}
-                    {badge && badge !== `items.${key}.badge` && (
-                      <div className="absolute top-4 left-4 z-10">
-                        <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
-                          {badge}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Contenido */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
-                      <h3 className="text-xl font-bold text-white mb-2">
-                        {t(`items.${key}.title`)}
-                      </h3>
-                      <p className="text-white/70 text-sm mb-4 line-clamp-2">
-                        {t(`items.${key}.description`)}
-                      </p>
-
-                      {/* Features */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {features.slice(0, 3).map((feature, i) => (
-                          <span
-                            key={i}
-                            className="px-2 py-1 bg-black/40 backdrop-blur-sm rounded text-white/80 text-xs"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Precio */}
-                      <div className="flex items-center justify-between">
-                        <span className={`font-bold ${styles.accent}`}>
-                          {t(`items.${key}.price`)}
-                        </span>
-                        <span className="text-white/50 text-sm group-hover:text-white transition-colors">
-                          {t('viewMore')} -&gt;
-                        </span>
-                      </div>
-                    </div>
+        {/* 3 pillars — icon-driven, no images */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {pillars.map(({ key, Icon, accent, accentLight, glowColor, href }, i) => (
+            <motion.div
+              key={key}
+              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Link href={href} className="group block">
+                <div
+                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] transition-all duration-500 h-full"
+                  style={{ background: `radial-gradient(ellipse at top left, ${glowColor}, transparent 70%)` }}
+                >
+                  {/* Icon */}
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${accent} text-white mb-5`}>
+                    <Icon />
                   </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+
+                  {/* Title */}
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-white/90 transition-colors">
+                    {t(`pillars.${key}.title`)}
+                  </h3>
+
+                  {/* Description — benefit-focused, not feature list */}
+                  <p className="text-white/50 text-sm leading-relaxed mb-5">
+                    {t(`pillars.${key}.desc`)}
+                  </p>
+
+                  {/* Highlights */}
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {(t.raw(`pillars.${key}.highlights`) as string[]).map((h, j) => (
+                      <span key={j} className={`text-xs font-medium px-2.5 py-1 rounded-full border border-white/[0.08] ${accentLight} bg-white/[0.03]`}>
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Link */}
+                  <div className={`flex items-center gap-1.5 text-sm font-semibold ${accentLight} group-hover:gap-2.5 transition-all`}>
+                    <span>{t('viewMore')}</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </div>
 
-        {/* CTA otras tematicas */}
+        {/* Bottom — types of events, compact */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="mt-12 md:mt-16 flex flex-wrap items-center justify-center gap-3 md:gap-4"
         >
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">
-            {t('notFound')}<br />
-            <span className="text-orange-400">{t('contact')}</span>
-          </h3>
-          <Link
-            href="/contacto"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 rounded-full text-black font-bold transition-all hover:scale-105"
-          >
-            {t('ctaButton')}
-            <span>-&gt;</span>
-          </Link>
+          <span className="text-white/30 text-sm">{t('weDoIt')}</span>
+          {(t.raw('eventTypes') as string[]).map((type, i) => (
+            <span key={i} className="text-white/60 text-sm font-medium px-3 py-1.5 rounded-full border border-white/[0.08] hover:border-white/20 transition-colors">
+              {type}
+            </span>
+          ))}
         </motion.div>
-
-        {/* CTA móvil eliminado - ya existe BottomNav + FloatingCTAs globales */}
       </div>
     </section>
   );
 }
-

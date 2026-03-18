@@ -462,7 +462,7 @@ export default function Footer() {
             </p>
 
             {/* Legal Links */}
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+            <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-2 text-sm pr-20 md:pr-0">
               {LEGAL_LINKS.map((link, idx) => (
                 <span key={link.nameKey} className="flex items-center gap-4">
                   <Link

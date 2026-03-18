@@ -163,7 +163,7 @@ export const SITE_CONFIG = {
       const fundingDate = new Date('2023-08-01');
       const now = new Date();
       const diffYears = (now.getTime() - fundingDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-      return Math.max(2, Math.floor(diffYears));
+      return Math.max(3, Math.floor(diffYears));
     })(),
     yearsLabel: 'Desde 2023',
     eventsCompleted: 50,

@@ -74,6 +74,8 @@ function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
       `Responsabilitat per danys: El client és responsable de qualsevol dany causat a l'equip tècnic per part dels convidats o per condicions inadequades del lloc (humitat, pluja sense cobertura, etc.).`,
       `Alimentació: Per a esdeveniments de més de 6 hores, el client proporcionarà un àpat per al DJ/tècnic.`,
       `Soroll: El client és responsable d'obtenir els permisos necessaris i de complir amb les ordenances municipals de soroll. El prestador ajustarà el volum segons la normativa vigent.`,
+      `Reserva de data: Un cop enviat el pressupost, la data queda reservada durant 48 hores sense necessitat de pagament. Si transcorregut aquest termini no s'ha formalitzat la reserva amb el pagament del 30% d'aval, la data quedarà lliure i es podrà assignar a un altre client.`,
+      `Propietat intel·lectual: Les fotografies i vídeos realitzats durant els esdeveniments podran ser utilitzats per Òrbita Events amb fins promocionals, llevat d'indicació expressa en contrari per part del client.`,
     ].join('\n'),
     es: [
       `Reserva: La fecha queda confirmada con el pago del 30% de señal.`,
@@ -84,6 +86,8 @@ function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
       `Responsabilidad por daños: El cliente es responsable de cualquier daño causado al equipo técnico por parte de los invitados o por condiciones inadecuadas del lugar.`,
       `Alimentación: Para eventos de más de 6 horas, el cliente proporcionará una comida para el DJ/técnico.`,
       `Ruido: El cliente es responsable de obtener los permisos necesarios y de cumplir con las ordenanzas municipales de ruido.`,
+      `Reserva de fecha: Una vez enviado el presupuesto, la fecha queda reservada durante 48 horas sin necesidad de pago. Si transcurrido este plazo no se ha formalizado la reserva con el pago del 30% de señal, la fecha quedará libre y podrá asignarse a otro cliente.`,
+      `Propiedad intelectual: Las fotografías y vídeos realizados durante los eventos podrán ser utilizados por Òrbita Events con fines promocionales, salvo indicación expresa en contrario por parte del cliente.`,
     ].join('\n'),
     en: [
       `Booking: The date is confirmed upon payment of the 30% deposit.`,
@@ -94,6 +98,8 @@ function getDefaultTermsAndConditions(locale: SupportedLocale = 'ca'): string {
       `Damage liability: The client is responsible for any damage to technical equipment caused by guests or inadequate venue conditions.`,
       `Catering: For events longer than 6 hours, the client will provide a meal for the DJ/technician.`,
       `Noise: The client is responsible for obtaining necessary permits and complying with local noise regulations.`,
+      `Date reservation: Once the quote is sent, the date is reserved for 48 hours at no cost. If the booking is not confirmed with the 30% deposit payment within this period, the date will become available and may be assigned to another client.`,
+      `Intellectual property: Photographs and videos taken during events may be used by Òrbita Events for promotional purposes, unless expressly indicated otherwise by the client.`,
     ].join('\n'),
   };
   return terms[locale];

@@ -24,7 +24,7 @@ async function main() {
     
     // Stats per l'API pública (claus que busca /api/public/stats)
     // NOTA: L'API ara usa valors hardcoded, però mantenim aquests per referència
-    { key: 'years_experience', value: '+2 anys', type: 'STRING', category: 'stats', label: 'Anys empresa activa (des de 2023)' },
+    { key: 'years_experience', value: '+3 anys', type: 'STRING', category: 'stats', label: 'Anys empresa activa (des de 2023)' },
     { key: 'coverage', value: 'Barcelona + Girona', type: 'STRING', category: 'stats', label: 'Cobertura geogràfica (2 províncies)' },
     { key: 'response_time', value: '2h', type: 'STRING', category: 'stats', label: 'Temps resposta' },
     { key: 'google_rating', value: '5.0', type: 'STRING', category: 'stats', label: 'Valoració Google' },

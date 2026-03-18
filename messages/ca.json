@@ -349,7 +349,7 @@
     }
   },
   "trust": {
-    "headline": "+2 anys creant experiències úniques",
+    "headline": "+3 anys creant experiències úniques",
     "subheadline": "Experiències completes a Barcelona i Girona. Professionalitat i dedicació en cada detall.",
     "clients": "Han confiat en nosaltres"
   },
@@ -1994,7 +1994,7 @@
         "imageAlt": "Serveis Orbita Events Barcelona"
       },
       "hero": {
-        "badge": "+2 anys · Barcelona i Girona",
+        "badge": "+3 anys · Barcelona i Girona",
         "title": "Els Nostres Serveis",
         "titleHighlight": "Per a Qualsevol Tipus de Festa",
         "subtitle": "DJ professional + llums + efectes. Tot el que necessites.",
@@ -2125,7 +2125,7 @@
         "party": "Festa"
       },
       "badge": "Experiència en casaments",
-      "badgeYears": "2+ anys en el sector",
+      "badgeYears": "3+ anys en el sector",
       "heroTitle": "DJ per a Casaments a Barcelona",
       "heroSubtitle": "Experiència personalitzada completa: música, il·luminació i efectes adaptats a la teva història. Pressupost instantani.",
       "coverage": {
@@ -2316,7 +2316,7 @@
       "title": "Discomòbil",
       "subtitle": "DJ professional allà on ho necessitis",
       "description": "Servei complet de discomòbil amb so i il·luminació professionals.",
-      "badgeYears": "2+ anys en el sector",
+      "badgeYears": "3+ anys en el sector",
       "heroTitle": "Discomòbil Barcelona",
       "heroSubtitle": "Música adaptada en temps real, il·luminació d'ambient i efectes especials. Molt més que posar música. Pressupost a l'instant.",
       "guestsQuestion": "Quantes persones espereu?",
@@ -2989,85 +2989,28 @@
     "addTo": "S'afegeix a qualsevol servei"
   },
   "servicesGrid": {
-    "subtitle": "Què ens fa diferents",
-    "title": "Experiències que ningú més ofereix",
-    "description": "No som només DJs. Transformem el teu event en una experiència completa amb decoració, efectes i ambientació.",
-    "viewMore": "Veure més",
-    "notFound": "Vols una altra temàtica?",
-    "contact": "La creem per a tu",
-    "items": {
-      "halloween": {
-        "title": "🎃 Temàtica Halloween",
-        "description": "Nits de terror amb decoració completa",
-        "price": "Des de 600€",
-        "badge": "🔥 Temporada {year}",
-        "href": "/tematica-halloween",
-        "features": [
-          "DJ temàtic",
-          "Decoració arreu",
-          "Fum + FX",
-          "2 fantasmes gegants"
-        ]
+    "title": "No posem música. Creem mons.",
+    "description": "DJ + so + llums + tematització + producció. Tot en un. L'únic equip a Barcelona i Girona que ho fa tot junt.",
+    "viewMore": "Descobrir",
+    "pillars": {
+      "dj": {
+        "title": "DJ + So Professional",
+        "desc": "La pista plena tota la nit. Llegim la sala, adaptem la música en directe i portem equip de club de veritat.",
+        "highlights": ["Equip de club", "Llums LED sync", "Fum + CO2 + Confeti"]
       },
-      "monMagic": {
-        "title": "🪄 Món Màgic",
-        "description": "Experiència escola de màgia",
-        "price": "Des de 600€",
-        "badge": "✨ Experiència única",
-        "href": "/tematica-mon-magic",
-        "features": [
-          "Sobres amb lacre",
-          "Veles flotants",
-          "Decoració completa",
-          "Ambientació"
-        ]
+      "theming": {
+        "title": "Tematització Completa",
+        "desc": "Halloween, Món Màgic, tropical, anys 80... Transformem l'espai sencer. Decoració, atrezzo, ambientació. Ningú més ho fa així.",
+        "highlights": ["Decoració immersiva", "Atrezzo temàtic", "Escenografia"]
       },
-      "casaments": {
-        "title": "💒 Casaments",
-        "description": "El dia més especial mereix ser perfecte",
-        "price": "Des de 550€",
-        "badge": "",
-        "href": "/servicios/bodas",
-        "features": [
-          "DJ Professional",
-          "So + Llums",
-          "Coordinació"
-        ]
-      },
-      "festes": {
-        "title": "🎉 Festes Privades",
-        "description": "La festa que recordaran sempre",
-        "price": "Des de 250€",
-        "badge": "",
-        "href": "/servicios/fiestas",
-        "features": [
-          "Discomòbil",
-          "Llums LED",
-          "Efectes",
-          "Tot inclòs"
-        ]
-      },
-      "empreses": {
-        "title": "🏢 Empreses",
-        "description": "Events corporatius d'impacte",
-        "price": "Des de 400€",
-        "badge": "",
-        "href": "/servicios/empresas",
-        "features": [
-          "Audiovisual",
-          "Micro sense fil",
-          "Branding",
-          "Factura"
-        ]
+      "production": {
+        "title": "Producció Tècnica",
+        "desc": "Events corporatius, presentacions, festivals. Audiovisual, il·luminació arquitectònica, microfonía, streaming.",
+        "highlights": ["Audiovisual HD", "Il·luminació arq.", "Streaming"]
       }
     },
-    "ctaButton": "Contacta'ns",
-    "mobileCta": {
-      "ready": "A punt per al teu esdeveniment?",
-      "response": "Resposta en <2h - Pressupost gratis",
-      "whatsapp": "WhatsApp",
-      "prices": "Veure preus"
-    }
+    "weDoIt": "Ho fem per a:",
+    "eventTypes": ["Casaments", "Festes privades", "Empreses", "Aniversaris", "Halloween", "Comunions", "Festivals"]
   },
   "offerModal": {
     "ariaLabel": "Oferta d'última hora",
@@ -3938,7 +3881,7 @@
       "experience": {
         "title": "Experiència des de dins",
         "description": "Portem anys treballant en events. Sabem com funciona un casament ABANS que comenci la música. Coneixem els temps, els nervis, els imprevistos.",
-        "highlight": "+2 anys d'experiència"
+        "highlight": "+3 anys d'experiència"
       },
       "timing": {
         "title": "Entenem els temps",
@@ -4150,10 +4093,10 @@
       "whatsapp": "Escriu-nos per WhatsApp",
       "contactForm": "Formulari de contacte",
       "call": "Truca'ns: 699 121 023",
-      "trustYears": "🎯 +2 anys d'experiència",
+      "trustYears": "🎯 +3 anys d'experiència",
       "trustLocation": "📍 Barcelona i Girona",
       "trustResponse": "⚡ Resposta en 2h",
-      "guarantee": "✓ Pressupost sense compromís · Cancel·lació amb retorn 100% fins 60 dies abans"
+      "guarantee": "✓ Pressupost sense compromís · Retorn 100% si cancel·les amb +60 dies · La data es reserva 48h"
     },
     "testimonis": {
       "0": {
@@ -4226,7 +4169,7 @@
       "swipeHint": "← Fes swipe per veure més fotos"
     },
     "gallery": {
-      "sectionTitle": "2+ anys experiència",
+      "sectionTitle": "3+ anys experiència",
       "title": "Experiències",
       "titleHighlight": "reals",
       "viewAll": "Veure tot el portfolio"
@@ -4260,7 +4203,7 @@
       "whatsapp": "WhatsApp directe",
       "budget": "Demana pressupost",
       "call": "Truca'ns",
-      "trustYears": "2+ anys",
+      "trustYears": "3+ anys",
       "trustLocation": "BCN + Girona",
       "trustResponse": "2h resposta"
     }
@@ -5189,7 +5132,7 @@
   },
   "seoJsonLd": {
     "organization": {
-      "description": "Events professionals a Barcelona i Girona: casaments, festes privades, events corporatius. DJ professional, tematització de festes i efectes especials. +2 anys d'experiència."
+      "description": "Events professionals a Barcelona i Girona: casaments, festes privades, events corporatius. DJ professional, tematització de festes i efectes especials. +3 anys d'experiència."
     },
     "services": {
       "bodas": {
@@ -6552,7 +6495,7 @@
         "limited": "🔥 S'acaba!",
         "available": "✓ Disponible"
       },
-      "guarantee": "✓ Pressupost sense compromís · Cancel·lació amb retorn 100% fins 60 dies abans"
+      "guarantee": "✓ Pressupost sense compromís · Retorn 100% si cancel·les amb +60 dies · La data es reserva 48h"
     },
     "heroVideo": {
       "badge": "✨ Creadors d'Experiències Immersives",
