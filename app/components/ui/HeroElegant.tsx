@@ -78,33 +78,26 @@ export default function HeroElegant() {
     >
       {/* ── Background carousel ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {/* Portfolio image slides with crossfade */}
+        {/* Portfolio image slides with crossfade — all eager-loaded */}
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={slide.src}
-            className="absolute inset-0 transition-opacity duration-[2s] ease-in-out"
+            className="absolute inset-0 transition-opacity duration-[2s] ease-in-out will-change-[opacity]"
             style={{ opacity: i === slideIndex ? 1 : 0 }}
           >
             <Image
               src={slide.src}
               alt={slide.alt}
               fill
-              className="object-cover scale-[1.05]"
+              className="object-cover"
               style={{ filter: 'brightness(0.55) saturate(1.15)' }}
               sizes="100vw"
-              priority={i === 0}
+              priority
               quality={75}
             />
           </div>
         ))}
 
-        {/* Ken Burns subtle zoom on active slide */}
-        <style jsx>{`
-          @keyframes kenburns {
-            0% { transform: scale(1.05); }
-            100% { transform: scale(1.15); }
-          }
-        `}</style>
 
         {/* Gradient overlays — cinematic */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/60 to-black/30" />
@@ -150,10 +143,10 @@ export default function HeroElegant() {
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={textIndex}
-                      initial={reduceMotion ? false : { opacity: 0, y: 24, filter: 'blur(6px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={reduceMotion ? undefined : { opacity: 0, y: -24, filter: 'blur(6px)' }}
-                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                      initial={reduceMotion ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={{ duration: 0.4, ease: 'easeInOut' }}
                       className="inline-block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent"
                     >
                       {rotatingTexts[textIndex]}
