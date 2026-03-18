@@ -245,35 +245,71 @@ export default function PortfolioShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const interactionTimer = useRef<NodeJS.Timeout | null>(null);
+  const speedRef = useRef(0.5); // px per frame base
+  const edgeSpeedRef = useRef(0); // velocitat extra per edge hover
+  const rafRef = useRef<number | null>(null);
+  const pausedRef = useRef(false);
+  const pauseTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-scroll carousel cada 5s
+  // Auto-scroll continu amb requestAnimationFrame (molt suau)
   useEffect(() => {
-    if (reduceMotion || isUserInteracting) return;
+    if (reduceMotion) return;
     const el = scrollRef.current;
     if (!el) return;
 
-    const interval = setInterval(() => {
-      const cardWidth = el.querySelector(':scope > *')?.clientWidth || 400;
-      const maxScroll = el.scrollWidth - el.clientWidth;
+    const tick = () => {
+      if (!pausedRef.current) {
+        const speed = speedRef.current + edgeSpeedRef.current;
+        const maxScroll = el.scrollWidth - el.clientWidth;
 
-      if (el.scrollLeft >= maxScroll - 10) {
-        // Tornar al principi
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: cardWidth + 20, behavior: 'smooth' });
+        if (el.scrollLeft >= maxScroll - 1) {
+          el.scrollLeft = 0;
+        } else {
+          el.scrollLeft += speed;
+        }
       }
-    }, 5000);
+      rafRef.current = requestAnimationFrame(tick);
+    };
 
-    return () => clearInterval(interval);
-  }, [reduceMotion, isUserInteracting]);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [reduceMotion]);
 
-  // Pausar auto-scroll quan l'usuari interactua (touch/mouse)
+  // Pausar auto-scroll quan l'usuari interactua
   const handleUserInteraction = useCallback(() => {
-    setIsUserInteracting(true);
-    if (interactionTimer.current) clearTimeout(interactionTimer.current);
-    interactionTimer.current = setTimeout(() => setIsUserInteracting(false), 10000);
+    pausedRef.current = true;
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => { pausedRef.current = false; }, 8000);
+  }, []);
+
+  // Edge hover: accelerar quan el ratolí s'acosta a les vores (desktop)
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    const edgeZone = width * 0.15; // 15% de cada vora
+
+    if (x < edgeZone) {
+      // Vora esquerra: scroll enrere
+      const intensity = 1 - (x / edgeZone);
+      edgeSpeedRef.current = -3 * intensity;
+      pausedRef.current = false;
+    } else if (x > width - edgeZone) {
+      // Vora dreta: scroll endavant
+      const intensity = 1 - ((width - x) / edgeZone);
+      edgeSpeedRef.current = 3 * intensity;
+      pausedRef.current = false;
+    } else {
+      edgeSpeedRef.current = 0;
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    edgeSpeedRef.current = 0;
   }, []);
 
   // Parallax title on scroll
@@ -350,7 +386,9 @@ export default function PortfolioShowcase() {
         onTouchStart={handleUserInteraction}
         onMouseDown={handleUserInteraction}
         onWheel={handleUserInteraction}
-        className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 scrollbar-hide scroll-smooth"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {EVENT_STORIES.map((story, i) => (
