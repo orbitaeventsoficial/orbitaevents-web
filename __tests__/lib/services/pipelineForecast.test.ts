@@ -1,0 +1,217 @@
+/**
+ * Tests per pipelineForecast — previsió de vendes combinada.
+ * Mock de Prisma + commercialScoring per testejar la lògica de previsió.
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// ─── Mocks ──────────────────────────────────────────────────────────────────
+
+const { mockPrisma, mockScoreLead, mockEstimateAmount } = vi.hoisted(() => ({
+  mockPrisma: {
+    lead: { findMany: vi.fn() },
+    booking: { findMany: vi.fn() },
+  },
+  mockScoreLead: vi.fn(),
+  mockEstimateAmount: vi.fn(),
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/commercialScoring', () => ({
+  scoreLead: mockScoreLead,
+  estimateLeadAmount: mockEstimateAmount,
+}));
+
+import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function futureDate(monthsAhead: number): Date {
+  const d = new Date();
+  d.setMonth(d.getMonth() + monthsAhead);
+  d.setDate(15);
+  return d;
+}
+
+function pastDate(monthsBack: number): Date {
+  const d = new Date();
+  d.setMonth(d.getMonth() - monthsBack);
+  d.setDate(15);
+  return d;
+}
+
+function makeLead(overrides: Record<string, unknown> = {}) {
+  return {
+    status: 'NEW',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    eventDate: futureDate(2),
+    budget: '2000 EUR',
+    phone: '612345678',
+    eventLocation: 'Barcelona',
+    guestCount: 100,
+    interestedPackId: 'pack-1',
+    source: 'WEBSITE',
+    eventType: 'WEDDING',
+    ...overrides,
+  };
+}
+
+function makeHistoricBooking(monthsBack: number, total: number) {
+  return {
+    eventDate: pastDate(monthsBack),
+    total,
+  };
+}
+
+// ─── Tests ──────────────────────────────────────────────────────────────────
+
+describe('buildPipelineForecast', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+    mockEstimateAmount.mockReturnValue(2000);
+  });
+
+  it('retorna mesos buits si no hi ha leads ni històric', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(3);
+
+    expect(result).toHaveLength(3);
+    expect(result.every((m) => m.pipeline === 0)).toBe(true);
+    expect(result.every((m) => m.historicalAvg === 0)).toBe(true);
+    expect(result.every((m) => m.combined === 0)).toBe(true);
+  });
+
+  it('calcula pipeline ponderat (amount × probability)', async () => {
+    mockScoreLead.mockReturnValue({ probability: 0.6, score: 60 });
+    mockEstimateAmount.mockReturnValue(3000);
+    mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate: futureDate(2) })]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(3);
+
+    // weighted = 3000 × 0.6 = 1800
+    const targetMonth = result.find((m) => m.pipeline > 0);
+    expect(targetMonth).toBeDefined();
+    expect(targetMonth!.pipeline).toBe(1800);
+  });
+
+  it('distribueix leads sense data als pròxims 3 mesos', async () => {
+    mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+    mockEstimateAmount.mockReturnValue(3000);
+    mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate: null })]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(6);
+
+    // weighted = 3000 × 0.5 = 1500, distributed = 500 per month (months 1,2,3)
+    const withPipeline = result.filter((m) => m.pipeline > 0);
+    expect(withPipeline.length).toBeGreaterThanOrEqual(2); // at least some months get pipeline
+    const totalPipeline = result.reduce((s, m) => s + m.pipeline, 0);
+    expect(totalPipeline).toBe(1500);
+  });
+
+  it('calcula mitjana històrica per mes calendari', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+
+    // 2 anys de dades per al mes actual+1
+    const targetMonth = new Date().getMonth() + 2; // +2 perquè el forecast comença al mes següent
+    const monthsBack1 = 12; // any passat, mateix mes
+    const monthsBack2 = 24; // 2 anys enrere
+
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeHistoricBooking(monthsBack1, 4000),
+      makeHistoricBooking(monthsBack2, 6000),
+    ]);
+
+    const result = await buildPipelineForecast(6);
+
+    // Algun mes ha de tenir historicalAvg > 0
+    const withHistory = result.filter((m) => m.historicalAvg > 0);
+    expect(withHistory.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('combina 60% pipeline + 40% històric si pipeline > 0', async () => {
+    mockScoreLead.mockReturnValue({ probability: 1.0, score: 100 });
+    mockEstimateAmount.mockReturnValue(1000);
+
+    const eventDate = futureDate(1);
+    mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate })]);
+
+    // Crear històric per al mateix mes calendari
+    const historicMonth = eventDate.getMonth() + 1;
+    const monthsBack = 12;
+    const historicDate = new Date();
+    historicDate.setMonth(historicDate.getMonth() - monthsBack);
+    historicDate.setDate(15);
+    // Ajustar perquè caigui al mes correcte
+    while (historicDate.getMonth() + 1 !== historicMonth) {
+      historicDate.setMonth(historicDate.getMonth() + 1);
+    }
+
+    mockPrisma.booking.findMany.mockResolvedValue([
+      { eventDate: historicDate, total: 5000 },
+    ]);
+
+    const result = await buildPipelineForecast(6);
+
+    // El mes amb pipeline hauria de tenir combined = round(1000*0.6 + 5000*0.4) = round(2600)
+    const monthWithBoth = result.find((m) => m.pipeline > 0 && m.historicalAvg > 0);
+    if (monthWithBoth) {
+      expect(monthWithBoth.combined).toBe(
+        Math.round(monthWithBoth.pipeline * 0.6 + monthWithBoth.historicalAvg * 0.4),
+      );
+    }
+  });
+
+  it('usa 100% històric si no hi ha pipeline', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([
+      makeHistoricBooking(12, 3000),
+    ]);
+
+    const result = await buildPipelineForecast(6);
+
+    for (const month of result) {
+      if (month.historicalAvg > 0) {
+        expect(month.combined).toBe(Math.round(month.historicalAvg));
+      }
+    }
+  });
+
+  it('retorna claus de mes en format YYYY-MM', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(3);
+
+    for (const month of result) {
+      expect(month.month).toMatch(/^\d{4}-\d{2}$/);
+    }
+  });
+
+  it('comença al mes SEGÜENT (no l\'actual)', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const expectedFirstKey = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+
+    const result = await buildPipelineForecast(3);
+
+    expect(result[0].month).toBe(expectedFirstKey);
+  });
+
+  it('respecta el paràmetre monthsAhead', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(12);
+
+    expect(result).toHaveLength(12);
+  });
+});

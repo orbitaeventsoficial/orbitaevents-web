@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { sendEmail, sendTestimonialApprovedEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getAppBaseUrl } from '@/lib/site';
@@ -56,7 +57,7 @@ async function sendPostEventSequence(customer: { name: string; email: string; pr
         sourceType: 'POST_EVENT',
       },
     });
-  } catch (err) { console.error('[customerProcess] discount code creation failed:', err); }
+  } catch (err) { log.error('[customerProcess] discount code creation failed:', err); }
 
   await sendTestimonialApprovedEmail({
     to: customer.email,
@@ -118,7 +119,7 @@ async function sendPromoEmail(customer: { name: string; email: string }) {
         sourceType: 'PROMOTION',
       },
     });
-  } catch (err) { console.error('[customerProcess] promo code creation failed:', err); }
+  } catch (err) { log.error('[customerProcess] promo code creation failed:', err); }
 
   await sendEmail({
     to: customer.email,
@@ -186,7 +187,7 @@ export async function startCustomerProcess(input: { customerId: string; bookingI
       action: processType,
       details: { description: `Procés "${processType}" iniciat` },
     },
-  }).catch((err) => console.error('[customerProcess] activity log failed:', err));
+  }).catch((err) => log.error('[customerProcess] activity log failed:', err));
 
   return {
     ok: true as const,

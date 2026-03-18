@@ -22,6 +22,7 @@ import {
 } from '@/lib/inventory-utils';
 import { formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useToast } from '../components/ToastProvider';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 interface InventoryItem {
@@ -52,6 +53,7 @@ interface Stats {
 type ViewMode = 'list' | 'grid';
 
 export default function InventoryListClient() {
+  const toast = useToast();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
@@ -179,11 +181,13 @@ export default function InventoryListClient() {
 
       if (!res.ok) {
         console.error('[Inventory] Error canviant estat:', res.status);
+        toast.error('Error canviant l\'estat de l\'equip');
         return;
       }
       fetchData();
     } catch (error) {
       console.error('[Inventory] Error actualitzant item:', error);
+      toast.error('Error actualitzant l\'equip');
     }
   }, [fetchData]);
 
@@ -554,8 +558,79 @@ export default function InventoryListClient() {
           })}
         </section>
       ) : (
-        /* Vista Llista (taula) */
-        <section className="rounded-2xl border p-0 admin-card-glass overflow-hidden">
+        <>
+        {/* Vista Llista — Targetes mòbil */}
+        <section className="lg:hidden space-y-3">
+          {items.map((item) => {
+            const catConf = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦' };
+            const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
+            const condLabel = CONDITION_LABELS[item.condition] || item.condition;
+
+            return (
+              <article
+                key={item.id}
+                className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+              >
+                {/* Fila superior: nom/codi + valor/estat */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/admin/inventory/${item.id}`}
+                      className="font-medium text-sm leading-tight transition-colors block truncate"
+                    >
+                      {item.name}
+                    </Link>
+                    <code className="text-[11px] font-mono mt-0.5 inline-block opacity-60">
+                      {item.code}
+                    </code>
+                  </div>
+                  <div className="text-right shrink-0 space-y-1">
+                    <p className="text-sm font-semibold">{formatNumber(item.value)}€</p>
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
+                      {statusConf.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Fila inferior: categoria, condició, watts, accions */}
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2 min-w-0">
+                    <span className="inline-flex items-center gap-1 text-xs opacity-70">
+                      {catConf.icon} {catConf.label}
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium">
+                      {condLabel}
+                    </span>
+                    {item.watts ? (
+                      <span className="text-[11px] opacity-60">{item.watts}W</span>
+                    ) : null}
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    <select
+                      value={item.status}
+                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                      className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-[11px] font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}
+                    >
+                      {statuses.map((st) => (
+                        <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
+                      ))}
+                    </select>
+                    <Link
+                      href={`/admin/inventory/${item.id}`}
+                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-white/5 hover:bg-white/10"
+                    >
+                      Fitxa
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+
+        {/* Vista Llista — Taula escriptori */}
+        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm" aria-label="Inventari d'equipament">
               <thead className="border-b">
@@ -640,6 +715,7 @@ export default function InventoryListClient() {
             </table>
           </div>
         </section>
+        </>
       )}
 
       {items.length === 0 && (

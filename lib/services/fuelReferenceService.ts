@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import {
   DEFAULT_VEHICLE_COST_PER_KM,
   DEFAULT_VEHICLE_CONSUMPTION_L100,
@@ -180,7 +181,7 @@ export async function getFuelCostPerKmReference(): Promise<{
         updatedAt: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('[FuelReference] Error refrescant preu combustible:', error);
+      log.error('[FuelReference] Error refrescant preu combustible:', error);
       return {
         costPerKm: Number.isFinite(costValue) && costValue > 0 ? costValue : DEFAULT_VEHICLE_COST_PER_KM,
         updatedAt,

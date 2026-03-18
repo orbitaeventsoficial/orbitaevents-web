@@ -10,105 +10,18 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { VIP_SPEND_THRESHOLD } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
-import { useToast } from '../components/ToastProvider';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TIPUS
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string | null;
-  city?: string | null;
-  instagram?: string | null;
-  source?: string;
-  total_events: number;
-  total_spent: number;
-  is_vip: boolean;
-  created_at: string;
-}
-
-interface CustomerStats {
-  total: number;
-  vip: number;
-  withEvents: number;
-  recentMonth: number;
-}
-
-const SOURCE_LABELS: Record<string, string> = {
-  website: 'Web',
-  configurator: 'Configurador',
-  phone: 'Telèfon',
-  whatsapp: 'WhatsApp',
-  instagram: 'Instagram',
-  wallapop: 'Wallapop',
-  referral: 'Boca-orella',
-  google: 'Google',
-  other: 'Altre',
-  manual: 'Manual',
-  testimonial_form: 'Ressenya',
-};
-
-function getNextStep(customer: Customer): { label: string; href: string; hint: string } {
-  if ((customer.total_events || 0) > 0) {
-    return {
-      label: 'Post-esdeveniment',
-      href: '/admin/post-event',
-      hint: 'Tancar cicle i demanar feedback',
-    };
-  }
-
-  return {
-    label: 'Crear pressupost',
-    href: `/admin/presupuestos?customerId=${encodeURIComponent(customer.id)}`,
-    hint: 'Primer pas per avançar venda',
-  };
-}
-
-type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
-
-const PRIORITY_FILTER_STYLES: Record<'ALL' | ExecutionPriority, string> = {
-  ALL: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
-  ALTA: 'border-rose-400/50 bg-rose-500/15 text-rose-200',
-  MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
-  BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
-};
-
-function getExecutionPriority(customer: Customer): { level: ExecutionPriority; score: number; hint: string } {
-  const createdAt = customer.created_at ? new Date(customer.created_at) : new Date();
-  const daysSinceCreated = Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)));
-  const hasContactChannel = Boolean(customer.email || customer.phone);
-
-  if (customer.is_vip) {
-    return { level: 'ALTA', score: 100, hint: 'Client VIP: seguiment prioritari' };
-  }
-  if ((customer.total_events || 0) === 0 && hasContactChannel && daysSinceCreated <= 3) {
-    return { level: 'ALTA', score: 90, hint: 'Lead recent sense esdeveniment' };
-  }
-  if ((customer.total_events || 0) === 0 && daysSinceCreated <= 14) {
-    return { level: 'MITJANA', score: 60, hint: 'Oportunitat activa' };
-  }
-  if ((customer.total_events || 0) > 0) {
-    return { level: 'MITJANA', score: 50, hint: 'Client amb potencial recurrència' };
-  }
-  return { level: 'BAIXA', score: 20, hint: 'Seguiment no urgent' };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
+import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
+import { SOURCE_LABELS, PRIORITY_FILTER_STYLES, getNextStep, getExecutionPriority } from './customer-utils';
+import { AddCustomerModal, StartProcessModal } from './ClientesModals';
 
 export default function AdminContactesPage() {
-  const toast = useToast();
   const searchParams = useSearchParams();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stats, setStats] = useState<CustomerStats | null>(null);
@@ -127,42 +40,8 @@ export default function AdminContactesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [addModalNotes, setAddModalNotes] = useState('');
 
-  // New customer form
-  const [newCustomer, setNewCustomer] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    dni: '',
-    instagram: '',
-    source: 'OTHER' as string,
-    notes: '',
-  });
-
-  // Close modals on Escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showAddModal) setShowAddModal(false);
-        if (showActionModal) setShowActionModal(false);
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [showAddModal, showActionModal]);
-
-  // Duplicate detection
-  const [duplicateWarnings, setDuplicateWarnings] = useState<Array<{
-    id: string;
-    name: string;
-    email: string;
-    phone: string | null;
-    matchScore: number;
-    matchReasons: Array<{ field: string; type: string; score: number }>;
-  }>>([]);
-  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
-  const [duplicateOverride, setDuplicateOverride] = useState(false);
 
   // Fetch customers
   const fetchCustomers = useCallback(async () => {
@@ -256,149 +135,10 @@ export default function AdminContactesPage() {
     const date = searchParams?.get('date');
     setShowAddModal(true);
     if (date) {
-      setNewCustomer((prev) => ({
-        ...prev,
-        notes: prev.notes || `Origen calendari (${date})`,
-      }));
+      setAddModalNotes(`Origen calendari (${date})`);
     }
   }, [searchParams]);
 
-  // Check duplicates in real-time
-  useEffect(() => {
-    const { name, email, phone, instagram } = newCustomer;
-    if (!name && !email && !phone) {
-      setDuplicateWarnings([]);
-      return;
-    }
-    const timeout = window.setTimeout(async () => {
-      setCheckingDuplicates(true);
-      try {
-        const res = await fetchWithCsrf('/api/admin/customers/check-duplicates', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ name, email, phone, instagram }),
-        });
-        const data = await res.json();
-        setDuplicateWarnings(data?.duplicates || []);
-      } catch {
-        setDuplicateWarnings([]);
-      } finally {
-        setCheckingDuplicates(false);
-      }
-    }, 400);
-    return () => window.clearTimeout(timeout);
-  }, [newCustomer]);
-
-  // Add customer
-  const handleAddCustomer = async () => {
-    if (!newCustomer.name || !newCustomer.email) {
-      setError('Nom i correu són obligatoris');
-      return;
-    }
-
-    // Warn about high-score duplicates
-    const highScoreDup = duplicateWarnings.find((d) => d.matchScore >= 80);
-    if (highScoreDup && !duplicateOverride) {
-      toast.warning(`Possible duplicat: "${highScoreDup.name}" (${highScoreDup.matchScore}%). Fes clic a "Crear igualment" per continuar.`);
-      setDuplicateOverride(true);
-      return;
-    }
-    setDuplicateOverride(false);
-
-    setActionLoading(true);
-
-    try {
-      const response = await fetchWithCsrf('/api/admin/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: newCustomer.name,
-          email: newCustomer.email,
-          phone: newCustomer.phone || undefined,
-          instagram: newCustomer.instagram || undefined,
-          dni: newCustomer.dni || undefined,
-          source: newCustomer.source,
-          notes: newCustomer.notes || undefined,
-        }),
-      });
-
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Error creant client');
-      }
-
-      const result = await response.json();
-      const createdDuplicateWarnings = Array.isArray(result?.data?.duplicateWarnings)
-        ? result.data.duplicateWarnings
-        : [];
-
-      // Refresh llista
-      if (page === 1) {
-        await fetchCustomers();
-      } else {
-        setPage(1);
-      }
-      setShowAddModal(false);
-      setDuplicateWarnings([]);
-
-      // Reset form
-      setNewCustomer({
-        name: '',
-        email: '',
-        phone: '',
-        dni: '',
-        instagram: '',
-        source: 'OTHER',
-        notes: '',
-      });
-
-      // Preguntar si iniciar procés
-      setSelectedCustomer(result.data);
-      setShowActionModal(true);
-      if (createdDuplicateWarnings.length > 0) {
-        setError(
-          `Possible duplicat detectat automàticament (${createdDuplicateWarnings.length}). Revisa'l abans de continuar.`
-        );
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Start process
-  const startProcess = async (processType: string) => {
-    if (!selectedCustomer) return;
-
-    setActionLoading(true);
-
-    try {
-      const response = await fetchWithCsrf('/api/admin/start-process', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          customerId: selectedCustomer.id,
-          processType,
-        }),
-      });
-
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Error iniciant procés');
-      }
-
-      toast.success(`Procés "${processType}" iniciat per ${selectedCustomer.name}`);
-      setShowActionModal(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error');
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -516,9 +256,90 @@ export default function AdminContactesPage() {
         </div>
       )}
 
-      {/* Customers List */}
+      {/* Customers List — Mobile cards */}
       {!loading && customers.length > 0 && (
-        <div className="rounded-2xl border p-0 admin-card-glass overflow-hidden">
+        <section className="lg:hidden space-y-3">
+          {filteredCustomers.map(({ customer, priority }) => {
+            const nextStep = getNextStep(customer);
+            return (
+              <article
+                key={customer.id}
+                className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                        {customer.name.charAt(0).toUpperCase()}
+                      </div>
+                      <p className="font-medium truncate">
+                        {customer.name}
+                        {customer.is_vip && (
+                          <span className="ml-2 px-2 py-0.5 text-[10px] rounded-full font-medium bg-amber-500/20 text-amber-300">VIP</span>
+                        )}
+                      </p>
+                    </div>
+                    {customer.city && <p className="text-xs mt-1 ml-10">{customer.city}</p>}
+                    {customer.email && <p className="text-xs mt-0.5 ml-10 truncate">{customer.email}</p>}
+                    {customer.phone && <p className="text-xs mt-0.5 ml-10">{customer.phone}</p>}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      priority.level === 'ALTA' ? 'admin-tone-soft-danger'
+                        : priority.level === 'MITJANA' ? 'bg-amber-500/20 text-amber-300'
+                        : 'admin-tone-soft-success'
+                    }`}>
+                      {priority.level}
+                    </span>
+                    <p className="text-xs mt-1">{customer.total_events} events</p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium ${
+                      customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300'
+                        : customer.source === 'web' ? 'admin-tone-soft-success'
+                        : customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300'
+                        : 'bg-white/5 text-white/40'
+                    }`}>
+                      {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
+                    </span>
+                    <Link href={nextStep.href} className="text-[11px] font-medium">
+                      {nextStep.label} →
+                    </Link>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setSelectedCustomer(customer); setShowActionModal(true); }}
+                      type="button"
+                      className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      title="Iniciar procés"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <Link
+                      href={`/admin/clientes/${customer.id}`}
+                      className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      title="Fitxa 360"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      )}
+
+      {/* Customers List — Desktop table */}
+      {!loading && customers.length > 0 && (
+        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
@@ -643,7 +464,7 @@ export default function AdminContactesPage() {
             </tbody>
           </table>
           </div>
-        </div>
+        </section>
       )}
 
       {!loading && customers.length > 0 && (
@@ -673,286 +494,37 @@ export default function AdminContactesPage() {
       {/* MODAL: Afegir Client */}
       <AnimatePresence>
         {showAddModal && (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
-            onClick={() => setShowAddModal(false)}
-            role="presentation"
-          >
-            <motion.div
-              initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="add-contact-title"
-              className="border rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
-            >
-              <h2 id="add-contact-title" className="text-2xl font-bold mb-6">Afegir Client</h2>
-
-              {/* Duplicate warnings */}
-              {duplicateWarnings.length > 0 && (
-                <div className="mb-5 rounded-xl border p-4">
-                  <p className="text-sm font-semibold mb-2">
-                    Possibles duplicats detectats
-                  </p>
-                  {duplicateWarnings.map((dup) => (
-                    <Link
-                      key={dup.id}
-                      href={`/admin/clientes/${dup.id}`}
-                      className="flex items-center justify-between rounded-xl border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">{dup.name}</p>
-                        <p className="text-xs">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                          dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
-                          dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                          'bg-white/5 text-white/40'
-                        }`}>
-                          {dup.matchScore}%
-                        </span>
-                        <span className="text-xs">
-                          {dup.matchReasons.map((r) => r.field).join(', ')}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                  {checkingDuplicates && <p className="text-xs mt-2">Comprovant...</p>}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label htmlFor="nc-name" className="block text-sm mb-2">Nom <span className="">*</span></label>
-                    <input
-                      id="nc-name"
-                      type="text"
-                      value={newCustomer.name}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
-                        !newCustomer.name && newCustomer.email ? 'border-rose-500/40' : ''
-                      }`}
-                      placeholder="Maria García"
-                      required
-                    />
-                  </div>
-
-                  <div className="col-span-2">
-                    <label htmlFor="nc-email" className="block text-sm mb-2">Email <span className="">*</span></label>
-                    <input
-                      id="nc-email"
-                      type="email"
-                      value={newCustomer.email}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all ${
-                        !newCustomer.email && newCustomer.name ? 'border-rose-500/40' : ''
-                      }`}
-                      placeholder="maria@email.com"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="nc-phone" className="block text-sm mb-2">Telèfon</label>
-                    <input
-                      id="nc-phone"
-                      type="tel"
-                      value={newCustomer.phone}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
-                      placeholder="699 123 456"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="nc-dni" className="block text-sm mb-2">DNI / NIF / NIE</label>
-                    <input
-                      id="nc-dni"
-                      type="text"
-                      value={newCustomer.dni}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, dni: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
-                      placeholder="12345678A"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="nc-instagram" className="block text-sm mb-2">Instagram</label>
-                    <input
-                      id="nc-instagram"
-                      type="text"
-                      value={newCustomer.instagram}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
-                      placeholder="@usuari"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="nc-source" className="block text-sm mb-2">Font</label>
-                    <select
-                      id="nc-source"
-                      value={newCustomer.source}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, source: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
-                    >
-                      <option value="PHONE">Telèfon</option>
-                      <option value="WHATSAPP">WhatsApp</option>
-                      <option value="INSTAGRAM">Instagram</option>
-                      <option value="WALLAPOP">Wallapop</option>
-                      <option value="WEBSITE">Web</option>
-                      <option value="CONFIGURATOR">Configurador</option>
-                      <option value="REFERRAL">Boca-orella</option>
-                      <option value="GOOGLE">Google</option>
-                      <option value="OTHER">Altre</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="nc-notes" className="block text-sm mb-2">Notes</label>
-                  <textarea
-                    id="nc-notes"
-                    value={newCustomer.notes}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all resize-none"
-                    rows={2}
-                    placeholder="Notes internes..."
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-8">
-                <button
-                  onClick={() => { setShowAddModal(false); setDuplicateWarnings([]); }}
-                  type="button"
-                  className="flex-1 py-3 border rounded-xl transition-all"
-                >
-                  Cancel·lar
-                </button>
-                <button
-                  onClick={handleAddCustomer}
-                  disabled={actionLoading || !newCustomer.name || !newCustomer.email}
-                  type="button"
-                  aria-busy={actionLoading}
-                  className="flex-1 py-3 rounded-xl text-white font-bold shadow-lg disabled:opacity-50 transition-all"
-                >
-                  {actionLoading ? 'Afegint...' : 'Afegir'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+          <AddCustomerModal
+            reduceMotion={reduceMotion}
+            initialNotes={addModalNotes}
+            onClose={() => setShowAddModal(false)}
+            onCreated={(customer, duplicateWarnings) => {
+              if (page === 1) {
+                fetchCustomers();
+              } else {
+                setPage(1);
+              }
+              setShowAddModal(false);
+              setSelectedCustomer(customer);
+              setShowActionModal(true);
+              if (duplicateWarnings.length > 0) {
+                setError(
+                  `Possible duplicat detectat automàticament (${duplicateWarnings.length}). Revisa'l abans de continuar.`
+                );
+              }
+            }}
+          />
         )}
       </AnimatePresence>
 
       {/* MODAL: Iniciar Procés */}
       <AnimatePresence>
         {showActionModal && selectedCustomer && (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 admin-card-glass flex items-center justify-center z-50 p-4"
-            onClick={() => setShowActionModal(false)}
-            role="presentation"
-          >
-            <motion.div
-              initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="start-process-title"
-              className="border rounded-2xl p-6 sm:p-8 max-w-md w-full"
-            >
-              <h2 id="start-process-title" className="text-2xl font-bold mb-2">🚀 Iniciar Procés</h2>
-              <p className="mb-6">
-                Per <span className="">{selectedCustomer.name}</span>
-              </p>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => startProcess('review_request')}
-                  disabled={actionLoading}
-                  type="button"
-                  aria-busy={actionLoading}
-                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">⭐</span>
-                    <div>
-                      <p className="font-medium">Demanar Opinió</p>
-                      <p className="text-sm">Envia un correu demanant una opinió</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => startProcess('post_event')}
-                  disabled={actionLoading}
-                  type="button"
-                  aria-busy={actionLoading}
-                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">🎉</span>
-                    <div>
-                      <p className="font-medium">Post-esdeveniment complet</p>
-                      <p className="text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => startProcess('welcome')}
-                  disabled={actionLoading}
-                  type="button"
-                  aria-busy={actionLoading}
-                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">👋</span>
-                    <div>
-                      <p className="font-medium">Benvinguda</p>
-                      <p className="text-sm">Email de benvinguda + Info empresa</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => startProcess('promo')}
-                  disabled={actionLoading}
-                  type="button"
-                  aria-busy={actionLoading}
-                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">🎁</span>
-                    <div>
-                      <p className="font-medium">Promoció</p>
-                      <p className="text-sm">Envia oferta o descompte especial</p>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <button
-                onClick={() => setShowActionModal(false)}
-                type="button"
-                className="w-full mt-6 py-3 border rounded-xl transition-all"
-              >
-                Cancel·lar
-              </button>
-            </motion.div>
-          </motion.div>
+          <StartProcessModal
+            customer={selectedCustomer}
+            reduceMotion={reduceMotion}
+            onClose={() => setShowActionModal(false)}
+          />
         )}
       </AnimatePresence>
     </AdminPage>

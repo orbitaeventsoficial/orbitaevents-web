@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useToast } from '@/app/admin/components/ToastProvider';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -108,6 +109,7 @@ function genId() { return `el-${nextId++}`; }
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function CanvasEditorClient() {
+  const toast = useToast();
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 1080, height: 1920 });
   const [canvasBg, setCanvasBg] = useState('linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)');
@@ -272,6 +274,7 @@ export default function CanvasEditorClient() {
       URL.revokeObjectURL(url);
     } catch {
       console.error('Error exportant canvas');
+      toast.error('Error exportant la imatge');
     } finally {
       setExporting(false);
     }

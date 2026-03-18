@@ -276,18 +276,18 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · Sound · Lights · Production",
+      "badge": "DJ · Lighting · Theming · Production",
       "badgeEmoji": "🎵",
-      "title1": "DJ, SOUND & PRODUCTION",
-      "title2": "FOR WEDDINGS.",
+      "title1": "WE TURN YOUR EVENT INTO",
+      "title2": "A SPECTACLE.",
       "rotatingTexts": [
-        "FOR WEDDINGS.",
-        "FOR PRIVATE PARTIES.",
-        "FOR CORPORATE EVENTS.",
-        "FOR THEMED EVENTS."
+        "A SPECTACLE.",
+        "AN UNFORGETTABLE PARTY.",
+        "A UNIQUE EXPERIENCE.",
+        "PURE MAGIC."
       ],
-      "subtitle": "Barcelona and Girona. Proposal in under 2h, clear pricing, flawless execution.",
-      "subtitleAlt": "Barcelona and Girona. Fast response, clear pricing, impeccable execution.",
+      "subtitle": "Professional DJ + lighting + full theming. Barcelona & Girona. Quote in 2h.",
+      "subtitleAlt": "Professional DJ + lighting + full theming. Barcelona & Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "See packs & pricing",

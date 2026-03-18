@@ -76,8 +76,35 @@ const ACTION_LABELS: Record<string, string> = {
   RETENTION_APPLIED: 'Retenció aplicada',
 };
 
+type ConsentRecord = {
+  id: string;
+  consentType: string;
+  granted: boolean;
+  consentVersion: string;
+  source: string;
+  email: string | null;
+  grantedAt: string;
+  revokedAt: string | null;
+  customer: { id: string; name: string; email: string } | null;
+};
+
+const CONSENT_TYPE_LABELS: Record<string, string> = {
+  GDPR_BASIC: 'RGPD Bàsic',
+  MARKETING_EMAIL: 'Màrqueting email',
+  MARKETING_SMS: 'Màrqueting SMS',
+  MARKETING_WHATSAPP: 'Màrqueting WhatsApp',
+  PROFILING: 'Perfilatge',
+  THIRD_PARTY: 'Tercers',
+  COOKIES_ANALYTICS: 'Cookies analítica',
+  COOKIES_MARKETING: 'Cookies màrqueting',
+  COOKIES_FUNCTIONAL: 'Cookies funcionals',
+  TESTIMONIAL_PUBLIC: 'Testimoni públic',
+  PHOTO_USAGE: 'Ús de fotos',
+};
+
 type StatusFilter = 'all' | 'pending' | 'completed';
-type PageTab = 'requests' | 'audit';
+type ConsentFilter = 'active' | 'revoked' | 'all';
+type PageTab = 'requests' | 'consents' | 'audit';
 
 export default function AdminPrivacyPage() {
   const [stats, setStats] = useState<PrivacyStats | null>(null);
@@ -90,6 +117,12 @@ export default function AdminPrivacyPage() {
   const [pageTab, setPageTab] = useState<PageTab>('requests');
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [consents, setConsents] = useState<ConsentRecord[]>([]);
+  const [consentsTotal, setConsentsTotal] = useState(0);
+  const [consentsLoading, setConsentsLoading] = useState(false);
+  const [consentFilter, setConsentFilter] = useState<ConsentFilter>('active');
+  const [consentSearch, setConsentSearch] = useState('');
+  const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const loadAudit = useCallback(async () => {
     setAuditLoading(true);
@@ -105,6 +138,49 @@ export default function AdminPrivacyPage() {
       setAuditLoading(false);
     }
   }, []);
+
+  const loadConsents = useCallback(async () => {
+    setConsentsLoading(true);
+    try {
+      const params = new URLSearchParams({ status: consentFilter, limit: '50' });
+      if (consentSearch) params.set('q', consentSearch);
+      const res = await fetchWithCsrf(`/api/admin/privacy/consents?${params}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setConsents(data.data?.items || []);
+        setConsentsTotal(data.data?.total || 0);
+      }
+    } catch (err) {
+      console.error('Error carregant consentiments:', err);
+    } finally {
+      setConsentsLoading(false);
+    }
+  }, [consentFilter, consentSearch]);
+
+  const revokeConsentAction = async (consentId: string) => {
+    setRevokingId(consentId);
+    try {
+      const res = await fetchWithCsrf('/api/admin/privacy/consents', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consentId, reason: 'Revocat per admin' }),
+      });
+      if (res.ok) {
+        setActionMsg('Consentiment revocat correctament');
+        setTimeout(() => setActionMsg(null), 4000);
+        await loadConsents();
+        // Recarregar stats
+        const statsRes = await fetchWithCsrf('/api/admin/privacy/stats', { cache: 'no-store' });
+        if (statsRes.ok) { const d = await statsRes.json(); setStats(d.data); }
+      }
+    } catch (err) {
+      console.error('Error revocant consentiment:', err);
+      setActionMsg('Error revocant consentiment');
+      setTimeout(() => setActionMsg(null), 4000);
+    } finally {
+      setRevokingId(null);
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -131,8 +207,9 @@ export default function AdminPrivacyPage() {
 
   useEffect(() => {
     if (pageTab === 'requests') load();
+    else if (pageTab === 'consents') loadConsents();
     else loadAudit();
-  }, [load, loadAudit, pageTab]);
+  }, [load, loadAudit, loadConsents, pageTab]);
 
   const processRequest = async (id: string, action: 'approve' | 'reject') => {
     setBusyId(id);
@@ -222,6 +299,15 @@ export default function AdminPrivacyPage() {
           }`}
         >
           Sol·licituds ARCO
+        </button>
+        <button
+          type="button"
+          onClick={() => setPageTab('consents')}
+          className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+            pageTab === 'consents' ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+          }`}
+        >
+          Consentiments
         </button>
         <button
           type="button"
@@ -377,6 +463,161 @@ export default function AdminPrivacyPage() {
           );
         })}
       </div>
+      )}
+
+      {/* Consents tab */}
+      {pageTab === 'consents' && (
+        <>
+          {/* Filters */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex gap-2">
+              {([
+                { key: 'active' as const, label: 'Actius' },
+                { key: 'revoked' as const, label: 'Revocats' },
+                { key: 'all' as const, label: 'Tots' },
+              ]).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setConsentFilter(key)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                    consentFilter === key ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1">
+              <input
+                type="search"
+                placeholder="Cercar per nom o email..."
+                value={consentSearch}
+                onChange={(e) => setConsentSearch(e.target.value)}
+                aria-label="Cercar consentiments"
+                className="w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              />
+            </div>
+            <span className="text-sm opacity-50">{consentsTotal} registres</span>
+          </div>
+
+          {/* Consents list */}
+          <div className="space-y-3">
+            {consentsLoading ? (
+              <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+                Carregant consentiments...
+              </div>
+            ) : consents.length === 0 ? (
+              <div className="rounded-2xl border admin-card-glass p-6 text-center opacity-60">
+                No hi ha consentiments amb aquest filtre.
+              </div>
+            ) : (
+              <>
+                {/* Mobile cards */}
+                <section className="lg:hidden space-y-3">
+                  {consents.map((c) => (
+                    <article key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">
+                            {c.customer?.name || c.email || 'Desconegut'}
+                          </p>
+                          <p className="text-xs mt-0.5 truncate opacity-60">
+                            {c.customer?.email || c.email}
+                          </p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                          c.revokedAt ? 'bg-red-500/20 text-red-300' : 'admin-tone-soft-success'
+                        }`}>
+                          {c.revokedAt ? 'Revocat' : 'Actiu'}
+                        </span>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="rounded-full bg-white/5 px-2.5 py-0.5">
+                            {CONSENT_TYPE_LABELS[c.consentType] || c.consentType}
+                          </span>
+                          <span className="opacity-50">{c.source}</span>
+                          <span className="opacity-50">{formatDateTime(c.grantedAt)}</span>
+                        </div>
+                        {!c.revokedAt && (
+                          <button
+                            type="button"
+                            onClick={() => revokeConsentAction(c.id)}
+                            disabled={revokingId === c.id}
+                            className="rounded-xl border border-red-500/30 px-3 py-2 text-xs font-medium text-red-400 transition-colors min-h-[44px] disabled:opacity-50"
+                          >
+                            Revocar
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </section>
+
+                {/* Desktop table */}
+                <div className="hidden lg:block rounded-2xl border overflow-hidden overflow-x-auto">
+                  <table className="w-full min-w-[800px] text-sm" aria-label="Llistat de consentiments">
+                    <thead>
+                      <tr className="border-b bg-white/[0.03]">
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Client</th>
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Tipus</th>
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Font</th>
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Versió</th>
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Atorgat</th>
+                        <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Estat</th>
+                        <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Accions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {consents.map((c) => (
+                        <tr key={c.id} className="hover:bg-white/[0.03] transition-colors">
+                          <td className="px-4 py-3">
+                            {c.customer ? (
+                              <Link href={`/admin/clientes/${c.customer.id}`} className="hover:underline">
+                                <p className="font-medium">{c.customer.name}</p>
+                                <p className="text-xs opacity-50">{c.customer.email}</p>
+                              </Link>
+                            ) : (
+                              <p className="text-sm opacity-70">{c.email || 'Desconegut'}</p>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-xs">
+                              {CONSENT_TYPE_LABELS[c.consentType] || c.consentType}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-xs opacity-60">{c.source}</td>
+                          <td className="px-4 py-3 text-xs opacity-60">{c.consentVersion}</td>
+                          <td className="px-4 py-3 text-xs opacity-60">{formatDateTime(c.grantedAt)}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              c.revokedAt ? 'bg-red-500/20 text-red-300' : 'admin-tone-soft-success'
+                            }`}>
+                              {c.revokedAt ? `Revocat ${formatDateTime(c.revokedAt)}` : 'Actiu'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            {!c.revokedAt && (
+                              <button
+                                type="button"
+                                onClick={() => revokeConsentAction(c.id)}
+                                disabled={revokingId === c.id}
+                                className="rounded-xl border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                              >
+                                {revokingId === c.id ? 'Revocant...' : 'Revocar'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        </>
       )}
 
       {/* Audit log */}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useHubContext } from '../CustomerHubClient';
 import { formatDateTime } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type ConsentRecord = {
   id: string;
@@ -65,6 +66,8 @@ export default function PrivacyPanel() {
   const [consents, setConsents] = useState<ConsentRecord[]>([]);
   const [requests, setRequests] = useState<DataRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -93,6 +96,34 @@ export default function PrivacyPanel() {
       </div>
     );
   }
+
+  const handleExport = async (portable: boolean) => {
+    setExporting(true);
+    try {
+      const res = await fetchWithCsrf(
+        `/api/admin/customers/${customerId}/export?portable=${portable ? '1' : '0'}&download=1`,
+        { cache: 'no-store' }
+      );
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `customer-data-${customerId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        setExportMsg('Dades exportades correctament');
+      } else {
+        setExportMsg('Error exportant dades');
+      }
+    } catch (err) {
+      console.error('Error exportant:', err);
+      setExportMsg('Error de connexió');
+    } finally {
+      setExporting(false);
+      setTimeout(() => setExportMsg(null), 4000);
+    }
+  };
 
   const activeConsents = consents.filter((c) => c.granted && !c.revokedAt);
   const revokedConsents = consents.filter((c) => !c.granted || c.revokedAt);
@@ -148,6 +179,32 @@ export default function PrivacyPanel() {
             </div>
           </details>
         )}
+      </div>
+
+      {/* Accions RGPD */}
+      <div className="rounded-2xl border admin-card-glass p-5">
+        <h2 className="text-lg font-semibold">Accions RGPD</h2>
+        {exportMsg && (
+          <p className="mt-2 text-sm rounded-xl border px-3 py-2">{exportMsg}</p>
+        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => handleExport(false)}
+            disabled={exporting}
+            className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+          >
+            {exporting ? 'Exportant...' : 'Exportar dades (Art. 15)'}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleExport(true)}
+            disabled={exporting}
+            className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+          >
+            Exportar portable (Art. 20)
+          </button>
+        </div>
       </div>
 
       {/* Sol·licituds ARCO */}

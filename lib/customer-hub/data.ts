@@ -1,5 +1,6 @@
 import { Prisma, type CustomerActivity, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { findLeadTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadTaskFacade';
 
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
@@ -207,7 +208,7 @@ async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await query();
   } catch (error) {
-    console.error('[CustomerHub] safeQuery error:', error);
+    log.error('[CustomerHub] safeQuery error:', error);
     return fallback;
   }
 }

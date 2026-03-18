@@ -1,0 +1,106 @@
+import { type Locale, type ServiceSlug, SERVICE_LABEL, STUDIO_COPY, formatEUR } from './studio-utils';
+
+export type StudioPreviewProps = {
+  brandName: string;
+  brandWebsite: string;
+  brandEmail: string;
+  brandPhone: string;
+  clientName: string;
+  clientContact: string;
+  clientEmail: string;
+  clientPhone: string;
+  eventType: ServiceSlug;
+  eventDate: string;
+  guests: number;
+  eventSchedule: string;
+  eventLocation: string;
+  validityDays: number;
+  whyChooseUs: string;
+  packName: string;
+  selectedPackName?: string;
+  durationHours: number;
+  basePrice: number;
+  extrasPrice: number;
+  travelCharge: number;
+  travelKm: number;
+  billableTravelKm: number;
+  travelBlocks: number;
+  discount: number;
+  total: number;
+  locale: Locale;
+};
+
+export default function StudioPreview(props: StudioPreviewProps) {
+  const t = STUDIO_COPY[props.locale];
+
+  return (
+    <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">
+      <h2 className="text-lg font-semibold">Vista ràpida</h2>
+      <p className="mt-1 text-sm">Resum del que sortirà al PDF.</p>
+
+      <div className="mt-4 space-y-3 text-sm">
+        <div className="rounded-xl border p-3">
+          <p className="">Marca</p>
+          <p className="font-semibold">{props.brandName || 'Marca'}</p>
+          <p className="">{props.brandWebsite || '-'}</p>
+          <p className="">{props.brandEmail || '-'} · {props.brandPhone || '-'}</p>
+        </div>
+
+        <div className="rounded-xl border p-3">
+          <p className="">{t.clientLabel}</p>
+          <p className="font-semibold">{props.clientName || t.defaultClientName}</p>
+          <p className="">{props.clientContact || '-'}</p>
+          <p className="">{props.clientEmail || '-'} · {props.clientPhone || '-'}</p>
+        </div>
+
+        <div className="rounded-xl border p-3">
+          <p className="">Esdeveniment</p>
+          <p className="font-semibold">{SERVICE_LABEL[props.eventType]}</p>
+          <p className="">{props.eventDate || t.noDate} · {props.guests} convidats</p>
+          <p className="">{props.eventSchedule || t.noSchedule} · {props.eventLocation || t.noLocation}</p>
+          <p className="">Validesa: {props.validityDays} dies</p>
+        </div>
+
+        <div className="rounded-xl border p-3">
+          <p className="">Narrativa comercial</p>
+          <p className="line-clamp-3">{props.whyChooseUs || '-'}</p>
+        </div>
+
+        <div className="rounded-xl border p-3">
+          <p className="">Pack</p>
+          <p className="font-semibold">{props.packName || props.selectedPackName || '-'}</p>
+          <p className="">{props.durationHours}h</p>
+        </div>
+
+        <div className="rounded-xl border p-3">
+          <p className="mb-2">Costos</p>
+          <div className="flex items-center justify-between">
+            <span>Base</span>
+            <span>{formatEUR(props.basePrice)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Extres</span>
+            <span>{formatEUR(props.extrasPrice)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Desplaçament</span>
+            <span>{formatEUR(props.travelCharge)}</span>
+          </div>
+          {props.travelCharge > 0 && (
+            <div className="text-xs">
+              {props.travelKm.toFixed(1)} km totals · {props.billableTravelKm.toFixed(1)} km extra · {props.travelBlocks} trams
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span>Descompte</span>
+            <span>-{formatEUR(props.discount)}</span>
+          </div>
+          <div className="mt-2 border-t pt-2 flex items-center justify-between text-base font-semibold">
+            <span>Total</span>
+            <span>{formatEUR(props.total)}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

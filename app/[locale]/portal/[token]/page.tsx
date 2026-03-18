@@ -9,6 +9,8 @@ import {
 } from '@/lib/services/clientPortalAccess';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { formatCurrency, toIntlLocale } from '@/lib/constants';
+import { listPortalPhotos } from '@/lib/services/galleryService';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -57,6 +59,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     feedbackSent: 'Feedback enviat',
     pendingClose: 'Pendent de tancament',
     trackingStatus: 'Estat de seguiment',
+    gallery: 'Galeria de fotos',
+    galleryEmpty: 'Encara no hi ha fotos disponibles.',
     backHome: 'Anar al web principal',
   },
   es: {
@@ -95,6 +99,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     feedbackSent: 'Feedback enviado',
     pendingClose: 'Pendiente de cierre',
     trackingStatus: 'Estado de seguimiento',
+    gallery: 'Galería de fotos',
+    galleryEmpty: 'Todavía no hay fotos disponibles.',
     backHome: 'Ir a la web principal',
   },
   en: {
@@ -133,6 +139,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     feedbackSent: 'Feedback sent',
     pendingClose: 'Pending closure',
     trackingStatus: 'Tracking status',
+    gallery: 'Photo gallery',
+    galleryEmpty: 'No photos available yet.',
     backHome: 'Back to main site',
   },
 };
@@ -205,6 +213,14 @@ export default async function ClientPortalPage({
   const showPayments = personalization.showPayments ?? true;
   const showDocuments = personalization.showDocuments ?? true;
   const showPostEvent = personalization.showPostEvent ?? true;
+
+  // Carregar fotos del portal
+  let portalPhotos: { id: string; photoUrl: string; caption: string | null }[] = [];
+  try {
+    portalPhotos = await listPortalPhotos(booking.id);
+  } catch {
+    // Si falla, no mostrar galeria
+  }
   const accentHex = personalization.accentColor && /^#?[0-9a-fA-F]{3,6}$/.test(personalization.accentColor)
     ? (personalization.accentColor.startsWith('#') ? personalization.accentColor : `#${personalization.accentColor}`)
     : '#06b6d4';
@@ -367,6 +383,26 @@ export default async function ClientPortalPage({
             ) : (
               <p className="mt-3 text-sm text-white/70">{t.noDocuments}</p>
             )}
+          </section>
+        )}
+
+        {/* Gallery */}
+        {portalPhotos.length > 0 && (
+          <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+            <h2 className="text-lg font-semibold">{t.gallery}</h2>
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {portalPhotos.map((photo) => (
+                <div key={photo.id} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
+                  <Image
+                    src={photo.photoUrl}
+                    alt={photo.caption || 'Event photo'}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                  />
+                </div>
+              ))}
+            </div>
           </section>
         )}
 

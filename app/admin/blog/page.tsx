@@ -181,7 +181,60 @@ export default function BlogAdminPage() {
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border admin-card-glass overflow-x-auto">
+          {/* Mobile cards */}
+          <section className="lg:hidden space-y-3">
+            {posts.map((post) => {
+              const translation = post.translations[0];
+              return (
+                <article key={post.id} className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{translation?.title || 'Sense títol'}</p>
+                      <p className="text-xs mt-0.5">/{post.slug}</p>
+                    </div>
+                    <button
+                      onClick={() => handleTogglePublish(post)}
+                      type="button"
+                      aria-pressed={post.isPublished}
+                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                        post.isPublished ? 'admin-tone-soft-success' : 'bg-yellow-500/20 text-yellow-300'
+                      }`}
+                    >
+                      {post.isPublished ? 'Publicat' : 'Esborrany'}
+                    </button>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full px-2.5 py-0.5 text-[10px] bg-white/5">{post.category}</span>
+                      <span>{post.viewCount} visites</span>
+                      <span>{formatDateSimple(post.createdAt)}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => router.push(`/admin/blog/edit/${post.id}`)}
+                        type="button"
+                        className="rounded-xl p-2.5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        title="Editar"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(post.id)}
+                        type="button"
+                        className="rounded-xl p-2.5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          {/* Desktop table */}
+          <div className="hidden lg:block rounded-2xl border admin-card-glass overflow-x-auto">
             <table className="w-full text-sm" aria-label="Llistat d'articles del blog">
               <thead className="border-b">
                 <tr>

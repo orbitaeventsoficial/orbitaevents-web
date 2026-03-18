@@ -3,86 +3,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { EVENT_TYPE_PLAIN, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-type Booking = {
-  id: string;
-  leadId?: string | null;
-  customerId?: string | null;
-  fechaEvento: string;
-  clientName?: string | null;
-  ubicacion?: string | null;
-  estado?: string | null;
-  eventType?: string | null;
-  eventStartTime?: string | null;
-  eventEndTime?: string | null;
-  packName?: string | null;
-};
-
-type Blockage = {
-  id: string;
-  fecha: string;
-  motivo?: string | null;
-  notas?: string | null;
-};
-
-type CalendarApiDay = {
-  reservas: Booking[];
-  bloqueos: Blockage[];
-};
-
-type CalendarApiResponse = {
-  days: Record<string, CalendarApiDay>;
-};
-
-const CALENDAR_EVENT_LABELS: Record<string, string> = {
-  ...EVENT_TYPE_PLAIN,
-  CELEBRATION: 'Celebració',
-};
-
-const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'Pendent', cls: 'bg-amber-500/20 text-amber-300' },
-  CONFIRMED: { label: 'Confirmat', cls: 'admin-tone-soft-success' },
-  PREPARING: { label: 'Preparant', cls: 'bg-blue-500/20 text-blue-300' },
-  COMPLETED: { label: 'Completat', cls: 'bg-white/10 text-white/50' },
-  CANCELLED: { label: 'Cancel·lat', cls: 'admin-tone-soft-danger' },
-};
-
-function formatKey(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function isToday(date: Date): boolean {
-  const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
-}
-
-function resolveServiceLabel(booking: Booking): string {
-  const pack = booking.packName?.trim();
-  if (pack) return pack;
-  const eventType = booking.eventType?.trim();
-  if (eventType && CALENDAR_EVENT_LABELS[eventType]) return CALENDAR_EVENT_LABELS[eventType];
-  if (eventType) return eventType;
-  return 'Servei';
-}
-
-const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 06:00 – 23:00
-
-function parseHour(timeStr?: string | null): number | null {
-  if (!timeStr) return null;
-  const m = timeStr.match(/^(\d{1,2})/);
-  return m ? parseInt(m[1], 10) : null;
-}
+import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, STATUS_BADGES, HOURS, parseHour } from './calendar-utils';
 
 export default function CalendarDayClient() {
   const toast = useToast();

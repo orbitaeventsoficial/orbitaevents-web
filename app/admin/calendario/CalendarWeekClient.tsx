@@ -3,90 +3,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { EVENT_TYPE_PLAIN, formatDateShort, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-type CalendarApiDay = {
-  reservas: {
-    id: string;
-    leadId?: string | null;
-    customerId?: string | null;
-    fechaEvento: string;
-    clientName?: string | null;
-    ubicacion?: string | null;
-    estado?: string | null;
-    eventType?: string | null;
-    eventStartTime?: string | null;
-    eventEndTime?: string | null;
-    packName?: string | null;
-  }[];
-  bloqueos: {
-    id: string;
-    fecha: string;
-    motivo?: string | null;
-    notas?: string | null;
-  }[];
-};
-
-type CalendarApiResponse = {
-  days: Record<string, CalendarApiDay>;
-};
-
-const CALENDAR_EVENT_LABELS: Record<string, string> = {
-  ...EVENT_TYPE_PLAIN,
-  CELEBRATION: 'Celebració',
-};
-
-const weekdayLabels = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'];
-
-function formatKey(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function getWeekDays(baseDate: Date): Date[] {
-  const day = baseDate.getDay();
-  const mondayOffset = (day + 6) % 7;
-  const monday = new Date(baseDate);
-  monday.setDate(baseDate.getDate() - mondayOffset);
-  const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    days.push(d);
-  }
-  return days;
-}
-
-function isToday(date: Date): boolean {
-  const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
-}
-
-function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {
-  const pack = booking.packName?.trim();
-  if (pack) return pack;
-  const eventType = booking.eventType?.trim();
-  if (eventType && CALENDAR_EVENT_LABELS[eventType]) return CALENDAR_EVENT_LABELS[eventType];
-  if (eventType) return eventType;
-  return 'Servei';
-}
-
-function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): string {
-  const start = booking.eventStartTime?.trim();
-  const end = booking.eventEndTime?.trim();
-  if (start && end) return `${start} - ${end}`;
-  if (start) return start;
-  return '';
-}
+import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel } from './calendar-utils';
 
 export default function CalendarWeekClient() {
   const toast = useToast();

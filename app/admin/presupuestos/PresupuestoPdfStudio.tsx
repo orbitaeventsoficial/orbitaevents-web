@@ -1,252 +1,23 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ALL_SERVICES,
-  EXTRAS,
-  getPacksByService,
-  type ExtraDefinition,
-  type PackDefinition,
-  type ServiceSlug,
-} from '@/app/config/packs-config';
+import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
-import { z } from 'zod';
 import { fetchWithCsrf } from '@/lib/csrf';
 import SortableList from '@/app/admin/components/SortableList';
+import StudioPreview from './StudioPreview';
+import {
+  type DocMode, type SectionId, type Locale, type CustomExtra,
+  type PricingCatalogState, type PricingCatalogPack, type PricingCatalogExtra,
+  type PricingCatalogResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
+  SECTION_LABELS, DEFAULT_SECTION_ORDER, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
+  OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
+  quoteStudioSchema, normalizeStudioLocale, formatEUR, toFeatureLines,
+  buildPackFromForm, translateBatchForPdf,
+} from './studio-utils';
 
-type DocMode = 'quote' | 'contract';
-
-type SectionId = 'config' | 'client' | 'brand' | 'pack' | 'extras-catalog' | 'extras-custom' | 'contract';
-
-const SECTION_LABELS: Record<SectionId, string> = {
-  config: 'Configuració',
-  client: 'Client i esdeveniment',
-  brand: 'Marca i identitat',
-  pack: 'Pack i condicions',
-  'extras-catalog': 'Extres del catàleg',
-  'extras-custom': 'Extres personalitzats',
-  contract: 'Dades del contracte',
-};
-
-const DEFAULT_SECTION_ORDER: SectionId[] = [
-  'config', 'client', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
-];
-
-type Locale = 'ca' | 'es' | 'en';
-
-type CustomExtra = {
-  id: string;
-  name: string;
-  price: number;
-};
-
-type PricingCatalogState = {
-  packNamesBySlug: Record<string, string>;
-  extraNamesBySlug: Record<string, string>;
-  extraDescriptionsBySlug: Record<string, string>;
-};
-
-type PricingCatalogPack = {
-  slug?: string;
-  name?: string;
-};
-
-type PricingCatalogExtra = {
-  slug?: string;
-  name?: string;
-  description?: string | null;
-};
-
-type PricingCatalogCustomer = {
-  id: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-};
-
-type PricingCatalogResponse = {
-  ok?: boolean;
-  error?: string;
-  oneWayKm?: number;
-  roundTripKm?: number;
-  data?: {
-    packs?: PricingCatalogPack[];
-    extras?: PricingCatalogExtra[];
-    customers?: PricingCatalogCustomer[];
-  };
-};
-
-type StudioProps = {
-  initialCustomerId?: string;
-  initialCustomerName?: string;
-  initialCustomerEmail?: string;
-  initialLeadId?: string;
-  initialProposalId?: string;
-  initialPreferredLocale?: string;
-  initialBrandName?: string;
-  initialBrandWebsite?: string;
-  initialBrandEmail?: string;
-  initialBrandPhone?: string;
-  initialBrandTagline?: string;
-  initialBrandLogoDataUrl?: string;
-};
-
-const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
-const CUSTOM_PACK_ID = '__custom_pack__';
-const OPERATOR_PDF_EXTRA_ID = '__operator_extra_pdf__';
-
-const STUDIO_COPY: Record<Locale, { hours: string; customServiceName: string; customExtraDescription: string; defaultClientName: string; sendQuote: string; sendingQuote: string; noDate: string; noSchedule: string; noLocation: string; clientLabel: string }> = {
-  ca: {
-    hours: 'hores',
-    customServiceName: 'Servei personalitzat',
-    customExtraDescription: 'Extra personalitzat',
-    defaultClientName: 'Client',
-    sendQuote: 'Envia pressupost',
-    sendingQuote: 'Enviant...',
-    noDate: 'Sense data',
-    noSchedule: 'Sense horari',
-    noLocation: 'Sense ubicació',
-    clientLabel: 'Client',
-  },
-  es: {
-    hours: 'horas',
-    customServiceName: 'Servicio personalizado',
-    customExtraDescription: 'Extra personalizado',
-    defaultClientName: 'Cliente',
-    sendQuote: 'Enviar presupuesto',
-    sendingQuote: 'Enviando...',
-    noDate: 'Sin fecha',
-    noSchedule: 'Sin horario',
-    noLocation: 'Sin ubicación',
-    clientLabel: 'Cliente',
-  },
-  en: {
-    hours: 'hours',
-    customServiceName: 'Custom service',
-    customExtraDescription: 'Custom extra',
-    defaultClientName: 'Client',
-    sendQuote: 'Send quote',
-    sendingQuote: 'Sending...',
-    noDate: 'No date',
-    noSchedule: 'No schedule',
-    noLocation: 'No location',
-    clientLabel: 'Client',
-  },
-};
-
-function normalizeStudioLocale(value?: string): Locale {
-  const raw = String(value || '').toLowerCase();
-  if (raw.startsWith('es')) return 'es';
-  if (raw.startsWith('en')) return 'en';
-  return 'ca';
-}
-const quoteStudioSchema = z.object({
-  clientName: z.string().trim().min(2, 'Nom del client massa curt'),
-  clientEmail: z.string().trim().email("Correu del client no vàlid"),
-  guests: z.number().int().min(1, 'Convidats ha de ser minim 1'),
-  validityDays: z.number().int().min(1).max(120),
-  basePrice: z.number().min(0),
-});
-
-const SERVICE_LABEL: Record<ServiceSlug, string> = {
-  bodas: 'Bodes',
-  fiestas: 'Festes',
-  discomovil: 'Discomòbil',
-  empresas: 'Empreses',
-};
-
-function formatEUR(value: number): string {
-  return `${Math.max(0, value).toFixed(2)}€`;
-}
-
-function toFeatureLines(text: string): string[] {
-  return text
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function buildPackFromForm(params: {
-  source: PackDefinition;
-  name: string;
-  price: number;
-  durationHours: number;
-  featuresText: string;
-  locale: Locale;
-}): PackDefinition {
-  const features = toFeatureLines(params.featuresText);
-  const duration = Math.max(1, Math.round(params.durationHours));
-  return {
-    ...params.source,
-    name: params.name.trim() || params.source.name,
-    priceValue: Math.max(0, params.price),
-    price: formatEUR(params.price),
-    durationHours: duration,
-    duration: `${duration} ${STUDIO_COPY[params.locale].hours}`,
-    features: features.length > 0 ? features : params.source.features,
-  };
-}
-
-const pdfTranslationCache = new Map<string, Map<Locale, string>>();
-
-async function translateBatchForPdf(texts: string[], locale: Locale): Promise<Map<string, string>> {
-  const cleaned = texts.map((t) => t.trim()).filter(Boolean);
-  const unique = Array.from(new Set(cleaned));
-  const result = new Map<string, string>();
-
-  if (unique.length === 0) return result;
-  if (locale === 'ca') {
-    for (const text of unique) result.set(text, text);
-    return result;
-  }
-
-  const toFetch: string[] = [];
-  for (const original of unique) {
-    const cachedByLang = pdfTranslationCache.get(original);
-    const cached = cachedByLang?.get(locale);
-    if (cached) result.set(original, cached);
-    else toFetch.push(original);
-  }
-
-  if (toFetch.length === 0) return result;
-
-  try {
-    const res = await fetchWithCsrf('/api/admin/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        texts: toFetch,
-        targetLanguages: [locale],
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data?.ok) {
-      for (const original of toFetch) result.set(original, original);
-      return result;
-    }
-
-    const translationsByText: Record<string, Record<string, string>> =
-      data?.translationsByText || {};
-
-    for (const original of toFetch) {
-      const translated = String(translationsByText?.[original]?.[locale] || original);
-      let byLang = pdfTranslationCache.get(original);
-      if (!byLang) {
-        byLang = new Map<Locale, string>();
-        pdfTranslationCache.set(original, byLang);
-      }
-      byLang.set(locale, translated);
-      result.set(original, translated);
-    }
-  } catch (error) {
-    console.error('Error translating batch for PDF:', error);
-    for (const original of toFetch) result.set(original, original);
-  }
-
-  return result;
-}
 
 export default function PresupuestoPdfStudio({
   initialCustomerId = '',
@@ -1657,85 +1428,35 @@ export default function PresupuestoPdfStudio({
         </div>
       </div>
 
-      <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">
-        <h2 className="text-lg font-semibold">Vista ràpida</h2>
-        <p className="mt-1 text-sm">Resum del que sortirà al PDF.</p>
-
-        <div className="mt-4 space-y-3 text-sm">
-          <div className="rounded-xl border p-3">
-            <p className="">Marca</p>
-            <p className="font-semibold">{brandName || 'Marca'}</p>
-            <p className="">{brandWebsite || '-'}</p>
-            <p className="">{brandEmail || '-'} · {brandPhone || '-'}</p>
-          </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="">{studioText.clientLabel}</p>
-            <p className="font-semibold">{clientName || studioText.defaultClientName}</p>
-            <p className="">{clientContact || '-'}</p>
-            <p className="">{clientEmail || '-'} · {clientPhone || '-'}</p>
-          </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="">Esdeveniment</p>
-            <p className="font-semibold">{SERVICE_LABEL[eventType]}</p>
-            <p className="">{eventDate || studioText.noDate} · {guests} convidats</p>
-            <p className="">{eventSchedule || studioText.noSchedule} · {eventLocation || studioText.noLocation}</p>
-            <p className="">Validesa: {validityDays} dies</p>
-          </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="">Narrativa comercial</p>
-            <p className="line-clamp-3">{whyChooseUs || '-'}</p>
-          </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="">Pack</p>
-            <p className="font-semibold">{packName || selectedPack?.name || '-'}</p>
-            <p className="">{durationHours}h</p>
-          </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="mb-2">Costos</p>
-            <div className="flex items-center justify-between">
-              <span>Base</span>
-              <span>{formatEUR(basePrice)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Extres</span>
-              <span>{formatEUR(extrasPrice)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Desplaçament</span>
-              <span>{formatEUR(travelCharge)}</span>
-            </div>
-            {travelCharge > 0 && (
-              <div className="text-xs">
-                {travelKm.toFixed(1)} km totals · {billableTravelKm.toFixed(1)} km extra · {travelBlocks} trams
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <span>Descompte</span>
-              <span>-{formatEUR(discount)}</span>
-            </div>
-            <div className="mt-2 border-t pt-2 flex items-center justify-between text-base font-semibold">
-              <span>Total</span>
-              <span>{formatEUR(total)}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <StudioPreview
+        brandName={brandName}
+        brandWebsite={brandWebsite}
+        brandEmail={brandEmail}
+        brandPhone={brandPhone}
+        clientName={clientName}
+        clientContact={clientContact}
+        clientEmail={clientEmail}
+        clientPhone={clientPhone}
+        eventType={eventType}
+        eventDate={eventDate}
+        guests={guests}
+        eventSchedule={eventSchedule}
+        eventLocation={eventLocation}
+        validityDays={validityDays}
+        whyChooseUs={whyChooseUs}
+        packName={packName}
+        selectedPackName={selectedPack?.name}
+        durationHours={durationHours}
+        basePrice={basePrice}
+        extrasPrice={extrasPrice}
+        travelCharge={travelCharge}
+        travelKm={travelKm}
+        billableTravelKm={billableTravelKm}
+        travelBlocks={travelBlocks}
+        discount={discount}
+        total={total}
+        locale={locale}
+      />
     </section>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

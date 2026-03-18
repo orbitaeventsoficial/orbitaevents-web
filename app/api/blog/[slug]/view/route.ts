@@ -1,6 +1,7 @@
 // app/api/blog/[slug]/view/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { incrementPublicBlogPostView } from '@/lib/services/publicBlogService';
+import { log } from '@/lib/logger';
 
 export async function POST(
   _req: NextRequest,
@@ -16,7 +17,7 @@ export async function POST(
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[Blog] Error incrementant views:', error);
+    log.error('[Blog] Error incrementant views:', error);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

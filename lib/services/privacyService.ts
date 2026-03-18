@@ -161,6 +161,53 @@ export async function revokeConsent(
 }
 
 /**
+ * Llistar tots els consentiments amb paginació i filtre
+ */
+export async function listConsents(opts: {
+  status?: 'active' | 'revoked' | 'all';
+  consentType?: ConsentType;
+  search?: string;
+  limit?: number;
+  offset?: number;
+} = {}) {
+  const { status = 'all', consentType, search, limit = 50, offset = 0 } = opts;
+
+  const where: Prisma.ConsentRecordWhereInput = {};
+
+  if (status === 'active') {
+    where.granted = true;
+    where.revokedAt = null;
+  } else if (status === 'revoked') {
+    where.revokedAt = { not: null };
+  }
+
+  if (consentType) where.consentType = consentType;
+
+  if (search) {
+    where.OR = [
+      { email: { contains: search, mode: 'insensitive' } },
+      { customer: { name: { contains: search, mode: 'insensitive' } } },
+      { customer: { email: { contains: search, mode: 'insensitive' } } },
+    ];
+  }
+
+  const [items, total] = await Promise.all([
+    prisma.consentRecord.findMany({
+      where,
+      include: {
+        customer: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+    }),
+    prisma.consentRecord.count({ where }),
+  ]);
+
+  return { items, total };
+}
+
+/**
  * Obtenir consentiments actius d'un client
  */
 export async function getActiveConsents(customerId: string) {

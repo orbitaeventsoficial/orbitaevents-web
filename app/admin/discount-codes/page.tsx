@@ -350,8 +350,60 @@ export default function DiscountCodesPage() {
         </div>
       )}
 
-      {/* Codes table */}
-      <div className="rounded-2xl border overflow-hidden">
+      {/* Codes — Mobile cards */}
+      <section className="lg:hidden space-y-3">
+        {codes.map((c) => {
+          const expired = isExpired(c.validUntil);
+          const maxReached = c.maxUses != null && c.currentUses >= c.maxUses;
+          const active = c.isActive && !expired && !maxReached;
+          return (
+            <article key={c.id} className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <code className="text-sm font-mono px-2 py-0.5 rounded bg-white/5">{c.code}</code>
+                  {c.description && <p className="text-xs mt-1">{c.description}</p>}
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="font-bold text-lg">
+                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
+                  </span>
+                  <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-center ${
+                    active ? 'admin-tone-soft-success' : 'bg-white/5 text-white/40'
+                  }`}>
+                    {active ? 'Actiu' : 'Inactiu'}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <span>{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</span>
+                  <span className={expired ? 'text-rose-400' : ''}>
+                    {formatDateSimple(c.validUntil)}{expired ? ' (caducat)' : ''}
+                  </span>
+                  <span>{c.currentUses}{c.maxUses ? ` / ${c.maxUses}` : ''} usos</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleActive(c.id, c.isActive)}
+                  className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors min-h-[44px]"
+                >
+                  {c.isActive ? 'Desactivar' : 'Activar'}
+                </button>
+              </div>
+            </article>
+          );
+        })}
+        {codes.length === 0 && (
+          <div className="rounded-2xl border admin-card-glass p-12 text-center">
+            <span className="text-4xl">🎟️</span>
+            <p className="mt-4">No hi ha codis de descompte</p>
+            <p className="text-sm">Crea el primer codi per oferir promocions</p>
+          </div>
+        )}
+      </section>
+
+      {/* Codes — Desktop table */}
+      <div className="hidden lg:block rounded-2xl border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" aria-label="Codis de descompte">
             <thead className="border-b">

@@ -39,6 +39,10 @@ yarn-error.log*
 Thumbs.db
 nul
 
+# Backups & uploads
+backup/
+uploads/
+
 # Misc
 *.log
 prisma.zip

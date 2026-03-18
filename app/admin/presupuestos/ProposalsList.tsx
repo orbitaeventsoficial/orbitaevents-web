@@ -216,8 +216,97 @@ export default function ProposalsList({
         </Link>
       </div>
 
-      {/* Proposals table */}
-      <div className="rounded-2xl border overflow-hidden overflow-x-auto">
+      {/* Proposals — mobile cards */}
+      <div className="lg:hidden space-y-3">
+        {filtered.length === 0 ? (
+          <p className="text-center py-8 opacity-60">
+            {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
+          </p>
+        ) : (
+          filtered.map((p) => (
+            <article
+              key={p.id}
+              className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
+                    className="font-medium hover:underline"
+                  >
+                    {p.reference}
+                  </Link>
+                  <p className="text-sm opacity-70 truncate">
+                    <Link href={`/admin/clientes/${p.customerId}`} className="hover:underline">
+                      {p.customer?.name || 'Sense nom'}
+                    </Link>
+                  </p>
+                </div>
+                <StatusBadge status={p.status} />
+              </div>
+
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <span className="font-medium tabular-nums">{formatCurrency(p.total)}</span>
+                <span className="opacity-60">{relativeDate(p.createdAt)}</span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
+                  className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                >
+                  ✏️ Editar
+                </Link>
+                {p.status === 'DRAFT' && (
+                  <button
+                    onClick={() => handleSend(p.id)}
+                    disabled={sendingId === p.id}
+                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors disabled:opacity-50"
+                  >
+                    {sendingId === p.id ? '⏳ Enviant...' : '📧 Enviar'}
+                  </button>
+                )}
+                {p.status === 'SENT' && (
+                  <>
+                    <button
+                      onClick={() => handleStatus(p.id, 'ACCEPTED')}
+                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-emerald-500/30 px-3 py-2 text-sm text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                    >
+                      ✅ Acceptat
+                    </button>
+                    <button
+                      onClick={() => handleStatus(p.id, 'REJECTED')}
+                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-red-500/30 px-3 py-2 text-sm text-red-300 hover:bg-red-500/10 transition-colors"
+                    >
+                      ❌ Rebutjat
+                    </button>
+                  </>
+                )}
+                {p.customer && (
+                  <Link
+                    href={`/admin/clientes/${p.customerId}`}
+                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                  >
+                    👤 Client
+                  </Link>
+                )}
+                {p.leadId && (
+                  <Link
+                    href={`/admin/leads/${p.leadId}`}
+                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                  >
+                    📋 Entrada
+                  </Link>
+                )}
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      {/* Proposals table — desktop */}
+      <div className="hidden lg:block rounded-2xl border overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
           <thead>
             <tr className="border-b bg-white/[0.03]">

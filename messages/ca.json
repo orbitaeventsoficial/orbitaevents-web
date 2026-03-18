@@ -276,18 +276,18 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · So · Llums · Producció",
+      "badge": "DJ · Il·luminació · Tematització · Producció",
       "badgeEmoji": "🎵",
-      "title1": "DJ, SO I PRODUCCIÓ",
-      "title2": "PER A CASAMENTS.",
+      "title1": "CONVERTIM EL TEU EVENT EN",
+      "title2": "UN ESPECTACLE.",
       "rotatingTexts": [
-        "PER A CASAMENTS.",
-        "PER A FESTES PRIVADES.",
-        "PER A EMPRESES.",
-        "PER A TEMÀTIQUES."
+        "UN ESPECTACLE.",
+        "UNA FESTA INOBLIDABLE.",
+        "UNA EXPERIÈNCIA ÚNICA.",
+        "PURA MÀGIA."
       ],
-      "subtitle": "Barcelona i Girona. Proposta en menys de 2h, pressupost clar, execució sense drama.",
-      "subtitleAlt": "Barcelona i Girona. Resposta ràpida, pressupost clar, execució impecable.",
+      "subtitle": "DJ professional + il·luminació + tematització completa. Barcelona i Girona. Pressupost en 2h.",
+      "subtitleAlt": "DJ professional + il·luminació + tematització completa. Barcelona i Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Veure packs i preus",

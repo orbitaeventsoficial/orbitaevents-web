@@ -1,22 +1,132 @@
 'use client';
 
 /**
- * Simple Gallery Component for Portfolio
- * Displays images in a responsive grid
+ * Gallery Component for Portfolio
+ * Mosaic layout with hero images + grid blocks + lightbox
+ * Pattern: HERO → 3-grid → HERO → 2-grid → repeat
  */
 
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface GalleryImage {
+export interface GalleryItem {
   src: string;
   alt: string;
+  type?: 'image' | 'video';
 }
 
-export function SimpleGallery({ images }: { images: GalleryImage[] }) {
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const blurDataURL =
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiMxMTEyMTQiLz48L3N2Zz4=";
+function isVideo(item: GalleryItem): boolean {
+  if (item.type === 'video') return true;
+  const ext = item.src.split('.').pop()?.toLowerCase() || '';
+  return ['mp4', 'webm', 'mov'].includes(ext);
+}
+
+// ─── Scroll fade-in hook ────────────────────────────────────────────────────
+
+function useFadeIn() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // Check prefers-reduced-motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) { setVisible(true); return; }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold: 0.1, rootMargin: '40px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
+
+function FadeInBlock({ children, className }: { children: React.ReactNode; className?: string }) {
+  const { ref, visible } = useFadeIn();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} ${className || ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── Media cell ─────────────────────────────────────────────────────────────
+
+const BLUR_DATA =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiMxMTEyMTQiLz48L3N2Zz4=";
+
+function MediaCell({
+  item,
+  index,
+  aspect,
+  sizes,
+  onClick,
+  onPrefetch,
+}: {
+  item: GalleryItem;
+  index: number;
+  aspect: string;
+  sizes: string;
+  onClick: () => void;
+  onPrefetch: (src: string) => void;
+}) {
+  const itemIsVideo = isVideo(item);
+  const isPriority = index < 4;
+
+  return (
+    <div
+      className={`relative ${aspect} rounded-2xl overflow-hidden cursor-pointer group bg-stone-900`}
+      onClick={onClick}
+      onMouseEnter={() => !itemIsVideo && onPrefetch(item.src)}
+      onFocus={() => !itemIsVideo && onPrefetch(item.src)}
+    >
+      {itemIsVideo ? (
+        <video
+          src={item.src}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          muted
+          playsInline
+          preload="metadata"
+          onMouseEnter={(e) => e.currentTarget.play()}
+          onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+        />
+      ) : (
+        <Image
+          src={item.src}
+          alt={item.alt}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes={sizes}
+          quality={index === 0 ? 75 : 60}
+          priority={isPriority}
+          loading={isPriority ? 'eager' : 'lazy'}
+          placeholder="blur"
+          blurDataURL={BLUR_DATA}
+        />
+      )}
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+      {itemIsVideo && (
+        <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
+          <span>▶</span> Vídeo
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main gallery ───────────────────────────────────────────────────────────
+
+export function SimpleGallery({ images }: { images: GalleryItem[] }) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const prefetchImage = useCallback((src: string) => {
     if (typeof window === 'undefined') return;
@@ -25,106 +135,184 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
   }, []);
 
   useEffect(() => {
-    if (selectedImage === null) return;
-    const next = images[selectedImage + 1]?.src;
-    const prev = images[selectedImage - 1]?.src;
-    if (next) prefetchImage(next);
-    if (prev) prefetchImage(prev);
-  }, [selectedImage, images, prefetchImage]);
+    if (selectedIndex === null) return;
+    const next = images[selectedIndex + 1];
+    const prev = images[selectedIndex - 1];
+    if (next && !isVideo(next)) prefetchImage(next.src);
+    if (prev && !isVideo(prev)) prefetchImage(prev.src);
+  }, [selectedIndex, images, prefetchImage]);
+
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedIndex(null);
+      if (e.key === 'ArrowRight' && selectedIndex < images.length - 1) setSelectedIndex(selectedIndex + 1);
+      if (e.key === 'ArrowLeft' && selectedIndex > 0) setSelectedIndex(selectedIndex - 1);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [selectedIndex, images.length]);
+
+  // Build mosaic blocks
+  // Pattern: HERO(1) → ROW3(3) → HERO(1) → ROW2(2) = 7 per cycle
+  const blocks: React.ReactNode[] = [];
+  let i = 0;
+  let blockKey = 0;
+
+  while (i < images.length) {
+    const remaining = images.length - i;
+
+    // HERO — single wide image
+    if (remaining >= 1) {
+      const heroIdx = i;
+      blocks.push(
+        <FadeInBlock key={`hero-${blockKey}`}>
+          <MediaCell
+            item={images[heroIdx]}
+            index={heroIdx}
+            aspect="aspect-[21/9]"
+            sizes="100vw"
+            onClick={() => setSelectedIndex(heroIdx)}
+            onPrefetch={prefetchImage}
+          />
+        </FadeInBlock>,
+      );
+      i += 1;
+    }
+
+    // ROW of 3
+    if (i < images.length) {
+      const row = images.slice(i, Math.min(i + 3, images.length));
+      blocks.push(
+        <FadeInBlock key={`row3-${blockKey}`} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {row.map((item, j) => (
+            <MediaCell
+              key={i + j}
+              item={item}
+              index={i + j}
+              aspect="aspect-[4/3]"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              onClick={() => setSelectedIndex(i + j)}
+              onPrefetch={prefetchImage}
+            />
+          ))}
+        </FadeInBlock>,
+      );
+      i += row.length;
+    }
+
+    // Second HERO (only if enough left)
+    if (i < images.length && (images.length - i) >= 3) {
+      const heroIdx = i;
+      blocks.push(
+        <FadeInBlock key={`hero2-${blockKey}`}>
+          <MediaCell
+            item={images[heroIdx]}
+            index={heroIdx}
+            aspect="aspect-[16/7]"
+            sizes="100vw"
+            onClick={() => setSelectedIndex(heroIdx)}
+            onPrefetch={prefetchImage}
+          />
+        </FadeInBlock>,
+      );
+      i += 1;
+    }
+
+    // ROW of 2
+    if (i < images.length) {
+      const row = images.slice(i, Math.min(i + 2, images.length));
+      blocks.push(
+        <FadeInBlock key={`row2-${blockKey}`} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {row.map((item, j) => (
+            <MediaCell
+              key={i + j}
+              item={item}
+              index={i + j}
+              aspect="aspect-[3/2]"
+              sizes="(max-width: 640px) 100vw, 50vw"
+              onClick={() => setSelectedIndex(i + j)}
+              onPrefetch={prefetchImage}
+            />
+          ))}
+        </FadeInBlock>,
+      );
+      i += row.length;
+    }
+
+    blockKey += 1;
+  }
+
+  const selected = selectedIndex !== null ? images[selectedIndex] : null;
 
   return (
     <>
-      {/* Grid de imágenes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {images.map((image, index) => {
-          // Primeres 6 imatges carreguen amb prioritat (2 files above the fold)
-          const isPriority = index < 6;
-          return (
-            <div
-              key={index}
-              className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity bg-stone-900"
-              onClick={() => setSelectedImage(index)}
-              onMouseEnter={() => prefetchImage(image.src)}
-              onFocus={() => prefetchImage(image.src)}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality={60}
-                priority={isPriority}
-                loading={isPriority ? 'eager' : 'lazy'}
-                placeholder="blur"
-                blurDataURL={blurDataURL}
-              />
-            </div>
-          );
-        })}
+      <div className="space-y-3">
+        {blocks}
       </div>
 
-      {/* Modal de imagen ampliada */}
-      {selectedImage !== null && (
+      {/* Lightbox */}
+      {selected && selectedIndex !== null && (
         <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedIndex(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
-            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+            onClick={() => setSelectedIndex(null)}
             aria-label="Cerrar"
           >
             ×
           </button>
 
-          {/* Navegación anterior */}
-          {selectedImage > 0 && (
+          {selectedIndex > 0 && (
             <button
-              className="absolute left-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedImage(selectedImage - 1);
-              }}
+              className="absolute left-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+              onClick={(e) => { e.stopPropagation(); setSelectedIndex(selectedIndex - 1); }}
               aria-label="Anterior"
             >
               ‹
             </button>
           )}
 
-          {/* Imagen */}
-          <div className="relative max-w-6xl max-h-[90vh] w-full h-full">
-            <Image
-              src={images[selectedImage].src}
-              alt={images[selectedImage].alt}
-              fill
-              className="object-contain"
-              sizes="100vw"
-              quality={65}
-              priority
-              loading="eager"
-              placeholder="blur"
-              blurDataURL={blurDataURL}
-            />
+          <div className="relative max-w-6xl max-h-[90vh] w-full h-full" onClick={(e) => e.stopPropagation()}>
+            {isVideo(selected) ? (
+              <video
+                key={selected.src}
+                src={selected.src}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+                playsInline
+              />
+            ) : (
+              <Image
+                src={selected.src}
+                alt={selected.alt}
+                fill
+                className="object-contain"
+                sizes="100vw"
+                quality={75}
+                priority
+                loading="eager"
+                placeholder="blur"
+                blurDataURL={BLUR_DATA}
+              />
+            )}
           </div>
 
-          {/* Navegación siguiente */}
-          {selectedImage < images.length - 1 && (
+          {selectedIndex < images.length - 1 && (
             <button
-              className="absolute right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedImage(selectedImage + 1);
-              }}
+              className="absolute right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+              onClick={(e) => { e.stopPropagation(); setSelectedIndex(selectedIndex + 1); }}
               aria-label="Siguiente"
             >
               ›
             </button>
           )}
 
-          {/* Contador */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
-            {selectedImage + 1} / {images.length}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm z-10">
+            {selectedIndex + 1} / {images.length}
           </div>
         </div>
       )}

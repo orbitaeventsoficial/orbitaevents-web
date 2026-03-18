@@ -16,6 +16,7 @@ import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import BookingSectionNav from './BookingSectionNav';
+import BookingGallery from './BookingGallery';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -23,50 +24,14 @@ import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import Tooltip from '@/app/admin/components/Tooltip';
+import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
+import { buildGoogleCalendarUrl, parseLogDetails, getPackTranslation } from './booking-utils';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: { id: string };
 }
-
-type BookingExtraRow = {
-  id: string;
-  price: number;
-  quantity: number | null;
-  extra: {
-    slug: string;
-    translations: Array<{ locale: string; name: string; tagline?: string | null }>;
-  };
-};
-
-type BookingProposalRow = {
-  id: string;
-  reference: string;
-  status: string;
-  pdfUrl: string | null;
-  contractStatus: string | null;
-  contractReference: string | null;
-  contractPdfUrl: string | null;
-  contractSignedAt: Date | null;
-};
-
-type BookingInvoiceRow = {
-  id: string;
-  reference: string;
-  status: string;
-  total: number;
-  holdedInvoiceUrl: string | null;
-  holdedSyncError: string | null;
-  createdAt: Date;
-};
-
-type BookingNumericCompat = {
-  extraHours?: number;
-  distanceKm?: number | null;
-  vehicleCostPerKm?: number | null;
-  fuelCostPerKm?: number | null;
-};
 
 async function getBooking(id: string) {
   try {
@@ -102,85 +67,6 @@ async function getBooking(id: string) {
 }
 
 
-function toGoogleCalendarUtc(date: Date): string {
-  const yyyy = date.getUTCFullYear();
-  const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(date.getUTCDate()).padStart(2, '0');
-  const hh = String(date.getUTCHours()).padStart(2, '0');
-  const min = String(date.getUTCMinutes()).padStart(2, '0');
-  const ss = String(date.getUTCSeconds()).padStart(2, '0');
-  return `${yyyy}${mm}${dd}T${hh}${min}${ss}Z`;
-}
-
-function combineDateAndTime(baseDate: Date, time: string | null): Date | null {
-  if (!time) return null;
-  const [hRaw, mRaw] = time.split(':');
-  const h = Number(hRaw);
-  const m = Number(mRaw);
-  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
-  const dt = new Date(baseDate);
-  dt.setHours(h, m, 0, 0);
-  return dt;
-}
-
-function buildGoogleCalendarUrl(booking: {
-  reference: string;
-  clientName: string;
-  eventDate: Date;
-  eventStartTime: string | null;
-  eventEndTime: string | null;
-  eventLocation: string;
-  eventVenue: string | null;
-  notes: string | null;
-}) {
-  const title = `Òrbita · ${booking.reference} · ${booking.clientName}`;
-  const start = combineDateAndTime(booking.eventDate, booking.eventStartTime);
-  const end = combineDateAndTime(booking.eventDate, booking.eventEndTime);
-  const location = [booking.eventVenue, booking.eventLocation].filter(Boolean).join(' · ');
-  const details = [
-    `Client: ${booking.clientName}`,
-    `Referència: ${booking.reference}`,
-    booking.notes ? `Notes: ${booking.notes}` : null,
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-  const params = new URLSearchParams();
-  params.set('action', 'TEMPLATE');
-  params.set('text', title);
-  if (start && end && end.getTime() > start.getTime()) {
-    params.set('dates', `${toGoogleCalendarUtc(start)}/${toGoogleCalendarUtc(end)}`);
-    params.set('ctz', 'Europe/Madrid');
-  } else {
-    const dayStart = new Date(booking.eventDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setDate(dayStart.getDate() + 1);
-    const yyyymmdd = `${dayStart.getFullYear()}${String(dayStart.getMonth() + 1).padStart(2, '0')}${String(dayStart.getDate()).padStart(2, '0')}`;
-    const yyyymmddEnd = `${dayEnd.getFullYear()}${String(dayEnd.getMonth() + 1).padStart(2, '0')}${String(dayEnd.getDate()).padStart(2, '0')}`;
-    params.set('dates', `${yyyymmdd}/${yyyymmddEnd}`);
-  }
-  if (location) params.set('location', location);
-  if (details) params.set('details', details);
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-
-function parseLogDetails(details: unknown): Record<string, unknown> {
-  if (!details || typeof details !== 'object') return {};
-  return details as Record<string, unknown>;
-}
-
-function getPackTranslation(
-  translations: Array<{ locale: string; name: string; tagline?: string | null }>,
-  locale?: string | null
-) {
-  const preferred = String(locale || 'ca').toLowerCase();
-  return (
-    translations.find((t) => t.locale === preferred) ||
-    translations.find((t) => t.locale === 'ca') ||
-    translations[0]
-  );
-}
 
 export default async function BookingDetailPage({ params }: PageProps) {
   const booking = await getBooking(params.id);
@@ -807,6 +693,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* Gallery Section */}
+      <section id="sec-galeria" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+        <BookingGallery bookingId={booking.id} />
+      </section>
 
       {/* Post-Event Section */}
       {booking.status === 'COMPLETED' && (

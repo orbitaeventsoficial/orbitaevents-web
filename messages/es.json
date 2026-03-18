@@ -276,18 +276,18 @@
   },
   "hero": {
     "elegant": {
-      "badge": "DJ · Sonido · Luces · Producción",
+      "badge": "DJ · Iluminación · Tematización · Producción",
       "badgeEmoji": "🎵",
-      "title1": "DJ, SONIDO Y PRODUCCIÓN",
-      "title2": "PARA BODAS.",
+      "title1": "CONVERTIMOS TU EVENTO EN",
+      "title2": "UN ESPECTÁCULO.",
       "rotatingTexts": [
-        "PARA BODAS.",
-        "PARA FIESTAS PRIVADAS.",
-        "PARA EMPRESAS.",
-        "PARA TEMÁTICAS."
+        "UN ESPECTÁCULO.",
+        "UNA FIESTA INOLVIDABLE.",
+        "UNA EXPERIENCIA ÚNICA.",
+        "PURA MAGIA."
       ],
-      "subtitle": "Barcelona y Girona. Propuesta en menos de 2h, presupuesto claro, ejecución sin drama.",
-      "subtitleAlt": "Barcelona y Girona. Respuesta rápida, presupuesto claro, ejecución impecable.",
+      "subtitle": "DJ profesional + iluminación + tematización completa. Barcelona y Girona. Presupuesto en 2h.",
+      "subtitleAlt": "DJ profesional + iluminación + tematización completa. Barcelona y Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Ver packs y precios",

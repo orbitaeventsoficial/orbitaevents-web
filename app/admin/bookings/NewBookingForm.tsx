@@ -13,6 +13,7 @@ import { AdminPage } from '../components/AdminPage';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useToast } from '../components/ToastProvider';
 
 type Pack = {
   id: string;
@@ -116,6 +117,7 @@ const INITIAL_FORM: FormData = {
 
 export default function NewBookingForm() {
   const router = useRouter();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const leadId = searchParams?.get('leadId') ?? null;
   const customerId = searchParams?.get('customerId') ?? null;
@@ -370,10 +372,11 @@ export default function NewBookingForm() {
       }
     } catch (error) {
       console.error('[NewBooking] Error validant codi descompte:', error);
+      toast.error('Error validant el codi de descompte');
     } finally {
       setValidatingCode(false);
     }
-  }, [packs, form.packId, selectedExtras]);
+  }, [packs, form.packId, selectedExtras, toast]);
 
   const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);

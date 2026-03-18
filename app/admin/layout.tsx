@@ -404,6 +404,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       'css-manager': 'CSS PRO',
       'post-event': 'Post-esdeveniment',
       'google-reviews': 'Ressenyes de Google',
+      portfolio: 'Portfolio',
     };
     const isDynamicId =
       /^[a-f0-9]{24}$/i.test(page) || // Mongo-like id

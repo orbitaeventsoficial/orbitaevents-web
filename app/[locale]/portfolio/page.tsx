@@ -64,40 +64,83 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
             {t('noCategories')}
           </p>
         ) : (
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat, index) => {
-              const translatedName = getCategoryName(cat.slug);
-              // Primeres 3 imatges carreguen amb prioritat (above the fold)
-              const isPriority = index < 3;
-              return (
-                <Link
-                  key={cat.slug}
-                  href={`/portfolio/${encodeURIComponent(cat.slug)}`}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl hover:shadow-oe-gold/20 transition-all duration-500 hover:-translate-y-4"
-                >
-                  <Image
-                    src={cat.cover}
-                    alt={translatedName}
-                    width={800}
-                    height={600}
-                    priority={isPriority}
-                    loading={isPriority ? 'eager' : 'lazy'}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    quality={70}
-                    className="h-80 w-full object-cover transition group-hover:scale-110 duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 p-8 w-full">
-                    <h3 className="text-3xl font-bold text-white drop-shadow-2xl">
-                      {translatedName}
-                    </h3>
-                    <p className="text-oe-gold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {t('viewGallery')}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="space-y-4">
+            {/* Featured — first 2 categories as large cinematic cards */}
+            <div className="grid gap-4 md:grid-cols-2">
+              {categories.slice(0, 2).map((cat, index) => {
+                const translatedName = getCategoryName(cat.slug);
+                return (
+                  <Link
+                    key={cat.slug}
+                    href={`/portfolio/${encodeURIComponent(cat.slug)}`}
+                    className="group relative overflow-hidden rounded-3xl h-[420px] md:h-[500px]"
+                  >
+                    <Image
+                      src={cat.cover}
+                      alt={translatedName}
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      quality={75}
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 p-8 md:p-10 w-full">
+                      <span className="text-amber-400 text-xs font-semibold tracking-widest uppercase">
+                        {t('viewGallery')}
+                      </span>
+                      <h3 className="text-3xl md:text-4xl font-black text-white mt-2 group-hover:text-amber-50 transition-colors">
+                        {translatedName}
+                      </h3>
+                      <div className="mt-3 flex items-center gap-2 text-white/50 text-sm group-hover:text-white/70 transition-colors">
+                        <span>Ver galería</span>
+                        <svg className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Rest — 3-column grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {categories.slice(2).map((cat, index) => {
+                const translatedName = getCategoryName(cat.slug);
+                const isPriority = index < 1;
+                return (
+                  <Link
+                    key={cat.slug}
+                    href={`/portfolio/${encodeURIComponent(cat.slug)}`}
+                    className="group relative overflow-hidden rounded-2xl h-[320px]"
+                  >
+                    <Image
+                      src={cat.cover}
+                      alt={translatedName}
+                      fill
+                      priority={isPriority}
+                      loading={isPriority ? 'eager' : 'lazy'}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      quality={65}
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 p-6 w-full">
+                      <h3 className="text-2xl font-bold text-white group-hover:text-amber-50 transition-colors">
+                        {translatedName}
+                      </h3>
+                      <p className="text-white/40 text-sm mt-1 flex items-center gap-1.5 group-hover:text-white/60 transition-colors">
+                        {t('viewGallery')}
+                        <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </section>

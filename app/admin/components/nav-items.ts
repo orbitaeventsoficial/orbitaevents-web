@@ -35,6 +35,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🤝', label: 'Col·laboradors', href: '/admin/collaborators' },
       { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops' },
+      { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
     ],
   },
   {
@@ -45,6 +46,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
       { icon: '💰', label: 'Preus', href: '/admin/pricing' },
       { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
+      { icon: '📋', label: 'Catàleg', href: '/admin/catalog' },
     ],
   },
   {
@@ -53,8 +55,10 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: '📰', label: 'Blog', href: '/admin/blog' },
       { icon: '✅', label: 'Ressenyes', href: '/admin/ressenyes' },
+      { icon: '⭐', label: 'Ressenyes Google', href: '/admin/google-reviews' },
       { icon: '🤖', label: 'Correus', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' },
       { icon: '✉️', label: 'Plantilles email', href: '/admin/email-templates' },
+      { icon: '🖼️', label: 'Portfolio', href: '/admin/portfolio' },
     ],
   },
   {
@@ -76,6 +80,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '📊', label: 'Estadístiques web', href: '/admin/stats' },
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
       { icon: '🎛️', label: 'Features', href: '/admin/features' },
+      { icon: '📡', label: 'Activitat', href: '/admin/activity' },
       { icon: '🔄', label: 'Crons', href: '/admin/crons' },
       { icon: '🎨', label: 'Tema admin', href: '/admin/css-manager' },
       { icon: '🛠️', label: 'Scripts i eines', href: '/admin/scripts' },

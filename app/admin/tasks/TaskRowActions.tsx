@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useToast } from '@/app/admin/components/ToastProvider';
 
 export default function TaskRowActions({
   taskId,
@@ -15,6 +16,7 @@ export default function TaskRowActions({
   destinationHref: string;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [saving, setSaving] = useState(false);
 
   const isDone = status === 'DONE';
@@ -30,11 +32,12 @@ export default function TaskRowActions({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No s’ha pogut actualitzar la tasca');
+        throw new Error(data?.error || "No s'ha pogut actualitzar la tasca");
       }
       router.refresh();
     } catch (error) {
       console.error('[TaskRowActions] Error actualitzant tasca:', error);
+      toast.error('Error actualitzant la tasca');
     } finally {
       setSaving(false);
     }
@@ -46,7 +49,7 @@ export default function TaskRowActions({
         href={destinationHref}
         className="rounded border px-2 py-1 text-xs font-medium"
       >
-        Obrir destí
+        Obrir desti
       </Link>
       <button
         type="button"
@@ -59,4 +62,3 @@ export default function TaskRowActions({
     </div>
   );
 }
-

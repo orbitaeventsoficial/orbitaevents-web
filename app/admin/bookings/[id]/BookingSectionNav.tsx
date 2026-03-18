@@ -13,6 +13,7 @@ const SECTIONS = [
   { id: 'sec-documents', label: 'Documents' },
   { id: 'sec-comunicacions', label: 'Comunicacions' },
   { id: 'sec-historial', label: 'Historial' },
+  { id: 'sec-galeria', label: 'Galeria' },
 ] as const;
 
 export default function BookingSectionNav() {

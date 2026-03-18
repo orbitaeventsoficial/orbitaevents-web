@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { getAppBaseUrl } from '@/lib/site';
 
 
@@ -193,7 +194,7 @@ export async function markPortalAccessHit(input: {
       },
     });
   } catch (error) {
-    console.error('[ClientPortal] Error actualitzant accés:', error);
+    log.error('[ClientPortal] Error actualitzant accés:', error);
   }
 }
 

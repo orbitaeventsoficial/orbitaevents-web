@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { BookingStatus, EventType } from '@prisma/client';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
@@ -75,7 +76,7 @@ export async function prepareBookingPatchData(existing: ExistingBookingRecord, i
       try {
         const route = await calculateGoogleMapsDistance({ destination });
         body.distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
-      } catch (err) { console.error('[bookingRoute] Google Maps distance failed:', err); }
+      } catch (err) { log.error('[bookingRoute] Google Maps distance failed:', err); }
     }
   }
 

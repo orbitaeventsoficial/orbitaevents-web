@@ -1,0 +1,155 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    lead: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    leadNote: { deleteMany: vi.fn() },
+    leadActivity: { deleteMany: vi.fn() },
+    leadDocument: { deleteMany: vi.fn() },
+    leadTask: { deleteMany: vi.fn() },
+    task: { deleteMany: vi.fn() },
+    adminLog: { create: vi.fn() },
+    $transaction: vi.fn(),
+  },
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+
+import {
+  getLeadDetail,
+  updateLeadFromInput,
+  deleteLeadIfAllowed,
+} from '@/lib/services/leadRouteService';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockPrisma.lead.findUnique.mockResolvedValue(null);
+  mockPrisma.lead.update.mockResolvedValue({ id: 'l1', name: 'Test', status: 'NEW' });
+  mockPrisma.adminLog.create.mockResolvedValue({});
+  mockPrisma.$transaction.mockImplementation((fn: Function) => fn({
+    leadNote: { deleteMany: mockPrisma.leadNote.deleteMany },
+    leadActivity: { deleteMany: mockPrisma.leadActivity.deleteMany },
+    task: { deleteMany: mockPrisma.task.deleteMany },
+    leadTask: { deleteMany: mockPrisma.leadTask.deleteMany },
+    leadDocument: { deleteMany: mockPrisma.leadDocument.deleteMany },
+    lead: { delete: vi.fn().mockResolvedValue({ id: 'l1' }) },
+  }));
+  mockPrisma.leadNote.deleteMany.mockResolvedValue({});
+  mockPrisma.leadActivity.deleteMany.mockResolvedValue({});
+  mockPrisma.leadDocument.deleteMany.mockResolvedValue({});
+  mockPrisma.leadTask.deleteMany.mockResolvedValue({});
+  mockPrisma.task.deleteMany.mockResolvedValue({});
+});
+
+describe('getLeadDetail', () => {
+  it('retorna 404 si no existeix', async () => {
+    const result = await getLeadDetail('l-inexistent');
+    expect(result.status).toBe(404);
+  });
+
+  it('retorna lead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', name: 'Maria', status: 'NEW' });
+
+    const result = await getLeadDetail('l1');
+
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+  });
+});
+
+describe('updateLeadFromInput', () => {
+  it('retorna 404 si no existeix', async () => {
+    const result = await updateLeadFromInput('l-inexistent', {});
+    expect(result.status).toBe(404);
+  });
+
+  it('actualitza lead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    const result = await updateLeadFromInput('l1', { priority: 'HIGH' });
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.lead.update).toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).toHaveBeenCalled();
+  });
+
+  it('parseja eventDate string', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    await updateLeadFromInput('l1', { eventDate: '2026-06-15' });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ eventDate: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('retorna 400 amb data invàlida', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    const result = await updateLeadFromInput('l1', { eventDate: 'invalid-date' });
+
+    expect(result.status).toBe(400);
+  });
+
+  it('estableix convertedAt quan WON', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEGOTIATING', contactedAt: new Date() });
+
+    await updateLeadFromInput('l1', { status: 'WON' });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ convertedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('estableix contactedAt quan CONTACTED', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', status: 'NEW', contactedAt: null });
+
+    await updateLeadFromInput('l1', { status: 'CONTACTED' });
+
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ contactedAt: expect.any(Date) }),
+      })
+    );
+  });
+});
+
+describe('deleteLeadIfAllowed', () => {
+  it('retorna 404 si no existeix', async () => {
+    const result = await deleteLeadIfAllowed('l-inexistent');
+    expect(result.status).toBe(404);
+  });
+
+  it('retorna 400 si té reserva', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1',
+      name: 'Test',
+      booking: { id: 'b1' },
+    });
+
+    const result = await deleteLeadIfAllowed('l1');
+
+    expect(result.status).toBe(400);
+  });
+
+  it('elimina lead en transaction', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1',
+      name: 'Test',
+      email: 'test@test.com',
+      booking: null,
+    });
+
+    const result = await deleteLeadIfAllowed('l1');
+
+    expect(result.status).toBe(200);
+    expect(mockPrisma.$transaction).toHaveBeenCalled();
+  });
+});

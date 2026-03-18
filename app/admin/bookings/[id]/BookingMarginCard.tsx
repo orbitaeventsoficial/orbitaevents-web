@@ -143,11 +143,15 @@ export default function BookingMarginCard({
           travelCost: calculateTravelCost(nextDistanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM),
         }),
       });
-      if (!res.ok) console.error('[BookingMarginCard] Error desant distància:', res.status);
+      if (!res.ok) {
+        console.error('[BookingMarginCard] Error desant distància:', res.status);
+        toast.error('Error desant la distància');
+      }
     } catch (err) {
       console.error('[BookingMarginCard] Error desant distància:', err);
+      toast.error('Error desant la distància');
     }
-  }, [bookingId, vehicleCostPerKm]);
+  }, [bookingId, vehicleCostPerKm, toast]);
 
   const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);

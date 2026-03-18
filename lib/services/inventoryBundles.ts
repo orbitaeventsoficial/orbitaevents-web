@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
@@ -48,7 +49,7 @@ export async function getInventoryBundles(): Promise<InventoryBundle[]> {
     if (bundles.length === 0) return getDefaultInventoryBundles();
     return bundles;
   } catch (error) {
-    console.error('[InventoryBundles] Error parsejant bundles:', error);
+    log.error('[InventoryBundles] Error parsejant bundles:', error);
     return getDefaultInventoryBundles();
   }
 }

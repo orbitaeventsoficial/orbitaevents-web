@@ -38,12 +38,6 @@ interface DuplicateMatch {
   matchReasons: MatchReason[];
 }
 
-interface DuplicateGroup {
-  primaryCustomer: Customer;
-  duplicates: DuplicateMatch[];
-  suggestedAction: 'auto_merge' | 'review' | 'ignore';
-}
-
 interface MergeResult {
   mergedCustomer: Customer;
   deletedIds: string[];
@@ -182,57 +176,6 @@ export async function findDuplicates(
   return matches.sort((a, b) => b.matchScore - a.matchScore);
 }
 
-/**
- * Obtenir tots els possibles duplicats del sistema
- */
-export async function findAllPotentialDuplicates(): Promise<{
-  groups: DuplicateGroup[];
-  totalDuplicates: number;
-}> {
-  const customers = await prisma.customer.findMany({
-    where: { mergedIntoId: null },
-    orderBy: { createdAt: 'asc' },
-  });
-
-  const groups: DuplicateGroup[] = [];
-  const processedIds = new Set<string>();
-
-  for (const customer of customers) {
-    if (processedIds.has(customer.id)) continue;
-
-    const duplicates = await findDuplicates(
-      {
-        email: customer.email,
-        name: customer.name,
-        phone: customer.phone || undefined,
-        instagram: customer.instagram || undefined,
-      },
-      customer.id
-    );
-
-    // Filtrar duplicats ja processats
-    const unprocessedDuplicates = duplicates.filter(d => !processedIds.has(d.customer.id));
-
-    if (unprocessedDuplicates.length > 0) {
-      const group: DuplicateGroup = {
-        primaryCustomer: customer,
-        duplicates: unprocessedDuplicates,
-        suggestedAction: getSuggestedAction(unprocessedDuplicates),
-      };
-
-      groups.push(group);
-
-      // Marcar tots com processats
-      processedIds.add(customer.id);
-      unprocessedDuplicates.forEach(d => processedIds.add(d.customer.id));
-    }
-  }
-
-  return {
-    groups,
-    totalDuplicates: groups.reduce((sum, g) => sum + g.duplicates.length, 0),
-  };
-}
 
 /**
  * Fusionar dos o més clients en un
@@ -398,20 +341,6 @@ export async function mergeCustomers(
   };
 }
 
-/**
- * Obtenir estadístiques de duplicats
- */
-export async function getDuplicateStats() {
-  const { groups, totalDuplicates } = await findAllPotentialDuplicates();
-
-  return {
-    totalGroups: groups.length,
-    totalDuplicates,
-    autoMergeRecommended: groups.filter(g => g.suggestedAction === 'auto_merge').length,
-    needsReview: groups.filter(g => g.suggestedAction === 'review').length,
-    lowPriority: groups.filter(g => g.suggestedAction === 'ignore').length,
-  };
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FUNCIONS AUXILIARS
@@ -455,16 +384,4 @@ function calculateSimilarity(str1: string, str2: string): number {
   return 1 - distance / maxLen;
 }
 
-/**
- * Suggerir acció basada en la puntuació
- */
-function getSuggestedAction(
-  duplicates: DuplicateMatch[]
-): 'auto_merge' | 'review' | 'ignore' {
-  const maxScore = Math.max(...duplicates.map(d => d.matchScore));
-
-  if (maxScore >= 90) return 'auto_merge'; // Quasi segur duplicat
-  if (maxScore >= 50) return 'review'; // Cal revisar
-  return 'ignore'; // Probablement no és duplicat
-}
 

@@ -649,6 +649,7 @@ model Booking {
   tasks              Task[]
   portalAccesses     ClientPortalAccess[]
   collaboratorBookings CollaboratorBooking[]
+  galleryPhotos        BookingGalleryPhoto[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -1619,4 +1620,83 @@ enum CustomQuoteStatus {
   SENT
   ACCEPTED
   REJECTED
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GALERIA DE FOTOS D'EVENTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model BookingGalleryPhoto {
+  id          String   @id @default(cuid())
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  photoUrl    String   // URL de la foto (uploads/bookings/{id}/gallery/{timestamp}.webp)
+  thumbnailUrl String? // URL thumbnail (opcional, generat)
+  caption     String?  // Descripció breu
+  sortOrder   Int      @default(0)
+
+  // Visibilitat
+  isPortfolio     Boolean  @default(false) // Mostrar al portfolio públic
+  isPortal        Boolean  @default(true)  // Mostrar al portal client
+  portfolioSlug   String?  // Carpeta del portfolio: "bodas", "discomovil", "fiestas-privadas", etc.
+
+  uploadedBy  String?  // Admin que ha pujat
+  createdAt   DateTime @default(now())
+
+  @@index([bookingId])
+  @@index([isPortfolio])
+  @@index([portfolioSlug])
+  @@map("booking_gallery_photos")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PORTFOLIO MEDIA (pujades directes, no lligades a booking)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model PortfolioMedia {
+  id           String          @id @default(cuid())
+  slug         String          // Categoria: "bodas", "discomovil", etc.
+  mediaUrl     String          // URL del fitxer
+  thumbnailUrl String?         // Thumbnail per vídeos
+  caption      String?
+  mediaType    String          @default("image") // "image" | "video"
+  sortOrder    Int             @default(0)
+  eventId      String?         // Opcional: vinculat a un event concret
+  event        PortfolioEvent? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  uploadedBy   String?
+  createdAt    DateTime        @default(now())
+
+  @@index([slug])
+  @@index([slug, sortOrder])
+  @@index([eventId])
+  @@map("portfolio_media")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PORTFOLIO EVENTS (mini-pàgines per event concret)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model PortfolioEvent {
+  id           String           @id @default(cuid())
+  slug         String           @unique // URL: /portfolio/bodas/boda-laura-marc
+  categorySlug String           // "bodas", "discomovil", etc.
+  title        String           // "Boda Laura & Marc"
+  subtitle     String?          // "Masía Can Riera · Septiembre 2024"
+  venue        String?          // "Masía Can Riera"
+  location     String?          // "Girona"
+  eventDate    DateTime?
+  guestCount   Int?
+  description  String?          // Text lliure de l'event
+  services     String[]         // ["DJ", "Iluminación", "Tematización"]
+  coverImage   String           // URL de la imatge hero
+  published    Boolean          @default(false)
+  sortOrder    Int              @default(0)
+  media        PortfolioMedia[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([categorySlug, published])
+  @@index([published, sortOrder])
+  @@map("portfolio_events")
 }

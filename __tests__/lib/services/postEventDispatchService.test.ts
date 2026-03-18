@@ -1,0 +1,179 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const { mockPrisma, mockSendEmail } = vi.hoisted(() => ({
+  mockPrisma: {
+    booking: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    customerActivity: { create: vi.fn() },
+    adminLog: { create: vi.fn() },
+  },
+  mockSendEmail: vi.fn(),
+}));
+
+vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/app/config/site-config', () => ({
+  SITE_CONFIG: {
+    business: { phone: '+34600000000', email: 'info@test.com' },
+    reviews: { googleReviewUrl: 'https://google.com/review' },
+  },
+}));
+vi.mock('@/lib/site', () => ({ getAppBaseUrl: () => 'https://test.orbita.events' }));
+vi.mock('@/lib/constants', () => ({
+  PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita',
+  toIntlLocale: (l: string) => l === 'es' ? 'es-ES' : l === 'en' ? 'en-GB' : 'ca-ES',
+}));
+vi.mock('@/lib/services/postEventEmailService', () => ({
+  normalizeLocale: (l: string) => l || 'ca',
+  resolvePackName: () => 'Premium',
+  getPostEventSubject: () => 'Subject',
+  generatePostEventEmail: () => '<html>email</html>',
+}));
+
+import { listPendingPostEventBookings, sendPostEventEmailForBooking } from '@/lib/services/postEventDispatchService';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockPrisma.booking.findMany.mockResolvedValue([]);
+  mockPrisma.booking.findUnique.mockResolvedValue(null);
+  mockPrisma.booking.update.mockResolvedValue({});
+  mockPrisma.customerActivity.create.mockResolvedValue({});
+  mockPrisma.adminLog.create.mockResolvedValue({});
+  mockSendEmail.mockResolvedValue({});
+});
+
+describe('listPendingPostEventBookings', () => {
+  it('retorna reserves pendents', async () => {
+    mockPrisma.booking.findMany.mockResolvedValue([{ id: 'b1' }]);
+
+    const result = await listPendingPostEventBookings();
+
+    expect(result).toHaveLength(1);
+    expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: 'COMPLETED',
+          postEventEmailSent: false,
+        }),
+      })
+    );
+  });
+});
+
+describe('sendPostEventEmailForBooking', () => {
+  it('retorna error si reserva no existeix', async () => {
+    const result = await sendPostEventEmailForBooking('b-inexistent');
+
+    expect(result.status).toBe('error');
+  });
+
+  it('salta si no COMPLETED', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'CONFIRMED',
+      clientName: 'Maria',
+      clientEmail: 'maria@test.com',
+      reference: 'REF-001',
+    });
+
+    const result = await sendPostEventEmailForBooking('b1');
+
+    expect(result.status).toBe('skipped');
+  });
+
+  it('salta si ja enviat', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'COMPLETED',
+      clientName: 'Maria',
+      clientEmail: 'maria@test.com',
+      postEventEmailSent: true,
+      reference: 'REF-001',
+    });
+
+    const result = await sendPostEventEmailForBooking('b1');
+
+    expect(result.status).toBe('skipped');
+  });
+
+  it('salta si email placeholder', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'COMPLETED',
+      clientName: 'Maria',
+      clientEmail: 'auto@placeholder.orbita',
+      postEventEmailSent: false,
+      reference: 'REF-001',
+    });
+
+    const result = await sendPostEventEmailForBooking('b1');
+
+    expect(result.status).toBe('skipped');
+  });
+
+  it('envia email correctament', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'COMPLETED',
+      clientName: 'Maria',
+      clientEmail: 'maria@test.com',
+      postEventEmailSent: false,
+      reference: 'REF-001',
+      eventDate: new Date(),
+      preferredLocale: 'ca',
+      lead: { preferredLocale: 'ca', customerId: 'cust1' },
+      pack: { translations: [{ locale: 'ca', name: 'Premium' }] },
+    });
+
+    const result = await sendPostEventEmailForBooking('b1');
+
+    expect(result.status).toBe('sent');
+    expect(mockSendEmail).toHaveBeenCalled();
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ postEventEmailSent: true }),
+      })
+    );
+  });
+
+  it('crea customerActivity si customer linked', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'COMPLETED',
+      clientName: 'Maria',
+      clientEmail: 'maria@test.com',
+      postEventEmailSent: false,
+      reference: 'REF-001',
+      eventDate: new Date(),
+      preferredLocale: 'ca',
+      lead: { preferredLocale: 'ca', customerId: 'cust1' },
+      pack: null,
+    });
+
+    await sendPostEventEmailForBooking('b1');
+
+    expect(mockPrisma.customerActivity.create).toHaveBeenCalled();
+  });
+
+  it('crea adminLog si opció activada', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      id: 'b1',
+      status: 'COMPLETED',
+      clientName: 'Maria',
+      clientEmail: 'maria@test.com',
+      postEventEmailSent: false,
+      reference: 'REF-001',
+      eventDate: new Date(),
+      preferredLocale: 'ca',
+      lead: null,
+      pack: null,
+    });
+
+    await sendPostEventEmailForBooking('b1', { createAdminLog: true });
+
+    expect(mockPrisma.adminLog.create).toHaveBeenCalled();
+  });
+});

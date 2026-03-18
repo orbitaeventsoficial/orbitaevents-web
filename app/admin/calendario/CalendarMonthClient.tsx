@@ -3,124 +3,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { EVENT_TYPE_PLAIN, formatDateShort, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-type CalendarApiDay = {
-  reservas: {
-    id: string;
-    leadId?: string | null;
-    customerId?: string | null;
-    fechaEvento: string;
-    clientName?: string | null;
-    ubicacion?: string | null;
-    estado?: string | null;
-    eventType?: string | null;
-    eventStartTime?: string | null;
-    eventEndTime?: string | null;
-    packName?: string | null;
-  }[];
-  bloqueos: {
-    id: string;
-    fecha: string;
-    motivo?: string | null;
-    notas?: string | null;
-  }[];
-};
-
-type CalendarApiResponse = {
-  days: Record<string, CalendarApiDay>; // key: 'YYYY-MM-DD'
-};
-
-type MonthYear = {
-  year: number;
-  month: number; // 0-11
-};
-
-type CalendarCell = {
-  date: Date;
-  key: string; // YYYY-MM-DD
-  inCurrentMonth: boolean;
-};
-
-const weekdayLabels = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg']; // dilluns primer
-
-const CALENDAR_EVENT_LABELS: Record<string, string> = {
-  ...EVENT_TYPE_PLAIN,
-  CELEBRATION: 'Celebració',
-};
-
-function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {
-  const pack = booking.packName?.trim();
-  if (pack) return pack;
-  const eventType = booking.eventType?.trim();
-  if (eventType && CALENDAR_EVENT_LABELS[eventType]) return CALENDAR_EVENT_LABELS[eventType];
-  if (eventType) return eventType;
-  return 'Servei';
-}
-
-function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): string {
-  const start = booking.eventStartTime?.trim();
-  const end = booking.eventEndTime?.trim();
-  if (start && end) return `${start} - ${end}`;
-  if (start) return start;
-  return new Date(booking.fechaEvento).toLocaleTimeString(DEFAULT_LOCALE, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatKey(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function getMonthDays({ year, month }: MonthYear): CalendarCell[] {
-  const firstOfMonth = new Date(year, month, 1);
-  const firstWeekday = firstOfMonth.getDay(); // 0 = Dg, 1 = Dl...
-  const offsetFromMonday = (firstWeekday + 6) % 7; // passar a setmana que comença dilluns
-  const startDate = new Date(year, month, 1 - offsetFromMonday);
-
-  const cells: CalendarCell[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + i);
-    cells.push({
-      date: d,
-      key: formatKey(d),
-      inCurrentMonth: d.getMonth() === month,
-    });
-  }
-
-  return cells;
-}
-
-function addMonths(base: MonthYear, delta: number): MonthYear {
-  const m = base.month + delta;
-  const year = base.year + Math.floor(m / 12);
-  const month = ((m % 12) + 12) % 12;
-  return { year, month };
-}
-
-function monthLabel({ year, month }: MonthYear): string {
-  return new Intl.DateTimeFormat(DEFAULT_LOCALE, {
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(year, month, 1));
-}
-
-function isToday(date: Date): boolean {
-  const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
-}
+import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday } from './calendar-utils';
 
 export default function CalendarMonthClient() {
   const toast = useToast();
