@@ -237,9 +237,10 @@ export async function GET() {
       avgRating = jsonData.rating;
     }
 
-    const totalReviews = filteredReviews.length > 0
-      ? filteredReviews.length
-      : (jsonData.total && jsonData.total > 0 ? jsonData.total : 0);
+    // Total real de Google (KG o cache), mai el nombre filtrat local
+    const totalReviews = (jsonData.total && jsonData.total > 0)
+      ? jsonData.total
+      : filteredReviews.length;
 
     const response: GoogleReviewsResponse = {
       rating: avgRating || 5.0,

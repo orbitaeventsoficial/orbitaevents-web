@@ -62,8 +62,8 @@ export async function fetchFromSerpAPI(): Promise<{
 
   do {
     const url = nextPageToken
-      ? `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es&next_page_token=${nextPageToken}`
-      : `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es`;
+      ? `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es&sort_by=newestFirst&next_page_token=${nextPageToken}`
+      : `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es&sort_by=newestFirst`;
 
     const res = await fetch(url);
     const data = await res.json();
