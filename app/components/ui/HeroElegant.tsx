@@ -105,8 +105,8 @@ export default function HeroElegant() {
           style={{ backgroundImage: "url('/img/hero-poster.webp')" }}
         />
 
-        {/* Active slide */}
-        <AnimatePresence mode="wait">
+        {/* Active slide — crossfade (no mode="wait") per evitar gap on es veu el poster */}
+        <AnimatePresence>
           {currentItem.type === 'video' ? (
             <motion.div
               key={`${currentItem.id}-${slideIndex}`}
