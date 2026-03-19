@@ -1570,6 +1570,11 @@
       "summer": "Verano",
       "retro": "Retro",
       "premium": "Premium"
+    },
+    "respira": {
+      "label": "Respira",
+      "title": "Espacio sensorial",
+      "description": "Un espacio para personas con sensibilidad sensorial, para sentirse a gusto y descansar."
     }
   },
   "mobileHeader": {

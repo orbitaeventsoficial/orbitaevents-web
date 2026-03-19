@@ -1570,6 +1570,11 @@
       "summer": "Summer",
       "retro": "Vintage",
       "premium": "Premium"
+    },
+    "respira": {
+      "label": "Respira",
+      "title": "Sensory space",
+      "description": "A space for people with sensory sensitivity, to feel comfortable and rest."
     }
   },
   "mobileHeader": {

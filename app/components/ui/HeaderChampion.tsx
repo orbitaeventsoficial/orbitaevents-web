@@ -56,6 +56,7 @@ const navItemsConfig: NavItemConfig[] = [
   { labelKey: 'configurator', href: '/configurador', badge: 'NEW' },
   { labelKey: 'portfolio', href: '/portfolio' },
   { labelKey: 'reviews', href: '/opiniones' },
+  { labelKey: 'blog', href: '/blog' },
   { labelKey: 'contact', href: '/contacto' },
 ];
 
@@ -69,9 +70,9 @@ export default function HeaderChampion() {
   const tServices = useTranslations('header.services');
   const tExperiences = useTranslations('header.experiences');
   const tZones = useTranslations('header.zones');
-  const respiraLabel = 'Respira';
-  const respiraTitle = 'Espai sensorial';
-  const respiraDescription = 'Un espai per a persones amb sensibilitat sensorial, per sentir-se a gust i descansar.';
+  const respiraLabel = tHeader('respira.label');
+  const respiraTitle = tHeader('respira.title');
+  const respiraDescription = tHeader('respira.description');
 
   // Estados
   const [isVisible, setIsVisible] = useState(true);

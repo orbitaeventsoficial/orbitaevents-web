@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ca">
+<html lang="ca" id="htmlRoot">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
@@ -191,16 +191,16 @@
     box-shadow:0 4px 16px rgba(0,0,0,0.1);
     transition:transform 0.2s, box-shadow 0.2s;
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    ← Tornar a l'Espai Sensorial
+    <span id="backLink">← Tornar a l'Espai Sensorial</span>
   </a>
 
   <div class="overlay" id="overlay">
     <div class="panel">
-      <h1 style="letter-spacing:1px;margin-bottom:6px;">Respira</h1>
-      <div class="hint">El so necessita un primer toc (sobretot a l'iPhone). Després ja sona el «pop» i veus la targeta.</div>
+      <h1 id="overlayTitle" style="letter-spacing:1px;margin-bottom:6px;">Respira</h1>
+      <div id="overlayHint" class="hint">El so necessita un primer toc (sobretot a l'iPhone). Després ja sona el «pop» i veus la targeta.</div>
       <button class="btn" id="startBtn" type="button">Toca per començar ✨</button>
       <button class="btn" id="motionBtn" type="button" style="background:#ffd4e8;">Permetre moviment</button>
-      <div class="hint">Funciona 100% offline.</div>
+      <div id="offlineHint" class="hint">Funciona 100% offline.</div>
     </div>
   </div>
 
@@ -210,40 +210,139 @@
     <div class="layer-content">
       <div class="card">
       <div class="header">
-        <h1>ESTRATÈGIA</h1>
-        <h2>DE RELAXACIÓ</h2>
+        <h1 id="strategyTitle">ESTRATÈGIA</h1>
+        <h2 id="strategySubtitle">DE RELAXACIÓ</h2>
       </div>
 
-      <div class="instruction"><strong>Observa al teu voltant i anomena:</strong></div>
+      <div id="instructionText" class="instruction"><strong>Observa al teu voltant i anomena:</strong></div>
 
       <div class="steps">
         <div class="step">
           <div class="bubble n5">👁️</div>
-          <div><span class="num">5</span><span class="txt">COSES QUE PUGUIS VEURE</span></div>
+          <div><span class="num">5</span><span class="txt" id="txt5">COSES QUE PUGUIS VEURE</span></div>
         </div>
         <div class="step">
           <div class="bubble n4">✋</div>
-          <div><span class="num">4</span><span class="txt">COSES QUE PUGUIS TOCAR</span></div>
+          <div><span class="num">4</span><span class="txt" id="txt4">COSES QUE PUGUIS TOCAR</span></div>
         </div>
         <div class="step">
           <div class="bubble n3">👂</div>
-          <div><span class="num">3</span><span class="txt">COSES QUE PUGUIS SENTIR</span></div>
+          <div><span class="num">3</span><span class="txt" id="txt3">COSES QUE PUGUIS SENTIR</span></div>
         </div>
         <div class="step">
           <div class="bubble n2">👃</div>
-          <div><span class="num">2</span><span class="txt">COSES QUE PUGUIS OLORAR</span></div>
+          <div><span class="num">2</span><span class="txt" id="txt2">COSES QUE PUGUIS OLORAR</span></div>
         </div>
         <div class="step">
           <div class="bubble n1">👅</div>
-          <div><span class="num">1</span><span class="txt">COSA QUE PUGUIS ASSABORIR</span></div>
+          <div><span class="num">1</span><span class="txt" id="txt1">COSA QUE PUGUIS ASSABORIR</span></div>
         </div>
       </div>
 
-      <div class="footer">Tècnica 5-4-3-2-1 de relaxació 🩷<br>Per compartir i ajudar</div>
+      <div class="footer" id="footerText">Tècnica 5-4-3-2-1 de relaxació 🩷<br>Per compartir i ajudar</div>
       </div>
     </div>
   </div>
 
+  <script>
+    // ---- i18n: detectar idioma ----
+    const i18n = {
+      ca: {
+        back: '← Tornar a l\'Espai Sensorial',
+        title: 'Respira',
+        hint: 'El so necessita un primer toc (sobretot a l\'iPhone). Després ja sona el «pop» i veus la targeta.',
+        start: 'Toca per començar ✨',
+        motion: 'Permetre moviment',
+        motionGranted: 'Moviment disponible ✓',
+        motionDenied: 'Moviment no permès',
+        motionError: 'No s\'ha pogut activar',
+        offline: 'Funciona 100% offline.',
+        strategyTitle: 'ESTRATÈGIA',
+        strategySubtitle: 'DE RELAXACIÓ',
+        instruction: 'Observa al teu voltant i anomena:',
+        step5: 'COSES QUE PUGUIS VEURE',
+        step4: 'COSES QUE PUGUIS TOCAR',
+        step3: 'COSES QUE PUGUIS SENTIR',
+        step2: 'COSES QUE PUGUIS OLORAR',
+        step1: 'COSA QUE PUGUIS ASSABORIR',
+        footer: 'Tècnica 5-4-3-2-1 de relaxació 🩷<br>Per compartir i ajudar',
+      },
+      es: {
+        back: '← Volver al Espacio Sensorial',
+        title: 'Respira',
+        hint: 'El sonido necesita un primer toque (sobre todo en iPhone). Después ya suena el «pop» y ves la tarjeta.',
+        start: 'Toca para empezar ✨',
+        motion: 'Permitir movimiento',
+        motionGranted: 'Movimiento disponible ✓',
+        motionDenied: 'Movimiento no permitido',
+        motionError: 'No se ha podido activar',
+        offline: 'Funciona 100% offline.',
+        strategyTitle: 'ESTRATEGIA',
+        strategySubtitle: 'DE RELAJACIÓN',
+        instruction: 'Observa a tu alrededor y nombra:',
+        step5: 'COSAS QUE PUEDAS VER',
+        step4: 'COSAS QUE PUEDAS TOCAR',
+        step3: 'COSAS QUE PUEDAS OÍR',
+        step2: 'COSAS QUE PUEDAS OLER',
+        step1: 'COSA QUE PUEDAS SABOREAR',
+        footer: 'Técnica 5-4-3-2-1 de relajación 🩷<br>Para compartir y ayudar',
+      },
+      en: {
+        back: '← Back to Sensory Space',
+        title: 'Breathe',
+        hint: 'Sound needs a first tap (especially on iPhone). Then you\'ll hear the "pop" and see the card.',
+        start: 'Tap to start ✨',
+        motion: 'Allow motion',
+        motionGranted: 'Motion available ✓',
+        motionDenied: 'Motion not allowed',
+        motionError: 'Could not activate',
+        offline: 'Works 100% offline.',
+        strategyTitle: 'RELAXATION',
+        strategySubtitle: 'STRATEGY',
+        instruction: 'Look around you and name:',
+        step5: 'THINGS YOU CAN SEE',
+        step4: 'THINGS YOU CAN TOUCH',
+        step3: 'THINGS YOU CAN HEAR',
+        step2: 'THINGS YOU CAN SMELL',
+        step1: 'THING YOU CAN TASTE',
+        footer: '5-4-3-2-1 relaxation technique 🩷<br>Share and help others',
+      },
+    };
+
+    function detectLang() {
+      // Check referrer URL for locale
+      const ref = document.referrer || '';
+      if (ref.includes('/es/')) return 'es';
+      if (ref.includes('/en/')) return 'en';
+      // Check browser language
+      const nav = (navigator.language || '').toLowerCase();
+      if (nav.startsWith('es')) return 'es';
+      if (nav.startsWith('en')) return 'en';
+      return 'ca';
+    }
+
+    const lang = detectLang();
+    const t = i18n[lang] || i18n.ca;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('htmlRoot').setAttribute('lang', lang);
+      document.getElementById('backLink').textContent = t.back;
+      document.getElementById('overlayTitle').textContent = t.title;
+      document.getElementById('overlayHint').textContent = t.hint;
+      document.getElementById('startBtn').textContent = t.start;
+      document.getElementById('motionBtn').textContent = t.motion;
+      document.getElementById('offlineHint').textContent = t.offline;
+      document.getElementById('strategyTitle').textContent = t.strategyTitle;
+      document.getElementById('strategySubtitle').textContent = t.strategySubtitle;
+      document.getElementById('instructionText').innerHTML = '<strong>' + t.instruction + '</strong>';
+      document.getElementById('txt5').textContent = t.step5;
+      document.getElementById('txt4').textContent = t.step4;
+      document.getElementById('txt3').textContent = t.step3;
+      document.getElementById('txt2').textContent = t.step2;
+      document.getElementById('txt1').textContent = t.step1;
+      document.getElementById('footerText').innerHTML = t.footer;
+    });
+  </script>
   <script>
     // ---- Àudio real de bombolles (retallat + alentit) ----
     let waterAudio;
@@ -297,17 +396,17 @@
         }
 
         if (!granted) {
-          motionBtn.textContent = "Moviment no permès";
+          motionBtn.textContent = t.motionDenied;
           motionBtn.style.background = "#ffd4e8";
           return false;
         }
 
         // Android / desktop o iOS amb permisos concedits
-        motionBtn.textContent = "Moviment disponible ✓";
+        motionBtn.textContent = t.motionGranted;
         motionBtn.style.background = "#c7f9cc";
         return true;
       } catch (e) {
-        motionBtn.textContent = "No s'ha pogut activar";
+        motionBtn.textContent = t.motionError;
         return false;
       }
     }

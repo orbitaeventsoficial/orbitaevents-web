@@ -3136,6 +3136,11 @@
       "summer": "Estiu",
       "retro": "Retro",
       "premium": "Premium"
+    },
+    "respira": {
+      "label": "Respira",
+      "title": "Espai sensorial",
+      "description": "Un espai per a persones amb sensibilitat sensorial, per sentir-se a gust i descansar."
     }
   },
   "smartImage": {
