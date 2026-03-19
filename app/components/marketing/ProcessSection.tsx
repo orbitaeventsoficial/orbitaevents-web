@@ -50,8 +50,11 @@ export default function ProcessSection() {
           <p className="text-white/50 text-lg">{t('subtitle')}</p>
         </motion.div>
 
-        {/* Steps grid */}
+        {/* Steps grid + connector */}
         <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {/* Connector line (desktop) */}
+          <div className="hidden md:block absolute top-12 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px border-t-2 border-dashed border-white/[0.08] z-0" />
+
           {steps.map((step, i) => {
             const style = STEP_STYLES[i];
             return (
@@ -63,21 +66,30 @@ export default function ProcessSection() {
                 transition={
                   reduceMotion
                     ? { duration: 0 }
-                    : { delay: i * 0.12, duration: 0.34, ease: [0.22, 1, 0.36, 1] }
+                    : { delay: i * 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }
                 }
-                className="relative p-7 rounded-3xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-colors group"
+                className="relative z-10 p-7 rounded-3xl bg-white/[0.04] border border-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-500 group backdrop-blur-sm"
+                style={{ boxShadow: `0 0 0 0 ${style.glow}` }}
+                whileHover={reduceMotion ? undefined : { boxShadow: `0 20px 60px ${style.glow}` }}
               >
-                {/* Icon */}
+                {/* Icon with pulse ring */}
                 <div className="relative inline-flex mb-6">
+                  <motion.div
+                    className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${style.gradient}`}
+                    initial={{ scale: 1, opacity: 0.5 }}
+                    whileInView={{ scale: 1.5, opacity: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.3 + i * 0.15 }}
+                  />
                   <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center`}
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center relative`}
                     style={{ boxShadow: `0 8px 32px ${style.glow}` }}
                   >
                     <span className="text-3xl">{style.emoji}</span>
                   </div>
                   {/* Number badge */}
-                  <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
-                    <span className="text-white/60 text-[10px] font-black">{step.number}</span>
+                  <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
+                    <span className="text-white/70 text-[11px] font-black">{step.number}</span>
                   </div>
                 </div>
 
@@ -85,6 +97,9 @@ export default function ProcessSection() {
                   {step.title}
                 </h3>
                 <p className="text-white/60 leading-relaxed">{step.desc}</p>
+
+                {/* Hover glow */}
+                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${style.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500 pointer-events-none`} />
               </motion.div>
             );
           })}
@@ -104,10 +119,10 @@ export default function ProcessSection() {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-zinc-900 transition-all hover:opacity-90 active:scale-95"
+            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-zinc-900 transition-all hover:scale-[1.03] active:scale-[0.98]"
             style={{
               background: 'linear-gradient(135deg, #F59E0B 0%, #EA580C 100%)',
-              boxShadow: '0 12px 32px rgba(245,158,11,0.3)',
+              boxShadow: '0 12px 40px rgba(245,158,11,0.35)',
             }}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

@@ -50,7 +50,7 @@ const Icons = {
     </svg>
   ),
   Quote: () => (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" opacity="0.08">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="text-amber-500/10">
       <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
     </svg>
   ),
@@ -78,12 +78,29 @@ const Icons = {
 // COMPONENTE: Rating Stars
 // ═══════════════════════════════════════════════════════════════════════════
 
-function RatingStars({ rating }: { rating: number }) {
+function RatingStars({ rating, animate = false }: { rating: number; animate?: boolean }) {
   return (
     <div className="flex gap-1 text-amber-400">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Icons.Star key={star} filled={star <= rating} />
-      ))}
+      {[1, 2, 3, 4, 5].map((star) =>
+        animate ? (
+          <motion.svg
+            key={star}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={star <= rating ? 'currentColor' : 'none'}
+            stroke="currentColor"
+            strokeWidth="2"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: star * 0.08, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </motion.svg>
+        ) : (
+          <Icons.Star key={star} filled={star <= rating} />
+        )
+      )}
     </div>
   );
 }
@@ -101,8 +118,11 @@ function ReviewCard({ review }: { review: GoogleReview }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.985, y: 8 }}
       transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-      className="relative bg-gradient-to-br from-white/8 to-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl shadow-amber-500/10 max-w-4xl mx-auto"
+      className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-md border border-white/10 ring-1 ring-white/[0.05] rounded-3xl p-8 md:p-10 shadow-2xl shadow-amber-500/10 max-w-4xl mx-auto"
     >
+      {/* Ambient glow */}
+      <div className="absolute -inset-4 bg-amber-500/[0.03] rounded-3xl blur-2xl pointer-events-none" />
+
       {/* Quote icon */}
       <div className="absolute top-8 right-8">
         <Icons.Quote />
@@ -130,9 +150,9 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-white text-xl mb-2">{author_name}</h4>
+          <h4 className="font-black text-white text-xl mb-2">{author_name}</h4>
           <div className="flex items-center gap-3 mb-2">
-            <RatingStars rating={rating} />
+            <RatingStars rating={rating} animate />
           </div>
           <div className="flex items-center gap-2">
             <Icons.Google />
@@ -142,8 +162,8 @@ function ReviewCard({ review }: { review: GoogleReview }) {
       </div>
 
       {/* Text */}
-      <blockquote className="text-white/90 text-lg leading-relaxed">
-        "{text}"
+      <blockquote className="relative text-white/90 text-xl md:text-2xl font-light italic leading-relaxed">
+        &ldquo;{text}&rdquo;
       </blockquote>
     </motion.div>
   );

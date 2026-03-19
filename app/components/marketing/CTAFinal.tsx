@@ -62,6 +62,24 @@ export default function CTAFinal() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-amber-500/10 via-transparent to-orange-500/10 rounded-full blur-3xl" />
       </div>
 
+      {/* Pulsing radial glow */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)' }}
+        animate={{ opacity: [0.05, 0.15, 0.05] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      {/* Film grain overlay */}
+      <div className="absolute inset-0 pointer-events-none z-10" style={{ opacity: 0.025 }}>
+        <svg width="100%" height="100%">
+          <filter id="cta-grain">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#cta-grain)" />
+        </svg>
+      </div>
+
       <div className="relative container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
 
@@ -88,7 +106,7 @@ export default function CTAFinal() {
             viewport={{ once: true }}
             className="mb-8"
           >
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mb-4">
               {t('title1')}
               <br />
               <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
@@ -120,8 +138,8 @@ export default function CTAFinal() {
               {/* Glow de fondo al hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-              {/* Shadow verde al hover */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur-lg opacity-0 group-hover:opacity-75 transition-opacity" />
+              {/* Shadow verde — always visible, stronger on hover */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur-lg opacity-25 group-hover:opacity-75 transition-opacity" />
 
               <span className="relative z-10 flex items-center gap-3">
                 <Icons.WhatsApp />
@@ -159,21 +177,21 @@ export default function CTAFinal() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="flex flex-wrap items-center justify-center gap-6 text-white text-sm mb-6 text-center"
+            className="flex flex-wrap items-center justify-center gap-6 text-white text-base font-medium mb-6 text-center"
           >
             <span className="flex items-center gap-2 justify-center">
-              <span className="text-xl">🎯</span>
-              <span><strong className="text-white">+{displayEvents}</strong> {t('events')}</span>
+              <svg className="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              <span><strong className="text-white font-bold">+{displayEvents}</strong> {t('events')}</span>
             </span>
-            <span className="hidden sm:block w-px h-4 bg-white/20" />
+            <span className="hidden sm:block w-px h-5 bg-white/20" />
             <span className="flex items-center gap-2 justify-center">
-              <span className="text-xl">⭐</span>
-              <span><strong className="text-white">5.0/5</strong> {t('rating')}</span>
+              <svg className="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span><strong className="text-white font-bold">5.0/5</strong> {t('rating')}</span>
             </span>
-            <span className="hidden sm:block w-px h-4 bg-white/20" />
-            <span className="flex items-center gap-1 justify-center">
-              <Icons.Clock />
-              <span><strong className="text-white">{responseValue}</strong> {t('response')}</span>
+            <span className="hidden sm:block w-px h-5 bg-white/20" />
+            <span className="flex items-center gap-2 justify-center">
+              <svg className="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span><strong className="text-white font-bold">{responseValue}</strong> {t('response')}</span>
             </span>
           </motion.div>
 
@@ -182,8 +200,9 @@ export default function CTAFinal() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-white/60 text-sm text-center"
+            className="flex items-center justify-center gap-2 text-white/60 text-sm text-center"
           >
+            <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             {t('guarantee')}
           </motion.p>
         </div>

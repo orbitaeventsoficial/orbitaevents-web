@@ -93,14 +93,14 @@ function GuaranteeCard({
       transition={{ delay: index * 0.1 }}
       className="group relative"
     >
-      <div className="relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 rounded-3xl p-6 h-full hover:border-white/20 transition-all duration-300">
+      <div className="relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm border border-white/10 rounded-3xl p-6 h-full hover:border-white/20 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
         {/* Highlight badge */}
-        <div className={`absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br ${config.color} rounded-2xl flex items-center justify-center transform rotate-12 group-hover:rotate-0 transition-transform shadow-lg`}>
+        <div className={`absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br ${config.color} rounded-2xl flex items-center justify-center transform rotate-12 group-hover:rotate-0 transition-transform shadow-lg shadow-black/30`}>
           <span className="text-white font-black text-sm">{config.highlight}</span>
         </div>
 
         {/* Icon */}
-        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${config.color} bg-opacity-20 flex items-center justify-center mb-5 text-white group-hover:scale-110 transition-transform`}>
+        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${config.color} flex items-center justify-center mb-5 text-white group-hover:scale-110 transition-transform duration-300`} style={{ boxShadow: `0 8px 24px rgba(0,0,0,0.3)` }}>
           <Icon />
         </div>
 
@@ -124,13 +124,13 @@ export default function GarantiaSection() {
   const { stats } = usePublicStats();
 
   return (
-    <section className="relative py-6 md:py-10 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-zinc-900" />
 
       {/* Grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.035]"
         style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
                            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,

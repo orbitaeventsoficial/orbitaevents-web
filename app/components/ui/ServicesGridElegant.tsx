@@ -1,8 +1,9 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
 
 // ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
 
@@ -40,6 +41,9 @@ function IconProduction() {
 export default function ServicesGridElegant() {
   const t = useTranslations('servicesGrid');
   const reduceMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
+  const headingY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   const pillars = [
     {
@@ -69,9 +73,10 @@ export default function ServicesGridElegant() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-[#0A0A0A] relative overflow-hidden">
+    <section ref={sectionRef} className="py-16 md:py-24 bg-[#0A0A0A] relative overflow-hidden">
       {/* Ambient */}
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/[0.02] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-purple-500/[0.03] blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 max-w-5xl">
         {/* Header — direct, no fluff */}
@@ -79,6 +84,7 @@ export default function ServicesGridElegant() {
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          style={reduceMotion ? undefined : { y: headingY }}
           className="text-center mb-14 md:mb-20"
         >
           <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
@@ -101,9 +107,20 @@ export default function ServicesGridElegant() {
             >
               <Link href={href} className="group block">
                 <div
-                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] transition-all duration-500 h-full"
+                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-sm transition-all duration-500 h-full overflow-hidden"
                   style={{ background: `radial-gradient(ellipse at top left, ${glowColor}, transparent 70%)` }}
                 >
+                  {/* Hover glow */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"
+                    style={{ boxShadow: `inset 0 0 40px ${glowColor}, 0 0 60px ${glowColor}` }}
+                  />
+                  {/* Shine sweep on hover */}
+                  <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div
+                      className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent -skew-x-12 group-hover:animate-[shine_1.2s_ease-in-out]"
+                    />
+                  </div>
                   {/* Icon */}
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${accent} text-white mb-5`}>
                     <Icon />

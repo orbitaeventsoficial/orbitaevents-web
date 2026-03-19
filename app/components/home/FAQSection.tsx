@@ -80,8 +80,8 @@ export default function FAQSection() {
                 <div
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                     isOpen
-                      ? 'border-amber-500/30 bg-amber-500/5'
-                      : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.14] hover:bg-white/[0.05]'
+                      ? 'border-amber-500/30 bg-amber-500/5 border-l-2 border-l-amber-500'
+                      : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.14] hover:bg-white/[0.05] hover:shadow-lg hover:shadow-amber-500/5'
                   }`}
                 >
                   {/* Question row */}
@@ -130,9 +130,14 @@ export default function FAQSection() {
                       >
                         <div className="px-5 pb-5">
                           <div className="h-px bg-amber-500/15 mb-4" />
-                          <p className="text-white/65 text-sm md:text-base leading-relaxed">
+                          <motion.p
+                            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={reduceMotion ? { duration: 0 } : { duration: 0.3, delay: 0.1 }}
+                            className="text-white/65 text-sm md:text-base leading-relaxed"
+                          >
                             {item.answer}
-                          </p>
+                          </motion.p>
                         </div>
                       </motion.div>
                     )}
@@ -159,7 +164,7 @@ export default function FAQSection() {
               trackWhatsAppClick('faq_section');
               trackCTAClick('faq_whatsapp_cta', 'faq_section');
             }}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 rounded-full text-amber-400 text-sm font-semibold transition-all"
+            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 rounded-full text-amber-400 text-base font-semibold transition-all"
           >
             {t('cta.button')}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

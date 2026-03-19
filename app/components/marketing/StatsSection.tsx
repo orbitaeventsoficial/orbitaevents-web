@@ -68,7 +68,7 @@ function StatCard({
       transition={
         reduceMotion ? { duration: 0 } : { delay, duration: 0.32, ease: [0.22, 1, 0.36, 1] }
       }
-      className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 text-center overflow-hidden group hover:border-white/20 transition-colors"
+      className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 text-center overflow-hidden group hover:border-white/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
       style={{
         background: `radial-gradient(ellipse at 50% 0%, ${config.glow}, transparent 65%), rgba(255,255,255,0.03)`,
       }}
@@ -81,9 +81,9 @@ function StatCard({
         />
       )}
 
-      <span className="text-4xl mb-3 block">{config.emoji}</span>
+      <span className="text-5xl mb-3 block">{config.emoji}</span>
       <div
-        className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-none mb-2`}
+        className={`text-5xl md:text-7xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-none mb-2`}
       >
         {config.prefix}
         {display}
@@ -135,6 +135,7 @@ export default function StatsSection() {
   return (
     <section ref={ref} className="relative py-16 md:py-24 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(251,191,36,0.04),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.06),transparent_70%)] pointer-events-none blur-2xl" />
 
       <div className="container mx-auto px-6 max-w-6xl">
         <motion.div
@@ -143,7 +144,8 @@ export default function StatsSection() {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
+          <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             {t('sectionLabel')}
           </span>
           <h2 className="text-4xl md:text-5xl font-black text-white">
