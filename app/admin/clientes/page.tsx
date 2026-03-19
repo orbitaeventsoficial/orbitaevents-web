@@ -77,6 +77,7 @@ export default function AdminContactesPage() {
 
       const mappedCustomers: Customer[] = rawCustomers.map((item: Record<string, unknown>) => ({
         id: String(item.id || ''),
+        customerNumber: typeof item.customerNumber === 'number' ? item.customerNumber : null,
         name: String(item.name || ''),
         email: String(item.email || ''),
         phone: item.phone ? String(item.phone) : null,
@@ -273,6 +274,9 @@ export default function AdminContactesPage() {
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <p className="font-medium truncate">
+                        {customer.customerNumber != null && (
+                          <span className="mr-1.5 text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
+                        )}
                         {customer.name}
                         {customer.is_vip && (
                           <span className="ml-2 px-2 py-0.5 text-[10px] rounded-full font-medium bg-amber-500/20 text-amber-300">VIP</span>
@@ -365,6 +369,9 @@ export default function AdminContactesPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                          {customer.customerNumber != null && (
+                            <span className="text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
+                          )}
                           {customer.name}
                           {customer.is_vip && (
                             <span className="px-2 py-0.5 text-xs rounded-full font-medium">VIP</span>

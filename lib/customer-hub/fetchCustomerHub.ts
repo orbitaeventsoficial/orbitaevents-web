@@ -219,6 +219,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   return {
     customer: {
       id: customerBase.id,
+      customerNumber: customerBase.customerNumber ?? null,
       name: customerBase.name,
       email: customerBase.email || undefined,
       phone: customerBase.phone || undefined,

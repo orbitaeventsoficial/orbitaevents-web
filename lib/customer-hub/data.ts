@@ -6,6 +6,7 @@ import { findLeadTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadTaskF
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
   select: {
     id: true;
+    customerNumber: true;
     name: true;
     email: true;
     phone: true;
@@ -105,6 +106,7 @@ export async function fetchCustomerHubCustomerBase(
     where: { id: customerId },
     select: {
       id: true,
+      customerNumber: true,
       name: true,
       email: true,
       phone: true,

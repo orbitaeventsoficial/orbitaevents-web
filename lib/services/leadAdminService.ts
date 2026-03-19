@@ -27,6 +27,7 @@ type LeadCreateInput = {
   message?: string;
   interestedPackId?: string;
   interestedExtras?: string[];
+  dni?: string;
   assignedTo?: string;
   source?: 'WEBSITE' | 'CONFIGURATOR' | 'PHONE' | 'WHATSAPP' | 'INSTAGRAM' | 'WALLAPOP' | 'REFERRAL' | 'GOOGLE' | 'OTHER';
   utmSource?: string;
@@ -56,6 +57,7 @@ export async function listAdminLeads(input: LeadListInput) {
         { name: { contains: input.search, mode: 'insensitive' as const } },
         { email: { contains: input.search, mode: 'insensitive' as const } },
         { phone: { contains: input.search } },
+        { dni: { contains: input.search, mode: 'insensitive' as const } },
       ],
     }),
   };

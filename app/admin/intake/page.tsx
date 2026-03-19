@@ -173,9 +173,8 @@ export default function IntakePage() {
     setError(null);
 
     try {
-      // Prepend DNI/address to message so data is captured
+      // Address goes into message; DNI is now a proper field
       const extraParts: string[] = [];
-      if (form.dni.trim()) extraParts.push(`DNI/NIF/CIF: ${form.dni.trim()}`);
       if (form.address.trim()) extraParts.push(`Adreça: ${form.address.trim()}`);
       const baseMessage = form.message.trim();
       const fullMessage = [...extraParts, baseMessage].filter(Boolean).join('\n') || undefined;
@@ -184,6 +183,7 @@ export default function IntakePage() {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || undefined,
+        dni: form.dni.trim().toUpperCase() || undefined,
         source: form.source || 'OTHER',
         eventType: form.eventType,
         eventDate: form.eventDate || undefined,

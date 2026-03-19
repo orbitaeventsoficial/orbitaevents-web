@@ -7,6 +7,7 @@
 
 export interface Customer {
   id: string;
+  customerNumber?: number | null;
   name: string;
   email: string;
   phone?: string | null;

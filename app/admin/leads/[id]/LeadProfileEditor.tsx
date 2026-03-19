@@ -12,6 +12,7 @@ type LeadProfile = {
   name: string;
   email: string;
   phone?: string | null;
+  dni?: string | null;
   eventDate?: string | null;
   eventType?: string | null;
   eventLocation?: string | null;
@@ -42,6 +43,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     name: lead.name || '',
     email: lead.email || '',
     phone: lead.phone || '',
+    dni: lead.dni || '',
     eventDate: lead.eventDate ? lead.eventDate.slice(0, 10) : '',
     eventType: lead.eventType || 'OTHER',
     eventLocation: lead.eventLocation || '',
@@ -106,6 +108,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         name: form.name,
         email: form.email,
         phone: form.phone || null,
+        dni: form.dni?.trim().toUpperCase() || null,
         eventDate: form.eventDate || undefined,
         eventType: form.eventType,
         eventLocation: form.eventLocation || null,
@@ -157,10 +160,11 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           <button
             type="button"
             onClick={handleDeleteLead}
-            disabled={deleting || saving}
+            disabled={deleting || saving || form.status !== 'LOST'}
             className={`rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
+            title={form.status !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Eliminar registre'}
           >
-            {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : 'Eliminar registre'}
+            {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : form.status !== 'LOST' ? 'Primer marca com a Perdut' : 'Eliminar registre'}
           </button>
           <button
             type="button"
@@ -197,6 +201,15 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             className="rounded-xl border border-white/10 px-3 py-2"
             value={form.phone}
             onChange={(e) => updateField('phone', e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          DNI / NIF / CIF
+          <input
+            className="rounded-xl border border-white/10 px-3 py-2 uppercase"
+            value={form.dni}
+            onChange={(e) => updateField('dni', e.target.value.toUpperCase())}
+            placeholder="12345678A"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">

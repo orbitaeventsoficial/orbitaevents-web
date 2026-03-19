@@ -24,6 +24,7 @@ const updateLeadSchema = z.object({
   source: nullableString,
   budget: nullableString,
   message: nullableString,
+  dni: nullableString,
   guestCount: z.union([z.number().int().positive(), z.null()]).optional(),
   eventLocation: nullableString,
   eventVenue: nullableString,

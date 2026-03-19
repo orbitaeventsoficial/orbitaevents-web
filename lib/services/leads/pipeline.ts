@@ -6,6 +6,7 @@ type PipelineLead = {
   name: string;
   email: string;
   phone: string | null;
+  dni: string | null;
   eventType: string;
   source: string;
   eventDate: Date | null;
@@ -34,6 +35,7 @@ export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereIn
       email: true,
       phone: true,
       eventType: true,
+      dni: true,
       source: true,
       eventDate: true,
       status: true,

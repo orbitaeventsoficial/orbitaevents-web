@@ -131,6 +131,7 @@ describe('deleteLeadIfAllowed', () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'l1',
       name: 'Test',
+      status: 'LOST',
       booking: { id: 'b1' },
     });
 
@@ -139,11 +140,27 @@ describe('deleteLeadIfAllowed', () => {
     expect(result.status).toBe(400);
   });
 
-  it('elimina lead en transaction', async () => {
+  it('rebutja eliminar lead que no és LOST', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'l1',
       name: 'Test',
       email: 'test@test.com',
+      status: 'NEW',
+      booking: null,
+    });
+
+    const result = await deleteLeadIfAllowed('l1');
+
+    expect(result.status).toBe(400);
+    expect(result.body.error).toContain('Perdut');
+  });
+
+  it('elimina lead LOST en transaction', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'l1',
+      name: 'Test',
+      email: 'test@test.com',
+      status: 'LOST',
       booking: null,
     });
 

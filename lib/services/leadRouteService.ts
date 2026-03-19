@@ -16,6 +16,7 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       name: true,
       email: true,
       phone: true,
+      dni: true,
       eventType: true,
       eventDate: true,
       eventLocation: true,
@@ -129,12 +130,17 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
       id: true,
       name: true,
       email: true,
+      status: true,
       booking: { select: { id: true } },
     },
   });
 
   if (!existing) {
     return { status: 404, body: { error: 'Lead no trobat' } };
+  }
+
+  if (existing.status !== 'LOST') {
+    return { status: 400, body: { error: 'Només es poden eliminar leads amb estat "Perdut". Canvia l\'estat a Perdut abans d\'eliminar.' } };
   }
 
   if (existing.booking) {

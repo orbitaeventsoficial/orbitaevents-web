@@ -388,6 +388,7 @@ model Lead {
   name             String
   email            String
   phone            String?
+  dni              String?
   eventType        EventType
   eventDate        DateTime?
   eventSchedule    String?

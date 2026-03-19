@@ -273,8 +273,13 @@ export default function CustomerHeader({
               </span>
             </div>
 
-            {/* Client name */}
+            {/* Client name + code */}
             <h1 className="mt-1 truncate text-xl font-semibold">
+              {data.customer.customerNumber != null && (
+                <span className="mr-2 text-sm font-mono text-white/40">
+                  CLI-{String(data.customer.customerNumber).padStart(4, '0')}
+                </span>
+              )}
               {data.customer.name}
             </h1>
 

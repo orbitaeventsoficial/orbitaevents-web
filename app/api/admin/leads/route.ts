@@ -51,6 +51,7 @@ const leadSchema = z.object({
   guestCount: z.number().optional(),
   budget: z.string().optional(),
   message: z.string().optional(),
+  dni: z.string().optional(),
   interestedPackId: z.string().optional(),
   interestedExtras: z.array(z.string()).optional(),
   assignedTo: z.string().optional(),

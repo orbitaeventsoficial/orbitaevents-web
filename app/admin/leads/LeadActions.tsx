@@ -148,15 +148,15 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       </Link>
       <button
         onClick={handleDelete}
-        disabled={isDeleting || hasBooking}
+        disabled={isDeleting || hasBooking || currentStatus !== 'LOST'}
         type="button"
         aria-busy={isDeleting}
         className={`inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors
-          ${hasBooking
+          ${hasBooking || currentStatus !== 'LOST'
             ? 'bg-white/[0.03] text-white/30 cursor-not-allowed border border-white/10'
             : 'admin-tone-soft-danger hover:bg-rose-500/30 border border-rose-500/30'
           }`}
-        title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Elimina entrada'}
+        title={hasBooking ? 'No es pot eliminar (té reserva)' : currentStatus !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Elimina entrada'}
       >
         {isDeleting ? '...' : '🗑️'}
       </button>
