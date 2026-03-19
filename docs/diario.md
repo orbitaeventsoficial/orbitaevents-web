@@ -1,5 +1,51 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-19 sessió 10 — Hero media admin + copy emocional + fixes
+
+### Hero media admin complet (4 fitxers nous)
+
+**Per què**: L'usuari vol gestionar des de l'admin els vídeos i imatges que roten al hero — afegir, eliminar, activar/desactivar, reordenar.
+
+**Fitxers creats**:
+1. **`lib/services/heroVideoService.ts`** — CRUD complet sobre Setting (key: `config.heroMedia`, type: JSON). Suporta upload local + URL externa, toggle actiu, reorder, update label. Defaults: 1 vídeo + 5 imatges portfolio.
+2. **`app/api/admin/hero-media/route.ts`** — API admin amb `requireAuth`. GET (llistar), POST (upload multipart / JSON toggle/reorder/URL), DELETE.
+3. **`app/api/hero-media/route.ts`** — API pública, 5min cache, retorna només actius.
+4. **`app/admin/settings/hero/page.tsx`** — UI admin completa: upload fitxers, URL externa, preview vídeo on hover, badges VID/IMG, toggle actiu amb icona, reordenar amunt/avall, eliminar amb confirm.
+
+### HeroElegant reescrit (3 iteracions)
+
+**Per què**: L'usuari va desafiar "és la teva millor versió?" tres cops. El hero ha de vendre energia, llums, ball — no ser un SaaS convencional.
+
+**Versió final**:
+- Fetch media des de `/api/hero-media`, shuffle aleatori
+- Suporta vídeo + imatges rotatius (mixed media)
+- Ken Burns per imatges (animació x/y/scale amb Framer Motion)
+- Blur morph rotating text (`filter: blur(12px)` → `blur(0px)` → `blur(8px)`)
+- Slide indicators interactius amb barra de progrés animada
+- VIDEO_MIN_DURATION=8000ms, IMAGE_DURATION=6000ms
+- Film title card layout: contingut abaix-esquerra, vídeo omple pantalla
+- Un sol CTA ("Munta el teu event"), social proof inline
+
+### Copy packs emocional (10 packs × 3 idiomes)
+
+**Per què**: L'usuari volia tots els textos escrits per la mateixa persona, professional i personal — "com si fos jo".
+
+- Reescrit `packs-config.ts` i `messages/{ca,es,en}.json` (bodas 3, disco 4 incl flash, empresas 3)
+- Taglines venen emocions no specs: "La festa on ningú vol marxar", "El detall sonor que fa que el teu còctel sigui diferent"
+- Consistència: "Nosaltres ho muntem i ho desmontem tot" a tots els packs
+
+### Fixes diversos
+- **Reviews 8/16**: `totalReviews` usava `filteredReviews.length` (8) en lloc del total de Google (16). SerpAPI `sort_by=newestFirst` afegit.
+- **Portfolio carousel salt**: `scrollLeft=0` causava snap visible. Fix: duplicar cards + reset `scrollLeft -= halfWidth`.
+- **"vibrant" eliminat**: Substituït a FAQ en 3 idiomes per "lectura de la pista en temps real".
+- **Stats apagats**: Opacitat stats hero/CTA augmentada de `white/50` a `white/80`.
+
+### Tests
+- **`heroVideoService.test.ts`** (22 tests) — list/listActive/add/remove/toggle/reorder/updateLabel, defaults, JSON invàlid, upload/URL, errors.
+- **Total: 1759 tests (138 fitxers), 0 errors tsc.**
+
+---
+
 ## 2026-03-18 sessió 9 — Cobertura total + E2E + CI/CD
 
 ### Tests unitaris: tots els serveis coberts (1464→1592 tests, 132 fitxers)

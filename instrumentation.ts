@@ -20,14 +20,15 @@ async function startCronScheduler() {
   // Esperar 60s perquè el servidor estigui completament llest
   await new Promise((resolve) => setTimeout(resolve, 60_000));
 
-  // ── Imports dinàmics (lazy) ────────────────────────────────────────────
-  const { syncReviews } = await import('@/lib/services/reviewsSyncService');
-  const { runCommercialDailyAutomation } = await import('@/lib/services/commercialDailyAutomationService');
-  const { listPendingPostEventBookings, sendPostEventEmailForBooking } = await import('@/lib/services/postEventDispatchService');
-  const { runFuelDailyRefresh } = await import('@/lib/services/fuelReferenceService');
-  const { runInvoiceSyncCron } = await import('@/lib/services/invoiceService');
-  const { runPackPricingCheck } = await import('@/lib/services/packPricingCheckService');
-  const { saveCronRunStatus } = await import('@/lib/services/cronRunStatusService');
+  // ── Imports dinàmics (opacs per webpack — evitar bundle nodemailer) ───
+  const imp = new Function('m', 'return import(m)') as (m: string) => Promise<any>;
+  const { syncReviews } = await imp('@/lib/services/reviewsSyncService');
+  const { runCommercialDailyAutomation } = await imp('@/lib/services/commercialDailyAutomationService');
+  const { listPendingPostEventBookings, sendPostEventEmailForBooking } = await imp('@/lib/services/postEventDispatchService');
+  const { runFuelDailyRefresh } = await imp('@/lib/services/fuelReferenceService');
+  const { runInvoiceSyncCron } = await imp('@/lib/services/invoiceService');
+  const { runPackPricingCheck } = await imp('@/lib/services/packPricingCheckService');
+  const { saveCronRunStatus } = await imp('@/lib/services/cronRunStatusService');
 
   // ── Post-event dispatch (mateixa lògica que la ruta cron) ──────────────
   async function runPostEventDispatch() {
@@ -38,7 +39,7 @@ async function startCronScheduler() {
     for (let i = 0; i < bookings.length; i += BATCH_SIZE) {
       const batch = bookings.slice(i, i + BATCH_SIZE);
       const results = await Promise.all(
-        batch.map(async (b) => {
+        batch.map(async (b: { id: string }) => {
           try {
             return await sendPostEventEmailForBooking(b.id);
           } catch {

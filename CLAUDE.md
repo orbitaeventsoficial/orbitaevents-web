@@ -118,7 +118,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 ### Estructura de tests
 
 ```
-__tests__/lib/services/     ← Unit tests (Vitest, ~1592 tests, 132 fitxers)
+__tests__/lib/services/     ← Unit tests (Vitest, ~1759 tests, 138 fitxers)
 e2e/                        ← E2E tests (Playwright, 9 specs, ~80 tests)
 vitest.config.ts            ← Config Vitest amb aliases
 playwright.config.ts        ← Config Playwright amb webServer
@@ -248,6 +248,14 @@ playwright.config.ts        ← Config Playwright amb webServer
   - Tot a `lib/storage.ts`
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`) — lint+typecheck, tests amb coverage, build
 - **CI backup**: `.github/workflows/backup.yml` — backup BD setmanal (dilluns 3:00 UTC)
+
+### Hero media admin
+
+- **Servei**: `lib/services/heroVideoService.ts` — CRUD sobre Setting (`config.heroMedia`, JSON)
+- **API admin**: `/api/admin/hero-media` — GET/POST/DELETE amb `requireAuth`
+- **API pública**: `/api/hero-media` — GET amb cache 5min, retorna només actius
+- **Admin UI**: `app/admin/settings/hero/page.tsx` — upload, URL externa, toggle, reorder, delete
+- **Component**: `app/components/ui/HeroElegant.tsx` — fetch media, shuffle, mixed video+imatge, Ken Burns, blur morph text
 
 ## Patrons de codi
 

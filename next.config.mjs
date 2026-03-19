@@ -123,6 +123,9 @@ const nextConfig = {
   experimental: {
     largePageDataBytes: 500 * 1000, // 500KB
   },
+
+  // Excloure mòduls de Node.js que webpack no pot resoldre (nodemailer via instrumentation.ts)
+  serverExternalPackages: ['nodemailer'],
 };
 
 // Importar plugins

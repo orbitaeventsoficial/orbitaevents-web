@@ -3,18 +3,64 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { trackCTAClick } from '@/app/lib/analytics';
 
-// ─── Hero — Cinematic Video ────────────────────────────────────────────────
+interface HeroMediaItem {
+  id: string;
+  url: string;
+  type: 'video' | 'image';
+  label: string;
+}
+
+// Fallback fins que l'API respongui
+const FALLBACK: HeroMediaItem[] = [
+  { id: 'fallback', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Fallback' },
+];
+
+const IMAGE_DURATION = 6000;
+const VIDEO_MIN_DURATION = 8000;
+
+// Ken Burns per imatges
+const KB = [
+  { x: [0, -3], y: [0, -2], scale: [1, 1.12] },
+  { x: [0, 3], y: [0, -1], scale: [1, 1.10] },
+  { x: [0, -2], y: [0, 2], scale: [1, 1.14] },
+  { x: [0, 2], y: [0, -3], scale: [1, 1.11] },
+  { x: [0, -1], y: [0, 1], scale: [1, 1.13] },
+];
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
   const rotatingTexts = t.raw('rotatingTexts') as string[];
   const [textIndex, setTextIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
   const [videoReady, setVideoReady] = useState(false);
   const reduceMotion = useReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Fetch media from API + shuffle
+  useEffect(() => {
+    fetch('/api/hero-media')
+      .then((r) => r.json())
+      .then((data: HeroMediaItem[]) => {
+        if (data.length > 0) setMediaItems(shuffle(data));
+      })
+      .catch(() => {});
+  }, []);
+
+  const currentItem = mediaItems[slideIndex % mediaItems.length];
+  const kbDir = KB[slideIndex % KB.length];
 
   // Rotate text
   useEffect(() => {
@@ -24,17 +70,29 @@ export default function HeroElegant() {
     return () => clearInterval(interval);
   }, [rotatingTexts.length]);
 
-  // Video ready with delay to avoid flash
-  const handleCanPlay = () => {
-    setTimeout(() => setVideoReady(true), 300);
-  };
+  // Rotate slides
+  useEffect(() => {
+    if (mediaItems.length <= 1) return;
+
+    const duration = currentItem?.type === 'video' ? VIDEO_MIN_DURATION : IMAGE_DURATION;
+    const timer = setTimeout(() => {
+      setSlideIndex((prev) => (prev + 1) % mediaItems.length);
+      setVideoReady(false);
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [slideIndex, mediaItems, currentItem?.type]);
+
+  const handleVideoReady = useCallback(() => {
+    setTimeout(() => setVideoReady(true), 200);
+  }, []);
 
   return (
     <section
       aria-label="Hero"
       className="relative min-h-[100svh] flex items-end overflow-hidden"
     >
-      {/* ── Video background ── */}
+      {/* ── Background — mixed media ── */}
       <div className="absolute inset-0" aria-hidden="true">
         {/* Poster fallback */}
         <div
@@ -42,35 +100,102 @@ export default function HeroElegant() {
           style={{ backgroundImage: "url('/img/hero-poster.webp')" }}
         />
 
-        {/* Video */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          disableRemotePlayback
-          disablePictureInPicture
-          poster="/img/hero-poster.webp"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            videoReady ? 'opacity-100' : 'opacity-0'
-          }`}
-          onCanPlay={handleCanPlay}
-        >
-          <source src="/videos/hero-orbita-mobile.mp4" type="video/mp4" />
-        </video>
+        {/* Active slide */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${currentItem.id}-${slideIndex}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute inset-0"
+          >
+            {currentItem.type === 'video' ? (
+              <video
+                key={currentItem.url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                disableRemotePlayback
+                disablePictureInPicture
+                className={`w-full h-full object-cover transition-opacity duration-700 ${
+                  videoReady ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{ filter: 'brightness(0.45) saturate(1.2)' }}
+                onCanPlay={handleVideoReady}
+              >
+                <source src={currentItem.url} type="video/mp4" />
+              </video>
+            ) : (
+              <motion.div
+                className="absolute inset-0"
+                animate={
+                  reduceMotion
+                    ? {}
+                    : {
+                        x: kbDir.x,
+                        y: kbDir.y,
+                        scale: kbDir.scale,
+                      }
+                }
+                transition={{ duration: IMAGE_DURATION / 1000, ease: 'linear' }}
+              >
+                <Image
+                  src={currentItem.url}
+                  alt={currentItem.label}
+                  fill
+                  className="object-cover"
+                  style={{ filter: 'brightness(0.45) saturate(1.2)' }}
+                  sizes="100vw"
+                  priority={slideIndex === 0}
+                  quality={80}
+                />
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Cinematic overlays */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-
-        {/* Subtle warm tone at bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-amber-950/10 to-transparent" />
       </div>
 
-      {/* ── Content — film title card style ── */}
+      {/* ── Slide indicators ── */}
+      {mediaItems.length > 1 && (
+        <div className="absolute top-6 right-6 md:top-10 md:right-10 z-20 flex items-center gap-2">
+          {mediaItems.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setSlideIndex(i); setVideoReady(false); }}
+              aria-label={`Slide ${i + 1}`}
+              className="group relative h-6 flex items-center cursor-pointer"
+            >
+              <div
+                className="h-[2px] rounded-full transition-all duration-500 bg-white/20 group-hover:bg-white/40"
+                style={{ width: i === slideIndex % mediaItems.length ? 28 : 8 }}
+              />
+              {i === slideIndex % mediaItems.length && (
+                <motion.div
+                  className="absolute left-0 h-[2px] rounded-full bg-amber-400"
+                  initial={{ width: 0 }}
+                  animate={{ width: 28 }}
+                  transition={{
+                    duration: (currentItem?.type === 'video' ? VIDEO_MIN_DURATION : IMAGE_DURATION) / 1000,
+                    ease: 'linear',
+                  }}
+                  key={slideIndex}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Content ── */}
       <div className="relative z-10 w-full pb-24 md:pb-32 pt-40">
         <div className="container mx-auto px-6 md:px-8 lg:px-12">
           <div className="max-w-3xl">
@@ -101,7 +226,7 @@ export default function HeroElegant() {
               </span>
             </motion.h1>
 
-            {/* Subtitle — one line, clear */}
+            {/* Subtitle */}
             <motion.p
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,7 +260,7 @@ export default function HeroElegant() {
               </Link>
             </motion.div>
 
-            {/* Social proof — integrated, not decorative */}
+            {/* Social proof */}
             <motion.div
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -162,7 +287,7 @@ export default function HeroElegant() {
         </div>
       </div>
 
-      {/* ── Scroll indicator ── */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.5 }}
