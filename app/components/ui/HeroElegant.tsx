@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { trackCTAClick } from '@/app/lib/analytics';
 
@@ -52,11 +52,11 @@ function StaggeredWords({ text, delay = 0 }: { text: string; delay?: number }) {
       {words.map((word, i) => (
         <motion.span
           key={i}
-          initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+          initial={{ opacity: 0, y: 28, filter: 'blur(10px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           transition={{
-            duration: 0.6,
-            delay: delay + i * 0.08,
+            duration: 0.7,
+            delay: delay + i * 0.1,
             ease: [0.22, 1, 0.36, 1],
           }}
           className="inline-block mr-[0.25em]"
@@ -68,37 +68,87 @@ function StaggeredWords({ text, delay = 0 }: { text: string; delay?: number }) {
   );
 }
 
-// ─── Floating ambient particles ──────────────────────────────────────────────
-function AmbientParticles() {
+// ─── Ambient particles — memoitzades per evitar re-render ────────────────────
+interface ParticleData {
+  w: number; h: number; left: string; top: string;
+  color: string; dy: number; dx: number; dur: number; del: number;
+}
+
+function AmbientParticles({ particles }: { particles: ParticleData[] }) {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {[...Array(20)].map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full"
-          style={{
-            width: Math.random() * 3 + 1,
-            height: Math.random() * 3 + 1,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            background: i % 3 === 0
-              ? 'rgba(251, 191, 36, 0.4)'
-              : 'rgba(255, 255, 255, 0.15)',
-          }}
-          animate={{
-            y: [0, -(30 + Math.random() * 40)],
-            x: [0, (Math.random() - 0.5) * 20],
-            opacity: [0, 0.8, 0],
-          }}
-          transition={{
-            duration: 6 + Math.random() * 6,
-            repeat: Infinity,
-            delay: Math.random() * 8,
-            ease: 'easeInOut',
-          }}
+          style={{ width: p.w, height: p.h, left: p.left, top: p.top, background: p.color }}
+          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0, 0.7, 0] }}
+          transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
         />
       ))}
     </div>
+  );
+}
+
+// ─── Counter animat ──────────────────────────────────────────────────────────
+function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const dur = 1200;
+        const start = performance.now();
+        const step = (now: number) => {
+          const t = Math.min((now - start) / dur, 1);
+          const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+          setCount(Math.round(ease * value));
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [value]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─── Cursor glow (desktop only) ──────────────────────────────────────────────
+function CursorGlow({ containerRef }: { containerRef: React.RefObject<HTMLElement | null> }) {
+  const [pos, setPos] = useState({ x: -200, y: -200 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    };
+    const onLeave = () => setPos({ x: -200, y: -200 });
+    el.addEventListener('mousemove', onMove);
+    el.addEventListener('mouseleave', onLeave);
+    return () => { el.removeEventListener('mousemove', onMove); el.removeEventListener('mouseleave', onLeave); };
+  }, [containerRef]);
+
+  return (
+    <div
+      className="absolute pointer-events-none z-[5] hidden md:block"
+      style={{
+        left: pos.x - 200,
+        top: pos.y - 200,
+        width: 400,
+        height: 400,
+        background: 'radial-gradient(circle, rgba(251,191,36,0.06) 0%, transparent 70%)',
+        transition: 'left 0.15s ease-out, top 0.15s ease-out',
+      }}
+    />
   );
 }
 
@@ -109,15 +159,38 @@ export default function HeroElegant() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
   const [videoReady, setVideoReady] = useState(false);
-  const [entered, setEntered] = useState(false);
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Entrance sequence
-  useEffect(() => {
-    const t = setTimeout(() => setEntered(true), 300);
-    return () => clearTimeout(t);
-  }, []);
+  // Scroll parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const contentY = useTransform(scrollYProgress, [0, 0.5], ['0px', '60px']);
+
+  // Partícules memoitzades — es generen un sol cop
+  const particles = useMemo<ParticleData[]>(() =>
+    Array.from({ length: 24 }, (_, i) => {
+      const size = 1 + (i % 4) * 0.8;
+      return {
+        w: size, h: size,
+        left: `${(i * 4.17) % 100}%`,
+        top: `${(i * 7.3 + 20) % 100}%`,
+        color: i % 4 === 0
+          ? 'rgba(251, 191, 36, 0.35)'
+          : i % 4 === 1
+            ? 'rgba(251, 191, 36, 0.15)'
+            : 'rgba(255, 255, 255, 0.12)',
+        dy: 30 + (i % 5) * 12,
+        dx: ((i % 3) - 1) * 10,
+        dur: 7 + (i % 4) * 2,
+        del: (i % 6) * 1.5,
+      };
+    }),
+  []);
 
   // Fetch media from API + shuffle
   useEffect(() => {
@@ -161,11 +234,11 @@ export default function HeroElegant() {
       aria-label="Hero"
       className="relative min-h-[100svh] flex items-end overflow-hidden bg-black"
     >
-      {/* ── Background media ── */}
-      <div className="absolute inset-0" aria-hidden="true">
+      {/* ── Background media — amb parallax ── */}
+      <motion.div className="absolute inset-0" style={{ y: reduceMotion ? 0 : bgY }} aria-hidden="true">
         {/* Poster — primer frame mentre carrega */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
           style={{ backgroundImage: "url('/img/hero-poster.webp')" }}
         />
 
@@ -193,7 +266,7 @@ export default function HeroElegant() {
                 style={{
                   opacity: videoReady ? 1 : 0,
                   transition: 'opacity 1s ease',
-                  filter: 'brightness(0.4) saturate(1.15)',
+                  filter: 'saturate(1.1)',
                 }}
                 onCanPlay={handleVideoReady}
               >
@@ -223,7 +296,7 @@ export default function HeroElegant() {
                   alt={currentItem.label}
                   fill
                   className="object-cover"
-                  style={{ filter: 'brightness(0.4) saturate(1.15)' }}
+                  style={{ filter: 'saturate(1.1)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
                   quality={85}
@@ -234,37 +307,29 @@ export default function HeroElegant() {
         </AnimatePresence>
 
         {/* ── Cinematic grade ── */}
-        {/* Base darkness */}
-        <div className="absolute inset-0 bg-black/30" />
-
-        {/* Bottom gradient — contingut llegible */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-        {/* Left gradient — text contrast */}
+        <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
-
-        {/* Warm tone a baix */}
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-amber-950/15 to-transparent" />
-
-        {/* Vignette subtil */}
+        {/* Vignette */}
         <div
           className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)',
-          }}
+          style={{ background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)' }}
         />
-
         {/* Film grain */}
         <div
-          className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.025] mix-blend-overlay"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           }}
         />
-      </div>
+      </motion.div>
+
+      {/* ── Cursor glow ── */}
+      {!reduceMotion && <CursorGlow containerRef={sectionRef} />}
 
       {/* ── Ambient particles ── */}
-      {!reduceMotion && <AmbientParticles />}
+      {!reduceMotion && <AmbientParticles particles={particles} />}
 
       {/* ── Slide indicators ── */}
       {mediaItems.length > 1 && (
@@ -302,8 +367,11 @@ export default function HeroElegant() {
         </div>
       )}
 
-      {/* ── Content ── */}
-      <div className="relative z-10 w-full pb-20 md:pb-28 lg:pb-32 pt-40">
+      {/* ── Content — amb parallax fade-out ── */}
+      <motion.div
+        className="relative z-10 w-full pb-20 md:pb-28 lg:pb-32 pt-40"
+        style={reduceMotion ? {} : { opacity: contentOpacity, y: contentY }}
+      >
         <div className="container mx-auto px-6 md:px-8 lg:px-12">
           <div className="max-w-3xl">
 
@@ -341,12 +409,15 @@ export default function HeroElegant() {
                     <AnimatePresence mode="wait">
                       <motion.span
                         key={textIndex}
-                        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
-                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute left-0 top-0 whitespace-nowrap bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent"
-                        style={{ textShadow: 'none' }}
+                        initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+                        exit={{ opacity: 0, y: -18, filter: 'blur(10px)', scale: 0.98 }}
+                        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute left-0 top-0 whitespace-nowrap bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite]"
+                        style={{
+                          backgroundImage: 'linear-gradient(90deg, #fcd34d, #f59e0b, #fb923c, #f59e0b, #fcd34d)',
+                          textShadow: 'none',
+                        }}
                       >
                         {rotatingTexts[textIndex]}
                       </motion.span>
@@ -380,12 +451,9 @@ export default function HeroElegant() {
                 onClick={() => trackCTAClick('hero_configurator_primary', 'hero_elegant')}
                 className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 md:px-10 md:py-5 rounded-2xl transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
               >
-                {/* Glow */}
-                <div className="absolute -inset-3 bg-amber-500/20 rounded-3xl blur-2xl group-hover:bg-amber-500/30 transition-colors duration-700" />
-                {/* Gradient bg */}
+                <div className="absolute -inset-3 bg-amber-500/20 rounded-3xl blur-2xl group-hover:bg-amber-500/35 transition-colors duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 bg-[length:200%_100%] rounded-2xl animate-[shimmer_3s_ease-in-out_infinite]" />
-                {/* Shine on hover */}
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
                 <span className="relative z-10 text-zinc-900 font-black text-base md:text-lg">
                   {t('ctaConfigurator')}
                 </span>
@@ -398,7 +466,7 @@ export default function HeroElegant() {
               <Link
                 href="/portfolio"
                 onClick={() => trackCTAClick('hero_portfolio_secondary', 'hero_elegant')}
-                className="group inline-flex items-center gap-2 px-6 py-4 md:px-8 md:py-5 rounded-2xl border border-white/10 hover:border-white/20 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-6 py-4 md:px-8 md:py-5 rounded-2xl border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm transition-all duration-300"
               >
                 <span className="text-white font-semibold text-base md:text-lg">
                   {t('ctaPrices')}
@@ -409,40 +477,50 @@ export default function HeroElegant() {
               </Link>
             </motion.div>
 
-            {/* Social proof */}
+            {/* Social proof — amb counter animat */}
             <motion.div
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 1.8 }}
               className="flex flex-wrap items-center gap-4 md:gap-5 mt-8 md:mt-10"
             >
-              {/* Stars */}
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <motion.svg
+                      key={i}
+                      initial={reduceMotion ? false : { opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: 1.9 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      className="w-4 h-4 text-amber-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+                    </motion.svg>
                   ))}
                 </div>
                 <span className="text-white font-bold text-sm">{t('rating')}</span>
               </div>
               <span className="w-px h-4 bg-white/20" />
-              <span className="text-white/80 font-medium text-sm">{t('socialProof')}</span>
+              <span className="text-white/80 font-medium text-sm">
+                <strong className="text-white"><AnimatedCounter value={50} suffix="+" /></strong>{' '}
+                {t('socialProof').replace(/\d+\+?\s*/, '')}
+              </span>
               <span className="w-px h-4 bg-white/20 hidden sm:block" />
               <span className="text-white/80 font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
             </motion.div>
 
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Scroll indicator ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.5 }}
         transition={reduceMotion ? { duration: 0 } : { delay: 3, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 z-10"
       >
         <motion.div
           animate={reduceMotion ? {} : { y: [0, 6, 0] }}
