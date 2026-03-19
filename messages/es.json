@@ -1815,77 +1815,76 @@
       "recommendedFor": "Recomendado para",
       "packs": {
         "bodas-basico": {
-          "name": "Básico (Baile)",
-          "tagline": "El baile de tu boda, con sonido y luces profesionales",
+          "name": "Básico",
+          "tagline": "Que la pista no pare hasta que vosotros digáis",
           "features": {
-            "f1": "DJ profesional 2 horas (baile final)",
-            "f2": "Sonido PRO 4000W EV",
-            "f3": "Iluminación básica (multiefectos LED + focos LED)",
-            "f4": "Máquina de humo",
-            "f5": "Montaje y desmontaje incluidos"
+            "f1": "DJ profesional 2 horas de sesión de baile",
+            "f2": "Sonido profesional 4000W que se escucha y se siente",
+            "f3": "Luces que crean ambiente de fiesta",
+            "f4": "Máquina de humo para los momentos clave",
+            "f5": "Nosotros lo montamos y lo desmontamos todo"
           },
-          "ideal": "Bodas — baile final"
+          "ideal": "Para el baile final de vuestra boda"
         },
         "bodas-premium": {
-          "name": "Premium (Baile + Espectáculo)",
-          "tagline": "Baile con espectáculo de luces y efectos que marcan la diferencia",
+          "name": "Premium",
+          "tagline": "Vuestro baile, con un espectáculo de luces que los invitados recordarán",
           "features": {
-            "f1": "DJ profesional 3 horas",
+            "f1": "DJ profesional 3 horas para disfrutar sin prisas",
             "f2": "Sonido PRO 4000W EV + controladora Pioneer",
-            "f3": "Iluminación PRO (4 cabezas móviles + multiefectos)",
-            "f4": "Cabina DJ ampliada",
-            "f5": "Máquina de humo",
-            "f6": "Montaje y desmontaje incluidos"
+            "f3": "4 cabezas móviles que siguen el ritmo de la música",
+            "f4": "Cabina DJ ampliada — el centro de la fiesta",
+            "f5": "Humo y efectos que hacen que cada momento sea especial",
+            "f6": "Nosotros lo montamos y lo desmontamos todo"
           },
-          "ideal": "Bodas — baile + espectáculo"
+          "ideal": "Baile con show de luces y efectos"
         },
         "bodas-luxury": {
-          "name": "Exclusivo (Día Completo)",
-          "tagline": "De la comida al baile — ponemos música en cada momento",
+          "name": "Exclusivo",
+          "tagline": "Estamos con vosotros desde la comida hasta la última canción",
           "features": {
-            "f1": "DJ + TÉCNICO DE LUCES (2 personas, 6 horas)",
-            "f2": "Música en cada momento: entrada de los novios, pases de platos y bebidas, tarta, entregas, regalos, salida y entrada al baile, sesión completa",
-            "f3": "Sonido audiófilo 4000W EV ETX 2000W",
-            "f4": "Show de luces sincronizado (4 cabezas móviles 150W LED)",
-            "f5": "Efecto máquina de humo bajo (Baile en las nubes)",
-            "f6": "Montaje y desmontaje incluidos"
+            "f1": "DJ + Técnico de luces dedicado (2 personas, 6 horas)",
+            "f2": "Ponemos la música en cada paso: entrada de los novios, pases de platos y bebidas, tarta, entregas, regalos, entrada al baile y sesión completa",
+            "f3": "Sonido audiófilo 4000W — cada canción suena como tiene que sonar",
+            "f4": "Show de luces sincronizado con la música (4 cabezas móviles 150W)",
+            "f5": "Humo bajo para el primer baile — bailaréis entre nubes",
+            "f6": "Nosotros lo montamos y lo desmontamos todo"
           },
-          "ideal": "Bodas — día completo"
+          "ideal": "Toda la boda, de la comida al baile"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
-          "tagline": "Profesionalismo que refuerza tu marca",
+          "tagline": "El detalle sonoro que hace que tu cóctel sea diferente",
           "features": {
-            "f1": "DJ/Hilo musical 4 horas",
-            "f2": "Sonido ambiente cristalino (EV ETX)",
-            "f3": "Iluminación estática decorativa",
-            "f4": "1 micrófono inalámbrico",
-            "f5": "Factura y gestión administrativa"
+            "f1": "Hilo musical o DJ ambiente 4 horas — ponemos el tono justo",
+            "f2": "Sonido nítido EV ETX que acompaña sin molestar",
+            "f3": "Iluminación decorativa que refuerza el ambiente",
+            "f4": "1 micrófono inalámbrico por si hace falta un discurso",
+            "f5": "Nosotros lo montamos y lo desmontamos todo"
           }
         },
         "empresas-evento": {
           "name": "Corporate Event",
-          "tagline": "Opción equilibrada para presentaciones y fiesta",
+          "tagline": "Presentación impecable, fiesta que la gente recuerda",
           "features": {
-            "f1": "DJ + técnico 5 horas",
-            "f2": "Sonido 4000W para speech y música",
-            "f3": "Iluminación dinámica (cabezas móviles)",
-            "f4": "2 micrófonos inalámbricos",
-            "f5": "Coordinación de escaleta",
-            "f6": "Soporte para proyección (audio)"
+            "f1": "DJ + técnico 5 horas — cubrimos presentación y fiesta",
+            "f2": "Sonido 4000W para discursos y música con la misma nitidez",
+            "f3": "Iluminación dinámica con cabezas móviles",
+            "f4": "2 micrófonos inalámbricos para intervenciones",
+            "f5": "Coordinación de escaleta con tu equipo",
+            "f6": "Nosotros lo montamos y lo desmontamos todo"
           }
         },
         "empresas-gala": {
           "name": "Corporate Gala",
-          "tagline": "Producción completa con refuerzo técnico",
+          "tagline": "Producción a otro nivel — que tu marca brille",
           "features": {
-            "f1": "Servicio integral 6 horas",
-            "f2": "DJ + técnico de sonido dedicado",
-            "f3": "Sonido reforzado + microfonía avanzada (4 micros)",
-            "f4": "Diseño de iluminación corporativa",
-            "f5": "Coordinación con agencia/venue",
-            "f6": "Grabación de audio del evento",
-            "f7": "Montaje estético impecable"
+            "f1": "Servicio integral 6 horas con DJ + técnico de sonido dedicado",
+            "f2": "Sonido reforzado + microfonía avanzada (4 micros)",
+            "f3": "Diseño de iluminación corporativa a medida",
+            "f4": "Coordinación directa con agencia o venue",
+            "f5": "Grabación de audio del evento",
+            "f6": "Montaje estético impecable — cuidamos cada detalle"
           }
         }
       }
@@ -2774,50 +2773,50 @@
       "discoPacks": {
         "oferta-flash": {
           "name": "Oferta Flash",
-          "tagline": "Descuento exclusivo para fiestas de hasta 50 invitados",
-          "ideal": "Fiestas privadas de hasta 50 invitados",
+          "tagline": "Tu fiesta de siempre, ahora con sonido y luces de verdad",
+          "ideal": "Cumpleaños y fiestas de hasta 50 invitados",
           "features": [
-            "Sonido PRO 4000W EV",
-            "Iluminación básica (multiefectos LED + focos LED)",
-            "DJ profesional 2 horas",
-            "Máquina de humo",
-            "Montaje y desmontaje incluido"
+            "DJ profesional 2 horas — la música que os gusta, como tiene que sonar",
+            "Sonido PRO 4000W que llena la sala",
+            "Luces que crean el ambiente perfecto",
+            "Máquina de humo para los momentos especiales",
+            "Nosotros lo montamos y lo desmontamos todo"
           ]
         },
         "disco-basico": {
           "name": "Party Starter",
-          "tagline": "Tu fiesta, tu estilo. Nosotros la hacemos realidad",
-          "ideal": "Fiestas privadas, cumpleaños, aniversarios",
+          "tagline": "Tu fiesta, tu sonido — nosotros ponemos el resto",
+          "ideal": "Cumpleaños, celebraciones y fiestas privadas",
           "features": [
-            "DJ profesional 3 horas",
-            "Sonido 4000W EV + controladora Pioneer",
-            "Iluminación básica (multiefectos LED + focos LED)",
-            "Máquina de humo",
-            "Música variada (Open format)"
+            "DJ profesional 3 horas — elegimos juntos la música",
+            "Sonido PRO 4000W EV que se escucha claro y limpio",
+            "4 cabezas móviles + multiefectos que transforman el espacio",
+            "Máquina de humo para los momentos clave",
+            "Nosotros lo montamos y lo desmontamos todo"
           ]
         },
         "disco-completo": {
           "name": "Party Machine",
-          "tagline": "Más duración y efectos para fiestas que no paran",
-          "ideal": "Fiestas medianas con ganas de bailar",
+          "tagline": "Una hora más porque las buenas noches no se acaban pronto",
+          "ideal": "Fiestas donde quieres que la noche no se acabe",
           "features": [
-            "DJ profesional 4 horas",
-            "Sonido 4000W EV + controladora Pioneer",
-            "Iluminación básica (multiefectos LED + focos LED)",
-            "Máquina de humo + burbujas",
-            "Peticiones de canciones en directo"
+            "DJ profesional 4 horas — sin mirar el reloj",
+            "Sonido PRO 4000W EV + controladora Pioneer",
+            "4 cabezas móviles + multiefectos que crean ambiente de club",
+            "Máquina de humo para los mejores momentos",
+            "Nosotros lo montamos y lo desmontamos todo"
           ]
         },
         "disco-premium": {
           "name": "VIP Experience",
-          "tagline": "Máxima duración, efectos espectaculares y potencia profesional",
-          "ideal": "Eventos largos o espacios grandes",
+          "tagline": "La fiesta de la que nadie quiere irse",
+          "ideal": "Fiestas grandes donde quieres que sea inolvidable",
           "features": [
-            "DJ profesional 6 horas",
-            "Sonido Club (4000W + subwoofer de refuerzo)",
-            "Show de luces completo (cabezas móviles)",
-            "Efectos VIP (humo, burbujas, chispas frías, confeti)",
-            "Cabina DJ Pro iluminada"
+            "DJ profesional 6 horas — toda la noche a tu servicio",
+            "Sonido de club (4000W + subwoofer de refuerzo) — lo sentiréis en todo el cuerpo",
+            "Show de luces completo con cabezas móviles sincronizadas",
+            "Efectos VIP: humo, burbujas, chispas frías, confeti",
+            "Cabina DJ Pro iluminada — el centro de la fiesta"
           ]
         }
       },

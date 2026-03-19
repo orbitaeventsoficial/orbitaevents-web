@@ -1815,77 +1815,76 @@
       "recommendedFor": "Recommended for",
       "packs": {
         "bodas-basico": {
-          "name": "Basic (Dance)",
-          "tagline": "Your wedding dance, with professional sound and lights",
+          "name": "Basic",
+          "tagline": "Keep the dance floor alive until you say stop",
           "features": {
-            "f1": "Professional DJ 2 hours (final dance)",
-            "f2": "PRO Sound 4000W EV",
-            "f3": "Basic lighting (LED multieffects + LED spots)",
-            "f4": "Smoke machine",
-            "f5": "Setup and teardown included"
+            "f1": "Professional DJ — 2 hours of pure dance session",
+            "f2": "4000W professional sound you can hear and feel",
+            "f3": "Lighting that sets the perfect party mood",
+            "f4": "Smoke machine for the key moments",
+            "f5": "We set it all up and take it all down"
           },
-          "ideal": "Weddings — final dance"
+          "ideal": "For the final dance of your wedding"
         },
         "bodas-premium": {
-          "name": "Premium (Dance + Show)",
-          "tagline": "Dance with a light and effects show that makes a difference",
+          "name": "Premium",
+          "tagline": "Don't just dance — live the experience",
           "features": {
-            "f1": "Professional DJ 3 hours",
-            "f2": "PRO Sound 4000W EV + Pioneer controller",
-            "f3": "PRO lighting (4 moving heads + multieffects)",
-            "f4": "Extended DJ booth",
-            "f5": "Smoke machine",
-            "f6": "Setup and teardown included"
+            "f1": "Professional DJ — 3 hours to enjoy without rushing",
+            "f2": "PRO sound 4000W EV + Pioneer controller",
+            "f3": "4 moving heads that follow the rhythm of the music",
+            "f4": "Extended DJ booth — the centre of the party",
+            "f5": "Smoke and effects that make every moment special",
+            "f6": "We set it all up and take it all down"
           },
-          "ideal": "Weddings — dance + show"
+          "ideal": "For couples who want more than just music"
         },
         "bodas-luxury": {
-          "name": "Exclusive (Full Day)",
-          "tagline": "From dinner to dance — we set the music for every moment",
+          "name": "Exclusive",
+          "tagline": "From lunch to the last dance — we take care of every note",
           "features": {
-            "f1": "DJ + LIGHT TECHNICIAN (2 people, 6 hours)",
-            "f2": "Music for every moment: couple's entrance, food & drink courses, cake, gift-giving, exit & entrance to the dance floor, full DJ session",
-            "f3": "Audiophile sound 4000W EV ETX 2000W",
-            "f4": "Synchronized light show (4 moving heads 150W LED)",
-            "f5": "Low fog machine effect (Dancing in the clouds)",
-            "f6": "Setup and teardown included"
+            "f1": "DJ + dedicated Light Technician (2 people, 6 hours)",
+            "f2": "We set the music at every step: couple's entrance, food and drink courses, cake, speeches, gifts, entrance to the dance floor, and full session",
+            "f3": "Audiophile 4000W sound — every song sounds the way it should",
+            "f4": "Synchronised light show (4 moving heads 150W)",
+            "f5": "Low fog for the first dance — you'll dance among the clouds",
+            "f6": "We set it all up and take it all down"
           },
-          "ideal": "Weddings — full day"
+          "ideal": "For the couple who wants everything perfect"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
-          "tagline": "Professionalism that strengthens your brand",
+          "tagline": "The sound detail that makes your cocktail stand out",
           "features": {
-            "f1": "DJ/background music 4 hours",
-            "f2": "Crystal-clear ambient sound (EV ETX)",
-            "f3": "Static decorative lighting",
-            "f4": "1 wireless microphone",
-            "f5": "Invoice and admin management"
+            "f1": "Background music or ambient DJ for 4 hours — we set the right tone",
+            "f2": "Crystal-clear EV ETX sound that accompanies without intruding",
+            "f3": "Decorative lighting that enhances the atmosphere",
+            "f4": "1 wireless microphone in case a speech is needed",
+            "f5": "We set it all up and take it all down"
           }
         },
         "empresas-evento": {
           "name": "Corporate Event",
-          "tagline": "Balanced option for presentations and party",
+          "tagline": "Flawless presentation, party people remember",
           "features": {
-            "f1": "DJ + technician 5 hours",
-            "f2": "4000W sound for speech and music",
-            "f3": "Dynamic lighting (moving heads)",
-            "f4": "2 wireless microphones",
-            "f5": "Run-of-show coordination",
-            "f6": "Projection support (audio)"
+            "f1": "DJ + technician for 5 hours — we cover presentation and party",
+            "f2": "4000W sound for speeches and music with the same clarity",
+            "f3": "Dynamic lighting with moving heads",
+            "f4": "2 wireless microphones for speakers",
+            "f5": "Run-of-show coordination with your team",
+            "f6": "We set it all up and take it all down"
           }
         },
         "empresas-gala": {
           "name": "Corporate Gala",
-          "tagline": "Full production with technical reinforcement",
+          "tagline": "Production on another level — let your brand shine",
           "features": {
-            "f1": "Full 6-hour service",
-            "f2": "DJ + dedicated sound technician",
-            "f3": "Reinforced sound + advanced miking (4 mics)",
-            "f4": "Corporate lighting design",
-            "f5": "Agency/venue coordination",
-            "f6": "Event audio recording",
-            "f7": "Impeccable setup and aesthetics"
+            "f1": "Full 6-hour service with DJ + dedicated sound technician",
+            "f2": "Reinforced sound + advanced miking (4 mics)",
+            "f3": "Custom corporate lighting design",
+            "f4": "Direct coordination with agency or venue",
+            "f5": "Event audio recording",
+            "f6": "Impeccable setup — we take care of every detail"
           }
         }
       }
@@ -2774,50 +2773,50 @@
       "discoPacks": {
         "oferta-flash": {
           "name": "Flash Offer",
-          "tagline": "Exclusive discount for parties up to 50 guests",
-          "ideal": "Private parties up to 50 guests",
+          "tagline": "Your party — now with real sound and lights",
+          "ideal": "Birthdays and parties up to 50 guests",
           "features": [
-            "Pro sound 4000W EV",
-            "Basic lighting (multieffect LED + LED wash)",
-            "Professional DJ for 2 hours",
-            "Smoke machine",
-            "Assembly and disassembly included"
+            "Professional DJ for 2 hours — your favourite music, the way it should sound",
+            "PRO 4000W sound that fills the room",
+            "Lighting that sets the perfect mood",
+            "Smoke machine for the special moments",
+            "We set it all up and take it all down"
           ]
         },
         "disco-basico": {
           "name": "Party Starter",
-          "tagline": "Your party, your style. We make it happen",
-          "ideal": "Private parties, birthdays, anniversaries",
+          "tagline": "Your party, your sound — we bring the rest",
+          "ideal": "Birthdays, celebrations and private parties",
           "features": [
-            "Professional DJ for 3 hours",
-            "Sound 4000W EV + Pioneer controller",
-            "Basic lighting (multieffect LED + LED wash)",
-            "Smoke machine",
-            "Open format music"
+            "Professional DJ for 3 hours — we choose the music together",
+            "PRO 4000W EV sound, clear and crisp",
+            "4 moving heads + multieffects that transform the space",
+            "Smoke machine for the key moments",
+            "We set it all up and take it all down"
           ]
         },
         "disco-completo": {
           "name": "Party Machine",
-          "tagline": "More time and effects for non-stop parties",
-          "ideal": "Medium parties with a big dance floor",
+          "tagline": "One more hour — because great nights shouldn't end early",
+          "ideal": "Parties where you want the night to last",
           "features": [
-            "Professional DJ for 4 hours",
-            "Sound 4000W EV + Pioneer controller",
-            "Basic lighting (multieffect LED + LED wash)",
-            "Smoke machine + bubble machine",
-            "Live song requests"
+            "Professional DJ for 4 hours — no clock-watching",
+            "PRO 4000W EV sound + Pioneer controller",
+            "4 moving heads + multieffects that create a club atmosphere",
+            "Smoke machine for the best moments",
+            "We set it all up and take it all down"
           ]
         },
         "disco-premium": {
           "name": "VIP Experience",
-          "tagline": "Maximum time, spectacular effects and pro power",
-          "ideal": "Long events or large venues",
+          "tagline": "The party nobody wants to leave",
+          "ideal": "Big parties where you want it to be unforgettable",
           "features": [
-            "Professional DJ for 6 hours",
-            "Club sound (4000W + subwoofer reinforcement)",
-            "Full light show (moving heads)",
-            "VIP effects (smoke, bubbles, cold sparks, confetti)",
-            "Pro illuminated DJ booth"
+            "Professional DJ for 6 hours — the whole night at your service",
+            "Club sound (4000W + reinforcement subwoofer) — you'll feel it in your bones",
+            "Full light show with synchronised moving heads",
+            "VIP effects: smoke, bubbles, cold sparks, confetti",
+            "Pro illuminated DJ booth — the centre of the party"
           ]
         }
       },

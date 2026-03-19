@@ -1460,77 +1460,76 @@
       "recommendedFor": "Recomanat per a",
       "packs": {
         "bodas-basico": {
-          "name": "Bàsic (Ball)",
-          "tagline": "El ball del teu casament, amb so i llums professionals",
+          "name": "Bàsic",
+          "tagline": "Que la pista no pari fins que vosaltres digueu",
           "features": {
-            "f1": "DJ professional 2 hores (ball final)",
-            "f2": "So PRO 4000W EV",
-            "f3": "Il·luminació bàsica (multiefectes LED + focus LED)",
-            "f4": "Màquina de fum",
-            "f5": "Muntatge i desmuntatge inclosos"
+            "f1": "DJ professional 2 hores de sessió de ball",
+            "f2": "So professional 4000W que s'escolta i es sent",
+            "f3": "Llums que creen ambient de festa",
+            "f4": "Màquina de fum per als moments clau",
+            "f5": "Nosaltres ho muntem i ho desmontem tot"
           },
-          "ideal": "Casaments — ball final"
+          "ideal": "Per al ball final del vostre casament"
         },
         "bodas-premium": {
-          "name": "Premium (Ball + Espectacle)",
-          "tagline": "Ball amb espectacle de llums i efectes que marquen la diferència",
+          "name": "Premium",
+          "tagline": "El vostre ball, amb un espectacle de llums que els convidats recordaran",
           "features": {
-            "f1": "DJ professional 3 hores",
+            "f1": "DJ professional 3 hores per gaudir sense pressa",
             "f2": "So PRO 4000W EV + controladora Pioneer",
-            "f3": "Il·luminació PRO (4 caps mòbils + multiefectes)",
-            "f4": "Cabina DJ ampliada",
-            "f5": "Màquina de fum",
-            "f6": "Muntatge i desmuntatge inclosos"
+            "f3": "4 caps mòbils que segueixen el ritme de la música",
+            "f4": "Cabina DJ ampliada — el centre de la festa",
+            "f5": "Fum i efectes que fan que cada moment sigui especial",
+            "f6": "Nosaltres ho muntem i ho desmontem tot"
           },
-          "ideal": "Casaments — ball + espectacle"
+          "ideal": "Ball amb show de llums i efectes"
         },
         "bodas-luxury": {
-          "name": "Exclusiu (Dia Complet)",
-          "tagline": "Del dinar al ball — posem música a cada moment",
+          "name": "Exclusiu",
+          "tagline": "Som amb vosaltres des del dinar fins a l'última cançó",
           "features": {
-            "f1": "DJ + TÈCNIC DE LLUMS (2 persones, 6 hores)",
-            "f2": "Música en cada moment: entrada nuvis, passes de plats i begudes, pastís, entregues, regals, sortida i entrada al ball, sessió completa",
-            "f3": "So audiòfil 4000W EV ETX 2000W",
-            "f4": "Show de llums sincronitzat (4 caps mòbils 150W LED)",
-            "f5": "Efecte màquina de fum baix (Ball entre núvols)",
-            "f6": "Muntatge i desmuntatge inclosos"
+            "f1": "DJ + Tècnic de llums dedicat (2 persones, 6 hores)",
+            "f2": "Posem la música a cada pas: entrada dels nuvis, passes de plats i begudes, pastís, entregues, regals, entrada al ball i sessió completa",
+            "f3": "So audiòfil 4000W — cada cançó sona com ha de sonar",
+            "f4": "Show de llums sincronitzat amb la música (4 caps mòbils 150W)",
+            "f5": "Fum baix per al primer ball — ballareu entre núvols",
+            "f6": "Nosaltres ho muntem i ho desmontem tot"
           },
-          "ideal": "Casaments — dia complet"
+          "ideal": "Tot el casament, del dinar al ball"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
-          "tagline": "Professionalitat que reforça la teva marca",
+          "tagline": "El detall sonor que fa que el teu còctel sigui diferent",
           "features": {
-            "f1": "DJ/Fil musical 4 hores",
-            "f2": "So ambient nítid (EV ETX)",
-            "f3": "Il·luminació estàtica decorativa",
-            "f4": "1 micròfon sense fils",
-            "f5": "Factura i gestió administrativa"
+            "f1": "Fil musical o DJ ambient 4 hores — posem el to just",
+            "f2": "So nítid EV ETX que acompanya sense molestar",
+            "f3": "Il·luminació decorativa que reforça l'ambient",
+            "f4": "1 micròfon sense fils per si cal fer un discurs",
+            "f5": "Nosaltres ho muntem i ho desmontem tot"
           }
         },
         "empresas-evento": {
           "name": "Corporate Event",
-          "tagline": "Opció equilibrada per presentacions i festa",
+          "tagline": "Presentació impecable, festa que la gent recorda",
           "features": {
-            "f1": "DJ + tècnic 5 hores",
-            "f2": "So 4000W per speech i música",
-            "f3": "Il·luminació dinàmica (caps mòbils)",
-            "f4": "2 micròfons sense fils",
-            "f5": "Coordinació d'escaleta",
-            "f6": "Suport de projecció (àudio)"
+            "f1": "DJ + tècnic 5 hores — cobrim presentació i festa",
+            "f2": "So 4000W per discursos i música amb la mateixa nitidesa",
+            "f3": "Il·luminació dinàmica amb caps mòbils",
+            "f4": "2 micròfons sense fils per a intervencions",
+            "f5": "Coordinació d'escaleta amb el teu equip",
+            "f6": "Nosaltres ho muntem i ho desmontem tot"
           }
         },
         "empresas-gala": {
           "name": "Corporate Gala",
-          "tagline": "Producció completa amb reforç tècnic",
+          "tagline": "Producció a un altre nivell — que la teva marca brilli",
           "features": {
-            "f1": "Servei integral 6 hores",
-            "f2": "DJ + tècnic de so dedicat",
-            "f3": "So reforçat + microfonia avançada (4 micros)",
-            "f4": "Disseny d'il·luminació corporativa",
-            "f5": "Coordinació amb agència/venue",
-            "f6": "Gravació d'àudio de l'esdeveniment",
-            "f7": "Muntatge estètic impecable"
+            "f1": "Servei integral 6 hores amb DJ + tècnic de so dedicat",
+            "f2": "So reforçat + microfonia avançada (4 micros)",
+            "f3": "Disseny d'il·luminació corporativa a mida",
+            "f4": "Coordinació directa amb agència o venue",
+            "f5": "Gravació d'àudio de l'esdeveniment",
+            "f6": "Muntatge estètic impecable — cuidem cada detall"
           }
         }
       }
@@ -2354,50 +2353,50 @@
       "discoPacks": {
         "oferta-flash": {
           "name": "Oferta Flash",
-          "tagline": "Descompte exclusiu per a festes de fins a 50 convidats",
-          "ideal": "Festes privades de fins a 50 convidats",
+          "tagline": "La teva festa de sempre, ara amb so i llums de veritat",
+          "ideal": "Aniversaris i festes de fins a 50 convidats",
           "features": [
-            "So PRO 4000W EV",
-            "Il·luminació bàsica (multiefectes LED + focus LED)",
-            "DJ professional 2 hores",
-            "Màquina de fum",
-            "Muntatge i desmuntatge inclosos"
+            "DJ professional 2 hores — la música que us agrada, com ha de sonar",
+            "So PRO 4000W que omple la sala",
+            "Llums que creen l'ambient perfecte",
+            "Màquina de fum per als moments especials",
+            "Nosaltres ho muntem i ho desmontem tot"
           ]
         },
         "disco-basico": {
           "name": "Party Starter",
-          "tagline": "La teva festa, el teu estil. Nosaltres la fem realitat",
-          "ideal": "Festes privades, aniversaris, celebracions",
+          "tagline": "La teva festa, el teu so — nosaltres posem la resta",
+          "ideal": "Aniversaris, celebracions i festes privades",
           "features": [
-            "DJ professional 3 hores",
-            "So 4000W EV + controladora Pioneer",
-            "Il·luminació bàsica (multiefectes LED + focus LED)",
-            "Màquina de fum",
-            "Música variada (Open format)"
+            "DJ professional 3 hores — triem junts la música",
+            "So PRO 4000W EV que s'escolta clar i net",
+            "4 caps mòbils + multiefectes que transformen l'espai",
+            "Màquina de fum per als moments clau",
+            "Nosaltres ho muntem i ho desmontem tot"
           ]
         },
         "disco-completo": {
           "name": "Party Machine",
-          "tagline": "Més durada i efectes per a festes que no paren",
-          "ideal": "Festes mitjanes amb ganes de ballar",
+          "tagline": "Una hora més perquè les bones nits no s'acaben aviat",
+          "ideal": "Festes on vols que la nit no s'acabi",
           "features": [
-            "DJ professional 4 hores",
-            "So 4000W EV + controladora Pioneer",
-            "Il·luminació bàsica (multiefectes LED + focus LED)",
-            "Màquina de fum + bombolles",
-            "Peticions de cançons en directe"
+            "DJ professional 4 hores — sense mirar el rellotge",
+            "So PRO 4000W EV + controladora Pioneer",
+            "4 caps mòbils + multiefectes que creen ambient de club",
+            "Màquina de fum per als millors moments",
+            "Nosaltres ho muntem i ho desmontem tot"
           ]
         },
         "disco-premium": {
           "name": "VIP Experience",
-          "tagline": "Màxima durada, efectes espectaculars i potència professional",
-          "ideal": "Esdeveniments llargs o espais grans",
+          "tagline": "La festa on ningú vol marxar",
+          "ideal": "Festes grans on vols que sigui inoblidable",
           "features": [
-            "DJ professional 6 hores",
-            "So Club (4000W + subwoofer de reforç)",
-            "Show de llums complet (caps mòbils)",
-            "Efectes VIP (fum, bombolles, espurnes fredes, confeti)",
-            "Cabina DJ Pro il·luminada"
+            "DJ professional 6 hores — tota la nit al teu servei",
+            "So de club (4000W + subwoofer de reforç) — ho sentireu a tot el cos",
+            "Show de llums complet amb caps mòbils sincronitzats",
+            "Efectes VIP: fum, bombolles, espurnes fredes, confeti",
+            "Cabina DJ Pro il·luminada — el centre de la festa"
           ]
         }
       },
