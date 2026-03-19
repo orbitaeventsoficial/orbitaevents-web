@@ -138,9 +138,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    log.error('Error obtenint leads:', error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack : undefined;
+    log.error('Error obtenint leads:', { message: errMsg, stack: errStack });
     return NextResponse.json(
-      { error: 'Error obtenint leads' },
+      { error: 'Error obtenint leads', details: errMsg },
       { status: 500 }
     );
   }
@@ -170,9 +172,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    log.error('Error creant lead:', error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    log.error('Error creant lead:', { message: errMsg });
     return NextResponse.json(
-      { error: 'Error creant lead' },
+      { error: 'Error creant lead', details: errMsg },
       { status: 500 }
     );
   }
