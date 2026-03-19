@@ -251,7 +251,8 @@ export default function PortfolioShowcase() {
   const pausedRef = useRef(false);
   const pauseTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-scroll continu amb requestAnimationFrame (molt suau)
+  // Auto-scroll continu amb loop infinit (duplicant cards)
+  // Quan passem la meitat del scrollWidth (el set duplicat), tornem al principi sense salt
   useEffect(() => {
     if (reduceMotion) return;
     const el = scrollRef.current;
@@ -260,12 +261,16 @@ export default function PortfolioShowcase() {
     const tick = () => {
       if (!pausedRef.current) {
         const speed = speedRef.current + edgeSpeedRef.current;
-        const maxScroll = el.scrollWidth - el.clientWidth;
+        // La meitat del scrollWidth = ample d'un set complet de cards
+        const halfWidth = el.scrollWidth / 2;
 
-        if (el.scrollLeft >= maxScroll - 1) {
-          el.scrollLeft = 0;
-        } else {
-          el.scrollLeft += speed;
+        el.scrollLeft += speed;
+
+        // Reset seamless: quan passem el set duplicat, tornem al primer
+        if (el.scrollLeft >= halfWidth) {
+          el.scrollLeft -= halfWidth;
+        } else if (el.scrollLeft < 0) {
+          el.scrollLeft += halfWidth;
         }
       }
       rafRef.current = requestAnimationFrame(tick);
@@ -391,13 +396,14 @@ export default function PortfolioShowcase() {
         className="flex gap-5 overflow-x-auto px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-4 scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {EVENT_STORIES.map((story, i) => (
+        {/* Dues còpies per loop infinit sense salt */}
+        {[...EVENT_STORIES, ...EVENT_STORIES].map((story, i) => (
           <StoryCard
-            key={story.id}
+            key={`${story.id}-${i}`}
             story={story}
             t={t}
             reduceMotion={reduceMotion}
-            index={i}
+            index={i % EVENT_STORIES.length}
           />
         ))}
       </div>
