@@ -1,132 +1,55 @@
 'use client';
 
 /**
- * ═══════════════════════════════════════════════════════════════════════════
  * MOBILE HERO ULTIMATE - Òrbita Events
- * ═══════════════════════════════════════════════════════════════════════════
- * 
- * Hero inmersivo fullscreen con:
- * - Video background con overlay dinámico
- * - Texto animado con morphing
- * - Partículas flotantes
- * - Parallax en scroll
- * - CTAs flotantes con glow
- * - Badge de urgencia animado
- * - Scroll indicator interactivo
- * 
- * FIXED:
- * - Rutas con locale
- * - Textos usando sistema de traducciones
- * - Scroll usando container ref
- * - Animaciones optimizadas para evitar parpadeos
+ * Hero mòbil amb carrousel d'imatges + video, optimitzat per fluïdesa
  */
 
-import { useRef, useMemo, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// PARTICLES BACKGROUND - ULTRA ENHANCED
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Media items (mateixos que desktop) ──────────────────────────────────────
 
-function ParticlesBackground() {
-  const reduceMotion = useReducedMotion();
-  const particles = useMemo(() =>
-    Array.from({ length: reduceMotion ? 6 : 10 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      duration: Math.random() * 10 + 8,
-      delay: Math.random() * 2,
-      xOffset: Math.random() * 30 - 15,
-      color: i % 3 === 0 ? 'bg-amber-400/40' : i % 3 === 1 ? 'bg-orange-500/40' : 'bg-yellow-400/40',
-    })), [reduceMotion]
-  );
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className={`absolute rounded-full ${p.color}`}
-          initial={{
-            x: `${p.x}%`,
-            y: `${p.y}%`,
-            opacity: 0
-          }}
-          animate={reduceMotion ? { opacity: 0.35 } : {
-            x: [`${p.x}%`, `${p.x + p.xOffset}%`, `${p.x}%`],
-            y: [`${p.y}%`, `${p.y - 10}%`, `${p.y}%`],
-            opacity: [0.2, 0.5, 0.2],
-          }}
-          transition={reduceMotion ? { duration: 0 } : {
-            duration: p.duration,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: 'easeInOut',
-          }}
-          style={{
-            width: p.size,
-            height: p.size,
-            position: 'absolute',
-          }}
-        />
-      ))}
-
-      {/* Glow effect overlay */}
-      <div className="absolute inset-0 bg-gradient-radial from-amber-500/10 via-transparent to-transparent" />
-    </div>
-  );
+interface HeroMediaItem {
+  id: string;
+  url: string;
+  type: 'video' | 'image';
+  label: string;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ANIMATED BADGE - ENHANCED
-// ═══════════════════════════════════════════════════════════════════════════
+const FALLBACK: HeroMediaItem[] = [
+  { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo' },
+  { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil' },
+  { id: 'img-bodas-04', url: '/img/portfolio/bodas/bodas-04.avif', type: 'image', label: 'Bodes' },
+  { id: 'img-halloween-01', url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', type: 'image', label: 'Halloween' },
+  { id: 'img-magic-05', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif', type: 'image', label: 'Món Màgic' },
+  { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses' },
+];
 
-function AnimatedBadge() {
-  const t = useTranslations('mobileHero');
+const IMAGE_DURATION = 6000;
+const VIDEO_MIN_DURATION = 10000;
 
-  const badges = useMemo(() => [
-    { emoji: '✨', text: t('badges.halloween', { year: new Date().getFullYear() }), gradient: 'from-amber-500 to-orange-500' },
-    { emoji: '🪄', text: t('badges.monMagic'), gradient: 'from-purple-500 to-pink-500' },
-    { emoji: '⭐', text: t('badges.rating'), gradient: 'from-amber-400 to-yellow-500' },
-  ], [t]);
-
-  const badge = badges[0];
-
-  return (
-    <div className="relative h-12 overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`relative inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${badge.gradient} shadow-2xl`}>
-          <div
-            className={`absolute inset-0 rounded-full bg-gradient-to-r ${badge.gradient} opacity-40 blur-lg`}
-          />
-          <span className="relative text-2xl drop-shadow-lg">{badge.emoji}</span>
-          <span className="relative text-white text-base font-bold tracking-wide drop-shadow-md">
-            {badge.text}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MORPHING TEXT - ULTRA SPECTACULAR
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Morphing text ───────────────────────────────────────────────────────────
 
 function MorphingText() {
   const t = useTranslations('mobileHero');
-
   const texts = useMemo(() => {
     const extended = t.raw('morphingTextsExtended') as string[] | undefined;
-    if (Array.isArray(extended) && extended.length > 0) {
-      return extended;
-    }
+    if (Array.isArray(extended) && extended.length > 0) return extended;
     return [
       t('morphingTexts.unique'),
       t('morphingTexts.magical'),
@@ -140,115 +63,80 @@ function MorphingText() {
     if (!texts.length) return;
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % texts.length);
-    }, 4500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [texts.length]);
 
   return (
-    <span className="relative inline-block min-w-[200px]">
-      <span
-        className="relative inline-block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent font-black"
-        style={{
-          textShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 0 80px rgba(251, 191, 36, 0.2)',
-          filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.3))',
-        }}
-      >
-        {texts[index]}
-      </span>
-
+    <span className="relative block h-[1.15em] mt-1">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute left-0 right-0 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent font-black"
+        >
+          {texts[index]}
+        </motion.span>
+      </AnimatePresence>
     </span>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SCROLL INDICATOR
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Scroll indicator ────────────────────────────────────────────────────────
 
 function ScrollIndicator() {
   const { haptic, scrollToSection } = useMobile();
   const t = useTranslations('mobileHero');
-  const reduceMotion = useReducedMotion();
-  
-  const handleClick = () => {
-    haptic('light');
-    scrollToSection('services-section');
-  };
 
   return (
-    <motion.button
-      onClick={handleClick}
+    <button
+      onClick={() => { haptic('light'); scrollToSection('services-section'); }}
       aria-label={t('scroll')}
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      initial={reduceMotion ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={reduceMotion ? undefined : { delay: 2 }}
+      className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-50"
     >
-      <span 
-        className="text-white/60 text-xs font-medium tracking-wider"
-      >
-        {t('scroll')}
-      </span>
-      
-      <div
-        className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2"
-      >
-        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
+      <span className="text-white/60 text-[10px] font-medium tracking-wider uppercase">{t('scroll')}</span>
+      <div className="w-5 h-8 rounded-full border border-white/25 flex justify-center pt-1.5">
+        <motion.div
+          animate={{ y: [0, 4, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-1 h-1.5 rounded-full bg-amber-400/80"
+        />
       </div>
-    </motion.button>
+    </button>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// FLOATING CTAS
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Floating CTAs ───────────────────────────────────────────────────────────
 
 function FloatingCTAs() {
   const { haptic, locale } = useMobile();
   const t = useTranslations('common');
-  const tMobileHero = useTranslations('mobileHero');
-  const reduceMotion = useReducedMotion();
+  const tHero = useTranslations('mobileHero');
 
   return (
     <div className="flex flex-col gap-3 w-full px-5">
       {/* Primary CTA - WhatsApp */}
       <motion.a
-        href={WHATSAPP_URL_WITH_MESSAGE(tMobileHero('whatsappMessage'))}
+        href={WHATSAPP_URL_WITH_MESSAGE(tHero('whatsappMessage'))}
         target="_blank"
         rel="noopener noreferrer"
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('medium')}
-        onClick={() => {
-          trackWhatsAppClick('mobile_hero');
-          trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero');
-        }}
-        className="relative group w-full overflow-hidden"
-        initial={{ opacity: 0, y: 20 }}
+        onClick={() => { trackWhatsAppClick('mobile_hero'); trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero'); }}
+        className="relative w-full overflow-hidden"
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
       >
-        {/* Animated glow effect */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-2xl blur-2xl opacity-60"
-          animate={{ opacity: reduceMotion ? 0.65 : 0.7, scale: 1 }}
-        />
-
-        {/* Shine effect */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          animate={{ x: 0, opacity: 0 }}
-        />
-
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-2xl blur-xl opacity-50" />
         <div className="relative flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-sm shadow-2xl">
-          <span className="relative z-10">{t('buttons.whatsapp')}</span>
-          <motion.svg
-            className="w-4 h-4 relative z-10"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={3}
-          >
+          <span>{t('buttons.whatsapp')}</span>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </motion.svg>
+          </svg>
         </div>
       </motion.a>
 
@@ -258,204 +146,217 @@ function FloatingCTAs() {
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
         onClick={() => trackCTAClick('mobile_hero_configurator_secondary', 'mobile_hero')}
-        className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"
-        initial={{ opacity: 0, y: 20 }}
+        className="flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white/[0.06] backdrop-blur-sm rounded-2xl border border-white/15 font-bold text-white text-sm"
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4, duration: 0.8 }}
+        transition={{ delay: 1, duration: 0.5 }}
       >
-        {/* Hover glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 to-green-500/20 opacity-0 group-active:opacity-100 transition-opacity" />
-
-        <motion.svg
-          className="w-6 h-6 text-green-400 relative z-10"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </motion.svg>
-        <span className="relative z-10">{t('buttons.requestQuote')}</span>
+        </svg>
+        <span>{t('buttons.requestQuote')}</span>
       </motion.a>
     </div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════
+// ── Main component ──────────────────────────────────────────────────────────
 
 export default function MobileHeroUltimate() {
   const t = useTranslations('mobileHero');
-  const containerRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
   const [videoReady, setVideoReady] = useState(false);
-  const videoReadyTimeout = useRef<number | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start'],
-  });
 
-  // Parallax transforms
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.2]);
-  const videoOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  
+  // Fetch media from API
   useEffect(() => {
-    return () => {
-      if (videoReadyTimeout.current !== null) {
-        window.clearTimeout(videoReadyTimeout.current);
-        videoReadyTimeout.current = null;
-      }
-    };
+    fetch('/api/hero-media')
+      .then((r) => r.json())
+      .then((data: HeroMediaItem[]) => {
+        if (data.length > 0) setMediaItems(shuffle(data));
+      })
+      .catch(() => {});
+  }, []);
+
+  const currentItem = mediaItems[slideIndex % mediaItems.length];
+
+  // Rotate slides
+  useEffect(() => {
+    if (mediaItems.length <= 1) return;
+    const duration = currentItem?.type === 'video' ? VIDEO_MIN_DURATION : IMAGE_DURATION;
+    const timer = setTimeout(() => {
+      setSlideIndex((prev) => (prev + 1) % mediaItems.length);
+      setVideoReady(false);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [slideIndex, mediaItems, currentItem?.type]);
+
+  const handleVideoReady = useCallback(() => {
+    setTimeout(() => setVideoReady(true), 200);
   }, []);
 
   return (
     <section
-      ref={containerRef}
       aria-label="Hero"
-      className="relative h-[100dvh] w-full overflow-hidden"
+      className="relative h-[100dvh] w-full overflow-hidden bg-black"
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Video Background with Parallax */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{ scale: videoScale, opacity: videoOpacity }}
+      {/* ── Background: poster + slides ── */}
+      <div className="absolute inset-0">
+        {/* Poster — logo mentre carrega */}
+        <div className="absolute inset-0 bg-black flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/orbitalockupwhite.svg" alt="Òrbita Events" className="w-36 h-36 opacity-25" />
+        </div>
+
+        {/* Slides — crossfade */}
+        <AnimatePresence>
+          {currentItem.type === 'video' ? (
+            <motion.div
+              key={`${currentItem.id}-${slideIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+              className="absolute inset-0"
+            >
+              <video
+                key={currentItem.url}
+                autoPlay muted loop playsInline
+                preload="metadata"
+                disableRemotePlayback disablePictureInPicture
+                className="w-full h-full object-cover"
+                style={{
+                  opacity: videoReady ? 1 : 0,
+                  transition: 'opacity 0.8s ease',
+                  filter: 'brightness(0.6) saturate(1.1)',
+                }}
+                onCanPlay={handleVideoReady}
+              >
+                <source src={currentItem.url} type="video/mp4" />
+              </video>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`${currentItem.id}-${slideIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={currentItem.url}
+                alt={currentItem.label}
+                fill
+                className="object-cover"
+                style={{ filter: 'brightness(0.6) saturate(1.1)' }}
+                sizes="100vw"
+                priority={slideIndex === 0}
+                quality={85}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black to-transparent" />
+      </div>
+
+      {/* ── Slide indicators ── */}
+      {mediaItems.length > 1 && (
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+          {mediaItems.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setSlideIndex(i); setVideoReady(false); }}
+              aria-label={`Slide ${i + 1}`}
+              className="h-6 flex items-center"
+            >
+              <div
+                className="h-[2px] rounded-full transition-all duration-300"
+                style={{
+                  width: i === slideIndex % mediaItems.length ? 20 : 6,
+                  backgroundColor: i === slideIndex % mediaItems.length ? 'rgba(251,191,36,0.8)' : 'rgba(255,255,255,0.25)',
+                }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Content ── */}
+      <div
+        className="relative z-10 h-full flex flex-col items-center justify-center pb-20 text-center"
+        style={{ paddingTop: 'calc(var(--header-height, 64px) + 1rem)' }}
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/img/hero-poster-mobile.webp')" }}
-        />
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          disablePictureInPicture
-          poster="/img/hero-poster-mobile.webp"
-          className={`w-full h-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
-          onCanPlay={() => {
-            if (videoReadyTimeout.current !== null) {
-              window.clearTimeout(videoReadyTimeout.current);
-            }
-            videoReadyTimeout.current = window.setTimeout(() => {
-              setVideoReady(true);
-              videoReadyTimeout.current = null;
-            }, 1200);
-          }}
-        >
-          <source src="/videos/hero-orbita-mobile.mp4" type="video/mp4" />
-        </video>
-
-        {/* Enhanced gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/80 via-zinc-950/60 to-zinc-950" />
-        <div className="absolute inset-0 bg-gradient-to-t from-amber-950/20 via-transparent to-transparent" />
-
-        {/* Vignette effect */}
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/60" />
-
-        {/* Particles */}
-        <ParticlesBackground />
-      </motion.div>
-
-      {/* Content with Parallax */}
-      <motion.div 
-        className="relative z-10 h-full flex flex-col items-center justify-start pb-28 text-center"
-        style={{
-          y: contentY,
-          opacity: contentOpacity,
-          paddingTop: 'calc(var(--header-height) + 1.5rem)',
-        }}
-      >
-        <div className="w-full max-w-md px-6 mx-auto text-center">
+        <div className="w-full max-w-md px-6 mx-auto">
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="mb-5"
           >
-            <AnimatedBadge />
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.08] border border-white/10 text-white/70 text-xs font-medium tracking-wide uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              {t('badges.halloween', { year: new Date().getFullYear() })}
+            </span>
           </motion.div>
 
-          {/* Main Title - ENHANCED */}
+          {/* Title */}
           <motion.h1
-            initial={{ opacity: 0, y: 40, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.7, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(2.35rem,11vw,3rem)] leading-[1.05] font-black text-white mt-6 mb-6 text-center"
-            style={{
-              textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.2)',
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(2.2rem,10vw,2.8rem)] leading-[1.05] font-black text-white mb-5"
+            style={{ textShadow: '0 4px 30px rgba(0,0,0,0.7)' }}
           >
             {t('title')}
-            <br />
             <MorphingText />
           </motion.h1>
 
-          {/* Subtitle - ENHANCED */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            className="mb-8 max-w-sm mx-auto"
+            transition={{ delay: 0.6, duration: 0.4 }}
+            className="text-base text-white/75 mb-6 max-w-xs mx-auto font-light"
+            style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}
           >
-            <p className="text-lg text-white/80 mb-2 font-medium">
-              {t('subtitle')}
-            </p>
-            <div className="flex items-center justify-center gap-2 text-amber-400/90">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm font-semibold">{t('location')}</span>
-            </div>
-          </motion.div>
+            {t('subtitle')}
+          </motion.p>
 
           {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.8 }}
-          >
-            <FloatingCTAs />
-          </motion.div>
+          <FloatingCTAs />
 
-          {/* Social Proof - ENHANCED */}
+          {/* Social proof */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6, duration: 0.8 }}
-            className="mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.5 }}
+            className="mt-5"
           >
-            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
-              <div className="flex items-center gap-1">
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
+              <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <motion.svg
-                    key={`star-${i}`}
-                    className="w-5 h-5 text-amber-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.55 + i * 0.08, duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-                  >
+                  <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </motion.svg>
+                  </svg>
                 ))}
               </div>
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-sm">5.0</span>
-                <span className="text-white/60 text-xs">{t('socialProof')}</span>
-              </div>
+              <span className="text-white font-bold text-sm">5.0</span>
+              <span className="text-white/50 text-xs">{t('socialProof')}</span>
             </div>
           </motion.div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Scroll Indicator */}
-      <ScrollIndicator />
-
-      {/* Gradient fade at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
+      {/* Scroll indicator */}
+      {!reduceMotion && <ScrollIndicator />}
     </section>
   );
 }

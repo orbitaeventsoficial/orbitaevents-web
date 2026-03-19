@@ -81,8 +81,15 @@ function AmbientParticles({ particles }: { particles: ParticleData[] }) {
         <motion.div
           key={i}
           className="absolute rounded-full"
-          style={{ width: p.w, height: p.h, left: p.left, top: p.top, background: p.color }}
-          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0, 0.7, 0] }}
+          style={{
+            width: p.w,
+            height: p.h,
+            left: p.left,
+            top: p.top,
+            background: p.color,
+            boxShadow: `0 0 ${p.w * 3}px ${p.color}`,
+          }}
+          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.15, 0.9, 0.15] }}
           transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
         />
       ))}
@@ -173,21 +180,21 @@ export default function HeroElegant() {
 
   // Partícules memoitzades — es generen un sol cop
   const particles = useMemo<ParticleData[]>(() =>
-    Array.from({ length: 14 }, (_, i) => {
-      const size = 2 + (i % 4) * 1.2;
+    Array.from({ length: 16 }, (_, i) => {
+      const size = 3 + (i % 5) * 1.5;
       return {
         w: size, h: size,
-        left: `${(i * 7.1) % 100}%`,
-        top: `${(i * 7.3 + 10) % 100}%`,
+        left: `${(i * 6.25) % 100}%`,
+        top: `${(i * 6.1 + 5) % 100}%`,
         color: i % 3 === 0
-          ? 'rgba(251, 191, 36, 0.6)'
+          ? 'rgba(251, 191, 36, 0.8)'
           : i % 3 === 1
-            ? 'rgba(251, 191, 36, 0.35)'
-            : 'rgba(255, 255, 255, 0.25)',
-        dy: 40 + (i % 5) * 15,
-        dx: ((i % 3) - 1) * 12,
-        dur: 6 + (i % 4) * 2,
-        del: (i % 6) * 1.2,
+            ? 'rgba(251, 191, 36, 0.5)'
+            : 'rgba(255, 255, 255, 0.4)',
+        dy: 50 + (i % 5) * 18,
+        dx: ((i % 3) - 1) * 15,
+        dur: 5 + (i % 4) * 2,
+        del: (i % 8) * 0.8,
       };
     }),
   []);
