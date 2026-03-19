@@ -425,7 +425,7 @@ function MobileFooter() {
   ].filter(Boolean) as { name: string; url: string; icon: string }[];
 
   return (
-    <footer className="py-8 px-6 pb-24 border-t border-white/10">
+    <footer className="py-8 px-6 pb-32 border-t border-white/10">
       <div className="text-center">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-4">

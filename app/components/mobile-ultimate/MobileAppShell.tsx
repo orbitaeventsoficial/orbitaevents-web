@@ -283,6 +283,7 @@ export default function MobileAppShell({
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
   const scrollRaf = useRef<number | null>(null);
+  const lastToggleTime = useRef(0);
 
   useEffect(() => {
     document.body.classList.add('mobile-experience-active');
@@ -332,15 +333,32 @@ export default function MobileAppShell({
         const currentScrollY = window.scrollY || 0;
         setScrollY(currentScrollY);
 
-                const scrollDiff = currentScrollY - lastScrollY.current;
+        const scrollDiff = currentScrollY - lastScrollY.current;
         const isNearTop = currentScrollY < 72;
 
-        if (isNearTop) {
-          setIsHeaderVisible(true);
-        } else if (scrollDiff > 18 && currentScrollY > 144) {
+        // Detect near-bottom: always show header to prevent trembling from elastic bounce
+        const docHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const isNearBottom = currentScrollY + viewportHeight >= docHeight - 150;
+
+        // Debounce: prevent toggling more than once per 200ms
+        const now = Date.now();
+        const canToggle = now - lastToggleTime.current > 200;
+
+        if (isNearTop || isNearBottom) {
+          if (!isHeaderVisible && canToggle) {
+            setIsHeaderVisible(true);
+            lastToggleTime.current = now;
+          } else if (!isHeaderVisible) {
+            // Force show even without debounce at boundaries
+            setIsHeaderVisible(true);
+          }
+        } else if (scrollDiff > 30 && currentScrollY > 144 && canToggle) {
           setIsHeaderVisible(false);
-        } else if (scrollDiff < -12) {
+          lastToggleTime.current = now;
+        } else if (scrollDiff < -12 && canToggle) {
           setIsHeaderVisible(true);
+          lastToggleTime.current = now;
         }
 
         lastScrollY.current = currentScrollY;
@@ -349,7 +367,7 @@ export default function MobileAppShell({
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       if (scrollRaf.current !== null) {
@@ -357,7 +375,7 @@ export default function MobileAppShell({
         scrollRaf.current = null;
       }
     };
-  }, []);
+  }, [isHeaderVisible]);
 
   // Configurar viewport per a safe areas (sense bloquejar zoom per accessibilitat)
   useEffect(() => {

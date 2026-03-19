@@ -66,6 +66,8 @@ type FormData = {
   name: string;
   email: string;
   phone: string;
+  dni: string;
+  address: string;
   source: string;
   eventType: string;
   eventDate: string;
@@ -80,6 +82,8 @@ const INITIAL_FORM: FormData = {
   name: '',
   email: '',
   phone: '',
+  dni: '',
+  address: '',
   source: 'PHONE',
   eventType: 'OTHER',
   eventDate: '',
@@ -169,6 +173,13 @@ export default function IntakePage() {
     setError(null);
 
     try {
+      // Prepend DNI/address to message so data is captured
+      const extraParts: string[] = [];
+      if (form.dni.trim()) extraParts.push(`DNI/NIF/CIF: ${form.dni.trim()}`);
+      if (form.address.trim()) extraParts.push(`Adreça: ${form.address.trim()}`);
+      const baseMessage = form.message.trim();
+      const fullMessage = [...extraParts, baseMessage].filter(Boolean).join('\n') || undefined;
+
       const body: Record<string, unknown> = {
         name: form.name.trim(),
         email: form.email.trim(),
@@ -179,7 +190,7 @@ export default function IntakePage() {
         eventLocation: form.eventLocation.trim() || undefined,
         guestCount: form.guestCount ? parseInt(form.guestCount, 10) : undefined,
         budget: form.budget.trim() || undefined,
-        message: form.message.trim() || undefined,
+        message: fullMessage,
         priority: form.priority,
       };
 
@@ -196,10 +207,13 @@ export default function IntakePage() {
 
       const data = await res.json();
       setSuccess({ id: data.lead.id, name: data.lead.name });
+      toast.success(`Entrada creada per a ${data.lead.name}`);
       setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
       setDuplicates([]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconegut');
+      const msg = err instanceof Error ? err.message : 'Error desconegut';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -363,6 +377,28 @@ export default function IntakePage() {
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+            />
+          </div>
+          <div>
+            <label htmlFor="intake-dni" className="text-xs">DNI / NIF / CIF</label>
+            <input
+              id="intake-dni"
+              type="text"
+              value={form.dni}
+              onChange={(e) => updateField('dni', e.target.value.toUpperCase())}
+              placeholder="12345678A / B12345678"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="intake-address" className="text-xs">Adreça</label>
+            <input
+              id="intake-address"
+              type="text"
+              value={form.address}
+              onChange={(e) => updateField('address', e.target.value)}
+              placeholder="Carrer, número, CP, ciutat"
               className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             />
           </div>
