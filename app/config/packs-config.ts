@@ -283,7 +283,7 @@ const PACKS: PackDefinition[] = [
     priceValue: 1000,
     features: [
       "DJ + TÈCNIC DE LLUMS (2 persones, 6 hores)",
-      "Música en cada moment: còctel, banquet, entregues, regals i ball",
+      "Música en cada moment: entrada nuvis, passes de plats i begudes, pastís, entregues, regals, sortida i entrada al ball, sessió completa",
       "So audiòfil 4000W EV ETX 2000W",
       "Show de llums sincronitzat (4 caps mòbils 150W LED)",
       "Efecte màquina de fum baix (Ball entre núvols)",
