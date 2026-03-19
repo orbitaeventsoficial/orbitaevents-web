@@ -107,15 +107,16 @@ export default function HeroElegant() {
 
         {/* Active slide */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={`${currentItem.id}-${slideIndex}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: currentItem.type === 'video' && !videoReady ? 0 : 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute inset-0"
-          >
-            {currentItem.type === 'video' ? (
+          {currentItem.type === 'video' ? (
+            <motion.div
+              key={`${currentItem.id}-${slideIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-0"
+            >
+              {/* Vídeo completament ocult fins onCanPlay — inline style síncron */}
               <video
                 key={currentItem.url}
                 autoPlay
@@ -126,12 +127,25 @@ export default function HeroElegant() {
                 disableRemotePlayback
                 disablePictureInPicture
                 className="w-full h-full object-cover"
-                style={{ filter: 'brightness(0.45) saturate(1.2)' }}
+                style={{
+                  opacity: videoReady ? 1 : 0,
+                  transition: 'opacity 0.8s ease',
+                  filter: 'brightness(0.45) saturate(1.2)',
+                }}
                 onCanPlay={handleVideoReady}
               >
                 <source src={currentItem.url} type="video/mp4" />
               </video>
-            ) : (
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`${currentItem.id}-${slideIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-0"
+            >
               <motion.div
                 className="absolute inset-0"
                 animate={
@@ -156,8 +170,8 @@ export default function HeroElegant() {
                   quality={85}
                 />
               </motion.div>
-            )}
-          </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Cinematic overlays */}
@@ -213,7 +227,7 @@ export default function HeroElegant() {
             >
               {t('title1')}
               <br />
-              <span className="relative inline-block mt-1 md:mt-3">
+              <span className="relative block mt-1 md:mt-3 h-[1.1em]">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={textIndex}
@@ -221,7 +235,7 @@ export default function HeroElegant() {
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     exit={reduceMotion ? undefined : { opacity: 0, y: -12, filter: 'blur(8px)' }}
                     transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                    className="inline-block bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_2px_20px_rgba(251,191,36,0.3)]"
+                    className="absolute left-0 top-0 whitespace-nowrap bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_2px_20px_rgba(251,191,36,0.3)]"
                   >
                     {rotatingTexts[textIndex]}
                   </motion.span>
