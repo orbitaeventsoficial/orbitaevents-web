@@ -1815,39 +1815,42 @@
       "recommendedFor": "Recomendado para",
       "packs": {
         "bodas-basico": {
-          "name": "Essential (Baile Final)",
-          "tagline": "Tu fiesta final, exactamente como la imaginas",
+          "name": "Básico (Baile)",
+          "tagline": "El baile de tu boda, con sonido y luces profesionales",
           "features": {
-            "f1": "DJ profesional 3 horas (Solo baile final)",
-            "f2": "Sonido PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
-            "f3": "Iluminación de pista (Multiefectos LED + 2x Focos Bash LED)",
+            "f1": "DJ profesional 2 horas (baile final)",
+            "f2": "Sonido PRO 4000W EV",
+            "f3": "Iluminación básica (multiefectos LED + focos LED)",
             "f4": "Máquina de humo",
             "f5": "Montaje y desmontaje incluidos"
           },
-          "ideal": "Bodas con baile final"
+          "ideal": "Bodas — baile final"
         },
         "bodas-premium": {
-          "name": "Signature (Día Completo)",
-          "tagline": "Vivimos tu boda contigo desde el primer momento",
+          "name": "Premium (Baile + Espectáculo)",
+          "tagline": "Baile con espectáculo de luces y efectos que marcan la diferencia",
           "features": {
-            "f1": "DJ profesional 5 horas (Ceremonia, Cóctel, Baile)",
-            "f2": "Sonido PRO 4000W + Pioneer DDJ REV7",
-            "f3": "Iluminación PRO: 4 Cabezas Móviles 150W LED",
-            "f4": "Iluminación ambiental (Bolas LED)",
-            "f5": "Máquina de humo"
+            "f1": "DJ profesional 3 horas",
+            "f2": "Sonido PRO 4000W EV + controladora Pioneer",
+            "f3": "Iluminación PRO (4 cabezas móviles + multiefectos)",
+            "f4": "Cabina DJ ampliada",
+            "f5": "Máquina de humo",
+            "f6": "Montaje y desmontaje incluidos"
           },
-          "ideal": "Bodas de día completo"
+          "ideal": "Bodas — baile + espectáculo"
         },
         "bodas-luxury": {
-          "name": "Royal Wedding (Full FX)",
-          "tagline": "La experiencia VIP que tus invitados jamás olvidarán",
+          "name": "Exclusivo (Día Completo)",
+          "tagline": "Ceremonia, banquete y baile — todo el día contigo",
           "features": {
             "f1": "DJ + TÉCNICO DE LUCES (2 personas, 6 horas)",
-            "f2": "Sonido audiófilo 4000W EV ETX 2000W",
-            "f3": "Show de luces sincronizado (4 Cabezas Móviles 150W LED)",
-            "f4": "Efecto máquina de humo bajo (Baile en las nubes)"
+            "f2": "Música ceremonia + cóctel + banquete + baile",
+            "f3": "Sonido audiófilo 4000W EV ETX 2000W",
+            "f4": "Show de luces sincronizado (4 cabezas móviles 150W LED)",
+            "f5": "Efecto máquina de humo bajo (Baile en las nubes)",
+            "f6": "Montaje y desmontaje incluidos"
           },
-          "ideal": "Bodas VIP"
+          "ideal": "Bodas — día completo"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",

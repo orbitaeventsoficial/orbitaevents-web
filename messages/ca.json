@@ -1460,39 +1460,42 @@
       "recommendedFor": "Recomanat per a",
       "packs": {
         "bodas-basico": {
-          "name": "Essential (Ball Final)",
-          "tagline": "La teva festa final, exactament com la imagines",
+          "name": "Bàsic (Ball)",
+          "tagline": "El ball del teu casament, amb so i llums professionals",
           "features": {
-            "f1": "DJ professional 3 hores (Només ball final)",
-            "f2": "So PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
-            "f3": "Il·luminació de pista (Multiefectes LED + 2x Focus Bash LED)",
+            "f1": "DJ professional 2 hores (ball final)",
+            "f2": "So PRO 4000W EV",
+            "f3": "Il·luminació bàsica (multiefectes LED + focus LED)",
             "f4": "Màquina de fum",
             "f5": "Muntatge i desmuntatge inclosos"
           },
-          "ideal": "Casaments amb ball final"
+          "ideal": "Casaments — ball final"
         },
         "bodas-premium": {
-          "name": "Signature (Dia Complet)",
-          "tagline": "Vivim el teu casament amb tu des del primer moment",
+          "name": "Premium (Ball + Espectacle)",
+          "tagline": "Ball amb espectacle de llums i efectes que marquen la diferència",
           "features": {
-            "f1": "DJ professional 5 hores (Cerimònia, Còctel, Ball)",
-            "f2": "So PRO 4000W + Pioneer DDJ REV7",
-            "f3": "Il·luminació PRO: 4 caps mòbils 150W LED",
-            "f4": "Il·luminació ambiental (Boles LED)",
-            "f5": "Màquina de fum"
+            "f1": "DJ professional 3 hores",
+            "f2": "So PRO 4000W EV + controladora Pioneer",
+            "f3": "Il·luminació PRO (4 caps mòbils + multiefectes)",
+            "f4": "Cabina DJ ampliada",
+            "f5": "Màquina de fum",
+            "f6": "Muntatge i desmuntatge inclosos"
           },
-          "ideal": "Casaments dia complet"
+          "ideal": "Casaments — ball + espectacle"
         },
         "bodas-luxury": {
-          "name": "Royal Wedding (Full FX)",
-          "tagline": "L'experiència VIP que els teus convidats no oblidaran",
+          "name": "Exclusiu (Dia Complet)",
+          "tagline": "Cerimònia, banquet i ball — tot el dia amb tu",
           "features": {
             "f1": "DJ + TÈCNIC DE LLUMS (2 persones, 6 hores)",
-            "f2": "So audiòfil 4000W EV ETX 2000W",
-            "f3": "Show de llums sincronitzat (4 caps mòbils 150W LED)",
-            "f4": "Efecte màquina de fum baix (Ball entre núvols)"
+            "f2": "Música cerimònia + còctel + banquet + ball",
+            "f3": "So audiòfil 4000W EV ETX 2000W",
+            "f4": "Show de llums sincronitzat (4 caps mòbils 150W LED)",
+            "f5": "Efecte màquina de fum baix (Ball entre núvols)",
+            "f6": "Muntatge i desmuntatge inclosos"
           },
-          "ideal": "Casaments VIP"
+          "ideal": "Casaments — dia complet"
         },
         "empresas-cocktail": {
           "name": "Corporate Cocktail",
