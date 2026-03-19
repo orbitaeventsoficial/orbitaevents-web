@@ -3,7 +3,7 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { trackCTAClick } from '@/app/lib/analytics';
 
@@ -14,7 +14,6 @@ interface HeroMediaItem {
   label: string;
 }
 
-// Fallback fins que l'API respongui (imatges alta resolució)
 const FALLBACK: HeroMediaItem[] = [
   { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo' },
   { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil' },
@@ -24,16 +23,16 @@ const FALLBACK: HeroMediaItem[] = [
   { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses' },
 ];
 
-const IMAGE_DURATION = 6000;
-const VIDEO_MIN_DURATION = 8000;
+const IMAGE_DURATION = 7000;
+const VIDEO_MIN_DURATION = 10000;
 
-// Ken Burns per imatges
+// Ken Burns — zoom in suau, cada direcció diferent
 const KB = [
-  { x: [0, -1.5], y: [0, -1], scale: [0.92, 1.0] },
-  { x: [0, 1.5], y: [0, -0.5], scale: [0.93, 1.0] },
-  { x: [0, -1], y: [0, 1], scale: [0.91, 1.0] },
-  { x: [0, 1], y: [0, -1.5], scale: [0.92, 1.0] },
-  { x: [0, -0.5], y: [0, 0.5], scale: [0.93, 1.0] },
+  { x: [0, -1.5], y: [0, -1],   scale: [0.95, 1.02] },
+  { x: [0, 1.5],  y: [0, -0.5], scale: [0.96, 1.01] },
+  { x: [0, -1],   y: [0, 1],    scale: [0.94, 1.02] },
+  { x: [0, 1],    y: [0, -1.5], scale: [0.95, 1.01] },
+  { x: [0, -0.5], y: [0, 0.5],  scale: [0.96, 1.02] },
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -45,6 +44,64 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// ─── Staggered word reveal ───────────────────────────────────────────────────
+function StaggeredWords({ text, delay = 0 }: { text: string; delay?: number }) {
+  const words = text.split(' ');
+  return (
+    <>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{
+            duration: 0.6,
+            delay: delay + i * 0.08,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="inline-block mr-[0.25em]"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </>
+  );
+}
+
+// ─── Floating ambient particles ──────────────────────────────────────────────
+function AmbientParticles() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {[...Array(20)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: Math.random() * 3 + 1,
+            height: Math.random() * 3 + 1,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            background: i % 3 === 0
+              ? 'rgba(251, 191, 36, 0.4)'
+              : 'rgba(255, 255, 255, 0.15)',
+          }}
+          animate={{
+            y: [0, -(30 + Math.random() * 40)],
+            x: [0, (Math.random() - 0.5) * 20],
+            opacity: [0, 0.8, 0],
+          }}
+          transition={{
+            duration: 6 + Math.random() * 6,
+            repeat: Infinity,
+            delay: Math.random() * 8,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
   const rotatingTexts = t.raw('rotatingTexts') as string[];
@@ -52,7 +109,15 @@ export default function HeroElegant() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
   const [videoReady, setVideoReady] = useState(false);
+  const [entered, setEntered] = useState(false);
   const reduceMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Entrance sequence
+  useEffect(() => {
+    const t = setTimeout(() => setEntered(true), 300);
+    return () => clearTimeout(t);
+  }, []);
 
   // Fetch media from API + shuffle
   useEffect(() => {
@@ -78,13 +143,11 @@ export default function HeroElegant() {
   // Rotate slides
   useEffect(() => {
     if (mediaItems.length <= 1) return;
-
     const duration = currentItem?.type === 'video' ? VIDEO_MIN_DURATION : IMAGE_DURATION;
     const timer = setTimeout(() => {
       setSlideIndex((prev) => (prev + 1) % mediaItems.length);
       setVideoReady(false);
     }, duration);
-
     return () => clearTimeout(timer);
   }, [slideIndex, mediaItems, currentItem?.type]);
 
@@ -94,18 +157,19 @@ export default function HeroElegant() {
 
   return (
     <section
+      ref={sectionRef}
       aria-label="Hero"
-      className="relative min-h-[100svh] flex items-end overflow-hidden"
+      className="relative min-h-[100svh] flex items-end overflow-hidden bg-black"
     >
-      {/* ── Background — mixed media ── */}
+      {/* ── Background media ── */}
       <div className="absolute inset-0" aria-hidden="true">
-        {/* Poster fallback */}
+        {/* Poster — primer frame mentre carrega */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/img/hero-poster.webp')" }}
         />
 
-        {/* Active slide — crossfade (no mode="wait") per evitar gap on es veu el poster */}
+        {/* Slides — crossfade simultani */}
         <AnimatePresence>
           {currentItem.type === 'video' ? (
             <motion.div
@@ -113,10 +177,9 @@ export default function HeroElegant() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 1.6, ease: [0.4, 0, 0.2, 1] }}
               className="absolute inset-0"
             >
-              {/* Vídeo completament ocult fins onCanPlay — inline style síncron */}
               <video
                 key={currentItem.url}
                 autoPlay
@@ -129,8 +192,8 @@ export default function HeroElegant() {
                 className="w-full h-full object-cover"
                 style={{
                   opacity: videoReady ? 1 : 0,
-                  transition: 'opacity 0.8s ease',
-                  filter: 'brightness(0.45) saturate(1.2)',
+                  transition: 'opacity 1s ease',
+                  filter: 'brightness(0.4) saturate(1.15)',
                 }}
                 onCanPlay={handleVideoReady}
               >
@@ -143,7 +206,7 @@ export default function HeroElegant() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 1.6, ease: [0.4, 0, 0.2, 1] }}
               className="absolute inset-0"
             >
               <motion.div
@@ -151,11 +214,7 @@ export default function HeroElegant() {
                 animate={
                   reduceMotion
                     ? {}
-                    : {
-                        x: kbDir.x,
-                        y: kbDir.y,
-                        scale: kbDir.scale,
-                      }
+                    : { x: kbDir.x, y: kbDir.y, scale: kbDir.scale }
                 }
                 transition={{ duration: IMAGE_DURATION / 1000, ease: 'linear' }}
               >
@@ -164,7 +223,7 @@ export default function HeroElegant() {
                   alt={currentItem.label}
                   fill
                   className="object-cover"
-                  style={{ filter: 'brightness(0.45) saturate(1.2)' }}
+                  style={{ filter: 'brightness(0.4) saturate(1.15)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
                   quality={85}
@@ -174,12 +233,38 @@ export default function HeroElegant() {
           )}
         </AnimatePresence>
 
-        {/* Cinematic overlays */}
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-amber-950/10 to-transparent" />
+        {/* ── Cinematic grade ── */}
+        {/* Base darkness */}
+        <div className="absolute inset-0 bg-black/30" />
+
+        {/* Bottom gradient — contingut llegible */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+        {/* Left gradient — text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+
+        {/* Warm tone a baix */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-amber-950/15 to-transparent" />
+
+        {/* Vignette subtil */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)',
+          }}
+        />
+
+        {/* Film grain */}
+        <div
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
       </div>
+
+      {/* ── Ambient particles ── */}
+      {!reduceMotion && <AmbientParticles />}
 
       {/* ── Slide indicators ── */}
       {mediaItems.length > 1 && (
@@ -189,17 +274,22 @@ export default function HeroElegant() {
               key={i}
               onClick={() => { setSlideIndex(i); setVideoReady(false); }}
               aria-label={`Slide ${i + 1}`}
-              className="group relative h-6 flex items-center cursor-pointer"
+              className="group relative h-8 flex items-center cursor-pointer"
             >
               <div
-                className="h-[2px] rounded-full transition-all duration-500 bg-white/20 group-hover:bg-white/40"
-                style={{ width: i === slideIndex % mediaItems.length ? 28 : 8 }}
+                className="h-[2px] rounded-full transition-all duration-500"
+                style={{
+                  width: i === slideIndex % mediaItems.length ? 32 : 8,
+                  backgroundColor: i === slideIndex % mediaItems.length
+                    ? 'rgba(255,255,255,0.3)'
+                    : 'rgba(255,255,255,0.15)',
+                }}
               />
               {i === slideIndex % mediaItems.length && (
                 <motion.div
                   className="absolute left-0 h-[2px] rounded-full bg-amber-400"
                   initial={{ width: 0 }}
-                  animate={{ width: 28 }}
+                  animate={{ width: 32 }}
                   transition={{
                     duration: (currentItem?.type === 'video' ? VIDEO_MIN_DURATION : IMAGE_DURATION) / 1000,
                     ease: 'linear',
@@ -213,65 +303,107 @@ export default function HeroElegant() {
       )}
 
       {/* ── Content ── */}
-      <div className="relative z-10 w-full pb-24 md:pb-32 pt-40">
+      <div className="relative z-10 w-full pb-20 md:pb-28 lg:pb-32 pt-40">
         <div className="container mx-auto px-6 md:px-8 lg:px-12">
           <div className="max-w-3xl">
 
-            {/* Title */}
-            <motion.h1
-              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+            {/* Badge */}
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[2.5rem] leading-[0.9] md:text-6xl lg:text-7xl xl:text-[5.2rem] font-black text-white tracking-[-0.03em]"
-              style={{ textShadow: '0 4px 40px rgba(0,0,0,0.5)' }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-6 md:mb-8"
             >
-              {t('title1')}
-              <br />
-              <span className="relative block mt-1 md:mt-3 h-[1.1em]">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={textIndex}
-                    initial={reduceMotion ? false : { opacity: 0, y: 20, filter: 'blur(12px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    exit={reduceMotion ? undefined : { opacity: 0, y: -12, filter: 'blur(8px)' }}
-                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute left-0 top-0 whitespace-nowrap bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_2px_20px_rgba(251,191,36,0.3)]"
-                  >
-                    {rotatingTexts[textIndex]}
-                  </motion.span>
-                </AnimatePresence>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-white/70 text-xs md:text-sm font-medium tracking-wide uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                {t('badge')}
               </span>
-            </motion.h1>
+            </motion.div>
+
+            {/* Title — staggered word reveal */}
+            <h1
+              className="text-[2.5rem] leading-[0.95] md:text-6xl lg:text-7xl xl:text-[5.2rem] font-black text-white tracking-[-0.03em]"
+              style={{ textShadow: '0 4px 60px rgba(0,0,0,0.6)' }}
+            >
+              {reduceMotion ? (
+                <>
+                  {t('title1')}
+                  <br />
+                  <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                    {rotatingTexts[textIndex]}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <StaggeredWords text={t('title1')} delay={0.4} />
+                  <br />
+                  <span className="relative block mt-2 md:mt-4 h-[1.15em]">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={textIndex}
+                        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
+                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute left-0 top-0 whitespace-nowrap bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent"
+                        style={{ textShadow: 'none' }}
+                      >
+                        {rotatingTexts[textIndex]}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>
+                </>
+              )}
+            </h1>
 
             {/* Subtitle */}
             <motion.p
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="text-base md:text-lg lg:text-xl text-white/75 mt-5 md:mt-7 max-w-lg leading-relaxed font-light"
+              transition={{ duration: 0.7, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="text-base md:text-lg lg:text-xl text-white/65 mt-5 md:mt-7 max-w-lg leading-relaxed font-light"
               style={{ textShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
             >
               {t('subtitle')}
             </motion.p>
 
-            {/* CTA */}
+            {/* CTAs */}
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 md:mt-10"
+              transition={{ duration: 0.6, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-wrap items-center gap-4 mt-8 md:mt-10"
             >
+              {/* Primary CTA */}
               <Link
                 href="/configurador"
                 onClick={() => trackCTAClick('hero_configurator_primary', 'hero_elegant')}
-                className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 md:px-10 md:py-5 rounded-2xl transition-transform hover:scale-[1.03] active:scale-[0.98]"
+                className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 md:px-10 md:py-5 rounded-2xl transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
               >
-                <div className="absolute -inset-2 bg-amber-500/25 rounded-3xl blur-2xl group-hover:bg-amber-500/35 transition-colors duration-500" />
+                {/* Glow */}
+                <div className="absolute -inset-3 bg-amber-500/20 rounded-3xl blur-2xl group-hover:bg-amber-500/30 transition-colors duration-700" />
+                {/* Gradient bg */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 bg-[length:200%_100%] rounded-2xl animate-[shimmer_3s_ease-in-out_infinite]" />
+                {/* Shine on hover */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
                 <span className="relative z-10 text-zinc-900 font-black text-base md:text-lg">
                   {t('ctaConfigurator')}
                 </span>
                 <svg className="relative z-10 w-5 h-5 text-zinc-900 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+
+              {/* Secondary CTA */}
+              <Link
+                href="/portfolio"
+                onClick={() => trackCTAClick('hero_portfolio_secondary', 'hero_elegant')}
+                className="group inline-flex items-center gap-2 px-6 py-4 md:px-8 md:py-5 rounded-2xl border border-white/10 hover:border-white/20 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm transition-all duration-300"
+              >
+                <span className="text-white font-semibold text-base md:text-lg">
+                  {t('ctaPrices')}
+                </span>
+                <svg className="w-4 h-4 text-white/60 group-hover:text-amber-400 group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
@@ -281,42 +413,47 @@ export default function HeroElegant() {
             <motion.div
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1.5 }}
-              className="flex items-center gap-5 mt-8 md:mt-10"
+              transition={{ duration: 0.8, delay: 1.8 }}
+              className="flex flex-wrap items-center gap-4 md:gap-5 mt-8 md:mt-10"
             >
+              {/* Stars */}
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
                 <span className="text-white font-bold text-sm">{t('rating')}</span>
               </div>
-              <span className="w-px h-3.5 bg-white/40" />
-              <span className="text-white font-medium text-sm">{t('socialProof')}</span>
-              <span className="w-px h-3.5 bg-white/40 hidden sm:block" />
-              <span className="text-white font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
+              <span className="w-px h-4 bg-white/20" />
+              <span className="text-white/80 font-medium text-sm">{t('socialProof')}</span>
+              <span className="w-px h-4 bg-white/20 hidden sm:block" />
+              <span className="text-white/80 font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
             </motion.div>
 
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* ── Scroll indicator ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.5 }}
-        transition={reduceMotion ? { duration: 0 } : { delay: 2.5, duration: 0.8 }}
+        transition={reduceMotion ? { duration: 0 } : { delay: 3, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
       >
         <motion.div
           animate={reduceMotion ? {} : { y: [0, 6, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-5 h-8 border border-white/25 rounded-full flex justify-center pt-1.5"
+          className="w-5 h-9 border border-white/20 rounded-full flex justify-center pt-2"
         >
-          <div className="w-1 h-1.5 bg-amber-400 rounded-full" />
+          <motion.div
+            animate={reduceMotion ? {} : { opacity: [1, 0.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-1 h-2 bg-amber-400/80 rounded-full"
+          />
         </motion.div>
       </motion.div>
     </section>
