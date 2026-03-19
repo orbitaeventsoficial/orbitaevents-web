@@ -3383,11 +3383,20 @@ async function main() {
   console.log('═══════════════════════════════════════════════════════════════\n');
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Error en el seed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+export { main as seedBlog };
+
+// Execució directa com a script (npx tsx prisma/seed-blog.ts)
+const isDirectRun = typeof require !== 'undefined'
+  ? require.main === module
+  : typeof process !== 'undefined' && process.argv[1]?.includes('seed-blog');
+
+if (isDirectRun) {
+  main()
+    .catch((e) => {
+      console.error('❌ Error en el seed:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
