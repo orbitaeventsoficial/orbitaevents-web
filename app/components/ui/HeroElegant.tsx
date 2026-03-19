@@ -110,9 +110,9 @@ export default function HeroElegant() {
           <motion.div
             key={`${currentItem.id}-${slideIndex}`}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: currentItem.type === 'video' && !videoReady ? 0 : 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
             className="absolute inset-0"
           >
             {currentItem.type === 'video' ? (
@@ -125,9 +125,7 @@ export default function HeroElegant() {
                 preload="auto"
                 disableRemotePlayback
                 disablePictureInPicture
-                className={`w-full h-full object-cover transition-opacity duration-700 ${
-                  videoReady ? 'opacity-100' : 'opacity-0'
-                }`}
+                className="w-full h-full object-cover"
                 style={{ filter: 'brightness(0.45) saturate(1.2)' }}
                 onCanPlay={handleVideoReady}
               >
@@ -155,7 +153,7 @@ export default function HeroElegant() {
                   style={{ filter: 'brightness(0.45) saturate(1.2)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
-                  quality={80}
+                  quality={85}
                 />
               </motion.div>
             )}
@@ -282,10 +280,10 @@ export default function HeroElegant() {
                 </div>
                 <span className="text-white font-bold text-sm">{t('rating')}</span>
               </div>
-              <span className="w-px h-3.5 bg-white/25" />
-              <span className="text-white/70 text-sm">{t('socialProof')}</span>
-              <span className="w-px h-3.5 bg-white/25 hidden sm:block" />
-              <span className="text-white/70 text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
+              <span className="w-px h-3.5 bg-white/40" />
+              <span className="text-white font-medium text-sm">{t('socialProof')}</span>
+              <span className="w-px h-3.5 bg-white/40 hidden sm:block" />
+              <span className="text-white font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
             </motion.div>
 
           </div>

@@ -159,7 +159,7 @@ export default function CTAFinal() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="flex flex-wrap items-center justify-center gap-6 text-white/80 text-sm mb-6 text-center"
+            className="flex flex-wrap items-center justify-center gap-6 text-white text-sm mb-6 text-center"
           >
             <span className="flex items-center gap-2 justify-center">
               <span className="text-xl">🎯</span>

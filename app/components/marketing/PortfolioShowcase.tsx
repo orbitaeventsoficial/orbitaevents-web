@@ -258,19 +258,25 @@ export default function PortfolioShowcase() {
     const el = scrollRef.current;
     if (!el) return;
 
+    // Calcular ample d'un set de cards (sumant ample+gap de les originals)
+    const cards = el.children;
+    const half = cards.length / 2;
+    let setWidth = 0;
+    for (let c = 0; c < half; c++) {
+      setWidth += (cards[c] as HTMLElement).offsetWidth + 20; // 20 = gap-5 (1.25rem)
+    }
+
     const tick = () => {
       if (!pausedRef.current) {
         const speed = speedRef.current + edgeSpeedRef.current;
-        // La meitat del scrollWidth = ample d'un set complet de cards
-        const halfWidth = el.scrollWidth / 2;
 
         el.scrollLeft += speed;
 
-        // Reset seamless: quan passem el set duplicat, tornem al primer
-        if (el.scrollLeft >= halfWidth) {
-          el.scrollLeft -= halfWidth;
+        // Reset seamless: quan passem el primer set, tornem enrere
+        if (el.scrollLeft >= setWidth) {
+          el.scrollLeft -= setWidth;
         } else if (el.scrollLeft < 0) {
-          el.scrollLeft += halfWidth;
+          el.scrollLeft += setWidth;
         }
       }
       rafRef.current = requestAnimationFrame(tick);

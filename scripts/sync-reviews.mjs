@@ -64,26 +64,41 @@ async function fetchFromSerpAPI() {
       const kg = kgData.knowledge_graph;
       console.log(`[SerpAPI] Encontrado: ${kg.title} (${kg.rating}, ${kg.review_count} reviews)`);
 
-      // Obtener reseñas usando Google Maps Reviews con place_id
-      const reviewsUrl = `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es`;
-      const reviewsRes = await fetch(reviewsUrl);
-      const reviewsData = await reviewsRes.json();
+      // Obtenir TOTES les ressenyes paginant
+      const allReviews = [];
+      let nextPageToken = undefined;
+      let page = 0;
+      const MAX_PAGES = 5;
 
-      if (reviewsData.error) {
-        console.log('[SerpAPI] Error obteniendo resenas:', reviewsData.error);
-        console.log('[SerpAPI] Intentando método alternativo...');
-      }
+      do {
+        const reviewsUrl = nextPageToken
+          ? `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es&sort_by=newestFirst&next_page_token=${nextPageToken}`
+          : `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es&sort_by=newestFirst`;
+        const reviewsRes = await fetch(reviewsUrl);
+        const reviewsData = await reviewsRes.json();
 
-      const reviews = (reviewsData.reviews || []).map(r => ({
-        author_name: r.user?.name || 'Anónimo',
-        rating: r.rating || 5,
-        text: r.snippet || r.text || '',
-        time: r.iso_date ? new Date(r.iso_date).getTime() / 1000 : Date.now() / 1000,
-        relative_time_description: r.date || 'Recientemente',
-        profile_photo_url: r.user?.thumbnail,
-      }));
+        if (reviewsData.error) {
+          console.log('[SerpAPI] Error obteniendo resenas:', reviewsData.error);
+          break;
+        }
 
-      console.log(`[SerpAPI] ${reviews.length} resenas obtenidas`);
+        const pageReviews = (reviewsData.reviews || []).map(r => ({
+          author_name: r.user?.name || 'Anónimo',
+          rating: r.rating || 5,
+          text: r.snippet || r.text || '',
+          time: r.iso_date ? new Date(r.iso_date).getTime() / 1000 : Date.now() / 1000,
+          relative_time_description: r.date || 'Recientemente',
+          profile_photo_url: r.user?.thumbnail,
+        }));
+        allReviews.push(...pageReviews);
+
+        nextPageToken = reviewsData.serpapi_pagination?.next_page_token;
+        page++;
+        console.log(`[SerpAPI] Pàgina ${page}: ${pageReviews.length} ressenyes`);
+      } while (nextPageToken && page < MAX_PAGES);
+
+      const reviews = allReviews;
+      console.log(`[SerpAPI] ${reviews.length} resenas totals obtenidas`);
 
       return {
         rating: kg.rating || 5,
