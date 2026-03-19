@@ -25,9 +25,9 @@ const SETTING_KEY = 'config.heroMedia';
 const DEFAULT_MEDIA: HeroMedia[] = [
   { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo original', active: true, sortOrder: 0 },
   { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil', active: true, sortOrder: 1 },
-  { id: 'img-bodas-01', url: '/img/portfolio/bodas/bodas-01.avif', type: 'image', label: 'Bodes', active: true, sortOrder: 2 },
+  { id: 'img-bodas-04', url: '/img/portfolio/bodas/bodas-04.avif', type: 'image', label: 'Bodes', active: true, sortOrder: 2 },
   { id: 'img-halloween-01', url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', type: 'image', label: 'Halloween', active: true, sortOrder: 3 },
-  { id: 'img-magic-01', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif', type: 'image', label: 'Món Màgic', active: true, sortOrder: 4 },
+  { id: 'img-magic-05', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif', type: 'image', label: 'Món Màgic', active: true, sortOrder: 4 },
   { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses', active: true, sortOrder: 5 },
 ];
 

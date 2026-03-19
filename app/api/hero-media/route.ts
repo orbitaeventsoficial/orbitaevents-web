@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { listActiveHeroMedia } from '@/lib/services/heroVideoService';
 
-export const revalidate = 300; // 5 min cache
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const media = await listActiveHeroMedia();
