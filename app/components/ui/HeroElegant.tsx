@@ -232,9 +232,9 @@ export default function HeroElegant() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-white/70 text-sm font-medium">{t('rating')}</span>
-                <span className="text-white/15">|</span>
-                <span className="text-white/40 text-sm">{t('socialProof')}</span>
+                <span className="text-white/90 text-sm font-medium">{t('rating')}</span>
+                <span className="text-white/30">|</span>
+                <span className="text-white/70 text-sm">{t('socialProof')}</span>
               </div>
             </StaggerItem>
           </div>
