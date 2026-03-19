@@ -106,14 +106,18 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const fetchPipeline = useCallback(async () => {
     try {
       const qs = filterQuery ? `&${filterQuery}` : '';
-      const res = await fetchWithCsrf(`/api/admin/leads?limit=500&pipeline=true${qs}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Error carregant pipeline');
+      const res = await fetchWithCsrf(`/api/admin/leads?limit=500&pipeline=true${qs}`);
+      if (!res.ok) {
+        const errorBody = await res.text().catch(() => '');
+        console.error(`Pipeline error ${res.status}:`, errorBody);
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
     } catch (err) {
       console.error('Error carregant pipeline', err);
-      toast.error('Error carregant el pipeline');
+      toast.error(`Error carregant el pipeline: ${err instanceof Error ? err.message : 'desconegut'}`);
     } finally {
       setLoading(false);
     }

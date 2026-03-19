@@ -282,6 +282,7 @@ export async function fetchWithCsrf(
 
   return fetch(url, {
     ...options,
+    credentials: options.credentials || 'include',
     headers,
   });
 }
