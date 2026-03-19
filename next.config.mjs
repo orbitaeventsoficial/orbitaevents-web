@@ -4,7 +4,9 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  compress: true,
 
   eslint: {
     // Detectar errores durante el build para mantener calidad de codigo
@@ -99,6 +101,37 @@ const nextConfig = {
         source: '/video/:path*',
         headers: [
           ...securityHeaders,
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Cache agresivo per videos carpeta /videos/
+      {
+        source: '/videos/:path*',
+        headers: [
+          ...securityHeaders,
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Cache agresivo per totes les imatges
+      {
+        source: '/img/:path*',
+        headers: [
+          ...securityHeaders,
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Cache per fonts
+      {
+        source: '/fonts/:path*',
+        headers: [
+          ...securityHeaders,
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Cache per assets estàtics de Next.js
+      {
+        source: '/_next/static/:path*',
+        headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },

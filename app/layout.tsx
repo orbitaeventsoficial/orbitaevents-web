@@ -88,6 +88,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Preconnect — redueix latència DNS+TLS per recursos externs */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://region1.analytics.google.com" />
+      </head>
       <body
         className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning

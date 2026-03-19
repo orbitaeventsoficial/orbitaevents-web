@@ -128,21 +128,21 @@ function ReviewCard({ review }: { review: GoogleReview }) {
         <Icons.Quote />
       </div>
 
-      {/* Header */}
-      <div className="flex items-start gap-5 mb-6">
+      {/* Header — estil Google Reviews */}
+      <div className="flex items-start gap-4 mb-5" style={{ fontFamily: 'Roboto, "Google Sans", system-ui, sans-serif' }}>
         {/* Avatar */}
-        <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex-shrink-0 ring-2 ring-amber-500/20">
+        <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex-shrink-0">
           {profile_photo_url ? (
             <Image
               src={profile_photo_url}
               alt={author_name}
               fill
-              sizes="64px"
+              sizes="48px"
               quality={60}
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white">
+            <div className="w-full h-full flex items-center justify-center text-lg font-medium text-white">
               {author_name.charAt(0)}
             </div>
           )}
@@ -150,20 +150,22 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-black text-white text-xl mb-2">{author_name}</h4>
-          <div className="flex items-center gap-3 mb-2">
+          <h4 className="font-medium text-white text-base leading-tight">{author_name}</h4>
+          <div className="flex items-center gap-2 mt-1">
             <RatingStars rating={rating} animate />
+            <span className="text-sm text-white/50">{relative_time_description}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Icons.Google />
-            <span className="text-sm text-white/60">{relative_time_description}</span>
-          </div>
+        </div>
+
+        {/* Google icon */}
+        <div className="flex-shrink-0">
+          <Icons.Google />
         </div>
       </div>
 
-      {/* Text */}
-      <blockquote className="relative text-white/90 text-xl md:text-2xl font-light italic leading-relaxed">
-        &ldquo;{text}&rdquo;
+      {/* Text — estil Google: normal weight, no italic */}
+      <blockquote className="relative text-white/85 text-base md:text-lg leading-relaxed" style={{ fontFamily: 'Roboto, "Google Sans", system-ui, sans-serif' }}>
+        {text}
       </blockquote>
     </motion.div>
   );

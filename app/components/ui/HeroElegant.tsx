@@ -28,11 +28,11 @@ const VIDEO_MIN_DURATION = 10000;
 
 // Ken Burns — zoom in suau, cada direcció diferent
 const KB = [
-  { x: [0, -1],   y: [0, -0.5], scale: [0.88, 0.95] },
-  { x: [0, 1],    y: [0, -0.5], scale: [0.89, 0.95] },
-  { x: [0, -0.5], y: [0, 0.5],  scale: [0.87, 0.94] },
-  { x: [0, 0.5],  y: [0, -1],   scale: [0.88, 0.95] },
-  { x: [0, -0.5], y: [0, 0.5],  scale: [0.89, 0.95] },
+  { x: [0, -1],   y: [0, -0.5], scale: [0.93, 1.02] },
+  { x: [0, 1],    y: [0, -0.5], scale: [0.94, 1.02] },
+  { x: [0, -0.5], y: [0, 0.5],  scale: [0.92, 1.01] },
+  { x: [0, 0.5],  y: [0, -1],   scale: [0.93, 1.02] },
+  { x: [0, -0.5], y: [0, 0.5],  scale: [0.94, 1.02] },
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -76,7 +76,7 @@ interface ParticleData {
 
 function AmbientParticles({ particles }: { particles: ParticleData[] }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[6]" aria-hidden="true">
       {particles.map((p, i) => (
         <motion.div
           key={i}
@@ -173,21 +173,21 @@ export default function HeroElegant() {
 
   // Partícules memoitzades — es generen un sol cop
   const particles = useMemo<ParticleData[]>(() =>
-    Array.from({ length: 24 }, (_, i) => {
-      const size = 1 + (i % 4) * 0.8;
+    Array.from({ length: 14 }, (_, i) => {
+      const size = 2 + (i % 4) * 1.2;
       return {
         w: size, h: size,
-        left: `${(i * 4.17) % 100}%`,
-        top: `${(i * 7.3 + 20) % 100}%`,
-        color: i % 4 === 0
-          ? 'rgba(251, 191, 36, 0.35)'
-          : i % 4 === 1
-            ? 'rgba(251, 191, 36, 0.15)'
-            : 'rgba(255, 255, 255, 0.12)',
-        dy: 30 + (i % 5) * 12,
-        dx: ((i % 3) - 1) * 10,
-        dur: 7 + (i % 4) * 2,
-        del: (i % 6) * 1.5,
+        left: `${(i * 7.1) % 100}%`,
+        top: `${(i * 7.3 + 10) % 100}%`,
+        color: i % 3 === 0
+          ? 'rgba(251, 191, 36, 0.6)'
+          : i % 3 === 1
+            ? 'rgba(251, 191, 36, 0.35)'
+            : 'rgba(255, 255, 255, 0.25)',
+        dy: 40 + (i % 5) * 15,
+        dx: ((i % 3) - 1) * 12,
+        dur: 6 + (i % 4) * 2,
+        del: (i % 6) * 1.2,
       };
     }),
   []);
@@ -237,10 +237,10 @@ export default function HeroElegant() {
       {/* ── Background media — amb parallax ── */}
       <motion.div className="absolute inset-0" style={{ y: reduceMotion ? 0 : bgY }} aria-hidden="true">
         {/* Poster — primer frame mentre carrega */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
-          style={{ backgroundImage: "url('/img/hero-poster.webp')" }}
-        />
+        <div className="absolute inset-0 bg-black flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/orbitalockupwhite.svg" alt="Òrbita Events" className="w-48 h-48 md:w-64 md:h-64 opacity-30" />
+        </div>
 
         {/* Slides — crossfade simultani */}
         <AnimatePresence>
@@ -259,14 +259,14 @@ export default function HeroElegant() {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="metadata"
                 disableRemotePlayback
                 disablePictureInPicture
                 className="w-full h-full object-cover"
                 style={{
                   opacity: videoReady ? 1 : 0,
                   transition: 'opacity 1s ease',
-                  filter: 'saturate(1.1)',
+                  filter: 'brightness(0.6) saturate(1.1)',
                 }}
                 onCanPlay={handleVideoReady}
               >
@@ -296,7 +296,7 @@ export default function HeroElegant() {
                   alt={currentItem.label}
                   fill
                   className="object-cover"
-                  style={{ filter: 'saturate(1.1)' }}
+                  style={{ filter: 'brightness(0.6) saturate(1.1)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
                   quality={85}

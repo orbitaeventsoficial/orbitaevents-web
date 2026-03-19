@@ -81,23 +81,28 @@ const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedB
   loading: () => <SectionSkeleton />,
 });
 const StatsSection = dynamic(() => import('@/app/components/marketing/StatsSection'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const ProcessSection = dynamic(() => import('@/app/components/marketing/ProcessSection'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const PortfolioShowcase = dynamic(() => import('@/app/components/marketing/PortfolioShowcase'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
   loading: () => <SectionSkeleton />,
-});
+}); // SSR per SEO (FAQ schema)
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), {
   loading: () => <HeroSkeleton />,
 });
