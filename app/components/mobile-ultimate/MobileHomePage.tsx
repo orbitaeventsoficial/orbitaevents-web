@@ -50,65 +50,6 @@ const HeroPortalLogo = dynamic(
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// QUICK FEATURES SECTION
-// ═══════════════════════════════════════════════════════════════════════════
-
-function QuickFeatures() {
-  const t = useTranslations('mobileHome.quickFeatures');
-  const reduceMotion = useReducedMotion();
-
-  const features = [
-    { icon: '💍', titleKey: 'bodas.title', descKey: 'bodas.desc', gradient: 'from-amber-400 to-orange-500' },
-    { icon: '🎃', titleKey: 'halloween.title', descKey: 'halloween.desc', gradient: 'from-orange-500 to-red-500' },
-    { icon: '🪄', titleKey: 'monMagic.title', descKey: 'monMagic.desc', gradient: 'from-purple-500 to-pink-500' },
-    { icon: '🎵', titleKey: 'djPro.title', descKey: 'djPro.desc', gradient: 'from-amber-500 to-orange-500' },
-  ];
-
-  return (
-    <section className="py-10 px-6 relative">
-      {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-[100px]" />
-
-      <div className="relative grid grid-cols-2 gap-4">
-        {features.map((feature, i) => (
-          <motion.div
-            key={feature.titleKey}
-            initial={reduceMotion ? false : { opacity: 0, y: 30, scale: 0.8 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={reduceMotion ? { duration: 0 } : { delay: i * 0.08, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            whileTap={{ scale: 0.95 }}
-            className="relative group p-5 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden"
-          >
-            {/* Hover glow effect */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-active:opacity-20 transition-opacity`} />
-
-            {/* Shine effect */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-              animate={reduceMotion ? { x: 0, opacity: 0 } : { x: ['-100%', '200%'] }}
-              transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
-            />
-
-            <div className="relative">
-              <motion.span
-                className="text-4xl block mb-3"
-                animate={reduceMotion ? { rotate: 0 } : { rotate: [0, 5, -5, 0] }}
-                transition={reduceMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
-              >
-                {feature.icon}
-              </motion.span>
-              <h3 className="text-white font-black text-base mb-1">{t(feature.titleKey)}</h3>
-              <p className="text-white/60 text-xs leading-tight">{t(feature.descKey)}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
 // GUARANTEE SECTION
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -177,32 +118,12 @@ function GuaranteeSection() {
               className="relative group"
             >
               <div className="relative flex items-start gap-4 p-5 rounded-3xl bg-gradient-to-r from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden">
-                {/* Animated gradient background */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-r ${guarantee.gradient} opacity-0 group-active:opacity-10 transition-opacity`}
-                />
+                {/* Tap glow */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${guarantee.gradient} opacity-0 group-active:opacity-10 transition-opacity`} />
 
-                {/* Shine effect */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                  animate={reduceMotion ? { x: 0, opacity: 0 } : { x: ['-100%', '200%'] }}
-                  transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'linear', delay: i * 1 }}
-                />
+                <div className="text-4xl flex-shrink-0">{guarantee.icon}</div>
 
-                <div className="relative">
-                  <motion.div
-                    animate={reduceMotion ? { scale: 1, rotate: 0 } : {
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 10, -10, 0],
-                    }}
-                    transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, delay: i * 0.5 }}
-                    className="text-4xl"
-                  >
-                    {guarantee.icon}
-                  </motion.div>
-                </div>
-
-                <div className="relative flex-1">
+                <div className="flex-1">
                   <h3 className="text-white font-black text-lg mb-1">
                     {t(guarantee.titleKey)}
                   </h3>
@@ -623,9 +544,6 @@ export default function MobileHomePage() {
         <MobileAppShell showSplash={false}>
           {/* Hero */}
           <MobileHeroUltimate />
-
-          {/* Quick Features */}
-          <QuickFeatures />
 
           {/* Stats animats — per què triar Òrbita */}
           <MobileStatsSection />

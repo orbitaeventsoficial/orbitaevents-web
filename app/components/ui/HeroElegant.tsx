@@ -76,7 +76,7 @@ interface ParticleData {
 
 function AmbientParticles({ particles }: { particles: ParticleData[] }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[6]" aria-hidden="true">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[8]" aria-hidden="true">
       {particles.map((p, i) => (
         <motion.div
           key={i}
@@ -335,8 +335,8 @@ export default function HeroElegant() {
       {/* ── Cursor glow ── */}
       {!reduceMotion && <CursorGlow containerRef={sectionRef} />}
 
-      {/* ── Ambient particles ── */}
-      {!reduceMotion && <AmbientParticles particles={particles} />}
+      {/* ── Ambient particles — sempre visibles ── */}
+      <AmbientParticles particles={particles} />
 
       {/* ── Slide indicators ── */}
       {mediaItems.length > 1 && (
