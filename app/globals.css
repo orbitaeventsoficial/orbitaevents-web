@@ -2377,11 +2377,7 @@ html.admin-mode .admin-shell .admin-tasks-action {
   color: var(--at-gold-text);
 }
 
-/* ── 19. BOOKINGS STATS ──────────────────────────────────────────────────── */
-html.admin-mode .admin-shell .admin-bookings-stat--pending   { background: color-mix(in oklab, var(--at-orange) 16%, var(--at-panel) 84%); border-color: var(--at-orange); }
-html.admin-mode .admin-shell .admin-bookings-stat--confirmed { background: color-mix(in oklab, var(--at-blue) 16%, var(--at-panel) 84%); border-color: var(--at-blue); }
-html.admin-mode .admin-shell .admin-bookings-stat--completed { background: color-mix(in oklab, var(--at-green) 16%, var(--at-panel) 84%); border-color: var(--at-green); }
-html.admin-mode .admin-shell .admin-bookings-stat--cancelled { background: color-mix(in oklab, var(--at-red) 14%, var(--at-panel) 86%); border-color: var(--at-red); }
+/* ── 19. BOOKINGS STATS — controlat per admin-theme.css ────────────────── */
 
 /* Priority badges */
 html.admin-mode .admin-shell .admin-priority-urgent,

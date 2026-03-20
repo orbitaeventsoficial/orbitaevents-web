@@ -89,7 +89,7 @@ function AmbientParticles({ particles }: { particles: ParticleData[] }) {
             background: p.color,
             boxShadow: `0 0 ${p.w * 4}px ${p.color}, 0 0 ${p.w * 8}px ${p.color.replace(/[\d.]+\)$/, '0.3)')}`,
           }}
-          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.25, 1, 0.25] }}
+          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.1, 0.6, 0.1] }}
           transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
         />
       ))}
@@ -179,27 +179,30 @@ export default function HeroElegant() {
   const contentY = useTransform(scrollYProgress, [0, 0.5], ['0px', '60px']);
 
   // Partícules memoitzades — es generen un sol cop
-  const particles = useMemo<ParticleData[]>(() =>
-    Array.from({ length: 28 }, (_, i) => {
-      const size = 4 + (i % 5) * 2;
+  // Seeded pseudo-random per posicions naturals però deterministes
+  const particles = useMemo<ParticleData[]>(() => {
+    const seed = (n: number) => ((n * 9301 + 49297) % 233280) / 233280;
+    return Array.from({ length: 24 }, (_, i) => {
+      const r = seed(i);
+      const size = 3 + r * 6;
       return {
         w: size, h: size,
-        left: `${(i * 3.57) % 100}%`,
-        top: `${(i * 3.5 + 8) % 100}%`,
+        left: `${seed(i * 7 + 1) * 100}%`,
+        top: `${seed(i * 13 + 3) * 100}%`,
         color: i % 4 === 0
-          ? 'rgba(251, 191, 36, 1)'
+          ? 'rgba(251, 191, 36, 0.45)'
           : i % 4 === 1
-            ? 'rgba(251, 191, 36, 0.7)'
+            ? 'rgba(251, 191, 36, 0.3)'
             : i % 4 === 2
-              ? 'rgba(255, 255, 255, 0.6)'
-              : 'rgba(251, 146, 60, 0.8)',
-        dy: 60 + (i % 5) * 22,
-        dx: ((i % 5) - 2) * 18,
-        dur: 6 + (i % 4) * 2.5,
-        del: (i % 10) * 0.7,
+              ? 'rgba(255, 255, 255, 0.25)'
+              : 'rgba(251, 146, 60, 0.35)',
+        dy: 40 + seed(i * 3) * 80,
+        dx: (seed(i * 5) - 0.5) * 40,
+        dur: 3 + seed(i * 11) * 4,
+        del: seed(i * 17) * 6,
       };
-    }),
-  []);
+    });
+  }, []);
 
   // Fetch media from API + shuffle
   useEffect(() => {

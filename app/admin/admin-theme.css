@@ -49,16 +49,17 @@ html.admin-mode {
 
 
 /* ─── Shell chrome ──────────────────────────────────────────────────────── */
-html.admin-mode .admin-mobile-header,
-html.admin-mode .admin-desktop-header,
-html.admin-mode .admin-bottom-nav {
+/* Especificitat (0,3,1) per guanyar globals.css (0,2,1) en qualsevol ordre de chunks */
+html.admin-mode .admin-layout-shell .admin-mobile-header,
+html.admin-mode .admin-layout-shell .admin-desktop-header,
+html.admin-mode .admin-layout-shell .admin-bottom-nav {
   background: var(--at-surface);
   border-color: var(--at-border);
 }
 
 /* ═══ SIDEBAR PREMIUM — Glass + Gradient ═══ */
-html.admin-mode .admin-sidebar,
-html.admin-mode .admin-mobile-sidebar {
+html.admin-mode .admin-layout-shell .admin-sidebar,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar {
   background: var(--at-glass-bg);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
@@ -76,7 +77,7 @@ html.admin-mode .admin-main-shell > .card {
 }
 
 /* admin-card-glass — used across all admin pages for glass morphism cards */
-html.admin-mode .admin-card-glass {
+html.admin-mode .admin-layout-shell .admin-card-glass {
   background: var(--at-glass-bg);
   border-color: var(--at-glass-border);
   box-shadow: var(--at-shadow-sm);
@@ -84,7 +85,7 @@ html.admin-mode .admin-card-glass {
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-html.admin-mode .admin-card-glass:hover {
+html.admin-mode .admin-layout-shell .admin-card-glass:hover {
   box-shadow: var(--at-shadow-md);
   border-color: var(--at-border-strong);
 }
