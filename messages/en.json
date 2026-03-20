@@ -296,6 +296,7 @@
       "ctaPrices": "See what we do",
       "rating": "5.0",
       "socialProof": "50+ events held",
+      "exclusivity": "Only 1 event per day — total dedication",
       "responseLabel": "response",
       "recommendedAt": "Recommended in",
       "whatsappMessage": "Hello! I want information for a thematic event"
@@ -440,7 +441,7 @@
       "tematiques": {
         "title": "Thematic Experiences",
         "description": "Harry Potter, Halloween and more",
-        "price": "From €600",
+        "price": "€600 – €1,500",
         "badge": "⭐ Most requested",
         "features": [
           "Decoration",
@@ -452,7 +453,7 @@
       "casaments": {
         "title": "Wedding",
         "description": "The most special day deserves to be perfect",
-        "price": "From €550",
+        "price": "€550 – €1,200",
         "features": [
           "Professional DJ",
           "Sound + Lights",
@@ -462,7 +463,7 @@
       "festes": {
         "title": "Private Parties",
         "description": "The party they will always remember",
-        "price": "From €250",
+        "price": "€250 – €600",
         "features": [
           "Discommobile",
           "LED lights",
@@ -473,7 +474,7 @@
       "empreses": {
         "title": "Companies",
         "description": "Impact corporate events",
-        "price": "From €400",
+        "price": "€400 – €900",
         "features": [
           "Audiovisual",
           "wireless microphone",
@@ -6347,7 +6348,7 @@
         "title": "halloween",
         "subtitle": "nights of terror",
         "description": "Full decoration, theme DJ, FX effects",
-        "price": "From €600",
+        "price": "€600 – €1,500",
         "badge": "🔥 Season {year}",
         "features": {
           "0": "giant ghosts",
@@ -6359,7 +6360,7 @@
         "title": "Magic World",
         "subtitle": "magic school",
         "description": "Envelopes with sealing wax, floating candles, setting",
-        "price": "From €600",
+        "price": "€600 – €1,500",
         "badge": "✨ Unique experience",
         "features": {
           "0": "Handmade sealing wax",
@@ -6371,7 +6372,7 @@
         "title": "Wedding",
         "subtitle": "your perfect day",
         "description": "Professional DJ, sound, lights, coordination",
-        "price": "From €550",
+        "price": "€550 – €1,200",
         "badge": "",
         "features": {
           "0": "DJPro",
@@ -6383,7 +6384,7 @@
         "title": "Parties",
         "subtitle": "Birthdays and more",
         "description": "Complete mobile disco with everything included",
-        "price": "From €250",
+        "price": "€250 – €600",
         "badge": "",
         "features": {
           "0": "LED lights",
@@ -6395,7 +6396,7 @@
         "title": "Companies",
         "subtitle": "Corporate events",
         "description": "Audiovisual, branding, invoice",
-        "price": "From €400",
+        "price": "€400 – €900",
         "badge": "",
         "features": {
           "0": "wireless microphone",

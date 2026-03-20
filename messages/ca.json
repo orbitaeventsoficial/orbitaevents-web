@@ -296,6 +296,7 @@
       "ctaPrices": "Mira què fem",
       "rating": "5.0",
       "socialProof": "50+ esdeveniments realitzats",
+      "exclusivity": "Només 1 event per dia — dedicació total",
       "responseLabel": "resposta",
       "recommendedAt": "Recomanats a",
       "whatsappMessage": "Hola! Vull info per a un esdeveniment temàtic"
@@ -418,7 +419,7 @@
       "tematiques": {
         "title": "Experiències Temàtiques",
         "description": "Harry Potter, Halloween i més",
-        "price": "Des de 600€",
+        "price": "600 – 1.500€",
         "badge": "⭐ El més demanat",
         "features": [
           "Decoració",
@@ -430,7 +431,7 @@
       "casaments": {
         "title": "Casaments",
         "description": "El dia més especial mereix ser perfecte",
-        "price": "Des de 550€",
+        "price": "550 – 1.200€",
         "features": [
           "DJ Professional",
           "So + Llums",
@@ -440,7 +441,7 @@
       "festes": {
         "title": "Festes Privades",
         "description": "La festa que recordaran sempre",
-        "price": "Des de 250€",
+        "price": "250 – 600€",
         "features": [
           "Discomòbil",
           "Llums LED",
@@ -451,7 +452,7 @@
       "empreses": {
         "title": "Empreses",
         "description": "Events corporatius d'impacte",
-        "price": "Des de 400€",
+        "price": "400 – 900€",
         "features": [
           "Audiovisual",
           "Micro sense fil",
@@ -6599,7 +6600,7 @@
         "title": "Halloween",
         "subtitle": "Nits de terror",
         "description": "Decoració completa, DJ temàtic, efectes FX",
-        "price": "Des de 600€",
+        "price": "600 – 1.500€",
         "badge": "🔥 Temporada {year}",
         "features": {
           "0": "Fantasmes gegants",
@@ -6611,7 +6612,7 @@
         "title": "Món Màgic",
         "subtitle": "Escola de màgia",
         "description": "Sobres amb lacre, veles flotants, ambientació",
-        "price": "Des de 600€",
+        "price": "600 – 1.500€",
         "badge": "✨ Experiència única",
         "features": {
           "0": "Lacre artesanal",
@@ -6623,7 +6624,7 @@
         "title": "Casaments",
         "subtitle": "El teu dia perfecte",
         "description": "DJ professional, so, llums, coordinació",
-        "price": "Des de 550€",
+        "price": "550 – 1.200€",
         "badge": "",
         "features": {
           "0": "DJ Pro",
@@ -6635,7 +6636,7 @@
         "title": "Festes",
         "subtitle": "Aniversaris i més",
         "description": "Discomòbil complet amb tot inclòs",
-        "price": "Des de 250€",
+        "price": "250 – 600€",
         "badge": "",
         "features": {
           "0": "Llums LED",
@@ -6647,7 +6648,7 @@
         "title": "Empreses",
         "subtitle": "Events corporatius",
         "description": "Audiovisual, branding, factura",
-        "price": "Des de 400€",
+        "price": "400 – 900€",
         "badge": "",
         "features": {
           "0": "Micro sense fil",

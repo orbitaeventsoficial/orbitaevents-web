@@ -296,6 +296,7 @@
       "ctaPrices": "Mira qué hacemos",
       "rating": "5.0",
       "socialProof": "50+ eventos realizados",
+      "exclusivity": "Solo 1 evento por día — dedicación total",
       "responseLabel": "respuesta",
       "recommendedAt": "Recomendados en",
       "whatsappMessage": "¡Hola! Quiero info para un evento temático"
@@ -440,7 +441,7 @@
       "tematiques": {
         "title": "Experiencias Temáticas",
         "description": "Harry Potter, Halloween y más",
-        "price": "Desde 600€",
+        "price": "600 – 1.500€",
         "badge": "⭐ Lo más pedido",
         "features": [
           "Decoración",
@@ -452,7 +453,7 @@
       "casaments": {
         "title": "Bodas",
         "description": "El día más especial merece ser perfecto",
-        "price": "Desde 550€",
+        "price": "550 – 1.200€",
         "features": [
           "DJ Profesional",
           "Sonido + Luces",
@@ -462,7 +463,7 @@
       "festes": {
         "title": "Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
-        "price": "Desde 250€",
+        "price": "250 – 600€",
         "features": [
           "Discomóvil",
           "Luces LED",
@@ -473,7 +474,7 @@
       "empreses": {
         "title": "Empresas",
         "description": "Eventos corporativos de impacto",
-        "price": "Desde 400€",
+        "price": "400 – 900€",
         "features": [
           "Audiovisual",
           "Micro inalámbrico",
@@ -6347,7 +6348,7 @@
         "title": "Halloween",
         "subtitle": "Noches de terror",
         "description": "Decoración completa, DJ temático, efectos FX",
-        "price": "Desde 600€",
+        "price": "600 – 1.500€",
         "badge": "🔥 Temporada {year}",
         "features": {
           "0": "Fantasmas gigantes",
@@ -6359,7 +6360,7 @@
         "title": "Mundo Mágico",
         "subtitle": "Escuela de magia",
         "description": "Sobres con lacre, velas flotantes, ambientación",
-        "price": "Desde 600€",
+        "price": "600 – 1.500€",
         "badge": "✨ Experiencia única",
         "features": {
           "0": "Lacre artesanal",
@@ -6371,7 +6372,7 @@
         "title": "Bodas",
         "subtitle": "Tu día perfecto",
         "description": "DJ profesional, sonido, luces, coordinación",
-        "price": "Desde 550€",
+        "price": "550 – 1.200€",
         "badge": "",
         "features": {
           "0": "DJ Pro",
@@ -6383,7 +6384,7 @@
         "title": "Fiestas",
         "subtitle": "Cumpleaños y más",
         "description": "Discomóvil completo con todo incluido",
-        "price": "Desde 250€",
+        "price": "250 – 600€",
         "badge": "",
         "features": {
           "0": "Luces LED",
@@ -6395,7 +6396,7 @@
         "title": "Empresas",
         "subtitle": "Eventos corporativos",
         "description": "Audiovisual, branding, factura",
-        "price": "Desde 400€",
+        "price": "400 – 900€",
         "badge": "",
         "features": {
           "0": "Micro inalámbrico",

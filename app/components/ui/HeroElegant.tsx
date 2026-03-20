@@ -516,6 +516,11 @@ export default function HeroElegant() {
               </span>
               <span className="w-px h-4 bg-white/20 hidden sm:block" />
               <span className="text-white/80 font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
+              <span className="w-px h-4 bg-white/20 hidden md:block" />
+              <span className="text-amber-400/90 font-semibold text-sm hidden md:inline-flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline-block"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                {t('exclusivity')}
+              </span>
             </motion.div>
 
           </div>
