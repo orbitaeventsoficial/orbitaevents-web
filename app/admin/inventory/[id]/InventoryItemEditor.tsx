@@ -8,36 +8,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
-
-const CATEGORIES = [
-  { value: 'SOUND', label: 'So', icon: '🔊' },
-  { value: 'LIGHTING', label: 'Il·luminació', icon: '💡' },
-  { value: 'EFFECTS', label: 'Efectes', icon: '✨' },
-  { value: 'STRUCTURE', label: 'Estructura', icon: '🏗️' },
-  { value: 'CABLING', label: 'Cablejat', icon: '🔌' },
-  { value: 'TECH', label: 'Tecnologia', icon: '💻' },
-  { value: 'DECORATION_HP', label: 'Deco HP', icon: '🎃' },
-  { value: 'DECORATION_HW', label: 'Deco HW', icon: '🎄' },
-  { value: 'DECORATION_GEN', label: 'Deco General', icon: '🎨' },
-  { value: 'CONSUMABLE', label: 'Consumibles', icon: '📦' },
-];
-
-const CONDITIONS = [
-  { value: 'NEW', label: 'Nou' },
-  { value: 'EXCELLENT', label: 'Excel·lent' },
-  { value: 'GOOD', label: 'Bo' },
-  { value: 'FAIR', label: 'Acceptable' },
-  { value: 'POOR', label: 'Dolent' },
-];
-
-const STATUSES = [
-  { value: 'AVAILABLE', label: 'Disponible' },
-  { value: 'IN_USE', label: 'En ús' },
-  { value: 'MAINTENANCE', label: 'Manteniment' },
-  { value: 'BROKEN', label: 'Avariat' },
-  { value: 'RETIRED', label: 'Retirat' },
-];
+import { DEFAULT_EXPECTED_LIFE_HOURS, INVENTORY_CATEGORY_OPTIONS, INVENTORY_CONDITION_OPTIONS, INVENTORY_STATUS_OPTIONS } from '@/lib/constants';
 
 interface ItemData {
   id: string;
@@ -199,7 +170,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <div>
             <label className="text-xs">Estat</label>
             <div className="mt-1 flex gap-1.5 flex-wrap">
-              {STATUSES.map((s) => (
+              {INVENTORY_STATUS_OPTIONS.map((s) => (
                 <button
                   key={s.value}
                   type="button"
@@ -235,7 +206,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
               onChange={(e) => updateField('category', e.target.value)}
               className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
             >
-              {CATEGORIES.map((cat) => (
+              {INVENTORY_CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat.value} value={cat.value}>
                   {cat.icon} {cat.label}
                 </option>
@@ -245,7 +216,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
           <div>
             <label className="text-xs">Condició</label>
             <div className="mt-1 flex gap-1.5">
-              {CONDITIONS.map((c) => (
+              {INVENTORY_CONDITION_OPTIONS.map((c) => (
                 <button
                   key={c.value}
                   type="button"
@@ -413,4 +384,6 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
     </div>
   );
 }
+
+
 

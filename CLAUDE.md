@@ -411,3 +411,9 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - **Sentry**: Integrat a next.config.mjs
 - **Analytics**: GA4 amb WebVitalsReporter, ConsentScripts
 - **Crons**: `lead-cleanup` (auto-LOST + auto-DELETE), emails automation, reviews sync — tots amb Bearer auth CRON_SECRET
+
+## Monocapa admin
+
+- Si una opció, label, ordre, badge o estat apareix a més d'un component admin, s'ha de moure a lib/constants/index.ts o lib/constants/privacy.ts.
+- Els components d'admin han de consumir la capa comuna; no han de recrear arrays locals de STATUS_OPTIONS, SOURCE_OPTIONS, EVENT_TYPES, SECTIONS, STATUS_ORDER o maps equivalents si la dada ja és compartida.
+- Quan es faci una passada d'un bloc d'admin, deixar també entrada breu i neta a docs/diario.md amb el criteri i la validació executada.

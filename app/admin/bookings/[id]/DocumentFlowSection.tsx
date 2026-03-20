@@ -18,29 +18,10 @@ interface InvoiceDoc {
   holdedInvoiceUrl: string | null;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// STATUS STYLES
-// ═══════════════════════════════════════════════════════════════════════════
-
 const STEP_STYLES = {
-  done: {
-    card: 'border-emerald-500/40 bg-emerald-500/10',
-    dot: 'bg-emerald-500',
-    label: 'text-emerald-400',
-    badge: 'admin-tone-soft-success border-emerald-500/30',
-  },
-  active: {
-    card: 'border-cyan-500/40 bg-cyan-500/10',
-    dot: 'bg-cyan-500 animate-pulse',
-    label: 'text-cyan-400',
-    badge: 'admin-tone-soft-info border-cyan-500/30',
-  },
-  pending: {
-    card: 'border-white/10 bg-white/[0.02]',
-    dot: 'bg-white/20',
-    label: 'text-white/40',
-    badge: 'bg-white/5 text-white/40 border-white/10',
-  },
+  done: { card: 'ap-card ap-card--success', dot: 'admin-tone-bg-success', label: 'admin-tone-text-success', badge: 'ap-badge ap-badge--success' },
+  active: { card: 'ap-card ap-card--info', dot: 'admin-tone-bg-info', label: 'admin-tone-text-info', badge: 'ap-badge ap-badge--info' },
+  pending: { card: 'ap-card', dot: 'admin-tone-bg-neutral', label: 'admin-tone-text-neutral', badge: 'ap-badge' },
 } as const;
 
 function getStepStyle(done: boolean, active: boolean) {
@@ -50,45 +31,23 @@ function getStepStyle(done: boolean, active: boolean) {
 }
 
 function proposalStatusLabel(status: string) {
-  const map: Record<string, string> = {
-    DRAFT: 'Esborrany', SENT: 'Enviat', VIEWED: 'Visualitzat',
-    ACCEPTED: 'Acceptat', REJECTED: 'Rebutjat', EXPIRED: 'Expirat',
-  };
+  const map: Record<string, string> = { DRAFT: 'Esborrany', SENT: 'Enviat', VIEWED: 'Visualitzat', ACCEPTED: 'Acceptat', REJECTED: 'Rebutjat', EXPIRED: 'Expirat' };
   return map[status] || status;
 }
 
 function contractStatusLabel(status: string | null) {
   if (!status) return 'Pendent';
-  const map: Record<string, string> = {
-    DRAFT: 'Esborrany', SENT: 'Enviat', SIGNED: 'Signat', CANCELLED: 'Cancel\u00B7lat',
-  };
+  const map: Record<string, string> = { DRAFT: 'Esborrany', SENT: 'Enviat', SIGNED: 'Signat', CANCELLED: 'Cancel·lat' };
   return map[status] || status;
 }
 
 function invoiceStatusLabel(status: string) {
-  const map: Record<string, string> = {
-    DRAFT: 'Esborrany', PENDING_SYNC: 'Sincronitzant...',
-    SYNCED: 'Sincronitzada', SYNC_ERROR: 'Error sync',
-    PAID: 'Pagada', CANCELLED: 'Cancel\u00B7lada',
-  };
+  const map: Record<string, string> = { DRAFT: 'Esborrany', PENDING_SYNC: 'Sincronitzant...', SYNCED: 'Sincronitzada', SYNC_ERROR: 'Error sync', PAID: 'Pagada', CANCELLED: 'Cancel·lada' };
   return map[status] || status;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════
-
-export default function DocumentFlowSection({
-  proposals,
-  invoices,
-}: {
-  proposals: ProposalDoc[];
-  invoices: InvoiceDoc[];
-}) {
-  const activeProposal = proposals.find(
-    (p) => p.status === 'ACCEPTED' || p.status === 'SENT'
-  ) || proposals[0];
-
+export default function DocumentFlowSection({ proposals, invoices }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[] }) {
+  const activeProposal = proposals.find((p) => p.status === 'ACCEPTED' || p.status === 'SENT') || proposals[0];
   const activeInvoice = invoices.find((inv) => inv.status !== 'CANCELLED');
 
   const hasProposal = !!activeProposal;
@@ -101,59 +60,24 @@ export default function DocumentFlowSection({
   if (!hasProposal && !hasInvoice) return null;
 
   const steps = [
-    {
-      label: 'Pressupost',
-      icon: '📄',
-      style: getStepStyle(proposalAccepted, hasProposal && !proposalAccepted),
-      ref: activeProposal?.reference,
-      status: activeProposal ? proposalStatusLabel(activeProposal.status) : null,
-      link: activeProposal?.pdfUrl ? { href: activeProposal.pdfUrl, label: 'PDF' } : null,
-      empty: !hasProposal ? 'Sense pressupost' : null,
-    },
-    {
-      label: 'Contracte',
-      icon: '📝',
-      style: getStepStyle(contractSigned, hasContract && !contractSigned),
-      ref: activeProposal?.contractReference,
-      status: hasContract ? contractStatusLabel(activeProposal?.contractStatus ?? null) : null,
-      link: activeProposal?.contractPdfUrl ? { href: activeProposal.contractPdfUrl, label: 'PDF' } : null,
-      empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null,
-    },
-    {
-      label: 'Factura',
-      icon: '🧾',
-      style: getStepStyle(invoicePaid, hasInvoice && !invoicePaid),
-      ref: activeInvoice?.reference,
-      status: activeInvoice ? invoiceStatusLabel(activeInvoice.status) : null,
-      link: activeInvoice?.holdedInvoiceUrl ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded' } : null,
-      empty: !hasInvoice ? 'Sense factura' : null,
-    },
+    { label: 'Pressupost', icon: '📄', style: getStepStyle(proposalAccepted, hasProposal && !proposalAccepted), ref: activeProposal?.reference, status: activeProposal ? proposalStatusLabel(activeProposal.status) : null, link: activeProposal?.pdfUrl ? { href: activeProposal.pdfUrl, label: 'PDF' } : null, empty: !hasProposal ? 'Sense pressupost' : null },
+    { label: 'Contracte', icon: '📝', style: getStepStyle(contractSigned, hasContract && !contractSigned), ref: activeProposal?.contractReference, status: hasContract ? contractStatusLabel(activeProposal?.contractStatus ?? null) : null, link: activeProposal?.contractPdfUrl ? { href: activeProposal.contractPdfUrl, label: 'PDF' } : null, empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null },
+    { label: 'Factura', icon: '🧾', style: getStepStyle(invoicePaid, hasInvoice && !invoicePaid), ref: activeInvoice?.reference, status: activeInvoice ? invoiceStatusLabel(activeInvoice.status) : null, link: activeInvoice?.holdedInvoiceUrl ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded' } : null, empty: !hasInvoice ? 'Sense factura' : null },
   ];
 
-  return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-      <h2 className="text-base font-semibold mb-5 flex items-center gap-2">
-        Flux documental
-      </h2>
+  const progressWidth = invoicePaid ? 'calc(100% - 3rem)' : hasInvoice ? 'calc(83% - 2.5rem)' : contractSigned ? 'calc(67% - 2rem)' : hasContract ? 'calc(50% - 1.5rem)' : proposalAccepted ? 'calc(33% - 1rem)' : hasProposal ? 'calc(16% - 0.5rem)' : '0%';
 
-      {/* Progress bar */}
+  return (
+    <section className="ap-card rounded-2xl p-6">
+      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold">Flux documental</h2>
+
       <div className="relative mb-6">
-        <div className="absolute top-3 left-6 right-6 h-0.5 bg-white/10" />
-        <div
-          className="absolute top-3 left-6 h-0.5 transition-all duration-500"
-          style={{
-            width: invoicePaid ? 'calc(100% - 3rem)' :
-              hasInvoice ? 'calc(83% - 2.5rem)' :
-              contractSigned ? 'calc(67% - 2rem)' :
-              hasContract ? 'calc(50% - 1.5rem)' :
-              proposalAccepted ? 'calc(33% - 1rem)' :
-              hasProposal ? 'calc(16% - 0.5rem)' : '0%'
-          }}
-        />
+        <div className="absolute left-6 right-6 top-3 h-0.5 admin-tone-bg-neutral" />
+        <div className="absolute left-6 top-3 h-0.5 transition-all duration-500 admin-tone-bg-info" style={{ width: progressWidth }} />
         <div className="flex justify-between">
           {steps.map((step, i) => (
-            <div key={i} className="flex flex-col items-center z-10">
-              <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs border-2 border-black ${step.style.dot}`}>
+            <div key={i} className="z-10 flex flex-col items-center">
+              <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-black text-xs ${step.style.dot}`}>
                 {step.style === STEP_STYLES.done ? '✓' : ''}
               </div>
             </div>
@@ -161,51 +85,21 @@ export default function DocumentFlowSection({
         </div>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-3 gap-3">
         {steps.map((step, i) => (
-          <div
-            key={i}
-            className={`rounded-xl border p-3.5 transition-all ${step.style.card}`}
-          >
-            <div className="flex items-center gap-1.5 mb-2">
+          <div key={i} className={`${step.style.card} rounded-xl p-3.5 transition-all`}>
+            <div className="mb-2 flex items-center gap-1.5">
               <span className="text-sm">{step.icon}</span>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider ${step.style.label}`}>
-                {step.label}
-              </p>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider ${step.style.label}`}>{step.label}</p>
             </div>
 
-            {step.ref && (
-              <p className="text-sm font-mono font-semibold truncate">{step.ref}</p>
-            )}
-
-            {step.status && (
-              <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium mt-1.5 ${step.style.badge}`}>
-                {step.status}
-              </span>
-            )}
-
-            {step.empty && (
-              <p className="text-xs text-white/40 mt-1">{step.empty}</p>
-            )}
-
-            {step.link && (
-              <a
-                href={step.link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[10px] font-medium transition-colors mt-2"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                {step.link.label}
-              </a>
-            )}
+            {step.ref && <p className="truncate font-mono text-sm font-semibold">{step.ref}</p>}
+            {step.status && <span className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${step.style.badge}`}>{step.status}</span>}
+            {step.empty && <p className="mt-1 text-xs admin-tone-text-slate">{step.empty}</p>}
+            {step.link && <a href={step.link.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium transition-colors admin-tone-text-info">{step.link.label}</a>}
           </div>
         ))}
       </div>
     </section>
   );
 }
-

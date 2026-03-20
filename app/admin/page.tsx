@@ -7,7 +7,8 @@ import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants'
 import { EVENT_TYPE_LABELS } from '@/lib/constants';
 import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
 import WeatherWidget from './components/WeatherWidget';
-import { LEAD_STATUS_OPTIONS, BOOKING_STATUS_OPTIONS, getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
+import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
+import { LEAD_STATUS_OPTIONS, BOOKING_STATUS_OPTIONS } from '@/lib/constants';
 
 // Removed: all widget components now in lib/dashboard-widgets.tsx
 export const dynamic = 'force-dynamic';
@@ -670,6 +671,7 @@ export default async function AdminDashboard() {
     </div>
   );
 }
+
 
 
 

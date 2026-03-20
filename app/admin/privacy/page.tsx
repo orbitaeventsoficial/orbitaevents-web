@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTime } from '@/lib/constants';
+import { PRIVACY_AUDIT_ACTION_LABELS, PRIVACY_CONSENT_LABELS, PRIVACY_PRIORITY_CONFIG, PRIVACY_REQUEST_STATUS_CONFIG, PRIVACY_REQUEST_TYPE_LABELS } from '@/lib/constants/privacy';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -25,57 +26,6 @@ type DataRequest = {
   customer: { id: string; name: string; email: string } | null;
 };
 
-const REQUEST_TYPE_LABELS: Record<string, string> = {
-  ACCESS: 'Accés',
-  RECTIFICATION: 'Rectificació',
-  ERASURE: 'Supressió',
-  RESTRICTION: 'Limitació',
-  PORTABILITY: 'Portabilitat',
-  OBJECTION: 'Oposició',
-  AUTOMATED: 'Decisions automatitzades',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-amber-500/20', text: 'text-amber-300' },
-  IDENTITY_REQUIRED: { label: 'Identitat pendent', bg: 'bg-orange-500/20', text: 'text-orange-300' },
-  VERIFIED: { label: 'Verificada', bg: 'bg-blue-500/20', text: 'text-blue-300' },
-  IN_PROGRESS: { label: 'En curs', bg: 'bg-cyan-500/20', text: 'text-cyan-300' },
-  COMPLETED: { label: 'Completada', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
-  REJECTED: { label: 'Rebutjada', bg: 'bg-red-500/20', text: 'text-red-300' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-white/10', text: 'text-white/50' },
-};
-
-const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
-  HIGH: { label: 'Alta', color: 'text-red-400' },
-  MEDIUM: { label: 'Mitjana', color: 'text-amber-400' },
-  LOW: { label: 'Baixa', color: 'text-white/50' },
-};
-
-type AuditLog = {
-  id: string;
-  entityType: string;
-  entityId: string;
-  action: string;
-  performedBy: string | null;
-  reason: string | null;
-  legalBasis: string | null;
-  affectedFields: string[];
-  createdAt: string;
-};
-
-const ACTION_LABELS: Record<string, string> = {
-  DATA_ACCESSED: 'Dades consultades',
-  DATA_EXPORTED: 'Dades exportades',
-  DATA_CREATED: 'Dades creades',
-  DATA_UPDATED: 'Dades actualitzades',
-  DATA_DELETED: 'Dades eliminades',
-  DATA_ANONYMIZED: 'Dades anonimitzades',
-  CONSENT_GRANTED: 'Consentiment atorgat',
-  CONSENT_REVOKED: 'Consentiment revocat',
-  ACCOUNT_DELETED: 'Compte eliminat',
-  RETENTION_APPLIED: 'Retenció aplicada',
-};
-
 type ConsentRecord = {
   id: string;
   consentType: string;
@@ -88,18 +38,16 @@ type ConsentRecord = {
   customer: { id: string; name: string; email: string } | null;
 };
 
-const CONSENT_TYPE_LABELS: Record<string, string> = {
-  GDPR_BASIC: 'RGPD Bàsic',
-  MARKETING_EMAIL: 'Màrqueting email',
-  MARKETING_SMS: 'Màrqueting SMS',
-  MARKETING_WHATSAPP: 'Màrqueting WhatsApp',
-  PROFILING: 'Perfilatge',
-  THIRD_PARTY: 'Tercers',
-  COOKIES_ANALYTICS: 'Cookies analítica',
-  COOKIES_MARKETING: 'Cookies màrqueting',
-  COOKIES_FUNCTIONAL: 'Cookies funcionals',
-  TESTIMONIAL_PUBLIC: 'Testimoni públic',
-  PHOTO_USAGE: 'Ús de fotos',
+type AuditLog = {
+  id: string;
+  entityType: string;
+  entityId: string;
+  action: string;
+  performedBy: string | null;
+  reason: string | null;
+  legalBasis: string | null;
+  details: string | null;
+  createdAt: string;
 };
 
 type StatusFilter = 'all' | 'pending' | 'completed';
@@ -290,12 +238,12 @@ export default function AdminPrivacyPage() {
       )}
 
       {/* Page tabs */}
-      <div className="flex gap-2 border-b border-white/10 pb-3">
+      <div className="admin-tone-border-neutral flex gap-2 border-b pb-3">
         <button
           type="button"
           onClick={() => setPageTab('requests')}
           className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
-            pageTab === 'requests' ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+            pageTab === 'requests' ? 'ap-btn ap-btn--primary' : 'ap-btn ap-btn--secondary'
           }`}
         >
           Sol·licituds ARCO
@@ -304,7 +252,7 @@ export default function AdminPrivacyPage() {
           type="button"
           onClick={() => setPageTab('consents')}
           className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
-            pageTab === 'consents' ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+            pageTab === 'consents' ? 'ap-btn ap-btn--primary' : 'ap-btn ap-btn--secondary'
           }`}
         >
           Consentiments
@@ -313,7 +261,7 @@ export default function AdminPrivacyPage() {
           type="button"
           onClick={() => setPageTab('audit')}
           className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
-            pageTab === 'audit' ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+            pageTab === 'audit' ? 'ap-btn ap-btn--primary' : 'ap-btn ap-btn--secondary'
           }`}
         >
           Registre d&apos;auditoria
@@ -360,14 +308,14 @@ export default function AdminPrivacyPage() {
           const isUrgent = daysLeft !== null && daysLeft <= 5;
           const isOverdue = daysLeft !== null && daysLeft < 0;
           const canProcess = r.status === 'VERIFIED';
-          const priorityCfg = PRIORITY_CONFIG[r.priority] || PRIORITY_CONFIG.MEDIUM;
-          const statusCfg = STATUS_CONFIG[r.status] || STATUS_CONFIG.PENDING;
+          const priorityCfg = PRIVACY_PRIORITY_CONFIG[r.priority] || PRIVACY_PRIORITY_CONFIG.MEDIUM;
+          const statusCfg = PRIVACY_REQUEST_STATUS_CONFIG[r.status] || PRIVACY_REQUEST_STATUS_CONFIG.PENDING;
 
           return (
             <div
               key={r.id}
               className={`rounded-2xl border p-5 transition-colors ${
-                isOverdue ? 'border-red-500/30 bg-red-500/5' : isUrgent ? 'border-amber-500/20 bg-amber-500/5' : 'admin-card-glass'
+                isOverdue ? 'admin-tone-border-danger admin-tone-bg-danger' : isUrgent ? 'admin-tone-border-warning admin-tone-bg-warning' : 'admin-card-glass admin-tone-border-neutral admin-tone-bg-neutral'
               }`}
             >
               {/* Header */}
@@ -375,7 +323,7 @@ export default function AdminPrivacyPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-base font-semibold">
-                      {REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
+                      {PRIVACY_REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
                     </span>
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusCfg.bg} ${statusCfg.text}`}>
                       {statusCfg.label}
@@ -401,7 +349,7 @@ export default function AdminPrivacyPage() {
                 <div className="text-right shrink-0">
                   <div className="text-xs opacity-50">{formatDateTime(r.createdAt)}</div>
                   {r.legalDeadline && (
-                    <div className={`mt-1 text-xs font-medium ${isOverdue ? 'text-red-400' : isUrgent ? 'text-amber-400' : 'opacity-60'}`}>
+                    <div className={`mt-1 text-xs font-medium ${isOverdue ? 'admin-tone-text-danger' : isUrgent ? 'admin-tone-text-warning' : 'admin-tone-text-neutral'}`}>
                       {isOverdue
                         ? `Vençuda fa ${Math.abs(daysLeft!)} dies`
                         : daysLeft === 0
@@ -435,7 +383,7 @@ export default function AdminPrivacyPage() {
                     placeholder="Notes (opcional)..."
                     value={processNotes[r.id] || ''}
                     onChange={(e) => setProcessNotes((prev) => ({ ...prev, [r.id]: e.target.value }))}
-                    className="w-full rounded-xl border bg-white/5 px-4 py-2 text-sm  resize-none"
+                    className="ap-input w-full resize-none px-4 py-2 text-sm"
                     rows={2}
                     aria-label="Notes per a la sol·licitud"
                   />
@@ -481,7 +429,7 @@ export default function AdminPrivacyPage() {
                   type="button"
                   onClick={() => setConsentFilter(key)}
                   className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
-                    consentFilter === key ? 'bg-white text-black border-white' : 'border-white/20 hover:bg-white/5'
+                    consentFilter === key ? 'ap-btn ap-btn--primary' : 'ap-btn ap-btn--secondary'
                   }`}
                 >
                   {label}
@@ -495,7 +443,7 @@ export default function AdminPrivacyPage() {
                 value={consentSearch}
                 onChange={(e) => setConsentSearch(e.target.value)}
                 aria-label="Cercar consentiments"
-                className="w-full rounded-xl border bg-white/5 px-4 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="ap-input w-full px-4 py-2.5 text-sm"
               />
             </div>
             <span className="text-sm opacity-50">{consentsTotal} registres</span>
@@ -516,7 +464,7 @@ export default function AdminPrivacyPage() {
                 {/* Mobile cards */}
                 <section className="lg:hidden space-y-3">
                   {consents.map((c) => (
-                    <article key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors">
+                    <article key={c.id} className="ap-card p-4 transition-colors">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <p className="font-medium truncate">
@@ -527,15 +475,15 @@ export default function AdminPrivacyPage() {
                           </p>
                         </div>
                         <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
-                          c.revokedAt ? 'bg-red-500/20 text-red-300' : 'admin-tone-soft-success'
+                          c.revokedAt ? 'admin-tone-bg-danger admin-tone-text-danger' : 'admin-tone-soft-success'
                         }`}>
                           {c.revokedAt ? 'Revocat' : 'Actiu'}
                         </span>
                       </div>
-                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                      <div className="admin-tone-border-neutral mt-3 flex items-center justify-between border-t pt-3 text-xs">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="rounded-full bg-white/5 px-2.5 py-0.5">
-                            {CONSENT_TYPE_LABELS[c.consentType] || c.consentType}
+                          <span className="ap-badge px-2.5 py-0.5">
+                            {PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}
                           </span>
                           <span className="opacity-50">{c.source}</span>
                           <span className="opacity-50">{formatDateTime(c.grantedAt)}</span>
@@ -583,8 +531,8 @@ export default function AdminPrivacyPage() {
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-xs">
-                              {CONSENT_TYPE_LABELS[c.consentType] || c.consentType}
+                            <span className="ap-badge px-2.5 py-0.5 text-xs">
+                              {PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-xs opacity-60">{c.source}</td>
@@ -592,7 +540,7 @@ export default function AdminPrivacyPage() {
                           <td className="px-4 py-3 text-xs opacity-60">{formatDateTime(c.grantedAt)}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              c.revokedAt ? 'bg-red-500/20 text-red-300' : 'admin-tone-soft-success'
+                              c.revokedAt ? 'admin-tone-bg-danger admin-tone-text-danger' : 'admin-tone-soft-success'
                             }`}>
                               {c.revokedAt ? `Revocat ${formatDateTime(c.revokedAt)}` : 'Actiu'}
                             </span>
@@ -647,7 +595,7 @@ export default function AdminPrivacyPage() {
                   {auditLogs.map((log) => (
                     <tr key={log.id} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-4 py-3">
-                        <span className="text-sm font-medium">{ACTION_LABELS[log.action] || log.action}</span>
+                        <span className="text-sm font-medium">{PRIVACY_AUDIT_ACTION_LABELS[log.action] || log.action}</span>
                         {log.legalBasis && (
                           <p className="text-xs opacity-40 mt-0.5">{log.legalBasis}</p>
                         )}
@@ -709,6 +657,12 @@ export default function AdminPrivacyPage() {
     </AdminPage>
   );
 }
+
+
+
+
+
+
 
 
 

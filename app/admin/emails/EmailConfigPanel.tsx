@@ -5,6 +5,8 @@ import { log } from '@/lib/logger';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
+const INPUT_CLASSES = 'ap-input px-3 py-2 text-sm';
+
 export default function EmailConfigPanel() {
   const [config, setConfig] = useState<{ googleReviewUrl: string; postEventDelay: number; enablePostEvent: boolean; enableCanvas: boolean; enableLeadConfirmation: boolean; discountBase: number; discountPhoto: number; discountVideo: number; discountGoogle: number }>({
     googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
@@ -33,7 +35,7 @@ export default function EmailConfigPanel() {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || "Error desant la configuració");
+        throw new Error(data.error || 'Error desant la configuració');
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -42,7 +44,7 @@ export default function EmailConfigPanel() {
       const errorMessage = err instanceof Error ? err.message : 'Error desconegut';
       setError(errorMessage);
       log.error('No s’ha pogut desar la configuració de correu', err, {
-        context: { config }
+        context: { config },
       });
     } finally {
       setSaving(false);
@@ -50,14 +52,14 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="rounded-2xl border admin-card-glass overflow-hidden">
-      <div className="px-6 py-4 border-b">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+      <div className="border-b px-6 py-4">
         <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>
 
-      <div className="p-6 space-y-5">
+      <div className="space-y-5 p-6">
         <div>
-          <label htmlFor="ec-google-url" className="text-sm font-medium block mb-1">
+          <label htmlFor="ec-google-url" className="mb-1 block text-sm font-medium">
             URL Google Reviews
           </label>
           <input
@@ -65,19 +67,19 @@ export default function EmailConfigPanel() {
             type="text"
             value={config.googleReviewUrl}
             onChange={(e) => setConfig({ ...config, googleReviewUrl: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-xl border "
+            className={INPUT_CLASSES}
           />
         </div>
 
         <div>
-          <label htmlFor="ec-post-delay" className="text-sm font-medium block mb-1">
+          <label htmlFor="ec-post-delay" className="mb-1 block text-sm font-medium">
             Dies de retard post-esdeveniment
           </label>
           <select
             id="ec-post-delay"
             value={config.postEventDelay}
             onChange={(e) => setConfig({ ...config, postEventDelay: Number(e.target.value) })}
-            className="w-full px-3 py-2 text-sm rounded-xl border "
+            className={INPUT_CLASSES}
           >
             <option value={1}>1 dia</option>
             <option value={2}>2 dies</option>
@@ -86,53 +88,53 @@ export default function EmailConfigPanel() {
         </div>
 
         <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"
               checked={config.enablePostEvent}
               onChange={(e) => setConfig({ ...config, enablePostEvent: e.target.checked })}
-              className="w-5 h-5 rounded"
+              className="h-5 w-5 rounded"
             />
             <span className="text-sm">Correu post-esdeveniment automàtic</span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"
               checked={config.enableCanvas}
               onChange={(e) => setConfig({ ...config, enableCanvas: e.target.checked })}
-              className="w-5 h-5 rounded"
+              className="h-5 w-5 rounded"
             />
             <span className="text-sm">Correu de canvas + descompte</span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"
               checked={config.enableLeadConfirmation}
               onChange={(e) => setConfig({ ...config, enableLeadConfirmation: e.target.checked })}
-              className="w-5 h-5 rounded"
+              className="h-5 w-5 rounded"
             />
             <span className="text-sm">Confirmació d’entrada (al client)</span>
           </label>
         </div>
 
         <div>
-          <p className="text-sm font-medium mb-2">Percentatges de descompte</p>
+          <p className="mb-2 text-sm font-medium">Percentatges de descompte</p>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl">
+            <div className="flex items-center justify-between rounded-xl border px-3 py-2">
               <span>Base:</span>
               <span className="font-bold">{config.discountBase}%</span>
             </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl">
+            <div className="flex items-center justify-between rounded-xl border px-3 py-2">
               <span>+Foto:</span>
               <span className="font-bold">{config.discountPhoto}%</span>
             </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl">
+            <div className="flex items-center justify-between rounded-xl border px-3 py-2">
               <span>+Video:</span>
               <span className="font-bold">{config.discountVideo}%</span>
             </div>
-            <div className="flex items-center justify-between px-3 py-2 rounded-xl">
+            <div className="flex items-center justify-between rounded-xl border px-3 py-2">
               <span>+Google:</span>
               <span className="font-bold">{config.discountGoogle}%</span>
             </div>
@@ -140,8 +142,8 @@ export default function EmailConfigPanel() {
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl border" role="alert">
-            <p className="text-sm">❌ {error}</p>
+          <div className="rounded-xl border p-3 admin-tone-soft-danger admin-tone-border-danger" role="alert">
+            <p className="text-sm admin-tone-text-danger">❌ {error}</p>
           </div>
         )}
 
@@ -150,12 +152,12 @@ export default function EmailConfigPanel() {
           disabled={saving}
           type="button"
           aria-busy={saving}
-          className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
+          className={`w-full rounded-xl py-2.5 text-sm font-medium transition-colors ${
             saved
-              ? 'admin-tone-soft-success border border-emerald-500/30'
+              ? 'border admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
               : saving
-              ? 'bg-white/5 text-white/30 border border-white/10'
-              : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
+                ? 'border border-white/10 bg-white/5 text-white/30'
+                : 'ap-btn ap-btn--primary justify-center'
           }`}
         >
           {saved ? '✅ Desat!' : saving ? 'Desant...' : '💾 Desa configuració'}
@@ -164,6 +166,3 @@ export default function EmailConfigPanel() {
     </section>
   );
 }
-
-
-

@@ -40,39 +40,32 @@ interface Props {
   initialTemplate?: string;
 }
 
+const INPUT_CLASSES = 'ap-input';
+const IDLE_BUTTON = 'rounded-xl px-4 py-2 text-sm font-medium transition-colors admin-tone-idle';
+const ACTIVE_BUTTON = 'rounded-xl border px-4 py-2 text-sm font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info';
+const CARD_SELECTED = 'rounded-xl border-2 p-4 text-left transition-colors admin-tone-soft-info admin-tone-border-info';
+const CARD_IDLE = 'rounded-xl border-2 border-white/10 bg-white/[0.03] p-4 text-left transition-colors hover:bg-white/[0.05]';
 
 export default function ComposeForm({ leads, packs, initialCustomer, initialTemplate }: Props) {
   const router = useRouter();
-
-  // Mode: 'email' o 'quote'
   const [mode, setMode] = useState<'email' | 'quote'>('email');
-
-  // Common fields
   const [selectedLeadId, setSelectedLeadId] = useState('');
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [locale, setLocale] = useState('ca');
-
-  // Quote fields
   const [selectedPackId, setSelectedPackId] = useState('');
   const [price, setPrice] = useState('');
   const [extras, setExtras] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [customMessage, setCustomMessage] = useState('');
-
-  // UI state
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-  const [previewHtml, setPreviewHtml] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
 
-  // Selected lead details
-  const selectedLead = leads.find(l => l.id === selectedLeadId);
-  const selectedPack = packs.find(p => p.id === selectedPackId);
+  const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
+  const selectedPack = packs.find((pack) => pack.id === selectedPackId);
 
-  // When lead changes
   useEffect(() => {
     if (selectedLead) {
       setTo(selectedLead.email);
@@ -115,7 +108,6 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     }
   }, [initialCustomer, initialTemplate, selectedLeadId, subject, body]);
 
-  // When pack changes
   useEffect(() => {
     if (selectedPack) {
       setPrice(selectedPack.price.toString());
@@ -126,7 +118,6 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     setError('');
 
     if (mode === 'quote') {
-      // Either need a lead selected OR a manual email
       const hasRecipient = selectedLeadId || to.trim();
       if (!hasRecipient || !selectedPackId || !price) {
         setError('Selecciona un lead o escriu un email, pack i preu');
@@ -141,7 +132,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           body: JSON.stringify({
             leadId: selectedLeadId || undefined,
             customerId: initialCustomer?.id || undefined,
-            to: selectedLeadId ? undefined : to.trim(), // Send manual email if no lead
+            to: selectedLeadId ? undefined : to.trim(),
             packId: selectedPackId,
             price: parseFloat(price),
             extras,
@@ -158,60 +149,56 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           const data = await res.json();
           setError(data.error || 'Error enviant pressupost');
         }
-      } catch (err) {
-        setError('Error de connexió');
+      } catch {
+        setError('Error de connexio');
       } finally {
         setSending(false);
       }
-    } else {
-      // Correu normal
-      if (!to || !subject || !body) {
-        setError('Omple tots els camps');
-        return;
-      }
+      return;
+    }
 
-      setSending(true);
-      try {
-        const res = await fetchWithCsrf('/api/admin/emails/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to,
-            subject,
-            body,
-            leadId: selectedLeadId || undefined,
-            customerId: initialCustomer?.id || undefined,
-            locale,
-          }),
-        });
+    if (!to || !subject || !body) {
+      setError('Omple tots els camps');
+      return;
+    }
 
-        if (res.ok) {
-          setSent(true);
-          setTimeout(() => router.push('/admin/inbox'), 1500);
-        } else {
-          const data = await res.json();
-          setError(data.error || 'Error enviant email');
-        }
-      } catch (err) {
-        setError('Error de connexió');
-      } finally {
-        setSending(false);
+    setSending(true);
+    try {
+      const res = await fetchWithCsrf('/api/admin/emails/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to,
+          subject,
+          body,
+          leadId: selectedLeadId || undefined,
+          customerId: initialCustomer?.id || undefined,
+          locale,
+        }),
+      });
+
+      if (res.ok) {
+        setSent(true);
+        setTimeout(() => router.push('/admin/inbox'), 1500);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Error enviant email');
       }
+    } catch {
+      setError('Error de connexio');
+    } finally {
+      setSending(false);
     }
   }
 
-  const inputClasses = "w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white/90 placeholder:text-white/30 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
-
   return (
     <div className="space-y-6">
-      <div className="flex gap-2 p-1 rounded-xl w-fit border">
+      <div className="flex w-fit gap-2 rounded-xl border p-1">
         <button
           onClick={() => setMode('email')}
           type="button"
           aria-pressed={mode === 'email'}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-white/10/80 text-white/90 shadow' : 'text-white/40 hover:text-white/60'
-          }`}
+          className={mode === 'email' ? ACTIVE_BUTTON : IDLE_BUTTON}
         >
           ✉️ Correu normal
         </button>
@@ -219,26 +206,21 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           onClick={() => setMode('quote')}
           type="button"
           aria-pressed={mode === 'quote'}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-white/10/80 text-white/90 shadow' : 'text-white/40 hover:text-white/60'
-          }`}
+          className={mode === 'quote' ? ACTIVE_BUTTON : IDLE_BUTTON}
         >
           💰 Pressupost professional
         </button>
       </div>
 
-      <div className="rounded-2xl border admin-card-glass overflow-hidden">
-        <div className="p-6 space-y-6">
-
+      <div className="overflow-hidden rounded-2xl border admin-card-glass">
+        <div className="space-y-6 p-6">
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Selecciona entrada (opcional)
-            </label>
+            <label className="mb-2 block text-sm font-medium">Selecciona entrada (opcional)</label>
             <select
               value={selectedLeadId}
               onChange={(e) => setSelectedLeadId(e.target.value)}
               aria-label="Selecciona entrada"
-              className={inputClasses}
+              className={INPUT_CLASSES}
             >
               <option value="">-- Escriu email manualment --</option>
               {leads.map((lead) => (
@@ -250,34 +232,30 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           </div>
 
           {selectedLead && (
-            <div className="rounded-xl p-4 border">
-              <h4 className="font-medium mb-3">📋 Detalls de l'entrada</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="rounded-xl border p-4">
+              <h4 className="mb-3 font-medium">📋 Detalls de l'entrada</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                 <div>
-                  <span className="">Tipus:</span>
+                  <span>Tipus:</span>
                   <p className="font-medium">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="">Data:</span>
-                  <p className="font-medium">
-                    {selectedLead.eventDate
-                      ? formatDateSimple(selectedLead.eventDate)
-                      : 'No especificat'}
-                  </p>
+                  <span>Data:</span>
+                  <p className="font-medium">{selectedLead.eventDate ? formatDateSimple(selectedLead.eventDate) : 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="">Ubicació:</span>
+                  <span>Ubicacio:</span>
                   <p className="font-medium">{selectedLead.eventLocation || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="">Convidats:</span>
+                  <span>Convidats:</span>
                   <p className="font-medium">{selectedLead.guestCount || 'No especificat'}</p>
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="mt-3 pt-3 border-t">
+                <div className="mt-3 border-t pt-3">
                   <span className="text-sm">Missatge:</span>
-                  <p className="text-sm mt-1">{selectedLead.message}</p>
+                  <p className="mt-1 text-sm">{selectedLead.message}</p>
                 </div>
               )}
             </div>
@@ -287,49 +265,40 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
             <>
               {!selectedLeadId && (
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Correu del client *
-                  </label>
+                  <label className="mb-2 block text-sm font-medium">Correu del client *</label>
                   <input
                     type="email"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    className={inputClasses}
+                    className={INPUT_CLASSES}
                     placeholder="email@exemple.com"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Pack recomanat *
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="mb-2 block text-sm font-medium">Pack recomanat *</label>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {packs.map((pack) => {
-                    const name = pack.translations.find(t => t.locale === locale)?.name || pack.translations[0]?.name;
+                    const name = pack.translations.find((translation) => translation.locale === locale)?.name || pack.translations[0]?.name;
                     return (
-                    <button
-                      key={pack.id}
-                      onClick={() => setSelectedPackId(pack.id)}
-                      type="button"
-                      aria-pressed={selectedPackId === pack.id}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
-                        selectedPackId === pack.id
-                          ? 'border-cyan-500 bg-cyan-500/10'
-                          : 'border-white/10 hover:border-white/10 bg-white/[0.03]'
-                      }`}
-                    >
+                      <button
+                        key={pack.id}
+                        onClick={() => setSelectedPackId(pack.id)}
+                        type="button"
+                        aria-pressed={selectedPackId === pack.id}
+                        className={selectedPackId === pack.id ? CARD_SELECTED : CARD_IDLE}
+                      >
                         <p className="font-semibold">{name}</p>
-                        <p className="font-bold mt-1">{formatCurrency(pack.price)}</p>
+                        <p className="mt-1 font-bold">{formatCurrency(pack.price)}</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Price */}
               <div>
-                <label htmlFor="cf-price" className="block text-sm font-medium mb-2">
+                <label htmlFor="cf-price" className="mb-2 block text-sm font-medium">
                   Preu total (€) *
                 </label>
                 <input
@@ -338,112 +307,95 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                   min={0}
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className={`${inputClasses} text-2xl font-bold`}
+                  className={`${INPUT_CLASSES} text-2xl font-bold`}
                   placeholder="0"
                 />
               </div>
 
-              {/* Extras */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Extras inclosos
-                </label>
+                <label className="mb-2 block text-sm font-medium">Extras inclosos</label>
                 <textarea
                   value={extras.join('\n')}
                   onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
                   rows={3}
-                  className={inputClasses}
-                  placeholder="Un extra per línia..."
+                  className={INPUT_CLASSES}
+                  placeholder="Un extra per linia..."
                 />
               </div>
 
-              {/* Custom message */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Missatge personalitzat (opcional)
-                </label>
+                <label className="mb-2 block text-sm font-medium">Missatge personalitzat (opcional)</label>
                 <textarea
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={4}
-                  className={inputClasses}
+                  className={INPUT_CLASSES}
                   placeholder="Afegeix un missatge personalitzat..."
                 />
               </div>
 
-              {/* Notes */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Notes addicionals
-                </label>
+                <label className="mb-2 block text-sm font-medium">Notes addicionals</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className={inputClasses}
+                  className={INPUT_CLASSES}
                   placeholder="Notes que apareixeran al pressupost..."
                 />
               </div>
 
-              {/* Locale */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Idioma del pressupost
-                </label>
+                <label className="mb-2 block text-sm font-medium">Idioma del pressupost</label>
                 <div className="flex gap-2">
                   {[
                     { code: 'ca', label: '🇦🇩 Català' },
                     { code: 'es', label: '🇪🇸 Castellà' },
-                  ].map((l) => (
+                  ].map((language) => (
                     <button
-                      key={l.code}
-                      onClick={() => setLocale(l.code)}
+                      key={language.code}
+                      onClick={() => setLocale(language.code)}
                       type="button"
-                      aria-pressed={locale === l.code}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                        locale === l.code
-                          ? 'admin-tone-soft-info border-2 border-cyan-500/50'
-                          : 'bg-white/5 text-white/60 border-2 border-transparent hover:bg-white/10'
-                      }`}
+                      aria-pressed={locale === language.code}
+                      className={locale === language.code ? ACTIVE_BUTTON : IDLE_BUTTON}
                     >
-                      {l.label}
+                      {language.label}
                     </button>
                   ))}
                 </div>
               </div>
             </>
           ) : (
-            // Normal email form
             <>
               <div>
-                <label className="block text-sm font-medium mb-2">Per a *</label>
+                <label className="mb-2 block text-sm font-medium">Per a *</label>
                 <input
                   type="email"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  className={inputClasses}
+                  className={INPUT_CLASSES}
                   placeholder="email@exemple.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Assumpte *</label>
+                <label className="mb-2 block text-sm font-medium">Assumpte *</label>
                 <input
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className={inputClasses}
+                  className={INPUT_CLASSES}
                   placeholder="Assumpte de l'email"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Missatge *</label>
+                <label className="mb-2 block text-sm font-medium">Missatge *</label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={10}
-                  className={inputClasses}
+                  className={INPUT_CLASSES}
                   placeholder="Escriu el teu missatge..."
                 />
               </div>
@@ -451,19 +403,16 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t">
+        <div className="flex items-center justify-between border-t px-6 py-4">
           <div>
             {error && (
-              <p className="text-sm" role="alert">❌ {error}</p>
+              <p className="text-sm admin-tone-text-danger" role="alert">
+                ❌ {error}
+              </p>
             )}
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={() => router.push('/admin/inbox')}
-              type="button"
-              className="px-4 py-2 transition-colors"
-            >
+            <button onClick={() => router.push('/admin/inbox')} type="button" className="ap-btn ap-btn--secondary">
               Cancel·lar
             </button>
             <button
@@ -471,12 +420,12 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               disabled={sending}
               type="button"
               aria-busy={sending}
-              className={`px-6 py-2 rounded-xl font-medium transition-colors ${
+              className={`rounded-xl px-6 py-2 font-medium transition-colors ${
                 sent
-                  ? 'admin-tone-soft-success border border-emerald-500/30'
+                  ? 'border admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
                   : sending
-                  ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
+                    ? 'border border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
+                    : 'ap-btn ap-btn--primary'
               }`}
             >
               {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Envia pressupost' : '📤 Envia correu'}
@@ -487,4 +436,3 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     </div>
   );
 }
-

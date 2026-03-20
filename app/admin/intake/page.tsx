@@ -11,47 +11,7 @@ import Link from 'next/link';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { AdminPage } from '../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-const SOURCE_OPTIONS = [
-  { value: 'PHONE', label: 'Telèfon', icon: '📞' },
-  { value: 'WHATSAPP', label: 'WhatsApp', icon: '💬' },
-  { value: 'INSTAGRAM', label: 'Instagram', icon: '📸' },
-  { value: 'WALLAPOP', label: 'Wallapop', icon: '🟢' },
-  { value: 'REFERRAL', label: 'Boca-orella', icon: '🗣️' },
-  { value: 'GOOGLE', label: 'Google', icon: '🔍' },
-  { value: 'WEBSITE', label: 'Web', icon: '🌐' },
-  { value: 'OTHER', label: 'Altre', icon: '📋' },
-];
-
-const SOURCE_SELECTED_STYLES: Record<string, string> = {
-  PHONE: 'border-sky-400/70 bg-sky-500/25 text-sky-100',
-  WHATSAPP: 'border-emerald-400/70 bg-emerald-500/25 text-emerald-100',
-  INSTAGRAM: 'border-pink-400/70 bg-pink-500/25 text-pink-100',
-  WALLAPOP: 'border-lime-400/70 bg-lime-500/25 text-lime-100',
-  REFERRAL: 'border-orange-400/70 bg-orange-500/25 text-orange-100',
-  GOOGLE: 'border-amber-400/70 bg-amber-500/25 text-amber-100',
-  WEBSITE: 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100',
-  OTHER: 'border-white/20 bg-white/10 text-white/90',
-};
-
-const EVENT_TYPES = [
-  { value: 'WEDDING', label: 'Casament', icon: '💍' },
-  { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
-  { value: 'CORPORATE', label: 'Corporatiu', icon: '🎯' },
-  { value: 'COMMUNION', label: 'Comunió', icon: '⛪' },
-  { value: 'BAPTISM', label: 'Bateig', icon: '👶' },
-  { value: 'GRADUATION', label: 'Graduació', icon: '🎓' },
-  { value: 'ANNIVERSARY', label: 'Celebració', icon: '🎉' },
-  { value: 'PRIVATE_PARTY', label: 'Festa privada', icon: '🎵' },
-  { value: 'OTHER', label: 'Altre', icon: '📋' },
-];
-
-const PRIORITY_OPTIONS = [
-  { value: 'LOW', label: 'Baixa', selected: 'border-white/15 bg-white/5 text-white/80' },
-  { value: 'MEDIUM', label: 'Mitjana', selected: 'border-sky-400/60 bg-sky-500/20 text-sky-100' },
-  { value: 'HIGH', label: 'Alta', selected: 'border-orange-400/60 bg-orange-500/20 text-orange-100' },
-  { value: 'URGENT', label: 'Urgent', selected: 'border-rose-400/70 bg-rose-500/25 text-rose-100' },
-];
+import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS, INTAKE_SOURCE_SELECTED_STYLES } from '@/lib/constants';
 
 type DuplicateWarning = {
   id: string;
@@ -109,7 +69,7 @@ export default function IntakePage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const storedSource = window.localStorage.getItem(INTAKE_SOURCE_STORAGE_KEY);
-    if (storedSource && SOURCE_OPTIONS.some((opt) => opt.value === storedSource)) {
+    if (storedSource && INTAKE_SOURCE_OPTIONS.some((opt) => opt.value === storedSource)) {
       setForm((prev) => ({ ...prev, source: storedSource }));
     }
   }, []);
@@ -321,7 +281,7 @@ export default function IntakePage() {
       <div className="rounded-2xl border p-5">
         <label className="text-sm font-semibold">Canal d&apos;entrada</label>
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {SOURCE_OPTIONS.map((src) => (
+          {INTAKE_SOURCE_OPTIONS.map((src) => (
             <button
               key={src.value}
               type="button"
@@ -329,7 +289,7 @@ export default function IntakePage() {
               aria-pressed={form.source === src.value}
               className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
-                  ? `${SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
+                  ? `${INTAKE_SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
                   : 'border-white/10 bg-white/[0.02] text-white/60 hover:bg-white/5'
               }`}
             >
@@ -405,7 +365,7 @@ export default function IntakePage() {
           <div>
             <label className="text-xs">Prioritat</label>
             <div className="mt-1 grid grid-cols-4 gap-2">
-              {PRIORITY_OPTIONS.map((p) => (
+              {INTAKE_PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
@@ -431,7 +391,7 @@ export default function IntakePage() {
         <div>
           <label className="text-xs">Tipus d&apos;esdeveniment</label>
           <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
-            {EVENT_TYPES.map((et) => (
+            {INTAKE_EVENT_TYPE_OPTIONS.map((et) => (
               <button
                 key={et.value}
                 type="button"
@@ -538,6 +498,7 @@ export default function IntakePage() {
     </AdminPage>
   );
 }
+
 
 
 

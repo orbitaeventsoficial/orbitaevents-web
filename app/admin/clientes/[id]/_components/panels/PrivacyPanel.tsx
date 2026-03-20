@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useHubContext } from '../CustomerHubClient';
 import { formatDateTime } from '@/lib/constants';
+import { PRIVACY_CONSENT_LABELS, PRIVACY_REQUEST_STATUS_CONFIG, PRIVACY_REQUEST_TYPE_LABELS } from '@/lib/constants/privacy';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type ConsentRecord = {
@@ -24,41 +25,6 @@ type DataRequest = {
   legalDeadline: string | null;
   processedAt: string | null;
   createdAt: string;
-};
-
-const CONSENT_LABELS: Record<string, string> = {
-  GDPR_BASIC: 'RGPD bàsic',
-  MARKETING_EMAIL: 'Email màrqueting',
-  MARKETING_SMS: 'SMS màrqueting',
-  MARKETING_WHATSAPP: 'WhatsApp màrqueting',
-  TERMS_OF_SERVICE: 'Termes de servei',
-  PRIVACY_POLICY: 'Política privacitat',
-  COOKIE_CONSENT: 'Cookies',
-  COOKIE_ANALYTICS: 'Cookies analítiques',
-  COOKIE_MARKETING: 'Cookies màrqueting',
-  DATA_PROCESSING: 'Processament dades',
-  THIRD_PARTY: 'Tercers',
-  PROFILING: 'Perfilat',
-};
-
-const REQUEST_TYPE_LABELS: Record<string, string> = {
-  ACCESS: 'Accés',
-  RECTIFICATION: 'Rectificació',
-  ERASURE: 'Supressió',
-  RESTRICTION: 'Limitació',
-  PORTABILITY: 'Portabilitat',
-  OBJECTION: 'Oposició',
-  AUTOMATED: 'Decisions automatitzades',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  PENDING: { label: 'Pendent', color: 'text-amber-300' },
-  IDENTITY_REQUIRED: { label: 'Identitat pendent', color: 'text-orange-300' },
-  VERIFIED: { label: 'Verificada', color: 'text-blue-300' },
-  IN_PROGRESS: { label: 'En curs', color: 'text-cyan-300' },
-  COMPLETED: { label: 'Completada', color: 'text-emerald-300' },
-  REJECTED: { label: 'Rebutjada', color: 'text-red-300' },
-  CANCELLED: { label: 'Cancel·lada', color: 'text-white/50' },
 };
 
 export default function PrivacyPanel() {
@@ -143,7 +109,7 @@ export default function PrivacyPanel() {
             {activeConsents.map((c) => (
               <div key={c.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
-                  <span className="text-sm font-medium">{CONSENT_LABELS[c.consentType] || c.consentType}</span>
+                  <span className="text-sm font-medium">{PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}</span>
                   <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                     Actiu
                   </span>
@@ -166,7 +132,7 @@ export default function PrivacyPanel() {
               {revokedConsents.map((c) => (
                 <div key={c.id} className="flex items-center justify-between rounded-xl border p-3 opacity-50">
                   <div>
-                    <span className="text-sm font-medium">{CONSENT_LABELS[c.consentType] || c.consentType}</span>
+                    <span className="text-sm font-medium">{PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}</span>
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                       Revocat
                     </span>
@@ -216,12 +182,12 @@ export default function PrivacyPanel() {
         ) : (
           <div className="mt-3 space-y-2">
             {requests.map((r) => {
-              const statusCfg = STATUS_CONFIG[r.status] || STATUS_CONFIG.PENDING;
+              const statusCfg = PRIVACY_REQUEST_STATUS_CONFIG[r.status] || PRIVACY_REQUEST_STATUS_CONFIG.PENDING;
               return (
                 <div key={r.id} className="rounded-xl border p-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium">
-                      {REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
+                      {PRIVACY_REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
                     </span>
                     <span className={`text-xs font-medium ${statusCfg.color}`}>
                       {statusCfg.label}
@@ -245,3 +211,5 @@ export default function PrivacyPanel() {
     </div>
   );
 }
+
+

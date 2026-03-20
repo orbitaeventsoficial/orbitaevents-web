@@ -10,27 +10,7 @@ import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
-
-const CATEGORY_LABELS: Record<string, string> = {
-  SOUND: '🔊 So',
-  LIGHTING: '💡 Il·lum.',
-  EFFECTS: '✨ Efectes',
-  STRUCTURE: '🏗️ Estruct.',
-  CABLING: '🔌 Cable',
-  TECH: '💻 Tech',
-  DECORATION_HP: '🎃 Deco HP',
-  DECORATION_HW: '🎄 Deco HW',
-  DECORATION_GEN: '🎨 Deco Gen',
-  CONSUMABLE: '📦 Consum.',
-};
-
-const CONDITION_OPTIONS = [
-  { value: 'NEW', label: 'Nou' },
-  { value: 'EXCELLENT', label: 'Excel·lent' },
-  { value: 'GOOD', label: 'Bo' },
-  { value: 'FAIR', label: 'Acceptable' },
-  { value: 'POOR', label: 'Dolent' },
-];
+import { INVENTORY_CATEGORY_LABELS, INVENTORY_CONDITION_OPTIONS } from '@/lib/constants';
 
 interface InventoryItem {
   id: string;
@@ -266,7 +246,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   if (loading) {
     return (
-      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+      <section className="ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Equipament assignat</h2>
         <p className="text-sm">Carregant...</p>
       </section>
@@ -274,7 +254,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   }
 
   return (
-    <section className="rounded-xl border border-white/10 shadow-sm p-6">
+    <section className="ap-card rounded-xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">
           Equipament assignat
@@ -353,7 +333,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           {assigned.map((a) => (
             <div
               key={a.id}
-              className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10"
+              className="flex items-center justify-between p-3 rounded-xl ap-card"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <code className="text-xs font-mono px-2 py-0.5 rounded shrink-0">
@@ -367,7 +347,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                     {a.item.name}
                   </Link>
                   <p className="text-xs">
-                    {CATEGORY_LABELS[a.item.category] || a.item.category}
+                    {INVENTORY_CATEGORY_LABELS[a.item.category] || a.item.category}
                     {a.item.watts ? ` · ${a.item.watts}W` : ''}
                   </p>
                 </div>
@@ -380,8 +360,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                   onClick={() => handleToggleCheckout(a)}
                   className={`rounded-xl px-2 py-1 text-xs font-medium transition-all ${
                     a.checkedOut
-                      ? 'admin-tone-soft-success border border-emerald-400/30'
-                      : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10'
+                      ? 'ap-badge ap-badge--success'
+                      : 'admin-tone-idle'
                   }`}
                 >
                   {a.checkedOut ? 'Sortida fet' : 'Marcar sortida'}
@@ -398,7 +378,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                     aria-label="Condició de retorn"
                   >
                     <option value="" disabled>Retorn...</option>
-                    {CONDITION_OPTIONS.map((c) => (
+                    {INVENTORY_CONDITION_OPTIONS.map((c) => (
                       <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                   </select>
@@ -426,7 +406,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       {/* Cerca d'equip disponible */}
       {showSearch && (
-        <div className="border-t border-white/10 pt-4 space-y-3">
+        <div className="border-t admin-tone-border-neutral pt-4 space-y-3">
           <input
             type="text"
             value={search}
@@ -443,7 +423,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
               {available.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors"
+                  className="flex items-center justify-between p-2 rounded-xl transition-colors hover:admin-tone-bg-neutral"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <code className="text-xs font-mono px-1.5 py-0.5 rounded">
@@ -451,7 +431,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                     </code>
                     <span className="text-sm truncate">{item.name}</span>
                     <span className="text-xs">
-                      {CATEGORY_LABELS[item.category] || item.category}
+                      {INVENTORY_CATEGORY_LABELS[item.category] || item.category}
                     </span>
                   </div>
                   <button
@@ -471,6 +451,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     </section>
   );
 }
+
+
 
 
 

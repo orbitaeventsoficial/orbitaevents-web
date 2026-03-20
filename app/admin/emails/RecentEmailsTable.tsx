@@ -3,6 +3,13 @@
 
 import { formatDateSimple } from '@/lib/constants';
 
+type ActionTone = {
+  label: string;
+  icon: string;
+  bg: string;
+  text: string;
+};
+
 interface Activity {
   id: string;
   action: string;
@@ -14,34 +21,41 @@ interface Activity {
   details?: Record<string, unknown>;
 }
 
-export default function RecentEmailsTable({ activities }: { activities: Activity[] }) {
-  const actionLabels: Record<string, { label: string; icon: string; bg: string; text: string }> = {
-    POST_EVENT_EMAIL_SENT: {
-      label: 'Email post-event enviat',
-      icon: '📧',
-      bg: 'bg-blue-500/20',
-      text: 'text-blue-300',
-    },
-    TESTIMONIAL_SUBMITTED: {
-      label: 'Valoració rebuda',
-      icon: '⭐',
-      bg: 'bg-amber-500/20',
-      text: 'text-amber-300',
-    },
-    DISCOUNT_CODE_GENERATED: {
-      label: 'Codi descompte generat',
-      icon: '🎁',
-      bg: 'bg-emerald-500/20',
-      text: 'text-emerald-300',
-    },
-    LEAD_EMAIL_SENT: {
-      label: 'Confirmació lead enviada',
-      icon: '✉️',
-      bg: 'bg-purple-500/20',
-      text: 'text-purple-300',
-    },
-  };
+const DEFAULT_ACTION_TONE: ActionTone = {
+  label: 'Activitat',
+  icon: '📋',
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+};
 
+const ACTION_TONES: Record<string, ActionTone> = {
+  POST_EVENT_EMAIL_SENT: {
+    label: 'Email post-event enviat',
+    icon: '📧',
+    bg: 'admin-tone-bg-info',
+    text: 'admin-tone-text-info',
+  },
+  TESTIMONIAL_SUBMITTED: {
+    label: 'Valoració rebuda',
+    icon: '⭐',
+    bg: 'admin-tone-bg-warning',
+    text: 'admin-tone-text-warning',
+  },
+  DISCOUNT_CODE_GENERATED: {
+    label: 'Codi descompte generat',
+    icon: '🎁',
+    bg: 'admin-tone-bg-success',
+    text: 'admin-tone-text-success',
+  },
+  LEAD_EMAIL_SENT: {
+    label: 'Confirmació lead enviada',
+    icon: '✉️',
+    bg: 'admin-tone-bg-violet',
+    text: 'admin-tone-text-violet',
+  },
+};
+
+export default function RecentEmailsTable({ activities }: { activities: Activity[] }) {
   const formatRelativeDate = (date: Date) => {
     const d = new Date(date);
     const now = new Date();
@@ -56,10 +70,10 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="rounded-2xl border admin-card-glass overflow-hidden">
-      <div className="px-6 py-4 border-b">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+      <div className="border-b px-6 py-4">
         <h2 className="font-semibold">📊 Activitat Recent</h2>
-        <p className="text-xs mt-1">Últims 7 dies</p>
+        <p className="mt-1 text-xs">Últims 7 dies</p>
       </div>
 
       {activities.length === 0 ? (
@@ -68,27 +82,25 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
           <p className="mt-2">Cap activitat recent</p>
         </div>
       ) : (
-        <div className="divide-y divide-white/5 max-h-96 overflow-y-auto">
+        <div className="max-h-96 divide-y divide-white/5 overflow-y-auto">
           {activities.map((activity) => {
-            const actionInfo = actionLabels[activity.action] || {
+            const actionInfo = ACTION_TONES[activity.action] || {
+              ...DEFAULT_ACTION_TONE,
               label: activity.action,
-              icon: '📋',
-              bg: 'bg-white/10',
-              text: 'text-white/70',
             };
 
             return (
               <div
                 key={activity.id}
-                className="px-6 py-3 flex items-center gap-4 transition-colors"
+                className="flex items-center gap-4 px-6 py-3 transition-colors"
               >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${actionInfo.bg}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-lg ${actionInfo.bg}`}
                 >
                   {actionInfo.icon}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
                     {activity.customer?.name || 'Usuari desconegut'}
                   </p>
                   <p className={`text-xs ${actionInfo.text}`}>{actionInfo.label}</p>

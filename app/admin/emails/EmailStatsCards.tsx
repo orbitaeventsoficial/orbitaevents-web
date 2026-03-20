@@ -9,70 +9,73 @@ interface Stats {
   discountCodes: number;
 }
 
+type CardTone = {
+  label: string;
+  value: number;
+  icon: string;
+  sublabel: string;
+  cardClass: string;
+  labelClass: string;
+};
+
 export default function EmailStatsCards({ stats }: { stats: Stats }) {
-  const cards = [
+  const cards: CardTone[] = [
     {
       label: 'Entrades amb correu',
       value: stats.leadsWithEmail,
       icon: '📧',
       sublabel: 'Últims 30 dies',
-      borderColor: 'border-blue-500/20',
-      gradient: 'from-blue-500/10 to-blue-600/5',
-      labelColor: 'text-blue-400',
+      cardClass: 'ap-card ap-card--info',
+      labelClass: 'admin-tone-text-info',
     },
     {
       label: 'Post-Event Enviats',
       value: stats.postEventSent,
       icon: '✅',
-      sublabel: 'Total historic',
-      borderColor: 'border-emerald-500/20',
-      gradient: 'from-emerald-500/10 to-emerald-600/5',
-      labelColor: 'text-emerald-400',
+      sublabel: 'Total històric',
+      cardClass: 'ap-card ap-card--success',
+      labelClass: 'admin-tone-text-success',
     },
     {
       label: 'Pendents',
       value: stats.postEventPending,
       icon: '⏳',
       sublabel: 'Per enviar',
-      borderColor: 'border-amber-500/20',
-      gradient: 'from-amber-500/10 to-amber-600/5',
-      labelColor: 'text-amber-400',
+      cardClass: 'ap-card ap-card--warning',
+      labelClass: 'admin-tone-text-warning',
     },
     {
       label: 'Valoracions',
       value: stats.testimonials,
       icon: '⭐',
       sublabel: 'Últims 30 dies',
-      borderColor: 'border-purple-500/20',
-      gradient: 'from-purple-500/10 to-purple-600/5',
-      labelColor: 'text-purple-400',
+      cardClass: 'ap-card',
+      labelClass: 'admin-tone-text-violet',
     },
     {
       label: 'Codis Descompte',
       value: stats.discountCodes,
       icon: '🎁',
       sublabel: 'Generats (30d)',
-      borderColor: 'border-pink-500/20',
-      gradient: 'from-pink-500/10 to-pink-600/5',
-      labelColor: 'text-pink-400',
+      cardClass: 'ap-card',
+      labelClass: 'admin-tone-text-danger',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {cards.map((card) => (
-        <div
-          key={card.label}
-          className={`rounded-2xl border ${card.borderColor} bg-gradient-to-br ${card.gradient} admin-card-glass p-4`}
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">{card.icon}</span>
-            <span className={`text-xs font-medium uppercase tracking-wider ${card.labelColor}`}>
-              {card.label}
-            </span>
+        <div key={card.label} className={`${card.cardClass} admin-card-glass rounded-2xl`}>
+          <div className="ap-card-body p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-xl">{card.icon}</span>
+              <span className={`text-xs font-medium uppercase tracking-wider ${card.labelClass}`}>
+                {card.label}
+              </span>
+            </div>
+            <p className="text-3xl font-bold">{card.value}</p>
+            <p className="mt-1 text-xs">{card.sublabel}</p>
           </div>
-          <p className="text-3xl font-bold">{card.value}</p>
-          <p className="text-xs mt-1">{card.sublabel}</p>
         </div>
       ))}
     </div>

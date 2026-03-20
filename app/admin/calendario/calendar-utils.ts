@@ -1,11 +1,9 @@
 /**
  * Tipus, constants i helpers purs compartits pels 3 components de calendari
- * (Month, Week, Day). Font única de veritat per evitar duplicats.
+ * (Month, Week, Day). Font unica de veritat per evitar duplicats.
  */
 
 import { EVENT_TYPE_PLAIN, DEFAULT_LOCALE } from '@/lib/constants';
-
-// ─── Types ──────────────────────────────────────────────────────────────────
 
 export type CalendarApiDay = {
   reservas: {
@@ -30,24 +28,21 @@ export type CalendarApiDay = {
 };
 
 export type CalendarApiResponse = {
-  days: Record<string, CalendarApiDay>; // key: 'YYYY-MM-DD'
+  days: Record<string, CalendarApiDay>;
 };
 
 export type MonthYear = {
   year: number;
-  month: number; // 0-11
+  month: number;
 };
 
 export type CalendarCell = {
   date: Date;
-  key: string; // YYYY-MM-DD
+  key: string;
   inCurrentMonth: boolean;
 };
 
-// ─── Constants ──────────────────────────────────────────────────────────────
-
-export const weekdayLabels = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg']; // dilluns primer
-
+export const weekdayLabels = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
 export const weekdayLabelsFull = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'];
 
 export const CALENDAR_EVENT_LABELS: Record<string, string> = {
@@ -56,16 +51,50 @@ export const CALENDAR_EVENT_LABELS: Record<string, string> = {
 };
 
 export const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'Pendent', cls: 'bg-amber-500/20 text-amber-300' },
-  CONFIRMED: { label: 'Confirmat', cls: 'admin-tone-soft-success' },
-  PREPARING: { label: 'Preparant', cls: 'bg-blue-500/20 text-blue-300' },
-  COMPLETED: { label: 'Completat', cls: 'bg-white/10 text-white/50' },
-  CANCELLED: { label: 'Cancel·lat', cls: 'admin-tone-soft-danger' },
+  PENDING: { label: 'Pendent', cls: 'admin-tone-soft-warning admin-tone-text-warning' },
+  CONFIRMED: { label: 'Confirmat', cls: 'admin-tone-soft-success admin-tone-text-success' },
+  PREPARING: { label: 'Preparant', cls: 'admin-tone-soft-info admin-tone-text-info' },
+  COMPLETED: { label: 'Completat', cls: 'admin-tone-idle' },
+  CANCELLED: { label: 'Cancel·lat', cls: 'admin-tone-soft-danger admin-tone-text-danger' },
 };
 
-export const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 06:00 – 23:00
+export const HOURS = Array.from({ length: 18 }, (_, i) => i + 6);
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+export function getCalendarTone(hasReservas: boolean, hasBloqueos: boolean): 'free' | 'reserved' | 'blocked' | 'mixed' {
+  if (hasReservas && hasBloqueos) return 'mixed';
+  if (hasBloqueos) return 'blocked';
+  if (hasReservas) return 'reserved';
+  return 'free';
+}
+
+export function getCalendarToneClasses(tone: ReturnType<typeof getCalendarTone>) {
+  if (tone === 'reserved') {
+    return {
+      card: 'admin-tone-soft-success admin-tone-border-success',
+      text: 'admin-tone-text-success',
+      subtle: 'admin-tone-bg-success',
+    };
+  }
+  if (tone === 'blocked') {
+    return {
+      card: 'admin-tone-soft-danger admin-tone-border-danger',
+      text: 'admin-tone-text-danger',
+      subtle: 'admin-tone-bg-danger',
+    };
+  }
+  if (tone === 'mixed') {
+    return {
+      card: 'admin-tone-soft-warning admin-tone-border-warning',
+      text: 'admin-tone-text-warning',
+      subtle: 'admin-tone-bg-warning',
+    };
+  }
+  return {
+    card: 'admin-tone-idle',
+    text: '',
+    subtle: 'admin-tone-bg-neutral',
+  };
+}
 
 export function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {
   const pack = booking.packName?.trim();
@@ -96,8 +125,8 @@ export function formatKey(date: Date): string {
 
 export function getMonthDays({ year, month }: MonthYear): CalendarCell[] {
   const firstOfMonth = new Date(year, month, 1);
-  const firstWeekday = firstOfMonth.getDay(); // 0 = Dg, 1 = Dl...
-  const offsetFromMonday = (firstWeekday + 6) % 7; // passar a setmana que comença dilluns
+  const firstWeekday = firstOfMonth.getDay();
+  const offsetFromMonday = (firstWeekday + 6) % 7;
   const startDate = new Date(year, month, 1 - offsetFromMonday);
 
   const cells: CalendarCell[] = [];
@@ -130,11 +159,7 @@ export function monthLabel({ year, month }: MonthYear): string {
 
 export function isToday(date: Date): boolean {
   const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 }
 
 export function getWeekDays(baseDate: Date): Date[] {

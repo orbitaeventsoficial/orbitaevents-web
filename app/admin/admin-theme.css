@@ -64,6 +64,48 @@ html.admin-mode .admin-tone-soft-warning {
   color: var(--at-text);
 }
 
+html.admin-mode .admin-tone-bg-neutral { background: var(--at-raised); }
+html.admin-mode .admin-tone-bg-slate { background: color-mix(in oklab, var(--at-muted) 16%, var(--at-panel) 84%); }
+html.admin-mode .admin-tone-bg-info { background: var(--at-blue-dim); }
+html.admin-mode .admin-tone-bg-cyan { background: var(--at-cyan-dim); }
+html.admin-mode .admin-tone-bg-violet { background: var(--at-violet-dim); }
+html.admin-mode .admin-tone-bg-success { background: var(--at-green-dim); }
+html.admin-mode .admin-tone-bg-teal { background: color-mix(in oklab, var(--at-green) 14%, var(--at-blue) 10%, var(--at-panel) 76%); }
+html.admin-mode .admin-tone-bg-warning { background: var(--at-orange-dim); }
+html.admin-mode .admin-tone-bg-danger { background: var(--at-red-dim); }
+
+html.admin-mode .admin-tone-text-neutral { color: var(--at-muted); }
+html.admin-mode .admin-tone-text-slate { color: var(--at-muted); }
+html.admin-mode .admin-tone-text-info { color: var(--at-blue); }
+html.admin-mode .admin-tone-text-cyan { color: var(--at-info); }
+html.admin-mode .admin-tone-text-violet { color: var(--at-violet); }
+html.admin-mode .admin-tone-text-success { color: var(--at-green); }
+html.admin-mode .admin-tone-text-teal { color: color-mix(in oklab, var(--at-green) 55%, var(--at-blue) 45%); }
+html.admin-mode .admin-tone-text-warning { color: var(--at-gold-text); }
+html.admin-mode .admin-tone-text-danger { color: var(--at-red); }
+
+html.admin-mode .admin-tone-border-neutral { border-color: var(--at-border); }
+html.admin-mode .admin-tone-border-slate { border-color: color-mix(in oklab, var(--at-muted) 35%, var(--at-border) 65%); }
+html.admin-mode .admin-tone-border-info { border-color: color-mix(in oklab, var(--at-blue) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-cyan { border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-violet { border-color: color-mix(in oklab, var(--at-violet) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-success { border-color: color-mix(in oklab, var(--at-green) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-teal { border-color: color-mix(in oklab, var(--at-green) 30%, var(--at-blue) 30%, var(--at-border) 40%); }
+html.admin-mode .admin-tone-border-warning { border-color: color-mix(in oklab, var(--at-orange) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-tone-border-danger { border-color: color-mix(in oklab, var(--at-red) 40%, var(--at-border) 60%); }
+
+html.admin-mode .admin-tone-idle {
+  background: var(--at-panel);
+  color: var(--at-subtle);
+  border-color: var(--at-border);
+}
+
+html.admin-mode .admin-tone-idle:hover {
+  background: var(--at-raised);
+  color: var(--at-muted);
+  border-color: var(--at-border-s);
+}
+
 html.admin-mode .admin-tooltip-wrap {
   position: relative;
   display: inline-flex;
@@ -173,3 +215,4 @@ html.admin-mode .admin-shimmer {
     animation: none;
   }
 }
+

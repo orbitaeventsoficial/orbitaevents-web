@@ -12,8 +12,8 @@ interface TemplateInfo {
 }
 
 const SOURCE_BADGE = {
-  db: { label: 'Personalitzat', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-  default: { label: 'Per defecte', color: 'bg-white/5 text-white/40 border-white/10' },
+  db: { label: 'Personalitzat', className: 'ap-badge ap-badge--success' },
+  default: { label: 'Per defecte', className: 'ap-badge' },
 } as const;
 
 const LOCALE_LABELS: Record<string, string> = { ca: 'Català', es: 'Castellà', en: 'Anglès' };
@@ -36,11 +36,13 @@ export default function EmailTemplatesClient() {
     }
   }, [toast]);
 
-  useEffect(() => { fetch_(); }, [fetch_]);
+  useEffect(() => {
+    fetch_();
+  }, [fetch_]);
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm" role="status">
+      <div className="flex items-center gap-2 text-sm admin-tone-text-neutral" role="status">
         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         Carregant plantilles...
       </div>
@@ -51,35 +53,31 @@ export default function EmailTemplatesClient() {
 
   return (
     <div className="space-y-4">
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border p-4">
-          <div className="text-[10px] uppercase tracking-wide text-white/50">Total plantilles</div>
-          <div className="text-2xl font-bold">{templates.length}</div>
+        <div className="ap-kpi">
+          <div className="ap-kpi-label">Total plantilles</div>
+          <div className="ap-kpi-value">{templates.length}</div>
         </div>
-        <div className="rounded-2xl border p-4">
-          <div className="text-[10px] uppercase tracking-wide text-white/50">Personalitzades</div>
-          <div className="text-2xl font-bold">{customized}</div>
+        <div className="ap-kpi ap-kpi--success">
+          <div className="ap-kpi-label">Personalitzades</div>
+          <div className="ap-kpi-value">{customized}</div>
         </div>
-        <div className="rounded-2xl border p-4">
-          <div className="text-[10px] uppercase tracking-wide text-white/50">Idiomes</div>
-          <div className="text-2xl font-bold">3</div>
-          <div className="text-xs text-white/40">CA · ES · EN</div>
+        <div className="ap-kpi ap-kpi--info">
+          <div className="ap-kpi-label">Idiomes</div>
+          <div className="ap-kpi-value">3</div>
+          <div className="ap-kpi-trend">CA · ES · EN</div>
         </div>
       </div>
 
-      {/* Llista */}
       <div className="space-y-2">
         {templates.map((t) => (
-          <div key={t.slug} className="rounded-2xl border p-4 transition-all hover:bg-white/[0.02]">
+          <div key={t.slug} className="ap-card rounded-2xl p-4 transition-all hover:admin-tone-bg-neutral">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="font-semibold text-sm">{t.description}</div>
-                <div className="text-xs text-white/40 font-mono mt-0.5">{t.slug}</div>
+                <div className="text-sm font-semibold">{t.description}</div>
+                <div className="mt-0.5 font-mono text-xs admin-tone-text-slate">{t.slug}</div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/40">
-                {t.variables.length} variables
-              </div>
+              <div className="flex items-center gap-2 text-xs admin-tone-text-slate">{t.variables.length} variables</div>
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
@@ -89,10 +87,10 @@ export default function EmailTemplatesClient() {
                   <Link
                     key={l.locale}
                     href={`/admin/email-templates/${t.slug}?locale=${l.locale}`}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/10 ${badge.color}`}
+                    className="ap-btn ap-btn--secondary"
                   >
                     <span className="font-semibold">{LOCALE_LABELS[l.locale] || l.locale}</span>
-                    <span className="text-[10px]">{badge.label}</span>
+                    <span className={badge.className}>{badge.label}</span>
                   </Link>
                 );
               })}
@@ -101,7 +99,7 @@ export default function EmailTemplatesClient() {
             {t.variables.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {t.variables.map((v) => (
-                  <span key={v} className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-mono text-white/30">
+                  <span key={v} className="ap-badge font-mono text-[10px]">
                     {`{{${v}}}`}
                   </span>
                 ))}

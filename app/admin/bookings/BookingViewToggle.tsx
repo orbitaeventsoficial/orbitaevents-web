@@ -19,14 +19,14 @@ export default function BookingViewToggle() {
   };
 
   return (
-    <div className="flex rounded-xl border overflow-hidden shrink-0">
+    <div className="admin-tone-border-neutral admin-tone-bg-neutral flex shrink-0 overflow-hidden rounded-xl border">
       <button
         type="button"
         onClick={() => toggle('list')}
         className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           current === 'list'
-            ? 'bg-white/10 font-semibold'
-            : 'hover:bg-white/5'
+            ? 'admin-tone-bg-info admin-tone-text-info font-semibold'
+            : 'admin-tone-text-neutral hover:brightness-105'
         }`}
       >
         Llista
@@ -36,8 +36,8 @@ export default function BookingViewToggle() {
         onClick={() => toggle('kanban')}
         className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           current === 'kanban'
-            ? 'bg-white/10 font-semibold'
-            : 'hover:bg-white/5'
+            ? 'admin-tone-bg-info admin-tone-text-info font-semibold'
+            : 'admin-tone-text-neutral hover:brightness-105'
         }`}
       >
         Kanban

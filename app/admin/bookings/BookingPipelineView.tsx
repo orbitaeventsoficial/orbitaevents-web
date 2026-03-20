@@ -29,17 +29,17 @@ type PipelineColumn = {
 };
 
 const COLUMNS_DEF: Omit<PipelineColumn, 'bookings'>[] = [
-  { status: 'PENDING', label: 'Pendents', toneClass: '', cardTone: 'border-yellow-500/20 bg-yellow-500/10' },
-  { status: 'CONFIRMED', label: 'Confirmades', toneClass: '', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
-  { status: 'PREPARING', label: 'Preparant', toneClass: '', cardTone: 'border-blue-500/20 bg-blue-500/10' },
-  { status: 'COMPLETED', label: 'Completades', toneClass: '', cardTone: 'border-teal-500/20 bg-teal-500/10' },
+  { status: 'PENDING', label: 'Pendents', toneClass: '', cardTone: 'ap-card--warning' },
+  { status: 'CONFIRMED', label: 'Confirmades', toneClass: '', cardTone: 'ap-card--success' },
+  { status: 'PREPARING', label: 'Preparant', toneClass: '', cardTone: 'ap-card--info' },
+  { status: 'COMPLETED', label: 'Completades', toneClass: '', cardTone: 'admin-tone-bg-teal admin-tone-border-teal' },
 ];
 
 function getMarginColor(pct: number | null): string {
-  if (pct === null) return 'text-white/40';
-  if (pct > 40) return 'text-emerald-400';
-  if (pct > 20) return 'text-amber-400';
-  return 'text-rose-400';
+  if (pct === null) return 'admin-tone-text-neutral';
+  if (pct > 40) return 'admin-tone-text-success';
+  if (pct > 20) return 'admin-tone-text-warning';
+  return 'admin-tone-text-danger';
 }
 
 export default function BookingPipelineView() {
@@ -275,7 +275,7 @@ export default function BookingPipelineView() {
                           key={target.status}
                           onClick={() => moveBooking(booking.id, target.status)}
                           disabled={isUpdating}
-                          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20 disabled:opacity-50"
+                          className="ap-btn ap-btn--secondary flex-1 px-2 py-1 text-[10px] disabled:opacity-50"
                         >
                           {target.label}
                         </button>
@@ -291,5 +291,6 @@ export default function BookingPipelineView() {
     </div>
   );
 }
+
 
 

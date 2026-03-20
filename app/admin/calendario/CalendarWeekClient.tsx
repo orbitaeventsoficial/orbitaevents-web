@@ -8,7 +8,7 @@ import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
 
 export default function CalendarWeekClient() {
   const toast = useToast();
@@ -119,7 +119,7 @@ export default function CalendarWeekClient() {
           <button
             type="button"
             onClick={() => navigateWeek(-1)}
-            className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium transition-all active:scale-[0.98]"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             ← Setmana anterior
           </button>
@@ -141,12 +141,12 @@ export default function CalendarWeekClient() {
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=month')}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+              className="ap-btn ap-btn--secondary text-sm border-0"
             >
               Mes
             </button>
             <span
-              className="inline-flex items-center px-3 py-2 text-sm font-medium bg-white/10"
+              className="ap-btn text-sm admin-tone-soft-info admin-tone-border-info admin-tone-text-info"
             >
               Setmana
             </span>
@@ -189,15 +189,15 @@ export default function CalendarWeekClient() {
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
           const todayClass = isToday(day);
+          const tone = getCalendarTone(hasReservas, hasBloqueos);
+          const toneClasses = getCalendarToneClasses(tone);
 
           return (
             <div
               key={key}
               className={[
-                'flex flex-col rounded-2xl border p-3 min-h-[280px] transition-all',
-                hasBloqueos ? 'border-rose-500/30 bg-rose-500/5' : '',
-                hasReservas && !hasBloqueos ? 'border-emerald-500/20 bg-emerald-500/5' : '',
-                !hasReservas && !hasBloqueos ? '' : '',
+                'flex min-h-[280px] flex-col rounded-2xl border p-3 transition-all',
+                toneClasses.card,
                 todayClass ? 'ring-2 ring-cyan-400/50' : '',
               ].join(' ')}
             >
@@ -208,13 +208,13 @@ export default function CalendarWeekClient() {
                     className={[
                       'inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold',
                       todayClass
-                        ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
-                        : 'text-white/70',
+                        ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info'
+                        : '',
                     ].join(' ')}
                   >
                     {day.getDate()}
                   </span>
-                  <span className="text-xs font-medium text-white/50 hidden sm:inline">
+                  <span className="hidden text-xs font-medium sm:inline">
                     {weekdayLabels[(day.getDay() + 6) % 7]}
                   </span>
                 </div>
@@ -230,7 +230,7 @@ export default function CalendarWeekClient() {
                   <button
                     type="button"
                     onClick={() => setBlockingDate(blockingDate === key ? null : key)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                    className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
                   >
                     Bloquejar
                   </button>
@@ -245,7 +245,7 @@ export default function CalendarWeekClient() {
                     value={blockNote}
                     onChange={(e) => setBlockNote(e.target.value)}
                     placeholder="Motiu..."
-                    className="w-full rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs "
+                    className="ap-input px-2 py-1 text-xs"
                   />
                   <div className="flex gap-1">
                     <button
@@ -258,7 +258,7 @@ export default function CalendarWeekClient() {
                     <button
                       type="button"
                       onClick={() => { setBlockingDate(null); setBlockNote(''); }}
-                      className="rounded-lg border px-2 py-1 text-[10px]"
+                      className="ap-btn ap-btn--secondary text-[10px]"
                     >
                       No
                     </button>
@@ -270,11 +270,11 @@ export default function CalendarWeekClient() {
               {hasBloqueos && dayData.bloqueos.map((b) => (
                 <div
                   key={b.id}
-                  className="mb-2 rounded-xl border px-2.5 py-2 text-xs"
+                  className="mb-2 rounded-xl border px-2.5 py-2 text-xs admin-tone-soft-danger admin-tone-border-danger"
                 >
                   <div className="font-semibold">Bloquejat</div>
                   {(b.notas || b.motivo) && (
-                    <div className="mt-0.5 text-white/60">{b.notas || b.motivo}</div>
+                    <div className="mt-0.5 text-xs">{b.notas || b.motivo}</div>
                   )}
                 </div>
               ))}
@@ -285,31 +285,31 @@ export default function CalendarWeekClient() {
                   <Link
                     key={r.id}
                     href={`/admin/bookings/${r.id}`}
-                    className="block rounded-xl border px-2.5 py-2 transition-all"
+                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass"
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-xs font-semibold truncate">
                         {r.clientName || 'Client'}
                       </span>
                       {r.estado && (
-                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase bg-white/10">
+                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase admin-tone-idle">
                           {r.estado}
                         </span>
                       )}
                     </div>
                     {resolveTimeLabel(r) && (
-                      <div className="text-[10px] text-white/60 mt-0.5">
+                      <div className="mt-0.5 text-[10px]">
                         {resolveTimeLabel(r)}
                       </div>
                     )}
-                    <div className="text-[10px] text-white/50 mt-0.5 truncate">
+                    <div className="mt-0.5 truncate text-[10px]">
                       {resolveServiceLabel(r)}
                       {r.ubicacion ? ` · ${r.ubicacion}` : ''}
                     </div>
                   </Link>
                 ))}
                 {!hasReservas && !hasBloqueos && (
-                  <div className="flex items-center justify-center h-full text-xs text-white/20">
+                  <div className="flex h-full items-center justify-center text-xs">
                     Lliure
                   </div>
                 )}
@@ -319,7 +319,7 @@ export default function CalendarWeekClient() {
               <div className="mt-2 pt-2 border-t border-white/5 flex gap-1">
                 <Link
                   href={`/admin/bookings/new?date=${key}`}
-                  className="flex-1 text-center rounded-lg border border-white/10 bg-white/5 py-1 text-[10px] font-medium transition-colors hover:bg-white/10"
+                  className="flex-1 rounded-lg border py-1 text-center text-[10px] font-medium transition-colors admin-tone-idle"
                 >
                   + Reserva
                 </Link>

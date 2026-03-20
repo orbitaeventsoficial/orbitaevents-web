@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PROPOSAL_STATUS_CONFIG, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { formatDate, formatCurrency } from '@/lib/constants';
 
 type ProposalItem = {
   id: string;
@@ -27,23 +27,27 @@ type QuoteItem = {
   lead: { name: string; email: string } | null;
 };
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  DRAFT: { label: 'Esborrany', bg: 'bg-white/10', text: 'text-white/70' },
-  SENT: { label: 'Enviat', bg: 'bg-blue-500/20', text: 'text-blue-300' },
-  ACCEPTED: { label: 'Acceptat', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
-  REJECTED: { label: 'Rebutjat', bg: 'bg-red-500/20', text: 'text-red-300' },
-  EXPIRED: { label: 'Caducat', bg: 'bg-amber-500/20', text: 'text-amber-300' },
+const DEFAULT_STATUS_STYLE = {
+  label: 'Esborrany',
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+  border: 'admin-tone-border-neutral',
 };
 
+const FILTERABLE_STATUSES = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED'] as const;
+
+function getProposalStatusStyle(status: string) {
+  return PROPOSAL_STATUS_CONFIG[status] || DEFAULT_STATUS_STYLE;
+}
+
 function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.DRAFT;
+  const cfg = getProposalStatusStyle(status);
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text} ${cfg.border}`}>
       {cfg.label}
     </span>
   );
 }
-
 
 function relativeDate(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -68,30 +72,29 @@ export default function ProposalsList({
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
 
-  const filtered = proposals.filter((p) => {
-    if (statusFilter && p.status !== statusFilter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      const matches =
-        p.reference.toLowerCase().includes(q) ||
-        (p.customer?.name || '').toLowerCase().includes(q) ||
-        (p.customer?.email || '').toLowerCase().includes(q);
-      if (!matches) return false;
-    }
-    return true;
+  const filtered = proposals.filter((proposal) => {
+    if (statusFilter && proposal.status !== statusFilter) return false;
+    if (!search) return true;
+
+    const query = search.toLowerCase();
+    return (
+      proposal.reference.toLowerCase().includes(query) ||
+      (proposal.customer?.name || '').toLowerCase().includes(query) ||
+      (proposal.customer?.email || '').toLowerCase().includes(query)
+    );
   });
 
   const stats = {
     total: proposals.length,
-    draft: proposals.filter((p) => p.status === 'DRAFT').length,
-    sent: proposals.filter((p) => p.status === 'SENT').length,
-    accepted: proposals.filter((p) => p.status === 'ACCEPTED').length,
-    rejected: proposals.filter((p) => p.status === 'REJECTED').length,
+    DRAFT: proposals.filter((proposal) => proposal.status === 'DRAFT').length,
+    SENT: proposals.filter((proposal) => proposal.status === 'SENT').length,
+    ACCEPTED: proposals.filter((proposal) => proposal.status === 'ACCEPTED').length,
+    REJECTED: proposals.filter((proposal) => proposal.status === 'REJECTED').length,
   };
 
   const totalValue = proposals
-    .filter((p) => p.status === 'ACCEPTED')
-    .reduce((sum, p) => sum + p.total, 0);
+    .filter((proposal) => proposal.status === 'ACCEPTED')
+    .reduce((sum, proposal) => sum + proposal.total, 0);
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -102,7 +105,6 @@ export default function ProposalsList({
       if (res.ok) {
         setActionMsg('Pressupost marcat com a enviat');
         setTimeout(() => setActionMsg(null), 3000);
-        // Refresh the page to see updated status
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
@@ -125,7 +127,7 @@ export default function ProposalsList({
         body: JSON.stringify({ status }),
       });
       if (res.ok) {
-        setActionMsg(`Estat canviat a ${STATUS_CONFIG[status]?.label || status}`);
+        setActionMsg(`Estat canviat a ${getProposalStatusStyle(status).label}`);
         setTimeout(() => setActionMsg(null), 3000);
         router.refresh();
       }
@@ -137,73 +139,57 @@ export default function ProposalsList({
 
   return (
     <section className="mb-6 space-y-4">
-      {/* Stats cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <button
           onClick={() => setStatusFilter('')}
-          className={`rounded-xl border p-3 text-left transition-colors ${!statusFilter ? 'border-cyan-500/50 bg-cyan-500/10' : 'hover:bg-white/[0.03]'}`}
+          className={`rounded-xl border p-3 text-left transition-colors ${!statusFilter ? 'border-white/20 bg-white/10' : 'admin-tone-idle'}`}
         >
           <p className="text-2xl font-bold">{stats.total}</p>
           <p className="text-xs opacity-60">Total</p>
         </button>
-        <button
-          onClick={() => setStatusFilter('DRAFT')}
-          className={`rounded-xl border p-3 text-left transition-colors ${statusFilter === 'DRAFT' ? 'border-white/30 bg-white/10' : 'hover:bg-white/[0.03]'}`}
-        >
-          <p className="text-2xl font-bold">{stats.draft}</p>
-          <p className="text-xs opacity-60">Esborranys</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter('SENT')}
-          className={`rounded-xl border p-3 text-left transition-colors ${statusFilter === 'SENT' ? 'border-blue-500/50 bg-blue-500/10' : 'hover:bg-white/[0.03]'}`}
-        >
-          <p className="text-2xl font-bold">{stats.sent}</p>
-          <p className="text-xs opacity-60">Enviats</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter('ACCEPTED')}
-          className={`rounded-xl border p-3 text-left transition-colors ${statusFilter === 'ACCEPTED' ? 'border-emerald-500/50 bg-emerald-500/10' : 'hover:bg-white/[0.03]'}`}
-        >
-          <p className="text-2xl font-bold">{stats.accepted}</p>
-          <p className="text-xs opacity-60">Acceptats</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter('REJECTED')}
-          className={`rounded-xl border p-3 text-left transition-colors ${statusFilter === 'REJECTED' ? 'border-red-500/50 bg-red-500/10' : 'hover:bg-white/[0.03]'}`}
-        >
-          <p className="text-2xl font-bold">{stats.rejected}</p>
-          <p className="text-xs opacity-60">Rebutjats</p>
-        </button>
+        {FILTERABLE_STATUSES.map((status) => {
+          const cfg = getProposalStatusStyle(status);
+          const count = stats[status];
+          const isActive = statusFilter === status;
+
+          return (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-xl border p-3 text-left transition-colors ${isActive ? `${cfg.border} ${cfg.bg}` : 'admin-tone-idle'}`}
+            >
+              <p className="text-2xl font-bold">{count}</p>
+              <p className="text-xs opacity-60">{cfg.label}{status === 'DRAFT' ? 's' : 's'}</p>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Revenue accepted */}
       {totalValue > 0 && (
         <div className="rounded-xl border px-4 py-2 text-sm">
-          Valor acceptat: <strong className="">{formatCurrency(totalValue)}</strong>
+          Valor acceptat: <strong>{formatCurrency(totalValue)}</strong>
         </div>
       )}
 
-      {/* Action message */}
       {actionMsg && (
         <div className="rounded-xl border px-4 py-2 text-sm">
           {actionMsg}
         </div>
       )}
 
-      {/* Search + filters */}
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
           placeholder="Cerca per client, referència..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] rounded-xl border bg-white/5 px-4 py-2 text-sm "
+          className="min-w-[200px] flex-1 rounded-xl border bg-white/5 px-4 py-2 text-sm"
           aria-label="Cercar pressupostos"
         />
         {statusFilter && (
           <button
             onClick={() => setStatusFilter('')}
-            className="rounded-full border px-3 py-1 text-xs hover:bg-white/10 transition-colors"
+            className="rounded-full border px-3 py-1 text-xs transition-colors hover:bg-white/10"
           >
             Netejar filtre
           </button>
@@ -216,85 +202,83 @@ export default function ProposalsList({
         </Link>
       </div>
 
-      {/* Proposals — mobile cards */}
-      <div className="lg:hidden space-y-3">
+      <div className="space-y-3 lg:hidden">
         {filtered.length === 0 ? (
-          <p className="text-center py-8 opacity-60">
+          <p className="py-8 text-center opacity-60">
             {search || statusFilter ? 'Cap resultat amb aquests filtres' : 'Cap pressupost creat encara'}
           </p>
         ) : (
-          filtered.map((p) => (
+          filtered.map((proposal) => (
             <article
-              key={p.id}
-              className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+              key={proposal.id}
+              className="block rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:bg-white/[0.06]"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
+                    href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
                     className="font-medium hover:underline"
                   >
-                    {p.reference}
+                    {proposal.reference}
                   </Link>
-                  <p className="text-sm opacity-70 truncate">
-                    <Link href={`/admin/clientes/${p.customerId}`} className="hover:underline">
-                      {p.customer?.name || 'Sense nom'}
+                  <p className="truncate text-sm opacity-70">
+                    <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                      {proposal.customer?.name || 'Sense nom'}
                     </Link>
                   </p>
                 </div>
-                <StatusBadge status={p.status} />
+                <StatusBadge status={proposal.status} />
               </div>
 
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="font-medium tabular-nums">{formatCurrency(p.total)}</span>
-                <span className="opacity-60">{relativeDate(p.createdAt)}</span>
+                <span className="tabular-nums font-medium">{formatCurrency(proposal.total)}</span>
+                <span className="opacity-60">{relativeDate(proposal.createdAt)}</span>
               </div>
 
-              {/* Action buttons */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Link
-                  href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
-                  className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                  href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                 >
                   ✏️ Editar
                 </Link>
-                {p.status === 'DRAFT' && (
+                {proposal.status === 'DRAFT' && (
                   <button
-                    onClick={() => handleSend(p.id)}
-                    disabled={sendingId === p.id}
-                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors disabled:opacity-50"
+                    onClick={() => handleSend(proposal.id)}
+                    disabled={sendingId === proposal.id}
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10 disabled:opacity-50"
                   >
-                    {sendingId === p.id ? '⏳ Enviant...' : '📧 Enviar'}
+                    {sendingId === proposal.id ? '⏳ Enviant...' : '📧 Enviar'}
                   </button>
                 )}
-                {p.status === 'SENT' && (
+                {proposal.status === 'SENT' && (
                   <>
                     <button
-                      onClick={() => handleStatus(p.id, 'ACCEPTED')}
-                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-emerald-500/30 px-3 py-2 text-sm text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                      onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
+                      className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/10"
                     >
                       ✅ Acceptat
                     </button>
                     <button
-                      onClick={() => handleStatus(p.id, 'REJECTED')}
-                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-red-500/30 px-3 py-2 text-sm text-red-300 hover:bg-red-500/10 transition-colors"
+                      onClick={() => handleStatus(proposal.id, 'REJECTED')}
+                      className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/10"
                     >
                       ❌ Rebutjat
                     </button>
                   </>
                 )}
-                {p.customer && (
+                {proposal.customer && (
                   <Link
-                    href={`/admin/clientes/${p.customerId}`}
-                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                    href={`/admin/clientes/${proposal.customerId}`}
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                   >
                     👤 Client
                   </Link>
                 )}
-                {p.leadId && (
+                {proposal.leadId && (
                   <Link
-                    href={`/admin/leads/${p.leadId}`}
-                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+                    href={`/admin/leads/${proposal.leadId}`}
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                   >
                     📋 Entrada
                   </Link>
@@ -305,16 +289,15 @@ export default function ProposalsList({
         )}
       </div>
 
-      {/* Proposals table — desktop */}
-      <div className="hidden lg:block rounded-2xl border overflow-hidden overflow-x-auto">
+      <div className="hidden overflow-hidden overflow-x-auto rounded-2xl border lg:block">
         <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
           <thead>
             <tr className="border-b bg-white/[0.03]">
               <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Ref.</th>
               <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Client</th>
-              <th scope="col" className="px-4 py-3 text-left font-medium opacity-70 hidden sm:table-cell">Estat</th>
+              <th scope="col" className="hidden px-4 py-3 text-left font-medium opacity-70 sm:table-cell">Estat</th>
               <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Import</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium opacity-70 hidden md:table-cell">Data</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-medium opacity-70 md:table-cell">Data</th>
               <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Accions</th>
             </tr>
           </thead>
@@ -326,82 +309,82 @@ export default function ProposalsList({
                 </td>
               </tr>
             ) : (
-              filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-white/[0.03] transition-colors">
+              filtered.map((proposal) => (
+                <tr key={proposal.id} className="transition-colors hover:bg-white/[0.03]">
                   <td className="px-4 py-3">
                     <Link
-                      href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
+                      href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
                       className="font-medium hover:underline"
                     >
-                      {p.reference}
+                      {proposal.reference}
                     </Link>
-                    <span className="sm:hidden ml-2"><StatusBadge status={p.status} /></span>
+                    <span className="ml-2 sm:hidden"><StatusBadge status={proposal.status} /></span>
                   </td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/clientes/${p.customerId}`} className="hover:underline">
-                      {p.customer?.name || 'Sense nom'}
+                    <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                      {proposal.customer?.name || 'Sense nom'}
                     </Link>
-                    <p className="text-xs opacity-50 truncate max-w-[200px]">{p.customer?.email}</p>
+                    <p className="max-w-[200px] truncate text-xs opacity-50">{proposal.customer?.email}</p>
                   </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <StatusBadge status={p.status} />
+                  <td className="hidden px-4 py-3 sm:table-cell">
+                    <StatusBadge status={proposal.status} />
                   </td>
-                  <td className="px-4 py-3 text-right font-medium tabular-nums">
-                    {formatCurrency(p.total)}
+                  <td className="px-4 py-3 text-right tabular-nums font-medium">
+                    {formatCurrency(proposal.total)}
                   </td>
-                  <td className="px-4 py-3 text-right opacity-60 hidden md:table-cell">
-                    {relativeDate(p.createdAt)}
+                  <td className="hidden px-4 py-3 text-right opacity-60 md:table-cell">
+                    {relativeDate(proposal.createdAt)}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <details className="relative inline-block">
-                      <summary className="cursor-pointer rounded-xl px-3 py-2 hover:bg-white/10 transition-colors list-none">
+                      <summary className="list-none cursor-pointer rounded-xl px-3 py-2 transition-colors hover:bg-white/10">
                         <span aria-hidden="true">⋯</span>
                         <span className="sr-only">Accions</span>
                       </summary>
-                      <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border bg-black/95 backdrop-blur-sm p-1 shadow-xl">
+                      <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border bg-black/95 p-1 shadow-xl backdrop-blur-sm">
                         <Link
-                          href={`/admin/presupuestos?proposalId=${p.id}&customerId=${p.customerId}`}
-                          className="block rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                          href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                          className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                         >
                           ✏️ Editar
                         </Link>
-                        {p.status === 'DRAFT' && (
+                        {proposal.status === 'DRAFT' && (
                           <button
-                            onClick={() => handleSend(p.id)}
-                            disabled={sendingId === p.id}
-                            className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 transition-colors disabled:opacity-50"
+                            onClick={() => handleSend(proposal.id)}
+                            disabled={sendingId === proposal.id}
+                            className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10 disabled:opacity-50"
                           >
-                            {sendingId === p.id ? '⏳ Enviant...' : '📧 Marcar enviat'}
+                            {sendingId === proposal.id ? '⏳ Enviant...' : '📧 Marcar enviat'}
                           </button>
                         )}
-                        {p.status === 'SENT' && (
+                        {proposal.status === 'SENT' && (
                           <>
                             <button
-                              onClick={() => handleStatus(p.id, 'ACCEPTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
+                              onClick={() => handleStatus(proposal.id, 'ACCEPTED')}
+                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                             >
                               ✅ Acceptat
                             </button>
                             <button
-                              onClick={() => handleStatus(p.id, 'REJECTED')}
-                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
+                              onClick={() => handleStatus(proposal.id, 'REJECTED')}
+                              className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                             >
                               ❌ Rebutjat
                             </button>
                           </>
                         )}
-                        {p.customer && (
+                        {proposal.customer && (
                           <Link
-                            href={`/admin/clientes/${p.customerId}`}
-                            className="block rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                            href={`/admin/clientes/${proposal.customerId}`}
+                            className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                           >
                             👤 Fitxa client
                           </Link>
                         )}
-                        {p.leadId && (
+                        {proposal.leadId && (
                           <Link
-                            href={`/admin/leads/${p.leadId}`}
-                            className="block rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                            href={`/admin/leads/${proposal.leadId}`}
+                            className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                           >
                             📋 Entrada
                           </Link>
@@ -416,25 +399,24 @@ export default function ProposalsList({
         </table>
       </div>
 
-      {/* Legacy quotes */}
       {quotes.length > 0 && (
         <details className="rounded-2xl border p-4">
-          <summary className="cursor-pointer text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">
+          <summary className="cursor-pointer text-sm font-medium opacity-70 transition-opacity hover:opacity-100">
             📄 Pressupostos antics (LeadDocument) — {quotes.length}
           </summary>
           <div className="mt-3 space-y-2">
-            {quotes.map((q) => (
-              <div key={q.id} className="flex items-center justify-between rounded-xl border p-3">
+            {quotes.map((quote) => (
+              <div key={quote.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
-                  <a href={q.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
-                    {q.title}
+                  <a href={quote.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
+                    {quote.title}
                   </a>
                   <p className="text-xs opacity-50">
-                    {q.lead?.name || 'Lead'} · {relativeDate(q.createdAt)}
+                    {quote.lead?.name || 'Lead'} · {relativeDate(quote.createdAt)}
                   </p>
                 </div>
                 <Link
-                  href={`/admin/leads/${q.leadId}`}
+                  href={`/admin/leads/${quote.leadId}`}
                   className="text-xs opacity-60 hover:opacity-100"
                 >
                   Veure lead →

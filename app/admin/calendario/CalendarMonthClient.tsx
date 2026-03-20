@@ -8,7 +8,7 @@ import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
 
 export default function CalendarMonthClient() {
   const toast = useToast();
@@ -245,7 +245,7 @@ export default function CalendarMonthClient() {
                 month: today.getMonth(),
               })
             }
-            className="inline-flex items-center rounded-lg border bg-amber-500/15 border-amber-500/30 text-amber-300 px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-amber-500/25 active:scale-[0.98]"
+            className="ap-btn text-xs admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning"
           >
             Avui
           </button>
@@ -257,7 +257,7 @@ export default function CalendarMonthClient() {
             Mes següent →
           </button>
           <div className="flex rounded-lg border overflow-hidden ml-2">
-            <span className="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold bg-amber-500/20 text-amber-300 border-r border-amber-500/20">
+            <span className="inline-flex items-center border-r px-2.5 py-1.5 text-xs font-semibold admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
               Mes
             </span>
             <button
@@ -300,49 +300,49 @@ export default function CalendarMonthClient() {
 
       {/* Stats ràpids del mes visible */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
-        <div className="admin-card-glass rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 sm:p-3 transition-all">
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-emerald-400/80">Reserves</span>
-              <span className="text-xl sm:text-2xl font-bold text-emerald-300">{stats.totalReservas}</span>
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-success">Reserves</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-success">{stats.totalReservas}</span>
             </div>
-            <span className="rounded-full bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-success admin-tone-border-success admin-tone-text-success">
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border border-rose-500/30 bg-rose-500/10 p-2.5 sm:p-3 transition-all">
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-danger admin-tone-border-danger">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-rose-400/80">Bloquejos</span>
-              <span className="text-xl sm:text-2xl font-bold text-rose-300">{stats.totalBloqueos}</span>
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-danger">Bloquejos</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-danger">{stats.totalBloqueos}</span>
             </div>
-            <span className="rounded-full bg-rose-500/15 border border-rose-500/25 px-2 py-0.5 text-[10px] font-medium text-rose-300">
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
               {stats.bloqueadoDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-2.5 sm:p-3 transition-all">
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-cyan-400/80">Dies lliures</span>
-              <span className="text-xl sm:text-2xl font-bold text-cyan-300">{stats.freeDays}</span>
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-info">Dies lliures</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.freeDays}</span>
             </div>
-            <span className="rounded-full bg-cyan-500/15 border border-cyan-500/25 px-2 py-0.5 text-[10px] font-medium text-cyan-300">
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
               Disponibles
             </span>
           </div>
         </div>
 
-        <div className="admin-card-glass rounded-xl border border-amber-500/30 bg-amber-500/10 p-2.5 sm:p-3 transition-all">
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-amber-400/80">Dies mixtes</span>
-              <span className="text-xl sm:text-2xl font-bold text-amber-300">{stats.mixedDays}</span>
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-warning">Dies mixtes</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.mixedDays}</span>
             </div>
-            <span className="rounded-full bg-amber-500/15 border border-amber-500/25 px-2 py-0.5 text-[10px] font-medium text-amber-300">
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
               Reserva + bloqueig
             </span>
           </div>
@@ -351,21 +351,21 @@ export default function CalendarMonthClient() {
 
       {/* Llegenda */}
       <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm">
-        <span className="font-medium text-white/70">Llegenda:</span>
+        <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
           <span className="text-xs sm:text-sm">Lliure</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm bg-emerald-500/50 border border-emerald-400/40" />
+          <span className="h-3 w-3 rounded-sm admin-tone-soft-success admin-tone-border-success" />
           <span className="text-xs sm:text-sm">Reserves</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm bg-rose-500/50 border border-rose-400/40" />
+          <span className="h-3 w-3 rounded-sm admin-tone-soft-danger admin-tone-border-danger" />
           <span className="text-xs sm:text-sm">Bloquejat</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm bg-amber-500/50 border border-amber-400/40" />
+          <span className="h-3 w-3 rounded-sm admin-tone-soft-warning admin-tone-border-warning" />
           <span className="text-xs sm:text-sm">Mixt</span>
         </div>
       </div>
@@ -389,19 +389,8 @@ export default function CalendarMonthClient() {
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
 
-          let bgClass = 'bg-white/5';
-          let hoverClass = 'hover:bg-white/10';
-          if (hasReservas && !hasBloqueos) {
-            bgClass = 'bg-emerald-600/30';
-            hoverClass = 'hover:bg-emerald-600/40';
-          } else if (!hasReservas && hasBloqueos) {
-            bgClass = 'bg-rose-600/30';
-            hoverClass = 'hover:bg-rose-600/40';
-          } else if (hasReservas && hasBloqueos) {
-            bgClass = 'bg-amber-600/30';
-            hoverClass = 'hover:bg-amber-600/40';
-          }
-
+          const tone = getCalendarTone(hasReservas, hasBloqueos);
+          const toneClasses = getCalendarToneClasses(tone);
           const isSelected = selectedDateKey === cell.key;
 
           return (
@@ -427,16 +416,11 @@ export default function CalendarMonthClient() {
                 setDraggingBookingId(null);
               }}
               className={[
-                'admin-calendar-cell flex h-[72px] sm:h-[80px] md:h-[88px] flex-col overflow-hidden p-1 sm:p-1.5 text-left text-xs transition-all',
-                bgClass,
-                hoverClass,
+                'admin-calendar-cell flex h-[72px] sm:h-[80px] md:h-[88px] flex-col overflow-hidden p-1 text-left text-xs transition-all sm:p-1.5',
+                toneClasses.card,
                 !cell.inCurrentMonth ? 'opacity-30' : '',
-                isSelected
-                  ? 'ring-2 ring-inset ring-cyan-400'
-                  : '',
-                dragOverDateKey === cell.key
-                  ? 'ring-2 ring-inset ring-amber-400/70'
-                  : '',
+                isSelected ? 'ring-2 ring-inset ring-cyan-400' : '',
+                dragOverDateKey === cell.key ? 'ring-2 ring-inset ring-amber-400/70' : '',
               ].join(' ')}
             >
               <div className="flex items-start justify-between gap-1">
@@ -444,8 +428,8 @@ export default function CalendarMonthClient() {
                   className={[
                     'inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs sm:text-sm font-semibold transition-colors',
                     isToday(cell.date)
-                      ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
-                      : 'text-white/70',
+                      ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info'
+                      : '',
                   ].join(' ')}
                 >
                   {cell.date.getDate()}
@@ -468,7 +452,7 @@ export default function CalendarMonthClient() {
                           setDraggingBookingId(null);
                           setDragOverDateKey(null);
                         }}
-                        className="rounded-md px-1 py-0.5 bg-emerald-500/20 text-emerald-200 cursor-grab active:cursor-grabbing">
+                        className="cursor-grab rounded-md px-1 py-0.5 admin-tone-soft-success admin-tone-text-success active:cursor-grabbing">
                         <div className="truncate font-semibold">
                           {r.leadId ? (
                             <Link
@@ -494,7 +478,7 @@ export default function CalendarMonthClient() {
                 )}
 
                 {hasBloqueos && (
-                  <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5 text-rose-300/80">
+                  <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5 admin-tone-text-danger/80">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
                     {dayData.bloqueos.length > 1
                       ? ` (+${dayData.bloqueos.length - 1})`
@@ -568,21 +552,21 @@ export default function CalendarMonthClient() {
                   value={blockNote}
                   onChange={(e) => setBlockNote(e.target.value)}
                   placeholder="p.ex. Vacances, manteniment..."
-                  className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                  className="ap-input text-sm"
                 />
               </div>
               <button
                 type="button"
                 disabled={blockingDate}
                 onClick={() => blockDay(selectedDayData.key!, blockNote)}
-                className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+                className="ap-btn ap-btn--primary text-sm disabled:opacity-50"
               >
                 {blockingDate ? 'Bloquejant...' : 'Confirmar bloqueig'}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowBlockForm(false); setBlockNote(''); }}
-                className="inline-flex items-center rounded-xl border px-3 py-2 text-sm transition-all active:scale-[0.98]"
+                className="ap-btn ap-btn--secondary text-sm"
               >
                 Cancel·lar
               </button>
@@ -652,7 +636,7 @@ export default function CalendarMonthClient() {
                           <input
                             type="date"
                             autoFocus
-                            className="rounded-xl border border-white/20 bg-white/5 px-2 py-0.5 text-[10px]"
+                            className="ap-input px-2 py-0.5 text-[10px]"
                             defaultValue={r.fechaEvento.slice(0, 10)}
                             onBlur={() => setChangingDateForBooking(null)}
                             onChange={(e) => {
@@ -666,7 +650,7 @@ export default function CalendarMonthClient() {
                         ) : (
                           <button
                             onClick={() => setChangingDateForBooking(r.id)}
-                            className="rounded-xl border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                            className="rounded-xl border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
                           >
                             Canviar data
                           </button>
@@ -702,7 +686,7 @@ export default function CalendarMonthClient() {
                         <button
                           type="button"
                           onClick={() => unblockDay(b.fecha.slice(0, 10))}
-                          className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                          className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
                         >
                           Desbloquejar
                         </button>

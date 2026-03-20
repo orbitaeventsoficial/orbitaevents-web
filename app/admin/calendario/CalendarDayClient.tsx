@@ -8,7 +8,7 @@ import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, STATUS_BADGES, HOURS, parseHour } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, STATUS_BADGES, HOURS, parseHour, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
 
 export default function CalendarDayClient() {
   const toast = useToast();
@@ -37,6 +37,8 @@ export default function CalendarDayClient() {
 
   const isBlocked = dayData.bloqueos.length > 0;
   const isTodayDate = isToday(currentDate);
+  const dayTone = getCalendarTone(dayData.reservas.length > 0, isBlocked);
+  const dayToneClasses = getCalendarToneClasses(dayTone);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,21 +124,21 @@ export default function CalendarDayClient() {
           <button
             onClick={() => navigateDay(-1)}
             type="button"
-            className="px-3 py-2 rounded-xl border border-white/10 text-sm hover:bg-white/5 transition-colors"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             ← Dia anterior
           </button>
           <button
             onClick={goToToday}
             type="button"
-            className="px-3 py-2 rounded-xl border border-white/10 text-sm hover:bg-white/5 transition-colors"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             Avui
           </button>
           <button
             onClick={() => navigateDay(1)}
             type="button"
-            className="px-3 py-2 rounded-xl border border-white/10 text-sm hover:bg-white/5 transition-colors"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             Dia següent →
           </button>
@@ -145,13 +147,13 @@ export default function CalendarDayClient() {
         <div className="flex items-center gap-2">
           <Link
             href="/admin/calendario?view=week"
-            className="px-3 py-2 rounded-xl border border-white/10 text-sm hover:bg-white/5 transition-colors"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             Setmana
           </Link>
           <Link
             href="/admin/calendario"
-            className="px-3 py-2 rounded-xl border border-white/10 text-sm hover:bg-white/5 transition-colors"
+            className="ap-btn ap-btn--secondary text-sm"
           >
             Mes
           </Link>
@@ -174,12 +176,12 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-white/10 p-0 overflow-hidden">
-              <div className={`px-5 py-3 border-b border-white/10 flex items-center justify-between ${isBlocked ? 'bg-rose-500/10' : isTodayDate ? 'bg-cyan-500/10' : 'bg-white/[0.02]'}`}>
+            <div className="overflow-hidden rounded-2xl border admin-card-glass">
+              <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
                   {!isBlocked && dayData.reservas.length > 0 && <span className="w-2.5 h-2.5 rounded-full" />}
-                  {!isBlocked && dayData.reservas.length === 0 && <span className="w-2.5 h-2.5 rounded-full bg-white/20" />}
+                  {!isBlocked && dayData.reservas.length === 0 && <span className="h-2.5 w-2.5 rounded-full admin-tone-bg-neutral" />}
                   <span className="text-sm font-medium">
                     {isBlocked ? 'Dia bloquejat' : `${dayData.reservas.length} reserv${dayData.reservas.length === 1 ? 'a' : 'es'}`}
                   </span>
@@ -193,7 +195,7 @@ export default function CalendarDayClient() {
                     <button
                       onClick={() => setShowBlockForm(!showBlockForm)}
                       type="button"
-                      className="text-xs px-3 py-1 rounded-xl border border-white/10 text-white/50 hover:bg-white/5 transition-colors"
+                      className="ap-btn ap-btn--secondary text-xs"
                     >
                       Bloquejar dia
                     </button>
@@ -208,13 +210,13 @@ export default function CalendarDayClient() {
               </div>
 
               {showBlockForm && (
-                <div className="px-5 py-3 border-b border-white/10 bg-white/[0.02] flex items-center gap-2">
+                <div className="flex items-center gap-2 border-b px-5 py-3 admin-card-glass">
                   <input
                     type="text"
                     value={blockNote}
                     onChange={(e) => setBlockNote(e.target.value)}
                     placeholder="Motiu del bloqueig (opcional)"
-                    className="flex-1 px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm "
+                    className="ap-input text-sm"
                   />
                   <button
                     onClick={() => blockDay(blockNote)}
@@ -226,7 +228,7 @@ export default function CalendarDayClient() {
                   <button
                     onClick={() => { setShowBlockForm(false); setBlockNote(''); }}
                     type="button"
-                    className="px-3 py-2 rounded-xl text-white/40 text-sm hover:bg-white/5 transition-colors"
+                    className="rounded-xl px-3 py-2 text-sm transition-colors admin-tone-idle"
                   >
                     Cancel·lar
                   </button>
@@ -244,7 +246,7 @@ export default function CalendarDayClient() {
 
                   return (
                     <div key={hour} className="flex border-b border-white/5 min-h-[48px]">
-                      <div className="w-16 flex-shrink-0 px-3 py-2 text-xs text-white/30 text-right border-r border-white/5">
+                      <div className="w-16 flex-shrink-0 border-r border-white/5 px-3 py-2 text-right text-xs">
                         {String(hour).padStart(2, '0')}:00
                       </div>
                       <div className="flex-1 flex items-stretch gap-1 px-2 py-1">
@@ -255,13 +257,13 @@ export default function CalendarDayClient() {
                               key={`${b.id}-${hour}`}
                               href={`/admin/bookings/${b.id}`}
                               className={`flex-1 rounded-lg px-3 py-1.5 text-xs transition-colors ${
-                                b.startH === hour ? 'bg-cyan-500/15 border border-cyan-500/30' : 'bg-cyan-500/5 border border-cyan-500/10'
+                                b.startH === hour ? 'border admin-tone-soft-info admin-tone-border-info' : 'border admin-tone-idle'
                               }`}
                             >
                               {b.startH === hour && (
                                 <>
-                                  <span className="font-medium text-white/80">{resolveServiceLabel(b)}</span>
-                                  {b.clientName && <span className="text-white/40 ml-2">{b.clientName}</span>}
+                                  <span className="font-medium">{resolveServiceLabel(b)}</span>
+                                  {b.clientName && <span className=" ml-2">{b.clientName}</span>}
                                 </>
                               )}
                             </Link>
@@ -274,16 +276,16 @@ export default function CalendarDayClient() {
 
                 {/* Bookings without time */}
                 {timelineBookings.filter((b) => b.startH === null).length > 0 && (
-                  <div className="border-t border-white/10 px-5 py-3 bg-white/[0.02]">
-                    <p className="text-xs text-white/30 mb-2">Sense hora definida:</p>
+                  <div className="border-t px-5 py-3 admin-card-glass">
+                    <p className="mb-2 text-xs">Sense hora definida:</p>
                     {timelineBookings.filter((b) => b.startH === null).map((b) => (
                       <Link
                         key={b.id}
                         href={`/admin/bookings/${b.id}`}
-                        className="block px-3 py-2 rounded-xl border border-white/10 mb-1 hover:bg-white/[0.03] transition-colors"
+                        className="mb-1 block rounded-xl border px-3 py-2 transition-colors admin-tone-idle"
                       >
                         <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
-                        {b.clientName && <span className="text-xs text-white/40 ml-2">{b.clientName}</span>}
+                        {b.clientName && <span className="text-xs  ml-2">{b.clientName}</span>}
                       </Link>
                     ))}
                   </div>
@@ -295,20 +297,20 @@ export default function CalendarDayClient() {
           {/* Detail sidebar */}
           <div className="space-y-4">
             {/* Summary card */}
-            <div className="rounded-2xl border border-white/10 p-5">
-              <h3 className="text-sm font-semibold mb-3 text-white/70">Resum del dia</h3>
+            <div className="rounded-2xl border p-5 admin-card-glass">
+              <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-white/40">Reserves</span>
+                  <span className="">Reserves</span>
                   <span className="font-medium">{dayData.reservas.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/40">Bloquejos</span>
+                  <span className="">Bloquejos</span>
                   <span className="font-medium">{dayData.bloqueos.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/40">Estat</span>
-                  <span className={`font-medium ${isBlocked ? 'text-rose-300' : dayData.reservas.length > 0 ? 'text-emerald-300' : 'text-white/50'}`}>
+                  <span className="">Estat</span>
+                  <span className={`font-medium ${dayToneClasses.text}`}>
                     {isBlocked ? 'Bloquejat' : dayData.reservas.length > 0 ? 'Ocupat' : 'Lliure'}
                   </span>
                 </div>
@@ -320,7 +322,7 @@ export default function CalendarDayClient() {
               <div className="rounded-2xl border p-5">
                 <h3 className="text-sm font-semibold mb-2">Bloquejos</h3>
                 {dayData.bloqueos.map((b) => (
-                  <div key={b.id} className="text-sm text-white/60">
+                  <div key={b.id} className="text-sm">
                     {b.motivo || b.notas || 'Sense motiu'}
                   </div>
                 ))}
@@ -334,20 +336,20 @@ export default function CalendarDayClient() {
                 <Link
                   key={b.id}
                   href={`/admin/bookings/${b.id}`}
-                  className="block rounded-2xl border border-white/10 p-5 hover:bg-white/[0.03] transition-colors"
+                  className="block rounded-2xl border p-5 transition-colors admin-card-glass"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
                   </div>
                   {b.clientName && (
-                    <p className="text-sm text-white/60">{b.clientName}</p>
+                    <p className="text-sm">{b.clientName}</p>
                   )}
                   {b.ubicacion && (
-                    <p className="text-xs text-white/40 mt-1">{b.ubicacion}</p>
+                    <p className="text-xs  mt-1">{b.ubicacion}</p>
                   )}
                   {(b.eventStartTime || b.eventEndTime) && (
-                    <p className="text-xs text-white/40 mt-1">
+                    <p className="text-xs  mt-1">
                       {b.eventStartTime}{b.eventEndTime ? ` – ${b.eventEndTime}` : ''}
                     </p>
                   )}
@@ -356,11 +358,11 @@ export default function CalendarDayClient() {
             })}
 
             {dayData.reservas.length === 0 && !isBlocked && (
-              <div className="rounded-2xl border border-white/10 p-5 text-center">
-                <p className="text-white/30 text-sm">Dia lliure</p>
+              <div className="rounded-2xl border p-5 text-center admin-card-glass">
+                <p className="text-sm">Dia lliure</p>
                 <Link
                   href={`/admin/bookings/new?date=${dateKey}`}
-                  className="inline-block mt-3 px-4 py-2 rounded-xl border text-sm transition-colors"
+                  className="mt-3 inline-flex ap-btn ap-btn--secondary text-sm"
                 >
                   + Nova reserva
                 </Link>

@@ -10,6 +10,12 @@ interface ChecklistItem {
   checked: boolean;
 }
 
+function progressTone(pct: number) {
+  if (pct === 100) return { bar: 'admin-tone-bg-success', text: 'admin-tone-text-success', check: 'ap-badge ap-badge--success' };
+  if (pct >= 50) return { bar: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', check: 'ap-badge ap-badge--warning' };
+  return { bar: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', check: 'ap-badge ap-badge--danger' };
+}
+
 export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +35,9 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
     }
   }, [bookingId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function save(updated: ChecklistItem[]) {
     setItems(updated);
@@ -46,9 +54,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   }
 
   function toggle(id: string) {
-    const updated = items.map((item) =>
-      item.id === id ? { ...item, checked: !item.checked } : item
-    );
+    const updated = items.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item));
     save(updated);
   }
 
@@ -68,8 +74,8 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 p-5">
-        <div className="animate-pulse h-4 w-32 rounded bg-white/10" />
+      <div className="ap-card rounded-2xl p-5">
+        <div className="admin-shimmer h-4 w-32 rounded" />
       </div>
     );
   }
@@ -77,60 +83,41 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   const done = items.filter((i) => i.checked).length;
   const total = items.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const tone = progressTone(pct);
 
   return (
-    <section className="rounded-2xl border border-white/10 p-5">
-      <div className="flex items-center justify-between mb-4">
+    <section className="ap-card rounded-2xl p-5">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold">Preparació del bolo</h3>
-          <p className="text-xs opacity-50 mt-0.5">{done}/{total} completat</p>
+          <p className="mt-0.5 text-xs admin-tone-text-neutral">{done}/{total} completat</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-20 h-2 rounded-full bg-white/5 overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all ${
-                pct === 100 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-rose-500'
-              }`}
-              style={{ width: `${pct}%` }}
-            />
+          <div className="h-2 w-20 overflow-hidden rounded-full admin-tone-bg-neutral">
+            <div className={`h-full rounded-full transition-all ${tone.bar}`} style={{ width: `${pct}%` }} />
           </div>
-          <span className={`text-sm font-bold ${
-            pct === 100 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-rose-400'
-          }`}>
-            {pct}%
-          </span>
+          <span className={`text-sm font-bold ${tone.text}`}>{pct}%</span>
         </div>
       </div>
 
       <ul className="space-y-1">
         {items.map((item) => (
-          <li key={item.id} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-white/[0.03] transition-colors">
+          <li key={item.id} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:admin-tone-bg-neutral">
             <button
               type="button"
               onClick={() => toggle(item.id)}
-              className={`flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                item.checked
-                  ? 'bg-emerald-500 border-emerald-500'
-                  : 'border-white/20 hover:border-white/40'
-              }`}
+              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-all ${item.checked ? 'admin-tone-border-success admin-tone-bg-success' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`}
               aria-label={item.checked ? `Desmarcar: ${item.label}` : `Marcar: ${item.label}`}
             >
               {item.checked && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
             </button>
-            <span className={`flex-1 text-sm ${item.checked ? 'line-through opacity-40' : ''}`}>
-              {item.label}
-            </span>
+            <span className={`flex-1 text-sm ${item.checked ? 'line-through opacity-40' : ''}`}>{item.label}</span>
             {item.id.startsWith('custom-') && (
-              <button
-                type="button"
-                onClick={() => removeItem(item.id)}
-                className="opacity-0 group-hover:opacity-40 hover:!opacity-100 text-xs transition-opacity"
-                aria-label={`Eliminar: ${item.label}`}
-              >
+              <button type="button" onClick={() => removeItem(item.id)} className="text-xs opacity-0 transition-opacity group-hover:opacity-60 hover:!opacity-100" aria-label={`Eliminar: ${item.label}`}>
                 ✕
               </button>
             )}
@@ -139,33 +126,28 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
       </ul>
 
       {adding ? (
-        <div className="flex gap-2 mt-3">
+        <div className="mt-3 flex gap-2">
           <input
             type="text"
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addItem()}
             placeholder="Nou ítem..."
-            className="flex-1 px-3 py-2 text-sm rounded-xl border border-white/10 bg-white/5 "
+            className="ap-input flex-1 px-3 py-2 text-sm"
             autoFocus
           />
-          <button type="button" onClick={addItem} className="px-3 py-2 text-sm rounded-xl bg-white/10 hover:bg-white/15 font-medium">
+          <button type="button" onClick={addItem} className="ap-btn ap-btn--primary">
             Afegir
           </button>
-          <button type="button" onClick={() => { setAdding(false); setNewLabel(''); }} className="px-3 py-2 text-sm rounded-xl hover:bg-white/5">
+          <button type="button" onClick={() => { setAdding(false); setNewLabel(''); }} className="ap-btn ap-btn--secondary">
             ✕
           </button>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          className="mt-3 w-full px-3 py-2 text-sm rounded-xl border border-dashed border-white/10 hover:border-white/20 hover:bg-white/[0.02] transition-colors text-center opacity-50 hover:opacity-80"
-        >
+        <button type="button" onClick={() => setAdding(true)} className="admin-tone-idle mt-3 w-full rounded-xl border border-dashed px-3 py-2 text-center text-sm transition-colors">
           + Afegir ítem
         </button>
       )}
     </section>
   );
 }
-

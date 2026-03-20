@@ -32,16 +32,11 @@ export default function DbReconnectButton() {
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <button
-        type="button"
-        onClick={reconnect}
-        disabled={loading}
-        className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
-      >
+      <button type="button" onClick={reconnect} disabled={loading} className="ap-btn ap-btn--secondary disabled:opacity-60">
         {loading ? 'Reiniciant connexio...' : 'Reiniciar connexio BBDD'}
       </button>
       {message ? (
-        <p className={`text-xs ${isError ? 'text-rose-300' : 'text-emerald-300'}`}>
+        <p className={`text-xs ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
           {message}
         </p>
       ) : null}

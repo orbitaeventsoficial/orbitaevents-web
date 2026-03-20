@@ -9,7 +9,7 @@ import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ComposeModal, QuoteModal } from './InboxModals';
 import type { LeadData, ImapEmail, UnifiedEmail, InboxStats, QuotePackOption } from './inbox-types';
-import { STATUS_COLORS } from './inbox-types';
+import { getLeadStatusTone } from './inbox-types';
 
 export default function InboxClient({
   initialLeads,
@@ -359,7 +359,7 @@ export default function InboxClient({
             onClick={() => setActiveTab('all')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              activeTab === 'all' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+              activeTab === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
             }`}
           >
             📬 Tot ({emails.length})
@@ -368,7 +368,7 @@ export default function InboxClient({
             onClick={() => setActiveTab('leads')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              activeTab === 'leads' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+              activeTab === 'leads' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
             }`}
           >
             📋 Entrades web ({initialLeads.length})
@@ -379,7 +379,7 @@ export default function InboxClient({
                 onClick={() => setActiveTab('emails')}
                 type="button"
                 className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  activeTab === 'emails' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                  activeTab === 'emails' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
                 }`}
               >
                 📧 Emails ({imapEmails.length})
@@ -393,7 +393,7 @@ export default function InboxClient({
                 onClick={() => setActiveTab('trash')}
                 type="button"
                 className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  activeTab === 'trash' ? 'bg-cyan-500/20 text-cyan-300' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                  activeTab === 'trash' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
                 }`}
               >
                 🗑️ Paperera {trashCount > 0 && `(${trashCount})`}
@@ -463,7 +463,7 @@ export default function InboxClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cercar..."
               aria-label="Cercar emails"
-              className="w-full pl-10 pr-4 py-2 rounded-xl border text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="ap-input py-2 pl-10 pr-4 text-sm"
             />
           </div>
         </div>
@@ -472,8 +472,8 @@ export default function InboxClient({
           <div
             className={`mx-3 mt-3 rounded-xl border px-3 py-2 text-xs ${
               flashMessage.type === 'success'
-                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                : 'border-rose-500/30 bg-rose-500/10 text-rose-300'
+                ? 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success'
+                : 'admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger'
             }`}
             role={flashMessage.type === 'error' ? 'alert' : 'status'}
             aria-live="polite"
@@ -510,15 +510,15 @@ export default function InboxClient({
                 onClick={() => handleSelectEmail(email)}
                 type="button"
                 className={`w-full text-left p-4 border-b border-white/5 hover:bg-white/[0.03] transition-colors ${
-                  selectedEmail?.id === email.id ? 'bg-cyan-500/10 border-l-4 border-l-cyan-500' : ''
-                } ${!email.read ? 'bg-blue-500/5' : ''}`}
+                  selectedEmail?.id === email.id ? 'admin-tone-bg-info border-l-4 admin-tone-border-info' : ''
+                } ${!email.read ? 'admin-tone-bg-info' : ''}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {!email.read && <span className="w-2 h-2 rounded-full flex-shrink-0" />}
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        email.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
+                        email.type === 'lead' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-bg-success admin-tone-text-success'
                       }`}>
                         {email.type === 'lead' ? 'Entrada web' : 'Correu IMAP'}
                       </span>
@@ -553,12 +553,12 @@ export default function InboxClient({
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs px-2 py-1 rounded ${
-                      selectedEmail.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
+                      selectedEmail.type === 'lead' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-bg-success admin-tone-text-success'
                     }`}>
                       {selectedEmail.type === 'lead' ? '📋 Entrada web' : '📧 Correu IMAP'}
                     </span>
                     {selectedEmail.leadData?.status && (
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[selectedEmail.leadData.status] || 'bg-white/5 text-white/40'}`}>
+                      <span className={`rounded border px-2 py-1 text-xs font-medium ${getLeadStatusTone(selectedEmail.leadData.status).bg} ${getLeadStatusTone(selectedEmail.leadData.status).text} ${getLeadStatusTone(selectedEmail.leadData.status).border}`}>
                         {selectedEmail.leadData.status}
                       </span>
                     )}
@@ -761,3 +761,11 @@ export default function InboxClient({
     </div>
   );
 }
+
+
+
+
+
+
+
+

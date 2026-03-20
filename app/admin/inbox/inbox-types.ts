@@ -3,6 +3,8 @@
  * Extret de InboxClient.tsx per reduir la mida del component.
  */
 
+import { LEAD_STATUS_CONFIG } from '@/lib/constants';
+
 export interface LeadData {
   id: string;
   name: string;
@@ -57,11 +59,13 @@ export interface QuotePackOption {
   price: number;
 }
 
-export const STATUS_COLORS: Record<string, string> = {
-  NEW: 'bg-blue-500/20 text-blue-300',
-  CONTACTED: 'bg-yellow-500/20 text-yellow-300',
-  QUOTE_SENT: 'bg-purple-500/20 text-purple-300',
-  NEGOTIATING: 'bg-orange-500/20 text-orange-300',
-  WON: 'bg-emerald-500/20 text-emerald-300',
-  LOST: 'bg-rose-500/20 text-rose-300',
+const DEFAULT_STATUS_TONE = {
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+  border: 'admin-tone-border-neutral',
+  label: 'Desconegut',
 };
+
+export function getLeadStatusTone(status: string) {
+  return LEAD_STATUS_CONFIG[status] || DEFAULT_STATUS_TONE;
+}

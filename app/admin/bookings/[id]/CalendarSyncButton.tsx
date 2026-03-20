@@ -47,12 +47,12 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
         type="button"
         onClick={syncNow}
         disabled={loading}
-        className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
+        className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs disabled:opacity-60"
       >
         {loading ? 'Sincronitzant...' : 'Sincronitza Google Calendar ara'}
       </button>
       {message && (
-        <p className={`text-[11px] ${isError ? 'text-rose-300' : 'text-emerald-300'}`}>
+        <p className={`text-[11px] ${isError ? 'admin-tone-text-danger' : 'admin-tone-text-success'}`}>
           {message}
         </p>
       )}

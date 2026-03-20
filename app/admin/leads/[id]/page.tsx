@@ -32,18 +32,14 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-import { LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber } from '@/lib/constants';
+import { LEAD_SCORE_BAND_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber } from '@/lib/constants';
 import { getAppBaseUrl } from '@/lib/site';
 
 
-const PRIORITY_LABELS = Object.fromEntries(
-  Object.entries(PRIORITY_CONFIG).map(([k, v]) => [k, { label: v.label, color: `${v.bg} ${v.text}` }])
-) as Record<string, { label: string; color: string }>;
-const SCORE_BAND_LABELS: Record<string, string> = {
-  LOW: 'BAIX',
-  MEDIUM: 'MITJÀ',
-  HIGH: 'ALT',
-};
+function getPriorityBadge(priority: string) {
+  const tone = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.MEDIUM;
+  return { label: tone.label, color: tone.bg + ' ' + tone.text };
+}
 
 function parseBudgetValue(input?: string | null): number | null {
   if (!input) return null;
@@ -118,7 +114,7 @@ export default async function LeadDetailPage({ params }: Props) {
 
   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
-  const priorityConf = PRIORITY_LABELS[lead.priority] || PRIORITY_LABELS.MEDIUM;
+  const priorityConf = getPriorityBadge(lead.priority);
   const baseUrl = getAppBaseUrl();
   const reviewUrl = lead.booking?.reviewToken
     ? `${baseUrl}/${lead.preferredLocale || 'es'}/valoracio?token=${lead.booking.reviewToken}&ref=${lead.booking.reference}`
@@ -335,7 +331,7 @@ export default async function LeadDetailPage({ params }: Props) {
               <InfoTooltip text={ADMIN_HELP.leadScore} />
             </p>
             <p className="text-xl font-semibold">
-              {leadScore.score} · {SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
+              {leadScore.score} · {LEAD_SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
             </p>
             <ScoreSnapshotButton leadId={lead.id} />
           </div>
@@ -409,7 +405,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 Reserva associada
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-white/10 p-4">
+                <div className="ap-card p-4">
                   <p className="font-medium">
                     📅 {formatDateFull(lead.booking.eventDate)}
                   </p>
@@ -418,7 +414,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <p className="text-sm">Ubicació: {lead.booking.eventLocation}</p>
                   <p className="text-sm">Convidats: {lead.booking.guestCount}</p>
                 </div>
-                <div className="rounded-xl border border-white/10 p-4">
+                <div className="ap-card p-4">
                   <p className="text-lg font-bold">
                     {formatNumber(lead.booking.total)}€
                   </p>
@@ -432,17 +428,17 @@ export default async function LeadDetailPage({ params }: Props) {
                     Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({formatNumber(lead.booking.remainingAmount)}€)
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/10 p-4 md:col-span-2">
+                <div className="ap-card p-4 md:col-span-2">
                   <h4 className="text-sm font-semibold mb-2">Post-event i automatitzacions</h4>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="text-sm">
                       <p className="">
                         Estat client: <strong className={
                           reviewFlowStatus === 'RESPONDIDO'
-                            ? 'text-emerald-600'
+                            ? 'admin-tone-text-success'
                             : reviewFlowStatus === 'ENVIADO'
-                              ? 'text-blue-600'
-                              : 'text-amber-600'
+                              ? 'admin-tone-text-info'
+                              : 'admin-tone-text-warning'
                         }>
                           {reviewFlowStatus === 'RESPONDIDO'
                             ? 'Respost'
@@ -454,7 +450,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         </strong>
                       </p>
                       <p className="">
-                        Enllaç de valoració enviat: <strong className={lead.booking.postEventEmailSent ? 'text-emerald-600' : 'text-amber-600'}>
+                        Enllaç de valoració enviat: <strong className={lead.booking.postEventEmailSent ? 'admin-tone-text-success' : 'admin-tone-text-warning'}>
                           {lead.booking.postEventEmailSent ? 'Sí' : 'No'}
                         </strong>
                       </p>
@@ -467,7 +463,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         Token de valoració: {lead.booking.reviewToken || '-'}
                       </p>
                       <p className="">
-                        El client ha respost: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
+                        El client ha respost: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'admin-tone-text-success' : 'admin-tone-text-warning'}>
                           {(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'Sí' : 'No'}
                         </strong>
                       </p>
@@ -483,10 +479,10 @@ export default async function LeadDetailPage({ params }: Props) {
                       <p className="">
                         Estat intern de post-esdeveniment: <strong className={
                           internalPostEventStatus === 'COMPLETO'
-                            ? 'text-emerald-600'
+                            ? 'admin-tone-text-success'
                             : internalPostEventStatus === 'EN_PROGRESO'
-                              ? 'text-blue-600'
-                              : 'text-amber-600'
+                              ? 'admin-tone-text-info'
+                              : 'admin-tone-text-warning'
                         }>
                           {internalPostEventStatus === 'COMPLETO'
                             ? 'Completat'
@@ -518,7 +514,7 @@ export default async function LeadDetailPage({ params }: Props) {
                       <input type="hidden" name="bookingId" value={lead.booking.id} />
                       <button
                         type="submit"
-                        className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white"
+                        className="ap-btn ap-btn--primary inline-flex items-center px-3 py-1.5 text-xs"
                       >
                         Enviar enllaç valoració
                       </button>
@@ -530,7 +526,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-semibold text-white"
+                        className="ap-btn ap-btn--primary inline-flex items-center px-3 py-1.5 text-xs"
                       >
                         Enviar per WhatsApp
                       </a>
@@ -540,21 +536,21 @@ export default async function LeadDetailPage({ params }: Props) {
                         href={reviewUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium"
+                        className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs"
                       >
                         Obrir formulari client
                       </a>
                     )}
-                    <Link href={`/admin/bookings/${lead.booking.id}`} className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium">
+                    <Link href={`/admin/bookings/${lead.booking.id}`} className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
                       Veure reserva completa
                     </Link>
-                    <Link href="/admin/post-event/reports" className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium">
+                    <Link href="/admin/post-event/reports" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
                       Informes post-event
                     </Link>
-                    <Link href="/admin/post-event/surveys" className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium">
+                    <Link href="/admin/post-event/surveys" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
                       Enquestes client
                     </Link>
-                    <Link href="/admin/emails" className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium">
+                    <Link href="/admin/emails" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
                       Automatitzacions de correu
                     </Link>
                   </div>
@@ -743,7 +739,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <Link
                     key={item.id}
                     href={`/admin/leads/${item.id}`}
-                    className="block rounded-xl border border-white/10 p-3"
+                    className="ap-card block p-3"
                   >
                     <p className="text-sm font-medium">
                       {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}
@@ -782,4 +778,11 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
+
+
+
+
+
+
+
 

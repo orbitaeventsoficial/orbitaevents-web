@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Pencil, Trash2, Plus } from 'lucide-react';
-import { log } from '@/lib/logger';
-import { formatDateSimple } from '@/lib/constants';
-import { AdminPage } from '../components/AdminPage';
-import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { formatDateSimple } from '@/lib/constants';
+import { log } from '@/lib/logger';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { AdminPage } from '../components/AdminPage';
 
 interface BlogPost {
   id: string;
@@ -28,6 +28,14 @@ interface BlogPost {
     title: string;
     excerpt: string;
   }[];
+}
+
+function getFlashClass(type: 'success' | 'error') {
+  return type === 'success' ? 'ap-inline-alert ap-inline-alert--success' : 'ap-inline-alert ap-inline-alert--danger';
+}
+
+function getPublishBadgeClass(isPublished: boolean) {
+  return isPublished ? 'ap-badge ap-badge--success' : 'ap-badge ap-badge--warning';
 }
 
 export default function BlogAdminPage() {
@@ -70,14 +78,16 @@ export default function BlogAdminPage() {
   }, [searchParams]);
 
   const handleDelete = async (id: string) => {
-    const ok = await confirm({ title: 'Eliminar post', message: 'Segur que vols eliminar aquest post?', confirmLabel: 'Eliminar', variant: 'danger' });
+    const ok = await confirm({
+      title: 'Eliminar post',
+      message: 'Segur que vols eliminar aquest post?',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
     if (!ok) return;
 
     try {
-      const res = await fetchWithCsrf(`/api/admin/blog?id=${id}`, {
-        method: 'DELETE',
-      });
-
+      const res = await fetchWithCsrf(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
         setFlashMessage({ type: 'success', text: 'Post eliminat correctament' });
         fetchPosts();
@@ -92,13 +102,10 @@ export default function BlogAdminPage() {
 
   const handleTogglePublish = async (post: BlogPost) => {
     try {
-      const res = await fetchWithCsrf(`/api/admin/blog`, {
+      const res = await fetchWithCsrf('/api/admin/blog', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: post.id,
-          isPublished: !post.isPublished,
-        }),
+        body: JSON.stringify({ id: post.id, isPublished: !post.isPublished }),
       });
 
       if (res.ok) {
@@ -122,42 +129,24 @@ export default function BlogAdminPage() {
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
             aria-label="Idioma"
-            className="rounded-xl border px-4 py-2 "
+            className="ap-input rounded-xl px-4 py-2"
           >
             <option value="es">Castellà</option>
             <option value="ca">Català</option>
           </select>
 
-          <button
-            onClick={() => (router.push('/admin/blog/new'))}
-            type="button"
-            className="ap-btn ap-btn--primary flex items-center gap-2"
-          >
+          <button onClick={() => router.push('/admin/blog/new')} type="button" className="ap-btn ap-btn--primary flex items-center gap-2">
             <Plus className="h-5 w-5" />
             Nou post
           </button>
         </div>
       }
     >
-
       {flashMessage && (
-        <div
-          className={`rounded-xl border px-4 py-3 text-sm ${
-            flashMessage.type === 'success'
-              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-              : 'border-rose-500/30 bg-rose-500/10 text-rose-300'
-          }`}
-          role={flashMessage.type === 'success' ? 'status' : 'alert'}
-          aria-live="polite"
-        >
+        <div className={getFlashClass(flashMessage.type)} role={flashMessage.type === 'success' ? 'status' : 'alert'} aria-live="polite">
           <div className="flex items-center justify-between gap-4">
             <span>{flashMessage.text}</span>
-            <button
-              onClick={() => setFlashMessage(null)}
-              type="button"
-              aria-label="Tancar missatge"
-              className="text-xs"
-            >
+            <button onClick={() => setFlashMessage(null)} type="button" aria-label="Tancar missatge" className="text-xs">
               ✕
             </button>
           </div>
@@ -165,47 +154,40 @@ export default function BlogAdminPage() {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+        <div className="flex items-center justify-center py-20 admin-tone-text-neutral" role="status" aria-live="polite">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
-          <p className="">Encara no hi ha posts</p>
-          <button
-            onClick={() => (router.push('/admin/blog/new'))}
-            type="button"
-            className="mt-4"
-          >
+        <div className="ap-card ap-empty rounded-2xl">
+          <p className="ap-empty-title">Encara no hi ha posts</p>
+          <button onClick={() => router.push('/admin/blog/new')} type="button" className="ap-btn ap-btn--primary mt-4">
             Crea el primer
           </button>
         </div>
       ) : (
         <>
-          {/* Mobile cards */}
-          <section className="lg:hidden space-y-3">
+          <section className="space-y-3 lg:hidden">
             {posts.map((post) => {
               const translation = post.translations[0];
               return (
-                <article key={post.id} className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors">
+                <article key={post.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate">{translation?.title || 'Sense títol'}</p>
-                      <p className="text-xs mt-0.5">/{post.slug}</p>
+                      <p className="truncate font-medium">{translation?.title || 'Sense títol'}</p>
+                      <p className="mt-0.5 text-xs admin-tone-text-slate">/{post.slug}</p>
                     </div>
                     <button
                       onClick={() => handleTogglePublish(post)}
                       type="button"
                       aria-pressed={post.isPublished}
-                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
-                        post.isPublished ? 'admin-tone-soft-success' : 'bg-yellow-500/20 text-yellow-300'
-                      }`}
+                      className={getPublishBadgeClass(post.isPublished)}
                     >
                       {post.isPublished ? 'Publicat' : 'Esborrany'}
                     </button>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-full px-2.5 py-0.5 text-[10px] bg-white/5">{post.category}</span>
+                  <div className="mt-3 flex items-center justify-between border-t pt-3 text-xs admin-tone-border-neutral">
+                    <div className="flex items-center gap-3 admin-tone-text-slate">
+                      <span className="ap-badge">{post.category}</span>
                       <span>{post.viewCount} visites</span>
                       <span>{formatDateSimple(post.createdAt)}</span>
                     </div>
@@ -213,7 +195,7 @@ export default function BlogAdminPage() {
                       <button
                         onClick={() => router.push(`/admin/blog/edit/${post.id}`)}
                         type="button"
-                        className="rounded-xl p-2.5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="ap-btn ap-btn--secondary flex min-h-[44px] min-w-[44px] items-center justify-center p-2.5"
                         title="Editar"
                       >
                         <Pencil className="h-4 w-4" />
@@ -221,7 +203,7 @@ export default function BlogAdminPage() {
                       <button
                         onClick={() => handleDelete(post.id)}
                         type="button"
-                        className="rounded-xl p-2.5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="ap-btn ap-btn--danger flex min-h-[44px] min-w-[44px] items-center justify-center p-2.5"
                         title="Eliminar"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -233,85 +215,45 @@ export default function BlogAdminPage() {
             })}
           </section>
 
-          {/* Desktop table */}
-          <div className="hidden lg:block rounded-2xl border admin-card-glass overflow-x-auto">
-            <table className="w-full text-sm" aria-label="Llistat d'articles del blog">
-              <thead className="border-b">
+          <div className="hidden lg:block ap-table-wrap">
+            <table className="ap-table w-full text-sm" aria-label="Llistat d'articles del blog">
+              <thead className="ap-table-head">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left font-medium">
-                    Títol
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium">
-                    Categoria
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium">
-                    Estat
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium">
-                    Visites
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium">
-                    Data
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right font-medium">
-                    Accions
-                  </th>
+                  <th scope="col" className="ap-table-th">Títol</th>
+                  <th scope="col" className="ap-table-th">Categoria</th>
+                  <th scope="col" className="ap-table-th">Estat</th>
+                  <th scope="col" className="ap-table-th">Visites</th>
+                  <th scope="col" className="ap-table-th">Data</th>
+                  <th scope="col" className="ap-table-th text-right">Accions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="ap-table-body">
                 {posts.map((post) => {
                   const translation = post.translations[0];
                   return (
-                    <tr key={post.id} className="hover:bg-white/[0.03] transition-colors">
+                    <tr key={post.id}>
                       <td className="px-6 py-4">
                         <div>
-                          <div className="font-medium">
-                            {translation?.title || 'Sense títol'}
-                          </div>
-                          <div className="text-sm">/{post.slug}</div>
+                          <div className="font-medium">{translation?.title || 'Sense títol'}</div>
+                          <div className="text-sm admin-tone-text-slate">/{post.slug}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="rounded-full px-3 py-1 text-xs">
-                          {post.category}
-                        </span>
+                        <span className="ap-badge">{post.category}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleTogglePublish(post)}
-                          type="button"
-                          aria-pressed={post.isPublished}
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            post.isPublished
-                              ? 'admin-tone-soft-success'
-                              : 'bg-yellow-500/20 text-yellow-300'
-                          }`}
-                        >
+                        <button onClick={() => handleTogglePublish(post)} type="button" aria-pressed={post.isPublished} className={getPublishBadgeClass(post.isPublished)}>
                           {post.isPublished ? 'Publicat' : 'Esborrany'}
                         </button>
                       </td>
                       <td className="px-6 py-4">{post.viewCount}</td>
-                      <td className="px-6 py-4 text-sm">
-                        {formatDateSimple(post.createdAt)}
-                      </td>
+                      <td className="px-6 py-4 admin-tone-text-slate">{formatDateSimple(post.createdAt)}</td>
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() =>
-                              (router.push(`/admin/blog/edit/${post.id}`))
-                            }
-                            type="button"
-                            className="rounded-xl p-2 transition-colors"
-                            title="Editar"
-                          >
+                          <button onClick={() => router.push(`/admin/blog/edit/${post.id}`)} type="button" className="ap-btn ap-btn--secondary p-2" title="Editar">
                             <Pencil className="h-5 w-5" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(post.id)}
-                            type="button"
-                            className="rounded-xl p-2 transition-colors"
-                            title="Eliminar"
-                          >
+                          <button onClick={() => handleDelete(post.id)} type="button" className="ap-btn ap-btn--danger p-2" title="Eliminar">
                             <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
@@ -325,23 +267,11 @@ export default function BlogAdminPage() {
 
           {totalPages > 1 && (
             <div className="mt-6 flex justify-center gap-2">
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-                type="button"
-                className="rounded-xl border px-4 py-2 disabled:opacity-50 transition-colors"
-              >
+              <button onClick={() => setPage(page - 1)} disabled={page === 1} type="button" className="ap-btn ap-btn--secondary">
                 Anterior
               </button>
-              <span className="flex items-center px-4">
-                Pàgina {page} de {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={page === totalPages}
-                type="button"
-                className="rounded-xl border px-4 py-2 disabled:opacity-50 transition-colors"
-              >
+              <span className="flex items-center px-4 admin-tone-text-slate">Pàgina {page} de {totalPages}</span>
+              <button onClick={() => setPage(page + 1)} disabled={page === totalPages} type="button" className="ap-btn ap-btn--secondary">
                 Següent
               </button>
             </div>
@@ -352,5 +282,3 @@ export default function BlogAdminPage() {
     </AdminPage>
   );
 }
-
-

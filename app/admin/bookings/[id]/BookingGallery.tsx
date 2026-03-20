@@ -9,22 +9,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { BOOKING_GALLERY_PORTFOLIO_CATEGORIES } from '@/lib/constants';
 
 const MAX_DIMENSION = 1200;
 const WEBP_QUALITY = 0.85;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-const PORTFOLIO_CATEGORIES = [
-  { slug: 'bodas', name: 'Bodas' },
-  { slug: 'discomovil', name: 'Discomovil' },
-  { slug: 'eventos-empresa', name: 'Eventos empresa' },
-  { slug: 'fiestas-infantiles', name: 'Fiestas infantiles' },
-  { slug: 'fiestas-privadas', name: 'Fiestas privadas' },
-  { slug: 'produccion-tecnica', name: 'Producción técnica' },
-  { slug: 'alquiler-equipo', name: 'Alquiler equipo' },
-  { slug: 'fiestas-tematicas-halloween', name: 'Fiestas temáticas Halloween' },
-  { slug: 'fiestas-tematicas-mon-magic', name: 'Fiestas temáticas Món Màgic' },
-];
 
 type GalleryPhoto = {
   id: string;
@@ -194,7 +183,7 @@ export default function BookingGallery({ bookingId }: Props) {
       <div className="animate-pulse space-y-3">
         <div className="h-6 w-1/4 rounded bg-white/10" />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="aspect-square rounded-xl bg-white/5" />)}
+          {[1, 2, 3, 4].map((i) => <div key={i} className="aspect-square rounded-xl admin-tone-bg-neutral" />)}
         </div>
       </div>
     );
@@ -255,7 +244,7 @@ export default function BookingGallery({ bookingId }: Props) {
             <div
               key={photo.id}
               className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                selectedId === photo.id ? 'border-cyan-500 ring-2 ring-cyan-500/30' : 'border-white/10 hover:border-white/30'
+                selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'
               }`}
               onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)}
             >
@@ -269,10 +258,10 @@ export default function BookingGallery({ bookingId }: Props) {
               {/* Badges */}
               <div className="absolute top-2 left-2 flex gap-1">
                 {photo.isPortal && (
-                  <span className="bg-blue-500/80 text-white text-[9px] px-1.5 py-0.5 rounded-full font-medium">Portal</span>
+                  <span className="ap-badge ap-badge--info text-[9px]">Portal</span>
                 )}
                 {photo.isPortfolio && (
-                  <span className="bg-purple-500/80 text-white text-[9px] px-1.5 py-0.5 rounded-full font-medium">Portfolio</span>
+                  <span className="ap-badge text-[9px]">Portfolio</span>
                 )}
               </div>
               {/* Delete on hover */}
@@ -304,7 +293,7 @@ export default function BookingGallery({ bookingId }: Props) {
 
       {/* Selected photo details */}
       {selected && (
-        <div className="rounded-xl border border-white/10 p-4 space-y-3">
+        <div className="ap-card rounded-xl p-4 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Configuració de la foto</p>
             <button
@@ -325,7 +314,7 @@ export default function BookingGallery({ bookingId }: Props) {
               aria-checked={selected.isPortal}
               onClick={() => toggleFlag(selected, 'isPortal')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                selected.isPortal ? 'bg-blue-500' : 'bg-white/20'
+                selected.isPortal ? 'admin-tone-bg-info' : 'admin-tone-bg-neutral'
               }`}
             >
               <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
@@ -344,13 +333,13 @@ export default function BookingGallery({ bookingId }: Props) {
               onClick={() => {
                 if (!selected.isPortfolio) {
                   // Quan s'activa, seleccionar carpeta per defecte
-                  toggleFlag(selected, 'isPortfolio', selected.portfolioSlug || PORTFOLIO_CATEGORIES[0].slug);
+                  toggleFlag(selected, 'isPortfolio', selected.portfolioSlug || BOOKING_GALLERY_PORTFOLIO_CATEGORIES[0].slug);
                 } else {
                   toggleFlag(selected, 'isPortfolio');
                 }
               }}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                selected.isPortfolio ? 'bg-purple-500' : 'bg-white/20'
+                selected.isPortfolio ? 'admin-tone-bg-violet' : 'admin-tone-bg-neutral'
               }`}
             >
               <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
@@ -367,9 +356,9 @@ export default function BookingGallery({ bookingId }: Props) {
                 id="portfolio-slug"
                 value={selected.portfolioSlug || ''}
                 onChange={(e) => setPortfolioSlug(selected, e.target.value)}
-                className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="ap-input w-full px-3 py-2.5 text-sm"
               >
-                {PORTFOLIO_CATEGORIES.map((cat) => (
+                {BOOKING_GALLERY_PORTFOLIO_CATEGORIES.map((cat) => (
                   <option key={cat.slug} value={cat.slug}>{cat.name}</option>
                 ))}
               </select>
@@ -380,3 +369,5 @@ export default function BookingGallery({ bookingId }: Props) {
     </div>
   );
 }
+
+

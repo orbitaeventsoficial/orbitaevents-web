@@ -612,8 +612,8 @@ export default function NewBookingForm() {
                 aria-pressed={form.eventType === et.value}
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
-                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/60'
-                    : 'border-white/10 bg-white/[0.03] text-white/40 hover:bg-white/[0.06]'
+                    ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
+                    : 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral hover:brightness-105'
                 }`}
               >
                 <span className="text-base leading-none">{et.icon}</span>
@@ -725,8 +725,8 @@ export default function NewBookingForm() {
                 onClick={() => updateField('packId', pack.id)}
                 className={`rounded-xl border p-4 text-center transition-all ${
                   isSelected
-                    ? 'border-cyan-400 bg-cyan-500/15 ring-1 ring-cyan-400/50'
-                    : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05]'
+                    ? 'admin-tone-border-info admin-tone-bg-info'
+                    : 'admin-tone-border-neutral admin-tone-bg-neutral hover:brightness-105'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -789,8 +789,8 @@ export default function NewBookingForm() {
                   key={extra.id}
                   className={`flex items-center justify-between rounded-xl border p-3 transition-all ${
                     isSelected
-                      ? 'border-emerald-400/50 bg-emerald-500/10'
-                      : 'border-white/10 bg-white/[0.02]'
+                      ? 'admin-tone-border-success admin-tone-bg-success'
+                      : 'admin-tone-border-neutral admin-tone-bg-neutral'
                   }`}
                 >
                   <button
@@ -798,7 +798,7 @@ export default function NewBookingForm() {
                     onClick={() => toggleExtra(extra)}
                     className="flex-1 text-center"
                   >
-                    <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-white/60'}`}>
+                    <span className={`text-sm font-medium ${isSelected ? 'admin-tone-text-success' : 'admin-tone-text-neutral'}`}>
                       {isSelected ? '✓ ' : ''}{name}
                     </span>
                     <span className="ml-2 text-xs">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
@@ -911,13 +911,13 @@ export default function NewBookingForm() {
                 type="button"
                 onClick={() => validateDiscountCode(form.discountCode)}
                 disabled={validatingCode || !form.discountCode}
-                className="rounded-xl border px-3 py-2 text-xs font-medium disabled:opacity-50 transition-colors"
+                className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
               >
                 {validatingCode ? '...' : 'Validar'}
               </button>
             </div>
             {discountValidation && (
-              <p className={`mt-1 text-xs ${discountValidation.valid ? 'text-emerald-300' : 'text-rose-300'}`}>
+              <p className={`mt-1 text-xs ${discountValidation.valid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                 {discountValidation.valid
                   ? `Vàlid: ${discountValidation.type === 'PERCENTAGE' ? `${discountValidation.value}%` : `${discountValidation.value}€`} (${discountValidation.source})`
                   : `Invàlid: ${discountValidation.reason}`}
@@ -1000,9 +1000,9 @@ export default function NewBookingForm() {
       {/* Margin estimate */}
       {marginEstimate && (
         <div className={`rounded-2xl border-2 p-5 ${
-          marginEstimate.tone === 'emerald' ? 'border-emerald-500/30 bg-emerald-500/5' :
-          marginEstimate.tone === 'amber' ? 'border-amber-500/30 bg-amber-500/5' :
-          'border-rose-500/30 bg-rose-500/5'
+          marginEstimate.tone === 'emerald' ? 'admin-tone-border-success admin-tone-bg-success' :
+          marginEstimate.tone === 'amber' ? 'admin-tone-border-warning admin-tone-bg-warning' :
+          'admin-tone-border-danger admin-tone-bg-danger'
         }`}>
           <h2 className="text-sm font-semibold mb-3">Rendibilitat estimada</h2>
           <div className="grid grid-cols-3 gap-4 text-center">
@@ -1013,26 +1013,26 @@ export default function NewBookingForm() {
             <div>
               <p className="text-xs opacity-60">Marge net</p>
               <p className={`text-lg font-bold ${
-                marginEstimate.tone === 'emerald' ? 'text-emerald-400' :
-                marginEstimate.tone === 'amber' ? 'text-amber-400' :
-                'text-rose-400'
+                marginEstimate.tone === 'emerald' ? 'admin-tone-text-success' :
+                marginEstimate.tone === 'amber' ? 'admin-tone-text-warning' :
+                'admin-tone-text-danger'
               }`}>{marginEstimate.netMargin.toFixed(0)}€</p>
             </div>
             <div>
               <p className="text-xs opacity-60">Marge %</p>
               <p className={`text-lg font-bold ${
-                marginEstimate.tone === 'emerald' ? 'text-emerald-400' :
-                marginEstimate.tone === 'amber' ? 'text-amber-400' :
-                'text-rose-400'
+                marginEstimate.tone === 'emerald' ? 'admin-tone-text-success' :
+                marginEstimate.tone === 'amber' ? 'admin-tone-text-warning' :
+                'admin-tone-text-danger'
               }`}>{marginEstimate.marginPct.toFixed(1)}%</p>
             </div>
           </div>
-          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mt-3">
+          <div className="admin-tone-bg-neutral mt-3 h-2 w-full overflow-hidden rounded-full">
             <div
               className={`h-full rounded-full transition-all ${
-                marginEstimate.tone === 'emerald' ? 'bg-emerald-500' :
-                marginEstimate.tone === 'amber' ? 'bg-amber-500' :
-                'bg-rose-500'
+                marginEstimate.tone === 'emerald' ? 'admin-tone-bg-success' :
+                marginEstimate.tone === 'amber' ? 'admin-tone-bg-warning' :
+                'admin-tone-bg-danger'
               }`}
               style={{ width: `${Math.min(100, Math.max(0, marginEstimate.marginPct))}%` }}
             />
@@ -1049,13 +1049,13 @@ export default function NewBookingForm() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.clientName || !form.clientEmail || !form.packId}
-          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="ap-btn ap-btn--primary px-6 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Creant reserva...' : 'Crear reserva'}
         </button>
         <Link
           href="/admin/bookings"
-          className="rounded-xl border px-4 py-3 text-sm transition-colors"
+          className="ap-btn ap-btn--secondary px-4 py-3 text-sm"
         >
           Cancel·lar
         </Link>
@@ -1063,6 +1063,8 @@ export default function NewBookingForm() {
     </AdminPage>
   );
 }
+
+
 
 
 

@@ -27,21 +27,11 @@ export interface CustomerStats {
   recentMonth: number;
 }
 
+import { CUSTOMER_SOURCE_LABELS } from '@/lib/constants';
+
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-export const SOURCE_LABELS: Record<string, string> = {
-  website: 'Web',
-  configurator: 'Configurador',
-  phone: 'Telèfon',
-  whatsapp: 'WhatsApp',
-  instagram: 'Instagram',
-  wallapop: 'Wallapop',
-  referral: 'Boca-orella',
-  google: 'Google',
-  other: 'Altre',
-  manual: 'Manual',
-  testimonial_form: 'Ressenya',
-};
+export const SOURCE_LABELS = CUSTOMER_SOURCE_LABELS;
 
 export type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
@@ -89,3 +79,4 @@ export function getExecutionPriority(customer: Customer): { level: ExecutionPrio
   }
   return { level: 'BAIXA', score: 20, hint: 'Seguiment no urgent' };
 }
+

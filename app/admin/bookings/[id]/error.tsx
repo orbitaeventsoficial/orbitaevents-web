@@ -10,28 +10,28 @@ export default function BookingDetailError({
   reset: () => void;
 }) {
   return (
-    <div className="flex items-center justify-center min-h-[50vh] p-4">
-      <div className="max-w-md w-full rounded-2xl border p-8 text-center">
-        <p className="text-4xl mb-4">⚠️</p>
-        <h2 className="text-lg font-bold mb-2">
+    <div className="flex min-h-[50vh] items-center justify-center p-4">
+      <div className="ap-card max-w-md p-8 text-center">
+        <p className="mb-4 text-4xl">⚠️</p>
+        <h2 className="mb-2 text-lg font-bold">
           Error carregant la reserva
         </h2>
-        <p className="text-sm mb-4">
+        <p className="mb-4 text-sm">
           No s&apos;ha pogut carregar la fitxa de la reserva.
         </p>
         {process.env.NODE_ENV === 'development' && (
-          <p className="text-xs font-mono mb-4 break-all">{error.message}</p>
+          <p className="mb-4 break-all font-mono text-xs">{error.message}</p>
         )}
-        <div className="flex gap-3 justify-center">
+        <div className="flex justify-center gap-3">
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-xl text-sm font-semibold border"
+            className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
           >
             Reintentar
           </button>
           <Link
             href="/admin/bookings"
-            className="px-4 py-2 rounded-xl bg-white/5 text-sm font-semibold hover:bg-white/10 border border-white/10"
+            className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
           >
             Tornar a reserves
           </Link>

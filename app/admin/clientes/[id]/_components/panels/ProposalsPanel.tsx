@@ -5,25 +5,22 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, ProposalDTO, ProposalStatus } from '@/lib/customer-hub/dto';
 import { labelEstatPressupost } from '@/lib/customer-hub/labels';
-import { formatDateSimple } from '@/lib/constants';
+import { CONTRACT_STATUS_CONFIG, PROPOSAL_STATUS_CONFIG, formatCurrency, formatDateSimple } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// STYLES
-// ═══════════════════════════════════════════════════════════════════════════
-
-const STATUS_STYLES: Record<ProposalStatus, { bg: string; text: string; border: string }> = {
-  DRAFT: { bg: 'bg-white/5', text: 'text-white/60', border: 'border-white/15' },
-  SENT: { bg: 'bg-cyan-500/20', text: 'text-cyan-300', border: 'border-cyan-500/40' },
-  VIEWED: { bg: 'bg-violet-500/20', text: 'text-violet-300', border: 'border-violet-500/40' },
-  ACCEPTED: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', border: 'border-emerald-500/40' },
-  REJECTED: { bg: 'bg-rose-500/20', text: 'text-rose-300', border: 'border-rose-500/40' },
-  EXPIRED: { bg: 'bg-amber-500/20', text: 'text-amber-300', border: 'border-amber-500/40' },
+const DEFAULT_PROPOSAL_STYLE = {
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+  border: 'admin-tone-border-neutral',
+  label: 'Esborrany',
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════
+const DEFAULT_CONTRACT_STYLE = {
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+  border: 'admin-tone-border-neutral',
+  label: 'Esborrany',
+};
 
 export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -82,22 +79,20 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
     }
   }, [router]);
 
-  // Separar per estat
-  const drafts = data.proposals.filter((p) => p.status === 'DRAFT');
-  const sent = data.proposals.filter((p) => p.status === 'SENT' || p.status === 'VIEWED');
-  const closed = data.proposals.filter((p) => 
-    p.status === 'ACCEPTED' || p.status === 'REJECTED' || p.status === 'EXPIRED'
+  const drafts = data.proposals.filter((proposal) => proposal.status === 'DRAFT');
+  const sent = data.proposals.filter((proposal) => proposal.status === 'SENT' || proposal.status === 'VIEWED');
+  const closed = data.proposals.filter((proposal) =>
+    proposal.status === 'ACCEPTED' || proposal.status === 'REJECTED' || proposal.status === 'EXPIRED'
   );
 
   return (
     <section className="space-y-4">
-      {/* Header */}
       <div className="rounded-2xl border p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Pressupostos</h2>
             <p className="text-sm">
-              {data.proposals.length} pressupost{data.proposals.length !== 1 ? 's' : ''} · 
+              {data.proposals.length} pressupost{data.proposals.length !== 1 ? 's' : ''} ·
               {drafts.length > 0 && ` ${drafts.length} esborrany`}
               {sent.length > 0 && ` · ${sent.length} pendent${sent.length !== 1 ? 's' : ''}`}
             </p>
@@ -117,7 +112,6 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
         )}
       </div>
 
-      {/* Esborranys */}
       {drafts.length > 0 && (
         <ProposalGroup
           title="Esborranys"
@@ -132,7 +126,6 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
         />
       )}
 
-      {/* Pendents de resposta */}
       {sent.length > 0 && (
         <ProposalGroup
           title="Pendents de resposta"
@@ -147,7 +140,6 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
         />
       )}
 
-      {/* Tancats */}
       {closed.length > 0 && (
         <ProposalGroup
           title="Històric"
@@ -163,10 +155,9 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
         />
       )}
 
-      {/* Sense pressupostos */}
       {data.proposals.length === 0 && (
         <div className="rounded-2xl border border-dashed p-8 text-center">
-          <p className="">No hi ha pressupostos per aquest client.</p>
+          <p>No hi ha pressupostos per aquest client.</p>
           <Link
             href={`/admin/presupuestos?customerId=${data.customer.id}`}
             className="mt-4 inline-block rounded-xl px-4 py-2 text-sm font-semibold text-white"
@@ -178,10 +169,6 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SUBCOMPONENTS
-// ═══════════════════════════════════════════════════════════════════════════
 
 function ProposalGroup({
   title,
@@ -209,11 +196,11 @@ function ProposalGroup({
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   return (
-    <div className="rounded-2xl border overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border">
       <button
         type="button"
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between px-5 py-3 text-left transition-colors"
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors"
       >
         <span className="flex items-center gap-2 text-sm font-medium">
           <span>{icon}</span>
@@ -228,7 +215,7 @@ function ProposalGroup({
       </button>
 
       {!isCollapsed && (
-        <div className="border-t p-3 space-y-2">
+        <div className="space-y-2 border-t p-3">
           {proposals.map((proposal) => (
             <ProposalCard
               key={proposal.id}
@@ -247,14 +234,6 @@ function ProposalGroup({
     </div>
   );
 }
-
-// Estat del contracte associat
-const CONTRACT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: 'Esborrany', color: 'text-white/60 bg-white/5 border-white/15' },
-  SENT: { label: 'Enviat', color: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40' },
-  SIGNED: { label: 'Signat', color: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/40' },
-  CANCELLED: { label: 'Cancel·lat', color: 'text-rose-300 bg-rose-500/20 border-rose-500/40' },
-};
 
 function ProposalCard({
   proposal,
@@ -276,7 +255,7 @@ function ProposalCard({
   customerId: string;
 }) {
   const router = useRouter();
-  const style = STATUS_STYLES[proposal.status];
+  const style = PROPOSAL_STATUS_CONFIG[proposal.status] || DEFAULT_PROPOSAL_STYLE;
   const isBusy = busyId?.includes(proposal.id) || false;
   const canSend = proposal.status === 'DRAFT';
   const canMarkAccepted = proposal.status === 'SENT' || proposal.status === 'VIEWED';
@@ -286,6 +265,7 @@ function ProposalCard({
 
   const contractStatus = proposal.contractStatus;
   const contractRef = proposal.contractReference;
+  const contractStyle = contractStatus ? CONTRACT_STATUS_CONFIG[contractStatus] || DEFAULT_CONTRACT_STYLE : null;
   const canGenerateContract = proposal.status === 'ACCEPTED' && !contractStatus;
   const canSendContract = contractStatus === 'DRAFT';
   const canMarkSigned = contractStatus === 'SENT';
@@ -302,7 +282,6 @@ function ProposalCard({
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload?.error || 'Error generant contracte');
       }
-      // Download the PDF
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -311,7 +290,7 @@ function ProposalCard({
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
       router.refresh();
     } catch (err) {
       setContractError(err instanceof Error ? err.message : 'Error');
@@ -373,7 +352,7 @@ function ProposalCard({
           </div>
           <p className="mt-1 text-xs">
             Creat {formatDateSimple(proposal.createdAt)} ·
-            <span className="font-medium"> {proposal.total.toFixed(2)}€</span>
+            <span className="font-medium"> {formatCurrency(proposal.total)}</span>
           </p>
           {proposal.sentAt && (
             <p className="text-[11px]">
@@ -388,11 +367,10 @@ function ProposalCard({
         </div>
 
         <div className="text-lg font-semibold">
-          {proposal.total.toFixed(0)}€
+          {formatCurrency(proposal.total)}
         </div>
       </div>
 
-      {/* Actions */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Link
           href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${customerId}`}
@@ -468,15 +446,14 @@ function ProposalCard({
         )}
       </div>
 
-      {/* Contract section */}
       {proposal.status === 'ACCEPTED' && (
         <div className="mt-3 border-t pt-3">
           <div className="flex flex-wrap items-center gap-2">
-            {contractStatus && contractRef && (
+            {contractStatus && contractRef && contractStyle && (
               <span className="flex items-center gap-1.5 text-xs">
                 📄 Contracte {contractRef}
-                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${CONTRACT_STATUS_LABELS[contractStatus]?.color || ''}`}>
-                  {CONTRACT_STATUS_LABELS[contractStatus]?.label || contractStatus}
+                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${contractStyle.bg} ${contractStyle.text} ${contractStyle.border}`}>
+                  {contractStyle.label}
                 </span>
               </span>
             )}
@@ -534,3 +511,4 @@ function ProposalCard({
     </div>
   );
 }
+

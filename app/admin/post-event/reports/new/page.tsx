@@ -95,7 +95,7 @@ export default function NewReportPage() {
   if (!bookingId) {
     return (
       <div className="space-y-6">
-        <div className="border rounded-xl p-6">
+        <div className="ap-card p-6">
           <p className="">❌ No s&apos;ha especificat cap reserva</p>
           <Link href="/admin/post-event" className="hover:underline mt-2 inline-block">
             Tornar a Post-event
@@ -113,7 +113,7 @@ export default function NewReportPage() {
     >
 
       {booking && (
-        <div className="border rounded-xl p-4">
+        <div className="ap-card p-4">
           <h3 className="font-semibold">Event: {booking.clientName}</h3>
           <p className="text-sm mt-1">
             {formatDateSimple(booking.eventDate)} · {booking.eventLocation}
@@ -123,13 +123,13 @@ export default function NewReportPage() {
 
       {/* Inventory used */}
       {inventoryItems.length > 0 && (
-        <div className="border border-white/10 rounded-xl p-5">
+        <div className="ap-card p-5">
           <h3 className="text-sm font-semibold mb-3">Equipament utilitzat ({inventoryItems.length})</h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {inventoryItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2"
+                className="ap-card admin-tone-bg-neutral flex items-center gap-3 px-3 py-2"
               >
                 <span className="text-xs font-mono font-bold">{item.inventoryItem.code}</span>
                 <span className="text-sm flex-1 truncate">{item.inventoryItem.name}</span>
@@ -148,12 +148,12 @@ export default function NewReportPage() {
       )}
 
       {formError && (
-        <div className="rounded-xl border px-4 py-3 text-sm flex items-center justify-between" role="alert">
+        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center justify-between px-4 py-3 text-sm" role="alert">
           <span>{formError}</span>
           <button type="button" onClick={() => setFormError(null)} className="">✕</button>
         </div>
       )}
-      <form onSubmit={handleSubmit} className="border border-white/10 rounded-xl p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="ap-card p-6 space-y-6">
         {/* Event Summary */}
         <div>
           <label className="block text-sm font-medium mb-2">
@@ -163,7 +163,7 @@ export default function NewReportPage() {
             name="eventSummary"
             required
             rows={4}
-            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+            className="ap-input w-full px-4 py-2"
             placeholder="Descriu com va anar l'event en general..."
           />
         </div>
@@ -177,7 +177,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="setupTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+              className="ap-input w-full px-4 py-2"
             />
           </div>
           <div>
@@ -187,7 +187,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="startTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+              className="ap-input w-full px-4 py-2"
             />
           </div>
           <div>
@@ -197,7 +197,7 @@ export default function NewReportPage() {
             <input
               type="time"
               name="endTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+              className="ap-input w-full px-4 py-2"
             />
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function NewReportPage() {
               name="soundQuality"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+              className="ap-input w-full px-4 py-2"
             />
           </div>
           <div>
@@ -225,7 +225,7 @@ export default function NewReportPage() {
               name="danceFloorLevel"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+              className="ap-input w-full px-4 py-2"
             />
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function NewReportPage() {
           <input
             type="text"
             name="musicStyles"
-            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+            className="ap-input w-full px-4 py-2"
             placeholder="Reggaeton, House, Comercial..."
           />
         </div>
@@ -251,7 +251,7 @@ export default function NewReportPage() {
           <textarea
             name="incidents"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+            className="ap-input w-full px-4 py-2"
             placeholder="Descriu qualsevol incidència o problema..."
           />
         </div>
@@ -264,7 +264,7 @@ export default function NewReportPage() {
           <textarea
             name="notes"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+            className="ap-input w-full px-4 py-2"
             placeholder="Qualsevol altra informació rellevant..."
           />
         </div>
@@ -276,7 +276,7 @@ export default function NewReportPage() {
           </label>
           <select
             name="status"
-            className="w-full px-4 py-2 border border-white/10 rounded-xl focus:ring-2"
+            className="ap-input w-full px-4 py-2"
           >
             <option value="DRAFT">Esborrany</option>
             <option value="COMPLETED">Completat</option>
@@ -288,13 +288,13 @@ export default function NewReportPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 text-white rounded-xl font-medium disabled:opacity-50"
+            className="ap-btn ap-btn--primary flex-1 px-6 py-3 disabled:opacity-50"
           >
             {loading ? 'Desant...' : 'Desar informe'}
           </button>
           <Link
             href="/admin/post-event"
-            className="px-6 py-3 bg-white/5 rounded-xl font-medium hover:bg-white/10"
+            className="ap-btn ap-btn--secondary px-6 py-3"
           >
             Cancel·lar
           </Link>
@@ -303,6 +303,7 @@ export default function NewReportPage() {
     </AdminPage>
   );
 }
+
 
 
 

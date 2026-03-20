@@ -1,12 +1,5 @@
 import type { CustomerHubDTO, DiscountCodeDTO } from '@/lib/customer-hub/dto';
-import { formatDateSimple } from '@/lib/constants';
-
-const SOURCE_LABELS: Record<string, string> = {
-  POST_EVENT: 'Post-event',
-  TESTIMONIAL: 'Testimoni',
-  REFERRAL: 'Recomanació',
-  MANUAL: 'Manual',
-};
+import { DISCOUNT_SOURCE_LABELS, formatDateSimple } from '@/lib/constants';
 
 function getStatus(dc: DiscountCodeDTO): { label: string; color: string } {
   if (!dc.isActive) return { label: 'Desactivat', color: 'border-white/10 bg-white/5 text-white/40' };
@@ -55,7 +48,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
                     Usos: {dc.currentUses}/{dc.maxUses}
                   </span>
                   <span>
-                    Origen: {SOURCE_LABELS[dc.sourceType] || dc.sourceType}
+                    Origen: {DISCOUNT_SOURCE_LABELS[dc.sourceType] || dc.sourceType}
                   </span>
                 </div>
 
@@ -72,3 +65,4 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
+

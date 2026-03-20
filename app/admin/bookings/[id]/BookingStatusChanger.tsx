@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
+import { BOOKING_STATUS_CONFIG, BOOKING_STATUS_ORDER } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Props {
@@ -12,17 +13,12 @@ interface Props {
   guestCount: number;
 }
 
-// Local config kept because it includes a `border` class not present in the
-// centralized BOOKING_STATUS_CONFIG (which only has bg + text + label).
-const BOOKING_STATUS_CONFIG_LOCAL: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/20', text: 'text-yellow-300', border: 'border-yellow-500/30' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/20', text: 'text-emerald-300', border: 'border-emerald-500/30' },
-  PREPARING: { label: 'Preparant', bg: 'bg-blue-500/20', text: 'text-blue-300', border: 'border-blue-500/30' },
-  COMPLETED: { label: 'Completada', bg: 'bg-teal-500/20', text: 'text-teal-300', border: 'border-teal-500/30' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/20', text: 'text-rose-300', border: 'border-rose-500/30' },
+const DEFAULT_STATUS_STYLE = {
+  bg: 'admin-tone-bg-neutral',
+  text: 'admin-tone-text-neutral',
+  border: 'admin-tone-border-neutral',
+  label: 'Desconegut',
 };
-
-const STATUS_ORDER = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'];
 
 export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: Props) {
   const router = useRouter();
@@ -33,7 +29,6 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
   const { confirm: confirmDialog, dialogProps } = useConfirmDialog();
 
   const handleStatusChange = async (newStatus: string) => {
-    // Si canviem a COMPLETED, mostrar confirmació
     if (newStatus === 'COMPLETED' && currentStatus !== 'COMPLETED') {
       setShowConfirmComplete(true);
       return;
@@ -59,10 +54,8 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         throw new Error(data.error || 'Error canviant estat');
       }
 
-      // Refrescar la pàgina
       router.refresh();
 
-      // Notificacions informatives
       const msgs: string[] = [];
       if (data.statsUpdated) {
         msgs.push(`Estadistiques actualitzades: +1 event, +${guestCount} persones`);
@@ -86,10 +79,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
 
   return (
     <div className="relative">
-      {/* Status Buttons */}
       <div className="flex flex-wrap gap-2">
-        {STATUS_ORDER.map((status) => {
-          const conf = BOOKING_STATUS_CONFIG_LOCAL[status];
+        {BOOKING_STATUS_ORDER.map((status) => {
+          const conf = BOOKING_STATUS_CONFIG[status] || DEFAULT_STATUS_STYLE;
           const isActive = status === currentStatus;
 
           return (
@@ -103,7 +95,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all
                 ${isActive
                   ? `${conf.bg} ${conf.text} ${conf.border} cursor-default`
-                  : 'bg-white/5 text-white/40 border-white/10 hover:border-white/20 hover:text-white/60'
+                  : 'admin-tone-idle'
                 }
                 ${isLoading ? 'opacity-50 cursor-wait' : ''}
                 disabled:cursor-not-allowed
@@ -116,49 +108,46 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         })}
       </div>
 
-      {/* Success */}
       {successMsg && (
         <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="status">
           <span>✓</span>
           <span className="flex-1">{successMsg}</span>
-          <button type="button" onClick={() => setSuccessMsg(null)} className="">✕</button>
+          <button type="button" onClick={() => setSuccessMsg(null)}>✕</button>
         </div>
       )}
 
-      {/* Error */}
       {error && (
         <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
           <span>⚠️</span>
           <span className="flex-1">{error}</span>
-          <button type="button" onClick={() => setError(null)} className="">✕</button>
+          <button type="button" onClick={() => setError(null)}>✕</button>
         </div>
       )}
 
-      {/* Confirmation Modal for COMPLETED */}
       {showConfirmComplete && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" role="presentation">
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" role="presentation">
           <div
-            className="border rounded-2xl p-6 max-w-md mx-4 shadow-xl"
+            className="mx-4 max-w-md rounded-2xl border p-6 shadow-xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-complete-title"
           >
-            <h3 id="confirm-complete-title" className="text-lg font-semibold mb-2">
+            <h3 id="confirm-complete-title" className="mb-2 text-lg font-semibold">
               Marcar com a Completat?
             </h3>
             <p className="mb-4">
               Aquesta acció actualitzarà automàticament les estadístiques públiques:
             </p>
-            <div className="border rounded-xl p-4 mb-4">
+            <div className="mb-4 rounded-xl border p-4">
               <p className="text-sm">
                 <strong>+1</strong> event realitzat<br />
                 <strong>+{guestCount}</strong> persones feliçes
               </p>
             </div>
-            <p className="text-xs mb-4">
+            <p className="mb-4 text-xs">
               Aquests números apareixeran a la web pública.
             </p>
-            <div className="flex gap-3 justify-end">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowConfirmComplete(false)}
                 className="px-4 py-2 text-sm font-medium transition-colors"
@@ -172,7 +161,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 disabled={isLoading}
                 type="button"
                 aria-busy={isLoading}
-                className="px-4 py-2 text-white text-sm font-medium rounded-xl disabled:opacity-50 shadow-lg transition-colors"
+                className="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg transition-colors disabled:opacity-50"
               >
                 {isLoading ? 'Actualitzant...' : 'Sí, Completar Event'}
               </button>
@@ -184,4 +173,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
     </div>
   );
 }
+
+
+
+
+
 

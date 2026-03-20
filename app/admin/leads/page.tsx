@@ -9,7 +9,7 @@ import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
 import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
-import { LEAD_COLOR_DEFAULT_VARS, PRIORITY_COLOR_OPTIONS, STATUS_COLOR_OPTIONS } from './colorTheme';
+import { LEAD_COLOR_DEFAULT_VARS, PRIORITY_COLOR_CONFIG, STATUS_COLOR_CONFIG } from './colorTheme';
 import ExportCsvButton from '../components/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
@@ -18,21 +18,10 @@ export const metadata = {
   title: 'Entrades | Òrbita Admin',
 };
 
-const STATUS_CONFIG = Object.fromEntries(
-  STATUS_COLOR_OPTIONS.map((option) => [
-    option.key,
-    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
-  ])
-) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
+import { EVENT_TYPE_LABELS, LEAD_STATUS_LABELS, PRIORITY_LABELS, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
 
-import { EVENT_TYPE_LABELS, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
-
-const PRIORITY_CONFIG = Object.fromEntries(
-  PRIORITY_COLOR_OPTIONS.map((option) => [
-    option.key,
-    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
-  ])
-) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
+const STATUS_CONFIG = STATUS_COLOR_CONFIG;
+const PRIORITY_CONFIG = PRIORITY_COLOR_CONFIG;
 
 
 function buildQuery(filters: {
@@ -55,8 +44,8 @@ function buildQuery(filters: {
   return params.toString();
 }
 
-const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const satisfies readonly LeadStatus[];
-const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const satisfies readonly Priority[];
+const VALID_STATUS = Object.keys(LEAD_STATUS_LABELS) as LeadStatus[];
+const VALID_PRIORITY = Object.keys(PRIORITY_LABELS) as Priority[];
 const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS) as EventType[];
 const VALID_SOURCE = Object.keys(SOURCE_LABELS) as LeadSource[];
 
@@ -551,5 +540,8 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
+
+
+
 
 

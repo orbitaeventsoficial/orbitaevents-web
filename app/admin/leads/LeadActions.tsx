@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { LEAD_STATUS_OPTIONS, PRIORITY_LABELS } from '@/lib/constants';
 
 interface LeadActionsProps {
   leadId: string;
@@ -96,72 +97,68 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
   return (
     <div className="flex flex-col items-end gap-1">
       {actionError && (
-        <div className="flex items-center gap-2 rounded-xl border px-2 py-1 text-[10px]">
+        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-[10px]">
           <span>{actionError}</span>
-          <button type="button" onClick={() => setActionError(null)} className="">✕</button>
+          <button type="button" onClick={() => setActionError(null)}>✕</button>
         </div>
       )}
-    <div className="flex items-center justify-end gap-2">
-      <select
-        value={currentStatus}
-        onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
-        disabled={statusUpdating}
-        className="rounded-xl border px-2 py-1.5 text-xs"
-        title="Canviar estat"
-      >
-        <option value="NEW">Entrada nova</option>
-        <option value="CONTACTED">Contactat</option>
-        <option value="QUOTE_SENT">Pressupost enviat</option>
-        <option value="NEGOTIATING">Negociació</option>
-        <option value="WON">Guanyat</option>
-        <option value="LOST">Perdut</option>
-      </select>
-      <select
-        value={currentPriority}
-        onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
-        disabled={priorityUpdating}
-        className="rounded-xl border px-2 py-1.5 text-xs"
-        title="Canviar prioritat"
-      >
-        <option value="LOW">Baixa</option>
-        <option value="MEDIUM">Mitjana</option>
-        <option value="HIGH">Alta</option>
-        <option value="URGENT">Urgent</option>
-      </select>
-      {phone && (
-        <a
-          href={`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
-            `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
-          )}`}
-          target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium transition-colors border"
-          title="Envia per WhatsApp"
+      <div className="flex items-center justify-end gap-2">
+        <select
+          value={currentStatus}
+          onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
+          disabled={statusUpdating}
+          className="ap-input px-2 py-1.5 text-xs"
+          title="Canviar estat"
+                >
+          {LEAD_STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <select
+          value={currentPriority}
+          onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
+          disabled={priorityUpdating}
+          className="ap-input px-2 py-1.5 text-xs"
+          title="Canviar prioritat"
+                >
+          {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+        {phone && (
+          <a
+            href={`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+              `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
+            )}`}
+            target="_blank" rel="noopener noreferrer"
+            className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
+            title="Envia per WhatsApp"
+          >
+            💬 WA
+          </a>
+        )}
+        <Link
+          href={`/admin/leads/${leadId}`}
+          className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
         >
-          💬 WA
-        </a>
-      )}
-      <Link
-        href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
-      >
-        Veure
-      </Link>
-      <button
-        onClick={handleDelete}
-        disabled={isDeleting || hasBooking || currentStatus !== 'LOST'}
-        type="button"
-        aria-busy={isDeleting}
-        className={`inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors
-          ${hasBooking || currentStatus !== 'LOST'
-            ? 'bg-white/[0.03] text-white/30 cursor-not-allowed border border-white/10'
-            : 'admin-tone-soft-danger hover:bg-rose-500/30 border border-rose-500/30'
+          Veure
+        </Link>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting || hasBooking || currentStatus !== 'LOST'}
+          type="button"
+          aria-busy={isDeleting}
+          className={`ap-btn px-2.5 py-1.5 text-xs ${
+            hasBooking || currentStatus !== 'LOST'
+              ? 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral cursor-not-allowed'
+              : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger hover:brightness-105'
           }`}
-        title={hasBooking ? 'No es pot eliminar (té reserva)' : currentStatus !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Elimina entrada'}
-      >
-        {isDeleting ? '...' : '🗑️'}
-      </button>
-      <ConfirmDialog {...dialogProps} />
-    </div>
+          title={hasBooking ? 'No es pot eliminar (té reserva)' : currentStatus !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Elimina entrada'}
+        >
+          {isDeleting ? '...' : '🗑️'}
+        </button>
+        <ConfirmDialog {...dialogProps} />
+      </div>
     </div>
   );
 }

@@ -35,6 +35,12 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
     }
   };
 
+  const buttonClass = sent
+    ? 'admin-tone-bg-success admin-tone-text-success admin-tone-border-success border'
+    : loading
+      ? 'border border-white/10 bg-white/5 text-white/30'
+      : 'ap-btn ap-btn--primary';
+
   return (
     <div className="flex flex-col items-end gap-2">
       <button
@@ -42,16 +48,12 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
         onClick={handleClick}
         disabled={loading || sent}
         aria-busy={loading}
-        className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-          sent
-            ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-            : 'bg-amber-500 text-white shadow-lg hover:bg-amber-600'
-        }`}
+        className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass}`}
       >
         {sent ? 'Enviat!' : loading ? 'Enviant...' : 'Envia ara'}
       </button>
       {error && (
-        <span className="text-xs" role="alert">
+        <span className="text-xs admin-tone-text-danger" role="alert">
           {error}
         </span>
       )}

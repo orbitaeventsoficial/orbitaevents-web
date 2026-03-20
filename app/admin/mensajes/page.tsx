@@ -1,6 +1,6 @@
 // app/admin/mensajes/page.tsx
 import { log } from '@/lib/logger';
-import { formatDateSimple } from '@/lib/constants';
+import { LEAD_STATUS_CONFIG, WHATSAPP_URL, formatDateSimple } from '@/lib/constants';
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -14,12 +14,7 @@ export const metadata = {
 
 async function getMessagesData() {
   try {
-    const [
-      recentLeads,
-      pendingLeads,
-      todayLeads,
-    ] = await Promise.all([
-      // Entrades recents amb missatge
+    const [recentLeads, pendingLeads, todayLeads] = await Promise.all([
       prisma.lead.findMany({
         where: {
           message: { not: null },
@@ -33,11 +28,9 @@ async function getMessagesData() {
           },
         },
       }),
-      // Entrades pendents de contactar
       prisma.lead.count({
         where: { status: 'NEW' },
       }),
-      // Entrades d'avui
       prisma.lead.count({
         where: {
           createdAt: {
@@ -62,16 +55,11 @@ async function getMessagesData() {
   }
 }
 
-// Local config kept because it uses a `color` key (not `text`) and has
-// different label/color values from the centralized LEAD_STATUS_CONFIG
-// (e.g. shorter labels, LOST uses red instead of slate).
-const LEAD_STATUS_CONFIG_LOCAL: Record<string, { label: string; color: string; bg: string }> = {
-  NEW: { label: 'Nou', color: 'text-blue-300', bg: 'bg-blue-500/20' },
-  CONTACTED: { label: 'Contactat', color: 'text-yellow-300', bg: 'bg-yellow-500/20' },
-  QUOTE_SENT: { label: 'Pressupost', color: 'text-purple-300', bg: 'bg-purple-500/20' },
-  NEGOTIATING: { label: 'Negociant', color: 'text-orange-300', bg: 'bg-orange-500/20' },
-  WON: { label: 'Guanyat', color: 'text-green-300', bg: 'bg-green-500/20' },
-  LOST: { label: 'Perdut', color: 'text-red-300', bg: 'bg-red-500/20' },
+const DEFAULT_LEAD_STATUS_STYLE = {
+  label: 'Nova entrada',
+  bg: 'admin-tone-bg-info',
+  text: 'admin-tone-text-info',
+  border: 'admin-tone-border-info',
 };
 
 const SOURCE_ICONS: Record<string, string> = {
@@ -103,13 +91,11 @@ export default async function MensajesPage() {
 
   return (
     <AdminPage title="Missatges" subtitle="Gestiona les comunicacions amb la clientela">
-
-      {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-xs font-medium uppercase">Pendents de contactar</p>
           <p className="mt-2 text-3xl font-bold">{data.pendingLeads}</p>
-          <p className="text-xs mt-1">Entrades noves sense resposta</p>
+          <p className="mt-1 text-xs">Entrades noves sense resposta</p>
         </div>
         <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-xs font-medium uppercase">Rebudes avui</p>
@@ -121,7 +107,6 @@ export default async function MensajesPage() {
         </div>
       </section>
 
-      {/* Accions ràpides */}
       <section className="flex flex-wrap gap-3">
         <Link
           href="/admin/leads?status=NEW"
@@ -130,8 +115,9 @@ export default async function MensajesPage() {
           🔵 Veure noves ({data.pendingLeads})
         </Link>
         <a
-          href="https://wa.me/34699121023"
-          target="_blank" rel="noopener noreferrer"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
         >
           💬 Obrir WhatsApp Web
@@ -144,85 +130,78 @@ export default async function MensajesPage() {
         </Link>
       </section>
 
-      {/* Plantilles de missatge */}
-      <section className="rounded-xl border shadow-sm overflow-hidden">
+      <section className="overflow-hidden rounded-xl border shadow-sm">
         <div className="border-b p-4">
           <h3 className="font-semibold">📋 Plantilles Ràpides</h3>
         </div>
-        <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+        <div className="grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Primer contacte</p>
-            <p className="text-xs mt-1">Resposta inicial a una entrada nova</p>
+            <p className="mt-1 text-xs">Resposta inicial a una entrada nova</p>
           </button>
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Envia pressupost</p>
-            <p className="text-xs mt-1">Acompanyament de pressupost</p>
+            <p className="mt-1 text-xs">Acompanyament de pressupost</p>
           </button>
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Seguiment</p>
-            <p className="text-xs mt-1">Recordatori després de dies</p>
+            <p className="mt-1 text-xs">Recordatori després de dies</p>
           </button>
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Confirmació</p>
-            <p className="text-xs mt-1">Confirmar reserva</p>
+            <p className="mt-1 text-xs">Confirmar reserva</p>
           </button>
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Preesdeveniment</p>
-            <p className="text-xs mt-1">Detalls abans de l&apos;esdeveniment</p>
+            <p className="mt-1 text-xs">Detalls abans de l&apos;esdeveniment</p>
           </button>
-          <button type="button" className="p-3 rounded-xl border text-left transition-colors">
+          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
             <p className="font-medium">Postesdeveniment</p>
-            <p className="text-xs mt-1">Agraïment i enquesta</p>
+            <p className="mt-1 text-xs">Agraïment i enquesta</p>
           </button>
         </div>
       </section>
 
-      {/* Missatges recents */}
-      <section className="rounded-xl border shadow-sm overflow-hidden">
+      <section className="overflow-hidden rounded-xl border shadow-sm">
         <div className="border-b p-4">
           <h3 className="font-semibold">📬 Missatges recents</h3>
         </div>
         <div className="divide-y divide-white/5">
           {data.recentLeads.map((lead) => {
-            const statusConfig = LEAD_STATUS_CONFIG_LOCAL[lead.status] || LEAD_STATUS_CONFIG_LOCAL.NEW;
+            const statusConfig = LEAD_STATUS_CONFIG[lead.status] || DEFAULT_LEAD_STATUS_STYLE;
             const sourceIcon = SOURCE_ICONS[lead.source] || '📩';
             return (
-              <div
-                key={lead.id}
-                className="p-4 transition-colors"
-              >
+              <div key={lead.id} className="p-4 transition-colors">
                 <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold text-white">
                     {lead.name.charAt(0)}
                   </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{lead.name}</span>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.bg} ${statusConfig.color}`}>
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>
                         {statusConfig.label}
                       </span>
                       <span className="text-xs">{sourceIcon}</span>
                     </div>
-                    <p className="text-sm mt-1 line-clamp-2">
+                    <p className="mt-1 line-clamp-2 text-sm">
                       {lead.message || 'Sense missatge'}
                     </p>
-                    <div className="flex items-center gap-3 mt-2 text-xs">
+                    <div className="mt-2 flex items-center gap-3 text-xs">
                       <span>{timeAgo(lead.createdAt)}</span>
                       {lead.email && <span>{lead.email}</span>}
                       {lead.phone && <span>{lead.phone}</span>}
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 items-center gap-2">
                     {lead.phone && (
                       <a
                         href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-xl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl"
                         title="WhatsApp"
                       >
                         💬
@@ -230,7 +209,7 @@ export default async function MensajesPage() {
                     )}
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-xl"
                       title="Obre"
                     >
                       👁️

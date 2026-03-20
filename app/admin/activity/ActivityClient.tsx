@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useToast } from '../components/ToastProvider';
-import { formatDateTimeFull } from '@/lib/constants';
 import Link from 'next/link';
-
-// ─── Types ──────────────────────────────────────────────────────────────────
+import { formatDateTimeFull } from '@/lib/constants';
+import { useToast } from '../components/ToastProvider';
 
 interface ActivityLog {
   id: string;
@@ -30,8 +28,6 @@ interface ActivityResponse {
   pages: number;
 }
 
-// ─── Constants ──────────────────────────────────────────────────────────────
-
 const CATEGORIES = [
   { id: 'all', label: 'Tot', icon: '📊' },
   { id: 'comms', label: 'Comunicacions', icon: '✉️' },
@@ -47,28 +43,59 @@ const DAYS_OPTIONS = [
   { value: 90, label: '90 dies' },
 ] as const;
 
-const ACTION_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  COMM_SENT: { label: 'Email enviat', icon: '📤', color: 'text-cyan-300' },
-  COMM_RESPONDED: { label: 'Resposta rebuda', icon: '📩', color: 'text-emerald-300' },
-  COMM_SEQUENCE_EXEC: { label: 'Seqüència comercial', icon: '🔗', color: 'text-cyan-300' },
-  COMM_SEQUENCE_BATCH: { label: 'Batch seqüències', icon: '📦', color: 'text-cyan-300' },
-  SEND_POST_EVENT_EMAIL: { label: 'Email post-event', icon: '🎉', color: 'text-purple-300' },
-  PAYMENT_REMINDER_SENT: { label: 'Recordatori pagament', icon: '💰', color: 'text-amber-300' },
-  AUTOMATION_DAILY_SUMMARY_SENT: { label: 'Resum diari', icon: '📋', color: 'text-blue-300' },
-  AUTOMATION_SLA_ENFORCED: { label: 'SLA aplicat', icon: '⏱️', color: 'text-rose-300' },
-  AUTOMATION_RUN_ALL: { label: 'Automatització completa', icon: '🤖', color: 'text-blue-300' },
-  AUTOMATION_FUEL_REFRESH: { label: 'Preu combustible', icon: '⛽', color: 'text-amber-300' },
-  PACK_PRICING_CHECK: { label: 'Check preus packs', icon: '💶', color: 'text-emerald-300' },
-  AUTOFIX_OK: { label: 'Autofix OK', icon: '✅', color: 'text-emerald-300' },
-  AUTOFIX_FAILED: { label: 'Autofix fallat', icon: '⚠️', color: 'text-amber-300' },
-  AUTOFIX_CRASH: { label: 'Autofix crash', icon: '💥', color: 'text-rose-300' },
-  CALENDAR_SYNC: { label: 'Sync calendari', icon: '📅', color: 'text-blue-300' },
-  CALENDAR_SYNC_ERROR: { label: 'Error sync calendari', icon: '❌', color: 'text-rose-300' },
-  PORTAL_AUTO_CREATED: { label: 'Portal client creat', icon: '🔑', color: 'text-purple-300' },
-  CREATE: { label: 'Creat', icon: '➕', color: 'text-emerald-300' },
-  UPDATE: { label: 'Actualitzat', icon: '✏️', color: 'text-cyan-300' },
-  DELETE: { label: 'Eliminat', icon: '🗑️', color: 'text-rose-300' },
+const ACTION_LABELS: Record<string, { label: string; icon: string; tone: string }> = {
+  COMM_SENT: { label: 'Email enviat', icon: '📤', tone: 'admin-tone-text-info' },
+  COMM_RESPONDED: { label: 'Resposta rebuda', icon: '📩', tone: 'admin-tone-text-success' },
+  COMM_SEQUENCE_EXEC: { label: 'Seqüència comercial', icon: '🔗', tone: 'admin-tone-text-info' },
+  COMM_SEQUENCE_BATCH: { label: 'Batch seqüències', icon: '📦', tone: 'admin-tone-text-info' },
+  SEND_POST_EVENT_EMAIL: { label: 'Email post-event', icon: '🎉', tone: 'admin-tone-text-violet' },
+  PAYMENT_REMINDER_SENT: { label: 'Recordatori pagament', icon: '💰', tone: 'admin-tone-text-warning' },
+  AUTOMATION_DAILY_SUMMARY_SENT: { label: 'Resum diari', icon: '📋', tone: 'admin-tone-text-info' },
+  AUTOMATION_SLA_ENFORCED: { label: 'SLA aplicat', icon: '⏱️', tone: 'admin-tone-text-danger' },
+  AUTOMATION_RUN_ALL: { label: 'Automatització completa', icon: '🤖', tone: 'admin-tone-text-info' },
+  AUTOMATION_FUEL_REFRESH: { label: 'Preu combustible', icon: '⛽', tone: 'admin-tone-text-warning' },
+  PACK_PRICING_CHECK: { label: 'Check preus packs', icon: '💶', tone: 'admin-tone-text-success' },
+  AUTOFIX_OK: { label: 'Autofix OK', icon: '✅', tone: 'admin-tone-text-success' },
+  AUTOFIX_FAILED: { label: 'Autofix fallat', icon: '⚠️', tone: 'admin-tone-text-warning' },
+  AUTOFIX_CRASH: { label: 'Autofix crash', icon: '💥', tone: 'admin-tone-text-danger' },
+  CALENDAR_SYNC: { label: 'Sync calendari', icon: '📅', tone: 'admin-tone-text-info' },
+  CALENDAR_SYNC_ERROR: { label: 'Error sync calendari', icon: '❌', tone: 'admin-tone-text-danger' },
+  PORTAL_AUTO_CREATED: { label: 'Portal client creat', icon: '🔑', tone: 'admin-tone-text-violet' },
+  CREATE: { label: 'Creat', icon: '➕', tone: 'admin-tone-text-success' },
+  UPDATE: { label: 'Actualitzat', icon: '✏️', tone: 'admin-tone-text-info' },
+  DELETE: { label: 'Eliminat', icon: '🗑️', tone: 'admin-tone-text-danger' },
 };
+
+const STATS_CARDS = [
+  {
+    key: 'comms',
+    label: 'Comunicacions',
+    icon: '✉️',
+    cardTone: 'ap-card--info',
+    textTone: 'admin-tone-text-info',
+  },
+  {
+    key: 'automation',
+    label: 'Automatitzacions',
+    icon: '⚡',
+    cardTone: 'ap-card--warning',
+    textTone: 'admin-tone-text-warning',
+  },
+  {
+    key: 'system',
+    label: 'Sistema',
+    icon: '🔄',
+    cardTone: 'admin-tone-border-info admin-tone-bg-info',
+    textTone: 'admin-tone-text-info',
+  },
+  {
+    key: 'crud',
+    label: 'Operacions',
+    icon: '📝',
+    cardTone: 'ap-card--success',
+    textTone: 'admin-tone-text-success',
+  },
+] as const;
 
 const ENTITY_LINKS: Record<string, (id: string) => string> = {
   booking: (id) => `/admin/bookings/${id}`,
@@ -76,8 +103,6 @@ const ENTITY_LINKS: Record<string, (id: string) => string> = {
   pack: (id) => `/admin/packs/${id}`,
   customer: (id) => `/admin/clientes/${id}`,
 };
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatTimeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
@@ -91,7 +116,7 @@ function formatTimeAgo(isoDate: string): string {
 }
 
 function getActionMeta(action: string) {
-  return ACTION_LABELS[action] || { label: action, icon: '•', color: 'text-white/70' };
+  return ACTION_LABELS[action] || { label: action, icon: '•', tone: 'admin-tone-text-neutral' };
 }
 
 function formatDetails(details: Record<string, unknown> | null): string {
@@ -106,7 +131,6 @@ function formatDetails(details: Record<string, unknown> | null): string {
   if (details.locale) parts.push(`idioma: ${details.locale}`);
   if (details.action) parts.push(`${details.action}`);
   if (parts.length === 0) {
-    // Fallback: show first 3 keys
     return Object.entries(details)
       .slice(0, 3)
       .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
@@ -114,8 +138,6 @@ function formatDetails(details: Record<string, unknown> | null): string {
   }
   return parts.join(' · ');
 }
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function ActivityClient() {
   const toast = useToast();
@@ -150,21 +172,13 @@ export default function ActivityClient() {
     fetchActivity();
   }, [fetchActivity]);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(1);
   }, [category, days]);
 
-  // ─── Stats cards ──────────────────────────────────────────────────────────
-
   const statsCards = data?.stats ? (
-    <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-      {[
-        { key: 'comms', label: 'Comunicacions', icon: '✉️', accent: 'cyan' },
-        { key: 'automation', label: 'Automatitzacions', icon: '⚡', accent: 'amber' },
-        { key: 'system', label: 'Sistema', icon: '🔄', accent: 'blue' },
-        { key: 'crud', label: 'Operacions', icon: '📝', accent: 'emerald' },
-      ].map(({ key, label, icon, accent }) => {
+    <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {STATS_CARDS.map(({ key, label, icon, cardTone, textTone }) => {
         const cat = data.stats[key];
         const total = cat?.total || 0;
         const topActions = cat
@@ -177,30 +191,26 @@ export default function ActivityClient() {
           <button
             key={key}
             onClick={() => setCategory(category === key ? 'all' : key)}
-            className={`rounded-2xl border p-4 text-left transition-all admin-card-glass ${
-              category === key
-                ? `border-${accent}-500/40 bg-${accent}-500/10`
-                : 'hover:bg-white/[0.03]'
+            className={`ap-card rounded-2xl p-4 text-left transition-all ${
+              category === key ? cardTone : 'admin-tone-idle hover:admin-tone-bg-neutral'
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs uppercase tracking-wide text-white/50">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-wide admin-tone-text-neutral">
                 {icon} {label}
               </span>
-              <span className={`text-xl font-bold ${total > 0 ? `text-${accent}-300` : 'text-white/30'}`}>
+              <span className={`text-xl font-bold ${total > 0 ? textTone : 'admin-tone-text-neutral'}`}>
                 {total}
               </span>
             </div>
             <div className="space-y-0.5">
               {topActions.map(([action, count]) => (
-                <div key={action} className="flex items-center justify-between text-xs text-white/40">
+                <div key={action} className="flex items-center justify-between text-xs admin-tone-text-slate">
                   <span>{getActionMeta(action).label}</span>
                   <span>{count}</span>
                 </div>
               ))}
-              {topActions.length === 0 && (
-                <div className="text-xs text-white/20">Cap activitat</div>
-              )}
+              {topActions.length === 0 && <div className="text-xs admin-tone-text-neutral">Cap activitat</div>}
             </div>
           </button>
         );
@@ -208,13 +218,9 @@ export default function ActivityClient() {
     </section>
   ) : null;
 
-  // ─── Render ──────────────────────────────────────────────────────────────
-
   return (
     <div className="space-y-4">
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* Category chips */}
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((cat) => (
             <button
@@ -222,8 +228,8 @@ export default function ActivityClient() {
               onClick={() => setCategory(cat.id)}
               className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
                 category === cat.id
-                  ? 'border-cyan-500/40 bg-cyan-500/15 text-cyan-200'
-                  : 'border-white/10 text-white/50 hover:text-white/70 hover:border-white/20'
+                  ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
+                  : 'admin-tone-idle'
               }`}
             >
               {cat.icon} {cat.label}
@@ -232,11 +238,10 @@ export default function ActivityClient() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* Days selector */}
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="ap-input rounded-xl px-3 py-1.5 text-xs"
             aria-label="Període de temps"
           >
             {DAYS_OPTIONS.map((opt) => (
@@ -246,41 +251,32 @@ export default function ActivityClient() {
             ))}
           </select>
 
-          {/* Refresh */}
-          <button
-            onClick={fetchActivity}
-            className="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-white/50 hover:text-white/70 hover:border-white/20 transition-colors"
-            aria-label="Refrescar"
-          >
+          <button onClick={fetchActivity} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" aria-label="Refrescar">
             🔄
           </button>
         </div>
       </div>
 
-      {/* Stats */}
       {!loading && statsCards}
 
-      {/* Loading */}
       {loading && (
-        <div className="flex items-center gap-2 py-8 justify-center text-sm text-white/50" role="status">
+        <div className="flex items-center justify-center gap-2 py-8 text-sm admin-tone-text-neutral" role="status">
           <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
           Carregant activitat...
         </div>
       )}
 
-      {/* Activity feed */}
       {!loading && data && (
         <>
-          <div className="text-xs text-white/40 mb-2">
+          <div className="mb-2 text-xs admin-tone-text-slate">
             {data.total} accions en {days === 1 ? 'les últimes 24h' : `els últims ${days} dies`}
             {data.pages > 1 && ` · Pàg. ${data.page}/${data.pages}`}
           </div>
 
-          {/* Mobile card view */}
-          <section className="lg:hidden space-y-3" aria-label="Registre d'activitat del sistema">
+          <section className="space-y-3 lg:hidden" aria-label="Registre d'activitat del sistema">
             {data.logs.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-12 text-center text-white/30">
-                Cap activitat en aquest període
+              <div className="ap-card ap-empty rounded-2xl">
+                <p className="ap-empty-title">Cap activitat en aquest període</p>
               </div>
             ) : (
               data.logs.map((log) => {
@@ -292,76 +288,58 @@ export default function ActivityClient() {
                 const detailsText = formatDetails(log.details);
 
                 return (
-                  <article
-                    key={log.id}
-                    className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <span className={`${meta.color} font-medium text-sm`}>
+                  <article key={log.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
+                    <div className="mb-2 flex items-start justify-between gap-3">
+                      <span className={`${meta.tone} text-sm font-medium`}>
                         {meta.icon} {meta.label}
                       </span>
-                      <span
-                        className="text-xs text-white/40 whitespace-nowrap"
-                        title={formatDateTimeFull(log.createdAt)}
-                      >
+                      <span className="whitespace-nowrap text-xs admin-tone-text-slate" title={formatDateTimeFull(log.createdAt)}>
                         {formatTimeAgo(log.createdAt)}
                       </span>
                     </div>
 
                     {log.entity && (
-                      <div className="text-sm text-white/60 mb-1">
+                      <div className="mb-1 text-sm admin-tone-text-neutral">
                         {entityLink ? (
-                          <Link
-                            href={entityLink}
-                            className="hover:text-cyan-300 underline decoration-white/20 hover:decoration-cyan-300/50 transition-colors"
-                          >
+                          <Link href={entityLink} className="admin-tone-text-info underline decoration-current/30 transition-colors hover:opacity-80">
                             {log.entity}
                             {log.entityId && (
-                              <span className="text-white/30 ml-1 text-xs">
-                                {log.entityId.slice(0, 8)}
-                              </span>
+                              <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>
                             )}
                           </Link>
                         ) : (
                           <span>
                             {log.entity}
                             {log.entityId && (
-                              <span className="text-white/30 ml-1 text-xs">
-                                {log.entityId.slice(0, 8)}
-                              </span>
+                              <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>
                             )}
                           </span>
                         )}
                       </div>
                     )}
 
-                    {detailsText && (
-                      <p className="text-xs text-white/40 line-clamp-2 mt-1">
-                        {detailsText}
-                      </p>
-                    )}
+                    {detailsText && <p className="mt-1 line-clamp-2 text-xs admin-tone-text-slate">{detailsText}</p>}
                   </article>
                 );
               })
             )}
           </section>
 
-          {/* Desktop table view */}
-          <section className="hidden lg:block rounded-2xl border admin-card-glass overflow-hidden">
+          <section className="hidden lg:block ap-table-wrap">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[700px] text-sm" aria-label="Registre d'activitat del sistema">
-                <thead className="border-b border-white/10">
+              <table className="ap-table w-full min-w-[700px] text-sm" aria-label="Registre d'activitat del sistema">
+                <thead className="ap-table-head">
                   <tr>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-white/60 w-16">Quan</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-white/60">Acció</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-white/60">Entitat</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-white/60">Detalls</th>
+                    <th scope="col" className="ap-table-th w-16">Quan</th>
+                    <th scope="col" className="ap-table-th">Acció</th>
+                    <th scope="col" className="ap-table-th">Entitat</th>
+                    <th scope="col" className="ap-table-th">Detalls</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="ap-table-body">
                   {data.logs.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-12 text-center text-white/30">
+                      <td colSpan={4} className="px-4 py-12 text-center admin-tone-text-neutral">
                         Cap activitat en aquest període
                       </td>
                     </tr>
@@ -374,29 +352,29 @@ export default function ActivityClient() {
                           : null;
 
                       return (
-                        <tr key={log.id} className="hover:bg-white/[0.03] transition-colors">
-                          <td className="px-4 py-3 text-white/40 whitespace-nowrap" title={formatDateTimeFull(log.createdAt)}>
+                        <tr key={log.id}>
+                          <td className="px-4 py-3 whitespace-nowrap admin-tone-text-slate" title={formatDateTimeFull(log.createdAt)}>
                             {formatTimeAgo(log.createdAt)}
                           </td>
                           <td className="px-4 py-3">
-                            <span className={`${meta.color} font-medium`}>
+                            <span className={`${meta.tone} font-medium`}>
                               {meta.icon} {meta.label}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-white/60">
+                          <td className="px-4 py-3 admin-tone-text-neutral">
                             {entityLink ? (
-                              <Link href={entityLink} className="hover:text-cyan-300 underline decoration-white/20 hover:decoration-cyan-300/50 transition-colors">
+                              <Link href={entityLink} className="admin-tone-text-info underline decoration-current/30 transition-colors hover:opacity-80">
                                 {log.entity}
-                                {log.entityId && <span className="text-white/30 ml-1 text-xs">{log.entityId.slice(0, 8)}</span>}
+                                {log.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>}
                               </Link>
                             ) : (
                               <span>
                                 {log.entity}
-                                {log.entityId && <span className="text-white/30 ml-1 text-xs">{log.entityId.slice(0, 8)}</span>}
+                                {log.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>}
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-white/40 text-xs max-w-xs truncate" title={log.details ? JSON.stringify(log.details) : ''}>
+                          <td className="max-w-xs truncate px-4 py-3 text-xs admin-tone-text-slate" title={log.details ? JSON.stringify(log.details) : ''}>
                             {formatDetails(log.details)}
                           </td>
                         </tr>
@@ -408,23 +386,22 @@ export default function ActivityClient() {
             </div>
           </section>
 
-          {/* Pagination */}
           {data.pages > 1 && (
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-white/50 hover:text-white/70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
               >
                 ← Anterior
               </button>
-              <span className="text-xs text-white/40">
+              <span className="text-xs admin-tone-text-slate">
                 {data.page} / {data.pages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
                 disabled={page >= data.pages}
-                className="rounded-xl border border-white/10 px-3 py-1.5 text-xs text-white/50 hover:text-white/70 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
               >
                 Següent →
               </button>
@@ -435,3 +412,4 @@ export default function ActivityClient() {
     </div>
   );
 }
+

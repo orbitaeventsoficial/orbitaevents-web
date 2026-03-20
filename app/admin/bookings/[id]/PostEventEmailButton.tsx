@@ -42,16 +42,16 @@ export default function PostEventEmailButton({ bookingId }: { bookingId: string 
         type="button"
         onClick={handleSend}
         disabled={sending || sent}
-        className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${
+        className={`ap-btn px-3 py-1.5 text-xs disabled:opacity-60 ${
           sent
-            ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-            : 'bg-amber-500 text-white hover:bg-amber-600'
-        } disabled:opacity-60`}
+            ? 'ap-btn--secondary admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+            : 'ap-btn--primary'
+        }`}
       >
         {sent ? '✓ Enviat!' : sending ? 'Enviant...' : 'Envia post-event al client'}
       </button>
       {error && (
-        <span className="text-[10px] mt-1">{error}</span>
+        <span className="admin-tone-text-danger mt-1 text-[10px]">{error}</span>
       )}
     </div>
   );

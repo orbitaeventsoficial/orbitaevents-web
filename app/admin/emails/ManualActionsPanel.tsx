@@ -4,6 +4,21 @@
 import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 
+const IDLE_BUTTON = 'w-full rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors admin-tone-idle';
+const DISABLED_BUTTON = 'w-full cursor-not-allowed rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/30';
+const PRIMARY_BUTTON = 'rounded-xl px-4 py-2 text-sm font-medium text-white shadow-lg transition-colors';
+
+function ResultMessage({ result }: { result: { ok: boolean; message: string } }) {
+  return (
+    <p
+      className={`mt-2 text-xs ${result.ok ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}
+      role={result.ok ? 'status' : 'alert'}
+    >
+      {result.message}
+    </p>
+  );
+}
+
 export default function ManualActionsPanel() {
   const [runningCron, setRunningCron] = useState(false);
   const [cronResult, setCronResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -18,7 +33,6 @@ export default function ManualActionsPanel() {
     setCronResult(null);
 
     try {
-      // Use admin-protected endpoint instead of exposing CRON_SECRET
       const res = await fetchWithCsrf('/api/admin/emails/run-cron', {
         method: 'POST',
       });
@@ -60,9 +74,7 @@ export default function ManualActionsPanel() {
         const pending = data.pendingCount || 0;
         setReminderResult({
           ok: true,
-          message: pending > 0
-            ? `✅ Recordatori enviat (${pending} pendents)`
-            : '✅ No hi ha testimonis pendents',
+          message: pending > 0 ? `✅ Recordatori enviat (${pending} pendents)` : '✅ No hi ha testimonis pendents',
         });
       } else {
         setReminderResult({
@@ -115,87 +127,56 @@ export default function ManualActionsPanel() {
   }
 
   return (
-    <section className="rounded-2xl border admin-card-glass overflow-hidden">
-      <div className="px-6 py-4 border-b">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+      <div className="border-b px-6 py-4">
         <h2 className="font-semibold">🔧 Accions Manuals</h2>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Run Cron Manually */}
+      <div className="space-y-6 p-6">
         <div>
-          <h3 className="text-sm font-medium mb-2">Executar Cron Post-Event</h3>
-          <p className="text-xs mb-3">
-            Envia correus a tots els esdeveniments completats pendents
-          </p>
+          <h3 className="mb-2 text-sm font-medium">Executar Cron Post-Event</h3>
+          <p className="mb-3 text-xs">Envia correus a tots els esdeveniments completats pendents</p>
           <button
             onClick={runCronManually}
             disabled={runningCron}
             type="button"
             aria-busy={runningCron}
-            className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              runningCron
-                ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
-                : 'bg-white/5 text-white/80 border border-white/10 hover:bg-white/10'
-            }`}
+            className={runningCron ? DISABLED_BUTTON : IDLE_BUTTON}
           >
             {runningCron ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                 Executant...
               </span>
             ) : (
               '🚀 Executar ara'
             )}
           </button>
-          {cronResult && (
-            <p
-              className={`mt-2 text-xs ${cronResult.ok ? 'text-emerald-400' : 'text-rose-400'}`}
-              role={cronResult.ok ? 'status' : 'alert'}
-            >
-              {cronResult.message}
-            </p>
-          )}
+          {cronResult && <ResultMessage result={cronResult} />}
         </div>
 
-        <hr className="" />
+        <hr />
 
-        {/* Testimonials Reminder */}
         <div>
-          <h3 className="text-sm font-medium mb-2">Recordatori de testimonis</h3>
-          <p className="text-xs mb-3">
-            Envia un resum amb testimonis pendents d'aprovació
-          </p>
+          <h3 className="mb-2 text-sm font-medium">Recordatori de testimonis</h3>
+          <p className="mb-3 text-xs">Envia un resum amb testimonis pendents d'aprovació</p>
           <button
             onClick={sendTestimonialsReminder}
             disabled={runningReminder}
             type="button"
             aria-busy={runningReminder}
-            className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              runningReminder
-                ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
-                : 'bg-white/5 text-white/80 border border-white/10 hover:bg-white/10'
-            }`}
+            className={runningReminder ? DISABLED_BUTTON : IDLE_BUTTON}
           >
             {runningReminder ? 'Enviant...' : '⭐ Envia recordatori'}
           </button>
-          {reminderResult && (
-            <p
-              className={`mt-2 text-xs ${reminderResult.ok ? 'text-emerald-400' : 'text-rose-400'}`}
-              role={reminderResult.ok ? 'status' : 'alert'}
-            >
-              {reminderResult.message}
-            </p>
-          )}
+          {reminderResult && <ResultMessage result={reminderResult} />}
         </div>
 
-        <hr className="" />
+        <hr />
 
-        {/* Send Test Email */}
         <div>
-          <h3 className="text-sm font-medium mb-2">Envia correu de prova</h3>
-          <p className="text-xs mb-3">
-            Envia un email de prova per verificar la configuració SMTP
-          </p>
+          <h3 className="mb-2 text-sm font-medium">Envia correu de prova</h3>
+          <p className="mb-3 text-xs">Envia un email de prova per verificar la configuració SMTP</p>
           <div className="flex gap-2">
             <input
               type="email"
@@ -203,55 +184,45 @@ export default function ManualActionsPanel() {
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
               aria-label="Email de prova"
-              className="flex-1 px-3 py-2 text-sm rounded-xl border "
+              className="flex-1 rounded-xl border px-3 py-2 text-sm"
             />
             <button
               onClick={sendTestEmail}
               disabled={sendingTest}
               type="button"
               aria-busy={sendingTest}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                sendingTest
-                  ? 'bg-white/5 text-white/30 border border-white/10'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
-              }`}
+              className={sendingTest ? DISABLED_BUTTON.replace('w-full ', '') : PRIMARY_BUTTON}
             >
               {sendingTest ? '...' : '📧'}
             </button>
           </div>
-          {testResult && (
-            <p
-              className={`mt-2 text-xs ${testResult.ok ? 'text-emerald-400' : 'text-rose-400'}`}
-              role={testResult.ok ? 'status' : 'alert'}
-            >
-              {testResult.message}
-            </p>
-          )}
+          {testResult && <ResultMessage result={testResult} />}
         </div>
 
-        <hr className="" />
+        <hr />
 
-        {/* Quick Links */}
         <div>
-          <h3 className="text-sm font-medium mb-3">Enllaços Ràpids</h3>
+          <h3 className="mb-3 text-sm font-medium">Enllaços Ràpids</h3>
           <div className="space-y-2">
             <a
               href="/api/canvas/rating?name=Prova&rating=10&code=TEST15&discount=15"
-              target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl border px-3 py-2 text-center text-sm transition-colors"
             >
               🎨 Previsualitzar Canvas
             </a>
             <a
               href="/ca/valoracio?ref=TEST-001"
-              target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl border px-3 py-2 text-center text-sm transition-colors"
             >
               ⭐ Veure pàgina valoració
             </a>
             <a
               href="/admin/google-reviews"
-              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
+              className="block w-full rounded-xl border px-3 py-2 text-center text-sm transition-colors"
             >
               📋 Gestionar ressenyes
             </a>
@@ -261,4 +232,3 @@ export default function ManualActionsPanel() {
     </section>
   );
 }
-

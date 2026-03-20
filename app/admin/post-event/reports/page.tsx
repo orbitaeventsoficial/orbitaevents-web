@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { formatDateSimple } from '@/lib/constants';
+import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -9,19 +10,7 @@ export const metadata = {
   title: 'Informes Post-Event | Òrbita Admin',
 };
 
-function getPackName(
-  translations: Array<{ locale: string; name: string }>,
-  fallback: string,
-  locale?: string | null
-) {
-  const preferred = String(locale || 'ca').toLowerCase();
-  return (
-    translations.find((t) => t.locale === preferred)?.name ||
-    translations.find((t) => t.locale === 'ca')?.name ||
-    translations[0]?.name ||
-    fallback
-  );
-}
+
 
 async function getReports() {
   return prisma.postEventReport.findMany({
@@ -86,15 +75,15 @@ export default async function ReportsPage() {
 
       {/* Available Bookings for New Report */}
       {availableBookings.length > 0 && (
-        <div className="border border-white/10 rounded-xl overflow-hidden">
+        <div className="ap-card overflow-hidden">
           <div className="border-b p-4">
             <h3 className="font-semibold">📝 Events sense informe ({availableBookings.length})</h3>
           </div>
           <div className="divide-y divide-white/5/40">
             {availableBookings.map((booking) => {
-              const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
+              const packName = getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
               return (
-                <div key={booking.id} className="p-4 flex items-center justify-between hover:bg-white/5">
+                <div key={booking.id} className="flex items-center justify-between p-4 hover:brightness-105">
                   <div>
                     <p className="font-medium">{booking.clientName}</p>
                     <p className="text-sm">
@@ -103,7 +92,7 @@ export default async function ReportsPage() {
                   </div>
                   <Link
                     href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-                    className="px-4 py-2 text-white rounded-xl text-sm font-medium"
+                    className="ap-btn ap-btn--primary px-4 py-2 text-sm"
                   >
                     Crear informe
                   </Link>
@@ -116,7 +105,7 @@ export default async function ReportsPage() {
 
       {/* Reports List */}
       {reports.length === 0 ? (
-        <div className="border border-white/10 rounded-xl p-12 text-center">
+        <div className="ap-card p-12 text-center">
           <div className="text-4xl mb-4">📋</div>
           <p className="mb-4">Encara no hi ha informes creats</p>
           {availableBookings.length === 0 ? (
@@ -128,7 +117,7 @@ export default async function ReportsPage() {
       ) : (
         <div className="space-y-3">
           {reports.map((report) => {
-            const packName = getPackName(
+            const packName = getTranslatedPackName(
               report.booking.pack.translations,
               report.booking.pack.slug,
               report.booking.lead?.preferredLocale
@@ -136,7 +125,7 @@ export default async function ReportsPage() {
             return (
               <div
                 key={report.id}
-                className="border border-white/10 rounded-xl p-4 hover:bg-white/5 transition-colors"
+                className="ap-card p-4 hover:brightness-105 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -146,8 +135,8 @@ export default async function ReportsPage() {
                       </h3>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                         report.status === 'DRAFT'
-                          ? 'bg-orange-500/15 text-orange-300'
-                          : 'bg-emerald-500/15 text-emerald-300'
+                          ? 'admin-tone-bg-warning admin-tone-text-warning'
+                          : 'admin-tone-bg-success admin-tone-text-success'
                       }`}>
                         {report.status === 'DRAFT' ? 'Esborrany' : 'Completat'}
                       </span>
@@ -163,7 +152,7 @@ export default async function ReportsPage() {
                   </div>
                   <Link
                     href={`/admin/bookings/${report.bookingId}`}
-                    className="px-4 py-2 bg-white/5 rounded-xl text-sm font-medium hover:bg-white/10"
+                    className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                   >
                     Veure detalls
                   </Link>
@@ -176,6 +165,8 @@ export default async function ReportsPage() {
     </AdminPage>
   );
 }
+
+
 
 
 

@@ -230,7 +230,7 @@ export default function BookingMarginCard({
       </div>
 
       {/* Sumatori clar */}
-      <div className="mb-6 rounded-xl border border-white/10 bg-black/20 p-4">
+      <div className="mb-6 ap-card rounded-xl p-4">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
@@ -238,18 +238,18 @@ export default function BookingMarginCard({
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
           <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(fixedOperationalCost)}</span></div>
           <div className="flex justify-between"><span title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
-          <div className="flex justify-between border-t border-white/10 pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
+          <div className="flex justify-between border-t admin-tone-border-neutral pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
           <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
           <div className="flex justify-between"><span>Diferencial de marge (ingrés - cost)</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
           <div className="flex justify-between"><span>Marge objectiu ({targetMarginPct.toFixed(1)}%)</span><span>{formatCurrency(targetMarginAmount)}</span></div>
           <div className="flex justify-between">
             <span>Diferencial vs objectiu</span>
-            <span className={marginDeltaVsTarget >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+            <span className={marginDeltaVsTarget >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}>
               {formatCurrency(marginDeltaVsTarget)}
             </span>
           </div>
           {typeof inventoryRemainingHoursAvg === 'number' && (
-            <div className="flex justify-between border-t border-white/10 pt-1.5">
+            <div className="flex justify-between border-t admin-tone-border-neutral pt-1.5">
               <span>Vida útil mitjana material assignat</span>
               <span>{inventoryRemainingHoursAvg.toFixed(0)}h restants</span>
             </div>
@@ -257,7 +257,7 @@ export default function BookingMarginCard({
           {typeof inventoryRemainingHoursMin === 'number' && (
             <div className="flex justify-between">
               <span>Element més crític (mínim)</span>
-              <span className={inventoryRemainingHoursMin < 200 ? 'text-rose-300' : 'text-white/80'}>
+              <span className={inventoryRemainingHoursMin < 200 ? 'admin-tone-text-danger' : 'admin-tone-text-neutral'}>
                 {inventoryRemainingHoursMin.toFixed(0)}h restants
               </span>
             </div>
@@ -328,19 +328,19 @@ export default function BookingMarginCard({
               </div>
             )}
             {/* Separador */}
-            <div className="border-t border-white/10 pt-2 mt-2">
+            <div className="border-t admin-tone-border-neutral pt-2 mt-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="font-bold">Benefici net (el que queda per a tu)</span>
                   <p className="text-[10px]">Compte corrent de l'empresa — sou, inversions, estalvi</p>
                 </div>
-                <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
             </div>
             {/* Consell */}
-            <div className="border-t border-white/10 pt-2 mt-1">
+            <div className="border-t admin-tone-border-neutral pt-2 mt-1">
               <p className="text-[10px] leading-relaxed">
                 <strong>Consell pràctic:</strong> Obre 4 comptes/pots al banc: <strong>Gasolina</strong> (repostar), <strong>Equip</strong> (recanvis i equip nou), <strong>Operacions</strong> (assegurança, llicències), i <strong>Benefici</strong> (sou i estalvi). Després de cada bolo, transfereix automàticament els imports d'amunt a cada pot. Així mai et quedaràs sense per a manteniment o reposició d'equip.
               </p>
@@ -350,7 +350,7 @@ export default function BookingMarginCard({
       )}
 
       {/* Cost breakdown */}
-      <div className="text-sm space-y-1 mb-6 border-t border-white/10 pt-4">
+      <div className="text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
@@ -392,7 +392,7 @@ export default function BookingMarginCard({
       </div>
 
       {/* Editable travel fields */}
-      <div className="border-t border-white/10 pt-4">
+      <div className="border-t admin-tone-border-neutral pt-4">
         <h3 className="text-sm font-semibold mb-3">🚗 Desplaçament (editable)</h3>
         <p className="mb-3 text-xs">
           Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
@@ -407,18 +407,18 @@ export default function BookingMarginCard({
               step="1"
               value={distanceKm}
               onChange={(e) => setDistanceKm(Number(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm focus:ring-2"
+              className="ap-input w-full px-3 py-2 text-sm"
             />
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">Km extra</label>
-            <div className="px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm">
+            <div className="ap-card px-3 py-2 text-sm">
               {billableKm} km
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">Cost viatge</label>
-            <div className="px-3 py-2 rounded-xl border border-white/10 bg-white/5 text-sm font-bold">
+            <div className="ap-card px-3 py-2 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
             <p className="mt-1 text-[11px]">
@@ -427,12 +427,12 @@ export default function BookingMarginCard({
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <div className="ap-card rounded-xl p-3">
             <p className="text-[11px] uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
             <p className="text-[11px]">{distanceKm.toFixed(1)} km × {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <div className="ap-card rounded-xl p-3">
             <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
             <p className="text-[11px]">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
@@ -455,7 +455,7 @@ export default function BookingMarginCard({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="mt-3 px-4 py-2 text-black rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors"
+            className="mt-3 ap-btn ap-btn--primary text-sm disabled:opacity-50"
           >
             {saving ? '⏳ Desant...' : '💾 Desar canvis'}
           </button>
@@ -464,6 +464,7 @@ export default function BookingMarginCard({
     </section>
   );
 }
+
 
 
 

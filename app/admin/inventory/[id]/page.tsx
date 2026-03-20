@@ -13,7 +13,7 @@ import {
   STATUS_CONFIG,
   CONDITION_LABELS,
 } from '@/lib/inventory-utils';
-import { formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG, formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
@@ -69,14 +69,6 @@ async function getItem(id: string) {
     return null;
   }
 }
-
-const BOOKING_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pendent',
-  CONFIRMED: 'Confirmada',
-  PREPARING: 'Preparant',
-  COMPLETED: 'Completada',
-  CANCELLED: 'Cancel·lada',
-};
 
 export default async function InventoryItemPage({ params }: PageProps) {
   const item = await getItem(params.id);
@@ -253,7 +245,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                     <td className="px-4 py-3">{formatDate(bi.booking.eventDate)}</td>
                     <td className="px-4 py-3">
                       <span className="text-xs">
-                        {BOOKING_STATUS_LABELS[bi.booking.status] || bi.booking.status}
+                        {BOOKING_STATUS_CONFIG[bi.booking.status]?.label || bi.booking.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -322,3 +314,5 @@ export default async function InventoryItemPage({ params }: PageProps) {
     </AdminPage>
   );
 }
+
+

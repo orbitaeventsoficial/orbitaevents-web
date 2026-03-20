@@ -85,23 +85,23 @@ export default function LeadNotesPanel({
   };
 
   return (
-    <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+    <section className="ap-card p-6">
       <div className="mb-4 flex items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">Notes ({notes.length})</h2>
         <button
           type="button"
           onClick={cleanDuplicates}
           disabled={cleaning}
-          className="rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60"
+          className="ap-btn ap-btn--secondary px-2.5 py-1 text-xs disabled:opacity-60"
         >
           {cleaning ? 'Netejant...' : 'Netejar duplicats'}
         </button>
       </div>
       {error && (
-        <p className="mb-3 rounded-xl border px-3 py-2 text-sm">{error}</p>
+        <p className="ap-card mb-3 px-3 py-2 text-sm">{error}</p>
       )}
       {success && (
-        <p className="mb-3 rounded-xl border px-3 py-2 text-sm">{success}</p>
+        <p className="ap-card mb-3 px-3 py-2 text-sm">{success}</p>
       )}
 
       {notes.length === 0 ? (
@@ -109,7 +109,7 @@ export default function LeadNotesPanel({
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <div key={note.id} className="rounded-xl border p-3 transition-colors">
+            <div key={note.id} className="ap-card p-3 transition-colors">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs">{formatNoteDate(note.createdAt)}</span>
@@ -119,7 +119,7 @@ export default function LeadNotesPanel({
                   type="button"
                   onClick={() => deleteNote(note.id)}
                   disabled={deletingId === note.id}
-                  className={`rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDeleteId === note.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
+                  className={`ap-btn px-2.5 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === note.id ? 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger' : 'ap-btn--secondary'}`}
                 >
                   {deletingId === note.id ? 'Eliminant...' : confirmingDeleteId === note.id ? 'Segur?' : 'Eliminar'}
                 </button>
@@ -132,5 +132,9 @@ export default function LeadNotesPanel({
     </section>
   );
 }
+
+
+
+
 
 

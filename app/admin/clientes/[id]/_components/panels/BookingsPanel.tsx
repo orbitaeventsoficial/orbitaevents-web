@@ -3,12 +3,10 @@ import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
 import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG, formatDateFull, formatNumber } from '@/lib/constants';
 
-// BOOKING_STATUS_COLORS is derived from the centralized BOOKING_STATUS_CONFIG but
-// produces a single combined class string (border + bg + text) for badge styling.
-// It has a different structure from BOOKING_STATUS_CONFIG, so it is kept local.
-const BOOKING_STATUS_COLORS: Record<string, string> = Object.fromEntries(
-  Object.entries(BOOKING_STATUS_CONFIG).map(([k, v]) => [k, `border-current ${v.bg} ${v.text}`])
-);
+function getBookingStatusBadgeClass(status: string) {
+  const tone = BOOKING_STATUS_CONFIG[status];
+  return tone ? ('border-current ' + tone.bg + ' ' + tone.text) : 'border-white/10 bg-white/5 text-white/60';
+}
 
 function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const deposit = booking.depositAmount ?? 0;
@@ -64,7 +62,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
             <p className="text-xs font-semibold uppercase tracking-wider">Properes ({upcoming.length})</p>
           )}
           {upcoming.map((booking) => {
-            const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-white/10 bg-white/5 text-white/60';
+            const statusColor = getBookingStatusBadgeClass(booking.status);
 
             return (
               <div key={booking.id} className="rounded-xl border p-4">
@@ -150,7 +148,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
             <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-white/40">Passades / Cancel·lades ({past.length})</p>
           )}
           {past.map((booking) => {
-            const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-white/10 bg-white/5 text-white/60';
+            const statusColor = getBookingStatusBadgeClass(booking.status);
             return (
               <div key={booking.id} className="rounded-xl border border-white/5 p-4 opacity-60">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -174,3 +172,6 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
+
+
+

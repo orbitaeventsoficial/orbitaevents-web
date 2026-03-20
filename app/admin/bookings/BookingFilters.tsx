@@ -2,17 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
-import { BOOKING_STATUS_CONFIG, EVENT_TYPE_PLAIN } from '@/lib/constants';
-
-const STATUS_OPTIONS = Object.entries(BOOKING_STATUS_CONFIG).map(([key, val]) => ({
-  value: key,
-  label: val.label,
-}));
-
-const EVENT_TYPE_OPTIONS = Object.entries(EVENT_TYPE_PLAIN).map(([key, val]) => ({
-  value: key,
-  label: val,
-}));
+import { BOOKING_STATUS_OPTIONS, EVENT_TYPE_OPTIONS } from '@/lib/constants';
 
 export default function BookingFilters() {
   const router = useRouter();
@@ -89,7 +79,7 @@ export default function BookingFilters() {
           className="rounded-xl border px-3 py-1.5 text-xs font-medium bg-transparent"
         >
           <option value="">Tots els estats</option>
-          {STATUS_OPTIONS.map((opt) => (
+          {BOOKING_STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -145,3 +135,4 @@ export default function BookingFilters() {
     </div>
   );
 }
+

@@ -54,7 +54,9 @@ export default function ImapSettingsClient() {
     }
   }, [toast]);
 
-  useEffect(() => { loadConfig(); }, [loadConfig]);
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
 
   const testConnection = async () => {
     if (!host || !user || !pass) {
@@ -124,52 +126,52 @@ export default function ImapSettingsClient() {
     );
   }
 
+  const connectionTone = connection?.ok
+    ? 'ap-card ap-card--success'
+    : config?.configured
+      ? 'ap-card ap-card--danger'
+      : 'ap-card ap-card--warning';
+
+  const connectionDot = connection?.ok
+    ? 'admin-tone-bg-success'
+    : config?.configured
+      ? 'admin-tone-bg-danger'
+      : 'admin-tone-bg-warning';
+
   return (
     <div className="space-y-4">
       {/* Estat de connexió */}
-      <div className={`rounded-2xl border p-5 ${
-        connection?.ok
-          ? 'border-emerald-500/30 bg-emerald-500/5'
-          : config?.configured
-            ? 'border-rose-500/30 bg-rose-500/5'
-            : 'border-amber-500/30 bg-amber-500/5'
-      }`}>
+      <div className={`${connectionTone} rounded-2xl border p-5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className={`h-4 w-4 rounded-full ${
-              connection?.ok ? 'bg-emerald-400' : config?.configured ? 'bg-rose-400' : 'bg-amber-400'
-            }`} />
+            <span className={`h-4 w-4 rounded-full ${connectionDot}`} />
             <div>
               <h2 className="font-semibold">
                 {connection?.ok
                   ? 'IMAP connectat i operatiu'
                   : config?.configured
-                    ? 'IMAP configurat però amb error'
+                    ? 'IMAP configurat pero amb error'
                     : 'IMAP no configurat'}
               </h2>
               {config?.source === 'env' && (
-                <p className="text-xs text-white/50 mt-0.5">Font: variables d&apos;entorn (Railway)</p>
+                <p className="mt-0.5 text-xs text-white/50">Font: variables d&apos;entorn (Railway)</p>
               )}
               {config?.source === 'db' && (
-                <p className="text-xs text-white/50 mt-0.5">Font: base de dades (configurat des de l&apos;admin)</p>
+                <p className="mt-0.5 text-xs text-white/50">Font: base de dades (configurat des de l&apos;admin)</p>
               )}
             </div>
           </div>
-          {connection?.ok && (
-            <span className="rounded-full px-3 py-1 text-xs font-semibold">
-              ONLINE
-            </span>
-          )}
+          {connection?.ok && <span className="ap-badge ap-badge--success">ONLINE</span>}
         </div>
         {connection && !connection.ok && connection.error && (
-          <p className="mt-2 text-sm">{connection.error}</p>
+          <p className="mt-2 text-sm admin-tone-text-danger">{connection.error}</p>
         )}
       </div>
 
       {/* Config actual */}
       {config?.configured && (
         <div className="rounded-2xl border p-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-3">Configuració actual</h3>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide">Configuració actual</h3>
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between border-b border-white/5 pb-2">
               <span className="text-white/50">Servidor</span>
@@ -185,36 +187,40 @@ export default function ImapSettingsClient() {
             </div>
             <div className="flex justify-between border-b border-white/5 pb-2">
               <span className="text-white/50">SSL/TLS</span>
-              <span>{config.secure ? 'Sí (port 993)' : 'No'}</span>
+              <span>{config.secure ? 'Si (port 993)' : 'No'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">Contrasenya</span>
-              <span>••••••••</span>
+              <span>........</span>
             </div>
           </div>
         </div>
       )}
 
       {/* Formulari de configuració */}
-      {(!config?.configured || showForm) ? (
+      {!config?.configured || showForm ? (
         <div className="rounded-2xl border p-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-4">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">
             {config?.configured ? 'Modificar configuració' : 'Configurar connexió IMAP'}
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="imap-host" className="block text-xs font-medium mb-1">Servidor IMAP</label>
+              <label htmlFor="imap-host" className="mb-1 block text-xs font-medium">
+                Servidor IMAP
+              </label>
               <input
                 id="imap-host"
                 type="text"
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 placeholder="imap.dondominio.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label htmlFor="imap-port" className="block text-xs font-medium mb-1">Port</label>
+              <label htmlFor="imap-port" className="mb-1 block text-xs font-medium">
+                Port
+              </label>
               <input
                 id="imap-port"
                 type="number"
@@ -222,29 +228,33 @@ export default function ImapSettingsClient() {
                 onChange={(e) => setPort(e.target.value)}
                 placeholder="993"
                 min={1}
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label htmlFor="imap-user" className="block text-xs font-medium mb-1">Usuari (email)</label>
+              <label htmlFor="imap-user" className="mb-1 block text-xs font-medium">
+                Usuari (email)
+              </label>
               <input
                 id="imap-user"
                 type="email"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 placeholder="info@orbitaevents.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label htmlFor="imap-pass" className="block text-xs font-medium mb-1">Contrasenya</label>
+              <label htmlFor="imap-pass" className="mb-1 block text-xs font-medium">
+                Contrasenya
+              </label>
               <input
                 id="imap-pass"
                 type="password"
                 value={pass}
                 onChange={(e) => setPass(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                placeholder="........"
+                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -289,7 +299,7 @@ export default function ImapSettingsClient() {
 
       {/* Com funciona */}
       <div className="rounded-2xl border p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide mb-2">Com funciona</h3>
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide">Com funciona</h3>
         <ul className="space-y-1.5 text-sm text-white/70">
           <li>• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
           <li>• La safata mostra tots els correus disponibles al compte IMAP configurat.</li>
@@ -300,5 +310,3 @@ export default function ImapSettingsClient() {
     </div>
   );
 }
-
-

@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { BOOKING_STATUS_OPTIONS, LEAD_STATUS_OPTIONS } from '@/lib/constants';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -37,23 +38,6 @@ type DonutSegment = {
 };
 
 // ─── Constants ──────────────────────────────────────────────────────────────
-
-export const LEAD_STATUS_OPTIONS = [
-  { value: 'NEW', label: 'Entrada nova' },
-  { value: 'CONTACTED', label: 'Contactat' },
-  { value: 'QUOTE_SENT', label: 'Pressupost enviat' },
-  { value: 'NEGOTIATING', label: 'Negociacio' },
-  { value: 'WON', label: 'Guanyat' },
-  { value: 'LOST', label: 'Perdut' },
-] as const;
-
-export const BOOKING_STATUS_OPTIONS = [
-  { value: 'PENDING', label: 'Pendent' },
-  { value: 'CONFIRMED', label: 'Confirmada' },
-  { value: 'PREPARING', label: 'Preparant' },
-  { value: 'COMPLETED', label: 'Completada' },
-  { value: 'CANCELLED', label: 'Cancel.lada' },
-] as const;
 
 const COLOR_MAP = {
   emerald: { stroke: '#34d399', glow: 'rgba(52, 211, 153, 0.2)' },
@@ -407,3 +391,5 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
     </div>
   );
 }
+
+

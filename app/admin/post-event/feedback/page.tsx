@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { formatDateSimple } from '@/lib/constants';
+import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -9,19 +10,7 @@ export const metadata = {
   title: 'Feedback post-esdeveniment | Òrbita Admin',
 };
 
-function getPackName(
-  translations: Array<{ locale: string; name: string }>,
-  fallback: string,
-  locale?: string | null
-) {
-  const preferred = String(locale || 'ca').toLowerCase();
-  return (
-    translations.find((t) => t.locale === preferred)?.name ||
-    translations.find((t) => t.locale === 'ca')?.name ||
-    translations[0]?.name ||
-    fallback
-  );
-}
+
 
 async function getCompletedBookings() {
   return prisma.booking.findMany({
@@ -63,20 +52,20 @@ export default async function FeedbackPage() {
 
       {/* Bookings List */}
       {bookings.length === 0 ? (
-        <div className="border border-white/10 rounded-xl p-12 text-center">
+        <div className="ap-card p-12 text-center">
           <div className="text-4xl mb-4">💌</div>
           <p className="">No hi ha esdeveniments completats recentment</p>
         </div>
       ) : (
         <div className="space-y-3">
           {bookings.map((booking) => {
-            const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
+            const packName = getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
             const hasSurvey = !!booking.clientSurvey;
 
             return (
               <div
                 key={booking.id}
-                className="border border-white/10 rounded-xl p-4 hover:bg-white/5 transition-colors"
+                className="ap-card p-4 hover:brightness-105 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -100,13 +89,13 @@ export default async function FeedbackPage() {
                   <div className="flex gap-2">
                     <Link
                       href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${formatDateSimple(booking.eventDate)}!`}
-                      className="px-4 py-2 text-white rounded-xl text-sm font-medium"
+                      className="ap-btn ap-btn--primary px-4 py-2 text-sm"
                     >
                       ✉️ Envia correu
                     </Link>
                     <Link
                       href={`/admin/bookings/${booking.id}`}
-                      className="px-4 py-2 bg-white/5 rounded-xl text-sm font-medium hover:bg-white/10"
+                      className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                     >
                       Veure
                     </Link>
@@ -120,6 +109,8 @@ export default async function FeedbackPage() {
     </AdminPage>
   );
 }
+
+
 
 
 

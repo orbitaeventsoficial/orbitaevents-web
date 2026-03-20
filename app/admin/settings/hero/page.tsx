@@ -11,6 +11,10 @@ interface HeroMedia {
   sortOrder: number;
 }
 
+const INPUT = 'ap-input';
+const CARD = 'rounded-xl border p-4 admin-card-glass';
+const ACTION = 'rounded-lg p-2 transition-colors admin-tone-idle';
+
 export default function HeroMediaAdmin() {
   const [media, setMedia] = useState<HeroMedia[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +29,10 @@ export default function HeroMediaAdmin() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchMedia(); }, [fetchMedia]);
+  useEffect(() => {
+    fetchMedia();
+  }, [fetchMedia]);
 
-  // Upload file
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
     if (!file) return;
@@ -44,7 +49,6 @@ export default function HeroMediaAdmin() {
     setUploading(false);
   };
 
-  // Add external URL
   const handleAddUrl = async () => {
     if (!urlInput.trim()) return;
     setUploading(true);
@@ -59,7 +63,6 @@ export default function HeroMediaAdmin() {
     setUploading(false);
   };
 
-  // Toggle active
   const handleToggle = async (id: string) => {
     await fetch('/api/admin/hero-media', {
       method: 'POST',
@@ -69,7 +72,6 @@ export default function HeroMediaAdmin() {
     await fetchMedia();
   };
 
-  // Delete
   const handleDelete = async (id: string, label: string) => {
     if (!confirm(`Eliminar "${label}"?`)) return;
     await fetch('/api/admin/hero-media', {
@@ -80,13 +82,12 @@ export default function HeroMediaAdmin() {
     await fetchMedia();
   };
 
-  // Move up/down
   const handleMove = async (index: number, direction: 'up' | 'down') => {
     const sorted = [...media];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= sorted.length) return;
     [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
-    const ids = sorted.map((m) => m.id);
+    const ids = sorted.map((item) => item.id);
     await fetch('/api/admin/hero-media', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -95,73 +96,60 @@ export default function HeroMediaAdmin() {
     await fetchMedia();
   };
 
-  const activeCount = media.filter((m) => m.active).length;
+  const activeCount = media.filter((item) => item.active).length;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="mx-auto max-w-4xl p-6">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Hero — Mitjans</h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Imatges i vídeos que roten al hero. {activeCount} actius de {media.length}.
-          </p>
+          <h1 className="text-2xl font-bold">Hero — Mitjans</h1>
+          <p className="mt-1 text-sm">Imatges i vídeos que roten al hero. {activeCount} actius de {media.length}.</p>
         </div>
       </div>
 
-      {/* Upload section */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-8">
-        <h2 className="text-lg font-semibold text-zinc-200 mb-4">Afegir mitjà</h2>
+      <div className="mb-8 rounded-xl border p-6 admin-card-glass">
+        <h2 className="mb-4 text-lg font-semibold">Afegir mitjà</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="block text-sm text-zinc-400 mb-1">Nom</label>
+            <label className="mb-1 block text-sm">Nom</label>
             <input
               type="text"
               value={labelInput}
               onChange={(e) => setLabelInput(e.target.value)}
               placeholder="Ex: Festa Halloween 2024"
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 text-sm"
+              className={INPUT}
             />
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* File upload */}
+        <div className="flex flex-col gap-4 sm:flex-row">
           <div className="flex-1">
-            <label className="block text-sm text-zinc-400 mb-1">Pujar fitxer</label>
+            <label className="mb-1 block text-sm">Pujar fitxer</label>
             <div className="flex gap-2">
               <input
                 ref={fileRef}
                 type="file"
                 accept="video/mp4,video/webm,image/jpeg,image/png,image/webp,image/avif"
-                className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-300 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-amber-500/20 file:text-amber-400 file:text-sm file:font-medium file:cursor-pointer"
+                className="ap-input flex-1 file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-1 file:text-sm file:font-medium"
               />
-              <button
-                onClick={handleUpload}
-                disabled={uploading}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-lg text-sm disabled:opacity-50 transition-colors whitespace-nowrap"
-              >
+              <button onClick={handleUpload} disabled={uploading} className="ap-btn ap-btn--primary whitespace-nowrap disabled:opacity-50">
                 {uploading ? 'Pujant...' : 'Pujar'}
               </button>
             </div>
           </div>
 
-          {/* URL input */}
           <div className="flex-1">
-            <label className="block text-sm text-zinc-400 mb-1">O URL externa</label>
+            <label className="mb-1 block text-sm">O URL externa</label>
             <div className="flex gap-2">
               <input
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder="https://..."
-                className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 text-sm"
+                className="ap-input flex-1"
               />
-              <button
-                onClick={handleAddUrl}
-                disabled={uploading || !urlInput.trim()}
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-bold rounded-lg text-sm disabled:opacity-50 transition-colors whitespace-nowrap"
-              >
+              <button onClick={handleAddUrl} disabled={uploading || !urlInput.trim()} className="ap-btn ap-btn--secondary whitespace-nowrap disabled:opacity-50">
                 Afegir
               </button>
             </div>
@@ -169,109 +157,75 @@ export default function HeroMediaAdmin() {
         </div>
       </div>
 
-      {/* Media list */}
       {loading ? (
-        <div className="text-center text-zinc-500 py-12">Carregant...</div>
+        <div className="py-12 text-center">Carregant...</div>
       ) : media.length === 0 ? (
-        <div className="text-center text-zinc-500 py-12">
-          No hi ha mitjans. Puja el primer vídeo o imatge.
-        </div>
+        <div className="py-12 text-center">No hi ha mitjans. Puja el primer vídeo o imatge.</div>
       ) : (
         <div className="space-y-3">
           {media.map((item, index) => (
             <div
               key={item.id}
-              className={`flex items-center gap-4 p-4 rounded-xl border transition-colors ${
-                item.active
-                  ? 'bg-zinc-900 border-zinc-700'
-                  : 'bg-zinc-950 border-zinc-800 opacity-60'
-              }`}
+              className={`flex items-center gap-4 rounded-xl border p-4 transition-colors ${item.active ? 'admin-card-glass' : 'opacity-60'}`}
             >
-              {/* Preview */}
-              <div className="w-24 h-16 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0 relative">
+              <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border">
                 {item.type === 'video' ? (
                   <video
                     src={item.url}
                     muted
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                     onMouseEnter={(e) => (e.currentTarget as HTMLVideoElement).play()}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLVideoElement).pause(); (e.currentTarget as HTMLVideoElement).currentTime = 0; }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLVideoElement).pause();
+                      (e.currentTarget as HTMLVideoElement).currentTime = 0;
+                    }}
                   />
                 ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.url} alt={item.label} className="w-full h-full object-cover" />
+                  <img src={item.url} alt={item.label} className="h-full w-full object-cover" />
                 )}
-                <div className="absolute top-1 left-1">
-                  <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                    item.type === 'video'
-                      ? 'bg-purple-500/80 text-white'
-                      : 'bg-blue-500/80 text-white'
-                  }`}>
+                <div className="absolute left-1 top-1">
+                  <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${item.type === 'video' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-soft-info admin-tone-text-info'}`}>
                     {item.type === 'video' ? 'VID' : 'IMG'}
                   </span>
                 </div>
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-zinc-200 font-medium text-sm truncate">{item.label}</p>
-                <p className="text-zinc-500 text-xs truncate">{item.url}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{item.label}</p>
+                <p className="truncate text-xs">{item.url}</p>
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {/* Move up */}
-                <button
-                  onClick={() => handleMove(index, 'up')}
-                  disabled={index === 0}
-                  className="p-2 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 transition-colors"
-                  title="Moure amunt"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="flex flex-shrink-0 items-center gap-1">
+                <button onClick={() => handleMove(index, 'up')} disabled={index === 0} className={`${ACTION} disabled:opacity-20`} title="Moure amunt">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
                 </button>
 
-                {/* Move down */}
-                <button
-                  onClick={() => handleMove(index, 'down')}
-                  disabled={index === media.length - 1}
-                  className="p-2 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 transition-colors"
-                  title="Moure avall"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <button onClick={() => handleMove(index, 'down')} disabled={index === media.length - 1} className={`${ACTION} disabled:opacity-20`} title="Moure avall">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
-                {/* Toggle active */}
                 <button
                   onClick={() => handleToggle(item.id)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    item.active
-                      ? 'text-emerald-400 hover:bg-emerald-500/10'
-                      : 'text-zinc-600 hover:bg-zinc-800'
-                  }`}
+                  className={`rounded-lg p-2 transition-colors ${item.active ? 'admin-tone-soft-success admin-tone-text-success' : 'admin-tone-idle'}`}
                   title={item.active ? 'Desactivar' : 'Activar'}
                 >
                   {item.active ? (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <circle cx="12" cy="12" r="10" />
                     </svg>
                   )}
                 </button>
 
-                {/* Delete */}
-                <button
-                  onClick={() => handleDelete(item.id, item.label)}
-                  className="p-2 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                  title="Eliminar"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <button onClick={() => handleDelete(item.id, item.label)} className="rounded-lg p-2 transition-colors admin-tone-soft-danger admin-tone-text-danger" title="Eliminar">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>

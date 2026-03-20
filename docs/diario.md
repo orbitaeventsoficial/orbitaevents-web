@@ -1,4 +1,330 @@
-## 2026-03-20 sessió 13 — Admin amb una sola capa visual real
+## 2026-03-20 sessió 32 — Pàgina principal del detall de booking gairebé tota monocapa
+
+### Què s'ha canviat
+- app/admin/bookings/[id]/page.tsx ha tret la major part de KPI cards, seccions, dropdown local, resum financer, taula de comunicacions, timeline i post-event pintats amb classes locals de white/*, merald/*, mber/* i ose/*.
+- Ara consumeix molt més p-card, p-badge, p-btn i tons semàntics compartits sense tocar la lògica de dades.
+- Aquesta passada completa el nucli principal del detall de reserva després dels talls previs de checklist, document flow, factura, marge, galeria i inventari.
+
+### Per què
+- Era la peça més gran que quedava dins el detall de reserva i encara replicava molta gramàtica visual per compte propi.
+- Sense atacar aquesta pàgina, ookings continuava sent una de les últimes bosses grosses de capa paral·lela dins l'admin.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/bookings/[id]/page.tsx.
+- npx tsc --noEmit continua passant.
+- Dins bookings ara queda sobretot BookingPipelineView, NewBookingForm i alguns fitxers auxiliars més petits.
+
+---## 2026-03-20 sessió 31 — Booking inventory section alineada amb la capa comuna
+
+### Què s'ha canviat
+- app/admin/bookings/[id]/BookingInventorySection.tsx ha tret superfícies locals de llistat, estat de sortida i blocs de cerca.
+- Ara reaprofita p-card, estats semàntics i contenidors comuns en lloc de white/* i variants locals de verd.
+- La lògica d'assignació, checkout/checkin i cerca no s'ha tocat.
+
+### Per què
+- Era una de les peces restants del detall de reserva que encara repintava files i estats pel seu compte.
+- Aquest retoc manté el mateix flux però redueix una altra capa visual paral·lela dins bookings.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/bookings/[id]/BookingInventorySection.tsx.
+- npx tsc --noEmit continua passant.
+- Dins bookings ja queda sobretot la pàgina gran, alguns panells auxiliars i la pipeline/new form.
+
+---## 2026-03-20 sessió 30 — Booking gallery sense selecció i toggles locals
+
+### Què s'ha canviat
+- app/admin/bookings/[id]/BookingGallery.tsx ha tret placeholders, selecció, badges i selector de carpeta basats en white/*, lue/*, purple/* i ocus:cian locals.
+- Les fotos seleccionades, els estats portal/portfolio i el panell lateral ara reaprofiten cards, badges, inputs i tons semàntics comuns.
+- La lògica d'upload, compressió i persistència no s'ha tocat.
+
+### Per què
+- Era una altra peça molt visible dins bookings i mantenia mini components visuals propis per a selecció i toggles.
+- Aquest retoc continua la mateixa estratègia: treure capa paral·lela sense reescriure la funcionalitat.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/bookings/[id]/BookingGallery.tsx.
+- npx tsc --noEmit continua passant.
+- El següent tall natural dins bookings és BookingInventorySection.
+
+---## 2026-03-20 sessió 29 — Booking margin card ja sense superfícies locals
+
+### Què s'ha canviat
+- app/admin/bookings/[id]/BookingMarginCard.tsx ha tret inputs, separadors, caixes i deltes visuals basats en white/*, merald/* i ose/* literals.
+- Ara reaprofita p-card, p-input, p-btn i tons semàntics per a marges, diferencials i blocs de resum.
+- La lògica de càlcul no s'ha tocat; només la capa de presentació.
+
+### Per què
+- Era una de les peces més visibles dins bookings i encara mantenia una mini gramàtica pròpia per costos, marges i transport.
+- Aquest retoc baixa molt soroll visual sense necessitat de reescriure la peça sencera.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/bookings/[id]/BookingMarginCard.tsx.
+- npx tsc --noEmit continua passant.
+- El següent tall natural dins bookings és gallery o inventory.
+
+---## 2026-03-20 sessió 28 — Primer tall de bookings: checklist, factura i flux documental
+
+### Què s'ha canviat
+- app/admin/bookings/[id]/BookingChecklist.tsx ha deixat progress bar, inputs i botons locals i ara consumeix cards, inputs, botons i tons semàntics comuns.
+- app/admin/bookings/[id]/InvoiceSection.tsx ja no usa badges ni CTA locals per estat; passa a p-badge, p-btn i alerts comunes.
+- app/admin/bookings/[id]/DocumentFlowSection.tsx també ha tret els mapes locals de merald/cyan/white i ara usa cards i badges semàntics compartits.
+
+### Per què
+- ookings és massa gran per una sola passada segura; la manera correcta és treure'n talls autònoms amb molta superfície visual.
+- Aquest primer paquet elimina tres peces molt visibles sense tocar encara el nucli enorme de la pàgina principal.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'aquests tres fitxers.
+- npx tsc --noEmit continua passant.
+- El següent tall natural dins bookings és margin, gallery o inventory.
+
+---## 2026-03-20 sessió 27 — Analytics ja consumeix la capa comuna d'admin
+
+### Què s'ha canviat
+- app/admin/analytics/page.tsx ha passat KPI, alerts, badges, taules, gràfiques simples, empty states i centres de control a p-kpi, p-card, p-inline-alert, p-badge i tons semàntics.
+- També s'han eliminat els mapes locals de colors per conversió i deltes, substituint-los per variants comunes i fons semàntics.
+- El bloc ja no depèn de white/*, merald/*, ose/*, lue/* o purple/* per a la UI d'admin.
+
+### Per què
+- nalytics era un dels últims nuclis grans que encara pintava gairebé tota la pàgina pel seu compte malgrat compartir patrons amb la resta de l'admin.
+- Aquesta passada redueix molt la divergència visual sense tocar càlculs ni integracions de dades.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/analytics.
+- npx tsc --noEmit continua passant.
+- Ara el gruix real pendent es concentra sobretot a bookings, privacy, pricing, parts de leads i post-event.
+
+---## 2026-03-20 sessió 26 — Scripts i sales-ops ja no pinten per compte propi
+
+### Què s'ha canviat
+- app/admin/scripts/ScriptsClient.tsx ha deixat els mapes locals de color per categories, les targetes manuals i els controls white/*; ara consumeix p-kpi, p-card, p-btn i badges comuns.
+- app/admin/sales-ops/page.tsx ha passat KPI, panells d'auditoria, taules, badges d'estat i CTA a la gramàtica comuna d'admin.
+- Els dos blocs han quedat sense aquella capa local de merald/amber/rose/white que encara decidia la presentació pel seu compte.
+
+### Per què
+- scripts era un hub compacte amb molt retorn visual immediat.
+- sales-ops també era un bloc autosuficient i encara duia tones, targetes i taules locals malgrat compartir semàntica amb la resta de l'admin.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/scripts ni d'app/admin/sales-ops.
+- npx tsc --noEmit continua passant.
+- Globalment encara queden molts focus dispersos, sobretot a analytics, bookings, privacy, pricing i alguns mòduls de leads.
+
+---## 2026-03-20 sessió 25 — Blog alineat amb la capa comuna d'admin
+
+### Què s'ha canviat
+- app/admin/blog/page.tsx ha deixat cards, badges, alerts i taula locals i ara consumeix p-card, p-table, p-btn, p-badge i alerts semàntiques.
+- app/admin/blog/BlogEditorForm.tsx ha passat formulari, tabs d'idioma, alertes i CTA a p-input, p-tab, p-btn i la resta de la capa comuna.
+- El bloc ja no usa white/*, merald/*, ose/* ni variants locals per a la UI d'admin.
+
+### Per què
+- log mantenia dues superfícies paral·leles: el llistat i l'editor, cadascun amb la seva pròpia gramàtica visual.
+- Aquesta passada elimina la divergència i deixa el manteniment visual del bloc molt més barat.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/blog.
+- npx tsc --noEmit continua passant.
+- El següent bloc amb més senyal ara és scripts o algun nucli de leads/inventory més dispers.
+
+---## 2026-03-20 sessió 24 — Email templates sense editor ni llistat amb capa visual paral·lela
+
+### Què s'ha canviat
+- app/admin/email-templates/[slug]/TemplateEditorClient.tsx ha passat tabs d'idioma, catàleg de blocs, dropzone, inspector i preview a p-card, p-tab, p-input, p-btn i tons semàntics.
+- app/admin/email-templates/EmailTemplatesClient.tsx també ha deixat els badges i targetes locals i ara reutilitza KPIs, cards, botons i badges comuns.
+- El bloc deixa d'usar white/*, cyan/* i variants locals per a la UI de gestió; només es conserva l'HTML inline que forma part del contingut real dels emails.
+
+### Per què
+- mail-templates era una doble capa paral·lela: llistat propi per una banda i editor visual amb una mini gramàtica completa per l'altra.
+- L'objectiu aquí no era tocar el rendering de l'email enviat, sinó eliminar la capa duplicada de l'admin que l'envolta.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/email-templates.
+- npx tsc --noEmit continua passant.
+- Els següents blocs grans amb més senyal ara són blog o scripts.
+
+---## 2026-03-20 sessió 23 — Collaborators alineat amb cards, inputs i taula comuns
+
+### Què s'ha canviat
+- app/admin/collaborators/CollaboratorsClient.tsx ja no pinta KPIs, formulari, estat de pricing ni taula de reserves amb classes locals de white/cyan/emerald.
+- El bloc ara consumeix p-kpi, p-card, p-input, p-btn, p-table i badges semàntics per a pricing i pagaments.
+- També s'han alineat els estats buits, botons d'acció i el loading perquè deixin d'usar una mini gramàtica visual pròpia.
+
+### Per què
+- collaborators concentrava en un sol fitxer gairebé tots els símptomes de capa paral·lela: formulari, KPIs, llistat i taula amb decisions visuals independents.
+- Aquesta passada el deixa dins la mateixa gramàtica de la resta de l'admin i redueix manteniment duplicat.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/collaborators.
+- npx tsc --noEmit continua passant.
+- Els següents blocs amb més senyal ara són blog, scripts o email-templates.
+
+---## 2026-03-20 sessió 22 — Activity sense capa local de color ni taula pròpia
+
+### Què s'ha canviat
+- app/admin/activity/ActivityClient.tsx ha substituït els mapes locals de colors per tons semàntics d'admin a accions, filtres i KPIs.
+- Les targetes de resum ja no construeixen accents Tailwind dinàmics; ara consumeixen p-card, variants semàntiques i text compartit.
+- La vista mòbil i la taula desktop han deixat superfícies i links cian/white locals per passar a p-card, p-table i tons comuns.
+- Els selectors i botons de control també reaprofiten p-input i p-btn.
+
+### Per què
+- ctivity mantenia una mini gramàtica visual pròpia amb colors d'acció, xips i taula diferents de la resta de l'admin.
+- Aquesta passada elimina aquella capa paral·lela i deixa que la UI només consumeixi la capa comuna.
+
+### Estat després
+- La cerca del patró de hardcodes visuals ja no retorna coincidències dins d'app/admin/activity.
+- npx tsc --noEmit continua passant.
+- El següent bloc natural és algun altre nucli transversal com bookings, packs o privacy.
+
+---## 2026-03-20 sessió 21 — Calendari gairebé sense capa visual paral·lela
+
+### Què s'ha canviat
+- app/admin/calendario/calendar-utils.ts centralitza ara badges d'estat i tons base del calendari.
+- app/admin/calendario/CalendarDayClient.tsx i app/admin/calendario/CalendarWeekClient.tsx han deixat superfícies, botons i highlights locals en favor de variants comunes i tons semàntics.
+- app/admin/calendario/CalendarMonthClient.tsx ha tret bona part dels KPI cards, pills, cèl·lules i controls laterals que encara mantenien paleta pròpia.
+
+### Per què
+- `calendario` tenia una de les últimes capes visuals grans fora d'emails/settings: cada vista reinterpretava el mateix estat amb una paleta diferent.
+- El pas correcte aquí era compartir gramàtica de to entre month/week/day, no només suavitzar classes soltes.
+
+### Estat després
+- La cerca d'aquest paquet de classes hardcoded ja no retorna coincidències dins d'app/admin/calendario.
+- npx tsc --noEmit continua passant.
+- El següent bloc natural ja és activity o algun altre nucli amb formularis/llistes encara locals.
+
+---## 2026-03-20 sessió 20 — Canvas sense capa visual paral·lela al fitxer principal
+
+### Què s'ha canviat
+- app/admin/canvas/CanvasEditorClient.tsx ha deixat els botons d'eina locals i ara reaprofita variants comunes d'admin.
+- Els panels laterals, selectors de mida, capes i inputs petits ja no depenen de `bg-white/5`, `border-white/10`, `focus:ring-cyan` o seleccions cian locals.
+- Els estats seleccionats de presets, alineació, capes i export també passen a tons semàntics compartits.
+
+### Per què
+- `canvas` tenia una mini UI pròpia molt marcada: mateixa lògica que la resta de l'admin, però amb una gramàtica visual separada.
+- Aquesta passada no canvia la funcionalitat de l'editor; només elimina la capa de presentació duplicada.
+
+### Estat després
+- La cerca d'aquest paquet de classes hardcoded ja no retorna coincidències dins d'app/admin/canvas/CanvasEditorClient.tsx.
+- npx tsc --noEmit continua passant.
+- El següent paquet natural és activity o calendario.
+
+---## 2026-03-20 sessió 19 — Bloc settings gairebé tot alineat amb la capa comuna
+
+### Què s'ha canviat
+- app/admin/settings/company/CompanySettingsClient.tsx ja usa `ap-input`, botons compartits i tons semàntics per a missatges i toggle d'Holded.
+- app/admin/settings/SettingsClient.tsx ha tret badges de tipus, inputs i accions locals per passar a variants comunes.
+- app/admin/settings/integrations/IntegrationSetupWizard.tsx, app/admin/settings/integrations/page.tsx i app/admin/settings/DbReconnectButton.tsx ja no tenen badges/enllaços/estats cromàtics locals.
+- app/admin/settings/notifications/page.tsx ha passat status cards, resultats i CTA principals a la capa semàntica compartida.
+- app/admin/settings/hero/page.tsx ha deixat la mini paleta zinc/cian pròpia i reaprofita cards, inputs, botons i tons comuns.
+
+### Per què
+- `settings` encara tenia una capa paral·lela completa: formularis, toggles, badges i CTA decidits fitxer per fitxer.
+- Sense tancar aquest bloc, l'admin continuava sent monocapa en uns llocs i multicapa en uns altres.
+
+### Estat després
+- La cerca de tons hardcoded amb aquest patró ja no retorna coincidències dins d'app/admin/settings.
+- npx tsc --noEmit continua passant.
+- El següent bloc natural ja és fora de settings: canvas, calendario o activity.
+
+---## 2026-03-20 sessió 18 — Inputs i formularis d'emails/inbox ja passen per la capa comuna
+
+### Què s'ha canviat
+- app/globals.css incorpora `ap-input` com a utilitat comuna per inputs i selects de l'admin.
+- app/admin/inbox/InboxClient.tsx i app/admin/inbox/InboxModals.tsx han deixat els `focus:ring/focus:border` locals i consumeixen `ap-input`.
+- app/admin/inbox/compose/ComposeForm.tsx s'ha reordenat perquè tabs, selecció de pack, idiomes, errors i CTA principal surtin de la capa semàntica compartida.
+- app/admin/emails/InboxPanel.tsx ha deixat la selecció local cian i reaprofita badges, tons d'estat i botons secundaris comuns.
+- app/admin/emails/EmailConfigPanel.tsx ja no porta CTA ni estat d'èxit/error locals; també usa `ap-input`.
+
+### Per què
+- En aquest bloc quedava l'última repetició clara: cada formulari decidia pel seu compte el focus, el botó principal, el seleccionat i el missatge d'error.
+- Sense una utilitat comuna d'input, la capa visual compartida quedava incompleta i obligava cada component a reimplementar-la.
+
+### Estat després
+- La cerca de `bg/text/border/focus` hardcoded ja no retorna coincidències dins d'app/admin/inbox i app/admin/emails amb aquest patró.
+- npx tsc --noEmit continua passant.
+- pnpm build continua passant.
+- Es manté un warning nou no bloquejant a app/admin/emails/InboxPanel.tsx per dependència de `useEffect`, a més dels avisos ja coneguts d'inventory i portfolio.
+
+---## 2026-03-20 sessió 17 — Inbox i eines manuals encara més monocapa a l'admin
+
+### Què s'ha canviat
+- app/admin/emails/ManualActionsPanel.tsx ha deixat els botons d'acció i missatges de resultat connectats a tons semàntics compartits, en lloc de pintar cada estat localment.
+- app/admin/emails/SendPostEventButton.tsx ja no usa èxit/error locals; passa a botó primari i estats success/error compartits.
+- app/admin/inbox/settings/ImapSettingsClient.tsx ha tret la targeta d'estat IMAP amb colors crus i ara consumeix ap-card/ap-badge i tons semàntics d'admin.
+- app/admin/inbox/InboxClient.tsx ha reduït més la capa local: tabs actius, missatge flash i selecció principal ja no depenen de colors Tailwind crus del component.
+- app/admin/inbox/InboxModals.tsx ha deixat el CTA principal i els missatges d'error/èxit alineats amb la capa compartida.
+
+### Per què
+- El problema continuava sent el mateix: petites decisions visuals repartides entre modals, eines manuals, inbox i settings.
+- Encara que cada cas fos petit, junts seguien mantenint una capa paral·lela que repintava l'admin per fragments.
+- Aquesta passada tanca el nucli funcional d'emails/inbox amb una gramàtica més única.
+
+### Estat després
+- npx tsc --noEmit continua passant.
+- pnpm build continua passant.
+- Encara queden restes locals en altres fitxers del mateix entorn, sobretot ComposeForm, InboxPanel i algun detall a EmailConfigPanel.
+
+---## 2026-03-20 sessió 16 — Emails i inbox més alineats amb la capa semàntica admin
+
+### Què s'ha canviat
+- pp/admin/emails/RecentEmailsTable.tsx ha deixat de portar el mapa local de colors Tailwind per accions i ara usa tons semàntics d'admin.
+- pp/admin/emails/EmailStatsCards.tsx ha eliminat gradients i vores cromàtiques locals per passar a cards p-card amb etiquetes de to compartides.
+- pp/admin/inbox/inbox-types.ts ja no exporta STATUS_COLORS; ara reaprofita LEAD_STATUS_CONFIG via getLeadStatusTone().
+- pp/admin/inbox/InboxClient.tsx ha deixat d'usar badges locals porpra/verd i el badge d'estat del lead surt directament de la config central.
+
+### Per què
+- En aquestes pantalles encara hi havia una mini capa paral·lela: components petits però amb mapes de color propis per accions, tipus de missatge i estat del lead.
+- El problema no era la mida del fitxer sinó que cada pantalla seguia definint la seva pròpia gramàtica visual.
+- La maniobra bona aquí era connectar-les a la capa comuna ja existent, no inventar una altra convenció local.
+
+### Estat després
+- 
+px tsc --noEmit passa net després de la neteja.
+- pnpm build torna a passar complet.
+- A mails i al nucli d'inbox ja hi ha menys color hardcoded i menys badges amb lògica visual duplicada.
+- Encara queden altres fitxers del mateix àmbit amb tons locals (InboxModals, ImapSettingsClient, ManualActionsPanel, etc.) per una passada posterior.
+
+---
+## 2026-03-20 sessió 15 — Admin sense tons Tailwind embeguts als estats compartits
+
+### Què s'ha canviat
+- lib/constants/index.ts ha deixat de guardar classes Tailwind de color (g-*, 	ext-*, order-*) dins de LEAD_STATUS_CONFIG, BOOKING_STATUS_CONFIG, PROPOSAL_STATUS_CONFIG, CONTRACT_STATUS_CONFIG i PRIORITY_CONFIG.
+- Ara aquestes configuracions apunten a classes semàntiques d'admin (dmin-tone-bg-*, dmin-tone-text-*, dmin-tone-border-*).
+- pp/admin/admin-theme.css incorpora la capa comuna d'aquests tons semàntics i també dmin-tone-idle per als estats inactius.
+- BookingStatusChanger, ProposalsPanel, MensajesPage i ProposalsList han deixat de portar defaults visuals amb colors inline i consumeixen la mateixa capa comuna.
+- pp/admin/control-room.css ha tret els últims gba(...) locals que quedaven en aquesta passada i reaprofita tokens/ombres compartides.
+
+### Per què
+- Encara que els estats ja estiguessin centralitzats, la configuració seguia portant classes Tailwind cromàtiques a dintre.
+- Això mantenia una capa visual amagada dins de TypeScript: la font de veritat del color no era només el tema admin, també era la pròpia config.
+- El criteri bo aquí és que TypeScript decideixi el concepte i el CSS decideixi la pintura.
+
+### Estat després
+- Els fitxers tocats en aquesta passada ja no depenen de colors Tailwind embeguts per als estats compartits.
+- 
+px tsc --noEmit torna a passar net.
+- pnpm build torna a passar complet.
+- Continuen quedant altres pantalles admin amb classes visuals locals, però la capa central d'estats ja no pinta pel seu compte.
+
+---
+## 2026-03-20 sessió 14 — Estats admin centralitzats i menys hardcoded
+
+### Què s'ha canviat
+- `lib/constants/index.ts` ara concentra també els tons i labels de `BOOKING_STATUS_CONFIG`, `PROPOSAL_STATUS_CONFIG` i `CONTRACT_STATUS_CONFIG` amb `bg`, `text`, `border` i `label`.
+- `app/admin/bookings/[id]/BookingStatusChanger.tsx` ha deixat de portar una còpia local dels estats de reserva.
+- `app/admin/presupuestos/ProposalsList.tsx` ha eliminat el mapa local de status de pressupost i consumeix la configuració comuna.
+- `app/admin/clientes/[id]/_components/panels/ProposalsPanel.tsx` ha eliminat tant `STATUS_STYLES` com `CONTRACT_STATUS_LABELS` i reutilitza els mateixos tons compartits.
+- També s'ha mantingut la neteja pendent de `app/admin/control-room.css` perquè els contenidors del dashboard no segueixin pintats amb variants arbitràries.
+
+### Per què
+- El problema no era només visual: hi havia el mateix concepte d'estat definit en diversos fitxers amb colors, labels i vores lleugerament diferents.
+- Això feia més fàcil que cada pantalla derivés cap a un sistema paral·lel.
+- Amb una sola configuració comuna, quan es toca un estat es toca una vegada i la resta de pantalles queden coherents.
+
+### Estat després
+- `npx tsc --noEmit` passa net després del refactor.
+- Queda menys hardcoded de status a admin, però encara n'hi ha en altres àrees com leads, activitat, privacitat, emails i documents.
+
+---## 2026-03-20 sessió 13 — Admin amb una sola capa visual real
 
 ### Què s'ha canviat
 - `app/admin/admin-theme.css` s'ha reduït a una capa prima de tokens compartits i utilitats mínimes reals.
@@ -5804,3 +6130,83 @@ Continuació cobertura tests sobre serveis sense testejar. 57 serveis pendents �
 - **0 errors TypeScript**
 - Migracions BD pendents deploy: booking_gallery_photos, portfolio_media, portfolio_events
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+## 2026-03-20 — Admin: aplanament estructural després de la neteja visual
+
+### Què s'ha fet
+
+#### 1. Constants de privacitat tretes de la pàgina
+- nou fitxer lib/constants/privacy.ts amb labels i configs de consentiments, tipus de sol·licitud, estats de peticions i prioritats
+- pp/admin/privacy/page.tsx i pp/admin/clientes/[id]/_components/panels/PrivacyPanel.tsx passen a consumir aquesta capa comuna
+
+#### 2. Helper de pack name unificat
+- nou fitxer lib/pack-name.ts`r
+- s'elimina la duplicació de getPackName a admin bookings i post-event (surveys, reports, feedback inclosos)
+
+#### 3. Leads i panels amb menys capes intermèdies
+- pp/admin/leads/colorTheme.ts ja exporta també els maps derivats, no només arrays base
+- pp/admin/leads/page.tsx deixa de reconstruir STATUS_CONFIG i PRIORITY_CONFIG`r
+- pp/admin/clientes/[id]/_components/panels/BookingsPanel.tsx elimina el mapa intermedi BOOKING_STATUS_COLORS`r
+
+### Validació
+- 
+px tsc --noEmit passa
+
+### Criteri consolidat
+- primer una sola capa visual
+- després una sola capa estructural per helpers, labels i configs derivades
+- menys mapes locals adaptadors si la font compartida ja és prou expressiva
+
+
+---
+
+## 2026-03-20 — Admin: consolidacio final de constants compartides
+
+### Què s'ha fet
+- s'ha continuat traient configuració local repetida de l'admin i portant-la a lib/constants/index.ts o lib/constants/privacy.ts
+- s'han centralitzat helpers, ordres, labels i opcions de:
+  - privacitat
+  - leads
+  - bookings i bookings/[id]
+  - settings
+  - clientes / discounts
+  - intake
+  - inventory/[id]
+- els components han passat a consumir la capa comuna en lloc de redefinir arrays, maps o enums visuals locals
+
+### Criteri consolidat
+- una sola capa visual compartida
+- una sola capa estructural compartida per labels, opcions, ordres i helpers de presentació
+- els components d'admin no han de decidir pel seu compte si la dada ja existeix com a constant comuna
+
+### Validació
+- 
+px tsc --noEmit passa després de cada paquet tancat
+- abans de tancar la sessió es torna a validar i es prepara commit net
+
+### Addenda 2026-03-20 — validacio final i monitor
+- 
+px tsc --noEmit passa amb la capa comuna d'admin consolidada
+- pnpm monitor contra https://orbitaevents.com dona 7/7 endpoints OK, temps mitjà 200ms
+- s'ha rematat també inventory/[id] centralitzant categories, condicions, estats i labels de reserves associades

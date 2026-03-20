@@ -2,14 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useToast } from '../../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
-import SortableList from '../../components/SortableList';
 import { SITE_CONFIG } from '@/app/config/site-config';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TIPUS DE BLOCS
-// ═══════════════════════════════════════════════════════════════════════════
+import SortableList from '../../components/SortableList';
+import { useToast } from '../../components/ToastProvider';
 
 type BlockType = 'heading' | 'text' | 'button' | 'info_table' | 'highlight' | 'divider' | 'image';
 
@@ -42,10 +38,6 @@ function createBlock(type: BlockType): Block {
   return { id, type, data: defaults[type] || {} };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// BLOC → HTML
-// ═══════════════════════════════════════════════════════════════════════════
-
 function blockToHtml(block: Block): string {
   switch (block.type) {
     case 'heading':
@@ -55,11 +47,15 @@ function blockToHtml(block: Block): string {
     case 'button':
       return `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px 0;"><tr><td style="background:linear-gradient(135deg,${block.data.color || '#06b6d4'},#3b82f6);border-radius:12px;padding:14px 28px;"><a href="${block.data.url || '#'}" style="color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.3px;display:inline-block;">${block.data.text || 'Botó'}</a></td></tr></table>`;
     case 'info_table': {
-      const rows = (block.data.rows || '').split('\n').filter(Boolean).map((row) => {
-        const [label, ...rest] = row.split(':');
-        const value = rest.join(':');
-        return `<tr><td style="padding:10px 14px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.04);width:140px;">${label}</td><td style="padding:10px 14px;font-size:14px;font-weight:600;color:#e5e5e5;border-bottom:1px solid rgba(255,255,255,0.04);">${value}</td></tr>`;
-      }).join('');
+      const rows = (block.data.rows || '')
+        .split('\n')
+        .filter(Boolean)
+        .map((row) => {
+          const [label, ...rest] = row.split(':');
+          const value = rest.join(':');
+          return `<tr><td style="padding:10px 14px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.04);width:140px;">${label}</td><td style="padding:10px 14px;font-size:14px;font-weight:600;color:#e5e5e5;border-bottom:1px solid rgba(255,255,255,0.04);">${value}</td></tr>`;
+        })
+        .join('');
       return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;">${rows}</table>`;
     }
     case 'highlight':
@@ -109,22 +105,16 @@ ${content}
 </body></html>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// PARSE HTML → BLOCS (per carregar templates existents)
-// ═══════════════════════════════════════════════════════════════════════════
-
 function htmlToBlocks(html: string): Block[] {
-  // Si no hi ha HTML, retornar blocs per defecte
   if (!html || html.length < 50) {
     return [createBlock('heading'), createBlock('text')];
   }
-  // Simplificat: un sol bloc text amb el contingut
   return [{ id: 'imported', type: 'text' as BlockType, data: { text: 'Plantilla importada — edita els blocs a la dreta' } }];
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
+function getLocaleTabClass(isActive: boolean) {
+  return isActive ? 'ap-tab ap-tab--active' : 'ap-tab ap-tab--idle';
+}
 
 export default function TemplateEditorClient({
   slug,
@@ -143,6 +133,7 @@ export default function TemplateEditorClient({
   const [saving, setSaving] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const previewRef = useRef<HTMLIFrameElement>(null);
+  const [translating, setTranslating] = useState(false);
 
   const loadTemplate = useCallback(async () => {
     setLoading(true);
@@ -157,7 +148,6 @@ export default function TemplateEditorClient({
       if (data.template?.bodyHtml) {
         setBlocks(htmlToBlocks(data.template.bodyHtml));
       } else {
-        // Carregar defaults com a blocs bàsics
         setBlocks([createBlock('heading'), createBlock('text')]);
       }
     } catch (err) {
@@ -167,13 +157,13 @@ export default function TemplateEditorClient({
     }
   }, [slug, locale, toast]);
 
-  useEffect(() => { loadTemplate(); }, [loadTemplate]);
+  useEffect(() => {
+    loadTemplate();
+  }, [loadTemplate]);
 
-  // Actualitzar preview
   useEffect(() => {
     if (previewRef.current) {
-      const html = blocksToFullHtml(blocks);
-      previewRef.current.srcdoc = html;
+      previewRef.current.srcdoc = blocksToFullHtml(blocks);
     }
   }, [blocks]);
 
@@ -212,32 +202,28 @@ export default function TemplateEditorClient({
   };
 
   const updateBlockData = (id: string, field: string, value: string) => {
-    setBlocks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, data: { ...b.data, [field]: value } } : b))
-    );
+    setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, data: { ...b.data, [field]: value } } : b)));
   };
 
-  const [translating, setTranslating] = useState(false);
-
   const autoTranslateFromCa = async () => {
-    if (locale === 'ca') { toast.error('Ja estàs en català'); return; }
+    if (locale === 'ca') {
+      toast.error('Ja estàs en català');
+      return;
+    }
     setTranslating(true);
     try {
-      // 1. Carregar la versió catalana
       const caRes = await fetchWithCsrf(`/api/admin/email-templates/${slug}?locale=ca`);
-      if (!caRes.ok) throw new Error('No s\'ha trobat la plantilla en català');
+      if (!caRes.ok) throw new Error("No s'ha trobat la plantilla en català");
       const caData = await caRes.json();
       const caSubject = caData.resolved?.subject || '';
       const caBlocks = caData.template?.bodyHtml ? htmlToBlocks(caData.template.bodyHtml) : [];
 
-      // 2. Recollir tots els textos a traduir
       const textsToTranslate: string[] = [];
       if (caSubject) textsToTranslate.push(caSubject);
       for (const block of caBlocks) {
         if (block.data.text) textsToTranslate.push(block.data.text);
         if (block.data.subtitle) textsToTranslate.push(block.data.subtitle);
       }
-      // Also translate current blocks if they have text (from the ca loaded content)
       const currentTexts: string[] = [];
       if (subject) currentTexts.push(subject);
       for (const block of blocks) {
@@ -246,9 +232,11 @@ export default function TemplateEditorClient({
       }
       const allTexts = [...new Set([...textsToTranslate, ...currentTexts])].filter(Boolean);
 
-      if (allTexts.length === 0) { toast.error('No hi ha contingut per traduir'); return; }
+      if (allTexts.length === 0) {
+        toast.error('No hi ha contingut per traduir');
+        return;
+      }
 
-      // 3. Traduir via API
       const trRes = await fetchWithCsrf('/api/admin/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -260,16 +248,17 @@ export default function TemplateEditorClient({
       const map = trData.translationsByText as Record<string, Record<string, string>>;
       const t = (text: string) => map[text]?.[locale] || text;
 
-      // 4. Aplicar traduccions
       if (subject) setSubject(t(subject));
-      setBlocks((prev) => prev.map((block) => ({
-        ...block,
-        data: {
-          ...block.data,
-          ...(block.data.text ? { text: t(block.data.text) } : {}),
-          ...(block.data.subtitle ? { subtitle: t(block.data.subtitle) } : {}),
-        },
-      })));
+      setBlocks((prev) =>
+        prev.map((block) => ({
+          ...block,
+          data: {
+            ...block.data,
+            ...(block.data.text ? { text: t(block.data.text) } : {}),
+            ...(block.data.subtitle ? { subtitle: t(block.data.subtitle) } : {}),
+          },
+        }))
+      );
 
       toast.success(`Traduït a ${locale.toUpperCase()} automàticament`);
     } catch (err) {
@@ -283,7 +272,7 @@ export default function TemplateEditorClient({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm" role="status">
+      <div className="flex items-center gap-2 text-sm admin-tone-text-neutral" role="status">
         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         Carregant plantilla...
       </div>
@@ -292,30 +281,30 @@ export default function TemplateEditorClient({
 
   return (
     <div className="space-y-4">
-      {/* Barra superior: locale + subject + desar */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-4 sm:flex-row sm:items-end">
-        <div className="flex gap-2">
+      <div className="ap-card flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-end">
+        <div className="ap-tabs-nav">
           {['ca', 'es', 'en'].map((l) => (
             <button
               key={l}
               type="button"
-              onClick={() => { setLocale(l); router.push(`/admin/email-templates/${slug}?locale=${l}`); }}
-              className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-all ${
-                l === locale ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
-              }`}
+              onClick={() => {
+                setLocale(l);
+                router.push(`/admin/email-templates/${slug}?locale=${l}`);
+              }}
+              className={getLocaleTabClass(l === locale)}
             >
               {l.toUpperCase()}
             </button>
           ))}
         </div>
         <div className="flex-1">
-          <label htmlFor="subject" className="block text-xs font-medium mb-1">Assumpte</label>
+          <label htmlFor="subject" className="mb-1 block text-xs font-medium admin-tone-text-neutral">Assumpte</label>
           <input
             id="subject"
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+            className="ap-input w-full px-3 py-2 text-sm"
           />
         </div>
         {locale !== 'ca' && (
@@ -323,52 +312,47 @@ export default function TemplateEditorClient({
             type="button"
             disabled={translating}
             onClick={autoTranslateFromCa}
-            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all disabled:opacity-50 active:scale-[0.98]"
+            className="ap-btn ap-btn--secondary"
           >
-            {translating ? 'Traduint...' : `Traduir des del CA → ${locale.toUpperCase()}`}
+            {translating ? 'Traduint...' : `Traduir des del CA -> ${locale.toUpperCase()}`}
           </button>
         )}
-        <button
-          type="button"
-          disabled={saving}
-          onClick={saveTemplate}
-          className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-        >
+        <button type="button" disabled={saving} onClick={saveTemplate} className="ap-btn ap-btn--primary">
           {saving ? 'Desant...' : 'Desa'}
         </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[260px_1fr_1fr]">
-        {/* Columna 1: Catàleg de blocs (drag source) */}
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-white/50">Blocs disponibles</h3>
-          <div className="space-y-1.5">
-            {BLOCK_CATALOG.map((cat) => (
-              <div
-                key={cat.type}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('text/plain', cat.type);
-                  e.dataTransfer.effectAllowed = 'copy';
-                }}
-                onDragEnd={() => {}}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 cursor-grab active:cursor-grabbing transition-all hover:bg-white/10 hover:border-white/20"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-sm font-bold">
-                  {cat.icon}
-                </span>
-                <div>
-                  <div className="text-sm font-medium">{cat.label}</div>
-                  <div className="text-[10px] text-white/30">{cat.category}</div>
+          <div className="ap-card rounded-2xl p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide admin-tone-text-neutral">Blocs disponibles</h3>
+            <div className="space-y-1.5">
+              {BLOCK_CATALOG.map((cat) => (
+                <div
+                  key={cat.type}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', cat.type);
+                    e.dataTransfer.effectAllowed = 'copy';
+                  }}
+                  onDragEnd={() => {}}
+                  className="admin-tone-idle flex cursor-grab items-center gap-3 rounded-xl border p-3 transition-all hover:admin-tone-bg-neutral active:cursor-grabbing"
+                >
+                  <span className="admin-tone-bg-neutral flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
+                    {cat.icon}
+                  </span>
+                  <div>
+                    <div className="text-sm font-medium">{cat.label}</div>
+                    <div className="text-[10px] admin-tone-text-slate">{cat.category}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Variables disponibles */}
           {variables.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-white/50 mb-2">Variables</h3>
+            <div className="ap-card rounded-2xl p-4">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide admin-tone-text-neutral">Variables</h3>
               <div className="flex flex-wrap gap-1">
                 {variables.map((v) => (
                   <button
@@ -378,7 +362,7 @@ export default function TemplateEditorClient({
                       navigator.clipboard.writeText(`{{${v}}}`);
                       toast.success(`{{${v}}} copiat!`);
                     }}
-                    className="rounded-lg border px-2 py-0.5 text-[10px] font-mono transition-colors"
+                    className="ap-badge font-mono text-[10px]"
                     title={`Clic per copiar {{${v}}}`}
                   >
                     {`{{${v}}}`}
@@ -389,9 +373,8 @@ export default function TemplateEditorClient({
           )}
         </div>
 
-        {/* Columna 2: Blocs de l'email (drop zone + reorder) */}
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-white/50">Contingut de l&apos;email</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide admin-tone-text-neutral">Contingut de l'email</h3>
           <SortableList
             items={blocks}
             keyFn={(b) => b.id}
@@ -402,7 +385,7 @@ export default function TemplateEditorClient({
               }
             }}
             acceptExternalType="text/plain"
-            className="min-h-[400px] rounded-2xl border border-dashed border-white/10 p-3 space-y-1"
+            className="min-h-[400px] space-y-1 rounded-2xl border border-dashed p-3 admin-tone-border-neutral admin-tone-bg-neutral"
             placeholderHeight={44}
             renderItem={(block, _idx, { isDragging }) => {
               const catInfo = BLOCK_CATALOG.find((c) => c.type === block.type);
@@ -411,24 +394,27 @@ export default function TemplateEditorClient({
                 <div
                   onClick={() => setSelectedBlockId(block.id)}
                   className={[
-                    'group flex items-center gap-2 rounded-xl border p-2.5 cursor-grab active:cursor-grabbing transition-all',
-                    isSelected ? 'border-cyan-500/40 bg-cyan-500/5' : 'border-white/10 bg-white/[0.02] hover:border-white/20',
+                    'group flex cursor-grab items-center gap-2 rounded-xl border p-2.5 transition-all active:cursor-grabbing',
+                    isSelected ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-idle hover:admin-tone-bg-neutral',
                     isDragging ? 'opacity-40' : '',
                   ].join(' ')}
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-xs font-bold flex-shrink-0">
+                  <span className="admin-tone-bg-neutral flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold">
                     {catInfo?.icon || '?'}
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium truncate">{catInfo?.label}</div>
-                    <div className="text-[10px] text-white/30 truncate">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs font-medium">{catInfo?.label}</div>
+                    <div className="truncate text-[10px] admin-tone-text-slate">
                       {block.data.text || block.data.rows?.split('\n')[0] || block.type}
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); removeBlock(block.id); }}
-                    className="opacity-0 group-hover:opacity-100 rounded-lg p-1 text-xs transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeBlock(block.id);
+                    }}
+                    className="rounded-lg p-1 text-xs transition-all opacity-0 group-hover:opacity-100"
                     aria-label="Eliminar bloc"
                   >
                     ✕
@@ -439,31 +425,29 @@ export default function TemplateEditorClient({
           />
         </div>
 
-        {/* Columna 3: Preview + editor del bloc seleccionat */}
         <div className="space-y-3">
-          {/* Editor del bloc seleccionat */}
           {selectedBlock && (
-            <div className="rounded-2xl border p-4 space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide">
+            <div className="ap-card space-y-3 rounded-2xl p-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wide admin-tone-text-neutral">
                 Editar: {BLOCK_CATALOG.find((c) => c.type === selectedBlock.type)?.label}
               </h3>
 
               {(selectedBlock.type === 'heading' || selectedBlock.type === 'text' || selectedBlock.type === 'button' || selectedBlock.type === 'highlight') && (
                 <div>
-                  <label className="block text-xs font-medium mb-1">Text</label>
+                  <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Text</label>
                   {selectedBlock.type === 'text' ? (
                     <textarea
                       value={selectedBlock.data.text || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'text', e.target.value)}
                       rows={4}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                      className="ap-input w-full px-3 py-2 text-sm"
                     />
                   ) : (
                     <input
                       type="text"
                       value={selectedBlock.data.text || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'text', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                      className="ap-input w-full px-3 py-2 text-sm"
                     />
                   )}
                 </div>
@@ -471,14 +455,14 @@ export default function TemplateEditorClient({
 
               {selectedBlock.type === 'heading' && (
                 <div>
-                  <label className="block text-xs font-medium mb-1">Mida (px)</label>
+                  <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Mida (px)</label>
                   <input
                     type="number"
                     value={selectedBlock.data.size || '26'}
                     onChange={(e) => updateBlockData(selectedBlock.id, 'size', e.target.value)}
                     min={14}
                     max={48}
-                    className="w-24 rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                    className="ap-input w-24 px-3 py-2 text-sm"
                   />
                 </div>
               )}
@@ -486,21 +470,21 @@ export default function TemplateEditorClient({
               {selectedBlock.type === 'button' && (
                 <>
                   <div>
-                    <label className="block text-xs font-medium mb-1">URL</label>
+                    <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">URL</label>
                     <input
                       type="text"
                       value={selectedBlock.data.url || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'url', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                      className="ap-input w-full px-3 py-2 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Color</label>
+                    <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Color</label>
                     <input
                       type="color"
                       value={selectedBlock.data.color || '#06b6d4'}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'color', e.target.value)}
-                      className="h-10 w-20 rounded-xl border border-white/20 bg-white/5"
+                      className="ap-input h-10 w-20 rounded-xl p-1"
                     />
                   </div>
                 </>
@@ -508,13 +492,13 @@ export default function TemplateEditorClient({
 
               {selectedBlock.type === 'info_table' && (
                 <div>
-                  <label className="block text-xs font-medium mb-1">Files (una per línia, format Label:Valor)</label>
+                  <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Files (una per línia, format Label:Valor)</label>
                   <textarea
                     value={selectedBlock.data.rows || ''}
                     onChange={(e) => updateBlockData(selectedBlock.id, 'rows', e.target.value)}
                     rows={6}
-                    placeholder="Referència:#{{reference}}\nData:{{eventDate}}"
-                    className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-xs font-mono "
+                    placeholder="Referència:#{{reference}}&#10;Data:{{eventDate}}"
+                    className="ap-input w-full px-3 py-2 font-mono text-xs"
                   />
                 </div>
               )}
@@ -522,21 +506,21 @@ export default function TemplateEditorClient({
               {selectedBlock.type === 'highlight' && (
                 <>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Subtítol</label>
+                    <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Subtítol</label>
                     <input
                       type="text"
                       value={selectedBlock.data.subtitle || ''}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'subtitle', e.target.value)}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm "
+                      className="ap-input w-full px-3 py-2 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Color accent</label>
+                    <label className="mb-1 block text-xs font-medium admin-tone-text-neutral">Color accent</label>
                     <input
                       type="color"
                       value={selectedBlock.data.color || '#06b6d4'}
                       onChange={(e) => updateBlockData(selectedBlock.id, 'color', e.target.value)}
-                      className="h-10 w-20 rounded-xl border border-white/20 bg-white/5"
+                      className="ap-input h-10 w-20 rounded-xl p-1"
                     />
                   </div>
                 </>
@@ -544,15 +528,14 @@ export default function TemplateEditorClient({
             </div>
           )}
 
-          {/* Preview */}
-          <div className="rounded-2xl border p-0 overflow-hidden">
-            <div className="px-4 py-2 border-b border-white/5 text-xs font-semibold uppercase tracking-wide text-white/40">
+          <div className="ap-card overflow-hidden rounded-2xl p-0">
+            <div className="border-b px-4 py-2 text-xs font-semibold uppercase tracking-wide admin-tone-border-neutral admin-tone-text-slate">
               Preview
             </div>
             <iframe
               ref={previewRef}
               title="Preview email"
-              className="w-full bg-[#0a0a0a]"
+              className="w-full admin-tone-bg-neutral"
               style={{ height: '500px', border: 'none' }}
               sandbox="allow-same-origin"
             />
@@ -562,6 +545,3 @@ export default function TemplateEditorClient({
     </div>
   );
 }
-
-
-

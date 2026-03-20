@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface ScriptInfo {
   name: string;
@@ -13,7 +13,6 @@ interface ScriptInfo {
 }
 
 const SCRIPTS: ScriptInfo[] = [
-  // ── SEED (dades inicials) ──
   {
     name: 'Seed complet',
     file: 'prisma/seed.ts',
@@ -35,8 +34,6 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'seed',
     description: 'Insereix articles de blog de prova amb traduccions.',
   },
-
-  // ── SYNC (sincronització) ──
   {
     name: 'Sync preu benzina MITECO',
     file: 'scripts/sync-fuel-price.ts',
@@ -58,8 +55,6 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'sync',
     description: 'Obté les ressenyes de Google Business via SerpAPI i les desa a la BD.',
   },
-
-  // ── CHECK (verificació) ──
   {
     name: 'Health check BD',
     file: 'scripts/health-check.ts',
@@ -72,7 +67,7 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/check-payment-status.ts',
     command: 'npx tsx scripts/check-payment-status.ts',
     category: 'check',
-    description: 'Mostra l\'estat de cobrament de totes les reserves actives amb semàfor: 🟢 tot cobrat, 🟡 falta resta, 🔴 res cobrat.',
+    description: "Mostra l'estat de cobrament de totes les reserves actives amb semàfor: tot cobrat, falta resta o res cobrat.",
   },
   {
     name: 'Monitor endpoints',
@@ -88,8 +83,6 @@ const SCRIPTS: ScriptInfo[] = [
     category: 'check',
     description: 'Verifica que els packs no retornin claus tècniques al i18n (e.g. slugs en lloc de noms).',
   },
-
-  // ── REPORT (informes) ──
   {
     name: 'Informe estadístiques',
     file: 'scripts/stats-report.ts',
@@ -109,17 +102,15 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/update-pack-prices.ts',
     command: 'npx tsx scripts/update-pack-prices.ts',
     category: 'report',
-    description: 'Mostra els PVP actuals de tots els packs. Amb arguments, permet canviar el preu: npx tsx scripts/update-pack-prices.ts flash 300',
+    description: 'Mostra els PVP actuals de tots els packs. Amb arguments, permet canviar el preu.',
     args: '<slug> <preu>',
   },
-
-  // ── FIX (correcció) ──
   {
     name: 'Recalcular scores leads',
     file: 'scripts/recalculate-scores.ts',
     command: 'npx tsx scripts/recalculate-scores.ts',
     category: 'fix',
-    description: 'Recalcula el cachedScore de tots els leads actius (no LOST) basant-se en tipus event, data, convidats, pressupost i font.',
+    description: 'Recalcula el cachedScore de tots els leads actius basant-se en tipus event, data, convidats, pressupost i font.',
   },
   {
     name: 'Recalcular marges reserves',
@@ -133,7 +124,7 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/cleanup-orphans.ts',
     command: 'npx tsx scripts/cleanup-orphans.ts',
     category: 'fix',
-    description: 'Detecta registres orfes (notes sense lead, activitats sense customer, etc). Dry-run per defecte, afegeix --fix per netejar.',
+    description: 'Detecta registres orfes. Dry-run per defecte, afegeix --fix per netejar.',
     args: '--fix',
   },
   {
@@ -141,7 +132,7 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/reset-email-templates.ts',
     command: 'npx tsx scripts/reset-email-templates.ts',
     category: 'fix',
-    description: 'Elimina les personalitzacions de plantilles email de la BD. Torna als defaults del codi. Es pot filtrar per slug.',
+    description: 'Elimina les personalitzacions de plantilles email de la BD. Torna als defaults del codi.',
     args: '<slug>',
     danger: true,
   },
@@ -150,37 +141,31 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/update-pack-prices.ts',
     command: 'npx tsx scripts/update-pack-prices.ts <slug> <preu>',
     category: 'fix',
-    description: 'Canvia el preu base d\'un pack. Ex: npx tsx scripts/update-pack-prices.ts flash 300',
+    description: "Canvia el preu base d'un pack.",
     args: '<slug> <preu>',
   },
-
-  // ── CHECK (verificació) — nous ──
   {
     name: 'Leads estancats',
     file: 'scripts/check-stale-leads.ts',
     command: 'npx tsx scripts/check-stale-leads.ts',
     category: 'check',
-    description: 'Detecta leads que necessiten atenció: sense contactar (>48h), sense seguiment (>7d), negociacions estancades (>14d), events propers sense confirmar.',
+    description: 'Detecta leads que necessiten atenció: sense contactar, sense seguiment, negociacions estancades o events propers sense confirmar.',
   },
   {
     name: 'Qualitat de dades',
     file: 'scripts/check-data-quality.ts',
     command: 'npx tsx scripts/check-data-quality.ts',
     category: 'check',
-    description: 'Auditoria de qualitat: camps buits, emails duplicats, reserves amb data passada activa, inventari sobreutilitzat, settings buides.',
+    description: 'Auditoria de qualitat: camps buits, emails duplicats, reserves amb data passada activa, inventari sobreutilitzat i settings buides.',
   },
-
-  // ── REPORT (informes) — nous ──
   {
     name: 'Informe mensual',
     file: 'scripts/monthly-report.ts',
     command: 'npx tsx scripts/monthly-report.ts',
     category: 'report',
-    description: 'Resum mes actual vs anterior: leads, reserves, ingressos, conversio, fonts. Accepta mes: npx tsx scripts/monthly-report.ts 2026-02',
+    description: 'Resum mes actual vs anterior: leads, reserves, ingressos, conversio i fonts.',
     args: '<YYYY-MM>',
   },
-
-  // ── AUDIT (auditoria) ──
   {
     name: 'Autofix master',
     file: 'scripts/autofix-master.ts',
@@ -193,59 +178,59 @@ const SCRIPTS: ScriptInfo[] = [
     file: 'scripts/autofix-finance-health.ts',
     command: 'npx tsx scripts/autofix-finance-health.ts',
     category: 'audit',
-    description: 'Verifica i corregeix configuració econòmica: pricing model, profitabilitat, cost engine.',
+    description: 'Verifica i corregeix configuració econòmica: pricing model, profitabilitat i cost engine.',
   },
   {
     name: 'Autofix sistema',
     file: 'scripts/autofix-system-health.ts',
     command: 'npx tsx scripts/autofix-system-health.ts',
     category: 'audit',
-    description: 'Valida CSS admin, costos horaris inventari, marges packs, salut econòmica general.',
+    description: 'Valida CSS admin, costos horaris inventari, marges packs i salut econòmica general.',
   },
   {
     name: 'Scan hardcoded',
     file: 'scripts/scan-hardcoded.js',
     command: 'node scripts/scan-hardcoded.js',
     category: 'audit',
-    description: 'Detecta valors hardcoded a les traduccions: preus, anys, telèfons, km, URLs.',
+    description: 'Detecta valors hardcoded a les traduccions: preus, anys, telèfons, km i URLs.',
   },
   {
     name: 'Scan i18n leaks',
     file: 'scripts/scan-i18n-leaks.mjs',
     command: 'node scripts/scan-i18n-leaks.mjs',
     category: 'audit',
-    description: 'Detecta claus de traducció no resoltes a pàgines públiques (textos en cru tipus hero.title).',
+    description: 'Detecta claus de traducció no resoltes a pàgines públiques.',
   },
   {
     name: 'Smoke test i18n',
     file: 'scripts/smoke-i18n.mjs',
     command: 'node scripts/smoke-i18n.mjs',
     category: 'audit',
-    description: 'Test ràpid i18n: verifica que les pàgines públiques no mostrin claus sense traduir.',
+    description: 'Test ràpid i18n per verificar que les pàgines públiques no mostrin claus sense traduir.',
   },
   {
     name: 'Autofix theme CSS',
     file: 'scripts/admin-theme-autofix.mjs',
     command: 'node scripts/admin-theme-autofix.mjs',
     category: 'audit',
-    description: 'Auto-fix colors Tailwind de l\'admin: canvia slate-* per white/opacity, arregla opacitats.',
+    description: "Auto-fix colors Tailwind de l'admin i opacitats inconsistents.",
   },
   {
     name: 'Auditoria visual',
     file: 'scripts/visual-audit.ts',
     command: 'npx tsx scripts/visual-audit.ts',
     category: 'audit',
-    description: 'Captura screenshots de totes les pàgines públiques (Playwright). Útil per revisar canvis visuals.',
+    description: 'Captura screenshots de totes les pàgines públiques amb Playwright.',
   },
 ];
 
-const CATEGORY_INFO: Record<string, { label: string; icon: string; color: string }> = {
-  seed: { label: 'Dades inicials', icon: '🌱', color: 'border-emerald-500/30 bg-emerald-500/5' },
-  sync: { label: 'Sincronització', icon: '🔄', color: 'border-cyan-500/30 bg-cyan-500/5' },
-  check: { label: 'Verificació', icon: '🔍', color: 'border-blue-500/30 bg-blue-500/5' },
-  report: { label: 'Informes', icon: '📊', color: 'border-purple-500/30 bg-purple-500/5' },
-  fix: { label: 'Correcció', icon: '🔧', color: 'border-amber-500/30 bg-amber-500/5' },
-  audit: { label: 'Auditoria', icon: '🛡️', color: 'border-rose-500/30 bg-rose-500/5' },
+const CATEGORY_INFO: Record<ScriptInfo['category'], { label: string; icon: string; tone: string }> = {
+  seed: { label: 'Dades inicials', icon: '🌱', tone: 'ap-kpi--success' },
+  sync: { label: 'Sincronització', icon: '🔄', tone: 'ap-kpi--info' },
+  check: { label: 'Verificació', icon: '🔍', tone: 'admin-tone-border-info admin-tone-bg-info' },
+  report: { label: 'Informes', icon: '📊', tone: 'admin-tone-border-violet admin-tone-bg-violet' },
+  fix: { label: 'Correcció', icon: '🔧', tone: 'ap-kpi--warning' },
+  audit: { label: 'Auditoria', icon: '🛡️', tone: 'ap-kpi--danger' },
 };
 
 export default function ScriptsClient() {
@@ -274,7 +259,6 @@ export default function ScriptsClient() {
 
   return (
     <div className="space-y-6">
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {Object.entries(CATEGORY_INFO).map(([key, info]) => {
           const count = SCRIPTS.filter((s) => s.category === key).length;
@@ -284,75 +268,52 @@ export default function ScriptsClient() {
               key={key}
               type="button"
               onClick={() => setFilter(isActive ? null : key)}
-              className={`rounded-2xl border p-3 text-left transition-all ${
-                isActive ? info.color + ' ring-1 ring-white/20' : 'hover:bg-white/[0.02]'
-              }`}
+              className={`ap-kpi text-left transition-all ${isActive ? info.tone : 'admin-tone-idle'}`}
             >
               <div className="text-lg">{info.icon}</div>
-              <div className="text-xs font-semibold mt-1">{info.label}</div>
-              <div className="text-lg font-bold">{count}</div>
+              <div className="ap-kpi-label mt-1">{info.label}</div>
+              <div className="ap-kpi-value">{count}</div>
             </button>
           );
         })}
       </div>
 
       {filter && (
-        <button
-          type="button"
-          onClick={() => setFilter(null)}
-          className="text-xs text-white/40 hover:text-white/70 transition-colors"
-        >
+        <button type="button" onClick={() => setFilter(null)} className="ap-btn ap-btn--secondary text-xs">
           Mostrar tots ({SCRIPTS.length})
         </button>
       )}
 
-      {/* Llista agrupada */}
       {Object.entries(grouped).map(([cat, scripts]) => {
-        const info = CATEGORY_INFO[cat];
+        const info = CATEGORY_INFO[cat as ScriptInfo['category']];
         return (
           <div key={cat}>
-            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white/50 mb-3">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide admin-tone-text-neutral">
               <span>{info.icon}</span> {info.label}
             </h2>
             <div className="space-y-2">
               {scripts.map((s) => (
-                <div
-                  key={s.file + s.name}
-                  className={`rounded-2xl border p-4 transition-all hover:bg-white/[0.02] ${s.danger ? 'border-rose-500/20' : ''}`}
-                >
+                <div key={s.file + s.name} className={`ap-card rounded-2xl p-4 transition-all hover:admin-tone-bg-neutral ${s.danger ? 'ap-card--danger' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm">{s.name}</span>
-                        {s.danger && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full border">
-                            destructiu
-                          </span>
-                        )}
+                        <span className="text-sm font-semibold">{s.name}</span>
+                        {s.danger && <span className="ap-badge ap-badge--danger">destructiu</span>}
                       </div>
-                      <p className="text-xs text-white/50 mt-1 leading-relaxed">{s.description}</p>
+                      <p className="mt-1 text-xs leading-relaxed admin-tone-text-neutral">{s.description}</p>
                       <div className="mt-2 flex items-center gap-2">
-                        <code className="text-[11px] font-mono bg-white/5 border border-white/10 rounded-lg px-2 py-1">
-                          {s.command}
-                        </code>
-                        <button
-                          type="button"
-                          onClick={() => copyCommand(s.command)}
-                          className="text-[10px] px-2 py-1 rounded-lg border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 transition-all"
-                          title="Copiar comanda"
-                        >
-                          {copiedCommand === s.command ? '✓ Copiat' : 'Copiar'}
+                        <code className="ap-badge rounded-lg border px-2 py-1 font-mono text-[11px]">{s.command}</code>
+                        <button type="button" onClick={() => copyCommand(s.command)} className="ap-btn ap-btn--secondary px-2 py-1 text-[10px]" title="Copiar comanda">
+                          {copiedCommand === s.command ? 'Copiat' : 'Copiar'}
                         </button>
                       </div>
                       {s.args && (
-                        <div className="mt-1 text-[10px] text-white/30">
-                          Arguments opcionals: <code className="text-white/40">{s.args}</code>
+                        <div className="mt-1 text-[10px] admin-tone-text-slate">
+                          Arguments opcionals: <code className="font-mono">{s.args}</code>
                         </div>
                       )}
                     </div>
-                    <div className="text-[10px] text-white/20 font-mono flex-shrink-0">
-                      {s.file}
-                    </div>
+                    <div className="flex-shrink-0 font-mono text-[10px] admin-tone-text-slate">{s.file}</div>
                   </div>
                 </div>
               ))}
@@ -361,14 +322,13 @@ export default function ScriptsClient() {
         );
       })}
 
-      {/* Instruccions */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-        <h3 className="text-sm font-semibold mb-2">Com executar</h3>
-        <ol className="text-xs text-white/50 space-y-1 list-decimal list-inside">
+      <div className="ap-card rounded-2xl p-5">
+        <h3 className="mb-2 text-sm font-semibold">Com executar</h3>
+        <ol className="list-inside list-decimal space-y-1 text-xs admin-tone-text-neutral">
           <li>Obre un terminal a la carpeta del projecte</li>
-          <li>Copia la comanda clicant el botó &quot;Copiar&quot;</li>
+          <li>Copia la comanda clicant el botó `Copiar`</li>
           <li>Enganxa i executa al terminal</li>
-          <li>Els scripts amb <code className="">--fix</code> modifiquen dades — primer executa sense per veure el report</li>
+          <li>Els scripts amb <code className="ap-badge rounded px-1 font-mono">--fix</code> modifiquen dades: primer executa sense per veure el report</li>
         </ol>
       </div>
     </div>

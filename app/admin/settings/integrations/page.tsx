@@ -6,20 +6,18 @@ import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import { getAppBaseUrl } from '@/lib/site';
 
-
 export const dynamic = 'force-dynamic';
 
 function BoolBadge({ ok }: { ok: boolean }) {
   return (
-    <span
-      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-        ok ? 'admin-tone-soft-success' : 'bg-amber-500/20 text-amber-300'
-      }`}
-    >
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ok ? 'admin-tone-soft-success admin-tone-text-success' : 'admin-tone-soft-warning admin-tone-text-warning'}`}>
       {ok ? 'Connectat' : 'Pendent'}
     </span>
   );
 }
+
+const LINK_BUTTON = 'ap-btn ap-btn--secondary';
+const CARD = 'rounded-2xl border p-5 admin-card-glass';
 
 export default async function IntegrationsPage() {
   const settings = await prisma.setting.findMany({
@@ -42,8 +40,8 @@ export default async function IntegrationsPage() {
     },
   });
 
-  const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
-  const baseUrl = (getAppBaseUrl()).replace(/\/+$/, '');
+  const map = Object.fromEntries(settings.map((setting) => [setting.key, setting.value]));
+  const baseUrl = getAppBaseUrl().replace(/\/+$/, '');
   const missingImapVars = [
     !process.env.IMAP_HOST ? 'IMAP_HOST' : null,
     !process.env.IMAP_PORT ? 'IMAP_PORT' : null,
@@ -53,9 +51,7 @@ export default async function IntegrationsPage() {
   const imapConfigured = missingImapVars.length === 0;
   const calendarFeedToken = map['integrations.calendar.feedToken'];
   const googleCalendarConnected = Boolean(map['integrations.googleCalendar.refreshToken']);
-  const calendarIdConfigured = Boolean(
-    map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID
-  );
+  const calendarIdConfigured = Boolean(map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID);
   const cronActive = String(map['emails.cron.lastStatus'] || '').toUpperCase() === 'OK';
 
   return (
@@ -76,117 +72,73 @@ export default async function IntegrationsPage() {
       />
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Google Business</h2>
             <BoolBadge ok={Boolean(map['integrations.google.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm">
-            Connexió per dades de Google Reviews i ecosistema Google.
-          </p>
-          <a
-            href="/api/google/oauth/start"
-            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
-          >
-            Connectar Google
-          </a>
+          <p className="mt-2 text-sm">Connexió per dades de Google Reviews i ecosistema Google.</p>
+          <a href="/api/google/oauth/start" className={`mt-4 inline-flex ${LINK_BUTTON}`}>Connectar Google</a>
         </article>
 
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Google Ads (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.googleAds.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm">
-            Connexió OAuth per carregar dades de campanyes i conversions a Analítica.
-          </p>
-          <p className="mt-1 text-xs">
-            Connectat: {map['integrations.googleAds.connectedAt'] ? formatDateTimeFull(map['integrations.googleAds.connectedAt']) : '-'}
-          </p>
-          <a
-            href="/api/google-ads/oauth/start"
-            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
-          >
+          <p className="mt-2 text-sm">Connexió OAuth per carregar dades de campanyes i conversions a Analítica.</p>
+          <p className="mt-1 text-xs">Connectat: {map['integrations.googleAds.connectedAt'] ? formatDateTimeFull(map['integrations.googleAds.connectedAt']) : '-'}</p>
+          <a href="/api/google-ads/oauth/start" className={`mt-4 inline-flex ${LINK_BUTTON}`}>
             {map['integrations.googleAds.refreshToken'] ? 'Reconnectar Google Ads' : 'Connectar Google Ads'}
           </a>
         </article>
 
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Gmail (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.gmail.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm">
-            Lectura i operativa de bústia Gmail des de l&apos;admin.
-          </p>
+          <p className="mt-2 text-sm">Lectura i operativa de bústia Gmail des de l&apos;admin.</p>
           <p className="mt-1 text-xs">Compte: {map['integrations.gmail.email'] || '-'}</p>
-          <a
-            href="/api/gmail/oauth/start"
-            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
-          >
-            Connectar Gmail
-          </a>
+          <a href="/api/gmail/oauth/start" className={`mt-4 inline-flex ${LINK_BUTTON}`}>Connectar Gmail</a>
         </article>
 
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Safata IMAP</h2>
             <BoolBadge ok={imapConfigured} />
           </div>
-          <p className="mt-2 text-sm">
-            Captura i importació d&apos;emails a leads CRM.
-          </p>
-          {!imapConfigured && (
-            <p className="mt-1 text-xs">
-              Falten: {missingImapVars.join(', ')}
-            </p>
-          )}
-          <Link
-            href="/admin/inbox/settings"
-            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
-          >
-            Configurar IMAP
-          </Link>
+          <p className="mt-2 text-sm">Captura i importació d&apos;emails a leads CRM.</p>
+          {!imapConfigured && <p className="mt-1 text-xs">Falten: {missingImapVars.join(', ')}</p>}
+          <Link href="/admin/inbox/settings" className={`mt-4 inline-flex ${LINK_BUTTON}`}>Configurar IMAP</Link>
         </article>
 
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
-          <p className="mt-2 text-sm">
-            Sincronització automàtica de reserves confirmades/preparació i baixa automàtica en cancel·lar.
-          </p>
+          <p className="mt-2 text-sm">Sincronització automàtica de reserves confirmades/preparació i baixa automàtica en cancel·lar.</p>
           <p className="mt-1 text-xs">
-            Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'}
-            {' '}· Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
+            Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'} · Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
           </p>
-          {!calendarIdConfigured && (
-            <p className="mt-1 text-xs">
-              Falta calendarId (setting `integrations.googleCalendar.calendarId` o env `GOOGLE_CALENDAR_ID`)
-            </p>
-          )}
-          <a
-            href="/api/google-calendar/oauth/start"
-            className="mt-4 inline-flex rounded-xl border px-4 py-2 text-sm font-semibold"
-          >
+          {!calendarIdConfigured && <p className="mt-1 text-xs">Falta calendarId (setting `integrations.googleCalendar.calendarId` o env `GOOGLE_CALENDAR_ID`)</p>}
+          <a href="/api/google-calendar/oauth/start" className={`mt-4 inline-flex ${LINK_BUTTON}`}>
             {googleCalendarConnected ? 'Reconnectar Google Calendar' : 'Connectar Google Calendar'}
           </a>
         </article>
 
-        <article className="rounded-2xl border p-5 shadow-sm">
+        <article className={CARD}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Feed de calendari (ICS)</h2>
             <BoolBadge ok={Boolean(calendarFeedToken)} />
           </div>
-          <p className="mt-2 text-sm">
-            Subscripció del calendari de reserves a Google Calendar, iPhone o Android.
-          </p>
+          <p className="mt-2 text-sm">Subscripció del calendari de reserves a Google Calendar, iPhone o Android.</p>
           <CalendarTokenManager baseUrl={baseUrl} initialToken={calendarFeedToken || null} />
         </article>
       </section>
 
-      <section className="rounded-2xl border p-5 shadow-sm">
+      <section className={CARD}>
         <h2 className="text-lg font-semibold">Checklist tècnic</h2>
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
           <p>• Gmail token: {map['integrations.gmail.refreshToken'] ? 'OK' : 'Pendent'}</p>
@@ -201,4 +153,3 @@ export default async function IntegrationsPage() {
     </AdminPage>
   );
 }
-

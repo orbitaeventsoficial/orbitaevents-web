@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, SOURCE_LABELS, PRIORITY_LABELS, formatDateShort } from '@/lib/constants';
+import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, SOURCE_LABELS, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -41,22 +41,7 @@ type PipelineColumn = {
   leads: PipelineLead[];
 };
 
-const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
-  { status: 'NEW', label: 'Noves', toneClass: 'admin-leads-tone admin-leads-tone--new', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--new' },
-  { status: 'CONTACTED', label: 'Contactat', toneClass: 'admin-leads-tone admin-leads-tone--contacted', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--contacted' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', toneClass: 'admin-leads-tone admin-leads-tone--quote', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--quote' },
-  { status: 'NEGOTIATING', label: 'Negociant', toneClass: 'admin-leads-tone admin-leads-tone--negotiating', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--negotiating' },
-  { status: 'WON', label: 'Guanyat', toneClass: 'admin-leads-tone admin-leads-tone--won', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--won' },
-  { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
-];
-
-
-const PRIORITY_DOT: Record<string, string> = {
-  LOW: 'bg-white/20',
-  MEDIUM: 'bg-blue-500',
-  HIGH: 'bg-orange-500',
-  URGENT: 'bg-rose-500',
-};
+const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [...LEAD_PIPELINE_COLUMNS];
 
 
 // Local filter chips for interactive pipeline filtering
@@ -67,8 +52,8 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
         active
-          ? 'border-cyan-400/50 bg-cyan-500/15 text-cyan-200'
-          : 'border-white/10 text-white/40 hover:text-white/80'
+          ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
+          : 'admin-tone-border-neutral admin-tone-text-neutral hover:brightness-105'
       }`}
     >
       {label}
@@ -250,7 +235,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               onClick={() => setLocalPriority(localPriority === p ? null : p)}
             />
           ))}
-          <span className="border-l border-white/10 mx-0.5" />
+          <span className="admin-tone-border-neutral mx-0.5 border-l" />
           {availableEventTypes.map((et) => (
             <FilterChip
               key={et}
@@ -259,7 +244,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               onClick={() => setLocalEventType(localEventType === et ? null : et)}
             />
           ))}
-          <span className="border-l border-white/10 mx-0.5" />
+          <span className="admin-tone-border-neutral mx-0.5 border-l" />
           {availableSources.map((s) => (
             <FilterChip
               key={s}
@@ -270,7 +255,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
           ))}
           {hasLocalFilters && (
             <>
-              <span className="border-l border-white/10 mx-0.5" />
+              <span className="admin-tone-border-neutral mx-0.5 border-l" />
               <button
                 type="button"
                 onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}
@@ -466,7 +451,7 @@ function PipelineCard({
               →
             </button>
           )}
-          <span className={`w-3 h-3 rounded-full ${PRIORITY_DOT[lead.priority] || PRIORITY_DOT.MEDIUM}`} title={lead.priority} />
+          <span className={`w-3 h-3 rounded-full ${PRIORITY_DOT_CLASS[lead.priority] || PRIORITY_DOT_CLASS.MEDIUM}`} title={lead.priority} />
         </div>
       </div>
 
@@ -477,10 +462,10 @@ function PipelineCard({
           const score = lead.cachedScore ?? estimateScore(lead);
           if (score === null) return null;
           const scoreColor = score > 70
-            ? 'admin-tone-soft-success border-emerald-500/30'
+            ? 'admin-tone-soft-success admin-tone-border-success'
             : score > 40
-              ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-              : 'admin-tone-soft-danger border-rose-500/30';
+              ? 'admin-tone-bg-warning admin-tone-text-warning admin-tone-border-warning'
+              : 'admin-tone-soft-danger admin-tone-border-danger';
           return (
             <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`} title="Score de qualitat">
               {score}
@@ -490,9 +475,9 @@ function PipelineCard({
         {/* Dies sense resposta */}
         {(() => {
           const daysSince = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / 86400000);
-          const daysColor = daysSince <= 2 ? 'admin-tone-soft-success border-emerald-500/30' :
-            daysSince <= 5 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
-            'admin-tone-soft-danger border-rose-500/30';
+          const daysColor = daysSince <= 2 ? 'admin-tone-soft-success admin-tone-border-success' :
+            daysSince <= 5 ? 'admin-tone-bg-warning admin-tone-text-warning admin-tone-border-warning' :
+            'admin-tone-soft-danger admin-tone-border-danger';
           return (
             <span className={`inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${daysColor}`}>
               {daysSince}d
@@ -541,6 +526,9 @@ function PipelineCard({
     </div>
   );
 }
+
+
+
 
 
 

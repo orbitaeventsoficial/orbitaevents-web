@@ -1,6 +1,7 @@
 // app/admin/post-event/page.tsx
 import { log } from '@/lib/logger';
 import { formatDateSimple } from '@/lib/constants';
+import { getTranslatedPackName } from '@/lib/pack-name';
 // Pàgina de gestió post-event
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -12,19 +13,7 @@ export const metadata = {
   title: 'Post-Event | Òrbita Admin',
 };
 
-function getPackName(
-  translations: Array<{ locale: string; name: string }>,
-  fallback: string,
-  locale?: string | null
-) {
-  const preferred = String(locale || 'ca').toLowerCase();
-  return (
-    translations.find((t) => t.locale === preferred)?.name ||
-    translations.find((t) => t.locale === 'ca')?.name ||
-    translations[0]?.name ||
-    fallback
-  );
-}
+
 
 async function getPostEventData() {
   try {
@@ -248,7 +237,7 @@ export default async function PostEventPage() {
         <div className="divide-y divide-white/5">
           {data.recentBookings.map((booking) => {
             const packName =
-              getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
+              getTranslatedPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
             return (
               <div
                 key={booking.id}
@@ -279,4 +268,5 @@ export default async function PostEventPage() {
     </AdminPage>
   );
 }
+
 

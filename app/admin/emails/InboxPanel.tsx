@@ -112,23 +112,18 @@ export default function InboxPanel() {
 
   useEffect(() => {
     fetchEmails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const handleEmailClick = async (email: EmailMessage) => {
     setSelectedEmail(email);
     if (!email.isRead) {
-      // Marcar com a llegit
       try {
         await fetchWithCsrf(`/api/admin/inbox/messages/${email.uid}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'markRead' }),
         });
-        // Actualitzar estat local
-        setEmails(prev => prev.map(e =>
-          e.uid === email.uid ? { ...e, isRead: true } : e
-        ));
+        setEmails((prev) => prev.map((item) => (item.uid === email.uid ? { ...item, isRead: true } : item)));
       } catch {
         log.error('Error marcant email com a llegit');
       }
@@ -143,12 +138,11 @@ export default function InboxPanel() {
       const res = await fetchWithCsrf(`/api/admin/inbox/messages/${uid}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error eliminant');
 
-      // Actualitzar llista
-      setEmails(prev => prev.filter(e => e.uid !== uid));
+      setEmails((prev) => prev.filter((email) => email.uid !== uid));
       if (selectedEmail?.uid === uid) {
         setSelectedEmail(null);
       }
-      setTotal(prev => prev - 1);
+      setTotal((prev) => prev - 1);
     } catch {
       setError('Error eliminant email');
     }
@@ -165,24 +159,17 @@ export default function InboxPanel() {
     return formatDateShort(date);
   };
 
-  const unreadCount = emails.filter(e => !e.isRead).length;
+  const unreadCount = emails.filter((email) => !email.isRead).length;
 
   return (
-    <section className="rounded-2xl border admin-card-glass overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-4 border-b flex items-center justify-between">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+      <div className="flex items-center justify-between border-b px-6 py-4">
         <div>
-          <h2 className="font-semibold flex items-center gap-2">
+          <h2 className="flex items-center gap-2 font-semibold">
             <span>📥</span> Safata d&apos;Entrada
-            {unreadCount > 0 && (
-              <span className="text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {unreadCount} nous
-              </span>
-            )}
+            {unreadCount > 0 && <span className="ap-badge ap-badge--info">{unreadCount} nous</span>}
           </h2>
-          <p className="text-xs mt-1">
-            {total} emails totals · info@orbitaevents.com
-          </p>
+          <p className="mt-1 text-xs">{total} emails totals · info@orbitaevents.com</p>
         </div>
         <button
           onClick={fetchEmails}
@@ -190,38 +177,32 @@ export default function InboxPanel() {
           type="button"
           aria-label="Refrescar emails"
           aria-busy={loading}
-          className="p-2 rounded-xl transition-colors disabled:opacity-50"
+          className="rounded-xl p-2 transition-colors disabled:opacity-50 admin-tone-idle"
           title="Refrescar"
         >
-          <svg className={`w-5 h-5 text-white/40 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
       </div>
 
-      {/* Error state */}
       {error && (
-        <div className="p-4 border-b" role="alert">
-          <p className="text-sm">{error}</p>
-          <p className="text-xs mt-1">
-            Verifica que les variables IMAP_HOST, IMAP_PORT, IMAP_USER i IMAP_PASS estan configurades.
-          </p>
+        <div className="border-b p-4 admin-tone-soft-danger admin-tone-border-danger" role="alert">
+          <p className="text-sm admin-tone-text-danger">{error}</p>
+          <p className="mt-1 text-xs">Verifica que les variables IMAP_HOST, IMAP_PORT, IMAP_USER i IMAP_PASS estan configurades.</p>
         </div>
       )}
 
-      {/* Loading state */}
       {loading && !error && (
         <div className="p-8 text-center" role="status" aria-live="polite">
-          <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-sm mt-3">Carregant emails...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+          <p className="mt-3 text-sm">Carregant emails...</p>
         </div>
       )}
 
-      {/* Content */}
       {!loading && !error && (
         <div className="flex">
-          {/* Email List */}
-          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} divide-y divide-white/5 max-h-[500px] overflow-y-auto`}>
+          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} max-h-[500px] overflow-y-auto divide-y divide-white/5`}>
             {emails.length === 0 ? (
               <div className="p-8 text-center">
                 <span className="text-4xl">📭</span>
@@ -234,32 +215,24 @@ export default function InboxPanel() {
                   onClick={() => handleEmailClick(email)}
                   type="button"
                   aria-pressed={selectedEmail?.uid === email.uid}
-                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-white/[0.03] transition-colors ${
-                    selectedEmail?.uid === email.uid ? 'bg-cyan-500/10 border-l-2 border-l-cyan-500' : ''
+                  className={`w-full cursor-pointer px-4 py-3 text-left transition-colors hover:bg-white/[0.03] ${
+                    selectedEmail?.uid === email.uid ? 'admin-tone-bg-info border-l-2 admin-tone-border-info' : ''
                   } ${!email.isRead ? 'bg-white/[0.02]' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-white/90' : 'text-white/60'}`}>
+                    <div className="min-w-0 flex-1">
+                      <p className={`truncate text-sm ${!email.isRead ? 'font-semibold text-white/90' : 'text-white/60'}`}>
                         {email.from.name || email.from.address}
                       </p>
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-white/80' : 'text-white/40'}`}>
+                      <p className={`truncate text-sm ${!email.isRead ? 'font-medium text-white/80' : 'text-white/40'}`}>
                         {email.subject}
                       </p>
-                      <p className="text-xs truncate mt-1">
-                        {email.preview}
-                      </p>
+                      <p className="mt-1 truncate text-xs">{email.preview}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span className="text-xs">
-                        {formatEmailDate(email.date)}
-                      </span>
-                      {email.hasAttachments && (
-                        <span className="">📎</span>
-                      )}
-                      {!email.isRead && (
-                        <span className="w-2 h-2 rounded-full"></span>
-                      )}
+                    <div className="flex flex-shrink-0 flex-col items-end gap-1">
+                      <span className="text-xs">{formatEmailDate(email.date)}</span>
+                      {email.hasAttachments && <span>📎</span>}
+                      {!email.isRead && <span className="h-2 w-2 rounded-full admin-tone-bg-info" />}
                     </div>
                   </div>
                 </button>
@@ -267,42 +240,26 @@ export default function InboxPanel() {
             )}
           </div>
 
-          {/* Email Detail */}
           {selectedEmail && (
-            <div className="w-2/3 flex flex-col max-h-[500px]">
-              {/* Email Header */}
-              <div className="px-4 py-3 border-b">
+            <div className="flex max-h-[500px] w-2/3 flex-col">
+              <div className="border-b px-4 py-3">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-semibold">{selectedEmail.subject}</h3>
-                    <p className="text-sm mt-1">
+                    <p className="mt-1 text-sm">
                       De: <span className="font-medium">{selectedEmail.from.name}</span>
-                      {selectedEmail.from.address && (
-                        <span className=""> &lt;{selectedEmail.from.address}&gt;</span>
-                      )}
+                      {selectedEmail.from.address && <span> &lt;{selectedEmail.from.address}&gt;</span>}
                     </p>
-                    <p className="text-xs mt-1">
-                      {formatDateTimeFull(selectedEmail.date)}
-                    </p>
+                    <p className="mt-1 text-xs">{formatDateTimeFull(selectedEmail.date)}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleDelete(selectedEmail.uid)}
-                      type="button"
-                      className="p-2 rounded-xl transition-colors"
-                      title="Eliminar"
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button onClick={() => handleDelete(selectedEmail.uid)} type="button" className="rounded-xl p-2 transition-colors admin-tone-idle" title="Eliminar">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
-                    <button
-                      onClick={() => setSelectedEmail(null)}
-                      type="button"
-                      aria-label="Tancar detall"
-                      className="p-2 rounded-xl transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button onClick={() => setSelectedEmail(null)} type="button" aria-label="Tancar detall" className="rounded-xl p-2 transition-colors admin-tone-idle">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -310,27 +267,21 @@ export default function InboxPanel() {
                 </div>
                 {selectedEmail.hasAttachments && (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {selectedEmail.attachments.map((att, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs">
-                        📎 {att.filename}
-                        <span className="">({Math.round(att.size / 1024)}KB)</span>
+                    {selectedEmail.attachments.map((attachment, idx) => (
+                      <span key={idx} className="inline-flex items-center gap-1 rounded border px-2 py-1 text-xs">
+                        📎 {attachment.filename}
+                        <span>({Math.round(attachment.size / 1024)}KB)</span>
                       </span>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Email Body */}
               <div className="flex-1 overflow-y-auto p-4">
                 {selectedEmail.bodyHtml ? (
-                  <div
-                    className="prose prose-sm prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.bodyHtml) }}
-                  />
+                  <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.bodyHtml) }} />
                 ) : (
-                  <pre className="whitespace-pre-wrap text-sm font-sans">
-                    {selectedEmail.body}
-                  </pre>
+                  <pre className="whitespace-pre-wrap font-sans text-sm">{selectedEmail.body}</pre>
                 )}
               </div>
             </div>
@@ -338,26 +289,23 @@ export default function InboxPanel() {
         </div>
       )}
 
-      {/* Pagination */}
       {!loading && !error && total > limit && (
-        <div className="px-4 py-3 border-t flex items-center justify-between">
-          <span className="text-sm">
-            Mostrant {page * limit + 1}-{Math.min((page + 1) * limit, total)} de {total}
-          </span>
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <span className="text-sm">Mostrant {page * limit + 1}-{Math.min((page + 1) * limit, total)} de {total}</span>
           <div className="flex gap-2">
             <button
-              onClick={() => setPage(p => Math.max(0, p - 1))}
+              onClick={() => setPage((currentPage) => Math.max(0, currentPage - 1))}
               disabled={page === 0}
               type="button"
-              className="px-3 py-1.5 text-sm border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="ap-btn ap-btn--secondary disabled:opacity-50"
             >
               ← Anterior
             </button>
             <button
-              onClick={() => setPage(p => p + 1)}
+              onClick={() => setPage((currentPage) => currentPage + 1)}
               disabled={(page + 1) * limit >= total}
               type="button"
-              className="px-3 py-1.5 text-sm border rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="ap-btn ap-btn--secondary disabled:opacity-50"
             >
               Següent →
             </button>

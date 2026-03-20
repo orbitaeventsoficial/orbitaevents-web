@@ -234,7 +234,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <span className="text-sm">{eventType} · {formatDate(booking.eventDate)}</span>
               {!isPast && !isToday && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                  isSoon ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-white/10 text-white/60'
+                  isSoon ? 'ap-badge ap-badge--warning' : 'ap-badge'
                 }`}>
                   {daysUntil} {daysUntil === 1 ? 'dia' : 'dies'}
                 </span>
@@ -274,14 +274,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
     >
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
+        <div className="ap-card rounded-xl px-4 py-3">
           <p className="text-xs uppercase tracking-wide">Total reserva</p>
           <p className="text-xl font-semibold">{formatCurrency(booking.total)}</p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'border-emerald-500/30 bg-emerald-500/5' : booking.depositPaid ? 'border-amber-500/30 bg-amber-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'ap-card--success' : booking.depositPaid ? 'ap-card--warning' : 'ap-card--danger'}`}>
           <div className="flex items-center gap-2">
             <Tooltip text={booking.depositPaid && booking.remainingPaid ? 'Paga i senyal + resta pagats' : booking.depositPaid ? 'Paga i senyal pagada, falta la resta' : 'Cap pagament rebut'}>
-              <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'bg-emerald-400' : booking.depositPaid ? 'bg-amber-400' : 'bg-rose-400'}`} />
+              <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
             </Tooltip>
             <p className="text-xs uppercase tracking-wide">Pagament</p>
           </div>
@@ -289,9 +289,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
             {booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
           </p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${reviewFlowStatus === 'RESPONDIDO' ? 'border-emerald-500/30 bg-emerald-500/5' : reviewFlowStatus === 'ENVIADO' ? 'border-amber-500/30 bg-amber-500/5' : 'border-rose-500/30 bg-rose-500/5'}`}>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${reviewFlowStatus === 'RESPONDIDO' ? 'ap-card--success' : reviewFlowStatus === 'ENVIADO' ? 'ap-card--warning' : 'ap-card--danger'}`}>
           <div className="flex items-center gap-2">
-            <span className={`inline-block w-2.5 h-2.5 rounded-full ${reviewFlowStatus === 'RESPONDIDO' ? 'bg-emerald-400' : reviewFlowStatus === 'ENVIADO' ? 'bg-amber-400' : 'bg-rose-400'}`} />
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${reviewFlowStatus === 'RESPONDIDO' ? 'admin-tone-bg-success' : reviewFlowStatus === 'ENVIADO' ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
             <p className="text-xs uppercase tracking-wide">Flux client</p>
           </div>
           <p className="text-xl font-semibold">
@@ -302,9 +302,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 : 'Falta enviar'}
           </p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${internalPostEventStatus === 'COMPLETO' ? 'border-emerald-500/30 bg-emerald-500/5' : internalPostEventStatus === 'EN_PROGRESO' ? 'border-amber-500/30 bg-amber-500/5' : 'border-white/10'}`}>
+        <div className={`rounded-xl border px-4 py-3 shadow-sm ${internalPostEventStatus === 'COMPLETO' ? 'ap-card--success' : internalPostEventStatus === 'EN_PROGRESO' ? 'ap-card--warning' : ''}`}>
           <div className="flex items-center gap-2">
-            <span className={`inline-block w-2.5 h-2.5 rounded-full ${internalPostEventStatus === 'COMPLETO' ? 'bg-emerald-400' : internalPostEventStatus === 'EN_PROGRESO' ? 'bg-amber-400' : 'bg-white/30'}`} />
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${internalPostEventStatus === 'COMPLETO' ? 'admin-tone-bg-success' : internalPostEventStatus === 'EN_PROGRESO' ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`} />
             <p className="text-xs uppercase tracking-wide">Post-event intern</p>
           </div>
           <p className="text-xl font-semibold">
@@ -315,7 +315,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 : 'Pendent'}
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
+        <div className="ap-card rounded-xl px-4 py-3">
           <p className="text-xs uppercase tracking-wide">Entrada comercial</p>
           <p className="text-xl font-semibold">
             {booking.lead ? (
@@ -330,7 +330,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       <BookingSectionNav />
 
       {/* Client Info */}
-      <section id="sec-client" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-client" className="scroll-mt-28 ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -357,7 +357,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         </div>
         {booking.lead && (
-          <div className="mt-4 pt-4 border-t border-white/10">
+          <div className="mt-4 pt-4 border-t admin-tone-border-neutral">
             <Link
               href={`/admin/leads/${booking.lead.id}`}
               className="text-sm hover:underline"
@@ -371,20 +371,20 @@ export default async function BookingDetailPage({ params }: PageProps) {
           {customer && (
             <Link
               href={`/admin/clientes/${customer.id}`}
-              className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5 transition-colors"
+              className="ap-btn ap-btn--secondary text-xs"
             >
               Fitxa client 360
             </Link>
           )}
           <CalendarSyncButton bookingId={booking.id} />
           <details className="relative group">
-            <summary className="list-none rounded-xl border border-white/10 px-3 py-1.5 text-xs font-semibold cursor-pointer hover:bg-white/5 transition-colors select-none">
+            <summary className="list-none ap-btn ap-btn--secondary text-xs cursor-pointer select-none">
               Mes accions ▾
             </summary>
-            <div className="absolute right-0 top-full mt-1 z-20 w-52 rounded-xl border border-white/10 bg-black shadow-xl py-1">
+            <div className="absolute right-0 top-full mt-1 z-20 w-52 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral py-1">
               <Link
                 href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+                className="block px-4 py-2 text-xs transition-colors hover:admin-tone-bg-neutral"
               >
                 Crear informe intern
               </Link>
@@ -392,13 +392,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 href={googleCalendarUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+                className="block px-4 py-2 text-xs transition-colors hover:admin-tone-bg-neutral"
               >
                 Afegir a Google Calendar
               </a>
               <Link
                 href="/admin/settings/integrations"
-                className="block px-4 py-2 text-xs hover:bg-white/5 transition-colors"
+                className="block px-4 py-2 text-xs transition-colors hover:admin-tone-bg-neutral"
               >
                 Sincronitzar mobil/ICS
               </Link>
@@ -406,7 +406,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </details>
         </div>
         {customer && (
-          <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-xs">
+          <div className="mt-3 ap-card rounded-xl p-3 text-xs">
             Historial client: {customer.totalEvents} esdeveniments · {formatCurrency(customer.totalSpent)} ·
             {' '}últim esdeveniment {formatDateSimple(customer.lastEventDate)}
           </div>
@@ -414,7 +414,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Event Info */}
-      <section id="sec-event" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-event" className="scroll-mt-28 ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -449,7 +449,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Services */}
-      <section id="sec-serveis" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-serveis" className="scroll-mt-28 ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
@@ -483,7 +483,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
               );
               return (
-                <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                <div key={extra.id} className="ap-card flex items-center justify-between p-3 rounded-xl">
                   <div>
                     <p className="font-medium">
                       {extraTranslation?.name || extra.extra.slug}
@@ -523,7 +523,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </div>
 
       {/* Pricing */}
-      <section id="sec-finances" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-finances" className="scroll-mt-28 ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -548,17 +548,17 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* Payment Status */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className={`p-4 rounded-xl ${booking.depositPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-rose-950/30 border border-rose-400/30'}`}>
+          <div className={`p-4 rounded-xl ${booking.depositPaid ? 'ap-card--success' : 'ap-card--danger'}`}>
             <p className="text-xs font-medium uppercase">Paga i Senyal (30%)</p>
             <p className="text-lg font-bold">{formatCurrency(booking.depositAmount)}</p>
-            <span className={`text-xs ${booking.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>
+            <span className={`text-xs ${booking.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
               {booking.depositPaid ? '✓ Pagat' : '✗ Pendent'}
             </span>
           </div>
-          <div className={`p-4 rounded-xl ${booking.remainingPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-amber-950/30 border border-amber-400/30'}`}>
+          <div className={`p-4 rounded-xl ${booking.remainingPaid ? 'ap-card--success' : 'ap-card--warning'}`}>
             <p className="text-xs font-medium uppercase">Resta</p>
             <p className="text-lg font-bold">{formatCurrency(booking.remainingAmount)}</p>
-            <span className={`text-xs ${booking.remainingPaid ? 'text-emerald-300' : 'text-amber-300'}`}>
+            <span className={`text-xs ${booking.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
               {booking.remainingPaid ? '✓ Pagat' : '○ Pendent'}
             </span>
           </div>
@@ -633,13 +633,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Notes */}
       {booking.notes && (
-        <section className="rounded-xl border border-white/10 shadow-sm p-6">
+        <section className="ap-card rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Notes</h2>
           <p className="whitespace-pre-wrap">{booking.notes}</p>
         </section>
       )}
 
-      <section id="sec-comunicacions" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-comunicacions" className="scroll-mt-28 ap-card rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Historial de comunicacions</h2>
         {recentCommRows.length === 0 ? (
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
@@ -647,7 +647,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm" aria-label="Historial de comunicacions">
               <thead>
-                <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide">
+                <tr className="border-b admin-tone-border-neutral text-left text-xs uppercase tracking-wide">
                   <th scope="col" className="px-2 py-2">Data</th>
                   <th scope="col" className="px-2 py-2">Acció</th>
                   <th scope="col" className="px-2 py-2">Flux</th>
@@ -656,7 +656,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               </thead>
               <tbody>
                 {recentCommRows.map((row: { id: string; createdAt: Date; action: string; flow: string; channel: string }) => (
-                  <tr key={row.id} className="border-b border-white/10 hover:bg-white/[0.03] transition-colors">
+                  <tr key={row.id} className="border-b admin-tone-border-neutral transition-colors hover:admin-tone-bg-neutral">
                     <td className="px-2 py-2 whitespace-nowrap overflow-hidden text-ellipsis">{formatDateTimeFull(row.createdAt)}</td>
                     <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
                     <td className="px-2 py-2">{row.flow}</td>
@@ -671,13 +671,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Activity timeline */}
       {activityTimeline.length > 0 && (
-        <section id="sec-historial" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+        <section id="sec-historial" className="scroll-mt-28 ap-card rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
           <div className="relative pl-6 space-y-0">
-            <div className="absolute left-2 top-1 bottom-1 w-px bg-white/10" />
+            <div className="absolute left-2 top-1 bottom-1 w-px admin-tone-bg-neutral" />
             {activityTimeline.map((entry: { id: string; createdAt: Date; icon: string; label: string; description: string }) => (
               <div key={entry.id} className="relative flex items-start gap-3 py-2.5">
-                <span className="absolute -left-4 top-3 w-2 h-2 rounded-full bg-white/30 ring-2 ring-black" />
+                <span className="absolute -left-4 top-3 w-2 h-2 rounded-full admin-tone-bg-neutral ring-2 ring-black" />
                 <span className="text-base leading-none">{entry.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">{entry.label}</p>
@@ -695,7 +695,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       )}
 
       {/* Gallery Section */}
-      <section id="sec-galeria" className="scroll-mt-28 rounded-xl border border-white/10 shadow-sm p-6">
+      <section id="sec-galeria" className="scroll-mt-28 ap-card rounded-xl p-6">
         <BookingGallery bookingId={booking.id} />
       </section>
 
@@ -704,19 +704,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <section className="rounded-xl border p-6">
           <h2 className="mb-4 text-lg font-semibold">Post-event</h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={`p-4 rounded-xl border ${booking.postEventReport ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.postEventReport ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Informe Intern</p>
               <p className="text-sm">
                 {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
               </p>
             </div>
-            <div className={`p-4 rounded-xl border ${booking.clientSurvey ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.clientSurvey ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Enquesta Client</p>
               <p className="text-sm">
                 {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
-            <div className={`p-4 rounded-xl border ${booking.clientFeedback ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-black/60 border-white/10'}`}>
+            <div className={`p-4 rounded-xl border ${booking.clientFeedback ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Feedback Enviat</p>
               <p className="text-sm">
                 {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}
@@ -751,6 +751,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
+
+
 
 
 

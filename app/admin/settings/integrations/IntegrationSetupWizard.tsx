@@ -16,6 +16,10 @@ type WizardProps = {
 
 type Step = 1 | 2 | 3;
 
+const STEP_ACTIVE = 'rounded-full border px-3 py-1 text-xs font-semibold admin-tone-soft-info admin-tone-border-info admin-tone-text-info';
+const STEP_IDLE = 'rounded-full border px-3 py-1 text-xs font-semibold admin-tone-idle';
+const LINK_BUTTON = 'ap-btn ap-btn--secondary text-xs';
+
 export default function IntegrationSetupWizard({
   gmailConnected,
   imapConfigured,
@@ -28,36 +32,28 @@ export default function IntegrationSetupWizard({
 }: WizardProps) {
   const [step, setStep] = useState<Step>(1);
 
-  const status = useMemo(() => ({
-    emailReady: gmailConnected || imapConfigured,
-    calendarReady: googleCalendarConnected && calendarIdConfigured,
-    icsReady: icsFeedConfigured,
-  }), [gmailConnected, imapConfigured, googleCalendarConnected, calendarIdConfigured, icsFeedConfigured]);
+  const status = useMemo(
+    () => ({
+      emailReady: gmailConnected || imapConfigured,
+      calendarReady: googleCalendarConnected && calendarIdConfigured,
+      icsReady: icsFeedConfigured,
+    }),
+    [gmailConnected, imapConfigured, googleCalendarConnected, calendarIdConfigured, icsFeedConfigured]
+  );
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5 admin-card-glass">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold">Configuració ràpida d&apos;integracions</h2>
           <p className="text-xs">3 passos per deixar email + calendari + feed operatius.</p>
         </div>
-        <div className="text-xs">
-          Estat global: {status.emailReady && status.calendarReady ? 'Operatiu' : 'Pendent'}
-        </div>
+        <div className="text-xs">Estat global: {status.emailReady && status.calendarReady ? 'Operatiu' : 'Pendent'}</div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {[1, 2, 3].map((n) => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => setStep(n as Step)}
-            className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-              step === n
-                ? 'border-cyan-300/70 bg-cyan-200/20 text-cyan-100'
-                : 'border-cyan-300/30 bg-cyan-200/5 text-cyan-100/80'
-            }`}
-          >
+          <button key={n} type="button" onClick={() => setStep(n as Step)} className={step === n ? STEP_ACTIVE : STEP_IDLE}>
             Pas {n}
           </button>
         ))}
@@ -72,8 +68,8 @@ export default function IntegrationSetupWizard({
             <li>Scopes recomanats Gmail: `gmail.readonly`, `gmail.modify`</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/api/gmail/oauth/start" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Gmail</a>
-            <Link href="/admin/inbox/settings" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Configurar IMAP</Link>
+            <a href="/api/gmail/oauth/start" className={LINK_BUTTON}>Connectar Gmail</a>
+            <Link href="/admin/inbox/settings" className={LINK_BUTTON}>Configurar IMAP</Link>
           </div>
         </div>
       )}
@@ -88,8 +84,8 @@ export default function IntegrationSetupWizard({
             <li>Scope recomanat: `https://www.googleapis.com/auth/calendar.events`</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/api/google-calendar/oauth/start" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Calendar</a>
-            <Link href="/admin/emails" className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Revisar cron/email</Link>
+            <a href="/api/google-calendar/oauth/start" className={LINK_BUTTON}>Connectar Calendar</a>
+            <Link href="/admin/emails" className={LINK_BUTTON}>Revisar cron/email</Link>
           </div>
         </div>
       )}
@@ -102,13 +98,7 @@ export default function IntegrationSetupWizard({
             <li>Quan estigui actiu, pots subscriure&apos;t des de Google Calendar / iPhone.</li>
           </ul>
           <div className="mt-3">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="rounded-xl border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5"
-            >
-              Tornar al pas 1
-            </button>
+            <button type="button" onClick={() => setStep(1)} className={LINK_BUTTON}>Tornar al pas 1</button>
           </div>
         </div>
       )}

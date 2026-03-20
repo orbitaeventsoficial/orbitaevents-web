@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { formatDateSimple } from '@/lib/constants';
+import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -9,19 +10,7 @@ export const metadata = {
   title: 'Enquestes Post-Event | Òrbita Admin',
 };
 
-function getPackName(
-  translations: Array<{ locale: string; name: string }>,
-  fallback: string,
-  locale?: string | null
-) {
-  const preferred = String(locale || 'ca').toLowerCase();
-  return (
-    translations.find((t) => t.locale === preferred)?.name ||
-    translations.find((t) => t.locale === 'ca')?.name ||
-    translations[0]?.name ||
-    fallback
-  );
-}
+
 
 async function getSurveys() {
   return prisma.clientSurvey.findMany({
@@ -81,14 +70,14 @@ export default async function SurveysPage() {
 
       {/* Surveys List */}
       {surveys.length === 0 ? (
-        <div className="border border-white/10 rounded-xl p-12 text-center">
+        <div className="ap-card p-12 text-center">
           <div className="text-4xl mb-4">📊</div>
           <p className="">Encara no hi ha enquestes rebudes</p>
         </div>
       ) : (
         <div className="space-y-3">
           {surveys.map((survey) => {
-            const packName = getPackName(
+            const packName = getTranslatedPackName(
               survey.booking.pack.translations,
               survey.booking.pack.slug,
               survey.booking.lead?.preferredLocale
@@ -96,7 +85,7 @@ export default async function SurveysPage() {
             return (
               <div
                 key={survey.id}
-                className="border border-white/10 rounded-xl p-4 hover:bg-white/5 transition-colors"
+                className="ap-card p-4 hover:brightness-105 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -106,7 +95,7 @@ export default async function SurveysPage() {
                       </h3>
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < (survey.overallRating || 0) ? 'text-yellow-500' : 'text-white/70'}>
+                          <span key={i} className={i < (survey.overallRating || 0) ? 'admin-tone-text-warning' : 'admin-tone-text-neutral'}>
                             ⭐
                           </span>
                         ))}
@@ -126,7 +115,7 @@ export default async function SurveysPage() {
                   </div>
                   <Link
                     href={`/admin/bookings/${survey.bookingId}`}
-                    className="px-4 py-2 bg-white/5 rounded-xl text-sm font-medium hover:bg-white/10"
+                    className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                   >
                     Veure detalls
                   </Link>
@@ -139,6 +128,8 @@ export default async function SurveysPage() {
     </AdminPage>
   );
 }
+
+
 
 
 

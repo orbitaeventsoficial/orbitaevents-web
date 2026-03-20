@@ -367,24 +367,24 @@ export default function CanvasEditorClient() {
       <div className="flex-1 min-w-0">
         {/* Toolbar */}
         <div className="flex flex-wrap gap-2 mb-4">
-          <button onClick={addText} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">+ Text</button>
-          <button onClick={() => addShape('rect')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">+ Rectangle</button>
-          <button onClick={() => addShape('circle')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">+ Cercle</button>
-          <button onClick={() => addShape('line')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">+ Línia</button>
+          <button onClick={addText} className="ap-btn ap-btn--secondary text-sm">+ Text</button>
+          <button onClick={() => addShape('rect')} className="ap-btn ap-btn--secondary text-sm">+ Rectangle</button>
+          <button onClick={() => addShape('circle')} className="ap-btn ap-btn--secondary text-sm">+ Cercle</button>
+          <button onClick={() => addShape('line')} className="ap-btn ap-btn--secondary text-sm">+ Línia</button>
           <div className="w-px bg-white/10 mx-1" />
           {selectedId && (
             <>
-              <button onClick={duplicateSelected} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">Duplicar</button>
-              <button onClick={() => moveLayer('up')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">↑ Capa</button>
-              <button onClick={() => moveLayer('down')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 text-sm">↓ Capa</button>
-              <button onClick={deleteSelected} className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-sm">Eliminar</button>
+              <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary text-sm">Duplicar</button>
+              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary text-sm">↑ Capa</button>
+              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary text-sm">↓ Capa</button>
+              <button onClick={deleteSelected} className="ap-btn text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">Eliminar</button>
             </>
           )}
           <div className="flex-1" />
           <button
             onClick={exportPng}
             disabled={exporting}
-            className="px-4 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/30 text-sm font-medium disabled:opacity-50"
+            className="ap-btn ap-btn--primary text-sm disabled:opacity-50"
           >
             {exporting ? 'Exportant...' : 'Descarregar PNG'}
           </button>
@@ -392,7 +392,7 @@ export default function CanvasEditorClient() {
 
         {/* Canvas area */}
         <div
-          className="relative overflow-hidden rounded-xl border border-white/10 mx-auto"
+          className="relative mx-auto overflow-hidden rounded-xl border admin-card-glass"
           style={{
             width: canvasSize.width * scale,
             height: canvasSize.height * scale,
@@ -406,7 +406,7 @@ export default function CanvasEditorClient() {
           {elements.map(renderElement)}
         </div>
 
-        <p className="text-white/30 text-xs mt-2 text-center">
+        <p className="mt-2 text-center text-xs">
           {canvasSize.width}×{canvasSize.height}px · {elements.length} elements · Arrossega per moure, cantonada per redimensionar
         </p>
       </div>
@@ -414,25 +414,25 @@ export default function CanvasEditorClient() {
       {/* RIGHT — Panel */}
       <div className="w-full lg:w-72 space-y-4">
         {/* Templates */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <h3 className="text-white/70 text-sm font-medium mb-3">Plantilles</h3>
+        <div className="rounded-xl border p-4 admin-card-glass">
+          <h3 className="mb-3 text-sm font-medium">Plantilles</h3>
           <div className="grid grid-cols-2 gap-2">
             {TEMPLATES.map(tpl => (
               <button
                 key={tpl.name}
                 onClick={() => loadTemplate(tpl)}
-                className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 text-xs text-left"
+                className="rounded-xl border px-3 py-2 text-left text-xs transition-colors admin-tone-idle"
               >
                 {tpl.name}
-                <span className="block text-white/30 text-[10px]">{tpl.width}×{tpl.height}</span>
+                <span className="block text-[10px]">{tpl.width}×{tpl.height}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Canvas size */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <h3 className="text-white/70 text-sm font-medium mb-3">Mida</h3>
+        <div className="rounded-xl border p-4 admin-card-glass">
+          <h3 className="mb-3 text-sm font-medium">Mida</h3>
           <div className="flex gap-2 mb-3">
             {(Object.keys(PRESET_SIZES) as PresetSize[]).map(k => (
               <button
@@ -440,86 +440,86 @@ export default function CanvasEditorClient() {
                 onClick={() => setPresetSize(k)}
                 className={`flex-1 px-2 py-1.5 rounded-xl text-xs border ${
                   canvasSize.width === PRESET_SIZES[k].width && canvasSize.height === PRESET_SIZES[k].height
-                    ? 'bg-cyan-500/20 border-cyan-500/30 text-cyan-400'
-                    : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'
+                    ? 'border admin-tone-soft-info admin-tone-border-info admin-tone-text-info'
+                    : 'border admin-tone-idle'
                 }`}
               >
                 {PRESET_SIZES[k].label}
               </button>
             ))}
           </div>
-          <label className="block text-white/40 text-xs mb-1">Fons</label>
+          <label className="mb-1 block text-xs">Fons</label>
           <input
             type="text"
             value={canvasBg}
             onChange={e => setCanvasBg(e.target.value)}
-            className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+            className="ap-input px-3 py-1.5 text-xs"
             placeholder="#0a0a0a o linear-gradient(...)"
           />
         </div>
 
         {/* Element properties */}
         {selected && (
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-            <h3 className="text-white/70 text-sm font-medium mb-3">
+          <div className="rounded-xl border p-4 admin-card-glass">
+            <h3 className="mb-3 text-sm font-medium">
               Propietats — {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
             </h3>
 
             {/* Position */}
             <div className="grid grid-cols-2 gap-2 mb-3">
               <div>
-                <label className="block text-white/40 text-[10px] mb-0.5">X</label>
+                <label className="mb-0.5 block text-[10px]">X</label>
                 <input type="number" value={selected.x} onChange={e => updateElement(selected.id, { x: +e.target.value })}
-                  className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                  className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="block text-white/40 text-[10px] mb-0.5">Y</label>
+                <label className="mb-0.5 block text-[10px]">Y</label>
                 <input type="number" value={selected.y} onChange={e => updateElement(selected.id, { y: +e.target.value })}
-                  className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                  className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="block text-white/40 text-[10px] mb-0.5">Ample</label>
+                <label className="mb-0.5 block text-[10px]">Ample</label>
                 <input type="number" value={selected.width} onChange={e => updateElement(selected.id, { width: +e.target.value })} min={10}
-                  className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                  className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
-                <label className="block text-white/40 text-[10px] mb-0.5">Alt</label>
+                <label className="mb-0.5 block text-[10px]">Alt</label>
                 <input type="number" value={selected.height} onChange={e => updateElement(selected.id, { height: +e.target.value })} min={10}
-                  className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                  className="ap-input px-2 py-1 text-xs" />
               </div>
             </div>
 
             {/* Text properties */}
             {selected.type === 'text' && (
               <>
-                <label className="block text-white/40 text-[10px] mb-0.5">Text</label>
+                <label className="mb-0.5 block text-[10px]">Text</label>
                 <textarea
                   value={selected.text || ''}
                   onChange={e => updateElement(selected.id, { text: e.target.value })}
                   rows={3}
-                  className="w-full px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs mb-2 resize-none focus:ring-1 focus:ring-cyan-500/50"
+                  className="ap-input mb-2 resize-none px-2 py-1.5 text-xs"
                 />
                 <div className="grid grid-cols-2 gap-2 mb-2">
                   <div>
-                    <label className="block text-white/40 text-[10px] mb-0.5">Mida</label>
+                    <label className="mb-0.5 block text-[10px]">Mida</label>
                     <input type="number" value={selected.fontSize || 48} onChange={e => updateElement(selected.id, { fontSize: +e.target.value })} min={8} max={300}
-                      className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                      className="ap-input px-2 py-1 text-xs" />
                   </div>
                   <div>
-                    <label className="block text-white/40 text-[10px] mb-0.5">Pes</label>
+                    <label className="mb-0.5 block text-[10px]">Pes</label>
                     <select value={selected.fontWeight || 'normal'} onChange={e => updateElement(selected.id, { fontWeight: e.target.value })}
-                      className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" aria-label="Pes de la font">
+                      className="ap-input px-2 py-1 text-xs" aria-label="Pes de la font">
                       <option value="normal">Normal</option>
                       <option value="bold">Negreta</option>
                     </select>
                   </div>
                 </div>
                 <div className="mb-2">
-                  <label className="block text-white/40 text-[10px] mb-0.5">Alineació</label>
+                  <label className="mb-0.5 block text-[10px]">Alineació</label>
                   <div className="flex gap-1">
                     {(['left', 'center', 'right'] as const).map(a => (
                       <button key={a} onClick={() => updateElement(selected.id, { textAlign: a })}
-                        className={`flex-1 px-2 py-1 rounded-lg text-xs ${selected.textAlign === a ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}>
+                        className={`flex-1 rounded-lg border px-2 py-1 text-xs ${selected.textAlign === a ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'}`}>
                         {a === 'left' ? '◁' : a === 'center' ? '◈' : '▷'}
                       </button>
                     ))}
@@ -529,7 +529,7 @@ export default function CanvasEditorClient() {
             )}
 
             {/* Color */}
-            <label className="block text-white/40 text-[10px] mb-0.5">
+            <label className="mb-0.5 block text-[10px]">
               {selected.type === 'text' ? 'Color text' : 'Color fons'}
             </label>
             <div className="flex flex-wrap gap-1 mb-2">
@@ -550,37 +550,37 @@ export default function CanvasEditorClient() {
               type="text"
               value={(selected.type === 'text' ? selected.color : selected.fill) || ''}
               onChange={e => updateElement(selected.id, selected.type === 'text' ? { color: e.target.value } : { fill: e.target.value })}
-              className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50"
+              className="ap-input px-2 py-1 text-xs"
               placeholder="#ffffff o rgba(...)"
             />
 
             {/* Border radius for shapes */}
             {selected.type === 'shape' && selected.shapeType === 'rect' && (
               <div className="mt-2">
-                <label className="block text-white/40 text-[10px] mb-0.5">Cantonades</label>
+                <label className="mb-0.5 block text-[10px]">Cantonades</label>
                 <input type="number" value={selected.borderRadius || 0} onChange={e => updateElement(selected.id, { borderRadius: +e.target.value })} min={0}
-                  className="w-full px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs focus:ring-1 focus:ring-cyan-500/50" />
+                  className="ap-input px-2 py-1 text-xs" />
               </div>
             )}
           </div>
         )}
 
         {/* Layers */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <h3 className="text-white/70 text-sm font-medium mb-3">Capes ({elements.length})</h3>
+        <div className="rounded-xl border p-4 admin-card-glass">
+          <h3 className="mb-3 text-sm font-medium">Capes ({elements.length})</h3>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {[...elements].reverse().map(el => (
               <button
                 key={el.id}
                 onClick={() => setSelectedId(el.id)}
                 className={`w-full text-left px-2 py-1.5 rounded-lg text-xs truncate ${
-                  el.id === selectedId ? 'bg-cyan-500/20 text-cyan-400' : 'text-white/50 hover:bg-white/5'
+                  el.id === selectedId ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'
                 }`}
               >
                 {el.type === 'text' ? `T: ${(el.text || '').slice(0, 25)}` : `■ ${el.shapeType || 'forma'}`}
               </button>
             ))}
-            {elements.length === 0 && <p className="text-white/30 text-xs">Sense elements</p>}
+            {elements.length === 0 && <p className="text-xs">Sense elements</p>}
           </div>
         </div>
       </div>

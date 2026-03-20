@@ -85,7 +85,7 @@ export default function BookingActions({
         value={status}
         onChange={(e) => handleStatusChange(e.target.value)}
         disabled={isUpdatingStatus}
-        className="rounded-xl border px-2 py-1.5 text-xs"
+        className="ap-input px-2 py-1.5 text-xs"
         title="Canviar estat"
         aria-label="Canviar estat reserva"
       >
@@ -97,21 +97,21 @@ export default function BookingActions({
       </select>
       <Link
         href={calendarHref}
-        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
+        className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
       >
         Calendari
       </Link>
       {customerId && (
         <Link
           href={`/admin/clientes/${customerId}`}
-          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
+          className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
         >
           Client
         </Link>
       )}
       <Link
         href={`/admin/bookings/${id}`}
-        className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors"
+        className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
       >
         Veure
       </Link>
@@ -121,7 +121,7 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border border-rose-500/30 text-rose-300 hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+          className="ap-btn admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger px-3 py-1.5 text-xs disabled:opacity-50"
         >
           {isDeleting ? 'Eliminant...' : 'Eliminar'}
         </button>
@@ -130,4 +130,3 @@ export default function BookingActions({
     </div>
   );
 }
-

@@ -19,41 +19,41 @@ const STEPS: Array<{
     status: 'NEW',
     label: 'Entrada nova',
     icon: '📥',
-    color: 'border-blue-500/30 bg-blue-500/5 text-blue-300',
-    activeColor: 'border-blue-400 bg-blue-500/20 text-blue-200 ring-2 ring-blue-400/50',
-    doneColor: 'border-blue-500/50 bg-blue-500/15 text-blue-300',
+    color: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+    activeColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info border-2',
+    doneColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
   },
   {
     status: 'CONTACTED',
     label: 'Contactat',
     icon: '📞',
-    color: 'border-yellow-500/30 bg-yellow-500/5 text-yellow-300',
-    activeColor: 'border-yellow-400 bg-yellow-500/20 text-yellow-200 ring-2 ring-yellow-400/50',
-    doneColor: 'border-yellow-500/50 bg-yellow-500/15 text-yellow-300',
+    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
+    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   },
   {
     status: 'QUOTE_SENT',
     label: 'Pressupost enviat',
     icon: '📄',
-    color: 'border-purple-500/30 bg-purple-500/5 text-purple-300',
-    activeColor: 'border-purple-400 bg-purple-500/20 text-purple-200 ring-2 ring-purple-400/50',
-    doneColor: 'border-purple-500/50 bg-purple-500/15 text-purple-300',
+    color: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
+    activeColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral border-2',
+    doneColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
   },
   {
     status: 'NEGOTIATING',
     label: 'Negociant',
     icon: '🤝',
-    color: 'border-orange-500/30 bg-orange-500/5 text-orange-300',
-    activeColor: 'border-orange-400 bg-orange-500/20 text-orange-200 ring-2 ring-orange-400/50',
-    doneColor: 'border-orange-500/50 bg-orange-500/15 text-orange-300',
+    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
+    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   },
   {
     status: 'WON',
     label: 'Guanyat!',
     icon: '🎉',
-    color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300',
-    activeColor: 'border-emerald-400 bg-emerald-500/20 text-emerald-200 ring-2 ring-emerald-400/50',
-    doneColor: 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300',
+    color: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+    activeColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success border-2',
+    doneColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
   },
 ];
 
@@ -173,7 +173,7 @@ export default function LeadGuidedFlow({
   }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
 
   return (
-    <section className="rounded-2xl border p-5 shadow-sm">
+    <section className="ap-card p-5">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -183,22 +183,22 @@ export default function LeadGuidedFlow({
           </p>
         </div>
         {isLost && (
-          <div className="rounded-full border px-3 py-1 text-xs font-semibold">
+          <div className="ap-badge px-3 py-1 text-xs">
             PERDUT
           </div>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="mt-3 h-2 w-full rounded-full overflow-hidden">
+      <div className="admin-tone-bg-neutral mt-3 h-2 w-full overflow-hidden rounded-full">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          className="admin-tone-bg-info h-full rounded-full transition-all duration-500"
           style={{ width: `${progress.pct}%` }}
         />
       </div>
 
       {error && (
-        <p className="mt-3 rounded-xl border px-3 py-2 text-xs">
+        <p className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger mt-3 px-3 py-2 text-xs">
           {error}
         </p>
       )}
@@ -232,7 +232,7 @@ export default function LeadGuidedFlow({
                 <span className="sm:hidden">{i + 1}</span>
               </button>
               {i < STEPS.length - 1 && (
-                <span className={`hidden lg:block mx-1 text-lg ${isDone ? 'text-emerald-500' : 'text-white/40'}`}>
+                <span className={`hidden lg:block mx-1 text-lg ${isDone ? 'admin-tone-text-success' : 'admin-tone-text-neutral'}`}>
                   →
                 </span>
               )}
@@ -247,7 +247,7 @@ export default function LeadGuidedFlow({
           nextAction.href ? (
             <Link
               href={nextAction.href}
-              className="rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all"
+              className="ap-btn ap-btn--primary px-4 py-2 text-xs"
             >
               {nextAction.label} →
             </Link>
@@ -256,7 +256,7 @@ export default function LeadGuidedFlow({
               type="button"
               onClick={nextAction.action}
               disabled={isPending}
-              className="rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all disabled:opacity-50"
+              className="ap-btn ap-btn--primary px-4 py-2 text-xs disabled:opacity-50"
             >
               {nextAction.label} →
             </button>
@@ -267,7 +267,7 @@ export default function LeadGuidedFlow({
           type="button"
           onClick={createFollowUpTask}
           disabled={creatingTask}
-          className="rounded-xl border px-3 py-2 text-xs font-semibold disabled:opacity-60 transition-colors"
+          className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-60"
         >
           {creatingTask ? 'Creant...' : '+ Tasca de seguiment'}
         </button>
@@ -275,7 +275,7 @@ export default function LeadGuidedFlow({
         {openTasksCount > 0 && (
           <a
             href="#lead-tasks"
-            className="rounded-xl border px-3 py-2 text-xs font-semibold transition-colors"
+            className="ap-btn ap-btn--secondary px-3 py-2 text-xs"
           >
             Tasques ({openTasksCount})
           </a>
@@ -286,7 +286,7 @@ export default function LeadGuidedFlow({
             type="button"
             onClick={() => updateStatus('LOST')}
             disabled={isPending}
-            className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
+            className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
           >
             Marcar perdut
           </button>
@@ -297,7 +297,7 @@ export default function LeadGuidedFlow({
             type="button"
             onClick={() => updateStatus('NEW')}
             disabled={isPending}
-            className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
+            className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
           >
             Reobrir entrada
           </button>
@@ -306,4 +306,7 @@ export default function LeadGuidedFlow({
     </section>
   );
 }
+
+
+
 

@@ -65,13 +65,13 @@ export default function CommunicationPanel({
   ];
 
   return (
-    <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+    <section className="ap-card p-6">
       <h2 className="text-lg font-semibold">Comunicacions multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
           return (
-            <div key={flow.key} className="rounded-xl border border-white/10 p-3">
+            <div key={flow.key} className="ap-card admin-tone-border-neutral p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{flow.label}</p>
                 <p className="text-xs">
@@ -89,7 +89,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('send_email', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
+                  className="ap-btn ap-btn--primary px-2 py-1 text-xs disabled:opacity-60"
                 >
                   Correu
                 </button>
@@ -97,7 +97,7 @@ export default function CommunicationPanel({
                   href={waLink(flow.key)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md px-2 py-1 text-xs font-semibold text-white"
+                  className="ap-btn ap-btn--secondary px-2 py-1 text-xs"
                 >
                   Obrir WhatsApp
                 </a>
@@ -105,7 +105,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('send_whatsapp', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
+                  className="ap-btn ap-btn--primary px-2 py-1 text-xs disabled:opacity-60"
                 >
                   Envia per API de WhatsApp
                 </button>
@@ -113,7 +113,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('log_sent', flow.key, 'whatsapp')}
                   disabled={loading === flow.key}
-                  className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
+                  className="ap-btn ap-btn--secondary px-2 py-1 text-xs disabled:opacity-60"
                 >
                   Marcar enviat
                 </button>
@@ -121,7 +121,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('mark_responded', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md border px-2 py-1 text-xs font-semibold disabled:opacity-60"
+                  className="ap-btn admin-tone-border-success admin-tone-bg-success admin-tone-text-success px-2 py-1 text-xs disabled:opacity-60"
                 >
                   Marcar respost
                 </button>
@@ -133,6 +133,3 @@ export default function CommunicationPanel({
     </section>
   );
 }
-
-
-

@@ -138,6 +138,20 @@ export const PRIORITY_COLOR_OPTIONS: LeadColorOption[] = [
   },
 ];
 
+export const STATUS_COLOR_CONFIG = Object.fromEntries(
+  STATUS_COLOR_OPTIONS.map((option) => [
+    option.key,
+    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
+  ])
+) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
+
+export const PRIORITY_COLOR_CONFIG = Object.fromEntries(
+  PRIORITY_COLOR_OPTIONS.map((option) => [
+    option.key,
+    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
+  ])
+) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
+
 export const DEFAULT_BASE_COLORS: Record<string, string> = {
   NEW: '#22d3ee',
   CONTACTED: '#fbbf24',
@@ -162,3 +176,4 @@ export const LEAD_COLOR_DEFAULT_VARS: Record<string, string> = ALL_OPTIONS.reduc
   acc[option.textVar] = tones.text;
   return acc;
 }, {} as Record<string, string>);
+

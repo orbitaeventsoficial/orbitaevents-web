@@ -99,24 +99,24 @@ interface StatsData {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  SOUND: { label: 'So', icon: '🔊', color: 'bg-blue-500/20' },
-  LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'bg-yellow-500/20' },
-  EFFECTS: { label: 'Efectes', icon: '✨', color: 'bg-purple-500/20' },
-  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'bg-white/5' },
-  CABLING: { label: 'Cablejat', icon: '🔌', color: 'bg-green-500/20' },
-  TECH: { label: 'Tècnic', icon: '💻', color: 'bg-indigo-500/20' },
-  DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'bg-orange-500/20' },
-  DECORATION_HW: { label: 'Deco HW', icon: '🎃', color: 'bg-orange-500/20' },
-  DECORATION_GEN: { label: 'Deco General', icon: '🎨', color: 'bg-pink-500/20' },
-  CONSUMABLE: { label: 'Consumible', icon: '📦', color: 'bg-red-500/20' },
+  SOUND: { label: 'So', icon: '🔊', color: 'admin-tone-bg-info' },
+  LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'admin-tone-bg-warning' },
+  EFFECTS: { label: 'Efectes', icon: '✨', color: 'admin-tone-bg-neutral' },
+  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'admin-tone-bg-neutral' },
+  CABLING: { label: 'Cablejat', icon: '🔌', color: 'admin-tone-bg-success' },
+  TECH: { label: 'Tècnic', icon: '💻', color: 'admin-tone-bg-info' },
+  DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'admin-tone-bg-warning' },
+  DECORATION_HW: { label: 'Deco HW', icon: '🎃', color: 'admin-tone-bg-warning' },
+  DECORATION_GEN: { label: 'Deco General', icon: '🎨', color: 'admin-tone-bg-neutral' },
+  CONSUMABLE: { label: 'Consumible', icon: '📦', color: 'admin-tone-bg-danger' },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   AVAILABLE: { label: 'Disponible', color: 'admin-tone-soft-success' },
-  IN_USE: { label: 'En ús', color: 'bg-blue-500/20 text-blue-300' },
-  MAINTENANCE: { label: 'Manteniment', color: 'bg-yellow-500/20 text-yellow-300' },
+  IN_USE: { label: 'En ús', color: 'admin-tone-bg-info admin-tone-text-info' },
+  MAINTENANCE: { label: 'Manteniment', color: 'admin-tone-bg-warning admin-tone-text-warning' },
   BROKEN: { label: 'Avariat', color: 'admin-tone-soft-danger' },
-  RETIRED: { label: 'Retirat', color: 'bg-white/5 text-white/40' },
+  RETIRED: { label: 'Retirat', color: 'admin-tone-bg-neutral admin-tone-text-neutral' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -229,8 +229,8 @@ export default function PricingAdminPage() {
             className={`
               px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
               ${activeTab === tab.key
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 border border-white/10'
+                ? 'ap-btn ap-btn--primary'
+                : 'ap-btn ap-btn--secondary admin-tone-text-neutral'
               }
             `}
           >
@@ -254,8 +254,8 @@ export default function PricingAdminPage() {
           className={`
             p-4 rounded-xl flex items-center justify-between
             ${message.type === 'success'
-              ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-              : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+              ? 'ap-card admin-tone-border-success admin-tone-bg-success admin-tone-text-success'
+              : 'ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger'
             }
           `}
           role={message.type === 'success' ? 'status' : 'alert'}
@@ -298,7 +298,7 @@ export default function PricingAdminPage() {
                 {stats.topExtras.map((extra, i) => (
                   <div key={extra.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-zinc-400' : i === 2 ? 'bg-amber-600' : 'bg-white/15'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{extra.name}</span>
@@ -321,7 +321,7 @@ export default function PricingAdminPage() {
                 {stats.topPacks.map((pack, i) => (
                   <div key={pack.slug} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-zinc-400' : i === 2 ? 'bg-amber-600' : 'bg-white/15'}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'admin-tone-bg-warning' : i === 1 ? 'admin-tone-bg-neutral' : i === 2 ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`}>
                         {i + 1}
                       </span>
                       <span className="font-medium">{pack.name}</span>
@@ -390,7 +390,7 @@ export default function PricingAdminPage() {
             {extras.map(extra => (
               <div
                 key={extra.id}
-                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-white/10 bg-white/[0.03] admin-card-glass'}`}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral admin-card-glass'}`}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -613,8 +613,8 @@ export default function PricingAdminPage() {
           {/* Llista */}
           <div className="grid gap-3">
             {filteredInventory.map(item => {
-              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'bg-white/5' };
-              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-white/5 text-white/40' };
+              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'admin-tone-bg-neutral' };
+              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'admin-tone-bg-neutral admin-tone-text-neutral' };
 
               return (
                 <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">
@@ -697,16 +697,16 @@ function StatCard({
   color: 'emerald' | 'cyan' | 'purple' | 'amber';
 }) {
   const styles = {
-    emerald: 'border-emerald-500/20 from-emerald-500/10 to-emerald-600/5 text-emerald-400',
-    cyan: 'border-cyan-500/20 from-cyan-500/10 to-blue-600/5 text-cyan-400',
-    purple: 'border-purple-500/20 from-purple-500/10 to-purple-600/5 text-purple-400',
-    amber: 'border-amber-500/20 from-amber-500/10 to-amber-600/5 text-amber-400',
+    emerald: 'ap-card admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+    cyan: 'ap-card admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+    purple: 'ap-card admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
+    amber: 'ap-card admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
   };
 
   const style = styles[color];
 
   return (
-    <div className={`rounded-2xl border bg-gradient-to-br admin-card-glass p-4 sm:p-5 ${style}`}>
+    <div className={`admin-card-glass p-4 sm:p-5 ${style}`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-3xl">{icon}</span>
       </div>
@@ -716,6 +716,7 @@ function StatCard({
     </div>
   );
 }
+
 
 
 

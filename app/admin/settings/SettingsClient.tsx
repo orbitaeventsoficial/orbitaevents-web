@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { formatDateSimple, formatNumber } from '@/lib/constants';
+import { SETTINGS_SENSITIVE_KEY_FRAGMENTS, formatDateSimple, formatNumber } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type Setting = {
@@ -24,17 +24,11 @@ const TYPE_LABELS: Record<Setting['type'], string> = {
   JSON: 'JSON',
 };
 
-// Keys que contenen dades sensibles que s\'han d'amagar
-const SENSITIVE_KEYS = ['refreshToken', 'accessToken', 'secret', 'password', 'apiKey'];
-
 function isSensitiveKey(key: string): boolean {
-  return SENSITIVE_KEYS.some(sensitive =>
-    key.toLowerCase().includes(sensitive.toLowerCase())
-  );
+  return SETTINGS_SENSITIVE_KEY_FRAGMENTS.some((sensitive) => key.toLowerCase().includes(sensitive.toLowerCase()));
 }
 
 function formatDisplay(setting: Setting): string {
-  // Amagar valors sensibles
   if (isSensitiveKey(setting.key) && setting.value) {
     return '••••••••••••••••';
   }
@@ -42,7 +36,6 @@ function formatDisplay(setting: Setting): string {
   if (setting.type === 'NUMBER') {
     const num = Number(setting.value);
     if (Number.isNaN(num)) return setting.value;
-    // No aplicar format de milers per a anys (valors entre 1900 i 2100)
     if (num >= 1900 && num <= 2100) {
       return String(num);
     }
@@ -68,6 +61,13 @@ function coerceValue(type: Setting['type'], raw: string): string | number | bool
   return raw;
 }
 
+function getTypeTone(type: Setting['type']): string {
+  if (type === 'NUMBER') return 'admin-tone-soft-info admin-tone-text-info';
+  if (type === 'BOOLEAN') return 'admin-tone-bg-violet admin-tone-text-violet';
+  if (type === 'JSON') return 'admin-tone-soft-warning admin-tone-text-warning';
+  return 'admin-tone-idle';
+}
+
 export default function SettingsClient({
   groupedSettings,
   categoryConfig,
@@ -83,8 +83,8 @@ export default function SettingsClient({
 
   const settingsFlat = useMemo(
     () =>
-      Object.values(settings).flat().reduce<Record<string, Setting>>((acc, s) => {
-        acc[s.key] = s;
+      Object.values(settings).flat().reduce<Record<string, Setting>>((acc, setting) => {
+        acc[setting.key] = setting;
         return acc;
       }, {}),
     [settings]
@@ -118,9 +118,7 @@ export default function SettingsClient({
       const response = await fetchWithCsrf('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          settings: [{ key: setting.key, value }],
-        }),
+        body: JSON.stringify({ settings: [{ key: setting.key, value }] }),
       });
 
       if (!response.ok) {
@@ -132,9 +130,7 @@ export default function SettingsClient({
         const next = { ...prev };
         const list = next[setting.category] || [];
         next[setting.category] = list.map((item) =>
-          item.key === setting.key
-            ? { ...item, value: String(value), updatedAt: new Date().toISOString() }
-            : item
+          item.key === setting.key ? { ...item, value: String(value), updatedAt: new Date().toISOString() } : item
         );
         return next;
       });
@@ -150,23 +146,16 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border p-4 text-sm" role="alert">
+        <div className="rounded-xl border p-4 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger" role="alert">
           {error}
         </div>
       )}
 
       {Object.entries(settings).map(([category, categorySettings]) => {
-        const config = categoryConfig[category] || {
-          label: category,
-          icon: '??',
-          description: '',
-        };
+        const config = categoryConfig[category] || { label: category, icon: '??', description: '' };
 
         return (
-          <section
-            key={category}
-            className="rounded-2xl border admin-card-glass overflow-hidden"
-          >
+          <section key={category} className="overflow-hidden rounded-2xl border admin-card-glass">
             <div className="border-b p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
@@ -184,59 +173,30 @@ export default function SettingsClient({
                 const current = settingsFlat[setting.key];
 
                 return (
-                  <div
-                    key={setting.id}
-                    className="p-4 transition-colors"
-                  >
+                  <div key={setting.id} className="p-4 transition-colors">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono px-2 py-0.5 rounded">
-                            {setting.key}
-                          </code>
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded ${
-                              setting.type === 'NUMBER'
-                                ? 'bg-blue-500/20 text-blue-300'
-                                : setting.type === 'BOOLEAN'
-                                ? 'bg-purple-500/20 text-purple-300'
-                                : setting.type === 'JSON'
-                                ? 'bg-orange-500/20 text-orange-300'
-                                : 'bg-white/10 text-white/70'
-                            }`}
-                          >
-                            {TYPE_LABELS[setting.type]}
-                          </span>
+                          <code className="rounded px-2 py-0.5 text-xs font-mono">{setting.key}</code>
+                          <span className={`rounded px-2 py-0.5 text-xs ${getTypeTone(setting.type)}`}>{TYPE_LABELS[setting.type]}</span>
                         </div>
-                        {setting.label && (
-                          <p className="mt-1 font-medium">{setting.label}</p>
-                        )}
-                        {setting.description && (
-                          <p className="text-sm">{setting.description}</p>
-                        )}
+                        {setting.label && <p className="mt-1 font-medium">{setting.label}</p>}
+                        {setting.description && <p className="text-sm">{setting.description}</p>}
                       </div>
 
                       <div className="text-right">
                         {isEditing ? (
                           <div className="space-y-2">
                             {setting.type === 'BOOLEAN' ? (
-                              <select
-                                className="rounded-xl border px-3 py-1.5 text-sm "
-                                value={draftValue || 'false'}
-                                onChange={(e) => setDraftValue(e.target.value)}
-                              >
+                              <select className="ap-input px-3 py-1.5 text-sm" value={draftValue || 'false'} onChange={(e) => setDraftValue(e.target.value)}>
                                 <option value="true">Si</option>
                                 <option value="false">No</option>
                               </select>
                             ) : setting.type === 'JSON' ? (
-                              <textarea
-                                className="rounded-xl border px-3 py-1.5 text-sm w-64 h-24 "
-                                value={draftValue}
-                                onChange={(e) => setDraftValue(e.target.value)}
-                              />
+                              <textarea className="ap-input h-24 w-64 px-3 py-1.5 text-sm" value={draftValue} onChange={(e) => setDraftValue(e.target.value)} />
                             ) : (
                               <input
-                                className="rounded-xl border px-3 py-1.5 text-sm "
+                                className="ap-input px-3 py-1.5 text-sm"
                                 type={setting.type === 'NUMBER' ? 'number' : 'text'}
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
@@ -244,39 +204,19 @@ export default function SettingsClient({
                             )}
 
                             <div className="flex items-center justify-end gap-2">
-                              <button
-                                className="text-xs px-3 py-1.5 rounded-xl border transition-colors"
-                                onClick={cancelEdit}
-                                disabled={isSaving}
-                                type="button"
-                              >
+                              <button className="ap-btn ap-btn--secondary text-xs" onClick={cancelEdit} disabled={isSaving} type="button">
                                 Cancel·lar
                               </button>
-                              <button
-                                className="text-xs px-3 py-1.5 rounded-xl text-white shadow-lg transition-colors"
-                                onClick={() => saveSetting(setting)}
-                                disabled={isSaving}
-                                type="button"
-                                aria-busy={isSaving}
-                              >
+                              <button className="ap-btn ap-btn--primary text-xs" onClick={() => saveSetting(setting)} disabled={isSaving} type="button" aria-busy={isSaving}>
                                 {isSaving ? 'Desant...' : 'Desar'}
                               </button>
                             </div>
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold">
-                              {formatDisplay(current)}
-                            </p>
-                            <p className="text-xs">
-                              Actualitzat:{' '}
-                              {formatDateSimple(current.updatedAt)}
-                            </p>
-                            <button
-                              className="mt-2 text-xs px-3 py-1.5 rounded-xl border transition-colors"
-                              onClick={() => startEdit(current)}
-                              type="button"
-                            >
+                            <p className="text-lg font-semibold">{formatDisplay(current)}</p>
+                            <p className="text-xs">Actualitzat: {formatDateSimple(current.updatedAt)}</p>
+                            <button className="mt-2 ap-btn ap-btn--secondary text-xs" onClick={() => startEdit(current)} type="button">
                               Editar
                             </button>
                           </>
@@ -293,6 +233,4 @@ export default function SettingsClient({
     </div>
   );
 }
-
-
 

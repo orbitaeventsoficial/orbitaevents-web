@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { LEAD_STATUS_OPTIONS } from '@/lib/constants';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -45,15 +46,14 @@ export default function LeadQuickStatus({
       className="rounded-xl border px-2 py-1 text-[11px]"
       title="Canviar estat"
       aria-label="Canviar estat"
-    >
-      <option value="NEW">Entrada nova</option>
-      <option value="CONTACTED">Contactat</option>
-      <option value="QUOTE_SENT">Pressupost enviat</option>
-      <option value="NEGOTIATING">Negociació</option>
-      <option value="WON">Guanyat</option>
-      <option value="LOST">Perdut</option>
+        >
+      {LEAD_STATUS_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
     </select>
   );
 }
+
+
 
 

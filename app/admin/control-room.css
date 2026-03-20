@@ -81,9 +81,9 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-panel {
   padding: 0.75rem;
 }
 
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--pilot { background: color-mix(in oklab, var(--at-success) 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, var(--at-success) 40%, var(--at-border) 60%); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--checklist { background: color-mix(in oklab, var(--at-info) 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--command { background: color-mix(in oklab, var(--at-violet) 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, var(--at-violet) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--pilot { background: var(--at-surface); border-color: color-mix(in oklab, var(--at-success) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--checklist { background: var(--at-surface); border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--command { background: var(--at-surface); border-color: color-mix(in oklab, var(--at-violet) 40%, var(--at-border) 60%); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--radar { background: var(--at-surface); border-color: var(--at-border); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel-head,
@@ -155,10 +155,10 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-step {
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step--rose { border-color: var(--at-cr-rose); background: var(--at-cr-rose-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step--amber { border-color: var(--at-cr-amber); background: var(--at-cr-amber-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step--sky { border-color: var(--at-cr-sky); background: var(--at-cr-sky-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step--emerald { border-color: var(--at-cr-emerald); background: var(--at-cr-emerald-soft); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--rose { border-color: var(--at-cr-rose); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--amber { border-color: var(--at-cr-amber); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--sky { border-color: var(--at-cr-sky); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--emerald { border-color: var(--at-cr-emerald); background: var(--at-panel); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step-kicker { font-size: 11px; font-weight: 700; color: var(--at-muted); text-transform: uppercase; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step-title { font-size: 14px; font-weight: 700; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step-desc { font-size: 12px; color: var(--at-text); margin-top: 0.25rem; }
@@ -166,7 +166,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-step-cta { margin-top
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-action-link {
   border: 1px solid var(--at-cr-cyan-border);
-  background: rgba(74, 166, 212, 0.16);
+  background: var(--at-cyan-dim);
   color: var(--at-text);
   border-radius: 0.625rem;
   padding: 0.45rem 0.75rem;
@@ -176,12 +176,12 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-action-link {
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box {
   border: 1px solid var(--at-border);
-  background: var(--at-cr-bg-card);
+  background: var(--at-surface);
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--amber { border-color: var(--at-cr-amber); background: var(--at-cr-amber-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--emerald { border-color: var(--at-cr-emerald); background: var(--at-cr-emerald-soft); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--amber { border-color: var(--at-cr-amber); background: var(--at-surface); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--emerald { border-color: var(--at-cr-emerald); background: var(--at-surface); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-label { font-size: 12px; color: var(--at-muted); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--amber { color: var(--at-brand-vivid); }
@@ -190,7 +190,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--emerald {
 html.admin-mode .admin-shell .admin-control-room .admin-cr-command-card,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-info-card {
   border: 1px solid var(--at-border);
-  background: var(--at-cr-bg-card);
+  background: var(--at-surface);
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
@@ -199,7 +199,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-command-head { displa
 html.admin-mode .admin-shell .admin-control-room .admin-cr-command-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-link-inline { font-size: 11px; color: var(--at-info); text-decoration: underline; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list { display: grid; gap: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border: 1px solid var(--at-border); background: var(--at-cr-bg-deep); border-radius: 0.5rem; padding: 0.45rem 0.5rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border: 1px solid var(--at-border); background: var(--at-panel); border-radius: 0.5rem; padding: 0.45rem 0.5rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row--link:hover { border-color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row--timeline { align-items: flex-start; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list-content { min-width: 0; flex: 1; }
@@ -211,7 +211,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-truncate { min-width:
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card {
   border: 1px solid var(--at-border);
-  background: var(--at-cr-bg-card);
+  background: var(--at-surface);
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
@@ -227,7 +227,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-emerald { color:
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-banner {
   border: 1px solid var(--at-cr-amber-border);
-  background: var(--at-cr-amber-dark);
+  background: var(--at-surface);
   border-radius: 0.75rem;
   padding: 0.75rem;
   display: flex;
@@ -240,9 +240,9 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-action { align
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-grid { display: grid; gap: 0.75rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert { border-radius: 0.75rem; border: 1px solid; padding: 0.75rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--error { border-color: var(--at-cr-rose); background: var(--at-cr-rose-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--warning { border-color: var(--at-cr-amber); background: var(--at-cr-amber-soft); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--info { border-color: var(--at-cr-sky); background: var(--at-cr-sky-soft); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--error { border-color: var(--at-cr-rose); background: var(--at-surface); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--warning { border-color: var(--at-cr-amber); background: var(--at-surface); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--info { border-color: var(--at-cr-sky); background: var(--at-surface); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-title { font-size: 14px; font-weight: 700; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-desc { font-size: 12px; color: var(--at-text); margin-top: 0.25rem; }
@@ -259,7 +259,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-main-grid { grid-temp
 html.admin-mode .admin-shell .admin-control-room .admin-cr-main-grid-wide { grid-column: auto; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-grid { margin-top: 0.625rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-health-item { border: 1px solid var(--at-border); background: var(--at-cr-bg-deep); border-radius: 0.5rem; padding: 0.35rem; text-align: center; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-health-item { border: 1px solid var(--at-border); background: var(--at-panel); border-radius: 0.5rem; padding: 0.35rem; text-align: center; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-label { font-size: 10px; color: var(--at-cr-meta); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-value { font-size: 12px; font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-footnote { margin-top: 0.625rem; font-size: 10px; color: var(--at-cr-meta); }
@@ -274,7 +274,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-grid {
 html.admin-mode .admin-shell .admin-control-room .admin-cr-card-pad { padding: 0.625rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-divide-list > * + * { border-top: 1px solid var(--at-cr-divide); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link { padding: 0.625rem 0.75rem; display: flex; align-items: center; gap: 0.625rem; transition: 120ms ease; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link:hover { background: rgba(36, 55, 84, 0.45); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link:hover { background: var(--at-cr-bg-action-h); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-box { width: 44px; height: 44px; border-radius: 0.625rem; border: 1px solid var(--at-cr-cyan-border); background: var(--at-cr-sky-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-text { color: var(--at-text); font-weight: 700; font-size: 0.95rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-chevron { width: 16px; height: 16px; color: var(--at-cr-meta); flex-shrink: 0; }
@@ -289,30 +289,30 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-round { width:
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip { padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 10px; font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--new { background: var(--at-cr-sky-soft); color: var(--at-cr-cyan-light); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--won { background: var(--at-cr-emerald-soft); color: var(--at-cr-emerald-text); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--default { background: rgba(142, 166, 198, 0.2); color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--default { background: color-mix(in oklab, var(--at-muted) 24%, transparent 76%); color: var(--at-text); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card {
   border: 1px solid var(--at-border);
   border-radius: 0.75rem;
   padding: 0.625rem;
 }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--violet { border-color: var(--at-cr-violet-border); background: var(--at-cr-violet-bg); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--amber { border-color: var(--at-cr-amber-border); background: var(--at-cr-amber-bg); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--rose { border-color: var(--at-cr-rose-border); background: var(--at-cr-rose-bg); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--cyan { border-color: var(--at-cr-cyan-border); background: var(--at-cr-sky-bg); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--violet { border-color: var(--at-cr-violet-border); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--amber { border-color: var(--at-cr-amber-border); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--rose { border-color: var(--at-cr-rose-border); background: var(--at-panel); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--cyan { border-color: var(--at-cr-cyan-border); background: var(--at-panel); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-value { font-size: 1.25rem; color: var(--at-text); font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-audit { border: 1px solid var(--at-border); border-radius: 0.75rem; background: var(--at-surface); overflow: hidden; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-head { padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--at-cr-divide); background: var(--at-cr-bg-hover); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-row { padding: 0.625rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 12px; color: var(--at-text); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-row { display: flex; align-items: flex-start; gap: 0.625rem; border: 1px solid var(--at-border); background: var(--at-cr-bg-deep); border-radius: 0.625rem; padding: 0.5rem 0.625rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-row { display: flex; align-items: flex-start; gap: 0.625rem; border: 1px solid var(--at-border); background: var(--at-panel); border-radius: 0.625rem; padding: 0.5rem 0.625rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-icon { width: 22px; height: 22px; border-radius: 9999px; border: 1px solid var(--at-border-strong); background: var(--at-cr-bg-hover); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
   border-radius: 0.875rem;
   border: 1px solid var(--at-border);
-  background: var(--at-cr-bg-input);
+  background: var(--at-surface);
   padding: 0.75rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--at-shadow-md);
   transition: border-color 150ms ease;
 }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-head {
@@ -356,8 +356,8 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky:hove
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-icon { color: var(--at-cr-sky-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-dot { background: var(--at-cr-sky-text); }
 
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card { overflow: hidden; border-radius: 0.875rem; border: 1px solid var(--at-border); background: var(--at-surface); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; border-bottom: 1px solid var(--at-cr-divide); background: var(--at-cr-bg-head); padding: 0.75rem 1rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card { overflow: hidden; border-radius: 0.875rem; border: 1px solid var(--at-border); background: var(--at-surface); box-shadow: var(--at-shadow-md); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; border-bottom: 1px solid var(--at-cr-divide); background: var(--at-surface); padding: 0.75rem 1rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head-copy { min-width: 0; flex: 1; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { font-size: 14px; font-weight: 700; color: var(--at-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-subtitle { margin-top: 0.15rem; font-size: 11px; color: var(--at-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -381,7 +381,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--default { paddin
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--sm { padding: 0.375rem 0.625rem; font-size: 11px; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary { background: var(--at-cr-btn-primary); color: var(--at-cr-btn-primary-t); border-color: var(--at-cr-btn-border); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary:hover { background: var(--at-cr-btn-primary-h); }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary { border-color: var(--at-border-strong); background: var(--at-cr-bg-action); color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary { border-color: var(--at-border-strong); background: var(--at-panel); color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary:hover { background: var(--at-cr-bg-action-h); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost { background: transparent; border-color: transparent; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { background: var(--at-cr-bg-ghost-h); color: var(--at-text); }
@@ -429,3 +429,6 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { ba
   html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+
+
