@@ -38,6 +38,12 @@ html.admin-mode {
   --at-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.2);
   --at-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
   --at-shadow-glow: 0 0 20px rgba(212, 152, 47, 0.08);
+
+  /* Semantic tone text */
+  --at-danger-text: #f6b7bf;
+  --at-success-text: #b9ebc6;
+  --at-info-text: #b7d8f3;
+  --at-warning-text: #f5d4a0;
 }
 
 
@@ -46,18 +52,18 @@ html.admin-mode {
 html.admin-mode .admin-mobile-header,
 html.admin-mode .admin-desktop-header,
 html.admin-mode .admin-bottom-nav {
-  background: var(--at-surface) !important;
-  border-color: var(--at-border) !important;
+  background: var(--at-surface);
+  border-color: var(--at-border);
 }
 
 /* ═══ SIDEBAR PREMIUM — Glass + Gradient ═══ */
 html.admin-mode .admin-sidebar,
 html.admin-mode .admin-mobile-sidebar {
-  background: var(--at-glass-bg) !important;
+  background: var(--at-glass-bg);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border-color: var(--at-glass-border) !important;
-  border-right: 1px solid var(--at-glass-border) !important;
+  border-color: var(--at-glass-border);
+  border-right: 1px solid var(--at-glass-border);
 }
 
 /* ═══ UNIFIED CARDS — glass treatment ═══ */
@@ -71,8 +77,8 @@ html.admin-mode .admin-main-shell > .card {
 
 /* admin-card-glass — used across all admin pages for glass morphism cards */
 html.admin-mode .admin-card-glass {
-  background: var(--at-glass-bg) !important;
-  border-color: var(--at-glass-border) !important;
+  background: var(--at-glass-bg);
+  border-color: var(--at-glass-border);
   box-shadow: var(--at-shadow-sm);
   backdrop-filter: blur(8px) saturate(1.2);
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
@@ -80,7 +86,7 @@ html.admin-mode .admin-card-glass {
 }
 html.admin-mode .admin-card-glass:hover {
   box-shadow: var(--at-shadow-md);
-  border-color: var(--at-border-strong) !important;
+  border-color: var(--at-border-strong);
 }
 
 /* ─── Inputs ─────────────────────────────────────────────────────────── */
@@ -108,50 +114,50 @@ html.admin-mode .admin-main-shell :is(button, [role='button']) {
 
 /* ═══ PIPELINE STATUS COLORS ═══ */
 html.admin-mode .admin-main-shell .admin-leads-tone--new {
-  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-info) !important;
+  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%);
+  border-color: var(--at-info);
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
-  background: color-mix(in oklab, var(--at-contacted) 25%, var(--at-panel) 75%) !important;
-  border-color: var(--at-contacted) !important;
+  background: color-mix(in oklab, var(--at-contacted) 25%, var(--at-panel) 75%);
+  border-color: var(--at-contacted);
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--quote {
-  background: color-mix(in oklab, var(--at-quote) 25%, var(--at-panel) 75%) !important;
-  border-color: var(--at-quote) !important;
+  background: color-mix(in oklab, var(--at-quote) 25%, var(--at-panel) 75%);
+  border-color: var(--at-quote);
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
-  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-warning) !important;
+  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%);
+  border-color: var(--at-warning);
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--won {
-  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-success) !important;
+  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%);
+  border-color: var(--at-success);
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--lost {
-  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-danger) !important;
+  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%);
+  border-color: var(--at-danger);
 }
 
 /* ═══ BOOKINGS KPI COLORS ═══ */
 html.admin-mode .admin-main-shell .admin-bookings-stat--total {
-  background: var(--at-panel) !important;
-  border-color: var(--at-border-strong) !important;
+  background: var(--at-panel);
+  border-color: var(--at-border-strong);
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--pending {
-  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-warning) !important;
+  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%);
+  border-color: var(--at-warning);
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--confirmed {
-  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-info) !important;
+  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%);
+  border-color: var(--at-info);
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--completed {
-  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-success) !important;
+  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%);
+  border-color: var(--at-success);
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
-  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%) !important;
-  border-color: var(--at-danger) !important;
+  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%);
+  border-color: var(--at-danger);
 }
 
 /* ═══ TOOLTIP ═══ */
@@ -290,23 +296,23 @@ html.admin-mode .admin-drag-inserted {
 
 /* ─── Semantic tone utilities ───────────────────────────────────────────── */
 html.admin-mode .admin-tone-soft-danger {
-  background: color-mix(in oklab, var(--at-danger) 35%, transparent) !important;
-  color: #f6b7bf !important;
+  background: color-mix(in oklab, var(--at-danger) 35%, transparent);
+  color: var(--at-danger-text);
 }
 
 html.admin-mode .admin-tone-soft-success {
-  background: color-mix(in oklab, var(--at-success) 35%, transparent) !important;
-  color: #b9ebc6 !important;
+  background: color-mix(in oklab, var(--at-success) 35%, transparent);
+  color: var(--at-success-text);
 }
 
 html.admin-mode .admin-tone-soft-info {
-  background: color-mix(in oklab, var(--at-info) 35%, transparent) !important;
-  color: #b7d8f3 !important;
+  background: color-mix(in oklab, var(--at-info) 35%, transparent);
+  color: var(--at-info-text);
 }
 
 html.admin-mode .admin-tone-soft-warning {
-  background: color-mix(in oklab, var(--at-warning) 30%, transparent) !important;
-  color: #f5d4a0 !important;
+  background: color-mix(in oklab, var(--at-warning) 30%, transparent);
+  color: var(--at-warning-text);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
