@@ -1,5 +1,96 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-20 sessió 11 — Admin UX overhaul, delete modals, Google reviews, CSS unificació
+
+### DATABASE_URL fix (producció)
+
+**Per què**: Tot l'admin donava Error 500. La variable `DATABASE_URL` a Railway apuntava a un Supabase mort. L'usuari la va canviar manualment al dashboard de Railway.
+
+### DNI field a leads
+
+**Per què**: L'usuari necessita identificar clients per DNI/NIF/CIF, no només per nom/email.
+
+**Canvis**:
+- `prisma/schema.prisma`: Afegit `dni String?` al model Lead
+- `prisma/migrations/20260507090000_add_lead_dni/migration.sql`: `ALTER TABLE "leads" ADD COLUMN "dni" TEXT`
+- Serveis: `leadAdminService.ts` (search per DNI), `leadRouteService.ts` (select + update), `leads/pipeline.ts` (select)
+- APIs: `leads/route.ts` i `leads/[id]/route.ts` — zod schema amb `dni`
+- UI: `LeadProfileEditor.tsx` (camp amb auto-uppercase), `intake/page.tsx` (camp separat)
+
+### Protecció delete leads (doble factor)
+
+**Per què**: L'usuari vol evitar esborrar leads accidentalment. Requereix posar a LOST abans de poder eliminar.
+
+**Canvis**:
+- `leadRouteService.ts`: Retorna 400 si `status !== 'LOST'`
+- `LeadProfileEditor.tsx`: Botó disabled si no és LOST, text "Primer marca com a Perdut"
+- `LeadActions.tsx`: Botó disabled amb tooltip explicatiu
+- Tests actualitzats a `leadRouteService.test.ts` amb nou test "rebutja eliminar lead que no és LOST"
+
+### Codi client CLI-XXXX visible
+
+**Per què**: L'usuari vol poder identificar ràpidament clients per codi.
+
+**Canvis**:
+- `customer-hub/dto.ts`, `customer-hub/data.ts`, `customer-hub/fetchCustomerHub.ts`: Afegit `customerNumber` al DTO
+- `clientes/page.tsx`: Mostra `CLI-0001` a llistes (mòbil + desktop)
+- `CustomerHeader.tsx`: Mostra `CLI-XXXX` davant del nom
+
+### Auto-cleanup leads (cron)
+
+**Per què**: "No vull que s'acumulin" — leads amb data passada han de marcar-se LOST, i LOST vells (>90d) s'han d'eliminar.
+
+**Fitxers nous**:
+- `lib/services/leadCleanupService.ts` — Auto-LOST (eventDate passat) + Auto-DELETE (LOST >90d sense booking, cascade transaction)
+- `app/api/cron/lead-cleanup/route.ts` — Endpoint cron amb Bearer auth + saveCronRunStatus
+- `__tests__/lib/services/leadCleanupService.test.ts` — 3 tests
+
+### CSS "ma de pintura" — admin-theme.css expandit
+
+**Per què**: El tema visual no arribava a totes les pàgines. `admin-card-glass` s'usava a 112 llocs sense definició CSS.
+
+**Canvis**:
+- `admin-theme.css`: Definit `.admin-card-glass` (glass-bg, backdrop-filter, shadow, hover)
+- `globals.css`: ~50 colors hardcoded (#141b2b, #355074, etc.) reemplaçats per `var(--at-*)`. Eliminats overrides `!important` sobre `.rounded-xl`, `.text-cyan-300` etc. que creaven "capes extra"
+
+### Delete amb ConfirmDialog modal (3 entitats)
+
+**Per què**: L'usuari vol poder esborrar tot amb doble confirmació segura. El patró anterior (doble-clic amb timeout 3s) era poc visible.
+
+**Canvis**:
+- **Leads** (`LeadProfileEditor.tsx`): Migrat de doble-clic a `useConfirmDialog()` modal
+- **Bookings** (`BookingActions.tsx`): Migrat de doble-clic a `useConfirmDialog()` modal
+- **Clients** (`CustomerHeader.tsx`): Botó NOU d'eliminar amb ConfirmDialog. Si té reserves/pressupostos → anonimitza (GDPR). Si no → elimina permanent.
+
+### Calendari compacte
+
+**Per què**: "El calendari més petit, que capigi a la mateixa pàgina"
+
+**Canvi**: `CalendarMonthClient.tsx` — cel·les de `h-[132px] sm:h-[152px] md:h-[168px]` → `h-[100px] sm:h-[110px] md:h-[120px]`, padding reduït
+
+### Dashboard: Google Reviews en comptes de testimonials interns
+
+**Per què**: "Les ressenyes, recordo que només tenim les de Google" — el dashboard mostrava 5.0 ⭐ 0 ressenyes perquè mirava CustomerTestimonial (buit) en comptes de Google reviews cached.
+
+**Canvis**:
+- `dashboard-data.ts`: Nova query a `stats.googleRating` i `stats.googleReviewCount` (Settings table). Variable `testimonialsApproved` ara ve del count de Google. Rating amb fallback: Google → internal → '—'
+
+### Umami eliminat
+
+**Per què**: L'usuari no vol Umami analytics.
+
+**Canvi**: `.env.example` — eliminades 5 variables Umami + comentaris
+
+### Estat final sessió
+- **0 errors TypeScript**
+- **1784 tests** (140 fitxers) — tots verd
+- **Commits**: `d3b721e` pushed a main
+- **Migracions pendents**: `prisma migrate deploy` (add_lead_dni + les 3 de sessió anterior)
+- **Pendent**: Configurar cron `lead-cleanup` a Railway (URL + CRON_SECRET)
+- **Pendent**: OPENWEATHERMAP_API_KEY per activar widget temps
+
+---
+
 ## 2026-03-19 sessió 10 — Hero media admin + copy emocional + fixes
 
 ### Hero media admin complet (4 fitxers nous)

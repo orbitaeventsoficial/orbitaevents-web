@@ -118,7 +118,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 ### Estructura de tests
 
 ```
-__tests__/lib/services/     ← Unit tests (Vitest, ~1759 tests, 138 fitxers)
+__tests__/lib/services/     ← Unit tests (Vitest, ~1784 tests, 140 fitxers)
 e2e/                        ← E2E tests (Playwright, 9 specs, ~80 tests)
 vitest.config.ts            ← Config Vitest amb aliases
 playwright.config.ts        ← Config Playwright amb webServer
@@ -314,6 +314,41 @@ playwright.config.ts        ← Config Playwright amb webServer
 
 - **Vista diària**: `?view=day` — CalendarDayClient amb timeline per hores
 - **Toggle**: Botons Mes/Setmana/Dia a les vistes
+- **Cel·les compactes**: `h-[100px] sm:h-[110px] md:h-[120px]` — dissenyat per cabre en una pantalla
+
+### Delete (patró estàndard)
+
+- **ConfirmDialog**: SEMPRE usar `useConfirmDialog()` per a deletes. Mai `window.confirm()`, mai doble-clic.
+  ```tsx
+  const { confirm, dialogProps } = useConfirmDialog();
+  const ok = await confirm({ title, message, variant: 'danger', confirmLabel: 'Eliminar' });
+  // + <ConfirmDialog {...dialogProps} /> al JSX
+  ```
+- **Leads**: Requereix estat LOST abans d'eliminar. Backend valida a `leadRouteService.ts`
+- **Bookings**: Només PENDING o CANCELLED. Backend valida a `bookingRouteService.ts`
+- **Clients**: Smart GDPR — si té reserves/pressupostos → anonimitza. Si no → elimina. Servei: `customerRouteService.ts`
+
+### Lead lifecycle
+
+- **Estats oberts**: NEW → CONTACTED → QUOTE_SENT → NEGOTIATING → WON/LOST
+- **Auto-LOST**: Cron `lead-cleanup` marca leads amb eventDate passat com LOST
+- **Auto-DELETE**: Cron `lead-cleanup` elimina LOST >90 dies sense booking (cascade: notes, activities, tasks, documents)
+- **Cron endpoint**: `/api/cron/lead-cleanup` — Bearer auth amb CRON_SECRET
+- **DNI**: Camp `dni` al model Lead. Auto-uppercase. Cercable a pipeline
+
+### Google Reviews (dashboard)
+
+- **Cache**: `settings` table amb claus `stats.googleRating`, `stats.googleReviewCount`, `cache.googleReviews`
+- **Dashboard**: Mostra rating i count de Google (no de CustomerTestimonial interna)
+- **Sync**: Via SerpAPI o Google Business OAuth. Manual a `/admin/google-reviews` ("Refrescar ressenyes")
+- **Servei**: `googleReviewsCacheService.ts` — `readGoogleReviewsCache()`, `writeGoogleReviewsCache()`
+
+### Weather Widget
+
+- **Servei**: `lib/services/weatherService.ts` — OpenWeatherMap free tier, 5-day forecast
+- **Cache**: 1h en memòria
+- **Activar**: Cal `OPENWEATHERMAP_API_KEY` a env vars. Sense key, widget no es mostra (graceful fallback)
+- **Mostra**: Previsions per reserves CONFIRMED/PREPARING en els pròxims 3 dies
 
 ### Filtres
 
@@ -344,7 +379,7 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - **SWC minify** + source maps desactivats en producció
 
 ### Testing (complet)
-- **1592 unit tests** (132 fitxers) — 100% serveis coberts
+- **1784 unit tests** (140 fitxers) — 100% serveis coberts
 - **9 E2E specs** (~80 tests) — admin, públic, APIs, SEO, contacte, serveis
 - **CI** amb coverage report i artifact upload
 
@@ -354,3 +389,4 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - **PWA admin**: Manifest + service worker
 - **Sentry**: Integrat a next.config.mjs
 - **Analytics**: GA4 amb WebVitalsReporter, ConsentScripts
+- **Crons**: `lead-cleanup` (auto-LOST + auto-DELETE), emails automation, reviews sync — tots amb Bearer auth CRON_SECRET
