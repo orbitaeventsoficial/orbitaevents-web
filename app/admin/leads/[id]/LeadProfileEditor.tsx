@@ -6,6 +6,8 @@ import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../components/adminHelpGlossary';
 import { LEAD_STATUS_LABELS as STATUS_LABELS, PRIORITY_LABELS, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import { useConfirmDialog } from '../../components/ConfirmDialog';
 
 type LeadProfile = {
   id: string;
@@ -64,14 +66,8 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!confirmingDelete) return;
-    const t = setTimeout(() => setConfirmingDelete(false), 3000);
-    return () => clearTimeout(t);
-  }, [confirmingDelete]);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const updateField = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -79,8 +75,13 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
 
   const handleDeleteLead = async () => {
     if (deleting) return;
-    if (!confirmingDelete) { setConfirmingDelete(true); return; }
-    setConfirmingDelete(false);
+    const confirmed = await confirm({
+      title: 'Eliminar entrada',
+      message: `Segur que vols eliminar "${lead.name}"? Totes les notes, activitats, tasques i documents associats s'eliminaran permanentment.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+    });
+    if (!confirmed) return;
     setDeleting(true);
     setStatus(null);
     try {
@@ -89,7 +90,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'No s’ha pogut eliminar el registre');
+        throw new Error(data.error || 'No s\'ha pogut eliminar el registre');
       }
       router.push('/admin/leads');
       router.refresh();
@@ -161,10 +162,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             type="button"
             onClick={handleDeleteLead}
             disabled={deleting || saving || form.status !== 'LOST'}
-            className={`rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 admin-tone-soft-danger' : ''}`}
+            className="rounded-xl border border-rose-500/30 px-4 py-2 text-sm font-semibold disabled:opacity-40 text-rose-300 hover:bg-rose-500/10"
             title={form.status !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Eliminar registre'}
           >
-            {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : form.status !== 'LOST' ? 'Primer marca com a Perdut' : 'Eliminar registre'}
+            {deleting ? 'Eliminant...' : form.status !== 'LOST' ? 'Primer marca com a Perdut' : 'Eliminar registre'}
           </button>
           <button
             type="button"
@@ -416,6 +417,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           {status}
         </p>
       )}
+      <ConfirmDialog {...dialogProps} />
     </section>
   );
 }

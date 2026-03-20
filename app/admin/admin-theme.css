@@ -69,6 +69,20 @@ html.admin-mode .admin-main-shell > .card {
   border-color: var(--at-border);
 }
 
+/* admin-card-glass — used across all admin pages for glass morphism cards */
+html.admin-mode .admin-card-glass {
+  background: var(--at-glass-bg) !important;
+  border-color: var(--at-glass-border) !important;
+  box-shadow: var(--at-shadow-sm);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+html.admin-mode .admin-card-glass:hover {
+  box-shadow: var(--at-shadow-md);
+  border-color: var(--at-border-strong) !important;
+}
+
 /* ─── Inputs ─────────────────────────────────────────────────────────── */
 html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']) {
   background: var(--at-input) !important;

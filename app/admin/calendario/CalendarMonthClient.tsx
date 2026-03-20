@@ -445,7 +445,7 @@ export default function CalendarMonthClient() {
                 setDraggingBookingId(null);
               }}
               className={[
-                'admin-calendar-cell flex h-[132px] sm:h-[152px] md:h-[168px] flex-col overflow-hidden p-1.5 sm:p-2 text-left text-sm transition-all',
+                'admin-calendar-cell flex h-[100px] sm:h-[110px] md:h-[120px] flex-col overflow-hidden p-1 sm:p-1.5 text-left text-sm transition-all',
                 bgClass,
                 hoverClass,
                 !cell.inCurrentMonth ? 'opacity-30' : '',

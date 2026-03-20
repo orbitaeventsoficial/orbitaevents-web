@@ -1152,29 +1152,15 @@ textarea:focus-visible {
    ========================================================================== */
 html.admin-mode .admin-shell .admin-control-room > section,
 html.admin-mode .admin-shell .admin-control-room > div.rounded-2xl {
-  border-color: #355074 !important;
-  background: #141b2b !important;
+  border-color: var(--at-border, #355074) !important;
+  background: var(--at-surface, #141b2b) !important;
 }
 
 html.admin-mode .admin-shell .admin-control-room > * + * {
   margin-top: 0.75rem !important;
 }
 
-html.admin-mode .admin-shell .admin-control-room .rounded-xl {
-  border-color: #3f5f88 !important;
-}
-
-html.admin-mode .admin-shell .admin-control-room .text-cyan-300 {
-  color: #67d6ff !important;
-}
-
-html.admin-mode .admin-shell .admin-control-room .text-amber-300 {
-  color: #ffcf6b !important;
-}
-
-html.admin-mode .admin-shell .admin-control-room .text-emerald-300 {
-  color: #64e8b0 !important;
-}
+/* Color overrides removed — Tailwind classes + admin-theme tokens are sufficient */
 
 html.admin-mode .admin-shell .admin-control-room {
   display: block;
@@ -1185,8 +1171,8 @@ html.admin-mode .admin-shell .admin-control-room > * + * {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-header {
-  border: 1px solid #355074;
-  background: #141b2b;
+  border: 1px solid var(--at-border);
+  background: var(--at-surface);
   border-radius: 0.75rem;
   padding: 0.75rem;
   display: flex;
@@ -1201,13 +1187,13 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-header-top {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-title {
-  color: #f3f7ff;
+  color: var(--at-text);
   font-size: 1.1rem;
   font-weight: 700;
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-subtitle {
-  color: #a8bbd5;
+  color: var(--at-muted);
   font-size: 0.75rem;
 }
 
@@ -1228,9 +1214,9 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-links {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link {
-  border: 1px solid #355074;
-  background: #1a2a42;
-  color: #d5e1f2;
+  border: 1px solid var(--at-border);
+  background: var(--at-panel);
+  color: var(--at-text);
   border-radius: 0.75rem;
   padding: 0.625rem 0.75rem;
   font-size: 0.75rem;
@@ -1238,20 +1224,20 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link:hover {
-  border-color: #5bc4f2;
-  color: #dff6ff;
+  border-color: var(--at-info);
+  color: var(--at-text);
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   border-radius: 0.75rem;
   padding: 0.75rem;
 }
 
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--pilot { background: #142b24; border-color: #2c6d57; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--checklist { background: #142536; border-color: #2a668a; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--command { background: #241936; border-color: #5f4a86; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--radar { background: #141b2b; border-color: #355074; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--pilot { background: color-mix(in oklab, var(--at-success) 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, var(--at-success) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--checklist { background: color-mix(in oklab, var(--at-info) 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, var(--at-info) 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--command { background: color-mix(in oklab, #8b5cf6 12%, var(--at-surface) 88%); border-color: color-mix(in oklab, #8b5cf6 40%, var(--at-border) 60%); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--radar { background: var(--at-surface); border-color: var(--at-border); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel-head,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel-row {
@@ -1267,7 +1253,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-panel-head-block {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker {
-  color: #a8bbd5;
+  color: var(--at-muted);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1275,22 +1261,22 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker--pilot { color: #73e0b9; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker--cyan { color: #67d6ff; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker--cyan { color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-kicker--violet { color: #c6a7ff; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-h2 {
-  color: #f3f7ff;
+  color: var(--at-text);
   font-size: 1rem;
   font-weight: 700;
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-small {
-  color: #d5e1f2;
+  color: var(--at-text);
   font-size: 12px;
   margin-top: 0.25rem;
 }
 
-html.admin-mode .admin-shell .admin-control-room .admin-cr-small--muted { color: #a8bbd5; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-small--muted { color: var(--at-muted); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-pill,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-chip {
@@ -1318,7 +1304,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-grid-3 { grid-templat
 html.admin-mode .admin-shell .admin-control-room .admin-cr-grid-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
@@ -1326,15 +1312,15 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-step--rose { border-c
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step--amber { border-color: #c89d51; background: rgba(200, 157, 81, 0.15); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step--sky { border-color: #5a98c0; background: rgba(90, 152, 192, 0.15); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-step--emerald { border-color: #3f8a68; background: rgba(63, 138, 104, 0.15); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step-kicker { font-size: 11px; font-weight: 700; color: #a8bbd5; text-transform: uppercase; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step-title { font-size: 14px; font-weight: 700; color: #f3f7ff; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step-desc { font-size: 12px; color: #d5e1f2; margin-top: 0.25rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-step-cta { margin-top: 0.5rem; display: inline-flex; font-size: 12px; font-weight: 700; color: #f3f7ff; text-decoration: underline dotted; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step-kicker { font-size: 11px; font-weight: 700; color: var(--at-muted); text-transform: uppercase; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step-title { font-size: 14px; font-weight: 700; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step-desc { font-size: 12px; color: var(--at-text); margin-top: 0.25rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step-cta { margin-top: 0.5rem; display: inline-flex; font-size: 12px; font-weight: 700; color: var(--at-text); text-decoration: underline dotted; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-action-link {
   border: 1px solid #4aa6d4;
   background: rgba(74, 166, 212, 0.16);
-  color: #dff6ff;
+  color: var(--at-text);
   border-radius: 0.625rem;
   padding: 0.45rem 0.75rem;
   font-size: 12px;
@@ -1342,55 +1328,55 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-action-link {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   background: #172135;
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--amber { border-color: #c89d51; background: rgba(200, 157, 81, 0.12); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-box--emerald { border-color: #3f8a68; background: rgba(63, 138, 104, 0.12); }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-label { font-size: 12px; color: #a8bbd5; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value { font-size: 1.4rem; font-weight: 700; color: #f3f7ff; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--amber { color: #ffcf6b; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--emerald { color: #64e8b0; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-label { font-size: 12px; color: var(--at-muted); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--amber { color: var(--at-brand-vivid); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-stat-value--emerald { color: var(--at-success); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-command-card,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-info-card {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   background: #172135;
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-command-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-command-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #d5e1f2; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-link-inline { font-size: 11px; color: #67d6ff; text-decoration: underline; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-command-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-link-inline { font-size: 11px; color: var(--at-info); text-decoration: underline; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list { display: grid; gap: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border: 1px solid #355074; background: #111a2a; border-radius: 0.5rem; padding: 0.45rem 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row--link:hover { border-color: #5bc4f2; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border: 1px solid var(--at-border); background: #111a2a; border-radius: 0.5rem; padding: 0.45rem 0.5rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row--link:hover { border-color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list-row--timeline { align-items: flex-start; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-list-content { min-width: 0; flex: 1; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-list-link { display: block; color: #f3f7ff; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-list-link:hover { color: #67d6ff; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-list-link { display: block; color: var(--at-text); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-list-link:hover { color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-meta { color: #8ea6c6; font-size: 11px; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-empty-text { color: #8ea6c6; font-size: 12px; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-truncate { min-width: 0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   background: #172135;
   border-radius: 0.625rem;
   padding: 0.625rem;
 }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--rose:hover { border-color: #c15f79; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--amber:hover { border-color: #c89d51; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--cyan:hover { border-color: #5bc4f2; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--cyan:hover { border-color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-value { font-size: 1.25rem; font-weight: 700; margin-top: 0.15rem; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-rose { color: #ff9bb6; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-amber { color: #ffcf6b; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-cyan { color: #67d6ff; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-emerald { color: #64e8b0; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-amber { color: var(--at-brand-vivid); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-cyan { color: var(--at-info); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-emerald { color: var(--at-success); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-banner {
   border: 1px solid #b07d2d;
@@ -1401,8 +1387,8 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-banner {
   flex-direction: column;
   gap: 0.5rem;
 }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-label { color: #d5e1f2; font-size: 12px; font-weight: 600; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-value { color: #f3f7ff; font-size: 1rem; font-weight: 700; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-label { color: var(--at-text); font-size: 12px; font-weight: 600; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-value { color: var(--at-text); font-size: 1rem; font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-banner-action { align-self: flex-start; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-grid { display: grid; gap: 0.75rem; }
@@ -1411,8 +1397,8 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--error { border
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--warning { border-color: #c89d51; background: rgba(200, 157, 81, 0.16); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--info { border-color: #5a98c0; background: rgba(90, 152, 192, 0.16); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-title { font-size: 14px; font-weight: 700; color: #f3f7ff; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-desc { font-size: 12px; color: #d5e1f2; margin-top: 0.25rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-title { font-size: 14px; font-weight: 700; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert-desc { font-size: 12px; color: var(--at-text); margin-top: 0.25rem; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-info-grid,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-chart-grid,
@@ -1426,7 +1412,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-main-grid { grid-temp
 html.admin-mode .admin-shell .admin-control-room .admin-cr-main-grid-wide { grid-column: auto; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-grid { margin-top: 0.625rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-health-item { border: 1px solid #355074; background: #111a2a; border-radius: 0.5rem; padding: 0.35rem; text-align: center; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-health-item { border: 1px solid var(--at-border); background: #111a2a; border-radius: 0.5rem; padding: 0.35rem; text-align: center; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-label { font-size: 10px; color: #8ea6c6; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-health-value { font-size: 12px; font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-footnote { margin-top: 0.625rem; font-size: 10px; color: #8ea6c6; }
@@ -1443,7 +1429,7 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-divide-list > * + * {
 html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link { padding: 0.625rem 0.75rem; display: flex; align-items: center; gap: 0.625rem; transition: 120ms ease; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link:hover { background: rgba(36, 55, 84, 0.45); }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-box { width: 44px; height: 44px; border-radius: 0.625rem; border: 1px solid #4aa6d4; background: #1a3040; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-text { color: #f3f7ff; font-weight: 700; font-size: 0.95rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-text { color: var(--at-text); font-weight: 700; font-size: 0.95rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-chevron { width: 16px; height: 16px; color: #8ea6c6; flex-shrink: 0; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-empty-block { padding: 1rem; text-align: center; color: #8ea6c6; }
 
@@ -1452,14 +1438,14 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-desktop-only-inline {
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mobile-only-inline { display: inline; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-row-main { display: flex; align-items: center; gap: 0.625rem; min-width: 0; flex: 1; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-row-side { display: flex; align-items: center; gap: 0.5rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-round { width: 36px; height: 36px; border-radius: 9999px; background: #263245; border: 1px solid #465b79; color: #d5e1f2; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-avatar-round { width: 36px; height: 36px; border-radius: 9999px; background: #263245; border: 1px solid #465b79; color: var(--at-text); font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip { padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 10px; font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--new { background: rgba(90, 152, 192, 0.2); color: #9ed8ff; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--won { background: rgba(63, 138, 104, 0.2); color: #8ff0c8; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--default { background: rgba(142, 166, 198, 0.2); color: #d5e1f2; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--default { background: rgba(142, 166, 198, 0.2); color: var(--at-text); }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card {
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   border-radius: 0.75rem;
   padding: 0.625rem;
 }
@@ -1467,16 +1453,16 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--violet { b
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--amber { border-color: #b07d2d; background: #3a2a15; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--rose { border-color: #9a4b62; background: #3a1f29; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--cyan { border-color: #4aa6d4; background: #1a3040; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-value { font-size: 1.25rem; color: #f3f7ff; font-weight: 700; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-audit { border: 1px solid #355074; border-radius: 0.75rem; background: #141b2b; overflow: hidden; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-value { font-size: 1.25rem; color: var(--at-text); font-weight: 700; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-audit { border: 1px solid var(--at-border); border-radius: 0.75rem; background: var(--at-surface); overflow: hidden; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-head { padding: 0.625rem 0.75rem; border-bottom: 1px solid #2f4463; background: #1d2940; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-row { padding: 0.625rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 12px; color: #d5e1f2; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-row { display: flex; align-items: flex-start; gap: 0.625rem; border: 1px solid #355074; background: #111a2a; border-radius: 0.625rem; padding: 0.5rem 0.625rem; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-icon { width: 22px; height: 22px; border-radius: 9999px; border: 1px solid #3f5f88; background: #1d2940; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-row { padding: 0.625rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 12px; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-row { display: flex; align-items: flex-start; gap: 0.625rem; border: 1px solid var(--at-border); background: #111a2a; border-radius: 0.625rem; padding: 0.5rem 0.625rem; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-activity-icon { width: 22px; height: 22px; border-radius: 9999px; border: 1px solid var(--at-border-strong); background: #1d2940; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
 
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
   border-radius: 0.875rem;
-  border: 1px solid #355074;
+  border: 1px solid var(--at-border);
   background: #121826;
   padding: 0.75rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
@@ -1490,29 +1476,29 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-head {
   margin-bottom: 0.625rem;
 }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-copy { min-width: 0; flex: 1; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-label { font-size: 12px; color: #a8bbd5; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-value { margin-top: 0.2rem; font-size: 1.45rem; line-height: 1.2; color: #f3f7ff; font-weight: 700; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-label { font-size: 12px; color: var(--at-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-value { margin-top: 0.2rem; font-size: 1.45rem; line-height: 1.2; color: var(--at-text); font-weight: 700; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-icon { flex-shrink: 0; margin-left: 0.375rem; opacity: 0.9; font-size: 1.2rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-dot { width: 3rem; height: 6px; border-radius: 9999px; margin-bottom: 0.5rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change--up { color: #64e8b0; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change--up { color: var(--at-success); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change--down { color: #ff9bb6; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change--neutral { color: #a8bbd5; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-change--neutral { color: var(--at-muted); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan { border-color: #3f7c99; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan:hover { border-color: #67d6ff; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan .admin-ui-metric-icon { color: #67d6ff; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan:hover { border-color: var(--at-info); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan .admin-ui-metric-icon { color: var(--at-info); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan .admin-ui-metric-dot { background: #67d6ff; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald { border-color: #3f8a68; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald:hover { border-color: #64e8b0; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald .admin-ui-metric-icon { color: #64e8b0; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald:hover { border-color: var(--at-success); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald .admin-ui-metric-icon { color: var(--at-success); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald .admin-ui-metric-dot { background: #64e8b0; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose { border-color: #9a4b62; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose:hover { border-color: #ff9bb6; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose .admin-ui-metric-icon { color: #ff9bb6; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose .admin-ui-metric-dot { background: #ff9bb6; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber { border-color: #b07d2d; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber:hover { border-color: #ffcf6b; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber .admin-ui-metric-icon { color: #ffcf6b; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber:hover { border-color: var(--at-brand-vivid); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber .admin-ui-metric-icon { color: var(--at-brand-vivid); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber .admin-ui-metric-dot { background: #ffcf6b; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--purple { border-color: #6f5aa0; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--purple:hover { border-color: #c6a7ff; }
@@ -1523,11 +1509,11 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky:hove
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-icon { color: #8ecbff; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky .admin-ui-metric-dot { background: #8ecbff; }
 
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card { overflow: hidden; border-radius: 0.875rem; border: 1px solid #355074; background: #141b2b; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card { overflow: hidden; border-radius: 0.875rem; border: 1px solid var(--at-border); background: var(--at-surface); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; border-bottom: 1px solid #2f4463; background: #1a2437; padding: 0.75rem 1rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head-copy { min-width: 0; flex: 1; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { font-size: 14px; font-weight: 700; color: #f3f7ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card-subtitle { margin-top: 0.15rem; font-size: 11px; color: #a8bbd5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { font-size: 14px; font-weight: 700; color: var(--at-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-subtitle { margin-top: 0.15rem; font-size: 11px; color: var(--at-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head-action { flex-shrink: 0; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-body { padding: 1rem; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-body--none { padding: 0; }
@@ -1548,10 +1534,10 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--default { paddin
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--sm { padding: 0.375rem 0.625rem; font-size: 11px; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary { background: #ffcf6b; color: #1a2538; border-color: #ffd98d; }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary:hover { background: #ffde9f; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary { border-color: #3f5f88; background: #20324b; color: #f3f7ff; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary { border-color: var(--at-border-strong); background: #20324b; color: var(--at-text); }
 html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--secondary:hover { background: #2a3f5e; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost { background: transparent; border-color: transparent; color: #d5e1f2; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { background: #1e2f49; color: #f3f7ff; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost { background: transparent; border-color: transparent; color: var(--at-text); }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { background: #1e2f49; color: var(--at-text); }
 
 @media (min-width: 640px) {
   html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card { padding: 1rem; }

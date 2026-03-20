@@ -8,6 +8,8 @@ import { labelEstatClient } from '@/lib/customer-hub/labels';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useHubContext } from './CustomerHubClient';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import ConfirmDialog from '@/app/admin/components/ConfirmDialog';
+import { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { formatDate, formatNumber } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -122,6 +124,7 @@ export default function CustomerHeader({
   const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const id = data.customer.id;
   const status = data.customer.status;
@@ -134,6 +137,33 @@ export default function CustomerHeader({
     : 'mai contactat';
 
   const hasProtectedData = data.bookings.length > 0 || data.proposals.length > 0;
+
+  const deleteCustomer = useCallback(async () => {
+    const confirmed = await confirm({
+      title: 'Eliminar client',
+      message: hasProtectedData
+        ? `"${data.customer.name}" té reserves o pressupostos. S'anonimitzarà (les dades personals s'esborren, però es conserven registres financers). Segur?`
+        : `Segur que vols eliminar "${data.customer.name}" de forma permanent? Aquesta acció no es pot desfer.`,
+      variant: 'danger',
+      confirmLabel: hasProtectedData ? 'Anonimitzar' : 'Eliminar',
+    });
+    if (!confirmed) return;
+    setActionLoading('delete');
+    try {
+      const res = await fetchWithCsrf(`/api/admin/customers/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success(hasProtectedData ? 'Client anonimitzat' : 'Client eliminat');
+        router.push('/admin/clientes');
+      } else {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body.error || 'Error eliminant client');
+      }
+    } catch {
+      toast.error('Error de connexió');
+    } finally {
+      setActionLoading(null);
+    }
+  }, [confirm, hasProtectedData, data.customer.name, id, toast, router]);
 
   const stageOrder: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
   const currentStageIndex = stageOrder.indexOf(status);
@@ -164,7 +194,7 @@ export default function CustomerHeader({
       return {
         label: 'Revisar reserva',
         href: `/admin/bookings?customerId=${id}`,
-        description: 'Validar preparació d’equip, horari i logística.',
+        description: "Validar preparació d'equip, horari i logística.",
       };
     }
     if (status === 'POSTEVENT') {
@@ -345,6 +375,16 @@ export default function CustomerHeader({
               color="slate"
               icon="✉️"
             />
+            <button
+              type="button"
+              onClick={deleteCustomer}
+              disabled={actionLoading === 'delete'}
+              className="rounded-xl px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20"
+              title={hasProtectedData ? 'Anonimitzar client (té registres vinculats)' : 'Eliminar client'}
+            >
+              <span>🗑️</span>
+              <span className="hidden sm:inline">{actionLoading === 'delete' ? 'Eliminant...' : 'Eliminar'}</span>
+            </button>
           </div>
         </div>
 
@@ -471,6 +511,7 @@ export default function CustomerHeader({
           </select>
         </div>
       </div>
+      <ConfirmDialog {...dialogProps} />
     </header>
   );
 }

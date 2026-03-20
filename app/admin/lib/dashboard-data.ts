@@ -182,7 +182,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   const [
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
-    customersCount, testimonialsPending, testimonialsApproved,
+    customersCount, googleReviewStats, testimonialsPending,
     recentLeads, upcomingBookings, inventoryStats, avgRating, wonLeads,
     leadsRecent30, bookingsRecent30, postEventPending, cronSettings, dbHealthy,
     recentLeadsTimeline, recentBookingsTimeline, recentCustomerActivity, recentAdminLogs,
@@ -195,8 +195,17 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery('admin:dashboard:bookings:confirmed', () => prisma.booking.count({ where: { status: 'CONFIRMED' } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:bookings:month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.count({ where: { createdAt: { gte: startOfMonth } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:customers:count', () => prisma.customer.count(), CacheTTL.MEDIUM).catch(() => 0),
+    cachedQuery('admin:dashboard:google-reviews:stats', async () => {
+      const [ratingRow, countRow] = await Promise.all([
+        prisma.setting.findUnique({ where: { key: 'stats.googleRating' } }),
+        prisma.setting.findUnique({ where: { key: 'stats.googleReviewCount' } }),
+      ]);
+      return {
+        rating: ratingRow?.value ? parseFloat(ratingRow.value) : null,
+        count: countRow?.value ? parseInt(countRow.value, 10) : 0,
+      };
+    }, CacheTTL.SHORT).catch(() => ({ rating: null, count: 0 })),
     cachedQuery('admin:dashboard:testimonials:pending', () => prisma.customerTestimonial.count({ where: { isApproved: false } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery('admin:dashboard:testimonials:approved', () => prisma.customerTestimonial.count({ where: { isApproved: true } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:recent-leads:5', () => prisma.lead.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, eventType: true, status: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:upcoming-bookings:5', () => prisma.booking.findMany({ where: { eventDate: { gte: now }, status: 'CONFIRMED' }, take: 5, orderBy: { eventDate: 'asc' }, select: { id: true, clientName: true, eventDate: true, eventType: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:inventory:group-status', () => prisma.inventoryItem.groupBy({ by: ['status'], _count: true }), CacheTTL.SHORT).catch(() => []),
@@ -233,7 +242,14 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const inventoryMaintenance = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'MAINTENANCE')?._count || 0;
   const inventoryBroken = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'BROKEN')?._count || 0;
 
-  const rating = avgRating._avg.rating ? avgRating._avg.rating.toFixed(1) : '5.0';
+  // Preferim Google reviews; fallback a testimonials interns
+  const gStats = googleReviewStats as { rating: number | null; count: number };
+  const testimonialsApproved = gStats.count || 0;
+  const rating = gStats.rating
+    ? gStats.rating.toFixed(1)
+    : avgRating._avg.rating
+      ? avgRating._avg.rating.toFixed(1)
+      : '—';
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
 
   // Marge mitjà de reserves confirmades/completades
