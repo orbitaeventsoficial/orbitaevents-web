@@ -1,6 +1,5 @@
-/* Admin theme tokens and shell styling for the /admin experience. */
+/* Single admin theme layer: shared tokens plus the few utilities that still need dedicated styling. */
 
-/* ─── Variables ─────────────────────────────────────────────────────────── */
 html.admin-mode {
   --at-bg: #0f1218;
   --at-surface: #1a1f2b;
@@ -9,169 +8,62 @@ html.admin-mode {
   --at-input: #151a24;
 
   --at-border: #3a4560;
-  --at-border-strong: #506080;
+  --at-border-s: #506080;
+  --at-border-sub: #2a3040;
+  --at-glass-border: rgba(255, 255, 255, 0.12);
 
   --at-text: #f0f4f8;
   --at-muted: #a8b5c4;
   --at-subtle: #7889a0;
 
-  --at-brand: #e0a832;
-  --at-brand-soft: rgba(224, 168, 50, 0.18);
-  --at-brand-glow: rgba(224, 168, 50, 0.10);
-  --at-brand-vivid: #f0b840;
+  --at-gold: #e0a832;
+  --at-gold-glow: rgba(224, 168, 50, 0.25);
+  --at-gold-dim: rgba(224, 168, 50, 0.15);
+  --at-gold-text: #f0c050;
 
-  --at-info: #5a9ee0;
-  --at-success: #45b868;
-  --at-warning: #e09830;
-  --at-danger: #e05060;
+  --at-blue: #5a9ee0;
+  --at-blue-dim: rgba(90, 158, 224, 0.16);
+  --at-green: #45b868;
+  --at-green-dim: rgba(69, 184, 104, 0.16);
+  --at-orange: #e09830;
+  --at-orange-dim: rgba(224, 152, 48, 0.16);
+  --at-red: #e05060;
+  --at-red-dim: rgba(224, 80, 96, 0.16);
 
-  --at-contacted: #6a7588;
-  --at-quote: #a08050;
-
-  /* Glass tokens */
   --at-glass-bg: rgba(22, 28, 40, 0.85);
-  --at-glass-border: rgba(255, 255, 255, 0.12);
-  --at-glass-shine: rgba(255, 255, 255, 0.05);
-
-  /* Shadows */
-  --at-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.04);
-  --at-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.05);
-  --at-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.06);
-  --at-shadow-glow: 0 0 24px rgba(224, 168, 50, 0.12);
-
-  /* Semantic tone text */
-  --at-danger-text: #f6b7bf;
-  --at-success-text: #b9ebc6;
-  --at-info-text: #b7d8f3;
-  --at-warning-text: #f5d4a0;
+  --at-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --at-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --at-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-
-
-/* ─── Shell chrome + sidebar glass → globals.css (font única) ────────── */
-
-/* ═══ UNIFIED CARDS — glass treatment ═══ */
-/* Només apliquem fons fosc a classes genèriques .panel/.card,
-   NO a utilities Tailwind (rounded-xl etc.) que tenen colors propis. */
-html.admin-mode .admin-main-shell > .panel,
-html.admin-mode .admin-main-shell > .card {
-  background: var(--at-panel);
-  border-color: var(--at-border);
-}
-
-/* admin-card-glass — used across all admin pages for glass morphism cards */
 html.admin-mode .admin-layout-shell .admin-card-glass {
   background: var(--at-glass-bg);
   border-color: var(--at-glass-border);
   box-shadow: var(--at-shadow-sm);
-  backdrop-filter: blur(8px) saturate(1.2);
-  -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-html.admin-mode .admin-layout-shell .admin-card-glass:hover {
-  box-shadow: var(--at-shadow-md);
-  border-color: var(--at-border-strong);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
 }
 
-/* ─── Inputs ─────────────────────────────────────────────────────────── */
-html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']) {
-  background: var(--at-input) !important;
-  border-color: var(--at-border) !important;
-  color: var(--at-text) !important;
+html.admin-mode .admin-tone-soft-danger {
+  background: var(--at-red-dim);
+  color: var(--at-text);
 }
 
-html.admin-mode .admin-main-shell :is(input, select, textarea):focus {
-  border-color: var(--at-brand) !important;
-  box-shadow: 0 0 0 2px var(--at-brand-soft) !important;
+html.admin-mode .admin-tone-soft-success {
+  background: var(--at-green-dim);
+  color: var(--at-text);
 }
 
-html.admin-mode .admin-main-shell :is(input, textarea)::placeholder {
-  color: var(--at-subtle) !important;
+html.admin-mode .admin-tone-soft-info {
+  background: var(--at-blue-dim);
+  color: var(--at-text);
 }
 
-/* ─── Buttons ────────────────────────────────────────────────────────── */
-/* Els botons admin tenen els seus propis estils via classes CSS.
-   Només apliquem transició base, sense sobreescriure colors. */
-html.admin-mode .admin-main-shell :is(button, [role='button']) {
-  transition: all 0.2s ease-out;
+html.admin-mode .admin-tone-soft-warning {
+  background: var(--at-orange-dim);
+  color: var(--at-text);
 }
 
-/* ═══ PIPELINE STATUS COLORS ═══ */
-html.admin-mode .admin-main-shell .admin-leads-tone--new {
-  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%);
-  border-color: var(--at-info);
-}
-html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
-  background: color-mix(in oklab, var(--at-contacted) 25%, var(--at-panel) 75%);
-  border-color: var(--at-contacted);
-}
-html.admin-mode .admin-main-shell .admin-leads-tone--quote {
-  background: color-mix(in oklab, var(--at-quote) 25%, var(--at-panel) 75%);
-  border-color: var(--at-quote);
-}
-html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
-  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%);
-  border-color: var(--at-warning);
-}
-html.admin-mode .admin-main-shell .admin-leads-tone--won {
-  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%);
-  border-color: var(--at-success);
-}
-html.admin-mode .admin-main-shell .admin-leads-tone--lost {
-  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%);
-  border-color: var(--at-danger);
-}
-
-/* ═══ LEADS METRICS ═══ */
-html.admin-mode .admin-main-shell .admin-leads-metric--open {
-  background: color-mix(in oklab, var(--at-info) 18%, var(--at-panel) 82%);
-  border-color: var(--at-info);
-}
-html.admin-mode .admin-main-shell .admin-leads-metric--open .admin-leads-metric-value { color: var(--at-info); }
-
-html.admin-mode .admin-main-shell .admin-leads-metric--won {
-  background: color-mix(in oklab, var(--at-success) 18%, var(--at-panel) 82%);
-  border-color: var(--at-success);
-}
-html.admin-mode .admin-main-shell .admin-leads-metric--won .admin-leads-metric-value { color: var(--at-success); }
-
-html.admin-mode .admin-main-shell .admin-leads-metric--lost {
-  background: color-mix(in oklab, var(--at-danger) 18%, var(--at-panel) 82%);
-  border-color: var(--at-danger);
-}
-html.admin-mode .admin-main-shell .admin-leads-metric--lost .admin-leads-metric-value { color: var(--at-danger); }
-
-html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
-  background: color-mix(in oklab, var(--at-brand) 18%, var(--at-panel) 82%);
-  border-color: var(--at-brand);
-}
-html.admin-mode .admin-main-shell .admin-leads-metric--winrate .admin-leads-metric-value { color: var(--at-brand-vivid); }
-
-html.admin-mode .admin-main-shell .admin-leads-metric-label { color: var(--at-muted); }
-
-/* ═══ BOOKINGS KPI COLORS ═══ */
-html.admin-mode .admin-main-shell .admin-bookings-stat--total {
-  background: var(--at-panel);
-  border-color: var(--at-border-strong);
-}
-html.admin-mode .admin-main-shell .admin-bookings-stat--pending {
-  background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%);
-  border-color: var(--at-warning);
-}
-html.admin-mode .admin-main-shell .admin-bookings-stat--confirmed {
-  background: color-mix(in oklab, var(--at-info) 24%, var(--at-panel) 76%);
-  border-color: var(--at-info);
-}
-html.admin-mode .admin-main-shell .admin-bookings-stat--completed {
-  background: color-mix(in oklab, var(--at-success) 24%, var(--at-panel) 76%);
-  border-color: var(--at-success);
-}
-html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
-  background: color-mix(in oklab, var(--at-danger) 24%, var(--at-panel) 76%);
-  border-color: var(--at-danger);
-}
-
-/* ═══ TOOLTIP ═══ */
 html.admin-mode .admin-tooltip-wrap {
   position: relative;
   display: inline-flex;
@@ -180,19 +72,19 @@ html.admin-mode .admin-tooltip-wrap {
 html.admin-mode .admin-tooltip-bubble {
   position: absolute;
   z-index: 50;
-  padding: 0.375rem 0.625rem;
+  padding: 0.375rem 0.75rem;
   font-size: 0.75rem;
   line-height: 1.35;
   white-space: nowrap;
   color: var(--at-text);
   background: var(--at-raised);
-  border: 1px solid var(--at-border-strong);
+  border: 1px solid var(--at-border-s);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--at-shadow-md);
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px);
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 html.admin-mode .admin-tooltip-wrap:hover .admin-tooltip-bubble,
@@ -223,285 +115,61 @@ html.admin-mode .admin-tooltip-wrap:focus-within .admin-tooltip-bubble--bottom {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ═══ PREFERS-REDUCED-MOTION ═══ */
-@media (prefers-reduced-motion: reduce) {
-  html.admin-mode .admin-stagger-item {
-    opacity: 1;
-    transform: none;
-    animation: none;
-  }
-  html.admin-mode .admin-progress-animated {
-    animation: none;
-    transform: scaleX(1);
-  }
-  html.admin-mode .admin-radial-ring {
-    animation: none;
-  }
-  html.admin-mode .admin-glow-pulse {
-    animation: none;
-  }
-  html.admin-mode .admin-ui-metric-card:hover,
-  html.admin-mode .admin-main-shell .admin-cr-radar-card:hover,
-  html.admin-mode .admin-main-shell .admin-cr-step:hover,
-  html.admin-mode .admin-main-shell .admin-cr-mini-card:hover {
-    transform: none;
-  }
-}
-
-/* ─── Drag & Drop global ──────────────────────────────────────────────── */
-
-/* Placeholder: silueta lluminosa del lloc on anirà l'element */
 html.admin-mode .admin-drag-placeholder {
   position: relative;
-  border: 2px dashed var(--at-brand);
-  border-radius: 12px;
-  background: var(--at-brand-glow);
-  box-shadow: 0 0 16px var(--at-brand-glow), inset 0 0 12px var(--at-brand-glow);
-  transition: height 0.2s ease, opacity 0.2s ease, margin 0.15s ease;
+  border: 2px dashed var(--at-gold);
+  border-radius: 1rem;
+  background: var(--at-gold-dim);
+  box-shadow: 0 0 16px var(--at-gold-glow), inset 0 0 12px var(--at-gold-glow);
+  transition: height 150ms ease, opacity 150ms ease, margin 150ms ease;
   opacity: 0.7;
   pointer-events: none;
 }
 
-/* Element arrossegat: lleugerament transparent amb glow */
-html.admin-mode [data-dragging="true"] {
-  opacity: 0.4;
+html.admin-mode [data-dragging='true'] {
+  opacity: 0.35;
   transform: scale(0.97);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
-/* Zona receptora activa */
 html.admin-mode .admin-drop-active {
-  background: var(--at-brand-glow);
-  border-color: var(--at-brand);
-  box-shadow: inset 0 0 20px var(--at-brand-glow);
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--at-gold-dim);
+  border-color: var(--at-gold);
+  box-shadow: inset 0 0 20px var(--at-gold-glow);
 }
 
-/* Transició suau dels elements quan es desplacen */
 html.admin-mode .admin-drag-item {
-  transition: transform 0.2s ease, margin 0.2s ease;
+  transition: transform 150ms ease, margin 150ms ease;
 }
 
-/* Animació d'entrada quan s'insereix */
 @keyframes admin-drag-insert {
   from { opacity: 0; transform: translateY(-8px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
 html.admin-mode .admin-drag-inserted {
-  animation: admin-drag-insert 0.25s ease forwards;
+  animation: admin-drag-insert 250ms ease forwards;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html.admin-mode .admin-drag-placeholder,
-  html.admin-mode [data-dragging="true"],
-  html.admin-mode .admin-drop-active,
-  html.admin-mode .admin-drag-item,
-  html.admin-mode .admin-drag-inserted {
-    transition: none;
-    animation: none;
-  }
-}
-
-
-
-
-/* ─── Semantic tone utilities ───────────────────────────────────────────── */
-html.admin-mode .admin-tone-soft-danger {
-  background: color-mix(in oklab, var(--at-danger) 35%, transparent);
-  color: var(--at-danger-text);
-}
-
-html.admin-mode .admin-tone-soft-success {
-  background: color-mix(in oklab, var(--at-success) 35%, transparent);
-  color: var(--at-success-text);
-}
-
-html.admin-mode .admin-tone-soft-info {
-  background: color-mix(in oklab, var(--at-info) 35%, transparent);
-  color: var(--at-info-text);
-}
-
-html.admin-mode .admin-tone-soft-warning {
-  background: color-mix(in oklab, var(--at-warning) 30%, transparent);
-  color: var(--at-warning-text);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/* UX POLISH — Global visual improvements                                    */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ─── Smoother scrollbar ─────────────────────────────────────────────── */
-html.admin-mode ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-html.admin-mode ::-webkit-scrollbar-track {
-  background: transparent;
-}
-html.admin-mode ::-webkit-scrollbar-thumb {
-  background: var(--at-border);
-  border-radius: 3px;
-}
-html.admin-mode ::-webkit-scrollbar-thumb:hover {
-  background: var(--at-border-strong);
-}
-
-/* ─── Enhanced shell chrome ──────────────────────────────────────────── */
-html.admin-mode .admin-mobile-header {
-  box-shadow: var(--at-shadow-md);
-}
-html.admin-mode .admin-desktop-header {
-  box-shadow: 0 1px 0 var(--at-border);
-}
-html.admin-mode .admin-bottom-nav {
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* ─── Enhanced sidebar ───────────────────────────────────────────────── */
-html.admin-mode .admin-sidebar {
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
-}
-
-/* Sidebar nav items: smoother hover */
-html.admin-mode .admin-nav-item {
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
-}
-html.admin-mode .admin-nav-item--idle:hover {
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateX(2px);
-}
-html.admin-mode .admin-nav-item--active {
-  box-shadow: inset 0 0 12px var(--at-brand-glow);
-}
-
-/* ─── Cards & panels with depth ──────────────────────────────────────── */
-html.admin-mode .admin-main-shell .ap-section {
-  box-shadow: var(--at-shadow-sm);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-html.admin-mode .admin-main-shell .ap-section:hover {
-  box-shadow: var(--at-shadow-md);
-  border-color: var(--at-border-strong);
-}
-
-html.admin-mode .admin-main-shell .ap-kpi {
-  box-shadow: var(--at-shadow-sm);
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-}
-html.admin-mode .admin-main-shell .ap-kpi:hover {
-  box-shadow: var(--at-shadow-md);
-  transform: translateY(-1px);
-  border-color: var(--at-border-strong);
-}
-
-/* ─── Table rows: nicer hover ────────────────────────────────────────── */
-html.admin-mode .admin-main-shell .ap-table-body tr {
-  transition: background 0.12s ease;
-}
-html.admin-mode .admin-main-shell .ap-table-body tr:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-/* ─── Inputs: refined feel ───────────────────────────────────────────── */
-html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']) {
-  border-radius: 0.625rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-/* ─── Buttons: better interactive feel ───────────────────────────────── */
-html.admin-mode .admin-main-shell .ap-btn--primary {
-  box-shadow: 0 2px 8px rgba(212, 152, 47, 0.2);
-}
-html.admin-mode .admin-main-shell .ap-btn--primary:hover:not(:disabled) {
-  box-shadow: 0 4px 16px rgba(212, 152, 47, 0.3);
-  transform: translateY(-1px);
-}
-html.admin-mode .admin-main-shell .ap-btn--primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(212, 152, 47, 0.15);
-}
-
-/* ─── Badges: slight glow ────────────────────────────────────────────── */
-html.admin-mode .ap-badge--success {
-  box-shadow: 0 0 8px rgba(56, 168, 85, 0.2);
-}
-html.admin-mode .ap-badge--danger {
-  box-shadow: 0 0 8px rgba(212, 74, 90, 0.2);
-}
-html.admin-mode .ap-badge--warning {
-  box-shadow: 0 0 8px rgba(212, 138, 44, 0.2);
-}
-html.admin-mode .ap-badge--info {
-  box-shadow: 0 0 8px rgba(75, 143, 212, 0.2);
-}
-
-/* ─── Control Room cards: premium hover ──────────────────────────────── */
-html.admin-mode .admin-main-shell .admin-cr-radar-card,
-html.admin-mode .admin-main-shell .admin-cr-step,
-html.admin-mode .admin-main-shell .admin-cr-mini-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  box-shadow: var(--at-shadow-sm);
-}
-html.admin-mode .admin-main-shell .admin-cr-radar-card:hover,
-html.admin-mode .admin-main-shell .admin-cr-step:hover,
-html.admin-mode .admin-main-shell .admin-cr-mini-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--at-shadow-lg);
-}
-
-/* ─── Pipeline columns: better visual hierarchy ─────────────────────── */
-html.admin-mode .admin-main-shell .admin-leads-tone--new,
-html.admin-mode .admin-main-shell .admin-leads-tone--contacted,
-html.admin-mode .admin-main-shell .admin-leads-tone--quote,
-html.admin-mode .admin-main-shell .admin-leads-tone--negotiating,
-html.admin-mode .admin-main-shell .admin-leads-tone--won,
-html.admin-mode .admin-main-shell .admin-leads-tone--lost {
-  box-shadow: var(--at-shadow-sm);
-  transition: box-shadow 0.2s ease;
-}
-
-/* ─── Selection highlight ────────────────────────────────────────────── */
-html.admin-mode ::selection {
-  background: rgba(212, 152, 47, 0.3);
-  color: #fff;
-}
-
-/* ─── Focus visible: accessible ring ─────────────────────────────────── */
-html.admin-mode .admin-main-shell :focus-visible {
-  outline: 2px solid var(--at-brand);
-  outline-offset: 2px;
-}
-
-/* ─── Loading pulse ──────────────────────────────────────────────────── */
 @keyframes admin-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
 html.admin-mode .admin-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--at-panel) 25%,
-    var(--at-raised) 50%,
-    var(--at-panel) 75%
-  );
+  background: linear-gradient(90deg, var(--at-panel) 25%, var(--at-raised) 50%, var(--at-panel) 75%);
   background-size: 200% 100%;
-  animation: admin-shimmer 1.5s ease-in-out infinite;
+  animation: admin-shimmer 1.8s ease infinite;
 }
 
-/* ─── Subtle page-level gradient ─────────────────────────────────────── */
-html.admin-mode .admin-main-shell {
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 152, 47, 0.03) 0%, transparent 60%),
-    var(--at-bg);
-}
-
-/* ─── FAB: better depth ──────────────────────────────────────────────── */
-html.admin-mode .admin-fab-trigger {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 24px rgba(212, 152, 47, 0.15);
-}
-
-/* ─── Toast improvements ─────────────────────────────────────────────── */
-html.admin-mode [role="alert"] {
-  box-shadow: var(--at-shadow-lg);
-  backdrop-filter: blur(8px);
+@media (prefers-reduced-motion: reduce) {
+  html.admin-mode .admin-drag-placeholder,
+  html.admin-mode [data-dragging='true'],
+  html.admin-mode .admin-drop-active,
+  html.admin-mode .admin-drag-item,
+  html.admin-mode .admin-drag-inserted,
+  html.admin-mode .admin-shimmer {
+    transition: none;
+    animation: none;
+  }
 }

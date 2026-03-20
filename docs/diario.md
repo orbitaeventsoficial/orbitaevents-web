@@ -1,3 +1,22 @@
+## 2026-03-20 sessió 13 — Admin amb una sola capa visual real
+
+### Què s'ha canviat
+- `app/admin/admin-theme.css` s'ha reduït a una capa prima de tokens compartits i utilitats mínimes reals.
+- S'ha eliminat el repintat duplicat de sidebar, headers, KPI, taules, badges, botons i contenidors que ja estaven definits a `app/globals.css`.
+- Es manté la millor part aplicada: la paleta amb més contrast (`--at-bg`, `--at-surface`, `--at-panel`, `--at-raised`, vores i semàntics) perquè tots els contenidors equivalents comparteixin exactament la mateixa família visual.
+- Es conserven només les peces que encara necessiten estil dedicat: `admin-card-glass`, tons semàntics tous, tooltips, drag and drop i shimmer.
+
+### Per què
+- El problema ja no era només la paleta sinó la doble capa: `globals.css` estructurava l'admin i `admin-theme.css` el tornava a pintar per sobre.
+- Això feia que cards, panells, seccions i caixes semblessin de sistemes diferents encara que funcionalment fossin el mateix.
+- El criteri correcte aquí és una sola font de veritat per a superfícies i estats: mateixa base, mateix border, mateix contrast; només variar quan hi ha un estat funcional real.
+
+### Estat després
+- `admin-theme.css` ha quedat molt més pla i sense ornaments redundants.
+- `npx tsc --noEmit` torna a passar net.
+- A partir d'ara, qualsevol contenidor equivalent ha de sortir de la mateixa capa compartida i no d'una reinterpretació local.
+
+---
 # Diari de treball — Òrbita Events
 
 ## 2026-03-20 sessió 12 — Arrel del CSS admin invisible + polish complet
@@ -5784,3 +5803,4 @@ Continuació cobertura tests sobre serveis sense testejar. 57 serveis pendents �
 - **1709 tests** (136 fitxers) — tots verds
 - **0 errors TypeScript**
 - Migracions BD pendents deploy: booking_gallery_photos, portfolio_media, portfolio_events
+
