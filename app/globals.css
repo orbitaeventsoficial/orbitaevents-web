@@ -1759,8 +1759,10 @@ html.admin-mode .admin-mobile-sidebar {
   top: 0;
   bottom: 0;
   width: 17rem;
-  background: var(--at-surface);
-  border-right: 1px solid var(--at-border);
+  background: var(--at-glass-bg);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-right: 1px solid var(--at-glass-border);
   z-index: 50;
   overflow: hidden;
   display: flex;
@@ -1997,15 +1999,17 @@ html.admin-mode .admin-bottom-nav-marker {
 }
 
 @media (min-width: 1024px) {
-  /* Activar sidebar fix */
+  /* Activar sidebar fix — glass premium */
   html.admin-mode .admin-sidebar {
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
     width: var(--at-sidebar-w);
-    background: var(--at-surface);
-    border-right: 1px solid var(--at-border);
+    background: var(--at-glass-bg);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border-right: 1px solid var(--at-glass-border);
     z-index: 40;
     display: flex;
     flex-direction: column;

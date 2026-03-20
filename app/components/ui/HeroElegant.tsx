@@ -89,7 +89,7 @@ function AmbientParticles({ particles }: { particles: ParticleData[] }) {
             background: p.color,
             boxShadow: `0 0 ${p.w * 4}px ${p.color}, 0 0 ${p.w * 8}px ${p.color.replace(/[\d.]+\)$/, '0.3)')}`,
           }}
-          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.1, 0.6, 0.1] }}
+          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.15, 0.85, 0.15] }}
           transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
         />
       ))}
@@ -182,20 +182,20 @@ export default function HeroElegant() {
   // Seeded pseudo-random per posicions naturals però deterministes
   const particles = useMemo<ParticleData[]>(() => {
     const seed = (n: number) => ((n * 9301 + 49297) % 233280) / 233280;
-    return Array.from({ length: 24 }, (_, i) => {
+    return Array.from({ length: 36 }, (_, i) => {
       const r = seed(i);
-      const size = 3 + r * 6;
+      const size = 3 + r * 8;
       return {
         w: size, h: size,
         left: `${seed(i * 7 + 1) * 100}%`,
         top: `${seed(i * 13 + 3) * 100}%`,
         color: i % 4 === 0
-          ? 'rgba(251, 191, 36, 0.45)'
+          ? 'rgba(251, 191, 36, 0.7)'
           : i % 4 === 1
-            ? 'rgba(251, 191, 36, 0.3)'
+            ? 'rgba(251, 191, 36, 0.5)'
             : i % 4 === 2
-              ? 'rgba(255, 255, 255, 0.25)'
-              : 'rgba(251, 146, 60, 0.35)',
+              ? 'rgba(255, 255, 255, 0.4)'
+              : 'rgba(251, 146, 60, 0.55)',
         dy: 40 + seed(i * 3) * 80,
         dx: (seed(i * 5) - 0.5) * 40,
         dur: 3 + seed(i * 11) * 4,

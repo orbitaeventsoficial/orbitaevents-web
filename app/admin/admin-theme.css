@@ -48,24 +48,7 @@ html.admin-mode {
 
 
 
-/* ─── Shell chrome ──────────────────────────────────────────────────────── */
-/* Especificitat (0,3,1) per guanyar globals.css (0,2,1) en qualsevol ordre de chunks */
-html.admin-mode .admin-layout-shell .admin-mobile-header,
-html.admin-mode .admin-layout-shell .admin-desktop-header,
-html.admin-mode .admin-layout-shell .admin-bottom-nav {
-  background: var(--at-surface);
-  border-color: var(--at-border);
-}
-
-/* ═══ SIDEBAR PREMIUM — Glass + Gradient ═══ */
-html.admin-mode .admin-layout-shell .admin-sidebar,
-html.admin-mode .admin-layout-shell .admin-mobile-sidebar {
-  background: var(--at-glass-bg);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border-color: var(--at-glass-border);
-  border-right: 1px solid var(--at-glass-border);
-}
+/* ─── Shell chrome + sidebar glass → globals.css (font única) ────────── */
 
 /* ═══ UNIFIED CARDS — glass treatment ═══ */
 /* Només apliquem fons fosc a classes genèriques .panel/.card,
