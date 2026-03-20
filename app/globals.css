@@ -2406,7 +2406,17 @@ html.admin-mode .admin-shell .text-sm { font-size: clamp(0.875rem, 0.86rem + 0.0
 html.admin-mode .admin-shell .text-base { font-size: clamp(0.94rem, 0.91rem + 0.09vw, 1rem); }
 html.admin-mode .admin-shell .text-lg { font-size: clamp(1.05rem, 1rem + 0.12vw, 1.14rem); }
 
-/* ── 21. (eliminat — admin-theme.css controla els fons) ─────────────────── */
+/* ── 21. DEFAULT TAILWIND → TOKENS dins admin ─────────────────────────── */
+/* Qualsevol element amb 'border' de Tailwind hereta el color de vora admin */
+html.admin-mode .admin-shell .border { border-color: var(--at-border); }
+html.admin-mode .admin-shell .border-b { border-bottom-color: var(--at-border); }
+html.admin-mode .admin-shell .border-t { border-top-color: var(--at-border); }
+html.admin-mode .admin-shell .border-l { border-left-color: var(--at-border); }
+html.admin-mode .admin-shell .border-r { border-right-color: var(--at-border); }
+/* bg-white/5 i similars → panel token per visibilitat */
+html.admin-mode .admin-shell .bg-white\/5 { background: var(--at-raised); }
+html.admin-mode .admin-shell .bg-white\/\[0\.03\] { background: color-mix(in oklab, var(--at-raised) 50%, var(--at-panel) 50%); }
+html.admin-mode .admin-shell .bg-white\/\[0\.06\] { background: var(--at-raised); }
 
 /* Conservar aparença dels states chips */
 html.admin-mode .admin-shell :is(

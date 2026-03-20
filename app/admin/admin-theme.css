@@ -122,6 +122,33 @@ html.admin-mode .admin-main-shell .admin-leads-tone--lost {
   border-color: var(--at-danger);
 }
 
+/* ═══ LEADS METRICS ═══ */
+html.admin-mode .admin-main-shell .admin-leads-metric--open {
+  background: color-mix(in oklab, var(--at-info) 18%, var(--at-panel) 82%);
+  border-color: var(--at-info);
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--open .admin-leads-metric-value { color: var(--at-info); }
+
+html.admin-mode .admin-main-shell .admin-leads-metric--won {
+  background: color-mix(in oklab, var(--at-success) 18%, var(--at-panel) 82%);
+  border-color: var(--at-success);
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--won .admin-leads-metric-value { color: var(--at-success); }
+
+html.admin-mode .admin-main-shell .admin-leads-metric--lost {
+  background: color-mix(in oklab, var(--at-danger) 18%, var(--at-panel) 82%);
+  border-color: var(--at-danger);
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--lost .admin-leads-metric-value { color: var(--at-danger); }
+
+html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
+  background: color-mix(in oklab, var(--at-brand) 18%, var(--at-panel) 82%);
+  border-color: var(--at-brand);
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--winrate .admin-leads-metric-value { color: var(--at-brand-vivid); }
+
+html.admin-mode .admin-main-shell .admin-leads-metric-label { color: var(--at-muted); }
+
 /* ═══ BOOKINGS KPI COLORS ═══ */
 html.admin-mode .admin-main-shell .admin-bookings-stat--total {
   background: var(--at-panel);

@@ -228,14 +228,14 @@ export default function CalendarMonthClient() {
   return (
     <AdminPage title="Calendari">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
-            className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium transition-all active:scale-[0.98]"
+            className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
           >
-            ← Mes anterior
+            ← Anterior
           </button>
           <button
             type="button"
@@ -245,34 +245,32 @@ export default function CalendarMonthClient() {
                 month: today.getMonth(),
               })
             }
-            className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium transition-all active:scale-[0.98]"
+            className="inline-flex items-center rounded-lg border bg-amber-500/15 border-amber-500/30 text-amber-300 px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-amber-500/25 active:scale-[0.98]"
           >
             Avui
           </button>
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
-            className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium transition-all active:scale-[0.98]"
+            className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
           >
             Mes següent →
           </button>
-          <div className="flex rounded-xl border p-0 overflow-hidden ml-2">
-            <span
-              className="inline-flex items-center px-3 py-2 text-sm font-medium bg-white/10"
-            >
+          <div className="flex rounded-lg border overflow-hidden ml-2">
+            <span className="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold bg-amber-500/20 text-amber-300 border-r border-amber-500/20">
               Mes
             </span>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=week')}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+              className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 border-r"
             >
               Setmana
             </button>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium transition-all hover:bg-white/10"
+              className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10"
             >
               Dia
             </button>
@@ -301,66 +299,50 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Stats ràpids del mes visible */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <div className="group relative overflow-hidden rounded-2xl border p-3 sm:p-4 transition-all">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="admin-card-glass rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 sm:p-3 transition-all">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] sm:text-xs uppercase tracking-wide">
-                Reserves
-              </span>
-              <span className="text-2xl sm:text-3xl font-bold">
-                {stats.totalReservas}
-              </span>
+              <span className="text-[10px] uppercase tracking-wide text-emerald-400/80">Reserves</span>
+              <span className="text-xl sm:text-2xl font-bold text-emerald-300">{stats.totalReservas}</span>
             </div>
-            <span className="rounded-full px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium">
+            <span className="rounded-full bg-emerald-500/15 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
               {stats.reservaDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border p-3 sm:p-4 transition-all">
+        <div className="admin-card-glass rounded-xl border border-rose-500/30 bg-rose-500/10 p-2.5 sm:p-3 transition-all">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] sm:text-xs uppercase tracking-wide">
-                Bloquejos
-              </span>
-              <span className="text-2xl sm:text-3xl font-bold">
-                {stats.totalBloqueos}
-              </span>
+              <span className="text-[10px] uppercase tracking-wide text-rose-400/80">Bloquejos</span>
+              <span className="text-xl sm:text-2xl font-bold text-rose-300">{stats.totalBloqueos}</span>
             </div>
-            <span className="rounded-full px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium">
+            <span className="rounded-full bg-rose-500/15 border border-rose-500/25 px-2 py-0.5 text-[10px] font-medium text-rose-300">
               {stats.bloqueadoDays + stats.mixedDays} dies
             </span>
           </div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border p-3 sm:p-4 transition-all">
+        <div className="admin-card-glass rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-2.5 sm:p-3 transition-all">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] sm:text-xs uppercase tracking-wide">
-                Dies lliures
-              </span>
-              <span className="text-2xl sm:text-3xl font-bold">
-                {stats.freeDays}
-              </span>
+              <span className="text-[10px] uppercase tracking-wide text-cyan-400/80">Dies lliures</span>
+              <span className="text-xl sm:text-2xl font-bold text-cyan-300">{stats.freeDays}</span>
             </div>
-            <span className="rounded-full px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium">
+            <span className="rounded-full bg-cyan-500/15 border border-cyan-500/25 px-2 py-0.5 text-[10px] font-medium text-cyan-300">
               Disponibles
             </span>
           </div>
         </div>
 
-        <div className="group relative overflow-hidden rounded-2xl border p-3 sm:p-4 transition-all">
+        <div className="admin-card-glass rounded-xl border border-amber-500/30 bg-amber-500/10 p-2.5 sm:p-3 transition-all">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[10px] sm:text-xs uppercase tracking-wide">
-                Dies mixtes
-              </span>
-              <span className="text-2xl sm:text-3xl font-bold">
-                {stats.mixedDays}
-              </span>
+              <span className="text-[10px] uppercase tracking-wide text-amber-400/80">Dies mixtes</span>
+              <span className="text-xl sm:text-2xl font-bold text-amber-300">{stats.mixedDays}</span>
             </div>
-            <span className="rounded-full px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium">
+            <span className="rounded-full bg-amber-500/15 border border-amber-500/25 px-2 py-0.5 text-[10px] font-medium text-amber-300">
               Reserva + bloqueig
             </span>
           </div>
@@ -368,22 +350,22 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl border p-0 px-3 sm:px-4 py-2.5 text-sm">
-        <span className="font-medium">Llegenda:</span>
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm">
+        <span className="font-medium text-white/70">Llegenda:</span>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm border" />
+          <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
           <span className="text-xs sm:text-sm">Lliure</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm border" />
+          <span className="h-3 w-3 rounded-sm bg-emerald-500/50 border border-emerald-400/40" />
           <span className="text-xs sm:text-sm">Reserves</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm border" />
+          <span className="h-3 w-3 rounded-sm bg-rose-500/50 border border-rose-400/40" />
           <span className="text-xs sm:text-sm">Bloquejat</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-sm border" />
+          <span className="h-3 w-3 rounded-sm bg-amber-500/50 border border-amber-400/40" />
           <span className="text-xs sm:text-sm">Mixt</span>
         </div>
       </div>
@@ -486,7 +468,7 @@ export default function CalendarMonthClient() {
                           setDraggingBookingId(null);
                           setDragOverDateKey(null);
                         }}
-                        className="rounded-md px-1 py-0.5 cursor-grab active:cursor-grabbing">
+                        className="rounded-md px-1 py-0.5 bg-emerald-500/20 text-emerald-200 cursor-grab active:cursor-grabbing">
                         <div className="truncate font-semibold">
                           {r.leadId ? (
                             <Link
@@ -512,7 +494,7 @@ export default function CalendarMonthClient() {
                 )}
 
                 {hasBloqueos && (
-                  <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5">
+                  <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5 text-rose-300/80">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
                     {dayData.bloqueos.length > 1
                       ? ` (+${dayData.bloqueos.length - 1})`
