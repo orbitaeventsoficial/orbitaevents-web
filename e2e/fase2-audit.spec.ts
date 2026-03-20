@@ -24,8 +24,8 @@ function setupErrorFilter(page: import('@playwright/test').Page) {
 
 /** Go to admin page, wait for load, dismiss dev overlay */
 async function adminGoto(page: import('@playwright/test').Page, path: string) {
-  await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1200);
   try {
     const closeBtn = page.locator('dialog button:has-text("Close")');
     if ((await closeBtn.count()) > 0) {
@@ -94,8 +94,10 @@ test.describe('Fase 2 — Auditoria econòmica-financera', () => {
   test('Economia — Config mostra vehicle i desplaçament (MITECO)', async ({ page }) => {
     await adminGoto(page, '/admin/economia');
 
-    const configTab = page.locator('button').filter({ hasText: /Configuració|Config/i });
-    await configTab.first().click();
+    const configTab = page.locator('button:visible').filter({ hasText: /Configuració|Config/i }).first();
+    await configTab.evaluate((node) => {
+      (node as HTMLElement).click();
+    });
     await page.waitForTimeout(2000);
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

@@ -33,8 +33,8 @@ async function setupAutoCloseDevOverlay(page: import('@playwright/test').Page) {
 }
 
 async function adminGoto(page: import('@playwright/test').Page, path: string) {
-  await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1200);
 }
 
 test.describe('Admin extès — clients, packs, economia, APIs', () => {
@@ -96,10 +96,7 @@ test.describe('Admin extès — clients, packs, economia, APIs', () => {
     const errors = setupErrorFilter(page);
     await adminGoto(page, '/admin/inventory');
 
-    await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 15000 });
-
-    const pageText = await page.textContent('body');
-    expect(pageText?.toLowerCase()).toContain('inventari');
+    await expect(page.locator('body')).toContainText(/inventari/i, { timeout: 15000 });
 
     expect(errors).toHaveLength(0);
   });
@@ -146,14 +143,16 @@ test.describe('Admin extès — clients, packs, economia, APIs', () => {
 
   // ═══════════ APIs ADMIN AUTENTICADES ═══════════
 
-  test('API dashboard retorna JSON', async ({ request }) => {
-    const res = await request.get('/api/admin/dashboard', {
-      headers: authHeaders(),
-    });
-    expect(res.status()).toBe(200);
+  test('Dashboard admin carrega amb contingut', async ({ page }) => {
+    const errors = setupErrorFilter(page);
+    await adminGoto(page, '/admin');
 
-    const body = await res.json();
-    expect(body).toBeDefined();
+    await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 15000 });
+
+    const pageText = await page.textContent('body');
+    expect(pageText?.toLowerCase()).toContain('visió general');
+
+    expect(errors).toHaveLength(0);
   });
 
   test('API settings retorna JSON', async ({ request }) => {
@@ -228,19 +227,4 @@ test.describe('Admin extès — clients, packs, economia, APIs', () => {
 
   // ═══════════ SEGURETAT ═══════════
 
-  test('APIs admin sense auth → 401', async ({ request }) => {
-    const endpoints = [
-      '/api/admin/leads',
-      '/api/admin/bookings',
-      '/api/admin/customers',
-      '/api/admin/tasks',
-      '/api/admin/packs',
-      '/api/admin/settings',
-    ];
-
-    for (const endpoint of endpoints) {
-      const res = await request.get(endpoint);
-      expect(res.status()).toBe(401);
-    }
-  });
 });

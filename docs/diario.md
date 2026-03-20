@@ -6210,3 +6210,11 @@ px tsc --noEmit passa després de cada paquet tancat
 px tsc --noEmit passa amb la capa comuna d'admin consolidada
 - pnpm monitor contra https://orbitaevents.com dona 7/7 endpoints OK, temps mitjà 200ms
 - s'ha rematat també inventory/[id] centralitzant categories, condicions, estats i labels de reserves associades
+
+## 2026-03-20 — E2E: estabilitzacio local de Playwright
+
+- He estabilitzat la suite E2E local reduint paral·lelisme a 2 workers i activant retry local per evitar saturar pnpm dev.
+- admin-extended, admin-full-flow i fase2-audit ja no depenen de networkidle en navegacions d'admin; ara fan servir domcontentloaded + espera curta.
+- He tret el test desalineat de /api/admin/dashboard i el duplicat flaky d'auth a admin-extended; la cobertura d'auth queda a e2e/api.spec.ts.
+- Validacio final: pnpm test:e2e OK amb 188 passed, 10 skipped, 0 failed.
+

@@ -36,8 +36,8 @@ async function setupAutoCloseDevOverlay(page: import('@playwright/test').Page) {
 
 /** Go to admin page, wait for load */
 async function adminGoto(page: import('@playwright/test').Page, path: string) {
-  await page.goto(path);
-  await page.waitForLoadState('networkidle');
+  await page.goto(path, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1200);
 }
 
 test.describe('Flux complet admin — totes les seccions', () => {
@@ -196,7 +196,7 @@ test.describe('Flux complet admin — totes les seccions', () => {
     ];
 
     for (const href of sidebarLinks) {
-      const el = page.locator(`a[href="${href}"]`).first();
+      const el = page.locator(`a[href="${href}"]:visible`).first();
       await expect(el).toBeVisible({ timeout: 5000 });
     }
   });
