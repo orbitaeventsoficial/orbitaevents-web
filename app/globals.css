@@ -1160,28 +1160,28 @@ textarea:focus-visible {
 /* ── 1. DESIGN TOKENS EXTRA (fons/surface/text → admin-theme.css) ─────────── */
 html.admin-mode {
   /* Vores extres (no definides a admin-theme.css) */
-  --at-border-s:    #484f58;   /* vora forta / activa */
-  --at-border-sub:  #21262d;   /* vora subtil */
+  --at-border-s:    #566580;   /* vora forta / activa */
+  --at-border-sub:  #2a3040;   /* vora subtil */
 
   /* Accent de marca — or Òrbita */
-  --at-gold:        #c79a3a;   /* accent primari */
-  --at-gold-glow:   rgba(199, 154, 58, 0.22);
-  --at-gold-dim:    rgba(199, 154, 58, 0.12);
-  --at-gold-text:   #e8b84b;   /* or llegible sobre fons fosc */
+  --at-gold:        #e0a832;   /* accent primari */
+  --at-gold-glow:   rgba(224, 168, 50, 0.25);
+  --at-gold-dim:    rgba(224, 168, 50, 0.15);
+  --at-gold-text:   #f0c050;   /* or llegible sobre fons fosc */
 
   /* Accents funcionals */
-  --at-blue:        #388bfd;   /* info / link */
-  --at-blue-dim:    rgba(56, 139, 253, 0.14);
-  --at-green:       #3fb950;   /* success */
-  --at-green-dim:   rgba(63, 185, 80, 0.14);
-  --at-orange:      #d29922;   /* warning */
-  --at-orange-dim:  rgba(210, 153, 34, 0.14);
-  --at-red:         #f85149;   /* danger */
-  --at-red-dim:     rgba(248, 81, 73, 0.14);
-  --at-violet:      #a371f7;   /* especial */
-  --at-violet-dim:  rgba(163, 113, 247, 0.14);
-  --at-cyan:        #39c5cf;   /* accent secondary */
-  --at-cyan-dim:    rgba(57, 197, 207, 0.14);
+  --at-blue:        #5a9ee0;   /* info / link */
+  --at-blue-dim:    rgba(90, 158, 224, 0.16);
+  --at-green:       #45b868;   /* success */
+  --at-green-dim:   rgba(69, 184, 104, 0.16);
+  --at-orange:      #e09830;   /* warning */
+  --at-orange-dim:  rgba(224, 152, 48, 0.16);
+  --at-red:         #e05060;   /* danger */
+  --at-red-dim:     rgba(224, 80, 96, 0.16);
+  --at-violet:      #b080ff;   /* especial */
+  --at-violet-dim:  rgba(176, 128, 255, 0.16);
+  --at-cyan:        #40d0e0;   /* accent secondary */
+  --at-cyan-dim:    rgba(64, 208, 224, 0.16);
 
   /* Control Room — paleta semàntica */
   --at-cr-rose:          #c15f79;
