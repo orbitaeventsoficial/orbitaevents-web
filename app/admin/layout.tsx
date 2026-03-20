@@ -11,6 +11,7 @@ import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import './admin-theme.css';
+import './control-room.css';
 
 const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
   ssr: false,
