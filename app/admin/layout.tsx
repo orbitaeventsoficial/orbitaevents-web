@@ -451,23 +451,21 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, [helpModeEnabled, isHelpTarget, isInteractiveControl]);
 
   return (
-    <html lang="ca" suppressHydrationWarning>
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#121417" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
-        <link rel="apple-touch-icon" href="/favicon-192.png" />
-      </head>
-      <body className="admin-layout-body" suppressHydrationWarning>
-        <div
-          className="admin-layout-shell"
-          onClickCapture={blockInteractionInHelpMode}
-          onDoubleClickCapture={blockInteractionInHelpMode}
-          onSubmitCapture={blockInteractionInHelpMode}
-          onPointerDownCapture={blockInteractionInHelpMode}
-        >
+    <>
+      {/* PWA head tags — Next.js App Router hoists these to <head> */}
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="theme-color" content="#121417" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
+      <link rel="apple-touch-icon" href="/favicon-192.png" />
+      <div
+        className="admin-layout-shell"
+        onClickCapture={blockInteractionInHelpMode}
+        onDoubleClickCapture={blockInteractionInHelpMode}
+        onSubmitCapture={blockInteractionInHelpMode}
+        onPointerDownCapture={blockInteractionInHelpMode}
+      >
           {customAdminCss && (
             <style id="admin-custom-css" dangerouslySetInnerHTML={{ __html: customAdminCss }} />
           )}
@@ -812,9 +810,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </nav>
       <FloatingAddButton />
       <AdminSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-        </div>
-      </body>
-    </html>
+      </div>
+    </>
   );
 }
 

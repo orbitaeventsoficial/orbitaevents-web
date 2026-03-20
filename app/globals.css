@@ -1290,7 +1290,8 @@ html.admin-mode .admin-layout-shell {
 }
 
 /* ── 2. BASE ──────────────────────────────────────────────────────────────── */
-html.admin-mode .admin-layout-body {
+html.admin-mode .admin-layout-shell {
+  min-height: 100vh;
   background: var(--at-bg);
   color: var(--at-text);
   font-family: var(--at-font);
@@ -1298,10 +1299,6 @@ html.admin-mode .admin-layout-body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-html.admin-mode .admin-layout-shell {
-  min-height: 100vh;
 }
 
 /* ── 3. HELP BANNER ───────────────────────────────────────────────────────── */
