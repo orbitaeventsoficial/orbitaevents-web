@@ -1,5 +1,91 @@
 # Diari de treball — Òrbita Events
 
+## 2026-03-20 sessió 12 — Arrel del CSS admin invisible + polish complet
+
+### CAUSA ARREL TROBADA: HTML niat al layout admin
+
+**Per què**: Des de sessió 11 l'usuari reportava que els canvis visuals de l'admin no es veien. Múltiples intents de fix (eliminar overrides `!important`, pujar especificitat, canviar cascada) no van funcionar.
+
+**Causa real**: `app/admin/layout.tsx` renderitzava `<html>` i `<body>` DINS del root layout (`app/layout.tsx`). El navegador esborra els tags HTML niats → la classe `admin-layout-body` (que portava `background: var(--at-bg)`, font, color) **mai s'aplicava al DOM**. El body quedava amb `bg-[var(--bg-main)]` del root layout = `#0a0a0b` (quasi negre) sense cap estil admin.
+
+**Fix**:
+- `admin/layout.tsx`: Eliminats `<html>`, `<head>`, `<body>` — ara retorna `<>Fragment</>` amb `<div className="admin-layout-shell">`
+- `globals.css`: Estils de `admin-layout-body` moguts a `.admin-layout-shell` (que SÍ existeix al DOM)
+- PWA meta tags renderitzats directament (Next.js App Router els hoist al `<head>`)
+
+### Eliminació de capes CSS mortes
+
+**Per què**: Múltiples capes de CSS competien amb especificitat idèntica. Amb Next.js App Router l'ordre de chunks no és garantit.
+
+**Canvis**:
+- Eliminats 2 blocs "nuclears" a globals.css (`backdrop-filter: none !important` i `background-image: none !important`) que mataven admin-theme.css
+- Eliminats duplicats booking-stat a globals.css (usaven `--at-orange`/`--at-blue` en lloc de `--at-warning`/`--at-info`)
+- Sidebar glass aplicat directament a globals.css (on es defineix l'estructura) — zero conflicte cascada
+- Eliminats 42 `!important` innecessaris d'admin-theme.css, mantinguts 6 als inputs (necessaris contra Tailwind)
+- 4 hex hardcoded en tons semàntics → `var(--at-danger-text)`, `var(--at-success-text)`, etc.
+- Control room CSS extret a fitxer independent (`control-room.css`, 431 línies)
+
+### Paleta admin amb contrast real
+
+**Per què**: Tota la paleta anterior era quasi negra (`#0c`, `#14`, `#1a` — diferència 10 unitats per capa, indistingible en monitor).
+
+**Nova paleta**:
+- `--at-bg: #0f1218` → `--at-surface: #1a1f2b` → `--at-panel: #222938` → `--at-raised: #2d3548` (30+ unitats diferència)
+- `--at-border: #3a4560` (era `#2a3340`) — vores visibles
+- `--at-glass-border: rgba(255,255,255,0.12)` (era 0.06) — el doble
+- Accents funcionals (info, success, warning, danger) +15% lluminositat
+- Ombres amb ring 1px blanc subtle per elevació
+
+### Tailwind genèric → tokens dins admin
+
+**Per què**: Molts elements admin usaven classes Tailwind (`border`, `bg-white/5`) sense herència de tokens.
+
+**Canvis**:
+- `globals.css`: `.border` dins `.admin-shell` → hereta `var(--at-border)`
+- `bg-white/5` → `var(--at-raised)`, `bg-white/[0.03]` → mix panel/raised
+
+### Calendari compacte amb color
+
+**Per què**: "El calendari segueix sent gran, necessito que capigi en la pantalla sense scroll"
+
+**Canvis** a `CalendarMonthClient.tsx`:
+- Cel·les: `h-[72px] sm:h-[80px] md:h-[88px]` (era 100/110/120)
+- KPIs amb color semàntic: reserves (emerald), bloquejos (rosa), lliures (cyan), mixtes (ambre)
+- Llegenda amb indicadors de color reals (no quadrats buits)
+- Botons compactes (text-xs, padding reduït)
+- Reserves dins cel·les amb bg emerald, bloquejos rosa
+- Selector Mes/Setmana/Dia compacte amb accent actiu
+
+### Leads: mètriques amb color
+
+**Canvis** a `admin-theme.css`:
+- `admin-leads-metric--open` → fons blau, valor blau
+- `admin-leads-metric--won` → fons verd, valor verd
+- `admin-leads-metric--lost` → fons vermell, valor vermell
+- `admin-leads-metric--winrate` → fons or, valor or
+
+### Partícules hero
+
+**Per què**: "No veig partícules" → eren 16 partícules de 3-10px amb opacitat 0.15 sobre fons fosc = invisibles.
+
+**Canvis** a `HeroElegant.tsx`:
+- 36 partícules (era 16), posicions pseudo-random (seeded, no patró visible)
+- Colors: ambre pur (0.7), ambre suau (0.5), blanc (0.4), taronja (0.55)
+- Animació: durada 3-7s (era 6-16s), opacitat 0.15→0.85→0.15
+- Doble glow (inner + outer halo)
+
+### UX copy públic (sessions anteriors, mantingut)
+
+- Preus "Desde X€" → rangs reals ("600 – 1.500€") a ca/es/en
+- Badge exclusivitat al hero ("Només 1 event per dia")
+
+### Estat final sessió
+- **0 errors TypeScript**
+- **Commits**: `a5838ab` pushed a main
+- **La causa arrel del "pintor invisible" era HTML niat al layout admin — ara resolt**
+
+---
+
 ## 2026-03-20 sessió 11 — Admin UX overhaul, delete modals, Google reviews, CSS unificació
 
 ### DATABASE_URL fix (producció)

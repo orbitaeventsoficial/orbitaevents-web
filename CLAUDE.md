@@ -290,15 +290,35 @@ playwright.config.ts        ← Config Playwright amb webServer
 
 ### Visual / CSS
 
-- **Color system**: `white/opacity` sobre fons negre — MAI `slate-*`. Opacitats: text 70/40/30, bg 5/[0.03]/[0.02], border 10/20
+#### Arquitectura CSS admin (IMPORTANT — no repetir errors)
+
+- **Layout admin**: `app/admin/layout.tsx` retorna `<>Fragment</>` amb `<div className="admin-layout-shell">` — **MAI** renderitzar `<html>` ni `<body>` (el root layout ja ho fa)
+- **Fitxers CSS admin**: 3 fitxers carregats a `admin/layout.tsx`:
+  - `globals.css` — estructura (sidebar, headers, nav) + tokens extra (`--at-gold`, `--at-blue`, etc.)
+  - `admin-theme.css` — tokens base (`--at-bg/surface/panel/border`), glass, pipeline colors, booking stats, leads metrics, semantic tones, UX polish
+  - `control-room.css` — dashboard específic amb tokens `--at-cr-*`
+- **Classe `admin-mode`**: S'afegeix a `document.documentElement` via useEffect. Tots els CSS admin requereixen `html.admin-mode` com a prefix.
+- **Cascada**: admin-theme.css NO pot competir amb globals.css a mateixa especificitat — Next.js no garanteix ordre de chunks. Si una propietat visual (background, border) es defineix a globals.css, canviar-la allà directament, no intentar override des d'admin-theme.css.
+- **Tailwind dins admin**: `.border` hereta `var(--at-border)`, `bg-white/5` → `var(--at-raised)` automàticament via globals.css
+
+#### Paleta admin (tokens a admin-theme.css)
+
+- `--at-bg: #0f1218` → `--at-surface: #1a1f2b` → `--at-panel: #222938` → `--at-raised: #2d3548`
+- `--at-border: #3a4560`, `--at-border-strong: #506080`
+- Glass: `--at-glass-bg: rgba(22,28,40,0.85)`, `--at-glass-border: rgba(255,255,255,0.12)`
+- Cada capa ha de tenir **mínim 20 unitats** de diferència amb l'anterior
+
+#### Classes i patrons
+
+- **Glass cards**: `.admin-card-glass` — backdrop-blur, semi-transparent, shadow, hover
 - **Focus**: `focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50` a tots els inputs admin
 - **Border radius**: `rounded-xl` estàndard, `rounded-2xl` cards/seccions, `rounded-full` badges
 - **Table hover**: `hover:bg-white/[0.03] transition-colors` a totes les `<tr>`
-- **Gradients admin**: MAI Tailwind gradient classes directes. Usar `.admin-gradient.admin-gradient--hero` etc.
-- **Glass cards**: `.admin-card-glass` (surface), `--raised` (panel), `--elevated` (modal)
+- **Gradients admin**: MAI Tailwind gradient classes directes. Usar classes `.admin-gradient--*`
 - **Metric glow**: Hover glow per accent color via CSS classes
 - **Stagger animation**: `.admin-stagger-item` amb nth-child delay. `prefers-reduced-motion` el desactiva.
 - **Components SVG**: `RadialProgress`, `Tooltip`, `MonthlyBarChart`, `DonutChart` — tots reutilitzables
+- **Leads metrics**: `.admin-leads-metric--open/won/lost/winrate` amb colors semàntics
 
 ### Accessibilitat (OBLIGATORI en tot codi nou)
 
@@ -314,7 +334,8 @@ playwright.config.ts        ← Config Playwright amb webServer
 
 - **Vista diària**: `?view=day` — CalendarDayClient amb timeline per hores
 - **Toggle**: Botons Mes/Setmana/Dia a les vistes
-- **Cel·les compactes**: `h-[100px] sm:h-[110px] md:h-[120px]` — dissenyat per cabre en una pantalla
+- **Cel·les compactes**: `h-[72px] sm:h-[80px] md:h-[88px]` — dissenyat per cabre en una pantalla sense scroll
+- **KPIs**: amb color semàntic (emerald reserves, rosa bloquejos, cyan lliures, ambre mixtes)
 
 ### Delete (patró estàndard)
 
