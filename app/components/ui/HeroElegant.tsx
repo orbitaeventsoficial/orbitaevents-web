@@ -76,7 +76,7 @@ interface ParticleData {
 
 function AmbientParticles({ particles }: { particles: ParticleData[] }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[8]" aria-hidden="true">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[9]" aria-hidden="true">
       {particles.map((p, i) => (
         <motion.div
           key={i}
@@ -87,9 +87,9 @@ function AmbientParticles({ particles }: { particles: ParticleData[] }) {
             left: p.left,
             top: p.top,
             background: p.color,
-            boxShadow: `0 0 ${p.w * 3}px ${p.color}`,
+            boxShadow: `0 0 ${p.w * 4}px ${p.color}, 0 0 ${p.w * 8}px ${p.color.replace(/[\d.]+\)$/, '0.3)')}`,
           }}
-          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.15, 0.9, 0.15] }}
+          animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.25, 1, 0.25] }}
           transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
         />
       ))}
@@ -180,21 +180,23 @@ export default function HeroElegant() {
 
   // Partícules memoitzades — es generen un sol cop
   const particles = useMemo<ParticleData[]>(() =>
-    Array.from({ length: 16 }, (_, i) => {
-      const size = 3 + (i % 5) * 1.5;
+    Array.from({ length: 28 }, (_, i) => {
+      const size = 4 + (i % 5) * 2;
       return {
         w: size, h: size,
-        left: `${(i * 6.25) % 100}%`,
-        top: `${(i * 6.1 + 5) % 100}%`,
-        color: i % 3 === 0
-          ? 'rgba(251, 191, 36, 0.8)'
-          : i % 3 === 1
-            ? 'rgba(251, 191, 36, 0.5)'
-            : 'rgba(255, 255, 255, 0.4)',
-        dy: 50 + (i % 5) * 18,
-        dx: ((i % 3) - 1) * 15,
-        dur: 5 + (i % 4) * 2,
-        del: (i % 8) * 0.8,
+        left: `${(i * 3.57) % 100}%`,
+        top: `${(i * 3.5 + 8) % 100}%`,
+        color: i % 4 === 0
+          ? 'rgba(251, 191, 36, 1)'
+          : i % 4 === 1
+            ? 'rgba(251, 191, 36, 0.7)'
+            : i % 4 === 2
+              ? 'rgba(255, 255, 255, 0.6)'
+              : 'rgba(251, 146, 60, 0.8)',
+        dy: 60 + (i % 5) * 22,
+        dx: ((i % 5) - 2) * 18,
+        dur: 6 + (i % 4) * 2.5,
+        del: (i % 10) * 0.7,
       };
     }),
   []);
