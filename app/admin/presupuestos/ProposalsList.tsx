@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PROPOSAL_STATUS_CONFIG, formatDate, formatCurrency } from '@/lib/constants';
+import { PROPOSAL_FILTERABLE_STATUSES, PROPOSAL_STATUS_CONFIG, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type ProposalItem = {
@@ -33,8 +33,6 @@ const DEFAULT_STATUS_STYLE = {
   text: 'admin-tone-text-neutral',
   border: 'admin-tone-border-neutral',
 };
-
-const FILTERABLE_STATUSES = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED'] as const;
 
 function getProposalStatusStyle(status: string) {
   return PROPOSAL_STATUS_CONFIG[status] || DEFAULT_STATUS_STYLE;
@@ -147,7 +145,7 @@ export default function ProposalsList({
           <p className="text-2xl font-bold">{stats.total}</p>
           <p className="text-xs opacity-60">Total</p>
         </button>
-        {FILTERABLE_STATUSES.map((status) => {
+        {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
           const cfg = getProposalStatusStyle(status);
           const count = stats[status];
           const isActive = statusFilter === status;
@@ -429,4 +427,3 @@ export default function ProposalsList({
     </section>
   );
 }
-

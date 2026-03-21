@@ -1,4 +1,4 @@
-import { formatDateSimple } from '@/lib/constants';
+import { TASK_STATUS_VALUES, formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import type { LeadTaskStatus } from '@prisma/client';
 import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
@@ -20,11 +20,9 @@ const STATUS_LABELS: Record<LeadTaskStatus, string> = {
   CANCELLED: 'Cancel·lada',
 };
 
-const VALID_STATUS = ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as const satisfies readonly LeadTaskStatus[];
-
 function isTaskStatus(value?: string): value is LeadTaskStatus {
   if (!value) return false;
-  return (VALID_STATUS as readonly string[]).includes(value);
+  return (TASK_STATUS_VALUES as readonly string[]).includes(value);
 }
 
 function parsePage(value?: string) {
@@ -130,7 +128,7 @@ export default async function TasksPage({
                 defaultValue={status || ''}
               >
                 <option value="">Totes</option>
-                {VALID_STATUS.map((value) => (
+                {TASK_STATUS_VALUES.map((value) => (
                   <option key={value} value={value}>
                     {STATUS_LABELS[value] || value}
                   </option>

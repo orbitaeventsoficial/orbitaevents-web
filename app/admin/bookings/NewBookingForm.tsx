@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
-import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS } from '@/lib/constants';
+import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, EVENT_TYPE_VALUES } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '../components/ToastProvider';
 
@@ -67,12 +67,6 @@ type BookingConflictRow = {
   status: string;
 };
 
-// Derived from centralized EVENT_TYPE_PLAIN and EVENT_TYPE_ICONS constants.
-const EVENT_TYPES = Object.keys(EVENT_TYPE_PLAIN).map((value) => ({
-  value,
-  label: EVENT_TYPE_PLAIN[value],
-  icon: EVENT_TYPE_ICONS[value] ?? '',
-}));
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 
 type FormData = {
@@ -604,20 +598,20 @@ export default function NewBookingForm() {
         <div>
           <span id="nb-event-type-label" className="text-xs">Tipus</span>
           <div role="group" aria-labelledby="nb-event-type-label" className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
-            {EVENT_TYPES.map((et) => (
+            {EVENT_TYPE_VALUES.map((value) => (
               <button
-                key={et.value}
+                key={value}
                 type="button"
-                onClick={() => updateField('eventType', et.value)}
-                aria-pressed={form.eventType === et.value}
+                onClick={() => updateField('eventType', value)}
+                aria-pressed={form.eventType === value}
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
-                  form.eventType === et.value
+                  form.eventType === value
                     ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
                     : 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral hover:brightness-105'
                 }`}
               >
-                <span className="text-base leading-none">{et.icon}</span>
-                <span className="mt-1 block leading-tight">{et.label}</span>
+                <span className="text-base leading-none">{EVENT_TYPE_ICONS[value]}</span>
+                <span className="mt-1 block leading-tight">{EVENT_TYPE_PLAIN[value]}</span>
               </button>
             ))}
           </div>
@@ -1063,11 +1057,3 @@ export default function NewBookingForm() {
     </AdminPage>
   );
 }
-
-
-
-
-
-
-
-

@@ -2,10 +2,11 @@ import { createHash, randomBytes } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { getAppBaseUrl } from '@/lib/site';
+import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
 
 
 const DEFAULT_EXPIRY_DAYS = 30;
-const SUPPORTED_LOCALES = new Set(['ca', 'es', 'en']);
+const SUPPORTED_LOCALES = new Set<string>(SHARED_SUPPORTED_LOCALES);
 const portalAccessRepo = prisma.clientPortalAccess;
 
 export type PortalPersonalization = {
@@ -197,5 +198,3 @@ export async function markPortalAccessHit(input: {
     log.error('[ClientPortal] Error actualitzant accés:', error);
   }
 }
-
-

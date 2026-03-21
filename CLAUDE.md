@@ -417,3 +417,22 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - Si una opció, label, ordre, badge o estat apareix a més d'un component admin, s'ha de moure a lib/constants/index.ts o lib/constants/privacy.ts.
 - Els components d'admin han de consumir la capa comuna; no han de recrear arrays locals de STATUS_OPTIONS, SOURCE_OPTIONS, EVENT_TYPES, SECTIONS, STATUS_ORDER o maps equivalents si la dada ja és compartida.
 - Quan es faci una passada d'un bloc d'admin, deixar també entrada breu i neta a docs/diario.md amb el criteri i la validació executada.
+- La regla de monocapa admin també aplica a domini compartit: locales suportats, status values, open statuses, catàlegs de categories, ordres de serveis i filtres repetits. Si admin i serveis comparteixen aquesta decisió, s'ha de treure a constants comunes.
+
+## Regles de no-engreixament
+
+- "Ja esta fet" no es valid si encara queden adapters locals trivials, arrays duplicats, labels locals o helpers repetits. No donar per tancada una passada fins que la cerca residual estigui sota control.
+- Si una decisio de domini o presentacio apareix en 2 o mes llocs, queda prohibit resoldre-la localment. S'ha de portar a lib/constants/* o a un helper compartit.
+- Aixo aplica a: status labels, status values, open statuses, locales suportats, locale labels, categories, service order, filter options, source labels, section order i qualsevol cataleg equivalent.
+- Queda prohibit recrear Record<string, string>, Object.keys(...), arrays s const, Set(...) o maps inline dins de components/serveis quan la mateixa dada ja existeixi conceptualment a la capa comuna.
+- Si un component o pagina nomes te una funcio local per traduir un status, tipus o variant coneguda, aquesta funcio s'ha d'eliminar i s'ha de consumir la constant/helper comuna.
+- Si una pagina te JSX massa dens o linies molt llargues amb logica incrustada, s'ha de refactoritzar abans de considerar la passada acabada.
+- Abans d'afegir qualsevol nova constant o helper local a admin o serveis, buscar primer a lib/constants/* i lib/* si la decisio ja existeix.
+- Quan es tanqui una passada, docs/diario.md ha d'explicar l'estat real: que s'ha rematat, que no, i quina validacio s'ha passat. No escriure "final" de manera optimista.
+- Quan es mogui una funcio petita o un helper local, deixar escrit tambe el perque: si no aporta comportament propi i nomes reempaqueta una decisio compartida, s'ha d'eliminar o moure a la capa comuna.
+- La mateixa regla aplica a semantica de rutes admin: shortcuts de teclat, labels de breadcrumb, noms de detall i aliases de navegacio no s'han de recrear dins layout o pagines si ja representen estructura compartida d'admin.
+- Regles de domini petites tambe compten: MIME types permesos, mides maximes de pujada, articles RGPD, camps que disparen sync extern i catalegs equivalents no s'han de deixar enterrats dins un servei si poden aparixer o ser consultats des d'altres punts.
+
+- Exemples de code smell que no s'han de reintroduir: Object.keys(...) per generar opcions compartides, maps locals de labels d'estat, Set([...]) locals per regles de domini, arrays derivats locals per event types/categories/status values.
+
+- Cas concret a no reintroduir: si una mateixa font, status o tipus necessita label + icona + fallback, no s'han de separar en maps locals per pantalla. S'ha de definir un helper/display compartit a lib/constants/* i consumir-lo des dels components.

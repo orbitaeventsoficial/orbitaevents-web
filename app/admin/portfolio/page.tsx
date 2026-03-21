@@ -8,23 +8,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
 
 const MAX_DIMENSION = 1200;
 const WEBP_QUALITY = 0.85;
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
-
-const CATEGORIES = [
-  { slug: 'bodas', name: 'Bodas' },
-  { slug: 'discomovil', name: 'Discomovil' },
-  { slug: 'eventos-empresa', name: 'Eventos empresa' },
-  { slug: 'fiestas-infantiles', name: 'Fiestas infantiles' },
-  { slug: 'fiestas-privadas', name: 'Fiestas privadas' },
-  { slug: 'produccion-tecnica', name: 'Producción técnica' },
-  { slug: 'alquiler-equipo', name: 'Alquiler equipo' },
-  { slug: 'fiestas-tematicas-halloween', name: 'Fiestas temáticas Halloween' },
-  { slug: 'fiestas-tematicas-mon-magic', name: 'Fiestas temáticas Món Màgic' },
-];
 
 type MediaItem = {
   id: string;
@@ -435,7 +424,7 @@ function EventsManager() {
             <div>
               <label className="text-xs opacity-50 block mb-1">Categoria *</label>
               <select value={form.categorySlug} onChange={(e) => setForm({ ...form, categorySlug: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm">
-                {CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+                {PORTFOLIO_CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
               </select>
             </div>
             <div>
@@ -560,7 +549,7 @@ export default function AdminPortfolioPage() {
 
       {tab === 'media' ? (
         <div className="space-y-3">
-          {CATEGORIES.map((cat) => (
+          {PORTFOLIO_CATEGORIES.map((cat) => (
             <CategorySection key={cat.slug} slug={cat.slug} name={cat.name} />
           ))}
         </div>

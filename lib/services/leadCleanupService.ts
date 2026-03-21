@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { OPEN_LEAD_STATUSES } from '@/lib/constants';
 
 /**
  * Lead Cleanup Service
@@ -8,7 +9,6 @@ import { log } from '@/lib/logger';
  * 2. Auto-DELETE: leads LOST de fa +90 dies sense reserva
  */
 
-const OPEN_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
 const DAYS_BEFORE_DELETE = 90;
 
 export async function runLeadCleanup(): Promise<{
@@ -20,7 +20,7 @@ export async function runLeadCleanup(): Promise<{
   // 1. Marca com LOST els leads amb data d'event passada
   const autoLostResult = await prisma.lead.updateMany({
     where: {
-      status: { in: [...OPEN_STATUSES] },
+      status: { in: [...OPEN_LEAD_STATUSES] },
       eventDate: { not: null, lt: now },
     },
     data: {

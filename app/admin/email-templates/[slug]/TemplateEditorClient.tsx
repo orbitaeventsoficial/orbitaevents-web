@@ -6,6 +6,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import SortableList from '../../components/SortableList';
 import { useToast } from '../../components/ToastProvider';
+import { SUPPORTED_LOCALES } from '@/lib/constants';
 
 type BlockType = 'heading' | 'text' | 'button' | 'info_table' | 'highlight' | 'divider' | 'image';
 
@@ -283,7 +284,7 @@ export default function TemplateEditorClient({
     <div className="space-y-4">
       <div className="ap-card flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-end">
         <div className="ap-tabs-nav">
-          {['ca', 'es', 'en'].map((l) => (
+          {SUPPORTED_LOCALES.map((l) => (
             <button
               key={l}
               type="button"

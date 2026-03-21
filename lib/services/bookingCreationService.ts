@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
+import { ACTIVE_BOOKING_STATUSES } from '@/lib/constants';
 
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
-const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
 
 function normalizeEventType(eventType: string): EventType {
   return Object.values(EventType).includes(eventType as EventType) ? (eventType as EventType) : EventType.OTHER;
@@ -336,6 +336,3 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
 
   return { status: 200, body: { ok: true, booking } };
 }
-
-
-

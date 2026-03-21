@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FAQ_CATEGORY_OPTIONS } from '@/lib/constants';
 
 type Translation = {
   locale: 'ca' | 'es' | 'en';
@@ -17,14 +18,6 @@ type InitialFaq = {
   isActive: boolean;
   translations: Translation[];
 };
-
-const CATEGORIES = [
-  { value: 'general', label: 'General' },
-  { value: 'sound', label: 'So' },
-  { value: 'lighting', label: 'Il·luminació' },
-  { value: 'pricing', label: 'Preus' },
-  { value: 'booking', label: 'Reserves' },
-];
 
 const BASE_TRANSLATIONS: Translation[] = [
   { locale: 'ca', question: '', answer: '' },
@@ -130,7 +123,7 @@ export default function FaqEditorForm({
               onChange={(e) => setCategory(e.target.value)}
               className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
             >
-              {CATEGORIES.map((c) => (
+              {FAQ_CATEGORY_OPTIONS.map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
                 </option>
@@ -220,4 +213,3 @@ export default function FaqEditorForm({
     </div>
   );
 }
-

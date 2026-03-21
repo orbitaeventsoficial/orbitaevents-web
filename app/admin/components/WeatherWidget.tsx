@@ -15,6 +15,16 @@ const WEATHER_EMOJI: Record<string, string> = {
 };
 const DEFAULT_EMOJI = '\uD83C\uDF24\uFE0F'; // 🌤️
 
+const WEATHER_EMOJI_CA: Record<string, string> = {
+  'cel serè': '\u2600\uFE0F',
+  'ennuvolat': '\u2601\uFE0F',
+  'pluja': '\uD83C\uDF27\uFE0F',
+  'plugim': '\uD83C\uDF26\uFE0F',
+  'tempesta': '\u26C8\uFE0F',
+  'neu': '\u2744\uFE0F',
+  'boira': '\uD83C\uDF2B\uFE0F',
+};
+
 function getWeatherEmoji(description: string): string {
   // Intentem trobar la descripció que coincideixi amb les claus del mapping
   for (const [key, emoji] of Object.entries(WEATHER_EMOJI)) {
@@ -22,18 +32,8 @@ function getWeatherEmoji(description: string): string {
       return emoji;
     }
   }
-  // Mapping per les descripcions en català
-  const catMap: Record<string, string> = {
-    'cel serè': '\u2600\uFE0F',
-    'ennuvolat': '\u2601\uFE0F',
-    'pluja': '\uD83C\uDF27\uFE0F',
-    'plugim': '\uD83C\uDF26\uFE0F',
-    'tempesta': '\u26C8\uFE0F',
-    'neu': '\u2744\uFE0F',
-    'boira': '\uD83C\uDF2B\uFE0F',
-  };
   const lower = description.toLowerCase();
-  for (const [key, emoji] of Object.entries(catMap)) {
+  for (const [key, emoji] of Object.entries(WEATHER_EMOJI_CA)) {
     if (lower.includes(key)) {
       return emoji;
     }

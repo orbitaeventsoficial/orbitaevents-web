@@ -1,10 +1,9 @@
-import { BookingStatus, EventType } from '@prisma/client';
+import { EventType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { ACTIVE_BOOKING_STATUSES, ACTIVE_INVENTORY_BOOKING_STATUSES } from '@/lib/constants';
 import { calculateEventDuration } from '@/lib/inventory-utils';
 import { tryEnsureCompletedBookingPortalAccess } from '@/lib/services/bookingPortalCompletionService';
 
-const ACTIVE_BOOKING_STATUSES = [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.PREPARING] as const;
-const INVENTORY_ACTIVE_STATUSES = [BookingStatus.CONFIRMED, BookingStatus.PREPARING] as const;
 
 export type ManagedBookingStatus = 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'COMPLETED' | 'CANCELLED';
 
@@ -121,7 +120,7 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
         where: {
           itemId: bi.itemId,
           bookingId: { not: bookingId },
-          booking: { status: { in: [...INVENTORY_ACTIVE_STATUSES] } },
+          booking: { status: { in: [...ACTIVE_INVENTORY_BOOKING_STATUSES] } },
         },
       });
 
@@ -151,7 +150,7 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
         where: {
           itemId: bi.itemId,
           bookingId: { not: bookingId },
-          booking: { status: { in: [...INVENTORY_ACTIVE_STATUSES] } },
+          booking: { status: { in: [...ACTIVE_INVENTORY_BOOKING_STATUSES] } },
         },
       });
 
@@ -163,4 +162,3 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
 
   return { statsUpdated };
 }
-

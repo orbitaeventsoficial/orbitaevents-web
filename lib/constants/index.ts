@@ -68,6 +68,15 @@ export const CONTRACT_STATUS_CONFIG: Record<string, StatusTone> = {
   CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'Cancel·lat' },
 };
 
+export const INVOICE_STATUS_LABELS: Record<string, string> = {
+  DRAFT: 'Esborrany',
+  PENDING_SYNC: 'Sincronitzant...',
+  SYNCED: 'Sincronitzada',
+  SYNC_ERROR: 'Error sync',
+  PAID: 'Pagada',
+  CANCELLED: 'Cancel·lada',
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
 // EVENT TYPES
 // ═══════════════════════════════════════════════════════════════════════════
@@ -118,7 +127,55 @@ export function getEventTypeDisplay(eventType: string) {
   };
 };
 
-// ═══════════════════════════════════════════════════════════════════════════`r`n// PRIORITY (dark theme)
+export const EVENT_TYPE_DOCUMENT_LABELS: Record<string, string> = {
+  WEDDING: 'Boda',
+  BIRTHDAY: 'Aniversari / Cumpleaños',
+  CORPORATE: 'Esdeveniment Corporatiu',
+  COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig',
+  GRADUATION: 'Graduació',
+  ANNIVERSARY: 'Aniversari',
+  PRIVATE_PARTY: 'Festa Privada',
+  OTHER: 'Esdeveniment',
+};
+
+export const RECENT_FEED_EVENT_TYPE_SERVICE_LABELS: Record<string, string> = {
+  WEDDING: 'DJ + Producció Boda',
+  BIRTHDAY: 'Festa Aniversari',
+  CORPORATE: 'Event Corporatiu',
+  COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig',
+  GRADUATION: 'Graduació',
+  ANNIVERSARY: 'Aniversari',
+  PRIVATE_PARTY: 'Festa Privada',
+  OTHER: 'Event Especial',
+};
+
+export const RECENT_FEED_EVENT_TYPE_ICONS: Record<string, 'check' | 'sparkles' | 'heart' | 'building'> = {
+  WEDDING: 'heart',
+  BIRTHDAY: 'sparkles',
+  CORPORATE: 'building',
+  COMMUNION: 'sparkles',
+  BAPTISM: 'heart',
+  GRADUATION: 'sparkles',
+  ANNIVERSARY: 'heart',
+  PRIVATE_PARTY: 'sparkles',
+  OTHER: 'check',
+};
+
+export const RECENT_FEED_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING', 'COMPLETED'] as const;
+export const RECENT_FEED_ANONYMOUS_NAMES: Record<string, readonly string[]> = {
+  WEDDING: ['Marc & Laura', 'Pau & Maria', 'Joan & Anna', 'Albert & Carla'],
+  BIRTHDAY: ['Sara', 'Marc', 'Laura', 'Pol', 'Maria'],
+  CORPORATE: ['Empresa Tech', 'Start-up BCN', 'Consulting SL'],
+  PRIVATE_PARTY: ['Marc', 'Laura', 'Joan', 'Anna'],
+  COMMUNION: ['Família García', 'Família López'],
+  BAPTISM: ['Família Martí', 'Família Puig'],
+  OTHER: ['Client VIP', 'Reserva especial'],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRIORITY (dark theme)
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const PRIORITY_CONFIG: Record<string, StatusTone> = {
@@ -144,6 +201,15 @@ export const LEAD_STATUS_LABELS: Record<string, string> = {
   NEGOTIATING: 'En negociació',
   WON: 'Guanyat',
   LOST: 'Perdut',
+};
+
+export const LEAD_STATUS_ANALYTICS_LABELS: Record<string, string> = {
+  NEW: 'Nous',
+  CONTACTED: 'Contactats',
+  QUOTE_SENT: 'Pressupost',
+  NEGOTIATING: 'Negociant',
+  WON: 'Guanyats',
+  LOST: 'Perduts',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -257,10 +323,16 @@ export const VIP_SPEND_THRESHOLD = 2000;
 
 
 
+export const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
+export const ACTIVE_INVENTORY_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING'] as const;
+
+
 export const BOOKING_STATUS_OPTIONS = Object.entries(BOOKING_STATUS_CONFIG).map(([value, config]) => ({
   value,
   label: config.label,
 }));
+
+export const PROPOSAL_FILTERABLE_STATUSES = ['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED'] as const;
 
 export const EVENT_TYPE_OPTIONS = Object.entries(EVENT_TYPE_PLAIN).map(([value, label]) => ({
   value,
@@ -277,6 +349,25 @@ export const SOURCE_LABELS: Record<string, string> = {
   REFERRAL: 'Boca-orella',
   GOOGLE: 'Google',
   OTHER: 'Altre',
+};
+
+export const SOURCE_ICONS: Record<string, string> = {
+  WEBSITE: '🌐',
+  CONFIGURATOR: '⚙️',
+  PHONE: '📞',
+  WHATSAPP: '💬',
+  INSTAGRAM: '📸',
+  WALLAPOP: '🟣',
+  REFERRAL: '👥',
+  GOOGLE: '🔍',
+  OTHER: '📩',
+};
+
+export function getSourceDisplay(source: string) {
+  return {
+    label: SOURCE_LABELS[source] || 'Altre',
+    icon: SOURCE_ICONS[source] || '📩',
+  };
 };
 
 export const LEAD_STATUS_OPTIONS = Object.entries(LEAD_STATUS_LABELS).map(([value, label]) => ({
@@ -316,6 +407,8 @@ export const LEAD_SCORE_BAND_LABELS: Record<string, string> = {
 };
 
 export const BOOKING_STATUS_ORDER = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'] as const;
+export const DELETABLE_BOOKING_STATUSES = ['PENDING', 'CANCELLED'] as const;
+export const BOOKING_CALENDAR_SYNC_FIELDS = ['status', 'eventDate', 'eventLocation', 'eventVenue', 'startTime', 'endTime', 'notes'] as const;
 
 export const BOOKING_DETAIL_SECTIONS = [
   { id: 'sec-client', label: 'Client' },
@@ -448,3 +541,72 @@ export const INVENTORY_STATUS_OPTIONS = [
   { value: 'BROKEN', label: 'Avariat' },
   { value: 'RETIRED', label: 'Retirat' },
 ] as const;
+export const BLOG_CATEGORY_OPTIONS = [
+  { value: 'general', label: 'General' },
+  { value: 'bodas', label: 'Bodes' },
+  { value: 'eventos', label: 'Esdeveniments' },
+  { value: 'consejos', label: 'Consells' },
+  { value: 'tendencias', label: 'Tendències' },
+  { value: 'tecnologia', label: 'Tecnologia' },
+] as const;
+
+export const FAQ_CATEGORY_OPTIONS = [
+  { value: 'general', label: 'General' },
+  { value: 'sound', label: 'So' },
+  { value: 'lighting', label: 'Il·luminació' },
+  { value: 'pricing', label: 'Preus' },
+  { value: 'booking', label: 'Reserves' },
+] as const;
+export const ACTIVITY_CATEGORY_OPTIONS = [
+  { id: 'all', label: 'Tot', icon: '📊' },
+  { id: 'comms', label: 'Comunicacions', icon: '✉️' },
+  { id: 'automation', label: 'Automatitzacions', icon: '⚡' },
+  { id: 'system', label: 'Sistema', icon: '🔄' },
+  { id: 'crud', label: 'Operacions', icon: '📝' },
+] as const;
+
+export const ACTIVITY_DAYS_OPTIONS = [
+  { value: 1, label: 'Avui' },
+  { value: 7, label: '7 dies' },
+  { value: 30, label: '30 dies' },
+  { value: 90, label: '90 dies' },
+] as const;
+
+export const PACK_SERVICE_OPTIONS = [
+  { value: 'bodas', label: 'Bodes' },
+  { value: 'fiestas', label: 'Festes' },
+  { value: 'discomovil', label: 'Discomòbil' },
+  { value: 'empresas', label: 'Empreses' },
+] as const;
+
+export const SUPPORTED_LOCALES = ['ca', 'es', 'en'] as const;
+export const SUPPORTED_LOCALE_LABELS: Record<string, string> = { ca: 'Català', es: 'Castellà', en: 'Anglès' };
+export const OPEN_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
+export const LEAD_STATUS_VALUES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const;
+export const PRIORITY_VALUES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
+export const EVENT_TYPE_VALUES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
+export const LEAD_SOURCE_VALUES = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'REPEAT', 'OTHER'] as const;
+export const OPEN_TASK_STATUSES = ['OPEN', 'IN_PROGRESS'] as const;
+export const TASK_STATUS_VALUES = ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as const;
+
+export const CANVAS_COLOR_OPTIONS = ['#ffffff', '#06b6d4', '#f97316', '#eab308', '#22c55e', '#ec4899', '#a855f7', '#ef4444', '#000000', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)'] as const;
+
+export const LEAD_DOCUMENT_UPLOAD_MAX_SIZE_BYTES = 8 * 1024 * 1024;
+export const LEAD_DOCUMENT_ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel',
+] as const;
+export const LEAD_DOCUMENT_TYPE_VALUES = [
+  'QUOTE',
+  'CONTRACT',
+  'INVOICE',
+  'IMAGE',
+  'FILE',
+  'OTHER',
+] as const;
+

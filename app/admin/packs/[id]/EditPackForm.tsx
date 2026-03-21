@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES } from '@/lib/constants';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 
 type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
@@ -83,7 +83,6 @@ const TABS: Array<{ id: EditorTab; label: string; icon: string }> = [
   { id: 'texts', label: 'Textos', icon: '🌐' },
   { id: 'publish', label: 'Publicació', icon: '✅' },
 ];
-const LOCALES = ['ca', 'es', 'en'] as const;
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const calcCostHour = (price: number | null, life: number | null) =>
@@ -162,7 +161,7 @@ export default function EditPackForm({
   });
   const [packInventory, setPackInventory] = useState<PackInventoryRow[]>(pack.inventory || []);
   const [translations, setTranslations] = useState<PackTranslation[]>(
-    LOCALES.map((locale) => pack.translations.find((t) => t.locale === locale) || { locale, name: '', description: '', tagline: '', features: [] })
+    SUPPORTED_LOCALES.map((locale) => pack.translations.find((t) => t.locale === locale) || { locale, name: '', description: '', tagline: '', features: [] })
   );
 
   const itemById = useMemo(() => new Map(inventoryItems.map((i) => [i.id, i])), [inventoryItems]);
@@ -739,7 +738,7 @@ export default function EditPackForm({
           <h3 className="mb-4 text-lg font-semibold">🌐 Textos</h3>
           <p className="mb-3 text-xs">Nom del pack editable + tagline + features per idioma.</p>
           <div className="grid gap-4">
-            {LOCALES.map((locale) => {
+            {SUPPORTED_LOCALES.map((locale) => {
               const tr = translations.find((t) => t.locale === locale)!;
               const featuresValue = (tr.features || []).join('\n');
               return (
@@ -787,6 +786,3 @@ export default function EditPackForm({
     </form>
   );
 }
-
-
-

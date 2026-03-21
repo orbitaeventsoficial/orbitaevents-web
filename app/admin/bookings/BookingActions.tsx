@@ -6,9 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog from '@/app/admin/components/ConfirmDialog';
 import { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
+import { BOOKING_STATUS_OPTIONS, DELETABLE_BOOKING_STATUSES } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-
-const DELETABLE_STATUSES = new Set(['PENDING', 'CANCELLED']);
 
 export default function BookingActions({
   id,
@@ -27,7 +26,7 @@ export default function BookingActions({
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
 
-  const canDelete = DELETABLE_STATUSES.has(status);
+  const canDelete = (DELETABLE_BOOKING_STATUSES as readonly string[]).includes(status);
   const calendarHref = eventDate
     ? `/admin/calendario?date=${encodeURIComponent(eventDate.slice(0, 10))}`
     : '/admin/calendario';
@@ -36,7 +35,7 @@ export default function BookingActions({
     if (!canDelete || isDeleting) return;
     const confirmed = await confirm({
       title: 'Eliminar reserva',
-      message: 'Segur que vols eliminar aquesta reserva? Aquesta acció no es pot desfer.',
+      message: 'Segur que vols eliminar aquesta reserva? Aquesta acci� no es pot desfer.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
     });
@@ -89,11 +88,9 @@ export default function BookingActions({
         title="Canviar estat"
         aria-label="Canviar estat reserva"
       >
-        <option value="PENDING">Pendent</option>
-        <option value="CONFIRMED">Confirmada</option>
-        <option value="PREPARING">Preparant</option>
-        <option value="COMPLETED">Completada</option>
-        <option value="CANCELLED">Cancel·lada</option>
+        {BOOKING_STATUS_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
       </select>
       <Link
         href={calendarHref}
@@ -130,3 +127,4 @@ export default function BookingActions({
     </div>
   );
 }
+

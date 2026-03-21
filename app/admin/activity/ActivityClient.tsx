@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { formatDateTimeFull } from '@/lib/constants';
+import { ACTIVITY_CATEGORY_OPTIONS, ACTIVITY_DAYS_OPTIONS, formatDateTimeFull } from '@/lib/constants';
 import { useToast } from '../components/ToastProvider';
 
 interface ActivityLog {
@@ -27,21 +27,6 @@ interface ActivityResponse {
   page: number;
   pages: number;
 }
-
-const CATEGORIES = [
-  { id: 'all', label: 'Tot', icon: '📊' },
-  { id: 'comms', label: 'Comunicacions', icon: '✉️' },
-  { id: 'automation', label: 'Automatitzacions', icon: '⚡' },
-  { id: 'system', label: 'Sistema', icon: '🔄' },
-  { id: 'crud', label: 'Operacions', icon: '📝' },
-] as const;
-
-const DAYS_OPTIONS = [
-  { value: 1, label: 'Avui' },
-  { value: 7, label: '7 dies' },
-  { value: 30, label: '30 dies' },
-  { value: 90, label: '90 dies' },
-] as const;
 
 const ACTION_LABELS: Record<string, { label: string; icon: string; tone: string }> = {
   COMM_SENT: { label: 'Email enviat', icon: '📤', tone: 'admin-tone-text-info' },
@@ -222,7 +207,7 @@ export default function ActivityClient() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-1.5">
-          {CATEGORIES.map((cat) => (
+          {ACTIVITY_CATEGORY_OPTIONS.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setCategory(cat.id)}
@@ -244,7 +229,7 @@ export default function ActivityClient() {
             className="ap-input rounded-xl px-3 py-1.5 text-xs"
             aria-label="Període de temps"
           >
-            {DAYS_OPTIONS.map((opt) => (
+            {ACTIVITY_DAYS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -412,4 +397,3 @@ export default function ActivityClient() {
     </div>
   );
 }
-

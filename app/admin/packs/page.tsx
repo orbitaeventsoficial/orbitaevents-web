@@ -8,19 +8,12 @@ import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
+import { PACK_SERVICE_OPTIONS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Packs | Òrbita Admin',
-};
-
-const SERVICE_ORDER = ['bodas', 'fiestas', 'discomovil', 'empresas'];
-const SERVICE_LABELS: Record<string, string> = {
-  bodas: 'Bodes',
-  fiestas: 'Festes',
-  discomovil: 'Discomòbil',
-  empresas: 'Empreses',
 };
 
 async function getPacks() {
@@ -59,12 +52,12 @@ export default async function PacksPage() {
   const pricingConfig = await getPackPricingModelConfig();
   const configPacks = getAllPacks();
   const packsInSync = packs.length === configPacks.length;
-  const packsByService = SERVICE_ORDER.map((service) => ({
-    service,
-    label: SERVICE_LABELS[service] || service,
-    packs: packs.filter((pack) => pack.service === service),
+  const packsByService = PACK_SERVICE_OPTIONS.map(({ value, label }) => ({
+    service: value,
+    label,
+    packs: packs.filter((pack) => pack.service === value),
   })).filter((group) => group.packs.length > 0);
-  const otherPacks = packs.filter((pack) => !pack.service || !SERVICE_ORDER.includes(pack.service));
+  const otherPacks = packs.filter((pack) => !pack.service || !PACK_SERVICE_OPTIONS.some(({ value }) => value === pack.service));
   const pricingHealthByPack = new Map<string, PackPricingHealth>(
     packs.map((pack) => [pack.id, computePackPricingHealth(pack, pricingConfig)])
   );

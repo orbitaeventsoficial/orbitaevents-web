@@ -1,8 +1,9 @@
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
+import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
 
 export type PublicStatsLocale = 'es' | 'ca' | 'en';
 
-const SUPPORTED_LOCALES = new Set<PublicStatsLocale>(['es', 'ca', 'en']);
+const SUPPORTED_LOCALES = new Set<PublicStatsLocale>(SHARED_SUPPORTED_LOCALES);
 const COMPANY_START_YEAR = 2023;
 
 const LOCALE_TEXT = {

@@ -1,3 +1,4 @@
+import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 
 type CalendarDay = {
@@ -58,7 +59,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
         select: {
           slug: true,
           translations: {
-            where: { locale: { in: ['ca', 'es', 'en'] } },
+            where: { locale: { in: [...SUPPORTED_LOCALES] } },
             select: { locale: true, name: true },
           },
         },

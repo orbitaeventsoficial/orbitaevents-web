@@ -20,7 +20,7 @@ import {
   CONDITION_LABELS,
   calculateLifeRemainingPercent,
 } from '@/lib/inventory-utils';
-import { formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { DEFAULT_EXPECTED_LIFE_HOURS, INVENTORY_CATEGORY_OPTIONS, INVENTORY_STATUS_OPTIONS, formatNumber } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '../components/ToastProvider';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
@@ -151,8 +151,8 @@ export default function InventoryListClient() {
     [items]
   );
 
-  const categories = Object.keys(CATEGORY_CONFIG);
-  const statuses = Object.keys(STATUS_CONFIG);
+  const categories = INVENTORY_CATEGORY_OPTIONS.map((option) => option.value);
+  const statuses = INVENTORY_STATUS_OPTIONS.map((option) => option.value);
   const selectedBundle = useMemo(
     () => bundles.find((b) => b.id === selectedBundleId) || null,
     [bundles, selectedBundleId]
@@ -736,6 +736,3 @@ export default function InventoryListClient() {
     </AdminPage>
   );
 }
-
-
-

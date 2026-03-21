@@ -1,25 +1,10 @@
 import type { LeadDocumentType } from '@prisma/client';
+import { LEAD_DOCUMENT_ALLOWED_MIME_TYPES, LEAD_DOCUMENT_TYPE_VALUES, LEAD_DOCUMENT_UPLOAD_MAX_SIZE_BYTES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { deleteFile, uploadFile } from '@/lib/storage';
 
-const MAX_SIZE_BYTES = 8 * 1024 * 1024;
-const ALLOWED_TYPES = new Set([
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.ms-excel',
-]);
-const ALLOWED_DOC_TYPES = new Set([
-  'QUOTE',
-  'CONTRACT',
-  'INVOICE',
-  'IMAGE',
-  'FILE',
-  'OTHER',
-]);
+const ALLOWED_TYPES = new Set<string>(LEAD_DOCUMENT_ALLOWED_MIME_TYPES);
+const ALLOWED_DOC_TYPES = new Set<string>(LEAD_DOCUMENT_TYPE_VALUES);
 
 export async function listLeadDocuments(leadId: string) {
   const documents = await prisma.leadDocument.findMany({
@@ -49,7 +34,7 @@ export async function uploadLeadDocument(leadId: string, formData: FormData) {
   if (!ALLOWED_TYPES.has(file.type)) {
     return { status: 400, body: { error: 'Tipus de fitxer no permès' } };
   }
-  if (file.size > MAX_SIZE_BYTES) {
+  if (file.size > LEAD_DOCUMENT_UPLOAD_MAX_SIZE_BYTES) {
     return { status: 413, body: { error: 'Fitxer massa gran' } };
   }
 

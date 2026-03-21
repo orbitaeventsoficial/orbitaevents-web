@@ -1,10 +1,9 @@
 import { BookingStatus, InventoryCategory, ItemStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { ACTIVE_BOOKING_STATUSES, ACTIVE_INVENTORY_BOOKING_STATUSES } from '@/lib/constants';
 import { getInventoryBundles } from '@/lib/services/inventoryBundles';
 
-const ACTIVE_BOOKING_STATUSES = [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.PREPARING] as const;
-const ACTIVE_INVENTORY_STATUSES = [BookingStatus.CONFIRMED, BookingStatus.PREPARING] as const;
 type InventoryAssignmentFailure = {
   ok: false;
   reason: 'NOT_FOUND' | 'ALREADY_ASSIGNED' | 'OVERLAP';
@@ -215,7 +214,7 @@ export async function removeBookingInventoryAssignment(assignmentId: string | nu
   const otherAssignments = await prisma.bookingInventory.count({
     where: {
       itemId: assignment.itemId,
-      booking: { status: { in: [...ACTIVE_INVENTORY_STATUSES] } },
+      booking: { status: { in: [...ACTIVE_INVENTORY_BOOKING_STATUSES] } },
     },
   });
 
@@ -234,8 +233,3 @@ export async function removeBookingInventoryAssignment(assignmentId: string | nu
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
-
-
-
-

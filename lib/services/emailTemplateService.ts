@@ -1,3 +1,4 @@
+import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 
 interface TemplateVariables {
@@ -114,7 +115,7 @@ export async function listTemplates(): Promise<{
   }
 
   return Object.entries(TEMPLATE_SLUGS).map(([, slug]) => {
-    const locales = ['ca', 'es', 'en'].map((locale) => {
+    const locales = SUPPORTED_LOCALES.map((locale) => {
       const db = dbMap.get(`${slug}:${locale}`);
       return {
         locale,

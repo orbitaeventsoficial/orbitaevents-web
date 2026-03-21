@@ -1,6 +1,6 @@
 // app/admin/mensajes/page.tsx
 import { log } from '@/lib/logger';
-import { LEAD_STATUS_CONFIG, WHATSAPP_URL, formatDateSimple } from '@/lib/constants';
+import { LEAD_STATUS_CONFIG, WHATSAPP_URL, formatDateSimple, getSourceDisplay } from '@/lib/constants';
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -62,17 +62,6 @@ const DEFAULT_LEAD_STATUS_STYLE = {
   border: 'admin-tone-border-info',
 };
 
-const SOURCE_ICONS: Record<string, string> = {
-  WEBSITE: '🌐',
-  CONFIGURATOR: '⚙️',
-  PHONE: '📞',
-  WHATSAPP: '💬',
-  INSTAGRAM: '📸',
-  WALLAPOP: '🟣',
-  REFERRAL: '👥',
-  GOOGLE: '🔍',
-  OTHER: '📩',
-};
 
 function timeAgo(date: Date): string {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -169,7 +158,7 @@ export default async function MensajesPage() {
         <div className="divide-y divide-white/5">
           {data.recentLeads.map((lead) => {
             const statusConfig = LEAD_STATUS_CONFIG[lead.status] || DEFAULT_LEAD_STATUS_STYLE;
-            const sourceIcon = SOURCE_ICONS[lead.source] || '📩';
+            const sourceIcon = getSourceDisplay(lead.source).icon;
             return (
               <div key={lead.id} className="p-4 transition-colors">
                 <div className="flex items-start gap-4">

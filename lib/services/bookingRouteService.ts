@@ -1,3 +1,4 @@
+import { BOOKING_CALENDAR_SYNC_FIELDS } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { BookingStatus, EventType } from '@prisma/client';
@@ -51,7 +52,7 @@ export async function getBookingDetail(id: string) {
 
 export async function prepareBookingPatchData(existing: ExistingBookingRecord, input: Record<string, unknown>) {
   const body: Record<string, unknown> = { ...input };
-  const syncSensitiveFields = new Set(['status', 'eventDate', 'eventLocation', 'eventVenue', 'startTime', 'endTime', 'notes']);
+  const syncSensitiveFields = new Set<string>(BOOKING_CALENDAR_SYNC_FIELDS);
   const shouldSyncCalendar = Object.keys(body).some((key) => syncSensitiveFields.has(key));
 
   if (body.eventDate && typeof body.eventDate === 'string') body.eventDate = new Date(body.eventDate);
@@ -225,6 +226,7 @@ export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecor
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
+
 
 
 

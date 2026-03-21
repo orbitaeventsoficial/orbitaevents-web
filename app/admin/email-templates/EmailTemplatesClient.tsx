@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '../components/ToastProvider';
+import { SUPPORTED_LOCALES, SUPPORTED_LOCALE_LABELS } from '@/lib/constants';
 
 interface TemplateInfo {
   slug: string;
@@ -16,7 +17,6 @@ const SOURCE_BADGE = {
   default: { label: 'Per defecte', className: 'ap-badge' },
 } as const;
 
-const LOCALE_LABELS: Record<string, string> = { ca: 'Català', es: 'Castellà', en: 'Anglès' };
 
 export default function EmailTemplatesClient() {
   const toast = useToast();
@@ -64,8 +64,8 @@ export default function EmailTemplatesClient() {
         </div>
         <div className="ap-kpi ap-kpi--info">
           <div className="ap-kpi-label">Idiomes</div>
-          <div className="ap-kpi-value">3</div>
-          <div className="ap-kpi-trend">CA · ES · EN</div>
+          <div className="ap-kpi-value">{SUPPORTED_LOCALES.length}</div>
+          <div className="ap-kpi-trend">{SUPPORTED_LOCALES.map((locale) => locale.toUpperCase()).join(' · ')}</div>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default function EmailTemplatesClient() {
                     href={`/admin/email-templates/${t.slug}?locale=${l.locale}`}
                     className="ap-btn ap-btn--secondary"
                   >
-                    <span className="font-semibold">{LOCALE_LABELS[l.locale] || l.locale}</span>
+                    <span className="font-semibold">{SUPPORTED_LOCALE_LABELS[l.locale] || l.locale}</span>
                     <span className={badge.className}>{badge.label}</span>
                   </Link>
                 );

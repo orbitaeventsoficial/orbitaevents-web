@@ -51,3 +51,13 @@ export const PRIVACY_AUDIT_ACTION_LABELS: Record<string, string> = {
   ACCOUNT_DELETED: 'Compte eliminat',
   RETENTION_APPLIED: 'Retenció aplicada',
 };
+
+export const PRIVACY_REQUEST_ARTICLES: Record<string, string> = {
+  ACCESS: '15',
+  RECTIFICATION: '16',
+  ERASURE: '17',
+  RESTRICTION: '18',
+  PORTABILITY: '20',
+  OBJECTION: '21',
+  AUTOMATED: '22',
+};

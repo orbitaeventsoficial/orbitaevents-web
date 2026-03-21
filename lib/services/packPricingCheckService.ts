@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import { OPEN_TASK_STATUSES } from '@/lib/constants';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 
 const DIVERGENCE_THRESHOLD_PCT = 15;
-const OPEN_TASK_STATUSES = ['OPEN', 'IN_PROGRESS'] as const;
 
 type PackPricingCheckResult = {
   reviewed: number;

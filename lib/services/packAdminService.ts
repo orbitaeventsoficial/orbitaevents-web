@@ -4,6 +4,7 @@ import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/servi
 import { getAllPacks } from '@/config/packs-config';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { log } from '@/lib/logger';
+import { SUPPORTED_LOCALES } from '@/lib/constants';
 
 type PackTranslationInput = {
   locale: string;
@@ -44,7 +45,7 @@ type PackInventoryInput = {
 async function completePackTranslations(input: unknown): Promise<PackTranslationInput[] | undefined> {
   if (!Array.isArray(input) || input.length === 0) return undefined;
 
-  const locales = ['ca', 'es', 'en'] as const;
+  const locales = SUPPORTED_LOCALES;
   const normalized: PackTranslationInput[] = locales.map((locale) => {
     const found = (input as PackTranslationInput[]).find((translation) => translation?.locale === locale);
     return {
@@ -350,5 +351,3 @@ export async function syncAdminPacksFromConfig() {
     errors: errors.length > 0 ? errors : undefined,
   };
 }
-
-

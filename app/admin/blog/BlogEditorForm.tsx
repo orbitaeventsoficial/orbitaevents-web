@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
+import { BLOG_CATEGORY_OPTIONS } from '@/lib/constants';
 
 type Locale = 'es' | 'ca';
 
@@ -47,15 +48,6 @@ const INITIAL_FORM: FormState = {
     ca: { ...EMPTY_TRANSLATION },
   },
 };
-
-const CATEGORIES = [
-  { value: 'general', label: 'General' },
-  { value: 'bodas', label: 'Bodes' },
-  { value: 'eventos', label: 'Esdeveniments' },
-  { value: 'consejos', label: 'Consells' },
-  { value: 'tendencias', label: 'Tendències' },
-  { value: 'tecnologia', label: 'Tecnologia' },
-];
 
 function generateSlug(title: string): string {
   return title
@@ -252,7 +244,7 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
             <div>
               <label htmlFor="blog-category" className="mb-1 block text-sm">Categoria</label>
               <select id="blog-category" value={formData.category} onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))} className="ap-input w-full px-4 py-2">
-                {CATEGORIES.map((c) => (
+                {BLOG_CATEGORY_OPTIONS.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
               </select>

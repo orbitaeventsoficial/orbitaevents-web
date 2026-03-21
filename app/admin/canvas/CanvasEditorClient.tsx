@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -101,7 +102,6 @@ const TEMPLATES: CanvasTemplate[] = [
   },
 ];
 
-const COLORS = ['#ffffff', '#06b6d4', '#f97316', '#eab308', '#22c55e', '#ec4899', '#a855f7', '#ef4444', '#000000', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)'];
 
 let nextId = 100;
 function genId() { return `el-${nextId++}`; }
@@ -533,7 +533,7 @@ export default function CanvasEditorClient() {
               {selected.type === 'text' ? 'Color text' : 'Color fons'}
             </label>
             <div className="flex flex-wrap gap-1 mb-2">
-              {COLORS.map(c => (
+              {CANVAS_COLOR_OPTIONS.map(c => (
                 <button
                   key={c}
                   onClick={() => updateElement(selected.id, selected.type === 'text' ? { color: c } : { fill: c })}

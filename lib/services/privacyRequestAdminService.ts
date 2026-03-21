@@ -1,18 +1,10 @@
 import { Prisma, type DataResponseType } from '@prisma/client';
+import { PRIVACY_REQUEST_ARTICLES } from '@/lib/constants/privacy';
 import { prisma } from '@/lib/prisma';
 import { anonymizeCustomerData, exportCustomerData, logPrivacyAction } from '@/lib/services/privacyService';
 
 function getArticle(requestType: string): string {
-  const articles: Record<string, string> = {
-    ACCESS: '15',
-    RECTIFICATION: '16',
-    ERASURE: '17',
-    RESTRICTION: '18',
-    PORTABILITY: '20',
-    OBJECTION: '21',
-    AUTOMATED: '22',
-  };
-  return articles[requestType] || '15';
+  return PRIVACY_REQUEST_ARTICLES[requestType] || '15';
 }
 
 export async function processPrivacyRequestById(id: string, action: 'approve' | 'reject', notes: string | undefined, adminUser: string) {

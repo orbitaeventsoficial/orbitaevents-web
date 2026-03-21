@@ -1,4 +1,4 @@
-import { LeadTaskStatus } from '@prisma/client';
+import { OPEN_TASK_STATUSES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { createUniversalTask } from '@/lib/services/tasks/taskCreation';
 
@@ -12,8 +12,6 @@ type QuoteFollowUpInput = {
   dueDate?: Date;
 };
 
-const OPEN_STATUSES: LeadTaskStatus[] = ['OPEN', 'IN_PROGRESS'];
-
 export async function ensureQuoteFollowUpTask(input: QuoteFollowUpInput): Promise<void> {
   const dueDate = input.dueDate ?? new Date(Date.now() + 48 * 60 * 60 * 1000);
 
@@ -21,12 +19,12 @@ export async function ensureQuoteFollowUpTask(input: QuoteFollowUpInput): Promis
     ? {
         customerId: input.customerId ?? null,
         proposalId: input.proposalId,
-        status: { in: OPEN_STATUSES },
+        status: { in: [...OPEN_TASK_STATUSES] },
       }
     : {
         leadId: input.leadId,
         title: input.title,
-        status: { in: OPEN_STATUSES },
+        status: { in: [...OPEN_TASK_STATUSES] },
       };
 
   const existingTask = await prisma.task.findFirst({
@@ -51,4 +49,3 @@ export async function ensureQuoteFollowUpTask(input: QuoteFollowUpInput): Promis
     createdBy: 'Sistema',
   });
 }
-

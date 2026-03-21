@@ -1,3 +1,4 @@
+import { RECENT_FEED_ANONYMOUS_NAMES, RECENT_FEED_BOOKING_STATUSES, RECENT_FEED_EVENT_TYPE_ICONS, RECENT_FEED_EVENT_TYPE_SERVICE_LABELS } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 
 type RecentFeedBooking = {
@@ -14,7 +15,7 @@ export async function listRecentBookingsFeed(): Promise<{ bookings: RecentFeedBo
   const recentBookings = await prisma.booking.findMany({
     where: {
       status: {
-        in: ['CONFIRMED', 'PREPARING', 'COMPLETED'],
+        in: [...RECENT_FEED_BOOKING_STATUSES],
       },
       createdAt: {
         gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -81,16 +82,7 @@ function anonymizeName(name: string): string {
 }
 
 function getAnonymousName(eventType: string): string {
-  const names: Record<string, string[]> = {
-    WEDDING: ['Marc & Laura', 'Pau & Maria', 'Joan & Anna', 'Albert & Carla'],
-    BIRTHDAY: ['Sara', 'Marc', 'Laura', 'Pol', 'Maria'],
-    CORPORATE: ['Empresa Tech', 'Start-up BCN', 'Consulting SL'],
-    PRIVATE_PARTY: ['Marc', 'Laura', 'Joan', 'Anna'],
-    COMMUNION: ['Família García', 'Família López'],
-    BAPTISM: ['Família Martí', 'Família Puig'],
-    OTHER: ['Client VIP', 'Reserva especial'],
-  };
-  const options = names[eventType] || names.OTHER;
+  const options = RECENT_FEED_ANONYMOUS_NAMES[eventType] || RECENT_FEED_ANONYMOUS_NAMES.OTHER;
   return options[Math.floor(Math.random() * options.length)];
 }
 
@@ -106,33 +98,11 @@ function extractCity(location: string): string {
 }
 
 function getServiceName(eventType: string): string {
-  const services: Record<string, string> = {
-    WEDDING: 'DJ + Producció Boda',
-    BIRTHDAY: 'Festa Aniversari',
-    CORPORATE: 'Event Corporatiu',
-    COMMUNION: 'Comunió',
-    BAPTISM: 'Bateig',
-    GRADUATION: 'Graduació',
-    ANNIVERSARY: 'Aniversari',
-    PRIVATE_PARTY: 'Festa Privada',
-    OTHER: 'Event Especial',
-  };
-  return services[eventType] || 'Event Personalitzat';
+  return RECENT_FEED_EVENT_TYPE_SERVICE_LABELS[eventType] || 'Event Personalitzat';
 }
 
 function getIconForType(eventType: string): 'check' | 'sparkles' | 'heart' | 'building' {
-  const icons: Record<string, 'check' | 'sparkles' | 'heart' | 'building'> = {
-    WEDDING: 'heart',
-    BIRTHDAY: 'sparkles',
-    CORPORATE: 'building',
-    COMMUNION: 'sparkles',
-    BAPTISM: 'heart',
-    GRADUATION: 'sparkles',
-    ANNIVERSARY: 'heart',
-    PRIVATE_PARTY: 'sparkles',
-    OTHER: 'check',
-  };
-  return icons[eventType] || 'check';
+  return RECENT_FEED_EVENT_TYPE_ICONS[eventType] || 'check';
 }
 
 function getTimeAgo(date: Date): string {

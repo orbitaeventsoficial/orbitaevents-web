@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../components/adminHelpGlossary';
-import { LEAD_STATUS_LABELS as STATUS_LABELS, PRIORITY_LABELS, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_LABELS as STATUS_LABELS, LEAD_STATUS_VALUES, PRIORITY_LABELS, PRIORITY_VALUES, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useConfirmDialog } from '../../components/ConfirmDialog';
@@ -34,10 +34,6 @@ type LeadProfile = {
   preferredLocale?: string | null;
 };
 
-const STATUS_OPTIONS = Object.keys(STATUS_LABELS);
-const PRIORITY_OPTIONS = Object.keys(PRIORITY_LABELS);
-const EVENT_TYPES = Object.keys(EVENT_TYPE_LABELS);
-const SOURCE_OPTIONS = Object.keys(SOURCE_LABELS);
 
 export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   const router = useRouter();
@@ -229,7 +225,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             value={form.eventType}
             onChange={(e) => updateField('eventType', e.target.value)}
           >
-            {EVENT_TYPES.map((type) => (
+            {EVENT_TYPE_VALUES.map((type) => (
               <option key={type} value={type}>
                 {EVENT_TYPE_LABELS[type] || type}
               </option>
@@ -279,7 +275,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             value={form.status}
             onChange={(e) => updateField('status', e.target.value)}
           >
-            {STATUS_OPTIONS.map((item) => (
+            {LEAD_STATUS_VALUES.map((item) => (
               <option key={item} value={item}>
                 {STATUS_LABELS[item] || item}
               </option>
@@ -296,7 +292,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             value={form.priority}
             onChange={(e) => updateField('priority', e.target.value)}
           >
-            {PRIORITY_OPTIONS.map((item) => (
+            {PRIORITY_VALUES.map((item) => (
               <option key={item} value={item}>
                 {PRIORITY_LABELS[item] || item}
               </option>
@@ -313,7 +309,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             value={form.source}
             onChange={(e) => updateField('source', e.target.value)}
           >
-            {SOURCE_OPTIONS.map((item) => (
+            {LEAD_SOURCE_VALUES.map((item) => (
               <option key={item} value={item}>
                 {SOURCE_LABELS[item] || item}
               </option>
@@ -421,9 +417,3 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     </section>
   );
 }
-
-
-
-
-
-

@@ -4,13 +4,10 @@
  * Cada event té metadades (títol, lloc, data, serveis) + galeria de fotos/vídeos
  */
 
+import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
 import { prisma } from '@/lib/prisma';
 
-const VALID_SLUGS = [
-  'bodas', 'discomovil', 'eventos-empresa', 'fiestas-infantiles',
-  'fiestas-privadas', 'produccion-tecnica', 'alquiler-equipo',
-  'fiestas-tematicas-halloween', 'fiestas-tematicas-mon-magic',
-];
+const VALID_SLUGS = PORTFOLIO_CATEGORIES.map(({ slug }) => slug);
 
 /**
  * Crear un event de portfolio

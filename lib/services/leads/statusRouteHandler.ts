@@ -3,18 +3,9 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
-import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { LEAD_STATUS_VALUES, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 
-const VALID_STATUSES = [
-  'NEW',
-  'CONTACTED',
-  'QUOTE_SENT',
-  'NEGOTIATING',
-  'WON',
-  'LOST',
-] as const;
-
-type LeadStatus = (typeof VALID_STATUSES)[number];
+type LeadStatus = (typeof LEAD_STATUS_VALUES)[number];
 
 export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
   const authError = requireAuth(req);
@@ -24,7 +15,7 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
     const body = await req.json();
     const { status } = body as { status?: string };
 
-    if (!status || !VALID_STATUSES.includes(status as LeadStatus)) {
+    if (!status || !LEAD_STATUS_VALUES.includes(status as LeadStatus)) {
       return NextResponse.json({ error: 'Estat invàlid' }, { status: 400 });
     }
 

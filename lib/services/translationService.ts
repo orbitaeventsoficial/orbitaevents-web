@@ -1,16 +1,16 @@
+import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 const MAX_TEXT_LENGTH = 2000;
 const MAX_BATCH_TEXTS = 200;
 const MAX_BATCH_TOTAL_CHARS = 50000;
 const TRANSLATE_TIMEOUT_MS = 6000;
-const ALLOWED_LANGUAGES = ['es', 'ca', 'en'] as const;
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 const DEEPL_BASE_URL =
   process.env.DEEPL_BASE_URL ||
   (DEEPL_API_KEY?.includes(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
 
-type AllowedLanguage = (typeof ALLOWED_LANGUAGES)[number];
+type AllowedLanguage = (typeof SUPPORTED_LOCALES)[number];
 
 type TranslateBody = {
   text?: string;

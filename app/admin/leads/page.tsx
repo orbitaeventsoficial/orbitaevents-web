@@ -18,7 +18,7 @@ export const metadata = {
   title: 'Entrades | Òrbita Admin',
 };
 
-import { EVENT_TYPE_LABELS, LEAD_STATUS_LABELS, PRIORITY_LABELS, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
 
 const STATUS_CONFIG = STATUS_COLOR_CONFIG;
 const PRIORITY_CONFIG = PRIORITY_COLOR_CONFIG;
@@ -44,25 +44,21 @@ function buildQuery(filters: {
   return params.toString();
 }
 
-const VALID_STATUS = Object.keys(LEAD_STATUS_LABELS) as LeadStatus[];
-const VALID_PRIORITY = Object.keys(PRIORITY_LABELS) as Priority[];
-const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS) as EventType[];
-const VALID_SOURCE = Object.keys(SOURCE_LABELS) as LeadSource[];
 
 function isLeadStatus(value: string): value is LeadStatus {
-  return (VALID_STATUS as readonly string[]).includes(value);
+  return (LEAD_STATUS_VALUES as readonly string[]).includes(value);
 }
 
 function isPriority(value: string): value is Priority {
-  return (VALID_PRIORITY as readonly string[]).includes(value);
+  return (PRIORITY_VALUES as readonly string[]).includes(value);
 }
 
 function isEventType(value: string): value is EventType {
-  return (VALID_EVENT_TYPE as readonly string[]).includes(value);
+  return (EVENT_TYPE_VALUES as readonly string[]).includes(value);
 }
 
 function isLeadSource(value: string): value is LeadSource {
-  return (VALID_SOURCE as readonly string[]).includes(value);
+  return (LEAD_SOURCE_VALUES as readonly string[]).includes(value);
 }
 
 function toArray(value?: string | string[]): string[] {
@@ -540,8 +536,3 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
-
-
-
-
-

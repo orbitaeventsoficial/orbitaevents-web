@@ -1,5 +1,6 @@
 'use client';
 
+import { CONTRACT_STATUS_CONFIG, INVOICE_STATUS_LABELS, PROPOSAL_STATUS_CONFIG } from '@/lib/constants';
 interface ProposalDoc {
   id: string;
   reference: string;
@@ -31,19 +32,16 @@ function getStepStyle(done: boolean, active: boolean) {
 }
 
 function proposalStatusLabel(status: string) {
-  const map: Record<string, string> = { DRAFT: 'Esborrany', SENT: 'Enviat', VIEWED: 'Visualitzat', ACCEPTED: 'Acceptat', REJECTED: 'Rebutjat', EXPIRED: 'Expirat' };
-  return map[status] || status;
+  return PROPOSAL_STATUS_CONFIG[status]?.label || status;
 }
 
 function contractStatusLabel(status: string | null) {
   if (!status) return 'Pendent';
-  const map: Record<string, string> = { DRAFT: 'Esborrany', SENT: 'Enviat', SIGNED: 'Signat', CANCELLED: 'Cancel·lat' };
-  return map[status] || status;
+  return CONTRACT_STATUS_CONFIG[status]?.label || status;
 }
 
 function invoiceStatusLabel(status: string) {
-  const map: Record<string, string> = { DRAFT: 'Esborrany', PENDING_SYNC: 'Sincronitzant...', SYNCED: 'Sincronitzada', SYNC_ERROR: 'Error sync', PAID: 'Pagada', CANCELLED: 'Cancel·lada' };
-  return map[status] || status;
+  return INVOICE_STATUS_LABELS[status] || status;
 }
 
 export default function DocumentFlowSection({ proposals, invoices }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[] }) {

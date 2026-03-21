@@ -5,6 +5,7 @@
  */
 
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { EVENT_TYPE_DOCUMENT_LABELS } from '@/lib/constants';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { getAppBaseUrl } from '@/lib/site';
@@ -493,18 +494,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
 // ============================================
 
 function getEventTypeLabel(eventType: string): string {
-  const labels: Record<string, string> = {
-    WEDDING: 'Boda',
-    BIRTHDAY: 'Aniversari / Cumpleaños',
-    CORPORATE: 'Esdeveniment Corporatiu',
-    COMMUNION: 'Comunió',
-    BAPTISM: 'Bateig',
-    GRADUATION: 'Graduació',
-    ANNIVERSARY: 'Aniversari',
-    PRIVATE_PARTY: 'Festa Privada',
-    OTHER: 'Esdeveniment',
-  };
-  return labels[eventType] || eventType;
+  return EVENT_TYPE_DOCUMENT_LABELS[eventType] || eventType;
 }
 
 // ============================================
@@ -567,5 +557,6 @@ export function createQuoteFromLead(
     notes: lead.message || undefined,
   };
 }
+
 
 

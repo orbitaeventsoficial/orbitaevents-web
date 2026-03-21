@@ -1,0 +1,47 @@
+export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
+  '1': '/admin/leads',
+  '2': '/admin/tasks',
+  '3': '/admin/emails',
+  '4': '/admin/bookings',
+  c: '/admin/calendario',
+};
+
+export const ADMIN_PAGE_LABELS: Record<string, string> = {
+  leads: 'Entrades',
+  bookings: 'Reserves',
+  tasks: 'Tasques',
+  packs: 'Packs',
+  analytics: 'Analítica',
+  'sales-ops': 'Operativa de vendes',
+  catalog: 'Catàleg',
+  emails: 'Correus automàtics',
+  inbox: 'Safata (IMAP)',
+  calendario: 'Calendari',
+  settings: 'Configuració',
+  integrations: 'Integracions',
+  quotes: 'Plantilla pressupostos',
+  inventory: 'Inventari',
+  clientes: 'Clients',
+  mensajes: 'Missatges',
+  ressenyes: 'Ressenyes',
+  faq: 'PMF',
+  pricing: 'Preus',
+  presupuestos: 'Editor PDF pressupost',
+  coverage: 'Cobertura',
+  features: 'Features',
+  stats: 'Estadístiques',
+  blog: 'Blog',
+  'text-manager': 'Textos PRO',
+  'css-manager': 'CSS PRO',
+  'post-event': 'Post-esdeveniment',
+  'google-reviews': 'Ressenyes de Google',
+  portfolio: 'Portfolio',
+};
+
+export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
+  inventory: 'Fitxa inventari',
+  bookings: 'Fitxa reserva',
+  leads: 'Fitxa entrada',
+  clientes: 'Fitxa client',
+  packs: 'Fitxa pack',
+};
