@@ -1,7 +1,7 @@
 import type { CustomerHubDTO, BookingDTO } from '@/lib/customer-hub/dto';
 import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
-import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG, formatDateFull, formatNumber } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG, formatDateFull, formatNumber, getEventLabel } from '@/lib/constants';
 
 function getBookingStatusBadgeClass(status: string) {
   const tone = BOOKING_STATUS_CONFIG[status];
@@ -77,7 +77,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 {/* Event type + data + horari + countdown */}
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   {booking.eventType && (
-                    <span>{EVENT_TYPE_LABELS[booking.eventType] || booking.eventType}</span>
+                    <span>{getEventLabel(booking.eventType)}</span>
                   )}
                   <span>
                     {booking.date

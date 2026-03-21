@@ -20,7 +20,8 @@ export async function generateMetadata({ params }: Props) {
       title: `${data.customer.name} - Fitxa Client | Admin`,
       description: `Gestió del client ${data.customer.name}`,
     };
-  } catch {
+  } catch (error) {
+    console.warn('[customerHub] metadata fallback', error);
     return {
       title: 'Client no trobat | Admin',
     };
@@ -47,7 +48,8 @@ async function CustomerHubLoader({ id }: { id: string }) {
   try {
     const data = await fetchCustomerHub(id);
     return <CustomerHubClient initial={data} />;
-  } catch {
+  } catch (error) {
+    console.warn('[customerHub] not found', error);
     notFound();
   }
 }

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import EditPackForm from './EditPackForm';
 import { AdminPage } from '../../components/AdminPage';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
-import { BOOKING_STATUS_CONFIG, formatDateSimple, formatCurrency } from '@/lib/constants';
+import { formatDateSimple, formatCurrency, getBookingStatusLabel } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -151,7 +151,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
                     b.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400' :
                     'bg-amber-500/20 text-amber-400'
                   }`}>
-                    {BOOKING_STATUS_CONFIG[b.status as keyof typeof BOOKING_STATUS_CONFIG]?.label || b.status}
+                    {getBookingStatusLabel(b.status)}
                   </span>
                   <span className="text-xs font-medium">{formatCurrency(b.total || 0, 'ca')}</span>
                 </div>

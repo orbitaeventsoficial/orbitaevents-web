@@ -1,6 +1,6 @@
 'use client';
 
-import { CONTRACT_STATUS_CONFIG, INVOICE_STATUS_LABELS, PROPOSAL_STATUS_CONFIG } from '@/lib/constants';
+import { getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
 interface ProposalDoc {
   id: string;
   reference: string;
@@ -31,19 +31,6 @@ function getStepStyle(done: boolean, active: boolean) {
   return STEP_STYLES.pending;
 }
 
-function proposalStatusLabel(status: string) {
-  return PROPOSAL_STATUS_CONFIG[status]?.label || status;
-}
-
-function contractStatusLabel(status: string | null) {
-  if (!status) return 'Pendent';
-  return CONTRACT_STATUS_CONFIG[status]?.label || status;
-}
-
-function invoiceStatusLabel(status: string) {
-  return INVOICE_STATUS_LABELS[status] || status;
-}
-
 export default function DocumentFlowSection({ proposals, invoices }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[] }) {
   const activeProposal = proposals.find((p) => p.status === 'ACCEPTED' || p.status === 'SENT') || proposals[0];
   const activeInvoice = invoices.find((inv) => inv.status !== 'CANCELLED');
@@ -58,9 +45,9 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
   if (!hasProposal && !hasInvoice) return null;
 
   const steps = [
-    { label: 'Pressupost', icon: '📄', style: getStepStyle(proposalAccepted, hasProposal && !proposalAccepted), ref: activeProposal?.reference, status: activeProposal ? proposalStatusLabel(activeProposal.status) : null, link: activeProposal?.pdfUrl ? { href: activeProposal.pdfUrl, label: 'PDF' } : null, empty: !hasProposal ? 'Sense pressupost' : null },
-    { label: 'Contracte', icon: '📝', style: getStepStyle(contractSigned, hasContract && !contractSigned), ref: activeProposal?.contractReference, status: hasContract ? contractStatusLabel(activeProposal?.contractStatus ?? null) : null, link: activeProposal?.contractPdfUrl ? { href: activeProposal.contractPdfUrl, label: 'PDF' } : null, empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null },
-    { label: 'Factura', icon: '🧾', style: getStepStyle(invoicePaid, hasInvoice && !invoicePaid), ref: activeInvoice?.reference, status: activeInvoice ? invoiceStatusLabel(activeInvoice.status) : null, link: activeInvoice?.holdedInvoiceUrl ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded' } : null, empty: !hasInvoice ? 'Sense factura' : null },
+    { label: 'Pressupost', icon: '📄', style: getStepStyle(proposalAccepted, hasProposal && !proposalAccepted), ref: activeProposal?.reference, status: activeProposal ? getProposalStatusDisplay(activeProposal.status).label : null, link: activeProposal?.pdfUrl ? { href: activeProposal.pdfUrl, label: 'PDF' } : null, empty: !hasProposal ? 'Sense pressupost' : null },
+    { label: 'Contracte', icon: '📝', style: getStepStyle(contractSigned, hasContract && !contractSigned), ref: activeProposal?.contractReference, status: hasContract ? getContractStatusLabel(activeProposal?.contractStatus ?? null) : null, link: activeProposal?.contractPdfUrl ? { href: activeProposal.contractPdfUrl, label: 'PDF' } : null, empty: !hasContract ? (proposalAccepted ? 'Pendent de generar' : 'Requereix pressupost acceptat') : null },
+    { label: 'Factura', icon: '🧾', style: getStepStyle(invoicePaid, hasInvoice && !invoicePaid), ref: activeInvoice?.reference, status: activeInvoice ? getInvoiceStatusLabel(activeInvoice.status) : null, link: activeInvoice?.holdedInvoiceUrl ? { href: activeInvoice.holdedInvoiceUrl, label: 'Holded' } : null, empty: !hasInvoice ? 'Sense factura' : null },
   ];
 
   const progressWidth = invoicePaid ? 'calc(100% - 3rem)' : hasInvoice ? 'calc(83% - 2.5rem)' : contractSigned ? 'calc(67% - 2rem)' : hasContract ? 'calc(50% - 1.5rem)' : proposalAccepted ? 'calc(33% - 1rem)' : hasProposal ? 'calc(16% - 0.5rem)' : '0%';

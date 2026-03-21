@@ -70,8 +70,8 @@ export default function BookingPipelineView() {
         marginPct: typeof b.marginPct === 'number' ? b.marginPct : null,
       }));
       setBookings(mapped);
-    } catch {
-      toast.error('Error carregant reserves');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error carregant reserves');
     } finally {
       setLoading(false);
     }
@@ -110,9 +110,9 @@ export default function BookingPipelineView() {
         const targetLabel = COLUMNS_DEF.find((c) => c.status === newStatus)?.label || newStatus;
         toast.success(`Reserva moguda a ${targetLabel}`);
       }
-    } catch {
+    } catch (error) {
       setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: prevStatus } : b)));
-      toast.error('Error de connexió');
+      toast.error(error instanceof Error ? error.message : 'Error de connexió');
     } finally {
       setUpdatingId(null);
     }

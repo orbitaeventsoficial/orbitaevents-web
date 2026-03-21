@@ -1,6 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useToast } from '../../components/ToastProvider';
 
 interface HeroMedia {
   id: string;
@@ -19,19 +21,44 @@ export default function HeroMediaAdmin() {
   const [media, setMedia] = useState<HeroMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState('');
   const [labelInput, setLabelInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   const fetchMedia = useCallback(async () => {
-    const res = await fetch('/api/admin/hero-media');
-    if (res.ok) setMedia(await res.json());
-    setLoading(false);
-  }, []);
+    try {
+      setLoadError(null);
+      const res = await fetch('/api/admin/hero-media');
+      if (!res.ok) {
+        throw new Error("No s'ha pogut carregar el hero media");
+      }
+      setMedia(await res.json());
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "No s'ha pogut carregar el hero media";
+      setLoadError(message);
+      toast.error(message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     fetchMedia();
   }, [fetchMedia]);
+
+  const parseHeroMediaError = async (response: Response, fallback: string) => {
+    try {
+      const data = await response.json();
+      if (data?.error && typeof data.error === 'string') return data.error;
+    } catch (error) {
+      console.warn("No s'ha pogut llegir el payload d'error del hero media", error);
+    }
+    return fallback;
+  };
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
@@ -42,44 +69,78 @@ export default function HeroMediaAdmin() {
     formData.append('file', file);
     formData.append('label', labelInput || file.name);
 
-    await fetch('/api/admin/hero-media', { method: 'POST', body: formData });
-    setLabelInput('');
-    if (fileRef.current) fileRef.current.value = '';
-    await fetchMedia();
-    setUploading(false);
+    try {
+      const response = await fetch('/api/admin/hero-media', { method: 'POST', body: formData });
+      if (!response.ok) {
+        throw new Error(await parseHeroMediaError(response, "No s'ha pogut pujar el fitxer"));
+      }
+      setLabelInput('');
+      if (fileRef.current) fileRef.current.value = '';
+      await fetchMedia();
+      toast.success('Fitxer pujat');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut pujar el fitxer");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleAddUrl = async () => {
     if (!urlInput.trim()) return;
     setUploading(true);
-    await fetch('/api/admin/hero-media', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: urlInput, label: labelInput || 'External' }),
-    });
-    setUrlInput('');
-    setLabelInput('');
-    await fetchMedia();
-    setUploading(false);
+    try {
+      const response = await fetch('/api/admin/hero-media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlInput, label: labelInput || 'External' }),
+      });
+      if (!response.ok) {
+        throw new Error(await parseHeroMediaError(response, "No s'ha pogut afegir la URL"));
+      }
+      setUrlInput('');
+      setLabelInput('');
+      await fetchMedia();
+      toast.success('URL afegida');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut afegir la URL");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleToggle = async (id: string) => {
-    await fetch('/api/admin/hero-media', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'toggle', id }),
-    });
-    await fetchMedia();
+    try {
+      const response = await fetch('/api/admin/hero-media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'toggle', id }),
+      });
+      if (!response.ok) {
+        throw new Error(await parseHeroMediaError(response, "No s'ha pogut actualitzar el mitjà"));
+      }
+      await fetchMedia();
+      toast.success('Mitjà actualitzat');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut actualitzar el mitjà");
+    }
   };
 
   const handleDelete = async (id: string, label: string) => {
     if (!confirm(`Eliminar "${label}"?`)) return;
-    await fetch('/api/admin/hero-media', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    await fetchMedia();
+    try {
+      const response = await fetch('/api/admin/hero-media', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) {
+        throw new Error(await parseHeroMediaError(response, "No s'ha pogut eliminar el mitjà"));
+      }
+      await fetchMedia();
+      toast.success('Mitjà eliminat');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut eliminar el mitjà");
+    }
   };
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
@@ -88,12 +149,20 @@ export default function HeroMediaAdmin() {
     if (targetIndex < 0 || targetIndex >= sorted.length) return;
     [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
     const ids = sorted.map((item) => item.id);
-    await fetch('/api/admin/hero-media', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'reorder', ids }),
-    });
-    await fetchMedia();
+
+    try {
+      const response = await fetch('/api/admin/hero-media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reorder', ids }),
+      });
+      if (!response.ok) {
+        throw new Error(await parseHeroMediaError(response, "No s'ha pogut reordenar el hero media"));
+      }
+      await fetchMedia();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut reordenar el hero media");
+    }
   };
 
   const activeCount = media.filter((item) => item.active).length;
@@ -106,6 +175,12 @@ export default function HeroMediaAdmin() {
           <p className="mt-1 text-sm">Imatges i vídeos que roten al hero. {activeCount} actius de {media.length}.</p>
         </div>
       </div>
+
+      {loadError && (
+        <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300">
+          {loadError}
+        </div>
+      )}
 
       <div className="mb-8 rounded-xl border p-6 admin-card-glass">
         <h2 className="mb-4 text-lg font-semibold">Afegir mitjà</h2>
@@ -181,7 +256,14 @@ export default function HeroMediaAdmin() {
                     }}
                   />
                 ) : (
-                  <img src={item.url} alt={item.label} className="h-full w-full object-cover" />
+                  <Image
+                    src={item.url}
+                    alt={item.label}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                    unoptimized
+                  />
                 )}
                 <div className="absolute left-1 top-1">
                   <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${item.type === 'video' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-soft-info admin-tone-text-info'}`}>

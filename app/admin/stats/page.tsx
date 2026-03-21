@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Stat {
@@ -24,6 +25,7 @@ export default function StatsPage() {
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
+  const toast = useToast();
 
   useEffect(() => {
     loadStats();
@@ -58,12 +60,16 @@ export default function StatsPage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        await loadStats();
-        setEditingStat(null);
+      if (!data.ok) {
+        throw new Error(data?.error || 'Error desant estadística');
       }
+
+      await loadStats();
+      setEditingStat(null);
+      toast.success('Estadística desada');
     } catch (error) {
       log.error('Error saving stat:', error);
+      toast.error(error instanceof Error ? error.message : 'Error desant estadística');
     } finally {
       setSaving(false);
     }
@@ -82,11 +88,15 @@ export default function StatsPage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        await loadStats();
+      if (!data.ok) {
+        throw new Error(data?.error || 'Error resetejant estadística');
       }
+
+      await loadStats();
+      toast.success('Estadística resetejada al valor automàtic');
     } catch (error) {
       log.error('Error resetting stat:', error);
+      toast.error(error instanceof Error ? error.message : 'Error resetejant estadística');
     } finally {
       setSaving(false);
     }

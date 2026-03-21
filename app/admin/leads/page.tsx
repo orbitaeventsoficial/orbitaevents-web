@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+﻿import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
 import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
-import { LEAD_COLOR_DEFAULT_VARS, PRIORITY_COLOR_CONFIG, STATUS_COLOR_CONFIG } from './colorTheme';
+import { getLeadPriorityColorDisplay, getLeadStatusColorDisplay, LEAD_COLOR_DEFAULT_VARS } from './colorTheme';
 import ExportCsvButton from '../components/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
@@ -18,10 +18,7 @@ export const metadata = {
   title: 'Entrades | Òrbita Admin',
 };
 
-import { EVENT_TYPE_LABELS, EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
-
-const STATUS_CONFIG = STATUS_COLOR_CONFIG;
-const PRIORITY_CONFIG = PRIORITY_COLOR_CONFIG;
+import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES, formatDateShort, formatDate, getEventLabel, getSourceDisplay } from '@/lib/constants';
 
 
 function buildQuery(filters: {
@@ -245,18 +242,18 @@ export default async function LeadsPage({
       actions={<div className="flex gap-2">
         <ExportCsvButton
           filename="entrades"
-          headers={['Nom', 'Email', 'Telèfon', 'Tipus', 'Origen', 'Estat', 'Data event']}
+          headers={['Nom', 'Email', 'TelÃ¨fon', 'Tipus', 'Origen', 'Estat', 'Data event']}
           rows={leads.map((l) => [
             l.name,
             l.email,
             l.phone || '',
-            EVENT_TYPE_LABELS[l.eventType] || l.eventType,
-            SOURCE_LABELS[l.source] || l.source,
+            getEventLabel(l.eventType),
+            getSourceDisplay(l.source).label,
             l.status,
             l.eventDate ? formatDate(l.eventDate) : '',
           ])}
         />
-        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>
+        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada rÃ pida</Link>
       </div>}
     >
     <div
@@ -278,7 +275,7 @@ export default async function LeadsPage({
             href="/admin/intake"
             className="admin-keep-colors admin-leads-tab admin-leads-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
           >
-            Entrada ràpida
+            Entrada rÃ pida
           </Link>
         </div>
       </section>
@@ -305,8 +302,8 @@ export default async function LeadsPage({
           </div>
         ) : (
           leads.map((lead) => {
-            const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
-            const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
+            const statusConf = getLeadStatusColorDisplay(lead.status);
+            const eventType = getEventLabel(lead.eventType);
 
             return (
               <article
@@ -323,7 +320,7 @@ export default async function LeadsPage({
                         {lead.name}
                       </Link>
                       <p className="text-xs truncate">{lead.email}</p>
-                      <p className="text-[11px]">{SOURCE_LABELS[lead.source] || lead.source}</p>
+                      <p className="text-[11px]">{getSourceDisplay(lead.source).label}</p>
                     </div>
                   </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.badgeClass}`}>
@@ -404,7 +401,7 @@ export default async function LeadsPage({
                 <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y admin-tone-border-subtle">
               {leads.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -416,12 +413,12 @@ export default async function LeadsPage({
                 </tr>
               ) : (
                 leads.map((lead) => {
-                  const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
-                  const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
-                  const priorityConf = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.MEDIUM;
+                  const statusConf = getLeadStatusColorDisplay(lead.status);
+                  const eventType = getEventLabel(lead.eventType);
+                  const priorityConf = getLeadPriorityColorDisplay(lead.priority);
 
                   return (
-                    <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors">
+                    <tr key={lead.id} className="transition-colors hover:bg-white/[0.03]">
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[180px]">
@@ -448,7 +445,7 @@ export default async function LeadsPage({
                         )}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{eventType}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{getSourceDisplay(lead.source).label}</td>
                       <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">
                         {lead.eventDate
                           ? formatDate(lead.eventDate)
@@ -494,9 +491,9 @@ export default async function LeadsPage({
       </section>
 
       {data.pagination.totalPages > 1 && (
-        <section className="flex items-center justify-between rounded-2xl border p-3 text-xs">
+        <section className="ap-card flex items-center justify-between rounded-2xl p-3 text-xs">
           <span>
-            Pàgina {data.pagination.page} de {data.pagination.totalPages}
+            PÃ gina {data.pagination.page} de {data.pagination.totalPages}
           </span>
           <div className="flex items-center gap-2">
             {data.pagination.page > 1 ? (
@@ -506,12 +503,12 @@ export default async function LeadsPage({
                   params.set('page', String(data.pagination.page - 1));
                   return params.toString();
                 })()}`}
-                className="rounded-xl border px-3 py-1"
+                className="ap-btn ap-btn--secondary px-3 py-1 text-xs"
               >
-                ← Anterior
+                â† Anterior
               </Link>
             ) : (
-              <span className="rounded-xl border px-3 py-1">← Anterior</span>
+              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">â† Anterior</span>
             )}
             {data.pagination.page < data.pagination.totalPages ? (
               <Link
@@ -522,10 +519,10 @@ export default async function LeadsPage({
                 })()}`}
                 className="rounded-xl border px-3 py-1"
               >
-                Següent →
+                SegÃ¼ent â†’
               </Link>
             ) : (
-              <span className="rounded-xl border px-3 py-1">Següent →</span>
+              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">SegÃ¼ent â†’</span>
             )}
           </div>
         </section>
@@ -536,3 +533,8 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
+
+
+
+
+

@@ -1,8 +1,7 @@
 'use client';
-/* eslint-disable @next/next/no-img-element */
-
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES } from '@/lib/constants';
@@ -552,9 +551,11 @@ export default function EditPackForm({
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {included.map(({ row, item }) => (
                   <article key={item.id} className="flex items-center gap-3 rounded-xl border p-2">
-                    <img
+                    <NextImage
                       src={item.imageUrl || '/placeholder.png'}
                       alt={item.name}
+                      width={56}
+                      height={56}
                       className="h-14 w-14 rounded-md border object-cover"
                     />
                     <div className="min-w-0 flex-1">
@@ -666,7 +667,7 @@ export default function EditPackForm({
                 {available.map((i) => (
                   <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
-                      <img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border object-cover" />
+                      <NextImage src={i.imageUrl || '/placeholder.png'} alt={i.name} width={56} height={56} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{i.name}</p>
                         <p className="text-xs">{i.code}</p>
@@ -689,7 +690,13 @@ export default function EditPackForm({
                 {included.map(({ row, item }) => (
                   <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
-                      <img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border object-cover" />
+                      <NextImage
+                      src={item.imageUrl || '/placeholder.png'}
+                      alt={item.name}
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 rounded-md border object-cover"
+                    />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{item.name}</p>
                         <p className="text-xs">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p>

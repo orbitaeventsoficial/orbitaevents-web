@@ -206,8 +206,14 @@ export default function MobileHeroUltimate() {
       <div className="absolute inset-0">
         {/* Poster — logo mentre carrega */}
         <div className="absolute inset-0 bg-black flex items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/orbitalockupwhite.svg" alt="Òrbita Events" className="w-36 h-36 opacity-25" />
+          <Image
+            src="/img/orbitalockupwhite.svg"
+            alt="Òrbita Events"
+            width={144}
+            height={144}
+            className="w-36 h-36 opacity-25"
+            priority
+          />
         </div>
 
         {/* Slides — crossfade */}

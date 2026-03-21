@@ -1,3 +1,249 @@
+## 2026-03-21 - Qualitat fina a inventari booking, clients i lead pipeline
+
+- Booking inventory section: missatges d'error més explícits a assignació, lot, pack, checkout/checkin i eliminació.
+- Clientes modals: comprovació de duplicats amb warning explícit en lloc de silenci opac.
+- Lead pipeline: rollback i toast amb error real quan falla el canvi d'estat.
+- Validació: `npx tsc --noEmit` OK i `pnpm build` OK.
+
+## 2026-03-21 - Error handling explícit a calendari, compose i pipeline de bookings
+
+- Calendar day: bloqueig i desbloqueig amb toasts que mostren l'error real quan falla l'API.
+- Inbox compose: enviament de correu i pressupost amb missatge d'error explícit en lloc de catch mut.
+- Booking pipeline: càrrega i canvi d'estat amb feedback més precís quan alguna mutació falla.
+- Client portal access: còpia del link amb warning explícit en lloc de silenci opac.
+- Validació: `npx tsc --noEmit` OK i `pnpm build` OK.
+
+## 2026-03-21 - Qualitat fina a settings, weather, checklist i inbox
+
+- Weather widget admin: càrrega amb missatge d'error explícit i sense catch mut.
+- Booking checklist: GET/PUT amb validació de resposta i fallback visual d'error en lloc de fallar en silenci.
+- Admin layout: càrrega de CSS i service worker amb warnings explícits, sense silencis opacs.
+- Company settings, canvas export i inbox panel: catches amb error real i feedback més clar.
+- Validació: `npx tsc --noEmit` OK i `pnpm build` OK.
+
+## 2026-03-21 - Qualitat fina a admin i neteja final de residus visuals
+
+- Hero media admin: errors visibles, toasts a mutacions i parser d'error sense catch mut.
+- Google Reviews admin: càrrega i refresc manual amb feedback explícit.
+- Collaborators admin: GET inicial i accions de delete/toggle amb validació de resposta i banner d'error.
+- Pack editor: substituïdes les miniatures residuals amb next/image; eliminats els últims <img> de app/**.
+- Verificació mecànica: 0 coincidències de `catch {}` a `app/**` i `lib/**`, 0 coincidències de `<img` a `app/**`.
+- Validació: `npx tsc --noEmit` OK i `pnpm build` OK.
+
+## 2026-03-21 - Feedback operatiu real a features i stats
+
+- He reforçat `app/admin/features/page.tsx` i `app/admin/stats/page.tsx` perquè les mutacions de l'admin no depenguin només del log intern: ara validen resposta, mostren toast d'èxit/error i actualitzen l'estat amb criteri més fiable.
+- Això tanca dos punts on l'operador podia clicar, no veure cap feedback visible i haver d'inferir si el canvi havia funcionat o no.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els avisos globals d'entorn d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Fluxos admin amb errors més explícits
+
+- He fet més robustos alguns fluxos d'operativa a `app/admin/discount-codes/page.tsx`, `app/admin/privacy/page.tsx` i `app/admin/ressenyes/page.tsx`, evitant fallades parcials opaques i millorant la traça d'errors quan les mutacions fallen.
+- A discount codes, el toggle d'activació ara valida la resposta, refresca llistat amb `await` real i mostra feedback coherent d'èxit/error; a privacy, el processat de sol·licituds ja no deixa un `catch` mut sense context.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els avisos globals d'entorn d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Coherència final d'imatges i catches muts
+
+- He tret tres excepcions manuals de `@next/next/no-img-element` que encara quedaven a `app/components/ui/HeroElegant.tsx`, `app/components/mobile-ultimate/MobileHeroUltimate.tsx` i `app/admin/ressenyes/page.tsx`, passant-les a `Image` amb els paràmetres adequats.
+- També he fet explícits dos punts de codi silenciós a `app/[locale]/gracias/page.tsx` i `app/[locale]/sensorial/page.tsx` perquè no quedin `catch` muts amagant la intenció del flux.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els avisos globals d'entorn d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Remat transversal de helpers compartits fora del nucli admin
+
+- He tret els últims adaptadors trivials de display que encara quedaven a serveis i components auxiliars després de la passada gran.
+- `lib/constants/index.ts` incorpora `getDiscountSourceLabel()`.
+- `lib/services/notificationService.ts` passa a consumir `getSourceDisplay()`, `app/admin/clientes/[id]/_components/panels/DiscountsPanel.tsx` usa `getDiscountSourceLabel()` i `app/admin/inbox/inbox-types.ts` reaprofita `getLeadStatusDisplay()`.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; aquest tall queda absorbit dins la passada final de neteja i el repo només manté els avisos d'entorn d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Canvas API declarades com a dinàmiques
+
+- He ajustat les routes `app/api/canvas/*` perquè declarin explícitament `dynamic = 'force-dynamic'` amb runtime `nodejs`.
+- Això alinea el build amb l'ús real de `request.url` i evita els errors de `dynamic server usage` que havien aparegut després de treure `edge`.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; desapareix l'avís de build relacionat amb `edge runtime`/`dynamic server usage` i només es mantenen els avisos d'entorn d'`npm`.
+
+## 2026-03-21 - Neteja d'entorn i build runtime
+
+- He normalitzat els scripts del repo a `pnpm` per reduir el soroll d'entorn durant build i execució.
+- `package.json` ja no encadena `npm run`/`npx` per als fluxos interns principals i la pantalla d'admin de scripts reflecteix aquesta convenció.
+- Les routes `app/api/canvas/*` passen de `edge` a `nodejs` per eliminar l'avís de build de Next sobre static generation desactivada.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; la normalització d'entorn elimina el soroll propi del repo durant build i només queden els avisos globals d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Fallback públic silenciós durant build
+
+- He afegit `lib/build-phase.ts` i he tallat les consultes a Prisma durant la fase de prerender de build als serveis públics que només necessiten fallback (`lib/packs-db.ts`, `lib/blog-public.ts`, `lib/services/publicStatsService.ts`, `lib/services/publicOfferService.ts`, `lib/coverage.ts`).
+- També he blindat els health checks no essencials de compilació a `app/admin/lib/dashboard-data.ts` i `lib/services/healthCheckService.ts` perquè el build no faci pings de base de dades innecessaris.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; desapareixen els logs de Prisma/P1001 durant `next build` i només es mantenen els avisos globals d'`npm` (`verify-deps-before-run` i `_jsr-registry`).
+
+## 2026-03-21 - Últim warning de hooks a inventory
+
+- He tancat l'últim warning residual de hooks que quedava viu a `app/admin/inventory/InventoryListClient.tsx`.
+- El callback de canvi d'estat ja declara `toast` al dependency array, de manera coherent amb l'ús real del hook.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; el front queda sense warnings operatius propis de hooks o `<img>`, i es mantenen només els avisos habituals d'entorn de Node/npm i l'avís de `edge runtime` que Next mostra al build.
+
+## 2026-03-21 - Tancament dels warnings operatius del front
+
+- He netejat els warnings vius que quedaven a hooks i `next/image` sense tocar el comportament funcional.
+- `app/admin/emails/InboxPanel.tsx` i `app/admin/inventory/InventoryListClient.tsx` ja tenen dependències de hooks alineades amb el codi real.
+- `app/admin/settings/hero/page.tsx`, `app/[locale]/portfolio/[slug]/page.tsx` i `app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx` substitueixen els `<img>` restants per `Image`.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; el front queda sense warnings operatius propis de hooks o `<img>`, i es mantenen només els avisos habituals d'entorn de Node/npm i l'avís de `edge runtime` que Next mostra al build.
+
+## 2026-03-21 - Remat transversal d'inventari i formularis
+
+- He tancat un altre paquet de residus mecànics a inventari, pricing i l'editor de leads.
+- `lib/inventory-utils.ts` incorpora `getInventoryConditionLabel()` i `app/admin/bookings/[id]/BookingInventorySection.tsx`, `app/admin/inventory/[id]/page.tsx` i `app/admin/inventory/InventoryListClient.tsx` reaprofiten millor els helpers compartits de categoria/condició.
+- `app/admin/pricing/page.tsx` consumeix els displays comuns d'inventari per evitar més fallbacks inline i `app/admin/leads/[id]/LeadProfileEditor.tsx` passa a consumir `getLeadStatusDisplay()` i `getLeadPriorityDisplay()`.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos habituals d'entorn de Node/npm.
+
+## 2026-03-21 - Tancament de residus finals de monocapa admin
+
+- He tret d'una passada els fallbacks finals de status/label que encara quedaven dispersos a leads, bookings, proposals, tasks, analytics, packs i inventory.
+- `lib/constants/index.ts` ara concentra també `getProposalStatusDisplay()`, `getContractStatusDisplay()`, `getContractStatusLabel()`, `getInvoiceStatusLabel()`, `getBookingStatusLabel()`, `getTaskStatusLabel()` i `getLeadStatusAnalyticsDisplay()`, a més de `TASK_STATUS_LABELS`.
+- `app/admin/leads/colorTheme.ts` incorpora `getLeadStatusColorDisplay()` i `getLeadPriorityColorDisplay()` perquè la vista principal de leads deixi de resoldre `badgeClass` amb fallbacks locals.
+- S'han reescrit `app/admin/leads/page.tsx`, `app/admin/clientes/[id]/_components/panels/LeadsPanel.tsx`, `app/admin/bookings/[id]/BookingStatusChanger.tsx`, `app/admin/bookings/[id]/DocumentFlowSection.tsx`, `app/admin/bookings/[id]/InvoiceSection.tsx`, `app/admin/clientes/[id]/_components/panels/ProposalsPanel.tsx`, `app/admin/presupuestos/ProposalsList.tsx`, `app/admin/tasks/page.tsx`, `app/admin/analytics/page.tsx`, `app/admin/packs/[id]/page.tsx` i `app/admin/inventory/[id]/page.tsx` per consumir aquesta capa comuna.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos habituals d'entorn de Node/npm.
+
+## 2026-03-21 - Estat i prioritat compartits també a bookings i leads
+
+- He tret els fallbacks locals d'estat i prioritat que encara quedaven a bookings, leads i mensajes (`CONFIG[value] || DEFAULT`).
+- `lib/constants/index.ts` ara exporta `getBookingStatusDisplay()`, `getLeadStatusDisplay()` i `getLeadPriorityDisplay()` com a capa comuna per aquest display.
+- `app/admin/bookings/page.tsx`, `app/admin/bookings/[id]/page.tsx` i `app/admin/mensajes/page.tsx` consumeixen aquests helpers; `app/admin/leads/[id]/page.tsx` reaprofita `getLeadStatusDisplay()` i `getLeadPriorityDisplay()`, mentre `app/admin/leads/page.tsx` manté el color config propi perquè depèn de `badgeClass` i no del shape estàndard.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos habituals d'entorn de Node/npm.
+
+## 2026-03-21 - Booking detail sense map local d'event type
+
+- He tret l'últim ús directe de `EVENT_TYPE_LABELS[...] || value` al detall de reserva.
+- `app/admin/bookings/[id]/page.tsx` ara consumeix `getEventLabel()` com la resta del flux comercial i de reserves.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos habituals d'entorn de Node/npm.
+
+## 2026-03-21 - Privacitat admin amb display helpers compartits
+
+- He tret els fallbacks locals de consentiments, tipus de sol·licitud, estat i prioritat RGPD per evitar repetir `MAP[value] || value` i `CONFIG[value] || DEFAULT` dins de l'admin.
+- `lib/constants/privacy.ts` ara exporta `getPrivacyConsentLabel()`, `getPrivacyRequestTypeLabel()`, `getPrivacyRequestStatusDisplay()` i `getPrivacyPriorityDisplay()` com a monocapa comuna del bloc de privacitat.
+- `app/admin/privacy/page.tsx` i `app/admin/clientes/[id]/_components/panels/PrivacyPanel.tsx` consumeixen aquests helpers i deixen de recrear fallbacks trivials locals.
+- Validació executada: `npx tsc --noEmit` passa i `pnpm build` passa; es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos habituals d'entorn de Node/npm.
+
+## 2026-03-21 — Admin: FAQ i inbox sense fallback local trivial
+
+### Què s'ha fet
+- `lib/constants/index.ts` incorpora `getFaqCategoryDisplay()` perquè la pàgina de FAQ no hagi de reconstruir el fallback de categoria desconeguda.
+- `app/admin/faq/page.tsx` passa a consumir aquest helper en lloc de mantenir l'objecte local `{ label: category, icon: '❓' }`.
+- `app/admin/inbox/inbox-types.ts` elimina `DEFAULT_STATUS_TONE` i reaprofita `LEAD_STATUS_CONFIG.NEW` com a fallback compartit per al to d'estat.
+
+### Per què
+- eren dos residus petits però clars: fallbacks locals que només reempaquetaven la mateixa decisió que ja pertoca a la capa comuna.
+- si no es treuen, aquests punts tornen a actuar com a mini-fonts de veritat dins de l'admin.
+
+### Validació
+- `npx tsc --noEmit` passa.
+- `pnpm build` passa.
+- es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos d'entorn habituals de Node/npm.
+
+---
+## 2026-03-21 — Admin: fallback compartit també a inventory i mensajes
+
+### Què s'ha fet
+- `lib/inventory-utils.ts` incorpora `getInventoryCategoryDisplay()` i `getInventoryStatusDisplay()` perquè la representació per defecte de categoria/estat no quedi repetida dins de les pantalles.
+- `app/admin/inventory/InventoryListClient.tsx` i `app/admin/inventory/[id]/page.tsx` passen a consumir aquests helpers en lloc de mantenir `CATEGORY_CONFIG[...] || ...` i `STATUS_CONFIG[...] || ...` inline.
+- `app/admin/mensajes/page.tsx` elimina `DEFAULT_LEAD_STATUS_STYLE` i reaprofita `LEAD_STATUS_CONFIG.NEW` com a fallback comú.
+
+### Per què
+- inventory encara repetia el mateix fallback en tres punts del llistat i un quart al detall; això és exactament la capa local que després torna a divergir.
+- a mensajes, el default local ja no aportava cap semàntica pròpia perquè la font canònica d'estat nou ja existeix a la capa comuna.
+
+### Validació
+- `npx tsc --noEmit` passa.
+- `pnpm build` passa.
+- es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos d'entorn habituals de Node/npm.
+
+---
+## 2026-03-21 — Admin: fora defaults locals trivials a bookings i proposals
+
+### Què s'ha fet
+- `app/admin/bookings/[id]/BookingStatusChanger.tsx` deixa de mantenir `DEFAULT_STATUS_STYLE` i reaprofita `BOOKING_STATUS_CONFIG.PENDING` com a fallback comú.
+- `app/admin/clientes/[id]/_components/panels/ProposalsPanel.tsx` elimina `DEFAULT_PROPOSAL_STYLE` i `DEFAULT_CONTRACT_STYLE`, i passa a consumir `PROPOSAL_STATUS_CONFIG.DRAFT` i `CONTRACT_STATUS_CONFIG.DRAFT`.
+
+### Per què
+- aquests defaults locals no aportaven cap comportament propi: només duplicaven exactament la semàntica de la capa comuna.
+- si la representació per defecte ja existeix a constants compartides, tornar-la a declarar dins el component és reobrir una capa local gratuïta.
+
+### Validació
+- `npx tsc --noEmit` passa.
+- `pnpm build` passa.
+- es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos d'entorn habituals de Node/npm.
+
+---
+## 2026-03-21 — Admin: event type compartit també a customer hub, lead detail i dashboard
+
+### Què s'ha fet
+- `app/admin/clientes/[id]/_components/panels/BookingsPanel.tsx` i `LeadsPanel.tsx` passen a consumir `getEventLabel()` en lloc de consultar `EVENT_TYPE_LABELS[...] || value`.
+- `app/admin/leads/[id]/LeadProfileEditor.tsx` usa `getEventLabel()` i `getSourceDisplay()` per a les opcions de tipus i origen del formulari.
+- `app/admin/leads/[id]/page.tsx` i `app/admin/page.tsx` també deixen de traduir tipus d'esdeveniment localment i reaprofiten el helper compartit.
+
+### Per què
+- encara quedaven diverses pantalles del mateix flux comercial consumint el map d'event type directament, amb el fallback reescrit a mà.
+- el criteri bo continua sent que la representació canònica de tipus i origen visqui a la capa comuna i no a cada vista.
+
+### Validació
+- `npx tsc --noEmit` passa.
+- `pnpm build` passa.
+- es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos d'entorn habituals de Node/npm.
+
+---
+
+## 2026-03-21 — Admin: fonts compartides també a clientes, analytics i pipeline
+
+### Què s'ha fet
+- `lib/constants/index.ts` incorpora `getCustomerSourceLabel()` per evitar que la capa de clients mantingui fallbacks locals de label per origen.
+- `app/admin/clientes/page.tsx` consumeix aquest helper al CSV i a les dues vistes del llistat; `app/admin/clientes/customer-utils.ts` deixa de reexportar `SOURCE_LABELS` i `ClientesModals.tsx` elimina l'import sobrant.
+- `app/admin/analytics/page.tsx` i `app/admin/leads/LeadPipelineView.tsx` passen a consumir `getSourceDisplay()` en lloc de consultar `SOURCE_LABELS[...] || value` directament.
+
+### Per què
+- encara quedaven adaptadors locals trivials per una mateixa decisió de domini: com es representa una font de contacte.
+- el criteri bo aquí és que lead/admin i customer/admin no decideixin pel seu compte labels i fallbacks si la capa comuna ja pot resoldre-ho.
+
+### Validació
+- `npx tsc --noEmit` passa.
+- `pnpm build` passa.
+- es mantenen només els warnings ja coneguts del repo (`InboxPanel`, `InventoryListClient` i alguns `<img>` de portfolio/settings hero), a més dels avisos d'entorn ja habituals de Node/npm.
+
+---
+## 2026-03-21 — Admin: event/source display compartit i menys fallbacks locals
+
+### Què s'ha fet
+- pp/admin/bookings/page.tsx, pp/admin/leads/page.tsx i pp/admin/inbox/compose/ComposeForm.tsx passen a consumir getEventLabel() i/o getSourceDisplay() en lloc de repetir MAP[value] || value.
+- pp/admin/mensajes/page.tsx deixa de mantenir un default local per l'estat del lead i usa LEAD_STATUS_CONFIG.NEW com a fallback comú.
+- pp/admin/presupuestos/ProposalsList.tsx deixa de mantenir DEFAULT_STATUS_STYLE i reaprofita PROPOSAL_STATUS_CONFIG.DRAFT.
+
+### Per què
+- aquests patrons eren exactament la capa local que torna a créixer sense aportar comportament: mateix fallback, mateix label i mateixa semàntica reescrits per pantalla.
+- el criteri bo aquí és que la representació canònica de tipus/origen/estat visqui en helpers o configs comunes i les pàgines només la consumeixin.
+
+### Validació
+- 
+px tsc --noEmit passa.
+- pnpm build passa.
+- es mantenen només els warnings ja coneguts del repo.
+
+---
+## 2026-03-21 — Admin: FAQ, settings i customer hub sense config local trivial
+
+### Què s'ha fet
+- lib/constants/index.ts concentra ara SETTINGS_TYPE_LABELS, SETTINGS_CATEGORY_CONFIG i FAQ_CATEGORY_CONFIG perquè settings i FAQ no tornin a mantenir maps locals de labels, icones i descripcions.
+- pp/admin/settings/page.tsx, pp/admin/settings/SettingsClient.tsx i pp/admin/faq/page.tsx passen a consumir aquesta capa comuna.
+- lib/customer-hub/labels.ts incorpora CUSTOMER_HUB_STAGE_ORDER, CUSTOMER_HUB_STAGE_LABELS, CUSTOMER_HUB_STATUS_TONES i CUSTOMER_HUB_AVATAR_TONES.
+- pp/admin/clientes/[id]/_components/CustomerHeader.tsx deixa de definir localment ordre d'etapes, labels, tons i gradients de l'estat del client.
+
+### Per què
+- aquest lot encara tenia configuració de presentació i catàleg compartit enterrada dins pàgines/components d'admin.
+- el criteri bo aquí no era retocar JSX, sinó assegurar que FAQ, settings i customer hub consumeixen una sola font per a aquestes decisions.
+
+### Validació
+- 
+px tsc --noEmit passa.
+- pnpm build passa.
+- es mantenen només warnings ja coneguts del repo (InboxPanel, InventoryListClient i alguns <img> a portfolio/settings hero).
+
+---
 ## 2026-03-20 sessió 32 — Pàgina principal del detall de booking gairebé tota monocapa
 
 ### Què s'ha canviat
@@ -322,7 +568,8 @@
 - Ara aquestes configuracions apunten a classes semàntiques d'admin (dmin-tone-bg-*, admin-tone-text-*, admin-tone-border-*).
 - app/admin/admin-theme.css incorpora la capa comuna d'aquests tons semàntics i també admin-tone-idle per als estats inactius.
 - BookingStatusChanger, ProposalsPanel, MensajesPage i ProposalsList han deixat de portar defaults visuals amb colors inline i consumeixen la mateixa capa comuna.
-- app/admin/control-room.css ha tret els últims gba(...) locals que quedaven en aquesta passada i reaprofita tokens/ombres compartides.
+- app/admin/control-room.css ha tret els últims 
+gba(...) locals que quedaven en aquesta passada i reaprofita tokens/ombres compartides.
 
 ### Per què
 - Encara que els estats ja estiguessin centralitzats, la configuració seguia portant classes Tailwind cromàtiques a dintre.
@@ -5052,7 +5299,8 @@ esolveQuotePack(), que es la que realmente usa el repo.
   - tras cerrar la fase estructural y volver a tener pnpm build pasando, el siguiente retorno real estaba en bordes de tipos y ny mecánicos que seguían ensuciando servicios del admin y el layout global de errores.
 - Qué error o warning salió:
   - app/not-found.tsx rompió build por usar 	.description con un tipo NotFoundMessages que no declaraba esa clave.
-  - al endurecer dminEmailSendService.ts con una firma demasiado genérica apareció un borde real: esolvedLeadId ya no se aceptaba como string por Prisma.
+  - al endurecer dminEmailSendService.ts con una firma demasiado genérica apareció un borde real: 
+esolvedLeadId ya no se aceptaba como string por Prisma.
   - seguían vivos los warnings de ny en dminEventsService.ts y 	askCreation.ts.
 - En qué estado quedó después:
   - pnpm build vuelve a pasar completo.
@@ -5138,7 +5386,8 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 - Por qué:
   - después de dejar el build limpio, aún quedaban restos muy localizados y baratos de corregir: casts sueltos en la ficha de reserva y validaciones de proposals demasiado permisivas para algo que ya no necesitaba ny.
 - Qué error o warning salió:
-  - no salió un bloqueo nuevo de build; esta tanda venía de barrido fino con g para cazar los últimos ny/z.any() obvios.
+  - no salió un bloqueo nuevo de build; esta tanda venía de barrido fino con 
+g para cazar los últimos ny/z.any() obvios.
 - En qué estado quedó después:
   - pnpm build vuelve a pasar completo.
   - la ficha de booking ya no arrastra esos ny locales visibles.
@@ -5460,14 +5709,16 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g '@/lib/prisma|prisma\.|normalizeEmail|normalizeName|normalizePhone|persistContactLead' app/api/contact/route.ts lib/services/contactLeadCaptureService.ts ya no devuelve Prisma ni normalización directa en la ruta; queda concentrado en [contactLeadCaptureService.ts](/D:/orbitaevents/lib/services/contactLeadCaptureService.ts).
+  - el barrido 
+g '@/lib/prisma|prisma\.|normalizeEmail|normalizeName|normalizePhone|persistContactLead' app/api/contact/route.ts lib/services/contactLeadCaptureService.ts ya no devuelve Prisma ni normalización directa en la ruta; queda concentrado en [contactLeadCaptureService.ts](/D:/orbitaevents/lib/services/contactLeadCaptureService.ts).
   - el formulario público de contacto queda ahora más alineado con el resto del repo: handler fino para validación y side effects, servicio dedicado para la persistencia real de lead/customer.
 
 ## 2026-03-13 - cron de revision de pricing de packs fuera del handler
 
 - qué se ha cambiado
   - se creó [packPricingCheckService.ts](/D:/orbitaevents/lib/services/packPricingCheckService.ts) para concentrar la revisión de divergencias de precio en packs activos, la creación de tareas abiertas y el dminLog del cron.
-  - [route.ts](/D:/orbitaevents/app/api/cron/pack-pricing-check/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en unPackPricingCheck().
+  - [route.ts](/D:/orbitaevents/app/api/cron/pack-pricing-check/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en 
+unPackPricingCheck().
 
 - por qué
   - tras cerrar contact, el barrido de app/api seguía mostrando Prisma directo en tres crons: uel-daily, invoice-sync y pack-pricing-check.
@@ -5479,14 +5730,17 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/pack-pricing-check/route.ts lib/services/packPricingCheckService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [packPricingCheckService.ts](/D:/orbitaevents/lib/services/packPricingCheckService.ts).
+  - el barrido 
+g '@/lib/prisma|prisma\.' app/api/cron/pack-pricing-check/route.ts lib/services/packPricingCheckService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [packPricingCheckService.ts](/D:/orbitaevents/lib/services/packPricingCheckService.ts).
   - el cron queda ahora alineado con el resto del repo: handler fino y servicio dedicado para lectura, cálculo, creación de tareas y trazabilidad.
 
 ## 2026-03-13 - cron diario de combustible fuera del handler
 
 - qué se ha cambiado
-  - se amplió [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts) con unFuelDailyRefresh() para concentrar el refresco diario, la composición del summary y el dminLog del cron.
-  - [route.ts](/D:/orbitaevents/app/api/cron/fuel-daily/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en unFuelDailyRefresh().
+  - se amplió [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts) con 
+unFuelDailyRefresh() para concentrar el refresco diario, la composición del summary y el dminLog del cron.
+  - [route.ts](/D:/orbitaevents/app/api/cron/fuel-daily/route.ts) dejó de importar Prisma y ahora solo hace auth, logging de error, saveCronRunStatus() y delegación en 
+unFuelDailyRefresh().
 
 - por qué
   - tras cerrar pack-pricing-check, el barrido de app/api seguía mostrando Prisma directo en uel-daily e invoice-sync.
@@ -5498,14 +5752,17 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/fuel-daily/route.ts lib/services/fuelReferenceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts).
+  - el barrido 
+g '@/lib/prisma|prisma\.' app/api/cron/fuel-daily/route.ts lib/services/fuelReferenceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [fuelReferenceService.ts](/D:/orbitaevents/lib/services/fuelReferenceService.ts).
   - el cron diario de combustible queda ahora alineado con el resto: handler fino y servicio único para refresco, summary y trazabilidad.
 
 ## 2026-03-13 - cron de sincronizacion de facturas fuera del handler
 
 - qué se ha cambiado
-  - se amplió [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts) con unInvoiceSyncCron() para concentrar la creación automática de facturas, los reintentos de sync con Holded, el refresh de estado y el summary del cron.
-  - [route.ts](/D:/orbitaevents/app/api/cron/invoice-sync/route.ts) dejó de importar Prisma y ahora solo hace auth, logging, saveCronRunStatus() y delegación en unInvoiceSyncCron().
+  - se amplió [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts) con 
+unInvoiceSyncCron() para concentrar la creación automática de facturas, los reintentos de sync con Holded, el refresh de estado y el summary del cron.
+  - [route.ts](/D:/orbitaevents/app/api/cron/invoice-sync/route.ts) dejó de importar Prisma y ahora solo hace auth, logging, saveCronRunStatus() y delegación en 
+unInvoiceSyncCron().
 
 - por qué
   - tras cerrar uel-daily, invoice-sync era el último cron gordo con Prisma directo dentro del handler.
@@ -5517,7 +5774,8 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g '@/lib/prisma|prisma\.' app/api/cron/invoice-sync/route.ts lib/services/invoiceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts).
+  - el barrido 
+g '@/lib/prisma|prisma\.' app/api/cron/invoice-sync/route.ts lib/services/invoiceService.ts ya no devuelve Prisma directo en la ruta; queda concentrado en [invoiceService.ts](/D:/orbitaevents/lib/services/invoiceService.ts).
   - el cron de facturas queda ahora alineado con el resto: handler fino y servicio único para el workflow de creación, reintento y refresco.
 
 ## 2026-03-13 - health check tecnico recentrado fuera de la ruta
@@ -5536,7 +5794,8 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g '@/lib/prisma|prisma\.' app/api ya no devuelve uso directo de Prisma en rutas de app/api.
+  - el barrido 
+g '@/lib/prisma|prisma\.' app/api ya no devuelve uso directo de Prisma en rutas de app/api.
   - el borde HTTP queda completamente fino: app/api sin acceso directo a Prisma y con lógica técnica o de dominio recentrada en servicios compartidos.
 
 ## 2026-03-13 - ultimo fallback legacy de tareas mas encapsulado
@@ -5555,7 +5814,8 @@ o-explicit-any en las funciones de correo de reserva y sus callbacks internos.
 
 - y en qué estado quedó después
   - pnpm build volvió a pasar completo.
-  - el barrido g 'legacyLeadTaskId|findLeadTaskLinkByTaskOrLegacyId|mirroredLegacyTask' lib/customer-hub lib/services/tasks confirma que customer-hub ya usa el helper compartido y el fallback manual mirroredLegacyTask ha desaparecido.
+  - el barrido 
+g 'legacyLeadTaskId|findLeadTaskLinkByTaskOrLegacyId|mirroredLegacyTask' lib/customer-hub lib/services/tasks confirma que customer-hub ya usa el helper compartido y el fallback manual mirroredLegacyTask ha desaparecido.
   - la compatibilidad residual de leadTask queda más arrinconada dentro de lib/services/tasks/* y deja menos conocimiento legacy disperso por el repo.
 
 ## 2026-03-13 - compatibilidad de extras por servicio mas centrada
@@ -5593,7 +5853,8 @@ ext dev que estaba sirviendo chunks corruptos
   - el runtime estaba lanzando NotFoundError: Failed to execute 'removeChild' on 'Node'
   - despues salio Cannot find module './7083.js', que es sintoma de .next mezclado/corrupto
 - que error o warning salio
-  - emoveChild ... node to be removed is not a child of this node
+  - 
+emoveChild ... node to be removed is not a child of this node
   - Cannot find module './7083.js' desde webpack-runtime.js
 - y en que estado quedo despues
   - pnpm build sigue pasando
@@ -5610,7 +5871,8 @@ ext dev que estaba sirviendo chunks corruptos
   - ya no era basura muerta, pero sí un monolito claro con retorno real de recomposición.
 
 - que error o warning salio
-  - al sacar esolveCustomerId apareció un borde de tipos en [data.ts](/D:/orbitaevents/lib/customer-hub/data.ts): ooking.leadId seguía como string | null al entrar en prisma.lead.findUnique.
+  - al sacar 
+esolveCustomerId apareció un borde de tipos en [data.ts](/D:/orbitaevents/lib/customer-hub/data.ts): ooking.leadId seguía como string | null al entrar en prisma.lead.findUnique.
   - se corrigió fijando primero bookingLeadId dentro de la rama protegida.
 
 - y en que estado quedo despues
@@ -5729,7 +5991,8 @@ ext dev que estaba sirviendo chunks corruptos
 
 - que se ha cambiado
   - [FloatingCTAs.tsx](/D:/orbitaevents/app/components/ui/FloatingCTAs.tsx) deja de mostrar la CTA desktop tan pronto y con una entrada tan seca.
-  - la CTA desktop ahora espera más scroll real antes de aparecer (desktopRevealOffset = 560) y usa equestAnimationFrame para no recalcular el estado a pelo en cada evento.
+  - la CTA desktop ahora espera más scroll real antes de aparecer (desktopRevealOffset = 560) y usa 
+equestAnimationFrame para no recalcular el estado a pelo en cada evento.
   - la entrada/salida de la CTA desktop, el botón de teléfono y el tooltip de WhatsApp se suavizaron con escalas menos agresivas y easing más estable.
   - la bottom bar móvil también se retrasó: ya no entra tan pronto al salir del hero y usa un criterio de scroll más amplio para ocultarse/mostrarse.
   - la animación de la barra móvil dejó el spring brusco y pasó a una transición temporal más controlada con opacidad.
@@ -6282,7 +6545,8 @@ Continuació cobertura tests sobre serveis sense testejar. 57 serveis pendents �
 - bookings/[id]/DocumentFlowSection.tsx deixa de portar maps locals per proposal/contract/invoice labels
 
 ### Regles dures a partir d'ara
-- no es pot escriure al diari que una passada esta "final" o "rematada" si encara hi ha duplicacions locals evidents detectables amb g
+- no es pot escriure al diari que una passada esta "final" o "rematada" si encara hi ha duplicacions locals evidents detectables amb 
+g
 - si una decisio es comparteix entre 2 o mes llocs, no es pot resoldre localment: s'ha de moure a lib/constants/* o a un helper comu
 - aixo aplica a colors, labels, ordres, enums, arrays de valors valids, open statuses, locales, categories i qualsevol cataleg de domini
 - si un component necessita un map local nomes per traduir un status o un type ja conegut, s'ha de consumir la font comuna en lloc de recrear-la
@@ -6349,4 +6613,17 @@ Continuació cobertura tests sobre serveis sense testejar. 57 serveis pendents �
 ### Validació final del lot
 - npx tsc --noEmit passa
 - pnpm test:run passa: 140 fitxers, 1784 tests
+- pnpm build passa
+
+
+### Addenda 2026-03-21 — remat final de catch muts a admin
+- InboxClient deixa de silenciar l'error quan falla la càrrega del detall d'un email IMAP seleccionat i passa a registrar un `console.warn(...)` explícit
+- el lot anterior de qualitat queda així tancat també en aquest punt residual, mantenint el criteri del repo: cap `catch` mut en fluxos d'usuari sense traça mínima de diagnòstic
+
+### Per què
+- encara que el panell hagi de continuar sent usable quan falla un detall, amagar completament l'error feia més difícil depurar incidències reals d'IMAP
+- el comportament funcional no canvia, però la traçabilitat sí: es manté el fallback tou i s'evita swallow silenciós
+
+### Validació
+- npx tsc --noEmit passa
 - pnpm build passa

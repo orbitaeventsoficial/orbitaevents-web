@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../components/adminHelpGlossary';
-import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_LABELS as STATUS_LABELS, LEAD_STATUS_VALUES, PRIORITY_LABELS, PRIORITY_VALUES, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES, getEventLabel, getLeadPriorityDisplay, getLeadStatusDisplay, getSourceDisplay } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useConfirmDialog } from '../../components/ConfirmDialog';
@@ -227,7 +227,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {EVENT_TYPE_VALUES.map((type) => (
               <option key={type} value={type}>
-                {EVENT_TYPE_LABELS[type] || type}
+                {getEventLabel(type)}
               </option>
             ))}
           </select>
@@ -277,7 +277,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {LEAD_STATUS_VALUES.map((item) => (
               <option key={item} value={item}>
-                {STATUS_LABELS[item] || item}
+                {getLeadStatusDisplay(item).label}
               </option>
             ))}
           </select>
@@ -294,7 +294,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {PRIORITY_VALUES.map((item) => (
               <option key={item} value={item}>
-                {PRIORITY_LABELS[item] || item}
+                {getLeadPriorityDisplay(item).label}
               </option>
             ))}
           </select>
@@ -311,7 +311,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {LEAD_SOURCE_VALUES.map((item) => (
               <option key={item} value={item}>
-                {SOURCE_LABELS[item] || item}
+                {getSourceDisplay(item).label}
               </option>
             ))}
           </select>

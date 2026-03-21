@@ -10,7 +10,8 @@ import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
-import { INVENTORY_CATEGORY_LABELS, INVENTORY_CONDITION_OPTIONS } from '@/lib/constants';
+import { INVENTORY_CONDITION_OPTIONS } from '@/lib/constants';
+import { getInventoryCategoryDisplay } from '@/lib/inventory-utils';
 
 interface InventoryItem {
   id: string;
@@ -125,8 +126,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       setMessage('Element afegit correctament.');
       setSkippedDetails([]);
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error assignant element');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error assignant element');
       setSkippedDetails([]);
     }
   }, [bookingId, searchQuery, fetchData]);
@@ -151,8 +152,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       setSkippedDetails(details);
       setMessage(`Pack afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error afegint inventari del pack');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error afegint inventari del pack');
       setSkippedDetails([]);
     }
   }, [bookingId, fetchData, searchQuery]);
@@ -180,8 +181,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       setSkippedDetails(details);
       setMessage(`Lot afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error afegint lot');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error afegint lot');
       setSkippedDetails([]);
     }
   }, [selectedBundleId, bookingId, fetchData, searchQuery]);
@@ -202,8 +203,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       }
 
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error eliminant');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error eliminant');
     }
   }, [bookingId, searchQuery, fetchData, confirm]);
 
@@ -220,8 +221,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       if (!res.ok) { setMessage('Error marcant sortida'); return; }
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error marcant sortida');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error marcant sortida');
     }
   }, [bookingId, searchQuery, fetchData]);
 
@@ -239,8 +240,8 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       if (!res.ok) { setMessage('Error marcant retorn'); return; }
       fetchData(searchQuery);
-    } catch {
-      setMessage('Error marcant retorn');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error marcant retorn');
     }
   }, [bookingId, searchQuery, fetchData]);
 
@@ -347,7 +348,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                     {a.item.name}
                   </Link>
                   <p className="text-xs">
-                    {INVENTORY_CATEGORY_LABELS[a.item.category] || a.item.category}
+                    {getInventoryCategoryDisplay(a.item.category).label}
                     {a.item.watts ? ` · ${a.item.watts}W` : ''}
                   </p>
                 </div>
@@ -431,7 +432,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                     </code>
                     <span className="text-sm truncate">{item.name}</span>
                     <span className="text-xs">
-                      {INVENTORY_CATEGORY_LABELS[item.category] || item.category}
+                      {getInventoryCategoryDisplay(item.category).label}
                     </span>
                   </div>
                   <button

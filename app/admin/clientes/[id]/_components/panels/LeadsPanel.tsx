@@ -1,6 +1,6 @@
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import Link from 'next/link';
-import { EVENT_TYPE_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG, formatDate, formatDateSimple, formatNumber } from '@/lib/constants';
+import { formatDate, formatDateSimple, formatNumber, getEventLabel, getLeadStatusDisplay } from '@/lib/constants';
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   return (
@@ -21,7 +21,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
           </p>
         ) : (
           data.leads.map((lead) => {
-            const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
+            const statusConf = getLeadStatusDisplay(lead.status);
             return (
               <Link
                 key={lead.id}
@@ -38,7 +38,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   <span className="">
-                    {EVENT_TYPE_LABELS[lead.eventType] || lead.eventType}
+                    {getEventLabel(lead.eventType)}
                   </span>
                   <span className="">
                     {lead.eventDate

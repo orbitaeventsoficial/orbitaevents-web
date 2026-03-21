@@ -80,18 +80,23 @@ export default function CollaboratorsClient() {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [kpis, setKpis] = useState<KPIs | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
 
   const load = useCallback(async () => {
     try {
+      setLoadError(null);
       const res = await fetch('/api/admin/collaborators');
+      if (!res.ok) throw new Error("No s'han pogut carregar els col·laboradors");
       const data = await res.json();
       setCollaborators(data.collaborators || []);
       setKpis(data.kpis || null);
-    } catch {
-      toast.error('Error carregant col·laboradors');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "No s'han pogut carregar els col·laboradors";
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -144,25 +149,27 @@ export default function CollaboratorsClient() {
   const handleDelete = async (id: string) => {
     if (!confirm('Segur que vols eliminar aquest col·laborador?')) return;
     try {
-      await fetchWithCsrf(`/api/admin/collaborators/${id}`, { method: 'DELETE' });
+      const response = await fetchWithCsrf(`/api/admin/collaborators/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error("No s'ha pogut eliminar el col·laborador");
       toast.success('Col·laborador eliminat');
-      load();
-    } catch {
-      toast.error('Error eliminant');
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut eliminar el col·laborador");
     }
   };
 
   const handleToggleActive = async (c: Collaborator) => {
     try {
-      await fetchWithCsrf(`/api/admin/collaborators/${c.id}`, {
+      const response = await fetchWithCsrf(`/api/admin/collaborators/${c.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !c.isActive }),
       });
+      if (!response.ok) throw new Error("No s'ha pogut actualitzar l'estat del col·laborador");
       toast.success(c.isActive ? 'Desactivat' : 'Activat');
-      load();
-    } catch {
-      toast.error('Error');
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No s'ha pogut actualitzar l'estat del col·laborador");
     }
   };
 
@@ -172,6 +179,11 @@ export default function CollaboratorsClient() {
 
   return (
     <div className="space-y-6">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300">
+          {loadError}
+        </div>
+      )}
       {kpis && (
         <div className="ap-kpi-row lg:grid-cols-6">
           {KPI_ITEMS(kpis).map((kpi) => (

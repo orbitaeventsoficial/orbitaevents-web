@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
 import { formatDateTime } from '@/lib/constants';
-import { PRIVACY_AUDIT_ACTION_LABELS, PRIVACY_CONSENT_LABELS, PRIVACY_PRIORITY_CONFIG, PRIVACY_REQUEST_STATUS_CONFIG, PRIVACY_REQUEST_TYPE_LABELS } from '@/lib/constants/privacy';
+import { PRIVACY_AUDIT_ACTION_LABELS, getPrivacyConsentLabel, getPrivacyPriorityDisplay, getPrivacyRequestStatusDisplay, getPrivacyRequestTypeLabel } from '@/lib/constants/privacy';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -176,8 +176,8 @@ export default function AdminPrivacyPage() {
         setActionMsg(data?.error || 'Error processant sol·licitud');
         setTimeout(() => setActionMsg(null), 4000);
       }
-    } catch {
-      console.error('Error processant sol·licitud');
+    } catch (error) {
+      console.error('Error processant sol·licitud:', error);
       setActionMsg('Error de connexió');
       setTimeout(() => setActionMsg(null), 4000);
     } finally {
@@ -308,8 +308,8 @@ export default function AdminPrivacyPage() {
           const isUrgent = daysLeft !== null && daysLeft <= 5;
           const isOverdue = daysLeft !== null && daysLeft < 0;
           const canProcess = r.status === 'VERIFIED';
-          const priorityCfg = PRIVACY_PRIORITY_CONFIG[r.priority] || PRIVACY_PRIORITY_CONFIG.MEDIUM;
-          const statusCfg = PRIVACY_REQUEST_STATUS_CONFIG[r.status] || PRIVACY_REQUEST_STATUS_CONFIG.PENDING;
+          const priorityCfg = getPrivacyPriorityDisplay(r.priority);
+          const statusCfg = getPrivacyRequestStatusDisplay(r.status);
 
           return (
             <div
@@ -323,7 +323,7 @@ export default function AdminPrivacyPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-base font-semibold">
-                      {PRIVACY_REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
+                      {getPrivacyRequestTypeLabel(r.requestType)}
                     </span>
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusCfg.bg} ${statusCfg.text}`}>
                       {statusCfg.label}
@@ -483,7 +483,7 @@ export default function AdminPrivacyPage() {
                       <div className="admin-tone-border-neutral mt-3 flex items-center justify-between border-t pt-3 text-xs">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="ap-badge px-2.5 py-0.5">
-                            {PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}
+                            {getPrivacyConsentLabel(c.consentType)}
                           </span>
                           <span className="opacity-50">{c.source}</span>
                           <span className="opacity-50">{formatDateTime(c.grantedAt)}</span>
@@ -507,7 +507,7 @@ export default function AdminPrivacyPage() {
                 <div className="hidden lg:block rounded-2xl border overflow-hidden overflow-x-auto">
                   <table className="w-full min-w-[800px] text-sm" aria-label="Llistat de consentiments">
                     <thead>
-                      <tr className="border-b bg-white/[0.03]">
+                      <tr className="border-b admin-tone-bg-neutral">
                         <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Client</th>
                         <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Tipus</th>
                         <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Font</th>
@@ -517,9 +517,9 @@ export default function AdminPrivacyPage() {
                         <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Accions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y admin-tone-border-subtle">
                       {consents.map((c) => (
-                        <tr key={c.id} className="hover:bg-white/[0.03] transition-colors">
+                        <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
                           <td className="px-4 py-3">
                             {c.customer ? (
                               <Link href={`/admin/clientes/${c.customer.id}`} className="hover:underline">
@@ -532,7 +532,7 @@ export default function AdminPrivacyPage() {
                           </td>
                           <td className="px-4 py-3">
                             <span className="ap-badge px-2.5 py-0.5 text-xs">
-                              {PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}
+                              {getPrivacyConsentLabel(c.consentType)}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-xs opacity-60">{c.source}</td>
@@ -583,7 +583,7 @@ export default function AdminPrivacyPage() {
             <div className="rounded-2xl border overflow-hidden overflow-x-auto">
               <table className="w-full min-w-[600px] text-sm" aria-label="Registre d'auditoria de privacitat">
                 <thead>
-                  <tr className="border-b bg-white/[0.03]">
+                  <tr className="border-b admin-tone-bg-neutral">
                     <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Acció</th>
                     <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Entitat</th>
                     <th scope="col" className="px-4 py-3 text-left font-medium opacity-70 hidden sm:table-cell">Actor</th>
@@ -591,9 +591,9 @@ export default function AdminPrivacyPage() {
                     <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Data</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y admin-tone-border-subtle">
                   {auditLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-white/[0.03] transition-colors">
+                    <tr key={log.id} className="transition-colors hover:bg-white/[0.03]">
                       <td className="px-4 py-3">
                         <span className="text-sm font-medium">{PRIVACY_AUDIT_ACTION_LABELS[log.action] || log.action}</span>
                         {log.legalBasis && (

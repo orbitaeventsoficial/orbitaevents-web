@@ -1,6 +1,7 @@
 // app/admin/settings/page.tsx
 import { log } from '@/lib/logger';
 // Pàgina de configuració - Settings i estadístiques
+import { SETTINGS_CATEGORY_CONFIG } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SettingsClient from './SettingsClient';
@@ -11,44 +12,6 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Configuració | Òrbita Admin',
-};
-
-const CATEGORY_CONFIG: Record<string, { label: string; icon: string; description: string }> = {
-  stats: {
-    label: 'Estadístiques Públiques',
-    icon: '📊',
-    description: 'Números que apareixen a la web (esdeveniments, persones, etc.)',
-  },
-  company: {
-    label: 'Empresa',
-    icon: '🏢',
-    description: 'Dades legals i nom comercial (edita a Configuració empresa)',
-  },
-  holded: {
-    label: 'Holded',
-    icon: '🧾',
-    description: 'Integració amb Holded per facturació',
-  },
-  contact: {
-    label: 'Contacte',
-    icon: '📞',
-    description: 'Telèfon, email, horaris...',
-  },
-  pricing: {
-    label: 'Preus',
-    icon: '💰',
-    description: 'Preus base, hora extra, descomptes...',
-  },
-  config: {
-    label: 'Configuració General',
-    icon: '⚙️',
-    description: 'Altres configuracions del sistema',
-  },
-  social: {
-    label: 'Xarxes Socials',
-    icon: '📱',
-    description: 'Perfils socials i enllaços',
-  },
 };
 
 async function getSettings() {
@@ -107,7 +70,7 @@ export default async function SettingsPage() {
           <p className="text-sm">Executa el seed per carregar dades inicials</p>
         </div>
       ) : (
-        <SettingsClient groupedSettings={settings} categoryConfig={CATEGORY_CONFIG} />
+        <SettingsClient groupedSettings={settings} categoryConfig={SETTINGS_CATEGORY_CONFIG} />
       )}
 
       {/* Quick Links */}
@@ -169,3 +132,7 @@ export default async function SettingsPage() {
     </AdminPage>
   );
 }
+
+
+
+

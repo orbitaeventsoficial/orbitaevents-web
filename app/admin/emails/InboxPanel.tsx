@@ -2,7 +2,7 @@
 import { log } from '@/lib/logger';
 import { formatDateShort, formatDateTimeFull, DEFAULT_LOCALE } from '@/lib/constants';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -74,7 +74,7 @@ export default function InboxPanel() {
   const limit = 20;
   const { confirm, dialogProps } = useConfirmDialog();
 
-  const fetchEmails = async () => {
+  const fetchEmails = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -108,11 +108,11 @@ export default function InboxPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit, page]);
 
   useEffect(() => {
     fetchEmails();
-  }, [page]);
+  }, [fetchEmails]);
 
   const handleEmailClick = async (email: EmailMessage) => {
     setSelectedEmail(email);
@@ -124,8 +124,8 @@ export default function InboxPanel() {
           body: JSON.stringify({ action: 'markRead' }),
         });
         setEmails((prev) => prev.map((item) => (item.uid === email.uid ? { ...item, isRead: true } : item)));
-      } catch {
-        log.error('Error marcant email com a llegit');
+      } catch (error) {
+        log.error('Error marcant email com a llegit', error);
       }
     }
   };
@@ -143,8 +143,8 @@ export default function InboxPanel() {
         setSelectedEmail(null);
       }
       setTotal((prev) => prev - 1);
-    } catch {
-      setError('Error eliminant email');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Error eliminant email');
     }
   };
 
@@ -202,7 +202,7 @@ export default function InboxPanel() {
 
       {!loading && !error && (
         <div className="flex">
-          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} max-h-[500px] overflow-y-auto divide-y divide-white/5`}>
+          <div className={`${selectedEmail ? 'w-1/3 border-r border-white/10' : 'w-full'} max-h-[500px] overflow-y-auto divide-y admin-tone-border-subtle`}>
             {emails.length === 0 ? (
               <div className="p-8 text-center">
                 <span className="text-4xl">📭</span>

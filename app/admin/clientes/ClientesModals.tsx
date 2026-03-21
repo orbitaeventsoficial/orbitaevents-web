@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { Customer } from './customer-utils';
-import { SOURCE_LABELS } from './customer-utils';
 
 interface DuplicateWarning {
   id: string;

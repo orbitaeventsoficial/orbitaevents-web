@@ -21,7 +21,7 @@ import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAcce
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { getBookingStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import Tooltip from '@/app/admin/components/Tooltip';
 import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
@@ -75,8 +75,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const statusConf = STATUS_CONFIG[booking.status] || STATUS_CONFIG.PENDING;
-  const eventType = EVENT_TYPE_LABELS[booking.eventType] || booking.eventType;
+  const statusConf = getBookingStatusDisplay(booking.status);
+  const eventType = getEventLabel(booking.eventType);
   const packTranslation = getPackTranslation(
     booking.pack.translations,
     booking.lead?.preferredLocale || booking.preferredLocale || 'ca'

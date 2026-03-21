@@ -128,7 +128,7 @@ export default function DiscountCodesPage() {
       setSuccessMsg(`Codi "${form.code.toUpperCase()}" creat correctament`);
       setForm(INITIAL_FORM);
       setShowForm(false);
-      loadCodes();
+      await loadCodes();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
@@ -138,15 +138,22 @@ export default function DiscountCodesPage() {
 
   const toggleActive = async (id: string, active: boolean) => {
     try {
-      await fetchWithCsrf(`/api/admin/discount-codes`, {
+      const res = await fetchWithCsrf('/api/admin/discount-codes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ _action: 'toggle', id, isActive: !active }),
       });
-      loadCodes();
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Error canviant l\'estat del codi');
+      }
+
+      await loadCodes();
+      toast.success(!active ? 'Codi activat' : 'Codi desactivat');
     } catch (error) {
       console.error('[DiscountCodes] Error canviant estat:', error);
-      toast.error('Error canviant l\'estat del codi');
+      toast.error(error instanceof Error ? error.message : 'Error canviant l\'estat del codi');
     }
   };
 
@@ -236,7 +243,7 @@ export default function DiscountCodesPage() {
                   className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'PERCENTAGE'
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-white/10 text-white/40 hover:bg-white/5'
+                      : 'admin-tone-idle'
                   }`}
                 >
                   Percentatge %
@@ -247,7 +254,7 @@ export default function DiscountCodesPage() {
                   className={`flex-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${
                     form.type === 'FIXED_AMOUNT'
                       ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-white/10 text-white/40 hover:bg-white/5'
+                      : 'admin-tone-idle'
                   }`}
                 >
                   Import fix
@@ -335,7 +342,7 @@ export default function DiscountCodesPage() {
               type="button"
               onClick={handleCreate}
               disabled={submitting || !form.code || !form.value || !form.validUntil}
-              className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50"
+              className="ap-btn ap-btn--primary disabled:opacity-50"
             >
               {submitting ? 'Creant...' : 'Crear codi'}
             </button>
@@ -357,7 +364,7 @@ export default function DiscountCodesPage() {
           const maxReached = c.maxUses != null && c.currentUses >= c.maxUses;
           const active = c.isActive && !expired && !maxReached;
           return (
-            <article key={c.id} className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors">
+            <article key={c.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <code className="text-sm font-mono px-2 py-0.5 rounded bg-white/5">{c.code}</code>
@@ -374,7 +381,7 @@ export default function DiscountCodesPage() {
                   </span>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+              <div className="mt-3 flex items-center justify-between border-t pt-3 admin-tone-border-neutral text-xs">
                 <div className="flex items-center gap-3">
                   <span>{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</span>
                   <span className={expired ? 'text-rose-400' : ''}>
@@ -418,12 +425,12 @@ export default function DiscountCodesPage() {
                 <th scope="col" className="px-4 py-3 text-right font-medium">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y admin-tone-border-subtle">
               {codes.map((c) => {
                 const expired = isExpired(c.validUntil);
                 const maxReached = c.maxUses != null && c.currentUses >= c.maxUses;
                 return (
-                  <tr key={c.id} className="hover:bg-white/[0.03] transition-colors">
+                  <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
                     <td className="px-4 py-3">
                       <code className="text-xs font-mono px-2 py-1 rounded">
                         {c.code}

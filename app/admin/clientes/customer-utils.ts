@@ -27,12 +27,6 @@ export interface CustomerStats {
   recentMonth: number;
 }
 
-import { CUSTOMER_SOURCE_LABELS } from '@/lib/constants';
-
-// ─── Constants ──────────────────────────────────────────────────────────────
-
-export const SOURCE_LABELS = CUSTOMER_SOURCE_LABELS;
-
 export type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
 export const PRIORITY_FILTER_STYLES: Record<'ALL' | ExecutionPriority, string> = {

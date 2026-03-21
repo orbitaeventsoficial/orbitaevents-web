@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, SOURCE_LABELS, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort } from '@/lib/constants';
+import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort, getSourceDisplay } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -248,7 +248,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
           {availableSources.map((s) => (
             <FilterChip
               key={s}
-              label={SOURCE_LABELS[s] || s}
+              label={getSourceDisplay(s).label}
               active={localSource === s}
               onClick={() => setLocalSource(localSource === s ? null : s)}
             />
@@ -500,7 +500,7 @@ function PipelineCard({
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
         <span>{EVENT_TYPE_ICONS[lead.eventType] || lead.eventType}</span>
-        <span>{SOURCE_LABELS[lead.source] || lead.source}</span>
+        <span>{getSourceDisplay(lead.source).label}</span>
       </div>
 
       {/* Links */}

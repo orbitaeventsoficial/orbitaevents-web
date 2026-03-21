@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 export type HealthCheckResult = {
   status: 'pass' | 'fail' | 'warn';
@@ -23,6 +24,14 @@ export type HealthStatus = {
 
 export async function checkDatabaseHealth(exposeDetails: boolean): Promise<HealthCheckResult> {
   const dbStartTime = Date.now();
+
+  if (isBuildPrerenderPhase()) {
+    return {
+      status: 'warn',
+      message: 'Database check skipped during build',
+      latency: 0,
+    };
+  }
 
   try {
     const { prisma } = await import('@/lib/prisma');

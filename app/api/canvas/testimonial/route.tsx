@@ -42,7 +42,8 @@ function translateEventType(eventType?: string): string {
   return eventType ? translations[eventType] || 'Esdeveniment' : 'Esdeveniment';
 }
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

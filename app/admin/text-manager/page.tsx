@@ -303,7 +303,7 @@ export default function TextManagerPage() {
         className={`bg-black/70 rounded-xl border transition-all ${
           isModified
             ? 'border-orange-300 shadow-md shadow-orange-100'
-            : 'border-white/10 hover:border-white/10'
+            : 'admin-tone-border-neutral hover:admin-tone-border-neutral'
         }`}
       >
         <div className="p-4">
@@ -342,7 +342,7 @@ export default function TextManagerPage() {
             className={`w-full px-4 py-3 rounded-xl border transition-all resize-y font-sans ${
               isModified
                 ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-                : 'border-white/10 bg-white/[0.02] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                : 'admin-tone-border-neutral admin-tone-bg-neutral focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
             }`}
             placeholder="Text buit..."
           />
@@ -440,8 +440,8 @@ export default function TextManagerPage() {
                     onClick={() => setActiveLanguage('es')}
                     className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'es'
-                        ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-black/70 text-white/60 hover:bg-white/10'
+                        ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
+                        : 'admin-tone-idle'
                     }`}
                   >
                     {LANGUAGE_META.es.icon} {LANGUAGE_META.es.label}
@@ -450,8 +450,8 @@ export default function TextManagerPage() {
                     onClick={() => setActiveLanguage('ca')}
                     className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'ca'
-                        ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-black/70 text-white/60 hover:bg-white/10'
+                        ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
+                        : 'admin-tone-idle'
                     }`}
                   >
                     {LANGUAGE_META.ca.icon} {LANGUAGE_META.ca.label}
@@ -460,8 +460,8 @@ export default function TextManagerPage() {
                     onClick={() => setActiveLanguage('en')}
                     className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'en'
-                        ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-black/70 text-white/60 hover:bg-white/10'
+                        ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
+                        : 'admin-tone-idle'
                     }`}
                   >
                     {LANGUAGE_META.en.icon} {LANGUAGE_META.en.label}
@@ -519,7 +519,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
-                    : 'bg-white/5 text-white/60 hover:bg-white/5'
+                    : 'admin-tone-idle'
                 }`}
               >
                     {showOnlyModified ? '✅ Només modificats' : '📋 Mostrar tots'}
@@ -531,7 +531,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
-                    : 'bg-white/5 text-white/60 hover:bg-white/5'
+                    : 'admin-tone-idle'
                 }`}
               >
                 🌐 Comparar idiomes
@@ -554,8 +554,8 @@ export default function TextManagerPage() {
                 disabled={saving || modifiedCount === 0}
                 className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
                   modifiedCount > 0
-                    ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-white/5 text-white/40 cursor-not-allowed'
+                    ? 'ap-btn ap-btn--primary hover:scale-105'
+                    : 'admin-tone-idle opacity-50 cursor-not-allowed'
                 }`}
               >
                 {saving ? (
@@ -621,8 +621,8 @@ export default function TextManagerPage() {
                 type="button"
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-amber-500/30 to-orange-500/20 text-amber-100 border border-amber-400/40 shadow-lg'
-                    : 'bg-black/70 hover:bg-white/[0.02] text-white/90'
+                    ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning border'
+                    : 'ap-card hover:admin-tone-bg-neutral'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -645,8 +645,8 @@ export default function TextManagerPage() {
                     type="button"
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
-                        ? `bg-gradient-to-r ${section.color} text-white shadow-lg`
-                        : 'bg-black/70 hover:bg-white/[0.02] text-white/90'
+                        ? ` ${section.color} text-white shadow-lg`
+                        : 'ap-card hover:admin-tone-bg-neutral'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -656,17 +656,17 @@ export default function TextManagerPage() {
                       <div className="flex items-center gap-2">
                         {counts.modified > 0 && (
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            isActive ? 'bg-white/20' : 'bg-orange-500/20 text-orange-300'
+                            isActive ? 'bg-white/20' : 'admin-tone-soft-warning admin-tone-text-warning'
                           }`}>
                             {counts.modified}
                           </span>
                         )}
-                        <span className={`text-xs ${isActive ? 'opacity-70' : 'text-white/40'}`}>
+                        <span className={`text-xs ${isActive ? 'opacity-70' : 'admin-tone-text-slate'}`}>
                           {counts.total}
                         </span>
                       </div>
                     </div>
-                    <p className={`text-xs mt-1 ${isActive ? 'opacity-70' : 'text-white/40'}`}>
+                    <p className={`text-xs mt-1 ${isActive ? 'opacity-70' : 'admin-tone-text-slate'}`}>
                       {section.description}
                     </p>
                   </button>
@@ -702,7 +702,7 @@ export default function TextManagerPage() {
           <main className="flex-1 min-w-0">
             {/* Info de secció activa */}
             {activeSection && (
-              <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
+              <div className={`mb-6 p-4 rounded-xl  ${
                 SECTIONS.find(s => s.id === activeSection)?.color || 'from-white/20 to-white/10'
               } text-white/90`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">

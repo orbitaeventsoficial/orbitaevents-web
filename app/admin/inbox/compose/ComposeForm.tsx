@@ -1,9 +1,9 @@
-// app/admin/inbox/compose/ComposeForm.tsx
+﻿// app/admin/inbox/compose/ComposeForm.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { EVENT_TYPE_LABELS, formatDateSimple, formatCurrency } from '@/lib/constants';
+import { formatDateSimple, formatCurrency, getEventLabel } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Lead {
@@ -44,7 +44,7 @@ const INPUT_CLASSES = 'ap-input';
 const IDLE_BUTTON = 'rounded-xl px-4 py-2 text-sm font-medium transition-colors admin-tone-idle';
 const ACTIVE_BUTTON = 'rounded-xl border px-4 py-2 text-sm font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info';
 const CARD_SELECTED = 'rounded-xl border-2 p-4 text-left transition-colors admin-tone-soft-info admin-tone-border-info';
-const CARD_IDLE = 'rounded-xl border-2 border-white/10 bg-white/[0.03] p-4 text-left transition-colors hover:bg-white/[0.05]';
+const CARD_IDLE = 'ap-card rounded-xl border-2 p-4 text-left transition-colors hover:admin-tone-bg-neutral';
 
 export default function ComposeForm({ leads, packs, initialCustomer, initialTemplate }: Props) {
   const router = useRouter();
@@ -149,8 +149,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           const data = await res.json();
           setError(data.error || 'Error enviant pressupost');
         }
-      } catch {
-        setError('Error de connexio');
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Error de connexio');
       } finally {
         setSending(false);
       }
@@ -184,8 +184,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
         const data = await res.json();
         setError(data.error || 'Error enviant email');
       }
-    } catch {
-      setError('Error de connexio');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Error de connexio');
     } finally {
       setSending(false);
     }
@@ -200,7 +200,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           aria-pressed={mode === 'email'}
           className={mode === 'email' ? ACTIVE_BUTTON : IDLE_BUTTON}
         >
-          ✉️ Correu normal
+          âœ‰ï¸ Correu normal
         </button>
         <button
           onClick={() => setMode('quote')}
@@ -208,7 +208,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           aria-pressed={mode === 'quote'}
           className={mode === 'quote' ? ACTIVE_BUTTON : IDLE_BUTTON}
         >
-          💰 Pressupost professional
+          ðŸ’° Pressupost professional
         </button>
       </div>
 
@@ -225,7 +225,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               <option value="">-- Escriu email manualment --</option>
               {leads.map((lead) => (
                 <option key={lead.id} value={lead.id}>
-                  {lead.name} ({lead.email}) - {EVENT_TYPE_LABELS[lead.eventType || ''] || 'Event'}
+                  {lead.name} ({lead.email}) - {getEventLabel(lead.eventType || '', 'Event')}
                 </option>
               ))}
             </select>
@@ -233,11 +233,11 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
           {selectedLead && (
             <div className="rounded-xl border p-4">
-              <h4 className="mb-3 font-medium">📋 Detalls de l'entrada</h4>
+              <h4 className="mb-3 font-medium">ðŸ“‹ Detalls de l'entrada</h4>
               <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                 <div>
                   <span>Tipus:</span>
-                  <p className="font-medium">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
+                  <p className="font-medium">{getEventLabel(selectedLead.eventType || '', 'No especificat')}</p>
                 </div>
                 <div>
                   <span>Data:</span>
@@ -299,7 +299,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               <div>
                 <label htmlFor="cf-price" className="mb-2 block text-sm font-medium">
-                  Preu total (€) *
+                  Preu total (â‚¬) *
                 </label>
                 <input
                   id="cf-price"
@@ -349,8 +349,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                 <label className="mb-2 block text-sm font-medium">Idioma del pressupost</label>
                 <div className="flex gap-2">
                   {[
-                    { code: 'ca', label: '🇦🇩 Català' },
-                    { code: 'es', label: '🇪🇸 Castellà' },
+                    { code: 'ca', label: 'ðŸ‡¦ðŸ‡© CatalÃ ' },
+                    { code: 'es', label: 'ðŸ‡ªðŸ‡¸ CastellÃ ' },
                   ].map((language) => (
                     <button
                       key={language.code}
@@ -407,13 +407,13 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           <div>
             {error && (
               <p className="text-sm admin-tone-text-danger" role="alert">
-                ❌ {error}
+                âŒ {error}
               </p>
             )}
           </div>
           <div className="flex gap-3">
             <button onClick={() => router.push('/admin/inbox')} type="button" className="ap-btn ap-btn--secondary">
-              Cancel·lar
+              CancelÂ·lar
             </button>
             <button
               onClick={handleSend}
@@ -428,7 +428,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                     : 'ap-btn ap-btn--primary'
               }`}
             >
-              {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Envia pressupost' : '📤 Envia correu'}
+              {sent ? 'âœ“ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? 'ðŸ“¤ Envia pressupost' : 'ðŸ“¤ Envia correu'}
             </button>
           </div>
         </div>
@@ -436,3 +436,6 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     </div>
   );
 }
+
+
+

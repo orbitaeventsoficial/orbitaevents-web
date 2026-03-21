@@ -5,22 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, ProposalDTO, ProposalStatus } from '@/lib/customer-hub/dto';
 import { labelEstatPressupost } from '@/lib/customer-hub/labels';
-import { CONTRACT_STATUS_CONFIG, PROPOSAL_STATUS_CONFIG, formatCurrency, formatDateSimple } from '@/lib/constants';
+import { formatCurrency, formatDateSimple, getContractStatusDisplay, getProposalStatusDisplay } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
-const DEFAULT_PROPOSAL_STYLE = {
-  bg: 'admin-tone-bg-neutral',
-  text: 'admin-tone-text-neutral',
-  border: 'admin-tone-border-neutral',
-  label: 'Esborrany',
-};
-
-const DEFAULT_CONTRACT_STYLE = {
-  bg: 'admin-tone-bg-neutral',
-  text: 'admin-tone-text-neutral',
-  border: 'admin-tone-border-neutral',
-  label: 'Esborrany',
-};
 
 export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -255,7 +242,7 @@ function ProposalCard({
   customerId: string;
 }) {
   const router = useRouter();
-  const style = PROPOSAL_STATUS_CONFIG[proposal.status] || DEFAULT_PROPOSAL_STYLE;
+  const style = getProposalStatusDisplay(proposal.status);
   const isBusy = busyId?.includes(proposal.id) || false;
   const canSend = proposal.status === 'DRAFT';
   const canMarkAccepted = proposal.status === 'SENT' || proposal.status === 'VIEWED';
@@ -265,7 +252,7 @@ function ProposalCard({
 
   const contractStatus = proposal.contractStatus;
   const contractRef = proposal.contractReference;
-  const contractStyle = contractStatus ? CONTRACT_STATUS_CONFIG[contractStatus] || DEFAULT_CONTRACT_STYLE : null;
+  const contractStyle = contractStatus ? getContractStatusDisplay(contractStatus) : null;
   const canGenerateContract = proposal.status === 'ACCEPTED' && !contractStatus;
   const canSendContract = contractStatus === 'DRAFT';
   const canMarkSigned = contractStatus === 'SENT';

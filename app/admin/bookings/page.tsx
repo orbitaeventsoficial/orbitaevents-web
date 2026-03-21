@@ -1,4 +1,4 @@
-// app/admin/bookings/page.tsx
+﻿// app/admin/bookings/page.tsx
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
@@ -9,7 +9,7 @@ import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import BookingViewToggle from './BookingViewToggle';
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatDateShort, formatCurrency } from '@/lib/constants';
+import { formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
@@ -144,7 +144,7 @@ export default async function BookingsPage({
   return (
     <AdminPage
       title="Reserves"
-      subtitle={<>{pagination.total} esdeveniments · {formatCurrency(totalRevenue)}</>}
+      subtitle={<>{pagination.total} esdeveniments Â· {formatCurrency(totalRevenue)}</>}
       actions={<div className="flex gap-2">
         <ExportCsvButton
           filename="reserves"
@@ -153,7 +153,7 @@ export default async function BookingsPage({
             b.reference,
             b.clientName,
             formatDate(b.eventDate),
-            EVENT_TYPE_LABELS[b.eventType] || b.eventType,
+            getEventLabel(b.eventType),
             b.status,
             String(b.total),
           ])}
@@ -213,8 +213,8 @@ export default async function BookingsPage({
           </div>
         ) : (
           bookings.map((booking) => {
-            const statusConf = STATUS_CONFIG[booking.status] || STATUS_CONFIG.PENDING;
-            const eventType = EVENT_TYPE_LABELS[booking.eventType] || booking.eventType;
+            const statusConf = getBookingStatusDisplay(booking.status);
+            const eventType = getEventLabel(booking.eventType);
             const isPast = new Date(booking.eventDate) < new Date();
 
             return (
@@ -329,7 +329,7 @@ export default async function BookingsPage({
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y admin-tone-border-subtle">
               {bookings.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center">
@@ -339,8 +339,8 @@ export default async function BookingsPage({
                 </tr>
               ) : (
                 bookings.map((booking) => {
-                  const statusConf = STATUS_CONFIG[booking.status] || STATUS_CONFIG.PENDING;
-                  const eventType = EVENT_TYPE_LABELS[booking.eventType] || booking.eventType;
+                  const statusConf = getBookingStatusDisplay(booking.status);
+                  const eventType = getEventLabel(booking.eventType);
                   const isPast = new Date(booking.eventDate) < new Date();
 
                   return (
@@ -490,6 +490,9 @@ export default async function BookingsPage({
     </AdminPage>
   );
 }
+
+
+
 
 
 

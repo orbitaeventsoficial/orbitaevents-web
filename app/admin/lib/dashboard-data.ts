@@ -9,6 +9,7 @@ import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -215,7 +216,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery(`admin:dashboard:bookings:series:${seriesStart.toISOString().slice(0, 10)}`, () => prisma.booking.findMany({ where: { eventDate: { gte: seriesStart } }, select: { eventDate: true, status: true, total: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:post-event:pending:${dayKey}`, () => prisma.booking.count({ where: { status: 'COMPLETED', eventDate: { lte: twoDaysAgo }, postEventEmailSent: false, clientEmail: { not: { contains: PLACEHOLDER_EMAIL_DOMAIN } } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:cron:settings', () => prisma.setting.findMany({ where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage', 'automation.commercial.lastRun', 'automation.commercial.lastStatus'] } } }), CacheTTL.SHORT).catch(() => []),
-    prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
+    (isBuildPrerenderPhase() ? Promise.resolve(false) : prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false)),
     cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:activity', () => prisma.customerActivity.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } } }), CacheTTL.SHORT).catch(() => []),

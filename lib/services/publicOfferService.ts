@@ -1,3 +1,5 @@
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
+
 export const PUBLIC_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
 };
@@ -12,7 +14,7 @@ export const FALLBACK_OFFER = {
 };
 
 export async function getPublicOffer() {
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL || isBuildPrerenderPhase()) {
     return FALLBACK_OFFER;
   }
 

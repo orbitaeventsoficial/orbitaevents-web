@@ -373,7 +373,7 @@ export default function IntakePage() {
                   className={`admin-keep-colors rounded-xl border px-2 py-2 text-sm font-medium transition-all ${
                     form.priority === p.value
                       ? `${p.selected} shadow-sm`
-                      : 'border-white/10 text-white/40 hover:bg-white/5'
+                      : 'admin-tone-idle'
                   }`}
                 >
                   {p.label}
@@ -400,7 +400,7 @@ export default function IntakePage() {
                 className={`admin-keep-colors rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
                     ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
-                    : 'border-white/10 bg-white/[0.02] text-white/40 hover:bg-white/5'
+                    : 'admin-tone-idle'
                 }`}
               >
                 <span className="text-base leading-none">{et.icon}</span>

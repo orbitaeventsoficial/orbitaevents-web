@@ -8,7 +8,8 @@ import { ImageResponse } from 'next/og';
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 interface CanvasElement {
   type: 'text' | 'shape' | 'image';

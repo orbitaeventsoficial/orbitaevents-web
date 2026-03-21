@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { SETTINGS_SENSITIVE_KEY_FRAGMENTS, formatDateSimple, formatNumber } from '@/lib/constants';
+import { SETTINGS_SENSITIVE_KEY_FRAGMENTS, SETTINGS_TYPE_LABELS, formatDateSimple, formatNumber } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type Setting = {
@@ -16,13 +16,6 @@ type Setting = {
 };
 
 type CategoryConfig = Record<string, { label: string; icon: string; description: string }>;
-
-const TYPE_LABELS: Record<Setting['type'], string> = {
-  STRING: 'STRING',
-  NUMBER: 'NUMBER',
-  BOOLEAN: 'BOOLEAN',
-  JSON: 'JSON',
-};
 
 function isSensitiveKey(key: string): boolean {
   return SETTINGS_SENSITIVE_KEY_FRAGMENTS.some((sensitive) => key.toLowerCase().includes(sensitive.toLowerCase()));
@@ -109,8 +102,8 @@ export default function SettingsClient({
       let value: string | number | boolean;
       try {
         value = coerceValue(setting.type, draftValue);
-      } catch {
-        setError('JSON invalid');
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'JSON invalid');
         setSavingKey(null);
         return;
       }
@@ -166,7 +159,7 @@ export default function SettingsClient({
               </div>
             </div>
 
-            <div className="divide-y divide-white/5">
+            <div className="divide-y admin-tone-border-subtle">
               {categorySettings.map((setting) => {
                 const isEditing = editingKey === setting.key;
                 const isSaving = savingKey === setting.key;
@@ -178,7 +171,7 @@ export default function SettingsClient({
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <code className="rounded px-2 py-0.5 text-xs font-mono">{setting.key}</code>
-                          <span className={`rounded px-2 py-0.5 text-xs ${getTypeTone(setting.type)}`}>{TYPE_LABELS[setting.type]}</span>
+                          <span className={`rounded px-2 py-0.5 text-xs ${getTypeTone(setting.type)}`}>{SETTINGS_TYPE_LABELS[setting.type]}</span>
                         </div>
                         {setting.label && <p className="mt-1 font-medium">{setting.label}</p>}
                         {setting.description && <p className="text-sm">{setting.description}</p>}
@@ -233,4 +226,8 @@ export default function SettingsClient({
     </div>
   );
 }
+
+
+
+
 

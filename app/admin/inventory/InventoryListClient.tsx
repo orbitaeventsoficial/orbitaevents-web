@@ -17,7 +17,9 @@ import { AdminPage } from '../components/AdminPage';
 import {
   CATEGORY_CONFIG,
   STATUS_CONFIG,
-  CONDITION_LABELS,
+  getInventoryCategoryDisplay,
+  getInventoryStatusDisplay,
+  getInventoryConditionLabel,
   calculateLifeRemainingPercent,
 } from '@/lib/inventory-utils';
 import { DEFAULT_EXPECTED_LIFE_HOURS, INVENTORY_CATEGORY_OPTIONS, INVENTORY_STATUS_OPTIONS, formatNumber } from '@/lib/constants';
@@ -99,7 +101,7 @@ export default function InventoryListClient() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, toast]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -189,7 +191,7 @@ export default function InventoryListClient() {
       console.error('[Inventory] Error actualitzant item:', error);
       toast.error('Error actualitzant l\'equip');
     }
-  }, [fetchData]);
+  }, [fetchData, toast]);
 
   const saveBundles = useCallback(async (nextBundles: InventoryBundle[]) => {
     setBundles(nextBundles);
@@ -491,8 +493,8 @@ export default function InventoryListClient() {
       {viewMode === 'grid' ? (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => {
-            const catConf = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦' };
-            const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
+            const catConf = getInventoryCategoryDisplay(item.category);
+            const statusConf = getInventoryStatusDisplay(item.status);
             const lifePercent = calculateLifeRemainingPercent(
               item.totalHoursUsed,
               item.expectedLifeHours
@@ -562,14 +564,14 @@ export default function InventoryListClient() {
         {/* Vista Llista — Targetes mòbil */}
         <section className="lg:hidden space-y-3">
           {items.map((item) => {
-            const catConf = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦' };
-            const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
-            const condLabel = CONDITION_LABELS[item.condition] || item.condition;
+            const catConf = getInventoryCategoryDisplay(item.category);
+            const statusConf = getInventoryStatusDisplay(item.status);
+            const condLabel = getInventoryConditionLabel(item.condition);
 
             return (
               <article
                 key={item.id}
-                className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
               >
                 {/* Fila superior: nom/codi + valor/estat */}
                 <div className="flex items-start justify-between gap-3">
@@ -645,13 +647,13 @@ export default function InventoryListClient() {
                   <th scope="col" className="px-4 py-3 text-right font-medium">Accions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y admin-tone-border-subtle">
                 {items.map((item) => {
-                  const catConf = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦' };
-                  const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
+                  const catConf = getInventoryCategoryDisplay(item.category);
+                  const statusConf = getInventoryStatusDisplay(item.status);
 
                   return (
-                    <tr key={item.id} className="hover:bg-white/[0.03] transition-colors">
+                    <tr key={item.id} className="transition-colors hover:bg-white/[0.03]">
                       <td className="px-4 py-3">
                         <code className="text-xs font-mono px-2 py-1 rounded">
                           {item.code}

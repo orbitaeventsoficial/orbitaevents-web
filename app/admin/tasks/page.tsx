@@ -1,4 +1,4 @@
-import { TASK_STATUS_VALUES, formatDateSimple } from '@/lib/constants';
+import { getTaskStatusLabel, TASK_STATUS_VALUES, formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import type { LeadTaskStatus } from '@prisma/client';
 import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
@@ -11,13 +11,6 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Tasques | Òrbita Admin',
-};
-
-const STATUS_LABELS: Record<LeadTaskStatus, string> = {
-  OPEN: 'Oberta',
-  IN_PROGRESS: 'En curs',
-  DONE: 'Feta',
-  CANCELLED: 'Cancel·lada',
 };
 
 function isTaskStatus(value?: string): value is LeadTaskStatus {
@@ -130,7 +123,7 @@ export default async function TasksPage({
                 <option value="">Totes</option>
                 {TASK_STATUS_VALUES.map((value) => (
                   <option key={value} value={value}>
-                    {STATUS_LABELS[value] || value}
+                    {getTaskStatusLabel(value)}
                   </option>
                 ))}
               </select>
@@ -159,7 +152,7 @@ export default async function TasksPage({
                       <Link href={destinationHref} className="min-w-0 flex-1">
                         <p className="text-sm truncate">{task.title}</p>
                         <p className="ap-subtitle">
-                          {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
+                          {(task.customer?.name || task.lead?.name || 'Sense relació')} · {getTaskStatusLabel(task.status)}
                         </p>
                       </Link>
                       <div className="flex shrink-0 items-center gap-3">

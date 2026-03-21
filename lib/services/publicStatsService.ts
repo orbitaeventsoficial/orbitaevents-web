@@ -1,5 +1,6 @@
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 export type PublicStatsLocale = 'es' | 'ca' | 'en';
 
@@ -48,7 +49,7 @@ export const PUBLIC_STATS_CACHE_HEADERS = {
 export async function getPublicStats(locale: PublicStatsLocale) {
   const fallbackStats = getFallbackPublicStats(locale);
 
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL || isBuildPrerenderPhase()) {
     return { ok: true as const, stats: fallbackStats, generatedAt: new Date().toISOString(), source: 'fallback' as const };
   }
 

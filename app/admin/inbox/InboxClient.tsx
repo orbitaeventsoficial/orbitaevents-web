@@ -206,8 +206,8 @@ export default function InboxClient({
           },
         };
       });
-    } catch {
-      // Ignore detail errors to keep inbox responsive.
+    } catch (error) {
+      console.warn("No s'han pogut carregar els detalls de l'email seleccionat", error);
     } finally {
       setLoadingSelected(false);
     }
@@ -359,7 +359,7 @@ export default function InboxClient({
             onClick={() => setActiveTab('all')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              activeTab === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+              activeTab === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'
             }`}
           >
             📬 Tot ({emails.length})
@@ -368,7 +368,7 @@ export default function InboxClient({
             onClick={() => setActiveTab('leads')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              activeTab === 'leads' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+              activeTab === 'leads' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'
             }`}
           >
             📋 Entrades web ({initialLeads.length})
@@ -379,7 +379,7 @@ export default function InboxClient({
                 onClick={() => setActiveTab('emails')}
                 type="button"
                 className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  activeTab === 'emails' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                  activeTab === 'emails' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'
                 }`}
               >
                 📧 Emails ({imapEmails.length})
@@ -393,7 +393,7 @@ export default function InboxClient({
                 onClick={() => setActiveTab('trash')}
                 type="button"
                 className={`w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  activeTab === 'trash' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                  activeTab === 'trash' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'
                 }`}
               >
                 🗑️ Paperera {trashCount > 0 && `(${trashCount})`}
@@ -409,7 +409,7 @@ export default function InboxClient({
             onClick={() => setFilter('all')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
-              filter === 'all' ? 'bg-white/5 text-white/80' : 'text-white/40 hover:bg-white/5'
+              filter === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5'
             }`}
           >
             Tots
@@ -418,7 +418,7 @@ export default function InboxClient({
             onClick={() => setFilter('unread')}
             type="button"
             className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
-              filter === 'unread' ? 'bg-white/5 text-white/80' : 'text-white/40 hover:bg-white/5'
+              filter === 'unread' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5'
             }`}
           >
             🔵 No llegits ({totalUnread})

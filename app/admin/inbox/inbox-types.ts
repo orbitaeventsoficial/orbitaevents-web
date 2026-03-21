@@ -3,7 +3,7 @@
  * Extret de InboxClient.tsx per reduir la mida del component.
  */
 
-import { LEAD_STATUS_CONFIG } from '@/lib/constants';
+import { getLeadStatusDisplay } from '@/lib/constants';
 
 export interface LeadData {
   id: string;
@@ -59,13 +59,7 @@ export interface QuotePackOption {
   price: number;
 }
 
-const DEFAULT_STATUS_TONE = {
-  bg: 'admin-tone-bg-neutral',
-  text: 'admin-tone-text-neutral',
-  border: 'admin-tone-border-neutral',
-  label: 'Desconegut',
-};
 
 export function getLeadStatusTone(status: string) {
-  return LEAD_STATUS_CONFIG[status] || DEFAULT_STATUS_TONE;
+  return getLeadStatusDisplay(status);
 }

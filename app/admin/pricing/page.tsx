@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import { formatCurrency, formatDate } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -613,8 +614,10 @@ export default function PricingAdminPage() {
           {/* Llista */}
           <div className="grid gap-3">
             {filteredInventory.map(item => {
-              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'admin-tone-bg-neutral' };
-              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'admin-tone-bg-neutral admin-tone-text-neutral' };
+              const categoryDisplay = getInventoryCategoryDisplay(item.category);
+              const categoryInfo = CATEGORY_LABELS[item.category] || { label: categoryDisplay.label, icon: categoryDisplay.icon, color: 'admin-tone-bg-neutral' };
+              const statusDisplay = getInventoryStatusDisplay(item.status);
+              const statusInfo = STATUS_LABELS[item.status] || { label: statusDisplay.label, color: `${statusDisplay.bg} ${statusDisplay.text}` };
 
               return (
                 <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">

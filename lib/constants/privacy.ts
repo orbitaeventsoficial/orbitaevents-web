@@ -61,3 +61,20 @@ export const PRIVACY_REQUEST_ARTICLES: Record<string, string> = {
   OBJECTION: '21',
   AUTOMATED: '22',
 };
+
+
+export function getPrivacyConsentLabel(consentType: string) {
+  return PRIVACY_CONSENT_LABELS[consentType] || consentType;
+}
+
+export function getPrivacyRequestTypeLabel(requestType: string) {
+  return PRIVACY_REQUEST_TYPE_LABELS[requestType] || requestType;
+}
+
+export function getPrivacyRequestStatusDisplay(status: string) {
+  return PRIVACY_REQUEST_STATUS_CONFIG[status] || PRIVACY_REQUEST_STATUS_CONFIG.PENDING;
+}
+
+export function getPrivacyPriorityDisplay(priority: string) {
+  return PRIVACY_PRIORITY_CONFIG[priority] || PRIVACY_PRIORITY_CONFIG.MEDIUM;
+}

@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
 import { formatDateTimeFull } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
@@ -33,7 +34,9 @@ export default function GoogleReviewsAdminPage() {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const reduceMotion = useReducedMotion();
+  const toast = useToast();
 
   useEffect(() => {
     loadReviews();
@@ -41,11 +44,22 @@ export default function GoogleReviewsAdminPage() {
 
   async function loadReviews() {
     try {
+      setLoadError(null);
       const response = await fetch('/api/google-reviews');
+      if (!response.ok) {
+        const message = "No s'han pogut carregar les ressenyes ara mateix.";
+        setLoadError(message);
+        throw new Error(message);
+      }
+
       const reviewsData: ReviewsData = await response.json();
       setData(reviewsData);
+      return true;
     } catch (error) {
+      const message = "No s'han pogut carregar les ressenyes ara mateix.";
+      setLoadError(message);
       log.error('Error carregant ressenyes:', error);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -54,7 +68,12 @@ export default function GoogleReviewsAdminPage() {
   async function syncReviews() {
     setSyncing(true);
     try {
-      await loadReviews();
+      const reloaded = await loadReviews();
+      if (reloaded) {
+        toast.success('Ressenyes actualitzades');
+      } else {
+        toast.error("No s'han pogut actualitzar les ressenyes");
+      }
     } finally {
       setSyncing(false);
     }
@@ -81,6 +100,12 @@ export default function GoogleReviewsAdminPage() {
       subtitle="Només es mostren ressenyes de 5 estrelles sincronitzades des de Google Business"
     >
 
+      {loadError && (
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300">
+          {loadError}
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <motion.div
@@ -90,7 +115,7 @@ export default function GoogleReviewsAdminPage() {
         >
           <div className="text-sm text-white/60 mb-1">Valoració mitjana</div>
           <div className="text-3xl font-bold">{data?.rating.toFixed(1) || '0.0'}</div>
-          <div className="text-xs text-white/40 mt-1">⭐⭐⭐⭐⭐</div>
+          <div className="mt-1 text-xs admin-tone-text-slate">⭐⭐⭐⭐⭐</div>
         </motion.div>
 
         <motion.div
@@ -101,7 +126,7 @@ export default function GoogleReviewsAdminPage() {
         >
           <div className="text-sm text-white/60 mb-1">Total ressenyes</div>
           <div className="text-3xl font-bold">{totalReviews}</div>
-          <div className="text-xs text-white/40 mt-1">En Google Business</div>
+          <div className="mt-1 text-xs admin-tone-text-slate">En Google Business</div>
         </motion.div>
 
         <motion.div
@@ -112,7 +137,7 @@ export default function GoogleReviewsAdminPage() {
         >
           <div className="text-sm text-white/60 mb-1">5 estrelles</div>
           <div className="text-3xl font-bold">{fiveStarReviews.length}</div>
-          <div className="text-xs text-white/40 mt-1">Mostrades al web</div>
+          <div className="mt-1 text-xs admin-tone-text-slate">Mostrades al web</div>
         </motion.div>
 
         <motion.div
@@ -134,13 +159,13 @@ export default function GoogleReviewsAdminPage() {
       </div>
 
       {/* Reviews List */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="ap-card rounded-2xl p-6">
         <h2 className="text-xl font-bold text-white mb-6">
           Ressenyes de 5 estrelles ({fiveStarReviews.length})
         </h2>
 
         {fiveStarReviews.length === 0 ? (
-          <div className="text-center py-12 text-white/40">
+          <div className="py-12 text-center admin-tone-text-slate">
             <p className="mb-4">Encara no hi ha ressenyes de 5 estrelles</p>
             <button
               onClick={syncReviews}
@@ -157,7 +182,7 @@ export default function GoogleReviewsAdminPage() {
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-colors"
+                className="ap-card rounded-xl p-6 transition-colors hover:admin-tone-bg-neutral"
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
@@ -169,7 +194,7 @@ export default function GoogleReviewsAdminPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-white">{review.author_name}</h3>
-                      <span className="text-xs text-white/50">{review.relative_time_description}</span>
+                      <span className="text-xs admin-tone-text-neutral">{review.relative_time_description}</span>
                     </div>
 
                     <div className="flex items-center gap-1 mb-3">

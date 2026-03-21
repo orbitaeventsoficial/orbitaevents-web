@@ -177,3 +177,12 @@ export const LEAD_COLOR_DEFAULT_VARS: Record<string, string> = ALL_OPTIONS.reduc
   return acc;
 }, {} as Record<string, string>);
 
+
+
+export function getLeadStatusColorDisplay(status: string) {
+  return STATUS_COLOR_CONFIG[status] || STATUS_COLOR_CONFIG.NEW;
+}
+
+export function getLeadPriorityColorDisplay(priority: string) {
+  return PRIORITY_COLOR_CONFIG[priority] || PRIORITY_COLOR_CONFIG.MEDIUM;
+}

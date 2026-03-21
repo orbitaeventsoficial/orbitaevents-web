@@ -8,15 +8,10 @@
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { getEventLabel, SOURCE_LABELS, formatDateSimple, formatDate, formatCurrency } from '@/lib/constants';
+import { getEventLabel, getSourceDisplay, formatDateSimple, formatDate, formatCurrency } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import { absoluteUrl } from '@/lib/site';
 
-
-/** Case-insensitive label lookup for source labels */
-function lookupSource(key: string): string {
-  return SOURCE_LABELS[key] || SOURCE_LABELS[key.toUpperCase()] || key;
-}
 
 // ============================================
 // TIPUS
@@ -95,7 +90,7 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
     }
 
     const eventLabel = getEventLabel(lead.eventType);
-    const sourceLabel = lookupSource(lead.source);
+    const sourceLabel = getSourceDisplay(lead.source).label;
     const timestamp = new Date().toLocaleString('ca-ES', {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',

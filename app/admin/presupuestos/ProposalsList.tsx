@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PROPOSAL_FILTERABLE_STATUSES, PROPOSAL_STATUS_CONFIG, formatDate, formatCurrency } from '@/lib/constants';
+import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type ProposalItem = {
@@ -27,19 +27,8 @@ type QuoteItem = {
   lead: { name: string; email: string } | null;
 };
 
-const DEFAULT_STATUS_STYLE = {
-  label: 'Esborrany',
-  bg: 'admin-tone-bg-neutral',
-  text: 'admin-tone-text-neutral',
-  border: 'admin-tone-border-neutral',
-};
-
-function getProposalStatusStyle(status: string) {
-  return PROPOSAL_STATUS_CONFIG[status] || DEFAULT_STATUS_STYLE;
-}
-
 function StatusBadge({ status }: { status: string }) {
-  const cfg = getProposalStatusStyle(status);
+  const cfg = getProposalStatusDisplay(status);
   return (
     <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.text} ${cfg.border}`}>
       {cfg.label}
@@ -125,7 +114,7 @@ export default function ProposalsList({
         body: JSON.stringify({ status }),
       });
       if (res.ok) {
-        setActionMsg(`Estat canviat a ${getProposalStatusStyle(status).label}`);
+        setActionMsg(`Estat canviat a ${getProposalStatusDisplay(status).label}`);
         setTimeout(() => setActionMsg(null), 3000);
         router.refresh();
       }
@@ -146,7 +135,7 @@ export default function ProposalsList({
           <p className="text-xs opacity-60">Total</p>
         </button>
         {PROPOSAL_FILTERABLE_STATUSES.map((status) => {
-          const cfg = getProposalStatusStyle(status);
+          const cfg = getProposalStatusDisplay(status);
           const count = stats[status];
           const isActive = statusFilter === status;
 
@@ -209,7 +198,7 @@ export default function ProposalsList({
           filtered.map((proposal) => (
             <article
               key={proposal.id}
-              className="block rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:bg-white/[0.06]"
+              className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
@@ -290,7 +279,7 @@ export default function ProposalsList({
       <div className="hidden overflow-hidden overflow-x-auto rounded-2xl border lg:block">
         <table className="w-full min-w-[600px] text-sm" aria-label="Llistat de pressupostos">
           <thead>
-            <tr className="border-b bg-white/[0.03]">
+            <tr className="border-b admin-tone-bg-neutral">
               <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Ref.</th>
               <th scope="col" className="px-4 py-3 text-left font-medium opacity-70">Client</th>
               <th scope="col" className="hidden px-4 py-3 text-left font-medium opacity-70 sm:table-cell">Estat</th>
@@ -299,7 +288,7 @@ export default function ProposalsList({
               <th scope="col" className="px-4 py-3 text-right font-medium opacity-70">Accions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y admin-tone-border-subtle">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center opacity-60">

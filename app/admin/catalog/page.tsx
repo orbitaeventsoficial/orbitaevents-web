@@ -1,34 +1,11 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/constants';
+import { CATALOG_TAB_META, formatCurrency } from '@/lib/constants';
 
-type CatalogTab = 'packs' | 'extras' | 'inventory' | 'pricing';
-
-const TAB_META: Record<CatalogTab, { label: string; title: string; description: string }> = {
-  packs: {
-    label: 'Packs',
-    title: 'Packs de servei',
-    description: 'Gestiona packs base, contingut i preus inicials.',
-  },
-  extras: {
-    label: 'Extres',
-    title: 'Catàleg d\'extres',
-    description: 'Defineix extres comercials i compatibilitats per servei.',
-  },
-  inventory: {
-    label: 'Inventari',
-    title: 'Inventari operatiu',
-    description: 'Controla estat, ús i disponibilitat del material.',
-  },
-  pricing: {
-    label: 'Regles de preu',
-    title: 'Preus i rendiment',
-    description: 'Edita preus, revisa rendiment i ajusta marges.',
-  },
-};
+type CatalogTab = keyof typeof CATALOG_TAB_META;
 
 function resolveTab(input?: string): CatalogTab {
   if (input === 'extras') return 'extras';
@@ -82,7 +59,7 @@ function resolveHealthTone(marginPct: number, targetMarginPct: number): {
   }
   return {
     tone: 'red',
-    label: 'Crític',
+    label: 'CrÃ­tic',
     badgeClass: '',
     dotClass: '',
   };
@@ -171,7 +148,7 @@ export default async function CatalogPage({
           semaforo,
           inventory: pack.inventory.map((row) => ({
             id: row.item.id,
-            label: `${row.item.name}${row.quantity > 1 ? ` ×${row.quantity}` : ''}`,
+            label: `${row.item.name}${row.quantity > 1 ? ` Ã—${row.quantity}` : ''}`,
             code: row.item.code || '',
           })),
         };
@@ -194,17 +171,17 @@ export default async function CatalogPage({
 
   return (
     <AdminPage
-      title="Catàleg"
-      subtitle="Punt únic per operar packs, extres, inventari i regles de preu."
+      title="CatÃ leg"
+      subtitle="Punt Ãºnic per operar packs, extres, inventari i regles de preu."
       alert={pricingAlerts > 0 ? (
         <p className="inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
-          ⚠ {pricingAlerts} alertes de divergència de preu en packs
+          âš  {pricingAlerts} alertes de divergÃ¨ncia de preu en packs
         </p>
       ) : undefined}
     >
 
       <nav className="flex flex-wrap gap-2">
-        {(Object.keys(TAB_META) as CatalogTab[]).map((tab) => {
+        {(Object.keys(CATALOG_TAB_META) as CatalogTab[]).map((tab) => {
           const isActive = tab === activeTab;
           return (
             <Link
@@ -216,15 +193,15 @@ export default async function CatalogPage({
                   : 'admin-catalog-tab--idle'
               }`}
             >
-              {TAB_META[tab].label}
+              {CATALOG_TAB_META[tab].label}
             </Link>
           );
         })}
       </nav>
 
-      <section className="rounded-2xl border border-white/10 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{TAB_META[activeTab].title}</h2>
-        <p className="mt-1 text-sm">{TAB_META[activeTab].description}</p>
+      <section className="ap-card rounded-2xl p-6">
+        <h2 className="text-lg font-semibold">{CATALOG_TAB_META[activeTab].title}</h2>
+        <p className="mt-1 text-sm">{CATALOG_TAB_META[activeTab].description}</p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {activeTab === 'packs' && (
@@ -233,7 +210,7 @@ export default async function CatalogPage({
                 href="/admin/packs"
                 className="rounded-xl border px-4 py-3 text-sm"
               >
-                Obrir gestió de packs
+                Obrir gestiÃ³ de packs
               </Link>
               <Link
                 href="/admin/packs/new"
@@ -252,7 +229,7 @@ export default async function CatalogPage({
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold">{pack.name}</p>
-                          <p className="text-xs mt-0.5">{pack.slug} · {pack.service}</p>
+                          <p className="text-xs mt-0.5">{pack.slug} Â· {pack.service}</p>
                         </div>
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${pack.semaforo.badgeClass}`}>
                           <span className={`inline-block h-2 w-2 rounded-full ${pack.semaforo.dotClass}`} />
@@ -273,7 +250,7 @@ export default async function CatalogPage({
                       </div>
                       {pack.inventory.length > 0 && (
                         <p className="mt-2 text-xs">
-                          Components: {pack.inventory.slice(0, 2).map((item) => item.label).join(' · ')}
+                          Components: {pack.inventory.slice(0, 2).map((item) => item.label).join(' Â· ')}
                           {pack.inventory.length > 2 ? ` +${pack.inventory.length - 2}` : ''}
                         </p>
                       )}
@@ -289,7 +266,7 @@ export default async function CatalogPage({
                 href="/admin/packs/extras"
                 className="rounded-xl border px-4 py-3 text-sm"
               >
-                Obrir catàleg d&apos;extres
+                Obrir catÃ leg d&apos;extres
               </Link>
               <Link
                 href="/admin/pricing"
@@ -326,15 +303,15 @@ export default async function CatalogPage({
                 <article className="rounded-xl border px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide">Vigilar</p>
                   <p className="mt-1 text-2xl font-bold">{amberCount}</p>
-                  <p className="text-xs">Marge proper al límit</p>
+                  <p className="text-xs">Marge proper al lÃ­mit</p>
                 </article>
                 <article className="rounded-xl border px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide">Crític</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide">CrÃ­tic</p>
                   <p className="mt-1 text-2xl font-bold">{redCount}</p>
                   <p className="text-xs">Requereix pujar preu o baixar cost</p>
                 </article>
                 <article className="rounded-xl border px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide">Marge mitjà</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide">Marge mitjÃ </p>
                   <p className="mt-1 text-2xl font-bold">{formatPct(avgMargin)}</p>
                   <p className="text-xs">Objectiu global: {formatPct(targetMarginPct)}</p>
                 </article>
@@ -351,20 +328,20 @@ export default async function CatalogPage({
               >
                 Revisar rendibilitat
               </Link>
-              <div className="sm:col-span-2 mt-1 overflow-hidden rounded-xl border border-white/10">
+              <div className="sm:col-span-2 mt-1 ap-card overflow-hidden rounded-xl">
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1120px] text-sm" aria-label="Catàleg de packs i extres">
+                  <table className="w-full min-w-[1120px] text-sm" aria-label="CatÃ leg de packs i extres">
                     <thead className="text-xs uppercase tracking-wide">
                       <tr>
                         <th scope="col" className="px-3 py-2 text-left">Pack</th>
-                        <th scope="col" className="px-3 py-2 text-left">Semàfor</th>
+                        <th scope="col" className="px-3 py-2 text-left">SemÃ for</th>
                         <th scope="col" className="px-3 py-2 text-right">Preu</th>
                         <th scope="col" className="px-3 py-2 text-right">Cost estimat</th>
                         <th scope="col" className="px-3 py-2 text-right">Benefici</th>
                         <th scope="col" className="px-3 py-2 text-right">Marge</th>
                         <th scope="col" className="px-3 py-2 text-right">Ratio cost</th>
                         <th scope="col" className="px-3 py-2 text-right">Preu recomanat</th>
-                        <th scope="col" className="px-3 py-2 text-right">Desviació</th>
+                        <th scope="col" className="px-3 py-2 text-right">DesviaciÃ³</th>
                         <th scope="col" className="px-3 py-2 text-left">Components</th>
                       </tr>
                     </thead>
@@ -375,10 +352,10 @@ export default async function CatalogPage({
                             <Link href={`/admin/packs/${row.id}`} className="font-semibold">
                               {row.name}
                             </Link>
-                            <p className="text-xs">{row.slug} · {row.service}</p>
+                            <p className="text-xs">{row.slug} Â· {row.service}</p>
                             {row.features.length > 0 && (
                               <p className="text-xs mt-0.5">
-                                {row.features.slice(0, 2).join(' · ')}
+                                {row.features.slice(0, 2).join(' Â· ')}
                                 {row.features.length > 2 ? ` +${row.features.length - 2}` : ''}
                               </p>
                             )}
@@ -402,7 +379,7 @@ export default async function CatalogPage({
                           </td>
                           <td className="px-3 py-2 text-xs">
                             {row.inventory.length > 0
-                              ? `${row.inventory.slice(0, 2).map((item) => item.label).join(' · ')}${row.inventory.length > 2 ? ` +${row.inventory.length - 2}` : ''}`
+                              ? `${row.inventory.slice(0, 2).map((item) => item.label).join(' Â· ')}${row.inventory.length > 2 ? ` +${row.inventory.length - 2}` : ''}`
                               : 'Sense components'}
                           </td>
                         </tr>
@@ -418,3 +395,5 @@ export default async function CatalogPage({
     </AdminPage>
   );
 }
+
+

@@ -141,10 +141,14 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
 
       {/* Cinematic hero */}
       <section className="relative h-[60vh] md:h-[75vh] overflow-hidden">
-        <img
+        <Image
           src={heroImage.src}
           alt={heroImage.alt}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+          unoptimized={heroImage.src.startsWith('data:') || heroImage.src.includes('/api/uploads/')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">

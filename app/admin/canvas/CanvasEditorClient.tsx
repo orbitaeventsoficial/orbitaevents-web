@@ -272,9 +272,9 @@ export default function CanvasEditorClient() {
       a.download = `orbita-canvas-${Date.now()}.png`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      console.error('Error exportant canvas');
-      toast.error('Error exportant la imatge');
+    } catch (error) {
+      console.error('Error exportant canvas', error);
+      toast.error(error instanceof Error ? error.message : 'Error exportant la imatge');
     } finally {
       setExporting(false);
     }

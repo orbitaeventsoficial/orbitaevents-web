@@ -19,17 +19,24 @@ function progressTone(pct: number) {
 export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const toast = useToast();
 
   const load = useCallback(async () => {
     try {
+      setLoadError(null);
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, { credentials: 'include' });
+      if (!res.ok) throw new Error("No s'ha pogut carregar la checklist");
       const data = await res.json();
-      if (data.ok) setItems(data.items);
-    } catch {
-      // fallback to empty
+      if (data.ok) {
+        setItems(data.items);
+      } else {
+        throw new Error("No s'ha pogut carregar la checklist");
+      }
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "No s'ha pogut carregar la checklist");
     } finally {
       setLoading(false);
     }
@@ -42,14 +49,15 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   async function save(updated: ChecklistItem[]) {
     setItems(updated);
     try {
-      await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, {
+      const response = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/checklist`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ items: updated }),
       });
-    } catch {
-      toast.error('Error desant checklist');
+      if (!response.ok) throw new Error('Error desant checklist');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error desant checklist');
     }
   }
 
@@ -76,6 +84,14 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
     return (
       <div className="ap-card rounded-2xl p-5">
         <div className="admin-shimmer h-4 w-32 rounded" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="ap-card rounded-2xl p-5 text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">
+        {loadError}
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 export interface CoverageArea {
   city: string;
@@ -62,6 +63,10 @@ function sanitizeCoverageAreas(areas: CoverageArea[]): CoverageArea[] {
 }
 
 export async function getCoverageAreas(): Promise<CoverageArea[]> {
+  if (isBuildPrerenderPhase()) {
+    return DEFAULT_AREAS;
+  }
+
   try {
     const setting = await prisma.setting.findUnique({ where: { key: SETTING_KEY } });
     if (!setting?.value) return DEFAULT_AREAS;

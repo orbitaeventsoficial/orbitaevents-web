@@ -32,12 +32,12 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-import { LEAD_SCORE_BAND_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber } from '@/lib/constants';
+import { LEAD_SCORE_BAND_LABELS, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber, getEventLabel, getLeadPriorityDisplay, getLeadStatusDisplay } from '@/lib/constants';
 import { getAppBaseUrl } from '@/lib/site';
 
 
 function getPriorityBadge(priority: string) {
-  const tone = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.MEDIUM;
+  const tone = getLeadPriorityDisplay(priority);
   return { label: tone.label, color: tone.bg + ' ' + tone.text };
 }
 
@@ -112,8 +112,8 @@ export default async function LeadDetailPage({ params }: Props) {
     notFound();
   }
 
-  const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
-  const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
+  const statusConf = getLeadStatusDisplay(lead.status);
+  const eventType = getEventLabel(lead.eventType);
   const priorityConf = getPriorityBadge(lead.priority);
   const baseUrl = getAppBaseUrl();
   const reviewUrl = lead.booking?.reviewToken
@@ -742,7 +742,7 @@ export default async function LeadDetailPage({ params }: Props) {
                     className="ap-card block p-3"
                   >
                     <p className="text-sm font-medium">
-                      {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}
+                      {getEventLabel(item.eventType)} · {item.status}
                     </p>
                     <p className="text-xs">
                       {item.eventDate ? formatDateSimple(item.eventDate) : 'Sense data'} ·

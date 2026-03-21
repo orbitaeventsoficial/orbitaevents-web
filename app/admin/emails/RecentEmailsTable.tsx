@@ -1,7 +1,7 @@
 // app/admin/emails/RecentEmailsTable.tsx
 'use client';
 
-import { formatDateSimple } from '@/lib/constants';
+import { EMAIL_ACTIVITY_DISPLAY, formatDateSimple } from '@/lib/constants';
 
 type ActionTone = {
   label: string;
@@ -26,33 +26,6 @@ const DEFAULT_ACTION_TONE: ActionTone = {
   icon: '📋',
   bg: 'admin-tone-bg-neutral',
   text: 'admin-tone-text-neutral',
-};
-
-const ACTION_TONES: Record<string, ActionTone> = {
-  POST_EVENT_EMAIL_SENT: {
-    label: 'Email post-event enviat',
-    icon: '📧',
-    bg: 'admin-tone-bg-info',
-    text: 'admin-tone-text-info',
-  },
-  TESTIMONIAL_SUBMITTED: {
-    label: 'Valoració rebuda',
-    icon: '⭐',
-    bg: 'admin-tone-bg-warning',
-    text: 'admin-tone-text-warning',
-  },
-  DISCOUNT_CODE_GENERATED: {
-    label: 'Codi descompte generat',
-    icon: '🎁',
-    bg: 'admin-tone-bg-success',
-    text: 'admin-tone-text-success',
-  },
-  LEAD_EMAIL_SENT: {
-    label: 'Confirmació lead enviada',
-    icon: '✉️',
-    bg: 'admin-tone-bg-violet',
-    text: 'admin-tone-text-violet',
-  },
 };
 
 export default function RecentEmailsTable({ activities }: { activities: Activity[] }) {
@@ -82,9 +55,9 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
           <p className="mt-2">Cap activitat recent</p>
         </div>
       ) : (
-        <div className="max-h-96 divide-y divide-white/5 overflow-y-auto">
+        <div className="max-h-96 divide-y admin-tone-border-subtle overflow-y-auto">
           {activities.map((activity) => {
-            const actionInfo = ACTION_TONES[activity.action] || {
+            const actionInfo = EMAIL_ACTIVITY_DISPLAY[activity.action] || {
               ...DEFAULT_ACTION_TONE,
               label: activity.action,
             };
@@ -116,3 +89,4 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
     </section>
   );
 }
+

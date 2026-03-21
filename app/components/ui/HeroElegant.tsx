@@ -250,8 +250,14 @@ export default function HeroElegant() {
       <motion.div className="absolute inset-0" style={{ y: reduceMotion ? 0 : bgY }} aria-hidden="true">
         {/* Poster — primer frame mentre carrega */}
         <div className="absolute inset-0 bg-black flex items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/orbitalockupwhite.svg" alt="Òrbita Events" className="w-48 h-48 md:w-64 md:h-64 opacity-30" />
+          <Image
+            src="/img/orbitalockupwhite.svg"
+            alt="Òrbita Events"
+            width={256}
+            height={256}
+            className="w-48 h-48 md:w-64 md:h-64 opacity-30"
+            priority
+          />
         </div>
 
         {/* Slides — crossfade simultani */}

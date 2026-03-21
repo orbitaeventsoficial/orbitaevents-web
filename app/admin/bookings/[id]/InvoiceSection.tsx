@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/constants';
+import { formatCurrency, getInvoiceStatusLabel } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -96,7 +96,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
               <span className="font-mono text-sm font-bold">{activeInvoice.reference}</span>
               <span className={statusStyle?.className || 'ap-badge'}>
                 <span>{statusStyle?.icon}</span>
-                {statusStyle?.label || activeInvoice.status}
+                {statusStyle?.label || getInvoiceStatusLabel(activeInvoice.status)}
               </span>
             </div>
             <span className="text-lg font-bold">{formatCurrency(activeInvoice.total)}</span>

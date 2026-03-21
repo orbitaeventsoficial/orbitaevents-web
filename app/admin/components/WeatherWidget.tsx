@@ -56,20 +56,23 @@ function formatShortDate(isoString: string): string {
 export default function WeatherWidget() {
   const [forecasts, setForecasts] = useState<WeatherForecast[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
+        setLoadError(null);
         const res = await fetch('/api/admin/weather');
-        if (!res.ok) throw new Error('Resposta no vàlida');
+        if (!res.ok) throw new Error("No s'ha pogut carregar el temps dels pròxims events");
         const data = await res.json();
         if (!cancelled && data.ok && Array.isArray(data.forecasts)) {
           setForecasts(data.forecasts);
         }
-      } catch {
-        console.error('Error carregant previsions meteorològiques');
+      } catch (error) {
+        console.error('Error carregant previsions meteorològiques', error);
+        if (!cancelled) setLoadError(error instanceof Error ? error.message : "No s'ha pogut carregar el temps dels pròxims events");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -79,8 +82,9 @@ export default function WeatherWidget() {
     return () => { cancelled = true; };
   }, []);
 
-  // No mostrar res si està carregant o no hi ha previsions
-  if (loading || forecasts.length === 0) return null;
+  if (loading) return null;
+
+  if (loadError || forecasts.length === 0) return null;
 
   return (
     <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
@@ -91,7 +95,7 @@ export default function WeatherWidget() {
         {forecasts.map((f) => (
           <div
             key={f.bookingId}
-            className="flex-shrink-0 rounded-xl border border-white/10 bg-white/[0.03] p-3 min-w-[160px] max-w-[200px] hover:bg-white/[0.05] transition-colors"
+            className="ap-card flex-shrink-0 rounded-xl p-3 min-w-[160px] max-w-[200px] transition-colors hover:admin-tone-bg-neutral"
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl leading-none">{getWeatherEmoji(f.description)}</span>

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
-import { BOOKING_STATUS_CONFIG, BOOKING_STATUS_ORDER } from '@/lib/constants';
+import { BOOKING_STATUS_ORDER, getBookingStatusDisplay } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Props {
@@ -13,12 +13,6 @@ interface Props {
   guestCount: number;
 }
 
-const DEFAULT_STATUS_STYLE = {
-  bg: 'admin-tone-bg-neutral',
-  text: 'admin-tone-text-neutral',
-  border: 'admin-tone-border-neutral',
-  label: 'Desconegut',
-};
 
 export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: Props) {
   const router = useRouter();
@@ -81,7 +75,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
     <div className="relative">
       <div className="flex flex-wrap gap-2">
         {BOOKING_STATUS_ORDER.map((status) => {
-          const conf = BOOKING_STATUS_CONFIG[status] || DEFAULT_STATUS_STYLE;
+          const conf = getBookingStatusDisplay(status);
           const isActive = status === currentStatus;
 
           return (

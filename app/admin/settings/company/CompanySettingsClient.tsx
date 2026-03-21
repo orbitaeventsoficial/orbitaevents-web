@@ -64,8 +64,8 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
       if (!res.ok) throw new Error('Error desant');
       setMessage({ type: 'ok', text: 'Configuracio desada correctament' });
       setTimeout(() => setMessage(null), 4000);
-    } catch {
-      setMessage({ type: 'error', text: 'Error desant la configuracio' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Error desant la configuracio' });
     } finally {
       setSaving(false);
     }
@@ -81,8 +81,8 @@ export default function CompanySettingsClient({ initial }: { initial: Record<str
       } else {
         setMessage({ type: 'error', text: "No s'ha pogut connectar amb Holded" });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Error de connexio' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Error de connexio' });
     } finally {
       setTestingHolded(false);
     }

@@ -13,12 +13,12 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { VIP_SPEND_THRESHOLD } from '@/lib/constants';
+import { VIP_SPEND_THRESHOLD, getCustomerSourceLabel } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { SOURCE_LABELS, PRIORITY_FILTER_STYLES, getNextStep, getExecutionPriority } from './customer-utils';
+import { PRIORITY_FILTER_STYLES, getNextStep, getExecutionPriority } from './customer-utils';
 import { AddCustomerModal, StartProcessModal } from './ClientesModals';
 
 export default function AdminContactesPage() {
@@ -197,7 +197,7 @@ export default function AdminContactesPage() {
               c.email,
               c.phone || '',
               c.city || '',
-              SOURCE_LABELS[c.source || ''] || c.source || '',
+              getCustomerSourceLabel(c.source, ''),
               String(c.total_events),
               String(c.total_spent),
               c.is_vip ? 'Sí' : 'No',
@@ -227,7 +227,7 @@ export default function AdminContactesPage() {
               className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
                 priorityFilter === value
                   ? PRIORITY_FILTER_STYLES[value]
-                  : 'border-white/10 text-white/40 hover:text-white/70'
+                  : 'admin-tone-idle'
               }`}
             >
               {value === 'ALL' ? 'Totes prioritats' : `Prioritat ${value.toLowerCase()}`}
@@ -265,7 +265,7 @@ export default function AdminContactesPage() {
             return (
               <article
                 key={customer.id}
-                className="block rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] p-4 transition-colors"
+                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -298,7 +298,7 @@ export default function AdminContactesPage() {
                     <p className="text-xs mt-1">{customer.total_events} events</p>
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                <div className="mt-3 flex items-center justify-between border-t pt-3 admin-tone-border-neutral">
                   <div className="flex items-center gap-2">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium ${
                       customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300'
@@ -306,7 +306,7 @@ export default function AdminContactesPage() {
                         : customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300'
                         : 'bg-white/5 text-white/40'
                     }`}>
-                      {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
+                      {getCustomerSourceLabel(customer.source)}
                     </span>
                     <Link href={nextStep.href} className="text-[11px] font-medium">
                       {nextStep.label} →
@@ -347,7 +347,7 @@ export default function AdminContactesPage() {
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
-              <tr className="border-b hover:bg-white/[0.03] transition-colors">
+              <tr className="border-b transition-colors hover:bg-white/[0.03]">
                 <th scope="col" className="text-center p-4 font-medium">Nom</th>
                 <th scope="col" className="text-center p-4 font-medium hidden md:table-cell">Contacte</th>
                 <th scope="col" className="text-center p-4 font-medium hidden lg:table-cell">Font</th>
@@ -361,7 +361,7 @@ export default function AdminContactesPage() {
               {filteredCustomers.map(({ customer, priority }) => {
                 const nextStep = getNextStep(customer);
                 return (
-                <tr key={customer.id} className="border-b hover:bg-white/[0.03] transition-colors">
+                <tr key={customer.id} className="border-b transition-colors hover:bg-white/[0.03]">
                   <td className="p-4 text-center">
                     <div className="flex items-center justify-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">
@@ -408,7 +408,7 @@ export default function AdminContactesPage() {
                       customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
                       'bg-white/5 text-white/40'
                     }`}>
-                      {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
+                      {getCustomerSourceLabel(customer.source)}
                     </span>
                   </td>
                   <td className="p-4 hidden sm:table-cell text-center">

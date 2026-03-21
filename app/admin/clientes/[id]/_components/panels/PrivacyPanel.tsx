@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useHubContext } from '../CustomerHubClient';
 import { formatDateTime } from '@/lib/constants';
-import { PRIVACY_CONSENT_LABELS, PRIVACY_REQUEST_STATUS_CONFIG, PRIVACY_REQUEST_TYPE_LABELS } from '@/lib/constants/privacy';
+import { getPrivacyConsentLabel, getPrivacyRequestStatusDisplay, getPrivacyRequestTypeLabel } from '@/lib/constants/privacy';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 type ConsentRecord = {
@@ -109,7 +109,7 @@ export default function PrivacyPanel() {
             {activeConsents.map((c) => (
               <div key={c.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
-                  <span className="text-sm font-medium">{PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}</span>
+                  <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
                   <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                     Actiu
                   </span>
@@ -132,7 +132,7 @@ export default function PrivacyPanel() {
               {revokedConsents.map((c) => (
                 <div key={c.id} className="flex items-center justify-between rounded-xl border p-3 opacity-50">
                   <div>
-                    <span className="text-sm font-medium">{PRIVACY_CONSENT_LABELS[c.consentType] || c.consentType}</span>
+                    <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
                     <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
                       Revocat
                     </span>
@@ -182,12 +182,12 @@ export default function PrivacyPanel() {
         ) : (
           <div className="mt-3 space-y-2">
             {requests.map((r) => {
-              const statusCfg = PRIVACY_REQUEST_STATUS_CONFIG[r.status] || PRIVACY_REQUEST_STATUS_CONFIG.PENDING;
+              const statusCfg = getPrivacyRequestStatusDisplay(r.status);
               return (
                 <div key={r.id} className="rounded-xl border p-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium">
-                      {PRIVACY_REQUEST_TYPE_LABELS[r.requestType] || r.requestType}
+                      {getPrivacyRequestTypeLabel(r.requestType)}
                     </span>
                     <span className={`text-xs font-medium ${statusCfg.color}`}>
                       {statusCfg.label}

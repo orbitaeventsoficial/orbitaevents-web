@@ -149,9 +149,9 @@ export default function CostCalculatorClient() {
   return (
     <div className="grid lg:grid-cols-[300px_1fr] gap-6">
       {/* Sidebar — Components disponibles */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+      <div className="ap-card rounded-xl p-5">
         <h3 className="text-sm font-bold text-white/70 uppercase tracking-wider mb-4">Components</h3>
-        <p className="text-xs text-white/40 mb-4">Arrossega o clica per afegir</p>
+        <p className="mb-4 text-xs admin-tone-text-slate">Arrossega o clica per afegir</p>
         <div className="space-y-2">
           {AVAILABLE_COMPONENTS.map((comp) => (
             <button
@@ -159,12 +159,12 @@ export default function CostCalculatorClient() {
               draggable
               onDragStart={(e) => handleDragStart(e, comp)}
               onClick={() => addComponent(comp)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 transition-all cursor-grab active:cursor-grabbing text-left"
+              className="ap-card w-full cursor-grab rounded-xl px-3 py-2.5 text-left transition-all active:cursor-grabbing hover:admin-tone-bg-neutral"
             >
               <span className="text-xl">{comp.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-white font-medium">{comp.label}</div>
-                <div className="text-xs text-white/40">
+                <div className="text-xs admin-tone-text-slate">
                   {comp.costPerHour}€/{comp.unit}
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function CostCalculatorClient() {
             dragOver
               ? 'border-amber-500/50 bg-amber-500/5'
               : components.length === 0
-              ? 'border-white/10 bg-white/[0.01]'
+              ? 'admin-tone-border-neutral admin-tone-bg-neutral'
               : 'border-transparent bg-transparent p-0'
           }`}
         >
@@ -200,7 +200,7 @@ export default function CostCalculatorClient() {
                 const avail = AVAILABLE_COMPONENTS.find((a) => a.type === comp.type);
                 const unit = avail?.unit || 'hora';
                 return (
-                  <div key={comp.id} className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 hover:bg-white/[0.04] transition-colors">
+                  <div key={comp.id} className="ap-card flex items-center gap-4 rounded-xl p-4 transition-colors hover:admin-tone-bg-neutral">
                     <span className="text-2xl">{comp.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-bold text-white">{comp.label}</div>
@@ -212,7 +212,7 @@ export default function CostCalculatorClient() {
                       <input
                         type="number" min={1} value={comp.quantity}
                         onChange={(e) => updateComponent(comp.id, 'quantity', Math.max(1, Number(e.target.value)))}
-                        className="w-16 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-center text-sm "
+                        className="w-16 px-2 py-1.5 rounded-lg border admin-tone-border-neutral admin-tone-bg-neutral text-center text-sm "
                       />
                     </div>
 
@@ -223,7 +223,7 @@ export default function CostCalculatorClient() {
                         <input
                           type="number" min={1} value={comp.hours}
                           onChange={(e) => updateComponent(comp.id, 'hours', Math.max(1, Number(e.target.value)))}
-                          className="w-16 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-center text-sm "
+                          className="w-16 px-2 py-1.5 rounded-lg border admin-tone-border-neutral admin-tone-bg-neutral text-center text-sm "
                         />
                       </div>
                     )}
@@ -234,7 +234,7 @@ export default function CostCalculatorClient() {
                       <input
                         type="number" min={0} step={0.01} value={comp.unitCost}
                         onChange={(e) => updateComponent(comp.id, 'unitCost', Math.max(0, Number(e.target.value)))}
-                        className="w-20 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-center text-sm "
+                        className="w-20 px-2 py-1.5 rounded-lg border admin-tone-border-neutral admin-tone-bg-neutral text-center text-sm "
                       />
                     </div>
 
@@ -262,11 +262,11 @@ export default function CostCalculatorClient() {
           <div className="rounded-xl border p-6">
             <div className="grid md:grid-cols-4 gap-6 mb-6">
               <div>
-                <div className="text-xs text-white/40 mb-1">Cost total</div>
+                <div className="text-xs admin-tone-text-slate mb-1">Cost total</div>
                 <div className="text-3xl font-black text-white">{totals.totalCost}€</div>
               </div>
               <div>
-                <div className="text-xs text-white/40 mb-1">Marge</div>
+                <div className="text-xs admin-tone-text-slate mb-1">Marge</div>
                 <div className="flex items-center gap-3">
                   <input
                     type="range" min={10} max={60} value={marginPct}
@@ -277,27 +277,27 @@ export default function CostCalculatorClient() {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-white/40 mb-1">Benefici</div>
+                <div className="text-xs admin-tone-text-slate mb-1">Benefici</div>
                 <div className="text-3xl font-black">{totals.margin}€</div>
               </div>
               <div>
-                <div className="text-xs text-white/40 mb-1">Preu suggerit</div>
+                <div className="text-xs admin-tone-text-slate mb-1">Preu suggerit</div>
                 <div className="text-3xl font-black">{totals.suggestedPrice}€</div>
               </div>
             </div>
 
             {/* Save form */}
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t pt-4 admin-tone-border-neutral">
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   value={quoteName} onChange={(e) => setQuoteName(e.target.value)}
                   placeholder="Nom del pressupost (ex: DJ 3h sense altaveus)"
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm "
+                  className="flex-1 px-4 py-2.5 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral text-sm "
                 />
                 <input
                   value={clientName} onChange={(e) => setClientName(e.target.value)}
                   placeholder="Client (opcional)"
-                  className="sm:w-48 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm "
+                  className="sm:w-48 px-4 py-2.5 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral text-sm "
                 />
                 <button
                   onClick={handleSave} disabled={saving}

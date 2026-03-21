@@ -4,29 +4,29 @@
   "private": true,
   "packageManager": "pnpm@10.13.0",
   "engines": {
-    "node": "22.x"
+    "node": ">=22 <25"
   },
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
     "sync:reviews": "node scripts/sync-reviews.mjs",
-    "assets:sync": "npm run logos:sync && npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio",
-    "sync:reviews:if-configured": "node -e \"const {execSync}=require('child_process');const hasKeys=Boolean(process.env.SERPAPI_KEY||process.env.OUTSCRAPER_KEY||process.env.OUTSCRAPER_API_KEY);if(!hasKeys){console.log('No review API keys configured - skipping sync:reviews');process.exit(0);}execSync('npm run sync:reviews',{stdio:'inherit'});\"",
-    "assets:sync:full": "npm run assets:sync && npm run sync:reviews:if-configured",
+    "assets:sync": "pnpm run logos:sync && pnpm run normalize:filenames && pnpm run rename:portfolio && pnpm run generate:portfolio",
+    "sync:reviews:if-configured": "node -e \"const {execSync}=require('child_process');const hasKeys=Boolean(process.env.SERPAPI_KEY||process.env.OUTSCRAPER_KEY||process.env.OUTSCRAPER_API_KEY);if(!hasKeys){console.log('No review API keys configured - skipping sync:reviews');process.exit(0);}execSync('pnpm run sync:reviews',{stdio:'inherit'});\"",
+    "assets:sync:full": "pnpm run assets:sync && pnpm run sync:reviews:if-configured",
     "logos:sync": "node scripts/sync-client-logos.mjs",
     "i18n:packs:guard": "npx tsx scripts/check-packs-i18n.ts",
     "i18n:packs:sync": "npx tsx scripts/sync-packs-to-db.ts",
-    "i18n:packs:fix-or-alert": "npm run i18n:packs:sync && npm run i18n:packs:guard",
+    "i18n:packs:fix-or-alert": "pnpm run i18n:packs:sync && pnpm run i18n:packs:guard",
     "autofix:finance:health": "npx tsx scripts/autofix-finance-health.ts",
     "autofix:system:health": "npx tsx scripts/autofix-system-health.ts",
     "theme:admin:check": "node scripts/admin-theme-autofix.mjs --check",
     "theme:admin:fix": "node scripts/admin-theme-autofix.mjs --fix",
     "autofix:master": "npx tsx scripts/autofix-master.ts",
-    "autofix": "npm run autofix:master",
+    "autofix": "pnpm run autofix:master",
     "qa:scan:web": "node scripts/scan-i18n-leaks.mjs",
     "qa:smoke:i18n": "node scripts/smoke-i18n.mjs",
-    "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('npm run assets:sync:full',{stdio:'inherit'});\"",
-    "build": "npm run build:assets && npm run i18n:packs:guard && next build",
+    "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('pnpm run assets:sync:full',{stdio:'inherit'});\"",
+    "build": "pnpm run build:assets && pnpm run i18n:packs:guard && next build",
     "start": "next start",
     "lint": "next lint",
     "generate:portfolio": "node scripts/generate-portfolio-config.mjs",
@@ -36,7 +36,7 @@
     "db:seed": "prisma db seed",
     "seed:blog": "npx tsx prisma/seed-blog.ts",
     "db:reset": "prisma db push --force-reset && prisma db seed",
-    "monitor": "npx ts-node scripts/monitor.ts",
+    "monitor": "pnpm exec ts-node scripts/monitor.ts",
     "health": "curl -s https://orbitaevents.com/api/health | node -e \"const d=require('fs').readFileSync(0,'utf8');const h=JSON.parse(d);console.log('Status:',h.status,'| DB:',h.checks?.database?.status,'| Response:',h.responseTime+'ms')\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -49,7 +49,7 @@
     "scan:hardcoded": "node scripts/scan-hardcoded.js"
   },
   "prisma": {
-    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "pnpm exec ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@google-analytics/data": "^5.2.1",

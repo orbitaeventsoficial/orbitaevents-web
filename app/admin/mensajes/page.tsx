@@ -1,6 +1,6 @@
 // app/admin/mensajes/page.tsx
 import { log } from '@/lib/logger';
-import { LEAD_STATUS_CONFIG, WHATSAPP_URL, formatDateSimple, getSourceDisplay } from '@/lib/constants';
+import { getLeadStatusDisplay, WHATSAPP_URL, formatDateSimple, getSourceDisplay } from '@/lib/constants';
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -55,13 +55,6 @@ async function getMessagesData() {
   }
 }
 
-const DEFAULT_LEAD_STATUS_STYLE = {
-  label: 'Nova entrada',
-  bg: 'admin-tone-bg-info',
-  text: 'admin-tone-text-info',
-  border: 'admin-tone-border-info',
-};
-
 
 function timeAgo(date: Date): string {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
@@ -80,26 +73,26 @@ export default async function MensajesPage() {
 
   return (
     <AdminPage title="Missatges" subtitle="Gestiona les comunicacions amb la clientela">
-      <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase">Pendents de contactar</p>
-          <p className="mt-2 text-3xl font-bold">{data.pendingLeads}</p>
-          <p className="mt-1 text-xs">Entrades noves sense resposta</p>
+      <section className="ap-kpi-row sm:grid-cols-3">
+        <div className="ap-kpi ap-kpi--warning">
+          <p className="ap-kpi-label">Pendents de contactar</p>
+          <p className="ap-kpi-value">{data.pendingLeads}</p>
+          <p className="ap-kpi-meta">Entrades noves sense resposta</p>
         </div>
-        <div className="rounded-xl border p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase">Rebudes avui</p>
-          <p className="mt-2 text-3xl font-bold">{data.todayLeads}</p>
+        <div className="ap-kpi ap-kpi--info">
+          <p className="ap-kpi-label">Rebudes avui</p>
+          <p className="ap-kpi-value">{data.todayLeads}</p>
         </div>
-        <div className="rounded-xl border p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase">Total converses</p>
-          <p className="mt-2 text-3xl font-bold">{data.recentLeads.length}</p>
+        <div className="ap-kpi">
+          <p className="ap-kpi-label">Total converses</p>
+          <p className="ap-kpi-value">{data.recentLeads.length}</p>
         </div>
       </section>
 
       <section className="flex flex-wrap gap-3">
         <Link
           href="/admin/leads?status=NEW"
-          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
+          className="ap-btn ap-btn--primary"
         >
           🔵 Veure noves ({data.pendingLeads})
         </Link>
@@ -107,62 +100,62 @@ export default async function MensajesPage() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white"
+          className="ap-btn ap-btn--secondary"
         >
           💬 Obrir WhatsApp Web
         </a>
         <Link
           href="/admin/leads"
-          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium"
+          className="ap-btn ap-btn--secondary"
         >
           👥 Totes les entrades
         </Link>
       </section>
 
-      <section className="overflow-hidden rounded-xl border shadow-sm">
-        <div className="border-b p-4">
+      <section className="ap-card overflow-hidden rounded-2xl p-0">
+        <div className="border-b p-4 admin-tone-border-neutral">
           <h3 className="font-semibold">📋 Plantilles Ràpides</h3>
         </div>
         <div className="grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Primer contacte</p>
-            <p className="mt-1 text-xs">Resposta inicial a una entrada nova</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Resposta inicial a una entrada nova</p>
           </button>
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Envia pressupost</p>
-            <p className="mt-1 text-xs">Acompanyament de pressupost</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Acompanyament de pressupost</p>
           </button>
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Seguiment</p>
-            <p className="mt-1 text-xs">Recordatori després de dies</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Recordatori després de dies</p>
           </button>
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Confirmació</p>
-            <p className="mt-1 text-xs">Confirmar reserva</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Confirmar reserva</p>
           </button>
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Preesdeveniment</p>
-            <p className="mt-1 text-xs">Detalls abans de l&apos;esdeveniment</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Detalls abans de l&apos;esdeveniment</p>
           </button>
-          <button type="button" className="rounded-xl border p-3 text-left transition-colors">
+          <button type="button" className="ap-card rounded-xl p-3 text-left transition-colors hover:admin-tone-bg-neutral">
             <p className="font-medium">Postesdeveniment</p>
-            <p className="mt-1 text-xs">Agraïment i enquesta</p>
+            <p className="mt-1 text-xs admin-tone-text-neutral">Agraïment i enquesta</p>
           </button>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-xl border shadow-sm">
+      <section className="ap-card overflow-hidden rounded-2xl p-0">
         <div className="border-b p-4">
           <h3 className="font-semibold">📬 Missatges recents</h3>
         </div>
-        <div className="divide-y divide-white/5">
+        <div className="divide-y admin-tone-border-subtle">
           {data.recentLeads.map((lead) => {
-            const statusConfig = LEAD_STATUS_CONFIG[lead.status] || DEFAULT_LEAD_STATUS_STYLE;
+            const statusConfig = getLeadStatusDisplay(lead.status);
             const sourceIcon = getSourceDisplay(lead.source).icon;
             return (
-              <div key={lead.id} className="p-4 transition-colors">
+              <div key={lead.id} className="p-4 transition-colors hover:bg-white/[0.03]">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold admin-tone-soft-info admin-tone-text-info">
                     {lead.name.charAt(0)}
                   </div>
 
@@ -190,7 +183,7 @@ export default async function MensajesPage() {
                         href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl"
+                        className="ap-btn ap-btn--secondary h-8 w-8 p-0"
                         title="WhatsApp"
                       >
                         💬
@@ -198,7 +191,7 @@ export default async function MensajesPage() {
                     )}
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-xl"
+                      className="ap-btn ap-btn--secondary h-8 w-8 p-0"
                       title="Obre"
                     >
                       👁️
@@ -209,7 +202,7 @@ export default async function MensajesPage() {
             );
           })}
           {data.recentLeads.length === 0 && (
-            <div className="p-8 text-center">
+            <div className="p-8 text-center admin-tone-text-slate">
               📭 No hi ha missatges
             </div>
           )}

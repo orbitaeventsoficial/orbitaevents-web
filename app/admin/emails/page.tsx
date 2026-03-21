@@ -259,7 +259,7 @@ export default async function EmailsAdminPage() {
                 <p className="mt-2">Tots els emails post-event estan enviats!</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y admin-tone-border-subtle">
                 {pendingBookings.map((booking) => (
                   <div key={booking.id} className="px-6 py-4 flex items-center justify-between transition-colors">
                     <div>

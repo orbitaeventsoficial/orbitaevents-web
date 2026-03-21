@@ -154,7 +154,7 @@ function CategorySection({ slug, name }: { slug: string; name: string }) {
   const videoCount = media.filter((m) => m.mediaType === 'video').length;
 
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden">
+    <div className="ap-card overflow-hidden rounded-2xl">
       {/* Header — sempre visible */}
       <button
         type="button"
@@ -189,7 +189,7 @@ function CategorySection({ slug, name }: { slug: string; name: string }) {
 
       {/* Cos expandible */}
       {expanded && (
-        <div className="border-t border-white/10 p-5 space-y-4">
+        <div className="border-t p-5 space-y-4 admin-tone-border-neutral">
           {error && <p className="text-sm text-red-400 rounded-xl border border-red-500/20 px-3 py-2">{error}</p>}
 
           <input
@@ -232,7 +232,7 @@ function CategorySection({ slug, name }: { slug: string; name: string }) {
           ) : media.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {media.map((item) => (
-                <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden border border-white/10 hover:border-white/30 transition-all">
+                <div key={item.id} className="group relative aspect-square overflow-hidden rounded-xl border admin-tone-border-neutral transition-all hover:admin-tone-border-info">
                   {item.mediaType === 'image' ? (
                     <Image
                       src={item.mediaUrl}
@@ -480,14 +480,14 @@ function EventsManager() {
       ) : (
         <div className="space-y-2">
           {events.map((ev) => (
-            <div key={ev.id} className="rounded-xl border border-white/10 p-4 flex items-center gap-4">
+            <div key={ev.id} className="ap-card rounded-xl p-4 flex items-center gap-4">
               <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
                 <Image src={ev.coverImage} alt={ev.title} fill className="object-cover" sizes="64px" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-semibold truncate">{ev.title}</p>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${ev.published ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-white/40'}`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${ev.published ? 'ap-badge ap-badge--success' : 'ap-badge'}`}>
                     {ev.published ? 'Publicat' : 'Esborrany'}
                   </span>
                 </div>
@@ -534,14 +534,14 @@ export default function AdminPortfolioPage() {
         <button
           type="button"
           onClick={() => setTab('media')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'media' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white/70'}`}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}
         >
           📷 Media per categoria
         </button>
         <button
           type="button"
           onClick={() => setTab('events')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'events' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white/70'}`}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}
         >
           🎪 Events
         </button>

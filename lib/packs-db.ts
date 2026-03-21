@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { getAllPacks, getPacksByService, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
 import { log } from '@/lib/logger';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
+import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 const fallbackPacks = getAllPacks();
 
@@ -145,7 +146,7 @@ function getFallback(service: ServiceSlug | undefined, locale: string): PackDefi
 export async function getDbPacks(options: { service?: ServiceSlug; locale?: string } = {}) {
   const { service, locale = 'es' } = options;
 
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL || isBuildPrerenderPhase()) {
     return getFallback(service, locale);
   }
 
@@ -171,7 +172,7 @@ export async function getDbPacks(options: { service?: ServiceSlug; locale?: stri
 }
 
 export async function getDbPackByCode(code: string, locale = 'es') {
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL || isBuildPrerenderPhase()) {
     const fallback = fallbackPacks.find((p) => p.id === code || p.slug === code);
     return fallback ? localizeFallbackPack(fallback, locale) : undefined;
   }

@@ -167,7 +167,14 @@ class AudioEngine {
 
   stop() {
     this.isPlaying = false;
-    this.oscillators.forEach(o => { try { o.stop(); } catch {} });
+    this.oscillators.forEach((oscillator) => {
+      // An oscillator may already be stopped if the release races with cleanup.
+      try {
+        oscillator.stop();
+      } catch {
+        return;
+      }
+    });
     this.oscillators = [];
   }
 }

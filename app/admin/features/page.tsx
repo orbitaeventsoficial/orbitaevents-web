@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface Feature {
@@ -17,6 +18,7 @@ export default function FeaturesPage() {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     loadFeatures();
@@ -46,13 +48,17 @@ export default function FeaturesPage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
-        setFeatures(features.map(f =>
-          f.key === key ? { ...f, enabled } : f
-        ));
+      if (!data.ok) {
+        throw new Error(data?.error || 'Error actualitzant funcionalitat');
       }
+
+      setFeatures((current) => current.map((feature) =>
+        feature.key === key ? { ...feature, enabled } : feature
+      ));
+      toast.success(enabled ? 'Funcionalitat activada' : 'Funcionalitat desactivada');
     } catch (error) {
       log.error('Error toggling feature:', error);
+      toast.error(error instanceof Error ? error.message : 'Error actualitzant funcionalitat');
     } finally {
       setSaving(null);
     }

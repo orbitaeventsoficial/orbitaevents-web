@@ -102,9 +102,9 @@ export default function TaskKanbanView() {
         const targetLabel = COLUMNS_DEF.find((c) => c.status === newStatus)?.label || newStatus;
         toast.success(`Tasca moguda a ${targetLabel}`);
       }
-    } catch {
+    } catch (error) {
       setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: prevStatus } : t)));
-      toast.error('Error de connexió');
+      toast.error(error instanceof Error ? error.message : 'Error de connexió');
     }
   };
 

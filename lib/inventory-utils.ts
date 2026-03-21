@@ -129,6 +129,19 @@ export const STATUS_CONFIG: Record<string, { label: string; bg: string; text: st
   RETIRED: { label: 'Retirat', bg: 'bg-slate-500/20', text: 'text-slate-400' },
 };
 
+
+export function getInventoryCategoryDisplay(category: string) {
+  return CATEGORY_CONFIG[category] || { label: category, icon: '📦', color: 'gray' };
+}
+
+export function getInventoryStatusDisplay(status: string) {
+  return STATUS_CONFIG[status] || STATUS_CONFIG.AVAILABLE;
+}
+
+export function getInventoryConditionLabel(condition: string) {
+  return CONDITION_LABELS[condition] || condition;
+}
+
 export const CONDITION_LABELS: Record<string, string> = {
   NEW: 'Nou',
   EXCELLENT: 'Excel·lent',

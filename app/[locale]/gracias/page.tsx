@@ -126,7 +126,9 @@ export default async function GraciasPage() {
               var consent = null;
               try {
                 consent = JSON.parse(localStorage.getItem('orbita_cookie_consent') || 'null');
-              } catch (e) {}
+              } catch (e) {
+                consent = null;
+              }
               var allowMarketing = !!(consent && consent.marketing);
 
               // Push to dataLayer (GTM)

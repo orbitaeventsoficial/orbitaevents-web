@@ -9,11 +9,11 @@ import {
   calculateCurrentValue,
   calculateCostPerHour,
   calculateLifeRemainingPercent,
-  CATEGORY_CONFIG,
-  STATUS_CONFIG,
-  CONDITION_LABELS,
+  getInventoryConditionLabel,
+  getInventoryCategoryDisplay,
+  getInventoryStatusDisplay,
 } from '@/lib/inventory-utils';
-import { BOOKING_STATUS_CONFIG, formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { formatDate, formatNumber, DEFAULT_EXPECTED_LIFE_HOURS, getBookingStatusLabel } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
@@ -77,9 +77,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
     notFound();
   }
 
-  const catConfig = CATEGORY_CONFIG[item.category] || { label: item.category, icon: '📦', color: 'gray' };
-  const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
-  const conditionLabel = CONDITION_LABELS[item.condition] || item.condition;
+  const catConfig = getInventoryCategoryDisplay(item.category);
+  const statusConf = getInventoryStatusDisplay(item.status);
+  const conditionLabel = getInventoryConditionLabel(item.condition);
 
   // KPIs d'amortització
   const currentValue = calculateCurrentValue(item.purchasePrice, item.totalHoursUsed, item.expectedLifeHours);
@@ -230,9 +230,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <th scope="col" className="px-4 py-3 text-left font-medium">Checkin</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y admin-tone-border-subtle">
                 {item.bookingItems.map((bi) => (
-                  <tr key={bi.id} className="hover:bg-white/[0.03] transition-colors">
+                  <tr key={bi.id} className="transition-colors hover:bg-white/[0.03]">
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/bookings/${bi.booking.id}`}
@@ -245,7 +245,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                     <td className="px-4 py-3">{formatDate(bi.booking.eventDate)}</td>
                     <td className="px-4 py-3">
                       <span className="text-xs">
-                        {BOOKING_STATUS_CONFIG[bi.booking.status]?.label || bi.booking.status}
+                        {getBookingStatusLabel(bi.booking.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -258,7 +258,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                     <td className="px-4 py-3">
                       {bi.checkedIn ? (
                         <span className="text-xs">
-                          Fet {bi.conditionAfter ? `(${CONDITION_LABELS[bi.conditionAfter] || bi.conditionAfter})` : ''}
+                          Fet {bi.conditionAfter ? `(${getInventoryConditionLabel(bi.conditionAfter)})` : ''}
                         </span>
                       ) : (
                         <span className="text-xs">—</span>
@@ -296,9 +296,9 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <th scope="col" className="px-4 py-3 text-left font-medium">Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y admin-tone-border-subtle">
                 {item.usageHistory.map((usage) => (
-                  <tr key={usage.id} className="hover:bg-white/[0.03] transition-colors">
+                  <tr key={usage.id} className="transition-colors hover:bg-white/[0.03]">
                     <td className="px-4 py-3">{formatDate(usage.usedAt)}</td>
                     <td className="px-4 py-3 font-medium">
                       {usage.hoursUsed ? `${usage.hoursUsed}h` : '—'}

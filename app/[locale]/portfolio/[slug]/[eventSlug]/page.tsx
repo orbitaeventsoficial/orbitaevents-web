@@ -8,6 +8,7 @@ import type { GalleryItem } from '@/app/components/GalleryPro';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
 import { getSiteUrl } from '@/lib/site';
+import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 
 type PageProps = {
@@ -88,10 +89,14 @@ export default async function PortfolioEventPage({ params }: PageProps) {
 
       {/* Cinematic hero */}
       <section className="relative h-[65vh] md:h-[80vh] overflow-hidden">
-        <img
+        <Image
           src={event.coverImage}
           alt={event.title}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+          unoptimized={event.coverImage.startsWith('data:') || event.coverImage.includes('/api/uploads/')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/50 to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">

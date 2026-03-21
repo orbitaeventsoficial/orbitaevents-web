@@ -254,8 +254,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       if (typeof data?.css === 'string') {
         setCustomAdminCss(data.css);
       }
-    } catch {
-      // Silently fail
+    } catch (error) {
+      console.warn("No s'ha pogut carregar el CSS admin personalitzat", error);
     }
   }, []);
 
@@ -282,11 +282,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     if (isLocalhost) {
       navigator.serviceWorker.getRegistrations()
         .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
-        .catch(() => { /* silent */ });
+        .catch((error) => { console.warn("No s'han pogut netejar els service workers locals", error); });
       return;
     }
 
-    navigator.serviceWorker.register('/sw.js').catch(() => { /* silent */ });
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.warn("No s'ha pogut registrar el service worker admin", error);
+    });
   }, []);
 
   useEffect(() => {

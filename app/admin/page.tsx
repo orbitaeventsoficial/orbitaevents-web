@@ -3,8 +3,7 @@ import Link from 'next/link';
 import QuickActions from './components/QuickActions';
 import StatusQuickSelect from './components/StatusQuickSelect';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
-import { formatDateTimeFull, formatCurrency, formatDate } from '@/lib/constants';
-import { EVENT_TYPE_LABELS } from '@/lib/constants';
+import { formatDateTimeFull, formatCurrency, formatDate, getEventLabel } from '@/lib/constants';
 import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
 import WeatherWidget from './components/WeatherWidget';
 import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
@@ -135,7 +134,7 @@ export default async function AdminDashboard() {
                 <p className="text-sm opacity-70 mt-1">
                   {formatDate(d.nextEvent.eventDate)}
                   {d.nextEvent.eventStartTime && ` · ${d.nextEvent.eventStartTime}`}
-                  {d.nextEvent.eventType && ` · ${EVENT_TYPE_LABELS[d.nextEvent.eventType] || d.nextEvent.eventType}`}
+                  {d.nextEvent.eventType && ` · ${getEventLabel(d.nextEvent.eventType)}`}
                 </p>
                 <p className="text-sm opacity-50 mt-0.5 truncate">
                   {[d.nextEvent.eventVenue, d.nextEvent.eventLocation].filter(Boolean).join(' · ')}

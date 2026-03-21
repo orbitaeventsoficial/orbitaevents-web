@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { AdminPage, AdminKpiRow, AdminKpi } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -70,18 +71,24 @@ export default function AdminRessenyesPage() {
         fetchWithCsrf('/api/admin/testimonials?status=approved', { cache: 'no-store' }),
       ]);
 
-      if (pendingRes.ok) {
-        const data = await pendingRes.json();
-        setPending(data.testimonials || []);
+      if (!pendingRes.ok || !approvedRes.ok) {
+        throw new Error('No s\'han pogut carregar totes les ressenyes');
       }
-      if (approvedRes.ok) {
-        const data = await approvedRes.json();
-        setApproved(data.testimonials || []);
-      }
+
+      const [pendingData, approvedData] = await Promise.all([
+        pendingRes.json(),
+        approvedRes.json(),
+      ]);
+
+      setPending(pendingData.testimonials || []);
+      setApproved(approvedData.testimonials || []);
+    } catch (error) {
+      console.error('[AdminRessenyes] Error carregant ressenyes:', error);
+      toast.error('Error carregant ressenyes');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     load();
@@ -321,11 +328,13 @@ export default function AdminRessenyesPage() {
                     Tancar
                   </button>
                 </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={canvasPreview.url}
                   alt={`Canvas de ${t.customer.name}`}
-                  className="max-h-[400px] rounded-xl mx-auto"
+                  width={1080}
+                  height={1080}
+                  unoptimized
+                  className="max-h-[400px] h-auto w-auto rounded-xl mx-auto"
                 />
               </div>
             )}

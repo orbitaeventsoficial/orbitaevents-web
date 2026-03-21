@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
-import { labelEstatClient } from '@/lib/customer-hub/labels';
+import { CUSTOMER_HUB_AVATAR_TONES, CUSTOMER_HUB_STAGE_LABELS, CUSTOMER_HUB_STAGE_ORDER, CUSTOMER_HUB_STATUS_TONES, labelEstatClient } from '@/lib/customer-hub/labels';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useHubContext } from './CustomerHubClient';
 import { useToast } from '@/app/admin/components/ToastProvider';
@@ -55,48 +55,6 @@ const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: Cus
   { key: 'privacy', label: 'Privacitat', icon: '🔒' },
 ];
 
-const STATUS_STYLES: Record<HubStatus | 'default', { bg: string; text: string; border: string }> = {
-  CONFIRMED: {
-    bg: 'bg-emerald-500/20',
-    text: 'text-emerald-300',
-    border: 'border-emerald-500/40',
-  },
-  NEGOTIATION: {
-    bg: 'bg-amber-500/20',
-    text: 'text-amber-300',
-    border: 'border-amber-500/40',
-  },
-  POSTEVENT: {
-    bg: 'bg-indigo-500/20',
-    text: 'text-indigo-300',
-    border: 'border-indigo-500/40',
-  },
-  LOST: {
-    bg: 'bg-rose-500/20',
-    text: 'text-rose-300',
-    border: 'border-rose-500/40',
-  },
-  LEAD: {
-    bg: 'bg-white/10',
-    text: 'text-white/70',
-    border: 'border-white/15',
-  },
-  default: {
-    bg: 'bg-white/10',
-    text: 'text-white/70',
-    border: 'border-white/15',
-  },
-};
-
-const AVATAR_COLORS: Record<HubStatus | 'default', string> = {
-  LEAD: 'bg-gradient-to-br from-white/20 to-white/5',
-  NEGOTIATION: 'bg-gradient-to-br from-amber-500/30 to-amber-600/10',
-  CONFIRMED: 'bg-gradient-to-br from-emerald-500/30 to-emerald-600/10',
-  POSTEVENT: 'bg-gradient-to-br from-indigo-500/30 to-indigo-600/10',
-  LOST: 'bg-gradient-to-br from-rose-500/30 to-rose-600/10',
-  default: 'bg-gradient-to-br from-white/20 to-white/5',
-};
-
 function getInitials(name: string): string {
   return name
     .split(' ')
@@ -129,7 +87,7 @@ export default function CustomerHeader({
   const id = data.customer.id;
   const status = data.customer.status;
   const statusLabel = labelEstatClient(status);
-  const statusStyle = STATUS_STYLES[status] || STATUS_STYLES.default;
+  const statusStyle = CUSTOMER_HUB_STATUS_TONES[status] || CUSTOMER_HUB_STATUS_TONES.default;
 
   // Calcular temps des de l'últim contacte
   const lastContactText = data.kpis.lastContactAt
@@ -165,15 +123,7 @@ export default function CustomerHeader({
     }
   }, [confirm, hasProtectedData, data.customer.name, id, toast, router]);
 
-  const stageOrder: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
-  const currentStageIndex = stageOrder.indexOf(status);
-  const stageLabel: Record<HubStatus, string> = {
-    LEAD: 'Entrada',
-    NEGOTIATION: 'Negociació',
-    CONFIRMED: 'Confirmat',
-    POSTEVENT: 'Post-esdeveniment',
-    LOST: 'Perdut',
-  };
+  const currentStageIndex = CUSTOMER_HUB_STAGE_ORDER.indexOf(status);
 
   const nextAction = (() => {
     if (status === 'LEAD') {
@@ -240,7 +190,7 @@ export default function CustomerHeader({
           <div className="flex items-start gap-4 min-w-0">
             {/* Avatar */}
             <div
-              className={`hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white/90 shadow-lg ring-1 ring-white/10 ${AVATAR_COLORS[status] || AVATAR_COLORS.default}`}
+              className={`hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white/90 shadow-lg ring-1 ring-white/10 ${CUSTOMER_HUB_AVATAR_TONES[status] || CUSTOMER_HUB_AVATAR_TONES.default}`}
             >
               {getInitials(data.customer.name)}
             </div>
@@ -273,8 +223,8 @@ export default function CustomerHeader({
                       onClick={() => setMenuOpen(false)}
                     />
                     <div className="absolute left-0 top-full z-50 mt-1 rounded-xl border py-1 shadow-xl min-w-[140px]">
-                      {(['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'] as HubStatus[]).map((s) => {
-                        const style = STATUS_STYLES[s];
+                      {CUSTOMER_HUB_STAGE_ORDER.map((s) => {
+                        const style = CUSTOMER_HUB_STATUS_TONES[s];
                         const isActive = s === status;
                         return (
                           <button
@@ -419,7 +369,7 @@ export default function CustomerHeader({
           <div className="rounded-xl border p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider">On està aquest client</p>
             <div className="mt-2 flex items-center overflow-x-auto">
-              {stageOrder.map((stage, idx) => {
+              {CUSTOMER_HUB_STAGE_ORDER.map((stage, idx) => {
                 const isCurrent = stage === status;
                 const isDone = status !== 'LOST' && idx < currentStageIndex;
                 const isLost = stage === 'LOST' && status === 'LOST';
@@ -436,10 +386,10 @@ export default function CustomerHeader({
                             ? 'admin-tone-soft-success border border-emerald-500/40'
                             : isLost
                               ? 'admin-tone-soft-danger border border-rose-500/40'
-                              : 'bg-white/5 text-white/40 border border-white/10'
+                              : 'admin-tone-idle'
                       }`}
                     >
-                      {isDone && '✓ '}{stageLabel[stage]}
+                      {isDone && '✓ '}{CUSTOMER_HUB_STAGE_LABELS[stage]}
                     </span>
                   </div>
                 );
@@ -471,7 +421,7 @@ export default function CustomerHeader({
                 className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-all flex items-center gap-1.5 ${
                   tab === item.key
                     ? 'bg-white text-black shadow-sm'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/90'
+                    : 'admin-tone-idle'
                 }`}
               >
                 <span className="text-base">{item.icon}</span>
@@ -480,8 +430,8 @@ export default function CustomerHeader({
                   <span
                     className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                       tab === item.key
-                        ? 'bg-black/60 text-white'
-                        : 'bg-amber-500/20 text-amber-300'
+                        ? 'admin-tone-soft-info admin-tone-text-info'
+                        : 'admin-tone-soft-warning admin-tone-text-warning'
                     }`}
                   >
                     {badge}
@@ -532,10 +482,10 @@ function ActionButton({
   icon: string;
 }) {
   const colorStyles = {
-    cyan: 'bg-cyan-500 hover:bg-cyan-600 text-white',
-    indigo: 'bg-indigo-500 hover:bg-indigo-600 text-white',
-    amber: 'bg-amber-500 hover:bg-amber-600 text-white',
-    slate: 'bg-white/5 border border-white/15 hover:bg-white/10 text-white/80',
+    cyan: 'ap-btn ap-btn--primary',
+    indigo: 'ap-btn ap-btn--secondary',
+    amber: 'ap-badge ap-badge--warning',
+    slate: 'admin-tone-idle',
   };
 
   return (
@@ -563,7 +513,7 @@ function KpiChip({
       className={`rounded-xl border px-3 py-2 transition-colors ${
         highlight
           ? 'border-cyan-500/30 bg-cyan-500/5'
-          : 'border-white/10 bg-white/[0.02]'
+          : 'admin-tone-border-neutral admin-tone-bg-neutral'
       }`}
     >
       <p className="text-[11px] uppercase tracking-wider">{label}</p>
@@ -603,6 +553,14 @@ function formatRelativeTime(dateStr: string): string {
   if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
   return formatDate(dateStr);
 }
+
+
+
+
+
+
+
+
 
 
 
