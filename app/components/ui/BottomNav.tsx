@@ -14,6 +14,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { PUBLIC_BOTTOM_NAV_ITEMS } from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { Home, Briefcase, Image, MessageCircle, Calculator } from 'lucide-react';
@@ -23,39 +24,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 // NAVIGATION ITEMS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const NAV_ITEMS = [
-  {
-    href: '/',
-    icon: Home,
-    labelKey: 'home',
-    exactMatch: true,
-  },
-  {
-    href: '/servicios/bodas',
-    icon: Briefcase,
-    labelKey: 'services',
-    exactMatch: false,
-  },
-  {
-    href: '/configurador',
-    icon: Calculator,
-    labelKey: 'configure',
-    exactMatch: true,
-    highlight: true,
-  },
-  {
-    href: '/portfolio',
-    icon: Image,
-    labelKey: 'portfolio',
-    exactMatch: true,
-  },
-  {
-    href: '/contacto',
-    icon: MessageCircle,
-    labelKey: 'contact',
-    exactMatch: true,
-  },
-];
+const ICONS = { Home, Briefcase, Calculator, Image, MessageCircle } as const;
+
+const NAV_ITEMS: Array<{ href: string; labelKey: string; exactMatch: boolean; highlight?: boolean; icon: (typeof ICONS)[keyof typeof ICONS] }> = PUBLIC_BOTTOM_NAV_ITEMS.map((item) => ({
+  ...item,
+  icon: ICONS[item.icon],
+}));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT

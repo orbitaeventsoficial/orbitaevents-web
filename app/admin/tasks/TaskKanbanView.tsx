@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { formatDateShort } from '@/lib/constants';
+import { TASK_KANBAN_COLUMNS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -25,11 +25,7 @@ type KanbanColumn = {
   tasks: KanbanTask[];
 };
 
-const COLUMNS_DEF: Omit<KanbanColumn, 'tasks'>[] = [
-  { status: 'OPEN', label: 'Obertes', toneClass: '', cardTone: 'border-sky-500/20 bg-sky-500/10' },
-  { status: 'IN_PROGRESS', label: 'En curs', toneClass: '', cardTone: 'border-amber-500/20 bg-amber-500/10' },
-  { status: 'DONE', label: 'Fetes', toneClass: '', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
-];
+const COLUMNS_DEF: Omit<KanbanColumn, 'tasks'>[] = [...TASK_KANBAN_COLUMNS];
 
 function getDueDateColor(dueDate: string | null): string {
   if (!dueDate) return '';

@@ -1,4 +1,5 @@
 import { SUPPORTED_LOCALES } from '@/lib/constants';
+import { ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS, ADMIN_EMAIL_TEMPLATE_SLUGS, ADMIN_EMAIL_TEMPLATE_VARIABLES, type AdminEmailTemplateSlug } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 
 interface TemplateVariables {
@@ -11,29 +12,7 @@ interface ResolvedTemplate {
   source: 'db' | 'default';
 }
 
-const TEMPLATE_SLUGS = {
-  BOOKING_CONFIRMATION: 'booking_confirmation',
-  ADMIN_BOOKING_NOTIFICATION: 'admin_booking_notification',
-  POST_EVENT: 'post_event',
-  PAYMENT_REMINDER: 'payment_reminder',
-  TESTIMONIAL_APPROVED: 'testimonial_approved',
-  TESTIMONIAL_RECEIVED: 'testimonial_received',
-  TESTIMONIAL_REMINDER: 'testimonial_reminder',
-  WELCOME: 'welcome',
-} as const;
-
-type TemplateSlug = typeof TEMPLATE_SLUGS[keyof typeof TEMPLATE_SLUGS];
-
-const TEMPLATE_VARIABLES: Record<TemplateSlug, string[]> = {
-  booking_confirmation: ['clientName', 'reference', 'eventDate', 'eventType', 'packName', 'location', 'total', 'depositAmount', 'startTime', 'endTime'],
-  admin_booking_notification: ['clientName', 'clientEmail', 'clientPhone', 'reference', 'eventDate', 'eventType', 'packName', 'location', 'total'],
-  post_event: ['clientName', 'packName', 'eventDate', 'reviewUrl', 'googleReviewUrl'],
-  payment_reminder: ['clientName', 'reference', 'pendingAmount', 'eventDate', 'daysUntilEvent'],
-  testimonial_approved: ['clientName', 'discountCode', 'discountAmount'],
-  testimonial_received: ['clientName'],
-  testimonial_reminder: ['clientName', 'reviewUrl'],
-  welcome: ['clientName'],
-};
+type TemplateSlug = AdminEmailTemplateSlug;
 
 function interpolate(template: string, variables: TemplateVariables): string {
   return template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
@@ -114,7 +93,7 @@ export async function listTemplates(): Promise<{
     dbMap.set(`${t.slug}:${t.locale}`, t);
   }
 
-  return Object.entries(TEMPLATE_SLUGS).map(([, slug]) => {
+  return Object.entries(ADMIN_EMAIL_TEMPLATE_SLUGS).map(([, slug]) => {
     const locales = SUPPORTED_LOCALES.map((locale) => {
       const db = dbMap.get(`${slug}:${locale}`);
       return {
@@ -126,33 +105,19 @@ export async function listTemplates(): Promise<{
 
     return {
       slug: slug as TemplateSlug,
-      description: getTemplateDescription(slug as TemplateSlug),
+      description: ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS[slug as TemplateSlug] || (slug as TemplateSlug),
       locales,
-      variables: TEMPLATE_VARIABLES[slug as TemplateSlug] || [],
+      variables: ADMIN_EMAIL_TEMPLATE_VARIABLES[slug as TemplateSlug] || [],
     };
   });
 }
 
 export function isTemplateSlug(value: string): value is TemplateSlug {
-  return Object.values(TEMPLATE_SLUGS).includes(value as TemplateSlug);
+  return Object.values(ADMIN_EMAIL_TEMPLATE_SLUGS).includes(value as TemplateSlug);
 }
 
 export function getTemplateVariables(slug: string): string[] {
-  return isTemplateSlug(slug) ? TEMPLATE_VARIABLES[slug] || [] : [];
-}
-
-function getTemplateDescription(slug: TemplateSlug): string {
-  const descriptions: Record<TemplateSlug, string> = {
-    booking_confirmation: 'Confirmació de reserva al client',
-    admin_booking_notification: 'Notificació de nova reserva a l\'admin',
-    post_event: 'Email post-event demanant ressenya',
-    payment_reminder: 'Recordatori de pagament pendent',
-    testimonial_approved: 'Testimoni aprovat + codi descompte',
-    testimonial_received: 'Confirmació recepció testimoni',
-    testimonial_reminder: 'Recordatori per deixar ressenya',
-    welcome: 'Benvinguda al nou client',
-  };
-  return descriptions[slug] || slug;
+  return isTemplateSlug(slug) ? ADMIN_EMAIL_TEMPLATE_VARIABLES[slug] || [] : [];
 }
 
 function emailShell(content: string, preheader?: string): string {

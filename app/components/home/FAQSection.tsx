@@ -10,17 +10,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { PUBLIC_FAQ_KEYS, WHATSAPP_NUMBER } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
-
-const FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7'] as const;
 
 export default function FAQSection() {
   const t = useTranslations('faq');
   const reduceMotion = useReducedMotion();
   const [openId, setOpenId] = useState<string | null>('1');
 
-  const items = FAQ_KEYS.map((key) => ({
+  const items = PUBLIC_FAQ_KEYS.map((key) => ({
     key,
     question: t(`items.${key}.question`),
     answer: t(`items.${key}.answer`),

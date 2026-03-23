@@ -4,6 +4,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
+import { PUBLIC_SERVICES_GRID_PILLARS } from '@/lib/constants';
 
 // ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
 
@@ -45,32 +46,8 @@ export default function ServicesGridElegant() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
   const headingY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
-  const pillars = [
-    {
-      key: 'dj',
-      Icon: IconDJ,
-      accent: 'from-amber-500 to-orange-500',
-      accentLight: 'text-amber-400',
-      glowColor: 'rgba(251, 191, 36, 0.08)',
-      href: '/servicios/fiestas',
-    },
-    {
-      key: 'theming',
-      Icon: IconTheme,
-      accent: 'from-purple-500 to-pink-500',
-      accentLight: 'text-purple-400',
-      glowColor: 'rgba(168, 85, 247, 0.08)',
-      href: '/portfolio',
-    },
-    {
-      key: 'production',
-      Icon: IconProduction,
-      accent: 'from-cyan-500 to-blue-500',
-      accentLight: 'text-cyan-400',
-      glowColor: 'rgba(6, 182, 212, 0.08)',
-      href: '/servicios/empresas',
-    },
-  ];
+  const pillarIcons = { dj: IconDJ, theme: IconTheme, production: IconProduction } as const;
+  const pillars = PUBLIC_SERVICES_GRID_PILLARS.map((pillar) => ({ ...pillar, Icon: pillarIcons[pillar.iconKey] }));
 
   return (
     <section ref={sectionRef} className="py-16 md:py-24 bg-[#0A0A0A] relative overflow-hidden">

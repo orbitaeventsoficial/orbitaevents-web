@@ -8,13 +8,8 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
-import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { PUBLIC_PROCESS_STEP_STYLES, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
-const STEP_STYLES = [
-  { gradient: 'from-amber-500 to-orange-500', glow: 'rgba(245,158,11,0.25)', emoji: '💬', accent: 'text-amber-400' },
-  { gradient: 'from-purple-500 to-pink-500',  glow: 'rgba(168,85,247,0.2)',  emoji: '✨', accent: 'text-purple-400' },
-  { gradient: 'from-emerald-500 to-teal-400', glow: 'rgba(16,185,129,0.2)',  emoji: '🎊', accent: 'text-emerald-400' },
-] as const;
 
 export default function ProcessSection() {
   const t = useTranslations('homePage.process');
@@ -56,7 +51,7 @@ export default function ProcessSection() {
           <div className="hidden md:block absolute top-12 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px border-t-2 border-dashed border-white/[0.08] z-0" />
 
           {steps.map((step, i) => {
-            const style = STEP_STYLES[i];
+            const style = PUBLIC_PROCESS_STEP_STYLES[i];
             return (
               <motion.div
                 key={step.number}

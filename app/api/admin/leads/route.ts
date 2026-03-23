@@ -8,43 +8,36 @@ import { z } from 'zod';
 import { getPipelineLeads } from '@/lib/services/leads/pipeline';
 import { countNewAdminLeads, createAdminLead, listAdminLeads } from '@/lib/services/leadAdminService';
 import { dispatchAutoTrigger } from '@/lib/services/automationTriggers';
+import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const;
-const VALID_EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
-const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
-const VALID_SOURCES = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'] as const;
-
-type LeadStatus = typeof VALID_STATUSES[number];
-type EventType = typeof VALID_EVENT_TYPES[number];
-type Priority = typeof VALID_PRIORITIES[number];
-type LeadSource = typeof VALID_SOURCES[number];
+type LeadStatus = typeof LEAD_STATUS_VALUES[number];
+type EventType = typeof EVENT_TYPE_VALUES[number];
+type Priority = typeof PRIORITY_VALUES[number];
+type LeadSource = typeof LEAD_SOURCE_VALUES[number];
 
 function isValidStatus(value: string | null): value is LeadStatus {
-  return value !== null && VALID_STATUSES.includes(value as LeadStatus);
+  return value !== null && LEAD_STATUS_VALUES.includes(value as LeadStatus);
 }
 
 function isValidEventType(value: string | null): value is EventType {
-  return value !== null && VALID_EVENT_TYPES.includes(value as EventType);
+  return value !== null && EVENT_TYPE_VALUES.includes(value as EventType);
 }
 
 function isValidPriority(value: string | null): value is Priority {
-  return value !== null && VALID_PRIORITIES.includes(value as Priority);
+  return value !== null && PRIORITY_VALUES.includes(value as Priority);
 }
 
 function isValidSource(value: string | null): value is LeadSource {
-  return value !== null && VALID_SOURCES.includes(value as LeadSource);
+  return value !== null && LEAD_SOURCE_VALUES.includes(value as LeadSource);
 }
 
 const leadSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   phone: z.string().optional(),
-  eventType: z.enum([
-    'WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION',
-    'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'
-  ]),
+  eventType: z.enum(EVENT_TYPE_VALUES),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
   eventVenue: z.string().optional(),
@@ -55,14 +48,11 @@ const leadSchema = z.object({
   interestedPackId: z.string().optional(),
   interestedExtras: z.array(z.string()).optional(),
   assignedTo: z.string().optional(),
-  source: z.enum([
-    'WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP',
-    'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'
-  ]).optional(),
+  source: z.enum(LEAD_SOURCE_VALUES).optional(),
   utmSource: z.string().optional(),
   utmMedium: z.string().optional(),
   utmCampaign: z.string().optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
+  priority: z.enum(PRIORITY_VALUES).optional(),
 });
 
 export async function GET(req: NextRequest) {

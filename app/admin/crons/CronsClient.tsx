@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../components/ToastProvider';
 import { formatDateTimeFull } from '@/lib/constants';
+import { ADMIN_CRON_HEALTH_CONFIG } from '@/lib/constants/admin';
 
 interface CronInfo {
   id: string;
@@ -14,13 +15,6 @@ interface CronInfo {
   lastMessage: string | null;
   health: 'ok' | 'warning' | 'error' | 'unknown';
 }
-
-const HEALTH_CONFIG = {
-  ok: { dot: 'bg-emerald-400', bg: 'border-emerald-500/20 bg-emerald-500/5', label: 'OK' },
-  warning: { dot: 'bg-amber-400', bg: 'border-amber-500/20 bg-amber-500/5', label: 'Retardat' },
-  error: { dot: 'bg-rose-400', bg: 'border-rose-500/20 bg-rose-500/5', label: 'Error' },
-  unknown: { dot: 'bg-white/30', bg: '', label: 'Mai executat' },
-} as const;
 
 function formatTimeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
@@ -108,7 +102,7 @@ export default function CronsClient() {
       {/* Llista de crons */}
       <div className="space-y-2">
         {crons.map((cron) => {
-          const config = HEALTH_CONFIG[cron.health];
+          const config = ADMIN_CRON_HEALTH_CONFIG[cron.health];
           const isExpanded = expandedId === cron.id;
           const summaryLines = formatSummary(cron.lastSummary);
 
@@ -200,3 +194,5 @@ export default function CronsClient() {
     </div>
   );
 }
+
+

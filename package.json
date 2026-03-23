@@ -26,7 +26,7 @@
     "qa:scan:web": "node scripts/scan-i18n-leaks.mjs",
     "qa:smoke:i18n": "node scripts/smoke-i18n.mjs",
     "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('pnpm run assets:sync:full',{stdio:'inherit'});\"",
-    "build": "pnpm run build:assets && pnpm run i18n:packs:guard && next build",
+    "build": "pnpm run arch:layer:check && pnpm run build:assets && pnpm run i18n:packs:guard && next build",
     "start": "next start",
     "lint": "next lint",
     "generate:portfolio": "node scripts/generate-portfolio-config.mjs",
@@ -46,7 +46,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
-    "scan:hardcoded": "node scripts/scan-hardcoded.js"
+    "scan:hardcoded": "node scripts/scan-hardcoded.js",
+    "arch:layer:check": "node scripts/check-layer-catalogs.mjs",
+    "validate:core": "pnpm run arch:layer:check && npx tsc --noEmit && pnpm run i18n:packs:guard"
   },
   "prisma": {
     "seed": "pnpm exec ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

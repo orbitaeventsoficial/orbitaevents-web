@@ -5,20 +5,9 @@ import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
-import type { CoverageArea } from '@/lib/coverage';
+import { COVERAGE_PROVINCES, type CoverageArea } from '@/lib/coverage';
 
 
-const PROVINCES = [
-  'Barcelona',
-  'Girona',
-  'Tarragona',
-  'Lleida',
-  'Madrid',
-  'Valencia',
-  'Alicante',
-  'Murcia',
-  'Castellón',
-];
 
 export default function CoveragePage() {
   const [areas, setAreas] = useState<CoverageArea[]>([]);
@@ -161,7 +150,7 @@ export default function CoveragePage() {
             aria-label="Província"
             className="px-4 py-2 rounded-xl border "
           >
-            {PROVINCES.map(p => (
+            {COVERAGE_PROVINCES.map(p => (
               <option key={p} value={p}>{p}</option>
             ))}
           </select>
@@ -223,6 +212,7 @@ export default function CoveragePage() {
     </AdminPage>
   );
 }
+
 
 
 

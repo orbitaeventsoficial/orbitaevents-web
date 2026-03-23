@@ -1,4 +1,4 @@
-﻿// app/admin/bookings/page.tsx
+// app/admin/bookings/page.tsx
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
@@ -9,7 +9,7 @@ import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import BookingViewToggle from './BookingViewToggle';
-import { formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
+import { BOOKING_OVERVIEW_STATUS_CARDS, formatDate, formatDateShort, formatCurrency, getBookingStatusDisplay, getEventLabel } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
@@ -169,22 +169,15 @@ export default async function BookingsPage({
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
           <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="admin-bookings-stat admin-bookings-stat--pending admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Pendents</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.PENDING?.count || 0}</p>
-        </div>
-        <div className="admin-bookings-stat admin-bookings-stat--confirmed admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Confirmades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CONFIRMED?.count || 0}</p>
-        </div>
-        <div className="admin-bookings-stat admin-bookings-stat--completed admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Completades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.COMPLETED?.count || 0}</p>
-        </div>
-        <div className="admin-bookings-stat admin-bookings-stat--cancelled admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Cancel·lades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CANCELLED?.count || 0}</p>
-        </div>
+        {BOOKING_OVERVIEW_STATUS_CARDS.map((card) => (
+          <div
+            key={card.status}
+            className={`${card.className} admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5`}
+          >
+            <p className="text-[10px] sm:text-xs font-medium uppercase text-center">{card.label}</p>
+            <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap[card.status]?.count || 0}</p>
+          </div>
+        ))}
       </section>
 
       {/* Filtres + Toggle vista */}

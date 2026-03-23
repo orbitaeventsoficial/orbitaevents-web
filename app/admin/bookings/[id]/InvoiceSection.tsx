@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCurrency, getInvoiceStatusLabel } from '@/lib/constants';
+import { formatCurrency, getInvoiceStatusDisplay } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -16,14 +16,6 @@ interface InvoiceData {
   createdAt: string;
 }
 
-const STATUS_STYLES: Record<string, { label: string; className: string; icon: string }> = {
-  DRAFT: { label: 'Esborrany', className: 'ap-badge', icon: '📝' },
-  PENDING_SYNC: { label: 'Sincronitzant...', className: 'ap-badge ap-badge--info', icon: '🔄' },
-  SYNCED: { label: 'Sincronitzada', className: 'ap-badge ap-badge--info', icon: '☁️' },
-  SYNC_ERROR: { label: 'Error sync', className: 'ap-badge ap-badge--danger', icon: '⚠️' },
-  PAID: { label: 'Pagada', className: 'ap-badge ap-badge--success', icon: '✓' },
-  CANCELLED: { label: 'Cancel·lada', className: 'ap-badge', icon: '✕' },
-};
 
 const Spinner = () => <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current/30 border-t-current" />;
 
@@ -70,7 +62,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
 
   const canMarkPaid = activeInvoice && ['DRAFT', 'SYNCED', 'PENDING_SYNC', 'SYNC_ERROR'].includes(activeInvoice.status);
   const canCancel = activeInvoice && activeInvoice.status !== 'PAID' && activeInvoice.status !== 'CANCELLED';
-  const statusStyle = activeInvoice ? STATUS_STYLES[activeInvoice.status] : null;
+  const statusDisplay = activeInvoice ? getInvoiceStatusDisplay(activeInvoice.status) : null;
 
   return (
     <div className="ap-card rounded-2xl p-5">
@@ -94,9 +86,9 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="font-mono text-sm font-bold">{activeInvoice.reference}</span>
-              <span className={statusStyle?.className || 'ap-badge'}>
-                <span>{statusStyle?.icon}</span>
-                {statusStyle?.label || getInvoiceStatusLabel(activeInvoice.status)}
+              <span className={statusDisplay?.className || 'ap-badge'}>
+                <span>{statusDisplay?.icon}</span>
+                {statusDisplay?.label || activeInvoice.status}
               </span>
             </div>
             <span className="text-lg font-bold">{formatCurrency(activeInvoice.total)}</span>
@@ -146,3 +138,4 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
     </div>
   );
 }
+

@@ -2,22 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { PUBLIC_HALLOWEEN_DECORATION_ITEMS, PUBLIC_HALLOWEEN_PREVIEW_ICONS } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════
 // HALLOWEEN DECORATION SECTION
 // Mostra tots els elements de decoració disponibles
 // ═══════════════════════════════════════════════════════════════
 
-const DECORATION_ITEMS = [
-  { icon: '👻', key: 0 },
-  { icon: '🕷️', key: 1 },
-  { icon: '🧹', key: 2 },
-  { icon: '🫕', key: 3 },
-  { icon: '🕯️', key: 4 },
-  { icon: '🪞', key: 5 },
-  { icon: '🕸️', key: 6 },
-  { icon: '💀', key: 7 },
-];
 
 export default function HalloweenDecorationSection() {
   const t = useTranslations('halloweenPage.decoration');
@@ -51,7 +42,7 @@ export default function HalloweenDecorationSection() {
 
         {/* Grid de decoració */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          {DECORATION_ITEMS.map((item, index) => (
+          {PUBLIC_HALLOWEEN_DECORATION_ITEMS.map((item, index) => (
             <motion.div
               key={item.key}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -114,7 +105,7 @@ export default function HalloweenDecorationSection() {
 // ═══════════════════════════════════════════════════════════════
 
 export function HalloweenDecorationPreview() {
-  const items = ['👻', '🕷️', '🫕', '🕯️', '💀', '🕸️'];
+  const items = PUBLIC_HALLOWEEN_PREVIEW_ICONS;
 
   return (
     <div className="flex items-center gap-3">

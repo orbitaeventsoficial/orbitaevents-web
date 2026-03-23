@@ -5,21 +5,19 @@
  */
 
 import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
+import { PORTFOLIO_MEDIA_IMAGE_MIME_TYPES, PORTFOLIO_MEDIA_VIDEO_MIME_TYPES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { uploadFile, deleteFile, getPublicUrl } from '@/lib/storage';
 
 const VALID_SLUGS = PORTFOLIO_CATEGORIES.map(({ slug }) => slug);
-
-const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
-const VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/mpeg'];
 
 export function isValidSlug(slug: string): boolean {
   return VALID_SLUGS.includes(slug);
 }
 
 export function detectMediaType(mimeType: string): 'image' | 'video' | null {
-  if (IMAGE_TYPES.includes(mimeType)) return 'image';
-  if (VIDEO_TYPES.includes(mimeType)) return 'video';
+  if ((PORTFOLIO_MEDIA_IMAGE_MIME_TYPES as readonly string[]).includes(mimeType)) return 'image';
+  if ((PORTFOLIO_MEDIA_VIDEO_MIME_TYPES as readonly string[]).includes(mimeType)) return 'video';
   return null;
 }
 

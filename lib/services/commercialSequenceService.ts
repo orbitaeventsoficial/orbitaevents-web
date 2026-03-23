@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
+import { COMMERCIAL_SEQUENCE_STEP_COPY } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -45,96 +46,6 @@ export const DEFAULT_NURTURING_CADENCE: NurturingStepDef[] = [
 // ---------------------------------------------------------------------------
 // Còpies per a cada pas × idioma
 // ---------------------------------------------------------------------------
-
-type StepCopy = {
-  subject: (eventType: string) => string;
-  text: (firstName: string) => string;
-  activity: string;
-};
-
-const STEP_COPY: Record<Locale, Record<string, StepCopy>> = {
-  ca: {
-    'follow-up-1': {
-      subject: (et) => `Seguiment de la teva sol·licitud · ${et}`,
-      text: (name) => `Hola ${name}, t'escrivim per avançar amb el teu esdeveniment. Si vols, avui mateix et proposem una opció concreta.`,
-      activity: 'Follow-up automàtic (pas 1)',
-    },
-    'follow-up-2': {
-      subject: (et) => `Seguiment pressupost · ${et}`,
-      text: (name) => `Hola ${name}, has pogut revisar la nostra proposta? Si vols, ajustem els detalls i tanquem data.`,
-      activity: 'Follow-up automàtic (pas 2)',
-    },
-    'follow-up-3': {
-      subject: (et) => `Encara tens temps de reservar · ${et}`,
-      text: (name) => `Hola ${name}, les dates disponibles es van omplint. Si t'interessa, podem guardar-te la data provisionalment sense compromís.`,
-      activity: 'Follow-up automàtic (pas 3)',
-    },
-    'follow-up-4': {
-      subject: (et) => `Última disponibilitat · ${et}`,
-      text: (name) => `Hola ${name}, volem assegurar-nos que no et quedis sense la data que necessites. Tens algun dubte que puguem resoldre?`,
-      activity: 'Follow-up automàtic (pas 4)',
-    },
-    'follow-up-last': {
-      subject: (et) => `Tanquem sol·licitud · ${et}`,
-      text: (name) => `Hola ${name}, com que no hem rebut resposta, tanquem la teva sol·licitud. Si en el futur necessites alguna cosa, escriu-nos sense compromís!`,
-      activity: 'Follow-up automàtic (últim pas)',
-    },
-  },
-  es: {
-    'follow-up-1': {
-      subject: (et) => `Seguimiento de tu solicitud · ${et}`,
-      text: (name) => `Hola ${name}, te escribimos para avanzar con tu evento. Si quieres, hoy mismo te proponemos una opción concreta.`,
-      activity: 'Follow-up automático (paso 1)',
-    },
-    'follow-up-2': {
-      subject: (et) => `Seguimiento presupuesto · ${et}`,
-      text: (name) => `Hola ${name}, ¿pudiste revisar nuestra propuesta? Si quieres, ajustamos los detalles y cerramos fecha.`,
-      activity: 'Follow-up automático (paso 2)',
-    },
-    'follow-up-3': {
-      subject: (et) => `Aún tienes tiempo de reservar · ${et}`,
-      text: (name) => `Hola ${name}, las fechas disponibles se van llenando. Si te interesa, podemos guardarte la fecha provisionalmente sin compromiso.`,
-      activity: 'Follow-up automático (paso 3)',
-    },
-    'follow-up-4': {
-      subject: (et) => `Última disponibilidad · ${et}`,
-      text: (name) => `Hola ${name}, queremos asegurarnos de que no te quedes sin la fecha que necesitas. ¿Tienes alguna duda que podamos resolver?`,
-      activity: 'Follow-up automático (paso 4)',
-    },
-    'follow-up-last': {
-      subject: (et) => `Cerramos solicitud · ${et}`,
-      text: (name) => `Hola ${name}, como no hemos recibido respuesta, cerramos tu solicitud. Si en el futuro necesitas algo, escríbenos sin compromiso.`,
-      activity: 'Follow-up automático (último paso)',
-    },
-  },
-  en: {
-    'follow-up-1': {
-      subject: (et) => `Follow-up on your request · ${et}`,
-      text: (name) => `Hi ${name}, we're writing to move forward with your event. If you'd like, we can propose a specific option today.`,
-      activity: 'Automatic follow-up (step 1)',
-    },
-    'follow-up-2': {
-      subject: (et) => `Quote follow-up · ${et}`,
-      text: (name) => `Hi ${name}, have you been able to review our proposal? We're happy to adjust the details and lock in a date.`,
-      activity: 'Automatic follow-up (step 2)',
-    },
-    'follow-up-3': {
-      subject: (et) => `Still time to book · ${et}`,
-      text: (name) => `Hi ${name}, available dates are filling up. If you're interested, we can hold your date provisionally with no commitment.`,
-      activity: 'Automatic follow-up (step 3)',
-    },
-    'follow-up-4': {
-      subject: (et) => `Last availability · ${et}`,
-      text: (name) => `Hi ${name}, we want to make sure you don't miss out on the date you need. Do you have any questions we can help with?`,
-      activity: 'Automatic follow-up (step 4)',
-    },
-    'follow-up-last': {
-      subject: (et) => `Closing your request · ${et}`,
-      text: (name) => `Hi ${name}, since we haven't heard back, we're closing your request. If you need anything in the future, feel free to reach out!`,
-      activity: 'Automatic follow-up (final step)',
-    },
-  },
-};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -231,7 +142,7 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
     summary.matched += 1;
     const locale = normalizeLocale(lead.preferredLocale);
     const templateSlug = nextStepDef.templateSlug;
-    const copy = STEP_COPY[locale][templateSlug];
+    const copy = COMMERCIAL_SEQUENCE_STEP_COPY[locale][templateSlug];
     if (!copy) {
       log.error(`Còpia no trobada per slug=${templateSlug} locale=${locale}`, null);
       summary.errors += 1;

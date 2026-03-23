@@ -2,9 +2,9 @@
 
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAllPacks } from '@/app/config/packs-config';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_ACTION_OPTIONS } from '@/lib/constants';
+import { getAdminLeadPackOptions } from '@/lib/constants/admin';
 
 interface Props {
   leadId: string;
@@ -13,18 +13,6 @@ interface Props {
   clientEmail: string;
   clientPhone?: string | null;
   eventType: string;
-}
-
-function buildPackOptions() {
-  const allPacks = getAllPacks();
-  const manual = { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 };
-  const packOptions = allPacks.map((p) => ({
-    value: p.slug,
-    label: `${p.name} (${p.service}) ${p.badge || ''}`.trim(),
-    price: p.priceValue,
-    hours: p.durationHours,
-  }));
-  return [manual, ...packOptions];
 }
 
 export default function LeadActionsEnhanced({ 
@@ -42,7 +30,7 @@ export default function LeadActionsEnhanced({
   const [optimisticStatus, setOptimisticStatus] = useState(currentStatus);
 
   // Pack options from packs-config (real prices)
-  const PACK_OPTIONS = useMemo(() => buildPackOptions(), []);
+  const PACK_OPTIONS = useMemo(() => getAdminLeadPackOptions(), []);
 
   // Quote generation state
   const [showQuoteModal, setShowQuoteModal] = useState(false);

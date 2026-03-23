@@ -1,43 +1,11 @@
+import { ADMIN_STATS_DEFINITIONS } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
-const STATS_DEFINITION = [
-  {
-    key: 'stats.events_completed',
-    label: 'Esdeveniments Realitzats',
-    description: 'Total d\'esdeveniments completats amb èxit',
-    icon: 'party',
-  },
-  {
-    key: 'stats.people_entertained',
-    label: 'Persones Entretingudes',
-    description: 'Total de convidats en tots els esdeveniments',
-    icon: 'people',
-  },
-  {
-    key: 'stats.years_experience',
-    label: 'Anys d\'Experiència',
-    description: 'Anys des del primer esdeveniment (calculat automàticament)',
-    icon: 'calendar',
-  },
-  {
-    key: 'stats.satisfaction_percent',
-    label: 'Satisfacció (%)',
-    description: 'Percentatge de clients satisfets',
-    icon: 'star',
-  },
-  {
-    key: 'stats.rating_average',
-    label: 'Valoració Mitjana',
-    description: 'Valoració mitjana d\'1-5 estrelles',
-    icon: 'sparkle',
-  },
-] as const;
-
-type AdminStatKey = typeof STATS_DEFINITION[number]['key'];
+type AdminStatKey = typeof ADMIN_STATS_DEFINITIONS[number]['key'];
 
 function getStatDefinition(key: string) {
-  return STATS_DEFINITION.find((stat) => stat.key === key);
+  return ADMIN_STATS_DEFINITIONS.find((stat) => stat.key === key);
 }
 
 async function calculateStats() {
@@ -100,14 +68,14 @@ export async function listAdminStats() {
   const settings = await prisma.setting.findMany({
     where: {
       key: {
-        in: STATS_DEFINITION.map((stat) => stat.key),
+        in: ADMIN_STATS_DEFINITIONS.map((stat) => stat.key),
       },
     },
   });
 
   const settingsMap = new Map(settings.map((setting) => [setting.key, parseFloat(setting.value) || 0]));
 
-  return STATS_DEFINITION.map((stat) => {
+  return ADMIN_STATS_DEFINITIONS.map((stat) => {
     const calculated = calculatedStats[stat.key];
     const fallback = settingsMap.get(stat.key) || 0;
     const isManual = fallback > 0;
@@ -178,5 +146,5 @@ export async function updateAdminStatFallback(input: {
 }
 
 export function isAdminStatKey(key: string): key is AdminStatKey {
-  return STATS_DEFINITION.some((stat) => stat.key === key);
+  return ADMIN_STATS_DEFINITIONS.some((stat) => stat.key === key);
 }

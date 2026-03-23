@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { PUBLIC_EXPERIENCES_PAGE_ITEMS, WHATSAPP_NUMBER } from '@/lib/constants';
 
 export const revalidate = 3600;
 
@@ -18,98 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ===============================================================
-// CONFIGURACIO D'EXPERIENCIES
-// ===============================================================
-const EXPERIENCES = [
-  {
-    id: 'mon-magic',
-    href: '/tematica-mon-magic',
-    icon: '🪄',
-    titleKey: 'monMagic.title',
-    subtitleKey: 'monMagic.subtitle',
-    descriptionKey: 'monMagic.description',
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
-    gradient: 'from-purple-600 to-blue-600',
-    bgGradient: 'from-purple-900/40 to-blue-900/40',
-    badgeKey: 'badges.popular',
-    badgeColor: 'bg-purple-500',
-    featuresKey: 'monMagic.features',
-  },
-  {
-    id: 'halloween',
-    href: '/tematica-halloween',
-    icon: '🎃',
-    titleKey: 'halloween.title',
-    subtitleKey: 'halloween.subtitle',
-    descriptionKey: 'halloween.description',
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
-    gradient: 'from-orange-600 to-red-700',
-    bgGradient: 'from-orange-900/40 to-red-900/40',
-    badgeKey: 'badges.terrific',
-    badgeColor: 'bg-orange-500',
-    featuresKey: 'halloween.features',
-  },
-  {
-    id: 'boda-halloween',
-    href: '/boda-halloween',
-    icon: '💀',
-    titleKey: 'bodaHalloween.title',
-    subtitleKey: 'bodaHalloween.subtitle',
-    descriptionKey: 'bodaHalloween.description',
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-02.avif',
-    gradient: 'from-gray-700 to-purple-800',
-    bgGradient: 'from-gray-900/40 to-purple-900/40',
-    badgeKey: 'badges.exclusive',
-    badgeColor: 'bg-gray-600',
-    featuresKey: 'bodaHalloween.features',
-  },
-  {
-    id: 'disco-80s',
-    href: '/contacto?tema=disco80s',
-    icon: '🕺',
-    titleKey: 'disco80s.title',
-    subtitleKey: 'disco80s.subtitle',
-    descriptionKey: 'disco80s.description',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
-    gradient: 'from-pink-600 to-purple-600',
-    bgGradient: 'from-pink-900/40 to-purple-900/40',
-    badgeKey: 'badges.retro',
-    badgeColor: 'bg-pink-500',
-    featuresKey: 'disco80s.features',
-    comingSoon: true,
-  },
-  {
-    id: 'tropical',
-    href: '/contacto?tema=tropical',
-    icon: '🌴',
-    titleKey: 'tropical.title',
-    subtitleKey: 'tropical.subtitle',
-    descriptionKey: 'tropical.description',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.avif',
-    gradient: 'from-green-500 to-teal-600',
-    bgGradient: 'from-green-900/40 to-teal-900/40',
-    badgeKey: 'badges.summer',
-    badgeColor: 'bg-green-500',
-    featuresKey: 'tropical.features',
-    comingSoon: true,
-  },
-  {
-    id: 'elegant',
-    href: '/contacto?tema=elegant',
-    icon: '✨',
-    titleKey: 'elegant.title',
-    subtitleKey: 'elegant.subtitle',
-    descriptionKey: 'elegant.description',
-    image: '/img/portfolio/bodas/bodas-01.avif',
-    gradient: 'from-amber-500 to-yellow-600',
-    bgGradient: 'from-amber-900/40 to-yellow-900/40',
-    badgeKey: 'badges.premium',
-    badgeColor: 'bg-amber-500',
-    featuresKey: 'elegant.features',
-    comingSoon: true,
-  },
-];
 
 export default async function ExperienciasPage() {
   const t = await getTranslations('experiences');
@@ -172,7 +80,7 @@ export default async function ExperienciasPage() {
       </section>
 
       {/* =============================================================== */}
-      {/* EXPERIENCES GRID                                                */}
+      {/* PUBLIC_EXPERIENCES_PAGE_ITEMS GRID                                                */}
       {/* =============================================================== */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
@@ -188,12 +96,14 @@ export default async function ExperienciasPage() {
 
           {/* Grid d'experiencies */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {EXPERIENCES.map((exp) => (
-              <Link
+            {PUBLIC_EXPERIENCES_PAGE_ITEMS.map((exp) => {
+              const isComingSoon = 'comingSoon' in exp && Boolean(exp.comingSoon);
+              return (
+                <Link
                 key={exp.id}
                 href={exp.href}
                 className={`group relative rounded-3xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 ${
-                  exp.comingSoon ? 'opacity-70' : ''
+                  isComingSoon ? 'opacity-70' : ''
                 }`}
               >
                 {/* Background image */}
@@ -214,7 +124,7 @@ export default async function ExperienciasPage() {
                 {exp.badgeKey && (
                   <div className="absolute top-4 right-4">
                     <span className={`px-3 py-1.5 ${exp.badgeColor} text-white text-xs font-bold rounded-full shadow-lg`}>
-                      {exp.comingSoon ? t('comingSoon') : t(exp.badgeKey)}
+                      {isComingSoon ? t('comingSoon') : t(exp.badgeKey)}
                     </span>
                   </div>
                 )}
@@ -243,7 +153,7 @@ export default async function ExperienciasPage() {
 
                   {/* CTA */}
                   <span className="inline-flex items-center gap-2 text-amber-400 font-semibold group-hover:gap-3 transition-all">
-                    {exp.comingSoon ? t('notifyMe') : t('viewExperience')}
+                    {isComingSoon ? t('notifyMe') : t('viewExperience')}
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -252,8 +162,9 @@ export default async function ExperienciasPage() {
 
                 {/* Hover glow effect */}
                 <div className={`absolute inset-0 bg-gradient-to-t ${exp.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none`} />
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

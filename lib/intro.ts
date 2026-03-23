@@ -2,7 +2,7 @@ export const INTRO_PAGES = ['/', '/ca', '/es', '/en'] as const;
 export const MOBILE_INTRO_STORAGE_KEY = 'orbita-mobile-intro-seen';
 export const MOBILE_INTRO_COMPLETE_EVENT = 'orbita-mobile-intro-complete';
 
-const INTRO_BOT_PATTERNS = [
+export const INTRO_BOT_PATTERNS = [
   'googlebot',
   'lighthouse',
   'pagespeed',

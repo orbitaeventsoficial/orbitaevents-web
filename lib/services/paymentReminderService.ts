@@ -8,12 +8,15 @@
 
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
-import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
-import { formatCurrency, formatDateFull } from '@/lib/constants';
+import {
+  PAYMENT_REMINDER_COPY,
+  PAYMENT_REMINDER_DAYS_BEFORE_EVENT,
+  PAYMENT_REMINDER_MIN_DAYS_BETWEEN,
+  PLACEHOLDER_EMAIL_DOMAIN,
+  formatCurrency,
+  formatDateFull,
+} from '@/lib/constants';
 import { log } from '@/lib/logger';
-
-const REMINDER_DAYS_BEFORE_EVENT = 14;
-const MIN_DAYS_BETWEEN_REMINDERS = 7;
 
 interface PaymentReminderResult {
   checked: number;
@@ -22,53 +25,7 @@ interface PaymentReminderResult {
   errors: number;
 }
 
-type Locale = 'ca' | 'es' | 'en';
-
-const COPY: Record<Locale, {
-  subject: (ref: string) => string;
-  title: string;
-  greeting: (name: string) => string;
-  body: (ref: string, date: string, days: number) => string;
-  pending: string;
-  alreadyPaid: string;
-  thanks: string;
-  deposit: string;
-  remaining: string;
-}> = {
-  ca: {
-    subject: (ref) => `Recordatori de pagament — ${ref}`,
-    title: 'Recordatori de pagament',
-    greeting: (name) => `Hola ${name},`,
-    body: (ref, date, days) => `Et recordem que tens un pagament pendent per a la teva reserva <strong>${ref}</strong>, programada per al <strong>${date}</strong> (d'aquí ${days} dies).`,
-    pending: 'Import pendent',
-    alreadyPaid: 'Si ja has realitzat el pagament, ignora aquest missatge.',
-    thanks: 'Gràcies per confiar en Òrbita Events.',
-    deposit: 'Dipòsit',
-    remaining: 'Resta',
-  },
-  es: {
-    subject: (ref) => `Recordatorio de pago — ${ref}`,
-    title: 'Recordatorio de pago',
-    greeting: (name) => `Hola ${name},`,
-    body: (ref, date, days) => `Te recordamos que tienes un pago pendiente para tu reserva <strong>${ref}</strong>, programada para el <strong>${date}</strong> (dentro de ${days} días).`,
-    pending: 'Importe pendiente',
-    alreadyPaid: 'Si ya has realizado el pago, ignora este mensaje.',
-    thanks: 'Gracias por confiar en Òrbita Events.',
-    deposit: 'Depósito',
-    remaining: 'Resto',
-  },
-  en: {
-    subject: (ref) => `Payment reminder — ${ref}`,
-    title: 'Payment reminder',
-    greeting: (name) => `Hi ${name},`,
-    body: (ref, date, days) => `This is a reminder that you have a pending payment for your booking <strong>${ref}</strong>, scheduled for <strong>${date}</strong> (in ${days} days).`,
-    pending: 'Pending amount',
-    alreadyPaid: 'If you have already made the payment, please disregard this message.',
-    thanks: 'Thank you for trusting Òrbita Events.',
-    deposit: 'Deposit',
-    remaining: 'Remaining',
-  },
-};
+type Locale = keyof typeof PAYMENT_REMINDER_COPY;
 
 function normalizeLocale(value?: string | null): Locale {
   const raw = String(value || '').toLowerCase();
@@ -80,7 +37,7 @@ function normalizeLocale(value?: string | null): Locale {
 export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
   const now = new Date();
   const cutoffDate = new Date(now);
-  cutoffDate.setDate(cutoffDate.getDate() + REMINDER_DAYS_BEFORE_EVENT);
+  cutoffDate.setDate(cutoffDate.getDate() + PAYMENT_REMINDER_DAYS_BEFORE_EVENT);
 
   const bookings = await prisma.booking.findMany({
     where: {
@@ -114,7 +71,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
           action: 'PAYMENT_REMINDER_SENT',
           entityId: booking.id,
           createdAt: {
-            gte: new Date(now.getTime() - MIN_DAYS_BETWEEN_REMINDERS * 24 * 60 * 60 * 1000),
+            gte: new Date(now.getTime() - PAYMENT_REMINDER_MIN_DAYS_BETWEEN * 24 * 60 * 60 * 1000),
           },
         },
       });
@@ -134,7 +91,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
       let pendingAmount = 0;
 
       const locale = normalizeLocale(booking.preferredLocale);
-      const t = COPY[locale];
+      const t = PAYMENT_REMINDER_COPY[locale];
       const pendingItems: string[] = [];
 
       if (!booking.depositPaid && depositAmount > 0) {
@@ -202,3 +159,4 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
 
   return result;
 }
+

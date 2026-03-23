@@ -1,35 +1,27 @@
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
-import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
+import { PUBLIC_STATS_CACHE_HEADERS, PUBLIC_STATS_COMPANY_START_YEAR, PUBLIC_STATS_LOCALE_TEXT, SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
 
 export type PublicStatsLocale = 'es' | 'ca' | 'en';
 
 const SUPPORTED_LOCALES = new Set<PublicStatsLocale>(SHARED_SUPPORTED_LOCALES);
-const COMPANY_START_YEAR = 2023;
-
-const LOCALE_TEXT = {
-  es: { since: 'Desde 2023', yearsSuffix: 'años', coverage: 'Barcelona + Girona' },
-  ca: { since: 'Des de 2023', yearsSuffix: 'anys', coverage: 'Barcelona + Girona' },
-  en: { since: 'Since 2023', yearsSuffix: 'years', coverage: 'Barcelona + Girona' },
-} as const;
-
 export function getPublicStatsLocale(value: string | null): PublicStatsLocale {
   return value && SUPPORTED_LOCALES.has(value as PublicStatsLocale) ? (value as PublicStatsLocale) : 'es';
 }
 
 function formatYearsExperience(locale: PublicStatsLocale, yearsCount: number): string {
-  return `+${yearsCount} ${LOCALE_TEXT[locale].yearsSuffix}`;
+  return `+${yearsCount} ${PUBLIC_STATS_LOCALE_TEXT[locale].yearsSuffix}`;
 }
 
 export function getFallbackPublicStats(locale: PublicStatsLocale) {
-  const startDate = new Date(Date.UTC(COMPANY_START_YEAR, 0, 1));
+  const startDate = new Date(Date.UTC(PUBLIC_STATS_COMPANY_START_YEAR, 0, 1));
   const yearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
 
   return {
     yearsExperience: formatYearsExperience(locale, yearsCount),
-    coverage: LOCALE_TEXT[locale].coverage,
+    coverage: PUBLIC_STATS_LOCALE_TEXT[locale].coverage,
     responseTime: '2h',
-    yearStarted: COMPANY_START_YEAR,
+    yearStarted: PUBLIC_STATS_COMPANY_START_YEAR,
     peopleEntertained: 0,
     technicalIncidents: 0,
     totalEvents: 0,
@@ -41,10 +33,6 @@ export function getFallbackPublicStats(locale: PublicStatsLocale) {
     googleReviewsCount: null,
   };
 }
-
-export const PUBLIC_STATS_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-};
 
 export async function getPublicStats(locale: PublicStatsLocale) {
   const fallbackStats = getFallbackPublicStats(locale);
@@ -72,12 +60,12 @@ export async function getPublicStats(locale: PublicStatsLocale) {
     cachedQuery('public:stats:events:parties', () => prisma.booking.count({ where: { status: 'COMPLETED', eventType: { in: ['BIRTHDAY', 'PRIVATE_PARTY', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY'] } } }), CacheTTL.LONG),
   ]);
 
-  const yearStartedSetting = parseInt(settingsMap['stats.yearStarted'] || String(COMPANY_START_YEAR), 10);
-  const yearStarted = Number.isNaN(yearStartedSetting) ? COMPANY_START_YEAR : yearStartedSetting;
+  const yearStartedSetting = parseInt(settingsMap['stats.yearStarted'] || String(PUBLIC_STATS_COMPANY_START_YEAR), 10);
+  const yearStarted = Number.isNaN(yearStartedSetting) ? PUBLIC_STATS_COMPANY_START_YEAR : yearStartedSetting;
   const startDate = new Date(Date.UTC(yearStarted, 0, 1));
   const yearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
   const yearsExperience = formatYearsExperience(locale, yearsCount);
-  const coverage = settingsMap['coverage'] || LOCALE_TEXT[locale].coverage;
+  const coverage = settingsMap['coverage'] || PUBLIC_STATS_LOCALE_TEXT[locale].coverage;
   const responseTime = settingsMap['response_time'] || '2h';
   const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 5.0;
   const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 1;

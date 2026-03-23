@@ -1,3 +1,4 @@
+import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 import type { LeadSource } from '@prisma/client';
 import { computeBookingFinancialSummary } from './costEngine';
@@ -43,15 +44,7 @@ type ProfitabilityReport = {
   riskProfitability: ProfitabilityRow[];
 };
 
-const DEFAULT_CONFIG: ProfitabilityConfig = {
-  packCostRatio: 0.36,
-  extraCostRatio: 0.28,
-  extraHourCostRatio: 0.2,
-  fixedOperationalCost: 45,
-  channelCac: {
-    WEBSITE: 22, CONFIGURATOR: 18, PHONE: 12, WHATSAPP: 10, INSTAGRAM: 35, WALLAPOP: 16, REFERRAL: 8, GOOGLE: 28, OTHER: 20, UNKNOWN: 20,
-  },
-};
+const DEFAULT_CONFIG: ProfitabilityConfig = PROFITABILITY_MODEL_DEFAULTS;
 
 export const DEFAULT_PROFITABILITY_CONFIG = DEFAULT_CONFIG;
 function clampRatio(input: unknown, fallback: number): number { const n = Number(input); if (!Number.isFinite(n)) return fallback; return Math.max(0, Math.min(1, n)); }

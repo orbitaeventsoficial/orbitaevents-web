@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
+import { ADMIN_CANVAS_PRESET_SIZES, ADMIN_CANVAS_TEMPLATES } from '@/lib/constants/admin';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -41,66 +42,12 @@ type PresetSize = 'story' | 'post' | 'landscape';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const PRESET_SIZES: Record<PresetSize, { width: number; height: number; label: string }> = {
-  story: { width: 1080, height: 1920, label: 'Story (9:16)' },
-  post: { width: 1080, height: 1080, label: 'Post (1:1)' },
-  landscape: { width: 1920, height: 1080, label: 'Horitzontal (16:9)' },
-};
+const PRESET_SIZES: Record<PresetSize, { width: number; height: number; label: string }> = ADMIN_CANVAS_PRESET_SIZES;
 
-const TEMPLATES: CanvasTemplate[] = [
-  {
-    name: 'Promo Event',
-    width: 1080,
-    height: 1920,
-    bg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)',
-    elements: [
-      { id: 't1', type: 'shape', x: 0, y: 0, width: 1080, height: 1920, shapeType: 'rect', fill: 'rgba(6,182,212,0.08)' },
-      { id: 't2', type: 'text', x: 80, y: 200, width: 920, height: 120, text: 'ORBITA EVENTS', fontSize: 72, fontWeight: 'bold', color: '#06b6d4', textAlign: 'center' },
-      { id: 't3', type: 'text', x: 80, y: 400, width: 920, height: 200, text: 'El teu event\ncom mai l\'has\nimaginat', fontSize: 96, fontWeight: 'bold', color: '#ffffff', textAlign: 'center' },
-      { id: 't4', type: 'shape', x: 390, y: 700, width: 300, height: 4, shapeType: 'rect', fill: '#06b6d4', borderRadius: 2 },
-      { id: 't5', type: 'text', x: 80, y: 780, width: 920, height: 100, text: 'DJ · Il·luminació · So Professional', fontSize: 36, color: 'rgba(255,255,255,0.6)', textAlign: 'center' },
-      { id: 't6', type: 'shape', x: 240, y: 1400, width: 600, height: 80, shapeType: 'rect', fill: '#06b6d4', borderRadius: 40 },
-      { id: 't7', type: 'text', x: 240, y: 1415, width: 600, height: 50, text: 'RESERVA ARA', fontSize: 32, fontWeight: 'bold', color: '#000000', textAlign: 'center' },
-      { id: 't8', type: 'text', x: 80, y: 1700, width: 920, height: 40, text: 'www.orbitaevents.com', fontSize: 28, color: 'rgba(255,255,255,0.4)', textAlign: 'center' },
-    ],
-  },
-  {
-    name: 'Oferta Flash',
-    width: 1080,
-    height: 1080,
-    bg: 'linear-gradient(135deg, #0a0a0a 0%, #1c1917 100%)',
-    elements: [
-      { id: 'o1', type: 'text', x: 80, y: 80, width: 920, height: 60, text: 'OFERTA LIMITADA', fontSize: 36, fontWeight: 'bold', color: '#f97316', textAlign: 'center' },
-      { id: 'o2', type: 'text', x: 80, y: 250, width: 920, height: 200, text: '-15%', fontSize: 200, fontWeight: 'bold', color: '#ffffff', textAlign: 'center' },
-      { id: 'o3', type: 'text', x: 80, y: 500, width: 920, height: 80, text: 'en tots els packs', fontSize: 48, color: 'rgba(255,255,255,0.7)', textAlign: 'center' },
-      { id: 'o4', type: 'shape', x: 340, y: 640, width: 400, height: 4, shapeType: 'rect', fill: '#f97316', borderRadius: 2 },
-      { id: 'o5', type: 'text', x: 80, y: 700, width: 920, height: 60, text: 'Codi: FLASH15', fontSize: 40, fontWeight: 'bold', color: '#f97316', textAlign: 'center' },
-      { id: 'o6', type: 'text', x: 80, y: 820, width: 920, height: 50, text: 'Vàlid fins diumenge', fontSize: 32, color: 'rgba(255,255,255,0.5)', textAlign: 'center' },
-      { id: 'o7', type: 'text', x: 80, y: 960, width: 920, height: 40, text: 'ORBITA EVENTS · orbitaevents.com', fontSize: 24, color: 'rgba(255,255,255,0.3)', textAlign: 'center' },
-    ],
-  },
-  {
-    name: 'Testimoni',
-    width: 1080,
-    height: 1920,
-    bg: 'linear-gradient(180deg, #0a0a0a 0%, #171717 100%)',
-    elements: [
-      { id: 'r1', type: 'text', x: 80, y: 200, width: 920, height: 60, text: '★★★★★', fontSize: 56, color: '#eab308', textAlign: 'center' },
-      { id: 'r2', type: 'text', x: 100, y: 400, width: 880, height: 400, text: '"La millor festa de\nla nostra vida.\nGràcies Òrbita!"', fontSize: 56, fontWeight: 'bold', color: '#ffffff', textAlign: 'center' },
-      { id: 'r3', type: 'shape', x: 440, y: 900, width: 200, height: 4, shapeType: 'rect', fill: 'rgba(255,255,255,0.2)', borderRadius: 2 },
-      { id: 'r4', type: 'text', x: 80, y: 970, width: 920, height: 50, text: '— Maria i Joan, Boda 2026', fontSize: 32, color: 'rgba(255,255,255,0.6)', textAlign: 'center' },
-      { id: 'r5', type: 'text', x: 80, y: 1600, width: 920, height: 60, text: 'ORBITA EVENTS', fontSize: 40, fontWeight: 'bold', color: '#06b6d4', textAlign: 'center' },
-      { id: 'r6', type: 'text', x: 80, y: 1700, width: 920, height: 40, text: 'Reserva el teu event · orbitaevents.com', fontSize: 24, color: 'rgba(255,255,255,0.4)', textAlign: 'center' },
-    ],
-  },
-  {
-    name: 'Buit',
-    width: 1080,
-    height: 1080,
-    bg: '#0a0a0a',
-    elements: [],
-  },
-];
+const TEMPLATES: CanvasTemplate[] = ADMIN_CANVAS_TEMPLATES.map((template) => ({
+  ...template,
+  elements: template.elements.map((element) => ({ ...element })),
+}));
 
 
 let nextId = 100;

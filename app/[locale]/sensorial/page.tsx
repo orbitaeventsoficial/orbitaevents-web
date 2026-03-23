@@ -11,67 +11,9 @@ import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { PUBLIC_SENSORIAL_CATEGORIES, PUBLIC_SENSORIAL_THEMES } from '@/lib/constants';
 
-// ============================================================
-// CONFIGURACIÓ DE TEMES (MOLTS MÉS!)
-// ============================================================
-
-// Theme IDs map to translation keys in sensorial.themeNames.*
-const THEMES = [
-  // Naturalesa
-  { id: 'calm', emoji: '🌙', category: 'natura', items: ['🌙', '⭐', '✨', '💫'], cursor: '🌙', colors: ['#a78bfa', '#818cf8'], bg: 'from-indigo-950 via-violet-950 to-black', sound: [130.81, 196.00, 261.63] },
-  { id: 'ocean', emoji: '🌊', category: 'natura', items: ['🐚', '🐠', '🦀', '🐙', '🦑', '🐡', '🦐', '💎', '🫧'], cursor: '🐚', colors: ['#0ea5e9', '#06b6d4'], bg: 'from-cyan-950 via-blue-950 to-black', sound: [110, 164.81, 220] },
-  { id: 'forest', emoji: '🌲', category: 'natura', items: ['🍃', '🌿', '🦋', '🐦', '🌸', '🍀', '🌺', '🐿️', '🦔'], cursor: '🍃', colors: ['#22c55e', '#10b981'], bg: 'from-emerald-950 via-green-950 to-black', sound: [146.83, 220, 293.66] },
-  { id: 'sky', emoji: '☁️', category: 'natura', items: ['☁️', '🌤️', '🌈', '🦅', '🎈', '🪁', '🦜', '🕊️'], cursor: '☁️', colors: ['#38bdf8', '#7dd3fc'], bg: 'from-sky-950 via-blue-950 to-black', sound: [174.61, 220, 261.63] },
-  { id: 'garden', emoji: '🌷', category: 'natura', items: ['🌷', '🌹', '🌻', '🌼', '💐', '🦋', '🐝', '🐞', '🌺'], cursor: '🌸', colors: ['#f472b6', '#fb7185'], bg: 'from-pink-950 via-rose-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'aurora', emoji: '🌌', category: 'natura', items: ['✨', '💫', '⭐', '🌟', '❄️', '🦌'], cursor: '✨', colors: ['#34d399', '#a78bfa', '#06b6d4'], bg: 'from-emerald-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'fireflies', emoji: '✨', category: 'natura', items: ['✨', '💫', '🌙', '🦗', '🌾', '🍃'], cursor: '✨', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
-
-  // Espai
-  { id: 'cosmos', emoji: '🚀', category: 'espai', items: ['🚀', '🛸', '🌍', '🌙', '⭐', '🪐', '☄️', '👽', '🛰️'], cursor: '🚀', colors: ['#8b5cf6', '#6366f1'], bg: 'from-violet-950 via-indigo-950 to-black', sound: [98, 130.81, 164.81] },
-  { id: 'planets', emoji: '🪐', category: 'espai', items: ['🪐', '🌍', '🌕', '☀️', '🌑', '🌓', '🌗', '💫'], cursor: '🪐', colors: ['#f59e0b', '#d97706'], bg: 'from-orange-950 via-amber-950 to-black', sound: [65.41, 98, 130.81] },
-
-  // Animals
-  { id: 'aquarium', emoji: '🐠', category: 'animals', items: ['🐠', '🐟', '🐡', '🦈', '🐙', '🦑', '🦐', '🦞', '🐢', '🦭'], cursor: '🐠', colors: ['#06b6d4', '#0891b2'], bg: 'from-cyan-950 via-teal-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'safari', emoji: '🦁', category: 'animals', items: ['🦁', '🐘', '🦒', '🦓', '🦛', '🐆', '🦏', '🐊', '🦩'], cursor: '🦁', colors: ['#d97706', '#b45309'], bg: 'from-amber-950 via-orange-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'pets', emoji: '🐱', category: 'animals', items: ['🐱', '🐶', '🐹', '🐰', '🐦', '🐢', '🐠', '🦜', '🐿️'], cursor: '🐾', colors: ['#fb923c', '#fdba74'], bg: 'from-orange-950 via-amber-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'dinosaurs', emoji: '🦕', category: 'animals', items: ['🦕', '🦖', '🥚', '🌋', '🌿', '🦴', '🪨'], cursor: '🦕', colors: ['#84cc16', '#65a30d'], bg: 'from-lime-950 via-green-950 to-black', sound: [65.41, 82.41, 98] },
-
-  // Fantasia
-  { id: 'unicorn', emoji: '🦄', category: 'fantasia', items: ['🦄', '🌈', '⭐', '💖', '🎀', '👑', '💎', '🌸', '✨'], cursor: '🦄', colors: ['#f472b6', '#c084fc', '#60a5fa'], bg: 'from-pink-950 via-purple-950 to-black', sound: [392, 493.88, 587.33] },
-  { id: 'fairy', emoji: '🧚', category: 'fantasia', items: ['🧚', '🦋', '🌸', '✨', '🍄', '🌺', '💫', '🌙'], cursor: '🧚', colors: ['#a855f7', '#d946ef'], bg: 'from-purple-950 via-fuchsia-950 to-black', sound: [523.25, 659.25, 783.99] },
-  { id: 'dragon', emoji: '🐉', category: 'fantasia', items: ['🐉', '🔥', '💎', '⚔️', '🏰', '👑', '🛡️', '🗡️'], cursor: '🐉', colors: ['#dc2626', '#f97316'], bg: 'from-red-950 via-orange-950 to-black', sound: [98, 116.54, 146.83] },
-  { id: 'mermaid', emoji: '🧜', category: 'fantasia', items: ['🧜', '🐚', '💎', '🦪', '🌊', '✨', '👑', '🔱'], cursor: '🧜', colors: ['#06b6d4', '#8b5cf6'], bg: 'from-cyan-950 via-violet-950 to-black', sound: [293.66, 369.99, 440] },
-
-  // Menjar
-  { id: 'candy', emoji: '🍭', category: 'menjar', items: ['🍭', '🍬', '🍫', '🧁', '🍩', '🍪', '🎂', '🍰', '🍦'], cursor: '🍭', colors: ['#f472b6', '#fb7185', '#fbbf24'], bg: 'from-pink-950 via-rose-950 to-black', sound: [523.25, 587.33, 659.25] },
-  { id: 'fruits', emoji: '🍎', category: 'menjar', items: ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍒', '🥝', '🍍', '🥭'], cursor: '🍎', colors: ['#ef4444', '#f97316', '#eab308'], bg: 'from-red-950 via-orange-950 to-black', sound: [261.63, 329.63, 392] },
-
-  // Festes (Òrbita!)
-  { id: 'monmagic', emoji: '⚡', category: 'orbita', items: ['⚡', '🪄', '🦉', '📚', '🏰', '🧹', '🐍', '🦁', '🦅', '🦡', '⭐', '✨'], cursor: '🪄', colors: ['#fbbf24', '#7c3aed'], bg: 'from-amber-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'halloween', emoji: '🎃', category: 'orbita', items: ['🎃', '👻', '🦇', '💀', '🕷️', '🕸️', '🧙', '🧛', '🌙', '🦴', '⚰️'], cursor: '🎃', colors: ['#f97316', '#7c2d12'], bg: 'from-orange-950 via-black to-black', sound: [146.83, 174.61, 220] },
-  { id: 'christmas', emoji: '🎄', category: 'orbita', items: ['🎄', '🎅', '🎁', '⭐', '❄️', '☃️', '🦌', '🔔', '🎀', '🍪'], cursor: '🎄', colors: ['#dc2626', '#16a34a'], bg: 'from-red-950 via-green-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'tropical', emoji: '🌴', category: 'orbita', items: ['🌴', '🌺', '🍹', '🥥', '🦜', '🐠', '🌊', '☀️', '🏝️', '🦀'], cursor: '🌴', colors: ['#06b6d4', '#10b981'], bg: 'from-cyan-950 via-emerald-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'disco', emoji: '🪩', category: 'orbita', items: ['🪩', '💃', '🕺', '🎵', '🎤', '🎧', '💜', '💖', '✨', '🌟'], cursor: '🪩', colors: ['#ec4899', '#8b5cf6', '#06b6d4'], bg: 'from-fuchsia-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'elegant', emoji: '✨', category: 'orbita', items: ['✨', '💎', '👑', '🥂', '🌹', '💫', '⭐', '🎀'], cursor: '💎', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
-  { id: 'carnival', emoji: '🎭', category: 'orbita', items: ['🎭', '🎪', '🎠', '🎡', '🎢', '🎨', '🎈', '🎉', '🤡'], cursor: '🎭', colors: ['#f43f5e', '#8b5cf6', '#fbbf24'], bg: 'from-rose-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
-
-  // Zen / Relaxació
-  { id: 'zen', emoji: '🪷', category: 'zen', items: ['🪷', '🧘', '☯️', '🕯️', '🪨', '💧', '🌸'], cursor: '🪷', colors: ['#a3a3a3', '#737373'], bg: 'from-stone-950 via-neutral-950 to-black', sound: [174.61, 220, 261.63] },
-  { id: 'rain', emoji: '🌧️', category: 'zen', items: ['💧', '🌧️', '☔', '🌈', '🍃', '🐸'], cursor: '💧', colors: ['#60a5fa', '#3b82f6'], bg: 'from-blue-950 via-black to-black', sound: [196, 233.08, 261.63] },
-  { id: 'snow', emoji: '❄️', category: 'zen', items: ['❄️', '☃️', '🌨️', '⛄', '🏔️', '🎿'], cursor: '❄️', colors: ['#e0f2fe', '#bae6fd'], bg: 'from-sky-950 via-black to-black', sound: [293.66, 349.23, 392] },
-];
-
-// Category IDs map to translation keys in sensorial.categoryNames.*
-const CATEGORIES = [
-  { id: 'natura', emoji: '🌿' },
-  { id: 'espai', emoji: '🚀' },
-  { id: 'animals', emoji: '🐾' },
-  { id: 'fantasia', emoji: '✨' },
-  { id: 'menjar', emoji: '🍭' },
-  { id: 'orbita', emoji: '🎉' },
-  { id: 'zen', emoji: '🧘' },
-];
+type SensorialTheme = (typeof PUBLIC_SENSORIAL_THEMES)[number];
 
 // ============================================================
 // MOTOR D'ÀUDIO
@@ -209,7 +151,7 @@ function InteractiveCanvas({
   speed,
   soundEnabled,
 }: {
-  theme: typeof THEMES[0];
+  theme: SensorialTheme;
   intensity: number;
   speed: number;
   soundEnabled: boolean;
@@ -649,8 +591,8 @@ function ControlPanel({
   t,
 }: {
   open: boolean;
-  theme: typeof THEMES[0];
-  onThemeChange: (t: typeof THEMES[0]) => void;
+  theme: SensorialTheme;
+  onThemeChange: (t: SensorialTheme) => void;
   intensity: number;
   onIntensityChange: (i: number) => void;
   speed: number;
@@ -665,8 +607,8 @@ function ControlPanel({
   if (!open) return null;
 
   const filteredThemes = selectedCategory
-    ? THEMES.filter(themeItem => themeItem.category === selectedCategory)
-    : THEMES;
+    ? PUBLIC_SENSORIAL_THEMES.filter(themeItem => themeItem.category === selectedCategory)
+    : PUBLIC_SENSORIAL_THEMES;
 
   return (
     <motion.aside
@@ -699,7 +641,7 @@ function ControlPanel({
             >
               {t('all')}
             </button>
-            {CATEGORIES.map(cat => (
+            {PUBLIC_SENSORIAL_CATEGORIES.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
@@ -851,7 +793,7 @@ export default function EspaiSensorial() {
   const [ready, setReady] = useState(false);
   const [showExplanation, setShowExplanation] = useState(true);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [theme, setTheme] = useState(THEMES[0]);
+  const [theme, setTheme] = useState<SensorialTheme>(PUBLIC_SENSORIAL_THEMES[0]);
   const [intensity, setIntensity] = useState(15);  // Reduït per fluïdesa
   const [speed, setSpeed] = useState(0.4);  // Reduït per fluïdesa
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -869,7 +811,7 @@ export default function EspaiSensorial() {
 
   useEffect(() => {
     if (soundEnabled) {
-      audio?.start(theme.sound);
+      audio?.start([...theme.sound]);
     } else {
       audio?.stop();
     }

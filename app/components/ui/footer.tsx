@@ -21,7 +21,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { WHATSAPP_URL } from '@/lib/constants';
+import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SERVICES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, PUBLIC_FOOTER_TRUST_SIGNAL_META, WHATSAPP_URL } from '@/lib/constants';
+import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
 // TikTok icon custom
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -34,78 +35,24 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 // CONSTANTS
 // ========================================
 
-const DEFAULT_COVERAGE = ['Barcelona', 'Girona', 'Costa Brava', 'Maresme', 'Vallès'];
-
 // Social links des de site-config
-const SOCIAL_LINKS = [
-  {
-    name: 'Instagram',
-    icon: Instagram,
-    href: SITE_CONFIG.social.instagram.url || '',
-    color: 'hover:text-[#E4405F] hover:bg-[#E4405F]/10',
-    enabled: SITE_CONFIG.social.instagram.enabled,
-  },
-  {
-    name: 'TikTok',
-    icon: TikTokIcon,
-    href: SITE_CONFIG.social.tiktok.url || '',
-    color: 'hover:text-[#00F2EA] hover:bg-[#00F2EA]/10',
-    enabled: SITE_CONFIG.social.tiktok.enabled,
-  },
-  {
-    name: 'LinkedIn',
-    icon: Linkedin,
-    href: SITE_CONFIG.social.linkedin.url || '',
-    color: 'hover:text-[#0A66C2] hover:bg-[#0A66C2]/10',
-    enabled: SITE_CONFIG.social.linkedin.enabled,
-  },
-  {
-    name: 'YouTube',
-    icon: Youtube,
-    href: SITE_CONFIG.social.youtube.url || '',
-    color: 'hover:text-[#FF0000] hover:bg-[#FF0000]/10',
-    enabled: SITE_CONFIG.social.youtube.enabled,
-  },
-].filter(link => link.enabled && link.href);
+const SOCIAL_ICON_MAP = {
+  Instagram,
+  TikTok: TikTokIcon,
+  LinkedIn: Linkedin,
+  YouTube: Youtube,
+} as const;
 
-// ═══════════════════════════════════════════════════════════════════
-// SERVEIS (4 principals)
-// ═══════════════════════════════════════════════════════════════════
-const SERVICIOS_LINKS = [
-  { nameKey: 'djWeddings', href: '/servicios/bodas', icon: '💍' },
-  { nameKey: 'privateParties', href: '/servicios/fiestas', icon: '🎉' },
-  { nameKey: 'corporateEvents', href: '/servicios/empresas', icon: '💼' },
-  { nameKey: 'discomovil', href: '/servicios/discomovil', icon: '🎵' },
-];
+const SOCIAL_LINKS = PUBLIC_FOOTER_SOCIAL_LINK_META.map((item) => {
+  const config = SITE_CONFIG.social[item.configKey];
+  return {
+    ...item,
+    icon: SOCIAL_ICON_MAP[item.name],
+    href: config.url || '',
+    enabled: config.enabled,
+  };
+}).filter((link) => link.enabled && link.href);
 
-// ═══════════════════════════════════════════════════════════════════
-// EXPERIÈNCIES TEMÀTIQUES - AQUÍ ESTÀ HALLOWEEN! 🎃🪄
-// ═══════════════════════════════════════════════════════════════════
-const EXPERIENCIAS_LINKS = [
-  { nameKey: 'monMagic', href: '/tematica-mon-magic', icon: '🪄' },
-  { nameKey: 'halloween', href: '/tematica-halloween', icon: '🎃' },
-  { nameKey: 'bodaHalloween', href: '/boda-halloween', icon: '💀' },
-  { nameKey: 'allExperiences', href: '/experiencias', icon: '✨' },
-];
-
-// Recursos
-const RECURSOS_LINKS = [
-  { nameKey: 'portfolio', href: '/portfolio' },
-  { nameKey: 'about', href: '/about' },
-  { nameKey: 'reviews', href: '/opiniones' },
-  { nameKey: 'faq', href: '/faq' },
-  { nameKey: 'blog', href: '/blog' },
-];
-
-const LEGAL_LINKS = [
-  { nameKey: 'privacy', href: '/legal/privacidad' },
-  { nameKey: 'privacyPortal', href: '/privacitat' },
-  { nameKey: 'terms', href: '/legal/terminos' },
-  { nameKey: 'cookies', href: '/legal/cookies' },
-  { nameKey: 'legalNotice', href: '/legal/aviso-legal' },
-];
-
-import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
 // ========================================
 // MAIN FOOTER COMPONENT
@@ -119,7 +66,7 @@ export default function Footer() {
   const tFooterLinks = useTranslations('footerLinks');
   const { track } = useAnalytics();
   const rawCoverage = t.raw('coverageAreas');
-  const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : DEFAULT_COVERAGE;
+  const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : [...PUBLIC_FOOTER_DEFAULT_COVERAGE];
   const [coverageAreas, setCoverageAreas] = useState<string[]>(localizedCoverage);
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
   const isHomePath = normalizedPath === '/' || /^\/(es|ca|en)$/.test(normalizedPath);
@@ -147,32 +94,18 @@ export default function Footer() {
     };
   }, []);
 
-  const trustSignals = [
-    {
-      metric: tStats('years.value'),
-      label: t('trust.experience'),
-      icon: '⭐',
-      color: 'from-amber-500/20 to-orange-500/20',
-    },
-    {
-      metric: `+${SITE_CONFIG.stats.eventsCompleted}`,
-      label: t('trust.events'),
-      icon: '🎉',
-      color: 'from-purple-500/20 to-pink-500/20',
-    },
-    {
-      metric: SITE_CONFIG.stats.responseTime,
-      label: t('trust.response'),
-      icon: '⚡',
-      color: 'from-green-500/20 to-emerald-500/20',
-    },
-    {
-      metric: tStats('coverage'),
-      label: t('trust.coverage'),
-      icon: '📍',
-      color: 'from-blue-500/20 to-cyan-500/20',
-    },
-  ];
+  const trustSignals = PUBLIC_FOOTER_TRUST_SIGNAL_META.map((item) => ({
+    ...item,
+    metric:
+      item.key === 'experience'
+        ? tStats('years.value')
+        : item.key === 'events'
+        ? `+${SITE_CONFIG.stats.eventsCompleted}`
+        : item.key === 'response'
+        ? SITE_CONFIG.stats.responseTime
+        : tStats('coverage'),
+    label: t(`trust.${item.key}`),
+  }));
 
   const handleLinkClick = (category: string, linkName: string) => {
     track('Footer_Link_Click', { category, link: linkName });
@@ -313,7 +246,7 @@ export default function Footer() {
                 {t('sections.services')}
               </h3>
               <ul className="space-y-3">
-                {SERVICIOS_LINKS.map((link) => (
+                {PUBLIC_FOOTER_SERVICES_LINKS.map((link) => (
                   <li key={link.nameKey}>
                     <Link
                       href={link.href}
@@ -340,7 +273,7 @@ export default function Footer() {
                 <Sparkles className="w-4 h-4 text-purple-400" />
               </h3>
               <ul className="space-y-3">
-                {EXPERIENCIAS_LINKS.map((link) => (
+                {PUBLIC_FOOTER_EXPERIENCES_LINKS.map((link) => (
                   <li key={link.nameKey}>
                     <Link
                       href={link.href}
@@ -366,7 +299,7 @@ export default function Footer() {
                 {t('sections.resources')}
               </h3>
               <ul className="space-y-3">
-                {RECURSOS_LINKS.map((link) => (
+                {PUBLIC_FOOTER_RESOURCES_LINKS.map((link) => (
                   <li key={link.nameKey}>
                     <Link
                       href={link.href}
@@ -463,7 +396,7 @@ export default function Footer() {
 
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-2 text-sm pr-20 md:pr-0">
-              {LEGAL_LINKS.map((link, idx) => (
+              {PUBLIC_FOOTER_LEGAL_LINKS.map((link, idx) => (
                 <span key={link.nameKey} className="flex items-center gap-4">
                   <Link
                     href={link.href}
@@ -472,7 +405,7 @@ export default function Footer() {
                   >
                     {tFooterLinks(`legal.${link.nameKey}`)}
                   </Link>
-                  {idx < LEGAL_LINKS.length - 1 && (
+                  {idx < PUBLIC_FOOTER_LEGAL_LINKS.length - 1 && (
                     <span className="text-white/20" aria-hidden="true">
                       •
                     </span>

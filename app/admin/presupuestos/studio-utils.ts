@@ -11,6 +11,7 @@ import {
 } from '@/app/config/packs-config';
 import { z } from 'zod';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_PDF_STUDIO_COPY, ADMIN_PDF_STUDIO_CUSTOM_PACK_ID, ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER, ADMIN_PDF_STUDIO_DRAFT_KEY, ADMIN_PDF_STUDIO_OPERATOR_EXTRA_ID, ADMIN_PDF_STUDIO_SECTION_LABELS, ADMIN_PDF_STUDIO_SERVICE_LABELS } from '@/lib/constants/admin';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -79,69 +80,17 @@ export type StudioProps = {
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
-export const SECTION_LABELS: Record<SectionId, string> = {
-  config: 'Configuració',
-  client: 'Client i esdeveniment',
-  brand: 'Marca i identitat',
-  pack: 'Pack i condicions',
-  'extras-catalog': 'Extres del catàleg',
-  'extras-custom': 'Extres personalitzats',
-  contract: 'Dades del contracte',
-};
+export const SECTION_LABELS: Record<SectionId, string> = ADMIN_PDF_STUDIO_SECTION_LABELS;
 
-export const DEFAULT_SECTION_ORDER: SectionId[] = [
-  'config', 'client', 'brand', 'pack', 'extras-catalog', 'extras-custom', 'contract',
-];
+export const DEFAULT_SECTION_ORDER: SectionId[] = [...ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER];
 
-export const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
-export const CUSTOM_PACK_ID = '__custom_pack__';
-export const OPERATOR_PDF_EXTRA_ID = '__operator_extra_pdf__';
+export const STUDIO_DRAFT_KEY = ADMIN_PDF_STUDIO_DRAFT_KEY;
+export const CUSTOM_PACK_ID = ADMIN_PDF_STUDIO_CUSTOM_PACK_ID;
+export const OPERATOR_PDF_EXTRA_ID = ADMIN_PDF_STUDIO_OPERATOR_EXTRA_ID;
 
-export const STUDIO_COPY: Record<Locale, { hours: string; customServiceName: string; customExtraDescription: string; defaultClientName: string; sendQuote: string; sendingQuote: string; noDate: string; noSchedule: string; noLocation: string; clientLabel: string }> = {
-  ca: {
-    hours: 'hores',
-    customServiceName: 'Servei personalitzat',
-    customExtraDescription: 'Extra personalitzat',
-    defaultClientName: 'Client',
-    sendQuote: 'Envia pressupost',
-    sendingQuote: 'Enviant...',
-    noDate: 'Sense data',
-    noSchedule: 'Sense horari',
-    noLocation: 'Sense ubicació',
-    clientLabel: 'Client',
-  },
-  es: {
-    hours: 'horas',
-    customServiceName: 'Servicio personalizado',
-    customExtraDescription: 'Extra personalizado',
-    defaultClientName: 'Cliente',
-    sendQuote: 'Enviar presupuesto',
-    sendingQuote: 'Enviando...',
-    noDate: 'Sin fecha',
-    noSchedule: 'Sin horario',
-    noLocation: 'Sin ubicación',
-    clientLabel: 'Cliente',
-  },
-  en: {
-    hours: 'hours',
-    customServiceName: 'Custom service',
-    customExtraDescription: 'Custom extra',
-    defaultClientName: 'Client',
-    sendQuote: 'Send quote',
-    sendingQuote: 'Sending...',
-    noDate: 'No date',
-    noSchedule: 'No schedule',
-    noLocation: 'No location',
-    clientLabel: 'Client',
-  },
-};
+export const STUDIO_COPY: Record<Locale, { hours: string; customServiceName: string; customExtraDescription: string; defaultClientName: string; sendQuote: string; sendingQuote: string; noDate: string; noSchedule: string; noLocation: string; clientLabel: string }> = ADMIN_PDF_STUDIO_COPY;
 
-export const SERVICE_LABEL: Record<ServiceSlug, string> = {
-  bodas: 'Bodes',
-  fiestas: 'Festes',
-  discomovil: 'Discomòbil',
-  empresas: 'Empreses',
-};
+export const SERVICE_LABEL: Record<ServiceSlug, string> = ADMIN_PDF_STUDIO_SERVICE_LABELS;
 
 export { ALL_SERVICES };
 export type { ExtraDefinition, PackDefinition, ServiceSlug };

@@ -1,18 +1,5 @@
+import { ADMIN_LEAD_TASK_SELECT } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
-
-const TASK_SELECT = {
-  id: true,
-  title: true,
-  description: true,
-  dueDate: true,
-  status: true,
-  priority: true,
-  createdAt: true,
-  updatedAt: true,
-  assignedTo: true,
-  createdBy: true,
-  completedAt: true,
-} as const;
 
 type LeadTaskStatus = 'OPEN' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED';
 type LeadTaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
@@ -40,7 +27,7 @@ export async function listLeadTasks(leadId: string) {
   const tasks = await prisma.task.findMany({
     where: { leadId },
     orderBy: { createdAt: 'desc' },
-    select: TASK_SELECT,
+    select: ADMIN_LEAD_TASK_SELECT,
   });
 
   return tasks.map(normalizeTaskRecord);
@@ -62,7 +49,7 @@ export async function createLeadTask(leadId: string, customerId: string | null |
       createdBy: input.createdBy ?? 'Admin',
       completedAt: input.status === 'DONE' ? new Date() : null,
     },
-    select: TASK_SELECT,
+    select: ADMIN_LEAD_TASK_SELECT,
   });
 
   return normalizeTaskRecord(task);
@@ -92,7 +79,7 @@ export async function updateLeadTask(taskId: string, leadId: string, input: Lead
   const task = await prisma.task.update({
     where: { id: existingTask.id },
     data: updateData,
-    select: TASK_SELECT,
+    select: ADMIN_LEAD_TASK_SELECT,
   });
 
   return normalizeTaskRecord(task);

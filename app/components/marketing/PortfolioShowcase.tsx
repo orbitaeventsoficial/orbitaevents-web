@@ -9,68 +9,10 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos } from '@/lib/constants';
 
-interface EventStory {
-  id: string;
-  slug: string;
-  category: string;
-  photos: string[];
-  overlayKey: string;
-  accent: string;
-}
-
-const EVENT_STORIES: EventStory[] = [
-  {
-    id: 'discomovil',
-    slug: 'discomovil',
-    category: 'discomovil',
-    photos: Array.from({ length: 10 }, (_, i) =>
-      `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-    overlayKey: 'discomovil',
-    accent: 'from-amber-500/30 to-orange-500/10',
-  },
-  {
-    id: 'halloween',
-    slug: 'fiestas-tematicas-halloween',
-    category: 'halloween',
-    photos: Array.from({ length: 10 }, (_, i) =>
-      `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-    overlayKey: 'halloween',
-    accent: 'from-purple-500/30 to-red-500/10',
-  },
-  {
-    id: 'monMagic',
-    slug: 'fiestas-tematicas-mon-magic',
-    category: 'monMagic',
-    photos: Array.from({ length: 9 }, (_, i) =>
-      `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-    overlayKey: 'monMagic',
-    accent: 'from-blue-500/30 to-cyan-500/10',
-  },
-  {
-    id: 'bodas',
-    slug: 'bodas',
-    category: 'bodas',
-    photos: Array.from({ length: 4 }, (_, i) =>
-      `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-    overlayKey: 'bodas',
-    accent: 'from-rose-500/30 to-pink-500/10',
-  },
-  {
-    id: 'empreses',
-    slug: 'eventos-empresa',
-    category: 'empreses',
-    photos: Array.from({ length: 9 }, (_, i) =>
-      `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-    overlayKey: 'empreses',
-    accent: 'from-emerald-500/30 to-teal-500/10',
-  },
-];
+type EventStory = (typeof PUBLIC_PORTFOLIO_SHOWCASE_ITEMS)[number];
+const EVENT_STORIES = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.filter((item) => item.showInDesktop);
 
 // ─── Story Card ────────────────────────────────────────────────────────────
 
@@ -87,18 +29,19 @@ function StoryCard({
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  const photos = getPublicPortfolioShowcasePhotos(story.slug, story.desktopPhotoCount);
 
   // Auto-rotate photos every 3s always
   const [isHovered, setIsHovered] = useState(false);
   useEffect(() => {
     if (reduceMotion) return;
     const interval = setInterval(() => {
-      setPhotoIdx((prev) => (prev + 1) % story.photos.length);
+      setPhotoIdx((prev) => (prev + 1) % photos.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [story.photos.length, reduceMotion]);
+  }, [photos.length, reduceMotion]);
 
-  const categoryName = t(`categories.${story.overlayKey}`);
+  const categoryName = t(`categories.${story.translationKey}`);
 
   return (
     <motion.div
@@ -121,7 +64,7 @@ function StoryCard({
       >
         {/* Photos with crossfade — totes apilades, opacity transition */}
         <div className="relative h-[28rem] md:h-[32rem] overflow-hidden">
-          {story.photos.map((photo, i) => (
+          {photos.map((photo, i) => (
             <Image
               key={photo}
               src={photo}
@@ -136,11 +79,11 @@ function StoryCard({
 
           {/* Gradient overlays */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-          <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100 bg-gradient-to-t ${story.accent}`} />
+          <div className={`absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100 bg-gradient-to-t ${story.desktopAccent}`} />
 
           {/* Photo dots indicator */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5">
-            {story.photos.slice(0, 5).map((_, i) => (
+            {photos.slice(0, 5).map((_, i) => (
               <button
                 key={i}
                 onClick={(e) => { e.preventDefault(); setPhotoIdx(i); }}
@@ -152,8 +95,8 @@ function StoryCard({
                 aria-label={`Foto ${i + 1}`}
               />
             ))}
-            {story.photos.length > 5 && (
-              <span className="text-white/50 text-xs ml-1">+{story.photos.length - 5}</span>
+            {photos.length > 5 && (
+              <span className="text-white/50 text-xs ml-1">+{photos.length - 5}</span>
             )}
           </div>
 
@@ -169,18 +112,18 @@ function StoryCard({
 
             {/* Title */}
             <h3 className="text-white text-2xl md:text-3xl font-black leading-tight mb-2">
-              {t(`stories.${story.overlayKey}.title`)}
+              {t(`stories.${story.translationKey}.title`)}
             </h3>
 
             {/* Description */}
             <p className="text-white/60 text-sm leading-relaxed line-clamp-2 mb-4">
-              {t(`stories.${story.overlayKey}.desc`)}
+              {t(`stories.${story.translationKey}.desc`)}
             </p>
 
             {/* Stats row */}
             <div className="flex items-center gap-4 text-sm">
               <span className="text-white/80 font-medium">
-                {story.photos.length} fotos
+                {photos.length} fotos
               </span>
               <span className="text-white/20">·</span>
               <span className="inline-flex items-center gap-1.5 text-amber-400/80 font-medium group-hover:text-amber-400 transition-colors">

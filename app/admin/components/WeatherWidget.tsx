@@ -1,44 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ADMIN_WEATHER_DEFAULT_EMOJI, ADMIN_WEATHER_EMOJI, ADMIN_WEATHER_EMOJI_CA } from '@/lib/constants/admin';
 import type { WeatherForecast } from '@/lib/services/weatherService';
-
-// ─── Mapping icona OpenWeatherMap → emoji ───────────────────────────
-
-const WEATHER_EMOJI: Record<string, string> = {
-  Clear: '\u2600\uFE0F',       // ☀️
-  Clouds: '\u2601\uFE0F',      // ☁️
-  Rain: '\uD83C\uDF27\uFE0F',  // 🌧️
-  Drizzle: '\uD83C\uDF26\uFE0F', // 🌦️
-  Thunderstorm: '\u26C8\uFE0F', // ⛈️
-  Snow: '\u2744\uFE0F',         // ❄️
-};
-const DEFAULT_EMOJI = '\uD83C\uDF24\uFE0F'; // 🌤️
-
-const WEATHER_EMOJI_CA: Record<string, string> = {
-  'cel serè': '\u2600\uFE0F',
-  'ennuvolat': '\u2601\uFE0F',
-  'pluja': '\uD83C\uDF27\uFE0F',
-  'plugim': '\uD83C\uDF26\uFE0F',
-  'tempesta': '\u26C8\uFE0F',
-  'neu': '\u2744\uFE0F',
-  'boira': '\uD83C\uDF2B\uFE0F',
-};
 
 function getWeatherEmoji(description: string): string {
   // Intentem trobar la descripció que coincideixi amb les claus del mapping
-  for (const [key, emoji] of Object.entries(WEATHER_EMOJI)) {
+  for (const [key, emoji] of Object.entries(ADMIN_WEATHER_EMOJI)) {
     if (description.toLowerCase().includes(key.toLowerCase())) {
       return emoji;
     }
   }
   const lower = description.toLowerCase();
-  for (const [key, emoji] of Object.entries(WEATHER_EMOJI_CA)) {
+  for (const [key, emoji] of Object.entries(ADMIN_WEATHER_EMOJI_CA)) {
     if (lower.includes(key)) {
       return emoji;
     }
   }
-  return DEFAULT_EMOJI;
+  return ADMIN_WEATHER_DEFAULT_EMOJI;
 }
 
 function formatShortDate(isoString: string): string {

@@ -6,34 +6,15 @@ import { Link } from '@/lib/navigation';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { trackCTAClick } from '@/app/lib/analytics';
+import { PUBLIC_HERO_KEN_BURNS_PRESETS, PUBLIC_HERO_MEDIA_FALLBACK } from '@/lib/constants';
 
-interface HeroMediaItem {
-  id: string;
-  url: string;
-  type: 'video' | 'image';
-  label: string;
-}
+type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
 
-const FALLBACK: HeroMediaItem[] = [
-  { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo' },
-  { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil' },
-  { id: 'img-bodas-04', url: '/img/portfolio/bodas/bodas-04.avif', type: 'image', label: 'Bodes' },
-  { id: 'img-halloween-01', url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', type: 'image', label: 'Halloween' },
-  { id: 'img-magic-05', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif', type: 'image', label: 'Món Màgic' },
-  { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses' },
-];
 
 const IMAGE_DURATION = 7000;
 const VIDEO_MIN_DURATION = 10000;
 
 // Ken Burns — zoom in suau, cada direcció diferent
-const KB = [
-  { x: [0, -1],   y: [0, -0.5], scale: [0.93, 1.02] },
-  { x: [0, 1],    y: [0, -0.5], scale: [0.94, 1.02] },
-  { x: [0, -0.5], y: [0, 0.5],  scale: [0.92, 1.01] },
-  { x: [0, 0.5],  y: [0, -1],   scale: [0.93, 1.02] },
-  { x: [0, -0.5], y: [0, 0.5],  scale: [0.94, 1.02] },
-];
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -164,7 +145,7 @@ export default function HeroElegant() {
   const rotatingTexts = t.raw('rotatingTexts') as string[];
   const [textIndex, setTextIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
-  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
+  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>([...PUBLIC_HERO_MEDIA_FALLBACK]);
   const [videoReady, setVideoReady] = useState(false);
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
@@ -215,7 +196,7 @@ export default function HeroElegant() {
   }, []);
 
   const currentItem = mediaItems[slideIndex % mediaItems.length];
-  const kbDir = KB[slideIndex % KB.length];
+  const kbDir = PUBLIC_HERO_KEN_BURNS_PRESETS[slideIndex % PUBLIC_HERO_KEN_BURNS_PRESETS.length];
 
   // Rotate text
   useEffect(() => {
@@ -305,7 +286,7 @@ export default function HeroElegant() {
                 animate={
                   reduceMotion
                     ? {}
-                    : { x: kbDir.x, y: kbDir.y, scale: kbDir.scale }
+                    : { x: [...kbDir.x], y: [...kbDir.y], scale: [...kbDir.scale] }
                 }
                 transition={{ duration: IMAGE_DURATION / 1000, ease: 'linear' }}
               >

@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import type { TimelineEventDTO, TimelineEventType } from '@/lib/customer-hub/dto';
 import { DEFAULT_LOCALE } from '@/lib/constants';
+import { CUSTOMER_TIMELINE_EVENT_META, CUSTOMER_TIMELINE_FILTER_OPTIONS } from '@/lib/constants/admin';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES I CONSTANTS
@@ -11,61 +12,6 @@ import { DEFAULT_LOCALE } from '@/lib/constants';
 
 type TimelineFilter = 'all' | 'proposals' | 'bookings' | 'tasks' | 'comms';
 
-const FILTER_OPTIONS: Array<{ key: TimelineFilter; label: string; icon: string }> = [
-  { key: 'all', label: 'Tot', icon: '📋' },
-  { key: 'proposals', label: 'Pressupostos', icon: '📄' },
-  { key: 'bookings', label: 'Reserves', icon: '📅' },
-  { key: 'tasks', label: 'Tasques', icon: '✅' },
-  { key: 'comms', label: 'Comunicacions', icon: '💬' },
-];
-
-const EVENT_TYPE_FILTER: Record<TimelineEventType, TimelineFilter> = {
-  PROPOSAL_CREATED: 'proposals',
-  PROPOSAL_SENT: 'proposals',
-  PROPOSAL_ACCEPTED: 'proposals',
-  BOOKING_CREATED: 'bookings',
-  BOOKING_CONFIRMED: 'bookings',
-  TASK_CREATED: 'tasks',
-  TASK_DONE: 'tasks',
-  MESSAGE_SENT: 'comms',
-  EMAIL_RECEIVED: 'comms',
-  WHATSAPP_SENT: 'comms',
-  PHONE_CALL: 'comms',
-  NOTE_ADDED: 'comms',
-  ACTIVITY: 'comms',
-};
-
-const EVENT_ICONS: Partial<Record<TimelineEventType, string>> = {
-  PROPOSAL_CREATED: '📄',
-  PROPOSAL_SENT: '📤',
-  PROPOSAL_ACCEPTED: '✅',
-  BOOKING_CREATED: '📅',
-  BOOKING_CONFIRMED: '🎉',
-  TASK_CREATED: '📝',
-  TASK_DONE: '✓',
-  MESSAGE_SENT: '✉️',
-  EMAIL_RECEIVED: '📩',
-  WHATSAPP_SENT: '💬',
-  PHONE_CALL: '📞',
-  NOTE_ADDED: '📌',
-  ACTIVITY: '•',
-};
-
-const EVENT_COLORS: Partial<Record<TimelineEventType, string>> = {
-  PROPOSAL_CREATED: 'border-l-cyan-500',
-  PROPOSAL_SENT: 'border-l-cyan-400',
-  PROPOSAL_ACCEPTED: 'border-l-emerald-500',
-  BOOKING_CREATED: 'border-l-indigo-500',
-  BOOKING_CONFIRMED: 'border-l-emerald-400',
-  TASK_CREATED: 'border-l-amber-500',
-  TASK_DONE: 'border-l-emerald-500',
-  MESSAGE_SENT: 'border-l-violet-500',
-  EMAIL_RECEIVED: 'border-l-violet-400',
-  WHATSAPP_SENT: 'border-l-green-500',
-  PHONE_CALL: 'border-l-sky-500',
-  NOTE_ADDED: 'border-l-white/20',
-  ACTIVITY: 'border-l-white/10',
-};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILS
@@ -124,7 +70,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
 
   const filteredTimeline = useMemo(() => {
     if (filter === 'all') return timeline;
-    return timeline.filter((event) => EVENT_TYPE_FILTER[event.type] === filter);
+    return timeline.filter((event) => CUSTOMER_TIMELINE_EVENT_META[event.type]?.filter === filter);
   }, [timeline, filter]);
 
   const groupedTimeline = useMemo(() => {
@@ -159,7 +105,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
 
       {/* Filters */}
       <div className="mt-3 flex flex-wrap gap-1">
-        {FILTER_OPTIONS.map((opt) => (
+        {CUSTOMER_TIMELINE_FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.key}
             type="button"
@@ -219,8 +165,9 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
 // ═══════════════════════════════════════════════════════════════════════════
 
 function EventCard({ event }: { event: TimelineEventDTO }) {
-  const icon = EVENT_ICONS[event.type] || '•';
-  const borderColor = EVENT_COLORS[event.type] || 'border-l-white/10';
+  const meta = CUSTOMER_TIMELINE_EVENT_META[event.type];
+  const icon = meta?.icon || '•';
+  const borderColor = meta?.borderClass || 'border-l-white/10';
 
   return (
     <article

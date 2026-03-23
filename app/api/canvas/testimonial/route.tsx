@@ -7,25 +7,10 @@
 
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { API_CANVAS_TESTIMONIAL_PRESETS } from '@/lib/constants';
 import { getInitials, getFirstName } from '@/lib/utils/normalize';
 import { log } from '@/lib/logger';
 
-const CANVAS_PRESETS = {
-  instagramStory: {
-    width: 1080,
-    height: 1920,
-    backgroundColor: '#0a0a0a',
-    accentColor: '#f97316',
-    textColor: '#ffffff',
-  },
-  instagramPost: {
-    width: 1080,
-    height: 1080,
-    backgroundColor: '#0a0a0a',
-    accentColor: '#f97316',
-    textColor: '#ffffff',
-  },
-} as const;
 
 function translateEventType(eventType?: string): string {
   const translations: Record<string, string> = {
@@ -55,9 +40,9 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get('code') || 'ORBITA10';
     const discount = searchParams.get('discount') || '10';
     const eventType = searchParams.get('eventType');
-    const preset = (searchParams.get('preset') || 'instagramStory') as keyof typeof CANVAS_PRESETS;
+    const preset = (searchParams.get('preset') || 'instagramStory') as keyof typeof API_CANVAS_TESTIMONIAL_PRESETS;
 
-    const config = CANVAS_PRESETS[preset] || CANVAS_PRESETS.instagramStory;
+    const config = API_CANVAS_TESTIMONIAL_PRESETS[preset] || API_CANVAS_TESTIMONIAL_PRESETS.instagramStory;
     const { width, height, backgroundColor, accentColor, textColor } = config;
 
     const firstName = getFirstName(name);

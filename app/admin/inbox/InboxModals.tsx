@@ -3,18 +3,11 @@
 import { useState } from 'react';
 import { log } from '@/lib/logger';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_INBOX_FALLBACK_PACK_OPTIONS } from '@/lib/constants/admin';
 import type { UnifiedEmail, QuotePackOption } from './inbox-types';
 
-const FALLBACK_PACK_OPTIONS: QuotePackOption[] = [
-  { id: 'disco-basico', label: 'Bàsic (Festes)', price: 350 },
-  { id: 'disco-completo', label: 'Complet (Festes)', price: 400 },
-  { id: 'disco-premium', label: 'Premium (Festes)', price: 700 },
-  { id: 'bodas-premium', label: 'Premium (Bodes)', price: 800 },
-  { id: 'empresas-evento', label: 'Estàndard (Empreses)', price: 850 },
-];
-
 function resolvePackOptions(packOptions: QuotePackOption[]): QuotePackOption[] {
-  return packOptions.length > 0 ? packOptions : FALLBACK_PACK_OPTIONS;
+  return packOptions.length > 0 ? packOptions : [...ADMIN_INBOX_FALLBACK_PACK_OPTIONS];
 }
 
 export function ComposeModal({

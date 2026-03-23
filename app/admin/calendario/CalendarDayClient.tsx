@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateFull, DEFAULT_LOCALE, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, STATUS_BADGES, HOURS, parseHour, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
 
 export default function CalendarDayClient() {
   const toast = useToast();
@@ -251,7 +251,7 @@ export default function CalendarDayClient() {
                       </div>
                       <div className="flex-1 flex items-stretch gap-1 px-2 py-1">
                         {bookingsAtHour.map((b) => {
-                          const badge = STATUS_BADGES[b.estado || ''] || STATUS_BADGES.PENDING;
+                          const badge = getBookingStatusBadgeDisplay(b.estado || '');
                           return (
                             <Link
                               key={`${b.id}-${hour}`}
@@ -331,7 +331,7 @@ export default function CalendarDayClient() {
 
             {/* Booking details */}
             {dayData.reservas.map((b) => {
-              const badge = STATUS_BADGES[b.estado || ''] || STATUS_BADGES.PENDING;
+              const badge = getBookingStatusBadgeDisplay(b.estado || '');
               return (
                 <Link
                   key={b.id}
@@ -340,7 +340,7 @@ export default function CalendarDayClient() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold">{resolveServiceLabel(b)}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
                   </div>
                   {b.clientName && (
                     <p className="text-sm">{b.clientName}</p>

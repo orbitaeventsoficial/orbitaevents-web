@@ -5,77 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
-
-// ═══════════════════════════════════════════════════════════════
-// IMATGES - Fotos reals del casament
-// ═══════════════════════════════════════════════════════════════
-
-const IMATGES = {
-  hero: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
-  heroAlt: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-02.avif',
-  sostre: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
-  sobreComplet: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-04.avif',
-  sobrePlat: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
-  sobreDetall: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.avif',
-  provaSocial: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-07.avif',
-  sobrePergami: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-08.avif',
-  mussol: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-09.avif',
-  pergaminsBilingue: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.avif',
-  pergaminsCintes: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-11.avif',
-  veles: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.avif',
-  botigueta: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.avif',
-  escombres: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
-};
-
-// ═══════════════════════════════════════════════════════════════
-// CASES DE L'ESCOLA DE MÀGIA - Només dades estàtiques (colors, gradients)
-// Textos via t('monMagic.houses.{id}.nom') i t('monMagic.houses.{id}.descripcio')
-// ═══════════════════════════════════════════════════════════════
-
-const CASES_MAGIA_DATA = [
-  { id: 'escola', color: '#1A1A1A', colorLacre: '#D4AF37', gradient: 'from-amber-600 to-amber-800', animal: '🏰' },
-  { id: 'lleons', color: '#740001', colorLacre: '#740001', gradient: 'from-red-700 to-red-900', animal: '🦁' },
-  { id: 'serps', color: '#1A472A', colorLacre: '#1A472A', gradient: 'from-green-700 to-green-900', animal: '🐍' },
-  { id: 'teixons', color: '#FFD700', colorLacre: '#1A1A1A', gradient: 'from-yellow-500 to-amber-600', animal: '🦡' },
-  { id: 'aguiles', color: '#0E1A40', colorLacre: '#0E1A40', gradient: 'from-blue-800 to-blue-950', animal: '🦅' },
-];
-
-// ═══════════════════════════════════════════════════════════════
-// PRODUCTES - Només dades estàtiques (preus, emojis)
-// Textos via t('monMagic.productes.{key}.*')
-// ═══════════════════════════════════════════════════════════════
-
-const PRODUCTES_DATA = [
-  { id: 'sobre-complet', key: 'sobreComplet', emoji: '✉️', preuUnitat: 10, preuPack: 8, packMinim: 50, destacat: true, numCaracteristiques: 6 },
-  { id: 'pergami-amor', key: 'pergamiAmor', emoji: '📜', preuUnitat: 4, preuPack: 3, packMinim: 30, numCaracteristiques: 6 },
-  { id: 'cartell-decoratiu', key: 'cartellDecoratiu', emoji: '🪧', preuUnitat: 15, preuPack: 12, packMinim: 5, numCaracteristiques: 6 },
-];
-
-// ═══════════════════════════════════════════════════════════════
-// PACKS AMB DESCOMPTE - Només dades estàtiques (preus, emojis)
-// Textos via t('monMagic.packs.{key}.*')
-// ═══════════════════════════════════════════════════════════════
-
-const PACKS_DATA = [
-  { id: 'pack-basic', key: 'basic', emoji: '📨', preuPack50: 450, preuPack80: 680, preuPack100: 800, estalviPercent: 10, numCaracteristiques: 5 },
-  { id: 'pack-premium', key: 'premium', emoji: '🏆', preuPack50: 650, preuPack80: 950, preuPack100: 1100, estalviPercent: 15, destacat: true, numCaracteristiques: 6 },
-];
-
-// ═══════════════════════════════════════════════════════════════
-// EXTRA: MULTI-SEGELL - Només preus (textos via t('monMagic.multiSegell.*'))
-// ═══════════════════════════════════════════════════════════════
-
-const EXTRA_MULTISEGELL = {
-  preuExtra50: 75,
-  preuExtra80: 100,
-  preuExtra100: 120,
-};
-
-// ═══════════════════════════════════════════════════════════════
-// FAQS - Només keys, textos via t('monMagic.faqs.q{n}.*')
-// ═══════════════════════════════════════════════════════════════
-
-const FAQS_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'];
+import {
+  PUBLIC_MON_MAGIC_CANDLE_DATA,
+  PUBLIC_MON_MAGIC_FAQ_KEYS,
+  PUBLIC_MON_MAGIC_HOUSES,
+  PUBLIC_MON_MAGIC_IMAGES,
+  PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA,
+  PUBLIC_MON_MAGIC_PACKS,
+  PUBLIC_MON_MAGIC_PRODUCTS,
+} from '@/lib/constants/index';
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT: Client-only Stars (to avoid hydration mismatch)
@@ -126,35 +64,12 @@ function ClientOnlyStars() {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-// COMPONENT: Veles Flotants (Gran Saló)
-// ═══════════════════════════════════════════════════════════════
-
-// Pre-computed candle data to avoid hydration mismatch
-const CANDLE_DATA = [
-  { id: 0, left: '5%', delay: 2.3, duration: 5.1, size: 22 },
-  { id: 1, left: '11%', delay: 0.8, duration: 4.3, size: 26 },
-  { id: 2, left: '17%', delay: 4.1, duration: 5.8, size: 19 },
-  { id: 3, left: '23%', delay: 1.5, duration: 4.7, size: 28 },
-  { id: 4, left: '29%', delay: 3.2, duration: 5.4, size: 21 },
-  { id: 5, left: '35%', delay: 0.3, duration: 4.1, size: 25 },
-  { id: 6, left: '41%', delay: 2.9, duration: 5.6, size: 23 },
-  { id: 7, left: '47%', delay: 1.1, duration: 4.5, size: 27 },
-  { id: 8, left: '53%', delay: 4.5, duration: 5.2, size: 20 },
-  { id: 9, left: '59%', delay: 0.6, duration: 4.9, size: 24 },
-  { id: 10, left: '65%', delay: 3.7, duration: 5.0, size: 29 },
-  { id: 11, left: '71%', delay: 1.8, duration: 4.2, size: 22 },
-  { id: 12, left: '77%', delay: 2.5, duration: 5.5, size: 26 },
-  { id: 13, left: '83%', delay: 0.9, duration: 4.8, size: 21 },
-  { id: 14, left: '89%', delay: 3.4, duration: 5.3, size: 25 },
-];
-
 function FloatingCandles() {
   const reduceMotion =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) return null;
 
-  const candles = CANDLE_DATA;
+  const candles = PUBLIC_MON_MAGIC_CANDLE_DATA;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -216,12 +131,12 @@ export default function ProductesMonMagic() {
   const [casaSeleccionada, setCasaSeleccionada] = useState('escola');
   const [multiSegell, setMultiSegell] = useState(false);
 
-  const casaActual = CASES_MAGIA_DATA.find(c => c.id === casaSeleccionada) || CASES_MAGIA_DATA[0];
+  const casaActual = PUBLIC_MON_MAGIC_HOUSES.find(c => c.id === casaSeleccionada) || PUBLIC_MON_MAGIC_HOUSES[0];
 
   // Calcular preu extra multi-segell
-  const preuMultiSegell = quantitat === 50 ? EXTRA_MULTISEGELL.preuExtra50
-    : quantitat === 80 ? EXTRA_MULTISEGELL.preuExtra80
-    : EXTRA_MULTISEGELL.preuExtra100;
+  const preuMultiSegell = quantitat === 50 ? PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA.preuExtra50
+    : quantitat === 80 ? PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA.preuExtra80
+    : PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA.preuExtra100;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] via-[#0f0f1a] to-black">
@@ -326,7 +241,7 @@ export default function ProductesMonMagic() {
               className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group"
             >
               <Image
-                src={IMATGES.sobreComplet}
+                src={PUBLIC_MON_MAGIC_IMAGES.sobreComplet}
                 alt={t('altSobreObert')}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
@@ -353,7 +268,7 @@ export default function ProductesMonMagic() {
               className="relative rounded-2xl overflow-hidden aspect-square group"
             >
               <Image
-                src={IMATGES.sobrePlat}
+                src={PUBLIC_MON_MAGIC_IMAGES.sobrePlat}
                 alt={t('altSobrePlat')}
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
@@ -371,7 +286,7 @@ export default function ProductesMonMagic() {
               className="relative rounded-2xl overflow-hidden aspect-square group"
             >
               <Image
-                src={IMATGES.provaSocial}
+                src={PUBLIC_MON_MAGIC_IMAGES.provaSocial}
                 alt={t('altConvidada')}
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
@@ -395,7 +310,7 @@ export default function ProductesMonMagic() {
               className="relative rounded-2xl overflow-hidden aspect-square group"
             >
               <Image
-                src={IMATGES.mussol}
+                src={PUBLIC_MON_MAGIC_IMAGES.mussol}
                 alt={t('altMussol')}
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
@@ -413,7 +328,7 @@ export default function ProductesMonMagic() {
               className="relative rounded-2xl overflow-hidden aspect-square group"
             >
               <Image
-                src={IMATGES.escombres}
+                src={PUBLIC_MON_MAGIC_IMAGES.escombres}
                 alt={t('altEscombres')}
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
@@ -450,7 +365,7 @@ export default function ProductesMonMagic() {
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto mb-8">
-            {CASES_MAGIA_DATA.map((casa, index) => (
+            {PUBLIC_MON_MAGIC_HOUSES.map((casa, index) => (
               <motion.button
                 key={casa.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -517,7 +432,7 @@ export default function ProductesMonMagic() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {PRODUCTES_DATA.map((producte, index) => (
+            {PUBLIC_MON_MAGIC_PRODUCTS.map((producte, index) => (
               <motion.div
                 key={producte.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -596,7 +511,7 @@ export default function ProductesMonMagic() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {PACKS_DATA.map((pack, index) => (
+            {PUBLIC_MON_MAGIC_PACKS.map((pack, index) => (
               <motion.div
                 key={pack.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -759,7 +674,7 @@ export default function ProductesMonMagic() {
           </h2>
 
           <div className="max-w-2xl mx-auto space-y-3">
-            {FAQS_KEYS.map((faqKey, index) => (
+            {PUBLIC_MON_MAGIC_FAQ_KEYS.map((faqKey, index) => (
               <motion.div
                 key={index}
                 className="bg-white/5 rounded-xl overflow-hidden"

@@ -10,26 +10,13 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
-import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { PUBLIC_HERO_MEDIA_FALLBACK, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // ── Media items (mateixos que desktop) ──────────────────────────────────────
 
-interface HeroMediaItem {
-  id: string;
-  url: string;
-  type: 'video' | 'image';
-  label: string;
-}
+type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
 
-const FALLBACK: HeroMediaItem[] = [
-  { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo' },
-  { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil' },
-  { id: 'img-bodas-04', url: '/img/portfolio/bodas/bodas-04.avif', type: 'image', label: 'Bodes' },
-  { id: 'img-halloween-01', url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', type: 'image', label: 'Halloween' },
-  { id: 'img-magic-05', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif', type: 'image', label: 'Món Màgic' },
-  { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses' },
-];
 
 const IMAGE_DURATION = 6000;
 const VIDEO_MIN_DURATION = 10000;
@@ -166,7 +153,7 @@ export default function MobileHeroUltimate() {
   const t = useTranslations('mobileHero');
   const reduceMotion = useReducedMotion();
   const [slideIndex, setSlideIndex] = useState(0);
-  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>(FALLBACK);
+  const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>([...PUBLIC_HERO_MEDIA_FALLBACK]);
   const [videoReady, setVideoReady] = useState(false);
 
   // Fetch media from API

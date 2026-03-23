@@ -129,9 +129,26 @@ export const STATUS_CONFIG: Record<string, { label: string; bg: string; text: st
   RETIRED: { label: 'Retirat', bg: 'bg-slate-500/20', text: 'text-slate-400' },
 };
 
+export const CATEGORY_ADMIN_TONE: Record<string, string> = {
+  SOUND: 'admin-tone-bg-info',
+  LIGHTING: 'admin-tone-bg-warning',
+  EFFECTS: 'admin-tone-bg-neutral',
+  STRUCTURE: 'admin-tone-bg-neutral',
+  CABLING: 'admin-tone-bg-success',
+  TECH: 'admin-tone-bg-info',
+  DECORATION_HP: 'admin-tone-bg-warning',
+  DECORATION_HW: 'admin-tone-bg-warning',
+  DECORATION_GEN: 'admin-tone-bg-neutral',
+  CONSUMABLE: 'admin-tone-bg-danger',
+};
+
 
 export function getInventoryCategoryDisplay(category: string) {
   return CATEGORY_CONFIG[category] || { label: category, icon: '📦', color: 'gray' };
+}
+
+export function getInventoryCategoryAdminTone(category: string) {
+  return CATEGORY_ADMIN_TONE[category] || 'admin-tone-bg-neutral';
 }
 
 export function getInventoryStatusDisplay(status: string) {

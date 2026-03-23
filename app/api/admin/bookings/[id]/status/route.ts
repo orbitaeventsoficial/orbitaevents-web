@@ -4,13 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { changeBookingStatus } from '@/lib/services/bookingRouteService';
+import { BOOKING_STATUS_VALUES } from '@/lib/constants';
 
 interface Params {
   params: { id: string };
 }
 
-const VALID_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED'] as const;
-type BookingStatus = typeof VALID_STATUSES[number];
+type BookingStatus = typeof BOOKING_STATUS_VALUES[number];
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const { status } = (await req.json()) as { status: BookingStatus };
 
-    if (!status || !VALID_STATUSES.includes(status)) {
+    if (!status || !BOOKING_STATUS_VALUES.includes(status)) {
       return NextResponse.json({ error: 'Estat invàlid' }, { status: 400 });
     }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { ADMIN_SCRIPT_CATEGORY_INFO } from '@/lib/constants/admin';
 
 interface ScriptInfo {
   name: string;
@@ -224,14 +225,6 @@ const SCRIPTS: ScriptInfo[] = [
   },
 ];
 
-const CATEGORY_INFO: Record<ScriptInfo['category'], { label: string; icon: string; tone: string }> = {
-  seed: { label: 'Dades inicials', icon: '🌱', tone: 'ap-kpi--success' },
-  sync: { label: 'Sincronització', icon: '🔄', tone: 'ap-kpi--info' },
-  check: { label: 'Verificació', icon: '🔍', tone: 'admin-tone-border-info admin-tone-bg-info' },
-  report: { label: 'Informes', icon: '📊', tone: 'admin-tone-border-violet admin-tone-bg-violet' },
-  fix: { label: 'Correcció', icon: '🔧', tone: 'ap-kpi--warning' },
-  audit: { label: 'Auditoria', icon: '🛡️', tone: 'ap-kpi--danger' },
-};
 
 export default function ScriptsClient() {
   const [filter, setFilter] = useState<string | null>(null);
@@ -260,7 +253,7 @@ export default function ScriptsClient() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {Object.entries(CATEGORY_INFO).map(([key, info]) => {
+        {(Object.entries(ADMIN_SCRIPT_CATEGORY_INFO) as Array<[ScriptInfo['category'], (typeof ADMIN_SCRIPT_CATEGORY_INFO)[ScriptInfo['category']]]>).map(([key, info]) => {
           const count = SCRIPTS.filter((s) => s.category === key).length;
           const isActive = filter === key;
           return (
@@ -285,7 +278,7 @@ export default function ScriptsClient() {
       )}
 
       {Object.entries(grouped).map(([cat, scripts]) => {
-        const info = CATEGORY_INFO[cat as ScriptInfo['category']];
+        const info = ADMIN_SCRIPT_CATEGORY_INFO[cat as ScriptInfo['category']];
         return (
           <div key={cat}>
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide admin-tone-text-neutral">

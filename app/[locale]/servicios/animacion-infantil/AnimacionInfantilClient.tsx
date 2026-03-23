@@ -33,39 +33,35 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import {
+  PUBLIC_CHILDREN_ANIMATION_INFO_ITEMS,
+  PUBLIC_CHILDREN_ANIMATION_PACKS,
+  PUBLIC_CHILDREN_ANIMATION_SERVICES,
+} from '@/lib/constants/index';
 
-// Serveis d'animacio infantil (solo datos estaticos)
-const SERVEIS_DATA = [
-  { id: 'jocs', icon: Gamepad2, color: 'from-pink-500 to-rose-500', bgColor: 'bg-pink-500/10', borderColor: 'border-pink-500/30' },
-  { id: 'pintacares', icon: Palette, color: 'from-purple-500 to-violet-500', bgColor: 'bg-purple-500/10', borderColor: 'border-purple-500/30' },
-  { id: 'magia', icon: Wand2, color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-500/10', borderColor: 'border-blue-500/30' },
-  { id: 'globoflexia', icon: Heart, color: 'from-red-500 to-orange-500', bgColor: 'bg-red-500/10', borderColor: 'border-red-500/30' },
-  { id: 'tallers', icon: Scissors, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-500/10', borderColor: 'border-green-500/30' },
-  { id: 'musica', icon: Music, color: 'from-amber-500 to-yellow-500', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/30' },
-];
+const SERVICE_ICONS = {
+  Gamepad2,
+  Palette,
+  Wand2,
+  Heart,
+  Scissors,
+  Music,
+} as const;
 
-// Packs d'animacio (solo datos estaticos)
-const PACKS_DATA = [
-  { id: 'basic', hours: 2, price: 150, recommended: false },
-  { id: 'complet', hours: 3, price: 220, recommended: true },
-  { id: 'premium', hours: 4, price: 320, recommended: false },
-];
-
-// Info items con iconos
-const INFO_ITEMS = [
-  { id: 'experience', icon: Star },
-  { id: 'ages', icon: Users },
-  { id: 'punctuality', icon: Clock },
-  { id: 'coverage', icon: MapPin },
-];
+const INFO_ICONS = {
+  Star,
+  Users,
+  Clock,
+  MapPin,
+} as const;
 
 export default function AnimacionInfantilClient() {
   const t = useTranslations('pages.animacion');
-  const [selectedPack, setSelectedPack] = useState('complet');
+  const [selectedPack, setSelectedPack] = useState<(typeof PUBLIC_CHILDREN_ANIMATION_PACKS)[number]['id']>('complet');
 
   // URL de contacte
   const getContactUrl = (packId: string) => {
-    const pack = PACKS_DATA.find(p => p.id === packId);
+    const pack = PUBLIC_CHILDREN_ANIMATION_PACKS.find(p => p.id === packId);
     const params = new URLSearchParams({
       servicio: 'animacion-infantil',
       pack: t(`packs.names.${packId}`),
@@ -134,8 +130,8 @@ export default function AnimacionInfantilClient() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {SERVEIS_DATA.map((servei, idx) => {
-            const Icon = servei.icon;
+          {PUBLIC_CHILDREN_ANIMATION_SERVICES.map((servei, idx) => {
+            const Icon = SERVICE_ICONS[servei.iconKey];
 
             return (
               <motion.div
@@ -169,7 +165,7 @@ export default function AnimacionInfantilClient() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {PACKS_DATA.map((pack) => {
+          {PUBLIC_CHILDREN_ANIMATION_PACKS.map((pack) => {
             const isSelected = selectedPack === pack.id;
             const features = t.raw(`packs.features.${pack.id}`) as string[];
 
@@ -253,8 +249,8 @@ export default function AnimacionInfantilClient() {
           </h3>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {INFO_ITEMS.map((item) => {
-              const Icon = item.icon;
+            {PUBLIC_CHILDREN_ANIMATION_INFO_ITEMS.map((item) => {
+              const Icon = INFO_ICONS[item.iconKey];
               return (
                 <div key={item.id} className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0">

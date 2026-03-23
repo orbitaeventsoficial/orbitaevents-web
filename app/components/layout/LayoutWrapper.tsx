@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { trackPageView } from '@/app/lib/analytics';
+import { APP_IMMERSIVE_PAGES } from '@/lib/constants';
 import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, MOBILE_INTRO_COMPLETE_EVENT, MOBILE_INTRO_STORAGE_KEY } from '@/lib/intro';
 
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
@@ -47,13 +48,6 @@ const Footer = dynamic(
   () => import('@/app/components/ui/footer'),
   { ssr: false }
 );
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Pàgines immersives sense header/footer
-const IMMERSIVE_PAGES = ['/sensorial', '/respira'];
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
@@ -229,7 +223,7 @@ const introMode = getClientIntroMode({
   }, [removeOverlay]);
 
   // Comprovar si és pàgina immersiva
-  const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
+  const isImmersive = APP_IMMERSIVE_PAGES.some(page => pathname?.includes(page));
   const isIntroActive = showIntro || hideHeaderOnMobileIntro;
 
   // ─────────────────────────────────────────────────────────────────────────

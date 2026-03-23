@@ -22,7 +22,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { WHATSAPP_NUMBER, toIntlLocale } from '@/lib/constants';
+import { PUBLIC_CALENDAR_DAY_SHORT, PUBLIC_CALENDAR_MONTH_NAMES, PUBLIC_CALENDAR_MONTH_SHORT, PUBLIC_CALENDAR_SOCIAL_PROOF_INITIALS, WHATSAPP_NUMBER, toIntlLocale } from '@/lib/constants/index';
 import { useAvailability } from '@/hooks/usePublicData';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
@@ -61,29 +61,6 @@ interface MonthData {
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════════════════
-
-const MONTH_NAMES: Record<CalendarLocale, string[]> = {
-  es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-  ca: ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
-       'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'],
-  en: ['January', 'February', 'March', 'April', 'May', 'June',
-       'July', 'August', 'September', 'October', 'November', 'December'],
-};
-
-const MONTH_SHORT: Record<CalendarLocale, string[]> = {
-  es: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'],
-  ca: ['GEN', 'FEB', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DES'],
-  en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-};
-
-const DAYS_SHORT: Record<CalendarLocale, string[]> = {
-  es: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
-  ca: ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'],
-  en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-};
-
-const SOCIAL_PROOF_INITIALS = ['G', 'I', 'X'] as const;
 
 
 // Traduccions per reasons
@@ -143,8 +120,8 @@ function generateMonthData(month: number, year: number, locale: CalendarLocale =
   return {
     month,
     year,
-    name: MONTH_NAMES[locale][month],
-    shortName: MONTH_SHORT[locale][month],
+    name: PUBLIC_CALENDAR_MONTH_NAMES[locale][month],
+    shortName: PUBLIC_CALENDAR_MONTH_SHORT[locale][month],
     days,
     stats: { totalSaturdays, availableSaturdays, status }
   };
@@ -233,7 +210,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
       
       {/* Días de la semana */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {DAYS_SHORT[locale].map((day, i) => (
+        {PUBLIC_CALENDAR_DAY_SHORT[locale].map((day, i) => (
           <div
             key={day}
             className={`
@@ -676,7 +653,7 @@ export default function CalendarioUrgencia({
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
           <span className="flex -space-x-1.5">
-            {SOCIAL_PROOF_INITIALS.map((initial, i) => (
+            {PUBLIC_CALENDAR_SOCIAL_PROOF_INITIALS.map((initial, i) => (
               <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0A0A0A] flex items-center justify-center text-[8px] text-black font-bold">
                 {initial}
               </span>

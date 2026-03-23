@@ -1,39 +1,12 @@
 import type { Messages } from 'next-intl';
+import { WEDDING_COVERAGE_ZONE_DEFINITIONS } from '@/lib/coverage';
 
-const COVERAGE_ZONE_DEFINITIONS = [
-  {
-    href: '/servicios/dj-bodas-maresme',
-    icon: '🏖️',
-    nameKey: 'coverage.zones.maresme.name',
-    descKey: 'coverage.zones.maresme.desc',
-    fallbackName: 'Maresme',
-    fallbackDesc: 'Bodas frente al mar y fincas costeras',
-  },
-  {
-    href: '/servicios/dj-bodas-girona',
-    icon: '🏛️',
-    nameKey: 'coverage.zones.girona.name',
-    descKey: 'coverage.zones.girona.desc',
-    fallbackName: 'Girona',
-    fallbackDesc: 'Masías, castillos y eventos elegantes',
-  },
-  {
-    href: '/servicios/dj-bodas-costa-brava',
-    icon: '🌊',
-    nameKey: 'coverage.zones.costaBrava.name',
-    descKey: 'coverage.zones.costaBrava.desc',
-    fallbackName: 'Costa Brava',
-    fallbackDesc: 'Celebraciones junto al mar con montaje completo',
-  },
-  {
-    href: '/servicios/dj-bodas-valles',
-    icon: '🏡',
-    nameKey: 'coverage.zones.valles.name',
-    descKey: 'coverage.zones.valles.desc',
-    fallbackName: 'Vallès',
-    fallbackDesc: 'Bodas en jardines, masías y espacios privados',
-  },
-];
+export type WeddingCoverageZone = {
+  href: string;
+  icon: string;
+  name: string;
+  desc: string;
+};
 
 function isI18nKey(value: string | null | undefined): value is string {
   return typeof value === 'string' && /^(configurator|pages|services|extras)\./.test(value);
@@ -87,8 +60,8 @@ function resolveCoverageText(
   return fallback;
 }
 
-export function getWeddingCoverageZones(messages: Messages | undefined, t: (key: string) => string) {
-  return COVERAGE_ZONE_DEFINITIONS.map((zone) => ({
+export function getWeddingCoverageZones(messages: Messages | undefined, t: (key: string) => string): WeddingCoverageZone[] {
+  return WEDDING_COVERAGE_ZONE_DEFINITIONS.map((zone) => ({
     href: zone.href,
     icon: zone.icon,
     name: resolveCoverageText(messages, t, zone.nameKey, zone.fallbackName),

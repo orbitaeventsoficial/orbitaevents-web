@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { PUBLIC_VERIFIED_CUSTOMER_LABELS } from '@/lib/constants/index';
 import { prisma } from '@/lib/prisma';
 
 type Locale = 'ca' | 'es' | 'en';
@@ -13,12 +14,6 @@ type SubmitPublicTestimonialInput = {
   videoUrl?: string;
   allowGoogleShare: boolean;
   consentPhotoPublication: boolean;
-};
-
-const VERIFIED_CUSTOMER_LABEL: Record<Locale, string> = {
-  ca: 'Client verificat',
-  es: 'Cliente verificado',
-  en: 'Verified customer',
 };
 
 function generateDiscountCode(): string {
@@ -83,7 +78,7 @@ export async function listApprovedPublicTestimonials(limit: number, offset: numb
   return {
     testimonials: testimonials.map((testimonial) => ({
       id: testimonial.id,
-      name: testimonial.showName ? testimonial.customer.name : VERIFIED_CUSTOMER_LABEL[locale],
+      name: testimonial.showName ? testimonial.customer.name : PUBLIC_VERIFIED_CUSTOMER_LABELS[locale],
       text: testimonial.text,
       rating: testimonial.rating,
       photoUrl: testimonial.showPhoto ? testimonial.photoUrl : null,

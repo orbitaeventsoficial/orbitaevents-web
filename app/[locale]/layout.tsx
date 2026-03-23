@@ -18,6 +18,7 @@ import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getAllPacks, getMinPriceByService } from '@/config/packs-config';
+import { getPublicOrganizationJsonLd } from '@/lib/constants';
 
 // Components
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
@@ -53,172 +54,13 @@ const FIESTAS_PRICE = getMinPriceByService('fiestas');
 
 const INTRO_BOOTSTRAP_SCRIPT = buildIntroBootstrapScript();
 
-const JSON_LD_ORGANIZATION = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  '@id': absoluteUrl('/#organization'),
-  name: 'Orbita Events',
-  alternateName: ['Orbita Events', 'Orbita Events Barcelona', 'DJ Bodas Barcelona', 'Discomóvil Barcelona'],
-  slogan: 'Creamos la experiencia completa que imaginas',
-  description:
-    'DJ profesional y tematización completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminación LED y efectos especiales.',
-  url: getSiteUrl(),
-  foundingDate: '2023',
-  knowsAbout: [
-    'DJ para bodas',
-    'Discomóvil profesional',
-    'Eventos corporativos',
-    'Fiestas temáticas',
-    'Producción técnica',
-    'Iluminación LED',
-    'Efectos especiales',
-    'Sonido profesional',
-    'Tematización de eventos',
-    'Animación de fiestas',
-  ],
-  logo: {
-    '@type': 'ImageObject',
-    url: absoluteUrl('/img/logoplanetatextdreta.svg'),
-    width: 280,
-    height: 80,
-  },
-  image: [
-    absoluteUrl('/og-default.jpg'),
-    absoluteUrl('/img/portfolio/bodas/bodas-01.avif'),
-    absoluteUrl('/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'),
-  ],
-  telephone: SITE_CONFIG.business.phone,
-  email: SITE_CONFIG.business.email,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Granollers',
-    addressLocality: 'Granollers',
-    addressRegion: 'Barcelona',
-    postalCode: '08400',
-    addressCountry: 'ES',
-  },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: 41.6083,
-    longitude: 2.2875,
-  },
-  areaServed: [
-    { '@type': 'City', name: 'Barcelona' },
-    { '@type': 'City', name: 'Girona' },
-    { '@type': 'City', name: 'Granollers' },
-    { '@type': 'City', name: 'Mataro' },
-    { '@type': 'City', name: 'Sabadell' },
-    { '@type': 'City', name: 'Terrassa' },
-    { '@type': 'City', name: 'Badalona' },
-    { '@type': 'City', name: 'Vic' },
-    { '@type': 'City', name: 'Manresa' },
-    { '@type': 'AdministrativeArea', name: 'Maresme' },
-    { '@type': 'AdministrativeArea', name: 'Valles Oriental' },
-    { '@type': 'AdministrativeArea', name: 'Valles Occidental' },
-    { '@type': 'AdministrativeArea', name: 'Costa Brava' },
-    { '@type': 'State', name: 'Catalunya' },
-  ],
-  priceRange: PRICE_RANGE,
-  currenciesAccepted: 'EUR',
-  paymentAccepted: 'Cash, Credit Card, Bank Transfer',
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '08:00',
-      closes: '20:00',
-    },
-  ],
-  sameAs: Object.values(SITE_CONFIG.social.urls),
-  // NOTE: aggregateRating removed to fix Google Rich Results error
-  // "La ressenya té diverses puntuacions agregades" (multiple aggregate ratings)
-  // Google detects LocalBusiness schema multiple times due to RSC hydration
-  // Only add aggregateRating on a dedicated reviews page with linked reviews
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Servicios DJ y Eventos Barcelona',
-    itemListElement: [
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'DJ bodas Barcelona',
-          description:
-            'DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y baile final.',
-          provider: {
-            '@id': absoluteUrl('/#organization'),
-          },
-        },
-        price: String(BODAS_PRICE),
-        priceCurrency: 'EUR',
-        priceValidUntil: `${new Date().getFullYear()}-12-31`,
-        availability: 'https://schema.org/InStock',
-        url: absoluteUrl('/servicios/bodas'),
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Discomovil Barcelona',
-          description:
-            'Discomóvil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebración.',
-          provider: {
-            '@id': absoluteUrl('/#organization'),
-          },
-        },
-        price: String(DISCO_PRICE),
-        priceCurrency: 'EUR',
-        priceValidUntil: `${new Date().getFullYear()}-12-31`,
-        availability: 'https://schema.org/InStock',
-        url: absoluteUrl('/servicios/discomovil'),
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Fiestas tematicas y privadas',
-          description:
-            'Tematización completa para fiestas: Halloween, años 80, mundo mágico y más. Decoración, efectos y ambientación.',
-          provider: {
-            '@id': absoluteUrl('/#organization'),
-          },
-        },
-        price: String(FIESTAS_PRICE),
-        priceCurrency: 'EUR',
-        priceValidUntil: `${new Date().getFullYear()}-12-31`,
-        availability: 'https://schema.org/InStock',
-        url: absoluteUrl('/servicios/fiestas'),
-      },
-    ],
-  },
-  potentialAction: [
-    {
-      '@type': 'ReserveAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: absoluteUrl('/contacto'),
-        inLanguage: ['es', 'ca'],
-        actionPlatform: [
-          'http://schema.org/DesktopWebPlatform',
-          'http://schema.org/MobileWebPlatform',
-        ],
-      },
-      result: {
-        '@type': 'Reservation',
-        name: 'Reserva de DJ para eventos',
-      },
-    },
-    {
-      '@type': 'CommunicateAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}`,
-        inLanguage: ['es', 'ca'],
-        actionPlatform: ['http://schema.org/MobileWebPlatform'],
-      },
-    },
-  ],
-};
+const JSON_LD_ORGANIZATION = getPublicOrganizationJsonLd({
+  minServicePrice: MIN_SERVICE_PRICE,
+  maxServicePrice: MAX_SERVICE_PRICE,
+  bodasPrice: BODAS_PRICE,
+  discoPrice: DISCO_PRICE,
+  fiestasPrice: FIESTAS_PRICE,
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // METADATA

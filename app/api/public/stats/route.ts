@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { getFallbackPublicStats, getPublicStats, getPublicStatsLocale, PUBLIC_STATS_CACHE_HEADERS } from '@/lib/services/publicStatsService';
+import { PUBLIC_STATS_CACHE_HEADERS } from '@/lib/constants';
+import { getFallbackPublicStats, getPublicStats, getPublicStatsLocale } from '@/lib/services/publicStatsService';
 
 export const revalidate = 3600;
 

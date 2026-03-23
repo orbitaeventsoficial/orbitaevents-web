@@ -1,22 +1,8 @@
+import { PUBLIC_CALENDAR_MONTH_NAMES, type PublicCalendarLocale } from '@/lib/constants/index';
 import { prisma } from '@/lib/prisma';
 
 export type AvailabilityDateStatus = 'AVAILABLE' | 'BOOKED' | 'BLOCKED';
-export type AvailabilityLocale = 'es' | 'ca' | 'en';
-
-const MONTH_NAMES: Record<AvailabilityLocale, string[]> = {
-  es: [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-  ],
-  ca: [
-    'Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
-    'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre',
-  ],
-  en: [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ],
-};
+export type AvailabilityLocale = PublicCalendarLocale;
 
 function getSaturdaysOfMonth(year: number, month: number): Date[] {
   const saturdays: Date[] = [];
@@ -39,7 +25,7 @@ function toIsoDateString(date: Date): string {
 }
 
 function getMonthName(month: number, locale: AvailabilityLocale): string {
-  return MONTH_NAMES[locale][month];
+  return PUBLIC_CALENDAR_MONTH_NAMES[locale][month];
 }
 
 function getScarcityMessage(

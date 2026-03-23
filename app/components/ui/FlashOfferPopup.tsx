@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { FLASH_OFFER_BASE } from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 
 /**
@@ -35,17 +36,6 @@ interface OfferConfig {
   accentColor: string;
 }
 
-// Solo oferta flash de 250€
-const OFFER_BASE = {
-  id: 'flash-250',
-  type: 'fixed',
-  value: 250,
-  originalValue: 450,
-  href: '/contacto?pack=oferta-flash',
-  gradient: 'from-amber-500 to-orange-500',
-  accentColor: 'amber',
-} as const;
-
 const STORAGE_KEY = 'flashOfferDismissed';
 const COOKIE_CONSENT_KEY = 'orbita_cookie_consent';
 const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hores
@@ -77,12 +67,12 @@ export default function FlashOfferPopup() {
     const rawFeatures = t.raw('features');
     const features = Array.isArray(rawFeatures) ? rawFeatures : [];
     return {
-      ...OFFER_BASE,
+      ...FLASH_OFFER_BASE,
       badge: t('badge'),
       title: t('title'),
       description: t('description'),
       features,
-      cta: t('cta', { price: OFFER_BASE.value }),
+      cta: t('cta', { price: FLASH_OFFER_BASE.value }),
       finePrint: t('finePrint'),
     };
   }, [t]);

@@ -1,4 +1,4 @@
-﻿import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
@@ -6,7 +6,7 @@ import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
@@ -466,13 +466,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
         _count: true,
       });
-      const colorMap: Record<string, string> = {
-        BODA: '#f472b6', FIESTA: '#fbbf24', EMPRESA: '#60a5fa', DISCOTECA_MOVIL: '#a78bfa',
-      };
       return groups.map((g) => ({
         label: g.eventType || 'Altres',
         value: g._count,
-        color: (g.eventType && colorMap[g.eventType]) || '#34d399',
+        color: (g.eventType && EVENT_TYPE_CHART_COLORS[g.eventType]) || EVENT_TYPE_CHART_COLORS.OTHER,
       }));
     }, CacheTTL.MEDIUM).catch(() => []),
   ]);
@@ -548,4 +545,5 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     timeline, alerts, activities, healthItems, cronMap,
   };
 }
+
 

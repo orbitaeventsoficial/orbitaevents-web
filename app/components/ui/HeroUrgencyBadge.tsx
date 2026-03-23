@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { PUBLIC_MONTH_KEYS } from '@/lib/constants';
 import { useAvailability } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════
@@ -20,11 +21,6 @@ interface ProcessedAvailability {
   isHalloweenMonth: boolean;
 }
 
-const MONTH_KEYS = [
-  'january', 'february', 'march', 'april', 'may', 'june',
-  'july', 'august', 'september', 'october', 'november', 'december',
-] as const;
-
 export default function HeroUrgencyBadge() {
   const t = useTranslations('heroUrgency');
   const tCommon = useTranslations('common');
@@ -35,7 +31,7 @@ export default function HeroUrgencyBadge() {
   const availability = useMemo<ProcessedAvailability | null>(() => {
     if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {   
       const now = new Date();
-      const monthKey = MONTH_KEYS[now.getMonth()];
+      const monthKey = PUBLIC_MONTH_KEYS[now.getMonth()];
       return {
         freeSaturdays: 0,
         totalSaturdays: 0,
@@ -59,7 +55,7 @@ export default function HeroUrgencyBadge() {
     const monthNum = parseInt(monthStr, 10);
     const yearNum = parseInt(yearStr, 10);
 
-    const monthKey = MONTH_KEYS[monthNum - 1];
+    const monthKey = PUBLIC_MONTH_KEYS[monthNum - 1];
     return {
       freeSaturdays: monthData.availableSaturdays || 0,
       totalSaturdays: monthData.totalSaturdays || 0,
@@ -239,7 +235,7 @@ export function HeroUrgencyBadgeCompact() {
     const [yearStr, monthStr] = monthData.month.split('-');
     const monthNum = parseInt(monthStr, 10);
 
-    const monthKey = MONTH_KEYS[monthNum - 1];
+    const monthKey = PUBLIC_MONTH_KEYS[monthNum - 1];
     return {
       freeSaturdays: monthData.availableSaturdays || 0,
       monthName: monthKey ? tCommon(`months.${monthKey}`) : monthData.monthName,

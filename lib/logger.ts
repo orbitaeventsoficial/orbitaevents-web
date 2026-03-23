@@ -2,6 +2,8 @@
 // Sistema de logging estructurado para Òrbita Events
 // Reemplaza todos los console.error/warn/log del proyecto
 
+import { LOGGER_LEVEL_EMOJI } from '@/lib/constants';
+
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 interface LogEntry {
@@ -21,15 +23,9 @@ interface LogOptions {
   sendAlert?: boolean;
 }
 
-const EMOJI = {
-  error: '❌',
-  warn: '⚠️',
-  info: 'ℹ️',
-  debug: '🔍',
-} as const;
 
 function formatForConsole(entry: LogEntry): string {
-  const emoji = EMOJI[entry.level];
+  const emoji = LOGGER_LEVEL_EMOJI[entry.level];
   const time = new Date(entry.timestamp).toLocaleTimeString('ca-ES');
   return `${emoji} [${time}] ${entry.message}`;
 }

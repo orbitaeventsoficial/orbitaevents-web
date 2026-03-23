@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { PUBLIC_HALLOWEEN_WEDDING_FAQ_KEYS, PUBLIC_HALLOWEEN_WEDDING_FEATURE_KEYS } from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
@@ -22,20 +23,19 @@ export const metadata: Metadata = {
   },
 };
 
-const FEATURE_ICONS = {
-  theming: Ghost,
-  effects: Sparkles,
-  dj: Moon,
-  experience: Skull,
-};
 
 export default async function BodaHalloweenPage() {
   const t = await getTranslations('bodaHalloween');
   const tWhatsapp = await getTranslations('whatsappMessages');
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}?text=${encodeURIComponent(tWhatsapp('bodas'))}`;
 
-  const features = ['theming', 'effects', 'dj', 'experience'] as const;
-  const faqItems = ['q1', 'q2', 'q3', 'q4'] as const;
+  const FEATURE_ICONS = {
+    theming: Ghost,
+    effects: Sparkles,
+    dj: Moon,
+    experience: Skull,
+  } as const;
+
 
   return (
     <>
@@ -153,7 +153,7 @@ export default async function BodaHalloweenPage() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((featureKey) => {
+              {PUBLIC_HALLOWEEN_WEDDING_FEATURE_KEYS.map((featureKey) => {
                 const Icon = FEATURE_ICONS[featureKey];
                 return (
                   <div
@@ -182,7 +182,7 @@ export default async function BodaHalloweenPage() {
             </div>
 
             <div className="max-w-3xl mx-auto space-y-4">
-              {faqItems.map((faqKey) => (
+              {PUBLIC_HALLOWEEN_WEDDING_FAQ_KEYS.map((faqKey) => (
                 <div
                   key={faqKey}
                   className="bg-bg-card border border-border rounded-xl p-6"

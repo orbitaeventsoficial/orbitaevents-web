@@ -36,6 +36,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Layer guard
+        run: pnpm run arch:layer:check
+
       - name: TypeScript check
         run: npx tsc --noEmit
 

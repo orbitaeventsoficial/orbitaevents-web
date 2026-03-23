@@ -5,47 +5,11 @@ import {
   ensureCoverageAreasSetting,
   updateCoverageAreas,
 } from '@/lib/coverage';
+import { ADMIN_COVERAGE_API_MESSAGES, type AdminCoverageApiLocale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'ca' | 'es' | 'en';
-const MESSAGES: Record<Locale, Record<string, string>> = {
-  ca: {
-    gettingAreas: 'Error obtenint àrees de cobertura',
-    actionCityRequired: 'Action i city són obligatoris',
-    provinceRequired: 'Province és obligatori per afegir',
-    cityAlreadyExists: 'Aquesta ciutat ja existeix',
-    invalidAction: 'Acció no vàlida',
-    updated: 'Àrees de cobertura actualitzades correctament',
-    updatingAreas: 'Error actualitzant àrees de cobertura',
-    label: 'Àrees de cobertura',
-    description: 'Ciutats i províncies on opera Òrbita Events',
-  },
-  es: {
-    gettingAreas: 'Error obteniendo áreas de cobertura',
-    actionCityRequired: 'Action y city son requeridos',
-    provinceRequired: 'Province es requerido para añadir',
-    cityAlreadyExists: 'Esta ciudad ya existe',
-    invalidAction: 'Acción no válida',
-    updated: 'Áreas de cobertura actualizadas correctamente',
-    updatingAreas: 'Error actualizando áreas de cobertura',
-    label: 'Áreas de Cobertura',
-    description: 'Ciudades y provincias donde opera Òrbita Events',
-  },
-  en: {
-    gettingAreas: 'Error fetching coverage areas',
-    actionCityRequired: 'Action and city are required',
-    provinceRequired: 'Province is required to add a city',
-    cityAlreadyExists: 'This city already exists',
-    invalidAction: 'Invalid action',
-    updated: 'Coverage areas updated successfully',
-    updatingAreas: 'Error updating coverage areas',
-    label: 'Coverage Areas',
-    description: 'Cities and provinces where Òrbita Events operates',
-  },
-};
-
-function resolveLocale(req: NextRequest): Locale {
+function resolveLocale(req: NextRequest): AdminCoverageApiLocale {
   const lang = req.headers.get('accept-language')?.toLowerCase() || '';
   if (lang.includes('ca')) return 'ca';
   if (lang.includes('en')) return 'en';
@@ -55,7 +19,7 @@ function resolveLocale(req: NextRequest): Locale {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
-  const t = MESSAGES[resolveLocale(req)];
+  const t = ADMIN_COVERAGE_API_MESSAGES[resolveLocale(req)];
 
   try {
     const areas = await ensureCoverageAreasSetting({ label: t.label, description: t.description });
@@ -69,7 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
-  const t = MESSAGES[resolveLocale(req)];
+  const t = ADMIN_COVERAGE_API_MESSAGES[resolveLocale(req)];
 
   try {
     const body = await req.json();

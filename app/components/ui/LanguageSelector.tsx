@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { PUBLIC_LANGUAGE_CODES, PUBLIC_LANGUAGE_SHORT_NAMES } from '@/lib/constants';
 
 /**
  * 🌍 LANGUAGE SELECTOR - CA/ES/EN
@@ -53,8 +54,8 @@ const flags: Record<string, JSX.Element> = {
 };
 
 // Configuració dels idiomes - CA/ES/EN
-const languageCodes = ['ca', 'es', 'en'] as const;
-const shortNames: Record<string, string> = { ca: 'CA', es: 'ES', en: 'EN' };
+const languageCodes = PUBLIC_LANGUAGE_CODES;
+const shortNames = PUBLIC_LANGUAGE_SHORT_NAMES;
 
 interface LanguageSelectorProps {
   variant?: 'flags' | 'flags-text' | 'compact';

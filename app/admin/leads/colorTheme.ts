@@ -165,9 +165,9 @@ export const DEFAULT_BASE_COLORS: Record<string, string> = {
   URGENT: '#ef4444',
 };
 
-const ALL_OPTIONS = [...STATUS_COLOR_OPTIONS, ...PRIORITY_COLOR_OPTIONS];
+export const LEAD_COLOR_OPTIONS = [...STATUS_COLOR_OPTIONS, ...PRIORITY_COLOR_OPTIONS];
 
-export const LEAD_COLOR_DEFAULT_VARS: Record<string, string> = ALL_OPTIONS.reduce((acc, option) => {
+export const LEAD_COLOR_DEFAULT_VARS: Record<string, string> = LEAD_COLOR_OPTIONS.reduce((acc, option) => {
   const base = DEFAULT_BASE_COLORS[option.key] || '#94a3b8';
   const tones = buildToneVars(base);
   acc[option.baseVar] = tones.base;

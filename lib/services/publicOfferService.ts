@@ -1,21 +1,9 @@
+import { PUBLIC_OFFER_FALLBACK } from '@/lib/constants';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
-
-export const PUBLIC_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
-};
-
-export const FALLBACK_OFFER = {
-  isActive: false,
-  endDate: null,
-  discount: 0,
-  ctaLink: '/contacto',
-  title: '',
-  description: '',
-};
 
 export async function getPublicOffer() {
   if (!process.env.DATABASE_URL || isBuildPrerenderPhase()) {
-    return FALLBACK_OFFER;
+    return PUBLIC_OFFER_FALLBACK;
   }
 
   const { prisma } = await import('@/lib/prisma');

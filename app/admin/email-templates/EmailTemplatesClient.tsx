@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '../components/ToastProvider';
 import { SUPPORTED_LOCALES, SUPPORTED_LOCALE_LABELS } from '@/lib/constants';
+import { ADMIN_EMAIL_TEMPLATE_SOURCE_BADGE } from '@/lib/constants/admin';
 
 interface TemplateInfo {
   slug: string;
@@ -11,11 +12,6 @@ interface TemplateInfo {
   locales: { locale: string; source: 'db' | 'default'; updatedAt?: string }[];
   variables: string[];
 }
-
-const SOURCE_BADGE = {
-  db: { label: 'Personalitzat', className: 'ap-badge ap-badge--success' },
-  default: { label: 'Per defecte', className: 'ap-badge' },
-} as const;
 
 
 export default function EmailTemplatesClient() {
@@ -82,7 +78,7 @@ export default function EmailTemplatesClient() {
 
             <div className="mt-3 flex flex-wrap gap-2">
               {t.locales.map((l) => {
-                const badge = SOURCE_BADGE[l.source];
+                const badge = ADMIN_EMAIL_TEMPLATE_SOURCE_BADGE[l.source];
                 return (
                   <Link
                     key={l.locale}

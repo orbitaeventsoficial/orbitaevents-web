@@ -23,7 +23,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { useAvailability } from '@/hooks/usePublicData';
-import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { PUBLIC_MOBILE_CTA_TRUST_BADGES, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -135,11 +135,7 @@ function TrustBadges() {
   const t = useTranslations('mobileCTA');
   const reduceMotion = useReducedMotion();
 
-  const badges = [
-    { icon: '⭐', value: '5.0', labelKey: 'badges.rating' },
-    { icon: '🎉', value: '50+', labelKey: 'badges.events' },
-    { icon: '⚡', value: '2h', labelKey: 'badges.response' },
-  ];
+  const badges = PUBLIC_MOBILE_CTA_TRUST_BADGES;
 
   return (
     <div className="flex justify-center gap-6">

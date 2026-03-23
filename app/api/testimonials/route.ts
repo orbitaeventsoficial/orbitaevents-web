@@ -1,35 +1,11 @@
 // app/api/testimonials/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { PUBLIC_TESTIMONIAL_API_MESSAGES, type PublicTestimonialApiLocale } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { listApprovedPublicTestimonials, submitPublicTestimonial } from '@/lib/services/publicTestimonialService';
 
-type Locale = 'ca' | 'es' | 'en';
-const MESSAGES: Record<Locale, Record<string, string>> = {
-  ca: {
-    success: 'Valoració enviada correctament',
-    invalid: 'Dades no vàlides',
-    processing: 'Error processant la valoració',
-    fetching: 'Error carregant valoracions',
-    verifiedCustomer: 'Client verificat',
-  },
-  es: {
-    success: 'Valoración enviada correctamente',
-    invalid: 'Datos inválidos',
-    processing: 'Error procesando la valoración',
-    fetching: 'Error cargando valoraciones',
-    verifiedCustomer: 'Cliente verificado',
-  },
-  en: {
-    success: 'Testimonial submitted successfully',
-    invalid: 'Invalid data',
-    processing: 'Error processing testimonial',
-    fetching: 'Error fetching testimonials',
-    verifiedCustomer: 'Verified customer',
-  },
-};
-
-function resolveLocale(request: NextRequest): Locale {
+function resolveLocale(request: NextRequest): PublicTestimonialApiLocale {
   const lang = request.headers.get('accept-language')?.toLowerCase() || '';
   if (lang.includes('ca')) return 'ca';
   if (lang.includes('en')) return 'en';
@@ -51,7 +27,7 @@ const testimonialSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const t = MESSAGES[resolveLocale(request)];
+  const t = PUBLIC_TESTIMONIAL_API_MESSAGES[resolveLocale(request)];
   try {
     const body = await request.json();
     const data = testimonialSchema.parse(body);
@@ -92,7 +68,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const t = MESSAGES[resolveLocale(request)];
+  const t = PUBLIC_TESTIMONIAL_API_MESSAGES[resolveLocale(request)];
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10', 10);
@@ -109,3 +85,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+

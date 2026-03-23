@@ -4,9 +4,9 @@ import { log } from '@/lib/logger';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
-import { formatCurrency, formatDate } from '@/lib/constants';
+import { formatCurrency, formatDate, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
+import { getInventoryCategoryAdminTone, getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -99,26 +99,6 @@ interface StatsData {
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  SOUND: { label: 'So', icon: '🔊', color: 'admin-tone-bg-info' },
-  LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'admin-tone-bg-warning' },
-  EFFECTS: { label: 'Efectes', icon: '✨', color: 'admin-tone-bg-neutral' },
-  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'admin-tone-bg-neutral' },
-  CABLING: { label: 'Cablejat', icon: '🔌', color: 'admin-tone-bg-success' },
-  TECH: { label: 'Tècnic', icon: '💻', color: 'admin-tone-bg-info' },
-  DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'admin-tone-bg-warning' },
-  DECORATION_HW: { label: 'Deco HW', icon: '🎃', color: 'admin-tone-bg-warning' },
-  DECORATION_GEN: { label: 'Deco General', icon: '🎨', color: 'admin-tone-bg-neutral' },
-  CONSUMABLE: { label: 'Consumible', icon: '📦', color: 'admin-tone-bg-danger' },
-};
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  AVAILABLE: { label: 'Disponible', color: 'admin-tone-soft-success' },
-  IN_USE: { label: 'En ús', color: 'admin-tone-bg-info admin-tone-text-info' },
-  MAINTENANCE: { label: 'Manteniment', color: 'admin-tone-bg-warning admin-tone-text-warning' },
-  BROKEN: { label: 'Avariat', color: 'admin-tone-soft-danger' },
-  RETIRED: { label: 'Retirat', color: 'admin-tone-bg-neutral admin-tone-text-neutral' },
-};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
@@ -605,8 +585,8 @@ export default function PricingAdminPage() {
               className="px-4 py-2.5 rounded-xl border "
             >
               <option value="all">Totes les categories</option>
-              {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
-                <option key={key} value={key}>{icon} {label}</option>
+              {INVENTORY_CATEGORY_OPTIONS.map(({ value, label, icon }) => (
+                <option key={value} value={value}>{icon} {label}</option>
               ))}
             </select>
           </div>
@@ -615,16 +595,15 @@ export default function PricingAdminPage() {
           <div className="grid gap-3">
             {filteredInventory.map(item => {
               const categoryDisplay = getInventoryCategoryDisplay(item.category);
-              const categoryInfo = CATEGORY_LABELS[item.category] || { label: categoryDisplay.label, icon: categoryDisplay.icon, color: 'admin-tone-bg-neutral' };
+              const categoryTone = getInventoryCategoryAdminTone(item.category);
               const statusDisplay = getInventoryStatusDisplay(item.status);
-              const statusInfo = STATUS_LABELS[item.status] || { label: statusDisplay.label, color: `${statusDisplay.bg} ${statusDisplay.text}` };
 
               return (
                 <div key={item.id} className="rounded-2xl border admin-card-glass p-4 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl`}>
-                        {categoryInfo.icon}
+                      <div className={`w-12 h-12 ${categoryTone} rounded-xl flex items-center justify-center text-2xl`}>
+                        {categoryDisplay.icon}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -632,7 +611,7 @@ export default function PricingAdminPage() {
                           <code className="text-xs px-2 py-0.5 rounded">{item.code}</code>
                         </div>
                         <div className="flex items-center gap-3 mt-1">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${statusInfo.color}`}>{statusInfo.label}</span>
+                          <span className={`px-2 py-0.5 text-xs rounded-full ${statusDisplay.bg} ${statusDisplay.text}`}>{statusDisplay.label}</span>
                           <span className="text-sm">Valor: {formatCurrency(item.value)}</span>
                         </div>
                       </div>

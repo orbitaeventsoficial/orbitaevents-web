@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { BOOKING_STATUS_OPTIONS, LEAD_STATUS_OPTIONS } from '@/lib/constants';
+import { BOOKING_STATUS_OPTIONS, DASHBOARD_WIDGET_COLOR_MAP, LEAD_STATUS_OPTIONS } from '@/lib/constants';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -39,13 +39,6 @@ type DonutSegment = {
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const COLOR_MAP = {
-  emerald: { stroke: '#34d399', glow: 'rgba(52, 211, 153, 0.2)' },
-  amber:   { stroke: '#fbbf24', glow: 'rgba(251, 191, 36, 0.2)' },
-  rose:    { stroke: '#f472b6', glow: 'rgba(244, 114, 182, 0.2)' },
-  cyan:    { stroke: '#22d3ee', glow: 'rgba(34, 211, 238, 0.2)' },
-};
-
 const accentClassMap: Record<AccentColor, string> = {
   cyan: 'admin-ui-metric-card--cyan',
   emerald: 'admin-ui-metric-card--emerald',
@@ -58,9 +51,9 @@ const accentClassMap: Record<AccentColor, string> = {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function getColor(value: number) {
-  if (value >= 70) return COLOR_MAP.emerald;
-  if (value >= 40) return COLOR_MAP.amber;
-  return COLOR_MAP.rose;
+  if (value >= 70) return DASHBOARD_WIDGET_COLOR_MAP.emerald;
+  if (value >= 40) return DASHBOARD_WIDGET_COLOR_MAP.amber;
+  return DASHBOARD_WIDGET_COLOR_MAP.rose;
 }
 
 function normalizeSeries(values: number[]) {
@@ -132,7 +125,7 @@ export function RadialProgress({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (clamped / 100) * circumference;
-  const color = colorOverride ? COLOR_MAP[colorOverride] : getColor(clamped);
+  const color = colorOverride ? DASHBOARD_WIDGET_COLOR_MAP[colorOverride] : getColor(clamped);
   const center = size / 2;
 
   return (

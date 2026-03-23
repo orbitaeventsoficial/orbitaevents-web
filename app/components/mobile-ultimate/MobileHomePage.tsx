@@ -42,6 +42,7 @@ import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { CLIENT_LOGOS } from '@/app/config/client-logos';
 import { hasSeenMobileIntro, markMobileIntroSeen } from '@/lib/intro';
+import { PUBLIC_MOBILE_HOME_GUARANTEES } from '@/lib/constants';
 
 // Lazy load HeroPortalLogo
 const HeroPortalLogo = dynamic(
@@ -57,26 +58,7 @@ function GuaranteeSection() {
   const t = useTranslations('mobileHome.guarantees');
   const reduceMotion = useReducedMotion();
 
-  const guarantees = [
-    {
-      icon: '🛡️',
-      titleKey: 'satisfaction.title',
-      descKey: 'satisfaction.desc',
-      gradient: 'from-green-500 to-emerald-500',
-    },
-    {
-      icon: '🔧',
-      titleKey: 'backup.title',
-      descKey: 'backup.desc',
-      gradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: '⚡',
-      titleKey: 'response.title',
-      descKey: 'response.desc',
-      gradient: 'from-amber-500 to-orange-500',
-    },
-  ];
+  const guarantees = PUBLIC_MOBILE_HOME_GUARANTEES;
 
   return (
     <section className="py-14 px-6 relative overflow-hidden">

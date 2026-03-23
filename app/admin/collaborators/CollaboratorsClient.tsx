@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_COLLABORATOR_EMPTY_FORM } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
 
 interface Collaborator {
@@ -42,16 +43,6 @@ interface KPIs {
   pendingCommissions: number;
 }
 
-const EMPTY_FORM = {
-  name: '',
-  company: '',
-  email: '',
-  phone: '',
-  commissionPct: 10,
-  pricingModel: 'DISCOUNT' as 'NET_PLUS_COMMISSION' | 'DISCOUNT',
-  notes: '',
-};
-
 const KPI_ITEMS = (kpis: KPIs) => [
   { label: 'Total', value: kpis.total, tone: '' },
   { label: 'Actius', value: kpis.active, tone: 'ap-kpi--success' },
@@ -83,7 +74,7 @@ export default function CollaboratorsClient() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(ADMIN_COLLABORATOR_EMPTY_FORM);
 
   const load = useCallback(async () => {
     try {
@@ -125,7 +116,7 @@ export default function CollaboratorsClient() {
       toast.success(editingId ? 'Col·laborador actualitzat' : 'Col·laborador creat');
       setShowForm(false);
       setEditingId(null);
-      setForm(EMPTY_FORM);
+      setForm(ADMIN_COLLABORATOR_EMPTY_FORM);
       load();
     } catch {
       toast.error('Error desant');
@@ -200,7 +191,7 @@ export default function CollaboratorsClient() {
           onClick={() => {
             setShowForm(!showForm);
             setEditingId(null);
-            setForm(EMPTY_FORM);
+            setForm(ADMIN_COLLABORATOR_EMPTY_FORM);
           }}
           className="ap-btn ap-btn--primary"
         >

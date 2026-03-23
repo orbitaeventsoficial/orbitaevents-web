@@ -3,22 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ALL_SERVICES, type ExtraDefinition, type ServiceSlug } from '@/config/packs-config';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_EXTRA_CATEGORY_OPTIONS, ADMIN_EXTRA_SERVICE_LABELS } from '@/lib/constants/admin';
 
-const SERVICE_LABELS: Record<ServiceSlug, string> = {
-  bodas: 'Bodes',
-  fiestas: 'Festes',
-  discomovil: 'Discomòbil',
-  empresas: 'Empreses',
-};
+const SERVICE_LABELS: Record<ServiceSlug, string> = ADMIN_EXTRA_SERVICE_LABELS;
 
-const CATEGORY_OPTIONS: Array<{ value: ExtraDefinition['category']; label: string }> = [
-  { value: 'effects', label: 'Efectes' },
-  { value: 'visual', label: 'Visual' },
-  { value: 'time', label: 'Temps' },
-  { value: 'sound', label: 'So' },
-  { value: 'lighting', label: 'Il·luminació' },
-  { value: 'other', label: 'Altres' },
-];
+const CATEGORY_OPTIONS: Array<{ value: ExtraDefinition['category']; label: string }> = [...ADMIN_EXTRA_CATEGORY_OPTIONS];
 
 const defaultExtra = (): ExtraDefinition => ({
   id: '',

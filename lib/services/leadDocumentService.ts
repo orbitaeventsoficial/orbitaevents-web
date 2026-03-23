@@ -3,8 +3,6 @@ import { LEAD_DOCUMENT_ALLOWED_MIME_TYPES, LEAD_DOCUMENT_TYPE_VALUES, LEAD_DOCUM
 import { prisma } from '@/lib/prisma';
 import { deleteFile, uploadFile } from '@/lib/storage';
 
-const ALLOWED_TYPES = new Set<string>(LEAD_DOCUMENT_ALLOWED_MIME_TYPES);
-const ALLOWED_DOC_TYPES = new Set<string>(LEAD_DOCUMENT_TYPE_VALUES);
 
 export async function listLeadDocuments(leadId: string) {
   const documents = await prisma.leadDocument.findMany({
@@ -26,12 +24,12 @@ export async function uploadLeadDocument(leadId: string, formData: FormData) {
   if (!title) {
     return { status: 400, body: { error: 'Falta el títol' } };
   }
-  if (!ALLOWED_DOC_TYPES.has(rawType)) {
+  if (!(LEAD_DOCUMENT_TYPE_VALUES as readonly string[]).includes(rawType)) {
     return { status: 400, body: { error: 'Tipus de document no permès' } };
   }
 
   const type = rawType as LeadDocumentType;
-  if (!ALLOWED_TYPES.has(file.type)) {
+  if (!(LEAD_DOCUMENT_ALLOWED_MIME_TYPES as readonly string[]).includes(file.type)) {
     return { status: 400, body: { error: 'Tipus de fitxer no permès' } };
   }
   if (file.size > LEAD_DOCUMENT_UPLOAD_MAX_SIZE_BYTES) {

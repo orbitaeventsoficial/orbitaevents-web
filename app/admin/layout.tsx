@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
 import { ToastProvider } from './components/ToastProvider';
 import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
-import { ADMIN_DETAIL_PAGE_LABELS, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
+import { ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import './admin-theme.css';
@@ -21,12 +21,6 @@ const AdminHelpOverlay = dynamicImport(() => import('./components/AdminHelpOverl
   ssr: false,
 });
 
-const FAB_ITEMS = [
-  { icon: '👥', label: 'Entrada rapida', href: '/admin/leads' },
-  { icon: '📋', label: 'Reserva', href: '/admin/bookings/new' },
-  { icon: '📝', label: 'Tasca', href: '/admin/tasks/new' },
-  { icon: '📄', label: 'Pressupost', href: '/admin/presupuestos' },
-] as const;
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
@@ -64,7 +58,7 @@ function FloatingAddButton() {
     <div ref={ref} className="fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
       {open && (
         <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-2">
-          {FAB_ITEMS.map((item) => (
+          {ADMIN_FAB_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -727,35 +721,17 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       {/* Mobile Bottom Navigation */}
       <nav className="admin-bottom-nav">
         <div className="admin-bottom-nav-inner">
-          <BottomNavItem
-            icon="📊"
-            label="Tauler"
-            href="/admin"
-            isActive={pathname === '/admin'}
-            onPrefetch={prefetchRoute}
-          />
-          <BottomNavItem
-            icon="📥"
-            label="Entrades"
-            href="/admin/leads"
-            isActive={pathname?.startsWith('/admin/leads') || false}
-            badge={newLeadsCount}
-            onPrefetch={prefetchRoute}
-          />
-          <BottomNavItem
-            icon="📋"
-            label="Reserves"
-            href="/admin/bookings"
-            isActive={pathname?.startsWith('/admin/bookings') || false}
-            onPrefetch={prefetchRoute}
-          />
-          <BottomNavItem
-            icon="📅"
-            label="Calendari"
-            href="/admin/calendario"
-            isActive={pathname?.startsWith('/admin/calendario') || false}
-            onPrefetch={prefetchRoute}
-          />
+          {ADMIN_MOBILE_PRIMARY_NAV.map((item) => (
+            <BottomNavItem
+              key={item.href}
+              icon={item.icon}
+              label={item.label}
+              href={item.href}
+              isActive={item.href === '/admin' ? pathname === '/admin' : pathname?.startsWith(item.href) || false}
+              badge={'badgeKey' in item && item.badgeKey === 'newLeads' ? newLeadsCount : undefined}
+              onPrefetch={prefetchRoute}
+            />
+          ))}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}

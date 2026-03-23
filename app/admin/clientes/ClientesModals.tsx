@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_CUSTOMER_START_PROCESSES } from '@/lib/constants/admin';
 import type { Customer } from './customer-utils';
 
 interface DuplicateWarning {
@@ -368,12 +369,6 @@ export function StartProcessModal({
     }
   }
 
-  const PROCESSES = [
-    { type: 'review_request', icon: '⭐', label: 'Demanar Opinió', desc: 'Envia un correu demanant una opinió' },
-    { type: 'post_event', icon: '🎉', label: 'Post-esdeveniment complet', desc: 'Canvas 10/10 + Gràcies + Demanar opinió' },
-    { type: 'welcome', icon: '👋', label: 'Benvinguda', desc: 'Email de benvinguda + Info empresa' },
-    { type: 'promo', icon: '🎁', label: 'Promoció', desc: 'Envia oferta o descompte especial' },
-  ];
 
   return (
     <motion.div
@@ -400,7 +395,7 @@ export function StartProcessModal({
         </p>
 
         <div className="space-y-3">
-          {PROCESSES.map(({ type, icon, label, desc }) => (
+          {ADMIN_CUSTOMER_START_PROCESSES.map(({ type, icon, label, desc }) => (
             <button
               key={type}
               onClick={() => startProcess(type)}
@@ -431,3 +426,4 @@ export function StartProcessModal({
     </motion.div>
   );
 }
+

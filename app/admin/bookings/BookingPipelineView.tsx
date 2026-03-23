@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { BOOKING_STATUS_CONFIG, formatDateShort, formatCurrency } from '@/lib/constants';
+import { BOOKING_PIPELINE_COLUMNS, BOOKING_STATUS_CONFIG, formatDateShort, formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -28,12 +28,7 @@ type PipelineColumn = {
   bookings: PipelineBooking[];
 };
 
-const COLUMNS_DEF: Omit<PipelineColumn, 'bookings'>[] = [
-  { status: 'PENDING', label: 'Pendents', toneClass: '', cardTone: 'ap-card--warning' },
-  { status: 'CONFIRMED', label: 'Confirmades', toneClass: '', cardTone: 'ap-card--success' },
-  { status: 'PREPARING', label: 'Preparant', toneClass: '', cardTone: 'ap-card--info' },
-  { status: 'COMPLETED', label: 'Completades', toneClass: '', cardTone: 'admin-tone-bg-teal admin-tone-border-teal' },
-];
+const COLUMNS_DEF: Omit<PipelineColumn, 'bookings'>[] = [...BOOKING_PIPELINE_COLUMNS];
 
 function getMarginColor(pct: number | null): string {
   if (pct === null) return 'admin-tone-text-neutral';

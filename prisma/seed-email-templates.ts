@@ -8,6 +8,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS } from '../lib/constants/admin';
 
 const prisma = new PrismaClient();
 
@@ -88,17 +89,6 @@ const TEMPLATE_VARIABLES: Record<string, string[]> = {
   testimonial_received: ['clientName'],
   testimonial_reminder: ['clientName', 'reviewUrl'],
   welcome: ['clientName'],
-};
-
-const DESCRIPTIONS: Record<string, string> = {
-  booking_confirmation: "Confirmació de reserva al client",
-  admin_booking_notification: "Notificació de nova reserva a l'admin",
-  post_event: 'Email post-event demanant ressenya',
-  payment_reminder: 'Recordatori de pagament pendent',
-  testimonial_approved: 'Testimoni aprovat + codi descompte',
-  testimonial_received: 'Confirmació recepció testimoni',
-  testimonial_reminder: 'Recordatori per deixar ressenya',
-  welcome: 'Benvinguda al nou client',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -571,7 +561,7 @@ async function main() {
 
   for (const t of templates) {
     const variables = TEMPLATE_VARIABLES[t.slug] || [];
-    const description = DESCRIPTIONS[t.slug] || t.slug;
+    const description = ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS[t.slug as keyof typeof ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS] || t.slug;
 
     const existing = await prisma.emailTemplate.findUnique({
       where: { slug_locale: { slug: t.slug, locale: t.locale } },
@@ -615,3 +605,6 @@ main()
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
+
+
+

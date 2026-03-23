@@ -5,10 +5,9 @@
  */
 
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { EVENT_TYPE_DOCUMENT_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_DOCUMENT_LABELS, getDocumentCompanyInfo } from '@/lib/constants';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { getAppBaseUrl } from '@/lib/site';
 
 
 // ============================================
@@ -85,23 +84,6 @@ export interface ContractData extends QuoteData {
 }
 
 // ============================================
-// CONFIGURACIÓ EMPRESA
-// ============================================
-
-const COMPANY_INFO = {
-  name: 'Òrbita Events',
-  legalName: process.env.COMPANY_LEGAL_NAME || 'Carles Ros Oliveras',
-  nif: process.env.COMPANY_NIF || 'Pendent de configurar',
-  address: 'Granollers, Barcelona',
-  phone: SITE_CONFIG.business.phone,
-  phoneDisplay: SITE_CONFIG.business.phoneDisplay,
-  email: SITE_CONFIG.business.email,
-  web: `www.${SITE_CONFIG.web.domain}`,
-  logoUrl: `${(getAppBaseUrl()).replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`,
-  iban: process.env.COMPANY_IBAN || 'Pendent de configurar',
-};
-
-// ============================================
 // GENERAR NÚMERO DE DOCUMENT
 // ============================================
 
@@ -116,6 +98,7 @@ export function generateQuoteNumber(): string {
 // ============================================
 
 export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverrides = {}): string {
+  const companyInfo = getDocumentCompanyInfo();
   const eventTypeLabel = getEventTypeLabel(data.eventType);
   const formattedDate = new Date(data.eventDate).toLocaleDateString('ca-ES', {
     weekday: 'long',
@@ -350,13 +333,13 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
   <div class="document">
     <!-- Header -->
     <div class="header">
-      <div class="logo"><img src="${COMPANY_INFO.logoUrl}" alt="Òrbita Events" /></div>
+      <div class="logo"><img src="${companyInfo.logoUrl}" alt="Òrbita Events" /></div>
       <div class="company-info">
-        <strong>${COMPANY_INFO.legalName}</strong><br>
-        ${COMPANY_INFO.address}<br>
-        ${COMPANY_INFO.phoneDisplay || COMPANY_INFO.phone}<br>
-        ${COMPANY_INFO.email}<br>
-        ${COMPANY_INFO.web}
+        <strong>${companyInfo.legalName}</strong><br>
+        ${companyInfo.address}<br>
+        ${companyInfo.phoneDisplay || companyInfo.phone}<br>
+        ${companyInfo.email}<br>
+        ${companyInfo.web}
       </div>
     </div>
 

@@ -8,6 +8,7 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { usePublicStats } from '@/hooks/usePublicData';
+import { PUBLIC_GARANTIA_CONFIG } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONOS
@@ -61,12 +62,19 @@ const Icons = {
 // GARANTIES CONFIG
 // ═══════════════════════════════════════════════════════════════════════════
 
-const guaranteesConfig = [
-  { key: 'response', icon: Icons.Clock, highlight: '<2h', color: 'from-amber-500 to-orange-500' },
-  { key: 'noSurprises', icon: Icons.Receipt, highlight: '0€', color: 'from-purple-500 to-violet-500' },
-  { key: 'support', icon: Icons.Headset, highlight: '24/7', color: 'from-rose-500 to-pink-500' },
-  { key: 'passion', icon: Icons.Heart, highlight: '∞', color: 'from-red-500 to-orange-500' },
-];
+const guaranteeIcons = {
+  Shield: Icons.Shield,
+  Backup: Icons.Backup,
+  Clock: Icons.Clock,
+  Receipt: Icons.Receipt,
+  Headset: Icons.Headset,
+  Heart: Icons.Heart,
+} as const;
+
+const guaranteesConfig = PUBLIC_GARANTIA_CONFIG.map((item) => ({
+  ...item,
+  icon: guaranteeIcons[item.iconKey],
+}));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENTE: Guarantee Card

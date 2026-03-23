@@ -1,15 +1,6 @@
+import { PACK_PRICING_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
-
-const DEFAULT_MARGIN_TARGET_PCT = 0.55;
-const DEFAULT_LABOR_COST_PER_HOUR = 22;
-const DEFAULT_SPECIALIST_MULTIPLIER = 1.35;
-const DEFAULT_FIXED_PACK_COST = 35;
-const DEFAULT_ALERT_DIVERGENCE_PCT = 20;
-const DEFAULT_SOCIAL_SECURITY_PCT = 0.32;
-const DEFAULT_IRPF_PCT = 0.15;
-const DEFAULT_SPECIALIST_SERVICES = ['bodas', 'empresas'];
-
 type PackWithInventory = {
   id: string;
   service: string | null;
@@ -112,20 +103,20 @@ export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
     getNumberSetting('pricing.pack.fixedPackCost'),
     getNumberSetting('pricing.pack.alertDivergencePct'),
   ]);
-  const socialSecurityPct = normalizePercent(socialSecurityPctRaw, DEFAULT_SOCIAL_SECURITY_PCT);
-  const withholdingPct = normalizePercent(withholdingPctRaw, DEFAULT_IRPF_PCT);
-  const baseLabor = Math.max(0, laborCostPerHourRaw ?? DEFAULT_LABOR_COST_PER_HOUR);
-  const specialistMultiplier = Math.max(1, specialistMultiplierRaw ?? DEFAULT_SPECIALIST_MULTIPLIER);
+  const socialSecurityPct = normalizePercent(socialSecurityPctRaw, PACK_PRICING_MODEL_DEFAULTS.socialSecurityPct);
+  const withholdingPct = normalizePercent(withholdingPctRaw, PACK_PRICING_MODEL_DEFAULTS.withholdingPct);
+  const baseLabor = Math.max(0, laborCostPerHourRaw ?? PACK_PRICING_MODEL_DEFAULTS.laborCostPerHour);
+  const specialistMultiplier = Math.max(1, specialistMultiplierRaw ?? PACK_PRICING_MODEL_DEFAULTS.specialistMultiplier);
   const fallbackOperatorGross = Math.max(0, operatorCostPerHourRaw ?? baseLabor);
   const operatorNetCostPerHour = Math.max(0, operatorNetCostPerHourRaw ?? (fallbackOperatorGross / (1 + socialSecurityPct)));
   const operatorCostPerHour = Math.max(0, operatorCostPerHourRaw ?? round2(operatorNetCostPerHour * (1 + socialSecurityPct)));
   const fallbackSpecialistGross = Math.max(0, specialistCostPerHourRaw ?? (operatorCostPerHour * specialistMultiplier));
   const specialistNetCostPerHour = Math.max(0, specialistNetCostPerHourRaw ?? (fallbackSpecialistGross / (1 + socialSecurityPct)));
   const specialistCostPerHour = Math.max(0, specialistCostPerHourRaw ?? round2(specialistNetCostPerHour * (1 + socialSecurityPct)));
-  const specialistServices = new Set((specialistServicesRaw?.value || DEFAULT_SPECIALIST_SERVICES.join(',')).split(',').map((token) => token.trim().toLowerCase()).filter(Boolean));
+  const specialistServices = new Set((specialistServicesRaw?.value || PACK_PRICING_MODEL_DEFAULTS.specialistServices.join(',')).split(',').map((token) => token.trim().toLowerCase()).filter(Boolean));
 
   return {
-    marginTargetPct: clamp(marginTargetPctRaw ?? DEFAULT_MARGIN_TARGET_PCT, 0.1, 0.9),
+    marginTargetPct: clamp(marginTargetPctRaw ?? PACK_PRICING_MODEL_DEFAULTS.marginTargetPct, 0.1, 0.9),
     socialSecurityPct,
     withholdingPct,
     operatorNetCostPerHour,
@@ -133,11 +124,11 @@ export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
     operatorCostPerHour,
     specialistCostPerHour,
     specialistServices,
-    supportOperatorMinGuests: Math.max(1, supportOperatorMinGuestsRaw ?? 150),
-    supportOperatorMinDjHours: Math.max(1, supportOperatorMinDjHoursRaw ?? 6),
-    supportOperatorMinWatts: Math.max(1, supportOperatorMinWattsRaw ?? 6000),
-    fixedPackCost: Math.max(0, fixedPackCostRaw ?? DEFAULT_FIXED_PACK_COST),
-    alertDivergencePct: Math.max(1, alertDivergencePctRaw ?? DEFAULT_ALERT_DIVERGENCE_PCT),
+    supportOperatorMinGuests: Math.max(1, supportOperatorMinGuestsRaw ?? PACK_PRICING_MODEL_DEFAULTS.supportOperatorMinGuests),
+    supportOperatorMinDjHours: Math.max(1, supportOperatorMinDjHoursRaw ?? PACK_PRICING_MODEL_DEFAULTS.supportOperatorMinDjHours),
+    supportOperatorMinWatts: Math.max(1, supportOperatorMinWattsRaw ?? PACK_PRICING_MODEL_DEFAULTS.supportOperatorMinWatts),
+    fixedPackCost: Math.max(0, fixedPackCostRaw ?? PACK_PRICING_MODEL_DEFAULTS.fixedPackCost),
+    alertDivergencePct: Math.max(1, alertDivergencePctRaw ?? PACK_PRICING_MODEL_DEFAULTS.alertDivergencePct),
   };
 }
 

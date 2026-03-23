@@ -1,34 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ADMIN_ACTIVITY_CATEGORY_MAP } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-
-const CATEGORY_MAP: Record<string, string> = {
-  // Comunicacions
-  COMM_SENT: 'comms',
-  COMM_RESPONDED: 'comms',
-  COMM_SEQUENCE_EXEC: 'comms',
-  COMM_SEQUENCE_BATCH: 'comms',
-  SEND_POST_EVENT_EMAIL: 'comms',
-  PAYMENT_REMINDER_SENT: 'comms',
-  // Automatitzacions
-  AUTOMATION_DAILY_SUMMARY_SENT: 'automation',
-  AUTOMATION_SLA_ENFORCED: 'automation',
-  AUTOMATION_RUN_ALL: 'automation',
-  AUTOMATION_FUEL_REFRESH: 'automation',
-  PACK_PRICING_CHECK: 'automation',
-  AUTOFIX_OK: 'automation',
-  AUTOFIX_FAILED: 'automation',
-  AUTOFIX_CRASH: 'automation',
-  // Sistema
-  CALENDAR_SYNC: 'system',
-  CALENDAR_SYNC_ERROR: 'system',
-  PORTAL_AUTO_CREATED: 'system',
-  // CRUD
-  CREATE: 'crud',
-  UPDATE: 'crud',
-  DELETE: 'crud',
-};
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -42,7 +16,7 @@ export async function GET(request: NextRequest) {
   // Filter by category → resolve to action names
   let actionFilter: string[] | undefined;
   if (category && category !== 'all') {
-    actionFilter = Object.entries(CATEGORY_MAP)
+    actionFilter = Object.entries(ADMIN_ACTIVITY_CATEGORY_MAP)
       .filter(([, cat]) => cat === category)
       .map(([action]) => action);
     if (actionFilter.length === 0) {
@@ -74,7 +48,7 @@ export async function GET(request: NextRequest) {
   // Build stats grouped by category
   const stats: Record<string, { total: number; actions: Record<string, number> }> = {};
   for (const row of statsByAction) {
-    const cat = CATEGORY_MAP[row.action] || 'other';
+    const cat = ADMIN_ACTIVITY_CATEGORY_MAP[row.action] || 'other';
     if (!stats[cat]) stats[cat] = { total: 0, actions: {} };
     stats[cat].total += row._count;
     stats[cat].actions[row.action] = row._count;
@@ -87,7 +61,7 @@ export async function GET(request: NextRequest) {
       entity: l.entity,
       entityId: l.entityId,
       details: l.details,
-      category: CATEGORY_MAP[l.action] || 'other',
+      category: ADMIN_ACTIVITY_CATEGORY_MAP[l.action] || 'other',
       createdAt: l.createdAt.toISOString(),
     })),
     total,

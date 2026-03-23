@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { PUBLIC_MOBILE_STATS_CONFIGS } from '@/lib/constants';
 
 // ── Hook de comptador animat ────────────────────────────────────────────────
 
@@ -32,51 +33,10 @@ function useCountUp(target: number, duration: number, started: boolean): number 
   return count;
 }
 
-// ── Dades estàtiques (valors i estils, no text) ─────────────────────────────
-
-const STAT_CONFIGS = [
-  {
-    key: 'events' as const,
-    value: 50,
-    prefix: '',
-    suffix: '+',
-    emoji: '🎉',
-    gradient: 'from-amber-400 to-orange-500',
-    glow: 'rgba(251,191,36,0.18)',
-  },
-  {
-    key: 'rating' as const,
-    value: 5,
-    prefix: '',
-    suffix: '.0★',
-    emoji: '🌟',
-    gradient: 'from-yellow-300 to-amber-400',
-    glow: 'rgba(253,224,71,0.15)',
-  },
-  {
-    key: 'response' as const,
-    value: 2,
-    prefix: '<',
-    suffix: 'h',
-    emoji: '⚡',
-    gradient: 'from-cyan-400 to-blue-500',
-    glow: 'rgba(34,211,238,0.15)',
-  },
-  {
-    key: 'experience' as const,
-    value: 3,
-    prefix: '',
-    suffix: '+',
-    emoji: '🏆',
-    gradient: 'from-purple-400 to-pink-500',
-    glow: 'rgba(167,139,250,0.15)',
-  },
-] as const;
-
 // ── Targeta individual ─────────────────────────────────────────────────────
 
 interface StatCardProps {
-  config: (typeof STAT_CONFIGS)[number];
+  config: (typeof PUBLIC_MOBILE_STATS_CONFIGS)[number];
   label: string;
   sublabel: string;
   delay: number;
@@ -166,7 +126,7 @@ export default function MobileStatsSection() {
 
       {/* Grid 2×2 */}
       <div className="grid grid-cols-2 gap-4">
-        {STAT_CONFIGS.map((config, i) => (
+        {PUBLIC_MOBILE_STATS_CONFIGS.map((config, i) => (
           <StatCard
             key={config.key}
             config={config}

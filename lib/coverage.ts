@@ -21,6 +21,18 @@ const DEFAULT_AREAS: CoverageArea[] = [
   { city: 'Lleida', province: 'Lleida', enabled: true },
 ];
 
+export const COVERAGE_PROVINCES = [
+  'Barcelona',
+  'Girona',
+  'Tarragona',
+  'Lleida',
+  'Madrid',
+  'Valencia',
+  'Alicante',
+  'Murcia',
+  'Castellón',
+] as const;
+
 const ZONE_RULES: Array<{ slug: string; matcher: (values: string[]) => boolean }> = [
   { slug: 'dj-bodas-girona', matcher: (values) => values.includes('girona') },
   { slug: 'dj-bodas-barcelona-ciudad', matcher: (values) => values.includes('barcelona') },
@@ -207,3 +219,38 @@ export async function getEnabledZoneLandingSlugs(): Promise<string[]> {
 
   return ZONE_RULES.filter((rule) => rule.matcher(normalizedValues)).map((rule) => rule.slug);
 }
+
+export const WEDDING_COVERAGE_ZONE_DEFINITIONS = [
+  {
+    href: '/servicios/dj-bodas-maresme',
+    icon: '🏖️',
+    nameKey: 'coverage.zones.maresme.name',
+    descKey: 'coverage.zones.maresme.desc',
+    fallbackName: 'Maresme',
+    fallbackDesc: 'Bodas frente al mar y fincas costeras',
+  },
+  {
+    href: '/servicios/dj-bodas-girona',
+    icon: '🏛️',
+    nameKey: 'coverage.zones.girona.name',
+    descKey: 'coverage.zones.girona.desc',
+    fallbackName: 'Girona',
+    fallbackDesc: 'Masías, castillos y eventos elegantes',
+  },
+  {
+    href: '/servicios/dj-bodas-costa-brava',
+    icon: '🌊',
+    nameKey: 'coverage.zones.costaBrava.name',
+    descKey: 'coverage.zones.costaBrava.desc',
+    fallbackName: 'Costa Brava',
+    fallbackDesc: 'Celebraciones junto al mar con montaje completo',
+  },
+  {
+    href: '/servicios/dj-bodas-valles',
+    icon: '🏡',
+    nameKey: 'coverage.zones.valles.name',
+    descKey: 'coverage.zones.valles.desc',
+    fallbackName: 'Vallès',
+    fallbackDesc: 'Bodas en jardines, masías y espacios privados',
+  },
+] as const;

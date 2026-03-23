@@ -50,13 +50,6 @@ export const CALENDAR_EVENT_LABELS: Record<string, string> = {
   CELEBRATION: 'Celebració',
 };
 
-export const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'Pendent', cls: 'admin-tone-soft-warning admin-tone-text-warning' },
-  CONFIRMED: { label: 'Confirmat', cls: 'admin-tone-soft-success admin-tone-text-success' },
-  PREPARING: { label: 'Preparant', cls: 'admin-tone-soft-info admin-tone-text-info' },
-  COMPLETED: { label: 'Completat', cls: 'admin-tone-idle' },
-  CANCELLED: { label: 'Cancel·lat', cls: 'admin-tone-soft-danger admin-tone-text-danger' },
-};
 
 export const HOURS = Array.from({ length: 18 }, (_, i) => i + 6);
 

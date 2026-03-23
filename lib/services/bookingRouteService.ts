@@ -52,8 +52,7 @@ export async function getBookingDetail(id: string) {
 
 export async function prepareBookingPatchData(existing: ExistingBookingRecord, input: Record<string, unknown>) {
   const body: Record<string, unknown> = { ...input };
-  const syncSensitiveFields = new Set<string>(BOOKING_CALENDAR_SYNC_FIELDS);
-  const shouldSyncCalendar = Object.keys(body).some((key) => syncSensitiveFields.has(key));
+  const shouldSyncCalendar = Object.keys(body).some((key) => (BOOKING_CALENDAR_SYNC_FIELDS as readonly string[]).includes(key));
 
   if (body.eventDate && typeof body.eventDate === 'string') body.eventDate = new Date(body.eventDate);
   if (body.depositPaidAt && typeof body.depositPaidAt === 'string') body.depositPaidAt = new Date(body.depositPaidAt);

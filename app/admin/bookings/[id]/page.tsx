@@ -17,6 +17,7 @@ import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
+import { BOOKING_ACTIVITY_ACTION_LABELS } from '@/lib/constants/admin';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -146,23 +147,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
       channel: typeof details.channel === 'string' ? details.channel : '-',
     };
   });
-  const ACTION_LABELS: Record<string, { icon: string; label: string }> = {
-    CREATE: { icon: '🆕', label: 'Reserva creada' },
-    UPDATE: { icon: '✏️', label: 'Reserva actualitzada' },
-    DELETE: { icon: '🗑️', label: 'Reserva eliminada' },
-    STATUS_CHANGE: { icon: '🔄', label: 'Canvi d\'estat' },
-    COMM_SENT: { icon: '📤', label: 'Comunicació enviada' },
-    COMM_RESPONDED: { icon: '📥', label: 'Resposta rebuda' },
-    PAYMENT_RECORDED: { icon: '💰', label: 'Pagament registrat' },
-    INVENTORY_ASSIGNED: { icon: '📦', label: 'Inventari assignat' },
-    CALENDAR_SYNC: { icon: '📅', label: 'Sincronitzat calendari' },
-    PORTAL_ACCESS: { icon: '🔗', label: 'Accés portal' },
-    CONTRACT_SIGNED: { icon: '✍️', label: 'Contracte signat' },
-    INVOICE_CREATED: { icon: '🧾', label: 'Factura creada' },
-  };
   const activityTimeline = activityLogs.map((entry) => {
     const details = parseLogDetails(entry.details);
-    const config = ACTION_LABELS[entry.action] || { icon: '📋', label: entry.action };
+    const config = BOOKING_ACTIVITY_ACTION_LABELS[entry.action] || { icon: '📋', label: entry.action };
     let description = '';
     if (entry.action === 'STATUS_CHANGE' && details.from && details.to) {
       description = `${details.from} → ${details.to}`;

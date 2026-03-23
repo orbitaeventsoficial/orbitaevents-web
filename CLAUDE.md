@@ -67,6 +67,9 @@ npx playwright test e2e/NOM.spec.ts --project=chromium
 # TypeScript check (sense executar)
 npx tsc --noEmit
 
+# Guard de capa (catalegs locals sospitosos)
+pnpm run arch:layer:check
+
 # Build complet
 pnpm build
 ```
@@ -77,12 +80,12 @@ pnpm build
 |---|---|
 | `lib/services/*.ts` | `pnpm test:run` (tots els unit tests) |
 | `lib/services/SERVEI.ts` concret | `pnpm test:run -- --run __tests__/lib/services/SERVEI.test.ts` |
-| `app/admin/**` (pàgines/components) | `npx tsc --noEmit` + `pnpm build` |
-| `app/api/**` (rutes API) | `pnpm test:run` + `npx tsc --noEmit` |
-| `prisma/schema.prisma` | `npx prisma generate` + `pnpm test:run` + `pnpm build` |
-| `messages/*.json` (i18n) | `pnpm build` |
+| `app/admin/**` (pàgines/components) | `pnpm run arch:layer:check` + `npx tsc --noEmit` + `pnpm build` |
+| `app/api/**` (rutes API) | `pnpm test:run` + `pnpm run arch:layer:check` + `npx tsc --noEmit` |
+| `prisma/schema.prisma` | `npx prisma generate` + `pnpm test:run` + `pnpm run arch:layer:check` + `pnpm build` |
+| `messages/*.json` (i18n) | `pnpm run arch:layer:check` + `pnpm build` |
 | `e2e/*.spec.ts` | `npx playwright test e2e/FITXER.spec.ts --project=chromium` |
-| Qualsevol canvi gran | `npx tsc --noEmit && pnpm test:run && pnpm build` |
+| Qualsevol canvi gran | `pnpm run arch:layer:check && npx tsc --noEmit && pnpm test:run && pnpm build` |
 
 ### Quan es crea un element nou
 
@@ -219,6 +222,7 @@ playwright.config.ts        ← Config Playwright amb webServer
 ### RESUM RÀPID — Checklist pre-lliurament
 
 ```
+□ pnpm run arch:layer:check → sense catalegs locals sospitosos
 □ npx tsc --noEmit          → 0 errors
 □ pnpm test:run             → tots passen
 □ pnpm build                → build net
@@ -414,6 +418,37 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 
 ## Monocapa admin
 
+### Regla de capa obligatoria
+
+- El repo no pot tornar a créixer amb catàlegs, presets, copy estructural o metadada declarativa dins de components, pàgines o serveis si aquesta decisió pot viure a la capa comuna.
+- Aquesta regla no aplica només a l'admin: també aplica a pàgines públiques, rutes API i serveis de domini.
+- Si una dada és estable, declarativa i governa render, flux o comportament, ha d'anar a `lib/constants/*` o a un helper compartit pur.
+
+### Què s'ha de deixar al component
+
+- Estat React, handlers, wiring de render, refs, efectes i composició visual local.
+- Wiring d'icones o components React quan només resolen una metadada compartida en un component concret.
+- Lògica estrictament local de presentació que no representi una decisió reutilitzable de producte o domini.
+
+### Què ha d'anar obligatoriament a la capa comuna
+
+- Arrays i objects de `options`, `items`, `cards`, `stats`, `steps`, `faq`, `features`, `packs`, `products`, `badges`, `thresholds`, `copy`, `defaults`, `messages`, `mime types`, `limits`, `status labels`, `source labels`, `section order`, `nav meta` i qualsevol catàleg equivalent.
+- Dades declaratives de pàgina encara que només surtin en una sola pàgina, si són estables i separables del JSX: galeries, cards, packs, FAQs, presets visuals, configuracions de calculadora, preus base, etc.
+- Qualsevol helper local que només reempaqueti una decisió compartida o derivi opcions des d'un catàleg que ja existeix.
+
+### Anti-patrons prohibits
+
+- Declarar `const SOMETHING = [...]` o `const SOMETHING = { ... }` dins d'una pàgina o servei per dades estables de producte, copy o configuració.
+- Fer `Object.keys(...)`, `Object.values(...)`, `new Set(...)` o `Record<string, string>` locals per reconstruir una decisió que la capa comuna ja coneix.
+- Duplicar la mateixa semàntica en forma de labels, emojis, gradients, ordres, FAQs, packs o presets a dos fitxers diferents.
+- Donar per bo un component perquè "només és d'aquesta pàgina" si el que conté és metadada declarativa i no wiring.
+
+### Protocol abans d'afegir cap dada local nova
+
+- Buscar primer a `lib/constants/*`, `lib/*` i a `docs/diario.md` si la decisió ja existeix.
+- Si la dada és estable i separable del JSX, crear-la o ampliar-la a la capa comuna abans de renderitzar-la.
+- Si hi ha dubte entre deixar-la local o no, el criteri per defecte és moure-la a constants compartides.
+
 - Si una opció, label, ordre, badge o estat apareix a més d'un component admin, s'ha de moure a lib/constants/index.ts o lib/constants/privacy.ts.
 - Els components d'admin han de consumir la capa comuna; no han de recrear arrays locals de STATUS_OPTIONS, SOURCE_OPTIONS, EVENT_TYPES, SECTIONS, STATUS_ORDER o maps equivalents si la dada ja és compartida.
 - Quan es faci una passada d'un bloc d'admin, deixar també entrada breu i neta a docs/diario.md amb el criteri i la validació executada.
@@ -429,6 +464,7 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - Si una pagina te JSX massa dens o linies molt llargues amb logica incrustada, s'ha de refactoritzar abans de considerar la passada acabada.
 - Abans d'afegir qualsevol nova constant o helper local a admin o serveis, buscar primer a lib/constants/* i lib/* si la decisio ja existeix.
 - Quan es tanqui una passada, docs/diario.md ha d'explicar l'estat real: que s'ha rematat, que no, i quina validacio s'ha passat. No escriure "final" de manera optimista.
+- `pnpm run arch:layer:check` forma part de la validacio obligatoria abans de build o merge. Si falla, no es pot donar la passada per bona.
 - Quan es mogui una funcio petita o un helper local, deixar escrit tambe el perque: si no aporta comportament propi i nomes reempaqueta una decisio compartida, s'ha d'eliminar o moure a la capa comuna.
 - La mateixa regla aplica a semantica de rutes admin: shortcuts de teclat, labels de breadcrumb, noms de detall i aliases de navegacio no s'han de recrear dins layout o pagines si ja representen estructura compartida d'admin.
 - Regles de domini petites tambe compten: MIME types permesos, mides maximes de pujada, articles RGPD, camps que disparen sync extern i catalegs equivalents no s'han de deixar enterrats dins un servei si poden aparixer o ser consultats des d'altres punts.

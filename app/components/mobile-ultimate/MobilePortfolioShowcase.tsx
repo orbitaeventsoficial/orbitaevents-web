@@ -10,82 +10,9 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
+import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos } from '@/lib/constants';
 
-const CATEGORIES = [
-  {
-    id: 'discomovil' as const,
-    slug: 'discomovil',
-    emoji: '🎧',
-    accent: 'from-amber-500 to-orange-500',
-    border: 'border-amber-500/50',
-    text: 'text-amber-400',
-    bg: 'bg-amber-500/10',
-    photos: Array.from({ length: 6 }, (_, i) =>
-      `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-  {
-    id: 'halloween' as const,
-    slug: 'fiestas-tematicas-halloween',
-    emoji: '🎃',
-    accent: 'from-orange-600 to-red-700',
-    border: 'border-orange-500/50',
-    text: 'text-orange-400',
-    bg: 'bg-orange-500/10',
-    photos: Array.from({ length: 6 }, (_, i) =>
-      `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-  {
-    id: 'monMagic' as const,
-    slug: 'fiestas-tematicas-mon-magic',
-    emoji: '🪄',
-    accent: 'from-purple-600 to-pink-600',
-    border: 'border-purple-500/50',
-    text: 'text-purple-400',
-    bg: 'bg-purple-500/10',
-    photos: Array.from({ length: 6 }, (_, i) =>
-      `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-  {
-    id: 'bodas' as const,
-    slug: 'bodas',
-    emoji: '💍',
-    accent: 'from-pink-500 to-rose-500',
-    border: 'border-pink-500/50',
-    text: 'text-pink-400',
-    bg: 'bg-pink-500/10',
-    photos: Array.from({ length: 4 }, (_, i) =>
-      `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-  {
-    id: 'empreses' as const,
-    slug: 'eventos-empresa',
-    emoji: '🏢',
-    accent: 'from-blue-500 to-cyan-500',
-    border: 'border-blue-500/50',
-    text: 'text-blue-400',
-    bg: 'bg-blue-500/10',
-    photos: Array.from({ length: 6 }, (_, i) =>
-      `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-  {
-    id: 'privades' as const,
-    slug: 'fiestas-privadas',
-    emoji: '🎉',
-    accent: 'from-emerald-500 to-teal-500',
-    border: 'border-emerald-500/50',
-    text: 'text-emerald-400',
-    bg: 'bg-emerald-500/10',
-    photos: Array.from({ length: 6 }, (_, i) =>
-      `/img/portfolio/fiestas-privadas/fiestas-privadas-${String(i + 1).padStart(2, '0')}.avif`
-    ),
-  },
-] as const;
-
+const CATEGORIES = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.filter((item) => item.showInMobile);
 type CategoryId = (typeof CATEGORIES)[number]['id'];
 
 export default function MobilePortfolioShowcase() {
@@ -95,6 +22,7 @@ export default function MobilePortfolioShowcase() {
   const tabsRef = useRef<HTMLDivElement>(null);
 
   const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[0];
+  const activePhotos = getPublicPortfolioShowcasePhotos(active.slug, active.mobilePhotoCount);
 
   const handleTabClick = (id: CategoryId, index: number) => {
     setActiveId(id);
@@ -136,7 +64,7 @@ export default function MobilePortfolioShowcase() {
             onClick={() => handleTabClick(cat.id, i)}
             className={`flex-shrink-0 whitespace-nowrap snap-center px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-95 ${
               activeId === cat.id
-                ? `${cat.bg} ${cat.border} ${cat.text}`
+                ? `${cat.mobileBg} ${cat.mobileBorder} ${cat.mobileText}`
                 : 'bg-white/5 border-white/10 text-white/60'
             }`}
           >
@@ -153,7 +81,7 @@ export default function MobilePortfolioShowcase() {
         className="px-6"
       >
         <div className="grid grid-cols-2 gap-3">
-          {active.photos.slice(0, 4).map((src, i) => (
+          {activePhotos.slice(0, 4).map((src, i) => (
             <Link
               key={src}
               href={`/portfolio/${active.slug}`}
@@ -185,7 +113,7 @@ export default function MobilePortfolioShowcase() {
             href={`/portfolio/${active.slug}`}
             className="relative overflow-hidden rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 min-h-48 active:scale-95 transition-transform"
           >
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.accent} flex items-center justify-center`}>
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.mobileAccent} flex items-center justify-center`}>
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

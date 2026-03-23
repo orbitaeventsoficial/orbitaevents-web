@@ -1,6 +1,7 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next';
 import { locales, defaultLocale } from '@/i18n';
+import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
 import { getEnabledZoneLandingSlugs } from '@/lib/coverage';
 import { getSiteUrl } from '@/lib/site';
 
@@ -22,18 +23,6 @@ async function getBlogSlugs(): Promise<{ slug: string; updatedAt?: string }[]> {
   }
 }
 
-// Categorias de portfolio para incluir en sitemap
-const PORTFOLIO_SLUGS = [
-  'bodas',
-  'discomovil',
-  'eventos-empresa',
-  'fiestas-infantiles',
-  'fiestas-privadas',
-  'produccion-tecnica',
-  'alquiler-equipo',
-  'fiestas-tematicas-halloween',
-  'fiestas-tematicas-mon-magic',
-];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
@@ -107,7 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   // Paginas dinamicas de portfolio
-  const portfolioPages: MetadataRoute.Sitemap = PORTFOLIO_SLUGS.map(slug => ({
+  const portfolioPages: MetadataRoute.Sitemap = PORTFOLIO_CATEGORIES.map((category) => category.slug).map(slug => ({
     url: `${base}/portfolio/${slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
@@ -116,7 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Versiones localizadas de portfolio
   const localizedPortfolioPages: MetadataRoute.Sitemap = [];
-  PORTFOLIO_SLUGS.forEach(slug => {
+  PORTFOLIO_CATEGORIES.map((category) => category.slug).forEach(slug => {
     secondaryLocales.forEach(locale => {
       localizedPortfolioPages.push({
         url: `${base}/${locale}/portfolio/${slug}`,

@@ -8,6 +8,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { WEATHER_DESCRIPTIONS_CA } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 // ─── Tipus ──────────────────────────────────────────────────────────
@@ -35,23 +36,6 @@ function isCacheValid(): boolean {
 }
 
 // ─── Mapping de condicions a descripció catalana ────────────────────
-
-const WEATHER_DESCRIPTIONS_CA: Record<string, string> = {
-  Clear: 'Cel serè',
-  Clouds: 'Ennuvolat',
-  Rain: 'Pluja',
-  Drizzle: 'Plugim',
-  Thunderstorm: 'Tempesta',
-  Snow: 'Neu',
-  Mist: 'Boira lleugera',
-  Fog: 'Boira',
-  Haze: 'Calitja',
-  Dust: 'Pols',
-  Sand: 'Sorra',
-  Ash: 'Cendra volcànica',
-  Squall: 'Ratxa de vent',
-  Tornado: 'Tornado',
-};
 
 // ─── OpenWeatherMap API ─────────────────────────────────────────────
 

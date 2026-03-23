@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ACTIVITY_CATEGORY_OPTIONS, ACTIVITY_DAYS_OPTIONS, formatDateTimeFull } from '@/lib/constants';
+import { ADMIN_ACTIVITY_ACTION_META, ADMIN_ACTIVITY_ENTITY_LINKS, ADMIN_ACTIVITY_STATS_CARDS } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
 
 interface ActivityLog {
@@ -28,67 +29,6 @@ interface ActivityResponse {
   pages: number;
 }
 
-const ACTION_LABELS: Record<string, { label: string; icon: string; tone: string }> = {
-  COMM_SENT: { label: 'Email enviat', icon: '📤', tone: 'admin-tone-text-info' },
-  COMM_RESPONDED: { label: 'Resposta rebuda', icon: '📩', tone: 'admin-tone-text-success' },
-  COMM_SEQUENCE_EXEC: { label: 'Seqüència comercial', icon: '🔗', tone: 'admin-tone-text-info' },
-  COMM_SEQUENCE_BATCH: { label: 'Batch seqüències', icon: '📦', tone: 'admin-tone-text-info' },
-  SEND_POST_EVENT_EMAIL: { label: 'Email post-event', icon: '🎉', tone: 'admin-tone-text-violet' },
-  PAYMENT_REMINDER_SENT: { label: 'Recordatori pagament', icon: '💰', tone: 'admin-tone-text-warning' },
-  AUTOMATION_DAILY_SUMMARY_SENT: { label: 'Resum diari', icon: '📋', tone: 'admin-tone-text-info' },
-  AUTOMATION_SLA_ENFORCED: { label: 'SLA aplicat', icon: '⏱️', tone: 'admin-tone-text-danger' },
-  AUTOMATION_RUN_ALL: { label: 'Automatització completa', icon: '🤖', tone: 'admin-tone-text-info' },
-  AUTOMATION_FUEL_REFRESH: { label: 'Preu combustible', icon: '⛽', tone: 'admin-tone-text-warning' },
-  PACK_PRICING_CHECK: { label: 'Check preus packs', icon: '💶', tone: 'admin-tone-text-success' },
-  AUTOFIX_OK: { label: 'Autofix OK', icon: '✅', tone: 'admin-tone-text-success' },
-  AUTOFIX_FAILED: { label: 'Autofix fallat', icon: '⚠️', tone: 'admin-tone-text-warning' },
-  AUTOFIX_CRASH: { label: 'Autofix crash', icon: '💥', tone: 'admin-tone-text-danger' },
-  CALENDAR_SYNC: { label: 'Sync calendari', icon: '📅', tone: 'admin-tone-text-info' },
-  CALENDAR_SYNC_ERROR: { label: 'Error sync calendari', icon: '❌', tone: 'admin-tone-text-danger' },
-  PORTAL_AUTO_CREATED: { label: 'Portal client creat', icon: '🔑', tone: 'admin-tone-text-violet' },
-  CREATE: { label: 'Creat', icon: '➕', tone: 'admin-tone-text-success' },
-  UPDATE: { label: 'Actualitzat', icon: '✏️', tone: 'admin-tone-text-info' },
-  DELETE: { label: 'Eliminat', icon: '🗑️', tone: 'admin-tone-text-danger' },
-};
-
-const STATS_CARDS = [
-  {
-    key: 'comms',
-    label: 'Comunicacions',
-    icon: '✉️',
-    cardTone: 'ap-card--info',
-    textTone: 'admin-tone-text-info',
-  },
-  {
-    key: 'automation',
-    label: 'Automatitzacions',
-    icon: '⚡',
-    cardTone: 'ap-card--warning',
-    textTone: 'admin-tone-text-warning',
-  },
-  {
-    key: 'system',
-    label: 'Sistema',
-    icon: '🔄',
-    cardTone: 'admin-tone-border-info admin-tone-bg-info',
-    textTone: 'admin-tone-text-info',
-  },
-  {
-    key: 'crud',
-    label: 'Operacions',
-    icon: '📝',
-    cardTone: 'ap-card--success',
-    textTone: 'admin-tone-text-success',
-  },
-] as const;
-
-const ENTITY_LINKS: Record<string, (id: string) => string> = {
-  booking: (id) => `/admin/bookings/${id}`,
-  lead: (id) => `/admin/leads/${id}`,
-  pack: (id) => `/admin/packs/${id}`,
-  customer: (id) => `/admin/clientes/${id}`,
-};
-
 function formatTimeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
   const minutes = Math.floor(diff / 60000);
@@ -101,7 +41,7 @@ function formatTimeAgo(isoDate: string): string {
 }
 
 function getActionMeta(action: string) {
-  return ACTION_LABELS[action] || { label: action, icon: '•', tone: 'admin-tone-text-neutral' };
+  return ADMIN_ACTIVITY_ACTION_META[action] || { label: action, icon: '•', tone: 'admin-tone-text-neutral' };
 }
 
 function formatDetails(details: Record<string, unknown> | null): string {
@@ -163,7 +103,7 @@ export default function ActivityClient() {
 
   const statsCards = data?.stats ? (
     <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {STATS_CARDS.map(({ key, label, icon, cardTone, textTone }) => {
+      {ADMIN_ACTIVITY_STATS_CARDS.map(({ key, label, icon, cardTone, textTone }) => {
         const cat = data.stats[key];
         const total = cat?.total || 0;
         const topActions = cat
@@ -267,8 +207,8 @@ export default function ActivityClient() {
               data.logs.map((log) => {
                 const meta = getActionMeta(log.action);
                 const entityLink =
-                  log.entityId && ENTITY_LINKS[log.entity]
-                    ? ENTITY_LINKS[log.entity](log.entityId)
+                  log.entityId && ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]
+                    ? `${ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]}/${log.entityId}`
                     : null;
                 const detailsText = formatDetails(log.details);
 
@@ -332,8 +272,8 @@ export default function ActivityClient() {
                     data.logs.map((log) => {
                       const meta = getActionMeta(log.action);
                       const entityLink =
-                        log.entityId && ENTITY_LINKS[log.entity]
-                          ? ENTITY_LINKS[log.entity](log.entityId)
+                        log.entityId && ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]
+                          ? `${ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]}/${log.entityId}`
                           : null;
 
                       return (
@@ -397,3 +337,4 @@ export default function ActivityClient() {
     </div>
   );
 }
+

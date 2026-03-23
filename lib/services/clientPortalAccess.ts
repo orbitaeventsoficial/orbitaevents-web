@@ -6,7 +6,6 @@ import { SUPPORTED_LOCALES as SHARED_SUPPORTED_LOCALES } from '@/lib/constants';
 
 
 const DEFAULT_EXPIRY_DAYS = 30;
-const SUPPORTED_LOCALES = new Set<string>(SHARED_SUPPORTED_LOCALES);
 const portalAccessRepo = prisma.clientPortalAccess;
 
 export type PortalPersonalization = {
@@ -29,7 +28,7 @@ function generatePortalToken(): string {
 
 export function normalizePortalLocale(locale: string | null | undefined): string {
   const normalized = String(locale || 'ca').toLowerCase();
-  return SUPPORTED_LOCALES.has(normalized) ? normalized : 'ca';
+  return (SHARED_SUPPORTED_LOCALES as readonly string[]).includes(normalized) ? normalized : 'ca';
 }
 
 function buildClientPortalUrl(token: string, locale: string): string {

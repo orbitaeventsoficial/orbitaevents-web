@@ -7,15 +7,8 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { PUBLIC_PROCESS_STEP_STYLES, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
-// ── Estils dels passos (no text) ───────────────────────────────────────────
-
-const STEP_STYLES = [
-  { gradient: 'from-amber-500 to-orange-500', glow: 'rgba(245,158,11,0.25)', emoji: '💬' },
-  { gradient: 'from-purple-500 to-pink-500',  glow: 'rgba(168,85,247,0.2)',  emoji: '✨' },
-  { gradient: 'from-emerald-500 to-teal-400', glow: 'rgba(16,185,129,0.2)',  emoji: '🎊' },
-] as const;
 
 // ── Component principal ────────────────────────────────────────────────────
 
@@ -55,7 +48,7 @@ export default function MobileProcessSection() {
       {/* Steps */}
       <div className="relative">
         {steps.map((step, i) => {
-          const style = STEP_STYLES[i];
+          const style = PUBLIC_PROCESS_STEP_STYLES[i];
           return (
             <motion.div
               key={step.number}

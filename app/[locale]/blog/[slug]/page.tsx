@@ -9,7 +9,7 @@ import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
-import { toIntlLocale } from '@/lib/constants';
+import { PUBLIC_BLOG_CATEGORY_COLORS, toIntlLocale } from '@/lib/constants';
 import { getPublicBlogPost, type PublicBlogPost } from '@/lib/blog-public';
 import { absoluteUrl, getSiteUrl } from '@/lib/site';
 
@@ -72,15 +72,6 @@ function BlogContent({ html }: { html: string }) {
   );
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  bodas: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
-  eventos: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  consejos: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  tendencias: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  tecnologia: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-  general: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-};
-
 export default async function BlogPostPage({
   params,
 }: {
@@ -95,7 +86,7 @@ export default async function BlogPostPage({
   }
 
   const translation = post.translations[0];
-  const categoryColor = CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general;
+  const categoryColor = PUBLIC_BLOG_CATEGORY_COLORS[post.category] || PUBLIC_BLOG_CATEGORY_COLORS.general;
   const yearsExperience = SITE_CONFIG.stats.yearsExperience;
 
   const canonicalUrl = absoluteUrl(`/${locale}/blog/${slug}`);

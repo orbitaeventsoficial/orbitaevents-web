@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { API_UPLOAD_DIRECT_LIMIT, API_UPLOAD_MESSAGES, API_UPLOAD_VALID_TYPES, type ApiUploadLocale } from '@/lib/constants';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
@@ -11,49 +12,8 @@ import { uploadFile, getPublicUrl } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
-const DIRECT_UPLOAD_LIMIT = 4 * 1024 * 1024;
-const VALID_UPLOAD_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'video/mp4',
-  'video/quicktime',
-];
 
-type UploadLocale = 'ca' | 'es' | 'en';
-
-const UPLOAD_MESSAGES: Record<UploadLocale, Record<string, string>> = {
-  ca: {
-    unauthorized: 'No autoritzat',
-    missingFileNameOrType: 'Falten paràmetres fileName i fileType',
-    invalidFolder: 'Carpeta no vàlida',
-    invalidFileType: 'Tipus de fitxer no permès. Fes servir JPG, PNG, WebP, GIF o MP4.',
-    missingFile: "No s'ha proporcionat cap fitxer",
-    fileTooLarge: 'Fitxer massa gran per pujada directa.',
-    processingError: "Error processant el fitxer",
-  },
-  es: {
-    unauthorized: 'No autorizado',
-    missingFileNameOrType: 'Faltan parametros fileName y fileType',
-    invalidFolder: 'Carpeta invalida',
-    invalidFileType: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.',
-    missingFile: 'No se ha proporcionado ningun fichero',
-    fileTooLarge: 'Fichero demasiado grande para upload directo.',
-    processingError: 'Error procesando el fichero',
-  },
-  en: {
-    unauthorized: 'Unauthorized',
-    missingFileNameOrType: 'Missing fileName and fileType parameters',
-    invalidFolder: 'Invalid folder',
-    invalidFileType: 'File type not allowed. Use JPG, PNG, WebP, GIF or MP4.',
-    missingFile: 'No file was provided',
-    fileTooLarge: 'File too large for direct upload.',
-    processingError: 'Error processing file',
-  },
-};
-
-function resolveUploadLocale(request: NextRequest): UploadLocale {
+function resolveApiUploadLocale(request: NextRequest): ApiUploadLocale {
   const header = request.headers.get('accept-language')?.toLowerCase() || '';
   if (header.includes('ca')) return 'ca';
   if (header.includes('en')) return 'en';
@@ -95,8 +55,8 @@ function verifyAuth(request: NextRequest): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  const locale = resolveUploadLocale(request);
-  const t = UPLOAD_MESSAGES[locale];
+  const locale = resolveApiUploadLocale(request);
+  const t = API_UPLOAD_MESSAGES[locale];
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
 
@@ -127,7 +87,7 @@ export async function POST(request: NextRequest) {
       if (!folder) {
         return NextResponse.json({ error: t.invalidFolder }, { status: 400 });
       }
-      if (!VALID_UPLOAD_TYPES.includes(fileType)) {
+      if (!API_UPLOAD_VALID_TYPES.includes(fileType as (typeof API_UPLOAD_VALID_TYPES)[number])) {
         return NextResponse.json({ error: t.invalidFileType }, { status: 400 });
       }
 
@@ -153,10 +113,10 @@ export async function POST(request: NextRequest) {
     if (!folder) {
       return NextResponse.json({ error: t.invalidFolder }, { status: 400 });
     }
-    if (!VALID_UPLOAD_TYPES.includes(file.type)) {
+    if (!API_UPLOAD_VALID_TYPES.includes(file.type as (typeof API_UPLOAD_VALID_TYPES)[number])) {
       return NextResponse.json({ error: t.invalidFileType }, { status: 400 });
     }
-    if (file.size > DIRECT_UPLOAD_LIMIT) {
+    if (file.size > API_UPLOAD_DIRECT_LIMIT) {
       return NextResponse.json({ error: t.fileTooLarge }, { status: 413 });
     }
 
