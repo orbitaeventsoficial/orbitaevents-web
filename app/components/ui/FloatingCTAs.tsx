@@ -101,9 +101,9 @@ export function ContactDesktop() {
                   </svg>
                 </div>
                 {/* Tooltip telèfon */}
-                <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#111] border border-white/10 rounded-lg px-3 py-1.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-zinc-900 border border-white/10 rounded-lg px-3 py-1.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   <span className="text-xs text-white/80">{SITE_CONFIG.business.phoneDisplay}</span>
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border-4 border-transparent border-l-[#111]" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border-4 border-transparent border-l-zinc-900" />
                 </div>
               </motion.a>
             )}
@@ -118,7 +118,7 @@ export function ContactDesktop() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 12 }}
                   transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-[#111] border border-white/10 rounded-lg px-4 py-2 whitespace-nowrap pointer-events-none"
+                  className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-zinc-900 border border-white/10 rounded-lg px-4 py-2 whitespace-nowrap pointer-events-none"
                 >
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
@@ -127,7 +127,7 @@ export function ContactDesktop() {
                     </span>
                   </div>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full">
-                    <div className="border-8 border-transparent border-l-[#111]" />
+                    <div className="border-8 border-transparent border-l-zinc-900" />
                   </div>
                 </motion.div>
               )}
@@ -295,7 +295,7 @@ export function BottomBarMobile() {
               </div>
 
               {/* Trust line */}
-              <div className="flex items-center justify-center gap-4 mt-2 text-[11px] text-[#666]">
+              <div className="flex items-center justify-center gap-4 mt-2 text-[11px] text-white/40">
                 <span>✓ {t('trust.responseTime')}</span>
                 <span>✓ {t('trust.noCommitment')}</span>
               </div>

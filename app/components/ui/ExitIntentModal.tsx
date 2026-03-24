@@ -82,7 +82,7 @@ export default function ExitIntentModal() {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-2xl bg-[#111] border border-white/10 shadow-2xl p-8 text-center animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md rounded-2xl bg-zinc-900 border border-white/10 shadow-2xl p-8 text-center animate-in fade-in zoom-in-95 duration-200">
         {/* Close */}
         <button
           onClick={handleClose}

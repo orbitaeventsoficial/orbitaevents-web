@@ -55,7 +55,7 @@ export default function CTAFinal() {
   };
 
   return (
-    <section className="relative py-20 md:py-28 overflow-hidden">
+    <section className="relative py-20 md:py-28 overflow-hidden oe-grid-pattern oe-film-grain">
       {/* Background */}
       <div className="absolute inset-0 bg-zinc-950" />
       <div className="absolute inset-0 overflow-hidden">
@@ -70,15 +70,7 @@ export default function CTAFinal() {
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* Film grain overlay */}
-      <div className="absolute inset-0 pointer-events-none z-10" style={{ opacity: 0.025 }}>
-        <svg width="100%" height="100%">
-          <filter id="cta-grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#cta-grain)" />
-        </svg>
-      </div>
+      {/* Film grain — via .oe-film-grain al section */}
 
       <div className="relative container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">

@@ -1,3 +1,59 @@
+## 2026-03-24 - Ma de pintura: hardcoded visuals → classes CSS monocapa
+
+### Noves classes CSS a globals.css
+- `.oe-film-grain` — soroll fractal SVG via `::after`, opacity 0.025, mix-blend-mode overlay
+- `.oe-vignette` — radial-gradient perifèric via `::after`
+- Ambdues segueixen el principi monocapa: un sol lloc, una sola definició
+
+### Fitxers netejats (hex/inline → Tailwind/classes)
+- **FloatingCTAs.tsx**: `#111` → `bg-zinc-900`, `border-l-[#111]` → `border-l-zinc-900`, `#666` → `text-white/40`
+- **ExitIntentModal.tsx**: `#111` → `bg-zinc-900`
+- **CTAFinal.tsx**: Film grain SVG inline eliminat → classe `.oe-film-grain` al `<section>`
+- **ProcessSection.tsx**: `linear-gradient(#F59E0B, #EA580C)` + `boxShadow` inline → `bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/35`
+- **GarantiaSection.tsx**: `boxShadow: rgba(0,0,0,0.3)` inline → `shadow-xl shadow-black/30`
+- **HeroElegant.tsx**: Vignette inline style → `.oe-vignette`, Film grain inline → `.oe-film-grain`
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- Playwright captures: home, packs, opiniones, mobile — tot coherent
+- Colors brand WhatsApp (`#25D366`) mantinguts (legítims)
+
+---
+
+## 2026-03-24 - Quadrícula consistent, heroes amb imatge, fixes footer, timeout admin
+
+### Quadrícula `oe-grid-pattern` a TOTES les seccions fosques
+- Creada classe CSS centralitzada `oe-grid-pattern` a `globals.css` (::before, 60px, 2.5% blanc)
+- Aplicada a **35+ components i pàgines**: homepage (desktop + mòbil), serveis, portfolio, blog, opiniones, packs, about, contacte, configurador, legal, zones, halloween, valoració, 404, error, gràcies, portal client
+- Eliminats patrons inline duplicats (footer, GarantiaSection)
+- Regla documentada a CLAUDE.md: tota secció fosca pública OBLIGATÒRIAMENT porta `oe-grid-pattern`
+
+### Heroes amb imatge a pàgines de serveis
+- Convertits 3 heroes de gradient pla a foto real: `/servicios` (fiestas-privadas-01), `/servicios/discomovil` (discomovil-01), `/servicios/animacion-infantil` (fiestas-infantiles-01)
+- Patró idèntic a bodas/fiestas/empresas: `Image fill` + `bg-gradient-to-b from-black/60 via-black/50 to-bg-main` + `backdrop-blur-sm` al badge
+
+### Footer: trust signals amb color + legal links posició
+- Trust signals: colors intensificats `/20` → `/30`, mètrica amb accent semàntic (ambre, lila, verd, cyan)
+- Quadrícula del footer ara comença DESPRÉS dels trust signals (no al `<footer>` sencer)
+- Legal links: `justify-start` + `pr-24` per evitar que WhatsApp tapi "Avís Legal"
+
+### Admin: timeout 15s a 10 pàgines amb spinner infinit
+- AbortController 15s + error state + botó "Reintentar" a: inventory, pricing, discount-codes, features, stats, privacy, clientes, text-manager, coverage, blog
+- Verificat amb Playwright: totes mostren contingut o error clar
+
+### Validació
+- `npx tsc --noEmit` → 0 errors
+- Regla `oe-grid-pattern` afegida a CLAUDE.md secció Visual/CSS
+
+## 2026-03-24 - i18n portfolio, metadata dinàmica i JSON-LD ImageGallery
+
+- He internacionalitzat totes les cadenes hardcoded de les pàgines de portfolio (`[slug]` i `[slug]/[eventSlug]`): "Lloc", "Data", "Convidats", "Serveis", "Esdeveniments destacats", "Galeria", "Vols algo semblant?", "Munta el teu event", "Veure event" i el comptador de fotos.
+- Afegides claus `pages.portfolio.eventDetail.*` als 3 fitxers de missatges (ca/es/en).
+- Arreglat "Ver galería" hardcoded en espanyol al portfolio index — ara usa `t('viewGallery')`.
+- Eliminat "Desde 250 EUR" hardcoded al metadata del layout (`title`, `description`, `openGraph`, `twitter`) — ara usa `MIN_SERVICE_PRICE` dinàmic que ve de `packs-config.ts`.
+- Afegit JSON-LD `ImageGallery` schema al portfolio de categoria per millorar indexació de Google Images.
+- Validació: `npx tsc --noEmit` OK i `pnpm build` OK.
+
 ## 2026-03-21 - Qualitat fina a inventari booking, clients i lead pipeline
 
 - Booking inventory section: missatges d'error mÃƒÂ©s explÃƒÂ­cits a assignaciÃƒÂ³, lot, pack, checkout/checkin i eliminaciÃƒÂ³.
