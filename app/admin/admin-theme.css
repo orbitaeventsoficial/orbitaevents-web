@@ -1,26 +1,35 @@
-/* Single admin theme layer: shared tokens plus the few utilities that still need dedicated styling. */
+/* ==========================================================================
+   ADMIN THEME — Single source of truth for ALL admin tokens.
+   Includes: base palette, semantic aliases, Control Room palette,
+   layout dimensions, transitions, typography, bridge tokens.
+   ========================================================================== */
 
 html.admin-mode {
+  /* ── Backgrounds ── */
   --at-bg: #0f1218;
   --at-surface: #1a1f2b;
   --at-panel: #222938;
   --at-raised: #2d3548;
   --at-input: #151a24;
 
+  /* ── Borders ── */
   --at-border: #3a4560;
   --at-border-s: #506080;
   --at-border-sub: #2a3040;
   --at-glass-border: rgba(255, 255, 255, 0.12);
 
+  /* ── Text ── */
   --at-text: #f0f4f8;
   --at-muted: #a8b5c4;
   --at-subtle: #7889a0;
 
+  /* ── Gold (brand accent) ── */
   --at-gold: #e0a832;
   --at-gold-glow: rgba(224, 168, 50, 0.25);
   --at-gold-dim: rgba(224, 168, 50, 0.15);
   --at-gold-text: #f0c050;
 
+  /* ── Functional accents ── */
   --at-blue: #5a9ee0;
   --at-blue-dim: rgba(90, 158, 224, 0.16);
   --at-green: #45b868;
@@ -29,13 +38,129 @@ html.admin-mode {
   --at-orange-dim: rgba(224, 152, 48, 0.16);
   --at-red: #e05060;
   --at-red-dim: rgba(224, 80, 96, 0.16);
+  --at-violet: #b080ff;
+  --at-violet-dim: rgba(176, 128, 255, 0.16);
+  --at-cyan: #40d0e0;
+  --at-cyan-dim: rgba(64, 208, 224, 0.16);
 
+  /* ── Semantic aliases ── */
+  --at-info: var(--at-blue);
+  --at-success: var(--at-green);
+  --at-brand-vivid: var(--at-gold-text);
+  --at-border-strong: var(--at-border-s);
+
+  /* ── Glass + Shadows ── */
   --at-glass-bg: rgba(22, 28, 40, 0.85);
   --at-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
   --at-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
   --at-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  /* ── Control Room palette ── */
+  --at-cr-rose: #c15f79;
+  --at-cr-rose-border: #9a4b62;
+  --at-cr-rose-soft: rgba(193, 95, 121, 0.15);
+  --at-cr-rose-chip: rgba(186, 74, 102, 0.2);
+  --at-cr-rose-text: #ff9bb6;
+  --at-cr-rose-bg: #3a1f29;
+
+  --at-cr-amber: #c89d51;
+  --at-cr-amber-border: #b07d2d;
+  --at-cr-amber-soft: rgba(200, 157, 81, 0.15);
+  --at-cr-amber-chip: rgba(192, 138, 44, 0.2);
+  --at-cr-amber-text: #ffcf6b;
+  --at-cr-amber-bg: #3a2a15;
+  --at-cr-amber-dark: #352913;
+
+  --at-cr-emerald: #3f8a68;
+  --at-cr-emerald-soft: rgba(63, 138, 104, 0.15);
+  --at-cr-emerald-text: #64e8b0;
+  --at-cr-emerald-chip: rgba(62, 160, 126, 0.2);
+  --at-cr-pilot-border: #3ea07e;
+  --at-cr-pilot-text: #c9ffe8;
+
+  --at-cr-sky: #5a98c0;
+  --at-cr-sky-border: #4a7ca6;
+  --at-cr-sky-deep: #3f7c99;
+  --at-cr-sky-soft: rgba(90, 152, 192, 0.15);
+  --at-cr-sky-text: #8ecbff;
+  --at-cr-sky-bg: #1a3040;
+  --at-cr-cyan-border: #4aa6d4;
+  --at-cr-cyan-text: #67d6ff;
+  --at-cr-cyan-light: #9ed8ff;
+
+  --at-cr-violet-border: #6f5aa0;
+  --at-cr-violet-bg: #2b1f3d;
+
+  --at-cr-bg-deep: #111a2a;
+  --at-cr-bg-card: #172135;
+  --at-cr-bg-head: #1a2437;
+  --at-cr-bg-hover: #1d2940;
+  --at-cr-bg-input: #121826;
+  --at-cr-bg-action: #20324b;
+  --at-cr-bg-action-h: #2a3f5e;
+  --at-cr-bg-ghost-h: #1e2f49;
+
+  --at-cr-meta: #8ea6c6;
+  --at-cr-divide: #2f4463;
+  --at-cr-avatar-bg: #263245;
+  --at-cr-avatar-border: #465b79;
+
+  --at-cr-btn-primary: #ffcf6b;
+  --at-cr-btn-primary-h: #ffde9f;
+  --at-cr-btn-primary-t: #1a2538;
+  --at-cr-btn-border: #ffd98d;
+
+  /* ── Layout ── */
+  --at-sidebar-w: 14rem;
+  --at-header-h: 60px;
+  --at-mobile-header-h: 56px;
+  --at-bottom-nav-h: 64px;
+
+  /* ── Transitions ── */
+  --at-transition: 150ms ease;
+  --at-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Typography ── */
+  --at-font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --at-font-size: clamp(0.9rem, 0.875rem + 0.1vw, 0.975rem);
+
+  color-scheme: dark;
 }
 
+/* ── Bridge tokens (layout → theme) ── */
+html.admin-mode .admin-layout-shell {
+  --admin-surface: var(--at-surface);
+  --admin-panel: var(--at-panel);
+  --admin-border: var(--at-border);
+  --admin-text: var(--at-text);
+  --admin-muted: var(--at-muted);
+  --admin-primary: var(--at-gold);
+  --admin-success: var(--at-green);
+  --admin-warning: var(--at-orange);
+  --admin-danger: var(--at-red);
+  --admin-cat-surface-base: var(--at-panel);
+  --admin-cat-surface-border: var(--at-border-s);
+  --admin-cat-surface-text: var(--at-text);
+  --admin-cat-action-bg: var(--at-raised);
+  --admin-cat-action-border: var(--at-border-s);
+  --admin-cat-action-text: var(--at-text);
+  --admin-cat-action-bg-hover: color-mix(in oklab, var(--at-gold) 25%, var(--at-raised) 75%);
+  --admin-cat-action-border-hover: var(--at-gold);
+  --admin-cat-status-pending-bg: color-mix(in oklab, var(--at-orange) 18%, var(--at-panel) 82%);
+  --admin-cat-status-pending-border: var(--at-orange);
+  --admin-cat-status-pending-text: var(--at-text);
+  --admin-cat-status-confirmed-bg: color-mix(in oklab, var(--at-blue) 18%, var(--at-panel) 82%);
+  --admin-cat-status-confirmed-border: var(--at-blue);
+  --admin-cat-status-confirmed-text: var(--at-text);
+  --admin-cat-status-completed-bg: color-mix(in oklab, var(--at-green) 18%, var(--at-panel) 82%);
+  --admin-cat-status-completed-border: var(--at-green);
+  --admin-cat-status-completed-text: var(--at-text);
+  --admin-cat-status-cancelled-bg: color-mix(in oklab, var(--at-red) 18%, var(--at-panel) 82%);
+  --admin-cat-status-cancelled-border: var(--at-red);
+  --admin-cat-status-cancelled-text: var(--at-text);
+}
+
+/* ── Component utilities ── */
 html.admin-mode .admin-layout-shell .admin-card-glass {
   background: var(--at-glass-bg);
   border-color: var(--at-glass-border);
@@ -215,4 +340,3 @@ html.admin-mode .admin-shimmer {
     animation: none;
   }
 }
-

@@ -242,7 +242,7 @@ export default async function LeadsPage({
       actions={<div className="flex gap-2">
         <ExportCsvButton
           filename="entrades"
-          headers={['Nom', 'Email', 'TelÃ¨fon', 'Tipus', 'Origen', 'Estat', 'Data event']}
+          headers={['Nom', 'Email', 'Telèfon', 'Tipus', 'Origen', 'Estat', 'Data event']}
           rows={leads.map((l) => [
             l.name,
             l.email,
@@ -253,7 +253,7 @@ export default async function LeadsPage({
             l.eventDate ? formatDate(l.eventDate) : '',
           ])}
         />
-        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada rÃ pida</Link>
+        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>
       </div>}
     >
     <div
@@ -275,7 +275,7 @@ export default async function LeadsPage({
             href="/admin/intake"
             className="admin-keep-colors admin-leads-tab admin-leads-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
           >
-            Entrada rÃ pida
+            Entrada ràpida
           </Link>
         </div>
       </section>
@@ -493,7 +493,7 @@ export default async function LeadsPage({
       {data.pagination.totalPages > 1 && (
         <section className="ap-card flex items-center justify-between rounded-2xl p-3 text-xs">
           <span>
-            PÃ gina {data.pagination.page} de {data.pagination.totalPages}
+            Pàgina {data.pagination.page} de {data.pagination.totalPages}
           </span>
           <div className="flex items-center gap-2">
             {data.pagination.page > 1 ? (
@@ -519,10 +519,10 @@ export default async function LeadsPage({
                 })()}`}
                 className="rounded-xl border px-3 py-1"
               >
-                SegÃ¼ent â†’
+                Següent →
               </Link>
             ) : (
-              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">SegÃ¼ent â†’</span>
+              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">Següent →</span>
             )}
           </div>
         </section>

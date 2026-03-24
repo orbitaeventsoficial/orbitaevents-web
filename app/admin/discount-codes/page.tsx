@@ -70,17 +70,25 @@ export default function DiscountCodesPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const loadCodes = useCallback(async () => {
+    setError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetchWithCsrf('/api/admin/discount-codes');
+      const res = await fetchWithCsrf('/api/admin/discount-codes', { signal: controller.signal });
       if (res.ok) {
         const data = await res.json();
         setCodes(data.codes || []);
         setStats(data.stats || null);
       }
     } catch (error) {
-      console.error('[DiscountCodes] Error carregant codis:', error);
-      toast.error('Error carregant codis de descompte');
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        console.error('[DiscountCodes] Error carregant codis:', error);
+        setError('Error carregant codis de descompte');
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }, [toast]);
@@ -163,6 +171,15 @@ export default function DiscountCodesPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (error && !codes.length) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{error}</p>
+        <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

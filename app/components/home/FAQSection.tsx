@@ -36,7 +36,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-hidden oe-grid-pattern">
       {/* JSON-LD Schema */}
       <script
         type="application/ld+json"

@@ -59,6 +59,7 @@ export default function InventoryListClient() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
@@ -77,15 +78,18 @@ export default function InventoryListClient() {
   });
 
   const fetchData = useCallback(async () => {
+    setFetchError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.set('search', searchQuery);
       if (filterCategory) params.set('category', filterCategory);
       if (filterStatus) params.set('status', filterStatus);
 
-      const res = await fetchWithCsrf(`/api/admin/inventory?${params}`);
+      const res = await fetchWithCsrf(`/api/admin/inventory?${params}`, { signal: controller.signal });
       if (!res.ok) {
-        console.error('[Inventory] API error:', res.status);
+        setFetchError(`Error del servidor (${res.status})`);
         return;
       }
 
@@ -93,8 +97,13 @@ export default function InventoryListClient() {
       setItems(data.items || []);
       setStats(data.stats || {});
     } catch (error) {
-      console.error('[Inventory] Error carregant inventari:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setFetchError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setFetchError('Error carregant inventari.');
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }, [searchQuery, filterCategory, filterStatus]);
@@ -269,6 +278,15 @@ export default function InventoryListClient() {
         <div className="h-10 rounded-2xl animate-pulse" />
         <div className="h-32 rounded-2xl animate-pulse" />
         <div className="h-64 rounded-2xl animate-pulse" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <button type="button" onClick={() => { setLoading(true); fetchData(); }} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

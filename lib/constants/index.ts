@@ -1,6 +1,6 @@
 // lib/constants/index.ts
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// Ã’RBITA EVENTS - CONSTANTES CENTRALIZADAS
+// ÒRBITA EVENTS - CONSTANTES CENTRALIZADAS
 //
 import type { ExtraDefinition, ServiceSlug } from '@/app/config/packs-config';
 import { PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
@@ -33,7 +33,7 @@ export const LEAD_STATUS_CONFIG: Record<string, StatusTone> = {
   NEW: { bg: 'admin-tone-bg-info', text: 'admin-tone-text-info', border: 'admin-tone-border-info', label: 'Nova entrada' },
   CONTACTED: { bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', border: 'admin-tone-border-warning', label: 'Contactat' },
   QUOTE_SENT: { bg: 'admin-tone-bg-violet', text: 'admin-tone-text-violet', border: 'admin-tone-border-violet', label: 'Pressupost enviat' },
-  NEGOTIATING: { bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', border: 'admin-tone-border-warning', label: 'NegociaciÃ³' },
+  NEGOTIATING: { bg: 'admin-tone-bg-warning', text: 'admin-tone-text-warning', border: 'admin-tone-border-warning', label: 'Negociació' },
   WON: { bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', border: 'admin-tone-border-success', label: 'Guanyat!' },
   LOST: { bg: 'admin-tone-bg-slate', text: 'admin-tone-text-slate', border: 'admin-tone-border-slate', label: 'Perdut' },
 };
@@ -47,7 +47,7 @@ export const BOOKING_STATUS_CONFIG: Record<string, StatusTone> = {
   CONFIRMED: { bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', border: 'admin-tone-border-success', label: 'Confirmada' },
   PREPARING: { bg: 'admin-tone-bg-info', text: 'admin-tone-text-info', border: 'admin-tone-border-info', label: 'Preparant' },
   COMPLETED: { bg: 'admin-tone-bg-teal', text: 'admin-tone-text-teal', border: 'admin-tone-border-teal', label: 'Completada' },
-  CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'CancelÂ·lada' },
+  CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'Cancel·lada' },
 };
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -59,7 +59,7 @@ export const BOOKING_STATUS_BADGE_DISPLAY: Record<string, { label: string; class
   CONFIRMED: { label: 'Confirmat', className: 'admin-tone-soft-success admin-tone-text-success' },
   PREPARING: { label: 'Preparant', className: 'admin-tone-soft-info admin-tone-text-info' },
   COMPLETED: { label: 'Completat', className: 'admin-tone-idle' },
-  CANCELLED: { label: 'CancelÂ·lat', className: 'admin-tone-soft-danger admin-tone-text-danger' },
+  CANCELLED: { label: 'Cancel·lat', className: 'admin-tone-soft-danger admin-tone-text-danger' },
 };
 
 export const PROPOSAL_STATUS_CONFIG: Record<string, StatusTone> = {
@@ -79,7 +79,7 @@ export const CONTRACT_STATUS_CONFIG: Record<string, StatusTone> = {
   DRAFT: { bg: 'admin-tone-bg-neutral', text: 'admin-tone-text-neutral', border: 'admin-tone-border-neutral', label: 'Esborrany' },
   SENT: { bg: 'admin-tone-bg-cyan', text: 'admin-tone-text-cyan', border: 'admin-tone-border-cyan', label: 'Enviat' },
   SIGNED: { bg: 'admin-tone-bg-success', text: 'admin-tone-text-success', border: 'admin-tone-border-success', label: 'Signat' },
-  CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'CancelÂ·lat' },
+  CANCELLED: { bg: 'admin-tone-bg-danger', text: 'admin-tone-text-danger', border: 'admin-tone-border-danger', label: 'Cancel·lat' },
 };
 
 export const INVOICE_STATUS_DISPLAY: Record<string, { label: string; className: string; icon: string }> = {
@@ -102,27 +102,27 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = Object.fromEntries(
 /** Emoji + label (default display) */
 export const EVENT_TYPE_LABELS: Record<string, string> = {
   WEDDING: 'ðŸ’ Casament',
-  BIRTHDAY: 'ðŸŽ‚ Aniversari',
-  CORPORATE: 'ðŸŽ¯ Corporatiu',
-  COMMUNION: 'â›ª ComuniÃ³',
-  BAPTISM: 'ðŸ‘¶ Bateig',
-  GRADUATION: 'ðŸŽ“ GraduaciÃ³',
-  ANNIVERSARY: 'ðŸŽ‰ CelebraciÃ³',
-  PRIVATE_PARTY: 'ðŸŽµ Festa privada',
-  OTHER: 'ðŸ“‹ Altre',
+  BIRTHDAY: '🎂 Aniversari',
+  CORPORATE: '🎯 Corporatiu',
+  COMMUNION: '⛪ Comunió',
+  BAPTISM: '👶 Bateig',
+  GRADUATION: '🎓 Graduació',
+  ANNIVERSARY: '🎉 Celebració',
+  PRIVATE_PARTY: '🎵 Festa privada',
+  OTHER: '📋 Altre',
 };
 
 /** Emoji only (for compact views like pipeline cards) */
 export const EVENT_TYPE_ICONS: Record<string, string> = {
   WEDDING: 'ðŸ’',
-  BIRTHDAY: 'ðŸŽ‚',
-  CORPORATE: 'ðŸŽ¯',
-  COMMUNION: 'â›ª',
-  BAPTISM: 'ðŸ‘¶',
-  GRADUATION: 'ðŸŽ“',
-  ANNIVERSARY: 'ðŸŽ‰',
-  PRIVATE_PARTY: 'ðŸŽµ',
-  OTHER: 'ðŸ“‹',
+  BIRTHDAY: '🎂',
+  CORPORATE: '🎯',
+  COMMUNION: '⛪',
+  BAPTISM: '👶',
+  GRADUATION: '🎓',
+  ANNIVERSARY: '🎉',
+  PRIVATE_PARTY: '🎵',
+  OTHER: '📋',
 };
 
 /** Plain text labels without emoji (for selects and forms) */
@@ -130,10 +130,10 @@ export const EVENT_TYPE_PLAIN: Record<string, string> = {
   WEDDING: 'Casament',
   BIRTHDAY: 'Aniversari',
   CORPORATE: 'Corporatiu',
-  COMMUNION: 'ComuniÃ³',
+  COMMUNION: 'Comunió',
   BAPTISM: 'Bateig',
-  GRADUATION: 'GraduaciÃ³',
-  ANNIVERSARY: 'CelebraciÃ³',
+  GRADUATION: 'Graduació',
+  ANNIVERSARY: 'Celebració',
   PRIVATE_PARTY: 'Festa privada',
   OTHER: 'Altre',
 };
@@ -152,17 +152,17 @@ export const EVENT_TYPE_CHART_COLORS: Record<string, string> = {
 export function getEventTypeDisplay(eventType: string) {
   return {
     label: EVENT_TYPE_PLAIN[eventType] || eventType,
-    icon: EVENT_TYPE_ICONS[eventType] || 'ðŸ“…',
+    icon: EVENT_TYPE_ICONS[eventType] || '📅',
   };
 };
 
 export const EVENT_TYPE_DOCUMENT_LABELS: Record<string, string> = {
   WEDDING: 'Boda',
-  BIRTHDAY: 'Aniversari / CumpleaÃ±os',
+  BIRTHDAY: 'Aniversari / Cumpleaños',
   CORPORATE: 'Esdeveniment Corporatiu',
-  COMMUNION: 'ComuniÃ³',
+  COMMUNION: 'Comunió',
   BAPTISM: 'Bateig',
-  GRADUATION: 'GraduaciÃ³',
+  GRADUATION: 'Graduació',
   ANNIVERSARY: 'Aniversari',
   PRIVATE_PARTY: 'Festa Privada',
   OTHER: 'Esdeveniment',
@@ -371,12 +371,12 @@ export function getPublicOrganizationJsonLd({
 }
 
 export const RECENT_FEED_EVENT_TYPE_SERVICE_LABELS: Record<string, string> = {
-  WEDDING: 'DJ + ProducciÃ³ Boda',
+  WEDDING: 'DJ + Producció Boda',
   BIRTHDAY: 'Festa Aniversari',
   CORPORATE: 'Event Corporatiu',
-  COMMUNION: 'ComuniÃ³',
+  COMMUNION: 'Comunió',
   BAPTISM: 'Bateig',
-  GRADUATION: 'GraduaciÃ³',
+  GRADUATION: 'Graduació',
   ANNIVERSARY: 'Aniversari',
   PRIVATE_PARTY: 'Festa Privada',
   OTHER: 'Event Especial',
@@ -400,8 +400,8 @@ export const RECENT_FEED_ANONYMOUS_NAMES: Record<string, readonly string[]> = {
   BIRTHDAY: ['Sara', 'Marc', 'Laura', 'Pol', 'Maria'],
   CORPORATE: ['Empresa Tech', 'Start-up BCN', 'Consulting SL'],
   PRIVATE_PARTY: ['Marc', 'Laura', 'Joan', 'Anna'],
-  COMMUNION: ['FamÃ­lia GarcÃ­a', 'FamÃ­lia LÃ³pez'],
-  BAPTISM: ['FamÃ­lia MartÃ­', 'FamÃ­lia Puig'],
+  COMMUNION: ['Família García', 'Família López'],
+  BAPTISM: ['Família Martí', 'Família Puig'],
   OTHER: ['Client VIP', 'Reserva especial'],
 };
 
@@ -429,7 +429,7 @@ export const LEAD_STATUS_LABELS: Record<string, string> = {
   NEW: 'Nou lead',
   CONTACTED: 'Contactat',
   QUOTE_SENT: 'Pressupost enviat',
-  NEGOTIATING: 'En negociaciÃ³',
+  NEGOTIATING: 'En negociació',
   WON: 'Guanyat',
   LOST: 'Perdut',
 };
@@ -632,7 +632,7 @@ export const EVENT_TYPE_OPTIONS = Object.entries(EVENT_TYPE_PLAIN).map(([value, 
 export const SOURCE_LABELS: Record<string, string> = {
   WEBSITE: 'Web',
   CONFIGURATOR: 'Configurador',
-  PHONE: 'TelÃ¨fon',
+  PHONE: 'Telèfon',
   WHATSAPP: 'WhatsApp',
   INSTAGRAM: 'Instagram',
   WALLAPOP: 'Wallapop',
@@ -643,20 +643,20 @@ export const SOURCE_LABELS: Record<string, string> = {
 
 export const SOURCE_ICONS: Record<string, string> = {
   WEBSITE: 'ðŸŒ',
-  CONFIGURATOR: 'âš™ï¸',
-  PHONE: 'ðŸ“ž',
-  WHATSAPP: 'ðŸ’¬',
-  INSTAGRAM: 'ðŸ“¸',
-  WALLAPOP: 'ðŸŸ£',
-  REFERRAL: 'ðŸ‘¥',
+  CONFIGURATOR: '⚙ï¸',
+  PHONE: '📞',
+  WHATSAPP: '💬',
+  INSTAGRAM: '📸',
+  WALLAPOP: '🟣',
+  REFERRAL: '👥',
   GOOGLE: 'ðŸ”',
-  OTHER: 'ðŸ“©',
+  OTHER: '📩',
 };
 
 export function getSourceDisplay(source: string) {
   return {
     label: SOURCE_LABELS[source] || 'Altre',
-    icon: SOURCE_ICONS[source] || 'ðŸ“©',
+    icon: SOURCE_ICONS[source] || '📩',
   };
 };
 
@@ -666,11 +666,11 @@ export const LEAD_STATUS_OPTIONS = Object.entries(LEAD_STATUS_LABELS).map(([valu
 }));
 
 export const LEAD_STATUS_ACTION_OPTIONS = [
-  { value: 'NEW', label: 'Nova entrada', tone: 'admin-tone-bg-info', icon: 'ðŸ†•' },
-  { value: 'CONTACTED', label: 'Contactat', tone: 'admin-tone-bg-warning', icon: 'ðŸ“ž' },
-  { value: 'QUOTE_SENT', label: 'Pressupost enviat', tone: 'admin-tone-bg-neutral', icon: 'ðŸ“„' },
-  { value: 'NEGOTIATING', label: 'En negociaciÃ³', tone: 'admin-tone-bg-warning', icon: 'ðŸ¤' },
-  { value: 'WON', label: 'Guanyat!', tone: 'admin-tone-bg-success', icon: 'âœ…' },
+  { value: 'NEW', label: 'Nova entrada', tone: 'admin-tone-bg-info', icon: '🆕' },
+  { value: 'CONTACTED', label: 'Contactat', tone: 'admin-tone-bg-warning', icon: '📞' },
+  { value: 'QUOTE_SENT', label: 'Pressupost enviat', tone: 'admin-tone-bg-neutral', icon: '📄' },
+  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: 'ðŸ¤' },
+  { value: 'WON', label: 'Guanyat!', tone: 'admin-tone-bg-success', icon: '✅' },
   { value: 'LOST', label: 'Perdut', tone: 'admin-tone-bg-danger', icon: 'âŒ' },
 ] as const;
 
@@ -692,7 +692,7 @@ export const PRIORITY_DOT_CLASS: Record<string, string> = {
 
 export const LEAD_SCORE_BAND_LABELS: Record<string, string> = {
   LOW: 'BAIX',
-  MEDIUM: 'MITJÃ€',
+  MEDIUM: 'MITJÀ',
   HIGH: 'ALT',
 };
 
@@ -737,28 +737,28 @@ export const BOOKING_GALLERY_PORTFOLIO_CATEGORIES = [
   { slug: 'eventos-empresa', name: 'Eventos empresa' },
   { slug: 'fiestas-infantiles', name: 'Fiestas infantiles' },
   { slug: 'fiestas-privadas', name: 'Fiestas privadas' },
-  { slug: 'produccion-tecnica', name: 'ProducciÃ³n tÃ©cnica' },
+  { slug: 'produccion-tecnica', name: 'Producción técnica' },
   { slug: 'alquiler-equipo', name: 'Alquiler equipo' },
-  { slug: 'fiestas-tematicas-halloween', name: 'Fiestas temÃ¡ticas Halloween' },
-  { slug: 'fiestas-tematicas-mon-magic', name: 'Fiestas temÃ¡ticas MÃ³n MÃ gic' },
+  { slug: 'fiestas-tematicas-halloween', name: 'Fiestas temáticas Halloween' },
+  { slug: 'fiestas-tematicas-mon-magic', name: 'Fiestas temáticas Món Màgic' },
 ] as const;
 
 export const INVENTORY_CATEGORY_LABELS: Record<string, string> = {
-  SOUND: 'ðŸ”Š So',
-  LIGHTING: 'ðŸ’¡ IlÂ·lum.',
-  EFFECTS: 'âœ¨ Efectes',
+  SOUND: '🔊 So',
+  LIGHTING: '💡 Il·lum.',
+  EFFECTS: '✨ Efectes',
   STRUCTURE: 'ðŸ—ï¸ Estruct.',
-  CABLING: 'ðŸ”Œ Cable',
-  TECH: 'ðŸ’» Tech',
-  DECORATION_HP: 'ðŸŽƒ Deco HP',
-  DECORATION_HW: 'ðŸŽ„ Deco HW',
-  DECORATION_GEN: 'ðŸŽ¨ Deco Gen',
-  CONSUMABLE: 'ðŸ“¦ Consum.',
+  CABLING: '🔌 Cable',
+  TECH: '💻 Tech',
+  DECORATION_HP: '🎃 Deco HP',
+  DECORATION_HW: '🎄 Deco HW',
+  DECORATION_GEN: '🎨 Deco Gen',
+  CONSUMABLE: '📦 Consum.',
 };
 
 export const INVENTORY_CONDITION_OPTIONS = [
   { value: 'NEW', label: 'Nou' },
-  { value: 'EXCELLENT', label: 'ExcelÂ·lent' },
+  { value: 'EXCELLENT', label: 'Excel·lent' },
   { value: 'GOOD', label: 'Bo' },
   { value: 'FAIR', label: 'Acceptable' },
   { value: 'POOR', label: 'Dolent' },
@@ -775,46 +775,46 @@ export const SETTINGS_TYPE_LABELS = {
 
 export const SETTINGS_CATEGORY_CONFIG: Record<string, { label: string; icon: string; description: string }> = {
   stats: {
-    label: 'EstadÃ­stiques PÃºbliques',
-    icon: 'ðŸ“Š',
-    description: 'NÃºmeros que apareixen a la web (esdeveniments, persones, etc.)',
+    label: 'Estadístiques Públiques',
+    icon: '📊',
+    description: 'Números que apareixen a la web (esdeveniments, persones, etc.)',
   },
   company: {
     label: 'Empresa',
     icon: 'ðŸ¢',
-    description: 'Dades legals i nom comercial (edita a ConfiguraciÃ³ empresa)',
+    description: 'Dades legals i nom comercial (edita a Configuració empresa)',
   },
   holded: {
     label: 'Holded',
-    icon: 'ðŸ§¾',
-    description: 'IntegraciÃ³ amb Holded per facturaciÃ³',
+    icon: '🧾',
+    description: 'Integració amb Holded per facturació',
   },
   contact: {
     label: 'Contacte',
-    icon: 'ðŸ“ž',
-    description: 'TelÃ¨fon, email, horaris...',
+    icon: '📞',
+    description: 'Telèfon, email, horaris...',
   },
   pricing: {
     label: 'Preus',
-    icon: 'ðŸ’°',
+    icon: '💰',
     description: 'Preus base, hora extra, descomptes...',
   },
   config: {
-    label: 'ConfiguraciÃ³ General',
-    icon: 'âš™ï¸',
+    label: 'Configuració General',
+    icon: '⚙ï¸',
     description: 'Altres configuracions del sistema',
   },
   social: {
     label: 'Xarxes Socials',
-    icon: 'ðŸ“±',
-    description: 'Perfils socials i enllaÃ§os',
+    icon: '📱',
+    description: 'Perfils socials i enllaços',
   },
 };
 
 export const CUSTOMER_SOURCE_LABELS: Record<string, string> = {
   website: 'Web',
   configurator: 'Configurador',
-  phone: 'TelÃ¨fon',
+  phone: 'Telèfon',
   whatsapp: 'WhatsApp',
   instagram: 'Instagram',
   wallapop: 'Wallapop',
@@ -833,7 +833,7 @@ export function getCustomerSourceLabel(source?: string | null, fallback = 'Desco
 export const DISCOUNT_SOURCE_LABELS: Record<string, string> = {
   POST_EVENT: 'Post-event',
   TESTIMONIAL: 'Testimoni',
-  REFERRAL: 'RecomanaciÃ³',
+  REFERRAL: 'Recomanació',
   MANUAL: 'Manual',
 };
 
@@ -842,14 +842,14 @@ export function getDiscountSourceLabel(sourceType: string) {
 }
 
 export const INTAKE_SOURCE_OPTIONS = [
-  { value: 'PHONE', label: 'TelÃ¨fon', icon: 'ðŸ“ž' },
-  { value: 'WHATSAPP', label: 'WhatsApp', icon: 'ðŸ’¬' },
-  { value: 'INSTAGRAM', label: 'Instagram', icon: 'ðŸ“¸' },
-  { value: 'WALLAPOP', label: 'Wallapop', icon: 'ðŸŸ¢' },
-  { value: 'REFERRAL', label: 'Boca-orella', icon: 'ðŸ—£ï¸' },
+  { value: 'PHONE', label: 'Telèfon', icon: '📞' },
+  { value: 'WHATSAPP', label: 'WhatsApp', icon: '💬' },
+  { value: 'INSTAGRAM', label: 'Instagram', icon: '📸' },
+  { value: 'WALLAPOP', label: 'Wallapop', icon: '🟢' },
+  { value: 'REFERRAL', label: 'Boca-orella', icon: '🗣ï¸' },
   { value: 'GOOGLE', label: 'Google', icon: 'ðŸ”' },
   { value: 'WEBSITE', label: 'Web', icon: 'ðŸŒ' },
-  { value: 'OTHER', label: 'Altre', icon: 'ðŸ“‹' },
+  { value: 'OTHER', label: 'Altre', icon: '📋' },
 ] as const;
 
 export const INTAKE_SOURCE_SELECTED_STYLES: Record<string, string> = {
@@ -865,14 +865,14 @@ export const INTAKE_SOURCE_SELECTED_STYLES: Record<string, string> = {
 
 export const INTAKE_EVENT_TYPE_OPTIONS = [
   { value: 'WEDDING', label: 'Casament', icon: 'ðŸ’' },
-  { value: 'BIRTHDAY', label: 'Aniversari', icon: 'ðŸŽ‚' },
-  { value: 'CORPORATE', label: 'Corporatiu', icon: 'ðŸŽ¯' },
-  { value: 'COMMUNION', label: 'ComuniÃ³', icon: 'â›ª' },
-  { value: 'BAPTISM', label: 'Bateig', icon: 'ðŸ‘¶' },
-  { value: 'GRADUATION', label: 'GraduaciÃ³', icon: 'ðŸŽ“' },
-  { value: 'ANNIVERSARY', label: 'CelebraciÃ³', icon: 'ðŸŽ‰' },
-  { value: 'PRIVATE_PARTY', label: 'Festa privada', icon: 'ðŸŽµ' },
-  { value: 'OTHER', label: 'Altre', icon: 'ðŸ“‹' },
+  { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
+  { value: 'CORPORATE', label: 'Corporatiu', icon: '🎯' },
+  { value: 'COMMUNION', label: 'Comunió', icon: '⛪' },
+  { value: 'BAPTISM', label: 'Bateig', icon: '👶' },
+  { value: 'GRADUATION', label: 'Graduació', icon: '🎓' },
+  { value: 'ANNIVERSARY', label: 'Celebració', icon: '🎉' },
+  { value: 'PRIVATE_PARTY', label: 'Festa privada', icon: '🎵' },
+  { value: 'OTHER', label: 'Altre', icon: '📋' },
 ] as const;
 
 export const INTAKE_PRIORITY_OPTIONS = [
@@ -883,21 +883,21 @@ export const INTAKE_PRIORITY_OPTIONS = [
 ] as const;
 
 export const INVENTORY_CATEGORY_OPTIONS = [
-  { value: 'SOUND', label: 'So', icon: 'ðŸ”Š' },
-  { value: 'LIGHTING', label: 'IlÂ·luminaciÃ³', icon: 'ðŸ’¡' },
-  { value: 'EFFECTS', label: 'Efectes', icon: 'âœ¨' },
+  { value: 'SOUND', label: 'So', icon: '🔊' },
+  { value: 'LIGHTING', label: 'Il·luminació', icon: '💡' },
+  { value: 'EFFECTS', label: 'Efectes', icon: '✨' },
   { value: 'STRUCTURE', label: 'Estructura', icon: 'ðŸ—ï¸' },
-  { value: 'CABLING', label: 'Cablejat', icon: 'ðŸ”Œ' },
-  { value: 'TECH', label: 'Tecnologia', icon: 'ðŸ’»' },
-  { value: 'DECORATION_HP', label: 'Deco HP', icon: 'ðŸŽƒ' },
-  { value: 'DECORATION_HW', label: 'Deco HW', icon: 'ðŸŽ„' },
-  { value: 'DECORATION_GEN', label: 'Deco General', icon: 'ðŸŽ¨' },
-  { value: 'CONSUMABLE', label: 'Consumibles', icon: 'ðŸ“¦' },
+  { value: 'CABLING', label: 'Cablejat', icon: '🔌' },
+  { value: 'TECH', label: 'Tecnologia', icon: '💻' },
+  { value: 'DECORATION_HP', label: 'Deco HP', icon: '🎃' },
+  { value: 'DECORATION_HW', label: 'Deco HW', icon: '🎄' },
+  { value: 'DECORATION_GEN', label: 'Deco General', icon: '🎨' },
+  { value: 'CONSUMABLE', label: 'Consumibles', icon: '📦' },
 ] as const;
 
 export const INVENTORY_STATUS_OPTIONS = [
   { value: 'AVAILABLE', label: 'Disponible' },
-  { value: 'IN_USE', label: 'En Ãºs' },
+  { value: 'IN_USE', label: 'En ús' },
   { value: 'MAINTENANCE', label: 'Manteniment' },
   { value: 'BROKEN', label: 'Avariat' },
   { value: 'RETIRED', label: 'Retirat' },
@@ -907,33 +907,33 @@ export const BLOG_CATEGORY_OPTIONS = [
   { value: 'bodas', label: 'Bodes' },
   { value: 'eventos', label: 'Esdeveniments' },
   { value: 'consejos', label: 'Consells' },
-  { value: 'tendencias', label: 'TendÃ¨ncies' },
+  { value: 'tendencias', label: 'Tendències' },
   { value: 'tecnologia', label: 'Tecnologia' },
 ] as const;
 
 export const FAQ_CATEGORY_OPTIONS = [
   { value: 'general', label: 'General' },
   { value: 'sound', label: 'So' },
-  { value: 'lighting', label: 'IlÂ·luminaciÃ³' },
+  { value: 'lighting', label: 'Il·luminació' },
   { value: 'pricing', label: 'Preus' },
   { value: 'booking', label: 'Reserves' },
 ] as const;
 
 export const FAQ_CATEGORY_CONFIG: Record<string, { label: string; icon: string }> = {
-  general: { label: 'General', icon: 'ðŸ“‹' },
-  sound: { label: 'So', icon: 'ðŸ”Š' },
-  lighting: { label: 'IlÂ·luminaciÃ³', icon: 'ðŸ’¡' },
-  pricing: { label: 'Preus', icon: 'ðŸ’°' },
-  booking: { label: 'Reserves', icon: 'ðŸ“…' },
+  general: { label: 'General', icon: '📋' },
+  sound: { label: 'So', icon: '🔊' },
+  lighting: { label: 'Il·luminació', icon: '💡' },
+  pricing: { label: 'Preus', icon: '💰' },
+  booking: { label: 'Reserves', icon: '📅' },
 };
 export function getFaqCategoryDisplay(category: string) {
   return FAQ_CATEGORY_CONFIG[category] || { label: category, icon: '❓' };
 }
 export const ACTIVITY_CATEGORY_OPTIONS = [
-  { id: 'all', label: 'Tot', icon: 'ðŸ“Š' },
-  { id: 'comms', label: 'Comunicacions', icon: 'âœ‰ï¸' },
-  { id: 'automation', label: 'Automatitzacions', icon: 'âš¡' },
-  { id: 'system', label: 'Sistema', icon: 'ðŸ”„' },
+  { id: 'all', label: 'Tot', icon: '📊' },
+  { id: 'comms', label: 'Comunicacions', icon: '✉ï¸' },
+  { id: 'automation', label: 'Automatitzacions', icon: '⚡' },
+  { id: 'system', label: 'Sistema', icon: '🔄' },
   { id: 'crud', label: 'Operacions', icon: 'ðŸ“' },
 ] as const;
 
@@ -952,13 +952,13 @@ export const CATALOG_TAB_META = {
   },
   extras: {
     label: 'Extres',
-    title: 'CatÃ leg d\'extres',
+    title: 'Catàleg d\'extres',
     description: 'Defineix extres comercials i compatibilitats per servei.',
   },
   inventory: {
     label: 'Inventari',
     title: 'Inventari operatiu',
-    description: 'Controla estat, Ãºs i disponibilitat del material.',
+    description: 'Controla estat, ús i disponibilitat del material.',
   },
   pricing: {
     label: 'Regles de preu',
@@ -970,12 +970,12 @@ export const CATALOG_TAB_META = {
 export const EMAIL_ACTIVITY_DISPLAY: Record<string, { label: string; icon: string; bg: string; text: string }> = {
   POST_EVENT_EMAIL_SENT: {
     label: 'Email post-event enviat',
-    icon: 'ðŸ“§',
+    icon: '📧',
     bg: 'admin-tone-bg-info',
     text: 'admin-tone-text-info',
   },
   TESTIMONIAL_SUBMITTED: {
-    label: 'ValoraciÃ³ rebuda',
+    label: 'Valoració rebuda',
     icon: 'â­',
     bg: 'admin-tone-bg-warning',
     text: 'admin-tone-text-warning',
@@ -987,8 +987,8 @@ export const EMAIL_ACTIVITY_DISPLAY: Record<string, { label: string; icon: strin
     text: 'admin-tone-text-success',
   },
   LEAD_EMAIL_SENT: {
-    label: 'ConfirmaciÃ³ lead enviada',
-    icon: 'âœ‰ï¸',
+    label: 'Confirmació lead enviada',
+    icon: '✉ï¸',
     bg: 'admin-tone-bg-violet',
     text: 'admin-tone-text-violet',
   },
@@ -997,12 +997,12 @@ export const EMAIL_ACTIVITY_DISPLAY: Record<string, { label: string; icon: strin
 export const PACK_SERVICE_OPTIONS = [
   { value: 'bodas', label: 'Bodes' },
   { value: 'fiestas', label: 'Festes' },
-  { value: 'discomovil', label: 'DiscomÃ²bil' },
+  { value: 'discomovil', label: 'Discomòbil' },
   { value: 'empresas', label: 'Empreses' },
 ] as const;
 
 export const SUPPORTED_LOCALES = ['ca', 'es', 'en'] as const;
-export const SUPPORTED_LOCALE_LABELS: Record<string, string> = { ca: 'CatalÃ ', es: 'CastellÃ ', en: 'AnglÃ¨s' };
+export const SUPPORTED_LOCALE_LABELS: Record<string, string> = { ca: 'Català', es: 'Castellà', en: 'Anglès' };
 export const OPEN_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
 export const LEAD_STATUS_VALUES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const;
 export const PRIORITY_VALUES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
@@ -1654,10 +1654,10 @@ export const PUBLIC_FOOTER_SOCIAL_LINK_META = [
 ] as const;
 
 export const PUBLIC_FOOTER_TRUST_SIGNAL_META = [
-  { key: 'experience', icon: '⭐', color: 'from-amber-500/20 to-orange-500/20' },
-  { key: 'events', icon: '🎉', color: 'from-purple-500/20 to-pink-500/20' },
-  { key: 'response', icon: '⚡', color: 'from-green-500/20 to-emerald-500/20' },
-  { key: 'coverage', icon: '📍', color: 'from-blue-500/20 to-cyan-500/20' },
+  { key: 'experience', icon: '⭐', color: 'from-amber-500/30 to-orange-500/30', accent: 'text-amber-400' },
+  { key: 'events', icon: '🎉', color: 'from-purple-500/30 to-pink-500/30', accent: 'text-purple-400' },
+  { key: 'response', icon: '⚡', color: 'from-green-500/30 to-emerald-500/30', accent: 'text-emerald-400' },
+  { key: 'coverage', icon: '📍', color: 'from-blue-500/30 to-cyan-500/30', accent: 'text-cyan-400' },
 ] as const;
 
 

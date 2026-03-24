@@ -2402,6 +2402,19 @@
         "alquiler-equipo": "Equipment Rental",
         "fiestas-tematicas-halloween": "Halloween Theme Parties",
         "fiestas-tematicas-mon-magic": "Magic World Theme Parties"
+      },
+      "eventDetail": {
+        "venue": "Venue",
+        "date": "Date",
+        "guests": "Guests",
+        "services": "Services",
+        "featuredEvents": "Featured events",
+        "gallery": "Gallery",
+        "wantSimilar": "Want something similar?",
+        "buildEvent": "Build your event",
+        "viewEvent": "View event",
+        "photosVideos": "photos & videos",
+        "photo": "photo"
       }
     },
     "servicios": {

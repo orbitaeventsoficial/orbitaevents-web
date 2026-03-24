@@ -18,7 +18,7 @@ export default async function GraciasPage() {
   const t = await getTranslations('gracias');
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 flex items-center justify-center px-4 py-20">
+    <main className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 flex items-center justify-center px-4 py-20 relative oe-grid-pattern">
       <div className="max-w-2xl w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">

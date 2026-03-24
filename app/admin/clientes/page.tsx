@@ -47,6 +47,8 @@ export default function AdminContactesPage() {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
 
     try {
       const params = new URLSearchParams({
@@ -58,6 +60,7 @@ export default function AdminContactesPage() {
 
       const response = await fetchWithCsrf(`/api/admin/customers?${params.toString()}`, {
         credentials: 'include',
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -95,8 +98,13 @@ export default function AdminContactesPage() {
       setTotalPages(Number(payload.totalPages || 1));
       setStats((payload.stats as CustomerStats) || null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconegut');
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Error desconegut');
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }, [page, pageSize, search]);
@@ -238,8 +246,9 @@ export default function AdminContactesPage() {
 
       {/* Error */}
       {error && (
-        <div className="border rounded-xl p-4" role="alert">
-          <p className="">{error}</p>
+        <div className="border rounded-xl p-4 flex items-center justify-between" role="alert">
+          <p className="text-amber-400">{error}</p>
+          <button type="button" onClick={fetchCustomers} className="ap-btn ap-btn--primary text-sm">Reintentar</button>
         </div>
       )}
 

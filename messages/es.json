@@ -2402,6 +2402,19 @@
         "alquiler-equipo": "Alquiler de Equipo",
         "fiestas-tematicas-halloween": "Fiestas Temáticas Halloween",
         "fiestas-tematicas-mon-magic": "Fiestas Temáticas Mundo Mágico"
+      },
+      "eventDetail": {
+        "venue": "Lugar",
+        "date": "Fecha",
+        "guests": "Invitados",
+        "services": "Servicios",
+        "featuredEvents": "Eventos destacados",
+        "gallery": "Galería",
+        "wantSimilar": "¿Quieres algo parecido?",
+        "buildEvent": "Monta tu evento",
+        "viewEvent": "Ver evento",
+        "photosVideos": "fotos y vídeos",
+        "photo": "foto"
       }
     },
     "servicios": {

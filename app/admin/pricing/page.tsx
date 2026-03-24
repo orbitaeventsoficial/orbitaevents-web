@@ -124,8 +124,11 @@ export default function PricingAdminPage() {
 
   async function loadData() {
     setLoading(true);
+    setMessage(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetchWithCsrf('/api/admin/pricing?locale=ca');
+      const res = await fetchWithCsrf('/api/admin/pricing?locale=ca', { signal: controller.signal });
       const data = await res.json();
       if (data.ok) {
         setExtras(data.data.extras);
@@ -136,8 +139,14 @@ export default function PricingAdminPage() {
         setMessage({ type: 'error', text: data.error || 'Error carregant dades' });
       }
     } catch (error) {
-      log.error('Error carregant pricing:', error);
-      setMessage({ type: 'error', text: 'Error carregant dades' });
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setMessage({ type: 'error', text: 'La connexió ha trigat massa. Reintenta.' });
+      } else {
+        log.error('Error carregant pricing:', error);
+        setMessage({ type: 'error', text: 'Error carregant dades' });
+      }
+    } finally {
+      clearTimeout(tid);
     }
     setLoading(false);
   }
@@ -184,6 +193,15 @@ export default function PricingAdminPage() {
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent mx-auto mb-4"></div>
           <p className="font-medium">Carregant dades...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (!stats && message?.type === 'error') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{message.text}</p>
+        <button type="button" onClick={loadData} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

@@ -21,6 +21,7 @@ interface Stat {
 export default function StatsPage() {
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [editingStat, setEditingStat] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -32,15 +33,24 @@ export default function StatsPage() {
   }, []);
 
   async function loadStats() {
+    setFetchError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetchWithCsrf('/api/admin/stats');
+      const res = await fetchWithCsrf('/api/admin/stats', { signal: controller.signal });
       const data = await res.json();
       if (data.ok) {
         setStats(data.stats);
       }
     } catch (error) {
-      log.error('Error loading stats:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setFetchError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setFetchError('Error carregant estadístiques.');
+        log.error('Error loading stats:', error);
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }
@@ -106,6 +116,15 @@ export default function StatsPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <button type="button" onClick={() => { setLoading(true); loadStats(); }} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

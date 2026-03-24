@@ -168,7 +168,7 @@ export default function MobileCTAUrgency() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="py-16 px-6">
+    <section className="py-16 px-6 relative oe-grid-pattern">
       {/* Background decoration */}
       <div className="relative">
         {/* Gradient glow */}

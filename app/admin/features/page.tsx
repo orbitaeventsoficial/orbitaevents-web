@@ -17,6 +17,7 @@ interface Feature {
 export default function FeaturesPage() {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const toast = useToast();
 
@@ -25,15 +26,24 @@ export default function FeaturesPage() {
   }, []);
 
   async function loadFeatures() {
+    setFetchError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetchWithCsrf('/api/admin/features');
+      const res = await fetchWithCsrf('/api/admin/features', { signal: controller.signal });
       const data = await res.json();
       if (data.ok) {
         setFeatures(data.features);
       }
     } catch (error) {
-      log.error('Error loading features:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setFetchError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setFetchError('Error carregant funcionalitats.');
+        log.error('Error loading features:', error);
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }
@@ -68,6 +78,15 @@ export default function FeaturesPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <button type="button" onClick={() => { setLoading(true); loadFeatures(); }} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

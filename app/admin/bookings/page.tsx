@@ -144,7 +144,7 @@ export default async function BookingsPage({
   return (
     <AdminPage
       title="Reserves"
-      subtitle={<>{pagination.total} esdeveniments Â· {formatCurrency(totalRevenue)}</>}
+      subtitle={<>{pagination.total} esdeveniments · {formatCurrency(totalRevenue)}</>}
       actions={<div className="flex gap-2">
         <ExportCsvButton
           filename="reserves"

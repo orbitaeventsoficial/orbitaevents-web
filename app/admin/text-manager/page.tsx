@@ -58,8 +58,10 @@ export default function TextManagerPage() {
   async function loadTexts() {
     setLoading(true);
     setError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetchWithCsrf('/api/admin/text-manager');
+      const response = await fetchWithCsrf('/api/admin/text-manager', { signal: controller.signal });
       const data = await response.json();
 
       if (data.ok) {
@@ -73,8 +75,14 @@ export default function TextManagerPage() {
         setError(data.error || 'Error carregant textos');
       }
     } catch (err) {
-      setError('Error de connexió');
-      log.error('Text manager error', err);
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setError('Error de connexió');
+        log.error('Text manager error', err);
+      }
+    } finally {
+      clearTimeout(tid);
     }
     setLoading(false);
   }
@@ -419,6 +427,15 @@ export default function TextManagerPage() {
           <p className="mt-4 text-lg">Carregant textos...</p>
           <p className="text-sm">Analitzant estructura del JSON</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error && !Object.keys(esTexts).length) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-amber-400 text-lg font-medium">{error}</p>
+        <button type="button" onClick={loadTexts} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

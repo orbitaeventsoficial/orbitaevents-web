@@ -14,6 +14,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -73,25 +74,31 @@ export default function AnimacionInfantilClient() {
   return (
     <div className="space-y-20 pb-20">
       {/* Hero */}
-      <section className="relative py-20 overflow-hidden">
-        {/* Background decoratiu */}
-        <div className="absolute inset-0 bg-gradient-to-b from-pink-500/10 via-purple-500/5 to-transparent" />
-        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl" />
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <Image
+            src="/img/portfolio/fiestas-infantiles/fiestas-infantiles-01.avif"
+            alt="Animació infantil Òrbita Events"
+            fill
+            priority
+            sizes="100vw"
+            quality={70}
+            className="object-cover"
+          />
+        </div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full border border-pink-500/30 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full border border-pink-500/30 mb-6 backdrop-blur-sm">
               <PartyPopper className="w-5 h-5 text-pink-400" />
               <span className="text-pink-300 text-sm font-medium">{t('hero.badge')}</span>
             </div>
 
-            {/* Titol */}
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               {t('hero.title')}
               <br />
@@ -100,12 +107,10 @@ export default function AnimacionInfantilClient() {
               </span>
             </h1>
 
-            {/* Subtitol */}
-            <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto mb-8">
               {t('hero.subtitle')}
             </p>
 
-            {/* CTA */}
             <Link
               href="/contacto?servicio=animacion-infantil"
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:shadow-pink-500/30 transition-all hover:scale-105"

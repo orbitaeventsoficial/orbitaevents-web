@@ -1,7 +1,7 @@
 /* ==========================================================================
    ADMIN CONTROL ROOM - centralized CSS skin for /admin/page
    Extracted from globals.css for maintainability.
-   All colors use --at-* and --at-cr-* tokens (defined in globals.css).
+   All colors use --at-* and --at-cr-* tokens (defined in admin-theme.css).
    ========================================================================== */
 html.admin-mode .admin-shell .admin-control-room > section,
 html.admin-mode .admin-shell .admin-control-room > div.rounded-2xl {

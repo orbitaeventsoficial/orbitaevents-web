@@ -1979,6 +1979,19 @@
         "alquiler-equipo": "Lloguer d'Equip",
         "fiestas-tematicas-halloween": "Festes Temàtiques Halloween",
         "fiestas-tematicas-mon-magic": "Festes Temàtiques Món Màgic"
+      },
+      "eventDetail": {
+        "venue": "Lloc",
+        "date": "Data",
+        "guests": "Convidats",
+        "services": "Serveis",
+        "featuredEvents": "Esdeveniments destacats",
+        "gallery": "Galeria",
+        "wantSimilar": "Vols algo semblant?",
+        "buildEvent": "Munta el teu event",
+        "viewEvent": "Veure event",
+        "photosVideos": "fotos i vídeos",
+        "photo": "foto"
       }
     },
     "servicios": {

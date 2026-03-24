@@ -63,14 +63,17 @@ function SectionSkeleton() {
 
 // Above-the-fold: SSR habilitado con loading skeleton
 const HeroElegant = dynamic(() => import('@/app/components/ui/HeroElegant'), {
+  ssr: false,
   loading: () => <HeroSkeleton />,
 });
 
 // Below-the-fold: Lazy loaded with SSR for SEO + skeleton fallback
 const ServicesGridElegant = dynamic(() => import('@/app/components/ui/ServicesGridElegant'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioUrgencia'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/GoogleReviewsRotating'), {
@@ -78,6 +81,7 @@ const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/Google
   loading: () => <SectionSkeleton />,
 });
 const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const StatsSection = dynamic(() => import('@/app/components/marketing/StatsSection'), {
@@ -101,8 +105,9 @@ const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), {
   loading: () => <SectionSkeleton />,
 });
 const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
+  ssr: false,
   loading: () => <SectionSkeleton />,
-}); // SSR per SEO (FAQ schema)
+});
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), {
   loading: () => <HeroSkeleton />,
 });
@@ -167,7 +172,7 @@ export default function HomePage() {
         </div>
 
         {/* 4. CALENDARIO - Urgència subtil */}
-        <section data-section-id="calendar" className="py-6 md:py-10 bg-[#0A0A0A]">
+        <section data-section-id="calendar" className="bg-[#0A0A0A] py-10 md:py-14 relative oe-grid-pattern">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>
@@ -212,4 +217,6 @@ export default function HomePage() {
     </HomePageWrapper>
   );
 }
+
+
 

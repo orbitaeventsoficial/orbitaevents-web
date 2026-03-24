@@ -51,17 +51,24 @@ export default function BlogAdminPage() {
   const { confirm, dialogProps } = useConfirmDialog();
 
   const fetchPosts = useCallback(async () => {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
       setLoading(true);
-      const res = await fetchWithCsrf(`/api/admin/blog?locale=${locale}&page=${page}&limit=20`);
+      const res = await fetchWithCsrf(`/api/admin/blog?locale=${locale}&page=${page}&limit=20`, { signal: controller.signal });
       const data = await res.json();
       setPosts(data.posts || []);
       setTotal(data.pagination?.total || 0);
       setTotalPages(data.pagination?.totalPages || 0);
     } catch (error) {
-      log.error('Failed to fetch posts:', error);
-      setFlashMessage({ type: 'error', text: 'Error carregant posts' });
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setFlashMessage({ type: 'error', text: 'La connexió ha trigat massa. Reintenta.' });
+      } else {
+        log.error('Failed to fetch posts:', error);
+        setFlashMessage({ type: 'error', text: 'Error carregant posts' });
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }, [locale, page]);
@@ -156,6 +163,11 @@ export default function BlogAdminPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20 admin-tone-text-neutral" role="status" aria-live="polite">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        </div>
+      ) : !loading && flashMessage?.type === 'error' && posts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <p className="text-amber-400 text-lg font-medium">{flashMessage.text}</p>
+          <button type="button" onClick={fetchPosts} className="ap-btn ap-btn--primary">Reintentar</button>
         </div>
       ) : posts.length === 0 ? (
         <div className="ap-card ap-empty rounded-2xl">

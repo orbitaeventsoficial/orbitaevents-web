@@ -58,6 +58,7 @@ export default function AdminPrivacyPage() {
   const [stats, setStats] = useState<PrivacyStats | null>(null);
   const [requests, setRequests] = useState<DataRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
@@ -132,10 +133,13 @@ export default function AdminPrivacyPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
       const [statsRes, reqRes] = await Promise.all([
-        fetchWithCsrf('/api/admin/privacy/stats', { cache: 'no-store' }),
-        fetchWithCsrf(`/api/admin/privacy/requests?status=${statusFilter === 'pending' ? 'VERIFIED' : statusFilter === 'completed' ? 'COMPLETED' : 'all'}`, { cache: 'no-store' }),
+        fetchWithCsrf('/api/admin/privacy/stats', { cache: 'no-store', signal: controller.signal }),
+        fetchWithCsrf(`/api/admin/privacy/requests?status=${statusFilter === 'pending' ? 'VERIFIED' : statusFilter === 'completed' ? 'COMPLETED' : 'all'}`, { cache: 'no-store', signal: controller.signal }),
       ]);
 
       if (statsRes.ok) {
@@ -147,8 +151,14 @@ export default function AdminPrivacyPage() {
         setRequests(data.data || []);
       }
     } catch (err) {
-      console.error('Error carregant dades privacitat:', err);
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setFetchError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setFetchError('Error carregant dades de privacitat.');
+        console.error('Error carregant dades privacitat:', err);
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }, [statusFilter]);
@@ -194,7 +204,19 @@ export default function AdminPrivacyPage() {
   if (loading && !stats) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-live="polite">
-        <div>Carregant dades de privacitat...</div>
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full mx-auto mb-4" />
+          <p>Carregant dades de privacitat...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError && !stats) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <button type="button" onClick={load} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }

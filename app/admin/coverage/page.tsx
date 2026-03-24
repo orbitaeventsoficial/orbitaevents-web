@@ -12,6 +12,7 @@ import { COVERAGE_PROVINCES, type CoverageArea } from '@/lib/coverage';
 export default function CoveragePage() {
   const [areas, setAreas] = useState<CoverageArea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [newCity, setNewCity] = useState('');
   const [newProvince, setNewProvince] = useState('Barcelona');
   const [adding, setAdding] = useState(false);
@@ -22,15 +23,24 @@ export default function CoveragePage() {
   }, []);
 
   async function loadAreas() {
+    setFetchError(null);
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetchWithCsrf('/api/admin/coverage');
+      const res = await fetchWithCsrf('/api/admin/coverage', { signal: controller.signal });
       const data = await res.json();
       if (data.ok) {
         setAreas(data.areas);
       }
     } catch (error) {
-      log.error('Error loading areas:', error);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setFetchError('La connexió ha trigat massa. Reintenta.');
+      } else {
+        setFetchError('Error carregant cobertura.');
+        log.error('Error loading areas:', error);
+      }
     } finally {
+      clearTimeout(tid);
       setLoading(false);
     }
   }
@@ -103,6 +113,15 @@ export default function CoveragePage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
+        <button type="button" onClick={() => { setLoading(true); loadAreas(); }} className="ap-btn ap-btn--primary">Reintentar</button>
       </div>
     );
   }
