@@ -34,6 +34,16 @@
 - **No repetir el que l'usuari ha dit.** Ell ja ho sap.
 - **No prometre coses que no has verificat.** Si dius "fet", ha d'estar realment fet i comprovat.
 
+### Verificació real — No dir "tot net" sense proves
+- **`tsc --noEmit` no és suficient.** Compilar sense errors de tipus NO vol dir que el codi estigui net.
+- **Després de cada ronda de canvis, fer grep actiu de residus:**
+  - `#[0-9a-fA-F]{3,6}` — hex literals que haurien de ser Tailwind
+  - `style={{` — inline styles que haurien de ser classes CSS
+  - `rgba(` — colors inline que haurien de ser tokens
+  - Imports no usats, exports morts
+- **Ser honest sobre què s'ha verificat i què no.** Dir "compila sense errors de tipus, però no he passat eslint" és millor que dir "tot perfecte".
+- **No defensar-se quan Codex o altres eines troben problemes.** Acceptar i corregir.
+
 ---
 
 ## CHECKLIST DE QUALITAT — Obligatòria en TOTA modificació
