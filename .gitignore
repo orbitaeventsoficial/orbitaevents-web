@@ -58,3 +58,5 @@ playwright-report/
 test-results/
 *.html
 !public/respira-rosa/index.html
+screenshots/
+scripts/admin-screenshots/
