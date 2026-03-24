@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Link, usePathname } from '@/lib/navigation';
+import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -21,7 +21,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SERVICES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, PUBLIC_FOOTER_TRUST_SIGNAL_META, WHATSAPP_URL } from '@/lib/constants';
+import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SERVICES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, WHATSAPP_URL } from '@/lib/constants';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
 // TikTok icon custom
@@ -59,17 +59,13 @@ const SOCIAL_LINKS = PUBLIC_FOOTER_SOCIAL_LINK_META.map((item) => {
 // ========================================
 
 export default function Footer() {
-  const pathname = usePathname();
   const t = useTranslations('footer');
   const tCommon = useTranslations('common');
-  const tStats = useTranslations('stats');
   const tFooterLinks = useTranslations('footerLinks');
   const { track } = useAnalytics();
   const rawCoverage = t.raw('coverageAreas');
   const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : [...PUBLIC_FOOTER_DEFAULT_COVERAGE];
   const [coverageAreas, setCoverageAreas] = useState<string[]>(localizedCoverage);
-  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
-  const isHomePath = normalizedPath === '/' || /^\/(es|ca|en)$/.test(normalizedPath);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,19 +90,6 @@ export default function Footer() {
     };
   }, []);
 
-  const trustSignals = PUBLIC_FOOTER_TRUST_SIGNAL_META.map((item) => ({
-    ...item,
-    metric:
-      item.key === 'experience'
-        ? tStats('years.value')
-        : item.key === 'events'
-        ? `+${SITE_CONFIG.stats.eventsCompleted}`
-        : item.key === 'response'
-        ? SITE_CONFIG.stats.responseTime
-        : tStats('coverage'),
-    label: t(`trust.${item.key}`),
-  }));
-
   const handleLinkClick = (category: string, linkName: string) => {
     track('Footer_Link_Click', { category, link: linkName });
   };
@@ -118,56 +101,17 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/10 relative overflow-hidden"
+      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/10 relative overflow-hidden oe-grid-pattern"
       role="contentinfo"
     >
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Gradient glow */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
-
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
 
-        {/* ════════════════════════════════════════════════════════════════ */}
-        {/* TRUST SIGNALS BAR - BRUTAL                                       */}
-        {/* ════════════════════════════════════════════════════════════════ */}
-        {!isHomePath && (
-          <div className="py-10 border-b border-white/10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {trustSignals.map((signal, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className={`flex flex-col items-center gap-1.5 p-3 sm:p-5 rounded-2xl bg-gradient-to-br ${signal.color} border border-white/5 hover:border-white/20 transition-all duration-300 group hover:scale-105`}
-                >
-                  <span className="text-xl sm:text-2xl group-hover:scale-125 transition-transform duration-300">
-                    {signal.icon}
-                  </span>
-                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
-                    {signal.metric}
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-white/70 text-center">
-                    {signal.label}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* ════════════════════════════════════════════════════════════════ */}
         {/* MAIN FOOTER CONTENT                                              */}

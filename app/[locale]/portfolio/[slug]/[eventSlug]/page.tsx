@@ -128,26 +128,26 @@ export default async function PortfolioEventPage({ params }: PageProps) {
           <div className="flex flex-wrap gap-8 md:gap-16">
             {event.venue && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Lloc</p>
+                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{tPortfolio('eventDetail.venue')}</p>
                 <p className="text-lg font-semibold text-white">{event.venue}</p>
                 {event.location && <p className="text-sm text-white/50">{event.location}</p>}
               </div>
             )}
             {dateFormatted && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Data</p>
+                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{tPortfolio('eventDetail.date')}</p>
                 <p className="text-lg font-semibold text-white capitalize">{dateFormatted}</p>
               </div>
             )}
             {event.guestCount && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Convidats</p>
+                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{tPortfolio('eventDetail.guests')}</p>
                 <p className="text-lg font-semibold text-white">{event.guestCount}</p>
               </div>
             )}
             {event.services.length > 0 && (
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Serveis</p>
+                <p className="text-xs text-white/40 uppercase tracking-widest mb-1">{tPortfolio('eventDetail.services')}</p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {event.services.map((s) => (
                     <span key={s} className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-sm font-medium border border-amber-500/20">
@@ -168,21 +168,21 @@ export default async function PortfolioEventPage({ params }: PageProps) {
 
         {/* Gallery */}
         {galleryItems.length > 0 && (
-          <section className="py-12 md:py-20">
+          <section className="py-12 md:py-20 relative">
             <SimpleGallery images={galleryItems} />
           </section>
         )}
 
         {/* CTA */}
-        <section className="py-12 md:py-16 text-center border-t border-white/10">
+        <section className="py-12 md:py-16 text-center border-t border-white/10 relative">
           <p className="text-white/40 text-sm uppercase tracking-widest mb-3">
-            {locale === 'en' ? 'Want something similar?' : locale === 'ca' ? 'Vols algo semblant?' : '¿Quieres algo parecido?'}
+            {tPortfolio('eventDetail.wantSimilar')}
           </p>
           <Link
             href="/configurador"
             className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-transform"
           >
-            {locale === 'en' ? 'Build your event' : locale === 'ca' ? 'Munta el teu event' : 'Monta tu evento'}
+            {tPortfolio('eventDetail.buildEvent')}
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

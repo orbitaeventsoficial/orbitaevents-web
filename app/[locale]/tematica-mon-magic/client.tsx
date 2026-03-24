@@ -139,7 +139,7 @@ export default function ProductesMonMagic() {
     : PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA.preuExtra100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] via-[#0f0f1a] to-black">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] via-[#0f0f1a] to-black relative">
 
       {/* ═══ HERO ═══ */}
       <section className="relative py-20 md:py-28 overflow-hidden">

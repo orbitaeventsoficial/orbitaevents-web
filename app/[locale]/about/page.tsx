@@ -57,7 +57,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
   }));
 
   return (
-    <section className="min-h-screen bg-bg-main py-20">
+    <section className="min-h-screen bg-bg-main py-20 relative">
       <div className="mx-auto max-w-6xl px-4">
 
         {/* HERO SEO + EMOCIÓN */}

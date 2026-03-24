@@ -10,7 +10,7 @@ function ValoracioContent() {
   const ref = searchParams?.get('ref') ?? null;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative oe-grid-pattern">
       <div className="w-full max-w-lg">
         <TestimonialForm token={token} bookingRef={ref} />
       </div>

@@ -9,6 +9,33 @@
 - **CONSTRUIR, no auditar**: L'usuari vol veure codi nou, no informes. Prioritzar sempre construir sobre analitzar.
 - **Concís**: Respostes curtes i directes. No repetir el que l'usuari ha dit. No demanar confirmació per coses òbvies.
 
+## NIVELL D'EXIGÈNCIA DE L'USUARI — LLEGIR ABANS DE FER RES
+
+**L'usuari és exigent, directe i no tolera voltes.** Aquestes regles són inviolables:
+
+### Escolta primer, actua després
+- **ENTENDRE el que demana ABANS de tocar codi.** Si no ho tens 100% clar, pregunta UNA vegada. No interpretar, no suposar, no improvisar.
+- **MAI fer canvis que no s'han demanat.** Si l'usuari diu "quadrícula al footer", NO toquis la quadrícula d'altres llocs. Si diu "unifica stats", NO eliminis el grid pattern global de passada.
+- **Un canvi = un canvi.** No aprofitar per "millorar" coses del voltant. No opinar sobre si algo és "de 2020" o no tret que es demani opinió.
+
+### Zero cercles
+- **Fer el canvi correcte A LA PRIMERA.** No fer-desfet-refer. Si no estàs segur, pregunta ABANS de tocar.
+- **MAI desfer un canvi i tornar-lo a fer 3 vegades.** Si t'equivoques, reverteix net i pregunta.
+- **Verificar amb captures de pantalla** (Playwright) cada canvi visual ABANS de dir que està fet.
+
+### Monocapa — SEMPRE
+- **Cada decisió visual, lògica o de dades ha de viure a UN SOL LLOC.** Mai duplicar el mateix efecte, valor o patró en dues capes (inline + CSS class, component + constant, etc.).
+- **Tot ha de venir dels arxius centralitzats** (`lib/constants`, `globals.css`, `site-config.ts`, `messages/*.json`). Si un valor apareix a un component, ha de ser perquè ve d'una font centralitzada, NO hardcoded.
+- **Abans de tocar qualsevol cosa**: comprovar si ja existeix per una altra via. Si existeix, usar-la. Si no, crear-la al lloc correcte (constants, CSS, traduccions) i referenciar-la.
+- **Si un efecte s'aplica a N llocs, ha de venir d'UN sol lloc.** Si és exclusiu d'un component, va inline. Mai les dues coses alhora.
+
+### Comunicació
+- **No donar rodeos.** Si l'has cagat, dir-ho i arreglar-ho. No justificar-se.
+- **No repetir el que l'usuari ha dit.** Ell ja ho sap.
+- **No prometre coses que no has verificat.** Si dius "fet", ha d'estar realment fet i comprovat.
+
+---
+
 ## CHECKLIST DE QUALITAT — Obligatòria en TOTA modificació
 
 **Aquesta secció és la llei del repo.** Cada cop que es modifica qualsevol fitxer, s'ha de verificar TOT el que apliqui. No és opcional.
@@ -293,6 +320,44 @@ playwright.config.ts        ← Config Playwright amb webServer
 - **BookingSectionNav**: IntersectionObserver per 10 seccions amb scroll-to smooth. Sticky.
 
 ### Visual / CSS
+
+#### Principi MONOCAPA visual (CRÍTIC — llegir abans de tocar CSS)
+
+**Cada efecte visual ha de viure a UN SOL LLOC. Mai duplicar entre inline i classe CSS, entre component i globals, o entre dos components.**
+
+Abans de tocar qualsevol estil:
+1. Comprovar si l'element JA té l'efecte per una altra via (classe global, inline, herència, pseudo-element)
+2. Si existeix → usar-lo, no crear-ne un de nou
+3. Si no existeix → crear-lo al lloc correcte (globals.css per compartit, inline per exclusiu d'un component)
+4. **MAI** aplicar el mateix efecte per dues vies alhora (ex: grid pattern via classe CSS + grid pattern inline = DOBLE = error)
+
+**Verificació obligatòria**: Després de cada canvi visual, fer captura amb Playwright i comparar amb l'estat anterior. No dir "fet" sense veure-ho.
+
+#### Quadrícula de fons (grid pattern)
+
+- **Classe**: `oe-grid-pattern` — definida a `globals.css`, `::before` amb quadrícula 60px × 60px, blanc, z-index 0.
+- **Opacitat**: `0.015` — molt subtil, afegeix textura sense competir amb el contingut.
+- **On s'aplica**: Seccions públiques amb fons fosc que necessiten textura (footer, stats, CTA, FAQ, garantia).
+- **On NO s'aplica**: Heroes amb imatge, seccions amb contingut dens (cards, portfoli, formularis), admin.
+- **Regla MONOCAPA**: Si una secció té `oe-grid-pattern`, **NO pot tenir** cap grid inline propi. Una sola font, sempre.
+- **Admin**: NO porta quadrícula. Mai.
+
+#### Paleta pública (site públic)
+
+- **Fons**: Negre (`#0A0A0A`, `zinc-950`, `black`). Totes les seccions públiques.
+- **Text**: `text-white` per títols, `text-white/70` per body, `text-white/40-60` per secundari.
+- **Accent únic**: Ambre (`amber-400`, `amber-500`, `orange-400`). Per a CTAs, highlights, badges, stats.
+- **MAI**: Porpra, cyan, rosa, verd o qualsevol altre color com a accent principal en seccions genèriques. Aquests colors NOMÉS per a pàgines temàtiques específiques (Halloween = taronja/vermell, Món Màgic = porpra, etc.).
+- **Glows decoratius**: Molt subtils (`/5` opacitat màxima), blur gran (`blur-3xl`). No han de competir amb el contingut.
+- **Border**: `border-white/10` estàndard. `border-white/20` al hover. Mai borders de color.
+
+#### Stats (component unificat)
+
+- **Un sol component**: `StatsSection` (`app/components/marketing/StatsSection.tsx`).
+- **Disseny**: Xifres ambre sobre negre, separadors verticals (`divide-x divide-white/10`), glow central subtil. Sense targetes colorides, sense emojis, sense gradients multicolor.
+- **Dades**: Via API `/api/public/stats`. Defaults raonables si l'API falla.
+- **On s'usa**: Home desktop (`page.tsx`), home mobile (`MobileHomePage`). Enlloc més.
+- **MAI**: Crear variants de stats a altres llocs (footer, opinions, etc.). Si es vol mostrar un número, usar el component existent.
 
 #### Arquitectura CSS admin (IMPORTANT — no repetir errors)
 

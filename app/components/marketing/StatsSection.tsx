@@ -1,9 +1,5 @@
 'use client';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// STATS SECTION — Dynamic counters from real DB data
-// ═══════════════════════════════════════════════════════════════════════════
-
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
@@ -36,12 +32,9 @@ interface StatConfig {
   value: number;
   prefix: string;
   suffix: string;
-  emoji: string;
-  gradient: string;
-  glow: string;
 }
 
-// ─── Stat Card ──────────────────────────────────────────────────────────────
+// ─── Stat Card — Clean, monochrome + amber accent ──────────────────────────
 
 function StatCard({
   config,
@@ -62,46 +55,30 @@ function StatCard({
 
   return (
     <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 40 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={
-        reduceMotion ? { duration: 0 } : { delay, duration: 0.32, ease: [0.22, 1, 0.36, 1] }
+        reduceMotion ? { duration: 0 } : { delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       }
-      className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 text-center overflow-hidden group hover:border-white/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
-      style={{
-        background: `radial-gradient(ellipse at 50% 0%, ${config.glow}, transparent 65%), rgba(255,255,255,0.03)`,
-      }}
+      className="flex flex-col items-center text-center py-8 px-4"
     >
-      {!reduceMotion && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none"
-          animate={{ x: ['-100%', '200%'] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'linear', delay: delay * 2 }}
-        />
-      )}
-
-      <span className="text-5xl mb-3 block">{config.emoji}</span>
-      <div
-        className={`text-5xl md:text-7xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-none mb-2`}
-      >
-        {config.prefix}
-        {display}
-        {config.suffix}
+      <div className="text-4xl sm:text-5xl md:text-6xl font-black text-amber-400 leading-none mb-2 tabular-nums">
+        {config.prefix}{display}{config.suffix}
       </div>
-      <p className="text-white font-bold text-lg mt-2">{label}</p>
-      <p className="text-white/60 text-sm mt-1">{sublabel}</p>
+      <p className="text-white font-semibold text-sm sm:text-base">{label}</p>
+      <p className="text-white/40 text-xs sm:text-sm mt-0.5">{sublabel}</p>
     </motion.div>
   );
 }
 
-// ─── Default values (shown instantly, replaced when API responds) ───────────
+// ─── Defaults ───────────────────────────────────────────────────────────────
 
 const DEFAULT_STATS: StatConfig[] = [
-  { key: 'events', value: 50, prefix: '', suffix: '+', emoji: '🎉', gradient: 'from-amber-400 to-orange-500', glow: 'rgba(251,191,36,0.2)' },
-  { key: 'rating', value: 5, prefix: '', suffix: '.0★', emoji: '🌟', gradient: 'from-yellow-300 to-amber-400', glow: 'rgba(253,224,71,0.15)' },
-  { key: 'response', value: 2, prefix: '<', suffix: 'h', emoji: '⚡', gradient: 'from-cyan-400 to-blue-500', glow: 'rgba(34,211,238,0.15)' },
-  { key: 'experience', value: 3, prefix: '', suffix: '+', emoji: '🏆', gradient: 'from-purple-400 to-pink-500', glow: 'rgba(167,139,250,0.15)' },
+  { key: 'events', value: 50, prefix: '', suffix: '+' },
+  { key: 'rating', value: 5, prefix: '', suffix: '.0★' },
+  { key: 'response', value: 2, prefix: '<', suffix: 'h' },
+  { key: 'experience', value: 3, prefix: '', suffix: '+' },
 ];
 
 // ─── Main Component ─────────────────────────────────────────────────────────
@@ -114,7 +91,6 @@ export default function StatsSection() {
   const reduceMotion = useReducedMotion();
   const [stats, setStats] = useState<StatConfig[]>(DEFAULT_STATS);
 
-  // Fetch real stats from API
   useEffect(() => {
     fetch(`/api/public/stats?locale=${locale}`)
       .then((r) => r.json())
@@ -134,29 +110,28 @@ export default function StatsSection() {
 
   return (
     <section ref={ref} className="relative py-16 md:py-24 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(251,191,36,0.04),transparent_70%)] pointer-events-none" />
-      <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.06),transparent_70%)] pointer-events-none blur-2xl" />
+      {/* Glow radial central ambre subtil */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[200px] bg-amber-500/[0.06] rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="container mx-auto px-6 max-w-6xl">
+      <div className="container mx-auto px-6 max-w-5xl">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
+          <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm font-medium tracking-wider uppercase mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             {t('sectionLabel')}
           </span>
-          <h2 className="text-4xl md:text-5xl font-black text-white">
+          <h2 className="text-3xl md:text-5xl font-black text-white">
             {t('heading')}{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              {t('headingHighlight')}
-            </span>
+            <span className="text-amber-400">{t('headingHighlight')}</span>
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        {/* Grid amb separadors verticals */}
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
           {stats.map((config, i) => (
             <StatCard
               key={config.key}

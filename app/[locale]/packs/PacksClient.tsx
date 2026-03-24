@@ -28,7 +28,7 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
   });
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white pt-28 pb-20 px-4">
+    <main className="min-h-screen bg-[#0A0A0A] text-white pt-28 pb-20 px-4 relative">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}

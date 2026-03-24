@@ -48,7 +48,7 @@ export default async function HalloweenPage() {
   const tWhatsapp = await getTranslations('whatsappMessages');
 
   return (
-    <main className="bg-black text-white">
+    <main className="bg-black text-white relative">
       {/* ========================================
           HERO AMB IMATGE HALLOWEEN
           ======================================== */}

@@ -155,7 +155,7 @@ export default async function OpinionesPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <main className="min-h-screen bg-[#0A0A0A]">
+      <main className="min-h-screen bg-[#0A0A0A] relative">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-24 pb-2 max-w-5xl">
           <nav className="flex items-center gap-2 text-sm text-white/40" aria-label="Breadcrumb">
@@ -211,19 +211,7 @@ export default async function OpinionesPage({
               : `${SITE_CONFIG.stats.reviewCount}+ reseñas reales · Valoración ${SITE_CONFIG.stats.avgRating}/5 · DJ y eventos en Barcelona y Girona`}
           </p>
 
-          {/* Trust stats grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto mb-4">
-            {trustStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5 text-center"
-              >
-                <div className="text-2xl mb-1" aria-hidden="true">{stat.icon}</div>
-                <div className="text-2xl font-black text-amber-400">{stat.value}</div>
-                <div className="text-xs text-white/50 mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+          {/* Trust stats — delegat a StatsSection unificat */}
         </section>
 
         {/* Google Reviews Carousel */}

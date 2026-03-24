@@ -64,7 +64,7 @@ export default async function ProduccionPage({ params }: { params: { locale: str
   const features = t.raw('items.produccion.features') as string[];
 
   return (
-    <section className="min-h-screen bg-bg-main py-20">
+    <section className="min-h-screen bg-bg-main py-20 relative">
       <ServiceJsonLD
         name="Producción Técnica de Eventos"
         slugPath="/servicios/produccion"

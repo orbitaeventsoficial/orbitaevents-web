@@ -203,7 +203,7 @@ export default function PrivacitatClient() {
   const getColors = (color: string) => COLOR_CLASSES[color] || COLOR_CLASSES.blue;
 
   return (
-    <main className="min-h-screen bg-bg-main py-20 px-4">
+    <main className="min-h-screen bg-bg-main py-20 px-4 relative">
       {/* Background decoratiu */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-oe-gold/5 rounded-full blur-3xl" />

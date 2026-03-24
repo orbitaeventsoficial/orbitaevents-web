@@ -251,7 +251,7 @@ export default async function ClientPortalPage({
   const travelCharge = calculateTravelCharge(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-[#0a0a0a] to-black text-white/90">
+    <main className="min-h-screen bg-gradient-to-b from-black via-[#0a0a0a] to-black text-white/90 relative">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <header className="rounded-2xl border bg-white/[0.03] p-6 shadow-xl" style={{ borderColor: accentBorder }}>
           <p className="text-xs uppercase tracking-[0.2em]" style={{ color: accentHex }}>{t.booking} {booking.reference}</p>

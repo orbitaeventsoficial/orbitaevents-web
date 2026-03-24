@@ -129,8 +129,32 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
   const heroImage = images[0];
   const galleryImages = images.slice(1);
 
+  const base = getSiteUrl();
+  const imageGalleryJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ImageGallery',
+    name: title,
+    description: `${title} — Òrbita Events Portfolio`,
+    url: `${base}/${locale}/portfolio/${slug}`,
+    numberOfItems: images.length,
+    image: images.slice(0, 20).map((img) => ({
+      '@type': 'ImageObject',
+      contentUrl: img.src.startsWith('http') ? img.src : `${base}${img.src}`,
+      description: img.alt,
+    })),
+    isPartOf: {
+      '@type': 'WebPage',
+      name: 'Portfolio — Òrbita Events',
+      url: `${base}/${locale}/portfolio`,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(imageGalleryJsonLd) }}
+      />
       <Breadcrumbs
         items={[
           { name: t('nav.home'), url: "/" },
@@ -158,18 +182,18 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
               {title}
             </h1>
             <p className="mt-4 text-white/50 text-lg">
-              {images.length} {images.length === 1 ? 'foto' : 'fotos & vídeos'}
+              {images.length} {images.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
             </p>
           </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20 space-y-16">
+      <main className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20 space-y-16 relative">
         {/* Events destacats */}
         {events.length > 0 && (
           <section>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-              {locale === 'en' ? 'Featured events' : locale === 'ca' ? 'Esdeveniments destacats' : 'Eventos destacados'}
+              {tPortfolio('eventDetail.featuredEvents')}
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {events.map((ev) => (
@@ -201,10 +225,10 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
                           {new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(new Date(ev.eventDate))}
                         </span>
                       )}
-                      {ev._count.media > 0 && <span>{ev._count.media} fotos</span>}
+                      {ev._count.media > 0 && <span>{ev._count.media} {tPortfolio('eventDetail.photosVideos')}</span>}
                     </div>
                     <div className="mt-3 flex items-center gap-1.5 text-amber-400 text-sm font-medium group-hover:text-amber-300 transition-colors">
-                      <span>{locale === 'en' ? 'View event' : locale === 'ca' ? 'Veure event' : 'Ver evento'}</span>
+                      <span>{tPortfolio('eventDetail.viewEvent')}</span>
                       <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -221,7 +245,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
           <section>
             {events.length > 0 && (
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-                {locale === 'en' ? 'Gallery' : locale === 'ca' ? 'Galeria' : 'Galería'}
+                {tPortfolio('eventDetail.gallery')}
               </h2>
             )}
             <SimpleGallery images={galleryImages} />

@@ -62,7 +62,7 @@ export default async function AlquilerPage({ params }: { params: { locale: strin
   const features = t.raw('items.alquiler.features') as string[];
 
   return (
-    <section className="min-h-screen bg-bg-main py-20">
+    <section className="min-h-screen bg-bg-main py-20 relative">
       <ServiceJsonLD
         name="Alquiler de Equipo de Sonido e Iluminación"
         slugPath="/servicios/alquiler"

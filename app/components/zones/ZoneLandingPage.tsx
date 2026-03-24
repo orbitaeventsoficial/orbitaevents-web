@@ -47,7 +47,7 @@ export default function ZoneLandingPage({ config }: Props) {
   } = config;
 
   return (
-    <main className="min-h-screen bg-[var(--bg-main)]">
+    <main className="min-h-screen bg-[var(--bg-main)] relative">
       {/* Hero Section amb imatge */}
       <section className="relative py-20 md:py-32 overflow-hidden">
         {/* Background image */}

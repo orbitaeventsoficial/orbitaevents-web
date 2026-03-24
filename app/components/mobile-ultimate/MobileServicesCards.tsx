@@ -277,7 +277,7 @@ export default function MobileServicesCards() {
   ], []);
 
   return (
-    <section id="services-section" className="py-12 overflow-hidden">
+    <section id="services-section" className="py-12 overflow-hidden relative">
       {/* Section Header */}
       <div className="px-6 mb-6 text-center">
         <motion.span

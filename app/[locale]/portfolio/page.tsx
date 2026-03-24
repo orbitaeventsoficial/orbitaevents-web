@@ -51,7 +51,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
         ]}
       />
 
-      <section className="mx-auto max-w-7xl px-8 py-20">
+      <section className="mx-auto max-w-7xl px-8 py-20 relative">
         <h1 className="text-5xl md:text-6xl font-bold text-center bg-gradient-to-r from-oe-gold to-oe-gold-bright bg-clip-text text-transparent">
           {t('title')}
         </h1>
@@ -93,7 +93,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                         {translatedName}
                       </h3>
                       <div className="mt-3 flex items-center gap-2 text-white/50 text-sm group-hover:text-white/70 transition-colors">
-                        <span>Ver galería</span>
+                        <span>{t('viewGallery')}</span>
                         <svg className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>

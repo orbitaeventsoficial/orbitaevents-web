@@ -25,7 +25,7 @@
     --border-subtle: rgba(255, 255, 255, 0.06);
     --border-default: rgba(255, 255, 255, 0.1);
     --border-hover: rgba(255, 255, 255, 0.18);
-    --border-glow: rgba(215, 184, 110, 0.4);
+    --border-glow: rgba(var(--oe-gold-rgb), 0.4);
 
     /* ─────────────────────────────────────────────────────────────────────────
        COLORS - TEXT (WCAG AA Compliant)
@@ -48,6 +48,7 @@
        BRAND COLORS - ACCENTS
        ───────────────────────────────────────────────────────────────────────── */
     --oe-amber: #f59e0b;
+    --oe-amber-rgb: 245, 158, 11;
     --oe-orange: #ea580c;
     --oe-purple: #8b5cf6;
     --oe-green: #22c55e;
@@ -55,8 +56,8 @@
     /* ─────────────────────────────────────────────────────────────────────────
        GRADIENTS
        ───────────────────────────────────────────────────────────────────────── */
-    --grad-gold: linear-gradient(135deg, #f0d99a 0%, #d7b86e 50%, #b8973f 100%);
-    --grad-gold-subtle: linear-gradient(135deg, rgba(215, 184, 110, 0.15) 0%, rgba(215, 184, 110, 0.05) 100%);
+    --grad-gold: linear-gradient(135deg, var(--oe-gold-light) 0%, var(--oe-gold) 50%, var(--oe-gold-dark) 100%);
+    --grad-gold-subtle: linear-gradient(135deg, rgba(var(--oe-gold-rgb), 0.15) 0%, rgba(var(--oe-gold-rgb), 0.05) 100%);
     --grad-dark-overlay: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
 
     /* ─────────────────────────────────────────────────────────────────────────
@@ -66,8 +67,8 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    --shadow-glow-gold: 0 0 30px rgba(215, 184, 110, 0.25);
-    --shadow-glow-gold-intense: 0 0 50px rgba(215, 184, 110, 0.4);
+    --shadow-glow-gold: 0 0 30px rgba(var(--oe-gold-rgb), 0.25);
+    --shadow-glow-gold-intense: 0 0 50px rgba(var(--oe-gold-rgb), 0.4);
 
     /* ─────────────────────────────────────────────────────────────────────────
        SPACING & SIZING
@@ -221,8 +222,8 @@
      ══════════════════════════════════════════════════════════════════════════ */
 
   ::selection {
-    background: rgba(215, 184, 110, 0.3);
-    color: #fff;
+    background: rgba(var(--oe-gold-rgb), 0.3);
+    color: var(--text-primary);
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
@@ -311,10 +312,10 @@
   }
 
   .glass-gold {
-    background: rgba(215, 184, 110, 0.05);
+    background: rgba(var(--oe-gold-rgb), 0.05);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(215, 184, 110, 0.15);
+    border: 1px solid rgba(var(--oe-gold-rgb), 0.15);
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -368,6 +369,27 @@
 
 @layer utilities {
   /* ─────────────────────────────────────────────────────────────────────────
+     SUBTLE GRID PATTERN — fons quadrícula consistent arreu del site
+     ───────────────────────────────────────────────────────────────────────── */
+
+  .oe-grid-pattern {
+    position: relative;
+  }
+
+  .oe-grid-pattern::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.015;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, white 1px, transparent 1px),
+      linear-gradient(to bottom, white 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
      GRADIENT TEXT
      ───────────────────────────────────────────────────────────────────────── */
 
@@ -400,7 +422,7 @@
   }
 
   .text-glow {
-    text-shadow: 0 0 20px rgba(215, 184, 110, 0.5);
+    text-shadow: 0 0 20px rgba(var(--oe-gold-rgb), 0.5);
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -775,7 +797,7 @@ html:not(.admin-mode) [class*="Header"] {
 html:not(.admin-mode) header.scrolled,
 html:not(.admin-mode) .header-scrolled {
   background: rgba(0, 0, 0, 0.98) !important;
-  border-bottom: 1px solid rgba(215, 184, 110, 0.2);
+  border-bottom: 1px solid rgba(var(--oe-gold-rgb), 0.2);
 }
 
 /* -----------------------------------------------------------------------------
@@ -843,17 +865,17 @@ input[type="range"].slider-custom::-webkit-slider-thumb {
   appearance: none;
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  background: linear-gradient(135deg, var(--oe-amber) 0%, #d97706 50%, #b45309 100%);
   border-radius: 50%;
   cursor: pointer;
   border: 3px solid #fbbf24;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(var(--oe-amber-rgb), 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 input[type="range"].slider-custom::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.7), 0 6px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(var(--oe-amber-rgb), 0.7), 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
 input[type="range"].slider-custom::-webkit-slider-thumb:active {
@@ -863,17 +885,17 @@ input[type="range"].slider-custom::-webkit-slider-thumb:active {
 input[type="range"].slider-custom::-moz-range-thumb {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  background: linear-gradient(135deg, var(--oe-amber) 0%, #d97706 50%, #b45309 100%);
   border-radius: 50%;
   cursor: pointer;
   border: 3px solid #fbbf24;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(var(--oe-amber-rgb), 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 input[type="range"].slider-custom::-moz-range-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.7), 0 6px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(var(--oe-amber-rgb), 0.7), 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
 input[type="range"].slider-custom::-moz-range-track {
@@ -890,13 +912,13 @@ html:not(.admin-mode) .cta-button,
 html:not(.admin-mode) [class*="cta"],
 html:not(.admin-mode) button[class*="pressupost" i],
 html:not(.admin-mode) a[class*="pressupost" i] {
-  background: linear-gradient(135deg, #d7b86e 0%, #f59e0b 100%) !important;
+  background: linear-gradient(135deg, var(--oe-gold) 0%, var(--oe-amber) 100%) !important;
   color: #000 !important;
   font-weight: 700 !important;
   border: none !important;
   box-shadow:
-    0 4px 15px rgba(215, 184, 110, 0.4),
-    0 0 30px rgba(215, 184, 110, 0.2) !important;
+    0 4px 15px rgba(var(--oe-gold-rgb), 0.4),
+    0 0 30px rgba(var(--oe-gold-rgb), 0.2) !important;
   transition: all 0.3s ease !important;
 }
 
@@ -905,21 +927,21 @@ html:not(.admin-mode) .cta-button:hover,
 html:not(.admin-mode) [class*="cta"]:hover {
   transform: scale(1.05) !important;
   box-shadow:
-    0 6px 25px rgba(215, 184, 110, 0.5),
-    0 0 40px rgba(215, 184, 110, 0.3) !important;
+    0 6px 25px rgba(var(--oe-gold-rgb), 0.5),
+    0 0 40px rgba(var(--oe-gold-rgb), 0.3) !important;
 }
 
 /* Botons secundaris (només web pública) */
 html:not(.admin-mode) .btn-secondary,
 html:not(.admin-mode) [class*="secondary"] button {
   background: transparent !important;
-  border: 2px solid rgba(215, 184, 110, 0.6) !important;
-  color: #d7b86e !important;
+  border: 2px solid rgba(var(--oe-gold-rgb), 0.6) !important;
+  color: var(--oe-gold) !important;
 }
 
 html:not(.admin-mode) .btn-secondary:hover {
-  background: rgba(215, 184, 110, 0.1) !important;
-  border-color: #d7b86e !important;
+  background: rgba(var(--oe-gold-rgb), 0.1) !important;
+  border-color: var(--oe-gold) !important;
 }
 
 /* -----------------------------------------------------------------------------
@@ -1116,7 +1138,7 @@ body.mobile-experience-active {
 
 /* Focus visible - clear focus indicators for keyboard navigation */
 *:focus-visible {
-  outline: 3px solid rgba(245, 158, 11, 0.8);
+  outline: 3px solid rgba(var(--oe-amber-rgb), 0.8);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -1127,9 +1149,9 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(245, 158, 11, 0.9);
+  outline: 3px solid rgba(var(--oe-amber-rgb), 0.9);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 4px rgba(var(--oe-amber-rgb), 0.2);
 }
 
 /* Remove default focus outline (we have focus-visible instead) */
@@ -1151,143 +1173,7 @@ textarea:focus-visible {
 
 
 
-/* ==========================================================================
-   ADMIN LAYOUT — TOKEN SYSTEM v4 UNIFICAT
-   Font única de veritat per a tots els colors i espais del panell admin.
-   Cap color hardcoded sota d'aquí — tot usa var(--at-*).
-   ========================================================================== */
-
-/* ── 1. DESIGN TOKENS EXTRA (fons/surface/text → admin-theme.css) ─────────── */
-html.admin-mode {
-  /* Vores extres (no definides a admin-theme.css) */
-  --at-border-s:    #566580;   /* vora forta / activa */
-  --at-border-sub:  #2a3040;   /* vora subtil */
-
-  /* Accent de marca — or Òrbita */
-  --at-gold:        #e0a832;   /* accent primari */
-  --at-gold-glow:   rgba(224, 168, 50, 0.25);
-  --at-gold-dim:    rgba(224, 168, 50, 0.15);
-  --at-gold-text:   #f0c050;   /* or llegible sobre fons fosc */
-
-  /* Accents funcionals */
-  --at-blue:        #5a9ee0;   /* info / link */
-  --at-blue-dim:    rgba(90, 158, 224, 0.16);
-  --at-green:       #45b868;   /* success */
-  --at-green-dim:   rgba(69, 184, 104, 0.16);
-  --at-orange:      #e09830;   /* warning */
-  --at-orange-dim:  rgba(224, 152, 48, 0.16);
-  --at-red:         #e05060;   /* danger */
-  --at-red-dim:     rgba(224, 80, 96, 0.16);
-  --at-violet:      #b080ff;   /* especial */
-  --at-violet-dim:  rgba(176, 128, 255, 0.16);
-  --at-cyan:        #40d0e0;   /* accent secondary */
-  --at-cyan-dim:    rgba(64, 208, 224, 0.16);
-
-  /* Control Room — paleta semàntica */
-  --at-cr-rose:          #c15f79;
-  --at-cr-rose-border:   #9a4b62;
-  --at-cr-rose-soft:     rgba(193, 95, 121, 0.15);
-  --at-cr-rose-chip:     rgba(186, 74, 102, 0.2);
-  --at-cr-rose-text:     #ff9bb6;
-  --at-cr-rose-bg:       #3a1f29;
-
-  --at-cr-amber:         #c89d51;
-  --at-cr-amber-border:  #b07d2d;
-  --at-cr-amber-soft:    rgba(200, 157, 81, 0.15);
-  --at-cr-amber-chip:    rgba(192, 138, 44, 0.2);
-  --at-cr-amber-text:    #ffcf6b;
-  --at-cr-amber-bg:      #3a2a15;
-  --at-cr-amber-dark:    #352913;
-
-  --at-cr-emerald:       #3f8a68;
-  --at-cr-emerald-soft:  rgba(63, 138, 104, 0.15);
-  --at-cr-emerald-text:  #64e8b0;
-  --at-cr-emerald-chip:  rgba(62, 160, 126, 0.2);
-  --at-cr-pilot-border:  #3ea07e;
-  --at-cr-pilot-text:    #c9ffe8;
-
-  --at-cr-sky:           #5a98c0;
-  --at-cr-sky-border:    #4a7ca6;
-  --at-cr-sky-deep:      #3f7c99;
-  --at-cr-sky-soft:      rgba(90, 152, 192, 0.15);
-  --at-cr-sky-text:      #8ecbff;
-  --at-cr-sky-bg:        #1a3040;
-  --at-cr-cyan-border:   #4aa6d4;
-  --at-cr-cyan-text:     #67d6ff;
-  --at-cr-cyan-light:    #9ed8ff;
-
-  --at-cr-violet-border: #6f5aa0;
-  --at-cr-violet-bg:     #2b1f3d;
-
-  --at-cr-bg-deep:       #111a2a;
-  --at-cr-bg-card:       #172135;
-  --at-cr-bg-head:       #1a2437;
-  --at-cr-bg-hover:      #1d2940;
-  --at-cr-bg-input:      #121826;
-  --at-cr-bg-action:     #20324b;
-  --at-cr-bg-action-h:   #2a3f5e;
-  --at-cr-bg-ghost-h:    #1e2f49;
-
-  --at-cr-meta:          #8ea6c6;
-  --at-cr-divide:        #2f4463;
-  --at-cr-avatar-bg:     #263245;
-  --at-cr-avatar-border: #465b79;
-
-  --at-cr-btn-primary:   #ffcf6b;
-  --at-cr-btn-primary-h: #ffde9f;
-  --at-cr-btn-primary-t: #1a2538;
-  --at-cr-btn-border:    #ffd98d;
-
-  /* Alçades de layout */
-  --at-sidebar-w:      14rem;
-  --at-header-h:       60px;
-  --at-mobile-header-h: 56px;
-  --at-bottom-nav-h:   64px;
-
-  /* Transicions */
-  --at-transition:  150ms ease;
-  --at-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* Tipografia */
-  --at-font:        "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --at-font-size:   clamp(0.9rem, 0.875rem + 0.1vw, 0.975rem);
-
-  color-scheme: dark;
-}
-
-/* Tokens puente del layout admin */
-html.admin-mode .admin-layout-shell {
-  --admin-surface:  var(--at-surface);
-  --admin-panel:    var(--at-panel);
-  --admin-border:   var(--at-border);
-  --admin-text:     var(--at-text);
-  --admin-muted:    var(--at-muted);
-  --admin-primary:  var(--at-gold);
-  --admin-success:  var(--at-green);
-  --admin-warning:  var(--at-orange);
-  --admin-danger:   var(--at-red);
-  /* Category tokens (per CSS Manager) */
-  --admin-cat-surface-base:    var(--at-panel);
-  --admin-cat-surface-border:  var(--at-border-s);
-  --admin-cat-surface-text:    var(--at-text);
-  --admin-cat-action-bg:             var(--at-raised);
-  --admin-cat-action-border:         var(--at-border-s);
-  --admin-cat-action-text:           var(--at-text);
-  --admin-cat-action-bg-hover:       color-mix(in oklab, var(--at-gold) 25%, var(--at-raised) 75%);
-  --admin-cat-action-border-hover:   var(--at-gold);
-  --admin-cat-status-pending-bg:     color-mix(in oklab, var(--at-orange) 18%, var(--at-panel) 82%);
-  --admin-cat-status-pending-border: var(--at-orange);
-  --admin-cat-status-pending-text:   var(--at-text);
-  --admin-cat-status-confirmed-bg:     color-mix(in oklab, var(--at-blue) 18%, var(--at-panel) 82%);
-  --admin-cat-status-confirmed-border: var(--at-blue);
-  --admin-cat-status-confirmed-text:   var(--at-text);
-  --admin-cat-status-completed-bg:     color-mix(in oklab, var(--at-green) 18%, var(--at-panel) 82%);
-  --admin-cat-status-completed-border: var(--at-green);
-  --admin-cat-status-completed-text:   var(--at-text);
-  --admin-cat-status-cancelled-bg:     color-mix(in oklab, var(--at-red) 18%, var(--at-panel) 82%);
-  --admin-cat-status-cancelled-border: var(--at-red);
-  --admin-cat-status-cancelled-text:   var(--at-text);
-}
+/* Admin tokens consolidats a admin-theme.css */
 
 /* ── 2. BASE ──────────────────────────────────────────────────────────────── */
 html.admin-mode .admin-layout-shell {

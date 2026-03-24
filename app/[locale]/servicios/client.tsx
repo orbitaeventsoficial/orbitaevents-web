@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
@@ -72,14 +73,27 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
   return (
     <>
       {/* HERO */}
-      <section className="relative py-20 sm:py-28 overflow-hidden">
-        <div className="mx-auto max-w-6xl px-4 text-center">
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <Image
+            src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif"
+            alt="Serveis d'events Òrbita Events"
+            fill
+            priority
+            sizes="100vw"
+            quality={70}
+            className="object-cover"
+          />
+        </div>
+
+        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6 backdrop-blur-sm">
               <span>⭐</span>
               {texts.badge}
             </span>
@@ -92,14 +106,13 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
               </span>
             </h1>
 
-            <p className="text-xl text-white/60 max-w-3xl mx-auto mb-4">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-4">
               {texts.subtitle}
             </p>
             <p className="text-lg text-amber-400 font-medium mb-8">
               {texts.cta}
             </p>
 
-            {/* CTA PROMINENTE CONFIGURADOR */}
             <div className="mb-10">
               <Link
                 href="/configurador"
@@ -114,7 +127,6 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
               </p>
             </div>
 
-            {/* Features */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
               {[texts.equipment, texts.backup, texts.guarantee].map((feature, i) => (
                 <div key={i} className="flex items-center gap-2 text-white/70">
@@ -128,7 +140,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* GRID SERVICIOS */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 relative">
         <div className="mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {servicios.map((servicio, index) => (
@@ -197,7 +209,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* CTA FINAL */}
-      <section className="py-20 sm:py-28">
+      <section className="py-20 sm:py-28 relative">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

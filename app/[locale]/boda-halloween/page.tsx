@@ -66,7 +66,7 @@ export default async function BodaHalloweenPage() {
         }}
       />
 
-      <main className="min-h-screen bg-bg-main">
+      <main className="min-h-screen bg-bg-main relative">
         {/* HERO */}
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
           {/* Background con gradiente Halloween */}
