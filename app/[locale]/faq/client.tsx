@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
@@ -51,6 +51,7 @@ export default function FAQClient({
 }: FAQClientProps) {
   const [activeCategory, setActiveCategory] = useState(categories[0]?.key || 'general');
   const [openQuestions, setOpenQuestions] = useState<Set<string>>(new Set());
+  const faqRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const toggleQuestion = (id: string) => {
     setOpenQuestions(prev => {
@@ -59,6 +60,9 @@ export default function FAQClient({
         newSet.delete(id);
       } else {
         newSet.add(id);
+        requestAnimationFrame(() => {
+          faqRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
       }
       return newSet;
     });
@@ -141,6 +145,7 @@ export default function FAQClient({
                 return (
                   <motion.div
                     key={id}
+                    ref={(el) => { faqRefs.current[id] = el; }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}

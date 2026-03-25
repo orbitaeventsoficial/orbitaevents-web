@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import type { PackDefinition, ServiceSlug } from '@/config/packs-config';
@@ -16,6 +16,15 @@ const TABS: { id: Tab; services: ServiceSlug[] }[] = [
 export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
   const t = useTranslations('packs');
   const [activeTab, setActiveTab] = useState<Tab>('festes');
+  const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
+  const packRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handlePackClick = useCallback((packId: string) => {
+    setSelectedPackId(packId);
+    requestAnimationFrame(() => {
+      packRefs.current[packId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, []);
 
   const tabConfig = TABS.find((tab) => tab.id === activeTab)!;
   const filtered = packs.filter((p) => tabConfig.services.includes(p.service));
@@ -71,11 +80,16 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
           {sorted.map((pack) => {
             const features = pack.features || [];
             const isPopular = pack.popular;
+            const isSelected = selectedPackId === pack.id;
             return (
               <div
                 key={pack.id}
-                className={`relative rounded-2xl border transition-all flex flex-col ${
-                  isPopular
+                ref={(el) => { packRefs.current[pack.id] = el; }}
+                onClick={() => handlePackClick(pack.id)}
+                className={`relative rounded-2xl border transition-all flex flex-col cursor-pointer ${
+                  isSelected
+                    ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
+                    : isPopular
                     ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
                     : 'bg-white/[0.03] border-white/10 hover:border-white/20'
                 } p-7 md:p-8`}

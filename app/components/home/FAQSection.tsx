@@ -5,7 +5,7 @@
 // Accordion elegant amb JSON-LD schema per SEO
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { PUBLIC_FAQ_KEYS, WHATSAPP_NUMBER } from '@/lib/constants';
@@ -15,6 +15,7 @@ export default function FAQSection() {
   const t = useTranslations('faq');
   const reduceMotion = useReducedMotion();
   const [openId, setOpenId] = useState<string | null>('1');
+  const faqRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const items = PUBLIC_FAQ_KEYS.map((key) => ({
     key,
@@ -33,7 +34,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden oe-grid-pattern">
+    <section className="relative py-16 md:py-24 overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -72,6 +73,7 @@ export default function FAQSection() {
                 transition={reduceMotion ? { duration: 0 } : { delay: i * 0.05 }}
               >
                 <div
+                  ref={(el) => { faqRefs.current[item.key] = el; }}
                   className={`rounded-2xl border transition-all duration-300 ${
                     isOpen
                       ? 'border-oe-gold/30 bg-bg-card border-l-2 border-l-oe-gold shadow-lg shadow-oe-gold/5'
@@ -80,7 +82,15 @@ export default function FAQSection() {
                 >
                   {/* Question */}
                   <button
-                    onClick={() => setOpenId(isOpen ? null : item.key)}
+                    onClick={() => {
+                      const newId = isOpen ? null : item.key;
+                      setOpenId(newId);
+                      if (newId) {
+                        requestAnimationFrame(() => {
+                          faqRefs.current[newId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        });
+                      }
+                    }}
                     className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
                     aria-expanded={isOpen}
                   >
@@ -113,7 +123,7 @@ export default function FAQSection() {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeInOut' }}
-                        className="overflow-hidden bg-bg-card"
+                        className="overflow-hidden bg-bg-card rounded-b-2xl"
                       >
                         <div className="px-5 pb-5">
                           <div className="h-px bg-oe-gold/10 mb-4" />

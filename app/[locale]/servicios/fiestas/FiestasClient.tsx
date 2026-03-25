@@ -1,17 +1,18 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Check, Star, ChevronRight, PartyPopper, Shield, Clock, Headphones
+  Check, Star, ChevronRight, PartyPopper
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getPacksByService, type PackDefinition } from '@/config/packs-config';
 import { usePacks } from '@/lib/hooks/usePacks';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import GuestRecommender from '@/app/components/ui/GuestRecommender';
+import { TRUST_POINTS } from '@/lib/constants/services';
 
 type AnalyticsValue = string | number | boolean | undefined;
 type AnalyticsParams = Record<string, AnalyticsValue>;
@@ -23,12 +24,6 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   if (!gtag) return;
   gtag('event', action, params);
 }
-
-const TRUST_POINTS = [
-  { icon: Clock, key: 'response' },
-  { icon: Shield, key: 'guarantee' },
-  { icon: Headphones, key: 'support' },
-] as const;
 
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
@@ -44,6 +39,16 @@ export default function FiestasClient() {
     () => fiestaPacks.length ? Math.min(...fiestaPacks.map(p => p.priceValue ?? 0)) : 0,
     [fiestaPacks]
   );
+
+  const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
+  const packRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handlePackClick = useCallback((packId: string) => {
+    setSelectedPackId(packId);
+    requestAnimationFrame(() => {
+      packRefs.current[packId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, []);
 
   const handlePackCTA = (pack: PackDefinition) => {
     trackServiceEvent('fiestas_pack_cta', {
@@ -155,16 +160,22 @@ export default function FiestasClient() {
         </motion.div>
 
         <div className={`grid gap-6 md:gap-8 ${fiestaPacks.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'}`}>
-          {fiestaPacks.map((pack, i) => (
+          {fiestaPacks.map((pack, i) => {
+            const isSelected = selectedPackId === pack.id;
+            return (
             <motion.div
               key={pack.id}
+              ref={(el) => { packRefs.current[pack.id] = el; }}
               initial={reduceMotion ? false : { opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => handlePackClick(pack.id)}
               className={`
-                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col
-                ${pack.popular
+                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer
+                ${isSelected
+                  ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
+                  : pack.popular
                   ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
                   : pack.isFlash
                   ? 'bg-gradient-to-b from-red-500/10 to-transparent border-red-500/40 ring-1 ring-red-500/20'
@@ -241,7 +252,8 @@ export default function FiestasClient() {
                 {t('configure')} →
               </Link>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

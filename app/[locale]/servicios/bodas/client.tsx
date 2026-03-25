@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Heart, Check, Star, ChevronRight, MapPin, Shield, Clock, Headphones
+  Heart, Check, Star, ChevronRight, MapPin
 } from 'lucide-react';
 import Image from 'next/image';
 import { getPacksByService, type PackDefinition } from '@/config/packs-config';
@@ -13,6 +13,7 @@ import { usePacks } from '@/lib/hooks/usePacks';
 import { getWeddingCoverageZones } from '@/lib/services/weddingCoverage';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import GuestRecommender from '@/app/components/ui/GuestRecommender';
+import { TRUST_POINTS } from '@/lib/constants/services';
 
 type AnalyticsValue = string | number | boolean | undefined;
 type AnalyticsParams = Record<string, AnalyticsValue>;
@@ -24,12 +25,6 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   if (!gtag) return;
   gtag('event', action, params);
 }
-
-const TRUST_POINTS = [
-  { icon: Clock, key: 'response' },
-  { icon: Shield, key: 'guarantee' },
-  { icon: Headphones, key: 'support' },
-] as const;
 
 export default function BodasClient() {
   const t = useTranslations('pages.weddings');
@@ -47,6 +42,16 @@ export default function BodasClient() {
     () => weddingPacks.length ? Math.min(...weddingPacks.map(p => p.priceValue ?? 0)) : 0,
     [weddingPacks]
   );
+
+  const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
+  const packRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handlePackClick = useCallback((packId: string) => {
+    setSelectedPackId(packId);
+    requestAnimationFrame(() => {
+      packRefs.current[packId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, []);
 
   const handlePackCTA = (pack: PackDefinition) => {
     trackServiceEvent('bodas_pack_cta', {
@@ -158,16 +163,22 @@ export default function BodasClient() {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          {weddingPacks.map((pack, i) => (
+          {weddingPacks.map((pack, i) => {
+            const isSelected = selectedPackId === pack.id;
+            return (
             <motion.div
               key={pack.id}
+              ref={(el) => { packRefs.current[pack.id] = el; }}
               initial={reduceMotion ? false : { opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => handlePackClick(pack.id)}
               className={`
-                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col
-                ${pack.popular
+                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer
+                ${isSelected
+                  ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
+                  : pack.popular
                   ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
                   : 'bg-white/[0.03] border-white/10 hover:border-white/20'
                 }
@@ -225,7 +236,8 @@ export default function BodasClient() {
                 {t('configure')} →
               </Link>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

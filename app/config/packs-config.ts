@@ -247,6 +247,8 @@ const PACKS: PackDefinition[] = [
     ideal: "Per al ball final del vostre casament",
     duration: "2 hores",
     durationHours: 2,
+    capacidadMinima: 20,
+    capacidadMaxima: 80,
     badge: null,
   },
   {
@@ -270,6 +272,8 @@ const PACKS: PackDefinition[] = [
     ideal: "Ball amb show de llums i efectes",
     duration: "3 hores",
     durationHours: 3,
+    capacidadMinima: 60,
+    capacidadMaxima: 150,
     popular: true,
     badge: "EL MÉS ESCOLLIT",
   },
@@ -294,6 +298,8 @@ const PACKS: PackDefinition[] = [
     ideal: "Tot el casament, del dinar al ball",
     duration: "6 hores",
     durationHours: 6,
+    capacidadMinima: 100,
+    capacidadMaxima: 300,
     badge: null,
   },
 
