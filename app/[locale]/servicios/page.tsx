@@ -60,10 +60,10 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
   }));
 
   return (
-    <div className="min-h-screen relative">
+    <div className="relative">
       {/* Background */}
-      <div className="fixed inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)] -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)] -z-10" />
 
       <Breadcrumbs
         items={[

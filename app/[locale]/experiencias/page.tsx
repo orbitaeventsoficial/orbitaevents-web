@@ -24,10 +24,10 @@ export default async function ExperienciasPage() {
   const tWhatsapp = await getTranslations('whatsappMessages');
 
   return (
-    <main className="min-h-screen relative">
+    <main className="relative">
       {/* Background consistent */}
-      <div className="fixed inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.1),transparent_50%)] -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.1),transparent_50%)] -z-10" />
 
       {/* =============================================================== */}
       {/* HERO SECTION                                                    */}

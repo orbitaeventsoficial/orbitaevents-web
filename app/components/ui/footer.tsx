@@ -155,7 +155,7 @@ export default function Footer() {
                 {coverageAreas.map((city) => (
                   <span
                     key={city}
-                    className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:border-amber-500/30 transition-colors cursor-default"
+                    className="px-3 py-1.5 rounded-full bg-zinc-900 border border-white/10 text-white/70 text-sm font-medium hover:bg-zinc-800 hover:border-amber-500/30 transition-colors cursor-default"
                   >
                     {city}
                   </span>
@@ -172,7 +172,7 @@ export default function Footer() {
                       href={social.href}
                       target="_blank" rel="noopener noreferrer"
                       onClick={() => handleSocialClick(social.name)}
-                      className={`p-3 rounded-xl bg-white/5 text-white/60 ${social.color} transition-all duration-200`}
+                      className={`p-3 rounded-xl bg-zinc-900 text-white/60 ${social.color} transition-all duration-200`}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                       aria-label={`Visitar ${social.name}`}
@@ -276,7 +276,7 @@ export default function Footer() {
                     onClick={() => handleLinkClick('contact', 'phone')}
                     className="flex items-center gap-3 text-white/60 hover:text-green-400 text-sm transition-colors group"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-green-500/20 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
                       <Phone className="w-4 h-4 text-green-400" />
                     </div>
                     <span className="font-medium">{SITE_CONFIG.business.phoneDisplay}</span>
@@ -289,7 +289,7 @@ export default function Footer() {
                     onClick={() => handleLinkClick('contact', 'email')}
                     className="flex items-center gap-3 text-white/60 hover:text-amber-400 text-sm transition-colors group"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
                       <Mail className="w-4 h-4 text-amber-400" />
                     </div>
                     <span className="font-medium break-all">{SITE_CONFIG.business.email}</span>
@@ -297,7 +297,7 @@ export default function Footer() {
                 </li>
 
                 <li className="flex items-center gap-3 text-white/60 text-sm">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-blue-500/20 flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-blue-400" />
                   </div>
                   <span className="font-medium">{t('location')}</span>
@@ -334,7 +334,7 @@ export default function Footer() {
         {/* BOTTOM BAR (Legal & Copyright)                                   */}
         {/* Padding extra per evitar que el BottomNav mòbil tapi els links   */}
         {/* ════════════════════════════════════════════════════════════════ */}
-        <div className="py-6 pb-24 lg:pb-6 border-t border-white/10">
+        <div className="py-6 pb-24 lg:pb-6 border-t border-white/10 bg-black relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <p className="text-white/60 text-sm text-center md:text-left">

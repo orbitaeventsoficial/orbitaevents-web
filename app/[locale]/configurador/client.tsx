@@ -388,21 +388,23 @@ function ProgressStepsNav({ currentStep, labels }: ProgressStepsNavProps) {
             <div className="flex flex-col items-center gap-1">
               <div
                 aria-current={currentStep === stepNumber ? 'step' : undefined}
-                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all ${
+                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-300 ${
                   currentStep >= stepNumber
-                    ? 'bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]'
+                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]'
                     : 'bg-bg-surface text-text-muted border border-border'
                 }`}
               >
                 {currentStep > stepNumber ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : stepNumber}
                 {currentStep === stepNumber && (
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 blur-lg" />
+                  <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-lg animate-pulse" />
                 )}
               </div>
-              <span className="hidden sm:block text-[10px] text-text-muted max-w-[80px] text-center truncate">{label}</span>
+              <span className={`hidden sm:block text-[10px] max-w-[80px] text-center truncate transition-colors ${
+                currentStep >= stepNumber ? 'text-oe-gold font-medium' : 'text-text-muted'
+              }`}>{label}</span>
             </div>
             {stepNumber < 4 && (
-              <div className={`h-0.5 w-6 sm:w-12 ${currentStep > stepNumber ? 'bg-gradient-to-r from-purple-500 to-fuchsia-500' : 'bg-border'}`} />
+              <div className={`h-0.5 w-6 sm:w-12 transition-all duration-500 ${currentStep > stepNumber ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-border'}`} />
             )}
           </div>
         ))}
@@ -590,8 +592,10 @@ export default function ConfiguradorClient() {
 
   // Scroll al top quan canvies de pas o selecciones pack
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'instant' : 'smooth' });
+    requestAnimationFrame(() => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'instant' : 'smooth' });
+    });
   }, [step, config.selectedPack, config.eventType]);
 
   const availableExtras = useMemo(() => {
@@ -635,16 +639,19 @@ export default function ConfiguradorClient() {
                   setStep(2);
                   track('Configurador_Step1_EventType', { type: service.slug });
                 }}
-                className="p-8 rounded-2xl bg-bg-surface border-2 border-border hover:border-oe-gold transition-all duration-300 transform hover:scale-105 hover:shadow-oe-gold text-left group"
+                className="relative p-8 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border-2 border-white/10 hover:border-oe-gold/60 transition-all duration-300 transform hover:scale-[1.03] hover:shadow-[0_8px_32px_rgba(245,158,11,0.15)] text-left group overflow-hidden"
               >
-                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">{service.icon}</div>
-                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-oe-gold transition-colors">
-                  {t(`step1.eventTypes.${service.slug}`)}
-                </h3>
-                <p className="text-white/40 text-xs mb-3">{t(service.idealKey)}</p>
-                <p className="text-text-muted text-sm mb-4">{t('step1.from')} {minPrice}€</p>
-                <div className="flex items-center text-oe-gold text-sm font-bold">
-                  {t('step1.viewPacks')} <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                <div className="absolute inset-0 bg-gradient-to-br from-oe-gold/0 to-oe-gold/0 group-hover:from-oe-gold/5 group-hover:to-transparent transition-all duration-500 rounded-2xl" />
+                <div className="relative">
+                  <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">{service.icon}</div>
+                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-oe-gold transition-colors">
+                    {t(`step1.eventTypes.${service.slug}`)}
+                  </h3>
+                  <p className="text-white/40 text-xs mb-3">{t(service.idealKey)}</p>
+                  <p className="text-lg font-bold text-oe-gold mb-4">{t('step1.from')} {minPrice}€</p>
+                  <div className="flex items-center text-white/60 group-hover:text-oe-gold text-sm font-semibold transition-colors">
+                    {t('step1.viewPacks')} <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
               </button>
             );
@@ -682,32 +689,37 @@ export default function ConfiguradorClient() {
             return (
             <div
               key={pack.id}
-              className={`group p-8 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
+              className={`relative group p-8 rounded-2xl border-2 transition-all duration-300 transform hover:scale-[1.02] flex flex-col ${
                 selectedPackId === pack.id
-                  ? 'border-oe-gold bg-oe-gold/5 shadow-oe-gold'
-                  : 'border-border bg-bg-surface hover:border-oe-gold/50 hover:shadow-lg'
-              } ${pack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
+                  ? 'border-oe-gold bg-gradient-to-b from-oe-gold/10 to-transparent shadow-[0_8px_32px_rgba(245,158,11,0.2)]'
+                  : pack.popular
+                  ? 'border-amber-500/40 bg-gradient-to-b from-amber-500/[0.07] to-transparent ring-1 ring-amber-500/20 md:scale-[1.03]'
+                  : 'border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent hover:border-white/20'
+              } ${pack.highlight ? 'ring-2 ring-oe-gold/30' : ''}`}
             >
               {pack.popular && (
-                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
-                  {t('step2.mostSold')}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-amber-500 text-black text-xs font-bold whitespace-nowrap shadow-lg shadow-amber-500/25">
+                  ⭐ {t('step2.mostSold')}
                 </div>
               )}
-              {pack.highlight && (
-                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold mb-4">
+              {pack.highlight && !pack.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-oe-gold to-amber-400 text-black text-xs font-bold whitespace-nowrap">
                   {t('step2.premium')}
                 </div>
               )}
 
-              <h3 className="text-2xl font-bold text-white mb-2">{pack.name}</h3>
-              <p className="text-text-muted text-sm mb-2">{pack.tagline}</p>
+              <div className="text-center mb-5 mt-2">
+                <h3 className="text-2xl font-bold text-white mb-1">{pack.name}</h3>
+                {pack.tagline && <p className="text-white/50 text-sm">{pack.tagline}</p>}
+              </div>
               {pack.ideal && (
-                <p className="text-white/40 text-xs mb-4">{t('step2.recommendedFor')}: {pack.ideal}</p>
+                <p className="text-white/40 text-xs mb-4 text-center">👥 {pack.ideal}</p>
               )}
 
-              <div className="mb-6">
+              <div className="text-center mb-6 pb-5 border-b border-white/[0.06]">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">{t('step1.from')}</p>
                 <div className="text-4xl font-black text-oe-gold mb-1">{pack.price}</div>
-                <div className="text-text-muted text-sm">{pack.duration}</div>
+                <div className="text-white/50 text-sm">{pack.duration}</div>
               </div>
 
               <ul className="space-y-2 mb-6">
@@ -728,13 +740,15 @@ export default function ConfiguradorClient() {
                   setStep(3);
                   track('Configurador_Step2_PackSelected', { pack: pack.id, price: pack.priceValue });
                 }}
-                className={`w-full py-3 rounded-xl font-bold transition-all ${
-                  selectedPackId === pack.id
+                className={`w-full py-3.5 rounded-xl font-bold transition-all mt-auto ${
+                  pack.popular
+                    ? 'bg-amber-500 text-black hover:bg-amber-400'
+                    : selectedPackId === pack.id
                     ? 'bg-oe-gold text-black'
-                    : 'bg-bg-main text-white hover:bg-oe-gold hover:text-black'
+                    : 'bg-white/10 text-white hover:bg-white/15'
                 }`}
               >
-                {selectedPackId === pack.id ? t('step2.selected') : t('step2.select')}
+                {selectedPackId === pack.id ? t('step2.selected') : t('step2.select')} →
               </button>
             </div>
           )})}
@@ -761,7 +775,7 @@ export default function ConfiguradorClient() {
 
         {/* Data i assistents */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-xl bg-bg-surface border border-border">
+          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10">
             <label
               htmlFor="event-date"
               className="block text-white font-bold mb-3 flex items-center gap-2"
@@ -776,7 +790,7 @@ export default function ConfiguradorClient() {
               autoComplete="off"
               value={config.date}
               onChange={(e) => setEventDate(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-black/30 text-white border border-white/10 focus:border-oe-gold focus:ring-1 focus:ring-oe-gold/30 outline-none transition-all"
               min={minDate}
             />
             {selectedDate && isDateBooked && (
@@ -799,7 +813,7 @@ export default function ConfiguradorClient() {
             )}
           </div>
 
-          <div className="p-6 rounded-xl bg-bg-surface border border-border">
+          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10">
             <label
               htmlFor="guests"
               className="block text-white font-bold mb-3 flex items-center gap-2"
@@ -816,12 +830,13 @@ export default function ConfiguradorClient() {
               onChange={(e) => setGuestCount(Number.parseInt(e.target.value, 10) || 0)}
               min="10"
               max="1000"
-              className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-black/30 text-white border border-white/10 focus:border-oe-gold focus:ring-1 focus:ring-oe-gold/30 outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* Extras */}
+        {/* Extras — hidden when none available */}
+        {hasAvailableExtras && (
         <div className="p-8 rounded-xl bg-bg-surface border border-border">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -829,7 +844,7 @@ export default function ConfiguradorClient() {
               {t('step3.extras')}
             </h3>
             {hasComboDiscount && (
-              <span className="text-xs bg-gradient-to-r from-fuchsia-500/20 to-purple-500/20 text-fuchsia-400 px-3 py-1 rounded-full font-bold border border-fuchsia-500/30 shadow-[0_0_15px_rgba(217,70,239,0.3)]">
+              <span className="text-xs bg-oe-gold/10 text-oe-gold px-3 py-1 rounded-full font-bold border border-oe-gold/30">
                 ✨ {t('step3.extrasDiscount')}
               </span>
             )}
@@ -840,10 +855,10 @@ export default function ConfiguradorClient() {
                 <label
                   key={extra.id}
                   htmlFor={`extra-${extra.id}`}
-                  className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden min-h-[44px] ${
+                  className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-xl border-2 cursor-pointer transition-all overflow-hidden min-h-[44px] ${
                     config.extras.includes(extra.id)
-                      ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
-                      : 'border-border hover:border-fuchsia-500/50'
+                      ? 'border-oe-gold bg-gradient-to-br from-oe-gold/10 to-transparent shadow-[0_0_20px_rgba(245,158,11,0.15)]'
+                      : 'border-white/10 hover:border-oe-gold/40'
                   }`}
                 >
                 <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -876,27 +891,23 @@ export default function ConfiguradorClient() {
                   </div>
                 </div>
                 {extra.popular && (
-                  <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="absolute top-2 right-2 bg-amber-500 text-black text-xs px-2 py-0.5 rounded-full font-bold">
                     {t('step3.popular')}
                   </span>
                 )}
                 {extra.premium && (
-                  <span className="absolute top-2 right-2 bg-oe-gold text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="absolute top-2 right-2 bg-oe-gold/20 text-oe-gold text-xs px-2 py-0.5 rounded-full font-bold border border-oe-gold/30">
                     {t('step3.premiumExtra')}
                   </span>
                 )}
                 </label>
               ))}
-            {!hasAvailableExtras && (
-                <div className="col-span-full text-center py-8 text-white/60">
-                  {t('step3.noExtras')}
-                </div>
-              )}
             </div>
         </div>
+        )}
 
         {/* Codi de descompte */}
-        <div className="p-6 rounded-xl bg-bg-surface border border-border">
+        <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10">
           <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
             <Tag className="w-5 h-5 text-oe-gold" />
             {t('step3.discountCode')}
@@ -911,14 +922,14 @@ export default function ConfiguradorClient() {
                 setDiscountCodeError('');
               }}
               placeholder={t('step3.discountCodePlaceholder')}
-              className="flex-1 px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
+              className="flex-1 px-4 py-3 rounded-xl bg-black/30 text-white border border-white/10 focus:border-oe-gold focus:ring-1 focus:ring-oe-gold/30 outline-none transition-all"
             />
             <button
               type="button"
               onClick={applyDiscountCode}
               disabled={discountCodeLoading || !trimmedDiscountCode}
               aria-busy={discountCodeLoading}
-              className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
+              className="px-5 py-3 rounded-xl bg-oe-gold text-black font-bold disabled:opacity-50 transition-all hover:bg-oe-gold-bright"
             >
               {discountCodeLoading ? t('step3.validatingCode') : t('step3.applyCode')}
             </button>
@@ -926,7 +937,7 @@ export default function ConfiguradorClient() {
               <button
                 type="button"
                 onClick={clearDiscountCode}
-                className="px-4 py-3 rounded-lg border border-border text-white"
+                className="px-4 py-3 rounded-xl border border-white/10 text-white hover:border-white/20 transition-colors"
               >
                 {t('step3.removeCode')}
               </button>
@@ -946,18 +957,18 @@ export default function ConfiguradorClient() {
         </div>
 
         {/* Resum de preu */}
-        <div className="p-8 rounded-2xl bg-gradient-to-br from-oe-gold/10 to-oe-gold/5 border-2 border-oe-gold/50">
-          <h3 className="text-2xl font-bold text-white mb-4">{t('step3.summary')}</h3>
+        <div className="p-8 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/30">
+          <h3 className="text-2xl font-bold text-white mb-6">{t('step3.summary')}</h3>
 
-          <div className="space-y-2 mb-4">
-            <div className="flex justify-between text-text-muted">
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between text-white/60">
               <span>{t('step3.basePrice')}</span>
-              <span>{pricing.basePrice}€</span>
+              <span className="text-white/80 font-medium">{pricing.basePrice}€</span>
             </div>
             {hasExtrasPrice && (
-              <div className="flex justify-between text-text-muted">
+              <div className="flex justify-between text-white/60">
                 <span>{t('step3.extrasPrice', { count: extrasCount })}</span>
-                <span>{pricing.extrasPrice}€</span>
+                <span className="text-white/80 font-medium">{pricing.extrasPrice}€</span>
               </div>
             )}
             {hasPricingDiscount && (
@@ -969,9 +980,9 @@ export default function ConfiguradorClient() {
                 <span>-{pricing.discount}€</span>
               </div>
             )}
-            <div className="border-t border-border pt-2 mt-2 flex justify-between items-center">
+            <div className="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
               <span className="text-xl font-bold text-white">{t('step3.total')}</span>
-              <span className="text-3xl font-black text-oe-gold">{pricing.total}€</span>
+              <span className="text-4xl font-black text-oe-gold">{pricing.total}€</span>
             </div>
           </div>
 
@@ -980,7 +991,7 @@ export default function ConfiguradorClient() {
               setStep(4);
               track('Configurador_Step3_Continue', { total: pricing.total });
             }}
-            className="w-full btn-primary text-lg py-4 flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg hover:scale-[1.02] transition-transform shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2"
           >
             {t('step3.continue')}
             <ChevronRight className="w-5 h-5" />
@@ -1135,14 +1146,14 @@ export default function ConfiguradorClient() {
 
       {/* Sticky price bar — visible from step 2 onwards */}
       {showStickyPrice && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 backdrop-blur-xl">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-black/90 backdrop-blur-2xl">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="text-white/60 text-sm hidden sm:inline">
+            <div className="flex items-center gap-3">
+              <span className="text-white font-semibold text-sm hidden sm:inline">
                 {config.selectedPack?.name}
               </span>
               {config.extras.length > 0 && (
-                <span className="text-white/40 text-xs">
+                <span className="text-white/40 text-xs bg-white/5 px-2 py-0.5 rounded-full">
                   +{config.extras.length} extras
                 </span>
               )}
@@ -1159,7 +1170,7 @@ export default function ConfiguradorClient() {
               {step === 3 && (
                 <button
                   onClick={() => { setStep(4); track('Configurador_Step3_Continue'); }}
-                  className="px-5 py-2 rounded-xl bg-oe-gold text-black font-bold text-sm hover:bg-oe-gold-bright transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm hover:scale-105 transition-transform shadow-lg shadow-orange-500/25"
                 >
                   {t('step3.continue')}
                 </button>

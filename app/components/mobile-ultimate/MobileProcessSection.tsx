@@ -24,7 +24,7 @@ export default function MobileProcessSection() {
   ] as const;
 
   return (
-    <section className="py-14 px-6 relative overflow-hidden oe-grid-pattern">
+    <section className="py-14 px-6 relative overflow-hidden">
       {/* Ambient blobs */}
       <div className="absolute top-0 right-0 w-56 h-56 bg-purple-500/5 rounded-full blur-[90px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-56 h-56 bg-amber-500/5 rounded-full blur-[90px] pointer-events-none" />

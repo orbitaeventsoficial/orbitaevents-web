@@ -102,7 +102,7 @@ export default function MobileStatsSection() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section ref={ref} className="py-14 px-6 relative overflow-hidden oe-grid-pattern">
+    <section ref={ref} className="py-14 px-6 relative overflow-hidden">
       {/* Ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(251,191,36,0.04),transparent_70%)] pointer-events-none" />
 

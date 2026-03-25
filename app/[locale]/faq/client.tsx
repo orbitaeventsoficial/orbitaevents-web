@@ -67,10 +67,10 @@ export default function FAQClient({
   const activeData = categories.find(c => c.key === activeCategory);
 
   return (
-    <main className="min-h-screen relative text-white">
+    <main className="relative text-white">
       {/* Background */}
-      <div className="fixed inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)] -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)] -z-10" />
 
       {/* Hero */}
       <section className="relative pt-32 pb-16 px-4">

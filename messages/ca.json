@@ -2201,6 +2201,12 @@
         "deposit": "Dipòsit: 30% en el moment de la reserva",
         "rest": "Resta: 7 dies abans de l'esdeveniment",
         "noFees": "Sense comissions de transferència"
+      },
+      "from": "Des de",
+      "trust": {
+        "response": "Resposta en menys de 2h",
+        "guarantee": "Pressupost tancat, sense sorpreses",
+        "support": "Suport total fins al dia de l'event"
       }
     },
     "parties": {
@@ -2253,7 +2259,14 @@
           "desc": "Lloret, Tossa, Platja d'Aro"
         }
       },
-      "more": "més..."
+      "more": "més...",
+      "from": "Des de",
+      "configure": "Configurar",
+      "trust": {
+        "response": "Resposta en menys de 2h",
+        "guarantee": "Pressupost tancat, sense sorpreses",
+        "support": "Suport total fins al dia de l'event"
+      }
     },
     "corporate": {
       "title": "Esdeveniments d'empresa",
@@ -2527,6 +2540,23 @@
           "name": "Caps Mòbils Extra (x2)",
           "description": "2 caps mòbils LED addicionals per ampliar la il·luminació"
         }
+      },
+      "from": "Des de",
+      "trust": {
+        "response": "Resposta en menys de 2h",
+        "guarantee": "Pressupost tancat, sense sorpreses",
+        "support": "Suport total fins al dia de l'event"
+      },
+      "coverageTitle": "On Portem la Festa",
+      "zones": {
+        "barcelona": "Barcelona",
+        "barcelonaDesc": "Ciutat i voltants",
+        "maresme": "Maresme",
+        "maresmeDesc": "Costa i interior",
+        "girona": "Girona",
+        "gironaDesc": "Província completa",
+        "valles": "Vallès",
+        "vallesDesc": "Oriental i Occidental"
       }
     },
     "production": {
@@ -3014,21 +3044,41 @@
       "dj": {
         "title": "DJ + So Professional",
         "desc": "La pista plena tota la nit. Llegim la sala, adaptem la música en directe i portem equip de club de veritat.",
-        "highlights": ["Equip de club", "Llums LED sync", "Fum + CO2 + Confeti"]
+        "highlights": [
+          "Equip de club",
+          "Llums LED sync",
+          "Fum + CO2 + Confeti"
+        ]
       },
       "theming": {
         "title": "Tematització Completa",
         "desc": "Halloween, Món Màgic, tropical, anys 80... Transformem l'espai sencer. Decoració, atrezzo, ambientació. Ningú més ho fa així.",
-        "highlights": ["Decoració immersiva", "Atrezzo temàtic", "Escenografia"]
+        "highlights": [
+          "Decoració immersiva",
+          "Atrezzo temàtic",
+          "Escenografia"
+        ]
       },
       "production": {
         "title": "Producció Tècnica",
         "desc": "Events corporatius, presentacions, festivals. Audiovisual, il·luminació arquitectònica, microfonía, streaming.",
-        "highlights": ["Audiovisual HD", "Il·luminació arq.", "Streaming"]
+        "highlights": [
+          "Audiovisual HD",
+          "Il·luminació arq.",
+          "Streaming"
+        ]
       }
     },
     "weDoIt": "Ho fem per a:",
-    "eventTypes": ["Casaments", "Festes privades", "Empreses", "Aniversaris", "Halloween", "Comunions", "Festivals"]
+    "eventTypes": [
+      "Casaments",
+      "Festes privades",
+      "Empreses",
+      "Aniversaris",
+      "Halloween",
+      "Comunions",
+      "Festivals"
+    ]
   },
   "offerModal": {
     "ariaLabel": "Oferta d'última hora",

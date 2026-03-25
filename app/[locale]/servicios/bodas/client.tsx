@@ -1,24 +1,18 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from '@/lib/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Heart, Check, Star, FileText,
-  Users, Zap, TrendingUp, ChevronRight, MapPin
+  Heart, Check, Star, ChevronRight, MapPin, Shield, Clock, Headphones
 } from 'lucide-react';
 import Image from 'next/image';
-import { getPacksByService, EXTRAS, type ExtraDefinition, type PackDefinition } from '@/config/packs-config';
+import { getPacksByService, type PackDefinition } from '@/config/packs-config';
 import { useLocale, useMessages, useTranslations } from 'next-intl';
 import { usePacks } from '@/lib/hooks/usePacks';
-import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 import { getWeddingCoverageZones } from '@/lib/services/weddingCoverage';
-
-interface ConfigState {
-  selectedPack: PackDefinition | null;
-  selectedExtras: Set<string>;
-  numGuests: number;
-}
+import { SITE_CONFIG } from '@/app/config/site-config';
+import GuestRecommender from '@/app/components/ui/GuestRecommender';
 
 type AnalyticsValue = string | number | boolean | undefined;
 type AnalyticsParams = Record<string, AnalyticsValue>;
@@ -31,139 +25,43 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   gtag('event', action, params);
 }
 
+const TRUST_POINTS = [
+  { icon: Clock, key: 'response' },
+  { icon: Shield, key: 'guarantee' },
+  { icon: Headphones, key: 'support' },
+] as const;
 
-export default function BodasClientV2() {
+export default function BodasClient() {
   const t = useTranslations('pages.weddings');
   const messages = useMessages();
   const locale = useLocale();
+  const reduceMotion = useReducedMotion();
   const fallbackPacks = useMemo(() => getPacksByService('bodas'), []);
   const { packs: weddingPacks } = usePacks({
     service: 'bodas',
     locale,
     fallback: fallbackPacks,
   });
-  const [config, setConfig] = useState<ConfigState>({
-    selectedPack: null,
-    selectedExtras: new Set(),
-    numGuests: 100,
-  });
-  const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
-
-  const [showSummary, setShowSummary] = useState(false);
-
-
-
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadExtras() {
-      try {
-        const res = await fetch(`/api/public/extras?locale=${locale}`, { cache: 'no-store' });
-        const data = await res.json();
-        if (!active) return;
-        if (Array.isArray(data?.extras)) {
-          setExtrasCatalog(data.extras as ExtraDefinition[]);
-        }
-      } catch {
-        // Fallback a EXTRAS del config
-      }
-    }
-
-    loadExtras();
-    return () => {
-      active = false;
-    };
-  }, [locale]);
-
-  const weddingExtras = useMemo(() => filterCompatibleExtras(extrasCatalog, 'bodas'), [extrasCatalog]);
   const coverageZones = useMemo(() => getWeddingCoverageZones(messages, t), [messages, t]);
-  // Calcular total
-  const packPrice = config.selectedPack?.priceValue || 0;
-  const extrasPrice = Array.from(config.selectedExtras).reduce((sum, id) => {
-    const extra = weddingExtras.find(e => e.id === id);
-    return sum + (extra?.price || 0);
-  }, 0);
-  const totalPrice = packPrice + extrasPrice;
+  const minPrice = useMemo(
+    () => weddingPacks.length ? Math.min(...weddingPacks.map(p => p.priceValue ?? 0)) : 0,
+    [weddingPacks]
+  );
 
-  // Descuento por 3+ extras (15%)
-  const hasComboDiscount = config.selectedExtras.size >= 3;
-  const discount = hasComboDiscount ? Math.round(extrasPrice * 0.15) : 0;
-  const finalPrice = totalPrice - discount;
-
-  // Mostrar summary cuando hay algo seleccionado
-  useEffect(() => {
-    setShowSummary(config.selectedPack !== null);
-  }, [config.selectedPack]);
-
-  // Recomendación según invitados
-  const getRecommendedPack = (): PackDefinition | null => {
-    if (!weddingPacks.length) return null;
-    if (config.numGuests <= 80) return weddingPacks[0] || null; // Esencial
-    if (config.numGuests <= 150) return weddingPacks[1] || weddingPacks[0] || null; // Premium
-    return weddingPacks[2] || weddingPacks[weddingPacks.length - 1] || null; // VIP
-  };
-
-  const recommendedPack = getRecommendedPack();
-
-  // Seleccionar pack
-  const selectPack = (pack: PackDefinition) => {
-    setConfig(prev => ({ ...prev, selectedPack: pack }));
-    
-    trackServiceEvent('bodas_pack_select', {
+  const handlePackCTA = (pack: PackDefinition) => {
+    trackServiceEvent('bodas_pack_cta', {
       pack_id: pack.id,
       pack_name: pack.name,
       price: pack.priceValue,
     });
   };
 
-  // Toggle extra
-  const toggleExtra = (extraId: string) => {
-    setConfig(prev => {
-      const newExtras = new Set(prev.selectedExtras);
-      if (newExtras.has(extraId)) {
-        newExtras.delete(extraId);
-      } else {
-        newExtras.add(extraId);
-      }
-      return { ...prev, selectedExtras: newExtras };
-    });
-
-    const extra = weddingExtras.find(e => e.id === extraId);
-    trackServiceEvent('bodas_extra_toggle', {
-      extra_id: extraId,
-      extra_name: extra?.name,
-      action: config.selectedExtras.has(extraId) ? 'remove' : 'add',
-    });
-  };
-
-  // Ir al configurador con pack pre-seleccionado
-  const goToConfigurator = () => {
-    if (!config.selectedPack) return;
-
-    const selectedExtrasIds = Array.from(config.selectedExtras).join(',');
-
-    const params = new URLSearchParams({
-      service: 'bodas',
-      packId: config.selectedPack.id,
-      guests: config.numGuests.toString(),
-      extras: selectedExtrasIds,
-    });
-
-    trackServiceEvent('bodas_pack_to_configurator', {
-      pack_id: config.selectedPack.id,
-      num_extras: config.selectedExtras.size,
-      num_guests: config.numGuests,
-    });
-
-    window.location.href = `/configurador?${params.toString()}`;
-  };
   return (
     <div className="min-h-screen bg-bg-main">
-      {/* HERO with background image */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+      {/* ═══ HERO ═══ */}
+      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-bg-main z-10" />
           <Image
             src="/img/portfolio/bodas/bodas-01.avif"
             alt="DJ para bodas Òrbita Events"
@@ -175,367 +73,217 @@ export default function BodasClientV2() {
           />
         </div>
 
-        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6 backdrop-blur-sm">
-            <Heart className="w-4 h-4 text-oe-gold" fill="currentColor" />
-            <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
-          </div>
-
-          <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
-            {t('heroTitle')}
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            {t('heroSubtitle')}
-          </p>
-        </div>
-      </section>
-
-      {/* Configurador de invitados */}
-      <section className="max-w-5xl mx-auto px-4 mb-16">
-        <div className="p-8 rounded-3xl bg-gradient-to-br from-bg-surface to-bg-card border border-oe-gold/30">
-          <div className="flex items-center gap-3 mb-6">
-            <Users className="w-6 h-6 text-oe-gold" />
-            <h3 className="text-2xl font-bold text-text-primary">{t('guestsQuestion')}</h3>
-          </div>
-
-          <div className="text-center mb-8">
-            <div className="text-7xl font-bold bg-gradient-to-r from-oe-gold to-oe-gold bg-clip-text text-transparent">
-              {config.numGuests}
-            </div>
-            <div className="text-text-muted mt-2">{t('people')}</div>
-          </div>
-
-          <input
-            type="range"
-            min="30"
-            max="300"
-            step="10"
-            value={config.numGuests}
-            onChange={(e) => setConfig(prev => ({ ...prev, numGuests: parseInt(e.target.value) }))}
-            className="w-full h-3 rounded-full appearance-none cursor-pointer slider-custom"
-          />
-          <div className="flex justify-between text-sm text-text-muted mt-4">
-            <span>30 {t('people')}</span>
-            <span>300 {t('people')}</span>
-          </div>
-
-          {/* Recomendación */}
-          {recommendedPack && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-oe-gold/20 rounded-xl border border-oe-gold/50"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-oe-gold" />
-                <span className="font-bold text-oe-gold">{t('recommended')}:</span>
-              </div>
-              <div className="text-lg text-text-primary">
-                <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
-              </div>
-              <p className="text-sm text-text-muted mt-1">{recommendedPack.tagline}</p>
-            </motion.div>
-          )}
-        </div>
-      </section>
-
-      {/* Selector de packs */}
-      <section className="max-w-7xl mx-auto px-4 mb-16">
-        <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
-          {t('choosePack')}
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {weddingPacks.map(pack => {
-            const isSelected = config.selectedPack?.id === pack.id;
-            const isRecommended = recommendedPack?.id === pack.id;
-
-            return (
-              <motion.div
-                key={pack.id}
-                layout
-                className={`
-                  relative p-6 rounded-2xl border-2 cursor-pointer transition-all
-                  ${isSelected
-                    ? 'border-oe-gold bg-oe-gold/10 shadow-lg shadow-oe-gold scale-105'
-                    : pack.popular
-                    ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-lg shadow-fuchsia-500/30 scale-105'
-                    : isRecommended
-                    ? 'border-oe-gold bg-oe-gold/5'
-                    : 'border-white/10 bg-bg-surface hover:border-white/20 hover:bg-bg-card'
-                  }
-                `}
-                onClick={() => selectPack(pack)}
-              >
-                {/* Badge Recomendado */}
-                {isRecommended && !isSelected && !pack.popular && (
-                  <div className="absolute -top-3 right-4">
-                    <div className="px-3 py-1 bg-oe-gold rounded-full text-xs font-bold flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      {t('recommendedBadge')}
-                    </div>
-                  </div>
-                )}
-
-                {/* Badge Popular con glow fucsia */}
-                {pack.popular && (
-                  <div className="absolute -top-3 left-4">
-                    <div className="px-3 py-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 rounded-full text-xs font-bold flex items-center gap-1 shadow-[0_0_20px_rgba(217,70,239,0.6)] animate-pulse">
-                      <Star className="w-4 h-4" fill="currentColor" />
-                      {t('mostChosen')}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-4 mt-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-text-primary">{pack.name}</h3>
-                    <p className="text-sm text-text-muted">{pack.tagline}</p>
-                  </div>
-
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-oe-gold">
-                      {pack.priceValue}€
-                    </span>
-                  </div>
-
-                  <div className="text-sm text-text-muted">
-                    👥 {pack.ideal || ''}
-                  </div>
-
-                  <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {(pack.features || []).slice(0, 5).map((feature, idx) => (
-                      <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
-                        <Check className="w-4 h-4 text-oe-gold flex-shrink-0 mt-0.5" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className={`
-                    w-full py-3 rounded-xl font-bold text-center transition-all
-                    ${isSelected
-                      ? 'bg-oe-gold text-text-primary'
-                      : 'bg-bg-card text-text-primary hover:bg-white/20'
-                    }
-                  `}>
-                    {isSelected ? `✓ ${t('selected')}` : t('select')}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Extras */}
-      {config.selectedPack && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-7xl mx-auto px-4 mb-16"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-text-primary mb-4">
-              {t('customizeExtras')}
-            </h2>
-            <p className="text-text-muted">
-              {t('extrasDiscount')} <span className="text-oe-gold font-bold">15%</span> {t('automatically')}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {weddingExtras.map(extra => {
-              const isSelected = config.selectedExtras.has(extra.id);
-
-              return (
-                <motion.div
-                  key={extra.id}
-                  layout
-                  className={`
-                    relative p-6 rounded-2xl border-2 cursor-pointer transition-all
-                    ${isSelected
-                      ? 'border-oe-gold bg-oe-gold/10 shadow-lg shadow-oe-gold/20'
-                      : 'border-white/10 bg-bg-surface hover:border-white/20 hover:bg-bg-card'
-                    }
-                  `}
-                  onClick={() => toggleExtra(extra.id)}
-                >
-                  {/* Checkbox */}
-                  <div className="absolute top-4 right-4">
-                    <div className={`
-                      w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-                      ${isSelected
-                        ? 'border-oe-gold bg-oe-gold'
-                        : 'border-oe-gold bg-transparent'
-                      }
-                    `}>
-                      {isSelected && (
-                        <Check className="w-4 h-4 text-text-primary" strokeWidth={3} />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Badge Popular */}
-                  {extra.popular && (
-                    <div className="absolute -top-3 left-4">
-                      <div className="px-2 py-1 bg-oe-gold rounded-full text-xs font-bold">
-                        {t('popular')}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Badge Premium */}
-                  {extra.premium && (
-                    <div className="absolute -top-3 left-4">
-                      <div className="px-2 py-1 bg-gradient-to-r from-oe-gold to-oe-gold rounded-full text-xs font-bold">
-                        {t('premium')}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-3 mt-4">
-                    <div className="text-4xl mb-2">{extra.icon}</div>
-                    <h4 className="text-lg font-bold text-text-primary pr-8">
-                      {extra.name}
-                    </h4>
-                    <p className="text-sm text-text-muted">
-                      {extra.description}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                      <span className="text-2xl font-bold text-oe-gold">
-                        +{extra.price}€
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Descuento combo */}
-          {hasComboDiscount && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="mt-8 p-6 bg-gradient-to-r from-green-900/30 to-oe-gold/30 rounded-2xl border-2 border-green-500/50 text-center"
-            >
-              <Zap className="w-12 h-12 text-green-400 mx-auto mb-3" fill="currentColor" />
-              <h3 className="text-2xl font-bold text-text-primary mb-2">
-                {t('comboDiscount')}
-              </h3>
-              <p className="text-green-400 text-lg">
-                {t('youSave')} <strong>{discount}€</strong> (15% {t('inExtras')})
-              </p>
-            </motion.div>
-          )}
-        </motion.section>
-      )}
-
-      {/* Sticky Summary */}
-      <AnimatePresence>
-        {showSummary && (
+        <div className="relative z-20 mx-auto max-w-4xl px-4 py-24 text-center">
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 left-0 right-0 z-[100]
-                     bg-black/95 backdrop-blur-xl
-                     border-t-2 border-amber-500/40
-                     shadow-[0_-10px_40px_rgba(0,0,0,0.8)]"
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                {/* Info */}
-                <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
-                  <div>
-                    <div className="text-xs sm:text-sm text-amber-500 font-semibold">
-                      {config.selectedPack?.name || ''}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs sm:text-sm text-white/70">
-                        {config.selectedExtras.size} {t('extras')}
-                      </span>
-                      {hasComboDiscount && (
-                        <>
-                          <span className="text-xs sm:text-sm text-white/50">•</span>
-                          <span className="text-xs sm:text-sm bg-amber-500/20 text-amber-500 px-2 py-1 rounded">
-                            -15% {t('extras')}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="hidden sm:block h-12 w-px bg-white/20" />
-                  <div>
-                    {discount > 0 && (
-                      <div className="text-xs sm:text-sm line-through text-white/60">{totalPrice}€</div>
-                    )}
-                    <div className="text-2xl sm:text-3xl font-bold text-amber-500">
-                      {finalPrice}€
-                    </div>
-                  </div>
-                </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6 backdrop-blur-sm">
+              <Heart className="w-4 h-4 text-oe-gold" fill="currentColor" />
+              <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
+            </div>
 
-                {/* CTA */}
-                <button
-                  onClick={goToConfigurator}
-                  className="
-                    px-6 sm:px-8 py-3 sm:py-4
-                    bg-amber-500 text-black rounded-full
-                    font-bold text-sm sm:text-base flex items-center gap-2
-                    hover:bg-amber-300 hover:shadow-2xl hover:shadow-amber-500/20
-                    transition-all duration-300 hover:scale-105 active:scale-95
-                    shadow-lg
-                  "
-                >
-                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden sm:inline">{t('continueToConfig')}</span>
-                  <span className="sm:hidden">{t('configure')}</span>
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </div>
+            <h1 className="text-5xl md:text-7xl font-display font-black text-white mb-5 leading-tight">
+              {t('heroTitle')}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-10">
+              {t('heroSubtitle')}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/configurador?service=bodas"
+                onClick={() => trackServiceEvent('bodas_hero_cta', { position: 'hero' })}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25 text-lg"
+              >
+                {t('configure')}
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+              <span className="text-white/50 text-sm">
+                {t('from')} {minPrice}€
+              </span>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      </section>
 
-      {/* Info adicional */}
-      <section className="max-w-4xl mx-auto px-4 py-16">
-        <div className="p-8 bg-bg-surface rounded-2xl border border-white/10">
-          <h3 className="text-2xl font-bold text-text-primary mb-4">💍 {t('importantInfo')}</h3>
-          <div className="grid md:grid-cols-2 gap-6 text-text-muted">
+      {/* ═══ TRUST BAR ═══ */}
+      <section className="border-y border-white/[0.06] bg-bg-surface/50 backdrop-blur-sm">
+        <div className="max-w-5xl mx-auto px-4 py-6">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            {TRUST_POINTS.map(({ icon: Icon, key }) => (
+              <div key={key} className="flex items-center gap-3 text-white/60">
+                <Icon className="w-5 h-5 text-oe-gold" />
+                <span className="text-sm font-medium">{t(`trust.${key}`)}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-2 text-white/60">
+              <Star className="w-5 h-5 text-amber-400" fill="currentColor" />
+              <span className="text-sm font-medium">
+                {SITE_CONFIG.stats.avgRating}/5 · {SITE_CONFIG.stats.reviewCount}+ reviews
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ SELECTOR CONVIDATS ═══ */}
+      <div className="py-12">
+        <GuestRecommender
+          packs={weddingPacks}
+          service="bodas"
+          labels={{
+            question: t('guestsQuestion'),
+            people: t('people'),
+            recommended: t('recommended'),
+            configure: t('configure'),
+            from: t('from'),
+          }}
+        />
+      </div>
+
+      {/* ═══ PACKS — Showcase ═══ */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+            {t('choosePack')}
+          </h2>
+          <p className="text-white/50 text-lg max-w-xl mx-auto">{t('heroSubtitle')}</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          {weddingPacks.map((pack, i) => (
+            <motion.div
+              key={pack.id}
+              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className={`
+                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col
+                ${pack.popular
+                  ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
+                  : 'bg-white/[0.03] border-white/10 hover:border-white/20'
+                }
+              `}
+            >
+              {/* Badge */}
+              {pack.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-amber-500 text-black whitespace-nowrap">
+                  <Star className="w-3 h-3 inline mr-1" fill="currentColor" />
+                  {t('mostChosen')}
+                </div>
+              )}
+
+              {/* Nom + tagline */}
+              <div className="text-center mb-5 mt-2">
+                <h3 className="text-2xl font-bold text-white mb-1">{pack.name}</h3>
+                {pack.tagline && (
+                  <p className="text-white/50 text-sm">{pack.tagline}</p>
+                )}
+              </div>
+
+              {/* Preu */}
+              <div className="text-center mb-6">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">{t('from')}</p>
+                <p className="text-4xl font-black text-oe-gold">{pack.price}</p>
+              </div>
+
+              {/* Ideal for */}
+              {pack.ideal && (
+                <p className="text-xs text-white/40 mb-4 text-center">
+                  <span className="font-medium text-white/50">👥</span> {pack.ideal}
+                </p>
+              )}
+
+              {/* Features */}
+              <ul className="space-y-2 mb-6 flex-1">
+                {(pack.features || []).slice(0, 5).map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm text-white/70">
+                    <Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA → Configurador */}
+              <Link
+                href={`/configurador?service=bodas&packId=${pack.id}`}
+                onClick={() => handlePackCTA(pack)}
+                className={`block text-center py-3.5 rounded-xl font-semibold transition-all mt-auto ${
+                  pack.popular
+                    ? 'bg-amber-500 text-black hover:bg-amber-400'
+                    : 'bg-white/10 text-white hover:bg-white/15'
+                }`}
+              >
+                {t('configure')} →
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ QUÈ INCLOU ═══ */}
+      <section className="max-w-5xl mx-auto px-4 py-16">
+        <div className="p-8 md:p-12 rounded-3xl bg-white/[0.03] border border-white/10">
+          <h3 className="text-2xl font-bold text-white text-center mb-8">💍 {t('importantInfo')}</h3>
+          <div className="grid md:grid-cols-2 gap-8 text-white/70">
             <div>
-              <strong className="text-text-primary">✅ {t('allPacksInclude')}</strong>
-              <ul className="mt-2 space-y-1 ml-4 text-sm">
-                <li>• {t('packFeatures.dj')}</li>
-                <li>• {t('packFeatures.sound')}</li>
-                <li>• {t('packFeatures.setup')}</li>
-                <li>• {t('packFeatures.soundcheck')}</li>
+              <strong className="text-white block mb-3">✅ {t('allPacksInclude')}</strong>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.dj')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.sound')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.setup')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.soundcheck')}</li>
               </ul>
             </div>
             <div>
-              <strong className="text-text-primary">💰 {t('paymentFacilities')}</strong>
-              <ul className="mt-2 space-y-1 ml-4 text-sm">
-                <li>• {t('paymentInfo.deposit')}</li>
-                <li>• {t('paymentInfo.rest')}</li>
-                <li>• {t('paymentInfo.noFees')}</li>
+              <strong className="text-white block mb-3">💰 {t('paymentFacilities')}</strong>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />{t('paymentInfo.deposit')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />{t('paymentInfo.rest')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />{t('paymentInfo.noFees')}</li>
               </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Zones de cobertura - Internal Linking SEO */}
+      {/* ═══ CTA INTERMEDI ═══ */}
+      <section className="max-w-3xl mx-auto px-4 py-12">
+        <div className="p-10 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
+          <h3 className="text-3xl font-bold text-white mb-3">
+            {t('heroTitle')}
+          </h3>
+          <p className="text-white/60 mb-8 max-w-md mx-auto">
+            {t('heroSubtitle')}
+          </p>
+          <Link
+            href="/configurador?service=bodas"
+            onClick={() => trackServiceEvent('bodas_mid_cta', { position: 'mid' })}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25"
+          >
+            {t('configure')}
+            <ChevronRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ═══ ZONES DE COBERTURA ═══ */}
       <section className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-4">
             <MapPin className="w-4 h-4 text-oe-gold" />
             <span className="text-sm font-medium text-oe-gold">{t('coverage.badge')}</span>
           </div>
-          <h3 className="text-2xl font-bold text-text-primary">{t('coverage.title')}</h3>
-          <p className="text-text-muted mt-2">{t('coverage.subtitle')}</p>
+          <h3 className="text-2xl font-bold text-white">{t('coverage.title')}</h3>
+          <p className="text-white/50 mt-2">{t('coverage.subtitle')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {coverageZones.map((zone) => (
@@ -545,8 +293,8 @@ export default function BodasClientV2() {
               className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
             >
               <div className="text-2xl mb-2">{zone.icon}</div>
-              <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{zone.name}</div>
-              <div className="text-xs text-text-muted">{zone.desc}</div>
+              <div className="font-semibold text-white group-hover:text-oe-gold transition-colors">{zone.name}</div>
+              <div className="text-xs text-white/50">{zone.desc}</div>
             </Link>
           ))}
         </div>
@@ -554,18 +302,3 @@ export default function BodasClientV2() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

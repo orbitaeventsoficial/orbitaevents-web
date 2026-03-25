@@ -14,7 +14,7 @@ export default function HalloweenDecorationSection() {
   const t = useTranslations('halloweenPage.decoration');
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden oe-grid-pattern">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
       {/* Fons decoratiu */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 text-8xl">🕸️</div>

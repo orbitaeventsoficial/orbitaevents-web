@@ -55,7 +55,7 @@ export default function CTAFinal() {
   };
 
   return (
-    <section className="relative py-20 md:py-28 overflow-hidden oe-grid-pattern oe-film-grain">
+    <section className="relative py-20 md:py-28 overflow-hidden oe-film-grain">
       {/* Background */}
       <div className="absolute inset-0 bg-zinc-950" />
       <div className="absolute inset-0 overflow-hidden">

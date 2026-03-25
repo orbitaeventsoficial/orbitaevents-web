@@ -155,7 +155,7 @@ export default async function OpinionesPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <main className="min-h-screen bg-bg-main relative oe-grid-pattern">
+      <main className="min-h-screen bg-bg-main relative">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-24 pb-2 max-w-5xl">
           <nav className="flex items-center gap-2 text-sm text-white/40" aria-label="Breadcrumb">
@@ -215,7 +215,7 @@ export default async function OpinionesPage({
         </section>
 
         {/* Google Reviews Carousel */}
-        <GoogleReviewsRotating showFooterCta={false} />
+        <GoogleReviewsRotating showFooterCta={false} showHeader={false} />
 
         {/* CTA dejar reseña */}
         <section className="container mx-auto px-4 py-16 max-w-3xl">

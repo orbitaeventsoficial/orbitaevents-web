@@ -1,18 +1,17 @@
-'use client';
+"use client";
 
-
-import { useState, useEffect, useMemo } from 'react';
-import { Link } from '@/lib/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check, PartyPopper } from 'lucide-react';
-import { useLocale, useMessages, useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 import Image from 'next/image';
+import { Link } from '@/lib/navigation';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
-  getPacksByService,
-  OFERTA_FLASH,
-  type PackDefinition
-} from '@/config/packs-config';
+  Check, Star, ChevronRight, PartyPopper, Shield, Clock, Headphones
+} from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { getPacksByService, type PackDefinition } from '@/config/packs-config';
 import { usePacks } from '@/lib/hooks/usePacks';
+import { SITE_CONFIG } from '@/app/config/site-config';
+import GuestRecommender from '@/app/components/ui/GuestRecommender';
 
 type AnalyticsValue = string | number | boolean | undefined;
 type AnalyticsParams = Record<string, AnalyticsValue>;
@@ -25,95 +24,44 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   gtag('event', action, params);
 }
 
+const TRUST_POINTS = [
+  { icon: Clock, key: 'response' },
+  { icon: Shield, key: 'guarantee' },
+  { icon: Headphones, key: 'support' },
+] as const;
 
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
-  const messages = useMessages();
   const locale = useLocale();
+  const reduceMotion = useReducedMotion();
   const fallbackPacks = useMemo(() => getPacksByService('fiestas'), []);
-  const fallbackDiscoPacks = useMemo(() => getPacksByService('discomovil'), []);
   const { packs: fiestaPacks } = usePacks({
     service: 'fiestas',
     locale,
     fallback: fallbackPacks,
   });
-  const { packs: discomovilPacks } = usePacks({
-    service: 'discomovil',
-    locale,
-    fallback: fallbackDiscoPacks,
-  });
-  const [numGuests, setNumGuests] = useState(60);
-  const [selectedPack, setSelectedPack] = useState<string | null>(null);
-  const [showRecommendation, setShowRecommendation] = useState(false);
+  const minPrice = useMemo(
+    () => fiestaPacks.length ? Math.min(...fiestaPacks.map(p => p.priceValue ?? 0)) : 0,
+    [fiestaPacks]
+  );
 
-  const allPacks = useMemo(() => {
-    const merged = [...fiestaPacks, ...discomovilPacks];
-    const deduped = new Map<string, PackDefinition>();
-    for (const pack of merged) {
-      if (!deduped.has(pack.id)) deduped.set(pack.id, pack);
-    }
-    return Array.from(deduped.values());
-  }, [fiestaPacks, discomovilPacks]);
-
-
-
-  const flashPack = allPacks.find((pack) => pack.isFlash);
-  const regularPacks = allPacks.filter(p => !p.isFlash);
-
-  const recommendedPack = (() => {
-    const eligible = regularPacks.filter((pack) => {
-      const min = pack.capacidadMinima ?? 0;
-      const max = pack.capacidadMaxima ?? Infinity;
-      return numGuests >= min && numGuests <= max;
-    });
-    return eligible.find((pack) => pack.popular) || eligible[0] || regularPacks[0] || null;
-  })();
-
-  // Actualizar recomendación cuando cambian los invitados
-  useEffect(() => {
-    if (recommendedPack) {
-      setShowRecommendation(true);
-      const timer = setTimeout(() => {
-        if (!selectedPack) {
-          setSelectedPack(recommendedPack.id);
-        }
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [numGuests, recommendedPack, selectedPack]);
-
-  // Analytics al cambiar número de invitados
-  const handleGuestsChange = (value: number) => {
-    setNumGuests(value);
-    trackServiceEvent('guests_slider_change', {
-      num_guests: value,
+  const handlePackCTA = (pack: PackDefinition) => {
+    trackServiceEvent('fiestas_pack_cta', {
+      pack_id: pack.id,
+      pack_name: pack.name,
+      price: pack.priceValue,
     });
   };
-
-  // Generar URL del formulario con parámetros
-  const getContactUrl = (pack: PackDefinition) => {
-    const params = new URLSearchParams({
-      servicio: 'fiestas',
-      pack: pack.name,
-      precio: pack.priceValue.toString(),
-      invitados: numGuests.toString(),
-    });
-    return `/contacto?${params.toString()}`;
-  };
-
-  // ¿El usuario puede acceder a la oferta flash?
-  const flashMaxGuests = flashPack?.capacidadMaxima ?? OFERTA_FLASH.maxInvitados;
-  const canUseFlashOffer = numGuests <= flashMaxGuests;
 
   return (
     <div className="min-h-screen bg-bg-main">
-      {/* HERO with background image */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+      {/* ═══ HERO ═══ */}
+      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-bg-main z-10" />
           <Image
             src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif"
-            alt="DJ para fiestas privadas Òrbita Events"
+            alt="DJ Festes Privades Òrbita Events"
             fill
             priority
             sizes="100vw"
@@ -122,339 +70,260 @@ export default function FiestasClient() {
           />
         </div>
 
-        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 mb-6 backdrop-blur-sm">
-            <PartyPopper className="w-4 h-4 text-amber-400" />
-            <span className="text-sm font-bold text-amber-400">{t('badge')}</span>
-          </div>
+        <div className="relative z-20 mx-auto max-w-4xl px-4 py-24 text-center">
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6 backdrop-blur-sm">
+              <PartyPopper className="w-4 h-4 text-oe-gold" />
+              <span className="text-sm font-bold text-oe-gold">{t('badge')}</span>
+            </div>
 
-          <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
-            {t('heroTitle')}
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            {t('heroSubtitle')}
-          </p>
+            <h1 className="text-5xl md:text-7xl font-display font-black text-white mb-5 leading-tight">
+              {t('heroTitle')}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-10">
+              {t('heroSubtitle')}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/configurador?service=fiestas"
+                onClick={() => trackServiceEvent('fiestas_hero_cta', { position: 'hero' })}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25 text-lg"
+              >
+                {t('configure')}
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+              <span className="text-white/50 text-sm">
+                {t('from')} {minPrice}€
+              </span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <div className="space-y-12 max-w-6xl mx-auto">
-      {/* Configurador de invitados */}
-      <div className="max-w-3xl mx-auto p-8 bg-gradient-to-br from-[#111111] to-[#161616] rounded-3xl border border-amber-500/30">
-        <div className="flex items-center gap-3 mb-6">
-          <Users className="w-6 h-6 text-amber-400" />
-          <h3 className="text-2xl font-bold">{t('guestsQuestion')}</h3>
-        </div>
-
-        {/* Número grande */}
-        <div className="text-center mb-8">
-          <div className="text-7xl font-bold bg-gradient-to-r from-amber-500 to-amber-300 bg-clip-text text-transparent">
-            {numGuests}
-          </div>
-          <div className="text-white/65 mt-2">{t('people')}</div>
-        </div>
-
-        {/* Slider */}
-        <div className="space-y-4">
-          <input
-            type="range"
-            min="20"
-            max="200"
-            step="5"
-            value={numGuests}
-            onChange={(e) => handleGuestsChange(parseInt(e.target.value))}
-            className="w-full h-3 rounded-full appearance-none cursor-pointer slider-custom"
-          />
-          <div className="flex justify-between text-sm text-white/65">
-            <span>20 {t('people')}</span>
-            <span>200 {t('people')}</span>
-          </div>
-        </div>
-
-        {/* Indicador de oferta flash disponible */}
-        {canUseFlashOffer && flashPack && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 bg-amber-500/20 rounded-xl border border-amber-500/50"
-          >
-            <div className="flex items-center gap-2 text-amber-300 font-bold">
-              <Zap className="w-5 h-5" fill="currentColor" />
-              {t('flashAccess')} {(flashPack ? flashPack.name : OFERTA_FLASH.nombre)}!
+      {/* ═══ TRUST BAR ═══ */}
+      <section className="border-y border-white/[0.06] bg-bg-surface/50 backdrop-blur-sm">
+        <div className="max-w-5xl mx-auto px-4 py-6">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            {TRUST_POINTS.map(({ icon: Icon, key }) => (
+              <div key={key} className="flex items-center gap-3 text-white/60">
+                <Icon className="w-5 h-5 text-oe-gold" />
+                <span className="text-sm font-medium">{t(`trust.${key}`)}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-2 text-white/60">
+              <Star className="w-5 h-5 text-amber-400" fill="currentColor" />
+              <span className="text-sm font-medium">
+                {SITE_CONFIG.stats.avgRating}/5 · {SITE_CONFIG.stats.reviewCount}+ reviews
+              </span>
             </div>
-            <p className="text-sm text-white/65 mt-1">
-              {t('upToGuests', { max: flashMaxGuests })} {flashPack?.flashDiscount ?? OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
-            </p>
-          </motion.div>
-        )}
+          </div>
+        </div>
+      </section>
 
-        {/* Recomendación de pack regular */}
-        <AnimatePresence>
-          {showRecommendation && recommendedPack && !canUseFlashOffer && (
+      {/* ═══ SELECTOR CONVIDATS ═══ */}
+      <div className="py-12">
+        <GuestRecommender
+          packs={fiestaPacks}
+          service="fiestas"
+          labels={{
+            question: t('guestsQuestion'),
+            people: t('people'),
+            recommended: t('recommended'),
+            configure: t('configure'),
+            from: t('from'),
+          }}
+        />
+      </div>
+
+      {/* ═══ PACKS — Showcase ═══ */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+            {t('allPacks')}
+          </h2>
+          <p className="text-white/50 text-lg max-w-xl mx-auto">{t('heroSubtitle')}</p>
+        </motion.div>
+
+        <div className={`grid gap-6 md:gap-8 ${fiestaPacks.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'}`}>
+          {fiestaPacks.map((pack, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mt-6 p-4 bg-purple-500/20 rounded-xl border border-purple-500/50"
+              key={pack.id}
+              initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className={`
+                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col
+                ${pack.popular
+                  ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
+                  : pack.isFlash
+                  ? 'bg-gradient-to-b from-red-500/10 to-transparent border-red-500/40 ring-1 ring-red-500/20'
+                  : 'bg-white/[0.03] border-white/10 hover:border-white/20'
+                }
+              `}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-purple-400" />
-                <span className="font-bold text-purple-300">{t('recommendedFor', { guests: numGuests })}</span>
-              </div>
-              <div className="text-lg">
-                <strong>{recommendedPack.name}</strong> - {recommendedPack.price}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Oferta Flash - DESTACADA (Solo si es elegible) */}
-      {flashPack && canUseFlashOffer && (
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className="relative p-8 rounded-3xl border-4 border-amber-500 bg-gradient-to-br from-amber-500/10 to-amber-600/20 shadow-2xl shadow-amber-500/30"
-          >
-            {/* Badge Flash */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <div className="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black rounded-full font-bold flex items-center gap-2 shadow-lg animate-pulse">
-                <Zap className="w-5 h-5" fill="currentColor" />
-                {flashPack.badge}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 mt-4">
-              {/* Info */}
-              <div className="space-y-4">
-                <h3 className="text-4xl font-bold">{flashPack.name}</h3>
-                <p className="text-xl text-white/65">{flashPack.tagline}</p>
-
-                {/* Precio */}
-                <div className="flex items-baseline gap-4">
-                  <div className="text-5xl font-bold text-amber-300">
-                    {flashPack.price}
-                  </div>
-                  {flashPack.priceOriginal && (
-                    <div className="text-2xl text-gray-300 line-through">
-                      {flashPack.priceOriginal}
-                    </div>
-                  )}
+              {/* Badge */}
+              {pack.badge && (
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
+                  pack.popular
+                    ? 'bg-amber-500 text-black'
+                    : pack.isFlash
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white/10 text-white/60 border border-white/10'
+                }`}>
+                  {pack.badge}
                 </div>
+              )}
 
-                {/* Ahorro */}
-                {flashPack.priceOriginalValue && (
-                  <div className="inline-block px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-lg">
-                    <span className="text-green-400 font-bold">
-                      {t('youSave')} {flashPack.priceOriginalValue - flashPack.priceValue}€ ({flashPack.flashDiscount}% OFF)
-                    </span>
+              {/* Nom + tagline */}
+              <div className="text-center mb-5 mt-2">
+                <h3 className="text-2xl font-bold text-white mb-1">{pack.name}</h3>
+                {pack.tagline && (
+                  <p className="text-white/50 text-sm">{pack.tagline}</p>
+                )}
+              </div>
+
+              {/* Preu */}
+              <div className="text-center mb-5">
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">{t('from')}</p>
+                {pack.priceOriginal && (
+                  <p className="text-white/30 text-lg line-through mb-0.5">{pack.priceOriginal}</p>
+                )}
+                <p className="text-4xl font-black text-oe-gold">{pack.price}</p>
+              </div>
+
+              {/* Quick specs */}
+              <div className="space-y-2 text-sm text-white/50 mb-5 pb-5 border-b border-white/[0.06]">
+                <div className="flex justify-between">
+                  <span>⏰</span>
+                  <span className="text-white/70 font-medium">{pack.duration}</span>
+                </div>
+                {pack.ideal && (
+                  <div className="flex justify-between">
+                    <span>👥</span>
+                    <span className="text-white/70 font-medium">{pack.ideal}</span>
                   </div>
                 )}
-
-                {/* Rango */}
-                <div className="text-white/65">
-                  📊 {t('idealFor')} {flashPack.capacidadMinima}-{flashPack.capacidadMaxima} {t('people')}
-                </div>
               </div>
 
-              {/* Features + CTA */}
-              <div className="space-y-6">
-                <ul className="space-y-3">
-                  {(flashPack.features || []).map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-amber-300" />
-                      </div>
-                      <span className="text-white/65">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Features */}
+              <ul className="space-y-2 mb-6 flex-1">
+                {(pack.features || []).slice(0, 5).map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm text-white/70">
+                    <Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
 
-                <Link
-                  href={getContactUrl(flashPack)}
-                  className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-300 text-black rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105"
-                >
-                  <FileText className="w-5 h-5" />
-                  {t('checkAvailability')}
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Resto de packs */}
-      <div className="space-y-6">
-        <h2 className="text-3xl font-bold text-center mb-8">{t('allPacks')}</h2>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {regularPacks.map(pack => {
-            const isSelected = selectedPack === pack.id;
-            const isRecommended = recommendedPack?.id === pack.id;
-            const isInRange = numGuests >= (pack.capacidadMinima || 0) &&
-                             numGuests <= (pack.capacidadMaxima || Infinity);
-
-            return (
-              <motion.div
-                key={pack.id}
-                layout
-                className={`
-                  relative p-6 rounded-2xl border-2 cursor-pointer
-                  transition-all duration-300
-                  ${isSelected
-                    ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20 scale-105'
-                    : isRecommended
-                    ? 'border-amber-500 bg-amber-500/5'
-                    : 'border-white/10 bg-[#111111] hover:border-white/20 hover:bg-[#161616]'
-                  }
-                  ${!isInRange ? 'opacity-50' : ''}
-                `}
-                onClick={() => setSelectedPack(pack.id)}
+              {/* CTA → Configurador */}
+              <Link
+                href={`/configurador?service=fiestas&packId=${pack.id}`}
+                onClick={() => handlePackCTA(pack)}
+                className={`block text-center py-3.5 rounded-xl font-semibold transition-all mt-auto ${
+                  pack.popular
+                    ? 'bg-amber-500 text-black hover:bg-amber-400'
+                    : pack.isFlash
+                    ? 'bg-red-500 text-white hover:bg-red-400'
+                    : 'bg-white/10 text-white hover:bg-white/15'
+                }`}
               >
-                {/* Badge Popular */}
-                {pack.popular && (
-                  <div className="absolute -top-3 right-4">
-                    <div className="px-3 py-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-xs font-bold flex items-center gap-1">
-                      <Star className="w-3 h-3" fill="currentColor" />
-                      {t('mostSold')}
-                    </div>
-                  </div>
-                )}
-
-                {/* Badge Recomendado */}
-                {isRecommended && isInRange && (
-                  <div className="absolute -top-3 left-4">
-                    <div className="px-3 py-1 bg-amber-500 text-black rounded-full text-xs font-bold flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      {t('recommended')}
-                    </div>
-                  </div>
-                )}
-
-                {/* Contenido */}
-                <div className="space-y-4 mt-4">
-                  <div>
-                    <h3 className="text-2xl font-bold">{pack.name}</h3>
-                    <p className="text-sm text-white/65">{pack.tagline}</p>
-                  </div>
-
-                  {/* Precio */}
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-amber-400">
-                      {pack.price}
-                    </span>
-                  </div>
-
-                  {/* Duración */}
-                  <div className="text-sm text-amber-300 font-medium">
-                    ⏱️ {pack.duration}
-                  </div>
-
-                  {/* Rango */}
-                  {pack.capacidadMinima && pack.capacidadMaxima && (
-                    <div className="text-sm text-white/65">
-                      📊 {pack.capacidadMinima}-{pack.capacidadMaxima} {t('people')}
-                    </div>
-                  )}
-
-                  {/* Features */}
-                  <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {(pack.features || []).slice(0, 5).map((feature, idx) => (
-                      <li key={idx} className="text-sm text-white/65 flex items-start gap-2">
-                        <span className="text-amber-400 flex-shrink-0">✓</span>
-                        {feature}
-                      </li>
-                    ))}
-                    {(pack.features || []).length > 5 && (
-                      <li className="text-sm text-amber-400">
-                        +{(pack.features || []).length - 5} {t('more')}
-                      </li>
-                    )}
-                  </ul>
-
-                  {/* CTA - Formulario */}
-                  <Link
-                    href={getContactUrl(pack)}
-                    onClick={(e) => e.stopPropagation()}
-                    className={`
-                      w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2
-                      transition-all
-                      ${isSelected
-                        ? 'bg-purple-500 text-white hover:bg-purple-600'
-                        : 'bg-[#161616] text-white hover:bg-white/20'
-                      }
-                    `}
-                  >
-                    <FileText className="w-4 h-4" />
-                    {t('requestInfo')}
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+                {t('configure')} →
+              </Link>
+            </motion.div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      {/* Info adicional */}
-      <div className="mt-16 p-8 bg-[#111111] rounded-2xl border border-white/10 max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold mb-4">💡 {t('importantInfo')}</h3>
-        <div className="grid md:grid-cols-2 gap-6 text-white/65">
-          <div>
-            <strong className="text-white">✅ {t('allPacksInclude')}</strong>
-            <ul className="mt-2 space-y-1 ml-4">
-              <li>• {t('packFeatures.transport')}</li>
-              <li>• {t('packFeatures.techDj')}</li>
-              <li>• {t('packFeatures.setup')}</li>
-              <li>• {t('packFeatures.insurance')}</li>
-            </ul>
-          </div>
-          <div>
-            <strong className="text-white">🎨 {t('customization')}</strong>
-            <ul className="mt-2 space-y-1 ml-4">
-              <li>• {t('customFeatures.theming')}</li>
-              <li>• {t('customFeatures.decoration')}</li>
-              <li>• {t('customFeatures.lightShow')}</li>
-              <li>• {t('customFeatures.consultation')}</li>
-            </ul>
+      {/* ═══ QUÈ INCLOU ═══ */}
+      <section className="max-w-5xl mx-auto px-4 py-16">
+        <div className="p-8 md:p-12 rounded-3xl bg-white/[0.03] border border-white/10">
+          <h3 className="text-2xl font-bold text-white text-center mb-8">🎉 {t('importantInfo')}</h3>
+          <div className="grid md:grid-cols-2 gap-8 text-white/70">
+            <div>
+              <strong className="text-white block mb-3">✅ {t('allPacksInclude')}</strong>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.transport')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.techDj')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.setup')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('packFeatures.insurance')}</li>
+              </ul>
+            </div>
+            <div>
+              <strong className="text-white block mb-3">🎨 {t('customization')}</strong>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.theming')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.decoration')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.lightShow')}</li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />{t('customFeatures.consultation')}</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Zonas de cobertura */}
-      <div className="max-w-5xl mx-auto px-4 pb-8">
-        <h2 className="text-2xl font-bold text-center mb-8">
+      {/* ═══ CTA INTERMEDI ═══ */}
+      <section className="max-w-3xl mx-auto px-4 py-12">
+        <div className="p-10 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
+          <h3 className="text-3xl font-bold text-white mb-3">
+            {t('heroTitle')}
+          </h3>
+          <p className="text-white/60 mb-8 max-w-md mx-auto">
+            {t('heroSubtitle')}
+          </p>
+          <Link
+            href="/configurador?service=fiestas"
+            onClick={() => trackServiceEvent('fiestas_mid_cta', { position: 'mid' })}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25"
+          >
+            {t('configure')}
+            <ChevronRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ═══ ZONES DE COBERTURA ═══ */}
+      <section className="max-w-5xl mx-auto px-4 pb-20">
+        <h2 className="text-2xl font-bold text-white text-center mb-8">
           {t('zones.title')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/servicios/dj-fiestas-barcelona"
-            className="group p-4 rounded-xl bg-[#111111] border border-white/10 hover:border-amber-500/50 transition-all text-center"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏙️</div>
-            <div className="font-semibold text-white text-sm">{t('zones.barcelona.name')}</div>
-            <div className="text-xs text-white/65 mt-1">{t('zones.barcelona.desc')}</div>
+            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.barcelona.name')}</div>
+            <div className="text-xs text-white/50 mt-1">{t('zones.barcelona.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-fiestas-maresme"
-            className="group p-4 rounded-xl bg-[#111111] border border-white/10 hover:border-amber-500/50 transition-all text-center"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏖️</div>
-            <div className="font-semibold text-white text-sm">{t('zones.maresme.name')}</div>
-            <div className="text-xs text-white/65 mt-1">{t('zones.maresme.desc')}</div>
+            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.maresme.name')}</div>
+            <div className="text-xs text-white/50 mt-1">{t('zones.maresme.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-fiestas-costa-brava"
-            className="group p-4 rounded-xl bg-[#111111] border border-white/10 hover:border-amber-500/50 transition-all text-center"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🌊</div>
-            <div className="font-semibold text-white text-sm">{t('zones.costaBrava.name')}</div>
-            <div className="text-xs text-white/65 mt-1">{t('zones.costaBrava.desc')}</div>
+            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.costaBrava.name')}</div>
+            <div className="text-xs text-white/50 mt-1">{t('zones.costaBrava.desc')}</div>
           </Link>
         </div>
-      </div>
-      </div>
+      </section>
     </div>
   );
 }
-

@@ -160,6 +160,8 @@ export interface ExtraDefinition {
   premium?: boolean;
   category?: 'effects' | 'visual' | 'time' | 'other' | 'sound' | 'lighting';
   compatibleWith?: ServiceSlug[];
+  /** Si és false, l'extra no es mostra al configurador públic */
+  enabled?: boolean;
 }
 
 // ============================================
@@ -452,6 +454,7 @@ export const EXTRAS: ExtraDefinition[] = [
     category: "time",
     compatibleWith: ["bodas", "discomovil", "fiestas", "empresas"],
     popular: true,
+    enabled: false,
   },
   {
     id: "caps-mobils-extra",
@@ -462,6 +465,7 @@ export const EXTRAS: ExtraDefinition[] = [
     category: "lighting",
     compatibleWith: ["bodas", "discomovil", "fiestas", "empresas"],
     popular: true,
+    enabled: false,
   },
   {
     id: "micro-inalambric",
@@ -471,6 +475,7 @@ export const EXTRAS: ExtraDefinition[] = [
     icon: "🎤",
     category: "sound",
     compatibleWith: ["bodas", "discomovil", "fiestas", "empresas"],
+    enabled: false,
   },
 ];
 

@@ -25,6 +25,7 @@ export function sanitizeExtrasConfig(input: unknown): ExtraDefinition[] {
         compatibleWith: Array.isArray(extra?.compatibleWith) ? extra?.compatibleWith : undefined,
         popular: Boolean(extra?.popular),
         premium: Boolean(extra?.premium),
+        enabled: extra?.enabled !== false,
       };
     })
     .filter((extra) => extra.id && extra.name);

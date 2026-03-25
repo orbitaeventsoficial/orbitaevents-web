@@ -175,7 +175,7 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default function GoogleReviewsRotating({ showFooterCta = true }: { showFooterCta?: boolean }) {
+export default function GoogleReviewsRotating({ showFooterCta = true, showHeader = true }: { showFooterCta?: boolean; showHeader?: boolean }) {
   const t = useTranslations('googleReviews');
   const locale = useLocale();
   const [reviews, setReviews] = useState<GoogleReview[]>([]);
@@ -305,36 +305,38 @@ export default function GoogleReviewsRotating({ showFooterCta = true }: { showFo
 
       <div className="relative container mx-auto px-4">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <span className="inline-block px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-            ⭐ {t('badge.opinions')}
-          </span>
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
-            {t('sectionTitle')}{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              {t('sectionTitleHighlight')}
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-block px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
+              ⭐ {t('badge.opinions')}
             </span>
-          </h2>
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <RatingStars rating={Math.round(averageRating)} />
-            <span className="text-white text-2xl font-bold">{averageRating.toFixed(1)}</span>
-            <span className="text-white/60">· {totalReviews} ressenyes a Google</span>
-          </div>
-          <p className="text-white/50 text-sm mt-3">
-            {formattedLastUpdated
-              ? t('meta.lastUpdateAndVisible', {
-                  date: formattedLastUpdated,
-                  visible: reviews.length,
-                  total: totalReviews,
-                })
-              : t('meta.visibleOnly', { visible: reviews.length, total: totalReviews })}
-          </p>
-        </motion.div>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
+              {t('sectionTitle')}{' '}
+              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                {t('sectionTitleHighlight')}
+              </span>
+            </h2>
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <RatingStars rating={Math.round(averageRating)} />
+              <span className="text-white text-2xl font-bold">{averageRating.toFixed(1)}</span>
+              <span className="text-white/60">· {totalReviews} ressenyes a Google</span>
+            </div>
+            <p className="text-white/50 text-sm mt-3">
+              {formattedLastUpdated
+                ? t('meta.lastUpdateAndVisible', {
+                    date: formattedLastUpdated,
+                    visible: reviews.length,
+                    total: totalReviews,
+                  })
+                : t('meta.visibleOnly', { visible: reviews.length, total: totalReviews })}
+            </p>
+          </motion.div>
+        )}
 
         {/* Carousel */}
         <div className="relative">

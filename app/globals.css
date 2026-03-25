@@ -146,6 +146,17 @@
     accent-color: var(--oe-gold);
   }
 
+  /* Focus-visible global — anell daurat per navegació amb teclat */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid rgba(var(--oe-gold-rgb), 0.6);
+    outline-offset: 2px;
+  }
+
   /* ══════════════════════════════════════════════════════════════════════════
      HERO PORTAL - PANTALLA NEGRA INICIAL (CSS puro, sense JS)
      Evita flash del contingut abans del logo
@@ -381,15 +392,16 @@
     content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.07;
+    opacity: 0.04;
     pointer-events: none;
     background-image:
       linear-gradient(to right, white 1px, transparent 1px),
       linear-gradient(to bottom, white 1px, transparent 1px);
     background-size: 60px 60px;
     z-index: -1;
-    mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 30%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 30%, transparent 100%);
+    filter: blur(0.5px);
+    mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 20%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 20%, transparent 90%);
   }
 
 
@@ -545,11 +557,65 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     FOCUS STATES — anell daurat accessible per navegació amb teclat
+     ───────────────────────────────────────────────────────────────────────── */
+
+  .oe-focus-ring:focus-visible {
+    outline: 2px solid rgba(var(--oe-gold-rgb), 0.6);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SHIMMER — loading skeleton premium (substitueix animate-pulse bàsic)
+     ───────────────────────────────────────────────────────────────────────── */
+
+  .oe-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: oe-shimmer 1.8s ease-in-out infinite;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GRADIENT BORDER — cantonada amb gradient daurat subtil
+     ───────────────────────────────────────────────────────────────────────── */
+
+  .oe-border-gradient {
+    position: relative;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .oe-border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(var(--oe-gold-rgb), 0.3), rgba(var(--oe-gold-rgb), 0.05) 40%, rgba(255,255,255,0.06) 60%, rgba(var(--oe-gold-rgb), 0.15));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
    ANIMATIONS
    ════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes oe-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* Fade in up */
 @keyframes fadeInUp {

@@ -132,7 +132,7 @@ export default function GarantiaSection() {
   const { stats } = usePublicStats();
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden oe-grid-pattern">
+    <section className="relative py-16 md:py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-zinc-900" />
 

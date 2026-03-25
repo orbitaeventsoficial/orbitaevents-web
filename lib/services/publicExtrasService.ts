@@ -77,7 +77,7 @@ export async function listPublicExtras(locale: string) {
   });
 
   if (dbExtras.length === 0) {
-    const extras: ExtraDefinition[] = EXTRAS.map((extra) =>
+    const extras: ExtraDefinition[] = EXTRAS.filter(e => e.enabled !== false).map((extra) =>
       resolvePublicExtraDefinition(
         {
           slug: extra.id,
@@ -96,19 +96,25 @@ export async function listPublicExtras(locale: string) {
     };
   }
 
+  // If all config extras are disabled, hide all extras (admin toggle)
+  const allConfigDisabled = EXTRAS.length > 0 && EXTRAS.every(e => e.enabled === false);
+  if (allConfigDisabled) {
+    return { extras: [], source: 'database' as const };
+  }
+
   const extras: ExtraDefinition[] = dbExtras.map((extra) => {
-    const translation = extra.translations[0];
-    return resolvePublicExtraDefinition(
-      {
-        slug: extra.slug,
-        price: extra.price,
-        priceType: extra.priceType,
-        translationName: translation?.name,
-        translationDescription: translation?.description,
-      },
-      normalizedLocale
-    );
-  });
+      const translation = extra.translations[0];
+      return resolvePublicExtraDefinition(
+        {
+          slug: extra.slug,
+          price: extra.price,
+          priceType: extra.priceType,
+          translationName: translation?.name,
+          translationDescription: translation?.description,
+        },
+        normalizedLocale
+      );
+    });
 
   return {
     extras,

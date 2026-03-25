@@ -30,7 +30,7 @@ const FAQ: FC<FAQProps> = ({ items, title }) => {
   };
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden oe-grid-pattern">
+    <section className="relative py-16 md:py-24 overflow-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(251,191,36,0.04),transparent_60%)] pointer-events-none" />
@@ -100,7 +100,7 @@ const FAQ: FC<FAQProps> = ({ items, title }) => {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeInOut' }}
-                        className="overflow-hidden bg-bg-card"
+                        className="overflow-hidden bg-bg-card rounded-b-2xl"
                       >
                         <div className="px-5 pb-5">
                           <div className="h-px bg-oe-gold/10 mb-4" />

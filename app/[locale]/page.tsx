@@ -47,10 +47,10 @@ function SectionSkeleton() {
   return (
     <div className="py-16 bg-bg-main">
       <div className="max-w-5xl mx-auto px-4 space-y-4">
-        <div className="h-6 w-48 rounded-lg bg-white/5 animate-pulse mx-auto" />
-        <div className="h-4 w-72 rounded-lg bg-white/5 animate-pulse mx-auto" />
+        <div className="h-6 w-48 rounded-lg bg-white/5 oe-shimmer mx-auto" />
+        <div className="h-4 w-72 rounded-lg bg-white/5 oe-shimmer mx-auto" />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-          {[1,2,3].map(i => <div key={i} className="h-32 rounded-xl bg-white/[0.03] animate-pulse" />)}
+          {[1,2,3].map(i => <div key={i} className="h-32 rounded-xl bg-white/[0.03] oe-shimmer" />)}
         </div>
       </div>
     </div>
@@ -172,7 +172,7 @@ export default function HomePage() {
         </div>
 
         {/* 4. CALENDARIO - Urgència subtil */}
-        <section data-section-id="calendar" className="bg-bg-main py-10 md:py-14 relative oe-grid-pattern oe-section-divider">
+        <section data-section-id="calendar" className="bg-bg-main py-10 md:py-14 relative oe-section-divider">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>

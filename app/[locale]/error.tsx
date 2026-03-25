@@ -25,7 +25,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-bg-main relative overflow-hidden oe-grid-pattern">
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-bg-main relative overflow-hidden">
       <div
         className="absolute inset-0 -z-10"
         style={{

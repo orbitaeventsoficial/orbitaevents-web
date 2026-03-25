@@ -76,7 +76,7 @@ export function ContactDesktop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 24 }}
           transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-8 right-8 z-40 hidden md:flex md:flex-col md:items-end gap-3"
+          className="fixed bottom-12 right-8 z-40 hidden md:flex md:flex-col md:items-end gap-3"
         >
           {/* Botó Telèfon - Només en horari d'atenció */}
           <AnimatePresence>

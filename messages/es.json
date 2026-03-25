@@ -2621,6 +2621,12 @@
         "deposit": "Depósito: 30% en el momento de la reserva",
         "rest": "Resto: 7 días antes del evento",
         "noFees": "Sin comisiones de transferencia"
+      },
+      "from": "Desde",
+      "trust": {
+        "response": "Respuesta en menos de 2h",
+        "guarantee": "Presupuesto cerrado, sin sorpresas",
+        "support": "Soporte total hasta el día del evento"
       }
     },
     "parties": {
@@ -2673,7 +2679,14 @@
           "desc": "Lloret, Tossa, Platja d'Aro"
         }
       },
-      "more": "más..."
+      "more": "más...",
+      "from": "Desde",
+      "configure": "Configurar",
+      "trust": {
+        "response": "Respuesta en menos de 2h",
+        "guarantee": "Presupuesto cerrado, sin sorpresas",
+        "support": "Soporte total hasta el día del evento"
+      }
     },
     "corporate": {
       "title": "Eventos de empresa",
@@ -2947,6 +2960,23 @@
           "name": "Cabezas Móviles Extra (x2)",
           "description": "2 cabezas móviles LED adicionales para ampliar la iluminación"
         }
+      },
+      "from": "Desde",
+      "trust": {
+        "response": "Respuesta en menos de 2h",
+        "guarantee": "Presupuesto cerrado, sin sorpresas",
+        "support": "Soporte total hasta el día del evento"
+      },
+      "coverageTitle": "Dónde Llevamos la Fiesta",
+      "zones": {
+        "barcelona": "Barcelona",
+        "barcelonaDesc": "Ciudad y alrededores",
+        "maresme": "Maresme",
+        "maresmeDesc": "Costa e interior",
+        "girona": "Girona",
+        "gironaDesc": "Provincia completa",
+        "valles": "Vallès",
+        "vallesDesc": "Oriental y Occidental"
       }
     },
     "production": {
@@ -3921,21 +3951,41 @@
       "dj": {
         "title": "DJ + Sonido Profesional",
         "desc": "La pista llena toda la noche. Leemos la sala, adaptamos la música en directo y llevamos equipo de club de verdad.",
-        "highlights": ["Equipo de club", "Luces LED sync", "Humo + CO2 + Confeti"]
+        "highlights": [
+          "Equipo de club",
+          "Luces LED sync",
+          "Humo + CO2 + Confeti"
+        ]
       },
       "theming": {
         "title": "Tematización Completa",
         "desc": "Halloween, Mundo Mágico, tropical, años 80... Transformamos el espacio entero. Decoración, atrezzo, ambientación. Nadie más lo hace así.",
-        "highlights": ["Decoración inmersiva", "Atrezzo temático", "Escenografía"]
+        "highlights": [
+          "Decoración inmersiva",
+          "Atrezzo temático",
+          "Escenografía"
+        ]
       },
       "production": {
         "title": "Producción Técnica",
         "desc": "Eventos corporativos, presentaciones, festivales. Audiovisual, iluminación arquitectónica, microfonía, streaming.",
-        "highlights": ["Audiovisual HD", "Iluminación arq.", "Streaming"]
+        "highlights": [
+          "Audiovisual HD",
+          "Iluminación arq.",
+          "Streaming"
+        ]
       }
     },
     "weDoIt": "Lo hacemos para:",
-    "eventTypes": ["Bodas", "Fiestas privadas", "Empresas", "Cumpleaños", "Halloween", "Comuniones", "Festivales"]
+    "eventTypes": [
+      "Bodas",
+      "Fiestas privadas",
+      "Empresas",
+      "Cumpleaños",
+      "Halloween",
+      "Comuniones",
+      "Festivales"
+    ]
   },
   "offerModal": {
     "ariaLabel": "Oferta de última hora",

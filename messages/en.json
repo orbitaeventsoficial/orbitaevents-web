@@ -2621,6 +2621,12 @@
         "deposit": "Deposit: 30% at time of booking",
         "rest": "Rest: 7 days before the event",
         "noFees": "No transfer fees"
+      },
+      "from": "From",
+      "trust": {
+        "response": "Response within 2h",
+        "guarantee": "Fixed quote, no surprises",
+        "support": "Full support until event day"
       }
     },
     "parties": {
@@ -2673,7 +2679,14 @@
           "desc": "Lloret, Tossa, Platja d'Aro"
         }
       },
-      "more": "further..."
+      "more": "further...",
+      "from": "From",
+      "configure": "Configure",
+      "trust": {
+        "response": "Response within 2h",
+        "guarantee": "Fixed quote, no surprises",
+        "support": "Full support until event day"
+      }
     },
     "corporate": {
       "title": "Company events",
@@ -2947,6 +2960,23 @@
           "name": "Extra Moving Heads (x2)",
           "description": "2 additional LED moving heads to enhance the lighting"
         }
+      },
+      "from": "From",
+      "trust": {
+        "response": "Response within 2h",
+        "guarantee": "Fixed quote, no surprises",
+        "support": "Full support until event day"
+      },
+      "coverageTitle": "Where We Party",
+      "zones": {
+        "barcelona": "Barcelona",
+        "barcelonaDesc": "City and surroundings",
+        "maresme": "Maresme",
+        "maresmeDesc": "Coast and inland",
+        "girona": "Girona",
+        "gironaDesc": "Full province",
+        "valles": "Vallès",
+        "vallesDesc": "Eastern and Western"
       }
     },
     "production": {
@@ -3921,21 +3951,41 @@
       "dj": {
         "title": "DJ + Professional Sound",
         "desc": "The dance floor packed all night. We read the room, adapt the music live and bring real club gear.",
-        "highlights": ["Club equipment", "LED lights sync", "Smoke + CO2 + Confetti"]
+        "highlights": [
+          "Club equipment",
+          "LED lights sync",
+          "Smoke + CO2 + Confetti"
+        ]
       },
       "theming": {
         "title": "Full Theming",
         "desc": "Halloween, Wizarding World, tropical, 80s... We transform the entire space. Decoration, props, atmosphere. Nobody else does it like this.",
-        "highlights": ["Immersive décor", "Theme props", "Scenography"]
+        "highlights": [
+          "Immersive décor",
+          "Theme props",
+          "Scenography"
+        ]
       },
       "production": {
         "title": "Technical Production",
         "desc": "Corporate events, presentations, festivals. Audiovisual, architectural lighting, microphones, streaming.",
-        "highlights": ["HD Audiovisual", "Architectural lighting", "Streaming"]
+        "highlights": [
+          "HD Audiovisual",
+          "Architectural lighting",
+          "Streaming"
+        ]
       }
     },
     "weDoIt": "We do it for:",
-    "eventTypes": ["Weddings", "Private parties", "Corporate", "Birthdays", "Halloween", "Communions", "Festivals"]
+    "eventTypes": [
+      "Weddings",
+      "Private parties",
+      "Corporate",
+      "Birthdays",
+      "Halloween",
+      "Communions",
+      "Festivals"
+    ]
   },
   "offerModal": {
     "ariaLabel": "Last minute offer",
