@@ -33,7 +33,7 @@ export async function resolveQuotePack(packKey: string, locale = 'ca'): Promise<
   const pack = await getDbPackByCode(packKey, locale);
   if (pack) return packToQuotePack(pack);
 
-  const fallback = await getDbPacks({ service: 'fiestas', locale });
+  const fallback = await getDbPacks({ service: 'discomovil', locale });
   return packToQuotePack(fallback[0]);
 }
 

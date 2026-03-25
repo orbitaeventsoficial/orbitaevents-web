@@ -39,11 +39,6 @@ const CookieConsent = dynamic(
   { ssr: false }
 );
 
-const FlashOfferPopup = dynamic(
-  () => import('@/app/components/ui/FlashOfferPopup'),
-  { ssr: false }
-);
-
 const Footer = dynamic(
   () => import('@/app/components/ui/footer'),
   { ssr: false }
@@ -273,8 +268,6 @@ const introMode = getClientIntroMode({
       {/* Consentiment cookies */}
       {!isIntroActive && <CookieConsent />}
 
-      {/* Popup oferta flash */}
-      {!isIntroActive && <FlashOfferPopup />}
     </>
   );
 }

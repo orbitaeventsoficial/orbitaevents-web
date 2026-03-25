@@ -61,7 +61,7 @@ async function main() {
               price: pack.priceValue,
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
-              isFeatured: pack.popular || pack.isFlash || false,
+              isFeatured: pack.popular || false,
               order: configPacks.indexOf(pack),
             }
           });
@@ -106,7 +106,7 @@ async function main() {
               originalPrice: pack.priceOriginalValue || null,
               djHours: pack.durationHours || 4,
               isActive: true,
-              isFeatured: pack.popular || pack.isFlash || false,
+              isFeatured: pack.popular || false,
               order: configPacks.indexOf(pack),
             }
           });

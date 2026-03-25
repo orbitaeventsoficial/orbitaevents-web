@@ -1417,15 +1417,6 @@ export const LEAD_DOCUMENT_TYPE_VALUES = [
 
 
 
-export const FLASH_OFFER_BASE = {
-  id: 'flash-250',
-  type: 'fixed',
-  value: 250,
-  originalValue: 450,
-  href: '/contacto?pack=oferta-flash',
-  gradient: 'from-amber-500 to-orange-500',
-  accentColor: 'amber',
-} as const;
 
 export const PUBLIC_MONTH_KEYS = [
   'january', 'february', 'march', 'april', 'may', 'june',
@@ -1864,9 +1855,9 @@ export const PUBLIC_CHILDREN_ANIMATION_SERVICES = [
 ] as const;
 
 export const PUBLIC_CHILDREN_ANIMATION_PACKS = [
-  { id: 'basic', hours: 2, price: 150, recommended: false },
-  { id: 'complet', hours: 3, price: 220, recommended: true },
-  { id: 'premium', hours: 4, price: 320, recommended: false },
+  { id: 'basic', hours: 1.5, price: 180, recommended: false },
+  { id: 'complet', hours: 2.5, price: 300, recommended: true },
+  { id: 'premium', hours: 3.5, price: 420, recommended: false },
 ] as const;
 
 export const PUBLIC_CHILDREN_ANIMATION_INFO_ITEMS = [

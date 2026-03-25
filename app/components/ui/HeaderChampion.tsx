@@ -41,23 +41,22 @@ const navItemsConfig: NavItemConfig[] = [
       { labelKey: 'fiestas', descKey: 'fiestasDesc', href: '/servicios/fiestas', icon: '🎉' },
       { labelKey: 'discomovil', descKey: 'discomovilDesc', href: '/servicios/discomovil', icon: '🎵' },
       { labelKey: 'empresas', descKey: 'empresasDesc', href: '/servicios/empresas', icon: '💼' },
-    ]
-  },
-  {
-    labelKey: 'experiences',
-    href: '/experiencias',
-    badge: 'NEW',
-    dropdownType: 'experiences',
-    dropdown: [
       { labelKey: 'monMagic', descKey: 'monMagicDesc', href: '/tematica-mon-magic', icon: '⚡', badge: 'EXCLUSIU' },
       { labelKey: 'halloween', descKey: 'halloweenDesc', href: '/tematica-halloween', icon: '🎃' },
     ]
   },
   { labelKey: 'configurator', href: '/configurador', badge: 'NEW' },
   { labelKey: 'portfolio', href: '/portfolio' },
-  { labelKey: 'reviews', href: '/opiniones' },
-  { labelKey: 'blog', href: '/blog' },
-  { labelKey: 'contact', href: '/contacto' },
+  {
+    labelKey: 'about',
+    href: '/opiniones',
+    dropdownType: 'zones',
+    dropdown: [
+      { labelKey: 'reviews', descKey: 'reviewsDesc', href: '/opiniones', icon: '⭐' },
+      { labelKey: 'blog', descKey: 'blogDesc', href: '/blog', icon: '📝' },
+      { labelKey: 'contact', descKey: 'contactDesc', href: '/contacto', icon: '💬' },
+    ]
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -159,7 +158,7 @@ export default function HeaderChampion() {
             {/* ════════════════════════════════════════════════════════════ */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 group"
+              className="flex items-center gap-2.5 group shrink-0"
               style={{ touchAction: 'manipulation' }}
             >
               <Image
@@ -169,7 +168,7 @@ export default function HeaderChampion() {
                 height={80}
                 sizes="260px"
                 quality={85}
-                className="h-14 md:h-16 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
+                className="h-14 md:h-[4.5rem] w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
                 priority
                 draggable={false}
               />

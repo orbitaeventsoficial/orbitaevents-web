@@ -1519,7 +1519,8 @@
       "contact": "Contact",
       "faq": "FAQ",
       "blog": "Blog",
-      "configurator": "Configurator"
+      "configurator": "Configurator",
+      "about": "About Us"
     },
     "dropdowns": {
       "servicesTitle": "Our services",
@@ -1537,7 +1538,11 @@
       "empresas": "Corporate Events",
       "empresasDesc": "Conferences, teambuildings and more",
       "discomovil": "Discommobile",
-      "discomovilDesc": "Professional sound, lights and DJ"
+      "discomovilDesc": "Professional sound, lights and DJ",
+      "monMagic": "Magic World",
+      "monMagicDesc": "Complete Harry Potter theming",
+      "halloween": "Halloween",
+      "halloweenDesc": "Nights of terror with all the effects"
     },
     "experiences": {
       "monMagic": "Magic World",
@@ -1563,7 +1568,13 @@
       "emporda": "Empordà",
       "empordaDesc": "Figueres, Roses and farmhouses",
       "costaBrava": "Costa Brava",
-      "costaBravaDesc": "Lloret, Tossa and coves"
+      "costaBravaDesc": "Lloret, Tossa and coves",
+      "reviews": "Reviews",
+      "reviewsDesc": "What our clients say",
+      "blog": "Blog",
+      "blogDesc": "Tips and inspiration for events",
+      "contact": "Contact",
+      "contactDesc": "Let's talk about your event"
     },
     "badges": {
       "popular": "Popular",

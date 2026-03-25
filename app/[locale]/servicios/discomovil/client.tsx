@@ -177,8 +177,6 @@ export default function DiscomovilClient() {
                   ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
                   : pack.popular
                   ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
-                  : pack.isFlash
-                  ? 'bg-gradient-to-b from-red-500/10 to-transparent border-red-500/40 ring-1 ring-red-500/20'
                   : 'bg-white/[0.03] border-white/10 hover:border-white/20'
                 }
               `}
@@ -188,8 +186,6 @@ export default function DiscomovilClient() {
                 <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
                   pack.popular
                     ? 'bg-amber-500 text-black'
-                    : pack.isFlash
-                    ? 'bg-red-500 text-white'
                     : 'bg-white/10 text-white/60 border border-white/10'
                 }`}>
                   {pack.badge}
@@ -244,8 +240,6 @@ export default function DiscomovilClient() {
                 className={`block text-center py-3.5 rounded-xl font-semibold transition-all mt-auto ${
                   pack.popular
                     ? 'bg-amber-500 text-black hover:bg-amber-400'
-                    : pack.isFlash
-                    ? 'bg-red-500 text-white hover:bg-red-400'
                     : 'bg-white/10 text-white hover:bg-white/15'
                 }`}
               >

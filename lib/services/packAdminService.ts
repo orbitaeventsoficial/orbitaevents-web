@@ -281,7 +281,7 @@ export async function syncAdminPacksFromConfig() {
           price: pack.priceValue,
           originalPrice: pack.priceOriginalValue || null,
           djHours: pack.durationHours || 4,
-          isFeatured: pack.popular || pack.isFlash || false,
+          isFeatured: pack.popular || false,
           order: configPacks.indexOf(pack),
           minGuests: pack.capacidadMinima ?? null,
           maxGuests: pack.capacidadMaxima ?? null,

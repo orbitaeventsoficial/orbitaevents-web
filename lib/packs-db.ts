@@ -72,7 +72,7 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
   const durationLabel = locale === 'ca' ? 'hores' : locale === 'en' ? 'hours' : 'horas';
   const fallbackPack = fallbackPacks.find((p) => p.slug === pack.slug);
   const code = pack.code || fallbackPack?.id || pack.slug;
-  const service = (pack.service || fallbackPack?.service || 'fiestas') as ServiceSlug;
+  const service = (pack.service || fallbackPack?.service || 'discomovil') as ServiceSlug;
 
   const name = resolveOrFallback(translation?.name, fallbackPack?.name, locale);
   const tagline = resolveOrFallback(translation?.tagline, fallbackPack?.tagline, locale);
@@ -122,7 +122,6 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
     badge: badge || null,
     capacidadMinima: pack.minGuests ?? undefined,
     capacidadMaxima: pack.maxGuests ?? undefined,
-    isFlash: code === 'oferta-flash' || pack.slug.includes('flash'),
   };
 }
 
@@ -154,7 +153,9 @@ export async function getDbPacks(options: { service?: ServiceSlug; locale?: stri
     const packs = await prisma.pack.findMany({
       where: {
         isActive: true,
-        ...(service ? { service } : {}),
+        ...(service
+          ? { service: (service === 'fiestas' ? 'discomovil' : service) }
+          : {}),
       },
       orderBy: { order: 'asc' },
       include: { translations: true },

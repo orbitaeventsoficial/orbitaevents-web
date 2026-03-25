@@ -145,8 +145,6 @@ export interface PackDefinition {
   recommendedOperatorExtraHourPrice?: number;
   capacidadMinima?: number;
   capacidadMaxima?: number;
-  isFlash?: boolean;
-  flashDiscount?: number;
 }
 
 export interface ExtraDefinition {
@@ -197,35 +195,6 @@ export const OFERTA_FLASH = {
 // ============================================
 
 const PACKS: PackDefinition[] = [
-  // ── OFERTA FLASH ──────────────────────────────────
-  {
-    id: "oferta-flash",
-    service: "fiestas",
-    slug: "oferta-flash",
-    i18nBaseKey: "services.mobile.discoPacks.oferta-flash",
-    name: "Oferta Flash",
-    tagline: "La teva festa de sempre, ara amb so i llums de veritat",
-    price: "250€",
-    priceValue: 250,
-    priceOriginal: "450€",
-    priceOriginalValue: 450,
-    features: [
-      "DJ professional 2 hores — la música que us agrada, com ha de sonar",
-      "So PRO 4000W que omple la sala",
-      "Llums que creen l'ambient perfecte",
-      "Màquina de fum per als moments especials",
-      "Nosaltres ho muntem i ho desmontem tot",
-    ],
-    ideal: "Aniversaris i festes de fins a 50 convidats",
-    duration: "2 hores",
-    durationHours: OFERTA_FLASH.duracionHoras,
-    badge: "🔥 OFERTA FLASH",
-    isFlash: true,
-    flashDiscount: OFERTA_FLASH.descuentoPorcentaje,
-    capacidadMinima: 10,
-    capacidadMaxima: OFERTA_FLASH.maxInvitados,
-  },
-
   // ── BODES ─────────────────────────────────────────
   {
     id: "bodas-basico",
@@ -238,18 +207,16 @@ const PACKS: PackDefinition[] = [
     price: "350€",
     priceValue: 350,
     features: [
-      "DJ professional 2 hores de sessió de ball",
-      "So professional 4000W que s'escolta i es sent",
-      "Llums que creen ambient de festa",
-      "Màquina de fum per als moments clau",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "2h de DJ professional",
+      "So 2000W",
+      "Llums bàsiques + fum",
+      "Muntatge i desmuntatge inclòs",
     ],
-    ideal: "Per al ball final del vostre casament",
-    duration: "2 hores",
+    ideal: "Ball final del casament, fins a 80 convidats",
+    duration: "2h",
     durationHours: 2,
     capacidadMinima: 20,
     capacidadMaxima: 80,
-    badge: null,
   },
   {
     id: "bodas-premium",
@@ -257,25 +224,23 @@ const PACKS: PackDefinition[] = [
     slug: "bodas-premium",
     i18nBaseKey: "configurator.step2.packs.bodas-premium",
     name: "Premium",
-    tagline: "El vostre ball, amb un espectacle de llums que els convidats recordaran",
-    emotion: "El vostre ball, amb un espectacle de llums que els convidats recordaran",
+    tagline: "Un espectacle de llums que els convidats recordaran",
+    emotion: "Un espectacle de llums que els convidats recordaran",
     price: "500€",
     priceValue: 500,
     features: [
-      "DJ professional 3 hores per gaudir sense pressa",
-      "So PRO 4000W EV + controladora Pioneer",
-      "4 caps mòbils que segueixen el ritme de la música",
-      "Cabina DJ ampliada — el centre de la festa",
-      "Fum i efectes que fan que cada moment sigui especial",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "3h de DJ professional",
+      "So 4000W EV",
+      "4 caps mòbils + llums + fum",
+      "Muntatge i desmuntatge inclòs",
     ],
-    ideal: "Ball amb show de llums i efectes",
-    duration: "3 hores",
+    ideal: "Ball amb show de llums, 60-150 convidats",
+    duration: "3h",
     durationHours: 3,
     capacidadMinima: 60,
     capacidadMaxima: 150,
     popular: true,
-    badge: "EL MÉS ESCOLLIT",
+    badge: "Més popular",
   },
   {
     id: "bodas-luxury",
@@ -288,22 +253,19 @@ const PACKS: PackDefinition[] = [
     price: "1.000€",
     priceValue: 1000,
     features: [
-      "DJ + Tècnic de llums dedicat (2 persones, 6 hores)",
-      "Posem la música a cada pas: entrada dels nuvis, passes de plats i begudes, pastís, entregues, regals, entrada al ball i sessió completa",
-      "So audiòfil 4000W — cada cançó sona com ha de sonar",
-      "Show de llums sincronitzat amb la música (4 caps mòbils 150W)",
-      "Fum baix per al primer ball — ballareu entre núvols",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "6h de DJ + tècnic de llums (2 persones)",
+      "So 4000W EV",
+      "4 caps mòbils + llums + fum baix primer ball",
+      "Música a cada moment: dinar, pastís, ball",
     ],
-    ideal: "Tot el casament, del dinar al ball",
-    duration: "6 hores",
+    ideal: "Tot el casament, 100-300 convidats",
+    duration: "6h",
     durationHours: 6,
     capacidadMinima: 100,
     capacidadMaxima: 300,
-    badge: null,
   },
 
-  // ── DISCOMÒBIL / FESTES ──────────────────────────────
+  // ── DISCOMÒBIL / FESTES PRIVADES ─────────────────────
   {
     id: "disco-basico",
     service: "discomovil",
@@ -312,21 +274,19 @@ const PACKS: PackDefinition[] = [
     name: "Bàsic",
     tagline: "La teva festa, el teu so — nosaltres posem la resta",
     emotion: "La teva festa, el teu so — nosaltres posem la resta",
-    price: "350€",
-    priceValue: 350,
+    price: "250€",
+    priceValue: 250,
     features: [
-      "DJ professional 3 hores — triem junts la música",
-      "So PRO 4000W EV que s'escolta clar i net",
-      "4 caps mòbils + multiefectes que transformen l'espai",
-      "Màquina de fum per als moments clau",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "2h de DJ professional",
+      "So 2000W",
+      "Llums bàsiques + fum",
+      "Muntatge i desmuntatge inclòs",
     ],
-    ideal: "Aniversaris, celebracions i festes privades",
-    duration: "3 hores",
-    durationHours: 3,
-    badge: "Bàsic",
+    ideal: "Aniversaris, comiats, festes fins a 60 persones",
+    duration: "2h",
+    durationHours: 2,
     capacidadMinima: 20,
-    capacidadMaxima: 80,
+    capacidadMaxima: 60,
   },
   {
     id: "disco-completo",
@@ -334,22 +294,21 @@ const PACKS: PackDefinition[] = [
     slug: "disco-completo",
     i18nBaseKey: "services.mobile.discoPacks.disco-completo",
     name: "Complet",
-    tagline: "Una hora més perquè les bones nits no s'acaben aviat",
+    tagline: "Una hora més i llums que transformen l'espai",
     price: "400€",
     priceValue: 400,
     features: [
-      "DJ professional 4 hores — sense mirar el rellotge",
-      "So PRO 4000W EV + controladora Pioneer",
-      "4 caps mòbils + multiefectes que creen ambient de club",
-      "Màquina de fum per als millors moments",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "3h de DJ professional",
+      "So 2000W",
+      "4 caps mòbils + llums bàsiques + fum",
+      "Muntatge i desmuntatge inclòs",
     ],
-    ideal: "Festes on vols que la nit no s'acabi",
-    duration: "4 hores",
-    durationHours: 4,
+    ideal: "Festes on vols un show de llums real",
+    duration: "3h",
+    durationHours: 3,
     popular: true,
     badge: "Més popular",
-    capacidadMinima: 50,
+    capacidadMinima: 40,
     capacidadMaxima: 120,
   },
   {
@@ -359,18 +318,17 @@ const PACKS: PackDefinition[] = [
     i18nBaseKey: "services.mobile.discoPacks.disco-premium",
     name: "Premium",
     tagline: "La festa on ningú vol marxar",
-    price: "700€",
-    priceValue: 700,
+    price: "600€",
+    priceValue: 600,
     features: [
-      "DJ professional 6 hores — tota la nit al teu servei",
-      "So de club (4000W + subwoofer de reforç) — ho sentireu a tot el cos",
-      "Show de llums complet amb caps mòbils sincronitzats",
-      "Efectes VIP: fum, bombolles, espurnes fredes, confeti",
-      "Cabina DJ Pro il·luminada — el centre de la festa",
+      "5h de DJ professional",
+      "So 4000W EV",
+      "4 caps mòbils + llums + fum",
+      "Efectes VIP: espurnes fredes, confeti, bombolles",
     ],
-    ideal: "Festes grans on vols que sigui inoblidable",
-    duration: "6 hores",
-    durationHours: 6,
+    ideal: "Festes grans, la nit sencera",
+    duration: "5h",
+    durationHours: 5,
     badge: "Premium",
     capacidadMinima: 80,
     capacidadMaxima: 200,
@@ -385,18 +343,17 @@ const PACKS: PackDefinition[] = [
     name: "Còctel",
     tagline: "El detall sonor que fa que el teu còctel sigui diferent",
     emotion: "El detall sonor que fa que el teu còctel sigui diferent",
-    price: "400€",
-    priceValue: 400,
+    price: "250€",
+    priceValue: 250,
     features: [
-      "Fil musical o DJ ambient 4 hores — posem el to just",
-      "So nítid EV ETX que acompanya sense molestar",
-      "Il·luminació decorativa que reforça l'ambient",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "2h de DJ ambient o fil musical",
+      "So 2000W",
+      "Llums bàsiques + fum",
+      "Muntatge i desmuntatge inclòs",
     ],
-    ideal: "Còctels corporatius, inauguracions, networking",
-    duration: "4 hores",
-    durationHours: 4,
-    badge: "Bàsic",
+    ideal: "Còctels, inauguracions, networking",
+    duration: "2h",
+    durationHours: 2,
   },
   {
     id: "empresas-evento",
@@ -406,18 +363,17 @@ const PACKS: PackDefinition[] = [
     name: "Estàndard",
     tagline: "Presentació impecable, festa que la gent recorda",
     emotion: "Presentació impecable, festa que la gent recorda",
-    price: "500€",
-    priceValue: 500,
+    price: "400€",
+    priceValue: 400,
     features: [
-      "DJ + tècnic 5 hores — cobrim presentació i festa",
-      "So 4000W per discursos i música amb la mateixa nitidesa",
-      "Il·luminació dinàmica amb caps mòbils",
-      "2 micròfons sense fils per a intervencions",
-      "Nosaltres ho muntem i ho desmontem tot",
+      "3h de DJ + tècnic",
+      "So 2000W",
+      "4 caps mòbils + llums + fum",
+      "2 micròfons sense fils inclosos",
     ],
-    ideal: "Esdeveniments corporatius on vols quedar bé",
-    duration: "5 hores",
-    durationHours: 5,
+    ideal: "Esdeveniments corporatius",
+    duration: "3h",
+    durationHours: 3,
     popular: true,
     badge: "Més popular",
   },
@@ -429,19 +385,17 @@ const PACKS: PackDefinition[] = [
     name: "Gala",
     tagline: "Producció a un altre nivell — que la teva marca brilli",
     emotion: "Producció a un altre nivell — que la teva marca brilli",
-    price: "1.400€",
-    priceValue: 1400,
+    price: "600€",
+    priceValue: 600,
     features: [
-      "Servei integral 6 hores amb DJ + tècnic de so dedicat",
-      "So reforçat + microfonia avançada (4 micros)",
-      "Disseny d'il·luminació corporativa a mida",
-      "Coordinació directa amb agència o venue",
-      "Gravació d'àudio de l'esdeveniment",
-      "Muntatge estètic impecable — cuidem cada detall",
+      "5h de DJ + tècnic dedicat",
+      "So 4000W EV",
+      "4 caps mòbils + llums + fum",
+      "Efectes VIP + coordinació amb venue",
     ],
     ideal: "Gales i esdeveniments d'alt nivell",
-    duration: "6 hores",
-    durationHours: 6,
+    duration: "5h",
+    durationHours: 5,
     badge: "Premium",
   },
 ];
@@ -514,15 +468,6 @@ export const OFFERS = {
     description: 'Esdeveniments en temporada baixa tenen descompte',
     badge: '📅 TEMPORADA',
   },
-  flash: {
-    id: 'oferta-flash',
-    name: OFERTA_FLASH.nombre,
-    discount: OFERTA_FLASH.descuentoPorcentaje,
-    maxGuests: OFERTA_FLASH.maxInvitados,
-    description: `Festes de fins a ${OFERTA_FLASH.maxInvitados} persones amb descompte exclusiu`,
-    badge: '⚡ FLASH',
-    condiciones: OFERTA_FLASH.condiciones,
-  },
 } as const;
 
 // ============================================
@@ -531,9 +476,7 @@ export const OFFERS = {
 
 export function getPacksByService(service: ServiceSlug): PackDefinition[] {
   if (service === 'fiestas' || service === 'discomovil') {
-    const discovilPacks = PACKS.filter(p => p.service === 'discomovil');
-    const flashPack = PACKS.find(p => p.isFlash);
-    return flashPack ? [flashPack, ...discovilPacks] : discovilPacks;
+    return PACKS.filter(p => p.service === 'discomovil');
   }
   return PACKS.filter(p => p.service === service);
 }
@@ -552,10 +495,6 @@ export function getPackById(id: string): PackDefinition | undefined {
   return PACKS.find(p => p.id === id);
 }
 
-export function getOfertaFlash(): PackDefinition | undefined {
-  return PACKS.find(p => p.isFlash);
-}
-
 export function getPacksByCapacity(guests: number, service?: ServiceSlug): PackDefinition[] {
   const packs = service ? getPacksByService(service) : PACKS;
   return packs.filter(p => {
@@ -567,7 +506,7 @@ export function getPacksByCapacity(guests: number, service?: ServiceSlug): PackD
 }
 
 export function getRecommendedPack(guests: number, service: ServiceSlug): PackDefinition | undefined {
-  const packs = getPacksByCapacity(guests, service).filter(p => !p.isFlash);
+  const packs = getPacksByCapacity(guests, service);
   return packs.find(p => p.popular) || packs[0];
 }
 
@@ -581,9 +520,8 @@ export function getFAQEquipamiento(): string {
 }
 
 export function getFAQPreciosResumen(): string {
-  const flash = PACKS.find(p => p.isFlash);
-  const bodasMin = Math.min(...PACKS.filter(p => p.service === 'bodas').map(p => p.priceValue));
   const discoMin = Math.min(...PACKS.filter(p => p.service === 'discomovil').map(p => p.priceValue));
+  const bodasMin = Math.min(...PACKS.filter(p => p.service === 'bodas').map(p => p.priceValue));
   const empresasMin = Math.min(...PACKS.filter(p => p.service === 'empresas').map(p => p.priceValue));
-  return `Festes des de ${flash?.priceValue || 250}€ (Oferta Flash fins a ${OFERTA_FLASH.maxInvitados} convidats), discomòbil des de ${discoMin}€, bodes des de ${bodasMin}€, empreses des de ${empresasMin}€. Hora extra ${EXTRAS[0].price}€. Tots els packs inclouen muntatge, desmuntatge i equip complet.`;
+  return `Festes i discomòbil des de ${discoMin}€, bodes des de ${bodasMin}€, empreses des de ${empresasMin}€. Tots els packs inclouen muntatge, desmuntatge i equip complet.`;
 }
