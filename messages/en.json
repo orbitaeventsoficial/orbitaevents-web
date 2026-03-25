@@ -286,8 +286,8 @@
         "A UNIQUE EXPERIENCE.",
         "PURE MAGIC."
       ],
-      "subtitle": "Professional DJ + lighting + full theming. Barcelona & Girona. Quote in 2h.",
-      "subtitleAlt": "Professional DJ + lighting + full theming. Barcelona & Girona.",
+      "subtitle": "DJ, lighting and theming for parties people actually remember. Barcelona & Girona. Quote in 2h.",
+      "subtitleAlt": "DJ, lighting and theming for parties people actually remember. Barcelona & Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "See packs & pricing",
@@ -2411,6 +2411,7 @@
         "featuredEvents": "Featured events",
         "gallery": "Gallery",
         "wantSimilar": "Want something similar?",
+        "seePacks": "See packs & pricing",
         "buildEvent": "Build your event",
         "viewEvent": "View event",
         "photosVideos": "photos & videos",
@@ -5149,9 +5150,9 @@
   },
   "homePage": {
     "meta": {
-      "title": "Immersive Experiences for Events | DJ + Theming Barcelona | From €250",
-      "description": "We create unique experiences: Harry Potter weddings, Halloween parties, corporate events. Professional DJ + complete theming. From €250. Barcelona and Girona. ★★★★★ 5.0/5",
-      "ogTitle": "Immersive Experiences for Events | Òrbita Events | From €250",
+      "title": "Professional DJ + Theming for Events | Parties €250–700 · Weddings €350–1,000 | Barcelona",
+      "description": "DJ that packs the dance floor + full theming: Harry Potter wedding, Halloween party, corporate event. Parties from €250, weddings from €350, corporate from €400. Barcelona & Girona. ★★★★★ 5.0/5",
+      "ogTitle": "DJ + Theming for Events | Parties from €250 | Òrbita Events",
       "ogDescription": "Harry Potter weddings, Halloween parties, corporate events. DJ + complete theming. Barcelona and Girona.",
       "ogImageAlt": "Òrbita Events - immersive experiences in Catalonia",
       "keywords": [
@@ -5198,22 +5199,22 @@
       }
     },
     "process": {
-      "sectionLabel": "The process",
-      "title": "How does it work?",
-      "subtitle": "3 steps · 0 complications",
+      "sectionLabel": "How it works",
+      "title": "From idea to party",
+      "subtitle": "3 steps · 0 headaches",
       "step1": {
         "title": "Tell us about your event",
-        "desc": "Contact us via WhatsApp or configure your quote online. We listen with no commitment and you get an answer in less than 2 hours."
+        "desc": "Message us on WhatsApp or through the form. Tell us the date, venue, how many guests and what vibe you're after. You'll hear back in under 2 hours."
       },
       "step2": {
-        "title": "We design it together",
-        "desc": "We create a 100% personalised quote for your event. No surprises, no hidden costs. Everything clear from the start."
+        "title": "We sort out the details",
+        "desc": "We put together a clear quote: you know exactly what's included and what it costs. No surprises."
       },
       "step3": {
-        "title": "You enjoy, we take care of everything",
-        "desc": "On the day, the Òrbita team handles every detail so the event is perfect. You just enjoy the moment."
+        "title": "You enjoy, we handle the rest",
+        "desc": "We set up, tear down and take care of everything. You just have a great time with your people."
       },
-      "ctaStart": "Let's start",
+      "ctaStart": "Get in touch",
       "ctaCalculate": "Calculate your price"
     },
     "portfolio": {
@@ -5236,23 +5237,23 @@
       "stories": {
         "discomovil": {
           "title": "Mobile disco parties",
-          "desc": "Professional sound, lights and DJ for private parties and celebrations"
+          "desc": "Big sound, cool lights and a DJ who knows what to play at every moment"
         },
         "halloween": {
-          "title": "Halloween nights",
-          "desc": "Themed decoration, special effects and terrifying atmosphere"
+          "title": "Halloween done right",
+          "desc": "Fog, lights, themed decor and a vibe that sticks with you"
         },
         "monMagic": {
-          "title": "Kids Magic World",
-          "desc": "Magic shows, entertainment and fun for the little ones"
+          "title": "Magic World for kids",
+          "desc": "Magic, games and a party where kids have the time of their lives"
         },
         "bodas": {
-          "title": "Dream weddings",
-          "desc": "DJ, lighting and production for the most special day"
+          "title": "Weddings with a real dance party",
+          "desc": "DJ, low fog, cold sparks — the moment everyone remembers"
         },
         "empreses": {
           "title": "Corporate events",
-          "desc": "Professional technical production for companies and brands"
+          "desc": "Sound, lights and the full setup so your event goes smoothly"
         }
       },
       "viewStory": "View story",
@@ -6323,6 +6324,7 @@
     }
   },
   "mobileHero": {
+    "ctaPacks": "See packs & pricing",
     "title": "WE CREATE EVENTS",
     "subtitle": "Weddings · Mobile DJ · Private parties · Themed events",
     "location": "Barcelona and Girona.",

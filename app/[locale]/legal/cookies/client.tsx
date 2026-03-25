@@ -85,10 +85,10 @@ export default function CookiesClient() {
             <h2 className="text-2xl font-semibold text-white">{t('section3.title')}</h2>
             <p>{t('section3.content')}</p>
             <ul className="list-disc pl-6 space-y-2 mt-4">
-              <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener" className="text-oe-gold hover:underline">{t('section3.browsers.chrome')}</a></li>
-              <li><a href="https://support.mozilla.org/es/kb/cookies-informacion-que-los-sitios-web-guardan-en-" target="_blank" rel="noopener" className="text-oe-gold hover:underline">{t('section3.browsers.firefox')}</a></li>
-              <li><a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener" className="text-oe-gold hover:underline">{t('section3.browsers.safari')}</a></li>
-              <li><a href="https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener" className="text-oe-gold hover:underline">{t('section3.browsers.edge')}</a></li>
+              <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer" className="text-oe-gold hover:underline">{t('section3.browsers.chrome')}</a></li>
+              <li><a href="https://support.mozilla.org/es/kb/cookies-informacion-que-los-sitios-web-guardan-en-" target="_blank" rel="noopener noreferrer" className="text-oe-gold hover:underline">{t('section3.browsers.firefox')}</a></li>
+              <li><a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer" className="text-oe-gold hover:underline">{t('section3.browsers.safari')}</a></li>
+              <li><a href="https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer" className="text-oe-gold hover:underline">{t('section3.browsers.edge')}</a></li>
             </ul>
           </section>
 

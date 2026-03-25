@@ -445,7 +445,7 @@ function EventsManager() {
             </div>
             <div>
               <label className="text-xs opacity-50 block mb-1">Convidats</label>
-              <input type="number" value={form.guestCount} onChange={(e) => setForm({ ...form, guestCount: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="120" />
+              <input type="number" min={0} value={form.guestCount} onChange={(e) => setForm({ ...form, guestCount: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="120" />
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs opacity-50 block mb-1">Serveis (separats per coma)</label>

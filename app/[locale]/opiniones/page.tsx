@@ -155,7 +155,7 @@ export default async function OpinionesPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <main className="min-h-screen bg-[#0A0A0A] relative">
+      <main className="min-h-screen bg-[#0A0A0A] relative oe-grid-pattern">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-24 pb-2 max-w-5xl">
           <nav className="flex items-center gap-2 text-sm text-white/40" aria-label="Breadcrumb">

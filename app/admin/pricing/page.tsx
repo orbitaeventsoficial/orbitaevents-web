@@ -432,6 +432,7 @@ export default function PricingAdminPage() {
                           <div className="flex items-center gap-2">
                             <input
                               type="number"
+                              min={0}
                               value={editPrice}
                               onChange={e => setEditPrice(Number(e.target.value))}
                               className="w-28 px-3 py-2 border-2 rounded-xl text-right text-xl font-bold focus:outline-none"

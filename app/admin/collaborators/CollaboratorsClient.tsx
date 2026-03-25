@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_COLLABORATOR_EMPTY_FORM } from '@/lib/constants/admin';
 import { useToast } from '../components/ToastProvider';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 
 interface Collaborator {
   id: string;
@@ -68,6 +69,7 @@ function getPaymentBadge(isPaid: boolean) {
 
 export default function CollaboratorsClient() {
   const toast = useToast();
+  const { confirm: confirmDialog, dialogProps } = useConfirmDialog();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [kpis, setKpis] = useState<KPIs | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,7 +140,8 @@ export default function CollaboratorsClient() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Segur que vols eliminar aquest col·laborador?')) return;
+    const ok = await confirmDialog({ title: 'Eliminar col·laborador', message: 'Segur que vols eliminar aquest col·laborador?', variant: 'danger', confirmLabel: 'Eliminar' });
+    if (!ok) return;
     try {
       const response = await fetchWithCsrf(`/api/admin/collaborators/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error("No s'ha pogut eliminar el col·laborador");
@@ -370,6 +373,7 @@ export default function CollaboratorsClient() {
           ))}
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }

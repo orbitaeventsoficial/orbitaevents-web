@@ -1,0 +1,68 @@
+name: Daily Cron Jobs
+
+on:
+  schedule:
+    # Cada dia a les 3:00 UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Permet execució manual
+
+jobs:
+  crons:
+    name: Run all cron jobs
+    runs-on: ubuntu-latest
+    steps:
+      - name: lead-cleanup
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/lead-cleanup")
+          echo "lead-cleanup: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: reviews-sync
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/reviews-sync")
+          echo "reviews-sync: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: post-event
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/post-event")
+          echo "post-event: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: pack-pricing-check
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/pack-pricing-check")
+          echo "pack-pricing-check: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: invoice-sync
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/invoice-sync")
+          echo "invoice-sync: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: fuel-daily
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/fuel-daily")
+          echo "fuel-daily: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: commercial-daily
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/commercial-daily")
+          echo "commercial-daily: $status"
+          [ "$status" = "200" ] || exit 1

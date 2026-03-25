@@ -286,8 +286,8 @@
         "UNA EXPERIENCIA ÚNICA.",
         "PURA MAGIA."
       ],
-      "subtitle": "DJ profesional + iluminación + tematización completa. Barcelona y Girona. Presupuesto en 2h.",
-      "subtitleAlt": "DJ profesional + iluminación + tematización completa. Barcelona y Girona.",
+      "subtitle": "DJ, iluminación y tematización para fiestas que la gente recuerda. Barcelona y Girona. Presupuesto en 2h.",
+      "subtitleAlt": "DJ, iluminación y tematización para fiestas que la gente recuerda. Barcelona y Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Ver packs y precios",
@@ -2411,6 +2411,7 @@
         "featuredEvents": "Eventos destacados",
         "gallery": "Galería",
         "wantSimilar": "¿Quieres algo parecido?",
+        "seePacks": "Ver packs y precios",
         "buildEvent": "Monta tu evento",
         "viewEvent": "Ver evento",
         "photosVideos": "fotos y vídeos",
@@ -5149,9 +5150,9 @@
   },
   "homePage": {
     "meta": {
-      "title": "Experiencias Inmersivas para Eventos | DJ + Tematización Barcelona | Desde 250€",
-      "description": "Creamos experiencias únicas: bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ profesional + tematización completa. Desde 250€. Barcelona y Girona. ★★★★★ 5.0/5",
-      "ogTitle": "Experiencias Inmersivas para Eventos | Òrbita Events | Desde 250€",
+      "title": "DJ Profesional + Tematización para Eventos | Fiestas 250–700€ · Bodas 350–1.000€ | Barcelona",
+      "description": "DJ que llena pistas + tematización completa: boda Harry Potter, fiesta Halloween, evento corporativo. Fiestas desde 250€, bodas desde 350€, empresas desde 400€. Barcelona y Girona. ★★★★★ 5.0/5",
+      "ogTitle": "DJ + Tematización para Eventos | Fiestas desde 250€ | Òrbita Events",
       "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona.",
       "ogImageAlt": "Òrbita Events - Experiencias inmersivas en Catalunya",
       "keywords": [
@@ -5198,22 +5199,22 @@
       }
     },
     "process": {
-      "sectionLabel": "El proceso",
-      "title": "¿Cómo funciona?",
-      "subtitle": "3 pasos · 0 complicaciones",
+      "sectionLabel": "Cómo funciona",
+      "title": "De la idea a la fiesta",
+      "subtitle": "3 pasos · 0 dolores de cabeza",
       "step1": {
         "title": "Cuéntanos tu evento",
-        "desc": "Contáctanos por WhatsApp o configura tu presupuesto online. Te escuchamos sin ningún compromiso y en menos de 2h tienes respuesta."
+        "desc": "Escríbenos por WhatsApp o por el formulario. Dinos fecha, lugar, cuánta gente y qué rollo buscas. En menos de 2h tienes respuesta."
       },
       "step2": {
-        "title": "Lo diseñamos juntos",
-        "desc": "Creamos un presupuesto 100% personalizado para tu evento. Sin sorpresas ni costes ocultos. Todo claro desde el primer momento."
+        "title": "Cerramos los detalles",
+        "desc": "Preparamos un presupuesto claro: sabes exactamente qué incluye y qué cuesta. Sin sorpresas."
       },
       "step3": {
-        "title": "Tú disfrutas, nosotros lo cuidamos todo",
-        "desc": "El gran día, el equipo de Òrbita se encarga de cada detalle para que el evento sea perfecto. Tú, a disfrutar del momento."
+        "title": "Tú disfrutas, nosotros nos encargamos",
+        "desc": "Montamos, desmontamos y lo cuidamos todo. Tú solo tienes que pasártelo bien con tu gente."
       },
-      "ctaStart": "Empezamos ahora",
+      "ctaStart": "Escríbenos",
       "ctaCalculate": "Calcula tu precio"
     },
     "portfolio": {
@@ -5236,23 +5237,23 @@
       "stories": {
         "discomovil": {
           "title": "Fiestas con discoteca móvil",
-          "desc": "Sonido profesional, luces y DJ para fiestas privadas y celebraciones"
+          "desc": "Sonido potente, luces que molan y un DJ que sabe qué poner en cada momento"
         },
         "halloween": {
-          "title": "Noches de Halloween",
-          "desc": "Decoración temática, efectos especiales y ambiente terrorífico"
+          "title": "Halloween como tiene que ser",
+          "desc": "Humo, luces, decoración temática y un ambiente que no se olvida fácilmente"
         },
         "monMagic": {
-          "title": "Mundo Mágico infantil",
-          "desc": "Espectáculos de magia, animación y diversión para los más pequeños"
+          "title": "Mundo Mágico para los peques",
+          "desc": "Magia, juegos y una fiesta donde los niños se lo pasan en grande"
         },
         "bodas": {
-          "title": "Bodas de ensueño",
-          "desc": "DJ, iluminación y producción para el día más especial"
+          "title": "Bodas con baile de verdad",
+          "desc": "DJ, humo bajo, chispas frías — el momento que todos recuerdan"
         },
         "empreses": {
           "title": "Eventos corporativos",
-          "desc": "Producción técnica profesional para empresas y marcas"
+          "desc": "Sonido, luces y todo el montaje para que el evento salga redondo"
         }
       },
       "viewStory": "Ver story",
@@ -6323,6 +6324,7 @@
     }
   },
   "mobileHero": {
+    "ctaPacks": "Ver packs y precios",
     "title": "CREAMOS EVENTOS",
     "subtitle": "Bodas · Discomóvil · Fiestas privadas · Eventos temáticos",
     "location": "Barcelona y Girona.",

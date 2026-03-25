@@ -198,6 +198,7 @@ export default function StatsPage() {
               <div className="flex gap-2">
                 <input
                   type="number"
+                  min={0}
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   className="flex-1 px-4 py-2 border border-white/10 rounded-xl focus:ring-2"

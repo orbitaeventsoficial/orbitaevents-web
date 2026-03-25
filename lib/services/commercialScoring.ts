@@ -1,3 +1,5 @@
+import { LEAD_SCORING_STATUS_BASE, LEAD_SCORING_STATUS_PROBABILITY, EVENT_TYPE_DEFAULT_BUDGET } from '@/lib/constants';
+
 type ScoreInput = {
   status: string;
   createdAt: Date;
@@ -30,23 +32,8 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-const STATUS_BASE: Record<string, number> = {
-  NEW: 20,
-  CONTACTED: 40,
-  QUOTE_SENT: 60,
-  NEGOTIATING: 72,
-  WON: 95,
-  LOST: 5,
-};
-
-const STATUS_PROBABILITY: Record<string, number> = {
-  NEW: 0.12,
-  CONTACTED: 0.22,
-  QUOTE_SENT: 0.38,
-  NEGOTIATING: 0.57,
-  WON: 0.95,
-  LOST: 0.03,
-};
+const STATUS_BASE = LEAD_SCORING_STATUS_BASE;
+const STATUS_PROBABILITY = LEAD_SCORING_STATUS_PROBABILITY;
 
 export function scoreLead(input: ScoreInput): LeadScoreResult {
   const reasons: string[] = [];
@@ -130,17 +117,6 @@ export function estimateLeadAmount(input: {
   const parsed = parseBudgetValue(input.budget);
   if (parsed > 0) return parsed;
 
-  const fallbackByType: Record<string, number> = {
-    WEDDING: 1800,
-    CORPORATE: 1500,
-    BIRTHDAY: 850,
-    PRIVATE_PARTY: 900,
-    COMMUNION: 700,
-    BAPTISM: 650,
-    GRADUATION: 800,
-    ANNIVERSARY: 900,
-    OTHER: 1000,
-  };
-  return fallbackByType[input.eventType || 'OTHER'] ?? 1000;
+  return EVENT_TYPE_DEFAULT_BUDGET[input.eventType || 'OTHER'] ?? 1000;
 }
 

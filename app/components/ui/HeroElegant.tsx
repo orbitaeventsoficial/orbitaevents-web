@@ -435,31 +435,31 @@ export default function HeroElegant() {
               transition={{ duration: 0.6, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-wrap items-center gap-4 mt-8 md:mt-10"
             >
-              {/* Primary CTA */}
+              {/* Primary CTA — Preus */}
               <Link
-                href="/configurador"
-                onClick={() => trackCTAClick('hero_configurator_primary', 'hero_elegant')}
+                href="/packs"
+                onClick={() => trackCTAClick('hero_packs_primary', 'hero_elegant')}
                 className="group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 md:px-10 md:py-5 rounded-2xl transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
               >
                 <div className="absolute -inset-3 bg-amber-500/20 rounded-3xl blur-2xl group-hover:bg-amber-500/35 transition-colors duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 bg-[length:200%_100%] rounded-2xl animate-[shimmer_3s_ease-in-out_infinite]" />
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
                 <span className="relative z-10 text-zinc-900 font-black text-base md:text-lg">
-                  {t('ctaConfigurator')}
+                  {t('ctaPacks')}
                 </span>
                 <svg className="relative z-10 w-5 h-5 text-zinc-900 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
 
-              {/* Secondary CTA */}
+              {/* Secondary CTA — Configurador */}
               <Link
-                href="/portfolio"
-                onClick={() => trackCTAClick('hero_portfolio_secondary', 'hero_elegant')}
+                href="/configurador"
+                onClick={() => trackCTAClick('hero_configurator_secondary', 'hero_elegant')}
                 className="group inline-flex items-center gap-2 px-6 py-4 md:px-8 md:py-5 rounded-2xl border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm transition-all duration-300"
               >
                 <span className="text-white font-semibold text-base md:text-lg">
-                  {t('ctaPrices')}
+                  {t('ctaConfigurator')}
                 </span>
                 <svg className="w-4 h-4 text-white/60 group-hover:text-amber-400 group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -374,19 +374,25 @@
 
   .oe-grid-pattern {
     position: relative;
+    isolation: isolate;
   }
 
   .oe-grid-pattern::before {
     content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.015;
+    opacity: 0.06;
     pointer-events: none;
     background-image:
       linear-gradient(to right, white 1px, transparent 1px),
       linear-gradient(to bottom, white 1px, transparent 1px);
     background-size: 60px 60px;
-    z-index: 0;
+    z-index: -1;
+  }
+
+  .oe-grid-pattern--radial::before {
+    mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, black 20%, transparent 100%);
   }
 
   /* ─────────────────────────────────────────────────────────────────────────

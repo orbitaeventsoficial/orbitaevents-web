@@ -125,7 +125,7 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
 
-      <main className="min-h-screen bg-[#0A0A0A] relative">
+      <main className="min-h-screen bg-[#0A0A0A] relative oe-grid-pattern">
         <BlogTracking page="post" slug={slug} />
         <section className="relative pt-24 pb-0 overflow-hidden">
           {post.featuredImage && (

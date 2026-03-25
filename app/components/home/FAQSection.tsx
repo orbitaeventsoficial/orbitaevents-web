@@ -46,7 +46,7 @@ export default function FAQSection() {
       {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(251,191,36,0.05),transparent_70%)] pointer-events-none" />
 
-      <div className="container mx-auto px-6 max-w-3xl">
+      <div className="container mx-auto px-6 max-w-3xl relative z-[1]">
         {/* Header */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
@@ -78,8 +78,8 @@ export default function FAQSection() {
                 <div
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                     isOpen
-                      ? 'border-amber-500/30 bg-amber-500/5 border-l-2 border-l-amber-500'
-                      : 'border-white/[0.08] bg-white/[0.03] hover:border-white/[0.14] hover:bg-white/[0.05] hover:shadow-lg hover:shadow-amber-500/5'
+                      ? 'border-amber-500/30 bg-[#141210] border-l-2 border-l-amber-500'
+                      : 'border-white/[0.08] bg-[#111111] hover:border-white/[0.14] hover:bg-[#161616] hover:shadow-lg hover:shadow-amber-500/5'
                   }`}
                 >
                   {/* Question row */}
@@ -162,7 +162,7 @@ export default function FAQSection() {
               trackWhatsAppClick('faq_section');
               trackCTAClick('faq_whatsapp_cta', 'faq_section');
             }}
-            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 rounded-full text-amber-400 text-base font-semibold transition-all"
+            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-[#1a1408] border border-amber-500/25 hover:bg-[#231b0e] hover:shadow-lg hover:shadow-amber-500/10 rounded-full text-amber-400 text-base font-semibold transition-all"
           >
             {t('cta.button')}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -286,8 +286,8 @@
         "UNA EXPERIÈNCIA ÚNICA.",
         "PURA MÀGIA."
       ],
-      "subtitle": "DJ professional + il·luminació + tematització completa. Barcelona i Girona. Pressupost en 2h.",
-      "subtitleAlt": "DJ professional + il·luminació + tematització completa. Barcelona i Girona.",
+      "subtitle": "DJ, il·luminació i tematització per a festes que la gent recorda. Barcelona i Girona. Pressupost en 2h.",
+      "subtitleAlt": "DJ, il·luminació i tematització per a festes que la gent recorda. Barcelona i Girona.",
       "subtitleLocation": "",
       "subtitleLocationAlt": "",
       "ctaPacks": "Veure packs i preus",
@@ -1988,6 +1988,7 @@
         "featuredEvents": "Esdeveniments destacats",
         "gallery": "Galeria",
         "wantSimilar": "Vols algo semblant?",
+        "seePacks": "Veure packs i preus",
         "buildEvent": "Munta el teu event",
         "viewEvent": "Veure event",
         "photosVideos": "fotos i vídeos",
@@ -2044,7 +2045,7 @@
             "Pista plena garantida",
             "Equipament professional",
             "Efectes WOW",
-            "Des de 250€"
+            "350–700€"
           ]
         },
         "fiestas": {
@@ -2055,7 +2056,7 @@
             "Tematització personalitzada",
             "DJ + efectes",
             "Playlist curada",
-            "Des de 250€"
+            "250–700€"
           ]
         },
         "animacionInfantil": {
@@ -5401,9 +5402,9 @@
   },
   "homePage": {
     "meta": {
-      "title": "Experiències Immersives per Events | DJ + Tematització Barcelona | Des de 250€",
-      "description": "Creem experiències úniques: casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 5.0/5",
-      "ogTitle": "Experiències Immersives per Events | Òrbita Events | Des de 250€",
+      "title": "DJ Professional + Tematització per Events | Festes 250–700€ · Bodes 350–1.000€ | Barcelona",
+      "description": "DJ que omple pistes + tematització completa: boda Harry Potter, festa Halloween, event corporatiu. Festes des de 250€, bodes des de 350€, empreses des de 400€. Barcelona i Girona. ★★★★★ 5.0/5",
+      "ogTitle": "DJ + Tematització per Events | Festes des de 250€ | Òrbita Events",
       "ogDescription": "Casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ + tematització completa. Barcelona i Girona.",
       "ogImageAlt": "Òrbita Events - Experiències immersives a Catalunya",
       "keywords": [
@@ -5450,22 +5451,22 @@
       }
     },
     "process": {
-      "sectionLabel": "El procés",
-      "title": "Com funciona?",
-      "subtitle": "3 passos · 0 complicacions",
+      "sectionLabel": "Com funciona",
+      "title": "De la idea a la festa",
+      "subtitle": "3 passos · 0 maldecaps",
       "step1": {
         "title": "Explica'ns el teu event",
-        "desc": "Contacta'ns per WhatsApp o configura el teu pressupost online. T'escoltem sense cap compromís i en menys de 2h tens resposta."
+        "desc": "Escriu-nos per WhatsApp o pel formulari. Digues-nos data, lloc, quanta gent i quin rollo busques. En menys de 2h tens resposta."
       },
       "step2": {
-        "title": "Ho dissenyem junts",
-        "desc": "Creem un pressupost 100% personalitzat per al teu event. Sense sorpreses ni costos ocults. Tot clar des del primer moment."
+        "title": "Tanquem els detalls",
+        "desc": "Preparem un pressupost clar: saps exactament què inclou i què costa. Sense sorpreses."
       },
       "step3": {
-        "title": "Tu gaudeixes, nosaltres ho cuidem tot",
-        "desc": "El dia B, l'equip d'Òrbita s'encarrega de cada detall perquè l'event sigui perfecte. Tu, a gaudir del moment."
+        "title": "Tu gaudeixes, nosaltres ens encarreguem",
+        "desc": "Muntem, desmuntem i ho cuidem tot. Tu només has de passar-ho bé amb la teva gent."
       },
-      "ctaStart": "Comencem ara",
+      "ctaStart": "Escriu-nos",
       "ctaCalculate": "Calcula el teu preu"
     },
     "portfolio": {
@@ -5488,23 +5489,23 @@
       "stories": {
         "discomovil": {
           "title": "Festes amb discomòbil",
-          "desc": "So professional, llums i DJ per a festes privades i celebracions"
+          "desc": "So potent, llums que molen i un DJ que sap què posar en cada moment"
         },
         "halloween": {
-          "title": "Nits de Halloween",
-          "desc": "Decoració temàtica, efectes especials i ambient terrorífic"
+          "title": "Halloween com toca",
+          "desc": "Fum, llums, decoració temàtica i un ambient que no s'oblida fàcilment"
         },
         "monMagic": {
-          "title": "Món Màgic infantil",
-          "desc": "Espectacles de màgia, animació i diversió per als més petits"
+          "title": "Món Màgic per als petits",
+          "desc": "Màgia, jocs i una festa on els nens s'ho passen en gran"
         },
         "bodas": {
-          "title": "Casaments de somni",
-          "desc": "DJ, il·luminació i producció per al dia més especial"
+          "title": "Casaments amb ball de veritat",
+          "desc": "DJ, fum baix, espurnes fredes — el moment que tothom recorda"
         },
         "empreses": {
           "title": "Events corporatius",
-          "desc": "Producció tècnica professional per a empreses i marques"
+          "desc": "So, llums i tot el muntatge perquè l'event surti rodó"
         }
       },
       "viewStory": "Veure story",
@@ -6575,6 +6576,7 @@
     }
   },
   "mobileHero": {
+    "ctaPacks": "Veure packs i preus",
     "title": "CREEM EVENTS",
     "subtitle": "Casaments · Discomòbil · Festes privades · Esdeveniments temàtics",
     "location": "Barcelona i Girona.",

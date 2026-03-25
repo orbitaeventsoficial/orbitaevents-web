@@ -345,10 +345,12 @@ Abans de tocar qualsevol estil:
 
 #### Quadrícula de fons (grid pattern)
 
-- **Classe**: `oe-grid-pattern` — definida a `globals.css`, `::before` amb quadrícula 60px × 60px, blanc, z-index 0.
-- **Opacitat**: `0.015` — molt subtil, afegeix textura sense competir amb el contingut.
-- **On s'aplica**: Seccions públiques amb fons fosc que necessiten textura (footer, stats, CTA, FAQ, garantia).
-- **On NO s'aplica**: Heroes amb imatge, seccions amb contingut dens (cards, portfoli, formularis), admin.
+- **Classe**: `oe-grid-pattern` — definida a `globals.css`, `::before` amb quadrícula 60px × 60px, blanc, `isolation: isolate` + `z-index: -1`.
+- **Opacitat**: `0.06` — visible però no competeix amb el contingut. **NO TOCAR**.
+- **On s'aplica**: TOTES les seccions públiques amb fons fosc (footer, stats, CTA, FAQ, garantia, blog, packs, opiniones, servicios).
+- **On NO s'aplica**: Heroes amb imatge, admin.
+- **Modificador `--radial`**: `oe-grid-pattern--radial` afegeix mask radial amb desaparició. Usat al footer. **NO TOCAR**.
+- **Cards sobre grid**: Si una secció té cards, el container de contingut ha de portar `relative z-[1]` i les cards fons opac (no semi-transparent). Referència: FAQSection.tsx.
 - **Regla MONOCAPA**: Si una secció té `oe-grid-pattern`, **NO pot tenir** cap grid inline propi. Una sola font, sempre.
 - **Admin**: NO porta quadrícula. Mai.
 
@@ -455,11 +457,76 @@ Abans de tocar qualsevol estil:
 - **Server-side**: searchParams a page.tsx → Prisma where clause
 - **Client-side**: FilterChips locals dins el component (no recarrega pàgina). Ref: LeadPipelineView.
 
-## Què JA EXISTEIX — NO tornar a crear ni auditar
+## Què JA EXISTEIX — NO tornar a crear, auditar NI MODIFICAR
 
-Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja està fet i funciona:
+Abans de proposar crear, auditar o **modificar** qualsevol d'això, **consulta primer**. Ja està fet, aprovat i tancat:
 
-### SEO (complet)
+### UX / Copy / Conversió (tancat 2026-03-25 — NO TOCAR)
+- **Hero CTAs**: Primari "Veure packs i preus" → /packs, Secundari "Munta el teu event" → /configurador. Mobile: WhatsApp primari, packs secundari.
+- **Hero subtitle**: "DJ, il·luminació i tematització per a festes que la gent recorda" (3 idiomes)
+- **Meta SEO homepage**: Rangs reals ("Festes 250–700€ · Bodes 350–1.000€") als 3 idiomes
+- **Process section**: "De la idea a la festa · 3 passos · 0 maldecaps" — copy natural (3 idiomes)
+- **Portfolio stories**: Copy natural per categoria ("Festes amb discomòbil", "Halloween com toca", etc.) — 3 idiomes
+- **Portfolio event CTA**: Primari preus, secundari configurador
+- **Features serveis preus**: Rangs reals (250–700€, 350–700€)
+- **Social proof hero**: 5★, 50+ events, "Només 1 event per dia"
+
+### Visual / CSS (tancat sessions 11-12 — NO TOCAR)
+- Paleta admin amb contrast 30+ unitats entre capes, sidebar glass, !important cleanup, control-room.css
+- Film grain (`.oe-film-grain`), vignette (`.oe-vignette`), grid pattern (`.oe-grid-pattern`) a 35+ seccions
+- Calendari 72-88px amb KPIs color semàntic
+- Partícules hero 36, pseudo-random, translúcides
+- Heroes amb imatge a 3 pàgines de serveis
+- Footer trust signals amb color semàntic + legal links posició
+- Admin timeout 15s a 10 pàgines amb spinner+reintentar
+- Hex hardcoded netejats → Tailwind/tokens (FloatingCTAs, ExitIntentModal, CTAFinal, ProcessSection, GarantiaSection, HeroElegant)
+
+### Components públics (consolidats — NO TOCAR)
+- **HeroElegant**: Carrousel media + Ken Burns + stagger words + CTAs + social proof + partícules + cursor glow
+- **MobileHeroUltimate**: Carrousel + WhatsApp CTA + packs CTA + morphing texts
+- **MobileHomePage**: App shell + intro + hero + serveis + stats + process + portfolio + FAQ + CTA + guarantees
+- **ProcessSection**: 3 steps amb gradient glow boxes + connector line + CTAs WhatsApp/configurador
+- **MobileProcessSection**: Versió mòbil, mateixes claus i18n
+- **StatsSection**: Component únic, xifres ambre, separadors, glow central — s'usa NOMÉS a home desktop i mòbil
+- **PortfolioShowcase**: Scroll horitzontal infinit, 6 story cards amb crossfade
+- **GarantiaSection**: 4 garanties amb icones
+- **CTAFinal**: CTA final amb film grain
+- **FAQSection**: Acordió amb schema.org
+- **GoogleReviewsRotating**: Reviews de Google amb rotació
+- **TrustedByLogos**: Logos de clients
+- **CalendarioUrgencia**: Urgència amb calendari real
+- **ServicesGridElegant**: Grid de serveis amb hover
+- **FloatingCTAs**: WhatsApp + configurador flotants
+- **ExitIntentModal**: Modal sortida amb oferta
+- **GalleryPro/SimpleGallery**: Mosaic HERO→3-grid→HERO→2-grid + lightbox
+
+### Pàgines públiques (consolidades — NO TOCAR estructura/copy)
+- **Homepage** (`app/[locale]/page.tsx`): 11 seccions en ordre fix (hero→serveis→stats→urgència→portfolio→process→reviews→logos→garantia→FAQ→CTA)
+- **Packs** (`app/[locale]/packs/`): 3 tabs (festes/bodas/empresas), cards amb preus, features, ideal per
+- **Portfolio index** (`app/[locale]/portfolio/page.tsx`): Grid categories amb hero cards cinemàtics
+- **Portfolio categoria** (`app/[locale]/portfolio/[slug]/page.tsx`): Hero + events destacats + galeria mosaic + JSON-LD ImageGallery
+- **Portfolio event** (`app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx`): Hero cinemàtic + detalls + galeria + CTA dual (preus+configurador)
+- **Serveis** (`app/[locale]/servicios/`): Heroes amb foto, FAQ, breadcrumbs
+- **Contacte, Blog, Opinions, About, Legal, Zones, Configurador**: Totes amb metadata, i18n, breadcrumbs
+
+### Admin — sistemes consolidats (NO TOCAR)
+- **Layout**: Fragment + admin-layout-shell, admin-mode class, 3 CSS files
+- **Sidebar glass**: A globals.css directament
+- **Kanban**: Drag & drop HTML5 + optimistic + toast + mòbil (Tasks, Leads, Bookings)
+- **BookingSectionNav**: IntersectionObserver 10 seccions, sticky
+- **ConfirmDialog**: Hook + component, variants danger/warning/info
+- **Error handling**: Timeout 15s, toasts explícits, zero catches muts
+- **Lead pipeline**: Estats, auto-LOST cron, auto-DELETE >90d, DNI, cercable
+- **Google Reviews cache**: Settings table, SerpAPI/Google OAuth, dashboard
+- **Weather widget**: OpenWeatherMap, 1h cache, graceful fallback
+- **Calendari**: Mes/Setmana/Dia, KPIs color, bloqueig/desbloqueig amb toast
+- **Inbox/Compose**: Email + pressupost amb error explícit
+- **Client portal**: Accés amb link, còpia amb warning
+- **Booking inventory**: Assignació, lot, pack, checkout/checkin amb errors explícits
+- **Clientes modals**: Duplicats check, GDPR smart delete/anonimitza
+- **Settings/Canvas/Checklist**: Tots amb error handling explícit
+
+### SEO (complet — NO TOCAR)
 - **`app/sitemap.ts`** (160 línies) — Dinàmic: pàgines estàtiques, zones, blog, portfolio, i18n (ca/es/en), prioritats estratègiques
 - **`app/robots.ts`** (48 línies) — Regles per Googlebot, Googlebot-Image, Twitterbot. Disallow: /api/, /admin/, /_next/
 - **`public/robots.txt`** — Fallback estàtic
@@ -469,7 +536,7 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - **Breadcrumbs** component amb schema.org
 - **FAQ** component amb schema.org
 
-### Performance (complet)
+### Performance (complet — NO TOCAR)
 - **53 `loading.tsx`** amb skeletons (48 admin + 5 públic)
 - **8 `dynamic()` imports** amb SSR i fallback skeletons
 - **`next/image`** a 25 components (només 2 `<img>` raw a admin)
@@ -478,18 +545,44 @@ Abans de proposar crear o auditar qualsevol d'això, **consulta primer**. Ja est
 - **Image formats**: webp + avif habilitats a next.config
 - **SWC minify** + source maps desactivats en producció
 
-### Testing (complet)
+### Testing (complet — NO TOCAR)
 - **1784 unit tests** (140 fitxers) — 100% serveis coberts
 - **9 E2E specs** (~80 tests) — admin, públic, APIs, SEO, contacte, serveis
 - **CI** amb coverage report i artifact upload
 
-### Infraestructura (complet)
+### Infraestructura (complet — NO TOCAR)
 - **CI**: `.github/workflows/ci.yml` — lint+tsc, tests+coverage, build
 - **Backup BD**: `.github/workflows/backup.yml` — setmanal, artifact 90 dies
 - **PWA admin**: Manifest + service worker
 - **Sentry**: Integrat a next.config.mjs
 - **Analytics**: GA4 amb WebVitalsReporter, ConsentScripts
 - **Crons**: `lead-cleanup` (auto-LOST + auto-DELETE), emails automation, reviews sync — tots amb Bearer auth CRON_SECRET
+
+### Configuració i constants (consolidat — NO TOCAR)
+- `config/packs-config.ts`: Packs amb preus, features, duració, capacitat (font de veritat preus)
+- `config/site-config.ts`: Business info, URLs, social, WhatsApp
+- `config/portfolio-images.ts`: Fotos portfolio per categoria
+- `config/client-logos.ts`: Logos clients
+- `config/equipment-config.ts`: Inventari equipament
+- `lib/constants/index.ts` (~1800L): Constants compartides (formats, opcions, catàlegs, process styles, portfolio items)
+- `lib/constants/privacy.ts`: Constants RGPD
+
+### Serveis de negoci (consolidats — NO TOCAR lògica)
+- `costEngine.ts`: `computeBookingFinancialSummary()` — font única per marges
+- `fuelReferenceService.ts`: `getEffectiveVehicleCostPerKm()`
+- `leadRouteService.ts`: Validació delete (requereix LOST)
+- `bookingRouteService.ts`: Validació delete (PENDING/CANCELLED)
+- `customerRouteService.ts`: Smart GDPR delete/anonimitza
+- `heroVideoService.ts`: CRUD hero media
+- `galleryService.ts` + `portfolioMediaService.ts` + `portfolioEventService.ts`: Portfolio backend
+- `googleReviewsCacheService.ts`: Cache Google Reviews
+- `weatherService.ts`: OpenWeatherMap amb cache 1h
+
+### i18n (estructura consolidada — NO TOCAR estructura)
+- 3 fitxers: `messages/ca.json`, `messages/es.json`, `messages/en.json` (~6800L cadascun)
+- Admin: català directe, no cal traduir
+- Emails: `preferredLocale` sempre
+- Formats: funcions centralitzades amb `locale` param
 
 ## Monocapa admin
 

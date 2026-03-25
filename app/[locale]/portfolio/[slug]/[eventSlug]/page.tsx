@@ -178,15 +178,23 @@ export default async function PortfolioEventPage({ params }: PageProps) {
           <p className="text-white/40 text-sm uppercase tracking-widest mb-3">
             {tPortfolio('eventDetail.wantSimilar')}
           </p>
-          <Link
-            href="/configurador"
-            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-transform"
-          >
-            {tPortfolio('eventDetail.buildEvent')}
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/packs"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-transform"
+            >
+              {tPortfolio('eventDetail.seePacks')}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/configurador"
+              className="inline-flex items-center gap-2 px-8 py-5 rounded-2xl border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] text-white font-semibold text-lg transition-all"
+            >
+              {tPortfolio('eventDetail.buildEvent')}
+            </Link>
+          </div>
         </section>
       </main>
     </>

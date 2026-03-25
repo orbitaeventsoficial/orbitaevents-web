@@ -416,12 +416,12 @@ export default function CanvasEditorClient() {
             <div className="grid grid-cols-2 gap-2 mb-3">
               <div>
                 <label className="mb-0.5 block text-[10px]">X</label>
-                <input type="number" value={selected.x} onChange={e => updateElement(selected.id, { x: +e.target.value })}
+                <input type="number" min={0} value={selected.x} onChange={e => updateElement(selected.id, { x: +e.target.value })}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>
                 <label className="mb-0.5 block text-[10px]">Y</label>
-                <input type="number" value={selected.y} onChange={e => updateElement(selected.id, { y: +e.target.value })}
+                <input type="number" min={0} value={selected.y} onChange={e => updateElement(selected.id, { y: +e.target.value })}
                   className="ap-input px-2 py-1 text-xs" />
               </div>
               <div>

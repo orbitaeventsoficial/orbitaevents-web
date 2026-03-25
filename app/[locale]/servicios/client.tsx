@@ -140,7 +140,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* GRID SERVICIOS */}
-      <section className="py-16 px-4 relative">
+      <section className="py-16 px-4 relative oe-grid-pattern">
         <div className="mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {servicios.map((servicio, index) => (
@@ -209,7 +209,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* CTA FINAL */}
-      <section className="py-20 sm:py-28 relative">
+      <section className="py-20 sm:py-28 relative oe-grid-pattern">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

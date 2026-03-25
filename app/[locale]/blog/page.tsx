@@ -162,7 +162,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
       />
-      <main className="min-h-screen bg-[#0A0A0A] relative">
+      <main className="min-h-screen bg-[#0A0A0A] relative oe-grid-pattern">
         <BlogTracking page="index" />
         <section className="relative pt-32 pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-[#0A0A0A]" />

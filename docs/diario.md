@@ -1,3 +1,44 @@
+## 2026-03-25 - UX conversió: copy directe, CTAs orientats a preus, rangs reals
+
+### Hero — CTA swap + copy natural
+- **CTA primari canviat**: "Munta el teu event" (→/configurador) → "Veure packs i preus" (→/packs). Raó: el visitant vol saber preus ABANS de configurar. Menys fricció.
+- **CTA secundari**: "Mira què fem" (→/portfolio) → "Munta el teu event" (→/configurador). El configurador passa a secundari.
+- **Subtitle**: Més natural, menys llista de serveis. "DJ, il·luminació i tematització per a festes que la gent recorda."
+- **Mobile hero**: CTA secundari canviat de configurador a packs+preus (amb icona $).
+- Clau `mobileHero.ctaPacks` afegida als 3 idiomes.
+
+### Meta titles/descriptions — rangs reals
+- Eliminat "Des de 250€" genèric dels meta tags de la homepage.
+- Ara mostren rangs per categoria: "Festes 250–700€ · Bodes 350–1.000€" — més transparent, millor CTR.
+- Aplicat als 3 idiomes (ca/es/en).
+
+### Copy portfolio — natural i concret
+- Stories del portfolio showcase reescrites: menys corporatiu, més com parla una persona.
+- Ex: "So professional, llums i DJ" → "So potent, llums que molen i un DJ que sap què posar en cada moment"
+
+### Process section — natural
+- Títol: "Com funciona?" → "De la idea a la festa"
+- Steps reescrits en to conversacional: "Escriu-nos per WhatsApp o pel formulari" en lloc de text corporatiu.
+- CTA: "Comencem ara" → "Escriu-nos"
+
+### Preus features serveis
+- "Des de 250€" a features discomòbil → "350–700€" (rang real)
+- "Des de 250€" a features festes → "250–700€" (rang real)
+
+### Portfolio event CTA — preus al davant
+- CTA de la pàgina d'event individual (`portfolio/[slug]/[eventSlug]`): afegit "Veure packs i preus" com a primari, "Munta el teu event" com a secundari.
+- Clau `eventDetail.seePacks` afegida als 3 idiomes.
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- `pnpm build` → net
+- Playwright homepage tests: 4/4 passed
+- Captures visuals: hero amb CTAs nous, process amb copy natural, portfolio amb stories actualitzades
+- Canvis a: messages/ca.json, messages/es.json, messages/en.json, HeroElegant.tsx, MobileHeroUltimate.tsx, portfolio/[slug]/[eventSlug]/page.tsx
+- Principi monocapa respectat: textos als JSONs, estructura al component, zero duplicats
+
+---
+
 ## 2026-03-24 - Ma de pintura: hardcoded visuals → classes CSS monocapa
 
 ### Noves classes CSS a globals.css
@@ -7059,3 +7100,27 @@ g
 - lib/services/weatherService.ts ja no mante WEATHER_DESCRIPTIONS_CA local i ara consumeix la capa compartida de lib/constants/index.ts.
 - pp/[locale]/blog/[slug]/page.tsx ja no mante CATEGORY_COLORS local i ara consumeix PUBLIC_BLOG_CATEGORY_COLORS des de lib/constants/index.ts.
 
+
+## 2026-03-25 - Grid pattern: cobertura completa + fix z-index + footer radial — NO TOCAR
+
+### Canvis globals.css (`oe-grid-pattern`)
+- Afegit `isolation: isolate` perquè `z-index: -1` del `::before` funcioni correctament sense desaparèixer darrere del fons del body.
+- `::before` z-index canviat de `0` a `-1` — el grid queda SEMPRE darrere del contingut dins del context aïllat.
+- Opacitat es manté a `0.06`.
+- Nou modificador `.oe-grid-pattern--radial` amb `mask-image: radial-gradient(...)` per dissolució cap als costats (usat al footer).
+
+### FAQSection.tsx
+- Cards amb fons opac (`#111111` tancat, `#141210` obert) en lloc de semi-transparent — les línies del grid no es veuen per sota.
+- Container principal amb `relative z-[1]` per assegurar stacking correcte.
+- Botó CTA contacte amb fons opac (`#1a1408` / `#231b0e` hover) en lloc de `bg-amber-500/10`.
+
+### Pàgines amb `oe-grid-pattern` afegit
+- `blog/page.tsx`, `blog/[slug]/page.tsx`, `packs/PacksClient.tsx`, `opiniones/page.tsx`, `servicios/client.tsx` (grid + CTA final).
+
+### Footer
+- Classe `oe-grid-pattern--radial` afegida per desenfocament radial amb desaparició.
+
+### REGLA: NO TOCAR
+- L'opacitat del grid (`0.06`), el `isolation: isolate`, el `z-index: -1` i el mask radial del footer estan aprovats i tancats.
+- Les cards de FAQ amb fons opac i z-index estan aprovades i tancades.
+- El botó CTA de FAQ amb fons opac està aprovat i tancat.

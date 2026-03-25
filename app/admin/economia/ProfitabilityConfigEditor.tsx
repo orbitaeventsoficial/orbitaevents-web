@@ -122,6 +122,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
               <input
                 type="number"
                 step="1"
+                min={0}
                 className={inputClass}
                 value={form.fixedOperationalCost}
                 onChange={(e) => update('fixedOperationalCost', Number(e.target.value))}
@@ -138,6 +139,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
                   <input
                     type="number"
                     step="1"
+                    min={0}
                     className={inputClass}
                     value={value}
                     onChange={(e) => updateCac(channel, Number(e.target.value))}

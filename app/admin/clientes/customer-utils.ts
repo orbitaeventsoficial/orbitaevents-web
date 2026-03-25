@@ -29,12 +29,7 @@ export interface CustomerStats {
 
 export type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
-export const PRIORITY_FILTER_STYLES: Record<'ALL' | ExecutionPriority, string> = {
-  ALL: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
-  ALTA: 'border-rose-400/50 bg-rose-500/15 text-rose-200',
-  MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
-  BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
-};
+export { PRIORITY_FILTER_STYLES } from '@/lib/constants';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

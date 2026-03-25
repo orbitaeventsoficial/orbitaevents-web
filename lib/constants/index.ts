@@ -2072,3 +2072,106 @@ export const PUBLIC_TESTIMONIAL_API_MESSAGES: Record<PublicTestimonialApiLocale,
   },
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LEAD SCORING
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const LEAD_SCORING_STATUS_BASE: Record<string, number> = {
+  NEW: 20,
+  CONTACTED: 40,
+  QUOTE_SENT: 60,
+  NEGOTIATING: 72,
+  WON: 95,
+  LOST: 5,
+};
+
+export const LEAD_SCORING_STATUS_PROBABILITY: Record<string, number> = {
+  NEW: 0.12,
+  CONTACTED: 0.22,
+  QUOTE_SENT: 0.38,
+  NEGOTIATING: 0.57,
+  WON: 0.95,
+  LOST: 0.03,
+};
+
+export const EVENT_TYPE_DEFAULT_BUDGET: Record<string, number> = {
+  WEDDING: 1800,
+  CORPORATE: 1500,
+  BIRTHDAY: 850,
+  PRIVATE_PARTY: 900,
+  COMMUNION: 700,
+  BAPTISM: 650,
+  GRADUATION: 800,
+  ANNIVERSARY: 900,
+  OTHER: 1000,
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LEAD GUIDED FLOW
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type LeadGuidedStep = {
+  status: 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
+  label: string;
+  icon: string;
+  color: string;
+  activeColor: string;
+  doneColor: string;
+};
+
+export const LEAD_GUIDED_STEPS: LeadGuidedStep[] = [
+  {
+    status: 'NEW',
+    label: 'Entrada nova',
+    icon: '📥',
+    color: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+    activeColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info border-2',
+    doneColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
+  },
+  {
+    status: 'CONTACTED',
+    label: 'Contactat',
+    icon: '📞',
+    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
+    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  },
+  {
+    status: 'QUOTE_SENT',
+    label: 'Pressupost enviat',
+    icon: '📄',
+    color: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
+    activeColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral border-2',
+    doneColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
+  },
+  {
+    status: 'NEGOTIATING',
+    label: 'Negociant',
+    icon: '🤝',
+    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
+    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
+  },
+  {
+    status: 'WON',
+    label: 'Guanyat!',
+    icon: '🎉',
+    color: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+    activeColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success border-2',
+    doneColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
+  },
+];
+
+export const LEAD_GUIDED_STATUS_ORDER: Array<'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON'> = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CUSTOMER PRIORITY STYLES
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const PRIORITY_FILTER_STYLES: Record<string, string> = {
+  ALL: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
+  ALTA: 'border-rose-400/50 bg-rose-500/15 text-rose-200',
+  MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
+  BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
+};
+

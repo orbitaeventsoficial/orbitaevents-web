@@ -311,6 +311,7 @@ export function QuoteModal({
             <label className="mb-1 block text-sm">Preu base (€)</label>
             <input
               type="number"
+              min={0}
               value={price}
               onChange={(e) => setPrice(Number(e.target.value) || 0)}
               className="w-full rounded-xl border px-4 py-2 text-sm"

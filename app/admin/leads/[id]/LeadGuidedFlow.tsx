@@ -4,63 +4,15 @@ import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER } from '@/lib/constants';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
-const STEPS: Array<{
-  status: LeadStatus;
-  label: string;
-  icon: string;
-  color: string;
-  activeColor: string;
-  doneColor: string;
-}> = [
-  {
-    status: 'NEW',
-    label: 'Entrada nova',
-    icon: '📥',
-    color: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-    activeColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info border-2',
-    doneColor: 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info',
-  },
-  {
-    status: 'CONTACTED',
-    label: 'Contactat',
-    icon: '📞',
-    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
-    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  },
-  {
-    status: 'QUOTE_SENT',
-    label: 'Pressupost enviat',
-    icon: '📄',
-    color: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
-    activeColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral border-2',
-    doneColor: 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral',
-  },
-  {
-    status: 'NEGOTIATING',
-    label: 'Negociant',
-    icon: '🤝',
-    color: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-    activeColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning border-2',
-    doneColor: 'admin-tone-border-warning admin-tone-bg-warning admin-tone-text-warning',
-  },
-  {
-    status: 'WON',
-    label: 'Guanyat!',
-    icon: '🎉',
-    color: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
-    activeColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success border-2',
-    doneColor: 'admin-tone-border-success admin-tone-bg-success admin-tone-text-success',
-  },
-];
-
-const STATUS_ORDER: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
+const STEPS = LEAD_GUIDED_STEPS;
+const STATUS_ORDER = LEAD_GUIDED_STATUS_ORDER;
 
 function getStatusIndex(status: LeadStatus): number {
-  const idx = STATUS_ORDER.indexOf(status);
+  const idx = (STATUS_ORDER as readonly string[]).indexOf(status);
   return idx >= 0 ? idx : 0;
 }
 
