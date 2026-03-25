@@ -442,7 +442,7 @@ export default function BodasClientV2() {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-0 left-0 right-0 z-[100]
                      bg-black/95 backdrop-blur-xl
-                     border-t-2 border-[var(--oe-gold)]/40
+                     border-t-2 border-amber-500/40
                      shadow-[0_-10px_40px_rgba(0,0,0,0.8)]"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
@@ -450,7 +450,7 @@ export default function BodasClientV2() {
                 {/* Info */}
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
                   <div>
-                    <div className="text-xs sm:text-sm text-[var(--oe-gold)] font-semibold">
+                    <div className="text-xs sm:text-sm text-amber-500 font-semibold">
                       {config.selectedPack?.name || ''}
                     </div>
                     <div className="flex items-center gap-3 mt-1">
@@ -460,7 +460,7 @@ export default function BodasClientV2() {
                       {hasComboDiscount && (
                         <>
                           <span className="text-xs sm:text-sm text-white/50">•</span>
-                          <span className="text-xs sm:text-sm bg-[var(--oe-gold)]/20 text-[var(--oe-gold)] px-2 py-1 rounded">
+                          <span className="text-xs sm:text-sm bg-amber-500/20 text-amber-500 px-2 py-1 rounded">
                             -15% {t('extras')}
                           </span>
                         </>
@@ -472,7 +472,7 @@ export default function BodasClientV2() {
                     {discount > 0 && (
                       <div className="text-xs sm:text-sm line-through text-white/60">{totalPrice}€</div>
                     )}
-                    <div className="text-2xl sm:text-3xl font-bold text-[var(--oe-gold)]">
+                    <div className="text-2xl sm:text-3xl font-bold text-amber-500">
                       {finalPrice}€
                     </div>
                   </div>
@@ -483,9 +483,9 @@ export default function BodasClientV2() {
                   onClick={goToConfigurator}
                   className="
                     px-6 sm:px-8 py-3 sm:py-4
-                    bg-[var(--oe-gold)] text-black rounded-full
+                    bg-amber-500 text-black rounded-full
                     font-bold text-sm sm:text-base flex items-center gap-2
-                    hover:bg-[var(--oe-gold-light)] hover:shadow-2xl hover:shadow-[var(--oe-gold)]/20
+                    hover:bg-amber-300 hover:shadow-2xl hover:shadow-amber-500/20
                     transition-all duration-300 hover:scale-105 active:scale-95
                     shadow-lg
                   "

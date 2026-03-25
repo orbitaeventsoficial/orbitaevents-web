@@ -101,7 +101,7 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/10 relative overflow-hidden oe-grid-pattern oe-grid-pattern--radial"
+      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/10 relative overflow-hidden oe-grid-pattern"
       role="contentinfo"
     >
       {/* Background effects */}
