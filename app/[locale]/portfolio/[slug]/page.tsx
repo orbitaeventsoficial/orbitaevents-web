@@ -174,7 +174,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
           sizes="100vw"
           unoptimized={heroImage.src.startsWith('data:') || heroImage.src.includes('/api/uploads/')}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/40 to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="mx-auto max-w-7xl">
             <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-3">Portfolio</p>

@@ -19,8 +19,8 @@ function HeroSkeleton() {
   const t = useTranslations('homePage');
 
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center bg-[#0A0A0A]">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-[#0A0A0A]/60 to-[#0A0A0A]" />
+    <section className="relative min-h-[100svh] flex items-center justify-center bg-bg-main">
+      <div className="absolute inset-0 bg-gradient-to-b from-bg-main/80 via-bg-main/60 to-bg-main" />
       <div className="relative z-10 container mx-auto px-5 py-24 md:py-32 text-center">
         <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
@@ -45,7 +45,7 @@ function HeroSkeleton() {
 
 function SectionSkeleton() {
   return (
-    <div className="py-16 bg-[#0A0A0A]">
+    <div className="py-16 bg-bg-main">
       <div className="max-w-5xl mx-auto px-4 space-y-4">
         <div className="h-6 w-48 rounded-lg bg-white/5 animate-pulse mx-auto" />
         <div className="h-4 w-72 rounded-lg bg-white/5 animate-pulse mx-auto" />
@@ -155,7 +155,7 @@ export default function HomePage() {
   return (
     <HomePageWrapper>
       {/* Desktop: Contingut elegant */}
-      <div className="min-h-screen bg-[#0A0A0A]">
+      <div className="min-h-screen bg-bg-main">
         {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
         <div data-section-id="hero">
           <HeroElegant />
@@ -172,7 +172,7 @@ export default function HomePage() {
         </div>
 
         {/* 4. CALENDARIO - Urgència subtil */}
-        <section data-section-id="calendar" className="bg-[#0A0A0A] py-10 md:py-14 relative oe-grid-pattern">
+        <section data-section-id="calendar" className="bg-bg-main py-10 md:py-14 relative oe-grid-pattern">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>

@@ -243,10 +243,10 @@ export function BottomBarMobile() {
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             {/* Gradient fade */}
-            <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-[#0A0A0A] to-transparent pointer-events-none" />
+            <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-bg-main to-transparent pointer-events-none" />
 
             {/* Bar */}
-            <div className="bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3">
+            <div className="bg-bg-main/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3">
               <div className="flex gap-2">
                 {/* Botó Telèfon - Només en horari d'atenció */}
                 {businessHours && (

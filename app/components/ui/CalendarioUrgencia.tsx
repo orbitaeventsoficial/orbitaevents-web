@@ -654,7 +654,7 @@ export default function CalendarioUrgencia({
           </span>
           <span className="flex -space-x-1.5">
             {PUBLIC_CALENDAR_SOCIAL_PROOF_INITIALS.map((initial, i) => (
-              <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0A0A0A] flex items-center justify-center text-[8px] text-black font-bold">
+              <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-bg-main flex items-center justify-center text-[8px] text-black font-bold">
                 {initial}
               </span>
             ))}

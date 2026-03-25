@@ -98,7 +98,7 @@ export default async function PortfolioEventPage({ params }: PageProps) {
           sizes="100vw"
           unoptimized={event.coverImage.startsWith('data:') || event.coverImage.includes('/api/uploads/')}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/50 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/50 to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="mx-auto max-w-7xl">
             <Link

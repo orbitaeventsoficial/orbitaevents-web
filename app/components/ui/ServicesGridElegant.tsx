@@ -50,7 +50,7 @@ export default function ServicesGridElegant() {
   const pillars = PUBLIC_SERVICES_GRID_PILLARS.map((pillar) => ({ ...pillar, Icon: pillarIcons[pillar.iconKey] }));
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-24 bg-[#0A0A0A] relative overflow-hidden">
+    <section ref={sectionRef} className="py-16 md:py-24 bg-bg-main relative overflow-hidden">
       {/* Ambient */}
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-amber-500/[0.02] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-purple-500/[0.03] blur-[100px] pointer-events-none" />

@@ -106,11 +106,11 @@ export default function FiestasClient() {
   const canUseFlashOffer = numGuests <= flashMaxGuests;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-bg-main">
       {/* HERO with background image */}
       <section className="relative min-h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-[#0A0A0A] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
           <Image
             src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif"
             alt="DJ para fiestas privadas Òrbita Events"

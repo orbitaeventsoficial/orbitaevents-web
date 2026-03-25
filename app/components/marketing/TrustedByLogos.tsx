@@ -15,7 +15,7 @@ export default function TrustedByLogos() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="py-16 bg-gradient-to-b from-zinc-950 via-[#0A0A0A] to-zinc-950 overflow-hidden">
+    <section className="py-16 bg-gradient-to-b from-zinc-950 via-bg-main to-zinc-950 overflow-hidden">
       <style jsx>{`
         @keyframes marquee-scroll {
           from { transform: translateX(0); }

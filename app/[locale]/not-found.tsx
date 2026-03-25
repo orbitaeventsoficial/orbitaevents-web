@@ -6,7 +6,7 @@ export default function NotFound() {
   const t = useTranslations('notFound');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4 relative oe-grid-pattern">
+    <div className="min-h-screen flex items-center justify-center bg-bg-main p-4 relative oe-grid-pattern">
       <div className="max-w-[42rem] text-center text-white">
         {/* 404 */}
         <div className="mb-8">
