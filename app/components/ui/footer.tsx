@@ -101,9 +101,12 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/10 relative overflow-hidden oe-grid-pattern"
+      className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/[0.06] relative overflow-hidden oe-grid-pattern"
       role="contentinfo"
     >
+      {/* Gold accent line at top */}
+      <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />

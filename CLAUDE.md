@@ -18,6 +18,14 @@
 - **MAI fer canvis que no s'han demanat.** Si l'usuari diu "quadrícula al footer", NO toquis la quadrícula d'altres llocs. Si diu "unifica stats", NO eliminis el grid pattern global de passada.
 - **Un canvi = un canvi.** No aprofitar per "millorar" coses del voltant. No opinar sobre si algo és "de 2020" o no tret que es demani opinió.
 
+### Zero hex hardcodejats
+- **MAI hardcodejar colors hex** (`#0A0A0A`, `#1a1408`, etc.) als components o pàgines. SEMPRE usar tokens del design system: `bg-bg-main`, `bg-bg-surface`, `bg-bg-card`, `text-oe-gold`, `from-bg-main`, etc.
+- Els únics llocs on hex és acceptable: `globals.css` (definició de variables), `tailwind.config.js`, admin canvas, API routes d'imatge, email templates.
+
+### No fer auditories si la guia diu que no cal
+- **Si la secció "Què JA EXISTEIX" marca una cosa com tancada, NO auditar-la.** La feina ja està feta. No perdre temps ni tokens revisant-la.
+- **Construir directament.** No fer "primer reviso l'estat actual" si la guia ja ho documenta.
+
 ### Zero cercles
 - **Fer el canvi correcte A LA PRIMERA.** No fer-desfet-refer. Si no estàs segur, pregunta ABANS de tocar.
 - **MAI desfer un canvi i tornar-lo a fer 3 vegades.** Si t'equivoques, reverteix net i pregunta.

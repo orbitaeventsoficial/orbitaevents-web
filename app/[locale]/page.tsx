@@ -162,49 +162,49 @@ export default function HomePage() {
         </div>
 
         {/* 2. SERVEIS - Grid elegant 4 cards */}
-        <div data-section-id="services">
+        <div data-section-id="services" className="oe-section-divider">
           <ServicesGridElegant />
         </div>
 
         {/* 3. STATS - Per què triar Òrbita Events */}
-        <div data-section-id="stats">
+        <div data-section-id="stats" className="oe-section-divider">
           <StatsSection />
         </div>
 
         {/* 4. CALENDARIO - Urgència subtil */}
-        <section data-section-id="calendar" className="bg-bg-main py-10 md:py-14 relative oe-grid-pattern">
+        <section data-section-id="calendar" className="bg-bg-main py-10 md:py-14 relative oe-grid-pattern oe-section-divider">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>
         </section>
 
         {/* 5. PORTFOLIO - Fotos reals dels events */}
-        <div data-section-id="portfolio">
+        <div data-section-id="portfolio" className="oe-section-divider">
           <PortfolioShowcase />
         </div>
 
         {/* 6. COM FUNCIONA - 3 passos */}
-        <div data-section-id="process">
+        <div data-section-id="process" className="oe-section-divider">
           <ProcessSection />
         </div>
 
         {/* 7. RESEÑAS GOOGLE - Prova social */}
-        <div data-section-id="reviews">
+        <div data-section-id="reviews" className="oe-section-divider">
           <GoogleReviewsRotating />
         </div>
 
         {/* 8. LOGOS CLIENTES - Confían en nosotros */}
-        <div data-section-id="clients">
+        <div data-section-id="clients" className="oe-section-divider">
           <TrustedByLogos />
         </div>
 
         {/* 9. GARANTÍA - Confiança */}
-        <div data-section-id="garantia">
+        <div data-section-id="garantia" className="oe-section-divider">
           <GarantiaSection />
         </div>
 
         {/* 10. FAQ - Preguntes freqüents amb JSON-LD schema */}
-        <div data-section-id="faq">
+        <div data-section-id="faq" className="oe-section-divider">
           <FAQSection />
         </div>
 

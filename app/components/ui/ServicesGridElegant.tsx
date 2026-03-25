@@ -84,7 +84,7 @@ export default function ServicesGridElegant() {
             >
               <Link href={href} className="group block">
                 <div
-                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-sm transition-all duration-500 h-full overflow-hidden"
+                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-sm transition-all duration-500 h-full overflow-hidden hover:-translate-y-2 hover:shadow-[0_24px_80px_rgba(0,0,0,0.3)]"
                   style={{ background: `radial-gradient(ellipse at top left, ${glowColor}, transparent 70%)` }}
                 >
                   {/* Hover glow */}

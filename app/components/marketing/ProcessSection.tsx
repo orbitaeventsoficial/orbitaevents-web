@@ -63,7 +63,7 @@ export default function ProcessSection() {
                     ? { duration: 0 }
                     : { delay: i * 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }
                 }
-                className="relative z-10 p-7 rounded-3xl bg-white/[0.04] border border-white/10 hover:border-white/20 hover:-translate-y-1 transition-all duration-500 group backdrop-blur-sm"
+                className="relative z-10 p-7 rounded-3xl bg-white/[0.04] border border-white/[0.08] hover:border-white/20 hover:-translate-y-2 transition-all duration-500 group backdrop-blur-sm hover:shadow-[0_24px_80px_rgba(0,0,0,0.3)]"
                 style={{ boxShadow: `0 0 0 0 ${style.glow}` }}
                 whileHover={reduceMotion ? undefined : { boxShadow: `0 20px 60px ${style.glow}` }}
               >

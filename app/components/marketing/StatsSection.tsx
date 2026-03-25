@@ -61,9 +61,9 @@ function StatCard({
       transition={
         reduceMotion ? { duration: 0 } : { delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       }
-      className="flex flex-col items-center text-center py-8 px-4"
+      className="flex flex-col items-center text-center py-8 px-4 group"
     >
-      <div className="text-4xl sm:text-5xl md:text-6xl font-black text-amber-400 leading-none mb-2 tabular-nums">
+      <div className="text-4xl sm:text-5xl md:text-6xl font-black leading-none mb-2 tabular-nums bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(251,191,36,0.3)]">
         {config.prefix}{display}{config.suffix}
       </div>
       <p className="text-white font-semibold text-sm sm:text-base">{label}</p>
@@ -112,6 +112,7 @@ export default function StatsSection() {
     <section ref={ref} className="relative py-16 md:py-24 overflow-hidden">
       {/* Glow radial central ambre subtil */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[200px] bg-amber-500/[0.06] rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-1/3 w-96 h-96 bg-amber-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-6 max-w-5xl">
         <motion.div

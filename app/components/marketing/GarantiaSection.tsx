@@ -101,7 +101,7 @@ function GuaranteeCard({
       transition={{ delay: index * 0.1 }}
       className="group relative"
     >
-      <div className="relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm border border-white/10 rounded-3xl p-6 h-full hover:border-white/20 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+      <div className="relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-6 h-full hover:border-white/20 hover:-translate-y-2 hover:shadow-[0_24px_80px_rgba(0,0,0,0.35)] transition-all duration-500">
         {/* Highlight badge */}
         <div className={`absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br ${config.color} rounded-2xl flex items-center justify-center transform rotate-12 group-hover:rotate-0 transition-transform shadow-lg shadow-black/30`}>
           <span className="text-white font-black text-sm">{config.highlight}</span>
