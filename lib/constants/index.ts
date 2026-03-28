@@ -1247,18 +1247,6 @@ export const COMMERCIAL_SEQUENCE_STEP_COPY: Record<CommercialSequenceLocale, Rec
   },
 };
 
-export const PUBLIC_OFFER_CACHE_HEADERS = {
-  'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
-} as const;
-
-export const PUBLIC_OFFER_FALLBACK = {
-  isActive: false,
-  endDate: null,
-  discount: 0,
-  ctaLink: '/contacto',
-  title: '',
-  description: '',
-} as const;
 export type PublicExtraSupportedLocale = 'ca' | 'es' | 'en';
 
 export type PublicExtraMeta = Pick<ExtraDefinition, 'icon' | 'category' | 'compatibleWith' | 'popular' | 'premium'> & {
@@ -1760,7 +1748,7 @@ export const PUBLIC_EXPERIENCES_PAGE_ITEMS = [
     titleKey: 'monMagic.title',
     subtitleKey: 'monMagic.subtitle',
     descriptionKey: 'monMagic.description',
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
+    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
     gradient: 'from-purple-600 to-blue-600',
     bgGradient: 'from-purple-900/40 to-blue-900/40',
     badgeKey: 'badges.popular',
@@ -1868,28 +1856,21 @@ export const PUBLIC_CHILDREN_ANIMATION_INFO_ITEMS = [
 ] as const;
 
 export const PUBLIC_MON_MAGIC_IMAGES = {
-  hero: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
-  heroAlt: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-02.avif',
-  sostre: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
-  sobreComplet: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-04.avif',
-  sobrePlat: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
-  sobreDetall: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.avif',
-  provaSocial: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-07.avif',
-  sobrePergami: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-08.avif',
-  mussol: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-09.avif',
-  pergaminsBilingue: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.avif',
-  pergaminsCintes: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-11.avif',
-  veles: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.avif',
-  botigueta: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.avif',
-  escombres: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
+  hero: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-18.avif',
+  featured: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-16.avif',
+  cartell: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-02.avif',
+  mussolDecoratiu: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.avif',
+  taulaCompleta: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.avif',
+  gabiaPerga: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.avif',
+  llegintCarta: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-14.avif',
 } as const;
 
 export const PUBLIC_MON_MAGIC_HOUSES = [
   { id: 'escola', color: '#1A1A1A', colorLacre: '#D4AF37', gradient: 'from-amber-600 to-amber-800', animal: '🏰' },
-  { id: 'lleons', color: '#740001', colorLacre: '#740001', gradient: 'from-red-700 to-red-900', animal: '🦁' },
-  { id: 'serps', color: '#1A472A', colorLacre: '#1A472A', gradient: 'from-green-700 to-green-900', animal: '🐍' },
-  { id: 'teixons', color: '#FFD700', colorLacre: '#1A1A1A', gradient: 'from-yellow-500 to-amber-600', animal: '🦡' },
-  { id: 'aguiles', color: '#0E1A40', colorLacre: '#0E1A40', gradient: 'from-blue-800 to-blue-950', animal: '🦅' },
+  { id: 'lleons', color: '#740001', colorLacre: '#9B1B30', gradient: 'from-red-700 to-red-900', animal: '🦁' },
+  { id: 'serps', color: '#1A472A', colorLacre: '#2D8C4E', gradient: 'from-green-700 to-green-900', animal: '🐍' },
+  { id: 'teixons', color: '#FFD700', colorLacre: '#D4A017', gradient: 'from-yellow-500 to-amber-600', animal: '🦡' },
+  { id: 'aguiles', color: '#0E1A40', colorLacre: '#3A6BC5', gradient: 'from-blue-800 to-blue-950', animal: '🦅' },
 ] as const;
 
 export const PUBLIC_MON_MAGIC_PRODUCTS = [
@@ -1908,6 +1889,27 @@ export const PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA = {
   preuExtra80: 100,
   preuExtra100: 120,
 } as const;
+
+export const PUBLIC_MON_MAGIC_QUANTITIES = [50, 80, 100] as const;
+export const PUBLIC_MON_MAGIC_DEFAULT_QUANTITY: (typeof PUBLIC_MON_MAGIC_QUANTITIES)[number] = 80;
+
+type MonMagicQuantity = (typeof PUBLIC_MON_MAGIC_QUANTITIES)[number];
+type MonMagicPack = (typeof PUBLIC_MON_MAGIC_PACKS)[number];
+
+const QUANTITY_PACK_KEY: Record<MonMagicQuantity, keyof Pick<MonMagicPack, 'preuPack50' | 'preuPack80' | 'preuPack100'>> = {
+  50: 'preuPack50', 80: 'preuPack80', 100: 'preuPack100',
+};
+const QUANTITY_STAMP_KEY: Record<MonMagicQuantity, keyof typeof PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA> = {
+  50: 'preuExtra50', 80: 'preuExtra80', 100: 'preuExtra100',
+};
+
+export function getMonMagicPackPrice(pack: MonMagicPack, qty: MonMagicQuantity): number {
+  return pack[QUANTITY_PACK_KEY[qty]];
+}
+
+export function getMonMagicStampPrice(qty: MonMagicQuantity): number {
+  return PUBLIC_MON_MAGIC_MULTI_STAMP_EXTRA[QUANTITY_STAMP_KEY[qty]];
+}
 
 export const PUBLIC_MON_MAGIC_FAQ_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'] as const;
 
@@ -2165,4 +2167,7 @@ export const PRIORITY_FILTER_STYLES: Record<string, string> = {
   MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
   BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
 };
+
+
+
 

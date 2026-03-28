@@ -1,3 +1,212 @@
+## 2026-03-28 — Visió mare de la refosa de l’admin
+
+- He deixat escrita la direcció general d’aquesta etapa a `docs/estat-admin.md` perquè no quedi només dins del cap ni en comentaris de sessió.
+- La idea mare és clara: l’admin no s’està ampliant per afegir més pantalles, sinó per convertir-se en una eina de direcció més clara, més fiable, més didàctica i més útil per governar Òrbita.
+- Finalitat de negoci: entendre millor marge, costos, cobraments, operativa, qualitat de dades i punts febles abans que es converteixin en problemes reals.
+- Finalitat didàctica: que el sistema expliqui què passa, per què importa i què convé fer, sense exigir llenguatge tècnic.
+- Direcció d’arquitectura: ordenar l’admin per organismes reals de negoci i reforçar la capa transversal de `Salut` com a centre de control.
+- Això queda documentat perquè qualsevol sessió futura tingui context de fons i no només una llista de canvis tècnics.
+## 2026-03-28 — Punt pendent abans de seguir
+
+- El centre `Salut` està creat, validat i documentat, però a `app/admin/page.tsx` ha quedat una inserció lletja al dashboard amb literals `` `r`n `` dins del JSX en dos punts: quick links de capçalera i peu de la targeta `Salut sistema`.
+- No és un canvi conceptual ni de model de negoci: és només neteja fina del JSX perquè el dashboard quedi polit.
+- Ordre recomanat per reprendre:
+  1. netejar aquests dos blocs a `app/admin/page.tsx`
+  2. passar `npx tsc --noEmit`
+  3. passar `pnpm run arch:layer:check`
+  4. seguir ampliant `Salut` a `Inventari`, `Packs`, `Extres` i després `Bookings`
+- Estat segur actual: `Salut` existeix, `build` ha passat i la documentació general de l’admin ja reflecteix la nova àrea.
+## 2026-03-27 — Salut reforçada a catàleg
+
+- He estès `lib/services/adminHealthService.ts` perquè `Salut` no es quedi en avisos genèrics i detecti millor problemes de catàleg.
+- Ara el bloc `Catàleg` diferencia entre: inventari incomplet, inventari avariat o en manteniment encara vinculat, extres venuts sense cost, extres amb marge massa just, packs sense equip base, packs en zona crítica, packs amb preu desalineat i packs amb càlcul parcial.
+- La idea és simple: que `Salut` no només digui que alguna cosa està malament, sinó per què t’afecta en marge o operativa.
+- He ampliat el test `__tests__/lib/services/adminHealthService.test.ts` per cobrir aquests casos nous i evitar regressions en aquesta capa.
+- Validació passada en aquesta iteració: `pnpm test:run -- --run __tests__/lib/services/adminHealthService.test.ts`, `npx tsc --noEmit` i `pnpm run arch:layer:check`.
+## 2026-03-27 — Centre Salut unificat
+
+- He afegit una primera capa unificada de `Salut` a l’admin per no dependre només del dashboard, scripts i crons separats.
+- Nova pantalla a `app/admin/salut/page.tsx` amb llegenda curta i blocs per `Sistema`, `Finances`, `Operacions`, `Catàleg` i `Dades`.
+- He creat `lib/services/adminHealthService.ts` per cosir el que ja existia: alerts financeres, frescor de crons, configuració SMTP/IMAP, inventari incomplet, packs en vermell, extres sense cost, leads calents estancats, reserves properes sense dipòsit i buits bàsics de dades.
+- He mantingut l’enfoc additiu: no substitueix dashboard, crons, scripts ni economia; només els ordena en una sola vista de govern.
+- He afegit test del servei a `__tests__/lib/services/adminHealthService.test.ts` i entrada de navegació a `app/admin/components/nav-items.ts`.
+- També he actualitzat `docs/estat-admin.md` perquè la guia reflecteixi la nova ruta `/admin/salut`.
+- Validació prevista per aquesta passada: test específic del servei + `npx tsc --noEmit` + `pnpm run arch:layer:check`. El build complet es valida després si aquesta capa base queda neta.
+## 2026-03-26 - Sessió 5: Neteja total residus flash + normes clares
+
+### Neteja oferta flash — eliminació completa de tot el circuit mort
+- **`packs-config.ts`**: Eliminada constant `OFERTA_FLASH` (30 línies mortes), `isFlash`/`flashDiscount` del type, funció `getOfertaFlash()`, objecte `OFFERS.flash`
+- **`messages/ca.json`, `es.json`, `en.json`**: Eliminades claus `discoPacks.oferta-flash` (12 línies × 3 idiomes)
+- **`hooks/usePublicData.ts`**: Eliminat hook `useOffer` complet (80 línies) + exports de tipus `OfferData`/`UseOfferReturn`
+- **`lib/services/publicOfferService.ts`**: Eliminat fitxer sencer (servei mort que ningú cridava)
+- **`app/api/public/offer/route.ts`**: Eliminat endpoint mort
+- **`__tests__/lib/services/publicOfferService.test.ts`**: Eliminat test del servei eliminat
+- **`lib/constants/index.ts`**: Eliminades constants mortes `PUBLIC_OFFER_CACHE_HEADERS`, `PUBLIC_OFFER_FALLBACK`
+- **`HeaderChampion.tsx`**: Eliminat type `'experiences'` del union (ja no s'usa), eliminat `tExperiences` (traductor mort), simplificat ternari de dropdownT
+- **Raó**: El `FlashOfferPopup` component es va eliminar al commit anterior però van quedar cadàvers per tot el repo. Grep complet confirma 0 refs residuals.
+
+### Normes de neteja — protocol obligatori quan s'elimina una feature
+1. **Grep TOT el repo** després d'eliminar qualsevol constant, component, servei o type
+2. **Cadena completa**: component → hook → servei → API route → test → constants → i18n keys
+3. **No deixar cap cadàver**: Si un export no s'importa, fora. Si un type union té un valor que ningú usa, fora.
+4. **Verificar amb `tsc --noEmit`** i grep de residus DESPRÉS de netejar
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- Grep `OFERTA_FLASH|oferta-flash|FlashOffer|useOffer|publicOfferService|PUBLIC_OFFER` → 0 resultats (excepte coverage cache, irrellevant)
+- Dev server funcionant
+
+---
+
+## 2026-03-26 - Sessió 4: Reestructurar packs grow-up + unificar fiestas/discomovil + header simplificat
+
+### Packs grow-up — progressió Bàsic → Complet → Premium
+- **Bodes**: Bàsic 350€ (2h) → Premium 500€ (3h) → Exclusiu 1.000€ (6h) — ja existia, retocat copy
+- **Discomòbil/Festes**: Bàsic 250€ (2h) → Complet 400€ (3h) → Premium 600€ (5h) — unificat fiestas=discomovil
+- **Empreses**: Còctel 250€ (2h) → Estàndard 400€ (3h) → Gala 600€ (5h) — alineat amb festes
+- **Animació infantil**: Bàsic 180€ (1.5h) → Complet 300€ (2.5h) → Premium 420€ (3.5h) — proporcional 120€/h
+- **Copy natural**: Totes les features reescrites de llista tècnica a copy clar i directe
+
+### Unificació fiestas + discomovil
+- `getPacksByService('fiestas')` ara retorna els mateixos packs que `'discomovil'`
+- Eliminat pack `oferta-flash` de la llista principal
+- `getFAQPreciosResumen()` simplificat: "Festes i discomòbil des de X€"
+
+### Header simplificat — 7→4 items amb dropdowns cascada
+- Eliminat dropdown "Experiències" separat → Mon Màgic i Halloween dins dropdown "Serveis"
+- Agrupat Opinions + Blog + Contacte dins dropdown "Nosaltres"
+- Items visibles: Serveis (dropdown) | Configurador | Portfolio | Nosaltres (dropdown)
+- Logo lleugerament més gran (`h-[4.5rem]` desktop)
+- Thresholds scroll ajustats per hide/show més suau
+
+### Eliminació FlashOfferPopup
+- Component `FlashOfferPopup.tsx` eliminat (332 línies)
+- Ref al `LayoutWrapper.tsx` eliminada
+- `isFlash`/`flashDiscount` eliminats del type `PackDefinition`
+- Constant `FLASH_OFFER_BASE` eliminada de `lib/constants`
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- Dev server reiniciat amb cache net
+
+---
+
+## 2026-03-26 - Sessió 3: Click-to-center UX + packs copy + empresas packs + Mon Magic immersiu
+
+### Click-to-center UX a /servicios, ServicesGridElegant i MobileServicesCards
+- **Patró nou**: Primer click centra la card al viewport i la destaca (border ambre + ring), segon click navega
+- **ServiciosClient** (`app/[locale]/servicios/client.tsx`): `handleCardClick` amb `focusedCard` state, `scrollIntoView({ behavior: 'smooth', block: 'center' })`, visual amb ring-1 ring-amber-500/20
+- **ServicesGridElegant** (`app/components/ui/ServicesGridElegant.tsx`): Mateix patró, `cardRefs` per cada pillar
+- **MobileServicesCards** (`app/components/mobile-ultimate/MobileServicesCards.tsx`): Adaptat per mòbil amb `isFocused` prop i `useRouter` per navegar al segon tap
+- **Raó**: L'usuari vol veure la card sencera abans de comprometre's a entrar
+
+### Packs copy — features reescrites a to natural
+- **`app/config/packs-config.ts`**: Totes les features dels packs reescrites de llista tècnica a copy natural/comercial
+  - Ex: "2h de DJ professional" → "DJ professional durant 2 hores"
+  - Ex: "So 2000W" → "So potent 2000W per omplir la sala"
+  - Ex: "Llums bàsiques + fum" → "Ambient de festa: llums, fum i cabina il·luminada"
+  - Ex: "4 caps mòbils + llums + fum" → "Pont de llums amb 4 caps mòbils i fons negre"
+- Aplicat a tots els serveis: bodas, fiestas, discomovil, empresas
+
+### Packs corporatius a /servicios/empresas
+- **Nova secció packs**: A `app/[locale]/servicios/empresas/client.tsx` — secció amb grid de pack cards dinàmiques
+- **Dades dinàmiques**: `usePacks({ service: 'empresas' })` + `getPacksByService('empresas')` fallback
+- **Visual consistent**: Mateixos patrons que /packs (hover glow, badge popular, checks circulars, separador preu/specs)
+- **i18n**: Afegides claus `packsTitle`, `packsSubtitle`, `vatExcluded` als 3 JSONs (ca/es/en)
+
+### GuestRecommender — millor selecció de pack recomanat
+- **`app/components/ui/GuestRecommender.tsx`**: Algorisme millorat — si múltiples packs encaixen, tria el que té el punt mig de capacitat més proper al nombre de convidats (no el popular per defecte)
+
+### Mon Magic — galeria immersiva + MagicSparkles
+- **MagicSparkles** (nou sub-component): 30 partícules flotants (amber, purple, gold) amb Framer Motion, respecta `prefers-reduced-motion`
+- **Galeria**: Marcs encantats amb ring-1 ring-amber-500/20, hover ring-amber-500/40, shadow glow
+- **Separadors gradient**: Entre seccions amb `bg-gradient-to-r from-transparent via-purple-500/40`
+- **Títols secció amb motion.div**: `whileInView` fade-in per seccions galeria i FAQ
+- **Imatges intercanviades**: sobreComplet ↔ mussol (04 ↔ 09) per millor composició
+
+### Fixes menors
+- **About**: `t('hero.description')` → `t.raw()` per permetre HTML (tags `<strong>`)
+- **Configurador**: `EVENT_TYPE_SERVICE_MAP.fiestas` afegit `'discomovil'` — ara mostra "Des de 250€" en lloc de "Des de 0€"
+- **Stats home**: Guard `averageRating < 4` → usa default 5.0
+- **i18n GuestRecommender**: Clau `contact` afegida als 3 JSONs
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- Dev server reiniciat amb cache net (.next eliminat)
+- Captures Playwright: packs, bodas, empresas, discomovil, fiestas, mon magic, halloween — tot verificat
+
+---
+
+## 2026-03-26 - Sessió 2: Món Màgic i Halloween — ma de pintura completa
+
+### Món Màgic (`/tematica-mon-magic`) — overhaul complet
+- **Cards seleccionables**: Packs i productes amb `selectedPack`/`selectedProduct` state, hover scale, checkmark visual, glow quan seleccionat
+- **Centrat automàtic**: `scrollToCenter()` amb `getBoundingClientRect` + `requestAnimationFrame` — centra la card seleccionada al viewport
+- **Cases hover glow**: `hoveredCasa` state amb `onHoverStart`/`onHoverEnd`, `boxShadow` dinàmic amb `casa.colorLacre`
+- **MagicSparkles**: 30 partícules flotants (amber, purple, gold) amb Framer Motion
+- **FAQ porpra**: Accent `border-purple-500/20`, `bg-purple-500/10`, icona "+" rotativa
+- **Separadors gradient**: `bg-gradient-to-r from-transparent via-purple-500/40 to-transparent`
+- **Fons radials**: Cada secció amb `bg-[radial-gradient(ellipse_at_center,...)]` subtil
+- **Calculadora monocapa**: Preus dinàmics des de `PUBLIC_MON_MAGIC_PACKS.map()`, noms amb `t(`packs.${pack.key}.nom`)`
+- **Fix monocapa**: Eliminats preus hardcoded (450/680/800/650/950/1100), `numCaracteristiques` ara ve de la constant (6, no 4), eliminat `preuActual` mort
+
+### Halloween (`/tematica-halloween`) — Tim Burton style
+- **Hero cinemàtic**: 85vh, 3 overlays de vignetting, títol gradient `from-orange-500 via-red-500 to-orange-600`
+- **HalloweenAtmosphere** (nou component client):
+  - `FloatingBats`: 8 ratpenats emoji 🦇, opacity 0.07, flotant per la pàgina
+  - `SpookyParticles`: 25 partícules (orange, red, white, green) amb pulsació
+  - `FogLayer`: Gradient fix al bottom
+  - Respecta `prefers-reduced-motion`
+- **Separadors gòtics**: Entre totes les seccions
+- **Pack cards**: Emojis temàtics (💀👻🧟), hover scale, preus gradient, badge gradient "MÉS DEMANAT"
+- **Galeria**: `ring-1 ring-white/5`, vignette overlay a totes les imatges
+- **Testimonial gòtic**: Separador gradient
+- **Fons radials**: Totes les seccions amb glows subtils
+
+### Verificació
+- Dev server reiniciat i verificat a localhost:3000
+- Ambdues pàgines visualment verificades en incògnit
+- `npx tsc --noEmit` → 0 errors
+
+---
+
+## 2026-03-26 - Millores visuals pack cards + fix i18n empresas
+
+### Pack cards — polish visual consistent a 5 pàgines
+- **Hover glow**: Cards amb `hover:shadow-lg hover:shadow-amber-500/10` (popular) i `hover:shadow-white/5` (normal) + `hover:bg-white/[0.05]` per elevar la card al hover
+- **Badge popular**: Afegit `shadow-md shadow-amber-500/30` per glow darrere el badge ambre
+- **Badge no-popular**: De `text-white/60 border-white/10` a `text-white/80 border-white/15 backdrop-blur-sm` — ara es llegeix
+- **Preu popular en ambre**: A `/packs`, preu del pack popular amb `text-amber-400` per destacar
+- **Separadors consistents**: Tots `border-white/10` (abans hi havia `/5`, `/[0.06]` inconsistents)
+- **Checks circulars**: `w-5 h-5 rounded-full bg-amber-500/10` amb check petit dins — molt més net que el ✓ sol
+- **"Tots els packs inclouen"**: Icones `w-12 h-12` amb `border-amber-500/20`, text `white/80 font-medium`
+- Aplicat a: PacksClient.tsx, bodas/client.tsx, discomovil/client.tsx, fiestas/FiestasClient.tsx, empresas/client.tsx
+
+### Fix About — claus i18n amb HTML raw
+- `t('hero.description')` → `t.raw('hero.description')` (i `history.paragraph1/2`)
+- next-intl `t()` interpreta `<strong>` com a tags ICU i falla. `t.raw()` retorna el string tal qual
+- Ara mostra el text complet amb bolds
+
+### Fix Configurador — "Festes privades: Des de 0€"
+- `EVENT_TYPE_SERVICE_MAP.fiestas` només contenia `['fiestas']` però cap pack té `service: 'fiestas'` (tots són `'discomovil'`)
+- Afegit `'discomovil'` al map: `fiestas: ['fiestas', 'discomovil']`
+- Ara mostra "Des de 250€"
+
+### Fix Stats home — guard rating API
+- Si l'API retorna `averageRating < 4`, usa default 5.0 en lloc de mostrar un número sospitosament baix
+- Protecció contra dades corruptes a BD
+
+### Fix i18n empresas
+- Claus `packsTitle` i `packsSubtitle` faltaven als 3 JSONs (ca/es/en) — es mostrava el key raw
+- Eliminat fallback hardcoded del component (monocapa)
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors
+- Captures Playwright: packs, bodas, empresas, discomovil, fiestas — tot consistent
+- Home verificat visualment — tot OK, blindat a CLAUDE.md
+
+---
+
 ## 2026-03-25 - UX conversió: copy directe, CTAs orientats a preus, rangs reals
 
 ### Hero — CTA swap + copy natural
@@ -7124,3 +7333,62 @@ g
 - L'opacitat del grid (`0.06`), el `isolation: isolate`, el `z-index: -1` i el mask radial del footer estan aprovats i tancats.
 - Les cards de FAQ amb fons opac i z-index estan aprovades i tancades.
 - El botó CTA de FAQ amb fons opac està aprovat i tancat.
+
+## 2026-03-27 - Portfolio admin visual + pipeline compartit d'imatges
+
+### Backend i pipeline
+- `lib/services/portfolioImageService.ts`: nova capa compartida per normalitzar noms i convertir imatges a AVIF per uploads d'admin i galeries vinculades.
+- `lib/services/portfolioMediaService.ts`: ara converteix imatges a AVIF al backend, retorna assignació d'event i permet editar `caption`, `sortOrder` i `eventId` sense duplicar lògica al client.
+- `lib/services/galleryService.ts`: les fotos de booking que entren per admin passen pel mateix processador compartit i ja no pugen el fitxer brut.
+- `app/api/admin/portfolio/media/route.ts` i `app/api/admin/portfolio/events/route.ts`: protegides amb `requireAuth`, amb errors explícits i PATCH preparat per assignació/reordenació.
+- `scripts/sync-portfolio-avif.mjs` + `package.json`: afegida la peça `portfolio:avif` a `assets:sync` per deixar el pipeline de carpeta alineat amb el de l'admin. No he executat aquesta sync encara perquè transforma i elimina originals de `public/img/portfolio`.
+
+### Admin portfolio
+- `app/admin/portfolio/page.tsx`: refeta la pantalla com a gestor visual real.
+- Ara mostra miniatures grans, preview fullscreen, llegendes d'ajuda a cada bloc, assignació a event, marcat de portada, substitució de fitxer, eliminació protegida i reordenació per drag & drop.
+- La pestanya `Events` també explica per què serveix cada camp i deixa clar que la galeria es vincula des de `Media`, mantenint monocapa.
+- El to és deliberadament didàctic perquè l'usuari no tècnic entengui què fa cada control.
+
+### Validació
+- `npx tsc --noEmit` OK
+- `pnpm run arch:layer:check` OK
+- No he executat `pnpm build` ni `pnpm run assets:sync` en aquesta passada.
+- `app/admin/components/AdminHelpLegend.tsx`: extret el patró d'ajuda contextual a component compartit per no duplicar llegendes explicatives entre pantalles.
+- `app/admin/portfolio/page.tsx`: ara consumeix el component compartit en lloc d'una implementació local.
+- `app/admin/settings/hero/page.tsx`: aplicada la mateixa capa d'ajuda contextual perquè `Hero media` també expliqui què és, com funciona l'ordre i què implica activar/desactivar peces.
+- Validació extra després d'aquesta extracció: `npx tsc --noEmit` OK i `pnpm run arch:layer:check` OK.
+
+## 2026-03-27 - Capa d ajuda curta als gestors troncals
+- He creat pp/admin/components/AdminHelpPanel.tsx com a capa compartida d ajuda breu i didàctica.
+- L he aplicada a 	ext-manager, clientes, ookings i leads amb tres llegendes curtes per pantalla.
+- He simplificat el to perquè sigui més natural, sense tecnicismes i amb el perquè de cada bloc.
+- Validació passada: 
+px tsc --noEmit i pnpm run arch:layer:check.
+
+
+## 2026-03-27 - Editor de packs més fàcil d entendre
+- He afegit ajuda curta i natural a l editor de packs amb AdminHelpPanel.
+- He simplificat la lectura de la relació entre equip, preu i semàfor perquè sigui més fàcil composar packs sense ser tècnic.
+- He deixat més clara la zona d inventari del pack i el significat del cost base estimat.
+- Validació passada: 
+px tsc --noEmit i pnpm run arch:layer:check.
+
+
+
+
+
+## 2026-03-28 - Món Màgic: hero, fotos reals i llegibilitat
+- He corregit `PUBLIC_MON_MAGIC_IMAGES` perquè el hero i la foto destacada no apuntin a fitxers inexistents.
+- El hero de `app/[locale]/tematica-mon-magic/client.tsx` queda re-enquadrat cap amunt per mostrar millor espelmes del sostre i cartes/plats al mateix temps.
+- He tret la foto de la gàbia del circuit visible de la galeria i l'he substituïda per una carta real del set.
+- També he pujat contrast i llegibilitat als textos clau de galeria, cases, packs, FAQ i CTA final.
+- Validació passada en aquesta ronda: captures locals de hero i packs + `npx tsc --noEmit`.
+## 2026-03-28 - Món Màgic: tancament visual de la pàgina pública
+- He refet el hero de `app/[locale]/tematica-mon-magic/client.tsx` perquè ocupi tota la pantalla i tota l'amplada, amb reenquadrament des de baix i millor lectura del copy sobre la foto.
+- He descartat l'efecte de doble tinta a `Casament` i he deixat el highlight en una sola tinta ambre.
+- He afegit un vel atmosfèric càlid al hero i un pedestal subtil darrere del bloc de text per separar millor tipografia i imatge sense enfosquir-ho de manera bruta.
+- He corregit les rutes trencades de `PUBLIC_MON_MAGIC_IMAGES` a `lib/constants/index.ts` i he deixat fixada la selecció visual vigent: principal `16`, galeria `02`, `10`, `13` i una miniatura menys perquè en sobrava una en la composició visible.
+- També he deixat la pàgina menys lúgubre i més ritual/càlida: més ambre i màgia suau, menys negre mort.
+- El criteri tancat per aquesta pàgina és: banquet màgic viu, no cripta; fantasia elegant, no gòtic pesat.
+- Validació passada durant aquesta ronda: múltiples captures locals del hero i seccions + `npx tsc --noEmit`.
+- Punt honest: la captura automatitzada de la galeria no ha estat prou fiable per jutjar tota la composició final, així que el tancament visual bo s'ha anat fent sobretot sobre el que s'ha vist i ajustat en local.
