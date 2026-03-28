@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '../../components/ToastProvider';
+import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
 
 interface HeroMedia {
   id: string;
@@ -182,6 +183,12 @@ export default function HeroMediaAdmin() {
         </div>
       )}
 
+      <div className="mb-6 grid gap-3 md:grid-cols-3">
+        <AdminHelpLegend title="Què és" body="Aquests mitjans alimenten el carrousel del hero públic. Pots combinar imatge i vídeo." />
+        <AdminHelpLegend title="Ordre" body="L'ordre determina la rotació. Mou amunt o avall per prioritzar què veu primer l'usuari." />
+        <AdminHelpLegend title="Actiu" body="Si un mitjà està desactivat es conserva, però deixa de sortir al hero públic." />
+      </div>
+
       <div className="mb-8 rounded-xl border p-6 admin-card-glass">
         <h2 className="mb-4 text-lg font-semibold">Afegir mitjà</h2>
 
@@ -319,3 +326,4 @@ export default function HeroMediaAdmin() {
     </div>
   );
 }
+

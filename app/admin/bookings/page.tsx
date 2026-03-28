@@ -6,6 +6,7 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AdminPage } from '../components/AdminPage';
+import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import BookingActions from './BookingActions';
 import BookingFilters from './BookingFilters';
 import BookingViewToggle from './BookingViewToggle';
@@ -161,6 +162,25 @@ export default async function BookingsPage({
         <Link href="/admin/bookings/new" className="ap-btn ap-btn--primary">+ Nova</Link>
       </div>}
     >
+
+      <AdminHelpPanel
+        title="Com treballar reserves"
+        description="Aquí controles l execució real dels esdeveniments. Tens a mà l estat, els imports i el marge per prendre decisions ràpides."
+        items={[
+          {
+            title: 'Estat',
+            body: 'Et diu en quin punt està cada reserva i ajuda a detectar bloquejos.',
+          },
+          {
+            title: 'Marge',
+            body: 'Et deixa veure si una reserva és sana abans que arribi el dia de l esdeveniment.',
+          },
+          {
+            title: 'Vista',
+            body: 'Pots canviar entre llista i kanban segons si vols detall o visió global.',
+          },
+        ]}
+      />
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
@@ -483,6 +503,8 @@ export default async function BookingsPage({
     </AdminPage>
   );
 }
+
+
 
 
 

@@ -238,6 +238,7 @@ export default async function LocaleLayout({
         {/* OVERLAY NEGRE INICIAL - Tapa tot fins que JS el treu */}
         <div
           id="intro-overlay"
+          suppressHydrationWarning
           style={{
             position: 'fixed',
             inset: 0,

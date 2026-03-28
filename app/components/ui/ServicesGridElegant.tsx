@@ -1,9 +1,9 @@
 'use client';
 
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { Link } from '@/lib/navigation';
+import { Link, useRouter } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { PUBLIC_SERVICES_GRID_PILLARS } from '@/lib/constants';
 
 // ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
@@ -41,10 +41,26 @@ function IconProduction() {
 
 export default function ServicesGridElegant() {
   const t = useTranslations('servicesGrid');
+  const router = useRouter();
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [focusedCard, setFocusedCard] = useState<string | null>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
   const headingY = useTransform(scrollYProgress, [0, 1], [40, -40]);
+
+  const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (focusedCard === href) {
+      router.push(href);
+    } else {
+      setFocusedCard(href);
+      const el = cardRefs.current[href];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [focusedCard, router]);
 
   const pillarIcons = { dj: IconDJ, theme: IconTheme, production: IconProduction } as const;
   const pillars = PUBLIC_SERVICES_GRID_PILLARS.map((pillar) => ({ ...pillar, Icon: pillarIcons[pillar.iconKey] }));
@@ -77,19 +93,24 @@ export default function ServicesGridElegant() {
           {pillars.map(({ key, Icon, accent, accentLight, glowColor, href }, i) => (
             <motion.div
               key={key}
+              ref={(el) => { cardRefs.current[href] = el; }}
               initial={reduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Link href={href} className="group block">
+              <div onClick={(e) => handleCardClick(href, e)} className="group block cursor-pointer">
                 <div
-                  className="relative p-7 md:p-8 rounded-2xl border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-sm transition-all duration-500 h-full overflow-hidden hover:-translate-y-2 hover:shadow-[0_24px_80px_rgba(0,0,0,0.3)]"
+                  className={`relative p-7 md:p-8 rounded-2xl border backdrop-blur-sm transition-all duration-500 h-full overflow-hidden hover:-translate-y-2 hover:shadow-[0_24px_80px_rgba(0,0,0,0.3)] ${
+                    focusedCard === href
+                      ? 'border-white/[0.25] -translate-y-2 shadow-[0_24px_80px_rgba(0,0,0,0.3)] ring-1 ring-white/10'
+                      : 'border-white/[0.08] hover:border-white/[0.18]'
+                  }`}
                   style={{ background: `radial-gradient(ellipse at top left, ${glowColor}, transparent 70%)` }}
                 >
                   {/* Hover glow */}
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"
+                    className={`absolute inset-0 transition-opacity duration-500 rounded-2xl pointer-events-none ${focusedCard === href ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                     style={{ boxShadow: `inset 0 0 40px ${glowColor}, 0 0 60px ${glowColor}` }}
                   />
                   {/* Shine sweep on hover */}
@@ -122,15 +143,15 @@ export default function ServicesGridElegant() {
                     ))}
                   </div>
 
-                  {/* Link */}
-                  <div className={`flex items-center gap-1.5 text-sm font-semibold ${accentLight} group-hover:gap-2.5 transition-all`}>
+                  {/* Link — always navigates directly */}
+                  <Link href={href} onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 text-sm font-semibold ${accentLight} group-hover:gap-2.5 transition-all`}>
                     <span>{t('viewMore')}</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                  </div>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>

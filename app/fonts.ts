@@ -10,7 +10,7 @@
 //
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FONT PRINCIPAL - TEXT DE COS
@@ -48,6 +48,20 @@ export const jetbrains = JetBrains_Mono({
   variable: "--font-mono",
   weight: ["400", "700"],
   fallback: ["Consolas", "Monaco", "monospace"],
-  preload: false, // No crítica per first paint
+  preload: false,
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FONT SERIF - PÀGINES TEMÀTIQUES (Món Màgic, etc.)
+// Cormorant Garamond: Elegant, clàssica, perfecta per a ambients màgics
+// ═══════════════════════════════════════════════════════════════════════════
+export const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  fallback: ["Georgia", "Times New Roman", "serif"],
+  preload: false,
 });
 

@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "dev": "next dev",
     "sync:reviews": "node scripts/sync-reviews.mjs",
-    "assets:sync": "pnpm run logos:sync && pnpm run normalize:filenames && pnpm run rename:portfolio && pnpm run generate:portfolio",
+    "assets:sync": "pnpm run logos:sync && pnpm run normalize:filenames && pnpm run portfolio:avif && pnpm run rename:portfolio && pnpm run generate:portfolio",
+    "portfolio:avif": "node scripts/sync-portfolio-avif.mjs",
     "sync:reviews:if-configured": "node -e \"const {execSync}=require('child_process');const hasKeys=Boolean(process.env.SERPAPI_KEY||process.env.OUTSCRAPER_KEY||process.env.OUTSCRAPER_API_KEY);if(!hasKeys){console.log('No review API keys configured - skipping sync:reviews');process.exit(0);}execSync('pnpm run sync:reviews',{stdio:'inherit'});\"",
     "assets:sync:full": "pnpm run assets:sync && pnpm run sync:reviews:if-configured",
     "logos:sync": "node scripts/sync-client-logos.mjs",
@@ -129,3 +130,5 @@
     ]
   }
 }
+
+

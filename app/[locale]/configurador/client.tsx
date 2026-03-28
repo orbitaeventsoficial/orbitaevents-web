@@ -376,7 +376,7 @@ interface ProgressStepsNavProps {
 
 function ProgressStepsNav({ currentStep, labels }: ProgressStepsNavProps) {
   return (
-    <nav aria-label={labels[0]} className="mb-16 flex justify-center">
+    <nav aria-label={labels[0]} className="mb-8 flex justify-center">
       <div className="flex items-center gap-2 sm:gap-4">
         {([
           { n: 1, label: labels[0] },
@@ -388,9 +388,9 @@ function ProgressStepsNav({ currentStep, labels }: ProgressStepsNavProps) {
             <div className="flex flex-col items-center gap-1">
               <div
                 aria-current={currentStep === stepNumber ? 'step' : undefined}
-                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-300 ${
+                className={`relative w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 ${
                   currentStep >= stepNumber
-                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black shadow-[0_0_16px_rgba(245,158,11,0.3)]'
                     : 'bg-bg-surface text-text-muted border border-border'
                 }`}
               >
@@ -422,7 +422,8 @@ export default function ConfiguradorClient() {
     locale,
     fallback: fallbackPacks,
   });
-  const [step, setStep] = useState(1);
+  const [step, setStepRaw] = useState(1);
+  const setStep = (n: number) => { setStepRaw(n); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const [config, setConfig] = useState<ConfigState>({
     eventType: null,
     selectedPack: null,
@@ -618,12 +619,12 @@ export default function ConfiguradorClient() {
   // PAS 1: Tipus d'esdeveniment
   const renderStep1 = () => {
         return (
-      <div className="space-y-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-display font-black text-white mb-4">
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl sm:text-4xl font-display font-black text-white mb-3">
             {t('step1.title')}
           </h2>
-          <p className="text-xl text-text-muted">{t('step1.subtitle')}</p>
+          <p className="text-lg text-text-muted">{t('step1.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1132,7 +1133,7 @@ export default function ConfiguradorClient() {
   const showStickyPrice = step >= 2 && config.selectedPack && step < 4;
 
   return (
-    <div className="relative min-h-screen bg-bg-main py-20 overflow-x-hidden">
+    <div className="relative min-h-screen bg-bg-main pt-6 pb-20 overflow-x-hidden">
       {/* Ambient background glow — changes per event type */}
       {ambient && (
         <>

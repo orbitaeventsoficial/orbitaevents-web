@@ -28,26 +28,15 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 
-// ─── AdminPage ────────────────────────────────────────────────────────────────
-
 interface AdminPageProps {
-  /** Títol principal de la pàgina (H1) */
   title: string;
-  /** Subtítol/descripció opcional */
   subtitle?: ReactNode;
-  /** Link de retorn. Apareix com a "← Label" sobre el títol */
   back?: { href: string; label: string };
-  /** Botons o controls a la dreta de la capçalera */
   actions?: ReactNode;
-  /** Fila de KPIs sota la capçalera */
   kpis?: ReactNode;
-  /** Navegació per tabs sota la capçalera */
   tabs?: ReactNode;
-  /** Missatge alert/info sota la capçalera */
   alert?: ReactNode;
-  /** Contingut principal */
   children: ReactNode;
-  /** Classe extra al contenidor principal (per overrides puntuals) */
   className?: string;
 }
 
@@ -64,7 +53,6 @@ export function AdminPage({
 }: AdminPageProps) {
   return (
     <div className={`ap-page ${className}`}>
-      {/* CAPÇALERA */}
       <header className="ap-header">
         <div className="ap-header-left">
           {back && (
@@ -78,34 +66,20 @@ export function AdminPage({
         {actions && <div className="ap-header-actions">{actions}</div>}
       </header>
 
-      {/* KPIs (fila opcional) */}
       {kpis && <div className="ap-kpis">{kpis}</div>}
-
-      {/* ALERT (banner informatiu o d'error) */}
       {alert && <div className="ap-alert">{alert}</div>}
-
-      {/* TABS (nav opcional) */}
       {tabs && <nav className="ap-tabs-nav">{tabs}</nav>}
-
-      {/* CONTINGUT */}
       <div className="ap-content">{children}</div>
     </div>
   );
 }
 
-// ─── AdminSection ─────────────────────────────────────────────────────────────
-
 interface AdminSectionProps {
-  /** Títol de la secció (H2) */
   title?: ReactNode;
-  /** Subtítol/descripció de la secció */
   description?: ReactNode;
-  /** Accions a la dreta del títol */
   actions?: ReactNode;
   children: ReactNode;
-  /** padding reduït */
   compact?: boolean;
-  /** sense padding */
   flush?: boolean;
   className?: string;
 }
@@ -136,8 +110,6 @@ export function AdminSection({
   );
 }
 
-// ─── AdminKpiRow + AdminKpi ────────────────────────────────────────────────────
-
 export function AdminKpiRow({ children }: { children: ReactNode }) {
   return <div className="ap-kpi-row">{children}</div>;
 }
@@ -145,9 +117,7 @@ export function AdminKpiRow({ children }: { children: ReactNode }) {
 interface AdminKpiProps {
   label: string;
   value: ReactNode;
-  /** 'neutral' | 'success' | 'warning' | 'danger' | 'info' */
   tone?: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
-  /** Variació vs. període anterior (+ o -) */
   trend?: ReactNode;
   href?: string;
 }
@@ -162,8 +132,6 @@ export function AdminKpi({ label, value, tone = 'neutral', trend, href }: AdminK
   );
   return href ? <Link href={href}>{content}</Link> : content;
 }
-
-// ─── AdminEmptyState ──────────────────────────────────────────────────────────
 
 interface AdminEmptyStateProps {
   icon?: string;
@@ -182,7 +150,3 @@ export function AdminEmptyState({ icon = '📭', title, description, action }: A
     </div>
   );
 }
-
-
-
-

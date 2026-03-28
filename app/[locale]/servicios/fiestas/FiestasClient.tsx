@@ -146,7 +146,7 @@ export default function FiestasClient() {
       </div>
 
       {/* ═══ PACKS — Showcase ═══ */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
+      <section className="max-w-6xl mx-auto px-4 pt-6 pb-16">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -172,12 +172,12 @@ export default function FiestasClient() {
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => handlePackClick(pack.id)}
               className={`
-                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer
+                relative p-7 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer group
                 ${isSelected
                   ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
                   : pack.popular
-                  ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
-                  : 'bg-white/[0.03] border-white/10 hover:border-white/20'
+                  ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03] hover:shadow-lg hover:shadow-amber-500/10'
+                  : 'bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-white/5'
                 }
               `}
             >
@@ -185,8 +185,8 @@ export default function FiestasClient() {
               {pack.badge && (
                 <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
                   pack.popular
-                    ? 'bg-amber-500 text-black'
-                    : 'bg-white/10 text-white/60 border border-white/10'
+                    ? 'bg-amber-500 text-black shadow-md shadow-amber-500/30'
+                    : 'bg-white/10 text-white/80 border border-white/15 backdrop-blur-sm'
                 }`}>
                   {pack.badge}
                 </div>
@@ -210,7 +210,7 @@ export default function FiestasClient() {
               </div>
 
               {/* Quick specs */}
-              <div className="space-y-2 text-sm text-white/50 mb-5 pb-5 border-b border-white/[0.06]">
+              <div className="space-y-2 text-sm text-white/50 mb-5 pb-5 border-b border-white/10">
                 <div className="flex justify-between">
                   <span>⏰</span>
                   <span className="text-white/70 font-medium">{pack.duration}</span>
@@ -227,7 +227,9 @@ export default function FiestasClient() {
               <ul className="space-y-2 mb-6 flex-1">
                 {(pack.features || []).slice(0, 5).map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-white/70">
-                    <Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                    <span className="w-5 h-5 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-amber-400" />
+                    </span>
                     <span>{feature}</span>
                   </li>
                 ))}

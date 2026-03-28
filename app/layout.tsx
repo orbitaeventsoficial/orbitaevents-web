@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import caMessages from '@/messages/ca.json';
 import { getSiteUrl } from '@/lib/site';
-import { inter, plusJakarta, jetbrains } from '@/app/fonts';
+import { inter, plusJakarta, jetbrains, cormorant } from '@/app/fonts';
 
 type HomeMeta = { title?: string; description?: string; keywords?: string[]; ogTitle?: string; ogDescription?: string; ogImageAlt?: string };
 
@@ -95,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="ca"
-      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} ${cormorant.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>

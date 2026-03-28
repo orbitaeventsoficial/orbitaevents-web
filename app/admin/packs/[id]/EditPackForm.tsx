@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES } from '@/lib/constants';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
+import { AdminHelpPanel } from '../../components/AdminHelpPanel';
 
 type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
 
@@ -390,6 +391,25 @@ export default function EditPackForm({
       </section>
 
       {error && <div className="rounded-xl border p-4 text-sm">❌ {error}</div>}
+
+      <AdminHelpPanel
+        title="Com treballar aquest pack"
+        description="Aquí prepares què inclou el servei i el sistema et diu si el preu aguanta bé el cost."
+        items={[
+          {
+            title: 'Equip',
+            body: 'Afegeix el material que realment necessita el pack. Això fa que el cost sigui més real.',
+          },
+          {
+            title: 'Preu',
+            body: 'El sistema et proposa un preu orientatiu segons hores, equip i suport necessari.',
+          },
+          {
+            title: 'Semàfor',
+            body: 'Verd vol dir que el preu va bé. Taronja que va just. Roig que s hauria de revisar.',
+          },
+        ]}
+      />
       {info && <div className="rounded-xl border p-4 text-sm">ℹ️ {info}</div>}
       {success && <div className="rounded-xl border p-4 text-sm">✅ Pack actualitzat correctament</div>}
 
@@ -481,6 +501,7 @@ export default function EditPackForm({
             <div className="rounded-xl border p-3">
               <p className="text-xs">Cost base estimat pack</p>
               <p className="mt-2 text-lg font-semibold">{eur(baseCostPack)}</p>
+              <p className="mt-1 text-xs text-white/55">És el cost mínim estimat abans de deixar marge.</p>
             </div>
           </div>
 
@@ -578,6 +599,25 @@ export default function EditPackForm({
             Visual amb foto + drag and drop: arrossega de "Disponibles" a "Inclosos" per composar el pack.
           </p>
 
+          <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Disponibles</p>
+              <p className="mt-1 text-sm text-white/75">Aquí tens el material que encara no forma part del pack.</p>
+            </div>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Inclosos</p>
+              <p className="mt-1 text-sm text-white/75">Aquest és l equip que el pack arrossega per defecte.</p>
+            </div>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Obligatori</p>
+              <p className="mt-1 text-sm text-white/75">Marca-ho si aquesta peça sempre ha d anar dins del pack.</p>
+            </div>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Lots</p>
+              <p className="mt-1 text-sm text-white/75">Si treballes amb equips repetits, el lot t estalvia anar peça per peça.</p>
+            </div>
+          </div>
+
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border p-3">
               <p className="text-xs">Elements</p>
@@ -648,6 +688,7 @@ export default function EditPackForm({
               Buidar composició
             </button>
           </div>
+
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
             <input className={input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca element..." />
@@ -793,3 +834,6 @@ export default function EditPackForm({
     </form>
   );
 }
+
+
+

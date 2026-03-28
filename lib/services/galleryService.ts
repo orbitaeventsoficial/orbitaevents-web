@@ -8,6 +8,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { uploadFile, deleteFile, getPublicUrl } from '@/lib/storage';
+import { buildBookingGalleryImagePath, normalizePortfolioImageBuffer } from '@/lib/services/portfolioImageService';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CRUD
@@ -32,14 +33,10 @@ export async function addGalleryPhoto(input: {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking) throw new Error('Booking no trobat');
 
-  // Generar path únic
-  const ext = fileName.split('.').pop()?.toLowerCase() || 'webp';
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).slice(2, 8);
-  const filePath = `bookings/${bookingId}/gallery/${timestamp}-${random}.${ext}`;
+  const filePath = buildBookingGalleryImagePath(bookingId, fileName);
+  const normalizedBuffer = await normalizePortfolioImageBuffer(fileBuffer);
 
-  // Pujar fitxer
-  await uploadFile(filePath, fileBuffer);
+  await uploadFile(filePath, normalizedBuffer);
 
   // Obtenir ordre actual
   const maxOrder = await prisma.bookingGalleryPhoto.aggregate({
@@ -178,3 +175,5 @@ export async function getGallerySummary(bookingId: string) {
   ]);
   return { total, portfolioCount, portalCount };
 }
+
+

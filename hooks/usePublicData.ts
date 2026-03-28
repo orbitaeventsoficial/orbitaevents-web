@@ -364,87 +364,6 @@ export function useCountdown(targetDate: Date | null): UseCountdownReturn {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HOOK: useOffer (para FlashOffer dinámico)
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface OfferData {
-  isActive: boolean;
-  endDate: string | null;
-  discount: number;
-  ctaLink: string;
-  title: string;
-  description: string;
-}
-
-interface UseOfferReturn {
-  offer: OfferData;
-  isLoading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
-
-const defaultOffer: OfferData = {
-  isActive: false,
-  endDate: null,
-  discount: 0,
-  ctaLink: '/contacto',
-  title: '',
-  description: '',
-};
-
-export function useOffer(): UseOfferReturn {
-  const [offer, setOffer] = useState<OfferData>(defaultOffer);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    // Check cache first
-    const cached = getCachedData<OfferData>('offer');
-    if (cached) {
-      setOffer(cached);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/public/offer');
-      const json = await response.json();
-
-      if (json.ok && json.offer) {
-        const offerData: OfferData = {
-          isActive: json.offer.isActive,
-          endDate: json.offer.endDate || null,
-          discount: json.offer.discount || 0,
-          ctaLink: json.offer.ctaLink || '/contacto',
-          title: json.offer.title || '',
-          description: json.offer.description || '',
-        };
-        setOffer(offerData);
-        setCachedData('offer', offerData);
-        setError(null);
-      }
-    } catch (err) {
-      log.error('Error fetching offer', err);
-      setError('Error de conexión');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return {
-    offer,
-    isLoading,
-    error,
-    refetch: fetchData,
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
 // HOOK: usePrices (precios desde BBDD)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -533,8 +452,6 @@ export type {
   UseAvailabilityReturn,
   UseStatsReturn,
   UseCountdownReturn,
-  OfferData,
-  UseOfferReturn,
   PackPrice,
   UsePricesReturn,
 };

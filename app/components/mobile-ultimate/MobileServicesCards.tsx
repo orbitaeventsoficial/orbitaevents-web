@@ -19,11 +19,12 @@
  * - Rutas con locale
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/lib/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SERVICE CARD 3D
@@ -47,18 +48,22 @@ interface Service {
 interface ServiceCardProps {
   service: Service;
   isActive: boolean;
+  isFocused: boolean;
   index: number;
   locale: string;
   t: ReturnType<typeof useTranslations>;
+  onCardClick: (href: string) => void;
 }
 
-function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
+function ServiceCard3D({ service, isActive, isFocused, index, locale, t, onCardClick }: ServiceCardProps) {
   const reduceMotion = useReducedMotion();
+  const cardRef = useRef<HTMLDivElement>(null);
 
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
   const title = t(`services.${service.id}.title`);
   const subtitle = t(`services.${service.id}.subtitle`);
   const price = t(`services.${service.id}.price`);
-  const badge = service.badgeKey ? t(`services.${service.id}.badge`, { year: new Date().getFullYear() }) : '';
+  const badge = service.badgeKey ? t(`services.${service.id}.badge`, { year: currentYear }) : '';
   const veilGradient = useMemo(() => {
     switch (service.id) {
       case 'halloween':
@@ -74,16 +79,19 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08 }}
       className="relative w-full max-w-[420px] h-[420px] mx-auto"
     >
-      <motion.a
-        href={`/${locale}${service.href}`}
+      <motion.div
+        onClick={() => onCardClick(service.href)}
         whileTap={{ scale: 0.97 }}
-        className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/15 shadow-lg"
+        className={`block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border shadow-lg cursor-pointer ${
+          isFocused ? 'border-amber-500/40 ring-1 ring-amber-500/20' : 'border-white/15'
+        }`}
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true }}
@@ -160,12 +168,16 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
             <span className="text-amber-400 font-bold text-lg">
               {price}
             </span>
-            <div className="flex items-center gap-1 text-white/50 text-sm">
+            <a
+              href={`/${locale}${service.href}`}
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 text-white/50 text-sm"
+            >
               <span>{t('viewMore')}</span>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-            </div>
+            </a>
           </div>
         </div>
 
@@ -189,7 +201,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
             />
           </>
         )}
-      </motion.a>
+      </motion.div>
     </motion.div>
   );
 }
@@ -201,6 +213,23 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 export default function MobileServicesCards() {
   const { locale } = useMobile();
   const t = useTranslations('mobileServices');
+  const router = useRouter();
+  const [focusedCard, setFocusedCard] = useState<string | null>(null);
+
+  const handleCardClick = useCallback((href: string) => {
+    if (focusedCard === href) {
+      router.push(href);
+    } else {
+      setFocusedCard(href);
+      // Find the card element and center it
+      setTimeout(() => {
+        const el = document.querySelector(`[data-card-href="${href}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    }
+  }, [focusedCard, router]);
 
   // Services data with translation keys
   const SERVICES: Service[] = useMemo(() => [
@@ -241,7 +270,7 @@ export default function MobileServicesCards() {
       priceKey: 'monmagic.price',
       badgeKey: 'monmagic.badge',
       badgeColor: 'from-amber-500 to-yellow-500',
-      image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
+      image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
       gradient: 'from-amber-500/14 via-purple-500/6 to-transparent',
       href: '/tematica-mon-magic',
       features: ['feature1', 'feature2', 'feature3'],
@@ -302,14 +331,17 @@ export default function MobileServicesCards() {
       {/* Vertical list to keep page scroll */}
       <div className="px-6 pb-4 space-y-6">
         {SERVICES.map((service, index) => (
-          <ServiceCard3D
-            key={service.id}
-            service={service}
-            isActive={false}
-            index={index}
-            locale={locale}
-            t={t}
-          />
+          <div key={service.id} data-card-href={service.href}>
+            <ServiceCard3D
+              service={service}
+              isActive={false}
+              isFocused={focusedCard === service.href}
+              index={index}
+              locale={locale}
+              t={t}
+              onCardClick={handleCardClick}
+            />
+          </div>
         ))}
       </div>
     </section>

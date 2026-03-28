@@ -1,11 +1,11 @@
 # Estat de l'Admin Òrbita Events — Referència Permanent
 
-> Última actualització: 2026-03-17
+> Última actualització: 2026-03-27
 > NO cal re-auditar cada sessió. Només actualitzar les seccions que canvien.
 
 ## Resum
 
-- **57 pàgines admin**, **148 rutes API**, **6 crons**, **~120 serveis**
+- **58 pàgines admin**, **148 rutes API**, **6 crons**, **~120 serveis**
 - Stack: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Railway)
 - Admin 100% en català, PWA instal·lable
 - v2.1 · Prisma + Railway
@@ -15,6 +15,7 @@
 | Àrea | Estat | Nota |
 |------|-------|------|
 | Tauler | ✅ Complet | 10 KPIs, gràfiques, radar, alertes, pilot automàtic, **insights narratius** |
+| Salut | ✅ Nou | Centre unificat per avisos de sistema, finances, operativa, catàleg i dades |
 | Leads | ✅ Molt complet | Kanban, scoring, flux guiat, workspace, vistes desades |
 | Reserves | ✅ Molt complet | Kanban, marge, portal client, contracte, factura, **countdown dies**, section nav |
 | Clients Hub | ✅ Molt complet | 9 panells + privacitat, **timeline unificat multi-canal**, KPIs, avatar stepper |
@@ -37,10 +38,137 @@
 | Crons (6) | ✅ Complet | Comercial, fuel, invoices, pricing, post-event, reviews-sync + **pàgina monitoratge** |
 | Auto-triggers | ✅ Complet | **NOU** — proposal→contracte, lead→welcome email, booking→checklist pre-event |
 
+## Direcció actual de l’admin
+
+### Horitzó d’empresa
+
+Òrbita Events no hauria d’anar només cap a una web més atractiva o cap a més volum de feina. Hauria d’anar cap a una empresa més governada, més fina i més potent.
+
+Això implica:
+- vendre millor
+- operar millor
+- decidir millor
+- entendre millor marge, costos i caixa
+- cuidar millor clients, leads i post-event
+- créixer sense perdre control intern
+
+### Paper estratègic d’Òrbita Admin
+
+`Òrbita Admin` no s’ha d’entendre com un simple panell intern. Ha de convertir-se en una màquina de gestió extraordinària per al negoci.
+
+Ha de ser alhora:
+- cervell comercial
+- centre operatiu
+- radar financer
+- memòria viva de clients
+- govern de contingut
+- sistema d’alerta
+- eina didàctica perquè el negoci s’entengui millor mentre es gestiona
+
+La web atrau i ven. Però l’admin governa.
+
+### Avantatge competitiu
+
+Si es construeix bé, `Òrbita Admin` no serà només una eina de suport. Serà part de l’avantatge competitiu d’Òrbita Events.
+
+Per què:
+- permetrà veure problemes abans
+- donarà criteri per decidir millor
+- reduirà dependència de memòria i improvisació
+- farà possible créixer sense convertir l’operativa en caos
+- ajudarà a delegar amb més seguretat
+
+### Visió
+
+L’admin d’Òrbita no s’està treballant com un simple panell intern, sinó com un sistema de gestió complet fet a mida del negoci. La direcció actual és convertir-lo en una eina més clara, més fiable, més didàctica i més governable, sense perdre tot el valor real que ja s’ha construït durant mesos.
+
+### Objectiu
+
+L’objectiu no és afegir pantalles per afegir. L’objectiu és que l’admin ajudi a dirigir millor Òrbita Events.
+
+Això vol dir:
+- entendre què passa al negoci amb rapidesa
+- detectar què està coix abans que faci mal
+- saber què dona marge i què no
+- tenir menys veritats duplicades
+- treballar amb més seguretat i menys intuïció dispersa
+- poder delegar millor sense dependre només de memòria o context oral
+
+### Finalitat real
+
+La finalitat d’aquesta refosa és que l’admin no només guardi dades. Ha de servir per:
+- prendre decisions millors
+- protegir marge, caixa i operativa
+- reduir errors humans
+- fer visible el perquè de les coses
+- ordenar un CRM/ERP molt fet a mida perquè pugui créixer sense convertir-se en una malgama
+
+### Principi didàctic
+
+L’admin s’ha de poder entendre sense parlar com un desenvolupador.
+
+Per això, la línia actual és:
+- llenguatge proper i natural
+- ajudes curtes en cada bloc important
+- explicar no només què passa, sinó per què importa
+- avisos visuals clars
+- menys tecnicisme i més context útil
+
+La meta és que el sistema també ensenyi mentre es fa servir.
+
+### Criteri d’arquitectura
+
+La reorganització no es fa per carpetes arbitràries, sinó per organismes reals de negoci.
+
+Els grans organismes de referència són:
+- Captació i vendes
+- Clients
+- Operacions
+- Catàleg
+- Contingut
+- Finances
+- Configuració
+
+I travessant-los tots:
+- Salut del sistema
+- Media
+- Documents
+- Semàfors
+- Ajuda contextual
+- Snapshot econòmic
+
+### Peça central actual: Salut
+
+La primera peça nova d’aquesta etapa és `Salut`.
+
+La seva funció és reunir en una sola vista allò que abans estava repartit entre dashboard, scripts, economia, crons i serveis interns. No substitueix aquestes peces; les ordena.
+
+`Salut` ha de servir per veure:
+- què falla
+- per què importa
+- què afecta
+- a quina pantalla es resol
+
+### Ordre de desplegament actual
+
+L’ordre actual de treball és aquest:
+1. construir i estabilitzar `Salut`
+2. reforçar `Inventari`, `Packs` i `Extres`
+3. arribar a una lectura econòmica més real de `Bookings`
+4. cosir millor dashboard, salut i organismes de negoci
+5. seguir fent l’admin més clar, més didàctic i més robust
+
+### Regla d’or
+
+No es tracta de reinventar Òrbita des de zero.
+
+Es tracta de conservar el que ja té valor, cosir el que avui està dispers, explicar millor el perquè de les coses i convertir aquest admin en una eina de direcció real, no només en un lloc on viuen dades.
+
 ## Pàgines per ruta
 
 ### Navegació principal
 - `/admin` — Tauler (dashboard)
+- `/admin/salut` — Centre de salut (avisos, qualitat de dades, finances, operativa i sistema)
 - `/admin/leads` — Entrades (llistat + kanban)
 - `/admin/leads/[id]` — Fitxa lead
 - `/admin/intake` — Entrada ràpida
@@ -190,3 +318,13 @@
 | A1 | **Insights narratius** — fins a 5 insights prioritzats en català al dashboard | `dashboardInsightsService.ts` | ✅ |
 | A5 | **Timeline unificat** — email+WhatsApp+trucades+notes en un fil, icones per canal | `TimelinePanel.tsx` | ✅ |
 | A6 | **Auto-triggers** — proposal→contracte, lead→welcome, booking→checklist | `automationTriggers.ts` | ✅ |
+
+
+
+
+
+
+
+
+
+

@@ -163,35 +163,7 @@ export interface ExtraDefinition {
 }
 
 // ============================================
-// 3. CONFIGURACIÓ DE L'OFERTA FLASH
-// ============================================
-
-export const OFERTA_FLASH = {
-  nombre: "Oferta Flash",
-  descripcion: "Festes petites amb descompte exclusiu",
-  maxInvitados: 50,
-  descuentoPorcentaje: 44,
-  duracionHoras: 2,
-  disponible: true,
-  condiciones: [
-    "Vàlid per a festes de fins a 50 convidats",
-    "Reserva amb mínim 15 dies d'antelació",
-    "Subjecte a disponibilitat",
-  ],
-  opciones: {
-    basica: { horas: 2, precio: 250 },
-    extendida: { horas: 3, precio: 400 },
-  },
-  extras: [
-    { id: "humo", nombre: "Màquina de fum", precio: 50 },
-    { id: "burbujas", nombre: "Màquina de bombolles", precio: 50 },
-    { id: "chispas", nombre: "Espurnes fredes", precio: 100 },
-    { id: "cabina-led", nombre: "Cabina DJ il·luminada", precio: 75 },
-  ],
-} as const;
-
-// ============================================
-// 4. PACKS PRINCIPALS — TEXT DIRECTE EN CATALÀ
+// 3. PACKS PRINCIPALS — TEXT DIRECTE EN CATALÀ
 // ============================================
 
 const PACKS: PackDefinition[] = [
@@ -207,10 +179,10 @@ const PACKS: PackDefinition[] = [
     price: "350€",
     priceValue: 350,
     features: [
-      "2h de DJ professional",
-      "So 2000W",
-      "Llums bàsiques + fum",
-      "Muntatge i desmuntatge inclòs",
+      "DJ professional durant 2 hores",
+      "So potent 2000W per fer vibrar la pista",
+      "Ambient de festa: llums, fum i cabina il·luminada",
+      "Muntatge i desmuntatge sense maldecaps",
     ],
     ideal: "Ball final del casament, fins a 80 convidats",
     duration: "2h",
@@ -229,10 +201,10 @@ const PACKS: PackDefinition[] = [
     price: "500€",
     priceValue: 500,
     features: [
-      "3h de DJ professional",
-      "So 4000W EV",
-      "4 caps mòbils + llums + fum",
-      "Muntatge i desmuntatge inclòs",
+      "DJ professional durant 3 hores",
+      "So d'alta potència 4000W EV",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Fum, cabina il·luminada i muntatge inclòs",
     ],
     ideal: "Ball amb show de llums, 60-150 convidats",
     duration: "3h",
@@ -253,10 +225,10 @@ const PACKS: PackDefinition[] = [
     price: "1.000€",
     priceValue: 1000,
     features: [
-      "6h de DJ + tècnic de llums (2 persones)",
-      "So 4000W EV",
-      "4 caps mòbils + llums + fum baix primer ball",
-      "Música a cada moment: dinar, pastís, ball",
+      "DJ + tècnic de llums tot el dia (6h: dinar → ball)",
+      "So d'alta potència 4000W EV",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Primer ball entre núvols (fum baix) + cabina il·luminada",
     ],
     ideal: "Tot el casament, 100-300 convidats",
     duration: "6h",
@@ -277,10 +249,10 @@ const PACKS: PackDefinition[] = [
     price: "250€",
     priceValue: 250,
     features: [
-      "2h de DJ professional",
-      "So 2000W",
-      "Llums bàsiques + fum",
-      "Muntatge i desmuntatge inclòs",
+      "DJ professional durant 2 hores",
+      "So potent 2000W per omplir la sala",
+      "Ambient de festa: llums, fum i cabina il·luminada",
+      "Muntatge i desmuntatge sense maldecaps",
     ],
     ideal: "Aniversaris, comiats, festes fins a 60 persones",
     duration: "2h",
@@ -298,10 +270,10 @@ const PACKS: PackDefinition[] = [
     price: "400€",
     priceValue: 400,
     features: [
-      "3h de DJ professional",
-      "So 2000W",
-      "4 caps mòbils + llums bàsiques + fum",
-      "Muntatge i desmuntatge inclòs",
+      "DJ professional durant 3 hores",
+      "So potent 2000W amb presència",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Fum, cabina il·luminada i muntatge inclòs",
     ],
     ideal: "Festes on vols un show de llums real",
     duration: "3h",
@@ -321,10 +293,10 @@ const PACKS: PackDefinition[] = [
     price: "600€",
     priceValue: 600,
     features: [
-      "5h de DJ professional",
-      "So 4000W EV",
-      "4 caps mòbils + llums + fum",
-      "Efectes VIP: espurnes fredes, confeti, bombolles",
+      "DJ professional durant 5 hores de festa non-stop",
+      "So d'alta potència 4000W EV",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Efectes VIP: espurnes fredes, confeti i bombolles",
     ],
     ideal: "Festes grans, la nit sencera",
     duration: "5h",
@@ -346,10 +318,10 @@ const PACKS: PackDefinition[] = [
     price: "250€",
     priceValue: 250,
     features: [
-      "2h de DJ ambient o fil musical",
-      "So 2000W",
-      "Llums bàsiques + fum",
-      "Muntatge i desmuntatge inclòs",
+      "DJ ambient o fil musical durant 2 hores",
+      "So professional 2000W",
+      "Il·luminació elegant i cabina il·luminada",
+      "Muntatge, desmuntatge i coordinació inclosos",
     ],
     ideal: "Còctels, inauguracions, networking",
     duration: "2h",
@@ -366,10 +338,10 @@ const PACKS: PackDefinition[] = [
     price: "400€",
     priceValue: 400,
     features: [
-      "3h de DJ + tècnic",
-      "So 2000W",
-      "4 caps mòbils + llums + fum",
-      "2 micròfons sense fils inclosos",
+      "DJ + tècnic durant 3 hores",
+      "So professional 2000W + 2 micros sense fils",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Coordinació completa amb el venue",
     ],
     ideal: "Esdeveniments corporatius",
     duration: "3h",
@@ -388,10 +360,10 @@ const PACKS: PackDefinition[] = [
     price: "600€",
     priceValue: 600,
     features: [
-      "5h de DJ + tècnic dedicat",
-      "So 4000W EV",
-      "4 caps mòbils + llums + fum",
-      "Efectes VIP + coordinació amb venue",
+      "DJ + tècnic dedicat durant 5 hores",
+      "So d'alta potència 4000W EV",
+      "Pont de llums amb 4 caps mòbils i fons negre",
+      "Efectes VIP + coordinació integral amb el venue",
     ],
     ideal: "Gales i esdeveniments d'alt nivell",
     duration: "5h",

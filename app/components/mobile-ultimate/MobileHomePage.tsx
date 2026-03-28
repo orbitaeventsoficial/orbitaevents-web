@@ -24,7 +24,7 @@
  * - HeroPortalLogo intro en móvil
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import MobileAppShell from './MobileAppShell';
@@ -395,7 +395,7 @@ function MobileReviewsSection() {
 function MobileFooter() {
   const t = useTranslations('mobileHome.footer');
   const { locale } = useMobile();
-  const currentYear = new Date().getFullYear();
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   const socialLinks = [
     SITE_CONFIG.social.instagram.enabled && SITE_CONFIG.social.instagram.url

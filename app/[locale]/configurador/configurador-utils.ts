@@ -47,7 +47,7 @@ export interface ClosingPricingSummary {
 export const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
   bodas: ['bodas'],
   discomovil: ['discomovil'],
-  fiestas: ['fiestas'],
+  fiestas: ['fiestas', 'discomovil'],
   empresas: ['empresas'],
 };
 

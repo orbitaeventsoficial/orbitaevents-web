@@ -21,7 +21,7 @@ interface NavItemConfig {
   labelKey: string;
   href: string;
   badge?: string;
-  dropdownType?: 'services' | 'experiences' | 'zones';
+  dropdownType?: 'services' | 'zones';
   dropdown?: {
     labelKey: string;
     descKey: string;
@@ -67,7 +67,6 @@ export default function HeaderChampion() {
   const tHeader = useTranslations('header');
   const tNav = useTranslations('header.nav');
   const tServices = useTranslations('header.services');
-  const tExperiences = useTranslations('header.experiences');
   const tZones = useTranslations('header.zones');
   const respiraLabel = tHeader('respira.label');
   const respiraTitle = tHeader('respira.title');
@@ -82,9 +81,9 @@ export default function HeaderChampion() {
   // Refs per scroll sense temblor
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
-  const hideThreshold = 24;
-  const showThreshold = 16;
-  const minHideOffset = 140;
+  const hideThreshold = 32;
+  const showThreshold = 6;
+  const minHideOffset = 100;
 
   // Scroll handler optimitzat
   const handleScroll = useCallback(() => {
@@ -180,7 +179,7 @@ export default function HeaderChampion() {
             <nav className="hidden lg:flex items-center gap-0.5">
               {navItemsConfig.map((item) => {
                 // Seleccionar el traductor correcte per al dropdown
-                const dropdownT = item.dropdownType === 'services' ? tServices : item.dropdownType === 'zones' ? tZones : tExperiences;
+                const dropdownT = item.dropdownType === 'services' ? tServices : tZones;
 
                 return (
                   <div
@@ -446,7 +445,7 @@ export default function HeaderChampion() {
                   </p>
 
                   {navItemsConfig.map((item) => {
-                    const dropdownT = item.dropdownType === 'services' ? tServices : item.dropdownType === 'zones' ? tZones : tExperiences;
+                    const dropdownT = item.dropdownType === 'services' ? tServices : tZones;
 
                     return (
                       <div key={item.href}>

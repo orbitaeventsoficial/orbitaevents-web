@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { TextNode, Section, TranslationComparison } from './text-manager-config';
 import { LANGUAGE_META, SECTIONS } from './text-manager-config';
@@ -625,7 +626,25 @@ export default function TextManagerPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <AdminHelpPanel
+          title="Com funciona"
+          description="Aquí edites els textos que es veuen a la web. Quan deses, el sistema manté els idiomes alineats perquè no se t escapi cap incoherència."
+          items={[
+            {
+              title: 'Seccions',
+              body: 'Cada bloc reuneix textos d una part concreta de la web. Així saps on toques en cada moment.',
+            },
+            {
+              title: 'Desar',
+              body: 'Només es desa el que realment has canviat. Si no hi ha canvis, el botó queda aturat.',
+            },
+            {
+              title: 'Comparar',
+              body: 'La comparació et deixa veure els altres idiomes abans de publicar cap canvi.',
+            },
+          ]}
+        />
         <div className="flex flex-col gap-6 xl:flex-row">
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* SIDEBAR - SECCIONS */}
@@ -796,3 +815,5 @@ export default function TextManagerPage() {
     </div>
   );
 }
+
+

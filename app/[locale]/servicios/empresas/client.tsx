@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from '@/lib/navigation';
 import ContactForm from "@/components/forms/ContactFormComplete";
 import { Briefcase, Users, Lightbulb, Star, Check, FileText, Shield, TrendingUp, Handshake, Sparkles } from "lucide-react";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
+import { usePacks } from '@/lib/hooks/usePacks';
+import { getPacksByService } from '@/config/packs-config';
 import Image from "next/image";
 
 export default function EmpresasClient() {
   const t = useTranslations('pages.corporate');
   const { track } = useAnalytics();
+  const locale = useLocale();
+  const fallbackPacks = useMemo(() => getPacksByService('empresas'), []);
+  const { packs: empresaPacks } = usePacks({ service: 'empresas', locale, fallback: fallbackPacks });
 
   useEffect(() => {
     track("View_Empresas");
@@ -76,7 +81,7 @@ export default function EmpresasClient() {
       </section>
 
       {/* TIPOS DE EVENTOS */}
-      <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-main to-bg-surface">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-bg-main to-bg-surface">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-h2 text-center text-white mb-12">
             {t('eventsTitle')} <span className="text-oe-gold">{t('eventsTitleHighlight')}</span>
@@ -104,8 +109,74 @@ export default function EmpresasClient() {
         </div>
       </section>
 
+      {/* ═══ PACKS PREUS ═══ */}
+      {empresaPacks.length > 0 && (
+        <section className="py-16 bg-bg-main">
+          <div className="mx-auto max-w-6xl px-4">
+            <h2 className="text-h2 text-center text-white mb-4">{t('packsTitle')}</h2>
+            <p className="text-text-muted text-center mb-12 max-w-2xl mx-auto">
+              {t('packsSubtitle')}
+            </p>
+
+            <div className={`grid gap-6 md:gap-8 md:grid-cols-${Math.min(empresaPacks.length, 3)}`}>
+              {[...empresaPacks].sort((a, b) => (a.priceValue ?? 0) - (b.priceValue ?? 0)).map((pack) => (
+                <div
+                  key={pack.id}
+                  className={`relative rounded-3xl p-8 border transition-all duration-300 group ${
+                    pack.popular
+                      ? 'bg-gradient-to-b from-amber-500/10 to-orange-500/5 border-oe-gold/50 scale-[1.02] hover:shadow-lg hover:shadow-amber-500/10'
+                      : 'bg-bg-surface border-border hover:border-oe-gold/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-white/5'
+                  }`}
+                >
+                  {pack.badge && (
+                    <div className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 text-sm font-bold rounded-full ${
+                      pack.popular
+                        ? 'bg-oe-gold text-bg-main shadow-md shadow-amber-500/30'
+                        : 'bg-white/10 text-white/80 border border-white/15 backdrop-blur-sm'
+                    }`}>
+                      {pack.badge}
+                    </div>
+                  )}
+                  <h3 className="text-2xl font-bold text-white text-center">{pack.name}</h3>
+                  <p className="text-text-muted text-sm text-center mt-1 mb-4">{pack.tagline}</p>
+                  <p className="text-xs text-text-muted text-center uppercase tracking-wider">Des de</p>
+                  <p className="text-4xl font-black text-oe-gold text-center">{pack.price}</p>
+                  <p className="text-xs text-text-muted text-center mb-1">{t('vatExcluded')}</p>
+                  <div className={`border-b ${pack.popular ? 'border-oe-gold/30' : 'border-white/10'} mb-4 mt-2`} />
+                  <div className="flex justify-between text-sm text-text-muted mb-4">
+                    <span>Durada</span>
+                    <span className="text-white font-medium">{pack.duration}</span>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {pack.features?.map((f: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-text-muted text-sm">
+                        <span className="w-5 h-5 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-oe-gold" />
+                        </span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/configurador?service=empresas&pack=${pack.id}`}
+                    className={`block w-full text-center py-4 rounded-xl font-bold transition-all ${
+                      pack.popular
+                        ? 'bg-oe-gold text-bg-main hover:bg-oe-gold/90'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => track(`CTA_Pack_${pack.id}`)}
+                  >
+                    Configurar →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* VALOR DIFERENCIAL */}
-      <section className="py-20 sm:py-32 bg-bg-surface">
+      <section className="py-12 sm:py-16 bg-bg-surface">
         <div className="mx-auto max-w-5xl px-4">
           <div className="card p-10 rounded-3xl border-2 border-oe-gold/50">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-oe-gold/10 flex items-center justify-center">
@@ -140,7 +211,7 @@ export default function EmpresasClient() {
       </section>
 
       {/* QUÉ INCLUYE */}
-      <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-surface to-bg-main">
+      <section className="py-12 sm:py-16 bg-gradient-to-b from-bg-surface to-bg-main">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-h2 text-center text-white mb-12">
             {t('includesTitle')} <span className="text-oe-gold">{t('includesTitleHighlight')}</span>
@@ -209,7 +280,7 @@ export default function EmpresasClient() {
       </section>
 
       {/* FORMULARIO */}
-      <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-main to-bg-surface">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-bg-main to-bg-surface">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl font-display font-black text-white mb-6">
             {t('formTitle')}

@@ -2737,6 +2737,9 @@
           "text": "Professional sound, elegant lighting, and impeccable coordination for institutional events."
         }
       },
+      "packsTitle": "Corporate Packages",
+      "packsSubtitle": "Transparent pricing. Choose the format that best fits your event.",
+      "vatExcluded": "Prices excl. VAT",
       "valueTitle": "Professionalism that Strengthens your Brand",
       "valueText": "Not just technical production: we create elegant networking, a professional atmosphere and moments of real connection between attendees. Your team remembers the event, your client is impressed.",
       "stats": {
@@ -2811,18 +2814,6 @@
         "backup": "Backup equipment on hand"
       },
       "discoPacks": {
-        "oferta-flash": {
-          "name": "Flash Offer",
-          "tagline": "Your party — now with real sound and lights",
-          "ideal": "Birthdays and parties up to 50 guests",
-          "features": [
-            "Professional DJ for 2 hours — your favourite music, the way it should sound",
-            "PRO 4000W sound that fills the room",
-            "Lighting that sets the perfect mood",
-            "Smoke machine for the special moments",
-            "We set it all up and take it all down"
-          ]
-        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "Your party, your sound — we bring the rest",
@@ -4677,6 +4668,7 @@
         "rating": "Assessment",
         "comment": "Comment",
         "media": "Photo/Video",
+        "contact": "Contact",
         "nps": "Recommendation",
         "finish": "End"
       },
@@ -5010,174 +5002,174 @@
     }
   },
   "monMagic": {
-    "badge": "Royal Handmade Sealing Wax",
-    "heroTitle": "Your wedding in",
-    "heroTitleHighlight": "Magic World",
-    "heroSubtitle": "Complete envelopes with a letter from the Director, personalized text and handmade sealing wax.",
-    "heroPrice": "✨ From €8/sachet with everything included ✨",
-    "priceUnit": "complete envelope",
-    "pricePackLabel": "pack +50",
-    "housesLabel": "houses",
-    "calculateBudget": "Calculate budget",
-    "seeHouses": "See the 5 houses",
-    "chooseCasa": "Choose your House",
-    "chooseCasaDesc": "All the envelopes of your order will have the sealing wax of the house you choose. Do you want different stamps? Adds the Multi-Stamp option.",
-    "lacreTitle": "Sealing wax",
-    "products": "Products",
-    "productsDesc": "Buy in units or take advantage of discounted packs",
-    "mostSold": "BEST SELLER",
+    "badge": "Parchment & Handmade Wax Seal",
+    "heroTitle": "The Letter Has Arrived at Your",
+    "heroTitleHighlight": "Wedding",
+    "heroSubtitle": "Every guest will receive their wax-sealed envelope with a letter from the Headmistress and a parchment bearing their name. Just like the day everything changed.",
+    "heroPrice": "From €8 per envelope — all handmade",
+    "priceUnit": "per envelope",
+    "pricePackLabel": "packs of 50+",
+    "housesLabel": "magical houses",
+    "calculateBudget": "Calculate your order",
+    "seeHouses": "Discover the houses",
+    "chooseCasa": "Which House Do You Belong To?",
+    "chooseCasaDesc": "Your envelope's wax seal will bear the emblem of the house you choose. Each seal is unique, hand-pressed. If you want each guest to carry their own house, enable Multi-Seal.",
+    "lacreTitle": "Seal of",
+    "products": "The Shopfront",
+    "productsDesc": "Everything you'll find in our Enchanted Alley shopfront",
+    "mostSold": "MOST REQUESTED",
     "perUnit": "Per unit",
     "askBudget": "Request a quote",
-    "packsDiscount": "Discounted Packs",
-    "packsDiscountDesc": "Save up to 15% with our complete packs",
+    "packsDiscount": "Magical Stationery Packs",
+    "packsDiscountDesc": "Everything you need so your guests feel like they've truly received their acceptance letter. Save up to 15%.",
     "recommended": "RECOMMENDED",
     "saving": "SAVING",
-    "requestPack": "Request pack",
-    "calculator": "Quick Calculator",
-    "calculatorDesc": "Select your number of guests",
-    "guests": "inv.",
-    "packBasic": "Basic Pack",
-    "packPremium": "Premium Pack",
+    "requestPack": "Request this pack",
+    "calculator": "Your Magical Budget",
+    "calculatorDesc": "How many guests will have a seat in the Great Hall?",
+    "guests": "guests",
+    "packBasic": "Acceptance Letter",
+    "packPremium": "The Great Hall",
     "requestBudgetFor": "Request quote for {count} guests",
-    "realPhotos": "Real Wedding Photos",
-    "realPhotosDesc": "See how our envelopes turned out at real weddings. The magic is palpable!",
-    "allPhotosReal": "All photos are from real weddings of our clients",
-    "completeLetter": "Envelope complete with letter",
-    "realReaction": "❤️ The real reaction",
-    "altSobreObert": "Open magic envelope with letter from the Director",
-    "altSobrePlat": "Personalized envelope on the plate",
-    "altConvidada": "Guest reading magic letter",
-    "altMussol": "Owl with scrolls",
-    "altEscombres": "Magic sports decoration",
-    "faq": "Frequently Asked Questions",
-    "wantCompletePack": "Do you want the complete theming pack?",
-    "wantCompletePackDesc": "Stationery is just the beginning. Combine it with DJ, special effects, lighting and decoration to create a complete magical experience.",
-    "configureComplete": "Set up full event",
-    "talkToUs": "talk to us",
+    "galleryLabel": "Gallery",
+    "schemaName": "Magical World Wedding Pack with Artisan Wax Seal",
+    "schemaDescription": "Complete envelopes for magic-themed weddings with Headmistress letter, personalised text and hand-pressed wax seal.",
+    "realPhotos": "Real Weddings, Real Magic",
+    "realPhotosDesc": "These photos are from weddings where guests opened their sealed envelopes at the table. Look at their faces.",
+    "allPhotosReal": "Everything you see is real — from our clients' weddings",
+    "completeLetter": "The envelope guests keep forever",
+    "realReaction": "❤️ Their face says it all",
+    "altSobreObert": "Wax-sealed envelope opened at the table",
+    "altSobrePlat": "Envelope with parchment at each guest's plate",
+    "altConvidada": "Guest reading their acceptance letter",
+    "altMussol": "Messenger owl decoration",
+    "altEscombres": "Flying broomstick decoration",
+    "altSobrePergami": "Envelope with parchment and artisan wax seal",
+    "altPergamins": "Personalised bilingual parchments",
+    "altCartell": "Custom couple sign with the Deathly Hallows symbol",
+    "faq": "Everything You Need to Know",
+    "wantCompletePack": "Want the full experience?",
+    "wantCompletePackDesc": "The stationery is the first spell. Add DJ, enchanted lighting, low fog for the first dance and themed decoration to transform your wedding into a night at the school of magic.",
+    "configureComplete": "Configure the full experience",
+    "talkToUs": "Send us an owl",
     "houses": {
       "escola": {
-        "nom": "Magic School",
-        "descripcio": "The official shield with the four houses"
+        "nom": "School of Magic",
+        "descripcio": "The official emblem — all four houses united"
       },
       "lleons": {
         "nom": "House of Lions",
-        "descripcio": "For the brave at heart"
+        "descripcio": "Courage, honour and determination"
       },
       "serps": {
-        "nom": "House of Snakes",
-        "descripcio": "For the ambitious and cunning"
+        "nom": "House of Serpents",
+        "descripcio": "Ambition, cunning and leadership"
       },
       "teixons": {
-        "nom": "Badger House",
-        "descripcio": "For the loyal and just"
+        "nom": "House of Badgers",
+        "descripcio": "Loyalty, patience and hard work"
       },
       "aguiles": {
-        "nom": "House of the Eagles",
-        "descripcio": "For the wise and creative"
+        "nom": "House of Eagles",
+        "descripcio": "Wisdom, creativity and wit"
       }
     },
     "productes": {
       "sobreComplet": {
-        "nom": "Complete Envelope School of Magic",
-        "descripcio": "The complete invitation pack: parchment paper envelope with personalized text, letter from the School Director, personalized frame for each guest, and handmade wax sealing with the seal of the chosen house.",
+        "nom": "The Sealed Envelope",
+        "descripcio": "The invitation your guests will open just like that first letter: parchment envelope with their name in calligraphy, a letter from the Headmistress, and real wax seal hand-pressed with the house emblem.",
         "caracteristiques": [
-          "Authentic parchment paper",
-          "Custom text for each guest",
-          "Letter from the School Director",
-          "Personalized frame with name and role",
-          "Handmade wax sealing",
-          "Seal of the chosen house"
+          "Authentic aged-texture parchment",
+          "Each guest's name in calligraphy",
+          "Letter from the School Headmistress",
+          "Custom role: groom, father, friend, master...",
+          "Real wax seal hand-pressed",
+          "House emblem of your choice"
         ],
-        "ideal": "Everything included in a single product"
+        "ideal": "The centrepiece of every seat"
       },
       "pergamiAmor": {
-        "nom": "Magical Love Scroll",
-        "descripcio": "Original love poems written in magical style, individually rolled and tied with an elegant ribbon. Perfect for decorating tables or giving to guests.",
+        "nom": "Enchanted Scrolls",
+        "descripcio": "Original love poems written as ancient spells. Individually rolled with silk ribbon. When guests unroll them, they find words that seem taken from a forbidden book in the library.",
         "caracteristiques": [
-          "Original and exclusive poems",
-          "Individually rolled",
-          "Tied with elegant ribbon",
-          "Quality parchment paper",
+          "Original poems in spell style",
+          "Hand-rolled with silk ribbon",
+          "Aged parchment paper",
           "12 poems in Catalan + 12 in Spanish",
-          "Perfect as a souvenir for guests"
+          "Each one unique and unrepeatable",
+          "The keepsake they'll treasure forever"
         ],
-        "ideal": "Table decoration and souvenirs"
+        "ideal": "A spell at every seat"
       },
       "cartellDecoratiu": {
-        "nom": "Magic School Decorative Posters",
-        "descripcio": "Thematic signs to decorate the space: Welcome to the Wedding, Flight Training Zone, magical signage...",
+        "nom": "Castle Signage",
+        "descripcio": "Signs in the style of the school notice boards: Welcome to the Wedding Feast, Flying Zone, Serpent Corridor... All customisable with your names.",
         "caracteristiques": [
-          "Magic Council style design",
-          "High quality printing",
+          "School notice board style design",
+          "High quality textured printing",
           "A3 or A2 size available",
-          "Customizable with names",
-          "Shields of the magical houses",
-          "Ideal for photocall"
+          "Customisable with your names",
+          "Magical house crests",
+          "Perfect for photo wall and decoration"
         ],
-        "ideal": "Decoration and photocall"
+        "ideal": "Transform the venue into a castle"
       }
     },
     "packs": {
       "basic": {
-        "nom": "Basic Pack \"Acceptance Letter\"",
-        "descripcio": "The essential pack: complete envelopes for all guests + 1 personalized welcome sign.",
+        "nom": "Acceptance Letter",
+        "descripcio": "Every guest receives their sealed envelope at their plate. Inside: the Headmistress's letter welcoming them to the wedding. The moment they open it is priceless.",
         "caracteristiques": [
-          "Complete envelopes for everyone",
-          "1 welcome poster A2",
-          "Chosen house sealing",
-          "Free review before printing",
+          "A sealed envelope for every guest",
+          "1 Welcome to the Feast banner (A2)",
+          "Wax seal of the house you choose",
+          "Free digital proof before production",
           "Delivery in 10-14 days"
         ],
-        "ideal": "Weddings up to 100 guests"
+        "ideal": "The envelope everyone will keep"
       },
       "premium": {
-        "nom": "Premium Pack \"Great Hall\"",
-        "descripcio": "Everything included: complete envelopes + scrolls for each table + pack of 5 decorative posters + multi-stamp option.",
+        "nom": "The Great Hall",
+        "descripcio": "The complete experience: sealed envelopes, enchanted scrolls at every table, castle signage throughout the venue, and the option for each guest to carry the seal of their own house.",
         "caracteristiques": [
-          "Complete envelopes for everyone",
-          "Scrolls for each table (1/table)",
-          "5 A2 decorative posters",
-          "Multi-seal option included",
-          "Priority delivery 7-10 days",
-          "Physical test before production"
+          "Sealed envelopes for every guest",
+          "Enchanted scrolls at every table",
+          "5 decorative signs with your names",
+          "Multi-Seal included — each house, its own wax",
+          "Priority delivery in 7-10 days",
+          "Real physical proof before production"
         ],
-        "ideal": "Premium weddings"
+        "ideal": "The wedding no one forgets"
       }
     },
     "multiSegell": {
-      "nom": "Multi-Seal Option",
-      "descripcio": "Each guest with the sealing wax of the color of their assigned house"
+      "nom": "Multi-Seal (each house, its own wax)",
+      "descripcio": "Assign a house to each guest and they'll receive their envelope with the matching coloured seal"
     },
     "faqs": {
       "q1": {
-        "pregunta": "What does the \"Complete Envelope\" include?",
-        "respuesta": "It includes everything you need: parchment paper envelope with the name of the guest, letter from the School Director, a personalized frame according to the role of the guest (boyfriend, father, friend...), and handmade wax sealing with the seal of the house you choose.",
-        "resposta": "It includes everything you need: parchment paper envelope with the name of the guest, letter from the School Director, a personalized frame according to the role of the guest (boyfriend, father, friend...), and handmade wax sealing with the seal of the house you choose."
+        "pregunta": "What exactly does each envelope include?",
+        "resposta": "Each envelope contains: parchment with the guest's name in calligraphy, a letter from the School Headmistress welcoming them, a custom frame with their role (groom, godmother, master of ceremonies...), and real wax seal hand-pressed with the emblem of the house you choose."
       },
       "q2": {
-        "pregunta": "Can I have envelopes with different stamps?",
-        "respuesta": "By default, all envelopes have the same stamp (the house you choose). If you want each guest to have the stamp of their assigned house, you can add the Multi-Stamp option for a supplement of €75-120 depending on the quantity.",
-        "resposta": "By default, all envelopes have the same stamp (the house you choose). If you want each guest to have the stamp of their assigned house, you can add the Multi-Stamp option for a supplement of €75-120 depending on the quantity."
+        "pregunta": "Can each guest have a different house?",
+        "resposta": "Yes! With Multi-Seal, you decide which house each guest belongs to. Their envelope will carry the matching coloured wax seal. Included in the Great Hall Pack, or as a supplement (€75-120) in the Acceptance Letter Pack."
       },
       "q3": {
-        "pregunta": "What are love scrolls like?",
-        "respuesta": "Each scroll is an original love poem with a magical theme. They come individually rolled and tied with an elegant ribbon. They are perfect to leave on each seat or as a table detail.",
-        "resposta": "Each scroll is an original love poem with a magical theme. They come individually rolled and tied with an elegant ribbon. They are perfect to leave on each seat or as a table detail."
+        "pregunta": "What are the enchanted scrolls?",
+        "resposta": "Original love poems written as spells. Individually rolled with silk ribbon on aged parchment. Place one at each seat and watch people read them to each other. The detail that turns a table into a moment."
       },
       "q4": {
-        "pregunta": "How long do they take?",
-        "respuesta": "Production time is 10-14 business days once the digital proof is approved. The Premium Pack includes priority delivery in 7-10 days. For urgent orders (+30%), we can deliver in 5-7 days.",
-        "resposta": "Production time is 10-14 business days once the digital proof is approved. The Premium Pack includes priority delivery in 7-10 days. For urgent orders (+30%), we can deliver in 5-7 days."
+        "pregunta": "When should I place my order?",
+        "resposta": "Standard production: 10-14 days once you approve the digital proof. The Great Hall Pack includes priority: 7-10 days. In a rush? We do urgent production (+30%) in 5-7 days. We recommend ordering 3-4 weeks ahead."
       },
       "q5": {
-        "pregunta": "Can I see a test first?",
-        "respuesta": "Yes. Before printing, we send you a digital PDF proof with 3-4 example envelopes. The Premium Pack includes a real physical test before full production.",
-        "resposta": "Yes. Before printing, we send you a digital PDF proof with 3-4 example envelopes. The Premium Pack includes a real physical test before full production."
+        "pregunta": "Can I see how it looks before paying?",
+        "resposta": "Always. We send a digital PDF proof with 3-4 sample envelopes so you can see names, typography and layout. The Great Hall Pack includes a real physical proof — the envelope in front of you, with the wax pressed, before producing all of them."
       },
       "q6": {
-        "pregunta": "Do you ship to all of Spain?",
-        "respuesta": "Yes. Shipping throughout the national territory with special packaging to protect the seals. Free collection in Granollers. Shipping by courier: €10-€18 depending on weight.",
-        "resposta": "Yes. Shipping throughout the national territory with special packaging to protect the seals. Free collection in Granollers. Shipping by courier: €10-€18 depending on weight."
+        "pregunta": "Do you ship anywhere?",
+        "resposta": "All across Spain, with special packaging to keep the wax seals intact. Free collection in Granollers. Courier shipping: €10-18 depending on weight and destination."
       }
     }
   },

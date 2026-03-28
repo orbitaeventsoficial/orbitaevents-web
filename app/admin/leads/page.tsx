@@ -1,9 +1,10 @@
-﻿import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import { AdminPage } from '../components/AdminPage';
+import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import LeadActions from './LeadActions';
 import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
@@ -261,6 +262,25 @@ export default async function LeadsPage({
       className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
+
+      <AdminHelpPanel
+        title="Com treballar entrades"
+        description="Aquesta és la porta comercial. Aquí veus quines oportunitats s han de respondre abans i com avançar-les cap a client o reserva."
+        items={[
+          {
+            title: 'Temps pendent',
+            body: 'T ajuda a no deixar refredar una oportunitat important.',
+          },
+          {
+            title: 'Pipeline',
+            body: 'El pipeline va bé per moure oportunitats. La llista va millor per revisar detall.',
+          },
+          {
+            title: 'Connexions',
+            body: 'Si una entrada ja està lligada a un client o una reserva, ho tens a un clic.',
+          },
+        ]}
+      />
 
       <section className="rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
@@ -533,6 +553,8 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
+
+
 
 
 

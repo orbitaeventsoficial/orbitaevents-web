@@ -32,6 +32,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '📄', label: 'Pressupostos', href: '/admin/presupuestos' },
       { icon: '🧮', label: 'Calculadora costos', href: '/admin/cost-calculator' },
       { icon: '💶', label: 'Finances', href: '/admin/economia' },
+      { icon: '🩺', label: 'Salut', href: '/admin/salut' },
       { icon: '🤝', label: 'Col·laboradors', href: '/admin/collaborators' },
       { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops' },
@@ -87,4 +88,5 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
 ];
+
 

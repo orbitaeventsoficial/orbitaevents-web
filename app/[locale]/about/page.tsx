@@ -69,7 +69,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </h1>
           <p
             className="text-xl text-white/70 max-w-3xl mx-auto"
-            dangerouslySetInnerHTML={{ __html: t('hero.description') }}
+            dangerouslySetInnerHTML={{ __html: t.raw('hero.description') }}
           />
         </div>
 
@@ -94,11 +94,11 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </h2>
           <p
             className="text-lg text-white/80 leading-relaxed text-center max-w-4xl mx-auto"
-            dangerouslySetInnerHTML={{ __html: t('history.paragraph1') }}
+            dangerouslySetInnerHTML={{ __html: t.raw('history.paragraph1') }}
           />
           <p
             className="text-lg text-white/80 leading-relaxed text-center max-w-4xl mx-auto mt-4"
-            dangerouslySetInnerHTML={{ __html: t('history.paragraph2') }}
+            dangerouslySetInnerHTML={{ __html: t.raw('history.paragraph2') }}
           />
           <p className="text-oe-gold text-xl font-bold text-center mt-6 animate-pulse">
             {t('history.highlight')}

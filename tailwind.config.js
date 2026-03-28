@@ -57,6 +57,9 @@ module.exports = {
         
         // Números - JetBrains Mono
         mono: ['var(--font-mono)', 'JetBrains Mono', 'Consolas', 'Monaco', 'monospace'],
+
+        // Serif - Cormorant Garamond (pàgines temàtiques)
+        serif: ['var(--font-serif)', 'Georgia', 'Times New Roman', 'serif'],
       },
 
       fontSize: {

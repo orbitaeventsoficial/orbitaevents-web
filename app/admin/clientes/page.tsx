@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { VIP_SPEND_THRESHOLD, getCustomerSourceLabel } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
@@ -180,6 +181,25 @@ export default function AdminContactesPage() {
         ) : undefined
       }
     >
+      <AdminHelpPanel
+        title="Com treballar clients"
+        description="Aquesta pantalla és el centre del CRM. Serveix per trobar persones ràpid, entendre qui necessita atenció i saber quin és el pas següent."
+        items={[
+          {
+            title: 'Prioritat',
+            body: 'La prioritat t ajuda a saber a qui convé moure abans.',
+          },
+          {
+            title: 'Proper pas',
+            body: 'Cada fila t orienta sobre la millor acció per fer avançar la relació.',
+          },
+          {
+            title: 'Fitxa 360',
+            body: 'La fitxa et dona la visió completa del client sense haver d anar buscant dades.',
+          },
+        ]}
+      />
+
       {/* Search & Add */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -546,5 +566,7 @@ export default function AdminContactesPage() {
     </AdminPage>
   );
 }
+
+
 
 

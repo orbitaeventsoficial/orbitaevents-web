@@ -8,6 +8,7 @@ import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
 import { PORTFOLIO_MEDIA_IMAGE_MIME_TYPES, PORTFOLIO_MEDIA_VIDEO_MIME_TYPES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { uploadFile, deleteFile, getPublicUrl } from '@/lib/storage';
+import { buildPortfolioUploadImagePath, normalizePortfolioImageBuffer } from '@/lib/services/portfolioImageService';
 
 const VALID_SLUGS = PORTFOLIO_CATEGORIES.map(({ slug }) => slug);
 
@@ -21,9 +22,6 @@ export function detectMediaType(mimeType: string): 'image' | 'video' | null {
   return null;
 }
 
-/**
- * Pujar media directament a una categoria del portfolio
- */
 export async function addPortfolioMedia(input: {
   slug: string;
   fileBuffer: Buffer;
@@ -39,19 +37,25 @@ export async function addPortfolioMedia(input: {
   const mediaType = detectMediaType(mimeType);
   if (!mediaType) throw new Error(`Tipus de fitxer no permès: ${mimeType}`);
 
-  const ext = fileName.split('.').pop()?.toLowerCase() || (mediaType === 'video' ? 'mp4' : 'webp');
+  const ext = fileName.split('.').pop()?.toLowerCase() || 'mp4';
   const timestamp = Date.now();
   const random = Math.random().toString(36).slice(2, 8);
-  const filePath = `portfolio/${slug}/${timestamp}-${random}.${ext}`;
+  const filePath = mediaType === 'image'
+    ? buildPortfolioUploadImagePath(slug, fileName)
+    : `portfolio/${slug}/${timestamp}-${random}.${ext}`;
 
-  await uploadFile(filePath, fileBuffer);
+  const normalizedBuffer = mediaType === 'image'
+    ? await normalizePortfolioImageBuffer(fileBuffer)
+    : fileBuffer;
+
+  await uploadFile(filePath, normalizedBuffer);
 
   const maxOrder = await prisma.portfolioMedia.aggregate({
     where: { slug },
     _max: { sortOrder: true },
   });
 
-  const media = await prisma.portfolioMedia.create({
+  return prisma.portfolioMedia.create({
     data: {
       slug,
       mediaUrl: getPublicUrl(filePath),
@@ -60,24 +64,26 @@ export async function addPortfolioMedia(input: {
       sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
       uploadedBy,
     },
+    include: {
+      event: {
+        select: { id: true, title: true, slug: true },
+      },
+    },
   });
-
-  return media;
 }
 
-/**
- * Llistar media d'una categoria
- */
 export async function listPortfolioMedia(slug: string) {
   return prisma.portfolioMedia.findMany({
     where: { slug },
-    orderBy: { sortOrder: 'asc' },
+    include: {
+      event: {
+        select: { id: true, title: true, slug: true },
+      },
+    },
+    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
 }
 
-/**
- * Llistar media de totes les categories amb recompte
- */
 export async function getPortfolioMediaCounts() {
   const counts = await prisma.portfolioMedia.groupBy({
     by: ['slug'],
@@ -90,22 +96,21 @@ export async function getPortfolioMediaCounts() {
   return map;
 }
 
-/**
- * Actualitzar media (caption, ordre)
- */
 export async function updatePortfolioMedia(
   mediaId: string,
-  data: { caption?: string; sortOrder?: number }
+  data: { caption?: string | null; sortOrder?: number; eventId?: string | null }
 ) {
   return prisma.portfolioMedia.update({
     where: { id: mediaId },
     data,
+    include: {
+      event: {
+        select: { id: true, title: true, slug: true },
+      },
+    },
   });
 }
 
-/**
- * Eliminar media
- */
 export async function deletePortfolioMedia(mediaId: string) {
   const media = await prisma.portfolioMedia.findUnique({ where: { id: mediaId } });
   if (!media) throw new Error('Media no trobat');

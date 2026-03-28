@@ -443,6 +443,34 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.avif",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  13"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-14.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  14"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-15.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  15"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-16.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  16"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-17.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  17"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-18.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  18"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-19.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  19"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-20.avif",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  20"
     }
   ],
   "produccion-tecnica": [

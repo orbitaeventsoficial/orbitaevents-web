@@ -120,8 +120,8 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
     extraHourPrice: Number((pack as { extraHourPrice?: number | null }).extraHourPrice ?? 0) || undefined,
     popular: pack.isFeatured || false,
     badge: badge || null,
-    capacidadMinima: pack.minGuests ?? undefined,
-    capacidadMaxima: pack.maxGuests ?? undefined,
+    capacidadMinima: pack.minGuests ?? fallbackPack?.capacidadMinima ?? undefined,
+    capacidadMaxima: pack.maxGuests ?? fallbackPack?.capacidadMaxima ?? undefined,
   };
 }
 

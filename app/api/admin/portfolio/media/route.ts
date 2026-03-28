@@ -2,11 +2,12 @@
  * API Portfolio Media — CRUD directe per categoria
  * GET    ?slug=bodas         → llistar media de la categoria
  * POST   FormData(file,slug) → pujar media
- * PATCH  JSON(mediaId,...)   → actualitzar caption/ordre
+ * PATCH  JSON(mediaId,...)   → actualitzar caption/ordre/event
  * DELETE ?mediaId=xxx        → eliminar media
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import {
   addPortfolioMedia,
   listPortfolioMedia,
@@ -15,11 +16,15 @@ import {
   isValidSlug,
   detectMediaType,
 } from '@/lib/services/portfolioMediaService';
-
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+import {
+  PORTFOLIO_MEDIA_IMAGE_MAX_SIZE,
+  PORTFOLIO_MEDIA_VIDEO_MAX_SIZE,
+} from '@/lib/constants/portfolio-media';
 
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const slug = request.nextUrl.searchParams.get('slug');
     if (!slug || !isValidSlug(slug)) {
@@ -34,6 +39,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -53,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Tipus no permès: ${file.type}` }, { status: 400 });
     }
 
-    const maxSize = mediaType === 'video' ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+    const maxSize = mediaType === 'video' ? PORTFOLIO_MEDIA_VIDEO_MAX_SIZE : PORTFOLIO_MEDIA_IMAGE_MAX_SIZE;
     if (file.size > maxSize) {
       const maxMB = maxSize / (1024 * 1024);
       return NextResponse.json({ error: `Fitxer massa gran (màx ${maxMB}MB)` }, { status: 400 });
@@ -66,6 +74,7 @@ export async function POST(request: NextRequest) {
       fileName: file.name,
       mimeType: file.type,
       caption,
+      uploadedBy: 'ADMIN',
     });
 
     return NextResponse.json({ data: media }, { status: 201 });
@@ -77,9 +86,12 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { mediaId, caption, sortOrder } = body;
+    const { mediaId, caption, sortOrder, eventId } = body;
 
     if (!mediaId) {
       return NextResponse.json({ error: 'mediaId requerit' }, { status: 400 });
@@ -88,6 +100,7 @@ export async function PATCH(request: NextRequest) {
     const updated = await updatePortfolioMedia(mediaId, {
       ...(caption !== undefined && { caption }),
       ...(sortOrder !== undefined && { sortOrder }),
+      ...(eventId !== undefined && { eventId }),
     });
 
     return NextResponse.json({ data: updated });
@@ -98,6 +111,9 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const mediaId = request.nextUrl.searchParams.get('mediaId');
     if (!mediaId) {

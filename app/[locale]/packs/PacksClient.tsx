@@ -29,12 +29,8 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
   const tabConfig = TABS.find((tab) => tab.id === activeTab)!;
   const filtered = packs.filter((p) => tabConfig.services.includes(p.service));
 
-  // Popular first, then by price ascending
-  const sorted = [...filtered].sort((a, b) => {
-    if (a.popular && !b.popular) return -1;
-    if (!a.popular && b.popular) return 1;
-    return (a.priceValue ?? 0) - (b.priceValue ?? 0);
-  });
+  // Price ascending (grow-up progression: Bàsic → Complet → Premium)
+  const sorted = [...filtered].sort((a, b) => (a.priceValue ?? 0) - (b.priceValue ?? 0));
 
   return (
     <main className="min-h-screen bg-bg-main text-white pt-28 pb-20 px-4 relative">
@@ -86,12 +82,12 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
                 key={pack.id}
                 ref={(el) => { packRefs.current[pack.id] = el; }}
                 onClick={() => handlePackClick(pack.id)}
-                className={`relative rounded-2xl border transition-all flex flex-col cursor-pointer ${
+                className={`relative rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer group ${
                   isSelected
                     ? 'bg-gradient-to-b from-amber-500/15 to-transparent border-amber-500/60 ring-2 ring-amber-500/40 scale-[1.02]'
                     : isPopular
-                    ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03]'
-                    : 'bg-white/[0.03] border-white/10 hover:border-white/20'
+                    ? 'bg-gradient-to-b from-amber-500/10 to-transparent border-amber-500/40 ring-1 ring-amber-500/20 md:scale-[1.03] hover:shadow-lg hover:shadow-amber-500/10'
+                    : 'bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-white/5'
                 } p-7 md:p-8`}
               >
                 {/* Badge */}
@@ -99,8 +95,8 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
                   <div
                     className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
                       isPopular
-                        ? 'bg-amber-500 text-black'
-                        : 'bg-white/10 text-white/60 border border-white/10'
+                        ? 'bg-amber-500 text-black shadow-md shadow-amber-500/30'
+                        : 'bg-white/10 text-white/80 border border-white/15 backdrop-blur-sm'
                     }`}
                   >
                     {pack.badge}
@@ -116,17 +112,17 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
                 </div>
 
                 {/* Price */}
-                <div className="text-center mb-5">
+                <div className="text-center mb-6 pb-6 border-b border-white/10">
                   <p className="text-xs text-white/40 uppercase tracking-wider mb-1">{t('from')}</p>
                   {pack.priceOriginal && (
                     <p className="text-white/30 text-lg line-through mb-0.5">{pack.priceOriginal}</p>
                   )}
-                  <p className="text-4xl font-black">{pack.price}</p>
+                  <p className={`text-4xl font-black ${isPopular ? 'text-amber-400' : ''}`}>{pack.price}</p>
                   <p className="text-white/30 text-xs mt-1">{t('vatExcluded')}</p>
                 </div>
 
                 {/* Quick specs */}
-                <div className="space-y-2 text-sm text-white/50 mb-5 pb-5 border-b border-white/5">
+                <div className="space-y-2 text-sm text-white/50 mb-5 pb-5 border-b border-white/10">
                   <div className="flex justify-between">
                     <span>{t('duration')}</span>
                     <span className="text-white/70 font-medium">{pack.duration}</span>
@@ -152,8 +148,8 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
                 {features.length > 0 && (
                   <ul className="space-y-2 mb-5 flex-1">
                     {features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-white/70">
-                        <span className="text-amber-400 mt-0.5 shrink-0">✓</span>
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-white/70">
+                        <span className="w-5 h-5 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 text-xs shrink-0 mt-0.5">✓</span>
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -189,8 +185,8 @@ export default function PacksClient({ packs }: { packs: PackDefinition[] }) {
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {(t.raw('allIncludeItems') as string[]).map((item: string, i: number) => (
               <div key={i} className="flex flex-col items-center gap-2">
-                <span className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 text-lg">✓</span>
-                <span className="text-white/70 text-sm">{item}</span>
+                <span className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-lg">✓</span>
+                <span className="text-white/80 text-sm font-medium">{item}</span>
               </div>
             ))}
           </div>

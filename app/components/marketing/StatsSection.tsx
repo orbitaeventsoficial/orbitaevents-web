@@ -100,7 +100,7 @@ export default function StatsSection() {
         const yearsNum = Math.max(1, new Date().getFullYear() - (s.yearStarted || 2023));
         setStats([
           { ...DEFAULT_STATS[0], value: Math.max(s.totalEvents || 0, 50) },
-          { ...DEFAULT_STATS[1], value: s.averageRating || 5 },
+          { ...DEFAULT_STATS[1], value: (s.averageRating && s.averageRating >= 4) ? s.averageRating : 5 },
           { ...DEFAULT_STATS[2], value: 2 },
           { ...DEFAULT_STATS[3], value: yearsNum },
         ]);

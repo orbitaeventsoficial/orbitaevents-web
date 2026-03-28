@@ -2306,6 +2306,9 @@
           "text": "So professional, il·luminació elegant i coordinació impecable per a actes institucionals."
         }
       },
+      "packsTitle": "Paquets Corporatius",
+      "packsSubtitle": "Preus transparents. Tria el format que millor encaixa amb el teu event.",
+      "vatExcluded": "Preus sense IVA",
       "valueTitle": "Professionalisme que Reforça la Teva Marca",
       "valueText": "No només producció tècnica: creem networking elegant, ambient professional i moments de connexió real entre assistents. El teu equip recorda l'esdeveniment, el teu client queda impressionat.",
       "stats": {
@@ -2380,18 +2383,6 @@
         "backup": "Equip de recanvi disponible"
       },
       "discoPacks": {
-        "oferta-flash": {
-          "name": "Oferta Flash",
-          "tagline": "La teva festa de sempre, ara amb so i llums de veritat",
-          "ideal": "Aniversaris i festes de fins a 50 convidats",
-          "features": [
-            "DJ professional 2 hores — la música que us agrada, com ha de sonar",
-            "So PRO 4000W que omple la sala",
-            "Llums que creen l'ambient perfecte",
-            "Màquina de fum per als moments especials",
-            "Nosaltres ho muntem i ho desmontem tot"
-          ]
-        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "La teva festa, el teu so — nosaltres posem la resta",
@@ -4543,6 +4534,7 @@
         "rating": "Valoració",
         "comment": "Comentari",
         "media": "Foto/Vídeo",
+        "contact": "Contacte",
         "nps": "Recomanació",
         "finish": "Final"
       },
@@ -5268,168 +5260,174 @@
     }
   },
   "monMagic": {
-    "badge": "Lacre Artesanal Real",
-    "heroTitle": "El Teu Casament al",
-    "heroTitleHighlight": "Món Màgic",
-    "heroSubtitle": "Sobres complets amb carta de la Directora, text personalitzat i lacre artesanal.",
-    "heroPrice": "✨ Des de 8€/sobre amb tot inclòs ✨",
-    "priceUnit": "sobre complet",
-    "pricePackLabel": "pack +50",
-    "housesLabel": "cases",
-    "calculateBudget": "Calcula pressupost",
-    "seeHouses": "Veure les 5 cases",
-    "chooseCasa": "Escull la Teva Casa",
-    "chooseCasaDesc": "Tots els sobres del teu encàrrec portaran el lacre de la casa que escullis. Vols segells diferents? Afegeix l'opció Multi-Segell.",
-    "lacreTitle": "Lacre",
-    "products": "Productes",
-    "productsDesc": "Compra per unitats o aprofita els packs amb descompte",
-    "mostSold": "MÉS VENUT",
+    "badge": "Pergamí i Lacre Artesanal",
+    "heroTitle": "La Carta Ha Arribat al Teu",
+    "heroTitleHighlight": "Casament",
+    "heroSubtitle": "Cada convidat rebrà el seu sobre segellat amb lacre de cera real, una carta de la Directora i el pergamí amb el seu nom. Com aquell dia que tot va canviar.",
+    "heroPrice": "Des de 8€ per sobre — tot fet a mà",
+    "priceUnit": "per sobre",
+    "pricePackLabel": "en packs de 50+",
+    "housesLabel": "cases màgiques",
+    "calculateBudget": "Calcula el teu encàrrec",
+    "seeHouses": "Descobreix les cases",
+    "chooseCasa": "A Quina Casa Pertanys?",
+    "chooseCasaDesc": "El lacre de cera del teu sobre portarà l'emblema de la casa que escullis. Cada segell és únic, premsat a mà. Si vols que cada convidat porti la seva pròpia casa, activa el Multi-Segell.",
+    "lacreTitle": "Segell de",
+    "products": "L'Aparador",
+    "productsDesc": "Tot el que trobaràs al nostre aparador del Carreró Encantat",
+    "mostSold": "EL MÉS DEMANAT",
     "perUnit": "Per unitat",
     "askBudget": "Demana pressupost",
-    "packsDiscount": "Packs amb Descompte",
-    "packsDiscountDesc": "Estalvia fins a un 15% amb els nostres packs complets",
+    "packsDiscount": "Packs de Papereria Màgica",
+    "packsDiscountDesc": "Tot el que necessites perquè els convidats sentin que han rebut la seva carta d'acceptació de veritat. Estalvia fins a un 15%.",
     "recommended": "RECOMANAT",
     "saving": "ESTALVI",
-    "requestPack": "Sol·licitar pack",
-    "calculator": "Calculadora Ràpida",
-    "calculatorDesc": "Selecciona la teva quantitat de convidats",
+    "requestPack": "Demanar aquest pack",
+    "calculator": "El Teu Pressupost Màgic",
+    "calculatorDesc": "Quants convidats tindran seient al Gran Saló?",
     "guests": "conv.",
-    "packBasic": "Pack Bàsic",
-    "packPremium": "Pack Premium",
-    "requestBudgetFor": "Sol·licitar pressupost per {count} convidats",
-    "realPhotos": "Fotos Reals de Casaments",
-    "realPhotosDesc": "Mira com van quedar els nostres sobres en casaments reals. La màgia és palpable!",
-    "allPhotosReal": "Totes les fotos són de casaments reals dels nostres clients",
-    "completeLetter": "Sobre complet amb carta",
-    "realReaction": "❤️ La reacció real",
-    "altSobreObert": "Sobre màgic obert amb carta de la Directora",
-    "altSobrePlat": "Sobre personalitzat al plat",
-    "altConvidada": "Convidada llegint carta màgica",
-    "altMussol": "Mussol amb pergamins",
-    "altEscombres": "Decoració esportiva màgica",
-    "faq": "Preguntes Freqüents",
-    "wantCompletePack": "Vols el pack complet de tematització?",
-    "wantCompletePackDesc": "La papereria és només el principi. Combina-la amb DJ, efectes especials, il·luminació i decoració per crear una experiència màgica completa.",
-    "configureComplete": "Configura event complet",
-    "talkToUs": "Parlar amb nosaltres",
+    "packBasic": "Carta d'Acceptació",
+    "packPremium": "Gran Saló Complet",
+    "requestBudgetFor": "Demanar pressupost per {count} convidats",
+    "galleryLabel": "Galeria",
+    "schemaName": "Pack Boda Món Màgic amb Lacre Artesanal",
+    "schemaDescription": "Sobres complets per a casaments temàtics de màgia amb carta de la Directora, text personalitzat i lacre de cera artesanal.",
+    "realPhotos": "Casaments Reals, Màgia Real",
+    "realPhotosDesc": "Aquestes fotos són de casaments on els convidats van obrir els seus sobres segellats a taula. Mira les cares.",
+    "allPhotosReal": "Tot el que veus és real — casaments dels nostres clients",
+    "completeLetter": "El sobre que els convidats guarden",
+    "realReaction": "❤️ La cara ho diu tot",
+    "altSobreObert": "Sobre segellat amb lacre obert a taula",
+    "altSobrePlat": "Sobre amb pergamí al plat de cada convidat",
+    "altConvidada": "Convidada llegint la seva carta d'acceptació",
+    "altMussol": "Decoració amb mussol missatger",
+    "altEscombres": "Decoració amb escombres voladores",
+    "altSobrePergami": "Sobre amb pergamí i lacre artesanal",
+    "altPergamins": "Pergamins bilingües personalitzats",
+    "altCartell": "Cartell personalitzat dels nuvis amb el símbol de les Relíquies",
+    "faq": "Tot El Que Necessites Saber",
+    "wantCompletePack": "Vols l'experiència completa?",
+    "wantCompletePackDesc": "La papereria és el primer encantament. Afegeix DJ, il·luminació encantada, fum baix per al primer ball i decoració temàtica per transformar el teu casament en una nit a l'escola de màgia.",
+    "configureComplete": "Configura l'experiència sencera",
+    "talkToUs": "Envia'ns un mussol",
     "houses": {
       "escola": {
         "nom": "Escola de Màgia",
-        "descripcio": "L'escut oficial amb les quatre cases"
+        "descripcio": "L'emblema oficial — les quatre cases unides"
       },
       "lleons": {
         "nom": "Casa dels Lleons",
-        "descripcio": "Per als valents de cor"
+        "descripcio": "Coratge, honor i determinació"
       },
       "serps": {
         "nom": "Casa de les Serps",
-        "descripcio": "Per als ambiciosos i astuts"
+        "descripcio": "Ambició, astúcia i lideratge"
       },
       "teixons": {
         "nom": "Casa dels Teixons",
-        "descripcio": "Per als lleials i justos"
+        "descripcio": "Lleialtat, paciència i treball"
       },
       "aguiles": {
         "nom": "Casa de les Àguiles",
-        "descripcio": "Per als savis i creatius"
+        "descripcio": "Saviesa, creativitat i enginy"
       }
     },
     "productes": {
       "sobreComplet": {
-        "nom": "Sobre Complet Escola de Màgia",
-        "descripcio": "El pack d'invitació complet: sobre de paper pergamí amb text personalitzat, carta de la Directora de l'Escola, frame personalitzat per cada convidat, i lacre de cera artesanal amb el segell de la casa escollida.",
+        "nom": "El Sobre Segellat",
+        "descripcio": "La invitació que els teus convidats obriran com aquella primera carta: sobre de pergamí amb el seu nom caligrafia, carta de la Directora, i lacre de cera real premsat a mà amb l'emblema de la casa.",
         "caracteristiques": [
-          "Paper pergamí autèntic",
-          "Text personalitzat per cada convidat",
+          "Pergamí autèntic amb textura envellida",
+          "Nom de cada convidat en cal·ligrafia",
           "Carta de la Directora de l'Escola",
-          "Frame personalitzat amb nom i rol",
-          "Lacre de cera artesanal",
-          "Segell de la casa escollida"
+          "Rol personalitzat: nuvi, pare, amic, mestre...",
+          "Lacre de cera real premsat a mà",
+          "Segell amb l'emblema de la casa escollida"
         ],
-        "ideal": "Tot inclòs en un sol producte"
+        "ideal": "La peça central de cada seient"
       },
       "pergamiAmor": {
-        "nom": "Pergamí d'Amor Màgic",
-        "descripcio": "Poemes originals d'amor escrits en estil màgic, enrollats individualment i lligats amb una cinta elegant. Perfectes per decorar les taules o regalar als convidats.",
+        "nom": "Pergamins Encantats",
+        "descripcio": "Poemes d'amor originals escrits com si fossin encanteris antics. Enrollats individualment amb cinta de seda. Quan els convidats els obrin, troben paraules que semblen tretes d'un llibre prohibit de la biblioteca.",
         "caracteristiques": [
-          "Poemes originals i exclusius",
-          "Enrollats individualment",
-          "Lligats amb cinta elegant",
-          "Paper pergamí de qualitat",
+          "Poemes originals en estil encantament",
+          "Enrollats a mà amb cinta de seda",
+          "Paper pergamí envellit",
           "12 poemes en català + 12 en castellà",
-          "Perfecte com a record per convidats"
+          "Cada un és únic i irrepetible",
+          "El record que es guarden per sempre"
         ],
-        "ideal": "Decoració de taules i records"
+        "ideal": "Un encantament a cada seient"
       },
       "cartellDecoratiu": {
-        "nom": "Cartells Decoratius Escola de Màgia",
-        "descripcio": "Cartells temàtics per decorar l'espai: Benvinguts a la Boda, Zona d'Entrenament de Vol, senyalització màgica...",
+        "nom": "Senyalització del Castell",
+        "descripcio": "Cartells amb l'estil dels taulers d'anuncis de l'escola: Benvinguts al Banquet de Noces, Zona de Vol, Passadís de les Serps... Tot personalitzable amb els vostres noms.",
         "caracteristiques": [
-          "Disseny estil Consell de Màgia",
-          "Impressió alta qualitat",
+          "Disseny estil tauler d'anuncis de l'escola",
+          "Impressió d'alta qualitat amb textures",
           "Mida A3 o A2 disponible",
-          "Personalitzable amb noms",
+          "Personalitzable amb els vostres noms",
           "Escuts de les cases màgiques",
-          "Ideal per photocall"
+          "Perfecte per photocall i decoració"
         ],
-        "ideal": "Decoració i photocall"
+        "ideal": "Transforma l'espai en un castell"
       }
     },
     "packs": {
       "basic": {
-        "nom": "Pack Bàsic \"Carta Acceptació\"",
-        "descripcio": "El pack essencial: sobres complets per a tots els convidats + 1 cartell de benvinguda personalitzat.",
+        "nom": "Carta d'Acceptació",
+        "descripcio": "Cada convidat rep el seu sobre segellat al plat. Dins: la carta de la Directora donant-li la benvinguda al casament. El moment en què l'obren no té preu.",
         "caracteristiques": [
-          "Sobres complets per a tots",
-          "1 cartell benvinguda A2",
-          "Lacre casa escollida",
-          "Revisió gratuïta abans imprimir",
-          "Entrega en 10-14 dies"
+          "Un sobre segellat per a cada convidat",
+          "1 cartell de benvinguda al Banquet (A2)",
+          "Lacre de la casa que escullis",
+          "Prova digital gratuïta abans de produir",
+          "Lliurament en 10-14 dies"
         ],
-        "ideal": "Casaments fins a 100 convidats"
+        "ideal": "El sobre que tothom guardarà"
       },
       "premium": {
-        "nom": "Pack Premium \"Gran Saló\"",
-        "descripcio": "Tot inclòs: sobres complets + pergamins per a cada taula + pack de 5 cartells decoratius + opció multi-segell.",
+        "nom": "El Gran Saló",
+        "descripcio": "L'experiència completa: sobres segellats, pergamins encantats a cada taula, senyalització del castell per tot l'espai, i la possibilitat que cada convidat porti el lacre de la seva pròpia casa.",
         "caracteristiques": [
-          "Sobres complets per a tots",
-          "Pergamins per cada taula (1/taula)",
-          "5 cartells decoratius A2",
-          "Opció multi-segell inclosa",
-          "Entrega prioritària 7-10 dies",
-          "Prova física abans producció"
+          "Sobres segellats per a cada convidat",
+          "Pergamins encantats a cada taula",
+          "5 cartells decoratius amb els vostres noms",
+          "Multi-Segell inclòs — cada casa, el seu lacre",
+          "Lliurament prioritari en 7-10 dies",
+          "Prova física real abans de la producció"
         ],
-        "ideal": "Casaments premium"
+        "ideal": "El casament que no s'oblida"
       }
     },
     "multiSegell": {
-      "nom": "Opció Multi-Segell",
-      "descripcio": "Cada convidat amb el lacre del color de la seva casa assignada"
+      "nom": "Multi-Segell (cada casa, el seu lacre)",
+      "descripcio": "Assigna una casa a cada convidat i rebrà el sobre amb el lacre del color corresponent"
     },
     "faqs": {
       "q1": {
-        "pregunta": "Què inclou el \"Sobre Complet\"?",
-        "resposta": "Inclou tot el que necessites: sobre de paper pergamí amb el nom del convidat, carta de la Directora de l'Escola, un frame personalitzat segons el rol del convidat (nuvi, pare, amic...), i lacre de cera artesanal amb el segell de la casa que escullis."
+        "pregunta": "Què inclou exactament cada sobre?",
+        "resposta": "Cada sobre conté: pergamí amb el nom del convidat en cal·ligrafia, carta de la Directora de l'Escola donant-li la benvinguda, un frame personalitzat amb el seu rol (nuvi, padrina, mestre de cerimònies...), i lacre de cera real premsat a mà amb l'emblema de la casa que escullis."
       },
       "q2": {
-        "pregunta": "Puc tenir sobres amb diferents segells?",
-        "resposta": "Per defecte, tots els sobres porten el mateix segell (la casa que escullis). Si vols que cada convidat tingui el segell de la seva casa assignada, pots afegir l'opció Multi-Segell per un suplement de 75-120€ segons la quantitat."
+        "pregunta": "Cada convidat pot tenir una casa diferent?",
+        "resposta": "Sí! Amb l'opció Multi-Segell, tu decideixes a quina casa pertany cada convidat. El sobre de cadascun portarà el lacre del color de la seva casa. Inclòs al Pack Gran Saló, o com a suplement (75-120€) al Pack Carta d'Acceptació."
       },
       "q3": {
-        "pregunta": "Com són els pergamins d'amor?",
-        "resposta": "Cada pergamí és un poema original d'amor amb temàtica màgica. Venen enrollats individualment i lligats amb una cinta elegant. Són perfectes per deixar a cada seient o com a detall de taula."
+        "pregunta": "Què són els pergamins encantats?",
+        "resposta": "Poemes d'amor originals escrits com si fossin encanteris. Van enrollats individualment amb cinta de seda sobre paper pergamí envellit. Posa'n un a cada seient i mira com la gent se'ls llegeix entre si. El detall que converteix la taula en un moment."
       },
       "q4": {
-        "pregunta": "Quant temps triguen?",
-        "resposta": "El temps de producció és de 10-14 dies laborables un cop aprovada la prova digital. El Pack Premium inclou entrega prioritària en 7-10 dies. Per comandes urgents (+30%), podem entregar en 5-7 dies."
+        "pregunta": "Quan he de fer la comanda?",
+        "resposta": "Producció estàndard: 10-14 dies un cop aproves la prova digital. El Pack Gran Saló inclou prioritat: 7-10 dies. Si tens pressa, fem producció urgent (+30%) en 5-7 dies. Recomanem demanar amb 3-4 setmanes de marge."
       },
       "q5": {
-        "pregunta": "Puc veure una prova abans?",
-        "resposta": "Sí! Abans d'imprimir, t'enviem una prova digital en PDF amb 3-4 sobres d'exemple. El Pack Premium inclou una prova física real abans de la producció completa."
+        "pregunta": "Puc veure com quedarà abans de pagar?",
+        "resposta": "Sempre. Enviem prova digital en PDF amb 3-4 sobres d'exemple perquè vegis noms, tipografia i maquetació. El Pack Gran Saló inclou una prova física real — el sobre al teu davant, amb el lacre premsat, abans de produir tots."
       },
       "q6": {
-        "pregunta": "Feu enviaments a tota Espanya?",
-        "resposta": "Sí! Enviament a tot el territori nacional amb embalatge especial per protegir els lacres. Recollida gratuïta a Granollers. Enviament per missatger: 10-18€ segons pes."
+        "pregunta": "Envieu a qualsevol lloc?",
+        "resposta": "A tot Espanya, amb embalatge especial perquè els lacres arribin intactes. Recollida gratuïta a Granollers. Enviament per missatger: 10-18€ segons pes i destí."
       }
     }
   },

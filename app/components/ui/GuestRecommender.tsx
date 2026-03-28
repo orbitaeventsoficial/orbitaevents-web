@@ -31,10 +31,18 @@ export default function GuestRecommender({ packs, service, labels }: GuestRecomm
       const max = pack.capacidadMaxima ?? Infinity;
       return numGuests >= min && numGuests <= max;
     });
-    if (eligible.length > 0) {
-      return eligible.find((p) => p.popular) || eligible[0];
+    if (eligible.length === 0) {
+      return packs.find((p) => p.popular) || packs[Math.floor(packs.length / 2)] || null;
     }
-    return packs.find((p) => p.popular) || packs[Math.floor(packs.length / 2)] || null;
+    if (eligible.length === 1) {
+      return eligible[0];
+    }
+    // Multiple eligible: best fit = closest to midpoint of capacity range
+    return eligible.reduce((best, pack) => {
+      const bestMid = ((best.capacidadMinima ?? 0) + (best.capacidadMaxima ?? 300)) / 2;
+      const packMid = ((pack.capacidadMinima ?? 0) + (pack.capacidadMaxima ?? 300)) / 2;
+      return Math.abs(numGuests - packMid) < Math.abs(numGuests - bestMid) ? pack : best;
+    });
   }, [packs, numGuests]);
 
   // Auto-center when recommendation changes after user interaction

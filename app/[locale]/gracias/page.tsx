@@ -47,7 +47,7 @@ export default async function GraciasPage() {
             </div>
             <p
               className="text-white/60 text-sm [&_strong]:text-amber-400"
-              dangerouslySetInnerHTML={{ __html: t('response.text') }}
+              dangerouslySetInnerHTML={{ __html: t.raw('response.text') }}
             />
           </div>
 

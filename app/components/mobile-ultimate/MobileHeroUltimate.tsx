@@ -152,6 +152,7 @@ function FloatingCTAs() {
 export default function MobileHeroUltimate() {
   const t = useTranslations('mobileHero');
   const reduceMotion = useReducedMotion();
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
   const [slideIndex, setSlideIndex] = useState(0);
   const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>([...PUBLIC_HERO_MEDIA_FALLBACK]);
   const [videoReady, setVideoReady] = useState(false);
@@ -296,7 +297,7 @@ export default function MobileHeroUltimate() {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.08] border border-white/10 text-white/70 text-xs font-medium tracking-wide uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              {t('badges.halloween', { year: new Date().getFullYear() })}
+              {t('badges.halloween', { year: currentYear })}
             </span>
           </motion.div>
 

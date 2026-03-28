@@ -1,296 +1,16 @@
 'use client';
 
-/**
- * Admin Portfolio — Gestió de media per categoria
- * Bustia de pujada per cada secció amb suport d'imatges i vídeos.
- */
-
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
 import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
-
-const MAX_DIMENSION = 1200;
-const WEBP_QUALITY = 0.85;
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
-
-type MediaItem = {
-  id: string;
-  mediaUrl: string;
-  mediaType: 'image' | 'video';
-  caption: string | null;
-  sortOrder: number;
-  createdAt: string;
-};
-
-function isImageType(type: string) {
-  return type.startsWith('image/');
-}
-
-function optimizeImage(file: File): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const img = new window.Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      let { width, height } = img;
-      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-        if (width > height) {
-          height = Math.round(height * (MAX_DIMENSION / width));
-          width = MAX_DIMENSION;
-        } else {
-          width = Math.round(width * (MAX_DIMENSION / height));
-          height = MAX_DIMENSION;
-        }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) { reject(new Error('No canvas')); return; }
-      ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob(
-        (blob) => {
-          if (blob) { resolve(blob); } else { reject(new Error('toBlob failed')); }
-        },
-        'image/webp',
-        WEBP_QUALITY,
-      );
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Error carregant imatge')); };
-    img.src = url;
-  });
-}
-
-function CategorySection({ slug, name }: { slug: string; name: string }) {
-  const [media, setMedia] = useState<MediaItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const loadMedia = useCallback(async () => {
-    try {
-      const res = await fetchWithCsrf(`/api/admin/portfolio/media?slug=${slug}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        setMedia(data.data || []);
-      }
-    } catch (err) {
-      console.error(`Error carregant ${slug}:`, err);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug]);
-
-  useEffect(() => {
-    if (expanded) loadMedia();
-  }, [expanded, loadMedia]);
-
-  const handleUpload = async (files: FileList) => {
-    setUploading(true);
-    setError(null);
-    let uploaded = 0;
-
-    for (const file of Array.from(files)) {
-      const isImage = isImageType(file.type);
-      const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_VIDEO_SIZE;
-
-      if (file.size > maxSize) {
-        const maxMB = maxSize / (1024 * 1024);
-        setError(`${file.name} massa gran (màx ${maxMB}MB)`);
-        continue;
-      }
-
-      try {
-        const formData = new FormData();
-        formData.append('slug', slug);
-
-        if (isImage) {
-          const optimized = await optimizeImage(file);
-          formData.append('file', optimized, `${Date.now()}.webp`);
-        } else {
-          formData.append('file', file, file.name);
-        }
-
-        const res = await fetchWithCsrf('/api/admin/portfolio/media', {
-          method: 'POST',
-          body: formData,
-        });
-        if (res.ok) {
-          uploaded++;
-        } else {
-          const d = await res.json().catch(() => ({}));
-          setError(d?.error || 'Error pujant fitxer');
-        }
-      } catch (err) {
-        console.error('Error pujant:', err);
-        setError('Error processant fitxer');
-      }
-    }
-
-    if (uploaded > 0) await loadMedia();
-    setUploading(false);
-    if (fileRef.current) fileRef.current.value = '';
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files);
-  };
-
-  const deleteMedia = async (mediaId: string) => {
-    try {
-      const res = await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${mediaId}`, { method: 'DELETE' });
-      if (res.ok) setMedia((prev) => prev.filter((m) => m.id !== mediaId));
-    } catch (err) {
-      console.error('Error eliminant:', err);
-    }
-  };
-
-  const imageCount = media.filter((m) => m.mediaType === 'image').length;
-  const videoCount = media.filter((m) => m.mediaType === 'video').length;
-
-  return (
-    <div className="ap-card overflow-hidden rounded-2xl">
-      {/* Header — sempre visible */}
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors text-left"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-lg">📁</span>
-          <div>
-            <p className="font-semibold">{name}</p>
-            <p className="text-xs opacity-50">{slug}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {!loading && (imageCount > 0 || videoCount > 0) && (
-            <div className="flex gap-2 text-xs">
-              {imageCount > 0 && (
-                <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">
-                  {imageCount} foto{imageCount !== 1 ? 's' : ''}
-                </span>
-              )}
-              {videoCount > 0 && (
-                <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
-                  {videoCount} vídeo{videoCount !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-          )}
-          <span className={`transition-transform ${expanded ? 'rotate-180' : ''}`}>▾</span>
-        </div>
-      </button>
-
-      {/* Cos expandible */}
-      {expanded && (
-        <div className="border-t p-5 space-y-4 admin-tone-border-neutral">
-          {error && <p className="text-sm text-red-400 rounded-xl border border-red-500/20 px-3 py-2">{error}</p>}
-
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*,video/mp4,video/webm,video/quicktime"
-            multiple
-            className="hidden"
-            onChange={(e) => e.target.files && handleUpload(e.target.files)}
-          />
-
-          {/* Drop zone */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => fileRef.current?.click()}
-            className="rounded-xl border-2 border-dashed border-white/20 p-8 text-center hover:border-white/40 transition-colors cursor-pointer"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
-          >
-            {uploading ? (
-              <p className="text-sm animate-pulse">Pujant fitxers...</p>
-            ) : (
-              <>
-                <span className="text-3xl block mb-2">📷🎬</span>
-                <p className="text-sm">Arrossega imatges o vídeos aquí</p>
-                <p className="text-xs opacity-50 mt-1">
-                  Imatges: JPG, PNG, WebP (màx 10MB, compressió auto WebP) · Vídeos: MP4, WebM (màx 100MB)
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Media grid */}
-          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((i) => <div key={i} className="aspect-square rounded-xl bg-white/5 animate-pulse" />)}
-            </div>
-          ) : media.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {media.map((item) => (
-                <div key={item.id} className="group relative aspect-square overflow-hidden rounded-xl border admin-tone-border-neutral transition-all hover:admin-tone-border-info">
-                  {item.mediaType === 'image' ? (
-                    <Image
-                      src={item.mediaUrl}
-                      alt={item.caption || `${name} foto`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  ) : (
-                    <div className="relative w-full h-full bg-black flex items-center justify-center">
-                      <video
-                        src={item.mediaUrl}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        muted
-                        playsInline
-                        preload="metadata"
-                        onMouseEnter={(e) => e.currentTarget.play()}
-                        onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
-                      />
-                      <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full z-10">▶ Vídeo</span>
-                    </div>
-                  )}
-
-                  {/* Badge tipus */}
-                  <div className="absolute top-2 left-2">
-                    <span className={`text-white text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
-                      item.mediaType === 'video' ? 'bg-purple-500/80' : 'bg-blue-500/80'
-                    }`}>
-                      {item.mediaType === 'video' ? 'Vídeo' : 'Foto'}
-                    </span>
-                  </div>
-
-                  {/* Delete */}
-                  <button
-                    type="button"
-                    onClick={() => deleteMedia(item.id)}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center"
-                    title="Eliminar"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm opacity-50 text-center py-4">Encara no hi ha media en aquesta categoria</p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// EVENTS MANAGEMENT
-// ═══════════════════════════════════════════════════════════════════════════
+import {
+  PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE,
+  PORTFOLIO_MEDIA_IMAGE_MAX_SIZE,
+  PORTFOLIO_MEDIA_UPLOAD_ACCEPT,
+  PORTFOLIO_MEDIA_VIDEO_MAX_SIZE,
+} from '@/lib/constants/portfolio-media';
 
 type PortfolioEvent = {
   id: string;
@@ -309,253 +29,624 @@ type PortfolioEvent = {
   _count?: { media: number };
 };
 
-function EventsManager() {
-  const [events, setEvents] = useState<PortfolioEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    slug: '', categorySlug: 'bodas', title: '', subtitle: '', venue: '', location: '',
-    eventDate: '', guestCount: '', description: '', services: '', coverImage: '', published: false,
-  });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+type EventRef = {
+  id: string;
+  title: string;
+  slug: string;
+};
 
-  const loadEvents = useCallback(async () => {
+type MediaItem = {
+  id: string;
+  mediaUrl: string;
+  mediaType: 'image' | 'video';
+  caption: string | null;
+  sortOrder: number;
+  createdAt: string;
+  event?: EventRef | null;
+};
+
+type PreviewState = {
+  url: string;
+  type: 'image' | 'video';
+  alt: string;
+};
+
+type EventFormState = {
+  slug: string;
+  categorySlug: string;
+  title: string;
+  subtitle: string;
+  venue: string;
+  location: string;
+  eventDate: string;
+  guestCount: string;
+  description: string;
+  services: string;
+  coverImage: string;
+  published: boolean;
+};
+
+const EMPTY_EVENT_FORM: EventFormState = {
+  slug: '',
+  categorySlug: 'bodas',
+  title: '',
+  subtitle: '',
+  venue: '',
+  location: '',
+  eventDate: '',
+  guestCount: '',
+  description: '',
+  services: '',
+  coverImage: '',
+  published: false,
+};
+
+function isImageType(type: string) {
+  return type.startsWith('image/');
+}
+
+function buildEventPayload(form: EventFormState) {
+  return {
+    ...form,
+    eventDate: form.eventDate || undefined,
+    guestCount: form.guestCount ? Number(form.guestCount) : undefined,
+    services: form.services
+      ? form.services.split(',').map((value) => value.trim()).filter(Boolean)
+      : [],
+  };
+}
+
+function FullscreenPreview({ preview, onClose }: { preview: PreviewState | null; onClose: () => void }) {
+  useEffect(() => {
+    if (!preview) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [preview, onClose]);
+
+  if (!preview) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/95 p-4" onClick={onClose}>
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/60 px-3 py-2 text-sm text-white/90"
+      >
+        Tancar
+      </button>
+      <div className="relative mx-auto h-full w-full max-w-7xl" onClick={(event) => event.stopPropagation()}>
+        {preview.type === 'image' ? (
+          <Image src={preview.url} alt={preview.alt} fill sizes="100vw" className="object-contain" />
+        ) : (
+          <video src={preview.url} className="h-full w-full object-contain" controls autoPlay playsInline />
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+function CategorySection({
+  slug,
+  name,
+  events,
+  onEventsRefresh,
+  onOpenPreview,
+}: {
+  slug: string;
+  name: string;
+  events: PortfolioEvent[];
+  onEventsRefresh: () => Promise<void>;
+  onOpenPreview: (preview: PreviewState) => void;
+}) {
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const replaceFileRef = useRef<HTMLInputElement>(null);
+  const replaceTargetRef = useRef<MediaItem | null>(null);
+
+  const categoryEvents = useMemo(() => events.filter((eventItem) => eventItem.categorySlug === slug), [events, slug]);
+  const coverMap = useMemo(() => {
+    const map = new Map<string, PortfolioEvent[]>();
+    for (const eventItem of categoryEvents) {
+      const current = map.get(eventItem.coverImage) || [];
+      current.push(eventItem);
+      map.set(eventItem.coverImage, current);
+    }
+    return map;
+  }, [categoryEvents]);
+
+  const loadMedia = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetchWithCsrf('/api/admin/portfolio/events?published=all', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        setEvents(data.events || []);
+      const response = await fetchWithCsrf(`/api/admin/portfolio/media?slug=${slug}`, { cache: 'no-store' });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || 'Error carregant media');
       }
+      const data = await response.json();
+      setMedia(data.data || []);
     } catch (err) {
-      console.error('Error carregant events:', err);
+      console.error(`Error carregant ${slug}:`, err);
+      setError(err instanceof Error ? err.message : 'Error carregant media');
     } finally {
       setLoading(false);
     }
+  }, [slug]);
+
+  useEffect(() => {
+    if (expanded) void loadMedia();
+  }, [expanded, loadMedia]);
+  const persistSortOrder = useCallback(async (items: MediaItem[]) => {
+    for (let index = 0; index < items.length; index += 1) {
+      await fetchWithCsrf('/api/admin/portfolio/media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mediaId: items[index].id, sortOrder: index }),
+      });
+    }
   }, []);
 
-  useEffect(() => { loadEvents(); }, [loadEvents]);
+  const handleUpload = useCallback(async (files: FileList | File[], replacement?: MediaItem | null) => {
+    const entries = Array.from(files);
+    if (entries.length === 0) return;
 
-  const handleSubmit = async () => {
-    if (!form.slug || !form.title || !form.coverImage) {
-      setError('Slug, títol i imatge de portada són requerits');
-      return;
-    }
-    setSaving(true);
+    setUploading(true);
     setError(null);
     try {
-      const res = await fetchWithCsrf('/api/admin/portfolio/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          eventDate: form.eventDate || undefined,
-          guestCount: form.guestCount ? Number(form.guestCount) : undefined,
-          services: form.services ? form.services.split(',').map((s) => s.trim()).filter(Boolean) : [],
-        }),
-      });
-      if (res.ok) {
-        setShowForm(false);
-        setForm({ slug: '', categorySlug: 'bodas', title: '', subtitle: '', venue: '', location: '', eventDate: '', guestCount: '', description: '', services: '', coverImage: '', published: false });
-        await loadEvents();
-      } else {
-        const d = await res.json().catch(() => ({}));
-        setError(d?.error || 'Error creant event');
-      }
-    } catch {
-      setError('Error de xarxa');
-    } finally {
-      setSaving(false);
-    }
-  };
+      for (const file of entries) {
+        const maxSize = isImageType(file.type) ? PORTFOLIO_MEDIA_IMAGE_MAX_SIZE : PORTFOLIO_MEDIA_VIDEO_MAX_SIZE;
+        if (file.size > maxSize) {
+          throw new Error(`${file.name} supera el límit permès`);
+        }
 
-  const togglePublished = async (ev: PortfolioEvent) => {
+        const formData = new FormData();
+        formData.append('slug', slug);
+        formData.append('file', file, file.name);
+        if (replacement?.caption) formData.append('caption', replacement.caption);
+
+        const uploadResponse = await fetchWithCsrf('/api/admin/portfolio/media', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!uploadResponse.ok) {
+          const data = await uploadResponse.json().catch(() => ({}));
+          throw new Error(data?.error || 'Error pujant fitxer');
+        }
+
+        const uploadData = await uploadResponse.json();
+        const created = uploadData.data as MediaItem;
+
+        if (replacement) {
+          await fetchWithCsrf('/api/admin/portfolio/media', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mediaId: created.id,
+              caption: replacement.caption,
+              sortOrder: replacement.sortOrder,
+              eventId: replacement.event?.id ?? null,
+            }),
+          });
+
+          const coverRefs = coverMap.get(replacement.mediaUrl) || [];
+          for (const eventItem of coverRefs) {
+            await fetchWithCsrf('/api/admin/portfolio/events', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: eventItem.id, coverImage: created.mediaUrl }),
+            });
+          }
+
+          await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${replacement.id}`, { method: 'DELETE' });
+          await onEventsRefresh();
+        }
+      }
+
+      await loadMedia();
+    } catch (err) {
+      console.error('Error pujant media:', err);
+      setError(err instanceof Error ? err.message : 'Error pujant media');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+      if (replaceFileRef.current) replaceFileRef.current.value = '';
+      replaceTargetRef.current = null;
+    }
+  }, [coverMap, loadMedia, onEventsRefresh, slug]);
+
+  const handleReplaceSelection = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || !replaceTargetRef.current) return;
+    void handleUpload(event.target.files, replaceTargetRef.current);
+  }, [handleUpload]);
+
+  const handleCaptionSave = useCallback(async (item: MediaItem, caption: string) => {
+    setSavingId(item.id);
+    setError(null);
+    try {
+      await fetchWithCsrf('/api/admin/portfolio/media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mediaId: item.id, caption }),
+      });
+      setMedia((current) => current.map((entry) => (entry.id === item.id ? { ...entry, caption } : entry)));
+    } catch (err) {
+      console.error('Error guardant caption:', err);
+      setError(err instanceof Error ? err.message : 'Error guardant caption');
+    } finally {
+      setSavingId(null);
+    }
+  }, []);
+
+  const handleAssignEvent = useCallback(async (item: MediaItem, eventId: string) => {
+    setSavingId(item.id);
+    setError(null);
+    try {
+      await fetchWithCsrf('/api/admin/portfolio/media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mediaId: item.id, eventId: eventId || null }),
+      });
+      await loadMedia();
+    } catch (err) {
+      console.error('Error assignant event:', err);
+      setError(err instanceof Error ? err.message : 'Error assignant event');
+    } finally {
+      setSavingId(null);
+    }
+  }, [loadMedia]);
+
+  const handleSetCover = useCallback(async (eventId: string, mediaUrl: string) => {
+    setSavingId(eventId);
+    setError(null);
     try {
       await fetchWithCsrf('/api/admin/portfolio/events', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: ev.id, published: !ev.published }),
+        body: JSON.stringify({ id: eventId, coverImage: mediaUrl }),
       });
-      await loadEvents();
+      await onEventsRefresh();
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error actualitzant portada:', err);
+      setError(err instanceof Error ? err.message : 'Error actualitzant portada');
+    } finally {
+      setSavingId(null);
     }
-  };
+  }, [onEventsRefresh]);
 
-  const deleteEvent = async (id: string) => {
+  const handleDelete = useCallback(async (item: MediaItem) => {
+    setSavingId(item.id);
+    setError(null);
+    try {
+      const coverRefs = coverMap.get(item.mediaUrl) || [];
+      if (coverRefs.length > 0) {
+        throw new Error('Aquesta imatge és portada d\'un event. Substitueix-la o assigna una altra portada abans d\'eliminar-la.');
+      }
+      await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
+      await loadMedia();
+    } catch (err) {
+      console.error('Error eliminant media:', err);
+      setError(err instanceof Error ? err.message : 'Error eliminant media');
+    } finally {
+      setSavingId(null);
+    }
+  }, [coverMap, loadMedia]);
+
+  const handleDrop = useCallback(async (targetId: string) => {
+    if (!draggingId || draggingId === targetId) return;
+    const startIndex = media.findIndex((item) => item.id === draggingId);
+    const targetIndex = media.findIndex((item) => item.id === targetId);
+    if (startIndex === -1 || targetIndex === -1) return;
+
+    const next = [...media];
+    const [moved] = next.splice(startIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    const normalized = next.map((item, index) => ({ ...item, sortOrder: index }));
+    setMedia(normalized);
+    setDraggingId(null);
+
+    try {
+      await persistSortOrder(normalized);
+    } catch (err) {
+      console.error('Error reordenant media:', err);
+      setError('No s\'ha pogut guardar el nou ordre');
+      await loadMedia();
+    }
+  }, [draggingId, loadMedia, media, persistSortOrder]);
+
+  const imageCount = media.filter((item) => item.mediaType === 'image').length;
+  const videoCount = media.filter((item) => item.mediaType === 'video').length;
+
+  return (
+    <div className="ap-card overflow-hidden rounded-2xl">
+      <input ref={fileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} multiple className="hidden" onChange={(event) => event.target.files && void handleUpload(event.target.files)} />
+      <input ref={replaceFileRef} type="file" accept={PORTFOLIO_MEDIA_UPLOAD_ACCEPT} className="hidden" onChange={handleReplaceSelection} />
+
+      <button type="button" onClick={() => setExpanded((current) => !current)} className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/5">
+        <div className="flex items-center gap-3">
+          <span className="text-lg">🖼️</span>
+          <div>
+            <p className="font-semibold text-white/90">{name}</p>
+            <p className="text-xs text-white/40">{slug}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-white/60">
+          <span className="rounded-full border border-white/10 px-2 py-1">{imageCount} fotos</span>
+          <span className="rounded-full border border-white/10 px-2 py-1">{videoCount} vídeos</span>
+          <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>▾</span>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="space-y-4 border-t border-white/10 p-5">
+          {error && <p className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300">{error}</p>}
+          <div className="grid gap-3 lg:grid-cols-3">
+            <AdminHelpLegend title="Portada" body="És la imatge principal de cada event. La pots marcar des de qualsevol miniatura." />
+            <AdminHelpLegend title="Assignació" body="Vincula una peça a un event concret perquè sàpigues on surt i la puguis reutilitzar amb criteri." />
+            <AdminHelpLegend title="Ordre" body="L'ordre controla la galeria pública. Arrossega targetes per canviar-lo sense tocar codi." />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 hover:bg-white/[0.03]">
+              <span className="mb-3 block text-3xl">＋</span>
+              <p className="text-sm font-medium text-white/90">Afegir media a {name}</p>
+              <p className="mt-1 text-xs text-white/50">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
+              <p className="mt-2 text-xs text-white/35">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
+            </button>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/40">Events d'aquesta categoria</p>
+              <div className="mt-3 space-y-2">
+                {categoryEvents.length === 0 ? <p className="text-sm text-white/45">Encara no hi ha events creats per aquesta categoria.</p> : categoryEvents.map((eventItem) => <div key={eventItem.id} className="rounded-xl border border-white/10 px-3 py-2"><p className="text-sm font-medium text-white/90">{eventItem.title}</p><p className="text-xs text-white/45">Portada actual: {eventItem.coverImage ? 'assignada' : 'pendent'}</p></div>)}
+              </div>
+            </div>
+          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1,2,3,4].map((item) => <div key={item} className="aspect-[0.9] animate-pulse rounded-2xl bg-white/5" />)}</div>
+          ) : media.length === 0 ? (
+            <p className="py-6 text-center text-sm text-white/45">{PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE}</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+              {media.map((item) => {
+                const coverRefs = coverMap.get(item.mediaUrl) || [];
+                return (
+                  <div key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-cyan-400/40' : 'border-white/10 hover:border-white/20'}`}>
+                    <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
+                      <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
+                        {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}
+                        <div className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[11px] text-white/90">{item.mediaType === 'image' ? 'Imatge' : 'Vídeo'} · #{item.sortOrder + 1}</div>
+                        <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2 py-1 text-[11px] text-white/90">Clic per ampliar</div>
+                      </button>
+                      <div className="space-y-4 p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-white/90">{item.caption || 'Sense caption'}</p>
+                            <p className="text-xs text-white/40">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-white/45">
+                            <span className="rounded-full border border-white/10 px-2 py-1">Drag & drop</span>
+                            {item.event ? <span className="rounded-full border border-cyan-500/30 px-2 py-1 text-cyan-200">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-white/40">Llegenda / codi intern</label>
+                          <input defaultValue={item.caption || ''} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85" placeholder="Ex: entrada-cerimonia" />
+                          <p className="mt-1 text-xs text-white/35">Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la.</p>
+                        </div>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <div>
+                            <label className="mb-1 block text-xs text-white/40">Assignar a event</label>
+                            <select value={item.event?.id || ''} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85">
+                              <option value="">Sense assignació</option>
+                              {categoryEvents.map((eventItem) => <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>)}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs text-white/40">Fer portada de</label>
+                            <div className="flex flex-wrap gap-2">
+                              {categoryEvents.length === 0 ? <p className="text-xs text-white/45">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
+                                const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
+                                return <button key={eventItem.id} type="button" onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs ${active ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <button type="button" onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">Substituir fitxer</button>
+                          <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10 disabled:opacity-50">Eliminar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; onEventsRefresh: () => Promise<void> }) {
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<EventFormState>(EMPTY_EVENT_FORM);
+
+  const handleSubmit = useCallback(async () => {
+    if (!form.slug || !form.title || !form.coverImage) {
+      setError('Slug, títol i portada són obligatoris');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildEventPayload(form)),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || 'Error creant event');
+      }
+      setForm(EMPTY_EVENT_FORM);
+      setShowForm(false);
+      await onEventsRefresh();
+    } catch (err) {
+      console.error('Error creant event:', err);
+      setError(err instanceof Error ? err.message : 'Error creant event');
+    } finally {
+      setSaving(false);
+    }
+  }, [form, onEventsRefresh]);
+
+  const togglePublished = useCallback(async (eventItem: PortfolioEvent) => {
+    try {
+      await fetchWithCsrf('/api/admin/portfolio/events', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: eventItem.id, published: !eventItem.published }),
+      });
+      await onEventsRefresh();
+    } catch (err) {
+      console.error('Error actualitzant event:', err);
+      setError(err instanceof Error ? err.message : 'Error actualitzant event');
+    }
+  }, [onEventsRefresh]);
+
+  const deleteEvent = useCallback(async (id: string) => {
     try {
       await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
-      setEvents((prev) => prev.filter((e) => e.id !== id));
+      await onEventsRefresh();
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error eliminant event:', err);
+      setError(err instanceof Error ? err.message : 'Error eliminant event');
     }
-  };
+  }, [onEventsRefresh]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Events del portfolio</h2>
-          <p className="text-xs opacity-50">Mini-pàgines per events concrets (Boda Laura & Marc, etc.)</p>
+          <h2 className="text-lg font-semibold text-white/90">Events del portfolio</h2>
+          <p className="text-xs text-white/45">Cada event és una mini-pàgina pública amb portada, metadades i galeria vinculada.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(!showForm)}
-          className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors min-h-[44px] hover:bg-white/5"
-        >
-          {showForm ? 'Cancel·lar' : '+ Nou event'}
-        </button>
+        <button type="button" onClick={() => setShowForm((current) => !current)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/5">{showForm ? 'Tancar formulari' : '+ Nou event'}</button>
       </div>
-
-      {error && <p className="text-sm text-red-400 rounded-xl border border-red-500/20 px-3 py-2">{error}</p>}
-
-      {/* Form */}
-      {showForm && (
-        <div className="rounded-2xl border border-white/10 p-5 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Títol *</label>
-              <input value={form.title} onChange={(e) => { setForm({ ...form, title: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '') }); }} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="Boda Laura & Marc" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Slug (URL) *</label>
-              <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="boda-laura-marc" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Categoria *</label>
-              <select value={form.categorySlug} onChange={(e) => setForm({ ...form, categorySlug: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm">
-                {PORTFOLIO_CATEGORIES.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Subtítol</label>
-              <input value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="Masía Can Riera · Septiembre 2024" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Lloc (venue)</label>
-              <input value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="Masía Can Riera" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Ubicació</label>
-              <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="Girona" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Data</label>
-              <input type="date" value={form.eventDate} onChange={(e) => setForm({ ...form, eventDate: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs opacity-50 block mb-1">Convidats</label>
-              <input type="number" min={0} value={form.guestCount} onChange={(e) => setForm({ ...form, guestCount: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="120" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs opacity-50 block mb-1">Serveis (separats per coma)</label>
-              <input value={form.services} onChange={(e) => setForm({ ...form, services: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="DJ, Iluminación, Tematización" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs opacity-50 block mb-1">URL imatge portada *</label>
-              <input value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="/img/portfolio/bodas/bodas-01.avif o URL pujada" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs opacity-50 block mb-1">Descripció</label>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full rounded-xl border bg-white/5 px-3 py-2.5 text-sm" placeholder="Boda temàtica amb ambientació completa..." />
-            </div>
+      {error && <p className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300">{error}</p>}
+      <div className="grid gap-3 lg:grid-cols-3">
+        <AdminHelpLegend title="Portada" body="És la imatge que representa l'event a la web. Es pot triar des de la pestanya de media." />
+        <AdminHelpLegend title="Publicació" body="Un event en esborrany existeix a l'admin però no es veu a la part pública." />
+        <AdminHelpLegend title="Relació amb media" body="La galeria no es guarda aquí: cada peça es vincula des de la pestanya Media per mantenir-ho monocapa." />
+      </div>
+      {showForm ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value, slug: event.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/g, '') }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Títol de l'event" />
+            <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Slug URL" />
+            <select value={form.categorySlug} onChange={(event) => setForm((current) => ({ ...current, categorySlug: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85">{PORTFOLIO_CATEGORIES.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}</select>
+            <input value={form.coverImage} onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="URL de portada" />
+            <input value={form.subtitle} onChange={(event) => setForm((current) => ({ ...current, subtitle: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Subtítol" />
+            <input value={form.venue} onChange={(event) => setForm((current) => ({ ...current, venue: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Venue" />
+            <input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Ubicació" />
+            <input type="date" value={form.eventDate} onChange={(event) => setForm((current) => ({ ...current, eventDate: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" />
+            <input type="number" min={0} value={form.guestCount} onChange={(event) => setForm((current) => ({ ...current, guestCount: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85" placeholder="Convidats" />
+            <input value={form.services} onChange={(event) => setForm((current) => ({ ...current, services: event.target.value }))} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Serveis separats per coma" />
+            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 md:col-span-2" placeholder="Descripció" />
           </div>
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="rounded" />
-              Publicat
-            </label>
-            <button type="button" onClick={handleSubmit} disabled={saving} className="rounded-xl bg-amber-500 text-black px-6 py-2.5 text-sm font-bold hover:bg-amber-400 disabled:opacity-50 min-h-[44px]">
-              {saving ? 'Guardant...' : 'Crear event'}
-            </button>
+          <div className="mt-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-white/80"><input type="checkbox" checked={form.published} onChange={(event) => setForm((current) => ({ ...current, published: event.target.checked }))} />Publicat</label>
+            <button type="button" onClick={() => void handleSubmit()} disabled={saving} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{saving ? 'Guardant...' : 'Crear event'}</button>
           </div>
         </div>
-      )}
-
-      {/* Events list */}
-      {loading ? (
-        <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-xl bg-white/5 animate-pulse" />)}</div>
-      ) : events.length === 0 ? (
-        <p className="text-sm opacity-50 text-center py-8">Cap event creat. Crea el primer event del portfolio.</p>
-      ) : (
-        <div className="space-y-2">
-          {events.map((ev) => (
-            <div key={ev.id} className="ap-card rounded-xl p-4 flex items-center gap-4">
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                <Image src={ev.coverImage} alt={ev.title} fill className="object-cover" sizes="64px" />
+      ) : null}
+      <div className="space-y-3">
+        {events.map((eventItem) => (
+          <div key={eventItem.id} className="ap-card rounded-2xl p-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">{eventItem.coverImage ? <Image src={eventItem.coverImage} alt={eventItem.title} fill className="object-cover" sizes="96px" /> : null}</div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-white/90">{eventItem.title}</p><span className={`rounded-full px-2 py-1 text-[11px] ${eventItem.published ? 'bg-emerald-500/15 text-emerald-200' : 'bg-white/10 text-white/60'}`}>{eventItem.published ? 'Publicat' : 'Esborrany'}</span></div>
+                <p className="mt-1 text-xs text-white/45">/{eventItem.categorySlug}/{eventItem.slug} · {eventItem._count?.media || 0} elements vinculats</p>
+                <p className="mt-1 text-xs text-white/35">Portada: {eventItem.coverImage || 'pendent'}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold truncate">{ev.title}</p>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${ev.published ? 'ap-badge ap-badge--success' : 'ap-badge'}`}>
-                    {ev.published ? 'Publicat' : 'Esborrany'}
-                  </span>
-                </div>
-                <p className="text-xs opacity-50 truncate">
-                  {ev.categorySlug} · {ev.venue || 'sense lloc'} · {ev._count?.media || 0} fotos
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button type="button" onClick={() => togglePublished(ev)} className="rounded-lg border px-3 py-1.5 text-xs hover:bg-white/5 min-h-[36px]">
-                  {ev.published ? 'Despublicar' : 'Publicar'}
-                </button>
-                <button type="button" onClick={() => deleteEvent(ev.id)} className="rounded-lg border border-red-500/20 text-red-400 px-3 py-1.5 text-xs hover:bg-red-500/10 min-h-[36px]">
-                  Eliminar
-                </button>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => void togglePublished(eventItem)} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">{eventItem.published ? 'Despublicar' : 'Publicar'}</button>
+                <button type="button" onClick={() => void deleteEvent(eventItem.id)} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10">Eliminar</button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// MAIN PAGE
-// ═══════════════════════════════════════════════════════════════════════════
 
 type AdminTab = 'media' | 'events';
 
 export default function AdminPortfolioPage() {
   const [tab, setTab] = useState<AdminTab>('media');
+  const [events, setEvents] = useState<PortfolioEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [preview, setPreview] = useState<PreviewState | null>(null);
+
+  const loadEvents = useCallback(async () => {
+    setEventsLoading(true);
+    try {
+      const response = await fetchWithCsrf('/api/admin/portfolio/events?published=all', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Error carregant events');
+      const data = await response.json();
+      setEvents(data.events || []);
+    } catch (err) {
+      console.error('Error carregant events:', err);
+    } finally {
+      setEventsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadEvents();
+  }, [loadEvents]);
 
   return (
     <div className="space-y-6">
+      <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
       <div>
-        <h1 className="text-2xl font-bold">Portfolio</h1>
-        <p className="text-sm opacity-50 mt-1">
-          Gestiona les imatges, vídeos i events del portfolio públic.
-        </p>
+        <h1 className="text-2xl font-bold text-white/95">Portfolio</h1>
+        <p className="mt-1 text-sm text-white/50">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
       </div>
-
-      {/* Tabs */}
+      <div className="grid gap-3 lg:grid-cols-3">
+        <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
+        <AdminHelpLegend title="Com treballar" body="Primer crea o revisa l'event. Després vincula les imatges, tria portada i ordena la galeria des de Media." />
+        <AdminHelpLegend title="Protecció" body="Les peces marcades com a portada no es deixen eliminar a cegues. Així s'evita trencar la web sense voler." />
+      </div>
       <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setTab('media')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}
-        >
-          📷 Media per categoria
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('events')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}
-        >
-          🎪 Events
-        </button>
+        <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Media</button>
+        <button type="button" onClick={() => setTab('events')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Events</button>
       </div>
-
       {tab === 'media' ? (
         <div className="space-y-3">
-          {PORTFOLIO_CATEGORIES.map((cat) => (
-            <CategorySection key={cat.slug} slug={cat.slug} name={cat.name} />
-          ))}
+          {eventsLoading ? <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-white/50">Carregant events i assignacions...</div> : PORTFOLIO_CATEGORIES.map((category) => <CategorySection key={category.slug} slug={category.slug} name={category.name} events={events} onEventsRefresh={loadEvents} onOpenPreview={setPreview} />)}
         </div>
       ) : (
-        <EventsManager />
+        <EventsManager events={events} onEventsRefresh={loadEvents} />
       )}
     </div>
   );
 }
+
+

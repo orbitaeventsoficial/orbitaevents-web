@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import {
   createPortfolioEvent,
   listPortfolioEvents,
@@ -15,6 +16,9 @@ import {
 } from '@/lib/services/portfolioEventService';
 
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const sp = request.nextUrl.searchParams;
     const categorySlug = sp.get('categorySlug') || undefined;
@@ -32,6 +36,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { slug, categorySlug, title, subtitle, venue, location, eventDate, guestCount, description, services, coverImage, published } = body;
@@ -64,6 +71,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { id, ...data } = body;
@@ -80,6 +90,9 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const id = request.nextUrl.searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'id requerit' }, { status: 400 });

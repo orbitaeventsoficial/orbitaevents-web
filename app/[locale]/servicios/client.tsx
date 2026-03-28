@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Link } from '@/lib/navigation';
+import { Link, useRouter } from '@/lib/navigation';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { useState, useRef, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SERVICIOS CLIENT v2.0 - ESTIL ELEGANT
@@ -70,6 +71,23 @@ const Icons = {
 };
 
 export default function ServiciosClient({ servicios, texts }: ServiciosClientProps) {
+  const router = useRouter();
+  const [focusedCard, setFocusedCard] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (focusedCard === href) {
+      router.push(href);
+    } else {
+      setFocusedCard(href);
+      const el = cardRefs.current[href];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [focusedCard, router]);
+
   return (
     <>
       {/* HERO */}
@@ -146,20 +164,23 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
             {servicios.map((servicio, index) => (
               <motion.div
                 key={servicio.href}
+                ref={(el) => { cardRefs.current[servicio.href] = el; }}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Link
-                  href={servicio.href}
+                <div
+                  onClick={(e) => handleCardClick(servicio.href, e)}
                   className={`
-                    group relative block h-full rounded-3xl p-8 transition-all duration-300
+                    group relative block h-full rounded-3xl p-8 transition-all duration-300 cursor-pointer
                     bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm
                     border hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10
-                    ${servicio.popular
-                      ? 'border-amber-500/30 hover:border-amber-500/50'
-                      : 'border-white/10 hover:border-amber-500/30'
+                    ${focusedCard === servicio.href
+                      ? 'border-amber-500/50 -translate-y-2 shadow-2xl shadow-amber-500/15 ring-1 ring-amber-500/20'
+                      : servicio.popular
+                        ? 'border-amber-500/30 hover:border-amber-500/50'
+                        : 'border-white/10 hover:border-amber-500/30'
                     }
                   `}
                 >
@@ -197,11 +218,15 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
                     ))}
                   </ul>
 
-                  <div className="flex items-center gap-2 text-amber-400 font-semibold group-hover:gap-4 transition-all">
+                  <Link
+                    href={servicio.href}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 text-amber-400 font-semibold group-hover:gap-4 transition-all"
+                  >
                     {texts.viewService}
                     <Icons.Arrow />
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>

@@ -28,6 +28,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   ressenyes: 'Ressenyes',
   faq: 'PMF',
   pricing: 'Preus',
+  salut: 'Salut',
   presupuestos: 'Editor PDF pressupost',
   coverage: 'Cobertura',
   features: 'Features',
@@ -527,3 +528,7 @@ export const ADMIN_CRON_PREFIXES = [
   { id: 'postEvent', label: 'Emails post-event', prefix: 'automation.postEvent', frequency: 'Diari' },
   { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari' },
 ] as const;
+
+export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
+export const ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING'] as const;
+

@@ -2737,6 +2737,9 @@
           "text": "Actos oficiales, ceremonias y eventos formales con protocolo impecable y producción técnica de alto nivel."
         }
       },
+      "packsTitle": "Paquetes Corporativos",
+      "packsSubtitle": "Precios transparentes. Elige el formato que mejor encaja con tu evento.",
+      "vatExcluded": "Precios sin IVA",
       "valueTitle": "Profesionalismo que Refuerza tu Marca",
       "valueText": "No solo producción técnica: creamos networking elegante, ambiente profesional y momentos de conexión real entre asistentes. Tu equipo recuerda el evento, tu cliente queda impresionado.",
       "stats": {
@@ -2811,18 +2814,6 @@
         "backup": "Equipo de respaldo disponible"
       },
       "discoPacks": {
-        "oferta-flash": {
-          "name": "Oferta Flash",
-          "tagline": "Tu fiesta de siempre, ahora con sonido y luces de verdad",
-          "ideal": "Cumpleaños y fiestas de hasta 50 invitados",
-          "features": [
-            "DJ profesional 2 horas — la música que os gusta, como tiene que sonar",
-            "Sonido PRO 4000W que llena la sala",
-            "Luces que crean el ambiente perfecto",
-            "Máquina de humo para los momentos especiales",
-            "Nosotros lo montamos y lo desmontamos todo"
-          ]
-        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "Tu fiesta, tu sonido — nosotros ponemos el resto",
@@ -4677,6 +4668,7 @@
         "rating": "Valoración",
         "comment": "Comentario",
         "media": "Foto/Vídeo",
+        "contact": "Contacto",
         "nps": "Recomendación",
         "finish": "Final"
       },
@@ -5010,174 +5002,174 @@
     }
   },
   "monMagic": {
-    "badge": "Lacre Artesanal Real",
-    "heroTitle": "Tu Boda en el",
-    "heroTitleHighlight": "Mundo Mágico",
-    "heroSubtitle": "Sobres completos con carta de la Directora, texto personalizado y lacre artesanal.",
-    "heroPrice": "✨ Desde 8€/sobre con todo incluido ✨",
-    "priceUnit": "sobre completo",
-    "pricePackLabel": "pack +50",
-    "housesLabel": "casas",
-    "calculateBudget": "Calcular presupuesto",
-    "seeHouses": "Ver las 5 casas",
-    "chooseCasa": "Elige tu Casa",
-    "chooseCasaDesc": "Todos los sobres de tu pedido llevarán el lacre de la casa que elijas. ¿Quieres sellos diferentes? Añade la opción Multi-Sello.",
-    "lacreTitle": "Lacre",
-    "products": "Productos",
-    "productsDesc": "Compra por unidades o aprovecha los packs con descuento",
-    "mostSold": "MÁS VENDIDO",
+    "badge": "Pergamino y Lacre Artesanal",
+    "heroTitle": "La Carta Ha Llegado a Tu",
+    "heroTitleHighlight": "Boda",
+    "heroSubtitle": "Cada invitado recibirá su sobre sellado con lacre de cera real, una carta de la Directora y el pergamino con su nombre. Como aquel día que todo cambió.",
+    "heroPrice": "Desde 8€ por sobre — todo hecho a mano",
+    "priceUnit": "por sobre",
+    "pricePackLabel": "en packs de 50+",
+    "housesLabel": "casas mágicas",
+    "calculateBudget": "Calcula tu encargo",
+    "seeHouses": "Descubre las casas",
+    "chooseCasa": "¿A Qué Casa Perteneces?",
+    "chooseCasaDesc": "El lacre de cera de tu sobre llevará el emblema de la casa que elijas. Cada sello es único, prensado a mano. Si quieres que cada invitado lleve su propia casa, activa el Multi-Sello.",
+    "lacreTitle": "Sello de",
+    "products": "El Escaparate",
+    "productsDesc": "Todo lo que encontrarás en nuestro escaparate del Callejón Encantado",
+    "mostSold": "EL MÁS PEDIDO",
     "perUnit": "Por unidad",
     "askBudget": "Pedir presupuesto",
-    "packsDiscount": "Packs con Descuento",
-    "packsDiscountDesc": "Ahorra hasta un 15% con nuestros packs completos",
+    "packsDiscount": "Packs de Papelería Mágica",
+    "packsDiscountDesc": "Todo lo que necesitas para que los invitados sientan que han recibido su carta de aceptación de verdad. Ahorra hasta un 15%.",
     "recommended": "RECOMENDADO",
     "saving": "AHORRO",
-    "requestPack": "Solicitar pack",
-    "calculator": "Calculadora Rápida",
-    "calculatorDesc": "Selecciona tu cantidad de invitados",
+    "requestPack": "Pedir este pack",
+    "calculator": "Tu Presupuesto Mágico",
+    "calculatorDesc": "¿Cuántos invitados tendrán asiento en el Gran Salón?",
     "guests": "inv.",
-    "packBasic": "Pack Básico",
-    "packPremium": "Pack Premium",
-    "requestBudgetFor": "Solicitar presupuesto para {count} invitados",
-    "realPhotos": "Fotos Reales de Bodas",
-    "realPhotosDesc": "Mira cómo quedaron nuestros sobres en bodas reales. ¡La magia es palpable!",
-    "allPhotosReal": "Todas las fotos son de bodas reales de nuestros clientes",
-    "completeLetter": "Sobre completo con carta",
-    "realReaction": "❤️ La reacción real",
-    "altSobreObert": "Sobre mágico abierto con carta de la Directora",
-    "altSobrePlat": "Sobre personalizado en el plato",
-    "altConvidada": "Invitada leyendo carta mágica",
-    "altMussol": "Búho con pergaminos",
-    "altEscombres": "Decoración deportiva mágica",
-    "faq": "Preguntas Frecuentes",
-    "wantCompletePack": "¿Quieres el pack completo de tematización?",
-    "wantCompletePackDesc": "La papelería es solo el principio. Combínala con DJ, efectos especiales, iluminación y decoración para crear una experiencia mágica completa.",
-    "configureComplete": "Configura evento completo",
-    "talkToUs": "Hablar con nosotros",
+    "packBasic": "Carta de Aceptación",
+    "packPremium": "Gran Salón Completo",
+    "requestBudgetFor": "Pedir presupuesto para {count} invitados",
+    "galleryLabel": "Galería",
+    "schemaName": "Pack Boda Mundo Mágico con Lacre Artesanal",
+    "schemaDescription": "Sobres completos para bodas temáticas de magia con carta de la Directora, texto personalizado y lacre de cera artesanal.",
+    "realPhotos": "Bodas Reales, Magia Real",
+    "realPhotosDesc": "Estas fotos son de bodas donde los invitados abrieron sus sobres sellados en la mesa. Mira las caras.",
+    "allPhotosReal": "Todo lo que ves es real — bodas de nuestros clientes",
+    "completeLetter": "El sobre que los invitados guardan",
+    "realReaction": "❤️ La cara lo dice todo",
+    "altSobreObert": "Sobre sellado con lacre abierto en la mesa",
+    "altSobrePlat": "Sobre con pergamino en el plato de cada invitado",
+    "altConvidada": "Invitada leyendo su carta de aceptación",
+    "altMussol": "Decoración con búho mensajero",
+    "altEscombres": "Decoración con escobas voladoras",
+    "altSobrePergami": "Sobre con pergamino y lacre artesanal",
+    "altPergamins": "Pergaminos bilingües personalizados",
+    "altCartell": "Cartel personalizado de los novios con el símbolo de las Reliquias",
+    "faq": "Todo Lo Que Necesitas Saber",
+    "wantCompletePack": "¿Quieres la experiencia completa?",
+    "wantCompletePackDesc": "La papelería es el primer encantamiento. Añade DJ, iluminación encantada, humo bajo para el primer baile y decoración temática para transformar tu boda en una noche en la escuela de magia.",
+    "configureComplete": "Configura la experiencia entera",
+    "talkToUs": "Envíanos un búho",
     "houses": {
       "escola": {
         "nom": "Escuela de Magia",
-        "descripcio": "El escudo oficial con las cuatro casas"
+        "descripcio": "El emblema oficial — las cuatro casas unidas"
       },
       "lleons": {
         "nom": "Casa de los Leones",
-        "descripcio": "Para los valientes de corazón"
+        "descripcio": "Coraje, honor y determinación"
       },
       "serps": {
         "nom": "Casa de las Serpientes",
-        "descripcio": "Para los ambiciosos y astutos"
+        "descripcio": "Ambición, astucia y liderazgo"
       },
       "teixons": {
         "nom": "Casa de los Tejones",
-        "descripcio": "Para los leales y justos"
+        "descripcio": "Lealtad, paciencia y trabajo"
       },
       "aguiles": {
         "nom": "Casa de las Águilas",
-        "descripcio": "Para los sabios y creativos"
+        "descripcio": "Sabiduría, creatividad e ingenio"
       }
     },
     "productes": {
       "sobreComplet": {
-        "nom": "Sobre Completo Escuela de Magia",
-        "descripcio": "El pack de invitación completo: sobre de papel pergamino con texto personalizado, carta de la Directora de la Escuela, frame personalizado para cada invitado, y lacre de cera artesanal con el sello de la casa elegida.",
+        "nom": "El Sobre Sellado",
+        "descripcio": "La invitación que tus invitados abrirán como aquella primera carta: sobre de pergamino con su nombre en caligrafía, carta de la Directora, y lacre de cera real prensado a mano con el emblema de la casa.",
         "caracteristiques": [
-          "Papel pergamino auténtico",
-          "Texto personalizado para cada invitado",
+          "Pergamino auténtico con textura envejecida",
+          "Nombre de cada invitado en caligrafía",
           "Carta de la Directora de la Escuela",
-          "Frame personalizado con nombre y rol",
-          "Lacre de cera artesanal",
-          "Sello de la casa elegida"
+          "Rol personalizado: novio, padre, amigo, maestro...",
+          "Lacre de cera real prensado a mano",
+          "Sello con el emblema de la casa elegida"
         ],
-        "ideal": "Todo incluido en un solo producto"
+        "ideal": "La pieza central de cada asiento"
       },
       "pergamiAmor": {
-        "nom": "Pergamino de Amor Mágico",
-        "descripcio": "Poemas originales de amor escritos en estilo mágico, enrollados individualmente y atados con una cinta elegante. Perfectos para decorar las mesas o regalar a los invitados.",
+        "nom": "Pergaminos Encantados",
+        "descripcio": "Poemas de amor originales escritos como si fueran hechizos antiguos. Enrollados individualmente con cinta de seda. Cuando los invitados los abren, encuentran palabras que parecen sacadas de un libro prohibido de la biblioteca.",
         "caracteristiques": [
-          "Poemas originales y exclusivos",
-          "Enrollados individualmente",
-          "Atados con cinta elegante",
-          "Papel pergamino de calidad",
+          "Poemas originales en estilo encantamiento",
+          "Enrollados a mano con cinta de seda",
+          "Papel pergamino envejecido",
           "12 poemas en catalán + 12 en castellano",
-          "Perfecto como recuerdo para invitados"
+          "Cada uno es único e irrepetible",
+          "El recuerdo que se guardan para siempre"
         ],
-        "ideal": "Decoración de mesas y recuerdos"
+        "ideal": "Un encantamiento en cada asiento"
       },
       "cartellDecoratiu": {
-        "nom": "Carteles Decorativos Escuela de Magia",
-        "descripcio": "Carteles temáticos para decorar el espacio: Bienvenidos a la Boda, Zona de Entrenamiento de Vuelo, señalización mágica...",
+        "nom": "Señalización del Castillo",
+        "descripcio": "Carteles con el estilo de los tablones de anuncios de la escuela: Bienvenidos al Banquete de Bodas, Zona de Vuelo, Pasillo de las Serpientes... Todo personalizable con vuestros nombres.",
         "caracteristiques": [
-          "Diseño estilo Consejo de Magia",
-          "Impresión alta calidad",
+          "Diseño estilo tablón de anuncios de la escuela",
+          "Impresión de alta calidad con texturas",
           "Tamaño A3 o A2 disponible",
-          "Personalizable con nombres",
+          "Personalizable con vuestros nombres",
           "Escudos de las casas mágicas",
-          "Ideal para photocall"
+          "Perfecto para photocall y decoración"
         ],
-        "ideal": "Decoración y photocall"
+        "ideal": "Transforma el espacio en un castillo"
       }
     },
     "packs": {
       "basic": {
-        "nom": "Pack Básico \"Carta Aceptación\"",
-        "descripcio": "El pack esencial: sobres completos para todos los invitados + 1 cartel de bienvenida personalizado.",
+        "nom": "Carta de Aceptación",
+        "descripcio": "Cada invitado recibe su sobre sellado en el plato. Dentro: la carta de la Directora dándole la bienvenida a la boda. El momento en que lo abren no tiene precio.",
         "caracteristiques": [
-          "Sobres completos para todos",
-          "1 cartel bienvenida A2",
-          "Lacre casa elegida",
-          "Revisión gratuita antes de imprimir",
+          "Un sobre sellado para cada invitado",
+          "1 cartel de bienvenida al Banquete (A2)",
+          "Lacre de la casa que elijas",
+          "Prueba digital gratuita antes de producir",
           "Entrega en 10-14 días"
         ],
-        "ideal": "Bodas hasta 100 invitados"
+        "ideal": "El sobre que todos guardarán"
       },
       "premium": {
-        "nom": "Pack Premium \"Gran Salón\"",
-        "descripcio": "Todo incluido: sobres completos + pergaminos para cada mesa + pack de 5 carteles decorativos + opción multi-sello.",
+        "nom": "El Gran Salón",
+        "descripcio": "La experiencia completa: sobres sellados, pergaminos encantados en cada mesa, señalización del castillo por todo el espacio, y la posibilidad de que cada invitado lleve el lacre de su propia casa.",
         "caracteristiques": [
-          "Sobres completos para todos",
-          "Pergaminos para cada mesa (1/mesa)",
-          "5 carteles decorativos A2",
-          "Opción multi-sello incluida",
-          "Entrega prioritaria 7-10 días",
-          "Prueba física antes de producción"
+          "Sobres sellados para cada invitado",
+          "Pergaminos encantados en cada mesa",
+          "5 carteles decorativos con vuestros nombres",
+          "Multi-Sello incluido — cada casa, su lacre",
+          "Entrega prioritaria en 7-10 días",
+          "Prueba física real antes de la producción"
         ],
-        "ideal": "Bodas premium"
+        "ideal": "La boda que no se olvida"
       }
     },
     "multiSegell": {
-      "nom": "Opción Multi-Sello",
-      "descripcio": "Cada invitado con el lacre del color de su casa asignada"
+      "nom": "Multi-Sello (cada casa, su lacre)",
+      "descripcio": "Asigna una casa a cada invitado y recibirá el sobre con el lacre del color correspondiente"
     },
     "faqs": {
       "q1": {
-        "pregunta": "¿Qué incluye el \"Sobre Completo\"?",
-        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas.",
-        "resposta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas."
+        "pregunta": "¿Qué incluye exactamente cada sobre?",
+        "resposta": "Cada sobre contiene: pergamino con el nombre del invitado en caligrafía, carta de la Directora de la Escuela dándole la bienvenida, un frame personalizado con su rol (novio, madrina, maestro de ceremonias...), y lacre de cera real prensado a mano con el emblema de la casa que elijas."
       },
       "q2": {
-        "pregunta": "¿Puedo tener sobres con diferentes sellos?",
-        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad.",
-        "resposta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad."
+        "pregunta": "¿Cada invitado puede tener una casa diferente?",
+        "resposta": "¡Sí! Con la opción Multi-Sello, tú decides a qué casa pertenece cada invitado. El sobre de cada uno llevará el lacre del color de su casa. Incluido en el Pack Gran Salón, o como suplemento (75-120€) en el Pack Carta de Aceptación."
       },
       "q3": {
-        "pregunta": "¿Cómo son los pergaminos de amor?",
-        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa.",
-        "resposta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa."
+        "pregunta": "¿Qué son los pergaminos encantados?",
+        "resposta": "Poemas de amor originales escritos como si fueran hechizos. Van enrollados individualmente con cinta de seda sobre papel pergamino envejecido. Pon uno en cada asiento y mira cómo la gente se los lee entre sí. El detalle que convierte la mesa en un momento."
       },
       "q4": {
-        "pregunta": "¿Cuánto tiempo tardan?",
-        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días.",
-        "resposta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días."
+        "pregunta": "¿Cuándo tengo que hacer el pedido?",
+        "resposta": "Producción estándar: 10-14 días una vez apruebes la prueba digital. El Pack Gran Salón incluye prioridad: 7-10 días. Si tienes prisa, hacemos producción urgente (+30%) en 5-7 días. Recomendamos pedir con 3-4 semanas de margen."
       },
       "q5": {
-        "pregunta": "¿Puedo ver una prueba antes?",
-        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa.",
-        "resposta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa."
+        "pregunta": "¿Puedo ver cómo quedará antes de pagar?",
+        "resposta": "Siempre. Enviamos prueba digital en PDF con 3-4 sobres de ejemplo para que veas nombres, tipografía y maquetación. El Pack Gran Salón incluye una prueba física real — el sobre delante de ti, con el lacre prensado, antes de producir todos."
       },
       "q6": {
-        "pregunta": "¿Hacéis envíos a toda España?",
-        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso.",
-        "resposta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso."
+        "pregunta": "¿Enviáis a cualquier sitio?",
+        "resposta": "A toda España, con embalaje especial para que los lacres lleguen intactos. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso y destino."
       }
     }
   },
