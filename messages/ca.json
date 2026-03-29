@@ -6,97 +6,97 @@
   },
   "halloweenPage": {
     "meta": {
-      "title": "Festa Halloween Barcelona | Decoració Completa + DJ + Efectes | Òrbita Events",
-      "description": "Transforma el teu event en una nit de terror. Decoració arreu: fantasmes gegants, gabies amb taràntules, caldero màgic, espelmes, miralls estranys... DJ + efectes especials. Des de 600€."
+      "title": "Halloween immersiu Barcelona | Passatge encantat + DJ + efectes | Òrbita Events",
+      "description": "Convertim el teu espai en un Halloween immersiu amb decoració real, DJ temàtic, boira, llum i escenes que semblen tretes d'un passatge encantat. Des de 600€."
     },
     "badge": "🎃 Temporada Halloween {year}",
     "hero": {
-      "title1": "NITS DE",
-      "title2": "TERROR",
-      "subtitle": "Decoració completa arreu de l'espai + DJ temàtic + efectes especials. Tot el que necessites per a una nit terroríficament perfecta."
+      "title1": "HALLOWEEN",
+      "title2": "IMMERSIU",
+      "subtitle": "No és una festa amb quatre detalls. És un passatge encantat amb decoració real, DJ temàtic, boira i llum per convertir l'espai en una escena de terror memorable."
     },
     "cta": {
-      "reserve": "Reserva la teva nit de terror",
+      "reserve": "Vull un Halloween immersiu",
       "whatsapp": "WhatsApp directe",
-      "reserve2025": "Reserva Halloween {year}",
-      "requestInfo": "Sol·licitar info"
+      "reserve2025": "Reserva el teu Halloween {year}",
+      "requestInfo": "Escull aquest format"
     },
     "gallery": {
-      "title": "Events Halloween",
+      "title": "Escenes",
       "titleHighlight": "reals",
-      "subtitle": "No són mockups. Són festes que hem creat."
+      "subtitle": "Decoració, boira, llum i ambientació que ja hem muntat de veritat. No són renders: és l'efecte que veuran els teus convidats."
     },
     "includes": {
-      "title": "Què inclou una nit",
-      "titleHighlight": "Halloween?",
+      "title": "Com construïm el",
+      "titleHighlight": "passatge?",
       "dj": {
-        "title": "DJ Temàtic",
-        "description": "Playlist curada de Halloween: des de clàssics (Thriller, Ghostbusters) fins a remixes actuals. El DJ pot anar caracteritzat."
+        "title": "Ritme i tensió",
+        "description": "Un DJ temàtic que acompanya l'ambient: clàssics de Halloween, remixes foscos i moments de tensió perquè la nit no decaigui."
       },
       "decoration": {
-        "title": "Decoració Completa",
-        "description": "Teranyines, carabasses LED, esquelets, calaveres, teles de sac, veles falses, cartells vintage de terror..."
+        "title": "Escena real",
+        "description": "Fantasmes, gàbies, teles, espelmes, taules i objectes repartits amb intenció perquè l'espai sembli un passatge encantat, no un photocall improvisat."
       },
       "effects": {
-        "title": "Efectes Especials",
-        "description": "Fum baix que recorre el terra, llums vermelles i verdes sincronitzades, efectes de so terrorífics, espurnes fredes."
+        "title": "Boira i llum",
+        "description": "Fum baix, boira ambiental, il·luminació taronja/vermella/verdosa i efectes de so perquè l'atmosfera entri pels ulls abans que comenci la música."
       },
-      "intro": "Tot el que veus a les fotos ho posem nosaltres. Tu només has de gaudir."
+      "intro": "Tot el que veus a les fotos ho muntem nosaltres: escena, música, boira i ritme visual perquè l'espai deixi de ser neutre i passi a ser una experiència."
     },
     "packs": {
-      "title": "Packs",
+      "title": "Formats",
       "titleHighlight": "Halloween {year}",
-      "subtitle": "Tot inclou decoració completa. Tria el nivell d'intensitat.",
+      "subtitle": "Tots inclouen ambientació Halloween. Tria si vols una entrada elegant, un passatge complet o una nit d'impacte total.",
       "mostRequested": "MÉS DEMANAT",
       "hours": "hores",
       "basic": {
-        "name": "Terror Bàsic",
+        "name": "Entrada espectral",
         "price": "600",
         "includes": [
           "DJ temàtic 4 hores",
           "So 4000W",
-          "Il·luminació vermella/verda",
+          "Il·luminació ambient taronja/verda",
           "Màquina de fum",
-          "Decoració bàsica (teranyines, carabasses, espelmes)"
+          "Escena base amb teles, espelmes i carabasses"
         ]
       },
       "night": {
-        "name": "Nit de Por",
+        "name": "Passatge encantat",
         "price": "900",
         "includes": [
           "DJ temàtic 5 hores",
           "So 4000W + subwoofer",
           "4 caps mòbils sincronitzats",
-          "Fum baix (terra)",
-          "Decoració completa (fantasmes, gàbies, caldero)",
-          "Efectes de so terrorífics"
+          "Fum baix i boira de terra",
+          "Escena completa amb fantasmes, gàbies i taules de terror",
+          "Efectes de so i ambient"
         ]
       },
       "zombie": {
-        "name": "Apocalipsi Zombie",
+        "name": "Ritual final",
         "price": "1500",
         "includes": [
-          "DJ + Tècnic de llums 6 hores",
+          "DJ + tècnic de llums 6 hores",
           "So club 4000W",
           "Show de llums complet",
-          "Fum baix + màquina de boira",
-          "Decoració TOTAL (200+ elements)",
+          "Fum baix + boira + reforç ambiental",
+          "Escenografia total amb 200+ elements",
           "Espurnes fredes + CO2 criogènic",
           "Miralls estranys interactius",
-          "Opció: actor/animador zombie"
+          "Opció d'actor o animació de terror"
         ]
       },
-      "includesDecoration": "✓ Inclou tota la decoració"
+      "includesDecoration": "✓ Tots els formats inclouen escenografia i ambientació Halloween"
     },
     "testimonial": {
-      "quote": "La millor festa de Halloween que hem fet mai. Els nens no paraven de cridar d'emoció (i una mica de por!). Repetirem segur.",
+      "quote": "No semblava una festa decorada, semblava que haguéssim entrat dins d'una escena. La boira, els fantasmes i la llum ho canviaven tot.",
       "author": "Família Martínez, Halloween 2024"
     },
     "finalCta": {
-      "title1": "Preparat per una nit",
-      "title2": "terroríficament bona?",
-      "subtitle": "Decoració completa + DJ + efectes. Tot inclòs.",
-      "footer": "📍 Barcelona i Girona · ⚡ Resposta en 2 hores · ✓ Sense compromís"
+      "title1": "Vols convertir el teu espai en un",
+      "title2": "passatge encantat?",
+      "subtitle": "Decoració real, DJ temàtic i efectes ben posats perquè el teu Halloween es recordi com una experiència, no només com una festa.",
+      "footer": "📍 Barcelona i Girona · ⚡ Resposta ràpida · ✓ Sense compromís"
     },
     "decoration": {
       "title": "Decoració",

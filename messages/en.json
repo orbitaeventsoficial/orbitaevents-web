@@ -6,97 +6,97 @@
   },
   "halloweenPage": {
     "meta": {
-      "title": "Barcelona Halloween Party | Complete Decoration + DJ + Effects | Orbita Events",
-      "description": "Transform your event into a night of terror. Decoration throughout the space: giant ghosts, cages with tarantulas, magic cauldron, candles, strange mirrors... DJ + special effects. From €600."
+      "title": "Immersive Halloween Barcelona | Haunted passage + DJ + effects | Orbita Events",
+      "description": "We turn your venue into an immersive Halloween experience with real decoration, thematic DJ, fog, lighting and scenes that feel like a haunted passage. From €600."
     },
     "badge": "🎃 Halloween Season {year}",
     "hero": {
-      "title1": "NIGHTS OF",
-      "title2": "TERROR",
-      "subtitle": "Complete decoration throughout the space + thematic DJ + special effects. Everything you need for a terrifyingly perfect night."
+      "title1": "IMMERSIVE",
+      "title2": "HALLOWEEN",
+      "subtitle": "This is not a party with a few props. It is a haunted passage built with real decoration, thematic DJ, fog and lighting to turn the whole space into a memorable horror scene."
     },
     "cta": {
-      "reserve": "Book your night of terror",
+      "reserve": "I want an immersive Halloween",
       "whatsapp": "direct WhatsApp",
-      "reserve2025": "Book Halloween {year}",
-      "requestInfo": "Request info"
+      "reserve2025": "Book your Halloween {year}",
+      "requestInfo": "Choose this format"
     },
     "gallery": {
-      "title": "Halloween Events",
-      "titleHighlight": "real",
-      "subtitle": "They are not mockups. They are parties that we have created."
+      "title": "Real",
+      "titleHighlight": "scenes",
+      "subtitle": "Decoration, fog, light and atmosphere we have already built for real events. Not renders: this is what your guests will actually walk into."
     },
     "includes": {
-      "title": "What does one night include?",
-      "titleHighlight": "Halloween?",
-      "intro": "Everything you see in the photos we put it. You just have to enjoy.",
+      "title": "How we build the",
+      "titleHighlight": "haunted passage",
+      "intro": "Everything you see in the photos is set up by us: scene, music, fog and visual rhythm so the venue stops feeling neutral and starts feeling like an experience.",
       "dj": {
-        "title": "Theme DJ",
-        "description": "Curated Halloween Playlist: Thriller, Ghostbusters, current remixes. The DJ can be characterized."
+        "title": "Rhythm and tension",
+        "description": "A thematic DJ that supports the mood: Halloween classics, darker remixes and tension moments so the night never goes flat."
       },
       "decoration": {
-        "title": "Complete Decoration",
-        "description": "Giant ghosts, cages with tarantulas, magic cauldron, candles, cobwebs, LED pumpkins, skeletons..."
+        "title": "A real scene",
+        "description": "Ghosts, cages, fabrics, candles, tables and objects placed with intent so the space feels like a haunted passage, not a quick photo corner."
       },
       "effects": {
-        "title": "Special effects",
-        "description": "Low smoke drifting across the ground, synchronized lights, terrifying sound effects, cold sparks."
+        "title": "Fog and lighting",
+        "description": "Low smoke, ambient fog, orange/red/green lighting and sound effects so the atmosphere hits the eyes before the music even drops."
       }
     },
     "packs": {
-      "title": "Packs",
+      "title": "Formats",
       "titleHighlight": "Halloween {year}",
-      "subtitle": "Everything includes complete decoration. Choose the intensity level.",
+      "subtitle": "All formats include Halloween staging. Choose between an elegant entrance, a full haunted passage or a maximum-impact night.",
       "mostRequested": "MORE ORDER",
       "hours": "hours",
-      "includesDecoration": "✓ Includes all decoration",
+      "includesDecoration": "✓ Every format includes Halloween staging and atmosphere",
       "basic": {
-        "name": "Basic Horror",
+        "name": "Spectral entry",
         "price": "600",
         "includes": [
           "Thematic DJ 4 hours",
           "4000W sound",
-          "Red/green lighting",
-          "smoke machine",
-          "Basic decoration (spiderwebs, pumpkins, candles)"
+          "Orange/green ambient lighting",
+          "Smoke machine",
+          "Base scene with fabrics, candles and pumpkins"
         ]
       },
       "night": {
-        "name": "Fright Night",
+        "name": "Haunted passage",
         "price": "900",
         "includes": [
           "Thematic DJ 5 hours",
           "4000W sound + subwoofer",
           "4 synchronized moving heads",
-          "Low smoke (ground)",
-          "Complete decoration (ghosts, cages, cauldron)",
-          "Terrifying sound effects"
+          "Low smoke and floor fog",
+          "Full scene with ghosts, cages and horror tables",
+          "Atmospheric sound effects"
         ]
       },
       "zombie": {
-        "name": "Zombie Apocalypse",
+        "name": "Final ritual",
         "price": "1500",
         "includes": [
-          "DJ + Lighting Technician 6 hours",
+          "DJ + lighting technician 6 hours",
           "4000W club sound",
-          "Complete light show",
-          "Low smoke + fog machine",
-          "TOTAL decoration (200+ elements)",
+          "Full light show",
+          "Low smoke + fog + ambient reinforcement",
+          "Full staging with 200+ elements",
           "Cold sparks + cryogenic CO2",
-          "Interactive Strange Mirrors",
-          "Option: zombie actor/animator"
+          "Interactive strange mirrors",
+          "Optional horror actor or live animation"
         ]
       }
     },
     "testimonial": {
-      "quote": "The best Halloween party we have ever had. The children couldn't stop screaming with excitement (and a little fear!). We will repeat for sure.",
+      "quote": "It did not feel like a decorated party. It felt like walking into a scene. The fog, the ghosts and the lighting changed everything.",
       "author": "Martínez Family, Halloween 2024"
     },
     "finalCta": {
-      "title1": "Ready for a night",
-      "title2": "terrifyingly good?",
-      "subtitle": "Complete decoration + DJ + effects. All inclusive.",
-      "footer": "📍 Barcelona and Girona · ⚡ Response in 2 hours · ✓ No obligation"
+      "title1": "Want to turn your venue into a",
+      "title2": "haunted passage?",
+      "subtitle": "Real decoration, thematic DJ and well-placed effects so your Halloween is remembered as an experience, not just a party.",
+      "footer": "📍 Barcelona and Girona · ⚡ Fast reply · ✓ No commitment"
     },
     "decoration": {
       "title": "Decoration",

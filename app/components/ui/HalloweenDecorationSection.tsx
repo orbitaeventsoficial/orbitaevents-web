@@ -2,127 +2,103 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { PUBLIC_HALLOWEEN_DECORATION_ITEMS, PUBLIC_HALLOWEEN_PREVIEW_ICONS } from '@/lib/constants';
-
-// ═══════════════════════════════════════════════════════════════
-// HALLOWEEN DECORATION SECTION
-// Mostra tots els elements de decoració disponibles
-// ═══════════════════════════════════════════════════════════════
-
+import { PUBLIC_HALLOWEEN_DECORATION_ITEMS } from '@/lib/constants';
 
 export default function HalloweenDecorationSection() {
   const t = useTranslations('halloweenPage.decoration');
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
-      {/* Fons decoratiu */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 text-8xl">🕸️</div>
-        <div className="absolute top-40 right-20 text-6xl">🕷️</div>
-        <div className="absolute bottom-20 left-1/4 text-7xl">💀</div>
-        <div className="absolute bottom-40 right-1/3 text-5xl">🦇</div>
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#090909_0%,#130b09_50%,#090909_100%)] py-18 md:py-24">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(180,83,9,0.14),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(120,53,15,0.1),transparent_50%)]" />
+        <div className="absolute left-[-4rem] top-12 h-40 w-40 rounded-full bg-orange-500/6 blur-3xl" />
+        <div className="absolute right-[-4rem] bottom-12 h-48 w-48 rounded-full bg-red-500/6 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+      <div className="relative z-10 mx-auto max-w-6xl px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="mx-auto mb-12 max-w-3xl text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {t('title')}{' '}
-            <span className="text-orange-500">{t('titleHighlight')}</span>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-orange-300/80">Escenografia</p>
+          <h2 className="text-3xl font-bold text-white md:text-4xl">
+            {t('title')} <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{t('titleHighlight')}</span>
           </h2>
-          <p className="text-white/60 max-w-2xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl text-white/58">
             {t('subtitle')}
           </p>
         </motion.div>
 
-        {/* Grid de decoració */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+        <div className="mb-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.24)]"
+          >
+            <p className="text-sm font-semibold text-orange-300">Passatge encantat</p>
+            <p className="mt-3 text-lg leading-8 text-white/74">
+              No portem només objectes. Muntem una escena: punts d'impacte, racons foscos, textures, llum i volum perquè l'espai sembli habitat per la història que expliques.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.08 }}
+            className="rounded-[28px] border border-orange-500/15 bg-gradient-to-br from-orange-500/8 via-white/[0.02] to-red-500/8 p-6"
+          >
+            <p className="text-sm font-semibold text-orange-300">Inclou</p>
+            <ul className="mt-4 space-y-3 text-sm text-white/66">
+              <li className="flex items-start gap-2"><span className="mt-0.5 text-orange-400">✦</span>Muntatge i desmuntatge</li>
+              <li className="flex items-start gap-2"><span className="mt-0.5 text-orange-400">✦</span>Transport i col·locació</li>
+              <li className="flex items-start gap-2"><span className="mt-0.5 text-orange-400">✦</span>Composició visual perquè llueixi també a fotos</li>
+            </ul>
+          </motion.div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PUBLIC_HALLOWEEN_DECORATION_ITEMS.map((item, index) => (
             <motion.div
               key={item.key}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="
-                relative p-6 rounded-2xl
-                bg-gradient-to-br from-orange-500/10 to-red-900/10
-                border border-orange-500/20
-                hover:border-orange-500/40
-                transition-all duration-300
-                group
-              "
+              transition={{ delay: index * 0.06 }}
+              className="group relative overflow-hidden rounded-[26px] border border-white/10 bg-black/24 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/35 hover:bg-white/[0.03]"
             >
-              {/* Icona gran */}
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
-                {item.icon}
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.14),transparent_38%)]" />
+              <div className="relative z-10">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-500/20 bg-orange-500/10 text-2xl">
+                  {item.icon}
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-white">
+                  {t(`items.${item.key}.title`)}
+                </h3>
+                <p className="text-sm leading-6 text-white/56">
+                  {t(`items.${item.key}.description`)}
+                </p>
               </div>
-
-              {/* Títol */}
-              <h3 className="text-white font-bold mb-2 text-sm md:text-base">
-                {t(`items.${item.key}.title`)}
-              </h3>
-
-              {/* Descripció */}
-              <p className="text-white/50 text-xs md:text-sm leading-relaxed">
-                {t(`items.${item.key}.description`)}
-              </p>
-
-              {/* Glow effect on hover */}
-              <div className="absolute inset-0 rounded-2xl bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.div>
           ))}
         </div>
 
-        {/* Nota important */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center"
+          className="mt-12 flex justify-center"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-4 bg-orange-500/10 border border-orange-500/30 rounded-2xl">
-            <span className="text-2xl">✅</span>
-            <div className="text-left">
-              <p className="text-white font-bold">Tot inclòs en el preu</p>
-              <p className="text-white/60 text-sm">Muntatge, desmuntatge i transport</p>
-            </div>
+          <div className="rounded-[24px] border border-orange-500/20 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-6 py-4 text-center shadow-[0_18px_50px_rgba(0,0,0,0.2)]">
+            <p className="text-sm font-semibold text-white">Tot inclòs en el preu</p>
+            <p className="mt-1 text-sm text-white/60">Muntatge, desmuntatge, transport i composició de l'escena</p>
           </div>
         </motion.div>
       </div>
     </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// MINI PREVIEW - Per mostrar a la home o altres pàgines
-// ═══════════════════════════════════════════════════════════════
-
-export function HalloweenDecorationPreview() {
-  const items = PUBLIC_HALLOWEEN_PREVIEW_ICONS;
-
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-white/60 text-sm">Decoració inclosa:</span>
-      <div className="flex gap-1">
-        {items.map((icon, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="text-lg"
-          >
-            {icon}
-          </motion.span>
-        ))}
-      </div>
-    </div>
   );
 }

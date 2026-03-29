@@ -1,3 +1,19 @@
+## 2026-03-29 — Halloween reorientat a experiència immersiva
+
+- He reorientat `app/[locale]/tematica-halloween/page.tsx` perquè la pàgina deixi de sonar com una "nit de terror" genèrica i es presenti com una experiència més pròpia: `Halloween immersiu`, `passatge encantat`, escena real, boira, llum i decoració premium.
+- El criteri no s'ha decidit a cegues: s'ha recolzat en captures locals de la pàgina (`.codex-captures/halloween-audit-2026-03-29` i `...-v2`) per ajustar el to al que realment mostren les fotos. Conclusió: el material visual encaixa millor amb "passatge encantat / escena immersiva" que no amb una fantasia tipus "món màgic".
+- També he reescrit els textos de `messages/ca.json`, `messages/es.json` i `messages/en.json` per alinear metadata, hero, galeria, inclosos, packs, testimoni i CTA final amb aquest nou posicionament.
+- Els packs de la pàgina passen a tenir un framing més evocador i coherent amb el material visual: `Entrada espectral`, `Passatge encantat` i `Ritual final`.
+- A nivell visual he reforçat els components compartits de la pàgina:
+  - `app/components/ui/HalloweenDecorationSection.tsx`: menys grid temàtic genèric i més lectura d'escenografia / muntatge immersiu.
+  - `app/components/ui/HalloweenAtmosphere.tsx`: atmosfera més cinematogràfica i menys "parc temàtic" genèric; menys protagonisme de ratpenats, més boira baixa, pols/embers i llum de candela.
+- Validació passada abans de la rematada visual final:
+  - `pnpm run validate:core` OK
+  - `pnpm build` OK
+- Punt honest:
+  - aquesta passada de `Halloween` ha quedat oberta en worktree i no s'ha commitejat en aquesta sessió.
+  - la documentació la deixo escrita aquí perquè, si s'apaga l'equip o entra una altra IA, quedi clar què s'ha tocat i amb quin criteri.
+
 ## 2026-03-29 — Reforç catàleg + cosir dashboard ↔ Salut + admin didàctic
 
 ### Health checks nous a adminHealthService
@@ -7571,3 +7587,4 @@ px tsc --noEmit i pnpm run arch:layer:check.
   - `pnpm build` OK
 - Conclusió: el tall mòbil queda funcional, validat i preparat per una segona mirada de polish, no per una reestructuració nova.
 - Punt honest: la passada visual final s'ha centrat en públic; l'admin s'ha validat sobretot per typecheck, test específic i build.
+

@@ -6,97 +6,97 @@
   },
   "halloweenPage": {
     "meta": {
-      "title": "Fiesta Halloween Barcelona | Decoración Completa + DJ + Efectos | Òrbita Events",
-      "description": "Transforma tu evento en una noche de terror. Decoración por todo el espacio: fantasmas gigantes, jaulas con tarántulas, caldero mágico, velas, espejos extraños... DJ + efectos especiales. Desde 600€."
+      "title": "Halloween inmersivo Barcelona | Pasaje encantado + DJ + efectos | Òrbita Events",
+      "description": "Convertimos tu espacio en un Halloween inmersivo con decoración real, DJ temático, niebla, luz y escenas que parecen sacadas de un pasaje encantado. Desde 600€."
     },
     "badge": "🎃 Temporada Halloween {year}",
     "hero": {
-      "title1": "NOCHES DE",
-      "title2": "TERROR",
-      "subtitle": "Decoración completa por todo el espacio + DJ temático + efectos especiales. Todo lo que necesitas para una noche terroríficamente perfecta."
+      "title1": "HALLOWEEN",
+      "title2": "INMERSIVO",
+      "subtitle": "No es una fiesta con cuatro detalles. Es un pasaje encantado con decoración real, DJ temático, niebla y luz para convertir el espacio en una escena de terror memorable."
     },
     "cta": {
-      "reserve": "Reserva tu noche de terror",
+      "reserve": "Quiero un Halloween inmersivo",
       "whatsapp": "WhatsApp directo",
-      "reserve2025": "Reserva Halloween {year}",
-      "requestInfo": "Solicitar info"
+      "reserve2025": "Reserva tu Halloween {year}",
+      "requestInfo": "Elegir este formato"
     },
     "gallery": {
-      "title": "Eventos Halloween",
+      "title": "Escenas",
       "titleHighlight": "reales",
-      "subtitle": "No son mockups. Son fiestas que hemos creado."
+      "subtitle": "Decoración, niebla, luz y ambientación que ya hemos montado de verdad. No son renders: es el efecto que vivirán tus invitados."
     },
     "includes": {
-      "title": "Qué incluye una noche",
-      "titleHighlight": "Halloween?",
-      "intro": "Todo lo que ves en las fotos lo ponemos nosotros. Tú solo tienes que disfrutar.",
+      "title": "Cómo construimos el",
+      "titleHighlight": "pasaje",
+      "intro": "Todo lo que ves en las fotos lo montamos nosotros: escena, música, niebla y ritmo visual para que el espacio deje de ser neutro y pase a ser una experiencia.",
       "dj": {
-        "title": "DJ Temático",
-        "description": "Playlist curada de Halloween: Thriller, Ghostbusters, remixes actuales. El DJ puede ir caracterizado."
+        "title": "Ritmo y tensión",
+        "description": "Un DJ temático que acompaña el ambiente: clásicos de Halloween, remixes oscuros y momentos de tensión para que la noche no caiga."
       },
       "decoration": {
-        "title": "Decoración Completa",
-        "description": "Fantasmas gigantes, jaulas con tarántulas, caldero mágico, velas, telarañas, calabazas LED, esqueletos..."
+        "title": "Escena real",
+        "description": "Fantasmas, jaulas, telas, velas, mesas y objetos colocados con intención para que el espacio parezca un pasaje encantado, no un photocall improvisado."
       },
       "effects": {
-        "title": "Efectos Especiales",
-        "description": "Humo bajo que recorre el suelo, luces sincronizadas, efectos de sonido terroríficos, chispas frías."
+        "title": "Niebla y luz",
+        "description": "Humo bajo, niebla ambiental, iluminación naranja/roja/verdosa y efectos de sonido para que la atmósfera entre por los ojos antes de que arranque la música."
       }
     },
     "packs": {
-      "title": "Packs",
+      "title": "Formatos",
       "titleHighlight": "Halloween {year}",
-      "subtitle": "Todo incluye decoración completa. Elige el nivel de intensidad.",
+      "subtitle": "Todos incluyen ambientación Halloween. Elige si quieres una entrada elegante, un pasaje completo o una noche de impacto total.",
       "mostRequested": "MÁS PEDIDO",
       "hours": "horas",
-      "includesDecoration": "✓ Incluye toda la decoración",
+      "includesDecoration": "✓ Todos los formatos incluyen escenografía y ambientación Halloween",
       "basic": {
-        "name": "Terror Básico",
+        "name": "Entrada espectral",
         "price": "600",
         "includes": [
           "DJ temático 4 horas",
           "Sonido 4000W",
-          "Iluminación roja/verde",
+          "Iluminación ambiental naranja/verde",
           "Máquina de humo",
-          "Decoración básica (telarañas, calabazas, velas)"
+          "Escena base con telas, velas y calabazas"
         ]
       },
       "night": {
-        "name": "Noche de Miedo",
+        "name": "Pasaje encantado",
         "price": "900",
         "includes": [
           "DJ temático 5 horas",
           "Sonido 4000W + subwoofer",
           "4 cabezas móviles sincronizadas",
-          "Humo bajo (suelo)",
-          "Decoración completa (fantasmas, jaulas, caldero)",
-          "Efectos de sonido terroríficos"
+          "Humo bajo y niebla de suelo",
+          "Escena completa con fantasmas, jaulas y mesas de terror",
+          "Efectos de sonido y ambiente"
         ]
       },
       "zombie": {
-        "name": "Apocalipsis Zombie",
+        "name": "Ritual final",
         "price": "1500",
         "includes": [
-          "DJ + Técnico de luces 6 horas",
+          "DJ + técnico de luces 6 horas",
           "Sonido club 4000W",
           "Show de luces completo",
-          "Humo bajo + máquina de niebla",
-          "Decoración TOTAL (200+ elementos)",
+          "Humo bajo + niebla + refuerzo ambiental",
+          "Escenografía total con 200+ elementos",
           "Chispas frías + CO2 criogénico",
           "Espejos extraños interactivos",
-          "Opción: actor/animador zombie"
+          "Opción de actor o animación de terror"
         ]
       }
     },
     "testimonial": {
-      "quote": "La mejor fiesta de Halloween que hemos hecho nunca. Los niños no paraban de gritar de emoción (¡y un poco de miedo!). Repetiremos seguro.",
+      "quote": "No parecía una fiesta decorada, parecía que hubiéramos entrado dentro de una escena. La niebla, los fantasmas y la luz lo cambiaban todo.",
       "author": "Familia Martínez, Halloween 2024"
     },
     "finalCta": {
-      "title1": "¿Preparado para una noche",
-      "title2": "terroríficamente buena?",
-      "subtitle": "Decoración completa + DJ + efectos. Todo incluido.",
-      "footer": "📍 Barcelona y Girona · ⚡ Respuesta en 2 horas · ✓ Sin compromiso"
+      "title1": "¿Quieres convertir tu espacio en un",
+      "title2": "pasaje encantado?",
+      "subtitle": "Decoración real, DJ temático y efectos bien puestos para que tu Halloween se recuerde como una experiencia, no solo como una fiesta.",
+      "footer": "📍 Barcelona y Girona · ⚡ Respuesta rápida · ✓ Sin compromiso"
     },
     "decoration": {
       "title": "Decoración",
