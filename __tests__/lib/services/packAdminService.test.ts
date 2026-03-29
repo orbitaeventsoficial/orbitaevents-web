@@ -9,6 +9,9 @@ const { mockPrisma, mockComputeHealth, mockGetPricingConfig, mockTranslate } = v
       create: vi.fn(),
       update: vi.fn(),
     },
+    lead: {
+      groupBy: vi.fn(),
+    },
     adminLog: { create: vi.fn() },
   },
   mockComputeHealth: vi.fn(),
@@ -45,6 +48,7 @@ beforeEach(() => {
   mockPrisma.pack.findFirst.mockResolvedValue(null);
   mockPrisma.pack.create.mockResolvedValue({ id: 'p1', slug: 'test' });
   mockPrisma.pack.update.mockResolvedValue({ id: 'p1', slug: 'updated' });
+  mockPrisma.lead.groupBy.mockResolvedValue([]);
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockGetPricingConfig.mockResolvedValue({});
   mockComputeHealth.mockReturnValue({
@@ -55,13 +59,31 @@ beforeEach(() => {
 });
 
 describe('listAdminPacks', () => {
-  it('retorna packs amb pricing health', async () => {
+  it('retorna packs amb pricing health i leadsCount', async () => {
     mockPrisma.pack.findMany.mockResolvedValue([{ id: 'p1', slug: 'basic' }]);
+    mockPrisma.lead.groupBy.mockResolvedValue([{ interestedPackId: 'p1', _count: 3 }]);
 
     const result = await listAdminPacks('ca', false);
 
     expect(result.ok).toBe(true);
-    expect(result.packs[0]).toHaveProperty('recommendedExtraHourPrice');
+    expect(result.packs[0]).toEqual(
+      expect.objectContaining({
+        id: 'p1',
+        leadsCount: 3,
+        recommendedOperatorExtraHourPrice: 80,
+        recommendedExtraHourPrice: 85,
+      })
+    );
+  });
+
+  it('demana agrupació de leads per interestedPackId', async () => {
+    await listAdminPacks('ca', false);
+
+    expect(mockPrisma.lead.groupBy).toHaveBeenCalledWith({
+      by: ['interestedPackId'],
+      where: { interestedPackId: { not: null } },
+      _count: true,
+    });
   });
 
   it('inclou inactius quan includeInactive', async () => {

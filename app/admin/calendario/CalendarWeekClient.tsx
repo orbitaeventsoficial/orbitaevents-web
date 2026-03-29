@@ -112,7 +112,7 @@ export default function CalendarWeekClient() {
   }, [weekDays, data]);
 
   return (
-    <AdminPage title="Calendari">
+    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
       {/* Barra superior */}
       <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-2">

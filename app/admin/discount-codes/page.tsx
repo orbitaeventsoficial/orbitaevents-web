@@ -91,7 +91,7 @@ export default function DiscountCodesPage() {
       clearTimeout(tid);
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     loadCodes();
@@ -511,6 +511,7 @@ export default function DiscountCodesPage() {
     </AdminPage>
   );
 }
+
 
 
 

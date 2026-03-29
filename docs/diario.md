@@ -1,3 +1,47 @@
+## 2026-03-29 — Reforç catàleg + cosir dashboard ↔ Salut + admin didàctic
+
+### Health checks nous a adminHealthService
+- **Cicle de vida inventari**: detecta peces amb >95% hores usades (critical) i >80% (warning). Compara `totalHoursUsed` (sumant `usageHistory.hoursUsed`) contra `expectedLifeHours`.
+- **Capital mort inventari**: detecta peces actives amb `purchasePrice > 0` que no estan vinculades a cap pack, extra ni reserva. Capital invertit sense retorn.
+- Ambdós checks s'integren amb la vista Salut i enllacen a filtres nous d'inventari (`?health=end-of-life`, `?health=aging`, `?health=unused`).
+
+### Filtres nous a InventoryListClient
+- `end-of-life`: equips >95% vida útil
+- `aging`: equips entre 80-95% vida útil
+- `unused`: equips amb valor econòmic sense cap ús a packs ni reserves
+- Cada filtre té etiqueta descriptiva a la barra de salut.
+
+### Marge visible als extres (pricing admin)
+- `pricingAdminService.ts`: afegit `costPerUnit` al mapping d'extres.
+- `app/admin/pricing/page.tsx`: la pestanya Extres ara mostra cost, marge € i marge % per cada extra que tingui `costPerUnit`. Marge <35% en vermell, ≥35% en verd. Si no hi ha cost definit, avís ambre.
+
+### Tests
+- 2 tests nous a `adminHealthService.test.ts`: cicle de vida (critical + warning) i capital mort.
+- Mocks ajustats per les 2 queries noves (`inventoryItem.findMany` × 2, `inventoryItem.count` × 4).
+
+### Dashboard ↔ Salut cosit
+- `dashboard-data.ts`: importa `getAdminHealthSnapshot`, afegeix `salutSnapshot` a DashboardData.
+- `app/admin/page.tsx`: la targeta "Salut sistema" ara mostra el resum real de Salut per scopes (Sistema, Finances, Operacions, Catàleg, Dades) amb semàfor vermell/ambre/verd i comptador de crítics/avisos. Cada scope enllaça a `/admin/salut?status=critical|warning`. Fallback als healthItems bàsics si el snapshot falla.
+- El títol de la targeta canvia de "Salut sistema" a "Salut del negoci" per reflectir que cobreix tot, no només la part tècnica.
+
+### Admin didàctic (punt 5 roadmap)
+- **Top items crítics al dashboard**: la targeta Salut ara mostra els 3 primers problemes amb títol, raó i link d'acció directe. L'usuari veu immediatament QUÈ falla, no només quants.
+- **Tooltips didàctics als 10 KPIs**: cada xifra del dashboard té ara un tooltip en llenguatge natural que explica què vol dir i per què importa (ex: "Percentatge que et queda net de cada reserva...").
+- **Subtítols millorats**: pricing ("Revisa preus, marges i costos...") i inventari ("equips, estat i amortització") tenen ara subtítols que expliquen la funció, no només números.
+
+### Packs — visibilitat comercial real
+- `packAdminService.ts` i `app/admin/packs/page.tsx`: cada pack mostra ara reserves, consultes (`interestedPackId`) i % de conversió reserva/consulta.
+- Això converteix la pantalla de packs en una lectura més comercial: no només què es ven, sinó també què interessa i quin pack converteix millor.
+- Cobertura afegida a `packAdminService.test.ts` per `lead.groupBy` i `leadsCount`.
+
+### Empty states més didàctics a l'admin
+- `bookings`, `clientes`, `inbox`, `leads` i `post-event/surveys` ara expliquen millor d'on surten les dades quan les llistes són buides.
+- L'objectiu no és visual només: reduir sensació de sistema trencat quan la base encara és buida o filtrada.
+### Validació
+- `npx tsc --noEmit` → 0 errors
+- `pnpm run validate:core` → OK
+- `npx vitest run` → 142 fitxers, 1794 tests, 0 errors
+
 ## 2026-03-29 — Arreglats 50 tests + hero mòbil millorat
 
 ### Hero mòbil — primera impressió resolta
@@ -7473,3 +7517,5 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - `app/admin/pricing/page.tsx`: ara llegeix `tab` i `focus` des de query per obrir directament la pestanya correcta; he deixat resolutiu el cas d'extres a preu 0.
 - `lib/services/adminHealthService.ts`: els avisos de `Salut` ja no apunten a vistes genèriques quan hi ha una aterratge més útil, sobretot a inventari i packs.
 - Validació passada: `npx tsc --noEmit` i `pnpm run arch:layer:check`.
+
+

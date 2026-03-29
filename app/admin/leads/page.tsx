@@ -318,7 +318,7 @@ export default async function LeadsPage({
           <div className="rounded-2xl border admin-card-glass p-8 text-center">
             <span className="text-4xl">📭</span>
             <p className="mt-2">Encara no hi ha entrades</p>
-            <p className="text-xs">Els contactes apareixeran aquí</p>
+            <p className="text-xs mt-1 admin-tone-text-slate">Les consultes del formulari web i altres canals apareixeran aquí automàticament.</p>
           </div>
         ) : (
           leads.map((lead) => {
@@ -428,6 +428,7 @@ export default async function LeadsPage({
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p>Encara no hi ha entrades</p>
+                      <p className="text-xs admin-tone-text-slate">Les consultes del formulari web i altres canals apareixeran aquí automàticament.</p>
                     </div>
                   </td>
                 </tr>

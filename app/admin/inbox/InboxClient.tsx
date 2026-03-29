@@ -502,6 +502,7 @@ export default function InboxClient({
             <div className="p-8 text-center">
               <span className="text-4xl">📭</span>
               <p className="mt-2">No hi ha missatges</p>
+              <p className="text-xs mt-1 admin-tone-text-slate">Els correus rebuts apareixeran aquí. Prova a canviar el filtre o recarregar.</p>
             </div>
           ) : (
             filteredEmails.map((email) => (

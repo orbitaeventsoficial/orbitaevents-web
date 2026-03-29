@@ -72,7 +72,8 @@ export default async function SurveysPage() {
       {surveys.length === 0 ? (
         <div className="ap-card p-12 text-center">
           <div className="text-4xl mb-4">📊</div>
-          <p className="">Encara no hi ha enquestes rebudes</p>
+          <p>Encara no hi ha enquestes rebudes</p>
+          <p className="text-sm mt-2 admin-tone-text-slate">Les enquestes es generen quan un client respon el formulari post-esdeveniment enviat des de la fitxa del booking.</p>
         </div>
       ) : (
         <div className="space-y-3">

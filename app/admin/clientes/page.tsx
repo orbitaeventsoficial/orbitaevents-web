@@ -282,7 +282,9 @@ export default function AdminContactesPage() {
       {/* Empty */}
       {!loading && customers.length === 0 && (
         <div className="text-center py-20" role="status" aria-live="polite">
-          <p className="text-lg">No hi ha clients</p>
+          <span className="text-4xl">👥</span>
+          <p className="text-lg mt-3">No hi ha clients</p>
+          <p className="text-sm mt-1 admin-tone-text-slate">Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment.</p>
         </div>
       )}
 

@@ -70,6 +70,8 @@ const CRON_MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const UPCOMING_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const EXTRA_HEALTH_MARGIN_WARNING_PCT = 0.35;
 const PAYMENT_DUE_SOON_DAYS = 7;
+const INVENTORY_LIFE_WARNING_PCT = 0.80;
+const INVENTORY_LIFE_CRITICAL_PCT = 0.95;
 
 function countStatuses(items: AdminHealthItem[]) {
   return {
@@ -172,6 +174,8 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     activeBookings,
     packPricingConfig,
     activePacks,
+    inventoryLifecycleRows,
+    inventoryUnusedCount,
   ] = await Promise.all([
     prisma.setting.findMany({
       where: {
@@ -323,6 +327,26 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
             },
           },
         },
+      },
+    }),
+    prisma.inventoryItem.findMany({
+      where: {
+        status: { not: 'RETIRED' },
+        expectedLifeHours: { not: null, gt: 0 },
+      },
+      select: {
+        id: true,
+        expectedLifeHours: true,
+        usageHistory: { select: { hoursUsed: true } },
+      },
+    }),
+    prisma.inventoryItem.count({
+      where: {
+        status: { not: 'RETIRED' },
+        purchasePrice: { gt: 0 },
+        packItems: { none: {} },
+        extraItems: { none: {} },
+        bookingItems: { none: {} },
       },
     }),
   ]);
@@ -766,6 +790,63 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       actionLabel: 'Revisar packs',
       href: '/admin/packs?focus=missing-capacity',
       count: packsWithoutCapacityCount,
+    });
+  }
+
+  // --- Cicle de vida inventari ---
+  let inventoryLifeWarningCount = 0;
+  let inventoryLifeCriticalCount = 0;
+  for (const row of inventoryLifecycleRows) {
+    const totalHours = row.usageHistory.reduce((sum: number, u: { hoursUsed: number | null }) => sum + (u.hoursUsed || 0), 0);
+    const lifeHours = row.expectedLifeHours || 2000;
+    const ratio = totalHours / lifeHours;
+    if (ratio >= INVENTORY_LIFE_CRITICAL_PCT) {
+      inventoryLifeCriticalCount += 1;
+    } else if (ratio >= INVENTORY_LIFE_WARNING_PCT) {
+      inventoryLifeWarningCount += 1;
+    }
+  }
+
+  if (inventoryLifeCriticalCount > 0) {
+    catalogItems.push({
+      id: 'catalog-inventory-end-of-life',
+      scope: 'catalog',
+      status: 'critical',
+      title: 'Inventari a fi de vida útil',
+      reason: `${inventoryLifeCriticalCount} peça${inventoryLifeCriticalCount > 1 ? 'es' : ''} ha${inventoryLifeCriticalCount > 1 ? 'n' : ''} superat el 95% de les hores de vida previstes.`,
+      impact: "El risc d'avaria en un event és alt. Convé planificar substitució o retirada.",
+      actionLabel: 'Revisar inventari',
+      href: '/admin/inventory?health=end-of-life',
+      count: inventoryLifeCriticalCount,
+    });
+  }
+
+  if (inventoryLifeWarningCount > 0) {
+    catalogItems.push({
+      id: 'catalog-inventory-aging',
+      scope: 'catalog',
+      status: 'warning',
+      title: 'Inventari envellint',
+      reason: `${inventoryLifeWarningCount} peça${inventoryLifeWarningCount > 1 ? 'es' : ''} ja supera${inventoryLifeWarningCount > 1 ? 'n' : ''} el 80% de la vida útil prevista.`,
+      impact: 'Encara serveixen, però convé tenir-ho al radar per planificar reposició.',
+      actionLabel: 'Revisar inventari',
+      href: '/admin/inventory?health=aging',
+      count: inventoryLifeWarningCount,
+    });
+  }
+
+  // --- Capital mort inventari ---
+  if (inventoryUnusedCount > 0) {
+    catalogItems.push({
+      id: 'catalog-inventory-unused',
+      scope: 'catalog',
+      status: 'warning',
+      title: 'Inventari sense cap ús',
+      reason: `${inventoryUnusedCount} peça${inventoryUnusedCount > 1 ? 'es' : ''} amb valor econòmic no està${inventoryUnusedCount > 1 ? 'n' : ''} vinculada${inventoryUnusedCount > 1 ? 'es' : ''} a cap pack, extra ni reserva.`,
+      impact: 'Capital invertit que no genera retorn. Pot ser que falti vincular o que sobri.',
+      actionLabel: 'Revisar inventari',
+      href: '/admin/inventory?health=unused',
+      count: inventoryUnusedCount,
     });
   }
 

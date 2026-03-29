@@ -55,8 +55,10 @@ describe('adminHealthService', () => {
       { key: 'emails.cron.lastRun', value: new Date().toISOString() },
       { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
     ]);
-    queueInventoryCounts(0, 0, 0);
-    mockPrisma.inventoryItem.findMany.mockResolvedValue([]);
+    queueInventoryCounts(0, 0, 0, 0);
+    mockPrisma.inventoryItem.findMany
+      .mockResolvedValueOnce([])   // lowStockRows
+      .mockResolvedValueOnce([]);  // lifecycleRows
     queueExtraCounts(0, 0);
     mockPrisma.extra.findMany.mockResolvedValue([]);
     mockPrisma.lead.count.mockResolvedValue(0);
@@ -140,10 +142,11 @@ describe('adminHealthService', () => {
       { key: 'alerts.system.autofixFailureCount', value: '1' },
     ]);
     mockPrisma.inventoryItem.count.mockReset();
-    queueInventoryCounts(3, 4, 2);
-    mockPrisma.inventoryItem.findMany.mockResolvedValue([
-      { id: 'inv-1', stockQuantity: 1, minStock: 2 },
-    ]);
+    queueInventoryCounts(3, 4, 2, 0);
+    mockPrisma.inventoryItem.findMany.mockReset();
+    mockPrisma.inventoryItem.findMany
+      .mockResolvedValueOnce([{ id: 'inv-1', stockQuantity: 1, minStock: 2 }])  // lowStockRows
+      .mockResolvedValueOnce([]);  // lifecycleRows
     mockPrisma.extra.count.mockReset();
     queueExtraCounts(2, 1);
     mockPrisma.extra.findMany.mockResolvedValue([
@@ -256,5 +259,32 @@ describe('adminHealthService', () => {
     expect(operationsSection?.items.some((item) => item.title.includes('Cobraments de reserves vençuts'))).toBe(true);
     expect(operationsSection?.items.some((item) => item.title.includes('Cobraments a punt de vèncer'))).toBe(true);
     expect(operationsSection?.items.some((item) => item.href === '/admin/leads')).toBe(true);
+  });
+
+  it('detecta inventari a fi de vida útil (critical >95%) i envellint (warning >80%)', async () => {
+    mockPrisma.inventoryItem.findMany.mockReset();
+    mockPrisma.inventoryItem.findMany
+      .mockResolvedValueOnce([])  // lowStockRows
+      .mockResolvedValueOnce([    // lifecycleRows
+        { id: 'item-old', expectedLifeHours: 1000, usageHistory: [{ hoursUsed: 960 }] },
+        { id: 'item-aging', expectedLifeHours: 2000, usageHistory: [{ hoursUsed: 1000 }, { hoursUsed: 700 }] },
+        { id: 'item-fresh', expectedLifeHours: 2000, usageHistory: [{ hoursUsed: 200 }] },
+      ]);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const catalogSection = snapshot.sections.find((s) => s.scope === 'catalog');
+
+    expect(catalogSection?.items.some((item) => item.id === 'catalog-inventory-end-of-life' && item.count === 1)).toBe(true);
+    expect(catalogSection?.items.some((item) => item.id === 'catalog-inventory-aging' && item.count === 1)).toBe(true);
+  });
+
+  it('detecta inventari amb capital mort (comprat però mai usat)', async () => {
+    mockPrisma.inventoryItem.count.mockReset();
+    queueInventoryCounts(0, 0, 0, 5);
+
+    const snapshot = await getAdminHealthSnapshot();
+    const catalogSection = snapshot.sections.find((s) => s.scope === 'catalog');
+
+    expect(catalogSection?.items.some((item) => item.id === 'catalog-inventory-unused' && item.count === 5)).toBe(true);
   });
 });

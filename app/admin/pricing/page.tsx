@@ -17,6 +17,7 @@ interface ExtraData {
   price: number;
   priceType: string;
   isActive: boolean;
+  costPerUnit: number | null;
   linkedInventory: Array<{
     itemCode: string;
     itemName: string;
@@ -264,7 +265,7 @@ export default function PricingAdminPage() {
   return (
     <AdminPage
       title="Preus"
-      subtitle="Edita preus dels extras · Consulta packs i inventari"
+      subtitle="Revisa preus, marges i costos dels extres, packs i inventari per saber què renta i què no."
     >
       <div className="flex gap-2 flex-wrap">
         {[
@@ -475,7 +476,7 @@ export default function PricingAdminPage() {
                           ))}
                         </div>
                       )}
-                      <div className="flex gap-6 text-sm">
+                      <div className="flex gap-6 text-sm flex-wrap">
                         <div>
                           <span className="">Vendes:</span>
                           <span className="font-semibold ml-1">{extra.salesCount}</span>
@@ -484,6 +485,25 @@ export default function PricingAdminPage() {
                           <span className="">Ingressos:</span>
                           <span className="font-semibold ml-1">{formatCurrency(extra.totalRevenue)}</span>
                         </div>
+                        {extra.costPerUnit != null && extra.price > 0 && (
+                          <>
+                            <div>
+                              <span className="">Cost:</span>
+                              <span className="font-semibold ml-1">{formatCurrency(extra.costPerUnit)}</span>
+                            </div>
+                            <div>
+                              <span className="">Marge:</span>
+                              <span className={`font-semibold ml-1 ${((extra.price - extra.costPerUnit) / extra.price) < 0.35 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                {formatCurrency(extra.price - extra.costPerUnit)} ({Math.round(((extra.price - extra.costPerUnit) / extra.price) * 100)}%)
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {extra.costPerUnit == null && extra.price > 0 && (
+                          <div>
+                            <span className="text-amber-400 text-xs">⚠ Sense cost definit</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 

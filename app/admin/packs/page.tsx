@@ -37,29 +37,37 @@ function resolvePackFocus(value?: string | string[]): PackFocus | null {
 
 async function getPacks() {
   try {
-    const packs = await prisma.pack.findMany({
-      orderBy: { order: 'asc' },
-      include: {
-        translations: true,
-        inventory: {
-          include: {
-            item: {
-              select: {
-                code: true,
-                name: true,
-                purchasePrice: true,
-                expectedLifeHours: true,
+    const [packs, leadsByPack] = await Promise.all([
+      prisma.pack.findMany({
+        orderBy: { order: 'asc' },
+        include: {
+          translations: true,
+          inventory: {
+            include: {
+              item: {
+                select: {
+                  code: true,
+                  name: true,
+                  purchasePrice: true,
+                  expectedLifeHours: true,
+                },
               },
             },
           },
+          _count: {
+            select: { bookings: true },
+          },
         },
-        _count: {
-          select: { bookings: true },
-        },
-      },
-    });
+      }),
+      prisma.lead.groupBy({
+        by: ['interestedPackId'],
+        where: { interestedPackId: { not: null } },
+        _count: true,
+      }),
+    ]);
 
-    return packs;
+    const leadsMap = new Map(leadsByPack.map((row) => [row.interestedPackId, row._count]));
+    return packs.map((pack) => ({ ...pack, leadsCount: leadsMap.get(pack.id) || 0 }));
   } catch (error) {
     log.error('Error obtenint packs:', error);
     return [];
@@ -353,7 +361,14 @@ export default async function PacksPage({
                     )}
 
                     <div className="flex items-center justify-between text-xs pt-2 border-t">
-                      <span>{pack._count.bookings} reserves</span>
+                      <span>{pack._count.bookings} reserves · {pack.leadsCount} consultes</span>
+                      {pack.leadsCount > 0 && (
+                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {Math.round((pack._count.bookings / pack.leadsCount) * 100)}% conv.
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs">
                       <span>{pack.inventory.length} elements inventari</span>
                     </div>
                   </div>
@@ -506,7 +521,14 @@ export default async function PacksPage({
                     )}
 
                     <div className="flex items-center justify-between text-xs pt-2 border-t">
-                      <span>{pack._count.bookings} reserves</span>
+                      <span>{pack._count.bookings} reserves · {pack.leadsCount} consultes</span>
+                      {pack.leadsCount > 0 && (
+                        <span className={`font-semibold ${Math.round((pack._count.bookings / pack.leadsCount) * 100) >= 30 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {Math.round((pack._count.bookings / pack.leadsCount) * 100)}% conv.
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs">
                       <span>{pack.inventory.length} elements inventari</span>
                     </div>
                   </div>

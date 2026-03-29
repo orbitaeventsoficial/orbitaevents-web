@@ -321,7 +321,8 @@ export default async function BookingsPage({
           <div className="rounded-2xl border admin-card-glass p-8 text-center">
             <span className="text-4xl">📅</span>
             <p className="mt-2">Encara no hi ha reserves</p>
-            <Link href="/admin/bookings/new" className="text-sm mt-2 inline-block font-medium">
+            <p className="text-xs mt-1 admin-tone-text-slate">Quan un lead es confirma, es genera una reserva automàticament. També pots crear-ne una manualment.</p>
+            <Link href="/admin/bookings/new" className="text-sm mt-3 inline-block font-medium">
               Crear primera reserva →
             </Link>
           </div>
@@ -448,6 +449,7 @@ export default async function BookingsPage({
                   <td colSpan={9} className="px-4 py-12 text-center">
                     <span className="text-4xl">📅</span>
                     <p className="mt-2">Encara no hi ha reserves</p>
+                    <p className="text-xs mt-1 admin-tone-text-slate">Quan un lead es confirma, es genera una reserva automàticament.</p>
                   </td>
                 </tr>
               ) : (

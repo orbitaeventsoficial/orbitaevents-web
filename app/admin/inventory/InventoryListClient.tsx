@@ -175,6 +175,17 @@ export default function InventoryListClient() {
           return item.purchasePrice == null || item.expectedLifeHours == null;
         case 'zero-value':
           return item.value === 0;
+        case 'end-of-life': {
+          const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
+          return life > 0 && (item.totalHoursUsed / life) >= 0.95;
+        }
+        case 'aging': {
+          const lifeA = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
+          const ratioA = lifeA > 0 ? item.totalHoursUsed / lifeA : 0;
+          return ratioA >= 0.80 && ratioA < 0.95;
+        }
+        case 'unused':
+          return item.purchasePrice != null && item.purchasePrice > 0 && item.packItems.length === 0 && item._count.bookingItems === 0;
         default:
           return true;
       }
@@ -191,6 +202,12 @@ export default function InventoryListClient() {
         return 'Mostrant només equips sense dades completes de cost o vida útil';
       case 'zero-value':
         return 'Mostrant només equips valorats a 0';
+      case 'end-of-life':
+        return 'Mostrant equips que han superat el 95% de la vida útil';
+      case 'aging':
+        return 'Mostrant equips entre el 80% i el 95% de la vida útil';
+      case 'unused':
+        return 'Mostrant equips amb valor econòmic sense cap ús a packs ni reserves';
       default:
         return null;
     }
@@ -333,7 +350,7 @@ export default function InventoryListClient() {
   return (
     <AdminPage
       title="Inventari"
-      subtitle={`${displayedItems.length} elements · ${formatNumber(totalValue)}€ valor total`}
+      subtitle={`${displayedItems.length} elements · ${formatNumber(totalValue)}€ invertits — equips, estat i amortització`}
       actions={
         <div className="flex gap-2">
           <div className="flex rounded-xl border p-0 overflow-hidden">
@@ -616,13 +633,14 @@ export default function InventoryListClient() {
                     </p>
                   )}
                   {/* Barra de vida */}
-                  <div className="h-1.5 w-full rounded-full">
+                  <div className="h-1.5 w-full rounded-full bg-white/10">
                     <div
                       className={`h-1.5 rounded-full ${
-                        lifePercent > 50 ? 'bg-emerald-400' :
-                        lifePercent > 20 ? 'bg-amber-400' : 'bg-rose-400'
+                        lifePercent > 40 ? 'bg-emerald-400' :
+                        lifePercent > 20 ? 'bg-amber-400' :
+                        lifePercent > 5 ? 'bg-orange-400' : 'bg-rose-400'
                       }`}
-                      style={{ width: `${lifePercent}%` }}
+                      style={{ width: `${Math.max(lifePercent, 3)}%` }}
                     />
                   </div>
                 </div>
@@ -722,6 +740,7 @@ export default function InventoryListClient() {
                 {displayedItems.map((item) => {
                   const catConf = getInventoryCategoryDisplay(item.category);
                   const statusConf = getInventoryStatusDisplay(item.status);
+                  const tableLifePct = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
 
                   return (
                     <tr key={item.id} className="transition-colors hover:bg-white/[0.03]">
@@ -753,13 +772,23 @@ export default function InventoryListClient() {
                         {formatNumber(item.value)}€
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-xs">
+                        <div className="text-xs space-y-1">
                           <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
                           {item.purchasePrice && (
-                            <p className="">
+                            <p>
                               ↓ {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h restants
                             </p>
                           )}
+                          <div className="h-1 w-full rounded-full bg-white/10 max-w-[80px]">
+                            <div
+                              className={`h-1 rounded-full ${
+                                tableLifePct > 40 ? 'bg-emerald-400' :
+                                tableLifePct > 20 ? 'bg-amber-400' :
+                                tableLifePct > 5 ? 'bg-orange-400' : 'bg-rose-400'
+                              }`}
+                              style={{ width: `${Math.max(tableLifePct, 5)}%` }}
+                            />
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">

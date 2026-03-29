@@ -158,6 +158,7 @@ export async function getPricingAdminData(locale: Locale) {
           itemValue: inventoryRow.item.value,
           quantity: inventoryRow.quantity,
         })),
+        costPerUnit: extra.costPerUnit,
         salesCount: extra.bookingExtras.length,
         totalRevenue: extra.bookingExtras.reduce((sum: number, row: ExtraBooking) => sum + row.price * row.quantity, 0),
         recentSales: extra.bookingExtras.slice(0, 5).map((row: ExtraBooking) => ({

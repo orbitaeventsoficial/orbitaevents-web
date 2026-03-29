@@ -10,6 +10,7 @@ import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS } f
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
+import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services/adminHealthService';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -150,6 +151,7 @@ export interface DashboardData {
   activities: { icon: string; text: string; time: string }[];
   healthItems: { label: string; status: string }[];
   cronMap: Record<string, string>;
+  salutSnapshot: AdminHealthSnapshot | null;
 }
 
 // ─── Main fetch ──────────────────────────────────────────────────────────────
@@ -176,9 +178,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
   const smtpConfigured = isSmtpConfigured();
 
-  const [ga4, profitConfig] = await Promise.all([
+  const [ga4, profitConfig, salutSnapshot] = await Promise.all([
     Promise.race([getGa4Report().catch(() => null), timeoutPromise(3000)]),
     getProfitabilityConfig(),
+    getAdminHealthSnapshot().catch(() => null),
   ]);
 
   const [
@@ -542,7 +545,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     leadsSeries, leadsWonSeries, bookingsSeries, revenueSeries, revenueTotal30,
     recentLeads, upcomingBookings, upcomingTasks,
     commandLeads, commandBookings, recentAdminLogs,
-    timeline, alerts, activities, healthItems, cronMap,
+    timeline, alerts, activities, healthItems, cronMap, salutSnapshot,
   };
 }
 

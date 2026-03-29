@@ -432,21 +432,86 @@ export default async function AdminDashboard() {
 
       <section className="admin-cr-info-grid">
         <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Salut sistema</p>
-          <div className="admin-cr-health-grid">
-            {d.healthItems.map((item) => {
-              const dot = item.status === 'OK' ? 'bg-emerald-400' : item.status === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400';
-              return (
-                <div key={item.label} className="admin-cr-health-item">
-                  <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
-                  <p className="admin-cr-health-label">{item.label}</p>
-                  <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
-                    {item.status}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+          <p className="admin-cr-kicker">Salut del negoci</p>
+          {d.salutSnapshot ? (
+            <>
+              <div className="flex items-center gap-4 mb-3">
+                {d.salutSnapshot.summary.critical > 0 && (
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-rose-400">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-rose-400" />
+                    {d.salutSnapshot.summary.critical} crític{d.salutSnapshot.summary.critical > 1 ? 's' : ''}
+                  </span>
+                )}
+                {d.salutSnapshot.summary.warning > 0 && (
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-400">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    {d.salutSnapshot.summary.warning} avís{d.salutSnapshot.summary.warning > 1 ? 'os' : ''}
+                  </span>
+                )}
+                {d.salutSnapshot.summary.critical === 0 && d.salutSnapshot.summary.warning === 0 && (
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-emerald-400">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    Tot correcte
+                  </span>
+                )}
+              </div>
+              <div className="admin-cr-health-grid">
+                {d.salutSnapshot.sections.map((section) => {
+                  const hasCritical = section.counts.critical > 0;
+                  const hasWarning = section.counts.warning > 0;
+                  const dot = hasCritical ? 'bg-rose-400' : hasWarning ? 'bg-amber-400' : 'bg-emerald-400';
+                  const tone = hasCritical ? 'admin-cr-tone-rose' : hasWarning ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald';
+                  const count = hasCritical ? section.counts.critical : hasWarning ? section.counts.warning : 0;
+                  const href = hasCritical ? '/admin/salut?status=critical' : hasWarning ? '/admin/salut?status=warning' : '/admin/salut';
+                  return (
+                    <Link key={section.scope} href={href} className="admin-cr-health-item hover:opacity-80 transition-opacity">
+                      <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
+                      <p className="admin-cr-health-label">{section.label}</p>
+                      <p className={`admin-cr-health-value ${tone}`}>
+                        {count > 0 ? count : 'OK'}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+              {(() => {
+                const topItems = d.salutSnapshot!.sections
+                  .flatMap((s) => s.items)
+                  .filter((item) => item.status === 'critical' || item.status === 'warning')
+                  .sort((a, b) => (a.status === 'critical' ? 0 : 1) - (b.status === 'critical' ? 0 : 1))
+                  .slice(0, 3);
+                if (topItems.length === 0) return null;
+                return (
+                  <div className="mt-3 space-y-2">
+                    {topItems.map((item) => (
+                      <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]">
+                        <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-rose-400' : 'bg-amber-400'}`} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>
+                          <p className="text-xs text-white/50 line-clamp-1">{item.reason}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                );
+              })()}
+            </>
+          ) : (
+            <div className="admin-cr-health-grid">
+              {d.healthItems.map((item) => {
+                const dot = item.status === 'OK' ? 'bg-emerald-400' : item.status === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400';
+                return (
+                  <div key={item.label} className="admin-cr-health-item">
+                    <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
+                    <p className="admin-cr-health-label">{item.label}</p>
+                    <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
+                      {item.status}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="mt-4 flex items-center justify-between gap-3">
             <p className="admin-cr-footnote">
               Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
@@ -493,16 +558,16 @@ export default async function AdminDashboard() {
       </section>
 
       <div className="admin-cr-kpi-grid">
-        <div className="admin-stagger-item"><MetricCard icon="📋" label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" /></div>
-        <div className="admin-stagger-item"><MetricCard icon="📨" label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" /></div>
-        <div className="admin-stagger-item"><MetricCard icon="🏆" label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" /></div>
-        <div className="admin-stagger-item"><MetricCard icon="⭐" label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" /></div>
-        <div className="admin-stagger-item"><MetricCard icon="🌐" label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></div>
-        <div className="admin-stagger-item"><MetricCard icon="⏱️" label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></div>
-        <div className="admin-stagger-item"><Tooltip text="Cost engine: costEngine.ts"><MetricCard icon="📊" label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Previsió cashFlowForecast.ts"><MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${Math.round(d.cashFlowNet30)} €`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Pipeline ponderat per probabilitat"><MetricCard icon="🔮" label="Pipeline ponderat" value={`${Math.round(d.pipelineWeighted30)} €`} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Reserves amb pagament pendent"><MetricCard icon="💶" label="Pendent de cobrar" value={`${Math.round(d.pendingPayments)} €`} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Quantes reserves tens confirmades ara mateix. Més confirmades = més feina segura."><MetricCard icon="📋" label="Reserves confirmades" value={d.bookingsConfirmed.toString()} change={d.bookingsThisMonth > 0 ? `+${d.bookingsThisMonth} aquest mes` : '-'} changeType="up" accent="emerald" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Consultes noves que han entrat aquest mes. Indica si la web i el màrqueting estan portant feina."><MetricCard icon="📨" label="Consultes del mes" value={d.leadsThisMonth.toString()} change={`${d.leadsCount} totals`} changeType="up" accent="sky" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Clients reals que han contractat. La conversió mostra quin % de consultes acaben en reserva."><MetricCard icon="🏆" label="Clients" value={d.customersCount.toString()} change={`${d.conversionRate}% de conversió`} changeType="up" accent="purple" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Nota mitjana de les ressenyes de Google. Afecta directament la confiança dels nous clients."><MetricCard icon="⭐" label="Valoració mitjana" value={d.rating} change={`${d.testimonialsApproved} ressenyes`} changeType="up" accent="amber" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Visites a la web els últims 30 dies. Si baixa, pot ser que el màrqueting perdi empenta."><MetricCard icon="🌐" label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Quant de temps passen els visitants a la web. Més temps = més interès real en el que ofereixes."><MetricCard icon="⏱️" label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Percentatge que et queda net de cada reserva després de descomptar costos. Per sobre del 50% és excel·lent."><MetricCard icon="📊" label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Quants diners entraran o sortiran els pròxims 30 dies, segons reserves confirmades i costos previstos."><MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${Math.round(d.cashFlowNet30)} €`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Valor estimat de les vendes en curs, ponderat per la probabilitat de tancar cada una."><MetricCard icon="🔮" label="Pipeline ponderat" value={`${Math.round(d.pipelineWeighted30)} €`} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Total que encara no has cobrat de reserves actives. Inclou bestretes i saldos pendents."><MetricCard icon="💶" label="Pendent de cobrar" value={`${Math.round(d.pendingPayments)} €`} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
       </div>
 
       <div className="admin-cr-chart-grid">

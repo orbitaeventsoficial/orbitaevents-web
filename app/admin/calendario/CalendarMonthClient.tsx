@@ -226,7 +226,7 @@ export default function CalendarMonthClient() {
   }, [cells, data]);
 
   return (
-    <AdminPage title="Calendari">
+    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
       {/* Barra superior: selector de mes + meta info */}
       <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-2">

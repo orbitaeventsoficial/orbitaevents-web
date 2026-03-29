@@ -328,6 +328,7 @@ function CategorySection({
   }, [onEventsRefresh]);
 
   const handleDelete = useCallback(async (item: MediaItem) => {
+    if (!window.confirm(`Segur que vols eliminar "${item.caption || 'aquest element'}"? Aquesta acció no es pot desfer.`)) return;
     setSavingId(item.id);
     setError(null);
     try {
@@ -529,6 +530,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
   }, [onEventsRefresh]);
 
   const deleteEvent = useCallback(async (id: string) => {
+    if (!window.confirm('Segur que vols eliminar aquest event del portfolio? Aquesta acció no es pot desfer.')) return;
     try {
       await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
       await onEventsRefresh();

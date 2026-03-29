@@ -20,12 +20,18 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import {
+  getPricingAdminData,
   normalizePricingLocale,
   updateExtraPrice,
 } from '@/lib/services/pricingAdminService';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockPrisma.extra.findMany.mockResolvedValue([]);
+  mockPrisma.pack.findMany.mockResolvedValue([]);
+  mockPrisma.inventoryItem.findMany.mockResolvedValue([]);
+  mockPrisma.booking.count.mockResolvedValue(0);
+  mockPrisma.booking.aggregate.mockResolvedValue({ _sum: { total: 0 } });
   mockPrisma.extra.findUnique.mockResolvedValue(null);
   mockPrisma.extra.update.mockResolvedValue({ id: 'e1', price: 50 });
   mockPrisma.adminLog.create.mockResolvedValue({});
@@ -51,6 +57,61 @@ describe('normalizePricingLocale', () => {
   it('retorna ca per valors desconeguts', () => {
     expect(normalizePricingLocale('fr')).toBe('ca');
     expect(normalizePricingLocale('de')).toBe('ca');
+  });
+});
+
+describe('getPricingAdminData', () => {
+  it('propaga costPerUnit dels extres i calcula vendes/revenue', async () => {
+    mockPrisma.extra.findMany.mockResolvedValue([
+      {
+        id: 'extra-1',
+        slug: 'fum',
+        translations: [{ locale: 'ca', name: 'Màquina de fum', description: 'Ambient', tagline: null }],
+        price: 40,
+        priceType: 'FIXED',
+        isActive: true,
+        order: 1,
+        costPerUnit: 18,
+        inventory: [
+          {
+            quantity: 1,
+            item: { id: 'inv-1', code: 'SMOKE', name: 'Màquina fum', value: 200 },
+          },
+        ],
+        bookingExtras: [
+          {
+            price: 40,
+            quantity: 2,
+            booking: { reference: 'B-001', eventDate: new Date('2026-06-10T00:00:00.000Z'), status: 'COMPLETED' },
+          },
+          {
+            price: 35,
+            quantity: 1,
+            booking: { reference: 'B-002', eventDate: new Date('2026-05-01T00:00:00.000Z'), status: 'CONFIRMED' },
+          },
+        ],
+      },
+    ]);
+
+    const result = await getPricingAdminData('ca');
+
+    expect(result.ok).toBe(true);
+    expect(result.data.extras).toHaveLength(1);
+    expect(result.data.extras[0]).toEqual(
+      expect.objectContaining({
+        id: 'extra-1',
+        name: 'Màquina de fum',
+        costPerUnit: 18,
+        salesCount: 2,
+        totalRevenue: 115,
+      })
+    );
+    expect(result.data.extras[0].linkedInventory).toEqual([
+      expect.objectContaining({ itemCode: 'SMOKE', itemName: 'Màquina fum', itemValue: 200, quantity: 1 }),
+    ]);
+    expect(result.data.stats.topExtras).toEqual([
+      expect.objectContaining({ slug: 'fum', totalSales: 2, revenue: 115 }),
+    ]);
   });
 });
 

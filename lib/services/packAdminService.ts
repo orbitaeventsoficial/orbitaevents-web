@@ -89,21 +89,31 @@ async function completePackTranslations(input: unknown): Promise<PackTranslation
 }
 
 export async function listAdminPacks(locale: string, includeInactive: boolean) {
-  const packs = await prisma.pack.findMany({
-    where: includeInactive ? undefined : { isActive: true },
-    include: {
-      translations: { where: { locale } },
-      inventory: { include: { item: true } },
-      _count: { select: { bookings: true } },
-    },
-    orderBy: { order: 'asc' },
-  });
+  const [packs, leadsByPack] = await Promise.all([
+    prisma.pack.findMany({
+      where: includeInactive ? undefined : { isActive: true },
+      include: {
+        translations: { where: { locale } },
+        inventory: { include: { item: true } },
+        _count: { select: { bookings: true } },
+      },
+      orderBy: { order: 'asc' },
+    }),
+    prisma.lead.groupBy({
+      by: ['interestedPackId'],
+      where: { interestedPackId: { not: null } },
+      _count: true,
+    }),
+  ]);
+
+  const leadsMap = new Map(leadsByPack.map((row) => [row.interestedPackId, row._count]));
 
   const pricingConfig = await getPackPricingModelConfig();
   const packsWithPricing = packs.map((pack) => {
     const health = computePackPricingHealth(pack, pricingConfig);
     return {
       ...pack,
+      leadsCount: leadsMap.get(pack.id) || 0,
       recommendedOperatorExtraHourPrice: health.recommendedOperatorExtraHourPrice,
       recommendedExtraHourPrice: health.recommendedExtraHourPrice,
     };
