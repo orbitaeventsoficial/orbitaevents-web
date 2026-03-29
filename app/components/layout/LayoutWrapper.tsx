@@ -81,7 +81,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   // Gestiona la intro usando la misma decision que se calcula en el bootstrap inicial.
   useEffect(() => {
-const introMode = getClientIntroMode({
+    const introMode = getClientIntroMode({
       pathname,
       search: window.location.search,
       isMobileViewport: window.innerWidth < 1024,
@@ -220,6 +220,12 @@ const introMode = getClientIntroMode({
   // Comprovar si és pàgina immersiva
   const isImmersive = APP_IMMERSIVE_PAGES.some(page => pathname?.includes(page));
   const isIntroActive = showIntro || hideHeaderOnMobileIntro;
+  const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+  const hideMobileChrome = isMobileViewport && (
+    pathWithoutLocale.startsWith('/configurador') ||
+    pathWithoutLocale.startsWith('/contacto') ||
+    pathWithoutLocale.startsWith('/reservar')
+  );
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -257,13 +263,13 @@ const introMode = getClientIntroMode({
       </main>
 
       {/* Footer */}
-      {!isIntroActive && <Footer />}
+      {!isIntroActive && !hideMobileChrome && <Footer />}
 
       {/* Bottom Navigation */}
-      {!isIntroActive && (isMobileViewport ? <MobileBottomNav /> : <BottomNav />)}
+      {!isIntroActive && !hideMobileChrome && (isMobileViewport ? <MobileBottomNav /> : <BottomNav />)}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
-      {!isIntroActive && <FloatingCTAs />}
+      {!isIntroActive && (!isMobileViewport || !hideMobileChrome) && <FloatingCTAs />}
 
       {/* Consentiment cookies */}
       {!isIntroActive && <CookieConsent />}
@@ -271,6 +277,7 @@ const introMode = getClientIntroMode({
     </>
   );
 }
+
 
 
 

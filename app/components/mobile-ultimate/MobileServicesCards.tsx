@@ -91,11 +91,11 @@ function ServiceCard({
       )}
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-5">
         <span className="text-4xl block mb-2">{service.emoji}</span>
 
-        <h3 className="text-2xl font-black text-white mb-1">{title}</h3>
-        <p className="text-white/60 text-sm mb-3">{subtitle}</p>
+        <h3 className="mb-1 text-[1.7rem] font-black text-white leading-tight">{title}</h3>
+        <p className="mb-3 text-sm leading-5 text-white/66">{subtitle}</p>
 
         {/* Feature pills */}
         <div className="flex flex-wrap gap-1.5 mb-4">
@@ -222,9 +222,9 @@ export default function MobileServicesCards() {
   }, [haptic]);
 
   return (
-    <section id="services-section" className="py-10 overflow-hidden relative">
+    <section id="services-section" className="relative overflow-hidden py-8">
       {/* Header */}
-      <div className="px-6 mb-6 text-center">
+      <div className="mb-5 px-6 text-center">
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -238,7 +238,7 @@ export default function MobileServicesCards() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="text-3xl font-black text-white mt-2"
+          className="mt-2 text-[1.9rem] font-black text-white"
         >
           {t('sectionTitle')}
         </motion.h2>
@@ -247,7 +247,7 @@ export default function MobileServicesCards() {
       {/* Horizontal snap carousel */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-6 pb-2"
+        className="flex gap-3 overflow-x-auto snap-x snap-proximity px-6 pb-2"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -260,7 +260,7 @@ export default function MobileServicesCards() {
         {SERVICES.map((service, index) => (
           <div
             key={service.id}
-            className="snap-center flex-shrink-0 w-[82vw] max-w-[380px] h-[400px]"
+            className="snap-center h-[360px] w-[84vw] max-w-[360px] flex-shrink-0"
           >
             <ServiceCard
               service={service}

@@ -1675,7 +1675,7 @@ html.admin-mode .admin-mobile-title-accent {
 }
 
 html.admin-mode .admin-mobile-subtitle {
-  max-width: 140px;
+  max-width: min(50vw, 200px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1781,7 +1781,7 @@ html.admin-mode .admin-mobile-sidebar {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 17rem;
+  width: min(17rem, 85vw);
   background: var(--at-glass-bg);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
@@ -1921,7 +1921,7 @@ html.admin-mode .admin-shell.admin-main-shell {
   margin: 0 auto;
   width: 100%;
   max-width: 1700px;
-  padding: 0.625rem;
+  padding: 0.75rem;
 }
 
 /* ── 9. BOTTOM NAV MOBILE ─────────────────────────────────────────────────── */
@@ -1971,6 +1971,11 @@ html.admin-mode .admin-bottom-nav-item--idle {
 
 html.admin-mode .admin-bottom-nav-item--idle:hover {
   color: var(--at-muted);
+}
+
+html.admin-mode .admin-bottom-nav-item:active {
+  transform: scale(0.93);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 html.admin-mode .admin-bottom-nav-icon-wrap {

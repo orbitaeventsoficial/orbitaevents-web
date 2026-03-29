@@ -7533,3 +7533,41 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - Validació passada: `npx tsc --noEmit` i `pnpm run arch:layer:check`.
 
 
+
+## 2026-03-29 — Auditoria i validació del tall mòbil públic
+
+- He revisat el tall mòbil públic amb criteri de guia: monocapa, responsive real i zero hardcoded en rutes/copy sensible.
+- Canvis principals al sistema públic: `LayoutWrapper`, `MobileBottomNav`, `MobileAppShell`, `MobileHeroUltimate`, `MobileHomePage`, `MobileServicesCards`, `servicios/client`, `packs/PacksClient`, `contacto/client` i `configurador/client`.
+- He reduït chrome persistent en fluxos de conversió, simplificat la bottom nav, descarregat el hero mòbil i compactat les first folds de serveis, packs, contacto i configurador.
+- `MobileHeroUltimate` queda sense rutes locals hardcoded i consumeix locale/traduccions per construir navegació i copy dinàmica.
+- També he regenerat captures locals de comprovació a `.codex-captures/mobile-audit-2026-03-29`, `.codex-captures/mobile-audit-2026-03-29-v2` i `.codex-captures/mobile-audit-2026-03-29-v3`.
+- Comprovació de regressions passada després del tall:
+  - `npx tsc --noEmit` OK
+  - `pnpm run validate:core` OK
+  - `pnpm vitest run` OK → 142 fitxers, 1795 tests
+- Conclusió d'aquesta passada: la reforma mòbil pública no ha trencat res del repo i la cobertura es conserva íntegra.
+- Punt honest: `app/admin/bookings/BookingPipelineView.tsx` i `app/globals.css` continuen oberts com a front mòbil admin separat; la comprovació d'avui confirma que el tall públic és estable, no que l'admin mòbil estigui refós del tot.
+
+## 2026-03-29 — Bookings admin mòbil: kanban tàctil i navegable
+
+- `app/admin/bookings/BookingPipelineView.tsx` ja no queda en un grid vertical simple a mòbil.
+- Ara el kanban administra millor el touch: scroll horitzontal amb `snap`, amplada de columna pensada per viewport mòbil i indicador de columna activa.
+- He afegit punts de navegació entre columnes i un petit context de posició (`Columna X de Y`) perquè el flux sigui més clar en pantalles estretes.
+- Els botons de canvi d'estat tàctils es mantenen, així que el kanban continua usable també sense drag & drop fi.
+- Validació passada després del canvi:
+  - `npx tsc --noEmit` OK
+  - `pnpm vitest run __tests__/app/admin/bookings/BookingPipelineView.test.tsx` OK
+  - `pnpm run validate:core` OK
+
+## 2026-03-29 — Tancament del tall mòbil amb build i captures finals
+
+- He tancat la passada final del mòbil amb `pnpm build` verd després del tall públic i del kanban admin mòbil.
+- `app/globals.css` queda validat com a part bona del tall: amplada més sana de sidebar admin, subtítol menys estrangulat, padding una mica més respirat i feedback tàctil a la bottom nav.
+- També he generat una ronda final de captures públiques a `.codex-captures/mobile-audit-2026-03-29-v4` per revisar `home`, `packs`, `servicios`, `configurador` i `contacto` amb el tall ja consolidat.
+- Validació acumulada del tall mòbil:
+  - `npx tsc --noEmit` OK
+  - `pnpm run validate:core` OK
+  - `pnpm vitest run` OK (`142` fitxers, `1795` tests)
+  - `pnpm build` OK
+- Conclusió: el tall mòbil queda funcional, validat i preparat per una segona mirada de polish, no per una reestructuració nova.
+- Punt honest: la passada visual final s'ha centrat en públic; l'admin s'ha validat sobretot per typecheck, test específic i build.

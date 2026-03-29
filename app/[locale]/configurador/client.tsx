@@ -619,15 +619,15 @@ export default function ConfiguradorClient() {
   // PAS 1: Tipus d'esdeveniment
   const renderStep1 = () => {
         return (
-      <div className="space-y-6">
-        <div className="text-center mb-6">
-          <h2 className="text-3xl sm:text-4xl font-display font-black text-white mb-3">
+      <div className="space-y-5">
+        <div className="mb-5 text-center">
+          <h2 className="mb-2 text-3xl font-display font-black text-white sm:text-4xl">
             {t('step1.title')}
           </h2>
-          <p className="text-lg text-text-muted">{t('step1.subtitle')}</p>
+          <p className="text-base text-text-muted sm:text-lg">{t('step1.subtitle')}</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {EVENT_TYPE_CARDS.map((service) => {
             const minPrice = getMinPriceForEventType(allPacks, service.slug);
 
@@ -640,16 +640,16 @@ export default function ConfiguradorClient() {
                   setStep(2);
                   track('Configurador_Step1_EventType', { type: service.slug });
                 }}
-                className="relative p-8 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border-2 border-white/10 hover:border-oe-gold/60 transition-all duration-300 transform hover:scale-[1.03] hover:shadow-[0_8px_32px_rgba(245,158,11,0.15)] text-left group overflow-hidden"
+                className="group relative overflow-hidden rounded-2xl border-2 border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6 text-left transition-all duration-300 hover:border-oe-gold/60 hover:shadow-[0_8px_32px_rgba(245,158,11,0.15)] md:hover:scale-[1.03]"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-oe-gold/0 to-oe-gold/0 group-hover:from-oe-gold/5 group-hover:to-transparent transition-all duration-500 rounded-2xl" />
                 <div className="relative">
-                  <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">{service.icon}</div>
-                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-oe-gold transition-colors">
+                  <div className="mb-3 text-4xl transition-transform duration-300 group-hover:scale-110">{service.icon}</div>
+                  <h3 className="mb-2 text-[1.9rem] font-bold text-white transition-colors group-hover:text-oe-gold">
                     {t(`step1.eventTypes.${service.slug}`)}
                   </h3>
-                  <p className="text-white/40 text-xs mb-3">{t(service.idealKey)}</p>
-                  <p className="text-lg font-bold text-oe-gold mb-4">{t('step1.from')} {minPrice}€</p>
+                  <p className="mb-2 text-xs text-white/40">{t(service.idealKey)}</p>
+                  <p className="mb-3 text-lg font-bold text-oe-gold">{t('step1.from')} {minPrice}€</p>
                   <div className="flex items-center text-white/60 group-hover:text-oe-gold text-sm font-semibold transition-colors">
                     {t('step1.viewPacks')} <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                   </div>
@@ -1133,7 +1133,7 @@ export default function ConfiguradorClient() {
   const showStickyPrice = step >= 2 && config.selectedPack && step < 4;
 
   return (
-    <div className="relative min-h-screen bg-bg-main pt-6 pb-20 overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-bg-main pb-16 pt-4 sm:pb-20 sm:pt-6">
       {/* Ambient background glow — changes per event type */}
       {ambient && (
         <>

@@ -40,7 +40,6 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { CLIENT_LOGOS } from '@/app/config/client-logos';
 import { hasSeenMobileIntro, markMobileIntroSeen } from '@/lib/intro';
 import { PUBLIC_MOBILE_HOME_GUARANTEES } from '@/lib/constants';
 
@@ -144,64 +143,6 @@ function GuaranteeSection() {
 // ═══════════════════════════════════════════════════════════════════════════
 // TRUSTED BY / LOGOS SECTION
 // ═══════════════════════════════════════════════════════════════════════════
-
-function TrustedBySection() {
-  const t = useTranslations('mobileHome.trustedBy');
-
-  return (
-    <section className="py-10 overflow-hidden">
-      <style jsx>{`
-        @keyframes marquee-scroll-mobile {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .marquee-track-mobile {
-          animation: marquee-scroll-mobile 25s linear infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .marquee-track-mobile { animation: none; }
-        }
-      `}</style>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="mx-auto mb-6 max-w-xs px-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-zinc-200/95"
-      >
-        {t('sectionTitle')}
-      </motion.p>
-
-      {/* Infinite scroll marquee */}
-      <div className="relative">
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-bg-main to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-bg-main to-transparent z-10 pointer-events-none" />
-
-        <div className="marquee-track-mobile flex items-center w-max">
-          {[0, 1].map((block) => (
-            <div key={block} className="flex gap-5 items-center px-2.5">
-              {CLIENT_LOGOS.map((logo, i) => (
-                <div
-                  key={`${block}-${i}`}
-                  className="flex-shrink-0 w-32 h-20 relative rounded-xl overflow-hidden bg-white/[0.07] p-2.5"
-                >
-                  <Image
-                    src={logo}
-                    alt={`Cliente ${i + 1}`}
-                    fill
-                    sizes="128px"
-                    className="object-contain"
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MOBILE REVIEWS SECTION
@@ -579,9 +520,6 @@ export default function MobileHomePage() {
 
           {/* Stats animats — per què triar Òrbita */}
           <StatsSection />
-
-          {/* Trusted By */}
-          <TrustedBySection />
 
           <SectionDivider />
 

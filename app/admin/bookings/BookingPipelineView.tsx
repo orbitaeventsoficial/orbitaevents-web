@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BOOKING_PIPELINE_COLUMNS, BOOKING_STATUS_CONFIG, formatDateShort, formatCurrency } from '@/lib/constants';
@@ -46,6 +46,8 @@ export default function BookingPipelineView() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [activeColumnIndex, setActiveColumnIndex] = useState(0);
+  const boardRef = useRef<HTMLDivElement | null>(null);
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -81,10 +83,38 @@ export default function BookingPipelineView() {
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
+  const handleBoardScroll = useCallback(() => {
+    const board = boardRef.current;
+    if (!board || typeof window === 'undefined' || window.innerWidth >= 768) return;
+    const columns = Array.from(board.querySelectorAll('[data-pipeline-column]'));
+    if (columns.length === 0) return;
+
+    const boardRect = board.getBoundingClientRect();
+    const boardCenter = boardRect.left + (boardRect.width / 2);
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    columns.forEach((column, index) => {
+      const rect = column.getBoundingClientRect();
+      const columnCenter = rect.left + (rect.width / 2);
+      const distance = Math.abs(columnCenter - boardCenter);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    setActiveColumnIndex(bestIndex);
+  }, []);
+
   const columns: PipelineColumn[] = COLUMNS_DEF.map((col) => ({
     ...col,
     bookings: bookings.filter((b) => b.status === col.status),
   }));
+
+  useEffect(() => {
+    handleBoardScroll();
+  }, [handleBoardScroll, bookings]);
 
   // Also count cancelled separately
   const cancelledCount = bookings.filter((b) => b.status === 'CANCELLED').length;
@@ -158,15 +188,41 @@ export default function BookingPipelineView() {
         </p>
       )}
 
+      {columns.length > 1 && (
+        <div className="flex items-center justify-center gap-1.5 md:hidden">
+          {columns.map((col, index) => (
+            <button
+              key={col.status}
+              type="button"
+              onClick={() => {
+                const board = boardRef.current;
+                const column = board?.querySelector(`[data-pipeline-column="${col.status}"]`);
+                column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+              }}
+              className={`h-2.5 rounded-full transition-all ${
+                index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-black/15 dark:bg-white/20'
+              }`}
+              aria-label={`Anar a ${col.label}`}
+              aria-pressed={index === activeColumnIndex}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Kanban board */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {columns.map((col) => (
+      <div
+        ref={boardRef}
+        onScroll={handleBoardScroll}
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:overflow-visible md:pb-0 xl:grid-cols-4"
+      >
+        {columns.map((col, index) => (
           <div
             key={col.status}
+            data-pipeline-column={col.status}
             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverStatus(col.status); }}
             onDragLeave={() => { if (dragOverStatus === col.status) setDragOverStatus(null); }}
             onDrop={(e) => { e.preventDefault(); handleDrop(col.status); }}
-            className={`rounded-2xl border flex min-h-[320px] flex-col transition-all ${col.toneClass} ${
+            className={`rounded-2xl border flex min-h-[320px] min-w-[86vw] shrink-0 snap-center flex-col transition-all md:min-w-0 ${col.toneClass} ${
               dragOverStatus === col.status ? 'admin-drop-active' : ''
             }`}
           >
@@ -176,6 +232,9 @@ export default function BookingPipelineView() {
                 <h3 className="text-sm font-semibold">{col.label}</h3>
                 <span className="rounded-full border px-2 py-0.5 text-[10px] font-bold">{col.bookings.length}</span>
               </div>
+              <p className="mt-1 text-[11px] opacity-70 md:hidden">
+                Columna {index + 1} de {columns.length}
+              </p>
             </div>
 
             {/* Cards */}
@@ -277,7 +336,7 @@ export default function BookingPipelineView() {
                           key={target.status}
                           onClick={() => moveBooking(booking.id, target.status)}
                           disabled={isUpdating}
-                          className="ap-btn ap-btn--secondary flex-1 px-2 py-1 text-[10px] disabled:opacity-50"
+                          className="ap-btn ap-btn--secondary flex-1 px-2.5 py-2 text-xs min-h-[44px] disabled:opacity-50"
                         >
                           {target.label}
                         </button>

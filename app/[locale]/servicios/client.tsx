@@ -91,7 +91,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
   return (
     <>
       {/* HERO */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+      <section className="relative flex min-h-[54vh] items-center overflow-hidden sm:min-h-[60vh]">
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
           <Image
@@ -105,18 +105,18 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
           />
         </div>
 
-        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
+        <div className="relative z-20 mx-auto max-w-5xl px-4 py-14 text-center sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6 backdrop-blur-sm">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs font-medium text-amber-400 backdrop-blur-sm sm:text-sm">
               <span>⭐</span>
               {texts.badge}
             </span>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.1]">
+            <h1 className="mb-4 text-4xl font-black leading-[1.05] text-white sm:text-6xl lg:text-7xl">
               {texts.title}
               <br />
               <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
@@ -124,17 +124,17 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
               </span>
             </h1>
 
-            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-4">
+            <p className="mx-auto mb-3 max-w-2xl text-base leading-7 text-white/78 sm:text-xl">
               {texts.subtitle}
             </p>
-            <p className="text-lg text-amber-400 font-medium mb-8">
+            <p className="mb-6 text-base font-medium text-amber-400 sm:text-lg">
               {texts.cta}
             </p>
 
-            <div className="mb-10">
+            <div className="mb-8">
               <Link
                 href="/configurador"
-                className="group inline-flex items-center gap-3 px-8 py-5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-lg rounded-2xl transition-all hover:scale-105 hover:shadow-[0_8px_30px_rgba(251,191,36,0.3)]"
+                className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 text-base font-bold text-black transition-all hover:from-amber-400 hover:to-orange-400 hover:shadow-[0_8px_30px_rgba(251,191,36,0.3)] sm:px-8 sm:py-5 sm:text-lg md:hover:scale-105"
               >
                 <Icons.Settings />
                 {texts.configureButton}
@@ -145,7 +145,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm">
               {[texts.equipment, texts.backup, texts.guarantee].map((feature, i) => (
                 <div key={i} className="flex items-center gap-2 text-white/70">
                   <span className="text-amber-400"><Icons.Check /></span>
@@ -158,9 +158,9 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* GRID SERVICIOS */}
-      <section className="py-16 px-4 relative">
+      <section className="relative px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:gap-6">
             {servicios.map((servicio, index) => (
               <motion.div
                 key={servicio.href}
@@ -173,7 +173,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
                 <div
                   onClick={(e) => handleCardClick(servicio.href, e)}
                   className={`
-                    group relative block h-full rounded-3xl p-8 transition-all duration-300 cursor-pointer
+                    group relative block h-full cursor-pointer rounded-3xl p-6 transition-all duration-300 sm:p-8
                     bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm
                     border hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10
                     ${focusedCard === servicio.href
@@ -193,11 +193,11 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
                   )}
 
                   {/* Emoji icon */}
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-3xl">
+                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-3xl transition-transform group-hover:scale-110 sm:h-16 sm:w-16">
                     {servicio.emoji}
                   </div>
 
-                  <h2 className="text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+                  <h2 className="mb-2 text-2xl font-bold text-white transition-colors group-hover:text-amber-400">
                     {servicio.name}
                   </h2>
 
@@ -205,7 +205,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
                     {servicio.tagline}
                   </p>
 
-                  <p className="text-white/60 mb-6 leading-relaxed">
+                  <p className="mb-5 leading-relaxed text-white/60">
                     {servicio.desc}
                   </p>
 
@@ -234,7 +234,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
       </section>
 
       {/* CTA FINAL */}
-      <section className="py-20 sm:py-28 relative">
+      <section className="relative py-16 sm:py-24">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
