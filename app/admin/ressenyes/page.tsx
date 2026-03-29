@@ -95,6 +95,7 @@ export default function AdminRessenyesPage() {
   }, [load]);
 
   const updateStatus = async (id: string, action: 'approve' | 'hide' | 'delete') => {
+    if (action === 'delete' && !window.confirm('Segur que vols eliminar aquest testimoni? Aquesta acció no es pot desfer.')) return;
     setBusyId(id);
 
     // Optimistic update
