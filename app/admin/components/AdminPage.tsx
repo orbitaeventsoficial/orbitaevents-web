@@ -27,6 +27,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import InfoTooltip from './InfoTooltip';
 
 interface AdminPageProps {
   title: string;
@@ -120,12 +121,13 @@ interface AdminKpiProps {
   tone?: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
   trend?: ReactNode;
   href?: string;
+  tooltip?: string;
 }
 
-export function AdminKpi({ label, value, tone = 'neutral', trend, href }: AdminKpiProps) {
+export function AdminKpi({ label, value, tone = 'neutral', trend, href, tooltip }: AdminKpiProps) {
   const content = (
     <div className={`ap-kpi ap-kpi--${tone}`}>
-      <span className="ap-kpi-label">{label}</span>
+      <span className="ap-kpi-label">{label} {tooltip && <InfoTooltip text={tooltip} />}</span>
       <span className="ap-kpi-value">{value}</span>
       {trend && <span className="ap-kpi-trend">{trend}</span>}
     </div>

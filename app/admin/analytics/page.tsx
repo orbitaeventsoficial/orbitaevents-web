@@ -6,6 +6,7 @@ import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/go
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { AdminPage } from '../components/AdminPage';
+import InfoTooltip from '../components/InfoTooltip';
 
 export const dynamic = 'force-dynamic';
 
@@ -200,10 +201,10 @@ export default async function AnalyticsPage() {
           </Link>
         </div>
         <div className="mt-4 ap-kpi-row lg:grid-cols-4">
-          <div className="ap-kpi"><p className="ap-kpi-label">Entrades 7 dies</p><p className="ap-kpi-value">{ops.leads7d}</p></div>
-          <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">% entrades a pressupost</p><p className="ap-kpi-value">{ops.conversionToQuotePct.toFixed(1)}%</p></div>
-          <div className="ap-kpi ap-kpi--success"><p className="ap-kpi-label">% pressupostos acceptats</p><p className="ap-kpi-value">{ops.proposalsAcceptedPct.toFixed(1)}%</p></div>
-          <div className="ap-kpi ap-kpi--warning"><p className="ap-kpi-label">1r contacte mitjà</p><p className="ap-kpi-value">{Math.max(0, Math.round(ops.avgFirstContactHours))}h</p></div>
+          <div className="ap-kpi"><p className="ap-kpi-label">Entrades 7 dies <InfoTooltip text="Nombre de leads nous rebuts en els últims 7 dies per tots els canals (web, email, telèfon, etc.)." /></p><p className="ap-kpi-value">{ops.leads7d}</p></div>
+          <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">% entrades a pressupost <InfoTooltip text="Percentatge de leads que han avançat fins a rebre un pressupost. Indica la qualitat del filtratge inicial." /></p><p className="ap-kpi-value">{ops.conversionToQuotePct.toFixed(1)}%</p></div>
+          <div className="ap-kpi ap-kpi--success"><p className="ap-kpi-label">% pressupostos acceptats <InfoTooltip text="Dels pressupostos enviats, quants s'han acceptat. Una ràtio alta indica bona proposta de valor." /></p><p className="ap-kpi-value">{ops.proposalsAcceptedPct.toFixed(1)}%</p></div>
+          <div className="ap-kpi ap-kpi--warning"><p className="ap-kpi-label">1r contacte mitjà <InfoTooltip text="Temps mitjà entre que entra un lead i es fa el primer contacte. Menys de 4h és excel·lent." /></p><p className="ap-kpi-value">{Math.max(0, Math.round(ops.avgFirstContactHours))}h</p></div>
         </div>
       </section>
 

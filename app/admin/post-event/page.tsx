@@ -6,6 +6,7 @@ import { getTranslatedPackName } from '@/lib/pack-name';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
+import InfoTooltip from '../components/InfoTooltip';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,21 +113,21 @@ export default async function PostEventPage() {
     <AdminPage title="Post-Event" subtitle="Gestiona informes, enquestes i feedback dels esdeveniments">
       <section className="ap-kpi-row lg:grid-cols-4">
         <div className="ap-kpi ap-kpi--warning">
-          <p className="ap-kpi-label">Informes pendents</p>
+          <p className="ap-kpi-label">Informes pendents <InfoTooltip text="Esdeveniments completats que encara no tenen informe intern. Fes-lo per tancar el cicle operatiu." /></p>
           <p className="ap-kpi-value">{data.pendingReports}</p>
           <p className="ap-kpi-meta">Esborrany</p>
         </div>
         <div className="ap-kpi ap-kpi--info">
-          <p className="ap-kpi-label">Enquestes per enviar</p>
+          <p className="ap-kpi-label">Enquestes per enviar <InfoTooltip text="Esdeveniments completats on el client encara no ha rebut l'enquesta de satisfacció." /></p>
           <p className="ap-kpi-value">{data.pendingSurveys}</p>
           <p className="ap-kpi-meta">Sense enquesta enviada</p>
         </div>
         <div className="ap-kpi ap-kpi--success">
-          <p className="ap-kpi-label">Informes completats</p>
+          <p className="ap-kpi-label">Informes completats <InfoTooltip text="Informes interns ja tancats. Serveixen per avaluar com va anar l'event i millorar." /></p>
           <p className="ap-kpi-value">{data.completedReports}</p>
         </div>
         <div className="ap-kpi">
-          <p className="ap-kpi-label">Enquestes rebudes</p>
+          <p className="ap-kpi-label">Enquestes rebudes <InfoTooltip text="Respostes de clients que han completat l'enquesta post-event. D'aquí surten valoracions i testimonis." /></p>
           <p className="ap-kpi-value">{data.completedSurveys}</p>
         </div>
       </section>

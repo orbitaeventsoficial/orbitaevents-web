@@ -37,10 +37,24 @@
 ### Empty states més didàctics a l'admin
 - `bookings`, `clientes`, `inbox`, `leads` i `post-event/surveys` ara expliquen millor d'on surten les dades quan les llistes són buides.
 - L'objectiu no és visual només: reduir sensació de sistema trencat quan la base encara és buida o filtrada.
+### Subtítols afegits
+- `CalendarMonthClient` i `CalendarWeekClient` ara tenen subtitle: "Visualitza reserves, bloquejos i disponibilitat per planificar events."
+
+### Confirmació en accions destructives
+- `portfolio/page.tsx`: `handleDelete` (media) i `deleteEvent` ara demanen `window.confirm` abans d'eliminar.
+- `ressenyes/page.tsx`: `updateStatus('delete')` demana confirmació abans de suprimir un testimoni.
+
+### Tooltips didàctics (InfoTooltip) a KPIs
+- **AdminKpi**: afegit prop `tooltip` opcional — qualsevol pàgina que usi `AdminKpi` pot afegir ajuda contextual.
+- **Salut** (4 KPIs): Crítics, Per revisar, Correctes i Últim càlcul expliquen què vol dir cada estat.
+- **Post-Event** (4 KPIs): Informes pendents, Enquestes per enviar, Informes completats i Enquestes rebudes amb context del flux.
+- **Sales-Ops** (8 KPIs): Embut brut, Previsió ponderada, Entrades obertes, Puntuació mitjana, SLA 24h, Comunicacions, Respostes i Seqüències auto.
+- **Analytics** (4 KPIs): Entrades 7 dies, % a pressupost, % acceptats i 1r contacte mitjà.
+- Total: **30 KPIs amb tooltip didàctic** (10 dashboard + 4 salut + 4 post-event + 8 sales-ops + 4 analytics).
+
 ### Validació
 - `npx tsc --noEmit` → 0 errors
-- `pnpm run validate:core` → OK
-- `npx vitest run` → 142 fitxers, 1794 tests, 0 errors
+- `npx vitest run` → 142 fitxers, 1795 tests, 0 errors
 
 ## 2026-03-29 — Arreglats 50 tests + hero mòbil millorat
 

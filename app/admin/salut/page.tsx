@@ -294,10 +294,10 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
       subtitle="Una sola vista per veure què està coix, per què importa i on convé actuar."
       kpis={(
         <AdminKpiRow>
-          <AdminKpi label="Crítics" value={hasActiveFilters ? filteredSummary.critical : snapshot.summary.critical} tone="danger" href={buildFilterHref('critical', activeFocus)} />
-          <AdminKpi label="Per revisar" value={hasActiveFilters ? filteredSummary.warning : snapshot.summary.warning} tone="warning" href={buildFilterHref('warning', activeFocus)} />
-          <AdminKpi label="Correctes" value={hasActiveFilters ? filteredSummary.ok : snapshot.summary.ok} tone="success" href={buildFilterHref('ok', activeFocus)} />
-          <AdminKpi label="Últim càlcul" value={formatDateTimeFull(snapshot.generatedAt)} tone="info" />
+          <AdminKpi label="Crítics" value={hasActiveFilters ? filteredSummary.critical : snapshot.summary.critical} tone="danger" href={buildFilterHref('critical', activeFocus)} tooltip="Problemes que requereixen acció immediata perquè poden afectar reserves, cobraments o operativa." />
+          <AdminKpi label="Per revisar" value={hasActiveFilters ? filteredSummary.warning : snapshot.summary.warning} tone="warning" href={buildFilterHref('warning', activeFocus)} tooltip="Avisos que convé revisar aviat però no bloquegen res de forma immediata." />
+          <AdminKpi label="Correctes" value={hasActiveFilters ? filteredSummary.ok : snapshot.summary.ok} tone="success" href={buildFilterHref('ok', activeFocus)} tooltip="Àrees del negoci que funcionen bé. Més verd, menys sorpreses." />
+          <AdminKpi label="Últim càlcul" value={formatDateTimeFull(snapshot.generatedAt)} tone="info" tooltip="Data i hora de l'última anàlisi de salut. Es recalcula automàticament cada cop que obres la pàgina." />
         </AdminKpiRow>
       )}
     >

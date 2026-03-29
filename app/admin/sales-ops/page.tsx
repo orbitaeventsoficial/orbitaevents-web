@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { formatNumber } from '@/lib/constants';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
 import { AdminPage } from '../components/AdminPage';
+import InfoTooltip from '../components/InfoTooltip';
 import RunCommercialSequencesButton from './RunCommercialSequencesButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
 import SlaAutomationButton from './SlaAutomationButton';
@@ -116,17 +117,17 @@ export default async function SalesOpsPage() {
   return (
     <AdminPage title="Sales Ops" subtitle="La teva màquina de vendes: priorització diària, control d'embut i execució sense fricció.">
       <section className="ap-kpi-row xl:grid-cols-5">
-        <div className="ap-kpi"><p className="text-sm">💼</p><p className="ap-kpi-label">Embut brut</p><p className="ap-kpi-value">{formatNumber(pipelineTotal)}€</p><p className="ap-kpi-trend">Valor total de negoci obert</p></div>
-        <div className="ap-kpi ap-kpi--info"><p className="text-sm">🔮</p><p className="ap-kpi-label">Previsió ponderada</p><p className="ap-kpi-value">{formatNumber(forecastTotal)}€</p><p className="ap-kpi-trend">Ingressos probables segons scoring</p></div>
-        <div className="ap-kpi"><p className="text-sm">📥</p><p className="ap-kpi-label">Entrades obertes</p><p className="ap-kpi-value">{scored.length}</p><p className="ap-kpi-trend">Leads actius pendent de tancament</p></div>
-        <div className="ap-kpi"><p className="text-sm">🎯</p><p className="ap-kpi-label">Puntuació mitjana</p><p className="ap-kpi-value">{avgScore.toFixed(1)}</p><p className="ap-kpi-trend">Qualitat global de l'embut</p></div>
-        <div className="ap-kpi ap-kpi--warning"><p className="text-sm">⏱️</p><p className="ap-kpi-label">Entrades sense resposta (&gt;24h)</p><p className="ap-kpi-value">{slaSnapshot}</p><p className="ap-kpi-trend">Prioritat operativa del dia</p></div>
+        <div className="ap-kpi"><p className="text-sm">💼</p><p className="ap-kpi-label">Embut brut <InfoTooltip text="Suma del valor estimat de totes les entrades obertes (no tancades ni descartades). Indica el potencial màxim teòric de vendes." /></p><p className="ap-kpi-value">{formatNumber(pipelineTotal)}€</p><p className="ap-kpi-trend">Valor total de negoci obert</p></div>
+        <div className="ap-kpi ap-kpi--info"><p className="text-sm">🔮</p><p className="ap-kpi-label">Previsió ponderada <InfoTooltip text="Valor esperat d'ingressos ajustat per la probabilitat de tancament de cada lead (scoring). Més fiable que l'embut brut." /></p><p className="ap-kpi-value">{formatNumber(forecastTotal)}€</p><p className="ap-kpi-trend">Ingressos probables segons scoring</p></div>
+        <div className="ap-kpi"><p className="text-sm">📥</p><p className="ap-kpi-label">Entrades obertes <InfoTooltip text="Nombre de leads actius que encara no s'han convertit en reserva ni descartat." /></p><p className="ap-kpi-value">{scored.length}</p><p className="ap-kpi-trend">Leads actius pendent de tancament</p></div>
+        <div className="ap-kpi"><p className="text-sm">🎯</p><p className="ap-kpi-label">Puntuació mitjana <InfoTooltip text="Qualitat mitjana dels leads oberts. Pondera urgència, pressupost, canal d'entrada i activitat. Per sobre de 60 indica un embut saludable." /></p><p className="ap-kpi-value">{avgScore.toFixed(1)}</p><p className="ap-kpi-trend">Qualitat global de l'embut</p></div>
+        <div className="ap-kpi ap-kpi--warning"><p className="text-sm">⏱️</p><p className="ap-kpi-label">Entrades sense resposta (&gt;24h) <InfoTooltip text="Leads que porten més de 24h sense cap resposta. El sistema crea una tasca i eleva la prioritat automàticament." /></p><p className="ap-kpi-value">{slaSnapshot}</p><p className="ap-kpi-trend">Prioritat operativa del dia</p></div>
       </section>
 
       <section className="ap-kpi-row xl:grid-cols-3">
-        <div className="ap-kpi"><p className="ap-kpi-label">Comunicacions 30d</p><p className="ap-kpi-value">{commSent30d}</p></div>
-        <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">Respostes 30d</p><p className="ap-kpi-value">{commResponded30d} · {toPct(responseRate30d)}</p></div>
-        <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d</p><p className="ap-kpi-value">{sequenceExec30d}</p></div>
+        <div className="ap-kpi"><p className="ap-kpi-label">Comunicacions 30d <InfoTooltip text="Total d'emails, missatges i trucades enviats en els últims 30 dies a leads i clients." /></p><p className="ap-kpi-value">{commSent30d}</p></div>
+        <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">Respostes 30d <InfoTooltip text="Comunicacions que han rebut resposta del client. Un % alt indica bona qualitat de contacte." /></p><p className="ap-kpi-value">{commResponded30d} · {toPct(responseRate30d)}</p></div>
+        <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d <InfoTooltip text="Missatges automàtics enviats pel sistema (follow-ups, recordatoris, seqüències comercials)." /></p><p className="ap-kpi-value">{sequenceExec30d}</p></div>
       </section>
 
       <section className="ap-card rounded-2xl p-5">
