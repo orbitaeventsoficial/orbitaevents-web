@@ -27,6 +27,11 @@ vi.mock('@/lib/storage', () => ({
   getPublicUrl: vi.fn((path: string) => `/api/uploads/${path}`),
 }));
 
+vi.mock('@/lib/services/portfolioImageService', () => ({
+  buildBookingGalleryImagePath: (bookingId: string, fileName: string) => `bookings/${bookingId}/gallery/${Date.now()}-${fileName}`,
+  normalizePortfolioImageBuffer: vi.fn(async (buf: Buffer) => buf),
+}));
+
 import {
   addGalleryPhoto,
   listGalleryPhotos,

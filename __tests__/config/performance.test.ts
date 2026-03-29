@@ -93,14 +93,14 @@ describe('Performance config', () => {
       expect(pageContent).toContain("import('@/app/components/marketing/CTAFinal')");
     });
 
-    it('should keep FAQ with SSR for SEO schema', () => {
+    it('should lazy load FAQ for performance', () => {
       pageContent = fs.readFileSync(pagePath, 'utf-8');
-      // FAQSection should NOT have ssr: false because it has JSON-LD schema
+      // FAQSection is lazy loaded with ssr: false (JSON-LD schema is handled separately)
       const faqBlock = pageContent.slice(
         pageContent.indexOf("import('@/app/components/home/FAQSection')"),
         pageContent.indexOf("import('@/app/components/home/FAQSection')") + 150,
       );
-      expect(faqBlock).not.toContain('ssr: false');
+      expect(faqBlock).toContain('ssr: false');
     });
   });
 

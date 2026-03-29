@@ -1,13 +1,14 @@
 'use client';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MOBILE PORTFOLIO SHOWCASE - Orbita Events
-// Pestanyes de categoria + grid tocable cap a la galeria real
-// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * MOBILE PORTFOLIO SHOWCASE - Òrbita Events
+ * Hero image gran + strip horitzontal d'imatges per categoria
+ * UX: tabs de categoria → imatge principal → scroll horitzontal de fotos
+ */
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos } from '@/lib/constants';
@@ -36,6 +37,7 @@ export default function MobilePortfolioShowcase() {
     <section className="py-14 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(251,191,36,0.04),transparent_70%)] pointer-events-none" />
 
+      {/* Header */}
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -53,11 +55,13 @@ export default function MobilePortfolioShowcase() {
         </h2>
       </motion.div>
 
+      {/* Category tabs */}
       <div
         ref={tabsRef}
-        className="flex gap-2.5 px-6 overflow-x-auto scrollbar-none pb-1 mb-6 snap-x snap-proximity"
+        className="flex gap-2.5 px-6 overflow-x-auto pb-1 mb-6 snap-x snap-proximity"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
+        <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
         {CATEGORIES.map((cat, i) => (
           <button
             key={cat.id}
@@ -73,59 +77,83 @@ export default function MobilePortfolioShowcase() {
         ))}
       </div>
 
-      <motion.div
-        key={activeId}
-        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        className="px-6"
-      >
-        <div className="grid grid-cols-2 gap-3">
-          {activePhotos.slice(0, 4).map((src, i) => (
+      {/* Portfolio content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeId}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {/* Hero image — full bleed */}
+          {activePhotos[0] && (
             <Link
-              key={src}
               href={`/portfolio/${active.slug}`}
-              className={`group relative overflow-hidden rounded-2xl bg-zinc-900 shadow-xl ${
-                i === 0 ? 'col-span-2 h-64' : 'h-48'
-              }`}
+              className="block relative mx-6 rounded-2xl overflow-hidden h-72 mb-3 group"
             >
               <Image
-                src={src}
-                alt={`${t(`categories.${active.id}`)} ${i + 1}`}
+                src={activePhotos[0]}
+                alt={`${t(`categories.${active.id}`)} 1`}
                 fill
-                sizes={i === 0 ? '100vw' : '50vw'}
-                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-                loading={i < 2 ? 'eager' : 'lazy'}
+                sizes="100vw"
+                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-active:scale-[1.03]"
+                loading="eager"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-              {i === 0 ? (
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="inline-flex items-center gap-2 mb-1.5 rounded-full bg-black/35 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-sm">
-                    {t(`categories.${active.id}`)}
-                  </div>
-                  <p className="text-sm text-white/70">{t('viewPortfolio')}</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <div className="inline-flex items-center gap-2 mb-1.5 rounded-full bg-black/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-sm">
+                  {active.emoji} {t(`categories.${active.id}`)}
                 </div>
-              ) : null}
+                <p className="text-sm text-white/70">{t('viewPortfolio')}</p>
+              </div>
             </Link>
-          ))}
+          )}
 
-          <Link
-            href={`/portfolio/${active.slug}`}
-            className="relative overflow-hidden rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 min-h-48 active:scale-95 transition-transform"
+          {/* Horizontal image strip */}
+          <div
+            className="flex gap-3 overflow-x-auto pl-6 pr-3 pb-2 snap-x snap-mandatory"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.mobileAccent} flex items-center justify-center`}>
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-white font-bold text-sm">{t('viewPortfolio')}</p>
-              <p className="text-white/50 text-xs mt-0.5">{t('viewPortfolioDesc')}</p>
-            </div>
-          </Link>
-        </div>
-      </motion.div>
+            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+            {activePhotos.slice(1).map((src, i) => (
+              <Link
+                key={src}
+                href={`/portfolio/${active.slug}`}
+                className="snap-start flex-shrink-0 w-44 h-56 relative rounded-xl overflow-hidden bg-zinc-900 group"
+              >
+                <Image
+                  src={src}
+                  alt={`${t(`categories.${active.id}`)} ${i + 2}`}
+                  fill
+                  sizes="176px"
+                  className="object-cover transition-transform duration-500 group-active:scale-[1.04]"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              </Link>
+            ))}
 
+            {/* "See all" card */}
+            <Link
+              href={`/portfolio/${active.slug}`}
+              className="snap-start flex-shrink-0 w-44 h-56 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform"
+            >
+              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.mobileAccent} flex items-center justify-center`}>
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </div>
+              <div className="text-center px-3">
+                <p className="text-white font-bold text-sm">{t('viewPortfolio')}</p>
+                <p className="text-white/50 text-xs mt-0.5">{t('viewPortfolioDesc')}</p>
+              </div>
+            </Link>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* View all portfolio */}
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -7,6 +7,16 @@ const { mockPrisma } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/config/packs-config', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    EXTRAS: [
+      { id: 'hora-extra', name: 'Hora extra', price: 75, description: 'Hora extra de DJ', icon: '⏰', category: 'time' },
+      { id: 'karaoke', name: 'Karaoke', price: 60, description: 'Karaoke pro', icon: '🎤', category: 'other' },
+    ],
+  };
+});
 
 import {
   resolvePublicExtraDefinition,

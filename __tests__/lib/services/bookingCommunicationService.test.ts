@@ -12,13 +12,17 @@ const { mockPrisma, mockSendEmail, mockSendWhatsAppText } = vi.hoisted(() => ({
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/services/whatsappService', () => ({ sendWhatsAppText: mockSendWhatsAppText }));
-vi.mock('@/lib/constants', () => ({
-  toIntlLocale: (l: string) => {
-    if (l === 'ca') return 'ca-ES';
-    if (l === 'en') return 'en-GB';
-    return 'es-ES';
-  },
-}));
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    toIntlLocale: (l: string) => {
+      if (l === 'ca') return 'ca-ES';
+      if (l === 'en') return 'en-GB';
+      return 'es-ES';
+    },
+  };
+});
 
 import {
   parseBookingCommunicationBody,

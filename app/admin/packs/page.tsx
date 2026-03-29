@@ -9,12 +9,31 @@ import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
 import { PACK_SERVICE_OPTIONS } from '@/lib/constants';
+import { calculateCostPerHour } from '@/lib/inventory-utils';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Packs | Òrbita Admin',
 };
+
+type PackFocus = 'alert' | 'critical-margin' | 'missing-capacity' | 'partial-cost' | 'without-inventory';
+
+function resolvePackFocus(value?: string | string[]): PackFocus | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return null;
+
+  switch (raw) {
+    case 'alert':
+    case 'critical-margin':
+    case 'missing-capacity':
+    case 'partial-cost':
+    case 'without-inventory':
+      return raw;
+    default:
+      return null;
+  }
+}
 
 async function getPacks() {
   try {
@@ -47,21 +66,87 @@ async function getPacks() {
   }
 }
 
-export default async function PacksPage() {
+export default async function PacksPage({
+  searchParams,
+}: {
+  searchParams?: { focus?: string | string[] };
+}) {
   const packs = await getPacks();
   const pricingConfig = await getPackPricingModelConfig();
+  const activeFocus = resolvePackFocus(searchParams?.focus);
   const configPacks = getAllPacks();
   const packsInSync = packs.length === configPacks.length;
-  const packsByService = PACK_SERVICE_OPTIONS.map(({ value, label }) => ({
-    service: value,
-    label,
-    packs: packs.filter((pack) => pack.service === value),
-  })).filter((group) => group.packs.length > 0);
-  const otherPacks = packs.filter((pack) => !pack.service || !PACK_SERVICE_OPTIONS.some(({ value }) => value === pack.service));
   const pricingHealthByPack = new Map<string, PackPricingHealth>(
     packs.map((pack) => [pack.id, computePackPricingHealth(pack, pricingConfig)])
   );
+  const packSignalsById = new Map(
+    packs.map((pack) => {
+      const health = pricingHealthByPack.get(pack.id);
+      const hasPartialCost = pack.inventory.some((row) => !row.item.purchasePrice || !row.item.expectedLifeHours);
+      const withoutInventory = pack.inventory.length === 0;
+      const missingCapacity = !pack.maxGuests || pack.maxGuests <= 0;
+      const laborCostPerHour = health?.laborCostPerHourUsed ?? 0;
+      const inventoryCostPerHour = pack.inventory.reduce((sum, row) => {
+        const itemPerHour = calculateCostPerHour(row.item.purchasePrice, row.item.expectedLifeHours);
+        return sum + (itemPerHour * Math.max(1, row.quantity));
+      }, 0);
+      const publicPrice = health?.publicPrice ?? 0;
+      const directCost =
+        (inventoryCostPerHour * Math.max(1, pack.djHours)) +
+        (laborCostPerHour * Math.max(1, pack.djHours)) +
+        pricingConfig.fixedPackCost;
+      const marginPct = publicPrice > 0 ? (publicPrice - directCost) / publicPrice : 0;
+      const criticalMargin = marginPct < (pricingConfig.marginTargetPct - 0.08);
+
+      return [
+        pack.id,
+        {
+          hasAlert: Boolean(health?.hasAlert),
+          criticalMargin,
+          hasPartialCost,
+          withoutInventory,
+          missingCapacity,
+        },
+      ] as const;
+    })
+  );
+  const filteredPacks = activeFocus
+    ? packs.filter((pack) => {
+        const signals = packSignalsById.get(pack.id);
+        if (!signals) return false;
+
+        switch (activeFocus) {
+          case 'alert':
+            return signals.hasAlert;
+          case 'critical-margin':
+            return signals.criticalMargin;
+          case 'missing-capacity':
+            return signals.missingCapacity;
+          case 'partial-cost':
+            return signals.hasPartialCost;
+          case 'without-inventory':
+            return signals.withoutInventory;
+          default:
+            return true;
+        }
+      })
+    : packs;
+  const packsByService = PACK_SERVICE_OPTIONS.map(({ value, label }) => ({
+    service: value,
+    label,
+    packs: filteredPacks.filter((pack) => pack.service === value),
+  })).filter((group) => group.packs.length > 0);
+  const otherPacks = filteredPacks.filter((pack) => !pack.service || !PACK_SERVICE_OPTIONS.some(({ value }) => value === pack.service));
   const pricingAlertsCount = Array.from(pricingHealthByPack.values()).filter((row) => row.hasAlert).length;
+  const activeFocusLabel = activeFocus
+    ? {
+        alert: 'Packs amb preu desalineat',
+        'critical-margin': 'Packs en zona crítica de marge',
+        'missing-capacity': 'Packs sense rang clar de convidats',
+        'partial-cost': 'Packs amb càlcul parcial',
+        'without-inventory': 'Packs sense equip base',
+      }[activeFocus]
+    : null;
 
   return (
     <AdminPage
@@ -69,6 +154,14 @@ export default async function PacksPage() {
       subtitle={
         <>
           Gestiona els packs de serveis i els seus preus
+          {activeFocusLabel && (
+            <span className="mt-2 inline-flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-sm text-amber-100">
+              Focus de salut: {activeFocusLabel} · {filteredPacks.length} pack{filteredPacks.length === 1 ? '' : 's'}
+              <Link href="/admin/packs" className="font-semibold underline underline-offset-2">
+                veure tots
+              </Link>
+            </span>
+          )}
           {!packsInSync && (
             <span className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm border">
               ℹ️ Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
@@ -104,28 +197,27 @@ export default async function PacksPage() {
         </Link>
       </nav>
 
-      {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Packs</p>
-          <p className="mt-2 text-3xl font-bold">{packs.length}</p>
+          <p className="mt-2 text-3xl font-bold">{filteredPacks.length}</p>
         </div>
         <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
-            {packs.filter((p) => p.isActive).length}
+            {filteredPacks.filter((p) => p.isActive).length}
           </p>
         </div>
         <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
-            {packs.filter((p) => p.isFeatured).length}
+            {filteredPacks.filter((p) => p.isFeatured).length}
           </p>
         </div>
         <div className="rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
-            {packs.reduce((sum, p) => sum + p._count.bookings, 0)}
+            {filteredPacks.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
         <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'border-rose-500/30 bg-rose-500/10' : 'border-emerald-500/30 bg-emerald-500/10'}`}>
@@ -134,7 +226,6 @@ export default async function PacksPage() {
         </div>
       </section>
 
-      {/* Packs per categoria */}
       {packsByService.map((group) => (
         <section key={group.service} className="space-y-4">
           <div className="flex items-center justify-between">
@@ -146,7 +237,6 @@ export default async function PacksPage() {
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
-              const extraHourDivergence = health?.extraHourDivergencePct ?? 0;
               const divergenceColor = health?.hasAlert
                 ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
@@ -271,13 +361,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -300,7 +390,6 @@ export default async function PacksPage() {
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
-              const extraHourDivergence = health?.extraHourDivergencePct ?? 0;
               const divergenceColor = health?.hasAlert
                 ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
@@ -425,13 +514,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -443,11 +532,11 @@ export default async function PacksPage() {
         </section>
       )}
 
-      {packs.length === 0 && (
+      {filteredPacks.length === 0 && (
         <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">📦</span>
-          <p className="mt-4">No hi ha packs configurats</p>
-          <p className="text-sm">Executa el seed per carregar dades inicials</p>
+          <p className="mt-4">{activeFocusLabel ? 'No hi ha packs dins d’aquest focus' : 'No hi ha packs configurats'}</p>
+          <p className="text-sm">{activeFocusLabel ? 'Canvia el focus o torna a la vista completa.' : 'Executa el seed per carregar dades inicials'}</p>
         </div>
       )}
     </AdminPage>

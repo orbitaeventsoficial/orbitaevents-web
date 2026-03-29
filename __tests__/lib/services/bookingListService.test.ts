@@ -44,28 +44,27 @@ describe('listAdminBookings', () => {
   it('filtra per status vàlid', async () => {
     await listAdminBookings({ locale: 'ca', page: 1, limit: 10, status: 'CONFIRMED' });
 
-    expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ status: 'CONFIRMED' }),
-      })
-    );
+    const call = mockPrisma.booking.findMany.mock.calls[0][0];
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    expect(andClauses).toBeDefined();
+    expect(andClauses.some((c: Record<string, unknown>) => c.status === 'CONFIRMED')).toBe(true);
   });
 
   it('ignora status invàlid', async () => {
     await listAdminBookings({ locale: 'ca', page: 1, limit: 10, status: 'INVALID' });
 
     const call = mockPrisma.booking.findMany.mock.calls[0][0];
-    expect(call.where.status).toBeUndefined();
+    // No AND clauses → empty where
+    expect(call.where.AND).toBeUndefined();
   });
 
   it('filtra per eventType', async () => {
     await listAdminBookings({ locale: 'ca', page: 1, limit: 10, eventType: 'WEDDING' });
 
-    expect(mockPrisma.booking.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ eventType: 'WEDDING' }),
-      })
-    );
+    const call = mockPrisma.booking.findMany.mock.calls[0][0];
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    expect(andClauses).toBeDefined();
+    expect(andClauses.some((c: Record<string, unknown>) => c.eventType === 'WEDDING')).toBe(true);
   });
 
   it('filtra per rang de dates', async () => {
@@ -75,17 +74,21 @@ describe('listAdminBookings', () => {
     });
 
     const call = mockPrisma.booking.findMany.mock.calls[0][0];
-    expect(call.where.eventDate).toBeDefined();
-    expect(call.where.eventDate.gte).toBeInstanceOf(Date);
-    expect(call.where.eventDate.lte).toBeInstanceOf(Date);
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    const dateClause = andClauses.find((c: Record<string, unknown>) => c.eventDate) as { eventDate: { gte?: Date; lte?: Date } };
+    expect(dateClause).toBeDefined();
+    expect(dateClause.eventDate.gte).toBeInstanceOf(Date);
+    expect(dateClause.eventDate.lte).toBeInstanceOf(Date);
   });
 
   it('filtra per cerca textual', async () => {
     await listAdminBookings({ locale: 'ca', page: 1, limit: 10, search: 'Maria' });
 
     const call = mockPrisma.booking.findMany.mock.calls[0][0];
-    expect(call.where.OR).toBeDefined();
-    expect(call.where.OR).toHaveLength(3);
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    const searchClause = andClauses.find((c: Record<string, unknown>) => c.OR) as { OR: unknown[] };
+    expect(searchClause).toBeDefined();
+    expect(searchClause.OR).toHaveLength(4);
   });
 
   it('agrupa estadístiques per status', async () => {

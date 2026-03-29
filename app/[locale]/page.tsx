@@ -155,7 +155,7 @@ export default function HomePage() {
   return (
     <HomePageWrapper>
       {/* Desktop: Contingut elegant */}
-      <div className="min-h-screen bg-bg-main">
+      <div className="min-h-screen bg-bg-main hidden md:block">
         {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
         <div data-section-id="hero">
           <HeroElegant />

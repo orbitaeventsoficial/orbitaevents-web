@@ -69,6 +69,7 @@ const SECTION_META: Record<AdminHealthScope, { label: string; description: strin
 const CRON_MAX_AGE_MS = 48 * 60 * 60 * 1000;
 const UPCOMING_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const EXTRA_HEALTH_MARGIN_WARNING_PCT = 0.35;
+const PAYMENT_DUE_SOON_DAYS = 7;
 
 function countStatuses(items: AdminHealthItem[]) {
   return {
@@ -131,10 +132,25 @@ function parseIsoDate(value?: string | null): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function formatDateParam(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+
 export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
   const now = new Date();
   const twoDaysAgo = new Date(now.getTime() - CRON_MAX_AGE_MS);
   const upcomingDateLimit = new Date(now.getTime() + UPCOMING_WINDOW_MS);
+  const paymentDueSoonLimit = addDays(now, PAYMENT_DUE_SOON_DAYS);
+  const upcomingBookingsHref = `/admin/bookings?status=CONFIRMED&fromDate=${formatDateParam(now)}&toDate=${formatDateParam(upcomingDateLimit)}`;
+  const overduePaymentsHref = '/admin/bookings?payment=overdue';
+  const dueSoonPaymentsHref = '/admin/bookings?payment=due-soon';
   const startOfToday = new Date(now);
   startOfToday.setHours(0, 0, 0, 0);
 
@@ -144,13 +160,16 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     inventoryCriticalCount,
     inventoryZeroValueCount,
     inventoryBlockedCount,
+    inventoryLowStockRows,
     extrasWithoutCostCount,
+    extrasZeroPriceCount,
     extraHealthRows,
     hotStaleLeadsCount,
     unpaidUpcomingBookingsCount,
     overdueTasksCount,
     customersWithoutEmailCount,
     bookingsTotalZeroCount,
+    activeBookings,
     packPricingConfig,
     activePacks,
   ] = await Promise.all([
@@ -171,8 +190,17 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     prisma.inventoryItem.count({
       where: {
         status: { not: 'RETIRED' },
-        OR: [{ purchasePrice: null }, { expectedLifeHours: null }],
-        packItems: { some: {} },
+        AND: [
+          {
+            OR: [{ purchasePrice: null }, { expectedLifeHours: null }],
+          },
+          {
+            OR: [
+              { packItems: { some: {} } },
+              { extraItems: { some: {} } },
+            ],
+          },
+        ],
       },
     }),
     prisma.inventoryItem.count({
@@ -186,14 +214,35 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         status: { in: ['BROKEN', 'MAINTENANCE'] },
         OR: [
           { packItems: { some: {} } },
+          { extraItems: { some: {} } },
           { bookingItems: { some: {} } },
         ],
+      },
+    }),
+    prisma.inventoryItem.findMany({
+      where: {
+        status: { not: 'RETIRED' },
+        minStock: { not: null },
+        stockQuantity: { not: null },
+      },
+      select: {
+        id: true,
+        stockQuantity: true,
+        minStock: true,
       },
     }),
     prisma.extra.count({
       where: {
         isActive: true,
         costPerUnit: null,
+        bookingExtras: { some: {} },
+      },
+    }),
+    prisma.extra.count({
+      where: {
+        isActive: true,
+        priceType: { not: 'ON_REQUEST' },
+        price: { lte: 0 },
         bookingExtras: { some: {} },
       },
     }),
@@ -238,6 +287,18 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         status: { not: 'CANCELLED' },
       },
     }),
+    prisma.booking.findMany({
+      where: {
+        status: { in: [...ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES] },
+        eventDate: { gte: now },
+      },
+      select: {
+        id: true,
+        eventDate: true,
+        depositPaid: true,
+        remainingPaid: true,
+      },
+    }),
     getPackPricingModelConfigEditable().catch(() => null),
     prisma.pack.findMany({
       where: { isActive: true },
@@ -248,6 +309,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         price: true,
         extraHourPrice: true,
         djHours: true,
+        minGuests: true,
         maxGuests: true,
         soundWatts: true,
         inventory: {
@@ -269,6 +331,38 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     acc[row.key] = row.value;
     return acc;
   }, {});
+
+  const inventoryLowStockCount = inventoryLowStockRows.filter((item) => {
+    const stock = typeof item.stockQuantity === 'number' ? item.stockQuantity : null;
+    const min = typeof item.minStock === 'number' ? item.minStock : null;
+    return stock !== null && min !== null && stock <= min;
+  }).length;
+
+  let overdueDepositCount = 0;
+  let overdueRemainingCount = 0;
+  let dueSoonDepositCount = 0;
+  let dueSoonRemainingCount = 0;
+
+  for (const booking of activeBookings) {
+    const depositDueAt = addDays(new Date(booking.eventDate), -30);
+    const remainingDueAt = addDays(new Date(booking.eventDate), -7);
+
+    if (!booking.depositPaid) {
+      if (depositDueAt < now) {
+        overdueDepositCount += 1;
+      } else if (depositDueAt <= paymentDueSoonLimit) {
+        dueSoonDepositCount += 1;
+      }
+    }
+
+    if (!booking.remainingPaid) {
+      if (remainingDueAt < now) {
+        overdueRemainingCount += 1;
+      } else if (remainingDueAt <= paymentDueSoonLimit) {
+        dueSoonRemainingCount += 1;
+      }
+    }
+  }
 
   const systemItems: AdminHealthItem[] = [];
   const financeItems: AdminHealthItem[] = [];
@@ -416,8 +510,38 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       reason: `${unpaidUpcomingBookingsCount} reserva${unpaidUpcomingBookingsCount > 1 ? 's' : ''} propera${unpaidUpcomingBookingsCount > 1 ? 'es' : ''} encara no té${unpaidUpcomingBookingsCount > 1 ? 'nen' : ''} dipòsit.`,
       impact: 'Tens feina a calendari amb caixa encara sense protegir.',
       actionLabel: 'Revisar reserves',
-      href: '/admin/bookings',
+      href: upcomingBookingsHref,
       count: unpaidUpcomingBookingsCount,
+    });
+  }
+
+  const overduePaymentsCount = overdueDepositCount + overdueRemainingCount;
+  if (overduePaymentsCount > 0) {
+    operationsItems.push({
+      id: 'operations-bookings-payments-overdue',
+      scope: 'operations',
+      status: 'critical',
+      title: 'Cobraments de reserves vençuts',
+      reason: `${overdueDepositCount} bestreta${overdueDepositCount === 1 ? '' : 's'} i ${overdueRemainingCount} saldo${overdueRemainingCount === 1 ? '' : 's'} ja haurien d’estar cobrats.`,
+      impact: 'No és només caixa pendent: és reserva activa treballant sense el cobrament que tocava.',
+      actionLabel: 'Obrir reserves',
+      href: overduePaymentsHref,
+      count: overduePaymentsCount,
+    });
+  }
+
+  const dueSoonPaymentsCount = dueSoonDepositCount + dueSoonRemainingCount;
+  if (dueSoonPaymentsCount > 0) {
+    operationsItems.push({
+      id: 'operations-bookings-payments-due-soon',
+      scope: 'operations',
+      status: 'warning',
+      title: 'Cobraments a punt de vèncer',
+      reason: `${dueSoonDepositCount} bestreta${dueSoonDepositCount === 1 ? '' : 's'} i ${dueSoonRemainingCount} saldo${dueSoonRemainingCount === 1 ? '' : 's'} vencen en els pròxims 7 dies.`,
+      impact: 'Si no es mou ara, el problema financer passarà a ser urgent molt aviat.',
+      actionLabel: 'Preparar seguiment',
+      href: dueSoonPaymentsHref,
+      count: dueSoonPaymentsCount,
     });
   }
 
@@ -441,10 +565,10 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'catalog',
       status: 'critical',
       title: 'Inventari amb dades econòmiques incompletes',
-      reason: `${inventoryCriticalCount} peça${inventoryCriticalCount > 1 ? 's' : ''} usada${inventoryCriticalCount > 1 ? 'es' : ''} a packs no té${inventoryCriticalCount > 1 ? 'nen' : ''} prou dades de cost.`,
-      impact: 'Amortització, packs i marges poden quedar maquillats.',
+      reason: `${inventoryCriticalCount} peça${inventoryCriticalCount > 1 ? 's' : ''} usada${inventoryCriticalCount > 1 ? 'es' : ''} a packs o extres no té${inventoryCriticalCount > 1 ? 'nen' : ''} prou dades de cost.`,
+      impact: 'Amortització, packs, extres i marges poden quedar maquillats.',
       actionLabel: 'Revisar inventari',
-      href: '/admin/inventory',
+      href: '/admin/inventory?health=missing-cost',
       count: inventoryCriticalCount,
     });
   }
@@ -455,10 +579,10 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'catalog',
       status: 'critical',
       title: 'Inventari tocat en ús real',
-      reason: `${inventoryBlockedCount} peça${inventoryBlockedCount > 1 ? 's' : ''} està${inventoryBlockedCount > 1 ? 'n' : ''} avariada${inventoryBlockedCount > 1 ? 'es' : ''} o en manteniment i segueix${inventoryBlockedCount > 1 ? 'en' : ''} vinculada${inventoryBlockedCount > 1 ? 'es' : ''} a packs o reserves.`,
+      reason: `${inventoryBlockedCount} peça${inventoryBlockedCount > 1 ? 's' : ''} està${inventoryBlockedCount > 1 ? 'n' : ''} avariada${inventoryBlockedCount > 1 ? 'es' : ''} o en manteniment i segueix${inventoryBlockedCount > 1 ? 'en' : ''} vinculada${inventoryBlockedCount > 1 ? 'es' : ''} a packs, extres o reserves.`,
       impact: 'Pots prometre material que avui no està fi o directament no està disponible.',
       actionLabel: 'Obrir inventari',
-      href: '/admin/inventory',
+      href: '/admin/inventory?health=blocked',
       count: inventoryBlockedCount,
     });
   }
@@ -472,8 +596,22 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       reason: `${inventoryZeroValueCount} ítem${inventoryZeroValueCount > 1 ? 's' : ''} continua${inventoryZeroValueCount > 1 ? 'n' : ''} amb valor 0.`,
       impact: 'És més difícil entendre què tens invertit i què s’amortitza.',
       actionLabel: 'Valorar inventari',
-      href: '/admin/inventory',
+      href: '/admin/inventory?health=zero-value',
       count: inventoryZeroValueCount,
+    });
+  }
+
+  if (inventoryLowStockCount > 0) {
+    catalogItems.push({
+      id: 'catalog-inventory-low-stock',
+      scope: 'catalog',
+      status: 'warning',
+      title: 'Inventari amb stock crític',
+      reason: `${inventoryLowStockCount} consumible${inventoryLowStockCount > 1 ? 's' : ''} o ítem${inventoryLowStockCount > 1 ? 's' : ''} controlat${inventoryLowStockCount > 1 ? 's' : ''} està${inventoryLowStockCount > 1 ? 'n' : ''} al mínim o per sota.`,
+      impact: 'Pots arribar a una reserva amb el material just o haver de córrer a última hora.',
+      actionLabel: 'Obrir inventari',
+      href: '/admin/inventory?health=blocked',
+      count: inventoryLowStockCount,
     });
   }
 
@@ -486,8 +624,22 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       reason: `${extrasWithoutCostCount} extra${extrasWithoutCostCount > 1 ? 's' : ''} s’està${extrasWithoutCostCount > 1 ? 'n' : ''} venent sense cost per unitat definit.`,
       impact: 'Factures, però no saps bé què guanyes.',
       actionLabel: 'Revisar extres',
-      href: '/admin/pricing',
+      href: '/admin/packs/extras',
       count: extrasWithoutCostCount,
+    });
+  }
+
+  if (extrasZeroPriceCount > 0) {
+    catalogItems.push({
+      id: 'catalog-extras-zero-price',
+      scope: 'catalog',
+      status: 'warning',
+      title: 'Extres venuts a preu 0',
+      reason: `${extrasZeroPriceCount} extra${extrasZeroPriceCount > 1 ? 's' : ''} no és${extrasZeroPriceCount > 1 ? 'n' : ''} "a consultar" però surt${extrasZeroPriceCount > 1 ? 'en' : ''} amb preu 0 en reserves reals.`,
+      impact: 'Pots estar regalant servei sense haver-ho decidit de manera explícita.',
+      actionLabel: 'Obrir extres',
+      href: '/admin/packs/extras',
+      count: extrasZeroPriceCount,
     });
   }
 
@@ -508,10 +660,12 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       reason: `${extrasThinMarginCount} extra${extrasThinMarginCount > 1 ? 's' : ''} venut${extrasThinMarginCount > 1 ? 's' : ''} deixa${extrasThinMarginCount > 1 ? 'en' : ''} molt poc coixí sobre el seu cost.`,
       impact: 'Sembla que ajuda a facturar, però pot aportar menys marge del que et convé.',
       actionLabel: 'Obrir preus',
-      href: '/admin/pricing',
+      href: '/admin/pricing?tab=extras',
       count: extrasThinMarginCount,
     });
   }
+
+  const packsWithoutCapacityCount = activePacks.filter((pack) => !pack.maxGuests || pack.maxGuests <= 0).length;
 
   if (packPricingConfig) {
     const pricingConfig = {
@@ -553,7 +707,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         reason: `${packWithoutInventoryCount} pack${packWithoutInventoryCount > 1 ? 's' : ''} actiu${packWithoutInventoryCount > 1 ? 's' : ''} no té${packWithoutInventoryCount > 1 ? 'nen' : ''} equip vinculat.`,
         impact: 'El cost base i la promesa operativa del pack queden massa a l’aire.',
         actionLabel: 'Obrir packs',
-        href: '/admin/packs',
+        href: '/admin/packs?focus=without-inventory',
         count: packWithoutInventoryCount,
       });
     }
@@ -567,7 +721,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         reason: `${packCriticalCount} pack${packCriticalCount > 1 ? 's' : ''} queda${packCriticalCount > 1 ? 'en' : ''} clarament per sota del marge objectiu.`,
         impact: 'Hi pot haver vendes que semblen bones però deixen massa poc coixí.',
         actionLabel: 'Obrir packs',
-        href: '/admin/packs',
+        href: '/admin/packs?focus=critical-margin',
         count: packCriticalCount,
       });
     }
@@ -581,7 +735,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         reason: `${packAlertCount} pack${packAlertCount > 1 ? 's' : ''} mostra${packAlertCount > 1 ? 'n' : ''} una diferència clara entre el preu públic i el recomanat.`,
         impact: 'El catàleg pot estar anant massa per davant o massa per darrere del cost real.',
         actionLabel: 'Revisar preus',
-        href: '/admin/pricing',
+        href: '/admin/packs?focus=alert',
         count: packAlertCount,
       });
     }
@@ -595,10 +749,24 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
         reason: `${packPartialCount} pack${packPartialCount > 1 ? 's' : ''} depèn${packPartialCount > 1 ? 'en' : ''} d’inventari incomplet.`,
         impact: 'El semàfor del pack pot semblar precís i no ser-ho del tot.',
         actionLabel: 'Revisar packs',
-        href: '/admin/packs',
+        href: '/admin/packs?focus=partial-cost',
         count: packPartialCount,
       });
     }
+  }
+
+  if (packsWithoutCapacityCount > 0) {
+    catalogItems.push({
+      id: 'catalog-pack-without-capacity',
+      scope: 'catalog',
+      status: 'warning',
+      title: 'Packs sense rang clar de convidats',
+      reason: `${packsWithoutCapacityCount} pack${packsWithoutCapacityCount > 1 ? 's' : ''} actiu${packsWithoutCapacityCount > 1 ? 's' : ''} no marca${packsWithoutCapacityCount > 1 ? 'n' : ''} aforament màxim.`,
+      impact: 'Costa vendre bé el pack i també decidir si realment encaixa amb cada reserva.',
+      actionLabel: 'Revisar packs',
+      href: '/admin/packs?focus=missing-capacity',
+      count: packsWithoutCapacityCount,
+    });
   }
 
   if (customersWithoutEmailCount > 0) {
@@ -657,3 +825,10 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
     generatedAt: new Date().toISOString(),
   };
 }
+
+
+
+
+
+
+

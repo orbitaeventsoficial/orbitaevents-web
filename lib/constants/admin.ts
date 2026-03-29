@@ -531,4 +531,28 @@ export const ADMIN_CRON_PREFIXES = [
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
 export const ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING'] as const;
+export const ADMIN_SALUT_STATUS_FILTER_OPTIONS = [
+  { id: 'all', label: 'Tot' },
+  { id: 'critical', label: 'Crítics' },
+  { id: 'warning', label: 'Per revisar' },
+  { id: 'ok', label: 'Correctes' },
+] as const;
+
+export const ADMIN_SALUT_FOCUS_FILTER_OPTIONS = [
+  { id: 'all', label: 'Tot' },
+  { id: 'inventory', label: 'Inventari' },
+  { id: 'packs', label: 'Packs' },
+  { id: 'extras', label: 'Extres' },
+  { id: 'leads', label: 'Leads' },
+  { id: 'bookings', label: 'Reserves' },
+  { id: 'tasks', label: 'Tasques' },
+] as const;
+
+export const ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS = [
+  { id: 'all', label: 'Tots els cobraments' },
+  { id: 'deposit-pending', label: 'Bestreta pendent' },
+  { id: 'overdue', label: 'Cobraments vençuts' },
+  { id: 'due-soon', label: 'Vencen aviat' },
+] as const;
+
 

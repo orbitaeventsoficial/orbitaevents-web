@@ -47,6 +47,14 @@ vi.mock('@/lib/storage', () => ({
   getPublicUrl: mockGetPublicUrl,
 }));
 
+vi.mock('@/lib/services/portfolioImageService', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    normalizePortfolioImageBuffer: vi.fn(async (buf: Buffer) => buf),
+  };
+});
+
 import {
   isValidSlug,
   detectMediaType,
@@ -187,10 +195,11 @@ describe('addPortfolioMedia', () => {
     expect(result.id).toBe('media-1');
     expect(result.sortOrder).toBe(3);
     expect(mockUploadFile).toHaveBeenCalledWith(
-      expect.stringMatching(/^portfolio\/bodas\/\d+-[a-z0-9]+\.jpg$/),
-      baseImageInput.fileBuffer
+      expect.stringMatching(/^portfolio\/bodas\/\d+-[a-z0-9]+-foto-casament\.avif$/),
+      expect.any(Buffer)
     );
     expect(mockPrisma.portfolioMedia.create).toHaveBeenCalledWith({
+      include: { event: { select: { id: true, title: true, slug: true } } },
       data: expect.objectContaining({
         slug: 'bodas',
         mediaType: 'image',
@@ -217,9 +226,10 @@ describe('addPortfolioMedia', () => {
     expect(result.mediaType).toBe('video');
     expect(mockUploadFile).toHaveBeenCalledWith(
       expect.stringMatching(/^portfolio\/discomovil\/\d+-[a-z0-9]+\.mp4$/),
-      baseVideoInput.fileBuffer
+      expect.any(Buffer)
     );
     expect(mockPrisma.portfolioMedia.create).toHaveBeenCalledWith({
+      include: { event: { select: { id: true, title: true, slug: true } } },
       data: expect.objectContaining({
         slug: 'discomovil',
         mediaType: 'video',
@@ -238,6 +248,7 @@ describe('addPortfolioMedia', () => {
     await addPortfolioMedia(baseImageInput);
 
     expect(mockPrisma.portfolioMedia.create).toHaveBeenCalledWith({
+      include: { event: { select: { id: true, title: true, slug: true } } },
       data: expect.objectContaining({ sortOrder: 0 }),
     });
   });
@@ -267,9 +278,10 @@ describe('addPortfolioMedia', () => {
     await addPortfolioMedia(baseImageInput);
 
     expect(mockGetPublicUrl).toHaveBeenCalledWith(
-      expect.stringMatching(/^portfolio\/bodas\/\d+-[a-z0-9]+\.jpg$/)
+      expect.stringMatching(/^portfolio\/bodas\/\d+-[a-z0-9]+-foto-casament\.avif$/)
     );
     expect(mockPrisma.portfolioMedia.create).toHaveBeenCalledWith({
+      include: { event: { select: { id: true, title: true, slug: true } } },
       data: expect.objectContaining({
         mediaUrl: expect.stringMatching(/^\/api\/uploads\/portfolio\/bodas\//),
       }),
@@ -289,6 +301,7 @@ describe('addPortfolioMedia', () => {
     await addPortfolioMedia(inputMinim);
 
     expect(mockPrisma.portfolioMedia.create).toHaveBeenCalledWith({
+      include: { event: { select: { id: true, title: true, slug: true } } },
       data: expect.objectContaining({
         slug: 'bodas',
         mediaType: 'image',
@@ -319,7 +332,8 @@ describe('listPortfolioMedia', () => {
     expect(result).toHaveLength(3);
     expect(mockPrisma.portfolioMedia.findMany).toHaveBeenCalledWith({
       where: { slug: 'bodas' },
-      orderBy: { sortOrder: 'asc' },
+      include: { event: { select: { id: true, title: true, slug: true } } },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
     });
   });
 
@@ -331,7 +345,8 @@ describe('listPortfolioMedia', () => {
     expect(result).toEqual([]);
     expect(mockPrisma.portfolioMedia.findMany).toHaveBeenCalledWith({
       where: { slug: 'alquiler-equipo' },
-      orderBy: { sortOrder: 'asc' },
+      include: { event: { select: { id: true, title: true, slug: true } } },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
     });
   });
 });
@@ -395,6 +410,7 @@ describe('updatePortfolioMedia', () => {
     expect(mockPrisma.portfolioMedia.update).toHaveBeenCalledWith({
       where: { id: 'media-1' },
       data: { caption: 'Nou caption' },
+      include: { event: { select: { id: true, title: true, slug: true } } },
     });
   });
 
@@ -410,6 +426,7 @@ describe('updatePortfolioMedia', () => {
     expect(mockPrisma.portfolioMedia.update).toHaveBeenCalledWith({
       where: { id: 'media-1' },
       data: { sortOrder: 5 },
+      include: { event: { select: { id: true, title: true, slug: true } } },
     });
   });
 
@@ -422,6 +439,7 @@ describe('updatePortfolioMedia', () => {
     expect(mockPrisma.portfolioMedia.update).toHaveBeenCalledWith({
       where: { id: 'media-1' },
       data,
+      include: { event: { select: { id: true, title: true, slug: true } } },
     });
   });
 });

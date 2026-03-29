@@ -3,14 +3,11 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
 import { formatCurrency, formatDate, INVENTORY_CATEGORY_OPTIONS } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { getInventoryCategoryAdminTone, getInventoryCategoryDisplay, getInventoryStatusDisplay } from '@/lib/inventory-utils';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TIPUS
-// ═══════════════════════════════════════════════════════════════════════════
 
 interface ExtraData {
   id: string;
@@ -95,18 +92,42 @@ interface StatsData {
   topPacks: Array<{ slug: string; name: string; totalBookings: number; revenue: number }>;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
+type PricingTab = 'overview' | 'extras' | 'packs' | 'inventory';
+type PricingFocus = 'alert' | 'zero-price';
 
+function resolvePricingTab(value?: string | null): PricingTab {
+  switch (value) {
+    case 'extras':
+    case 'packs':
+    case 'inventory':
+      return value;
+    default:
+      return 'overview';
+  }
+}
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
+function resolvePricingFocus(value?: string | null): PricingFocus | null {
+  switch (value) {
+    case 'alert':
+    case 'zero-price':
+      return value;
+    default:
+      return null;
+  }
+}
+
+function isFocusSupportedForTab(focus: PricingFocus | null, tab: PricingTab) {
+  if (!focus) return false;
+  if (focus === 'zero-price') return tab === 'extras';
+  if (focus === 'alert') return tab === 'packs';
+  return false;
+}
 
 export default function PricingAdminPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'extras' | 'packs' | 'inventory'>('overview');
+  const [activeTab, setActiveTab] = useState<PricingTab>(() => resolvePricingTab(searchParams?.get('tab')));
   const [extras, setExtras] = useState<ExtraData[]>([]);
   const [packs, setPacks] = useState<PackData[]>([]);
   const [inventory, setInventory] = useState<InventoryData[]>([]);
@@ -118,9 +139,27 @@ export default function PricingAdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
+  const focusParam = resolvePricingFocus(searchParams?.get('focus'));
+  const activeFocus = isFocusSupportedForTab(focusParam, activeTab) ? focusParam : null;
+
+  useEffect(() => {
+    setActiveTab(resolvePricingTab(searchParams?.get('tab')));
+  }, [searchParams]);
+
   useEffect(() => {
     loadData();
   }, []);
+
+  function updateUrl(tab: PricingTab, focus?: PricingFocus | null) {
+    const next = new URLSearchParams(searchParams?.toString() ?? '');
+    next.set('tab', tab);
+    if (focus && isFocusSupportedForTab(focus, tab)) {
+      next.set('focus', focus);
+    } else {
+      next.delete('focus');
+    }
+    router.replace(`/admin/pricing?${next.toString()}`, { scroll: false });
+  }
 
   async function loadData() {
     setLoading(true);
@@ -174,7 +213,6 @@ export default function PricingAdminPage() {
     setSaving(false);
   }
 
-  // Filtrar inventari
   const searchLower = searchTerm.trim().toLowerCase();
   const filteredInventory = useMemo(() => {
     return inventory.filter((item) => {
@@ -185,6 +223,23 @@ export default function PricingAdminPage() {
       return matchesSearch && matchesCategory;
     });
   }, [inventory, searchLower, categoryFilter]);
+
+  const filteredExtras = useMemo(() => {
+    if (activeFocus !== 'zero-price') return extras;
+    return extras.filter((extra) => extra.priceType !== 'ON_REQUEST' && Number(extra.price || 0) <= 0);
+  }, [extras, activeFocus]);
+
+  const filteredPacks = useMemo(() => {
+    if (activeFocus !== 'alert') return packs;
+    return packs.filter((pack) => pack.editableNote?.toLowerCase().includes('alerta'));
+  }, [packs, activeFocus]);
+
+  const activeFocusLabel = activeFocus
+    ? {
+        'zero-price': 'Extres a preu 0',
+        alert: 'Packs amb alerta de preu',
+      }[activeFocus]
+    : null;
 
   if (loading) {
     return (
@@ -211,8 +266,6 @@ export default function PricingAdminPage() {
       title="Preus"
       subtitle="Edita preus dels extras · Consulta packs i inventari"
     >
-
-      {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
         {[
           { key: 'overview', label: 'Resum', icon: '📊' },
@@ -222,7 +275,7 @@ export default function PricingAdminPage() {
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            onClick={() => updateUrl(tab.key as PricingTab, focusParam)}
             type="button"
             aria-pressed={activeTab === tab.key}
             className={`
@@ -247,7 +300,20 @@ export default function PricingAdminPage() {
         ))}
       </div>
 
-      {/* Missatge */}
+      {activeFocusLabel && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          Focus de salut: {activeFocusLabel}
+          {' · '}
+          <button
+            type="button"
+            onClick={() => updateUrl(activeTab, null)}
+            className="font-semibold underline underline-offset-2"
+          >
+            veure tot
+          </button>
+        </div>
+      )}
+
       {message && (
         <div
           className={`
@@ -275,10 +341,8 @@ export default function PricingAdminPage() {
         </div>
       )}
 
-      {/* TAB: OVERVIEW */}
       {activeTab === 'overview' && stats && (
         <div className="space-y-8">
-          {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard icon="💰" label="Ingressos totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} esdeveniments completats`} color="emerald" />
             <StatCard icon="📦" label="Total packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
@@ -286,7 +350,6 @@ export default function PricingAdminPage() {
             <StatCard icon="🔧" label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
           </div>
 
-          {/* Top Performers */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl border admin-card-glass p-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -335,7 +398,6 @@ export default function PricingAdminPage() {
             </div>
           </div>
 
-          {/* Llegenda */}
           <div className="rounded-2xl border admin-card-glass p-6">
             <h3 className="font-bold mb-3 flex items-center gap-2">
               <span className="text-xl">💡</span>
@@ -374,7 +436,6 @@ export default function PricingAdminPage() {
         </div>
       )}
 
-      {/* TAB: EXTRAS */}
       {activeTab === 'extras' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
@@ -386,7 +447,7 @@ export default function PricingAdminPage() {
           </div>
 
           <div className="grid gap-4">
-            {extras.map(extra => (
+            {filteredExtras.map(extra => (
               <div
                 key={extra.id}
                 className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral admin-tone-bg-neutral admin-card-glass'}`}
@@ -436,7 +497,6 @@ export default function PricingAdminPage() {
                               value={editPrice}
                               onChange={e => setEditPrice(Number(e.target.value))}
                               className="w-28 px-3 py-2 border-2 rounded-xl text-right text-xl font-bold focus:outline-none"
-                              /* eslint-disable-next-line jsx-a11y/no-autofocus */
                               autoFocus
                             />
                             <span className="text-xl">€</span>
@@ -472,11 +532,16 @@ export default function PricingAdminPage() {
                 )}
               </div>
             ))}
+
+            {filteredExtras.length === 0 && (
+              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+                No hi ha extres dins d'aquest focus.
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* TAB: PACKS */}
       {activeTab === 'packs' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
@@ -493,7 +558,7 @@ export default function PricingAdminPage() {
           </div>
 
           <div className="grid gap-4">
-            {packs.map(pack => (
+            {filteredPacks.map(pack => (
               <div key={pack.id} className="rounded-2xl border admin-card-glass overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -569,11 +634,16 @@ export default function PricingAdminPage() {
                 </div>
               </div>
             ))}
+
+            {filteredPacks.length === 0 && (
+              <div className="rounded-2xl border admin-card-glass p-8 text-center text-sm">
+                No hi ha packs dins d'aquest focus.
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* TAB: INVENTORY */}
       {activeTab === 'inventory' && (
         <div className="space-y-4">
           <div className="border rounded-xl p-4 flex items-center gap-3">
@@ -589,7 +659,6 @@ export default function PricingAdminPage() {
             </div>
           </div>
 
-          {/* Filtres */}
           <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
@@ -610,7 +679,6 @@ export default function PricingAdminPage() {
             </select>
           </div>
 
-          {/* Llista */}
           <div className="grid gap-3">
             {filteredInventory.map(item => {
               const categoryDisplay = getInventoryCategoryDisplay(item.category);
@@ -670,7 +738,7 @@ export default function PricingAdminPage() {
 
             {filteredInventory.length === 0 && (
               <div className="text-center py-12">
-                No s\'han trobat resultats
+                No s'han trobat resultats
               </div>
             )}
           </div>
@@ -679,10 +747,6 @@ export default function PricingAdminPage() {
     </AdminPage>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTS AUXILIARS
-// ═══════════════════════════════════════════════════════════════════════════
 
 function StatCard({
   icon,
@@ -717,9 +781,3 @@ function StatCard({
     </div>
   );
 }
-
-
-
-
-
-

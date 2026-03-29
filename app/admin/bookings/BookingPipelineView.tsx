@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BOOKING_PIPELINE_COLUMNS, BOOKING_STATUS_CONFIG, formatDateShort, formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
@@ -39,6 +40,7 @@ function getMarginColor(pct: number | null): string {
 
 export default function BookingPipelineView() {
   const toast = useToast();
+  const searchParams = useSearchParams();
   const [bookings, setBookings] = useState<PipelineBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -47,7 +49,12 @@ export default function BookingPipelineView() {
 
   const fetchBookings = useCallback(async () => {
     try {
-      const res = await fetchWithCsrf('/api/admin/bookings?limit=500&pipeline=true', { credentials: 'include' });
+      const params = new URLSearchParams(searchParams?.toString() || '');
+      params.set('limit', '500');
+      params.set('pipeline', 'true');
+      params.delete('page');
+      params.delete('view');
+      const res = await fetchWithCsrf(`/api/admin/bookings?${params.toString()}`, { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant reserves');
       const data = await res.json();
       const rows = data?.data?.bookings || data?.bookings || data?.data || [];
@@ -70,7 +77,7 @@ export default function BookingPipelineView() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [searchParams, toast]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 

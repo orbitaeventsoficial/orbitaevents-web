@@ -467,10 +467,6 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-19.avif",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  19"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-20.avif",
-      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  20"
     }
   ],
   "produccion-tecnica": [

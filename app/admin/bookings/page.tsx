@@ -17,6 +17,7 @@ import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
+import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
 
 const BookingPipelineViewWrapper = dynamicImport(
   () => import('./BookingPipelineView'),
@@ -29,6 +30,8 @@ export const metadata = {
   title: 'Reserves | Òrbita Admin',
 };
 
+type BookingPaymentFilter = 'deposit-pending' | 'overdue' | 'due-soon';
+
 interface BookingSearchParams {
   page?: string;
   status?: string;
@@ -37,6 +40,110 @@ interface BookingSearchParams {
   toDate?: string;
   search?: string;
   view?: string;
+  payment?: string;
+}
+
+function addDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function resolvePaymentFilter(value?: string): BookingPaymentFilter | null {
+  switch (value) {
+    case 'deposit-pending':
+    case 'overdue':
+    case 'due-soon':
+      return value;
+    default:
+      return null;
+  }
+}
+
+function getPaymentFilterLabel(value: BookingPaymentFilter | null) {
+  if (!value) return null;
+  const match = ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS.find((option) => option.id === value);
+  return match?.label ?? null;
+}
+
+function buildBookingsWhere(params: BookingSearchParams) {
+  const now = new Date();
+  const paymentFilter = resolvePaymentFilter(params.payment);
+  const overdueEventDateLimit = addDays(now, 30);
+  const overdueRemainingDateLimit = addDays(now, 7);
+  const dueSoonDepositFrom = addDays(now, 30);
+  const dueSoonDepositTo = addDays(now, 37);
+  const dueSoonRemainingFrom = addDays(now, 7);
+  const dueSoonRemainingTo = addDays(now, 14);
+
+  const andClauses: Prisma.BookingWhereInput[] = [];
+  if (params.status) {
+    andClauses.push({
+      status: params.status as Prisma.BookingWhereInput['status'],
+    });
+  }
+  if (params.eventType) {
+    andClauses.push({
+      eventType: params.eventType as Prisma.BookingWhereInput['eventType'],
+    });
+  }
+  if (params.fromDate || params.toDate) {
+    const eventDate: Prisma.DateTimeFilter = {};
+    if (params.fromDate) {
+      eventDate.gte = new Date(params.fromDate);
+    }
+    if (params.toDate) {
+      eventDate.lte = new Date(params.toDate + 'T23:59:59');
+    }
+    andClauses.push({ eventDate });
+  }
+  if (params.search) {
+    const q = params.search;
+    andClauses.push({
+      OR: [
+        { clientName: { contains: q, mode: 'insensitive' } },
+        { reference: { contains: q, mode: 'insensitive' } },
+        { eventLocation: { contains: q, mode: 'insensitive' } },
+        { clientEmail: { contains: q, mode: 'insensitive' } },
+      ],
+    });
+  }
+  if (paymentFilter === 'deposit-pending') {
+    andClauses.push({ depositPaid: false });
+  }
+  if (paymentFilter === 'overdue') {
+    andClauses.push({
+      OR: [
+        { depositPaid: false, eventDate: { lt: overdueEventDateLimit } },
+        { remainingPaid: false, eventDate: { lt: overdueRemainingDateLimit } },
+      ],
+    });
+  }
+  if (paymentFilter === 'due-soon') {
+    andClauses.push({
+      OR: [
+        {
+          depositPaid: false,
+          eventDate: {
+            gte: dueSoonDepositFrom,
+            lte: dueSoonDepositTo,
+          },
+        },
+        {
+          remainingPaid: false,
+          eventDate: {
+            gte: dueSoonRemainingFrom,
+            lte: dueSoonRemainingTo,
+          },
+        },
+      ],
+    });
+  }
+
+  return {
+    paymentFilter,
+    where: andClauses.length > 0 ? { AND: andClauses } : {},
+  } satisfies { paymentFilter: BookingPaymentFilter | null; where: Prisma.BookingWhereInput };
 }
 
 async function getBookings(params: BookingSearchParams) {
@@ -44,37 +151,11 @@ async function getBookings(params: BookingSearchParams) {
     const pageRaw = Number.parseInt(params.page || '1', 10);
     const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
     const pageSize = 25;
-
-    // Build where clause from filters
-    const where: Prisma.BookingWhereInput = {};
-    if (params.status) {
-      where.status = params.status as Prisma.BookingWhereInput['status'];
-    }
-    if (params.eventType) {
-      where.eventType = params.eventType as Prisma.BookingWhereInput['eventType'];
-    }
-    if (params.fromDate || params.toDate) {
-      where.eventDate = {};
-      if (params.fromDate) {
-        (where.eventDate as Prisma.DateTimeFilter).gte = new Date(params.fromDate);
-      }
-      if (params.toDate) {
-        (where.eventDate as Prisma.DateTimeFilter).lte = new Date(params.toDate + 'T23:59:59');
-      }
-    }
-    if (params.search) {
-      const q = params.search;
-      where.OR = [
-        { clientName: { contains: q, mode: 'insensitive' } },
-        { reference: { contains: q, mode: 'insensitive' } },
-        { eventLocation: { contains: q, mode: 'insensitive' } },
-        { clientEmail: { contains: q, mode: 'insensitive' } },
-      ];
-    }
+    const { paymentFilter, where } = buildBookingsWhere(params);
 
     const cacheKey = `admin:bookings:${JSON.stringify({ page, pageSize, ...params })}`;
 
-    const [bookings, stats, totalCount] = await cachedQuery(
+    const [bookings, stats, totalCount, exportRows] = await cachedQuery(
       cacheKey,
       () => Promise.all([
         prisma.booking.findMany({
@@ -91,10 +172,23 @@ async function getBookings(params: BookingSearchParams) {
         }),
         prisma.booking.groupBy({
           by: ['status'],
+          where,
           _count: true,
           _sum: { total: true },
         }),
         prisma.booking.count({ where }),
+        prisma.booking.findMany({
+          where,
+          orderBy: { eventDate: 'desc' },
+          select: {
+            reference: true,
+            clientName: true,
+            eventDate: true,
+            eventType: true,
+            status: true,
+            total: true,
+          },
+        }),
       ]),
       CacheTTL.VERY_SHORT
     );
@@ -102,6 +196,8 @@ async function getBookings(params: BookingSearchParams) {
     return {
       bookings,
       stats,
+      exportRows,
+      paymentFilter,
       pagination: {
         page,
         pageSize,
@@ -114,13 +210,12 @@ async function getBookings(params: BookingSearchParams) {
     return {
       bookings: [],
       stats: [],
+      exportRows: [],
+      paymentFilter: null,
       pagination: { page: 1, pageSize: 25, total: 0, totalPages: 1 },
     };
   }
 }
-
-
-
 
 export default async function BookingsPage({
   searchParams,
@@ -129,18 +224,18 @@ export default async function BookingsPage({
 }) {
   const sp = searchParams || {};
   const isKanban = sp.view === 'kanban';
-  const [{ bookings, stats, pagination }, profitConfig] = await Promise.all([
+  const [{ bookings, stats, exportRows, pagination, paymentFilter }, profitConfig] = await Promise.all([
     getBookings(sp),
     getProfitabilityConfig(),
   ]);
 
-  // Transformar stats
   const statsMap = stats.reduce((acc, s) => {
     acc[s.status] = { count: s._count, revenue: s._sum.total || 0 };
     return acc;
   }, {} as Record<string, { count: number; revenue: number }>);
 
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
+  const paymentFilterLabel = getPaymentFilterLabel(paymentFilter);
 
   return (
     <AdminPage
@@ -150,7 +245,7 @@ export default async function BookingsPage({
         <ExportCsvButton
           filename="reserves"
           headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
-          rows={bookings.map((b) => [
+          rows={exportRows.map((b) => [
             b.reference,
             b.clientName,
             formatDate(b.eventDate),
@@ -182,7 +277,16 @@ export default async function BookingsPage({
         ]}
       />
 
-      {/* Stats Cards - Scrollable horizontal en móvil */}
+      {paymentFilterLabel && (
+        <section className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          Focus de cobrament: {paymentFilterLabel}
+          {' · '}
+          <Link href="/admin/bookings" className="font-semibold underline underline-offset-2">
+            veure totes les reserves
+          </Link>
+        </section>
+      )}
+
       <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
         <div className="admin-bookings-stat admin-bookings-stat--total admin-card-glass admin-stagger-item shrink-0 w-28 sm:w-auto rounded-2xl border p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
@@ -200,7 +304,6 @@ export default async function BookingsPage({
         ))}
       </section>
 
-      {/* Filtres + Toggle vista */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex-1">
           <BookingFilters />
@@ -208,12 +311,10 @@ export default async function BookingsPage({
         <BookingViewToggle />
       </div>
 
-      {/* Kanban View */}
       {isKanban && (
         <BookingPipelineViewWrapper />
       )}
 
-      {/* List View (mobile cards + desktop table) */}
       {!isKanban && <>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
@@ -325,7 +426,6 @@ export default async function BookingsPage({
         )}
       </section>
 
-      {/* Desktop Table View */}
       <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de reserves">
@@ -475,6 +575,7 @@ export default async function BookingsPage({
               const filterParams = new URLSearchParams();
               if (sp.status) filterParams.set('status', sp.status);
               if (sp.eventType) filterParams.set('eventType', sp.eventType);
+              if (sp.payment) filterParams.set('payment', sp.payment);
               if (sp.fromDate) filterParams.set('fromDate', sp.fromDate);
               if (sp.toDate) filterParams.set('toDate', sp.toDate);
               if (sp.search) filterParams.set('search', sp.search);
@@ -503,17 +604,3 @@ export default async function BookingsPage({
     </AdminPage>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -55,7 +55,7 @@ function MorphingText() {
   }, [texts.length]);
 
   return (
-    <span className="relative block h-[1.15em] mt-1">
+    <span className="relative block h-[3em] mt-1">
       <AnimatePresence mode="wait">
         <motion.span
           key={index}
@@ -114,9 +114,9 @@ function FloatingCTAs() {
         onTapStart={() => haptic('medium')}
         onClick={() => { trackWhatsAppClick('mobile_hero'); trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero'); }}
         className="relative w-full overflow-hidden"
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
+        transition={{ delay: 0.3, duration: 0.35 }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-2xl blur-xl opacity-50" />
         <div className="relative flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-sm shadow-2xl">
@@ -134,9 +134,9 @@ function FloatingCTAs() {
         onTapStart={() => haptic('light')}
         onClick={() => trackCTAClick('mobile_hero_packs_secondary', 'mobile_hero')}
         className="flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white/[0.06] backdrop-blur-sm rounded-2xl border border-white/15 font-bold text-white text-sm"
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.5 }}
+        transition={{ delay: 0.4, duration: 0.35 }}
       >
         <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -187,22 +187,13 @@ export default function MobileHeroUltimate() {
   return (
     <section
       aria-label="Hero"
-      className="relative h-[100dvh] w-full overflow-hidden bg-black"
-      style={{ touchAction: 'pan-y' }}
+      className="relative h-[100dvh] w-full overflow-hidden"
+      style={{ touchAction: 'pan-y', background: 'linear-gradient(to bottom, #0a0a0a 0%, #1a1008 40%, #12100a 70%, #0a0a0a 100%)' }}
     >
       {/* ── Background: poster + slides ── */}
       <div className="absolute inset-0">
-        {/* Poster — logo mentre carrega */}
-        <div className="absolute inset-0 bg-black flex items-center justify-center">
-          <Image
-            src="/img/orbitalockupwhite.svg"
-            alt="Òrbita Events"
-            width={144}
-            height={144}
-            className="w-36 h-36 opacity-25"
-            priority
-          />
-        </div>
+        {/* Poster — warm gradient visible immediatament mentre carrega media */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-amber-950/20 to-black" />
 
         {/* Slides — crossfade */}
         <AnimatePresence>
@@ -218,13 +209,13 @@ export default function MobileHeroUltimate() {
               <video
                 key={currentItem.url}
                 autoPlay muted loop playsInline
-                preload="metadata"
+                preload="auto"
                 disableRemotePlayback disablePictureInPicture
                 className="w-full h-full object-cover"
                 style={{
                   opacity: videoReady ? 1 : 0,
                   transition: 'opacity 0.8s ease',
-                  filter: 'brightness(0.6) saturate(1.1)',
+                  filter: 'brightness(0.55) saturate(1.15)',
                 }}
                 onCanPlay={handleVideoReady}
               >
@@ -234,10 +225,10 @@ export default function MobileHeroUltimate() {
           ) : (
             <motion.div
               key={`${currentItem.id}-${slideIndex}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.2 }}
+              transition={{ duration: 1.4, ease: 'easeOut' }}
               className="absolute inset-0"
             >
               <Image
@@ -245,7 +236,7 @@ export default function MobileHeroUltimate() {
                 alt={currentItem.label}
                 fill
                 className="object-cover"
-                style={{ filter: 'brightness(0.6) saturate(1.1)' }}
+                style={{ filter: 'brightness(0.55) saturate(1.15)' }}
                 sizes="100vw"
                 priority={slideIndex === 0}
                 quality={85}
@@ -254,10 +245,12 @@ export default function MobileHeroUltimate() {
           )}
         </AnimatePresence>
 
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black to-transparent" />
+        {/* Overlays — cinematogràfics */}
+        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/90" />
+        <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-black via-black/80 to-transparent" />
+        {/* Vinyeta lateral subtil */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)' }} />
       </div>
 
       {/* ── Slide indicators ── */}
@@ -284,18 +277,18 @@ export default function MobileHeroUltimate() {
 
       {/* ── Content ── */}
       <div
-        className="relative z-10 h-full flex flex-col items-center justify-center pb-20 text-center"
+        className="relative z-10 h-full flex flex-col items-center justify-center pb-14 text-center"
         style={{ paddingTop: 'calc(var(--header-height, 64px) + 1rem)' }}
       >
         <div className="w-full max-w-md px-6 mx-auto">
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="mb-5"
+            transition={{ delay: 0.1, duration: 0.3 }}
+            className="mb-3"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.08] border border-white/10 text-white/70 text-xs font-medium tracking-wide uppercase">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/10 text-white/70 text-xs font-medium tracking-wide uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               {t('badges.halloween', { year: currentYear })}
             </span>
@@ -303,10 +296,10 @@ export default function MobileHeroUltimate() {
 
           {/* Title */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(2.2rem,10vw,2.8rem)] leading-[1.05] font-black text-white mb-5"
+            transition={{ delay: 0.15, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(2.2rem,10vw,2.8rem)] leading-[1.05] font-black text-white mb-3"
             style={{ textShadow: '0 4px 30px rgba(0,0,0,0.7)' }}
           >
             {t('title')}
@@ -315,10 +308,10 @@ export default function MobileHeroUltimate() {
 
           {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.4 }}
-            className="text-base text-white/75 mb-6 max-w-xs mx-auto font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="text-base text-white/75 mb-4 max-w-xs mx-auto font-light"
             style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}
           >
             {t('subtitle')}
@@ -331,10 +324,10 @@ export default function MobileHeroUltimate() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
-            className="mt-5"
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="mt-3"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] backdrop-blur-sm border border-white/10">
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">

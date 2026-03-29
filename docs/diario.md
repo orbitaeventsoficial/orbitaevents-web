@@ -1,3 +1,76 @@
+## 2026-03-29 — Arreglats 50 tests + hero mòbil millorat
+
+### Hero mòbil — primera impressió resolta
+- `MobileHeroUltimate`: canviat `bg-black` per gradient càlid immediat. Delays d'animació reduïts de 0.8-1.2s a 0.1-0.5s.
+
+### 50 tests arreglats — de 1735/1785 a 1785/1785 (100%)
+- **performance.test.ts**: FAQSection ara és lazy (`ssr: false`), test actualitzat.
+- **bookingCommunicationService.test.ts**: mock `importOriginal` per incloure `BOOKING_COMMUNICATION_COPY`.
+- **bookingListService.test.ts**: el servei usa `{ AND: [...] }`, tests actualitzats.
+- **paymentReminderService.test.ts**: mock `importOriginal` per incloure `PAYMENT_REMINDER_COPY` i constants.
+- **notificationService.test.ts**: afegit `getSourceDisplay` al mock.
+- **publicExtrasService.test.ts**: mock de `@/config/packs-config` amb EXTRAS actius (tots tenien `enabled: false`).
+- **galleryService.test.ts**: mock de `normalizePortfolioImageBuffer` (sharp petava amb buffer fals).
+- **portfolioMediaService.test.ts**: paths `.avif`, `include: { event }`, `orderBy` multi-camp.
+
+### Validació
+- `npx tsc --noEmit` → 0 errors
+- `npx vitest run` → 140 fitxers, 1785 tests, 0 errors
+
+## 2026-03-29 — Tancament del tall de reserves abans de parar
+
+- La part de `bookings` queda coherent entre vista server, API compartida, kanban i export CSV.
+- `app/admin/bookings/page.tsx`: cerca textual + filtre de cobrament es combinen bé, i l'export ja surt del conjunt filtrat complet, no només de la pàgina visible.
+- `lib/services/bookingListService.ts` i `app/api/admin/bookings/route.ts`: el filtre `payment` queda suportat també al servei compartit i a l'API.
+- `app/admin/bookings/BookingPipelineView.tsx`: la vista kanban llegeix la querystring activa i respecta els mateixos filtres que la llista.
+- `lib/services/adminHealthService.ts` i `app/admin/page.tsx`: els accessos a cobraments vençuts / imminents queden resolts tant des de `Salut` com des del dashboard.
+- `CLAUDE.md`: queda fixada la rutina base `pnpm run validate:core` com a passada curta per defecte.
+- Validació passada abans de tancar:
+  - `pnpm test:run -- --run __tests__/lib/services/bookingListService.test.ts`
+  - `pnpm test:run -- --run __tests__/lib/services/adminHealthService.test.ts`
+  - `pnpm run validate:core`
+- Punt honest:
+  - `validate:core` passa, però `npm` continua mostrant warnings d'entorn sobre `verify-deps-before-run` i `_jsr-registry`; no bloquegen la validació.
+  - El worktree segueix tenint molts canvis d'altres fronts oberts (mobile, portfolio, imatges, tests diversos). No s'han netejat ni reordenat en aquesta passada.
+- Punt de represa recomanat per demà:
+  1. decidir si aquest tall de `bookings` es dona per tancat o si vols afegir tests d'integració/UI
+  2. si `bookings` ja es considera tancat, saltar al següent front real del repo i no tornar a remenar aquesta part sense motiu
+
+## 2026-03-28 — Millora hero mòbil: eliminat pantalla negra + animacions instantànies
+
+- **Problema**: el hero mòbil (`MobileHeroUltimate`) mostrava pantalla completament negra durant uns segons mentre carregava el vídeo/imatge de fons. Mala primera impressió.
+- **Solució**: canviat `bg-black` per un gradient càlid (`linear-gradient` amb tons amber/black) que es veu immediatament, i reduïts tots els delays d'animació (badge 0.1s, title 0.15s, subtitle 0.25s, CTAs 0.3-0.4s, social proof 0.5s) perquè el contingut aparegui quasi instantàniament.
+- **Captures**: script `mobile-screenshots.ts` regenerat — 10 passos, 7.086px, tot renderitza correcte.
+- **Validació**: `npx tsc --noEmit` → 0 errors. Tests: 1.735/1.785 passen (50 fallen en 8 fitxers preexistents no relacionats).
+
+## 2026-03-28 — Rutina base de validació fixada a guia i diari
+
+- Deixo fixat com a rutina curta de passada `pnpm run validate:core` abans de donar un canvi per net quan encara no cal una ronda més pesada.
+- Aquesta comanda resumeix la base obligatòria del repo: `pnpm run arch:layer:check`, `npx tsc --noEmit` i el guard d’i18n encapsulat a l’script.
+- Quan el tall toca UI admin o flux compartit i no hi ha canvi estructural gros, el mínim exigible queda escrit així: `pnpm run validate:core`; si el canvi és més profund, després s’amplia amb tests específics o `pnpm build`.
+- També queda reflectit a `CLAUDE.md` perquè no depengui de memòria de sessió.
+
+## 2026-03-28 — Reserves: filtre de cobrament coherent entre vista i API
+
+- `app/admin/bookings/page.tsx`: he corregit la composició de filtres perquè la cerca textual i el focus de cobrament no es trepitgin quan conviuen; ara es combinen amb `AND`.
+- `lib/constants/admin.ts`: he afegit el catàleg compartit `ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS` perquè la UI i la pàgina usin la mateixa font.
+- `lib/services/bookingListService.ts` i `app/api/admin/bookings/route.ts`: l’API de reserves ja admet `payment` i aplica la mateixa semàntica de `deposit-pending`, `overdue` i `due-soon`, amb estadístiques filtrades pel mateix `where`.
+- `lib/services/adminHealthService.ts`: els deep links de `Salut` cap a cobraments de reserves ja queden resolts.
+- Validació passada: `npx tsc --noEmit` i `pnpm run arch:layer:check`.
+
+## 2026-03-28 — Validació ampla de l’admin i efecte real del build
+
+- He deixat `Salut` amb capçalera executiva, ordre per urgència, filtres ràpids i deep links més resolutius cap a inventari i cobraments.
+- També he fet que `InventoryListClient` pugui entrar amb `health` per URL perquè els avisos de `Salut` no aterrin en una vista genèrica.
+- Validació passada en aquesta ronda: `npx tsc --noEmit`, `pnpm run arch:layer:check` i `pnpm build`.
+- Punt honest important: el `build` ha executat el pipeline d’actius i ha tocat `app/config/portfolio-images.ts` i la carpeta `public/img/portfolio/fiestas-tematicas-mon-magic` renumerant fitxers AVIF. No és un efecte lateral inventat per aquesta nota, sinó resultat real dels scripts del build del repo.
+## 2026-03-28 — Salut amb filtres ràpids i monocapa neta
+
+- He estès `app/admin/salut/page.tsx` amb filtres ràpids per `estat` i `focus` via querystring per poder veure només crítics o anar directe a `Inventari`, `Packs`, `Extres`, `Leads`, `Reserves` o `Tasques`.
+- La pantalla continua sent server-side i no s’ha convertit en un panell client nou; només filtra la mateixa lectura de govern.
+- He ordenat també els blocs perquè dins de cada grup surtin primer els crítics, després els avisos i al final els correctes.
+- El guard de capa ha obligat a treure els catàlegs de filtres fora de la pàgina i ara viuen a `lib/constants/admin.ts`, deixant `Salut` alineada amb la regla de monocapa del repo.
+- Validació passada en aquesta ronda: `npx tsc --noEmit` i `pnpm run arch:layer:check`.
 ## 2026-03-28 — Visió mare de la refosa de l’admin
 
 - He deixat escrita la direcció general d’aquesta etapa a `docs/estat-admin.md` perquè no quedi només dins del cap ni en comentaris de sessió.
@@ -7392,3 +7465,11 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - El criteri tancat per aquesta pàgina és: banquet màgic viu, no cripta; fantasia elegant, no gòtic pesat.
 - Validació passada durant aquesta ronda: múltiples captures locals del hero i seccions + `npx tsc --noEmit`.
 - Punt honest: la captura automatitzada de la galeria no ha estat prou fiable per jutjar tota la composició final, així que el tancament visual bo s'ha anat fent sobretot sobre el que s'ha vist i ajustat en local.
+
+
+
+## 2026-03-28 - Salut: deep links resolutius cap a packs i pricing
+- `app/admin/packs/page.tsx`: ara admet `focus` per URL i pot aterrar directament a packs amb alerta de preu, marge crític, capacitat incompleta, càlcul parcial o sense equip base.
+- `app/admin/pricing/page.tsx`: ara llegeix `tab` i `focus` des de query per obrir directament la pestanya correcta; he deixat resolutiu el cas d'extres a preu 0.
+- `lib/services/adminHealthService.ts`: els avisos de `Salut` ja no apunten a vistes genèriques quan hi ha una aterratge més útil, sobretot a inventari i packs.
+- Validació passada: `npx tsc --noEmit` i `pnpm run arch:layer:check`.

@@ -130,22 +130,30 @@ npx tsc --noEmit
 # Guard de capa (catalegs locals sospitosos)
 pnpm run arch:layer:check
 
+# Passada base recomanada del repo
+pnpm run validate:core
+
 # Build complet
 pnpm build
 ```
+
+### Rutina curta per defecte
+
+- **Abans de donar per bona una passada normal**, executar `pnpm run validate:core`.
+- Aquesta és la validació base amb nom curt del repo. Si el canvi toca més superfície, sumar-hi després els tests específics o `pnpm build`, però no saltar-se aquesta passada base.
 
 ### QuÃ¨ executar segons el que modifiques
 
 | Modifiques | Executa |
 |---|---|
-| `lib/services/*.ts` | `pnpm test:run` (tots els unit tests) |
+| `lib/services/*.ts` | `pnpm run validate:core` + `pnpm test:run` (tots els unit tests) |
 | `lib/services/SERVEI.ts` concret | `pnpm test:run -- --run __tests__/lib/services/SERVEI.test.ts` |
-| `app/admin/**` (pÃ gines/components) | `pnpm run arch:layer:check` + `npx tsc --noEmit` + `pnpm build` |
-| `app/api/**` (rutes API) | `pnpm test:run` + `pnpm run arch:layer:check` + `npx tsc --noEmit` |
-| `prisma/schema.prisma` | `npx prisma generate` + `pnpm test:run` + `pnpm run arch:layer:check` + `pnpm build` |
-| `messages/*.json` (i18n) | `pnpm run arch:layer:check` + `pnpm build` |
+| `app/admin/**` (pÃ gines/components) | `pnpm run validate:core` + `pnpm build` |
+| `app/api/**` (rutes API) | `pnpm run validate:core` + `pnpm test:run` |
+| `prisma/schema.prisma` | `npx prisma generate` + `pnpm run validate:core` + `pnpm test:run` + `pnpm build` |
+| `messages/*.json` (i18n) | `pnpm run validate:core` + `pnpm build` |
 | `e2e/*.spec.ts` | `npx playwright test e2e/FITXER.spec.ts --project=chromium` |
-| Qualsevol canvi gran | `pnpm run arch:layer:check && npx tsc --noEmit && pnpm test:run && pnpm build` |
+| Qualsevol canvi gran | `pnpm run validate:core && pnpm test:run && pnpm build` |
 
 ### Quan es crea un element nou
 
@@ -284,6 +292,7 @@ playwright.config.ts        â† Config Playwright amb webServer
 ```
 â–¡ pnpm run arch:layer:check â†’ sense catalegs locals sospitosos
 â–¡ npx tsc --noEmit          â†’ 0 errors
+□ pnpm run validate:core    → passada base feta
 â–¡ pnpm test:run             â†’ tots passen
 â–¡ pnpm build                â†’ build net
 â–¡ 0 valors hardcoded        â†’ dates, moneda, anys, textos, colors

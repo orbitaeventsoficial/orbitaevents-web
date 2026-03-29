@@ -20,11 +20,14 @@ vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
-vi.mock('@/lib/constants', () => ({
-  PLACEHOLDER_EMAIL_DOMAIN: '@leads.orbitaevents.local',
-  formatCurrency: (n: number) => `${n} €`,
-  formatDateFull: (d: Date) => d.toISOString().split('T')[0],
-}));
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    formatCurrency: (n: number) => `${n} €`,
+    formatDateFull: (d: Date) => d.toISOString().split('T')[0],
+  };
+});
 
 import { sendPaymentReminders } from '@/lib/services/paymentReminderService';
 

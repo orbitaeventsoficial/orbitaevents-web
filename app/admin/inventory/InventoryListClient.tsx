@@ -11,6 +11,7 @@ interface BundleApiItem {
 }
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AdminPage } from '../components/AdminPage';
@@ -56,14 +57,20 @@ type ViewMode = 'list' | 'grid';
 
 export default function InventoryListClient() {
   const toast = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams?.get('search') || '';
+  const initialCategory = searchParams?.get('category') || null;
+  const initialStatus = searchParams?.get('status') || null;
+  const healthFilter = searchParams?.get('health') || '';
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [search, setSearch] = useState(initialSearch);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [filterCategory, setFilterCategory] = useState<string | null>(initialCategory);
+  const [filterStatus, setFilterStatus] = useState<string | null>(initialStatus);
   const [bundles, setBundles] = useState<InventoryBundle[]>([]);
   const [selectedBundleId, setSelectedBundleId] = useState('');
   const [bundleItemSearch, setBundleItemSearch] = useState('');
@@ -147,11 +154,6 @@ export default function InventoryListClient() {
     localStorage.setItem('inventory-view', mode);
   }, []);
 
-  const totalValue = useMemo(() =>
-    items.reduce((sum, item) => sum + item.value, 0),
-    [items]
-  );
-
   const lowStockItems = useMemo(() =>
     items.filter((i) =>
       i.isConsumable &&
@@ -160,6 +162,43 @@ export default function InventoryListClient() {
       i.stockQuantity <= i.minStock
     ),
     [items]
+  );
+
+  const displayedItems = useMemo(() => {
+    return items.filter((item) => {
+      switch (healthFilter) {
+        case 'blocked':
+          return item.status === 'BROKEN' || item.status === 'MAINTENANCE';
+        case 'low-stock':
+          return item.isConsumable && item.stockQuantity != null && item.minStock != null && item.stockQuantity <= item.minStock;
+        case 'missing-cost':
+          return item.purchasePrice == null || item.expectedLifeHours == null;
+        case 'zero-value':
+          return item.value === 0;
+        default:
+          return true;
+      }
+    });
+  }, [healthFilter, items]);
+
+  const activeHealthLabel = useMemo(() => {
+    switch (healthFilter) {
+      case 'blocked':
+        return 'Mostrant només equip avariat o en manteniment';
+      case 'low-stock':
+        return 'Mostrant només consumibles o ítems amb stock al mínim';
+      case 'missing-cost':
+        return 'Mostrant només equips sense dades completes de cost o vida útil';
+      case 'zero-value':
+        return 'Mostrant només equips valorats a 0';
+      default:
+        return null;
+    }
+  }, [healthFilter]);
+
+  const totalValue = useMemo(() =>
+    displayedItems.reduce((sum, item) => sum + item.value, 0),
+    [displayedItems]
   );
 
   const categories = INVENTORY_CATEGORY_OPTIONS.map((option) => option.value);
@@ -294,7 +333,7 @@ export default function InventoryListClient() {
   return (
     <AdminPage
       title="Inventari"
-      subtitle={`${items.length} elements · ${formatNumber(totalValue)}€ valor total`}
+      subtitle={`${displayedItems.length} elements · ${formatNumber(totalValue)}€ valor total`}
       actions={
         <div className="flex gap-2">
           <div className="flex rounded-xl border p-0 overflow-hidden">
@@ -335,18 +374,18 @@ export default function InventoryListClient() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Elements</p>
-          <p className="mt-2 text-3xl font-bold">{items.length}</p>
+          <p className="mt-2 text-3xl font-bold">{displayedItems.length}</p>
         </div>
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Disponibles</p>
           <p className="mt-2 text-3xl font-bold">
-            {items.filter((i) => i.status === 'AVAILABLE').length}
+            {displayedItems.filter((i) => i.status === 'AVAILABLE').length}
           </p>
         </div>
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">En ús</p>
           <p className="mt-2 text-3xl font-bold">
-            {items.filter((i) => i.status === 'IN_USE').length}
+            {displayedItems.filter((i) => i.status === 'IN_USE').length}
           </p>
         </div>
         <div className="rounded-2xl border admin-card-glass p-4">
@@ -450,6 +489,20 @@ export default function InventoryListClient() {
         </div>
       )}
 
+
+      {activeHealthLabel && (
+        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 admin-card-glass">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200/80">Focus de salut</p>
+              <p className="mt-1 text-sm text-white/80">{activeHealthLabel}</p>
+            </div>
+            <Link href="/admin/inventory" className="ap-btn ap-btn--secondary text-sm">
+              Veure tot l’inventari
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Cerca + Filtres */}
       <div className="space-y-3">
         <input
@@ -499,7 +552,7 @@ export default function InventoryListClient() {
 
           <button
             type="button"
-            onClick={() => { setSearch(''); setFilterCategory(null); setFilterStatus(null); }}
+            onClick={() => { setSearch(''); setSearchQuery(''); setFilterCategory(null); setFilterStatus(null); router.replace('/admin/inventory'); }}
             className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors"
           >
             Netejar filtres
@@ -510,7 +563,7 @@ export default function InventoryListClient() {
       {/* Vista Graella */}
       {viewMode === 'grid' ? (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((item) => {
+          {displayedItems.map((item) => {
             const catConf = getInventoryCategoryDisplay(item.category);
             const statusConf = getInventoryStatusDisplay(item.status);
             const lifePercent = calculateLifeRemainingPercent(
@@ -581,7 +634,7 @@ export default function InventoryListClient() {
         <>
         {/* Vista Llista — Targetes mòbil */}
         <section className="lg:hidden space-y-3">
-          {items.map((item) => {
+          {displayedItems.map((item) => {
             const catConf = getInventoryCategoryDisplay(item.category);
             const statusConf = getInventoryStatusDisplay(item.status);
             const condLabel = getInventoryConditionLabel(item.condition);
@@ -666,7 +719,7 @@ export default function InventoryListClient() {
                 </tr>
               </thead>
               <tbody className="divide-y admin-tone-border-subtle">
-                {items.map((item) => {
+                {displayedItems.map((item) => {
                   const catConf = getInventoryCategoryDisplay(item.category);
                   const statusConf = getInventoryStatusDisplay(item.status);
 
@@ -738,14 +791,14 @@ export default function InventoryListClient() {
         </>
       )}
 
-      {items.length === 0 && (
+      {displayedItems.length === 0 && (
         <div className="rounded-2xl border admin-card-glass p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4">No hi ha elements que coincideixin amb els filtres</p>
-          {(search || filterCategory || filterStatus) && (
+          {(search || filterCategory || filterStatus || healthFilter) && (
             <button
               type="button"
-              onClick={() => { setSearch(''); setFilterCategory(null); setFilterStatus(null); }}
+              onClick={() => { setSearch(''); setSearchQuery(''); setFilterCategory(null); setFilterStatus(null); router.replace('/admin/inventory'); }}
               className="mt-2 text-sm hover:underline"
             >
               Netejar filtres
@@ -756,3 +809,12 @@ export default function InventoryListClient() {
     </AdminPage>
   );
 }
+
+
+
+
+
+
+
+
+

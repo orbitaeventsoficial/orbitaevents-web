@@ -15,6 +15,7 @@ vi.mock('@/app/config/site-config', () => ({
 vi.mock('@/lib/utils/sanitize', () => ({ escapeHtml: (s: string) => s }));
 vi.mock('@/lib/constants', () => ({
   getEventLabel: (t: string) => t === 'WEDDING' ? 'Boda' : t,
+  getSourceDisplay: (s: string) => ({ label: s === 'WEBSITE' ? 'Web' : s, icon: '📩' }),
   SOURCE_LABELS: { WEBSITE: 'Web', CONFIGURATOR: 'Configurador' },
   formatDateSimple: () => '15/09/2026',
   formatDate: () => '15 set. 2026',

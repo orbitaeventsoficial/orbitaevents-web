@@ -102,7 +102,11 @@ export default async function AdminDashboard() {
             <Link href="/admin/inbox" className="admin-cr-quick-link">📥 Inbox (IMAP)</Link>
             <Link href="/admin/emails" className="admin-cr-quick-link">🤖 Correus automàtics</Link>
             <Link href="/admin/bookings" className="admin-cr-quick-link">📋 Reserves</Link>
-            <Link href="/admin/economia" className="admin-cr-quick-link">💶 Economia</Link>`r`n            <Link href="/admin/salut" className="admin-cr-quick-link">🩺 Salut</Link>`r`n            <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
+            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link">💸 Cobraments vençuts</Link>
+            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link">⏳ Vencen aviat</Link>
+            <Link href="/admin/economia" className="admin-cr-quick-link">💶 Economia</Link>
+            <Link href="/admin/salut" className="admin-cr-quick-link">🩺 Salut</Link>
+            <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
           </div>
         </div>
       </div>
@@ -443,7 +447,12 @@ export default async function AdminDashboard() {
               );
             })}
           </div>
-          <div className="mt-4 flex items-center justify-between gap-3">`r`n            <p className="admin-cr-footnote">`r`n              Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}`r`n            </p>`r`n            <Link href="/admin/salut" className="admin-cr-link-inline">Obrir Salut</Link>`r`n          </div>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="admin-cr-footnote">
+              Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
+            </p>
+            <Link href="/admin/salut" className="admin-cr-link-inline">Obrir Salut</Link>
+          </div>
         </div>
         <div className="admin-cr-info-card">
           <p className="admin-cr-kicker">Tasques pendents</p>
@@ -667,6 +676,7 @@ export default async function AdminDashboard() {
     </div>
   );
 }
+
 
 
 

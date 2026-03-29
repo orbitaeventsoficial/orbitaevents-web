@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     setting: { findMany: vi.fn() },
-    inventoryItem: { count: vi.fn() },
+    inventoryItem: { count: vi.fn(), findMany: vi.fn() },
     extra: { count: vi.fn(), findMany: vi.fn() },
     lead: { count: vi.fn() },
-    booking: { count: vi.fn() },
+    booking: { count: vi.fn(), findMany: vi.fn() },
     task: { count: vi.fn() },
     customer: { count: vi.fn() },
     pack: { findMany: vi.fn() },
@@ -39,6 +39,10 @@ function queueInventoryCounts(...values: number[]) {
   values.forEach((value) => mockPrisma.inventoryItem.count.mockResolvedValueOnce(value));
 }
 
+function queueExtraCounts(...values: number[]) {
+  values.forEach((value) => mockPrisma.extra.count.mockResolvedValueOnce(value));
+}
+
 function queueBookingCounts(...values: number[]) {
   values.forEach((value) => mockPrisma.booking.count.mockResolvedValueOnce(value));
 }
@@ -52,10 +56,12 @@ describe('adminHealthService', () => {
       { key: 'automation.commercial.lastRun', value: new Date().toISOString() },
     ]);
     queueInventoryCounts(0, 0, 0);
-    mockPrisma.extra.count.mockResolvedValue(0);
+    mockPrisma.inventoryItem.findMany.mockResolvedValue([]);
+    queueExtraCounts(0, 0);
     mockPrisma.extra.findMany.mockResolvedValue([]);
     mockPrisma.lead.count.mockResolvedValue(0);
     queueBookingCounts(0, 0);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
     mockPrisma.task.count.mockResolvedValue(0);
     mockPrisma.customer.count.mockResolvedValue(0);
     mockPrisma.pack.findMany.mockResolvedValue([]);
@@ -125,6 +131,8 @@ describe('adminHealthService', () => {
   });
 
   it('marca incidències crítiques i avisos quan detecta problemes reals', async () => {
+    const now = new Date();
+
     mockPrisma.setting.findMany.mockResolvedValue([
       { key: 'emails.cron.lastRun', value: '2026-01-01T00:00:00.000Z' },
       { key: 'automation.commercial.lastRun', value: '2026-01-01T00:00:00.000Z' },
@@ -133,7 +141,11 @@ describe('adminHealthService', () => {
     ]);
     mockPrisma.inventoryItem.count.mockReset();
     queueInventoryCounts(3, 4, 2);
-    mockPrisma.extra.count.mockResolvedValue(2);
+    mockPrisma.inventoryItem.findMany.mockResolvedValue([
+      { id: 'inv-1', stockQuantity: 1, minStock: 2 },
+    ]);
+    mockPrisma.extra.count.mockReset();
+    queueExtraCounts(2, 1);
     mockPrisma.extra.findMany.mockResolvedValue([
       { id: 'extra-1', slug: 'fum', price: 40, costPerUnit: 32 },
       { id: 'extra-2', slug: 'confeti', price: 0, costPerUnit: 10 },
@@ -141,6 +153,26 @@ describe('adminHealthService', () => {
     mockPrisma.lead.count.mockResolvedValue(5);
     mockPrisma.booking.count.mockReset();
     queueBookingCounts(6, 1);
+    mockPrisma.booking.findMany.mockResolvedValue([
+      {
+        id: 'booking-overdue-deposit',
+        eventDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000),
+        depositPaid: false,
+        remainingPaid: false,
+      },
+      {
+        id: 'booking-overdue-remaining',
+        eventDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        depositPaid: true,
+        remainingPaid: false,
+      },
+      {
+        id: 'booking-due-soon',
+        eventDate: new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000),
+        depositPaid: false,
+        remainingPaid: false,
+      },
+    ]);
     mockPrisma.task.count.mockResolvedValue(7);
     mockPrisma.customer.count.mockResolvedValue(3);
     vi.mocked(isImapConfigured).mockReturnValue(false);
@@ -184,7 +216,8 @@ describe('adminHealthService', () => {
         price: 100,
         extraHourPrice: 30,
         djHours: 5,
-        maxGuests: 100,
+        minGuests: 20,
+        maxGuests: null,
         soundWatts: 2000,
         inventory: [
           {
@@ -203,6 +236,7 @@ describe('adminHealthService', () => {
         price: 80,
         extraHourPrice: 20,
         djHours: 6,
+        minGuests: 80,
         maxGuests: 180,
         soundWatts: 8000,
         inventory: [],
@@ -216,9 +250,11 @@ describe('adminHealthService', () => {
     expect(snapshot.summary.critical).toBeGreaterThan(0);
     expect(snapshot.summary.warning).toBeGreaterThan(0);
     expect(snapshot.sections.find((section) => section.scope === 'system')?.counts.critical).toBeGreaterThan(0);
-    expect(catalogSection?.items.some((item) => item.title.includes('Inventari'))).toBe(true);
-    expect(catalogSection?.items.some((item) => item.title.includes('Extres'))).toBe(true);
-    expect(catalogSection?.items.some((item) => item.title.includes('Packs'))).toBe(true);
+    expect(catalogSection?.items.some((item) => item.title.includes('stock crític'))).toBe(true);
+    expect(catalogSection?.items.some((item) => item.title.includes('Extres venuts a preu 0'))).toBe(true);
+    expect(catalogSection?.items.some((item) => item.title.includes('rang clar de convidats'))).toBe(true);
+    expect(operationsSection?.items.some((item) => item.title.includes('Cobraments de reserves vençuts'))).toBe(true);
+    expect(operationsSection?.items.some((item) => item.title.includes('Cobraments a punt de vèncer'))).toBe(true);
     expect(operationsSection?.items.some((item) => item.href === '/admin/leads')).toBe(true);
   });
 });

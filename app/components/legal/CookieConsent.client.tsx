@@ -1,12 +1,23 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X, Settings } from 'lucide-react';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 const COOKIE_CONSENT_KEY = 'orbita_cookie_consent';
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return mobile;
+}
 
 export default function CookieConsent() {
   const t = useTranslations('footer.cookieConsent');
@@ -175,8 +186,104 @@ export default function CookieConsent() {
     notifyConsentUpdate();
   };
 
+  const isMobile = useIsMobile();
+
   if (!showBanner) return null;
 
+  // ── Mòbil: banner compacte que no tapa el contingut ──
+  if (isMobile) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          className="fixed bottom-0 left-0 right-0 z-50"
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+        >
+          <div className="bg-neutral-950/95 backdrop-blur-xl border-t border-oe-gold/20 px-4 py-3 safe-area-bottom">
+            <AnimatePresence mode="wait">
+              {!showSettings ? (
+                <motion.div
+                  key="compact"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-3"
+                >
+                  <Cookie className="h-4 w-4 text-oe-gold flex-shrink-0" />
+                  <p className="text-xs text-white/70 flex-1 line-clamp-1">
+                    {t('description')}{' '}
+                    <Link href="/legal/cookies" className="text-oe-gold">
+                      {t('moreInfo')}
+                    </Link>
+                  </p>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={acceptAll}
+                      className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold whitespace-nowrap"
+                    >
+                      {t('acceptAll')}
+                    </button>
+                    <button
+                      onClick={() => setShowSettings(true)}
+                      className="p-1.5 text-white/50 hover:text-white transition-colors"
+                      aria-label={t('customize')}
+                    >
+                      <Settings className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="expanded"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <div className="space-y-3 pb-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-xs font-medium">{t('necessary.title')}</span>
+                      <div className="w-10 h-5 rounded-full bg-oe-gold flex items-center px-0.5">
+                        <div className="w-3.5 h-3.5 rounded-full bg-black ml-auto" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-xs font-medium">{t('analytics.title')}</span>
+                      <button
+                        onClick={() => setPreferences((p) => ({ ...p, analytics: !p.analytics }))}
+                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.analytics ? 'bg-oe-gold' : 'bg-gray-600'}`}
+                      >
+                        <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences.analytics ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-xs font-medium">{t('marketing.title')}</span>
+                      <button
+                        onClick={() => setPreferences((p) => ({ ...p, marketing: !p.marketing }))}
+                        className={`w-10 h-5 rounded-full flex items-center px-0.5 transition-colors ${preferences.marketing ? 'bg-oe-gold' : 'bg-gray-600'}`}
+                      >
+                        <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences.marketing ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={savePreferences} className="flex-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold">
+                        {t('save')}
+                      </button>
+                      <button onClick={acceptNecessary} className="flex-1 px-3 py-1.5 border border-white/20 rounded-full text-white text-xs font-medium">
+                        {t('onlyNecessary')}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  // ── Desktop: banner original ──
   return (
     <AnimatePresence>
       <motion.div

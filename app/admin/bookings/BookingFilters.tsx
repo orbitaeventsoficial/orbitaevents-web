@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { BOOKING_STATUS_OPTIONS, EVENT_TYPE_OPTIONS } from '@/lib/constants';
+import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
 
 export default function BookingFilters() {
   const router = useRouter();
@@ -11,13 +12,13 @@ export default function BookingFilters() {
   const [search, setSearch] = useState(searchParams?.get('search') || '');
   const status = searchParams?.get('status') || '';
   const eventType = searchParams?.get('eventType') || '';
+  const payment = searchParams?.get('payment') || '';
   const fromDate = searchParams?.get('fromDate') || '';
   const toDate = searchParams?.get('toDate') || '';
 
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
       const params = new URLSearchParams(searchParams?.toString() || '');
-      // Reset page when filters change
       params.delete('page');
       for (const [key, value] of Object.entries(updates)) {
         if (value) {
@@ -31,7 +32,6 @@ export default function BookingFilters() {
     [router, searchParams],
   );
 
-  // Debounce search
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const current = searchParams?.get('search') || '';
@@ -42,11 +42,10 @@ export default function BookingFilters() {
     return () => window.clearTimeout(timeout);
   }, [search, searchParams, updateParams]);
 
-  const hasFilters = status || eventType || fromDate || toDate || search;
+  const hasFilters = status || eventType || payment || fromDate || toDate || search;
 
   return (
     <div className="space-y-3">
-      {/* Search */}
       <div className="relative">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
@@ -70,7 +69,6 @@ export default function BookingFilters() {
         />
       </div>
 
-      {/* Filter chips */}
       <div className="flex flex-wrap gap-2">
         <select
           value={status}
@@ -95,6 +93,19 @@ export default function BookingFilters() {
           <option value="">Tots els tipus</option>
           {EVENT_TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={payment}
+          onChange={(e) => updateParams({ payment: e.target.value })}
+          aria-label="Filtrar per cobrament"
+          className="rounded-xl border px-3 py-1.5 text-xs font-medium bg-transparent"
+        >
+          {ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id === 'all' ? '' : opt.id}>
               {opt.label}
             </option>
           ))}
@@ -135,4 +146,3 @@ export default function BookingFilters() {
     </div>
   );
 }
-

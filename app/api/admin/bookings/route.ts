@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
       fromDate: searchParams.get('fromDate'),
       toDate: searchParams.get('toDate'),
       search: searchParams.get('search'),
+      payment: searchParams.get('payment'),
       page: safeParseInt(searchParams.get('page'), 1, 1),
       limit: safeParseInt(searchParams.get('limit'), 25, 1, isPipeline ? 1000 : 200),
     }));
