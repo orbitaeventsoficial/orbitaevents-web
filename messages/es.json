@@ -7,7 +7,8 @@
   "halloweenPage": {
     "meta": {
       "title": "Halloween inmersivo Barcelona | Pasaje encantado + DJ + efectos | Òrbita Events",
-      "description": "Convertimos tu espacio en un Halloween inmersivo con decoración real, DJ temático, niebla, luz y escenas que parecen sacadas de un pasaje encantado. Desde 600€."
+      "description": "Convertimos tu espacio en un Halloween inmersivo con decoración real, DJ temático, niebla, luz y escenas que parecen sacadas de un pasaje encantado. Desde 600€.",
+      "keywords": "halloween inmersivo barcelona, pasaje encantado, decoración halloween premium, dj halloween, efectos especiales halloween, humo bajo, fiesta temática halloween"
     },
     "badge": "🎃 Temporada Halloween {year}",
     "hero": {
@@ -166,6 +167,110 @@
         "31 oct"
       ],
       "warning": "⚠️ Ya tenemos consultas para estas fechas"
+    },
+    "sections": {
+      "gallery": "Escenas reales",
+      "includes": "Cómo construimos la escena",
+      "packs": "Formatos",
+      "urgencyLabel": "Disponibilidad",
+      "faqLabel": "Preguntas frecuentes",
+      "close": "Cierre"
+    },
+    "decoration": {
+      "title": "Decoración",
+      "titleHighlight": "por todas partes",
+      "subtitle": "No es solo música. Transformamos el espacio completo.",
+      "label": "Escenografía",
+      "passatge": {
+        "title": "Pasaje encantado",
+        "description": "No traemos solo objetos. Montamos una escena: puntos de impacto, rincones oscuros, texturas, luz y volumen para que el espacio parezca habitado por la historia que cuentas."
+      },
+      "inclou": {
+        "title": "Incluye",
+        "item1": "Montaje y desmontaje",
+        "item2": "Transporte y colocación",
+        "item3": "Composición visual para que luzca también en fotos"
+      },
+      "footer": {
+        "title": "Todo incluido en el precio",
+        "subtitle": "Montaje, desmontaje, transporte y composición de la escena"
+      },
+      "items": [
+        {
+          "icon": "👻",
+          "title": "2 Fantasmas Gigantes",
+          "description": "Figuras de 2m que se mueven con el viento. Impacto visual garantizado."
+        },
+        {
+          "icon": "🕷️",
+          "title": "Jaulas con Tarántulas",
+          "description": "Jaulas decorativas con arañas y murciélagos realistas."
+        },
+        {
+          "icon": "🧹",
+          "title": "Escobas de Bruja",
+          "description": "Escobas decorativas por el espacio, perfectas para photocall."
+        },
+        {
+          "icon": "🫕",
+          "title": "Caldero Mágico",
+          "description": "Caldero con humo (hielo seco) y luz verde. El centro de la fiesta."
+        },
+        {
+          "icon": "🕯️",
+          "title": "Velas LED",
+          "description": "Decenas de velas sin llama por todo el espacio. Ambiente mágico."
+        },
+        {
+          "icon": "🪞",
+          "title": "Espejos Extraños",
+          "description": "Espejos con efectos que 'hablan' o muestran reflejos inquietantes."
+        },
+        {
+          "icon": "🕸️",
+          "title": "Telarañas + Calabazas",
+          "description": "Clásicos de Halloween: telarañas por todas partes y calabazas LED."
+        },
+        {
+          "icon": "💀",
+          "title": "Esqueletos y Calaveras",
+          "description": "Elementos decorativos repartidos estratégicamente."
+        }
+      ]
+    },
+    "faqs": {
+      "q1": {
+        "pregunta": "¿Qué incluye cada formato exactamente?",
+        "resposta": "Todos los formatos incluyen DJ temático, sonido profesional, iluminación ambiental, máquina de humo y escenografía base de Halloween. Los formatos superiores añaden humo bajo, escenografía completa, cabezas móviles sincronizadas y efectos como CO2 criogénico."
+      },
+      "q2": {
+        "pregunta": "¿Cuánto tiempo tardáis en montar todo?",
+        "resposta": "Llegamos 3-4 horas antes del evento para montar la decoración, calibrar el sonido y la iluminación, y preparar los efectos. Todo queda listo antes de que lleguen los primeros invitados."
+      },
+      "q3": {
+        "pregunta": "¿Se puede personalizar la temática?",
+        "resposta": "Sí. Trabajamos sobre una base de Halloween pero adaptamos la escenografía a tu espacio y tu idea: desde pasaje encantado clásico hasta terror cinematográfico, brujería elegante o zombies."
+      },
+      "q4": {
+        "pregunta": "¿En qué espacios trabajáis?",
+        "resposta": "Masías, restaurantes, naves, jardines, salas de fiestas, locales privados… Adaptamos la escenografía a cualquier espacio en Barcelona y Girona. Visitamos el espacio antes si es necesario."
+      },
+      "q5": {
+        "pregunta": "¿La niebla y el humo son seguros?",
+        "resposta": "Totalmente. Usamos líquidos homologados para espectáculos y máquinas profesionales. La niebla baja (hielo seco) es inofensiva. Llevamos extintores y medidas de seguridad reglamentarias."
+      },
+      "q6": {
+        "pregunta": "¿Se pueden añadir actores de terror?",
+        "resposta": "Sí, en el formato Ritual Final ofrecemos opción de actor o animación de terror. También podemos coordinar con compañías de terror especializadas si necesitas más de un actor."
+      }
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "subtitle": "Resolvemos las dudas más habituales sobre Halloween inmersivo"
+    },
+    "schema": {
+      "name": "Halloween Inmersivo — Òrbita Events",
+      "description": "Servicio de ambientación Halloween inmersiva con decoración real, DJ temático, niebla, humo bajo y escenografía completa en Barcelona y Girona."
     }
   },
   "loader": {
@@ -5002,6 +5107,10 @@
     }
   },
   "monMagic": {
+    "meta": {
+      "title": "Boda Mundo Mágico con Lacre Artesanal | Invitaciones Escuela de Magia | Òrbita Events",
+      "description": "Invitaciones de boda temática mágica con lacre de cera REAL. Cartas personalizadas, sobres con sello de las 5 casas mágicas. Hecho a mano en Catalunya."
+    },
     "badge": "Pergamino y Lacre Artesanal",
     "heroTitle": "La Carta Ha Llegado a Tu",
     "heroTitleHighlight": "Boda",
@@ -6752,3 +6861,5 @@
     "spamNote": "Revisa tu bandeja de spam si no ves nuestro email en las próximas horas"
   }
 }
+
+

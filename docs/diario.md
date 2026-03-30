@@ -7588,3 +7588,21 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - Conclusió: el tall mòbil queda funcional, validat i preparat per una segona mirada de polish, no per una reestructuració nova.
 - Punt honest: la passada visual final s'ha centrat en públic; l'admin s'ha validat sobretot per typecheck, test específic i build.
 
+
+## 2026-03-30 — Halloween públic: redisseny visual en curs i nova base de transició
+
+- He continuat la passada grossa de `Halloween` sobre `app/[locale]/tematica-halloween/client.tsx` i `app/components/ui/HalloweenDecorationSection.tsx` amb criteri de pàgina més escènica i menys landing genèrica.
+- El `hero` queda molt més treballat que al punt de partida: llamp + rentat blanc, contenidor principal més llegible i una primera base de desaparició/aparició cap al bloc següent.
+- També he repintat l'atmosfera global a `app/components/ui/HalloweenAtmosphere.tsx` amb més boira, vel general, menys ratpenats i moviment menys absurd que abans.
+- La secció de decoració ha rebut una passada forta de materials, densitat i ritme perquè el cos de pàgina no caigui en sec després del `hero`.
+- He fet diverses rondes de captures locals per jutjar hero, transició, decoració, packs i mòbil. Les més recents queden a `.codex-captures/halloween-2026-03-30-visual`.
+- També he intentat unificar la família de contenidors del cos de pàgina perquè deixin de semblar una col·lecció arbitrària de caixes; el criteri ha millorat però encara no el dono per tancat del tot.
+- S'ha corregit una regressió on els packs havien quedat massa negres i la targeta `MÉS DEMANAT` havia perdut jerarquia. Ara els packs tornen a tenir més contrast i lectura.
+- Validació passada durant aquesta ronda:
+  - `npx tsc --noEmit` OK
+  - comprovació local de `http://localhost:3000/tematica-halloween` amb resposta `200`
+- Punt honest important: el redisseny visual de `Halloween` encara NO està tancat. El `hero` és la part més aconseguida; el cos de pàgina està millor encaminat però encara hi ha marge real en coherència de contenidors i, sobretot, en la transició de desaparició/aparició perquè se senti completament natural.
+- Punt de represa recomanat per a la pròxima sessió:
+  - revisar en local només la transició `hero -> primer bloc`
+  - acabar de decidir el sistema únic de contenidors del cos
+  - fer una passada final curta de `packs` + `FAQ` + `CTA` per donar-los el mateix nivell de tensió visual que té ja el `hero`

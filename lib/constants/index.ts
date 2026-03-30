@@ -1573,6 +1573,30 @@ export const PUBLIC_HALLOWEEN_DECORATION_ITEMS = [
 
 export const PUBLIC_HALLOWEEN_PREVIEW_ICONS = ['👻', '🕷️', '🫕', '🕯️', '💀', '🕸️'] as const;
 
+export const PUBLIC_HALLOWEEN_PACKS = [
+  { key: 'basic', emoji: '🕯️', hours: 4, price: 600, popular: false },
+  { key: 'night', emoji: '👻', hours: 5, price: 900, popular: true },
+  { key: 'zombie', emoji: '💀', hours: 6, price: 1500, popular: false },
+] as const;
+
+export const PUBLIC_HALLOWEEN_INCLUDES_KEYS = ['dj', 'decoration', 'effects'] as const;
+
+export const PUBLIC_HALLOWEEN_FAQ_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'] as const;
+
+export const PUBLIC_HALLOWEEN_HERO_TAGS = ['tag1', 'tag2', 'tag3'] as const;
+
+export const PUBLIC_HALLOWEEN_HERO_IMAGE =
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-15.avif' as const;
+
+export const PUBLIC_HALLOWEEN_GALLERY_SELECTION = [
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-10.avif',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-16.avif',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-20.avif',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-23.avif',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-24.avif',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-29.avif',
+] as const;
+
 
 export const PUBLIC_MOBILE_STATS_CONFIGS = [
   {
@@ -2167,6 +2191,7 @@ export const PRIORITY_FILTER_STYLES: Record<string, string> = {
   MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
   BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
 };
+
 
 
 

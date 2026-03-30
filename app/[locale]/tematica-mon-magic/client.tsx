@@ -908,7 +908,7 @@ export default function ProductesMonMagic() {
         )}
       </AnimatePresence>
 
-      {/* Schema.org */}
+      {/* Schema.org — Product */}
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -925,6 +925,26 @@ export default function ProductesMonMagic() {
               "highPrice": String(Math.max(...PUBLIC_MON_MAGIC_PACKS.map(p => p.preuPack100))),
               "priceCurrency": "EUR",
             },
+          }),
+        }}
+      />
+
+      {/* Schema.org — FAQ */}
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": PUBLIC_MON_MAGIC_FAQ_KEYS.map((key) => ({
+              "@type": "Question",
+              "name": t(`faqs.${key}.pregunta`),
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": t(`faqs.${key}.resposta`),
+              },
+            })),
           }),
         }}
       />

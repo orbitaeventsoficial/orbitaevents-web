@@ -39,7 +39,7 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "fiestas-tematicas-halloween",
     "name": "Fiestas tematicas halloween",
-    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif"
+    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-15.avif"
   },
   {
     "slug": "fiestas-tematicas-mon-magic",
@@ -488,3 +488,5 @@ export const PORTFOLIO_IMAGES = {
     }
   ]
 };
+
+

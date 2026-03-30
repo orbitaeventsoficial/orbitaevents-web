@@ -7,7 +7,8 @@
   "halloweenPage": {
     "meta": {
       "title": "Halloween immersiu Barcelona | Passatge encantat + DJ + efectes | Òrbita Events",
-      "description": "Convertim el teu espai en un Halloween immersiu amb decoració real, DJ temàtic, boira, llum i escenes que semblen tretes d'un passatge encantat. Des de 600€."
+      "description": "Convertim el teu espai en un Halloween immersiu amb decoració real, DJ temàtic, boira, llum i escenes que semblen tretes d'un passatge encantat. Des de 600€.",
+      "keywords": "halloween immersiu barcelona, passatge encantat, decoració halloween premium, dj halloween, efectes especials halloween, fum baix, festa temàtica halloween"
     },
     "badge": "🎃 Temporada Halloween {year}",
     "hero": {
@@ -166,6 +167,121 @@
         "31 oct"
       ],
       "warning": "⚠️ Ja tenim consultes per aquestes dates"
+    },
+    "hero": {
+      "title1": "HALLOWEEN",
+      "title2": "IMMERSIU",
+      "subtitle": "No és una festa amb quatre detalls. És un passatge encantat amb decoració real, DJ temàtic, boira i llum per convertir l'espai en una escena de terror memorable.",
+      "kicker": "Passatge encantat · boira · llum · escena real",
+      "tags": {
+        "tag1": "Decoració real",
+        "tag2": "DJ temàtic",
+        "tag3": "Fum i llum sincronitzats"
+      }
+    },
+    "sections": {
+      "gallery": "Escenes reals",
+      "includes": "Com construïm l'escena",
+      "packs": "Formats",
+      "urgencyLabel": "Disponibilitat",
+      "faqLabel": "Preguntes freqüents",
+      "close": "Tancament"
+    },
+    "decoration": {
+      "title": "Decoració",
+      "titleHighlight": "arreu",
+      "subtitle": "No és només música. Transformem l'espai complet.",
+      "label": "Escenografia",
+      "passatge": {
+        "title": "Passatge encantat",
+        "description": "No portem només objectes. Muntem una escena: punts d'impacte, racons foscos, textures, llum i volum perquè l'espai sembli habitat per la història que expliques."
+      },
+      "inclou": {
+        "title": "Inclou",
+        "item1": "Muntatge i desmuntatge",
+        "item2": "Transport i col·locació",
+        "item3": "Composició visual perquè llueixi també a fotos"
+      },
+      "footer": {
+        "title": "Tot inclòs en el preu",
+        "subtitle": "Muntatge, desmuntatge, transport i composició de l'escena"
+      },
+      "items": [
+        {
+          "icon": "👻",
+          "title": "2 Fantasmes Gegants",
+          "description": "Figures de 2m que es mouen amb el vent. Impacte visual garantit."
+        },
+        {
+          "icon": "🕷️",
+          "title": "Gàbies amb Taràntules",
+          "description": "Gàbies decoratives amb aranyes i ratpenats realistes."
+        },
+        {
+          "icon": "🧹",
+          "title": "Escombres de Bruixa",
+          "description": "Escombres decoratives per l'espai, perfectes per a photocall."
+        },
+        {
+          "icon": "🫕",
+          "title": "Caldero Màgic",
+          "description": "Caldero amb fum (gel sec) i llum verda. El centre de la festa."
+        },
+        {
+          "icon": "🕯️",
+          "title": "Espelmes LED",
+          "description": "Desenes d'espelmes sense flama per tot l'espai. Ambient màgic."
+        },
+        {
+          "icon": "🪞",
+          "title": "Miralls Estranys",
+          "description": "Miralls amb efectes que 'parlen' o mostren reflexos inquietants."
+        },
+        {
+          "icon": "🕸️",
+          "title": "Teranyines + Carabasses",
+          "description": "Clàssics de Halloween: teranyines arreu i carabasses LED."
+        },
+        {
+          "icon": "💀",
+          "title": "Esquelets i Calaveres",
+          "description": "Elements decoratius repartits estratègicament."
+        }
+      ]
+    },
+    "faqs": {
+      "q1": {
+        "pregunta": "Què inclou cada format exactament?",
+        "resposta": "Tots els formats inclouen DJ temàtic, so professional, il·luminació ambient, màquina de fum i escenografia base de Halloween. Els formats superiors afegeixen fum baix, escenografia completa, caps mòbils sincronitzats i efectes com CO2 criogènic."
+      },
+      "q2": {
+        "pregunta": "Quant temps triguen a muntar tot?",
+        "resposta": "Arribem 3-4 hores abans de l'event per muntar la decoració, calibrar el so i la il·luminació, i preparar els efectes. Tot queda llest abans que arribin els primers convidats."
+      },
+      "q3": {
+        "pregunta": "Es pot personalitzar la temàtica?",
+        "resposta": "Sí. Treballem sobre una base de Halloween però adaptem l'escenografia al teu espai i la teva idea: des de passatge encantat clàssic fins a terror cinematogràfic, bruixeria elegant o zombies."
+      },
+      "q4": {
+        "pregunta": "A quins espais treballeu?",
+        "resposta": "Masies, restaurants, naus, jardins, sales de festes, locals privats… Adaptem l'escenografia a qualsevol espai a Barcelona i Girona. Visitem l'espai abans si és necessari."
+      },
+      "q5": {
+        "pregunta": "La boira i el fum són segurs?",
+        "resposta": "Totalment. Usem líquids homologats per a espectacles i màquines professionals. La boira baixa (gel sec) és inofensiva. Portem els extintors i mesures de seguretat reglamentàries."
+      },
+      "q6": {
+        "pregunta": "Es poden afegir actors de terror?",
+        "resposta": "Sí, al format Ritual Final oferim opció d'actor o animació de terror. També podem coordinar amb companyies de terror especialitzades si necessites més d'un actor."
+      }
+    },
+    "faq": {
+      "title": "Preguntes freqüents",
+      "subtitle": "Resolem els dubtes més habituals sobre Halloween immersiu"
+    },
+    "schema": {
+      "name": "Halloween Immersiu — Òrbita Events",
+      "description": "Servei d'ambientació Halloween immersiva amb decoració real, DJ temàtic, boira, fum baix i escenografia completa a Barcelona i Girona."
     }
   },
   "loader": {
@@ -5260,6 +5376,10 @@
     }
   },
   "monMagic": {
+    "meta": {
+      "title": "Boda Món Màgic amb Lacre Artesanal | Invitacions Escola de Màgia | Òrbita Events",
+      "description": "Invitacions de boda temàtica màgica amb lacre de cera REAL. Cartes personalitzades, sobres amb segell de les 5 cases màgiques. Fet a mà a Catalunya."
+    },
     "badge": "Pergamí i Lacre Artesanal",
     "heroTitle": "La Carta Ha Arribat al Teu",
     "heroTitleHighlight": "Casament",
@@ -7010,3 +7130,5 @@
     "spamNote": "Revisa la teva safata de correu brossa si no veus el nostre email en les pròximes hores"
   }
 }
+
+

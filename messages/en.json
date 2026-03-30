@@ -7,7 +7,8 @@
   "halloweenPage": {
     "meta": {
       "title": "Immersive Halloween Barcelona | Haunted passage + DJ + effects | Orbita Events",
-      "description": "We turn your venue into an immersive Halloween experience with real decoration, thematic DJ, fog, lighting and scenes that feel like a haunted passage. From €600."
+      "description": "We turn your venue into an immersive Halloween experience with real decoration, thematic DJ, fog, lighting and scenes that feel like a haunted passage. From €600.",
+      "keywords": "immersive halloween barcelona, haunted passage, premium halloween decoration, halloween dj, halloween special effects, low smoke, halloween themed party"
     },
     "badge": "🎃 Halloween Season {year}",
     "hero": {
@@ -166,6 +167,110 @@
         "Oct 31"
       ],
       "warning": "⚠️ We already have inquiries for these dates"
+    },
+    "sections": {
+      "gallery": "Real scenes",
+      "includes": "How we build the scene",
+      "packs": "Formats",
+      "urgencyLabel": "Availability",
+      "faqLabel": "Frequently asked questions",
+      "close": "Closing"
+    },
+    "decoration": {
+      "title": "Decoration",
+      "titleHighlight": "everywhere",
+      "subtitle": "It's not just music. We transform the entire space.",
+      "label": "Staging",
+      "passatge": {
+        "title": "Haunted passage",
+        "description": "We don't just bring objects. We build a scene: impact points, dark corners, textures, light and depth so the space feels inhabited by the story you're telling."
+      },
+      "inclou": {
+        "title": "Includes",
+        "item1": "Setup and takedown",
+        "item2": "Transport and placement",
+        "item3": "Visual composition so it looks great in photos too"
+      },
+      "footer": {
+        "title": "Everything included in the price",
+        "subtitle": "Setup, takedown, transport and scene composition"
+      },
+      "items": [
+        {
+          "icon": "👻",
+          "title": "2 Giant Ghosts",
+          "description": "2m figures that move with the wind. Guaranteed visual impact."
+        },
+        {
+          "icon": "🕷️",
+          "title": "Cages with Tarantulas",
+          "description": "Decorative cages with realistic spiders and bats."
+        },
+        {
+          "icon": "🧹",
+          "title": "Witch's Brooms",
+          "description": "Decorative brooms around the space, perfect for photocalls."
+        },
+        {
+          "icon": "🫕",
+          "title": "Magic Cauldron",
+          "description": "Cauldron with smoke (dry ice) and green light. The center of the party."
+        },
+        {
+          "icon": "🕯️",
+          "title": "LED candles",
+          "description": "Dozens of flameless candles throughout the space. Magical atmosphere."
+        },
+        {
+          "icon": "🪞",
+          "title": "Strange Mirrors",
+          "description": "Mirrors with effects that 'talk' or show disturbing reflections."
+        },
+        {
+          "icon": "🕸️",
+          "title": "Cobwebs + Pumpkins",
+          "description": "Halloween classics: cobwebs everywhere and LED pumpkins."
+        },
+        {
+          "icon": "💀",
+          "title": "Skeletons and Skulls",
+          "description": "Decorative elements strategically distributed."
+        }
+      ]
+    },
+    "faqs": {
+      "q1": {
+        "pregunta": "What does each format include exactly?",
+        "resposta": "All formats include thematic DJ, professional sound, ambient lighting, smoke machine and base Halloween staging. Higher formats add low smoke, complete staging, synchronized moving heads and effects like cryogenic CO2."
+      },
+      "q2": {
+        "pregunta": "How long does setup take?",
+        "resposta": "We arrive 3-4 hours before the event to set up decoration, calibrate sound and lighting, and prepare effects. Everything is ready before the first guests arrive."
+      },
+      "q3": {
+        "pregunta": "Can the theme be customised?",
+        "resposta": "Yes. We work on a Halloween base but adapt the staging to your space and your idea: from classic haunted passage to cinematic horror, elegant witchcraft or zombies."
+      },
+      "q4": {
+        "pregunta": "What venues do you cover?",
+        "resposta": "Country houses, restaurants, warehouses, gardens, party halls, private venues… We adapt the staging to any space in Barcelona and Girona. We visit the venue beforehand if needed."
+      },
+      "q5": {
+        "pregunta": "Are the fog and smoke safe?",
+        "resposta": "Absolutely. We use certified liquids for shows and professional machines. Low fog (dry ice) is harmless. We carry fire extinguishers and all required safety measures."
+      },
+      "q6": {
+        "pregunta": "Can horror actors be added?",
+        "resposta": "Yes, the Final Ritual format includes the option for a horror actor or live animation. We can also coordinate with specialised horror companies if you need more than one actor."
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "subtitle": "We answer the most common questions about immersive Halloween"
+    },
+    "schema": {
+      "name": "Immersive Halloween — Orbita Events",
+      "description": "Immersive Halloween atmosphere service with real decoration, thematic DJ, fog, low smoke and full staging in Barcelona and Girona."
     }
   },
   "loader": {
@@ -5002,6 +5107,10 @@
     }
   },
   "monMagic": {
+    "meta": {
+      "title": "Magic World Wedding with Handmade Wax Seal | Magic School Invitations | Orbita Events",
+      "description": "Magic-themed wedding invitations with REAL wax seal. Personalised letters, envelopes sealed with the 5 magical houses. Handmade in Catalonia."
+    },
     "badge": "Parchment & Handmade Wax Seal",
     "heroTitle": "The Letter Has Arrived at Your",
     "heroTitleHighlight": "Wedding",
@@ -6752,3 +6861,5 @@
     "spamNote": "Check your spam folder if you don't see our email in the next few hours"
   }
 }
+
+
