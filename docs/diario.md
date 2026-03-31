@@ -7900,3 +7900,19 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - es deixa sense canvis de codi per no sobrecuinar una peça que ja aguanta bé
 - captures de referència a `.codex-captures/about-responsive-audit-2026-03-31`
 - validació mantinguda amb `npx tsc --noEmit`
+## 2026-03-31 — Configurador: pas de navegació responsive tancat
+
+### Configurador (`app/[locale]/configurador/client.tsx`):
+- `ProgressStepsNav` deixa de truncar agressivament els labels a `tablet/desktop`
+- el pas de navegació guanya amplada útil, connectors més equilibrats i labels multilínia en lloc de text tallat
+- `mobile` es manté compacte i sense afegir soroll nou al primer fold
+- captures noves de control a `.codex-captures/configurador-responsive-audit-2026-03-31-v2`
+- validació passada amb `npx tsc --noEmit`
+## 2026-03-31 — FAQ: passada responsive de tancament
+
+### FAQ (`app/[locale]/faq/client.tsx`):
+- hero una mica més compacte a mobile sense perdre pes visual
+- barra de categories més neta: rail mòbil compacte i comportament més obert a `tablet/desktop`
+- CTA de WhatsApp a tota amplada a mobile i amplada natural a `sm+`
+- captures noves de control a `.codex-captures/faq-responsive-audit-2026-03-31-v2`
+- validació passada amb `npx tsc --noEmit`

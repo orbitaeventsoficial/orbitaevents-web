@@ -3,7 +3,7 @@
 // app/configurador/client.tsx
 import { OFFERS, getAllPacks, type ExtraDefinition, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
 import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import {
   Check,
@@ -62,9 +62,10 @@ function Step4SuccessCard({
 
   return (
     <motion.div
-      className="p-8 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-600/5 border-2 border-green-500/50 text-center"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+      className="p-8 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-600/5 border-2 border-green-500/50 text-center shadow-[0_0_40px_rgba(34,197,94,0.1)]"
+      initial={{ opacity: 0, scale: 0.85, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
     >
       <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
         <CheckCircle className="w-12 h-12 text-green-400" />
@@ -208,8 +209,10 @@ function Step4LeadForm({
       <button
         type="submit"
         disabled={sending || !turnstileToken}
-        className="w-full btn-primary sm:text-xl text-lg sm:py-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="group relative overflow-hidden w-full btn-primary sm:text-xl text-lg sm:py-6 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)] transition-shadow duration-300"
       >
+        {/* Shine sweep */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] animate-[shimmer_2s_ease-in-out_infinite] pointer-events-none" />
         {sending ? (
           <>
             <div className="w-6 h-6 border-4 border-black/30 border-t-black rounded-full animate-spin" />
@@ -376,35 +379,35 @@ interface ProgressStepsNavProps {
 
 function ProgressStepsNav({ currentStep, labels }: ProgressStepsNavProps) {
   return (
-    <nav aria-label={labels[0]} className="mb-8 flex justify-center">
-      <div className="flex items-center gap-2 sm:gap-4">
+    <nav aria-label={labels[0]} className="mb-8 flex justify-center overflow-x-auto px-2 sm:px-0">
+      <div className="flex min-w-max items-start gap-2 sm:gap-5 lg:gap-7">
         {([
           { n: 1, label: labels[0] },
           { n: 2, label: labels[1] },
           { n: 3, label: labels[2] },
           { n: 4, label: labels[3] },
         ] as const).map(({ n: stepNumber, label }) => (
-          <div key={stepNumber} className="flex items-center gap-2 sm:gap-4">
-            <div className="flex flex-col items-center gap-1">
+          <div key={stepNumber} className="flex items-start gap-2 sm:gap-3 lg:gap-5">
+            <div className="flex w-10 flex-col items-center gap-1.5 sm:w-[6.25rem] sm:gap-2 lg:w-[8.5rem]">
               <div
                 aria-current={currentStep === stepNumber ? 'step' : undefined}
-                className={`relative w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 ${
+                className={`relative h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 sm:h-9 sm:w-9 sm:text-sm lg:h-10 lg:w-10 ${
                   currentStep >= stepNumber
-                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black shadow-[0_0_16px_rgba(245,158,11,0.3)]'
+                    ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.35)] ring-2 ring-amber-500/25'
                     : 'bg-bg-surface text-text-muted border border-border'
                 }`}
               >
-                {currentStep > stepNumber ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : stepNumber}
+                {currentStep > stepNumber ? <Check className="h-4 w-4 sm:h-5 sm:w-5" /> : stepNumber}
                 {currentStep === stepNumber && (
                   <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-lg animate-pulse" />
                 )}
               </div>
-              <span className={`hidden sm:block text-[10px] max-w-[80px] text-center truncate transition-colors ${
+              <span className={`hidden min-h-[2.4rem] text-center text-[10px] leading-tight transition-colors sm:block sm:max-w-[6.25rem] lg:min-h-[2.8rem] lg:max-w-[8.5rem] lg:text-[11px] ${
                 currentStep >= stepNumber ? 'text-oe-gold font-medium' : 'text-text-muted'
               }`}>{label}</span>
             </div>
             {stepNumber < 4 && (
-              <div className={`h-0.5 w-6 sm:w-12 transition-all duration-500 ${currentStep > stepNumber ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-border'}`} />
+              <div className={`mt-3 h-0.5 w-6 transition-all duration-700 sm:mt-4 sm:w-10 lg:w-14 ${currentStep > stepNumber ? 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]' : 'bg-border'}`} />
             )}
           </div>
         ))}
@@ -621,7 +624,7 @@ export default function ConfiguradorClient() {
         return (
       <div className="space-y-5">
         <div className="mb-5 text-center">
-          <h2 className="mb-2 text-3xl font-display font-black text-white sm:text-4xl">
+          <h2 className="mb-2 text-3xl font-display font-black sm:text-4xl bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent">
             {t('step1.title')}
           </h2>
           <p className="text-base text-text-muted sm:text-lg">{t('step1.subtitle')}</p>
@@ -640,9 +643,10 @@ export default function ConfiguradorClient() {
                   setStep(2);
                   track('Configurador_Step1_EventType', { type: service.slug });
                 }}
-                className="group relative overflow-hidden rounded-2xl border-2 border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6 text-left transition-all duration-300 hover:border-oe-gold/60 hover:shadow-[0_8px_32px_rgba(245,158,11,0.15)] md:hover:scale-[1.03]"
+                className="group relative overflow-hidden rounded-2xl border-2 border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6 text-left transition-all duration-500 hover:border-oe-gold/70 hover:shadow-[0_12px_48px_rgba(245,158,11,0.2),0_0_80px_rgba(245,158,11,0.06)] md:hover:scale-[1.05] hover:-translate-y-1"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-oe-gold/0 to-oe-gold/0 group-hover:from-oe-gold/5 group-hover:to-transparent transition-all duration-500 rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-oe-gold/0 to-oe-gold/0 group-hover:from-oe-gold/[0.07] group-hover:to-transparent transition-all duration-700 rounded-2xl" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-[linear-gradient(115deg,transparent_30%,rgba(245,158,11,0.06)_45%,rgba(245,158,11,0.14)_50%,rgba(245,158,11,0.06)_55%,transparent_70%)] pointer-events-none" />
                 <div className="relative">
                   <div className="mb-3 text-4xl transition-transform duration-300 group-hover:scale-110">{service.icon}</div>
                   <h3 className="mb-2 text-[1.9rem] font-bold text-white transition-colors group-hover:text-oe-gold">
@@ -681,25 +685,31 @@ export default function ConfiguradorClient() {
             <ArrowLeft className="w-4 h-4" />
             {t('step2.changeEvent')}
           </button>
-          <h2 className="text-4xl font-display font-black text-white mb-4">{serviceName}</h2>
+          <h2 className="text-4xl font-display font-black mb-4 bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent">{serviceName}</h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {packs.map((pack) => {
+          {packs.map((pack, packIndex) => {
             const safeFeatures = pack.features || [];
             return (
-            <div
+            <motion.div
               key={pack.id}
-              className={`relative group p-8 rounded-2xl border-2 transition-all duration-300 transform hover:scale-[1.02] flex flex-col ${
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: packIndex * 0.12, ease: [0.4, 0, 0.2, 1] }}
+              className={`relative group p-8 rounded-2xl border-2 transition-all duration-500 transform hover:scale-[1.03] hover:-translate-y-2 flex flex-col ${
                 selectedPackId === pack.id
-                  ? 'border-oe-gold bg-gradient-to-b from-oe-gold/10 to-transparent shadow-[0_8px_32px_rgba(245,158,11,0.2)]'
+                  ? 'border-oe-gold bg-gradient-to-b from-oe-gold/10 to-transparent shadow-[0_16px_48px_rgba(245,158,11,0.2)]'
                   : pack.popular
                   ? 'border-amber-500/40 bg-gradient-to-b from-amber-500/[0.07] to-transparent ring-1 ring-amber-500/20 md:scale-[1.03]'
-                  : 'border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent hover:border-white/20'
+                  : 'border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent hover:border-white/20 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)]'
               } ${pack.highlight ? 'ring-2 ring-oe-gold/30' : ''}`}
             >
+              {/* Shine sweep on hover */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-[linear-gradient(115deg,transparent_30%,rgba(245,158,11,0.06)_45%,rgba(245,158,11,0.12)_50%,rgba(245,158,11,0.06)_55%,transparent_70%)] pointer-events-none" />
+
               {pack.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-amber-500 text-black text-xs font-bold whitespace-nowrap shadow-lg shadow-amber-500/25">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-amber-500 text-black text-xs font-bold whitespace-nowrap shadow-lg shadow-amber-500/25 animate-[pulse_3s_ease-in-out_infinite]">
                   ⭐ {t('step2.mostSold')}
                 </div>
               )}
@@ -741,9 +751,9 @@ export default function ConfiguradorClient() {
                   setStep(3);
                   track('Configurador_Step2_PackSelected', { pack: pack.id, price: pack.priceValue });
                 }}
-                className={`w-full py-3.5 rounded-xl font-bold transition-all mt-auto ${
+                className={`relative overflow-hidden w-full py-3.5 rounded-xl font-bold transition-all mt-auto ${
                   pack.popular
-                    ? 'bg-amber-500 text-black hover:bg-amber-400'
+                    ? 'bg-amber-500 text-black hover:bg-amber-400 hover:shadow-[0_8px_24px_rgba(245,158,11,0.3)]'
                     : selectedPackId === pack.id
                     ? 'bg-oe-gold text-black'
                     : 'bg-white/10 text-white hover:bg-white/15'
@@ -751,7 +761,7 @@ export default function ConfiguradorClient() {
               >
                 {selectedPackId === pack.id ? t('step2.selected') : t('step2.select')} →
               </button>
-            </div>
+            </motion.div>
           )})}
         </div>
       </div>
@@ -771,12 +781,12 @@ export default function ConfiguradorClient() {
             <ArrowLeft className="w-4 h-4" />
             {t('step3.changePack')}
           </button>
-          <h2 className="text-4xl font-display font-black text-white mb-4">{t('step3.title')}</h2>
+          <h2 className="text-4xl font-display font-black mb-4 bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent">{t('step3.title')}</h2>
         </div>
 
         {/* Data i assistents */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10">
+          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 transition-all duration-300 hover:border-white/20 hover:shadow-lg">
             <label
               htmlFor="event-date"
               className="block text-white font-bold mb-3 flex items-center gap-2"
@@ -814,7 +824,7 @@ export default function ConfiguradorClient() {
             )}
           </div>
 
-          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10">
+          <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 transition-all duration-300 hover:border-white/20 hover:shadow-lg">
             <label
               htmlFor="guests"
               className="block text-white font-bold mb-3 flex items-center gap-2"
@@ -983,7 +993,7 @@ export default function ConfiguradorClient() {
             )}
             <div className="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
               <span className="text-xl font-bold text-white">{t('step3.total')}</span>
-              <span className="text-4xl font-black text-oe-gold">{pricing.total}€</span>
+              <span className="text-5xl font-black text-oe-gold drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]">{pricing.total}€</span>
             </div>
           </div>
 
@@ -992,7 +1002,7 @@ export default function ConfiguradorClient() {
               setStep(4);
               track('Configurador_Step3_Continue', { total: pricing.total });
             }}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg hover:scale-[1.02] transition-transform shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg hover:scale-[1.03] transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-[0_8px_32px_rgba(251,191,36,0.35)] flex items-center justify-center gap-2"
           >
             {t('step3.continue')}
             <ChevronRight className="w-5 h-5" />
@@ -1049,7 +1059,7 @@ export default function ConfiguradorClient() {
     return (
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-display font-black text-white mb-4">
+          <h2 className="text-4xl font-display font-black mb-4 bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent">
             {t('step4.title')}
           </h2>
           <p className="text-xl text-text-muted">
@@ -1061,7 +1071,7 @@ export default function ConfiguradorClient() {
         <div className="p-6 rounded-xl bg-gradient-to-br from-oe-gold/10 to-oe-gold/5 border border-oe-gold/30">
           <div className="text-center">
             <p className="text-sm text-text-muted mb-2">{t('step4.finalPrice')}</p>
-            <p className="text-5xl font-black text-oe-gold mb-2">{finalPrice}€</p>
+            <p className="text-6xl font-black text-oe-gold mb-2 drop-shadow-[0_0_24px_rgba(245,158,11,0.35)]">{finalPrice}€</p>
             {earlyBirdDiscount > 0 && (
               <p className="text-green-400 text-sm font-medium flex items-center justify-center gap-1">
                 <TrendingDown className="w-4 h-4" />
@@ -1073,7 +1083,7 @@ export default function ConfiguradorClient() {
         </div>
 
         {/* Garantia */}
-        <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/30">
+        <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/30 transition-all duration-300 hover:border-green-500/50 hover:shadow-[0_0_24px_rgba(34,197,94,0.08)]">
           <div className="flex items-start gap-4">
             <Zap className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
             <div>
@@ -1119,8 +1129,8 @@ export default function ConfiguradorClient() {
           />
         )}
 
-        {/* Social proof - usando datos reales del config */}
-        <div className="text-center pt-6 border-t border-border">
+        {/* Social proof */}
+        <div className="text-center pt-6 px-4 py-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
           <p className="text-sm text-text-muted">
             ⭐⭐⭐⭐⭐ <strong className="text-white">{t('step4.satisfactionGuaranteed')}</strong> • {t('step4.responseTime')}
           </p>
@@ -1134,20 +1144,42 @@ export default function ConfiguradorClient() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-bg-main pb-16 pt-4 sm:pb-20 sm:pt-6">
-      {/* Ambient background glow — changes per event type */}
+      {/* NOTE: No particles — project aesthetic is premium-minimal, not atmospheric */}
+
+      {/* Ambient background glow — animated multi-orb system */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <motion.div
+          className="absolute w-[800px] h-[600px] rounded-full blur-[150px] -top-[20%] left-1/2 -translate-x-1/2"
+          animate={{
+            backgroundColor: ambient ? ambient.glow : 'rgba(245,158,11,0.04)',
+            scale: [1, 1.08, 1],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute w-[500px] h-[500px] rounded-full blur-[120px] bottom-[5%] -left-[10%]"
+          animate={{
+            backgroundColor: ambient ? ambient.glow : 'rgba(245,158,11,0.03)',
+            scale: [1, 1.15, 1],
+          }}
+          transition={{ duration: 14, repeat: Infinity, delay: 4, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute w-[400px] h-[400px] rounded-full blur-[100px] top-[40%] -right-[8%]"
+          animate={{
+            backgroundColor: ambient ? ambient.glow : 'rgba(245,158,11,0.03)',
+            scale: [1.1, 1, 1.1],
+          }}
+          transition={{ duration: 12, repeat: Infinity, delay: 2, ease: 'easeInOut' }}
+        />
+      </div>
       {ambient && (
-        <>
-          <div
-            className="fixed inset-0 pointer-events-none transition-all duration-1000 opacity-100"
-            style={{ background: `radial-gradient(ellipse at 50% 0%, ${ambient.glow}, transparent 60%)` }}
-          />
-          <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 bg-gradient-to-b ${ambient.gradient}`} />
-        </>
+        <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 bg-gradient-to-b ${ambient.gradient}`} />
       )}
 
       {/* Sticky price bar — visible from step 2 onwards */}
       {showStickyPrice && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-black/90 backdrop-blur-2xl">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-oe-gold/20 bg-black/90 backdrop-blur-2xl shadow-[0_-8px_30px_rgba(245,158,11,0.06)]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-white font-semibold text-sm hidden sm:inline">
@@ -1181,17 +1213,27 @@ export default function ConfiguradorClient() {
         </div>
       )}
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ProgressStepsNav
           currentStep={step}
           labels={[t('step1.title'), 'Pack', t('step3.title'), t('step4.lastStep')]}
         />
 
-        {/* Steps Content */}
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
+        {/* Steps Content — smooth transitions */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -16, filter: 'blur(4px)' }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+            {step === 4 && renderStep4()}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Bottom spacing for sticky bar */}
@@ -1199,6 +1241,7 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
+
 
 
 
