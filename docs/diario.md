@@ -7916,3 +7916,102 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - CTA de WhatsApp a tota amplada a mobile i amplada natural a `sm+`
 - captures noves de control a `.codex-captures/faq-responsive-audit-2026-03-31-v2`
 - validació passada amb `npx tsc --noEmit`
+## 2026-03-31 — Home + chrome públic: passada final de control
+
+### Home / chrome compartit:
+- ronda nova de captures útils per `home` en `desktop`, `tablet` i `mobile`, amb talls de primer fold, tram mig i tram baix
+- `header`, `hero`, seccions centrals i `footer` mantenen llenguatge coherent i no presenten cap trencament prou fort per justificar repintat en aquesta passada
+- es deixa sense canvis de codi per no tocar una base comuna que ara mateix aguanta bé
+- captures de referència a `.codex-captures/home-chrome-audit-2026-03-31` i `.codex-captures/home-slices-2026-03-31`
+## 2026-03-31 — Handoff operatiu per continuar amb Claude
+
+### Tancat en aquesta ronda
+- `configurador`: `ProgressStepsNav` corregit i validat visualment a `mobile/tablet/desktop`
+- `faq`: rail de categories i CTA de WhatsApp polits i validats a `mobile/tablet/desktop`
+- `home + chrome compartit`: passada final de control sense defecte prou fort per tocar base comuna
+- commits ja pujats en aquesta fase:
+  - `6b4ce812` — `Tighten mobile public chrome and portfolio heroes`
+  - `21b78175` — `Polish configurador steps and FAQ mobile layout`
+
+### Queda obert de frontend públic
+- continuar auditoria final pàgina a pàgina amb criteri `mobile -> tablet -> desktop`
+- prioritat recomanada de continuació:
+  1. `packs` — comprovació visual final i microretoc només si hi ha desencaix de primer fold, tabs o CTA
+  2. `servicios` — comprovació final de graella i hero, sobretot chrome compartit + ritme vertical
+  3. `portfolio index` — control visual final; de moment no s'ha detectat defecte prou fort per repintar-lo, però convé una última lectura en viu amb criteri de conversió
+  4. `portfolio categoria` i `portfolio event` — només si hi ha dades públiques navegables per validar event detail de debò
+  5. resta de públiques ja revisades (`contacte`, `opinions`, `about`) només si es detecta regressió nova
+
+### Criteri obligatori perquè Claude continuï bé
+- no tocar `HeroPortalLogo`
+- no repintar peces que ja aguanten només per gust
+- quan una secció es tanqui, deixar-la escrita al diari i no tornar-la a obrir sense motiu real
+- si hi ha canvi gran: `npx tsc --noEmit`, captura real, després `commit` i `push`
+- `mobile` continua sent la referència alta
+## 2026-03-31 — Packs: passada responsive final de control
+
+### Packs (`app/[locale]/packs/PacksClient.tsx`):
+- ronda nova de captures passada a `mobile`, `tablet` i `desktop`
+- hero, tabs, graella de packs i CTA finals mantenen coherència visual i no presenten un defecte prou fort per justificar nou retoc en aquesta passada
+- es deixa sense canvis de codi per no sobrecuinar una pàgina de conversió que ara mateix aguanta bé
+- captures de referència a `.codex-captures/packs-responsive-audit-2026-03-31`
+## 2026-03-31 — Servicios: passada responsive final de control
+
+### Servicios (`app/[locale]/servicios/client.tsx`):
+- ronda nova de captures útils passada a `mobile`, `tablet` i `desktop`, incloent talls de primer fold i tram de cards
+- hero, graella de serveis i CTA final mantenen coherència visual i no presenten cap defecte prou fort per justificar retoc nou en aquesta passada
+- es deixa sense canvis de codi per no repintar una peça que ara mateix aguanta bé
+- captures de referència a `.codex-captures/servicios-responsive-audit-2026-03-31-v2` i `.codex-captures/servicios-slices-2026-03-31`
+## 2026-03-31 — Portfolio index: passada visual final de control
+
+### Portfolio index (`app/[locale]/portfolio/page.tsx`):
+- comprovació nova amb captures per viewport i talls reals de primer fold, tram mig i footer
+- la lectura a `mobile`, `tablet` i `desktop` és bona; no hi ha un defecte prou fort per justificar repintat nou en aquesta passada
+- es deixa sense canvis de codi per no tocar una peça que ara mateix ja aguanta bé
+- captures de referència a `.codex-captures/portfolio-index-responsive-audit-2026-03-31` i `.codex-captures/portfolio-index-slices-2026-03-31`
+## 2026-03-31 — Portfolio categoria: bug funcional detectat en auditoria
+
+### Portfolio categoria (`app/[locale]/portfolio/[slug]/page.tsx`):
+- durant la passada visual final he comprovat que la categoria pública `http://localhost:3000/ca/portfolio/bodas` està caient a `404`
+- això no és un problema de copy ni de layout: és un defecte funcional real de la ruta pública
+- el catàleg estàtic continua existint a `app/config/portfolio-images.ts` amb `slug: "bodas"` i imatges estàtiques disponibles, així que el `404` no sembla venir d'absència de dades bàsiques del catàleg
+- punt de diagnòstic mínim localitzat: el `notFound()` de `app/[locale]/portfolio/[slug]/page.tsx` és l'únic tall explícit del component, i el problema s'ha de revisar abans de donar el portfolio intern per tancat
+- captures de referència a `.codex-captures/portfolio-category-audit-2026-03-31` i `.codex-captures/portfolio-category-audit-2026-03-31-v2`
+## 2026-03-31 — Portfolio categoria: correcció del fals positiu de 404
+
+### Portfolio categoria (`app/[locale]/portfolio/[slug]/page.tsx`):
+- la caiguda a `404` detectada durant l'auditoria no s'ha confirmat com a bug estructural del codi
+- després de reiniciar el `dev server`, `http://localhost:3000/ca/portfolio/bodas` i altres categories públiques tornen `200`
+- conclusió honesta: el problema venia d'un estat brut del servidor local, no d'una absència real de la ruta dinàmica
+- captures bones regenerades a `.codex-captures/portfolio-category-audit-2026-03-31-v3`
+- el `portfolio` de categoria continua pendent només de lectura visual final, no de reparació funcional de routing
+## 2026-03-31 — Portfolio categoria: passada visual final de control
+
+### Portfolio categoria (`app/[locale]/portfolio/[slug]/page.tsx`):
+- ronda bona de captures passada a `mobile`, `tablet` i `desktop` després de reiniciar el `dev server`
+- el `404` vist abans queda descartat com a bug estructural; era un estat brut del servidor local
+- hero, galeria i footer mantenen coherència visual i no presenten un defecte prou fort per justificar retoc nou en aquesta passada
+- es deixa sense canvis de codi per no repintar una peça que ara mateix ja aguanta bé
+- captures de referència a `.codex-captures/portfolio-category-audit-2026-03-31-v3` i `.codex-captures/portfolio-category-slices-2026-03-31`
+## 2026-04-01 — Tancament de l auditoria final del front públic
+
+### Estat final del front públic:
+- passada final de revisió feta sobre codi i captures reals de les pàgines públiques clau
+- sweep públic final passat a `desktop` i `mobile` sense errors de runtime a les rutes principals auditades
+- `about` era l últim punt tècnic real obert: les imatges de l equip responien `400` via `/_next/image`
+- això queda resolt amb fallback net i sense trencar la lectura visual de la secció
+- validació final passada amb `npx tsc --noEmit`
+- captures finals de referència a `.codex-captures/public-sweep-2026-04-01` i `.codex-captures/about-responsive-audit-2026-04-01`
+- criteri honest de tancament: el front públic queda prou revisat, coherent i madur per donar aquesta fase per acabada
+## 2026-04-01 — About: imatges d equip i sweep final públic
+
+### About (`app/[locale]/about/page.tsx`, `app/components/about/TeamMembersGrid.tsx`):
+- detectat i corregit l últim error tècnic real del front públic: les fotos de l equip estaven intentant carregar-se des de `/img/team/*` i responien `400` via `/_next/image`
+- la pàgina ara comprova si el fitxer existeix abans de passar-lo al component i, si no existeix, mostra un fallback net amb inicial en lloc de deixar requests trencades
+- revalidació passada sobre `/ca/about` sense cap `400`
+- captura final de control a `.codex-captures/about-responsive-audit-2026-04-01`
+
+### Sweep final públic:
+- passada final curta a `desktop` i `mobile` sobre les rutes públiques principals
+- sense errors de runtime al sweep final; l últim soroll real era `about` i ja queda resolt
+- resum de sweep a `.codex-captures/public-sweep-2026-04-01/summary.json`
