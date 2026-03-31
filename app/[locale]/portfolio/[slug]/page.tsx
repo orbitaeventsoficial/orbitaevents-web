@@ -1,10 +1,9 @@
-// app/portfolio/[slug]/page.tsx
 import type { Metadata } from 'next';
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
-import { SimpleGallery } from "@/app/components/GalleryPro";
-import Breadcrumbs from "@/components/seo/Breadcrumbs";
+import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
+import { SimpleGallery } from '@/app/components/GalleryPro';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { getSiteUrl } from '@/lib/site';
 import { listPortfolioPhotos } from '@/lib/services/galleryService';
 import { listPortfolioMedia } from '@/lib/services/portfolioMediaService';
@@ -13,7 +12,36 @@ import type { GalleryItem } from '@/app/components/GalleryPro';
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 
+function isVideoAsset(src: string): boolean {
+  const normalized = src.split('?')[0]?.toLowerCase() || '';
+  return ['.mp4', '.webm', '.mov', '.m4v'].some((ext) => normalized.endsWith(ext));
+}
 
+function resolveHeroMedia(items: GalleryItem[], fallback: { src: string; alt: string }) {
+  if (!items.length) {
+    return {
+      heroIndex: -1,
+      media: {
+        src: fallback.src,
+        alt: fallback.alt,
+        type: 'image' as const,
+      },
+    };
+  }
+
+  const heroIndex = items.findIndex((item) => item.type === 'video' || isVideoAsset(item.src));
+  const finalIndex = heroIndex >= 0 ? heroIndex : 0;
+  const media = items[finalIndex];
+
+  return {
+    heroIndex: finalIndex,
+    media: {
+      src: media.src,
+      alt: media.alt,
+      type: media.type === 'video' || isVideoAsset(media.src) ? 'video' as const : 'image' as const,
+    },
+  };
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
   const { slug, locale } = await params;
@@ -66,35 +94,42 @@ type PageProps = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
+type EventWithCount = {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  coverImage: string;
+  venue: string | null;
+  eventDate: Date | null;
+  _count: { media: number };
+};
+
 export default async function PortfolioSlugPage({ params }: PageProps) {
   const { slug, locale } = await params;
   const t = await getTranslations({ locale, namespace: 'common' });
   const tPortfolio = await getTranslations({ locale, namespace: 'pages.portfolio' });
 
-  const staticImages =
-    (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ??
-    [];
+  const staticImages = (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ?? [];
   const category = PORTFOLIO_CATEGORIES.find((c) => c.slug === slug);
 
-  // Fotos de bookings marcades com a portfolio
   let bookingImages: GalleryItem[] = [];
   try {
     const { photos } = await listPortfolioPhotos({ slug, limit: 100 });
     bookingImages = photos.map((p) => ({
       src: p.photoUrl,
-      alt: p.caption || `${category?.name || slug} – foto event`,
+      alt: p.caption || `${category?.name || slug} - foto event`,
     }));
   } catch {
     // Si falla (BD no disponible), continuar amb les estàtiques
   }
 
-  // Media directe del portfolio (pujades des d'admin)
   let directMedia: GalleryItem[] = [];
   try {
     const items = await listPortfolioMedia(slug);
     directMedia = items.map((m) => ({
       src: m.mediaUrl,
-      alt: m.caption || `${category?.name || slug} – ${m.mediaType}`,
+      alt: m.caption || `${category?.name || slug} - ${m.mediaType}`,
       type: m.mediaType as 'image' | 'video',
     }));
   } catch {
@@ -103,8 +138,6 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
 
   const images: GalleryItem[] = [...staticImages, ...bookingImages, ...directMedia];
 
-  // Events concrets d'aquesta categoria
-  type EventWithCount = { id: string; slug: string; title: string; subtitle: string | null; coverImage: string; venue: string | null; eventDate: Date | null; _count: { media: number } };
   let events: EventWithCount[] = [];
   try {
     const result = await listPortfolioEvents({ categorySlug: slug, published: true, limit: 20 });
@@ -117,7 +150,6 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     notFound();
   }
 
-  // Obtenir el nom traduït de la categoria
   let title: string;
   try {
     title = tPortfolio(`categories.${slug}`);
@@ -125,16 +157,19 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     title = category?.name ?? slug;
   }
 
-  // Hero image = first image for cinematic intro
-  const heroImage = images[0];
-  const galleryImages = images.slice(1);
+  const fallbackHero = {
+    src: events[0]?.coverImage || '/img/portfolio/bodas/bodas-01.avif',
+    alt: events[0]?.title || title,
+  };
+  const { heroIndex, media: heroMedia } = resolveHeroMedia(images, fallbackHero);
+  const galleryImages = images.filter((_, index) => index !== heroIndex);
 
   const base = getSiteUrl();
   const imageGalleryJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ImageGallery',
     name: title,
-    description: `${title} — Òrbita Events Portfolio`,
+    description: `${title} - Òrbita Events Portfolio`,
     url: `${base}/${locale}/portfolio/${slug}`,
     numberOfItems: images.length,
     image: images.slice(0, 20).map((img) => ({
@@ -144,7 +179,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     })),
     isPartOf: {
       '@type': 'WebPage',
-      name: 'Portfolio — Òrbita Events',
+      name: 'Portfolio - Òrbita Events',
       url: `${base}/${locale}/portfolio`,
     },
   };
@@ -157,31 +192,69 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
       />
       <Breadcrumbs
         items={[
-          { name: t('nav.home'), url: "/" },
-          { name: t('nav.portfolio'), url: "/portfolio" },
-          { name: title, url: `/portfolio/${slug}` }
+          { name: t('nav.home'), url: '/' },
+          { name: t('nav.portfolio'), url: '/portfolio' },
+          { name: title, url: `/portfolio/${slug}` },
         ]}
       />
 
-      {/* Cinematic hero */}
-      <section className="relative h-[60vh] md:h-[75vh] overflow-hidden">
-        <Image
-          src={heroImage.src}
-          alt={heroImage.alt}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-          unoptimized={heroImage.src.startsWith('data:') || heroImage.src.includes('/api/uploads/')}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/40 to-black/20" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
-          <div className="mx-auto max-w-7xl">
-            <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-3">Portfolio</p>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight">
+      <section className="relative h-[34svh] min-h-[280px] sm:h-[44svh] md:h-[54vh] lg:h-[70vh] overflow-hidden border-b border-white/10">
+        {heroMedia.type === 'video' ? (
+          <video
+            src={heroMedia.src}
+            className="absolute inset-0 h-full w-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <Image
+            src={heroMedia.src}
+            alt={heroMedia.alt}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+            unoptimized={heroMedia.src.startsWith('data:') || heroMedia.src.includes('/api/uploads/')}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/48 to-black/20" />
+        <div className="absolute inset-0 oe-vignette pointer-events-none" />
+        <div className="absolute inset-0 oe-film-grain pointer-events-none" />
+
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:hidden">
+          <div className="inline-flex max-w-[92vw] flex-col rounded-[22px] border border-white/10 bg-black/38 px-4 py-3 backdrop-blur-md shadow-[0_18px_48px_rgba(0,0,0,0.34)]">
+            <p className="text-amber-400 text-[10px] font-semibold tracking-[0.28em] uppercase mb-2">Portfolio</p>
+            <h1 className="text-[clamp(1.8rem,8vw,2.65rem)] font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
               {title}
             </h1>
-            <p className="mt-4 text-white/50 text-lg">
+            <div className="mt-2 inline-flex rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/72">
+              {images.length} {images.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 hidden p-6 sm:block lg:hidden">
+          <div className="max-w-2xl rounded-[28px] border border-white/10 bg-black/30 p-6 backdrop-blur-md shadow-[0_24px_72px_rgba(0,0,0,0.34)]">
+            <p className="text-amber-400 text-xs font-semibold tracking-[0.28em] uppercase mb-3">Portfolio</p>
+            <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
+              {title}
+            </h1>
+            <p className="mt-3 inline-flex rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/68 backdrop-blur-sm">
+              {images.length} {images.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
+            </p>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 hidden p-16 lg:block">
+          <div className="mx-auto max-w-7xl">
+            <p className="text-amber-400 text-sm font-semibold tracking-[0.28em] uppercase mb-3">Portfolio</p>
+            <h1 className="text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
+              {title}
+            </h1>
+            <p className="mt-3 inline-flex rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/68 backdrop-blur-sm">
               {images.length} {images.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
             </p>
           </div>
@@ -189,7 +262,6 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
       </section>
 
       <main className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20 space-y-16 relative">
-        {/* Events destacats */}
         {events.length > 0 && (
           <section>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
@@ -200,7 +272,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
                 <Link
                   key={ev.id}
                   href={`/portfolio/${slug}/${ev.slug}`}
-                  className="group relative overflow-hidden rounded-2xl h-[360px]"
+                  className="group relative overflow-hidden rounded-2xl h-[360px] transition-shadow duration-500 hover:shadow-[0_16px_64px_rgba(0,0,0,0.4),0_0_30px_rgba(245,158,11,0.06)]"
                 >
                   <Image
                     src={ev.coverImage}
@@ -240,7 +312,6 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Gallery mosaic */}
         {galleryImages.length > 0 && (
           <section>
             {events.length > 0 && (

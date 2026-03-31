@@ -91,7 +91,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
   return (
     <>
       {/* HERO */}
-      <section className="relative flex min-h-[54vh] items-center overflow-hidden sm:min-h-[60vh]">
+      <section className="relative flex min-h-[50svh] items-center overflow-hidden sm:min-h-[60vh]">
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
           <Image
@@ -105,7 +105,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
           />
         </div>
 
-        <div className="relative z-20 mx-auto max-w-5xl px-4 py-14 text-center sm:py-20">
+        <div className="relative z-20 mx-auto max-w-5xl px-4 py-12 text-center sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -274,3 +274,4 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
     </>
   );
 }
+

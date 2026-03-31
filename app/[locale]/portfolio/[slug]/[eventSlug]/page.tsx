@@ -1,4 +1,3 @@
-// app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -14,6 +13,37 @@ import { Link } from '@/lib/navigation';
 type PageProps = {
   params: Promise<{ slug: string; eventSlug: string; locale: string }>;
 };
+
+function isVideoAsset(src: string): boolean {
+  const normalized = src.split('?')[0]?.toLowerCase() || '';
+  return ['.mp4', '.webm', '.mov', '.m4v'].some((ext) => normalized.endsWith(ext));
+}
+
+function resolveEventHeroMedia(event: Awaited<ReturnType<typeof getPortfolioEvent>>) {
+  const featuredVideo = event?.media.find((media) => media.mediaType === 'video' || isVideoAsset(media.mediaUrl));
+  if (featuredVideo) {
+    return {
+      src: featuredVideo.mediaUrl,
+      alt: featuredVideo.caption || event?.title || 'Portfolio event video',
+      type: 'video' as const,
+    };
+  }
+
+  const firstMedia = event?.media[0];
+  if (firstMedia) {
+    return {
+      src: firstMedia.mediaUrl,
+      alt: firstMedia.caption || event?.title || 'Portfolio event media',
+      type: firstMedia.mediaType === 'video' || isVideoAsset(firstMedia.mediaUrl) ? 'video' as const : 'image' as const,
+    };
+  }
+
+  return {
+    src: event?.coverImage || '',
+    alt: event?.title || 'Portfolio event image',
+    type: 'image' as const,
+  };
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, eventSlug, locale } = await params;
@@ -31,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${event.title} | ${categoryName} | Òrbita Events`,
-    description: event.description || `${event.title} — ${event.subtitle || categoryName}`,
+    description: event.description || `${event.title} - ${event.subtitle || categoryName}`,
     metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: `/portfolio/${slug}/${eventSlug}` },
     openGraph: {
@@ -71,6 +101,7 @@ export default async function PortfolioEventPage({ params }: PageProps) {
     alt: m.caption || event.title,
     type: m.mediaType as 'image' | 'video',
   }));
+  const heroMedia = resolveEventHeroMedia(event);
 
   const dateFormatted = event.eventDate
     ? new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(new Date(event.eventDate))
@@ -87,43 +118,110 @@ export default async function PortfolioEventPage({ params }: PageProps) {
         ]}
       />
 
-      {/* Cinematic hero */}
-      <section className="relative h-[65vh] md:h-[80vh] overflow-hidden">
-        <Image
-          src={event.coverImage}
-          alt={event.title}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-          unoptimized={event.coverImage.startsWith('data:') || event.coverImage.includes('/api/uploads/')}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/50 to-black/20" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
-          <div className="mx-auto max-w-7xl">
+      <section className="relative h-[38svh] min-h-[300px] sm:h-[50svh] md:h-[58vh] lg:h-[74vh] overflow-hidden border-b border-white/10">
+        {heroMedia.type === 'video' ? (
+          <video
+            src={heroMedia.src}
+            poster={event.coverImage}
+            className="absolute inset-0 h-full w-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <Image
+            src={heroMedia.src}
+            alt={heroMedia.alt}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+            unoptimized={heroMedia.src.startsWith('data:') || heroMedia.src.includes('/api/uploads/')}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-black/65 to-black/24" />
+        <div className="absolute inset-0 oe-vignette pointer-events-none" />
+        <div className="absolute inset-0 oe-film-grain pointer-events-none" />
+
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:hidden">
+          <div className="rounded-[24px] border border-white/10 bg-black/38 p-4 backdrop-blur-md shadow-[0_18px_48px_rgba(0,0,0,0.34)]">
             <Link
               href={`/portfolio/${slug}`}
-              className="inline-flex items-center gap-1.5 text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 hover:text-amber-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-amber-400 text-[10px] font-semibold tracking-[0.26em] uppercase mb-2 hover:text-amber-300 transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               {categoryName}
             </Link>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight">
+            <h1 className="max-w-[14ch] text-[clamp(1.9rem,8vw,2.85rem)] font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
               {event.title}
             </h1>
             {event.subtitle && (
-              <p className="mt-4 text-white/60 text-xl md:text-2xl font-light">
+              <p className="mt-2 max-w-[28ch] text-sm font-light leading-snug text-white/72">
                 {event.subtitle}
               </p>
             )}
+            <div className="mt-3 inline-flex rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/72">
+              {galleryItems.length} {galleryItems.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 hidden p-6 sm:block lg:hidden">
+          <div className="max-w-2xl rounded-[28px] border border-white/10 bg-black/30 p-6 backdrop-blur-md shadow-[0_24px_72px_rgba(0,0,0,0.34)]">
+            <Link
+              href={`/portfolio/${slug}`}
+              className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-semibold tracking-[0.28em] uppercase mb-3 hover:text-amber-300 transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              {categoryName}
+            </Link>
+            <h1 className="max-w-3xl text-5xl font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
+              {event.title}
+            </h1>
+            {event.subtitle && (
+              <p className="mt-3 max-w-2xl text-lg font-light text-white/72">
+                {event.subtitle}
+              </p>
+            )}
+            <div className="mt-4 inline-flex rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/68 backdrop-blur-sm">
+              {galleryItems.length} {galleryItems.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 hidden p-16 lg:block">
+          <div className="mx-auto max-w-7xl">
+            <Link
+              href={`/portfolio/${slug}`}
+              className="inline-flex items-center gap-1.5 text-amber-400 text-sm font-semibold tracking-[0.28em] uppercase mb-4 hover:text-amber-300 transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              {categoryName}
+            </Link>
+            <h1 className="max-w-4xl text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.6)]">
+              {event.title}
+            </h1>
+            {event.subtitle && (
+              <p className="mt-4 max-w-2xl text-2xl font-light text-white/72">
+                {event.subtitle}
+              </p>
+            )}
+            <div className="mt-4 inline-flex rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/68 backdrop-blur-sm">
+              {galleryItems.length} {galleryItems.length === 1 ? tPortfolio('eventDetail.photo') : tPortfolio('eventDetail.photosVideos')}
+            </div>
           </div>
         </div>
       </section>
 
       <main className="mx-auto max-w-7xl px-4 md:px-6">
-        {/* Event details strip */}
         <section className="py-10 md:py-14 border-b border-white/10">
           <div className="flex flex-wrap gap-8 md:gap-16">
             {event.venue && (
@@ -166,14 +264,12 @@ export default async function PortfolioEventPage({ params }: PageProps) {
           )}
         </section>
 
-        {/* Gallery */}
         {galleryItems.length > 0 && (
           <section className="py-12 md:py-20 relative">
             <SimpleGallery images={galleryItems} />
           </section>
         )}
 
-        {/* CTA */}
         <section className="py-12 md:py-16 text-center border-t border-white/10 relative">
           <p className="text-white/40 text-sm uppercase tracking-widest mb-3">
             {tPortfolio('eventDetail.wantSimilar')}
@@ -181,7 +277,7 @@ export default async function PortfolioEventPage({ params }: PageProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/packs"
-              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-transform"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)]"
             >
               {tPortfolio('eventDetail.seePacks')}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

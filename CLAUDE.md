@@ -1,4 +1,4 @@
-﻿# Ã’rbita Events â€” Instruccions per a Claude Code
+# Ã’rbita Events â€” Instruccions per a Claude Code
 
 ## Comportament general
 
@@ -30,6 +30,7 @@
 - **Fer el canvi correcte A LA PRIMERA.** No fer-desfet-refer. Si no estÃ s segur, pregunta ABANS de tocar.
 - **MAI desfer un canvi i tornar-lo a fer 3 vegades.** Si t'equivoques, reverteix net i pregunta.
 - **Verificar amb captures de pantalla** (Playwright) cada canvi visual ABANS de dir que estÃ  fet.
+- **Si hi ha intro o overlay, el contingut real ha de continuar renderitzat darrere** per evitar first fold negre o buit a mobile.
 
 ### Procediment correcte quan cal netejar o refactoritzar visuals sense canviar el look
 - **Objectiu primer**: mantenir el look actual. Si la pantalla ja es veu bÃ©, la neteja NO Ã©s una excusa per repintar-la.
@@ -695,6 +696,7 @@ Abans de proposar crear, auditar o **modificar** qualsevol d'aixÃ², **consulta
 - Exemples de code smell que no s'han de reintroduir: Object.keys(...) per generar opcions compartides, maps locals de labels d'estat, Set([...]) locals per regles de domini, arrays derivats locals per event types/categories/status values.
 
 - Cas concret a no reintroduir: si una mateixa font, status o tipus necessita label + icona + fallback, no s'han de separar en maps locals per pantalla. S'ha de definir un helper/display compartit a lib/constants/* i consumir-lo des dels components.
+
 
 
 

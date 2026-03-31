@@ -1,3 +1,184 @@
+## 2026-03-31 — Upgrade visual About + Header + Footer + PortfolioShowcase + Blog detail
+
+### About (`app/[locale]/about/page.tsx`):
+- Hero: text-8xl, gradient ambre (from-amber-300 via-amber-400 to-orange-400), vignette, ambient glow
+- Stats cards: hover shadow + border glow ambre + icon scale
+- History card: hover shadow + border
+- Services cards: hover -translate-y-1 + shadow 40px + icon scale
+- Guarantees cards: hover -translate-y-1 + shadow + icon glow (20px ambre)
+- Tots els h2: md:text-4xl tracking-tight
+- CTA final: scale + glow ambre
+- TeamMembersGrid: hover -translate-y-1 + shadow + avatar glow ambre
+
+### PortfolioShowcase (`app/components/marketing/PortfolioShowcase.tsx`):
+- StoryCard: blur crossfade entre fotos (blur 4px al sortir)
+- StoryCard: hover shadow glow ambre (60px)
+- Dots: w-5 + glow actiu, w-1.5 inactiu
+- Títol secció: lg:text-6xl tracking-tight
+- Botó "View all": hover shadow
+
+### Portfolio index:
+- Vignette + grid-pattern al fons
+- Featured cards: gradient overlay ambre al hover
+- Badge "★ Featured" als 2 primers
+
+### Portfolio detail [slug]:
+- Hero: oe-vignette + oe-film-grain
+
+### Blog PostCard:
+- Gradient hover ambre sobre featured image
+- Category badge: hover bg-white/10
+- Fletxa "Llegir més": translate-x al hover
+
+### Blog detail [slug]:
+- Hero: vignette, opacity 25%
+- Títol: lg:text-6xl tracking-tight
+- CTA: scale + glow ambre
+
+### Header:
+- Dropdown shadow intensificat
+- Dropdown items: transition-all duration-200
+
+### Footer:
+- CTA Configurador: glow ambre al hover
+- CTA WhatsApp: glow verd al hover
+
+### Validació:
+- `npx tsc --noEmit` → 0 errors
+
+---
+
+## 2026-03-31 — Upgrade visual premium-minimal global (Configurador + Portfolio + Blog + Packs + Contacte + GalleryPro)
+
+### Sessió completa — canvis aplicats per Claude Code:
+
+**Packs** (`app/[locale]/packs/PacksClient.tsx`):
+- Title: tracking-tight, gradient via-amber-300
+- Pack cards: hover translate-y -1 + shadow dramàtic (48px popular, 40px estàndard), duration-500
+- CTA botó popular: glow hover
+- Bottom CTA: scale + glow
+
+**Contacte** (`app/[locale]/contacto/client.tsx`):
+- Title: text-6xl, tracking-tight, gradient via-amber-300
+
+## 2026-03-31 — Portfolio + Blog + GalleryPro: upgrade visual premium-minimal
+
+### Portfolio canvis aplicats:
+- **Index** (`portfolio/page.tsx`): gradient title from-white→oe-gold, font-black, text-7xl, ambient glow subtil (blur-150px), spacing millorat (py-28, mb-20), featured cards amb hover shadow dramàtic + glow ambre, grid cards amb hover shadow
+- **Categoria** (`portfolio/[slug]/page.tsx`): hero title amb drop-shadow cinematogràfic, event cards amb hover shadow + glow
+- **Event** (`portfolio/[slug]/[eventSlug]/page.tsx`): hero title drop-shadow, CTA primari amb glow hover + scale
+
+### Blog canvis aplicats:
+- **Index** (`blog/page.tsx`): title text-7xl tracking-tight amb gradient via-amber-300, PostCard amb hover translate-y -1 + shadow 40px, CTA botó amb scale + glow
+
+### GalleryPro canvis aplicats:
+- **MediaCell**: hover shadow-[0_8px_32px] per profunditat
+- **Lightbox overlay**: backdrop-blur-sm + fadeIn CSS animation
+- **Lightbox contingut**: scaleIn CSS animation (scale 0.95→1)
+- **Lightbox botons** (tancar/prev/next): redissenyats com a cercles (rounded-full, bg-white/10) amb hover amber
+- **Lightbox comptador**: badge arrodonit amb backdrop-blur
+
+### globals.css:
+- Nous keyframes `fadeIn` i `scaleIn` per al lightbox
+
+### Guia Codex:
+- Creada/actualitzada `docs/guia-portfolio-blog-upgrade.md` amb tasques restants per Codex
+
+### Validació:
+- `npx tsc --noEmit` → 0 errors a tots els fitxers modificats
+
+## 2026-03-31 — Configurador: upgrade visual premium-minimal
+
+### Canvis aplicats a `app/[locale]/configurador/client.tsx`:
+- **AnimatePresence** entre passos: transicions fade + slide + blur (duració 0.4s, ease material)
+- **Ambient background**: 3 orbs animats amb `motion.div` + blur-150px que canvien de color segons l'event type seleccionat (bodas=rosa, fiestas=porpra, discomovil=cyan, empresas=blau)
+- **Step 1 cards**: hover dramàtic (glow 48px, scale 1.05, translate-y -1, shine sweep overlay amb gradient lineal)
+- **Step 2 pack cards**: staggered entry amb framer-motion (delay 0.12s per card), hover amb translate-y -2 + shadow 48px, shine sweep overlay, badge popular pulsant, botó amb glow hover
+- **Títols gradient text**: Steps 1-4 amb `bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent`
+- **Preu total**: Step 3 → text-5xl amb drop-shadow ambre, Step 4 → text-6xl amb drop-shadow 24px
+- **Sticky price bar**: border `oe-gold/20` + shadow glow ambre
+- **ProgressStepsNav**: ring-2 ring-amber-500/25 al step actual, connecting lines amb shadow glow quan completades
+- **Content container**: z-10 per estar correctament sobre els orbs ambientals
+
+### Criteri de disseny:
+- S'ha revisat tot el projecte (hero, home, servicios, packs, portfolio, opiniones, CTAFinal, GarantiaSection) per entendre l'estètica base: **premium-minimal**, NO atmosfèric
+- NO s'han afegit partícules ni efectes atmosfèrics (reservats per pàgines temàtiques com Halloween/Mon Magic)
+- Tècniques alineades amb l'estètica existent: shine sweeps, glows subtils, staggered entries, gradient text, hover elevation
+
+### Guia Codex:
+- Creada `docs/guia-configurador-upgrade.md` amb instruccions detallades per completar les millores restants (Step 3 extras, Step 4 conversió, responsive polish, micro-interaccions)
+
+### Validació:
+- `npx tsc --noEmit` → 0 errors al configurador
+- Errors preexistents al repo no relacionats (i18n, middleware)
+
+## 2026-03-30 20:35 CET
+- Halloween: refet l’ancoratge dels filaments de `HalloweenDecorationSection` perquè, en mode contenidor, neixin de cantonades interiors del marc i no flotin per coordenades lliures.
+- Halloween: refinada la geometria de `buildHalloweenBrokenFilamentGeometry` per llegir més com ramets/filaments trencats enganxats al marc.
+- Validació: `npx tsc --noEmit` OK.
+- Validació: `pnpm run arch:layer:check` OK.
+- Captures: `D:\orbitaevents\.codex-captures\halloween-2026-03-30-anchored-filaments`.
+## 2026-03-30 20:15 CET
+- Halloween: refeta la geometria compartida de teranyines a `lib/constants/halloween-atmosphere.ts` perquè els arcs, radials i filaments trenquin menys geomètrics i llegeixin més com teranyina real.
+- Halloween: eliminada la generació local de filaments de `app/components/ui/HalloweenDecorationSection.tsx`; ara les targetes reutilitzen el mateix motor compartit, amb quantitat/ubicació deterministes per seed i moviment suau.
+- Validació: `npx tsc --noEmit` OK.
+- Validació: `pnpm run arch:layer:check` OK.
+- Captures: `D:\orbitaevents\.codex-captures\halloween-2026-03-30-cobwebs-pass`.
+## 2026-03-30 — Halloween: teranyines passades a monocapa comuna
+
+- He aturat la deriva de proves visuals locals a `app/components/ui/HalloweenAtmosphere.tsx` i he refet la base de teranyines sota criteri de guia: monocapa, 0 catàlegs locals i lògica declarativa fora del component.
+- He creat `lib/constants/halloween-atmosphere.ts` com a font única per a:
+  - la geometria responsive de capa de teranyines
+  - les variants de cobertura (`quarter`, `half`, `three-quarter`, `full`)
+  - els helpers d'ancoratge, mirall, origen i desplaçament
+  - el catàleg `HALLOWEEN_HERO_LIGHTNING_EPISODES`, que també ha sortit de `client.tsx`
+- `HalloweenAtmosphere.tsx` queda reduït a wiring/render: consumeix la capa comuna i deixa de contenir el catàleg declaratiu de teranyines.
+- `app/[locale]/tematica-halloween/client.tsx` també deixa de tenir el catàleg local de llamps i passa a consumir constants comunes.
+- Validació real passada després de la refeta:
+  - `pnpm run arch:layer:check` OK
+  - `npx tsc --noEmit` OK
+- Punt honest:
+  - la capa tècnica ara sí compleix millor la guia, però la lectura visual final de les teranyines encara s'haurà d'acabar d'ajustar sobre navegador si es vol una direcció més concreta.
+
+
+## 2026-03-30 — Halloween responsive: comprovació final a mobile, tablet i pc
+
+- He aprofitat el servidor local obert per fer una passada curta específica de `Halloween` en tres mides: `mobile`, `tablet` i `desktop`.
+- Les captures d’aquesta ronda queden a `.codex-captures/halloween-2026-03-30-responsive-pass`.
+- El patró feble compartit era clar: massa aire entre el `quick info strip` i l’entrada de `Escenografia` en totes les mides, no només a desktop.
+- He ajustat `app/components/ui/HalloweenDecorationSection.tsx` per escurçar aquesta transició de manera consistent a les tres amplades.
+- Resultat honest després de regenerar captures:
+  - `mobile`: la transició ja no cau tan buida i la lectura aguanta millor sota la capçalera/bottom nav
+  - `tablet`: queda més compacta i més pròpia de landing escènica, no de blocs separats
+  - `desktop`: encara conserva respir, però ja no sembla un tall mort ni una pausa accidental
+- Validació passada després d’aquest ajust:
+  - `npx tsc --noEmit` OK
+  - captures responsive regenerades OK
+- Punt honest final d’aquesta ronda:
+  - no considero que `Halloween` hagi quedat mil·limètricament perfecte a cada viewport, però sí prou cosit i coherent entre `mobile`, `tablet` i `pc` per sortir de fase de represa i entrar en fase de tancament real
+
+
+## 2026-03-30 — Halloween: cos de pàgina més cosit i validació visual local
+
+- He continuat la passada de `Halloween` a `app/[locale]/tematica-halloween/client.tsx` amb un objectiu concret: que el cos de pàgina deixi de sentir-se com una suma de blocs similars però independents.
+- He unificat millor el sistema de superfícies fosques/liles del cos (`quick info`, `urgency`, `FAQ`, testimoni i `final CTA`) perquè comparteixin més llenguatge i menys variants arbitràries.
+- També he suavitzat la transició `hero -> primer bloc` rebaixant una mica el desplaçament/blur d’entrada i donant més continuïtat al primer contenidor flotant.
+- A `app/components/ui/HalloweenAtmosphere.tsx` he rebaixat una mica la densitat visual (menys ratpenats, menys partícules i vel més discret) perquè el cos respirï millor i no competeixi tant amb el `hero`.
+- Després d’això he fet una ronda visual local real amb `next dev` a `http://localhost:3000/ca/tematica-halloween` i captures a `.codex-captures/halloween-2026-03-30-followup`.
+- Conclusió visual honesta d’aquesta ronda:
+  - el `hero` continua sent el tram més fort
+  - la transició cap a `decoració` ja és més natural que abans
+  - el cos queda més coherent i menys caòtic en materials i contenidors
+  - encara hi ha força aire entre blocs en alguns punts, però ja no se sent com un buit trencat
+- Ajust final d’aquesta mateixa ronda: he escurçat una mica l’entrada de `HalloweenDecorationSection` perquè el salt des del `quick info strip` cap a `Escenografia` no tingui tant de tram mort.
+- Validació passada en aquesta ronda:
+  - `npx tsc --noEmit` OK
+  - comprovació local `http://localhost:3000/ca/tematica-halloween` OK (`200`)
+  - captures locals desktop + mòbil a `.codex-captures/halloween-2026-03-30-followup`
+- Punt honest:
+  - les captures estan parcialment contaminades pel banner de cookies, així que la lectura fina del tram baix no és perfecta
+  - no dono encara `Halloween` per blindat a nivell visual absolut, però sí prou encaminat i coherent per sortir del punt feble on era
+
 ## 2026-03-29 — Halloween reorientat a experiència immersiva
 
 - He reorientat `app/[locale]/tematica-halloween/page.tsx` perquè la pàgina deixi de sonar com una "nit de terror" genèrica i es presenti com una experiència més pròpia: `Halloween immersiu`, `passatge encantat`, escena real, boira, llum i decoració premium.
@@ -7606,3 +7787,116 @@ px tsc --noEmit i pnpm run arch:layer:check.
   - revisar en local només la transició `hero -> primer bloc`
   - acabar de decidir el sistema únic de contenidors del cos
   - fer una passada final curta de `packs` + `FAQ` + `CTA` per donar-los el mateix nivell de tensió visual que té ja el `hero`
+
+## 2026-03-30 — Halloween tablet: hero i chrome públic recuperats
+
+- He corregit `app/[locale]/tematica-halloween/page.tsx` perquè la pàgina no depengui de `ssr: false`; ara el `hero` i el cos poden renderitzar d'entrada també en dispositius més lents.
+- També he ajustat `app/components/layout/LayoutWrapper.tsx` perquè `Header` i `Footer` no quedin diferits només al client, i perquè la bottom nav pública no aparegui a amplada tablet.
+- A `app/[locale]/tematica-halloween/client.tsx` he alineat els `HalloweenDivider` amb el tipat real vigent del fitxer (`purple/teal`) per deixar el tall validable.
+- Verificació passada en aquesta ronda:
+  - `npx tsc --noEmit` OK
+  - comprovació local `http://localhost:3000/ca/tematica-halloween` OK
+  - captures locals tablet a `.codex-captures/halloween-tablet-2026-03-30` (`tablet-top-v2.png` i `tablet-bottom-v2.png`)
+- Conclusió honesta: el trencament gros de tablet que deixava la pàgina sense entrada visual clara i amb chrome brut queda resolt, però el polish visual del cos de `Halloween` continua obert per una passada posterior.
+
+## 2026-03-30 — Smoke responsive nou per layout públic (mòbil + tablet)
+
+- He afegit `e2e/responsive-layout.spec.ts` com a xarxa curta contra regressions globals de layout públic.
+- La suite no duplica tota la cobertura: només comprova `header`, `main`, `bottom nav` i `footer` en els viewports que importaven en aquest tall.
+- Cobertura actual del smoke:
+  - `mobile`: `/ca`, `/ca/packs`, `/ca/servicios`, `/ca/contacto`
+  - `tablet`: `/ca`, `/ca/packs`, `/ca/servicios`, `/ca/contacto`
+- Criteri útil que queda automatitzat:
+  - `bottom nav` visible només on toca a mòbil
+  - `bottom nav` absent a tablet
+  - `header` i contingut principal visibles
+  - `footer` visible a tablet i a les rutes mòbils on el producte sí que el mostra
+- Validació passada:
+  - `npx playwright test e2e/responsive-layout.spec.ts --project=chromium` → **8 passed**
+
+
+
+## 2026-03-31 — Halloween: filaments penjants i núvols frontals
+
+- He refet el bloc compartit de `lib/constants/halloween-atmosphere.ts` perquè els filaments tornin a ser una sola font procedural: arrel enganxada al marc, aleatorietat controlada i caiguda per gravetat.
+- A `app/components/ui/HalloweenDecorationSection.tsx` els filaments de contenidor continuen renderitzant-se només al client, però ara treballen amb una oscil·lació més caiguda i amb cop de ràfega al mig del cicle.
+- A `app/components/ui/HalloweenAtmosphere.tsx` he reescrit el component net per recuperar consistència després de diversos parxes, i hi he deixat núvols ràpids frontals per davant de tota la composició.
+- Criteri funcional del tall:
+  - els filaments de contenidor només s'ancoren a dalt perquè la lectura de gravetat sigui coherent
+  - el naixement queda fixat i el que es mou és el filament
+  - l'atmosfera frontal torna a tenir presència sense reintroduir errors d'hidratació
+- Validació passada:
+  - `npx tsc --noEmit` OK
+  - `pnpm run arch:layer:check` OK
+
+## 2026-03-31 — Portfolio responsive: hero diferenciat per mobile, tablet i desktop
+
+- He rellegit `CLAUDE.md`, `docs/diario.md` i `docs/guia-portfolio-blog-upgrade.md` abans de reprendre el tall del `portfolio`.
+- He confirmat per codi que el `portfolio` continua passant pel mateix chrome públic que la resta del web (`LayoutWrapper`, `HeaderChampion` i `MobileBottomNav`). El problema percebut no venia d'un segon menú separat, sinó sobretot del primer fold del `portfolio`.
+- A `app/[locale]/portfolio/[slug]/page.tsx` he refet el hero perquè ja no comparteixi exactament la mateixa composició a totes les mides:
+  - `mobile`: hero més curt i bloc de copy compacte tipus targeta enganxada a baix
+  - `tablet`: bloc de copy més ample i separat, amb més aire
+  - `desktop`: composició oberta i cinematogràfica, mantenint el llenguatge premium-minimal existent
+- A `app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx` he aplicat el mateix criteri responsive per viewport, i a més el hero ara prioritza vídeo real quan l'event en té.
+- He mantingut el llenguatge visual aprovat de portfolio: `oe-vignette`, `oe-film-grain`, accent ambre i zero ambientació fora de guia.
+- També he evitat afegir nou copy públic hardcoded per no trencar la regla d'i18n de la guia.
+- Validació passada:
+  - `npx tsc --noEmit` OK
+- Punt honest:
+  - aquesta passada resol millor la diferència entre `mobile`, `tablet` i `desktop` a nivell de hero i compactació del primer fold.
+  - encara no hi ha ronda nova de captures locals d'aquest tall concret, així que la validació visual final continua pendent d'una comprovació directa en navegador.
+## 2026-03-31 — Base comuna mobile: home sense blank inicial
+
+### Mobile home (`app/components/mobile-ultimate/MobileHomePage.tsx`):
+- `HeroPortalLogo` es manté intacte
+- el contingut de la home mòbil continua renderitzat darrere de la intro per evitar el primer fold negre inicial
+- estat inicial ajustat perquè la `home` no neixi buida abans que el client resolgui la intro
+- validació passada amb `npx tsc --noEmit`
+## 2026-03-31 — Packs mobile: pestanyes i CTA més sòlids
+
+### Packs (`app/[locale]/packs/PacksClient.tsx`):
+- pestanyes de filtre ara poden fer `wrap` a mobile en lloc d'estrènyer-se massa
+- cada pestanya manté amplada mínima perquè la lectura no es trenqui en pantalles estretes
+- els dos CTA finals passen a `full width` a mobile i tornen a amplada natural a `sm+`
+- validació passada amb `npx tsc --noEmit`
+## 2026-03-31 — Servicios mobile: hero i CTA més compactes
+
+### Servicios (`app/[locale]/servicios/client.tsx`):
+- hero una mica més curt a mobile perquè el primer fold no mengi tant espai vertical
+- CTA principal del hero passa a `full width` a mobile i recupera amplada natural a `sm+`
+- CTA finals també passen a `full width` a mobile per millorar taps i llegibilitat
+- validació passada amb `npx tsc --noEmit`
+## 2026-03-31 — Portfolio: validació visual responsive del tall públic
+
+### Portfolio (`app/[locale]/portfolio/[slug]/page.tsx`, `app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx`):
+- ronda nova de captures passada a `mobile`, `tablet` i `desktop`
+- `home` de portfolio i categoria validats visualment amb el hero diferenciant bé per viewport
+- es manté el mateix chrome públic que la resta del web; no hi ha un menú separat al `portfolio`
+- el detall d'`event` no s'ha pogut validar visualment en aquesta ronda perquè a la categoria pública auditada no hi ha cap `event` navegable (`event=none` a mobile, tablet i desktop)
+- això queda marcat com a bloqueig real de dades/publicació, no com a defecte de frontend
+- captures de referència a `.codex-captures/portfolio-responsive-audit-2026-03-31-refresh`
+- validació de codi mantinguda amb `npx tsc --noEmit`
+## 2026-03-31 — Contacte: passada responsive de control
+
+### Contacte (`app/[locale]/contacto/client.tsx`):
+- ronda de captures passada a `mobile`, `tablet` i `desktop`
+- no s'ha detectat cap trencament gros de chrome, espaiat o CTA que justifiqui tocar la peça en aquesta passada
+- es manté sense canvis de codi per evitar repintar una pantalla que ja aguanta bé
+- captures de referència a `.codex-captures/contact-responsive-audit-2026-03-31`
+## 2026-03-31 — Opinions: passada responsive de control
+
+### Opinions (`app/[locale]/opiniones/page.tsx`):
+- ronda de captures passada a `mobile`, `tablet` i `desktop`
+- la pantalla manté coherència visual amb el llenguatge públic actual i no presenta un trencament prou fort per justificar retoc en aquesta passada
+- es deixa sense canvis de codi per no repintar una peça que ja aguanta bé
+- captures de referència a `.codex-captures/opiniones-responsive-audit-2026-03-31`
+- validació mantinguda amb `npx tsc --noEmit`
+## 2026-03-31 — About: passada responsive de control
+
+### About (`app/[locale]/about/page.tsx`):
+- ronda de captures passada a `mobile`, `tablet` i `desktop`
+- hero, cards i chrome compartit mantenen el mateix llenguatge visual del bloc públic actual
+- no s'ha detectat cap desviació prou forta per justificar retoc en aquesta passada
+- es deixa sense canvis de codi per no sobrecuinar una peça que ja aguanta bé
+- captures de referència a `.codex-captures/about-responsive-audit-2026-03-31`
+- validació mantinguda amb `npx tsc --noEmit`

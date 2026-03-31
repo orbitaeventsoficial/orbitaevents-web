@@ -473,7 +473,7 @@ function MobileFooter() {
 
 export default function MobileHomePage() {
   const [showIntro, setShowIntro] = useState(false);
-  const [introFinished, setIntroFinished] = useState(false);
+  const [introFinished, setIntroFinished] = useState(true);
 
   useEffect(() => {
     if (!hasSeenMobileIntro(sessionStorage)) {
@@ -512,7 +512,7 @@ export default function MobileHomePage() {
         />
       )}
 
-      {/* Contenido principal móvil - Solo se muestra después de la intro */}
+      {/* Contingut mòbil sempre renderitzat darrere de la intro per evitar el primer fold negre */}
       {introFinished && (
         <MobileAppShell showSplash={false}>
           {/* Hero */}
@@ -562,6 +562,8 @@ export default function MobileHomePage() {
     </MobileErrorBoundary>
   );
 }
+
+
 
 
 

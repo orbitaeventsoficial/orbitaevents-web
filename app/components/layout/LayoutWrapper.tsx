@@ -16,13 +16,10 @@ import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, MOBILE_INTRO_COMPL
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
 const Header = dynamic(
   () => import('@/app/components/ui/HeaderChampion'),
-  { ssr: false, loading: () => <div className="h-16 bg-zinc-950" /> }
+  { loading: () => <div className="h-16 bg-zinc-950" /> }
 );
 
-const BottomNav = dynamic(
-  () => import('@/app/components/ui/BottomNav'),
-  { ssr: false }
-);
+
 const MobileBottomNav = dynamic(
   () => import('@/app/components/mobile-ultimate/MobileBottomNav'),
   { ssr: false }
@@ -40,8 +37,7 @@ const CookieConsent = dynamic(
 );
 
 const Footer = dynamic(
-  () => import('@/app/components/ui/footer'),
-  { ssr: false }
+  () => import('@/app/components/ui/footer')
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -226,6 +222,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     pathWithoutLocale.startsWith('/contacto') ||
     pathWithoutLocale.startsWith('/reservar')
   );
+  const needsMobileBottomOffset = !isIntroActive && !hideMobileChrome && isMobileViewport;
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -257,7 +254,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <main
         id="main-content"
         tabIndex={-1}
-        className="min-h-screen outline-none"
+        className={`min-h-screen outline-none ${needsMobileBottomOffset ? 'pb-28' : ''}`}
       >
         {children}
       </main>
@@ -266,7 +263,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {!isIntroActive && !hideMobileChrome && <Footer />}
 
       {/* Bottom Navigation */}
-      {!isIntroActive && !hideMobileChrome && (isMobileViewport ? <MobileBottomNav /> : <BottomNav />)}
+      {!isIntroActive && !hideMobileChrome && isMobileViewport && <MobileBottomNav />}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
       {!isIntroActive && (!isMobileViewport || !hideMobileChrome) && <FloatingCTAs />}
@@ -277,6 +274,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     </>
   );
 }
+
+
+
 
 
 
