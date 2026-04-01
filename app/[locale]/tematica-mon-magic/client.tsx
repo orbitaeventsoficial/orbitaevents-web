@@ -28,7 +28,8 @@ function ClientOnlyStars() {
 
   useEffect(() => {
     const shouldReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const count = shouldReduce ? 8 : 25;
+    const isMobile = window.innerWidth < 768;
+    const count = shouldReduce ? 8 : isMobile ? 10 : 25;
     setStars(Array.from({ length: count }, () => ({
       left: Math.random() * 100,
       top: Math.random() * 100,
@@ -104,8 +105,9 @@ function GoldenSparkles() {
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const isMobile = window.innerWidth < 768;
     const colors = ['rgba(212,175,55,0.5)', 'rgba(245,158,11,0.4)', 'rgba(255,215,0,0.45)', 'rgba(240,214,128,0.35)'];
-    setSparkles(Array.from({ length: 25 }, () => ({
+    setSparkles(Array.from({ length: isMobile ? 10 : 25 }, () => ({
       left: Math.random() * 100,
       top: Math.random() * 100,
       size: 2 + Math.random() * 3,
@@ -238,7 +240,7 @@ export default function ProductesMonMagic() {
             fill
             priority
             sizes="100vw"
-            quality={90}
+            quality={75}
             className="object-cover object-bottom scale-[1.02]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/44 via-black/18 to-[#16110b]" />
@@ -893,7 +895,7 @@ export default function ProductesMonMagic() {
                 alt=""
                 fill
                 sizes="100vw"
-                quality={90}
+                quality={75}
                 className="object-contain"
               />
               <button

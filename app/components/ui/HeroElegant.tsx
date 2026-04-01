@@ -265,7 +265,7 @@ export default function HeroElegant() {
                 style={{
                   opacity: videoReady ? 1 : 0,
                   transition: 'opacity 1s ease',
-                  filter: 'brightness(0.6) saturate(1.1)',
+                  filter: 'brightness(0.72) saturate(1.1)',
                 }}
                 onCanPlay={handleVideoReady}
               >
@@ -295,7 +295,7 @@ export default function HeroElegant() {
                   alt={currentItem.label}
                   fill
                   className="object-cover"
-                  style={{ filter: 'brightness(0.6) saturate(1.1)' }}
+                  style={{ filter: 'brightness(0.72) saturate(1.1)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
                   quality={75}
@@ -306,9 +306,9 @@ export default function HeroElegant() {
         </AnimatePresence>
 
         {/* ── Cinematic grade ── */}
-        <div className="absolute inset-0 bg-black/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-amber-950/15 to-transparent" />
         {/* Vignette + Film grain — via classes CSS globals */}
         <div className="absolute inset-0 oe-vignette" />

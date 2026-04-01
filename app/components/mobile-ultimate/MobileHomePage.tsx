@@ -32,7 +32,7 @@ import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
 import MobileCTAUrgency from './MobileCTAUrgency';
-import StatsSection from '@/app/components/marketing/StatsSection';
+import MobileStatsSection from './MobileStatsSection';
 import MobileProcessSection from './MobileProcessSection';
 import MobilePortfolioShowcase from './MobilePortfolioShowcase';
 import FAQSection from '@/app/components/home/FAQSection';
@@ -519,7 +519,7 @@ export default function MobileHomePage() {
           <MobileHeroUltimate />
 
           {/* Stats animats — per què triar Òrbita */}
-          <StatsSection />
+          <MobileStatsSection />
 
           <SectionDivider />
 

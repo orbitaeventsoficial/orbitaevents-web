@@ -342,12 +342,24 @@ function TwistedBranches() {
 
 export default function HalloweenAtmosphere() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setIsMobile(window.innerWidth < 768);
   }, []);
 
   if (!mounted) return null;
+
+  // Mòbil: només elements estàtics lleugers. Res de blur animat ni fixed infinit.
+  if (isMobile) {
+    return (
+      <>
+        <TwistedBranches />
+        <MoonlightGlow />
+      </>
+    );
+  }
 
   return (
     <>

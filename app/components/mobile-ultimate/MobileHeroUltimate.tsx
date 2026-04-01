@@ -98,7 +98,7 @@ export default function MobileHeroUltimate() {
       style={{ background: 'linear-gradient(180deg, #0b0b0b 0%, #1a120a 42%, #090909 100%)' }}
     >
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/68 via-black/30 to-black/78" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
         <AnimatePresence>
           {currentItem.type === 'video' ? (
             <motion.div
@@ -117,7 +117,7 @@ export default function MobileHeroUltimate() {
                 playsInline
                 preload="metadata"
                 className="h-full w-full object-cover"
-                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.6s ease', filter: 'brightness(0.62) saturate(1.08)' }}
+                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.6s ease', filter: 'brightness(0.72) saturate(1.08)' }}
                 onCanPlay={handleVideoReady}
               >
                 <source src={currentItem.url} type="video/mp4" />
@@ -140,17 +140,17 @@ export default function MobileHeroUltimate() {
                 sizes="100vw"
                 quality={75}
                 className="object-cover"
-                style={{ filter: 'brightness(0.62) saturate(1.05)' }}
+                style={{ filter: 'brightness(0.72) saturate(1.05)' }}
               />
             </motion.div>
           )}
         </AnimatePresence>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.12),transparent_45%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/68 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
 
-      <div className="relative z-10 flex min-h-[82svh] items-end px-5 pb-20 pt-24">
-        <div className="mx-auto w-full max-w-md rounded-[32px] border border-white/10 bg-black/22 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-md">
+      <div className="relative z-10 flex min-h-[88svh] items-end px-5 pb-16 pt-32">
+        <div className="mx-auto w-full max-w-md rounded-[32px] border border-white/10 bg-black/30 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-sm">
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

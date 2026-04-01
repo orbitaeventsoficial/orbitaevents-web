@@ -26,7 +26,7 @@ import { useConfiguratorExtras } from '@/lib/hooks/useConfiguratorExtras';
 import { useConfiguratorLeadForm } from '@/lib/hooks/useConfiguratorLeadForm';
 import { usePacks } from '@/lib/hooks/usePacks';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
-import { generateQuotePDF } from '@/lib/pdf-utils';
+// jspdf carrega lazy — només quan l'usuari clica "Descarregar PDF"
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
 import { getWhatsAppUrl } from '@/config/site-config';
@@ -84,6 +84,7 @@ function Step4SuccessCard({
 
           const extrasNames = getSelectedExtraNames(config.extras, extrasCatalog);
 
+          const { generateQuotePDF } = await import('@/lib/pdf-utils');
           const doc = await generateQuotePDF({
             eventType: selectedEvent,
             pack: selectedPack,

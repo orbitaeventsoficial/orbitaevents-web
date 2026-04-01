@@ -92,6 +92,7 @@ export default function HalloweenClient() {
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [heroStormOpacity, setHeroStormOpacity] = useState(1);
   const [heroScrollProgress, setHeroScrollProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const halloweenGallery = PUBLIC_HALLOWEEN_GALLERY_SELECTION.map((src) =>
     (PORTFOLIO_IMAGES['fiestas-tematicas-halloween'] || []).find((image) => image.src === src)
@@ -114,6 +115,12 @@ export default function HalloweenClient() {
   }, [lightboxSrc]);
 
   useEffect(() => {
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
+
+    // Mòbil: sense parallax scroll — massa car per la GPU
+    if (mobile) return;
+
     const updateHeroScrollFx = () => {
       const viewportHeight = window.innerHeight || 1;
       const fadeDistance = viewportHeight * 1.34;
@@ -137,21 +144,21 @@ export default function HalloweenClient() {
   }, []);
 
   const sceneProgress = heroScrollProgress;
-  const heroLayerProgress = Number(Math.min(1, Math.max(0, (sceneProgress - 0.24) / 0.5)).toFixed(3));
-  const introLayerProgress = Number(Math.min(1, Math.max(0, (sceneProgress - 0.34) / 0.28)).toFixed(3));
-  const heroSectionOpacity = Number(Math.max(0.08, 1 - heroLayerProgress * 0.92).toFixed(3));
-  const heroSectionTranslateY = Number((heroLayerProgress * 104).toFixed(2));
-  const heroSectionScale = Number((1 - heroLayerProgress * 0.05).toFixed(3));
-  const heroSectionBlur = Number((heroLayerProgress * 7.5).toFixed(2));
-  const heroContentOpacity = Number(Math.max(0.36, 1 - heroLayerProgress * 0.42).toFixed(3));
-  const heroContentTranslateY = Number((heroLayerProgress * 34).toFixed(2));
-  const heroContentScale = Number((1 - heroLayerProgress * 0.018).toFixed(3));
-  const heroContentBlur = Number((heroLayerProgress * 1.8).toFixed(2));
-  const firstSectionOpacity = Number(Math.pow(introLayerProgress, 0.84).toFixed(3));
-  const firstSectionTranslateY = Number(((1 - introLayerProgress) * 118).toFixed(2));
-  const firstSectionScale = Number((0.972 + introLayerProgress * 0.028).toFixed(3));
-  const firstSectionBlur = Number(((1 - introLayerProgress) * 8).toFixed(2));
-  const firstSectionClipInset = Number(((1 - introLayerProgress) * 10).toFixed(2));
+  const heroLayerProgress = isMobile ? 0 : Number(Math.min(1, Math.max(0, (sceneProgress - 0.24) / 0.5)).toFixed(3));
+  const introLayerProgress = isMobile ? 1 : Number(Math.min(1, Math.max(0, (sceneProgress - 0.34) / 0.28)).toFixed(3));
+  const heroSectionOpacity = isMobile ? 1 : Number(Math.max(0.08, 1 - heroLayerProgress * 0.92).toFixed(3));
+  const heroSectionTranslateY = isMobile ? 0 : Number((heroLayerProgress * 104).toFixed(2));
+  const heroSectionScale = isMobile ? 1 : Number((1 - heroLayerProgress * 0.05).toFixed(3));
+  const heroSectionBlur = isMobile ? 0 : Number((heroLayerProgress * 7.5).toFixed(2));
+  const heroContentOpacity = isMobile ? 1 : Number(Math.max(0.36, 1 - heroLayerProgress * 0.42).toFixed(3));
+  const heroContentTranslateY = isMobile ? 0 : Number((heroLayerProgress * 34).toFixed(2));
+  const heroContentScale = isMobile ? 1 : Number((1 - heroLayerProgress * 0.018).toFixed(3));
+  const heroContentBlur = isMobile ? 0 : Number((heroLayerProgress * 1.8).toFixed(2));
+  const firstSectionOpacity = isMobile ? 1 : Number(Math.pow(introLayerProgress, 0.84).toFixed(3));
+  const firstSectionTranslateY = isMobile ? 0 : Number(((1 - introLayerProgress) * 118).toFixed(2));
+  const firstSectionScale = isMobile ? 1 : Number((0.972 + introLayerProgress * 0.028).toFixed(3));
+  const firstSectionBlur = isMobile ? 0 : Number(((1 - introLayerProgress) * 8).toFixed(2));
+  const firstSectionClipInset = isMobile ? 0 : Number(((1 - introLayerProgress) * 10).toFixed(2));
 
   return (
     <main className="relative overflow-hidden bg-[linear-gradient(180deg,#06060e_0%,#0a0518_26%,#0e071a_58%,#060608_100%)] text-white">
