@@ -115,7 +115,7 @@ export default function MobileHeroUltimate() {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="metadata"
                 className="h-full w-full object-cover"
                 style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.6s ease', filter: 'brightness(0.62) saturate(1.08)' }}
                 onCanPlay={handleVideoReady}
@@ -138,6 +138,7 @@ export default function MobileHeroUltimate() {
                 fill
                 priority={slideIndex === 0}
                 sizes="100vw"
+                quality={75}
                 className="object-cover"
                 style={{ filter: 'brightness(0.62) saturate(1.05)' }}
               />

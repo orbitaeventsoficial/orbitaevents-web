@@ -244,7 +244,7 @@ export default async function LocaleLayout({
             inset: 0,
             background: '#000',
             zIndex: 9998,
-            transition: 'opacity 0.4s ease-out',
+            transition: 'opacity 0.25s ease-out',
             display: 'block',
             pointerEvents: 'auto',
             opacity: 1,

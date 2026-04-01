@@ -19,6 +19,7 @@ function ContactContent() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)]" />
+      <div className="absolute inset-0 oe-vignette pointer-events-none" aria-hidden="true" />
 
       <div className="relative">
         {/* Header */}
@@ -29,9 +30,9 @@ function ContactContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="mb-3 text-3xl font-black text-white md:text-5xl">
+              <h1 className="mb-3 text-3xl font-black text-white md:text-5xl lg:text-6xl tracking-tight">
                 {t('page.titlePart1')}
-                <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                   {t('page.titleHighlight')}
                 </span>
               </h1>
@@ -62,7 +63,7 @@ function ContactContent() {
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
                 target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-white/48 transition-colors hover:text-[#25D366]"
+                className="inline-flex items-center gap-2 text-sm text-white/48 transition-all duration-300 hover:text-[#25D366] hover:drop-shadow-[0_0_8px_rgba(37,211,102,0.3)]"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.613.613l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.352 0-4.556-.725-6.379-1.963l-.447-.305-2.948.988.988-2.948-.305-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
                 <span>{t('page.whatsappCta')}</span>
@@ -79,7 +80,7 @@ function ContactContent() {
           className="px-4 pb-10 sm:pb-16"
         >
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-5 shadow-2xl backdrop-blur-sm md:p-8">
+            <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-5 shadow-2xl backdrop-blur-sm md:p-8 hover:border-amber-500/20 hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] transition-all duration-500">
               <ContactFormComplete
                 preselectedService={preselectedService}
                 preselectedDate={preselectedDate}

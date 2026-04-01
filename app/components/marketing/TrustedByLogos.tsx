@@ -68,6 +68,8 @@ export default function TrustedByLogos() {
                     alt={`Cliente ${i + 1}`}
                     fill
                     sizes="160px"
+                    quality={70}
+                    loading="lazy"
                     className="object-contain p-1"
                   />
                 </div>

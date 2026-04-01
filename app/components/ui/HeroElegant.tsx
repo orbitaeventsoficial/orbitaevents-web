@@ -68,7 +68,7 @@ function AmbientParticles({ particles }: { particles: ParticleData[] }) {
             left: p.left,
             top: p.top,
             background: p.color,
-            boxShadow: `0 0 ${p.w * 4}px ${p.color}, 0 0 ${p.w * 8}px ${p.color.replace(/[\d.]+\)$/, '0.3)')}`,
+            boxShadow: `0 0 ${p.w * 4}px ${p.color}`,
           }}
           animate={{ y: [0, -p.dy], x: [0, p.dx], opacity: [0.15, 0.85, 0.15] }}
           transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: 'easeInOut' }}
@@ -163,7 +163,7 @@ export default function HeroElegant() {
   // Seeded pseudo-random per posicions naturals però deterministes
   const particles = useMemo<ParticleData[]>(() => {
     const seed = (n: number) => ((n * 9301 + 49297) % 233280) / 233280;
-    return Array.from({ length: 36 }, (_, i) => {
+    return Array.from({ length: 16 }, (_, i) => {
       const r = seed(i);
       const size = 3 + r * 8;
       return {
@@ -298,7 +298,7 @@ export default function HeroElegant() {
                   style={{ filter: 'brightness(0.6) saturate(1.1)' }}
                   sizes="100vw"
                   priority={slideIndex === 0}
-                  quality={85}
+                  quality={75}
                 />
               </motion.div>
             </motion.div>

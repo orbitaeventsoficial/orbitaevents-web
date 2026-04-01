@@ -19,6 +19,7 @@ const nextConfig = {
 
   images: {
     formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 31536000, // 1 year — images are fingerprinted
     unoptimized: false,
     // Dominios permitidos para imagenes externas
     remotePatterns: [

@@ -7,7 +7,7 @@
  */
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 
 export interface GalleryItem {
   src: string;
@@ -83,7 +83,7 @@ function MediaCell({
 
   return (
     <div
-      className={`relative ${aspect} rounded-2xl overflow-hidden cursor-pointer group bg-stone-900`}
+      className={`relative ${aspect} rounded-2xl overflow-hidden cursor-pointer group bg-stone-900 transition-shadow duration-500 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]`}
       onClick={onClick}
       onMouseEnter={() => !itemIsVideo && onPrefetch(item.src)}
       onFocus={() => !itemIsVideo && onPrefetch(item.src)}
@@ -127,6 +127,20 @@ function MediaCell({
 
 export function SimpleGallery({ images }: { images: GalleryItem[] }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: ReactTouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: ReactTouchEvent) => {
+    if (touchStartX.current === null || selectedIndex === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 50) return; // min swipe distance
+    if (dx < 0 && selectedIndex < images.length - 1) setSelectedIndex(selectedIndex + 1);
+    if (dx > 0 && selectedIndex > 0) setSelectedIndex(selectedIndex - 1);
+  }, [selectedIndex, images.length]);
 
   const prefetchImage = useCallback((src: string) => {
     if (typeof window === 'undefined') return;
@@ -254,11 +268,11 @@ export function SimpleGallery({ images }: { images: GalleryItem[] }) {
       {/* Lightbox */}
       {selected && selectedIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-out]"
           onClick={() => setSelectedIndex(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white text-2xl font-normal hover:bg-white/20 hover:text-amber-400 transition-all z-10"
             onClick={() => setSelectedIndex(null)}
             aria-label="Cerrar"
           >
@@ -267,7 +281,7 @@ export function SimpleGallery({ images }: { images: GalleryItem[] }) {
 
           {selectedIndex > 0 && (
             <button
-              className="absolute left-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+              className="absolute left-4 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white text-2xl font-normal hover:bg-white/20 hover:text-amber-400 transition-all z-10"
               onClick={(e) => { e.stopPropagation(); setSelectedIndex(selectedIndex - 1); }}
               aria-label="Anterior"
             >
@@ -275,7 +289,12 @@ export function SimpleGallery({ images }: { images: GalleryItem[] }) {
             </button>
           )}
 
-          <div className="relative max-w-6xl max-h-[90vh] w-full h-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative max-w-6xl max-h-[90vh] w-full h-full animate-[scaleIn_0.3s_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {isVideo(selected) ? (
               <video
                 key={selected.src}
@@ -303,7 +322,7 @@ export function SimpleGallery({ images }: { images: GalleryItem[] }) {
 
           {selectedIndex < images.length - 1 && (
             <button
-              className="absolute right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors z-10"
+              className="absolute right-4 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white text-2xl font-normal hover:bg-white/20 hover:text-amber-400 transition-all z-10"
               onClick={(e) => { e.stopPropagation(); setSelectedIndex(selectedIndex + 1); }}
               aria-label="Siguiente"
             >
@@ -311,7 +330,7 @@ export function SimpleGallery({ images }: { images: GalleryItem[] }) {
             </button>
           )}
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm z-10">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-white/80 text-sm font-medium z-10">
             {selectedIndex + 1} / {images.length}
           </div>
         </div>

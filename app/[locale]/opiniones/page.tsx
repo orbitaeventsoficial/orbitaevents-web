@@ -155,7 +155,10 @@ export default async function OpinionesPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <main className="min-h-screen bg-bg-main relative">
+      <main className="min-h-screen bg-bg-main relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 oe-vignette pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[150px] bg-amber-500/[0.04] pointer-events-none" aria-hidden="true" />
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-24 pb-2 max-w-5xl">
           <nav className="flex items-center gap-2 text-sm text-white/40" aria-label="Breadcrumb">
@@ -178,25 +181,25 @@ export default async function OpinionesPage({
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 leading-tight tracking-tight">
             {isCA ? (
               <>
                 El que diuen els{' '}
-                <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                   nostres clients
                 </span>
               </>
             ) : isEN ? (
               <>
                 What our{' '}
-                <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                   clients say
                 </span>
               </>
             ) : (
               <>
                 Lo que dicen{' '}
-                <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                   nuestros clientes
                 </span>
               </>
@@ -211,16 +214,28 @@ export default async function OpinionesPage({
               : `${SITE_CONFIG.stats.reviewCount}+ reseñas reales · Valoración ${SITE_CONFIG.stats.avgRating}/5 · DJ y eventos en Barcelona y Girona`}
           </p>
 
-          {/* Trust stats — delegat a StatsSection unificat */}
+          {/* Trust stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {trustStats.map((stat, i) => (
+              <div key={i} className="card p-4 rounded-2xl text-center group hover:border-amber-500/20 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500">
+                <span className="text-2xl mb-1 block group-hover:scale-110 transition-transform duration-300" aria-hidden="true">{stat.icon}</span>
+                <p className="text-2xl font-black text-oe-gold drop-shadow-[0_2px_8px_rgba(245,158,11,0.15)]">{stat.value}</p>
+                <p className="text-xs text-white/50">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Google Reviews Carousel */}
-        <GoogleReviewsRotating showFooterCta={false} showHeader={false} />
+        <div className="relative">
+          <div className="absolute inset-0 oe-grid-pattern pointer-events-none" aria-hidden="true" />
+          <GoogleReviewsRotating showFooterCta={false} showHeader={false} />
+        </div>
 
         {/* CTA dejar reseña */}
         <section className="container mx-auto px-4 py-16 max-w-3xl">
-          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08] rounded-3xl p-10 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+          <div className="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08] rounded-3xl p-10 text-center hover:border-white/15 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)] transition-all duration-500">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">
               {isCA
                 ? 'Has gaudit del teu event amb nosaltres?'
                 : isEN
@@ -239,7 +254,7 @@ export default async function OpinionesPage({
                 href={SITE_CONFIG.reviews.googleReviewUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-white text-[#1a1a1a] font-bold px-8 py-4 rounded-2xl hover:bg-neutral-100 transition-all shadow-lg shadow-white/5 text-sm md:text-base"
+                className="inline-flex items-center gap-3 bg-white text-[#1a1a1a] font-bold px-8 py-4 rounded-2xl hover:bg-neutral-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 shadow-lg shadow-white/10 text-sm md:text-base"
               >
                 <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -251,7 +266,7 @@ export default async function OpinionesPage({
               </a>
               <Link
                 href="/configurador"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity text-sm md:text-base"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)] text-sm md:text-base"
               >
                 {ctaBook} →
               </Link>

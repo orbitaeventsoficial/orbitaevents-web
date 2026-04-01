@@ -51,11 +51,17 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
         ]}
       />
 
-      <section className="mx-auto max-w-7xl px-8 py-20 relative">
-        <h1 className="text-5xl md:text-6xl font-bold text-center bg-gradient-to-r from-oe-gold to-oe-gold-bright bg-clip-text text-transparent">
+      <section className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-28 relative">
+        {/* Ambient glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[150px] bg-amber-500/[0.04] pointer-events-none" aria-hidden="true" />
+        {/* Vignette + grid pattern */}
+        <div className="absolute inset-0 oe-vignette pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 oe-grid-pattern pointer-events-none" aria-hidden="true" />
+
+        <h1 className="text-5xl md:text-7xl font-black text-center bg-gradient-to-r from-white via-amber-100 to-oe-gold bg-clip-text text-transparent tracking-tight relative">
           {t('title')}
         </h1>
-        <p className="text-center text-white/70 text-xl mb-16 max-w-3xl mx-auto">
+        <p className="text-center text-white/60 text-lg md:text-xl mb-16 md:mb-20 max-w-2xl mx-auto mt-4 relative">
           {t('subtitle')}
         </p>
 
@@ -73,7 +79,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                   <Link
                     key={cat.slug}
                     href={`/portfolio/${encodeURIComponent(cat.slug)}`}
-                    className="group relative overflow-hidden rounded-3xl h-[420px] md:h-[500px]"
+                    className="group relative overflow-hidden rounded-3xl h-[420px] md:h-[500px] transition-all duration-500 hover:shadow-[0_16px_64px_rgba(0,0,0,0.4),0_0_40px_rgba(245,158,11,0.06)]"
                   >
                     <Image
                       src={cat.cover}
@@ -85,6 +91,12 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-amber-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Featured badge */}
+                    <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-amber-500/90 text-black text-xs font-bold uppercase tracking-wider shadow-lg shadow-amber-500/20">
+                      ★ Featured
+                    </div>
                     <div className="absolute bottom-0 p-8 md:p-10 w-full">
                       <span className="text-amber-400 text-xs font-semibold tracking-widest uppercase">
                         {t('viewGallery')}
@@ -113,7 +125,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                   <Link
                     key={cat.slug}
                     href={`/portfolio/${encodeURIComponent(cat.slug)}`}
-                    className="group relative overflow-hidden rounded-2xl h-[320px]"
+                    className="group relative overflow-hidden rounded-2xl h-[320px] transition-all duration-500 hover:shadow-[0_12px_48px_rgba(0,0,0,0.4)]"
                   >
                     <Image
                       src={cat.cover}

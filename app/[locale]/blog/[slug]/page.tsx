@@ -125,7 +125,7 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
 
-      <main className="min-h-screen bg-bg-main relative">
+      <main className="min-h-screen bg-bg-main relative overflow-hidden">
         <BlogTracking page="post" slug={slug} />
         <section className="relative pt-24 pb-0 overflow-hidden">
           {post.featuredImage && (
@@ -135,10 +135,11 @@ export default async function BlogPostPage({
                 alt={translation.title}
                 fill
                 sizes="100vw"
-                className="object-cover opacity-20"
+                className="object-cover opacity-25"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-bg-main/60 via-bg-main/80 to-bg-main" />
+              <div className="absolute inset-0 bg-gradient-to-b from-bg-main/50 via-bg-main/80 to-bg-main" />
+              <div className="absolute inset-0 oe-vignette pointer-events-none" />
             </div>
           )}
 
@@ -166,7 +167,7 @@ export default async function BlogPostPage({
               <span className="text-white/50 text-sm">✍️ {tBlog('post.byAuthor', { author: post.author })}</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-6">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 tracking-tight">
               {translation.title}
             </h1>
 
@@ -186,7 +187,7 @@ export default async function BlogPostPage({
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm"
+                  className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm hover:border-amber-500/30 hover:text-white/80 transition-all duration-300 cursor-default"
                 >
                   #{tag}
                 </span>
@@ -194,7 +195,7 @@ export default async function BlogPostPage({
             </div>
           )}
 
-          <div className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
+          <div className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center hover:border-amber-500/30 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)] transition-all duration-500">
             <h3 className="text-2xl font-bold text-white mb-3">
               {tBlog('post.ctaTitle')}
             </h3>
@@ -205,7 +206,7 @@ export default async function BlogPostPage({
               <Link
                 href="/configurador"
                 data-blog-cta="blog_post_configurator"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)]"
               >
                 {tBlog('post.ctaPrimary')}
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

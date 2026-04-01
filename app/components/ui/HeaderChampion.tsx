@@ -230,7 +230,7 @@ export default function HeaderChampion() {
                             bg-zinc-900
                             border border-zinc-700
                             rounded-xl
-                            shadow-2xl shadow-black/50
+                            shadow-2xl shadow-black/60
                           "
                           style={{
                             backgroundColor: 'rgb(24, 24, 27)',
@@ -244,7 +244,7 @@ export default function HeaderChampion() {
                                 flex items-start gap-3 p-3
                                 rounded-lg
                                 hover:bg-zinc-800
-                                transition-colors
+                                transition-all duration-200
                                 group/item
                               "
                               onClick={() => setActiveDropdown(null)}

@@ -4,13 +4,9 @@
  */
 
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
 import { PUBLIC_HALLOWEEN_HERO_IMAGE } from '@/lib/constants';
-
-const HalloweenClient = dynamic(() => import('./client'), {
-  ssr: false,
-});
+import HalloweenClient from './client';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('halloweenPage');
@@ -30,3 +26,4 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function HalloweenPage() {
   return <HalloweenClient />;
 }
+

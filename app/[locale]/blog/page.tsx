@@ -66,7 +66,7 @@ function PostCard({
     <Link
       href={`/blog/${post.slug}`}
       data-blog-cta={`blog_card_${post.slug}`}
-      className="group block rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 overflow-hidden"
+      className="group block rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-500 overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] hover:-translate-y-1"
     >
       <div className="relative h-48 bg-gradient-to-br from-zinc-900 to-zinc-800 overflow-hidden">
         {post.featuredImage ? (
@@ -81,11 +81,12 @@ function PostCard({
           <div className="flex h-full items-center justify-center text-6xl opacity-20">{emoji}</div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
 
       <div className="p-6">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border capitalize ${categoryColor}`}>
+          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border capitalize transition-colors duration-300 hover:bg-white/10 ${categoryColor}`}>
             {post.category}
           </span>
           {post.readingTime && (
@@ -108,7 +109,7 @@ function PostCard({
 
         <div className="mt-4 flex items-center gap-1.5 text-amber-400 text-sm font-semibold group-hover:gap-3 transition-all">
           <span>{readMoreLabel}</span>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </div>
@@ -162,7 +163,8 @@ export default async function BlogPage({ params }: { params: { locale: string } 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
       />
-      <main className="min-h-screen bg-bg-main relative">
+      <main className="min-h-screen bg-bg-main relative overflow-hidden">
+        <div className="absolute inset-0 oe-vignette pointer-events-none" aria-hidden="true" />
         <BlogTracking page="index" />
         <section className="relative pt-32 pb-16 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-bg-main" />
@@ -171,17 +173,18 @@ export default async function BlogPage({ params }: { params: { locale: string } 
             <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
               📝 {t('badge')}
             </span>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 tracking-tight">
               {t('title1')}{' '}
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                 {t('title2')}
               </span>
             </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">{t('subtitle')}</p>
+            <p className="text-lg text-white/55 max-w-2xl mx-auto">{t('subtitle')}</p>
           </div>
         </section>
 
-        <section className="container mx-auto px-4 pb-24">
+        <section className="container mx-auto px-4 pb-24 relative">
+          <div className="absolute inset-0 oe-grid-pattern pointer-events-none" aria-hidden="true" />
           {posts.length === 0 ? (
             <div className="text-center py-24">
               <div className="text-6xl mb-6">✍️</div>
@@ -214,7 +217,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
                 <Link
                   href="/configurador"
                   data-blog-cta="blog_footer_configurator"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)]"
                 >
                   {t('ctaButton')}
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

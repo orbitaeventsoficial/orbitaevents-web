@@ -61,9 +61,8 @@ function SectionSkeleton() {
 // COMPONENTS - Above-the-fold con SSR, below-the-fold lazy loaded
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Above-the-fold: SSR habilitado con loading skeleton
+// Above-the-fold: SSR habilitado — hero HTML al response inicial per LCP ràpid
 const HeroElegant = dynamic(() => import('@/app/components/ui/HeroElegant'), {
-  ssr: false,
   loading: () => <HeroSkeleton />,
 });
 

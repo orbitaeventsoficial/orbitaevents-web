@@ -60,7 +60,7 @@ function StoryCard({
     >
       <Link
         href={`/portfolio/${story.slug}`}
-        className="group relative block overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_32px_100px_rgba(0,0,0,0.4)]"
+        className="group relative block overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-500 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_32px_100px_rgba(0,0,0,0.4),0_0_60px_rgba(245,158,11,0.06)]"
       >
         {/* Photos with crossfade — totes apilades, opacity transition */}
         <div className="relative h-[28rem] md:h-[32rem] overflow-hidden">
@@ -72,7 +72,7 @@ function StoryCard({
               fill
               sizes="(max-width: 768px) 85vw, (max-width: 1024px) 50vw, 32vw"
               className="object-cover transition-all duration-[1.5s] ease-in-out group-hover:scale-110"
-              style={{ opacity: i === photoIdx ? 1 : 0 }}
+              style={{ opacity: i === photoIdx ? 1 : 0, visibility: i === photoIdx ? 'visible' : 'hidden' }}
               loading={i === 0 ? 'eager' : 'lazy'}
             />
           ))}
@@ -87,10 +87,10 @@ function StoryCard({
               <button
                 key={i}
                 onClick={(e) => { e.preventDefault(); setPhotoIdx(i); }}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 ${
                   i === photoIdx % 5
-                    ? 'bg-white w-4'
-                    : 'bg-white/40 hover:bg-white/60'
+                    ? 'bg-white w-5 shadow-[0_0_6px_rgba(255,255,255,0.4)]'
+                    : 'bg-white/40 w-1.5 hover:bg-white/60'
                 }`}
                 aria-label={`Foto ${i + 1}`}
               />
@@ -316,7 +316,7 @@ export default function PortfolioShowcase() {
             </span>
             <motion.h2
               style={reduceMotion ? {} : { x: titleX }}
-              className="text-4xl md:text-5xl font-black text-white"
+              className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight"
             >
               {t('title')}{' '}
               <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
@@ -377,7 +377,7 @@ export default function PortfolioShowcase() {
         >
           <Link
             href="/portfolio"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all group"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] group"
           >
             {t('viewAll')}
             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
