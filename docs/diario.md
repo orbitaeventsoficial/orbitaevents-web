@@ -8332,3 +8332,21 @@ px tsc --noEmit OK
 - Els deletes d'assets individuals també invaliden cache abans de l'IO de fitxers per evitar lectures velles si falla el filesystem.
 - L'upload neteja l'arxiu nou si el flux posterior falla per no deixar orfes.
 - L'script migrate-image-manager-to-prisma.ts ara prepara totes les files i executa createMany + delete setting dins una única $transaction.
+
+## 2026-04-03 — Tancament de sessió: polish mòbil, imports estabilitzats i push complet del workspace
+
+### Mòbil (pp/components/mobile-ultimate/*, pp/components/layout/LayoutWrapper.tsx, lib/intro.ts):
+- s'ha estabilitzat la intro mòbil perquè el control principal quedi al layout i no torni el flash inicial abans del portal/logo
+- s'ha fet una passada de polish visual al primer fold mòbil (hero + ottom nav) i s'han generat captures locals de comprovació
+- commits clau del tram mòbil: 7ec929ca, 30e5cfa8
+
+### Build/deploy (pp/components/*, pp/[locale]/portfolio/*):
+- s'han estabilitzat imports de tipus client perquè no depenguin de serveis ( 9ec3468)
+- les rutes de portfolio s'han passat a dinàmic per evitar saturació de connexions Prisma durant 
+ext build (d2e25747)
+- s'han acabat pujant els mòduls nous d'image manager i hero media que existien localment però no eren a HEAD (7465dac1)
+
+### Tancament:
+- per petició explícita s'ha fet també un push complet de tot l'estat local del workspace a main sense filtratge addicional (205166d)
+- el diari deixa constància que aquest últim commit inclou també captures, scripts temporals i altres canvis acumulats del worktree
+- l'estat final de deploy s'ha de validar sobre el build que corri ja amb 205166d, perquè part dels logs revisats abans encara corresponien a commits previs
