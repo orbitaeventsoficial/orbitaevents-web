@@ -127,7 +127,11 @@
     }
     .steps{display:flex;flex-direction:column;gap:14px}
     .step{display:flex;align-items:center;gap:16px;padding:14px;border-radius:15px;background:transparent;transition:.25s}
+    .step{transition:transform .25s, box-shadow .25s, background .4s}
     .step:hover{transform:translateX(5px);box-shadow:0 5px 15px rgba(232,166,196,.3)}
+    .step.active{background:rgba(232,166,196,.15);transform:scale(1.03);box-shadow:0 5px 20px rgba(232,166,196,.4)}
+    .step.active .bubble{transform:scale(1.15);transition:transform .3s}
+    .step.active .num{color:#d4789c}
     .bubble{
       width:62px;height:62px;border-radius:50%;
       display:grid;place-items:center;flex:0 0 62px;
@@ -344,8 +348,14 @@
     });
   </script>
   <script>
-    // ---- Àudio real de bombolles (retallat + alentit) ----
+    // ---- Àudio bombolles en loop 5→4→3→2→1 ----
     let waterAudio;
+    let loopTimer = null;
+    let loopRunning = false;
+    let currentStep = 0;
+    const BUBBLE_DURATION = 2800;  // ms durada del so
+    const PAUSE_BETWEEN = 1200;    // ms pausa entre bombolles
+    const steps = document.querySelectorAll('.step');
 
     function ensureWaterAudio() {
       if (!waterAudio) {
@@ -359,21 +369,43 @@
     }
 
     async function playWaterSound() {
-      try {
-        await ensureWaterAudio();
-      } catch (e) {}
+      try { await ensureWaterAudio(); } catch (e) {}
       if (!waterAudio) return;
-      const start = 0;       // àudio ja retallat
-      const duration = 2.8;  // durada del retall
       waterAudio.pause();
-      waterAudio.playbackRate = 0.8; // més ràpid
+      waterAudio.playbackRate = 0.8;
       waterAudio.volume = 1.0;
-      waterAudio.currentTime = start;
+      waterAudio.currentTime = 0;
       waterAudio.play().catch(() => {});
-      setTimeout(() => {
-        if (!waterAudio) return;
-        waterAudio.pause();
-      }, duration * 1000);
+      setTimeout(() => { if (waterAudio) waterAudio.pause(); }, BUBBLE_DURATION);
+    }
+
+    function highlightStep(index) {
+      steps.forEach(s => s.classList.remove('active'));
+      if (index >= 0 && index < steps.length) {
+        steps[index].classList.add('active');
+      }
+    }
+
+    function loopTick() {
+      if (!loopRunning) return;
+      highlightStep(currentStep);
+      playWaterSound();
+      currentStep = (currentStep + 1) % steps.length;
+      loopTimer = setTimeout(loopTick, BUBBLE_DURATION + PAUSE_BETWEEN);
+    }
+
+    function startLoop() {
+      if (loopRunning) return;
+      loopRunning = true;
+      currentStep = 0;
+      loopTick();
+    }
+
+    function stopLoop() {
+      loopRunning = false;
+      if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+      if (waterAudio) waterAudio.pause();
+      steps.forEach(s => s.classList.remove('active'));
     }
 
     const overlay = document.getElementById("overlay");
@@ -401,7 +433,6 @@
           return false;
         }
 
-        // Android / desktop o iOS amb permisos concedits
         motionBtn.textContent = t.motionGranted;
         motionBtn.style.background = "#c7f9cc";
         return true;
@@ -417,7 +448,7 @@
         overlay.style.display = "none";
         cardRoot.setAttribute("aria-hidden", "false");
         requestMotionPermission().catch(function(){});
-        playWaterSound();
+        startLoop();
       } catch (ex) {
         overlay.style.display = "none";
         cardRoot.setAttribute("aria-hidden", "false");
@@ -434,9 +465,9 @@
     motionBtn.addEventListener("click", handleMotion);
     motionBtn.addEventListener("touchend", handleMotion);
 
-    // Bombolla al tocar la targeta
-    cardRoot.addEventListener("pointerdown", async () => {
-      playWaterSound();
+    // Toc a la pantalla: atura o reprèn el loop
+    cardRoot.addEventListener("pointerdown", () => {
+      if (loopRunning) { stopLoop(); } else { startLoop(); }
     }, { passive: true });
   </script>
   <script>
