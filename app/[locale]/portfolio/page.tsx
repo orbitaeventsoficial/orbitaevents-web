@@ -1,13 +1,16 @@
 // app/portfolio/page.tsx
 import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
-import Image from "next/image";
-import Breadcrumbs from "@/components/seo/Breadcrumbs";
-import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
+import Image from 'next/image';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
 import { getTranslations } from 'next-intl/server';
 import { getSiteUrl } from '@/lib/site';
+import { listPortfolioEvents } from '@/lib/services/portfolioEventService';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
@@ -30,31 +33,47 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
   const tCommon = await getTranslations({ locale, namespace: 'common' });
 
   const categories = PORTFOLIO_CATEGORIES;
+  const { events } = await listPortfolioEvents({ published: true, limit: 200 });
+  const managedCoverEntries = await Promise.all(
+    categories.map(async (cat) => [cat.slug, await getManagedImageOverride(`portfolio.category.${cat.slug}.cover`)] as const)
+  );
 
-  // Funció per obtenir el nom traduït de la categoria
+  const managedCoverMap = new Map<string, string>();
+  for (const [slug, managed] of managedCoverEntries) {
+    if (managed?.src) managedCoverMap.set(slug, managed.src);
+  }
+
+  const categoryCoverMap = new Map<string, string>();
+  for (const eventItem of events) {
+    if (!categoryCoverMap.has(eventItem.categorySlug) && eventItem.coverImage) {
+      categoryCoverMap.set(eventItem.categorySlug, eventItem.coverImage);
+    }
+  }
+
   const getCategoryName = (slug: string): string => {
     try {
       return t(`categories.${slug}`);
     } catch {
-      // Fallback al nom original si no hi ha traducció
-      const cat = categories.find(c => c.slug === slug);
+      const cat = categories.find((item) => item.slug === slug);
       return cat?.name ?? slug;
     }
+  };
+
+  const resolveCover = (slug: string, fallback: string) => {
+    return managedCoverMap.get(slug) || categoryCoverMap.get(slug) || fallback;
   };
 
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: tCommon('breadcrumbs.home'), url: "/" },
-          { name: t('breadcrumb'), url: "/portfolio" }
+          { name: tCommon('breadcrumbs.home'), url: '/' },
+          { name: t('breadcrumb'), url: '/portfolio' },
         ]}
       />
 
       <section className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-28 relative">
-        {/* Ambient glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[150px] bg-amber-500/[0.04] pointer-events-none" aria-hidden="true" />
-        {/* Vignette + grid pattern */}
         <div className="absolute inset-0 oe-vignette pointer-events-none" aria-hidden="true" />
         <div className="absolute inset-0 oe-grid-pattern pointer-events-none" aria-hidden="true" />
 
@@ -66,14 +85,11 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
         </p>
 
         {categories.length === 0 ? (
-          <p className="text-center text-white/60 text-lg">
-            {t('noCategories')}
-          </p>
+          <p className="text-center text-white/60 text-lg">{t('noCategories')}</p>
         ) : (
           <div className="space-y-4">
-            {/* Featured — first 2 categories as large cinematic cards */}
             <div className="grid gap-4 md:grid-cols-2">
-              {categories.slice(0, 2).map((cat, index) => {
+              {categories.slice(0, 2).map((cat) => {
                 const translatedName = getCategoryName(cat.slug);
                 return (
                   <Link
@@ -82,7 +98,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                     className="group relative overflow-hidden rounded-3xl h-[420px] md:h-[500px] transition-all duration-500 hover:shadow-[0_16px_64px_rgba(0,0,0,0.4),0_0_40px_rgba(245,158,11,0.06)]"
                   >
                     <Image
-                      src={cat.cover}
+                      src={resolveCover(cat.slug, cat.cover)}
                       alt={translatedName}
                       fill
                       priority
@@ -91,16 +107,12 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                    {/* Gradient overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-t from-amber-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    {/* Featured badge */}
                     <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-amber-500/90 text-black text-xs font-bold uppercase tracking-wider shadow-lg shadow-amber-500/20">
                       ★ Featured
                     </div>
                     <div className="absolute bottom-0 p-8 md:p-10 w-full">
-                      <span className="text-amber-400 text-xs font-semibold tracking-widest uppercase">
-                        {t('viewGallery')}
-                      </span>
+                      <span className="text-amber-400 text-xs font-semibold tracking-widest uppercase">{t('viewGallery')}</span>
                       <h3 className="text-3xl md:text-4xl font-black text-white mt-2 group-hover:text-amber-50 transition-colors">
                         {translatedName}
                       </h3>
@@ -116,7 +128,6 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
               })}
             </div>
 
-            {/* Rest — 3-column grid */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {categories.slice(2).map((cat, index) => {
                 const translatedName = getCategoryName(cat.slug);
@@ -128,7 +139,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                     className="group relative overflow-hidden rounded-2xl h-[320px] transition-all duration-500 hover:shadow-[0_12px_48px_rgba(0,0,0,0.4)]"
                   >
                     <Image
-                      src={cat.cover}
+                      src={resolveCover(cat.slug, cat.cover)}
                       alt={translatedName}
                       fill
                       priority={isPriority}
@@ -139,9 +150,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-0 p-6 w-full">
-                      <h3 className="text-2xl font-bold text-white group-hover:text-amber-50 transition-colors">
-                        {translatedName}
-                      </h3>
+                      <h3 className="text-2xl font-bold text-white group-hover:text-amber-50 transition-colors">{translatedName}</h3>
                       <p className="text-white/40 text-sm mt-1 flex items-center gap-1.5 group-hover:text-white/60 transition-colors">
                         {t('viewGallery')}
                         <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

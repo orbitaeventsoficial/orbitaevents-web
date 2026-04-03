@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -48,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const tPortfolio = await getTranslations({ locale, namespace: 'pages.portfolio' });
 
   const category = PORTFOLIO_CATEGORIES.find((c) => c.slug === slug);
-  const images = (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ?? [];
+  const staticImages = (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ?? [];
 
   let title: string;
   try {
@@ -57,7 +60,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title = category?.name ?? slug;
   }
 
-  const firstImage = images[0]?.src || '/img/portfolio/bodas/bodas-01.avif';
+  let mediaPreview: string | undefined;
+  try {
+    const items = await listPortfolioMedia(slug);
+    mediaPreview = items[0]?.mediaUrl;
+  } catch {
+    // continuar amb altres fallbacks
+  }
+
+  if (!mediaPreview) {
+    try {
+      const { photos } = await listPortfolioPhotos({ slug, limit: 1 });
+      mediaPreview = photos[0]?.photoUrl;
+    } catch {
+      // continuar amb altres fallbacks
+    }
+  }
+
+  if (!mediaPreview) {
+    try {
+      const result = await listPortfolioEvents({ categorySlug: slug, published: true, limit: 1 });
+      mediaPreview = result.events[0]?.coverImage;
+    } catch {
+      // continuar amb l'estàtic
+    }
+  }
+
+  const firstImage = mediaPreview || staticImages[0]?.src || '/img/portfolio/bodas/bodas-01.avif';
   const isEs = locale === 'es';
 
   const metaTitle = isEs
@@ -136,7 +165,8 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     // Si falla, continuar
   }
 
-  const images: GalleryItem[] = [...staticImages, ...bookingImages, ...directMedia];
+  const dynamicImages: GalleryItem[] = directMedia.length > 0 ? directMedia : bookingImages;
+  const images: GalleryItem[] = dynamicImages.length > 0 ? dynamicImages : staticImages;
 
   let events: EventWithCount[] = [];
   try {
@@ -326,3 +356,5 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     </>
   );
 }
+
+
