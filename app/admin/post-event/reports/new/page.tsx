@@ -150,7 +150,7 @@ export default function NewReportPage() {
       {formError && (
         <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center justify-between px-4 py-3 text-sm" role="alert">
           <span>{formError}</span>
-          <button type="button" onClick={() => setFormError(null)} className="">✕</button>
+          <button type="button" onClick={() => setFormError(null)} className="" aria-label="Tancar error">✕</button>
         </div>
       )}
       <form onSubmit={handleSubmit} className="ap-card p-6 space-y-6">

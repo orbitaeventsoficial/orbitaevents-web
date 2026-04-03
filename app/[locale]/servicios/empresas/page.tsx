@@ -7,6 +7,7 @@ import FAQ from '@/components/seo/FAQ';
 import Client from './client';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
@@ -17,6 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const packs = await getDbPacks({ service: 'empresas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('empresas');
   const t = await getTranslations({ locale, namespace: 'services.empresas' });
 
   return {
@@ -30,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url: '/servicios/empresas',
       images: [
         {
-          url: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
+          url: heroImage,
           alt: t('breadcrumb'),
         },
       ],
@@ -40,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/eventos-empresa/eventos-empresa-02.avif'],
+      images: [heroImage],
     },
     robots: { index: true, follow: true },
     keywords: [
@@ -65,6 +67,7 @@ export default async function EmpresasPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const packs = await getDbPacks({ service: 'empresas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('empresas');
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -117,10 +120,11 @@ export default async function EmpresasPage({ params }: PageProps) {
         }))}
       />
 
-      <Client />
+      <Client heroImage={heroImage} />
 
       <FAQ items={faqItems} />
     </>
   );
 }
+
 

@@ -52,7 +52,7 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Configuració d'emails" data-help-desc="Ajusta la configuració base del sistema: Google Reviews, retard post-event, automatismes actius i percentatges de descompte.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>
@@ -87,7 +87,7 @@ export default function EmailConfigPanel() {
           </select>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3" data-help-title="Automatismes actius" data-help-desc="Activa o desactiva els correus post-event, canvas amb descompte i confirmació d'entrada.">
           <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"

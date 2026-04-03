@@ -1,8 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { deleteAdminCollaborator, getAdminCollaborator, updateAdminCollaborator } from '@/lib/services/collaboratorAdminService';
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const result = await getAdminCollaborator(params.id);
     return NextResponse.json(result.body, { status: result.status });
@@ -13,6 +17,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const result = await updateAdminCollaborator(params.id, body);
@@ -23,7 +30,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const result = await deleteAdminCollaborator(params.id);
     return NextResponse.json(result.body, { status: result.status });

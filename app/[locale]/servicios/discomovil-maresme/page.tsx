@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
+  return {
   title: `Discomóvil Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Pineda, Arenys, Canet y toda la costa. DJ profesional + equipo completo para fiestas privadas.`,
   keywords: ['discomovil Maresme', 'discomóvil Mataró', 'DJ fiesta Maresme', 'discomóvil Calella', 'DJ fiestas costa Maresme'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `Discomóvil Maresme | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas en el Maresme. Mataró, Calella, Pineda y toda la costa.',
     url: '/servicios/discomovil-maresme',
-    images: [{ url: '/img/portfolio/discomovil/discomovil-04.avif', alt: 'Discomóvil Maresme - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'Discomóvil Maresme - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const maresmeTowns = ['Mataró', 'Calella', 'Pineda de Mar', 'Arenys de Mar', 'Canet de Mar', 'Malgrat de Mar', 'Santa Susanna', 'Caldes d\'Estrac', 'Premià de Mar', 'Vilassar de Mar', 'Argentona', 'Sant Andreu de Llavaneres'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DiscomovilMaresmePage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DiscomovilMaresmePage({ params }: PageProps) {
       'Equipo resistente: Preparado para exteriores costeros',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/discomovil/discomovil-04.avif',
-    galleryImages: [
-      '/img/portfolio/discomovil/discomovil-06.avif',
-      '/img/portfolio/discomovil/discomovil-08.avif',
-      '/img/portfolio/discomovil/discomovil-10.avif',
-      '/img/portfolio/discomovil/discomovil-12.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DiscomovilMaresmePage({ params }: PageProps) {
     </>
   );
 }
+

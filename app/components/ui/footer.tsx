@@ -24,18 +24,12 @@ import { useTranslations } from 'next-intl';
 import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SERVICES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, WHATSAPP_URL } from '@/lib/constants';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
-// TikTok icon custom
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
   </svg>
 );
 
-// ========================================
-// CONSTANTS
-// ========================================
-
-// Social links des de site-config
 const SOCIAL_ICON_MAP = {
   Instagram,
   TikTok: TikTokIcon,
@@ -53,11 +47,6 @@ const SOCIAL_LINKS = PUBLIC_FOOTER_SOCIAL_LINK_META.map((item) => {
   };
 }).filter((link) => link.enabled && link.href);
 
-
-// ========================================
-// MAIN FOOTER COMPONENT
-// ========================================
-
 export default function Footer() {
   const t = useTranslations('footer');
   const tCommon = useTranslations('common');
@@ -66,6 +55,7 @@ export default function Footer() {
   const rawCoverage = t.raw('coverageAreas');
   const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : [...PUBLIC_FOOTER_DEFAULT_COVERAGE];
   const [coverageAreas, setCoverageAreas] = useState<string[]>(localizedCoverage);
+  const [managedLogoSrc, setManagedLogoSrc] = useState('/img/logoplanetatextdreta.svg');
 
   useEffect(() => {
     let cancelled = false;
@@ -83,7 +73,21 @@ export default function Footer() {
       }
     };
 
-    loadCoverage();
+    const loadManagedLogo = async () => {
+      try {
+        const response = await fetch('/api/public/image-manager?key=layout.logo.header', { cache: 'no-store' });
+        const data = await response.json().catch(() => null);
+        const src = data?.data?.['layout.logo.header']?.item?.src;
+        if (!cancelled && typeof src === 'string' && src.length > 0) {
+          setManagedLogoSrc(src);
+        }
+      } catch {
+        // mantenir fallback estàtic
+      }
+    };
+
+    void loadCoverage();
+    void loadManagedLogo();
 
     return () => {
       cancelled = true;
@@ -104,29 +108,16 @@ export default function Footer() {
       className="bg-gradient-to-b from-zinc-950 to-black border-t border-white/[0.06] relative overflow-hidden oe-grid-pattern"
       role="contentinfo"
     >
-      {/* Gold accent line at top */}
       <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
-
-      {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-
-
-        {/* ════════════════════════════════════════════════════════════════ */}
-        {/* MAIN FOOTER CONTENT                                              */}
-        {/* ════════════════════════════════════════════════════════════════ */}
         <div className="py-16">
           <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
-
-            {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 1: BRAND & CONTACT                                    */}
-            {/* ════════════════════════════════════════════════════════════ */}
             <div className="lg:col-span-2">
-              {/* Logo amb glow */}
               <Link
                 href="/"
                 className="inline-block mb-6 group"
@@ -135,13 +126,14 @@ export default function Footer() {
                 <div className="relative">
                   <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <Image
-                    src="/img/logoplanetatextdreta.svg"
+                    src={managedLogoSrc}
                     alt="Òrbita Events"
                     width={200}
                     height={60}
                     sizes="200px"
                     quality={80}
                     className="h-14 w-auto relative z-10 group-hover:scale-105 transition-transform duration-300"
+                    unoptimized={managedLogoSrc.includes('/api/uploads/')}
                   />
                 </div>
               </Link>
@@ -150,7 +142,6 @@ export default function Footer() {
                 {tFooterLinks('description')}
               </p>
 
-              {/* Coverage areas amb badges */}
               <div className="flex flex-wrap gap-2 mb-8">
                 {coverageAreas.map((city) => (
                   <span
@@ -162,7 +153,6 @@ export default function Footer() {
                 ))}
               </div>
 
-              {/* Social Media amb efectes */}
               <div className="flex gap-2">
                 {SOCIAL_LINKS.map((social) => {
                   const Icon = social.icon;
@@ -184,9 +174,6 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 2: SERVICIOS                                          */}
-            {/* ════════════════════════════════════════════════════════════ */}
             <div>
               <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
                 <span className="w-1.5 h-6 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full" />
@@ -210,9 +197,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 3: EXPERIÈNCIES TEMÀTIQUES 🔥                         */}
-            {/* ════════════════════════════════════════════════════════════ */}
             <div>
               <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
                 <span className="w-1.5 h-6 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full" />
@@ -237,9 +221,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 4: RECURSOS                                             */}
-            {/* ════════════════════════════════════════════════════════════ */}
             <div>
               <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
                 <span className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full" />
@@ -260,9 +241,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 5: CONTACTE & CTA                                     */}
-            {/* ════════════════════════════════════════════════════════════ */}
             <div>
               <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
                 <span className="w-1.5 h-6 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full" />
@@ -304,7 +282,6 @@ export default function Footer() {
                 </li>
               </ul>
 
-              {/* CTAs */}
               <div className="space-y-3">
                 <Link
                   href="/configurador"
@@ -330,18 +307,12 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ════════════════════════════════════════════════════════════════ */}
-        {/* BOTTOM BAR (Legal & Copyright)                                   */}
-        {/* Padding extra per evitar que el BottomNav mòbil tapi els links   */}
-        {/* ════════════════════════════════════════════════════════════════ */}
         <div className="py-6 pb-24 lg:pb-6 border-t border-white/10 bg-black relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* Copyright */}
             <p className="text-white/60 text-sm text-center md:text-left">
               © {new Date().getFullYear()} Òrbita Events · {t('since')} · {t('copyright')}
             </p>
 
-            {/* Legal Links */}
             <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-2 text-sm pr-20 md:pr-0">
               {PUBLIC_FOOTER_LEGAL_LINKS.map((link, idx) => (
                 <span key={link.nameKey} className="flex items-center gap-4">

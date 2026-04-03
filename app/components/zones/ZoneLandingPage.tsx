@@ -15,12 +15,12 @@ export interface ZoneConfig {
   heroSubtitle: string;
   minPrice: number;
   towns: string[];
-  highlights: string[];  // SEO keywords ara
+  highlights: string[];
   description: string;
   whyChooseUs: string[];
   faqs: Array<{ question: string; answer: string }>;
-  heroImage?: string;  // Imatge hero de la zona
-  galleryImages?: string[];  // Mini galeria de bodes
+  heroImage?: string;
+  galleryImages?: string[];
 }
 
 interface Props {
@@ -46,16 +46,16 @@ export default function ZoneLandingPage({ config }: Props) {
     galleryImages,
   } = config;
 
+  const galleryHref = `/portfolio/${service === 'fiestas' ? 'fiestas-privadas' : service}`;
+
   return (
     <main className="min-h-screen bg-[var(--bg-main)] relative">
-      {/* Hero Section amb imatge */}
       <section className="relative py-20 md:py-32 overflow-hidden">
-        {/* Background image */}
         {heroImage && (
           <div className="absolute inset-0">
             <Image
               src={heroImage}
-              alt={`Bodas en ${zone}`}
+              alt={t(`galleryAltByService.${service}`, { zone, index: 1 })}
               fill
               className="object-cover"
               priority
@@ -68,7 +68,6 @@ export default function ZoneLandingPage({ config }: Props) {
         )}
 
         <div className="relative max-w-5xl mx-auto px-4 text-center">
-          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,7 +79,6 @@ export default function ZoneLandingPage({ config }: Props) {
             </span>
           </motion.div>
 
-          {/* Títol H1 - SEO optimitzat */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -90,7 +88,6 @@ export default function ZoneLandingPage({ config }: Props) {
             {heroTitle}
           </motion.h1>
 
-          {/* Subtítol amb pobles */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,7 +97,6 @@ export default function ZoneLandingPage({ config }: Props) {
             {heroSubtitle}
           </motion.p>
 
-          {/* Preu destacat */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -112,7 +108,6 @@ export default function ZoneLandingPage({ config }: Props) {
             </span>
           </motion.div>
 
-          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -135,7 +130,6 @@ export default function ZoneLandingPage({ config }: Props) {
             </a>
           </motion.div>
 
-          {/* Keywords SEO - Més visuals */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -163,12 +157,11 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* Galeria de bodes a la zona */}
       {galleryImages && galleryImages.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold text-white mb-6 text-center">
-              {t('galleryTitle', { zone })}
+              {t(`galleryTitleByService.${service}`, { zone })}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {galleryImages.slice(0, 4).map((img, index) => (
@@ -181,7 +174,7 @@ export default function ZoneLandingPage({ config }: Props) {
                 >
                   <Image
                     src={img}
-                    alt={`Boda en ${zone} - ${index + 1}`}
+                    alt={t(`galleryAltByService.${service}`, { zone, index: index + 1 })}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -191,10 +184,10 @@ export default function ZoneLandingPage({ config }: Props) {
             </div>
             <div className="text-center mt-6">
               <Link
-                href="/portfolio/bodas"
+                href={galleryHref}
                 className="inline-flex items-center gap-2 text-[var(--oe-gold)] hover:underline"
               >
-                {t('viewMoreWeddings')}
+                {t(`viewMoreByService.${service}`)}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -202,7 +195,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </section>
       )}
 
-      {/* Contingut SEO */}
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-6">
@@ -216,7 +208,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* Per què escollir-nos */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
@@ -238,7 +229,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* Pobles coberts */}
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
@@ -257,7 +247,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* Què inclou */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
@@ -295,7 +284,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-12 text-center">
@@ -317,7 +305,6 @@ export default function ZoneLandingPage({ config }: Props) {
         </div>
       </section>
 
-      {/* CTA Final */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">

@@ -4,7 +4,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de FAQs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -139,12 +139,14 @@ export default async function FAQPage() {
       })}
 
       {faqs.length === 0 && (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
-          <span className="text-4xl">❓</span>
-          <p className="mt-4">No hi ha preguntes freqüents</p>
-          <p className="text-sm">Crea la primera pregunta per començar</p>
-        </div>
+        <AdminEmptyState
+          icon="❓"
+          title="No hi ha preguntes freqüents"
+          description="Crea la primera pregunta per començar"
+        />
       )}
     </AdminPage>
   );
 }
+
+

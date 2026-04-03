@@ -8,9 +8,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { formatDateSimple } from '@/lib/constants';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useAsyncForm } from '../components/useAsyncForm';
 
 type DiscountCode = {
   id: string;
@@ -65,9 +66,8 @@ export default function DiscountCodesPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const { submitting, error: formError, success, setError: setFormError, setSuccess, run, reset } = useAsyncForm();
 
   const loadCodes = useCallback(async () => {
     setError(null);
@@ -103,44 +103,41 @@ export default function DiscountCodesPage() {
 
   const handleCreate = async () => {
     if (!form.code || !form.value || !form.validUntil) {
-      setError('Codi, valor i data de caducitat són obligatoris');
+      setFormError('Codi, valor i data de caducitat són obligatoris');
       return;
     }
 
-    setSubmitting(true);
-    setError(null);
-
     try {
-      const body = {
-        code: form.code.trim(),
-        type: form.type,
-        value: parseFloat(form.value) || 0,
-        description: form.description.trim() || undefined,
-        validUntil: form.validUntil,
-        maxUses: form.maxUses ? parseInt(form.maxUses, 10) : undefined,
-        minOrderValue: form.minOrderValue ? parseFloat(form.minOrderValue) : undefined,
-        isAccumulative: form.isAccumulative,
-      };
+      await run(async () => {
+        const body = {
+          code: form.code.trim(),
+          type: form.type,
+          value: parseFloat(form.value) || 0,
+          description: form.description.trim() || undefined,
+          validUntil: form.validUntil,
+          maxUses: form.maxUses ? parseInt(form.maxUses, 10) : undefined,
+          minOrderValue: form.minOrderValue ? parseFloat(form.minOrderValue) : undefined,
+          isAccumulative: form.isAccumulative,
+        };
 
-      const res = await fetchWithCsrf('/api/admin/discount-codes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        const res = await fetchWithCsrf('/api/admin/discount-codes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data?.error || 'Error creant codi');
+        }
+
+        setSuccess(`Codi "${form.code.toUpperCase()}" creat correctament`);
+        setForm(INITIAL_FORM);
+        setShowForm(false);
+        await loadCodes();
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || 'Error creant codi');
-      }
-
-      setSuccessMsg(`Codi "${form.code.toUpperCase()}" creat correctament`);
-      setForm(INITIAL_FORM);
-      setShowForm(false);
-      await loadCodes();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconegut');
-    } finally {
-      setSubmitting(false);
+    } catch {
+      // L'error queda centralitzat al hook.
     }
   };
 
@@ -177,10 +174,17 @@ export default function DiscountCodesPage() {
 
   if (error && !codes.length) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{error}</p>
-        <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">Reintentar</button>
-      </div>
+      <AdminPage title="Codis de descompte" subtitle="Gestiona codis promocionals per a reserves" className="max-w-5xl">
+        <AdminEmptyState
+          icon="⚠️"
+          title={error}
+          action={
+            <button type="button" onClick={() => { setLoading(true); loadCodes(); }} className="ap-btn ap-btn--primary">
+              Reintentar
+            </button>
+          }
+        />
+      </AdminPage>
     );
   }
 
@@ -199,8 +203,6 @@ export default function DiscountCodesPage() {
       }
       className="max-w-5xl"
     >
-
-      {/* Stats */}
       {stats && (
         <div className="grid gap-4 sm:grid-cols-4">
           <div className="rounded-2xl border p-4">
@@ -222,19 +224,17 @@ export default function DiscountCodesPage() {
         </div>
       )}
 
-      {/* Messages */}
-      {successMsg && (
+      {success && (
         <div className="rounded-xl border p-4">
-          <p className="text-sm">{successMsg}</p>
+          <p className="text-sm">{success}</p>
         </div>
       )}
-      {error && (
+      {formError && (
         <div className="rounded-xl border p-4">
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">{formError}</p>
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <div className="rounded-2xl border p-5 space-y-4">
           <h2 className="text-sm font-semibold">Nou codi de descompte</h2>
@@ -365,7 +365,7 @@ export default function DiscountCodesPage() {
             </button>
             <button
               type="button"
-              onClick={() => { setShowForm(false); setError(null); }}
+              onClick={() => { setShowForm(false); reset(); }}
               className="rounded-xl border px-4 py-2.5 text-sm transition-colors"
             >
               Cancel·lar
@@ -374,7 +374,6 @@ export default function DiscountCodesPage() {
         </div>
       )}
 
-      {/* Codes — Mobile cards */}
       <section className="lg:hidden space-y-3">
         {codes.map((c) => {
           const expired = isExpired(c.validUntil);
@@ -418,15 +417,14 @@ export default function DiscountCodesPage() {
           );
         })}
         {codes.length === 0 && (
-          <div className="rounded-2xl border admin-card-glass p-12 text-center">
-            <span className="text-4xl">🎟️</span>
-            <p className="mt-4">No hi ha codis de descompte</p>
-            <p className="text-sm">Crea el primer codi per oferir promocions</p>
-          </div>
+          <AdminEmptyState
+            icon="🎟️"
+            title="No hi ha codis de descompte"
+            description="Crea el primer codi per oferir promocions"
+          />
         )}
       </section>
 
-      {/* Codes — Desktop table */}
       <div className="hidden lg:block rounded-2xl border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm" aria-label="Codis de descompte">
@@ -449,19 +447,11 @@ export default function DiscountCodesPage() {
                 return (
                   <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
                     <td className="px-4 py-3">
-                      <code className="text-xs font-mono px-2 py-1 rounded">
-                        {c.code}
-                      </code>
-                      {c.description && (
-                        <p className="text-[10px] mt-0.5">{c.description}</p>
-                      )}
+                      <code className="text-xs font-mono px-2 py-1 rounded">{c.code}</code>
+                      {c.description && <p className="text-[10px] mt-0.5">{c.description}</p>}
                     </td>
-                    <td className="px-4 py-3">
-                      {c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}
-                    </td>
-                    <td className="px-4 py-3 font-semibold">
-                      {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
-                    </td>
+                    <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
+                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}</td>
                     <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-white/60'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-[10px]">Caducat</span>}
@@ -481,9 +471,7 @@ export default function DiscountCodesPage() {
                         {c.isActive && !expired && !maxReached ? 'Actiu' : 'Inactiu'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs">
-                      {c.isAccumulative ? 'Sí' : 'No'}
-                    </td>
+                    <td className="px-4 py-3 text-xs">{c.isAccumulative ? 'Sí' : 'No'}</td>
                     <td className="px-4 py-3 text-right">
                       <button
                         type="button"
@@ -501,17 +489,15 @@ export default function DiscountCodesPage() {
         </div>
 
         {codes.length === 0 && (
-          <div className="p-12 text-center">
-            <span className="text-4xl">🎟️</span>
-            <p className="mt-4">No hi ha codis de descompte</p>
-            <p className="text-sm">Crea el primer codi per oferir promocions</p>
+          <div className="p-12">
+            <AdminEmptyState
+              icon="🎟️"
+              title="No hi ha codis de descompte"
+              description="Crea el primer codi per oferir promocions"
+            />
           </div>
         )}
       </div>
     </AdminPage>
   );
 }
-
-
-
-

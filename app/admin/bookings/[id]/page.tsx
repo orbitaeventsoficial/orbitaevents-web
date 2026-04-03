@@ -260,7 +260,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       }
     >
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5" data-help-title="Resum executiu de la reserva" data-help-desc="Resumeix import, estat de pagament, flux client, post-event i vincle comercial abans d'entrar al detall operatiu.">
         <div className="ap-card rounded-xl px-4 py-3">
           <p className="text-xs uppercase tracking-wide">Total reserva</p>
           <p className="text-xl font-semibold">{formatCurrency(booking.total)}</p>
@@ -317,7 +317,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       <BookingSectionNav />
 
       {/* Client Info */}
-      <section id="sec-client" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-client" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Informació del client" data-help-desc="Concentra les dades de contacte, accessos ràpids i historial resumit del client d'aquesta reserva.">
         <h2 className="text-lg font-semibold mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -401,7 +401,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Event Info */}
-      <section id="sec-event" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-event" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Detalls de l'esdeveniment" data-help-desc="Mostra quan i on passa l'esdeveniment, quin tipus és i quantes persones hi assistiran.">
         <h2 className="text-lg font-semibold mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -436,7 +436,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Services */}
-      <section id="sec-serveis" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-serveis" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Serveis contractats" data-help-desc="Desglossa el pack, els extres i les hores addicionals contractades per aquesta reserva.">
         <h2 className="text-lg font-semibold mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
@@ -510,7 +510,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </div>
 
       {/* Pricing */}
-      <section id="sec-finances" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-finances" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Resum econòmic" data-help-desc="Resumeix subtotal, descompte, IVA, total i estat actual dels cobraments de la reserva.">
         <h2 className="text-lg font-semibold mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -626,7 +626,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      <section id="sec-comunicacions" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-comunicacions" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Historial de comunicacions" data-help-desc="Recull enviaments i respostes vinculades a la reserva per entendre què s'ha comunicat i per quin canal.">
         <h2 className="text-lg font-semibold mb-4">Historial de comunicacions</h2>
         {recentCommRows.length === 0 ? (
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
@@ -658,7 +658,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Activity timeline */}
       {activityTimeline.length > 0 && (
-        <section id="sec-historial" className="scroll-mt-28 ap-card rounded-xl p-6">
+        <section id="sec-historial" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Historial de canvis" data-help-desc="Mostra la traça administrativa dels canvis importants fets a la reserva al llarg del temps.">
           <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
           <div className="relative pl-6 space-y-0">
             <div className="absolute left-2 top-1 bottom-1 w-px admin-tone-bg-neutral" />
@@ -682,7 +682,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       )}
 
       {/* Gallery Section */}
-      <section id="sec-galeria" className="scroll-mt-28 ap-card rounded-xl p-6">
+      <section id="sec-galeria" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Galeria de la reserva" data-help-desc="Permet consultar o gestionar imatges associades a aquest esdeveniment o a la seva documentació visual.">
         <BookingGallery bookingId={booking.id} />
       </section>
 
@@ -738,6 +738,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
+
 
 
 

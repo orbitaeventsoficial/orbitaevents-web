@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en La Selva desde ${MIN_PRICE}€. Blanes, Lloret, Santa Coloma, Hostalric. Costa y interior de Girona.`,
   keywords: ['DJ bodas La Selva', 'DJ bodas Blanes', 'DJ bodas Lloret', 'DJ bodas Santa Coloma', 'bodas La Selva Girona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en La Selva. Costa y interior de la comarca de Girona.',
     url: '/servicios/dj-bodas-selva',
-    images: [{ url: '/img/portfolio/bodas/bodas-01.avif', alt: 'DJ Bodas La Selva - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas La Selva - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const selvaTowns = ['Blanes', 'Lloret de Mar', 'Santa Coloma de Farners', 'Hostalric', 'Arbúcies', 'Breda', 'Vidreres', 'Caldes de Malavella', 'Cassà de la Selva', 'Tossa de Mar', 'Sils', 'Maçanet de la Selva', 'Riudarenes', 'Anglès'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-selva' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
       'Jardines botánicos: Marimurtra y espacios únicos',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-02.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-06.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
     </>
   );
 }
+

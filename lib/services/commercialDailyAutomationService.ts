@@ -10,6 +10,8 @@ import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 
+const COMMERCIAL_SCORING_BATCH_SIZE = 50;
+
 export async function runCommercialDailyAutomation() {
   const [sequences, sla, paymentReminders] = await Promise.all([
     runCommercialSequences(),
@@ -39,13 +41,26 @@ export async function runCommercialDailyAutomation() {
       },
     });
 
-    for (const lead of activeLeads) {
+    const scoredLeads = activeLeads.map((lead) => {
       const result = scoreLead(lead);
-      await (prisma.lead.update as Function)({
-        where: { id: lead.id },
-        data: { cachedScore: result.score, cachedScoreAt: new Date() },
-      });
-      scoringUpdated++;
+      return {
+        id: lead.id,
+        score: result.score,
+        cachedScoreAt: new Date(),
+      };
+    });
+
+    for (let index = 0; index < scoredLeads.length; index += COMMERCIAL_SCORING_BATCH_SIZE) {
+      const batch = scoredLeads.slice(index, index + COMMERCIAL_SCORING_BATCH_SIZE);
+      await prisma.$transaction(
+        batch.map((lead) =>
+          prisma.lead.update({
+            where: { id: lead.id },
+            data: { cachedScore: lead.score, cachedScoreAt: lead.cachedScoreAt },
+          })
+        )
+      );
+      scoringUpdated += batch.length;
     }
   } catch (err) {
     log.error('Scoring cache update failed', err);

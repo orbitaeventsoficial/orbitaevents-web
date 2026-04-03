@@ -77,6 +77,7 @@ export default function HeaderChampion() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [managedLogoSrc, setManagedLogoSrc] = useState('/img/logoplanetatextdreta.svg');
 
   // Refs per scroll sense temblor
   const lastScrollY = useRef(0);
@@ -127,6 +128,28 @@ export default function HeaderChampion() {
     }
   }, [activeDropdown]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadManagedLogo = async () => {
+      try {
+        const response = await fetch('/api/public/image-manager?key=layout.logo.header', { cache: 'no-store' });
+        const data = await response.json().catch(() => null);
+        const src = data?.data?.['layout.logo.header']?.item?.src;
+        if (!cancelled && typeof src === 'string' && src.length > 0) {
+          setManagedLogoSrc(src);
+        }
+      } catch {
+        // mantenir fallback estàtic
+      }
+    };
+
+    void loadManagedLogo();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════ */}
@@ -161,7 +184,7 @@ export default function HeaderChampion() {
               style={{ touchAction: 'manipulation' }}
             >
               <Image
-                src="/img/logoplanetatextdreta.svg"
+                src={managedLogoSrc}
                 alt="Òrbita Events"
                 width={260}
                 height={80}
@@ -554,3 +577,4 @@ export default function HeaderChampion() {
     </>
   );
 }
+

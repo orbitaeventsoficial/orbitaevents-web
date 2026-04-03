@@ -15,7 +15,6 @@ import {
   WHATSAPP_NUMBER,
 } from '@/lib/constants';
 import { HALLOWEEN_HERO_LIGHTNING_EPISODES } from '@/lib/constants/halloween-atmosphere';
-import { PORTFOLIO_IMAGES } from '@/config/portfolio-images';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import HalloweenAtmosphere from '@/app/components/ui/HalloweenAtmosphere';
 import HalloweenDecorationSection from '@/app/components/ui/HalloweenDecorationSection';
@@ -82,7 +81,9 @@ const BODY_CARD_CLASS =
 // MAIN CLIENT COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-export default function HalloweenClient() {
+type HalloweenGalleryItem = { src: string; alt: string };
+
+export default function HalloweenClient({ initialGallery }: { initialGallery: HalloweenGalleryItem[] }) {
   const t = useTranslations('halloweenPage');
   const tWhatsapp = useTranslations('whatsappMessages');
   const prefersReducedMotion = useReducedMotion();
@@ -94,9 +95,7 @@ export default function HalloweenClient() {
   const [heroScrollProgress, setHeroScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
-  const halloweenGallery = PUBLIC_HALLOWEEN_GALLERY_SELECTION.map((src) =>
-    (PORTFOLIO_IMAGES['fiestas-tematicas-halloween'] || []).find((image) => image.src === src)
-  ).filter((image): image is NonNullable<(typeof PORTFOLIO_IMAGES)['fiestas-tematicas-halloween'][number]> => Boolean(image));
+  const halloweenGallery = initialGallery;
   const year = new Date().getFullYear();
   const heroTags = PUBLIC_HALLOWEEN_HERO_TAGS ?? [];
   const includeKeys = PUBLIC_HALLOWEEN_INCLUDES_KEYS ?? [];
@@ -875,6 +874,7 @@ export default function HalloweenClient() {
     </main>
   );
 }
+
 
 
 

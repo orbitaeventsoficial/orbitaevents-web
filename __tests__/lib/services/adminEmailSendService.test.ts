@@ -48,6 +48,10 @@ vi.mock('@/app/config/site-config', () => ({
 }));
 vi.mock('@/lib/site', () => ({
   getAppBaseUrl: () => 'https://test.orbita.events',
+  absoluteUrl: (path: string, base: string) => path.startsWith('http') ? path : `${base}${path}`,
+}));
+vi.mock('@/lib/services/imageManagerService', () => ({
+  getManagedImageOverride: vi.fn().mockResolvedValue(null),
 }));
 
 import { sendAdminEmail } from '@/lib/services/adminEmailSendService';

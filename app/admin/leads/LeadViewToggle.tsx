@@ -32,7 +32,11 @@ export default function LeadViewToggle({
 
   return (
     <>
-      <div className="flex items-center justify-center sm:justify-start gap-2">
+      <div
+        className="flex items-center justify-center sm:justify-start gap-2"
+        data-help-title="Canvi de vista d'entrades"
+        data-help-desc="Pipeline per avançar oportunitats d'una etapa a una altra. Llista per revisar cada entrada amb més detall."
+      >
         <label htmlFor="lead-view-mode" className="text-xs font-medium">
           Vista
         </label>
@@ -40,7 +44,7 @@ export default function LeadViewToggle({
           id="lead-view-mode"
           value={view}
           onChange={(e) => setView(e.target.value === 'pipeline' ? 'pipeline' : 'list')}
-          className="rounded-xl border px-3 py-1.5 text-xs font-medium "
+          className="rounded-xl border px-3 py-1.5 text-xs font-medium"
         >
           <option value="pipeline">Pipeline</option>
           <option value="list">Llista</option>
@@ -51,4 +55,3 @@ export default function LeadViewToggle({
     </>
   );
 }
-

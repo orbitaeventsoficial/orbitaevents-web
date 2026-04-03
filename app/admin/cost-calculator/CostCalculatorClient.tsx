@@ -147,9 +147,9 @@ export default function CostCalculatorClient() {
   };
 
   return (
-    <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+    <div className="grid lg:grid-cols-[300px_1fr] gap-6" data-help-title="Calculadora de costos" data-help-desc="Munta pressupostos personalitzats arrossegant components (DJ, so, llums, transport...). Calcula cost, marge i preu suggerit.">
       {/* Sidebar — Components disponibles */}
-      <div className="ap-card rounded-xl p-5">
+      <div className="ap-card rounded-xl p-5" data-help-title="Components disponibles" data-help-desc="Arrossega o clica components per afegir-los al pressupost. Cada component té un cost/hora estimat.">
         <h3 className="text-sm font-bold text-white/70 uppercase tracking-wider mb-4">Components</h3>
         <p className="mb-4 text-xs admin-tone-text-slate">Arrossega o clica per afegir</p>
         <div className="space-y-2">
@@ -259,7 +259,7 @@ export default function CostCalculatorClient() {
 
         {/* Totals + Marge */}
         {components.length > 0 && (
-          <div className="rounded-xl border p-6">
+          <div className="rounded-xl border p-6" data-help-title="Resum i marge" data-help-desc="Veu el cost total, ajusta el marge (%) amb el slider, i el sistema calcula benefici i preu suggerit automàticament.">
             <div className="grid md:grid-cols-4 gap-6 mb-6">
               <div>
                 <div className="text-xs admin-tone-text-slate mb-1">Cost total</div>

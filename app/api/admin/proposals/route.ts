@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
       leadId: searchParams.get('leadId') || undefined,
       bookingId: searchParams.get('bookingId') || undefined,
       status: searchParams.get('status'),
+      page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
+      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
     });
     return NextResponse.json(result);
   } catch (error) {
@@ -72,4 +74,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Error creant pressupost' }, { status: 500 });
   }
 }
-

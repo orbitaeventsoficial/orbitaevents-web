@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Empordà desde ${MIN_PRICE}€. Figueres, Roses, Cadaqués, L'Escala. Especialistas en bodas con encanto empordanés.`,
   keywords: ['DJ bodas Empordà', 'DJ bodas Figueres', 'DJ bodas Roses', 'DJ bodas Costa Brava', 'bodas Empordà'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Empordà. Especialistas en masías empordanesas y bodas con vistas al Mediterráneo.',
     url: '/servicios/dj-bodas-emporda',
-    images: [{ url: '/img/portfolio/bodas/bodas-05.avif', alt: 'DJ Bodas Empordà - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Empordà - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const empordaTowns = ['Figueres', 'Roses', 'Cadaqués', 'L\'Escala', 'Empuriabrava', 'Castelló d\'Empúries', 'Peralada', 'Vilabertran', 'Sant Pere Pescador', 'Torroella de Montgrí'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-emporda' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -66,13 +73,8 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
     // Imatges
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-01.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -97,3 +99,4 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
     </>
   );
 }
+

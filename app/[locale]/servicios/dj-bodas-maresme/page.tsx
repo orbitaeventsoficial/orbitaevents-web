@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Arenys de Mar, Vilassar. Desplazamiento incluido.`,
   keywords: ['DJ bodas Maresme', 'DJ bodas Mataró', 'DJ bodas Calella', 'DJ bodas Arenys de Mar', 'bodas Maresme'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Maresme. Toda la comarca con desplazamiento incluido.',
     url: '/servicios/dj-bodas-maresme',
-    images: [{ url: '/img/portfolio/bodas/bodas-04.avif', alt: 'DJ Bodas Maresme - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Maresme - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const maresmeTowns = ['Mataró', 'Calella', 'Arenys de Mar', 'Vilassar de Mar', 'Premià de Mar', 'El Masnou', 'Canet de Mar', 'Sant Pol de Mar', 'Pineda de Mar', 'Tordera', 'Argentona', 'Cabrera de Mar', 'Alella'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-maresme' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
       'Adaptable: Preparados para limitaciones eléctricas',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-04.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/discomovil/discomovil-08.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
     </>
   );
 }
+

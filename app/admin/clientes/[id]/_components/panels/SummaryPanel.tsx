@@ -101,7 +101,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   }, [data.customer]);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4" data-help-title="Resum del client" data-help-desc="Vista general del client: contacte editable, estadístiques, finances, pròxim event i accions ràpides contextuals.">
       {/* Alertes */}
       {alerts.length > 0 && (
         <div className="space-y-2">
@@ -126,7 +126,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       )}
 
       {/* Informació de contacte */}
-      <div className="rounded-2xl border p-5">
+      <div className="rounded-2xl border p-5" data-help-title="Informació de contacte" data-help-desc="Nom, email, telèfon i idioma del client. Clica 'Editar' per modificar in-line.">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Informació de contacte</h2>
           {!editing ? (
@@ -202,7 +202,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       {/* Estadístiques */}
-      <div className="rounded-2xl border p-5">
+      <div className="rounded-2xl border p-5" data-help-title="Resum operatiu" data-help-desc="Pressupostos, reserves, tasques i comunicacions del client d'un cop d'ull.">
         <h2 className="text-lg font-semibold">Resum operatiu</h2>
         <p className="mt-1 text-sm">
           Client des de {formatDate(data.customer.createdAt)}
@@ -295,7 +295,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       )}
 
       {/* Pròxima acció / Pròxim esdeveniment */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2" data-help-title="Pròximes accions" data-help-desc="Aquí veus la pròxima tasca pendent i els pròxims esdeveniments del client per decidir el següent pas.">
         <ActionCard
           title="Pròxima tasca"
           isEmpty={!nextTask}
@@ -371,7 +371,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       {/* Accions ràpides contextuals */}
-      <div className="rounded-2xl border p-5">
+      <div className="rounded-2xl border p-5" data-help-title="Accions ràpides" data-help-desc="Accions contextuals segons l'estat del client: continuar pressupost, enviar recordatori, crear reserva, etc.">
         <h3 className="text-sm font-semibold">Accions ràpides</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {draftProposals > 0 && (

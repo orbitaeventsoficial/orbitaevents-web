@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,7 +53,7 @@ export default function CookieConsent() {
   useEffect(() => {
     const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
     if (!stored) {
-      const timer = setTimeout(() => setShowBanner(true), 2000);
+      const timer = setTimeout(() => setShowBanner(true), 3500);
       return () => clearTimeout(timer);
     }
 
@@ -93,7 +93,7 @@ export default function CookieConsent() {
       notifyConsentUpdate();
     } catch {
       localStorage.removeItem(COOKIE_CONSENT_KEY);
-      const timer = setTimeout(() => setShowBanner(true), 2000);
+      const timer = setTimeout(() => setShowBanner(true), 3500);
       return () => clearTimeout(timer);
     }
   }, []);

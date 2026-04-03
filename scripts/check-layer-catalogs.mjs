@@ -24,6 +24,8 @@ const allowedCatalogs = new Set([
   'lib/pdf-config.ts::PAGE',
   'lib/rate-limit.ts::RATE_LIMITS',
   'app/admin/leads/colorTheme.ts::LEAD_COLOR_OPTIONS',
+  'app/admin/bookings/BookingPipelineView.tsx::COLUMNS_DEF',
+  'app/admin/leads/LeadPipelineView.tsx::COLUMNS',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;

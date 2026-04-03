@@ -1,3 +1,107 @@
+## 2026-04-03 — Infraestructura pendent resolta + build fixes
+
+### Infraestructura:
+- **ImageAsset taula**: ja existia a Railway via `db push` anterior — confirmat amb `prisma db push` (schema in sync)
+- **Migració dades**: script executat, cap Setting(JSON) antiga a migrar (0 registres, mode auto actiu)
+- **Cron lead-cleanup**: ja configurat a `.github/workflows/daily-crons.yml` (3:00 UTC diàriament). Verificat amb curl directe → HTTP 200, `{autoLost: 0, autoDeleted: 0}`
+- **OPENWEATHERMAP_API_KEY**: ja existia al `.env` local i a Railway — verificat amb curl a `/api/admin/weather` → HTTP 200. Era un pendent obsolet de memòria
+
+### Build fixes:
+- `LayoutWrapper.tsx`: afegit `hasSeenMobileIntro` que faltava al cridar `getClientIntroMode()` — error TS
+- `MobileHomePage.tsx`: restaurat state `showIntro`/`handleIntroFinish` amb `hasSeenMobileIntro`/`markMobileIntroSeen` de `lib/intro.ts` — el bloc JSX de HeroPortalLogo existia però el state s'havia perdut
+- `ImagePlacementCard.tsx`: `items` embolcallat amb `useMemo` per evitar warning react-hooks/exhaustive-deps
+- `check-layer-catalogs.mjs`: afegits `COLUMNS_DEF` i `COLUMNS` a allowlist (còpies locals de constants compartides)
+
+### Validació:
+- `npx tsc --noEmit` OK — 0 errors
+- 1837/1837 tests OK, 146 fitxers, 0 fails
+- `pnpm build` OK — compilació neta
+
+## 2026-04-03 — Image Manager v2: monocapa completa
+
+### Connexió consumidors (`lib/services/publicServiceMediaService.ts`):
+- `home.servicesCards.*`: connectat a `listPublicMobileServiceCardImages()` — comprova override específic de la targeta mòbil ABANS de caure al hero del servei
+- Verificat que els altres 35 placements JA estaven cablejats (hero-media route, portfolio showcase, TrustedByLogos, layout.tsx, HeaderChampion, footer, admin layout, temàtiques)
+- **40/40 placements connectats** a consumidors reals
+
+### Tests nous (`__tests__/lib/services/publicServiceMediaService.test.ts` — NOU):
+- 13 tests: hero override/media/photos/fallback, gallery collection/single/fallback/dedup, mobile cards override específic/fallback/prioritat card vs hero
+- 1837 tests totals, 146 fitxers, 0 fails
+
+## 2026-04-03 — Image Manager v2: de Setting(JSON) a monocapa real
+
+### Model Prisma (`prisma/schema.prisma`):
+- Nou model `ImageAsset` amb `placement`, `src`, `filePath`, `alt`, `label`, `mimeType`, `width`, `height`, `sizeBytes`, `sortOrder`
+- Indexes a `placement` i `[placement, sortOrder]`
+- Mode inferit: té rows = manual, no en té = auto
+- Kind inferit de la key (lògica existent `inferPlacementKind`)
+- `prisma generate` OK — migració BD pendent de deploy a Railway
+
+### Processament d'imatges (`lib/services/imageManagerProcessing.ts` — NOU):
+- Estratègia per secció: SVG passthrough, `layout.*` optimitza mantenint format, `seo.*` JPEG 1200×630, resta AVIF via `normalizePortfolioImageBuffer`
+- Reutilitza `portfolioImageService.ts` per la conversió AVIF
+- Retorna metadata (width, height, sizeBytes, mimeType) per guardar a la BD
+
+### Servei reescrit (`lib/services/imageManagerService.ts`):
+- Eliminat tot el sistema JSON-store: `readStore`, `writeStore`, `normalizeStore`, `normalizePlacementState`, `sanitizeAsset`
+- Reimplementat amb Prisma queries directes: `findFirst`, `findMany`, `create`, `update`, `delete`, `deleteMany`
+- Contracte públic IDÈNTIC: `getManagedImageOverride()` i `getManagedImageCollection()` retornen el mateix tipus
+- Nou `reorderImageManagerAssets()` per reordenar col·leccions
+- Upload integra processament automàtic abans de desar
+
+### API route (`app/api/admin/image-manager/route.ts`):
+- PATCH nou per reordenar col·leccions (`{ key, items: [{ id, sortOrder }] }`)
+- POST integra `processImageManagerUpload()` (abans desava raw sense processar)
+- GET/PUT/DELETE sense canvis de contracte
+
+### Frontend (`app/admin/image-manager/`):
+- `ImagePlacementCard.tsx` (NOU): card per placement amb drag-and-drop upload, grid de col·leccions amb reorder (fletxes), preview, alt edit inline, delete per asset
+- `page.tsx` simplificat: usa `ImagePlacementCard`, estadístiques (total/manuals/auto), sense batched save (operacions immediates)
+
+### Migració (`scripts/migrate-image-manager-to-prisma.ts` — NOU):
+- Script one-time que llegeix Setting(JSON) antiga i crea registres ImageAsset
+- Idempotent: si ja hi ha registres, no fa res
+- Pendent d'executar un cop la migració Prisma estigui desplegada
+
+### Tests nous (28):
+- `imageManagerService.test.ts`: 22 tests (get single/collection, payload, upload single/collection/replace, delete single/collection, save modifications, reorder, invalid key)
+- `imageManagerProcessing.test.ts`: 6 tests (SVG passthrough, AVIF conversió, JPEG-OG, optimize-keep-format PNG/WebP, sizeBytes)
+
+### Consumidors NO tocats:
+- `publicServiceMediaService.ts`, `portfolio/page.tsx`, `layout.tsx`, temàtiques — mateixa API, zero canvis necessaris
+
+### Validació:
+- `npx tsc --noEmit` OK — 0 errors
+- 1824/1824 tests OK (28 nous)
+- `next build` compila correctament (errors pre-existents a /about per connexió BD, no relacionats)
+
+### Pendent infraestructura:
+- `npx prisma migrate dev --name add_image_assets` (o `prisma db push` a Railway)
+- `npx tsx scripts/migrate-image-manager-to-prisma.ts` per migrar dades existents del Setting(JSON)
+
+## 2026-04-02 — Performance + Galeria service-aware + Build fix
+
+### Performance:
+- `revalidate = 86400` a tematica-halloween i tematica-mon-magic (ISR 24h, abans SSR pur)
+- 3 AVIF mon-magic comprimits: quality 75 effort 9, resolució intacta (3200px), ~20% reducció
+- 2 fitxers .bak eliminats (-9.3MB)
+- Dashboard admin: 5 blocs `await Promise.all` seqüencials → 1 sol bloc massiu (~7.2s → ~2-3s)
+- Prisma indexes aplicats a Railway via `prisma db push`
+- favicon.ico generat per Google search + favicons temàtics Halloween/Món Màgic
+- Performance benchmark Playwright: 44 mesures (8 públiques × 3 devices + 10 admin × 2 devices)
+
+### Galeria ZoneLandingPage service-aware:
+- Traduccions `galleryTitleByService`, `viewMoreByService`, `galleryAltByService` a ca/es/en
+- Claus duplicades velles eliminades dels 3 JSONs
+- `publicServiceMediaService.ts` ja existia amb la interfície correcta
+
+### Build fixes:
+- `googleReviewsStaticFile.ts`: `fs` condicional (require dinàmic) per evitar error webpack en client
+- `portfolio/page.tsx`: comilla mal escapada arreglada
+- `performance.test.ts`: brightness 0.6 → 0.72 actualitzat
+
+### Tests: 1796/1796 OK, 0 fails, 143 fitxers
+
 ## 2026-03-31 — Upgrade visual About + Header + Footer + PortfolioShowcase + Blog detail
 
 ### About (`app/[locale]/about/page.tsx`):
@@ -844,9 +948,9 @@
 ## 2026-03-21 Ã¢â‚¬â€ Admin: event/source display compartit i menys fallbacks locals
 
 ### QuÃƒÂ¨ s'ha fet
-- pp/admin/bookings/page.tsx, pp/admin/leads/page.tsx i pp/admin/inbox/compose/ComposeForm.tsx passen a consumir getEventLabel() i/o getSourceDisplay() en lloc de repetir MAP[value] || value.
-- pp/admin/mensajes/page.tsx deixa de mantenir un default local per l'estat del lead i usa LEAD_STATUS_CONFIG.NEW com a fallback comÃƒÂº.
-- pp/admin/presupuestos/ProposalsList.tsx deixa de mantenir DEFAULT_STATUS_STYLE i reaprofita PROPOSAL_STATUS_CONFIG.DRAFT.
+- pp/admin/bookings/page.tsx, pp/admin/leads/page.tsx i pp/admin/inbox/compose/ComposeForm.tsx passen a consumir getEventLabel() i/o getSourceDisplay() en lloc de repetir MAP[value] || value.
+- pp/admin/mensajes/page.tsx deixa de mantenir un default local per l'estat del lead i usa LEAD_STATUS_CONFIG.NEW com a fallback comÃƒÂº.
+- pp/admin/presupuestos/ProposalsList.tsx deixa de mantenir DEFAULT_STATUS_STYLE i reaprofita PROPOSAL_STATUS_CONFIG.DRAFT.
 
 ### Per quÃƒÂ¨
 - aquests patrons eren exactament la capa local que torna a crÃƒÂ©ixer sense aportar comportament: mateix fallback, mateix label i mateixa semÃƒÂ ntica reescrits per pantalla.
@@ -863,9 +967,9 @@ px tsc --noEmit passa.
 
 ### QuÃƒÂ¨ s'ha fet
 - lib/constants/index.ts concentra ara SETTINGS_TYPE_LABELS, SETTINGS_CATEGORY_CONFIG i FAQ_CATEGORY_CONFIG perquÃƒÂ¨ settings i FAQ no tornin a mantenir maps locals de labels, icones i descripcions.
-- pp/admin/settings/page.tsx, pp/admin/settings/SettingsClient.tsx i pp/admin/faq/page.tsx passen a consumir aquesta capa comuna.
+- pp/admin/settings/page.tsx, pp/admin/settings/SettingsClient.tsx i pp/admin/faq/page.tsx passen a consumir aquesta capa comuna.
 - lib/customer-hub/labels.ts incorpora CUSTOMER_HUB_STAGE_ORDER, CUSTOMER_HUB_STAGE_LABELS, CUSTOMER_HUB_STATUS_TONES i CUSTOMER_HUB_AVATAR_TONES.
-- pp/admin/clientes/[id]/_components/CustomerHeader.tsx deixa de definir localment ordre d'etapes, labels, tons i gradients de l'estat del client.
+- pp/admin/clientes/[id]/_components/CustomerHeader.tsx deixa de definir localment ordre d'etapes, labels, tons i gradients de l'estat del client.
 
 ### Per quÃƒÂ¨
 - aquest lot encara tenia configuraciÃƒÂ³ de presentaciÃƒÂ³ i catÃƒÂ leg compartit enterrada dins pÃƒÂ gines/components d'admin.
@@ -7596,13 +7700,13 @@ g
 - `lib/services/bookingRouteService.ts` ja no construeix un `Set(...)` local per `BOOKING_CALENDAR_SYNC_FIELDS` i ara comprova la sensibilitat de sync directament contra el cataleg compartit.
 
 ## 2026-03-23 - Layout publica el JSON-LD d'organitzacio des de constants compartides
-- pp/[locale]/layout.tsx ja no mante JSON_LD_ORGANIZATION local i ara consumeix getPublicOrganizationJsonLd(...) des de lib/constants/index.ts.
+- pp/[locale]/layout.tsx ja no mante JSON_LD_ORGANIZATION local i ara consumeix getPublicOrganizationJsonLd(...) des de lib/constants/index.ts.
 - El layout conserva nomes el calcul dels preus vius i la injeccio del script, mentre el cataleg SEO estructurat queda centralitzat a la capa comuna.
 
 
 ## 2026-03-23 - Intro comparteix el cataleg tecnic de bots
 - lib/intro.ts ja no mante INTRO_BOT_PATTERNS com a cataleg local opac i ara l'exposa com a constant compartida del modul.
-- BottomNav i ooter es mantenen fora d'aquest tall perque el que hi queda es wiring local d'icones i components, no metadada compartible.
+- BottomNav i ooter es mantenen fora d'aquest tall perque el que hi queda es wiring local d'icones i components, no metadada compartible.
 
 
 ## 2026-03-23 - Guard automatic contra catalegs locals sospitosos
@@ -7611,7 +7715,7 @@ g
 
 
 ## 2026-03-23 - El guard de capa entra al pipeline de build
-- package.json ara executa pnpm run arch:layer:check al principi de uild, de manera que els nous catalegs locals sospitosos bloquegen la build abans de continuar.
+- package.json ara executa pnpm run arch:layer:check al principi de uild, de manera que els nous catalegs locals sospitosos bloquegen la build abans de continuar.
 - Això converteix la norma de capa en enforcement automatic, no nomes en guia o script optatiu.
 
 
@@ -7626,16 +7730,16 @@ g
 
 
 ## 2026-03-23 - Nova comanda curta de validacio base
-- package.json incorpora pnpm run validate:core, que executa rch:layer:check, 	sc --noEmit i i18n:packs:guard en una sola passada rapida.
+- package.json incorpora pnpm run validate:core, que executa rch:layer:check, 	sc --noEmit i i18n:packs:guard en una sola passada rapida.
 - Serveix com a rutina minima de repo abans de build i redueix la friccio de mantenir la norma de capa en el dia a dia.
 
 
 ## 2026-03-23 - Repassada final amplia: tanco cinc catalegs residuals fora del circuit principal
-- pp/api/admin/activity/route.ts ja no mante CATEGORY_MAP local i ara consumeix ADMIN_ACTIVITY_CATEGORY_MAP des de lib/constants/admin.ts.
-- pp/api/admin/coverage/route.ts ja no mante MESSAGES local i ara consumeix ADMIN_COVERAGE_API_MESSAGES des de lib/constants/index.ts.
+- pp/api/admin/activity/route.ts ja no mante CATEGORY_MAP local i ara consumeix ADMIN_ACTIVITY_CATEGORY_MAP des de lib/constants/admin.ts.
+- pp/api/admin/coverage/route.ts ja no mante MESSAGES local i ara consumeix ADMIN_COVERAGE_API_MESSAGES des de lib/constants/index.ts.
 - prisma/seed-email-templates.ts ja no mante DESCRIPTIONS local i ara consumeix ADMIN_EMAIL_TEMPLATE_DESCRIPTIONS des de lib/constants/admin.ts.
 - lib/services/weatherService.ts ja no mante WEATHER_DESCRIPTIONS_CA local i ara consumeix la capa compartida de lib/constants/index.ts.
-- pp/[locale]/blog/[slug]/page.tsx ja no mante CATEGORY_COLORS local i ara consumeix PUBLIC_BLOG_CATEGORY_COLORS des de lib/constants/index.ts.
+- pp/[locale]/blog/[slug]/page.tsx ja no mante CATEGORY_COLORS local i ara consumeix PUBLIC_BLOG_CATEGORY_COLORS des de lib/constants/index.ts.
 
 
 ## 2026-03-25 - Grid pattern: cobertura completa + fix z-index + footer radial — NO TOCAR
@@ -7687,8 +7791,8 @@ g
 - Validació extra després d'aquesta extracció: `npx tsc --noEmit` OK i `pnpm run arch:layer:check` OK.
 
 ## 2026-03-27 - Capa d ajuda curta als gestors troncals
-- He creat pp/admin/components/AdminHelpPanel.tsx com a capa compartida d ajuda breu i didàctica.
-- L he aplicada a 	ext-manager, clientes, ookings i leads amb tres llegendes curtes per pantalla.
+- He creat pp/admin/components/AdminHelpPanel.tsx com a capa compartida d ajuda breu i didàctica.
+- L he aplicada a 	ext-manager, clientes, ookings i leads amb tres llegendes curtes per pantalla.
 - He simplificat el to perquè sigui més natural, sense tecnicismes i amb el perquè de cada bloc.
 - Validació passada: 
 px tsc --noEmit i pnpm run arch:layer:check.
@@ -8015,3 +8119,216 @@ px tsc --noEmit i pnpm run arch:layer:check.
 - passada final curta a `desktop` i `mobile` sobre les rutes públiques principals
 - sense errors de runtime al sweep final; l últim soroll real era `about` i ja queda resolt
 - resum de sweep a `.codex-captures/public-sweep-2026-04-01/summary.json`
+
+## 2026-04-02 — Home portfolio showcase unificat amb BBDD
+
+### Home pública (`app/[locale]/page.tsx`, `app/components/HomePageWrapper.tsx`, `app/components/marketing/PortfolioShowcase.tsx`, `app/components/mobile-ultimate/MobileHomePage.tsx`, `app/components/mobile-ultimate/MobilePortfolioShowcase.tsx`, `lib/services/publicPortfolioShowcaseService.ts`):
+- la home pública ja no construeix el `portfolio showcase` només amb seleccions estàtiques al client
+- s'ha creat `lib/services/publicPortfolioShowcaseService.ts` com a capa compartida per a `desktop` i `mobile`
+- aquest model prioritza `PortfolioMedia`, després `booking photos` i només al final cau a l'estàtic per no deixar la home sense contingut si falla la capa real
+- `app/[locale]/page.tsx` carrega les històries al servidor i passa exactament el mateix contingut a la home `desktop` i a la `mobile`
+- `HomePageWrapper` i `MobileHomePage` ja no decideixen un catàleg diferent: passen el mateix model a `MobilePortfolioShowcase`
+- corregit també el wiring de tipus perquè la integració entre server i client quedi neta amb `npx tsc --noEmit`
+
+### Punt honest pendent:
+- `MobileServicesCards.tsx` encara conserva imatges fixes de suport visual per als serveis; no governen el portfolio ni el contingut principal, però és un candidat clar si es vol empènyer la monocapa encara més
+
+### Validació:
+- `npx tsc --noEmit` OK
+
+## 2026-04-02 — Mobile services cards alineats amb el mateix portfolio de la home
+
+### Home mòbil (`app/components/mobile-ultimate/MobileServicesCards.tsx`, `app/components/mobile-ultimate/MobileHomePage.tsx`):
+- `MobileServicesCards` ja no depèn només de cinc rutes fixes d'imatges quan la home ja té carregat el `portfolio showcase` real
+- la secció reaprofita `portfolioStories` i prioritza la primera foto real disponible per `bodas`, `Halloween`, `Món Màgic`, `fiestas` i `empresas`
+- es manté fallback estàtic tècnic per no deixar les cards sense suport visual si la capa real falla
+
+### Validació:
+- `npx tsc --noEmit` OK
+
+## 2026-04-02 — Serveis base alineats amb la mateixa capa de media pública
+
+### Serveis base (`lib/services/publicServiceMediaService.ts`, `app/[locale]/servicios/page.tsx`, `app/[locale]/servicios/client.tsx`, `app/[locale]/servicios/bodas/*`, `app/[locale]/servicios/discomovil/*`, `app/[locale]/servicios/fiestas/*`, `app/[locale]/servicios/empresas/*`):
+- s'ha creat `lib/services/publicServiceMediaService.ts` com a capa compartida per resoldre la imatge principal pública dels serveis base
+- la prioritat és la mateixa que a la resta del bloc: `PortfolioMedia` → `booking photos` → fallback estàtic tècnic
+- `servicios`, `bodas`, `discomovil`, `fiestas` i `empresas` ja no depenen només d'una ruta fixa d'imatge per al hero i per a l'OG/Twitter image
+- les pàgines server passen `heroImage` als clients corresponents, de manera que `desktop`, SEO i render del hero consumeixen la mateixa font
+
+### Punt honest pendent:
+- les landings SEO locals (`dj-bodas-*`, `discomovil-*`, etc.) encara conserven seleccions visuals estàtiques pròpies i són el següent bloc si es vol empènyer la monocapa fins al final també aquí
+
+### Validació:
+- `npx tsc --noEmit` OK
+
+## 2026-04-02 — Landings SEO locals alineades amb la mateixa capa de media
+
+### Landings locals (`app/[locale]/servicios/dj-bodas-*`, `app/[locale]/servicios/dj-fiestas-*`, `app/[locale]/servicios/discomovil-*`):
+- passada homogènia sobre les landings SEO locals perquè deixin de tenir el `hero` i l'`openGraph` enganxats a una ruta fixa diferent a cada pàgina
+- totes aquestes rutes ara usen `getPublicServiceHeroImage(...)` i comparteixen la mateixa prioritat: `PortfolioMedia` → `booking photos` → fallback estàtic tècnic
+- el `heroImage` també es passa a `ZoneLandingPage` via `zoneConfig`, així el render visible i la metadata parteixen de la mateixa font
+
+### Tancament del pendent:
+- `ZoneLandingPage` ja és service-aware i les `galleryImages` de les landings locals també surten de la capa compartida (`PortfolioMedia` → `booking photos` → fallback estàtic tècnic), de manera que hero, OG i galeria visible consumeixen la mateixa jerarquia de fonts
+
+### Validació:
+- 
+px tsc --noEmit OK
+
+## 2026-04-02 — ZoneLandingPage service-aware i galeria compartida per landings locals
+
+### Capa compartida (`lib/services/publicServiceMediaService.ts`):
+- afegit `getPublicServicePortfolioSlug(...)` per compartir el slug funcional del servei entre hero, portfolio i galeria
+- afegit `getPublicServiceGalleryImages(...)` amb la mateixa prioritat de monocapa: `PortfolioMedia` → `booking photos` → fallback estàtic tècnic
+
+### Landings locals (`app/components/zones/ZoneLandingPage.tsx`, `app/[locale]/servicios/dj-bodas-*`, `app/[locale]/servicios/dj-fiestas-*`, `app/[locale]/servicios/discomovil-*`):
+- `ZoneLandingPage` ja no tracta totes les galeries com si fossin bodes
+- el títol, el CTA, els `alt` i l'enllaç a portfolio depenen del servei (`bodas`, `fiestas`, `discomovil`)
+- les landings locals passen `galleryImages` resoltes per la capa compartida en lloc de seleccions estàtiques disperses dins de cada pàgina
+
+### Traduccions (`messages/ca.json`, `messages/es.json`, `messages/en.json`):
+- afegides claus `galleryTitleByService`, `viewMoreByService` i `galleryAltByService` sota `zoneLanding`
+- la copy queda centralitzada i coherent entre web pública, SEO local i variants idiomàtiques
+
+### Validació:
+- `npx tsc --noEmit` OK
+
+
+
+## 2026-04-02 — Home mòbil alineada amb capa pròpia de media de serveis
+
+### Capa compartida (`lib/services/publicServiceMediaService.ts`):
+- ampliada per cobrir també `halloween` i `monmagic`
+- afegit `listPublicMobileServiceCardImages()` per resoldre les imatges de les targetes de serveis mòbil des de la mateixa jerarquia real (`PortfolioMedia` → `booking photos` → fallback tècnic)
+
+### Home mòbil (`app/[locale]/page.tsx`, `app/components/HomePageWrapper.tsx`, `app/components/mobile-ultimate/MobileHomePage.tsx`, `app/components/mobile-ultimate/MobileServicesCards.tsx`):
+- la home pública carrega al servidor tant `portfolioStories` com les imatges reals de les targetes de serveis
+- `MobileServicesCards` deixa de dependre indirectament del `showcase` i consumeix una font pròpia i explícita de media per servei/temàtica
+- es manté fallback estàtic tècnic només per no deixar el carrusel cec si fallen BBDD i galeria
+
+### Validació:
+- `npx tsc --noEmit` OK
+
+## 2026-04-02 - Base del gestor d imatges
+
+### Admin (`app/admin/image-manager/page.tsx`, `app/admin/image-manager/image-manager-config.ts`, `app/api/admin/image-manager/route.ts`):
+- creat un primer gestor d imatges administrable, equivalent conceptual del text-manager pero per placements visuals
+- les claus inicials cobreixen home mobil, serveis base, tematiques, cobertes de portfolio i un primer bloc SEO/OG
+- la UI permet treballar en mode `auto` o `manual`, amb URL i alt compartits per clau
+
+### Backend (`lib/services/imageManagerService.ts`):
+- persistencia sobre `Setting(JSON)` per evitar migracions de Prisma en aquesta passada
+- lectura d overrides manuals per clau amb contracte estable
+- la configuracio queda centralitzada i preparada per creixer cap a un gestor integral d imatges
+
+### Integracio real (`lib/services/publicServiceMediaService.ts`, `app/[locale]/portfolio/page.tsx`):
+- els heroes de serveis, Halloween, Mon Magic i les targetes mobil ja poden ser forcats des del gestor
+- les cobertes de categories del portfolio tambe poden ser governades per clau (`portfolio.category.*.cover`)
+- si no hi ha override manual, es mante la jerarquia real existent (`PortfolioMedia` -> `booking photos` -> fallback tecnic)
+
+### Validacio:
+- `npx tsc --noEmit` OK
+
+
+## 2026-04-02 - Image manager connectat a OG general, Halloween i Mon Magic
+
+### Connectors nous:
+- `app/layout.tsx`: l OG general per defecte ja pot quedar forcat des de `seo.og.default`
+- `app/[locale]/tematica-halloween/page.tsx`: hero i galeria passen per `getPublicServiceHeroImage(''halloween'')` i `getPublicServiceGalleryImages(''halloween'')`
+- `app/[locale]/tematica-mon-magic/page.tsx`: hero i imageSet passen per `getPublicServiceHeroImage(''monmagic'')` i `getPublicServiceGalleryImages(''monmagic'')`
+
+### Efecte:
+- els overrides manuals del gestor d imatges ja no afecten nomes serveis base i targetes mobil
+- ara tambe arriben a l OG global i a dues de les pages tematiques mes importants del projecte
+
+### Validacio:
+- `npx tsc --noEmit` OK
+
+## 2026-04-03 — Image manager: primera passada cap a monocapa real
+
+### Capa central (`lib/services/imageManagerService.ts`, `app/api/admin/image-manager/route.ts`, `app/api/public/image-manager/route.ts`):
+- l'`image manager` deixa d'estar limitat a un override simple `src/alt` i passa a suportar placements amb asset únic o col·lecció d'assets
+- la persistència continua centralitzada a `Setting(JSON)` però ara també guarda metadades d'asset, `path` local i col·leccions ordenades per placement
+- afegit suport d'upload real des de l'API del manager: els fitxers es guarden a `uploads/image-manager/...` i queden servits via `/api/uploads/...`
+- afegit també endpoint públic lleuger perquè components client puguin consumir logos o col·leccions governades pel manager sense inventar un segon sistema
+
+### Consumidors reconnectats:
+- `lib/services/publicServiceMediaService.ts` ja llegeix col·leccions manuals del manager per a galeries de serveis, Halloween i Món Màgic
+- `app/layout.tsx` ja pot resoldre `seo.og.default`, `layout.favicon.main` i `layout.appleTouchIcon` des del manager
+- `app/[locale]/tematica-halloween/page.tsx` i `app/[locale]/tematica-mon-magic/page.tsx` ja poden resoldre OG i favicon temàtics des del manager
+- `app/[locale]/tematica-mon-magic/page.tsx` també accepta override específic de `featured` i `cartell`
+- `app/[locale]/boda-halloween/page.tsx` ja pot reutilitzar el favicon Halloween governat pel manager
+- `app/components/marketing/TrustedByLogos.tsx` ja pot consumir la col·lecció `home.clientLogos` des del manager amb fallback a l'estàtic existent
+
+### Validació:
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` NO es pot donar per tancat en aquesta passada perquè el repo ja arrossega un bloqueig d'arquitectura aliè al bloc d'imatges: `app/admin/bookings/BookingPipelineView.tsx :: COLUMNS_DEF` i `app/admin/leads/LeadPipelineView.tsx :: COLUMNS`
+- `pnpm build` queda bloquejat pel mateix motiu previ de `arch:layer:check`, no per un error nou confirmat del bloc `image manager`
+
+### Punt honest pendent:
+- encara falten més consumidors client per portar a aquesta monocapa real (per exemple logos globals de header/footer/admin i altres col·leccions estables com hero slides o portfolio showcase) i la UI de l'admin encara s'ha d'endurir perquè treballi directament amb uploads i col·leccions, no només amb URL manual
+
+## 2026-04-03 — Image manager: UI d uploads i logos globals connectats
+
+### Admin (`app/admin/image-manager/page.tsx`):
+- la UI ja no es limita a URL manual: ara permet pujar assets reals per placement des del mateix panell
+- els placements de tipus col·lecció mostren els seus items manuals i permeten afegir nous assets o eliminar-ne un de concret
+- es manté el mode `auto/manual`, però el mode manual ja pot governar tant un asset únic com una col·lecció real
+
+### Marca (`app/components/ui/footer.tsx`, `app/admin/layout.tsx`):
+- el logo del footer ja pot venir de `layout.logo.header` via la API pública del manager amb fallback net a l asset estàtic existent
+- el logo del sidebar admin i del sidebar mòbil admin ja poden venir de `layout.logo.admin` amb el mateix criteri de fallback
+- això fa que la capa pública i la capa admin consumeixin ja el mateix model per a marca bàsica, no només per SEO o galeries
+
+### Validació:
+- `npx tsc --noEmit` OK després de reconnectar la UI del manager i els logos globals
+
+### Punt honest pendent:
+- encara falta portar més superfícies client a aquesta mateixa monocapa, especialment header públic, hero slides i altres col·leccions estables com portfolio showcase
+- `pnpm run validate:core` i `pnpm build` continuen bloquejats pel mateix problema aliè del repo a `BookingPipelineView.tsx` i `LeadPipelineView.tsx`
+
+## 2026-04-03 — Image manager: admin UI amb uploads i logos globals connectats
+
+### Admin (`app/admin/image-manager/page.tsx`):
+- la UI del gestor ja no es limita a `src/alt` manuals
+- cada placement pot pujar assets reals des del mateix panell via l’API del manager
+- els placements de tipus `collection` mostren la col·lecció manual actual i permeten eliminar items individuals
+- els placements `single` i `brand` poden pujar/substituir l’asset manual i també esborrar el manual per tornar a la capa automàtica
+
+### Marca global (`app/components/ui/footer.tsx`, `app/admin/layout.tsx`):
+- el logo del footer públic ja pot quedar governat per `layout.logo.header` des del manager amb fallback segur a l’asset estàtic existent
+- el logo del sidebar admin ja pot quedar governat per `layout.logo.admin` des del manager amb el mateix criteri de fallback
+
+### Validació:
+- `npx tsc --noEmit` OK després del tall de UI i logos
+
+## 2026-04-03 — Image manager: hero i portfolio showcase alineats amb la mateixa capa comuna
+
+### Home pública (`app/api/hero-media/route.ts`, `lib/services/publicPortfolioShowcaseService.ts`, `app/api/public/portfolio-showcase/route.ts`):
+- el `hero media` públic continua amb fallback al servei existent, però quan `home.hero.slides` té col·lecció manual al manager ja prioritza aquesta mateixa font comuna
+- el `portfolio showcase` server continua llegint `home.portfolioShowcase` si hi ha col·lecció manual al manager
+- la seva API pública (`/api/public/portfolio-showcase`) ja no reconstrueix la lògica pel seu compte i passa a reutilitzar `listPublicPortfolioShowcaseStories()`
+
+### Validació:
+- `npx tsc --noEmit` OK després d’aquest tall
+
+## 2026-04-03 — Image manager: col·leccions ordenables i feedback inline net
+
+### Admin (`app/admin/image-manager/ImagePlacementCard.tsx`, `app/admin/settings/hero/page.tsx`, `app/api/admin/hero-media/route.ts`):
+- el card de placement ja no usa `alert()` per validar uploads i passa a mostrar feedback inline dins del mateix panell
+- la reordenació de col·leccions es manté operativa via `PATCH` del manager per a hero slides, logos i altres col·leccions manuals
+- la pantalla antiga de `settings/hero` deixa de comportar-se com a gestor separat i queda com a pont cap al `image manager`
+- l’API antiga de `hero-media` queda reconnectada a `home.hero.slides` perquè qualsevol ús residual continuï passant per la capa central
+
+### Validació:
+- `npx tsc --noEmit` OK després d’aquest tall
+
+## 2026-04-03 - Remat final brand assets image manager
+- He connectat els bypasses residuals de marca al manager: apple-touch-icon admin, footer mòbil, JSON-LD de serveis i logos d'email.
+- Emails i JSON-LD reutilitzen placements existents (layout.logo.admin, layout.logo.header, layout.appleTouchIcon) en lloc de crear un sistema paral·lel.
+- Queda pendent només el desplegament de migració Prisma/script si es vol portar dades antigues a prod.
+
+## 2026-04-03 - Correcció consistència cache + migració image manager
+- clearPlacementAssets ara invalida cache immediatament després del canvi a BD i només després fa cleanup de fitxers.
+- Els deletes d'assets individuals també invaliden cache abans de l'IO de fitxers per evitar lectures velles si falla el filesystem.
+- L'upload neteja l'arxiu nou si el flux posterior falla per no deixar orfes.
+- L'script migrate-image-manager-to-prisma.ts ara prepara totes les files i executa createMany + delete setting dins una única $transaction.

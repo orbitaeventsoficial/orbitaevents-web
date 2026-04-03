@@ -1,6 +1,6 @@
 import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
-import type { LeadSource } from '@prisma/client';
+import type { LeadSource, Prisma } from '@prisma/client';
 import { computeBookingFinancialSummary } from './costEngine';
 
 export type ProfitabilityConfig = {
@@ -45,6 +45,7 @@ type ProfitabilityReport = {
 };
 
 const DEFAULT_CONFIG: ProfitabilityConfig = PROFITABILITY_MODEL_DEFAULTS;
+const PROFITABILITY_BATCH_SIZE = 500;
 
 export const DEFAULT_PROFITABILITY_CONFIG = DEFAULT_CONFIG;
 function clampRatio(input: unknown, fallback: number): number { const n = Number(input); if (!Number.isFinite(n)) return fallback; return Math.max(0, Math.min(1, n)); }
@@ -116,14 +117,50 @@ function summarize(rows: ProfitabilityRow[]) {
   return { bookings: rows.length, revenue, netMargin, avgMarginPct: revenue > 0 ? netMargin / revenue : 0 };
 }
 
+async function fetchProfitabilityBookings() {
+  const where: Prisma.BookingWhereInput = { status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] } };
+  const includeWithLead = {
+    pack: { select: { price: true, extraHourPrice: true } },
+    extras: { select: { price: true, quantity: true } },
+    lead: { select: { source: true } },
+  };
+  const includeWithoutLead = {
+    pack: { select: { price: true, extraHourPrice: true } },
+    extras: { select: { price: true, quantity: true } },
+  };
+
+  const readAll = async (include: typeof includeWithLead | typeof includeWithoutLead) => {
+    const bookings: Array<Record<string, unknown>> = [];
+    let cursorId: string | undefined;
+
+    while (true) {
+      const batch = await prisma.booking.findMany({
+        where,
+        orderBy: { id: 'asc' },
+        take: PROFITABILITY_BATCH_SIZE,
+        ...(cursorId ? { cursor: { id: cursorId }, skip: 1 } : {}),
+        include,
+      }) as unknown as Array<Record<string, unknown>>;
+
+      if (batch.length === 0) break;
+      bookings.push(...batch);
+      cursorId = String(batch[batch.length - 1]?.id || '');
+      if (!cursorId) break;
+    }
+
+    return bookings;
+  };
+
+  try {
+    return await readAll(includeWithLead);
+  } catch {
+    return readAll(includeWithoutLead);
+  }
+}
+
 export async function buildProfitabilityReport(): Promise<ProfitabilityReport> {
   const config = await getProfitabilityConfig();
-  let bookings: Array<Record<string, unknown>> = [];
-  try {
-    bookings = await prisma.booking.findMany({ where: { status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] } }, orderBy: { eventDate: 'desc' }, include: { pack: { select: { price: true, extraHourPrice: true } }, extras: { select: { price: true, quantity: true } }, lead: { select: { source: true } } }, take: 1500 }) as unknown as Array<Record<string, unknown>>;
-  } catch {
-    bookings = await prisma.booking.findMany({ where: { status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] } }, orderBy: { eventDate: 'desc' }, include: { pack: { select: { price: true, extraHourPrice: true } }, extras: { select: { price: true, quantity: true } } }, take: 1500 }) as unknown as Array<Record<string, unknown>>;
-  }
+  const bookings = await fetchProfitabilityBookings();
 
   const rows: ProfitabilityRow[] = bookings.map((booking) => {
     const packObj = (booking.pack && typeof booking.pack === 'object') ? (booking.pack as { price?: number; extraHourPrice?: number }) : null;

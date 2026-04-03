@@ -99,7 +99,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       {actionError && (
         <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-[10px]">
           <span>{actionError}</span>
-          <button type="button" onClick={() => setActionError(null)}>✕</button>
+          <button type="button" onClick={() => setActionError(null)} aria-label="Tancar error">✕</button>
         </div>
       )}
       <div className="flex items-center justify-end gap-2">

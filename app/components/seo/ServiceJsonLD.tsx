@@ -1,8 +1,8 @@
 // app/components/seo/ServiceJsonLD.tsx
 // 🔥 MANOLO VERSION - Optimizado para conversión SEO
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { getSiteUrl } from '@/lib/site';
-
+import { absoluteUrl, getSiteUrl } from '@/lib/site';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 
 type AggregateRating = {
   '@type': 'AggregateRating';
@@ -32,11 +32,10 @@ interface Props {
   priceCurrency?: string;
   availability?: string;
   aggregateRating?: { ratingValue: number; reviewCount: number };
-  // 🔥 NUEVA: Acepta múltiples ofertas para mostrar paquetes
   offers?: CustomOffer[];
 }
 
-export default function ServiceJsonLD({
+export default async function ServiceJsonLD({
   name,
   slugPath,
   description,
@@ -46,14 +45,15 @@ export default function ServiceJsonLD({
   priceCurrency = 'EUR',
   availability = 'https://schema.org/InStock',
   aggregateRating,
-  offers, // 🔥 Prop opcional para múltiples ofertas
+  offers,
 }: Props) {
   const base = getSiteUrl();
   const url = `${base}${slugPath}`;
+  const managedHeaderLogo = await getManagedImageOverride('layout.logo.header');
+  const providerLogoUrl = absoluteUrl(managedHeaderLogo?.src || SITE_CONFIG.web.logo, base);
 
-  // 🔥 LÓGICA: Si hay offers custom, úsalos. Si no, genera el default simple
   const offersData = offers && offers.length > 0
-    ? offers.map(offer => ({
+    ? offers.map((offer) => ({
         '@type': 'Offer' as const,
         name: offer.name,
         price: offer.price,
@@ -77,20 +77,17 @@ export default function ServiceJsonLD({
     '@type': 'Service',
     name,
     description,
-    // Schema.org espera Text, no array - usem el primer o join
     serviceType: Array.isArray(serviceType) ? serviceType[0] : serviceType,
-    // Afegim category per SEO addicional
     category: Array.isArray(serviceType) ? serviceType.join(', ') : serviceType,
     url,
     image: `${base}/api/og?title=${encodeURIComponent(name)}`,
-    // areaServed ha de ser AdministrativeArea, no Place genèric
-    areaServed: areaServed.map(a => ({ '@type': 'AdministrativeArea', name: a })),
+    areaServed: areaServed.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
     offers: offersData,
     provider: {
       '@type': 'Organization',
       name: SITE_CONFIG.business.name,
       url: base,
-      logo: `${base}${SITE_CONFIG.web.logo}`,
+      logo: providerLogoUrl,
       sameAs: Object.values(SITE_CONFIG.social.urls),
       contactPoint: {
         '@type': 'ContactPoint',

@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  return {
   title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Pineda y toda la costa. Cumpleaños, aniversarios y fiestas privadas con equipo profesional.`,
   keywords: ['DJ fiestas Maresme', 'DJ fiesta Mataró', 'DJ fiesta Calella', 'DJ cumpleaños Maresme', 'contratar DJ Maresme'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas en el Maresme. Mataró, Calella, Pineda y toda la costa.',
     url: '/servicios/dj-fiestas-maresme',
-    images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-04.avif', alt: 'DJ Fiestas Maresme - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Fiestas Maresme - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const maresmeTowns = ['Mataró', 'Calella', 'Pineda de Mar', 'Arenys de Mar', 'Canet de Mar', 'Malgrat de Mar', 'Santa Susanna', 'Premià de Mar', 'Vilassar de Mar', 'Argentona', 'Alella', 'Montgat'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DJFiestasMaresmePage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DJFiestasMaresmePage({ params }: PageProps) {
       'Open format: La música que vosotros queráis',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/fiestas-privadas/fiestas-privadas-04.avif',
-    galleryImages: [
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-06.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-08.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-10.avif',
-      '/img/portfolio/discomovil/discomovil-06.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DJFiestasMaresmePage({ params }: PageProps) {
     </>
   );
 }
+

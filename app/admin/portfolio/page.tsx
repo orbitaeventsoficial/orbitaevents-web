@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
-import { PORTFOLIO_CATEGORIES } from '@/app/config/portfolio-images';
+import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
   PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE,
   PORTFOLIO_MEDIA_IMAGE_MAX_SIZE,
@@ -43,6 +43,7 @@ type MediaItem = {
   sortOrder: number;
   createdAt: string;
   event?: EventRef | null;
+  isStatic?: boolean;
 };
 
 type PreviewState = {
@@ -83,6 +84,24 @@ const EMPTY_EVENT_FORM: EventFormState = {
 
 function isImageType(type: string) {
   return type.startsWith('image/');
+}
+
+function inferMediaTypeFromUrl(url: string): 'image' | 'video' {
+  return /\.(mp4|webm|mov)$/i.test(url) ? 'video' : 'image';
+}
+
+function buildStaticMediaItems(slug: string): MediaItem[] {
+  const items = PORTFOLIO_IMAGES[slug as keyof typeof PORTFOLIO_IMAGES] || [];
+  return items.map((item, index) => ({
+    id: `static:${slug}:${index}`,
+    mediaUrl: item.src,
+    mediaType: inferMediaTypeFromUrl(item.src),
+    caption: item.alt || null,
+    sortOrder: index,
+    createdAt: '',
+    event: null,
+    isStatic: true,
+  }));
 }
 
 function buildEventPayload(form: EventFormState) {
@@ -171,6 +190,7 @@ function CategorySection({
   const loadMedia = useCallback(async () => {
     setLoading(true);
     setError(null);
+    const fallbackItems = buildStaticMediaItems(slug);
     try {
       const response = await fetchWithCsrf(`/api/admin/portfolio/media?slug=${slug}`, { cache: 'no-store' });
       if (!response.ok) {
@@ -178,10 +198,18 @@ function CategorySection({
         throw new Error(data?.error || 'Error carregant media');
       }
       const data = await response.json();
-      setMedia(data.data || []);
+      const items = Array.isArray(data.data) ? data.data : [];
+      setMedia(items.length > 0 ? items : fallbackItems);
     } catch (err) {
       console.error(`Error carregant ${slug}:`, err);
-      setError(err instanceof Error ? err.message : 'Error carregant media');
+      setMedia(fallbackItems);
+      setError(
+        fallbackItems.length > 0
+          ? "No s'ha pogut llegir el portfolio editable; es mostra el catàleg públic actual en mode lectura."
+          : err instanceof Error
+            ? err.message
+            : 'Error carregant media'
+      );
     } finally {
       setLoading(false);
     }
@@ -422,7 +450,7 @@ function CategorySection({
               {media.map((item) => {
                 const coverRefs = coverMap.get(item.mediaUrl) || [];
                 return (
-                  <div key={item.id} draggable onDragStart={() => setDraggingId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-cyan-400/40' : 'border-white/10 hover:border-white/20'}`}>
+                  <div key={item.id} draggable={!item.isStatic} onDragStart={() => !item.isStatic && setDraggingId(item.id)} onDragOver={(event) => !item.isStatic && event.preventDefault()} onDrop={() => !item.isStatic && void handleDrop(item.id)} className={`overflow-hidden rounded-2xl border bg-white/[0.02] transition-colors ${draggingId === item.id ? 'border-cyan-400/40' : 'border-white/10 hover:border-white/20'}`}>
                     <div className="grid gap-0 md:grid-cols-[18rem_minmax(0,1fr)]">
                       <button type="button" onClick={() => onOpenPreview({ url: item.mediaUrl, type: item.mediaType, alt: item.caption || `${name} media` })} className="relative aspect-[4/3] bg-black">
                         {item.mediaType === 'image' ? <Image src={item.mediaUrl} alt={item.caption || `${name} media`} fill sizes="(max-width: 768px) 100vw, 288px" className="object-cover" /> : <video src={item.mediaUrl} className="h-full w-full object-cover" muted playsInline preload="metadata" />}
@@ -436,19 +464,19 @@ function CategorySection({
                             <p className="text-xs text-white/40">ID {item.id.slice(0, 8)} · destí /portfolio/{slug}</p>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-white/45">
-                            <span className="rounded-full border border-white/10 px-2 py-1">Drag & drop</span>
+                            <span className="rounded-full border border-white/10 px-2 py-1">{item.isStatic ? 'Catàleg públic actual' : 'Drag & drop'}</span>
                             {item.event ? <span className="rounded-full border border-cyan-500/30 px-2 py-1 text-cyan-200">Vinculat a {item.event.title}</span> : <span className="rounded-full border border-white/10 px-2 py-1">Sense event</span>}
                           </div>
                         </div>
                         <div>
                           <label className="mb-1 block text-xs text-white/40">Llegenda / codi intern</label>
-                          <input defaultValue={item.caption || ''} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85" placeholder="Ex: entrada-cerimonia" />
-                          <p className="mt-1 text-xs text-white/35">Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la.</p>
+                          <input defaultValue={item.caption || ''} disabled={item.isStatic} onBlur={(event) => { if ((item.caption || '') !== event.target.value) { void handleCaptionSave(item, event.target.value); } }} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60" placeholder="Ex: entrada-cerimonia" />
+                          <p className="mt-1 text-xs text-white/35">{item.isStatic ? 'Aquesta peça ve del catàleg públic actual. Per editar-la o reordenar-la, primer cal migrar-la al portfolio de BBDD.' : "Aquesta etiqueta t'ajuda a saber què és la peça sense obrir-la."}</p>
                         </div>
                         <div className="grid gap-3 md:grid-cols-2">
                           <div>
                             <label className="mb-1 block text-xs text-white/40">Assignar a event</label>
-                            <select value={item.event?.id || ''} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85">
+                            <select value={item.event?.id || ''} disabled={item.isStatic} onChange={(event) => void handleAssignEvent(item, event.target.value)} className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85 disabled:cursor-not-allowed disabled:opacity-60">
                               <option value="">Sense assignació</option>
                               {categoryEvents.map((eventItem) => <option key={eventItem.id} value={eventItem.id}>{eventItem.title}</option>)}
                             </select>
@@ -458,14 +486,14 @@ function CategorySection({
                             <div className="flex flex-wrap gap-2">
                               {categoryEvents.length === 0 ? <p className="text-xs text-white/45">Crea primer un event.</p> : categoryEvents.map((eventItem) => {
                                 const active = coverRefs.some((coverEvent) => coverEvent.id === eventItem.id);
-                                return <button key={eventItem.id} type="button" onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs ${active ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
+                                return <button key={eventItem.id} type="button" disabled={item.isStatic} onClick={() => void handleSetCover(eventItem.id, item.mediaUrl)} className={`rounded-full border px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{active ? `Portada: ${eventItem.title}` : eventItem.title}</button>;
                               })}
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <button type="button" onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5">Substituir fitxer</button>
-                          <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10 disabled:opacity-50">Eliminar</button>
+                          <button type="button" disabled={item.isStatic} onClick={() => { replaceTargetRef.current = item; replaceFileRef.current?.click(); }} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/80 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60">Substituir fitxer</button>
+                          <button type="button" onClick={() => void handleDelete(item)} disabled={savingId === item.id || item.isStatic} className="rounded-xl border border-rose-500/20 px-3 py-2 text-sm text-rose-300 hover:bg-rose-500/10 disabled:opacity-50">Eliminar</button>
                         </div>
                       </div>
                     </div>
@@ -650,5 +678,9 @@ export default function AdminPortfolioPage() {
     </div>
   );
 }
+
+
+
+
 
 

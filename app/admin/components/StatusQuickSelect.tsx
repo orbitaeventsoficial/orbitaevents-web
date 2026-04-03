@@ -50,6 +50,8 @@ export default function StatusQuickSelect({
       className="rounded-xl border px-2 py-1 text-[11px]"
       title={title}
       aria-label={title}
+      data-help-title={title}
+      data-help-desc="Canvia l'estat directament des de la llista sense haver d'obrir la fitxa completa."
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>

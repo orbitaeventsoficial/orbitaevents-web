@@ -6,7 +6,8 @@
 import nodemailer from 'nodemailer';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { getAppBaseUrl } from '@/lib/site';
+import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 
 import { type EmailLocale, normalizeEmailLocale, toIntlLocaleEmail, PRIVACY_REQUEST_LABELS, PRIVACY_COPY, TESTIMONIAL_COPY } from '@/lib/email-i18n';
 
@@ -70,6 +71,11 @@ const EMAIL_CONTACT_PHONE = SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.bus
 const EMAIL_CONTACT_EMAIL = SITE_CONFIG.business.email;
 const EMAIL_CONTACT_WEB = SITE_CONFIG.web.url;
 
+async function getManagedBrandLogoUrl(): Promise<string> {
+  const managedLogo = await getManagedImageOverride('layout.logo.admin');
+  return absoluteUrl(managedLogo?.src || EMAIL_LOGO_URL, APP_BASE_URL);
+}
+
 function htmlToText(html: string): string {
   return html
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -123,7 +129,7 @@ function extractBodyHtml(html: string): string {
   return html.trim();
 }
 
-function ensureOrbitaEmailShell(html: string, brandingStyle: 'hero' | 'soft' = 'soft'): string {
+function ensureOrbitaEmailShell(html: string, logoUrl: string, brandingStyle: 'hero' | 'soft' = 'soft'): string {
   if (!html || hasOrbitaEmailShell(html)) {
     return html;
   }
@@ -150,7 +156,7 @@ function ensureOrbitaEmailShell(html: string, brandingStyle: 'hero' | 'soft' = '
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   <tr>
                     <td style="width:${logoCellWidth}px;vertical-align:middle;">
-                      <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" width="${logoSize}" height="${logoSize}" style="display:block;width:${logoSize}px;height:${logoSize}px;border-radius:${isHero ? '10px' : '8px'};background:#ffffff;padding:${isHero ? '4px' : '3px'};" />
+                      <img src="${logoUrl}" alt="Òrbita Events" width="${logoSize}" height="${logoSize}" style="display:block;width:${logoSize}px;height:${logoSize}px;border-radius:${isHero ? '10px' : '8px'};background:#ffffff;padding:${isHero ? '4px' : '3px'};" />
                     </td>
                     <td style="vertical-align:middle;">
                       <div style="font-size:${titleSize}px;font-weight:800;letter-spacing:0.2px;color:#ffffff;">Òrbita Events</div>
@@ -184,14 +190,14 @@ function ensureOrbitaEmailShell(html: string, brandingStyle: 'hero' | 'soft' = '
 </html>`;
 }
 
-function injectOrbitaLogo(html: string): string {
+function injectOrbitaLogo(html: string, logoUrl: string): string {
   if (!html || hasOrbitaBrandingInHeader(html)) {
     return html;
   }
 
   const logoBlock = `
     <div data-orbita-email-logo="true" style="text-align:center; padding: 18px 0 10px 0;">
-      <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" style="width: 196px; max-width: 72%; height: auto; display:inline-block;" />
+      <img src="${logoUrl}" alt="Òrbita Events" style="width: 196px; max-width: 72%; height: auto; display:inline-block;" />
     </div>
   `;
 
@@ -280,8 +286,10 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const fromAddress = options.from?.trim() || `"Orbita Events" <${smtpFrom}>`;
   const toAddress = options.to.trim();
 
+  const emailLogoUrl = await getManagedBrandLogoUrl();
   const brandedHtml = ensureOrbitaEmailShell(
-    injectOrbitaContactFooter(injectOrbitaLogo(options.html)),
+    injectOrbitaContactFooter(injectOrbitaLogo(options.html, emailLogoUrl)),
+    emailLogoUrl,
     options.brandingStyle || 'soft'
   );
 
@@ -320,13 +328,14 @@ export async function sendEmailWithTimeout(
 /**
  * Genera firma professional HTML per als emails enviats des de l'admin.
  */
-export function getEmailSignatureHtml(): string {
+export async function getEmailSignatureHtml(): Promise<string> {
+  const emailLogoUrl = await getManagedBrandLogoUrl();
   return `
     <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e7e5e4;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#334155;line-height:1.5;">
       <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
         <tr>
           <td style="vertical-align:top;padding-right:14px;">
-            <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px;background:#111827;padding:4px;" />
+            <img src="${emailLogoUrl}" alt="Òrbita Events" width="48" height="48" style="display:block;width:48px;height:48px;border-radius:10px;background:#111827;padding:4px;" />
           </td>
           <td style="vertical-align:top;">
             <div style="font-weight:700;font-size:14px;color:#111827;">Òrbita Events</div>
@@ -1127,4 +1136,8 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
     `,
   });
 }
+
+
+
+
 

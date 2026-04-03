@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SettingsClient from './SettingsClient';
 import DbReconnectButton from './DbReconnectButton';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,11 +64,11 @@ export default async function SettingsPage() {
         </p>
       </div>
       {Object.keys(settings).length === 0 ? (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
-          <span className="text-4xl">⚙️</span>
-          <p className="mt-4">No hi ha configuracions</p>
-          <p className="text-sm">Executa el seed per carregar dades inicials</p>
-        </div>
+        <AdminEmptyState
+          icon="⚙️"
+          title="No hi ha configuracions"
+          description="Executa el seed per carregar dades inicials"
+        />
       ) : (
         <SettingsClient groupedSettings={settings} categoryConfig={SETTINGS_CATEGORY_CONFIG} />
       )}
@@ -132,6 +132,8 @@ export default async function SettingsPage() {
     </AdminPage>
   );
 }
+
+
 
 
 

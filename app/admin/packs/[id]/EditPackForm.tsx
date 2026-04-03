@@ -706,7 +706,7 @@ export default function EditPackForm({
               <p className="mb-2 text-sm font-semibold">Disponibles ({available.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={i.id} draggable aria-label={`${i.name} — arrossega per afegir al pack`} onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <NextImage src={i.imageUrl || '/placeholder.png'} alt={i.name} width={56} height={56} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -729,7 +729,7 @@ export default function EditPackForm({
               <p className="mb-2 text-sm font-semibold">Inclosos ({included.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={item.id} draggable aria-label={`${item.name} — arrossega per treure del pack`} onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <NextImage
                       src={item.imageUrl || '/placeholder.png'}

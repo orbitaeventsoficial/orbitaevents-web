@@ -187,7 +187,17 @@ function GoldenDivider({ className = '' }: { className?: string }) {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-export default function ProductesMonMagic() {
+type MonMagicImageSet = {
+  hero: string;
+  featured: string;
+  cartell: string;
+  mussolDecoratiu: string;
+  taulaCompleta: string;
+  gabiaPerga: string;
+  llegintCarta: string;
+};
+
+export default function ProductesMonMagic({ imageSet = PUBLIC_MON_MAGIC_IMAGES }: { imageSet?: MonMagicImageSet }) {
   const t = useTranslations('monMagic');
 
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
@@ -235,7 +245,7 @@ export default function ProductesMonMagic() {
       <section className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-x-0 inset-y-[-3%]">
           <Image
-            src={PUBLIC_MON_MAGIC_IMAGES.hero}
+            src={imageSet.hero}
             alt={t('heroTitle')}
             fill
             priority
@@ -394,12 +404,12 @@ export default function ProductesMonMagic() {
               viewport={{ once: true }}
               className="col-span-2 row-span-2 relative rounded-xl overflow-hidden group cursor-pointer border border-amber-600/20 min-h-[18rem] sm:min-h-[24rem] md:min-h-[32rem]"
               style={{ boxShadow: '0 0 30px rgba(200,165,55,0.08)' }}
-              onClick={() => setLightboxSrc(PUBLIC_MON_MAGIC_IMAGES.featured)}
+              onClick={() => setLightboxSrc(imageSet.featured)}
             >
               <div className="absolute inset-0 rounded-xl border border-amber-500/20 group-hover:border-amber-500/40 transition-all duration-500 z-10 pointer-events-none" />
               <div className="absolute inset-[3px] rounded-xl border border-amber-500/10 group-hover:border-amber-500/20 transition-all duration-500 z-10 pointer-events-none" />
               <Image
-                src={PUBLIC_MON_MAGIC_IMAGES.featured}
+                src={imageSet.featured}
                 alt={t('altSobreObert')}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
@@ -420,10 +430,10 @@ export default function ProductesMonMagic() {
 
             {/* Gallery photos */}
             {([
-              { src: PUBLIC_MON_MAGIC_IMAGES.cartell, alt: t('altCartell') },
-              { src: PUBLIC_MON_MAGIC_IMAGES.taulaCompleta, alt: t('altSobreObert') },
-              { src: PUBLIC_MON_MAGIC_IMAGES.gabiaPerga, alt: t('altSobrePergami') },
-              { src: PUBLIC_MON_MAGIC_IMAGES.llegintCarta, alt: t('altConvidada'), label: t('realReaction') },
+              { src: imageSet.cartell, alt: t('altCartell') },
+              { src: imageSet.taulaCompleta, alt: t('altSobreObert') },
+              { src: imageSet.gabiaPerga, alt: t('altSobrePergami') },
+              { src: imageSet.llegintCarta, alt: t('altConvidada'), label: t('realReaction') },
             ] as const).map((photo, i) => (
               <motion.div
                 key={i}
@@ -953,6 +963,8 @@ export default function ProductesMonMagic() {
     </div>
   );
 }
+
+
 
 
 

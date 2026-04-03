@@ -65,7 +65,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
   const statusDisplay = activeInvoice ? getInvoiceStatusDisplay(activeInvoice.status) : null;
 
   return (
-    <div className="ap-card rounded-2xl p-5">
+    <div className="ap-card rounded-2xl p-5" data-help-title="Factura" data-help-desc="Des d'aquí pots generar, revisar, marcar com pagada o cancel·lar la factura vinculada a la reserva.">
       <div className="mb-4 flex items-center gap-2">
         <span className="text-base">🧾</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide">Factura</h3>
@@ -104,7 +104,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" data-help-title="Accions de factura" data-help-desc="Mostren les accions disponibles segons l'estat actual: veure a Holded, marcar pagada, reintentar sync o cancel·lar.">
             {activeInvoice.holdedInvoiceUrl && (
               <a href={activeInvoice.holdedInvoiceUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary text-xs">
                 Veure a Holded
@@ -130,7 +130,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
         <div className="mt-3 ap-inline-alert ap-inline-alert--danger flex items-center gap-2">
           <span className="text-xs">⚠️</span>
           <p className="flex-1 text-xs">{error}</p>
-          <button type="button" onClick={() => setError(null)} className="text-xs">✕</button>
+          <button type="button" onClick={() => setError(null)} className="text-xs" aria-label="Tancar error">✕</button>
         </div>
       )}
 
@@ -138,4 +138,5 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
     </div>
   );
 }
+
 

@@ -7,6 +7,7 @@ import FAQ from '@/components/seo/FAQ';
 import Client from './client';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
@@ -17,6 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const packs = await getDbPacks({ service: 'discomovil', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('discomovil');
   const t = await getTranslations({ locale, namespace: 'services.discomovil' });
 
   return {
@@ -28,14 +30,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/discomovil',
-      images: [{ url: '/img/portfolio/discomovil/discomovil-01.avif', alt: t('breadcrumb') }],
+      images: [{ url: heroImage, alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/discomovil/discomovil-01.avif'],
+      images: [heroImage],
     },
     robots: { index: true, follow: true },
     keywords: ['discomóvil barcelona', 'discomóvil girona', 'dj fiestas privadas barcelona', 'discomóvil cumpleaños', 'discomóvil bodas'],
@@ -52,6 +54,7 @@ export default async function DiscomovilPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const packs = await getDbPacks({ service: 'discomovil', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('discomovil');
 
   const faqItems = [];
   for (let i = 0; i < 6; i++) {
@@ -92,8 +95,9 @@ export default async function DiscomovilPage({ params }: PageProps) {
           description: pack.tagline,
         }))}
       />
-      <Client />
+      <Client heroImage={heroImage} />
       <FAQ items={faqItems} />
     </>
   );
 }
+

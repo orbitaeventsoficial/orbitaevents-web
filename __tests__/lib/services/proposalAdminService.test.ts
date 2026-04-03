@@ -4,6 +4,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     proposal: {
       findMany: vi.fn(),
+      count: vi.fn(),
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       create: vi.fn(),
@@ -25,6 +26,7 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.proposal.findMany.mockResolvedValue([]);
+  mockPrisma.proposal.count.mockResolvedValue(0);
   mockPrisma.proposal.findUnique.mockResolvedValue(null);
   mockPrisma.proposal.findFirst.mockResolvedValue(null);
   mockPrisma.proposal.create.mockResolvedValue({ id: 'prop1', reference: 'PROP-2026-0001' });
@@ -38,6 +40,7 @@ describe('listAdminProposals', () => {
 
     expect(result.ok).toBe(true);
     expect(result.proposals).toEqual([]);
+    expect(result.pagination).toEqual({ page: 1, limit: 50, total: 0, pages: 1 });
   });
 
   it('filtra per customerId', async () => {
@@ -48,12 +51,22 @@ describe('listAdminProposals', () => {
         where: expect.objectContaining({ customerId: 'c1' }),
       })
     );
+    expect(mockPrisma.proposal.count).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ customerId: 'c1' }),
+      })
+    );
   });
 
   it('filtra per status vàlid', async () => {
     await listAdminProposals({ status: 'DRAFT' });
 
     expect(mockPrisma.proposal.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ status: 'DRAFT' }),
+      })
+    );
+    expect(mockPrisma.proposal.count).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({ status: 'DRAFT' }),
       })

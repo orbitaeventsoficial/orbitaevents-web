@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Penedès desde ${MIN_PRICE}€. Vilafranca, Sant Sadurní, Sitges. Especialistas en bodas en bodegas y viñedos.`,
   keywords: ['DJ bodas Penedès', 'DJ bodas Vilafranca', 'DJ bodas Sant Sadurní', 'DJ bodas bodegas', 'bodas viñedos Penedès'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Penedès. Especialistas en bodegas y viñedos.',
     url: '/servicios/dj-bodas-penedes',
-    images: [{ url: '/img/portfolio/bodas/bodas-03.avif', alt: 'DJ Bodas Penedès - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Penedès - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const penedesTowns = ['Vilafranca del Penedès', 'Sant Sadurní d\'Anoia', 'Sitges', 'Vilanova i la Geltrú', 'El Vendrell', 'Calafell', 'Sant Pere de Ribes', 'Cubelles', 'Cunit', 'Olèrdola', 'Subirats', 'Torrelavit', 'Gelida', 'Santa Margarida i els Monjos'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-penedes' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
       'Generador propio: Por si la finca no tiene potencia',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-04.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/discomovil/discomovil-04.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
     </>
   );
 }
+

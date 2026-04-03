@@ -73,7 +73,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   );
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4" data-help-title="Pressupostos del client" data-help-desc="Llista tots els pressupostos: esborranys, pendents de resposta i històric. Pots enviar, acceptar, rebutjar i gestionar contractes.">
       <div className="rounded-2xl border p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -328,7 +328,7 @@ function ProposalCard({
   };
 
   return (
-    <div className="rounded-xl border p-4">
+    <div className="rounded-xl border p-4" data-help-title={`Pressupost ${proposal.reference}`} data-help-desc="Detall del pressupost amb accions disponibles: editar, enviar, marcar estat i gestionar contracte si s'ha acceptat.">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
@@ -434,7 +434,7 @@ function ProposalCard({
       </div>
 
       {proposal.status === 'ACCEPTED' && (
-        <div className="mt-3 border-t pt-3">
+        <div className="mt-3 border-t pt-3" data-help-title="Gestió de contracte" data-help-desc="Un cop acceptat, pots generar el PDF del contracte, enviar-lo per email i marcar-lo com signat.">
           <div className="flex flex-wrap items-center gap-2">
             {contractStatus && contractRef && contractStyle && (
               <span className="flex items-center gap-1.5 text-xs">

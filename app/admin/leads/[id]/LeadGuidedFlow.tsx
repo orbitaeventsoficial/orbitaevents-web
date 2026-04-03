@@ -125,7 +125,7 @@ export default function LeadGuidedFlow({
   }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
 
   return (
-    <section className="ap-card p-5">
+    <section className="ap-card p-5" data-help-title="Pipeline comercial guiat" data-help-desc="Et diu en quin pas està l'entrada i suggereix la millor acció següent per fer-la avançar.">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -194,7 +194,7 @@ export default function LeadGuidedFlow({
       </div>
 
       {/* Next suggested action + quick actions */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2" data-help-title="Accions ràpides del lead" data-help-desc="Permeten executar el següent pas recomanat, crear tasca de seguiment o marcar l'entrada com a perduda o reoberta.">
         {nextAction && (
           nextAction.href ? (
             <Link
@@ -258,6 +258,7 @@ export default function LeadGuidedFlow({
     </section>
   );
 }
+
 
 
 

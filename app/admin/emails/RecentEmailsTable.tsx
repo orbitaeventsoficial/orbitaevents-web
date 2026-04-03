@@ -43,7 +43,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Activitat recent d'emails" data-help-desc="Llista cronològica dels últims enviaments, testimonis i automatitzacions relacionades amb correu.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">📊 Activitat Recent</h2>
         <p className="mt-1 text-xs">Últims 7 dies</p>
@@ -55,7 +55,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
           <p className="mt-2">Cap activitat recent</p>
         </div>
       ) : (
-        <div className="max-h-96 divide-y admin-tone-border-subtle overflow-y-auto">
+        <div className="max-h-96 divide-y admin-tone-border-subtle overflow-y-auto" data-help-title="Taula d'activitat recent" data-help-desc="Cada fila indica qui ha rebut o generat l'acció i quan ha passat per seguir el ritme del sistema d'emails.">
           {activities.map((activity) => {
             const actionInfo = EMAIL_ACTIVITY_DISPLAY[activity.action] || {
               ...DEFAULT_ACTION_TONE,

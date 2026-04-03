@@ -106,7 +106,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="status">
           <span>✓</span>
           <span className="flex-1">{successMsg}</span>
-          <button type="button" onClick={() => setSuccessMsg(null)}>✕</button>
+          <button type="button" onClick={() => setSuccessMsg(null)} aria-label="Tancar missatge">✕</button>
         </div>
       )}
 
@@ -114,7 +114,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
         <div className="mt-2 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
           <span>⚠️</span>
           <span className="flex-1">{error}</span>
-          <button type="button" onClick={() => setError(null)}>✕</button>
+          <button type="button" onClick={() => setError(null)} aria-label="Tancar error">✕</button>
         </div>
       )}
 

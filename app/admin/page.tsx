@@ -91,22 +91,22 @@ export default async function AdminDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Link href="/admin/analytics" className="hidden sm:inline-flex">
-                <Button variant="secondary" icon="📈" label="Analítica" />
+                <Button variant="secondary" icon="📈" label="Analítica" helpText="Obre els informes detallats del negoci: ingressos, conversió, canals i rendiment." />
               </Link>
               <Link href="/admin/leads">
-                <Button variant="primary" icon="+" label="Nou lead" />
+                <Button variant="primary" icon="+" label="Nou lead" helpText="Crea manualment una entrada nova quan una consulta no ha arribat sola des de la web o el correu." />
               </Link>
             </div>
           </div>
           <div className="admin-cr-quick-links mt-4">
-            <Link href="/admin/inbox" className="admin-cr-quick-link">📥 Inbox (IMAP)</Link>
-            <Link href="/admin/emails" className="admin-cr-quick-link">🤖 Correus automàtics</Link>
-            <Link href="/admin/bookings" className="admin-cr-quick-link">📋 Reserves</Link>
-            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link">💸 Cobraments vençuts</Link>
-            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link">⏳ Vencen aviat</Link>
-            <Link href="/admin/economia" className="admin-cr-quick-link">💶 Economia</Link>
-            <Link href="/admin/salut" className="admin-cr-quick-link">🩺 Salut</Link>
-            <Link href="/admin/calendario" className="admin-cr-quick-link">📅 Calendari</Link>
+            <Link href="/admin/inbox" className="admin-cr-quick-link" data-help-title="Inbox (IMAP)" data-help-desc="Centralitza els correus entrants per convertir-los en leads, seguir converses i no deixar cap consulta sense resposta.">📥 Inbox (IMAP)</Link>
+            <Link href="/admin/emails" className="admin-cr-quick-link" data-help-title="Correus automàtics" data-help-desc="Gestiona les seqüències automàtiques i els enviaments operatius abans i després dels esdeveniments.">🤖 Correus automàtics</Link>
+            <Link href="/admin/bookings" className="admin-cr-quick-link" data-help-title="Reserves" data-help-desc="Obre el tauler complet de reserves per revisar estats, preparar esdeveniments i seguir cobraments.">📋 Reserves</Link>
+            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" data-help-title="Cobraments vençuts" data-help-desc="Filtra directament les reserves amb pagaments que ja haurien d'haver entrat i requereixen seguiment.">💸 Cobraments vençuts</Link>
+            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" data-help-title="Cobraments que vencen aviat" data-help-desc="Mostra les reserves amb pagaments a punt de vèncer per poder anticipar recordatoris.">⏳ Vencen aviat</Link>
+            <Link href="/admin/economia" className="admin-cr-quick-link" data-help-title="Economia" data-help-desc="Accedeix a la visió financera: factures, pressupostos, fluxos i marge del negoci.">💶 Economia</Link>
+            <Link href="/admin/salut" className="admin-cr-quick-link" data-help-title="Salut" data-help-desc="Revisa alertes i incidències del sistema, dades, automatitzacions i operativa general.">🩺 Salut</Link>
+            <Link href="/admin/calendario" className="admin-cr-quick-link" data-help-title="Calendari" data-help-desc="Consulta l'agenda d'esdeveniments i planifica el volum de feina dels pròxims dies.">📅 Calendari</Link>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* ═══ OBJECTIU MENSUAL — amb RadialProgress ═══ */}
-      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass">
+      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass" data-help-title="Objectiu mensual d'ingressos" data-help-desc="Resumeix quant has facturat aquest mes respecte de l'objectiu configurat. T'ajuda a veure si vas per sota, en línia o per sobre del ritme previst.">
         <div className="flex items-center gap-5">
           <RadialProgress
             value={d.revenueMonthPct}
@@ -203,7 +203,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--pilot">
+      <section className="admin-cr-panel admin-cr-panel--pilot" data-help-title="Pilot automàtic d'avui" data-help-desc="És una ruta guiada per a un usuari novell: primer entrades, després tasques, post-esdeveniment i finalment reserves. Pots saltar passos si ja saps què toca.">
         <div className="admin-cr-panel-head">
           <div>
             <p className="admin-cr-kicker admin-cr-kicker--pilot">Mode Solo</p>
@@ -213,8 +213,8 @@ export default async function AdminDashboard() {
           <span className="admin-cr-pill admin-cr-pill--pilot">4 passos clars</span>
         </div>
         <div className="admin-cr-chip-row">
-          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber">Comença per pas 2</Link>
-          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose">Comença per pas 3</Link>
+          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber" data-help-title="Comença pel pas 2" data-help-desc="Et porta directament a tasques si ja has resolt les entrades i vols avançar feina operativa.">Comença per pas 2</Link>
+          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose" data-help-title="Comença pel pas 3" data-help-desc="Et porta a correus automàtics si vols tancar la part post-esdeveniment sense seguir l'ordre complet.">Comença per pas 3</Link>
         </div>
         <div className="admin-cr-grid-4">
           {pilotToday.map((item) => {
@@ -223,7 +223,7 @@ export default async function AdminDashboard() {
               : item.tone === 'sky' ? 'admin-cr-step--sky'
               : 'admin-cr-step--emerald';
             return (
-              <Link key={item.id} href={item.href} className={`admin-cr-step ${toneClasses}`}>
+              <Link key={item.id} href={item.href} className={`admin-cr-step ${toneClasses}`} data-help-title={item.title} data-help-desc={`${item.description}. Acció recomanada: ${item.cta}.`}>
                 <p className="admin-cr-step-kicker">{item.step}</p>
                 <p className="admin-cr-step-title">{item.title}</p>
                 <p className="admin-cr-step-desc">{item.description}</p>
@@ -234,7 +234,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--checklist">
+      <section className="admin-cr-panel admin-cr-panel--checklist" data-help-title="Checklist d'avui" data-help-desc="Concentra les tasques diàries obertes i el progrés del dia. Serveix per no perdre el fil operatiu.">
         <div className="admin-cr-panel-row">
           <div>
             <p className="admin-cr-kicker admin-cr-kicker--cyan">Checklist d&apos;avui</p>
@@ -265,7 +265,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--command">
+      <section className="admin-cr-panel admin-cr-panel--command" data-help-title="Centre de comandament" data-help-desc="Permet moure estats clau de leads i reserves sense entrar a cada fitxa. És per operativa ràpida des del dashboard.">
         <div className="admin-cr-panel-head-block">
           <p className="admin-cr-kicker admin-cr-kicker--violet">Centre de comandament</p>
           <h2 className="admin-cr-h2">Mou estats sense canviar de pantalla</h2>
@@ -329,7 +329,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--radar">
+      <section className="admin-cr-panel admin-cr-panel--radar" data-help-title="Radar d'execució" data-help-desc="Resumeix en semàfors on hi ha urgència real: leads aturats, oportunitats calentes i pressupostos en curs.">
         <div className="admin-cr-panel-head-block">
           <p className="admin-cr-kicker admin-cr-kicker--cyan">Radar d&apos;execució</p>
           <h2 className="admin-cr-h2">On posar el focus avui</h2>
@@ -571,7 +571,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="admin-cr-chart-grid">
-        <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
+        <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding helpText="Mostra l'evolució recent del trànsit web per veure si hi ha moviment d'audiència i captació.">
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: d.ga4Sessions || '-' },
@@ -580,7 +580,7 @@ export default async function AdminDashboard() {
             {!d.ga4Available && <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>}
           </div>
         </Card>
-        <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding>
+        <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding helpText="Compara el volum d'entrades amb els tancaments per entendre el rendiment comercial del període.">
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.leadsSeries, stroke: '#34d399', label: 'Entrades', value: d.leadsThisMonth },
@@ -588,7 +588,7 @@ export default async function AdminDashboard() {
             ]} />
           </div>
         </Card>
-        <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding>
+        <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding helpText="Relaciona reserves confirmades i facturació per veure si la càrrega d'esdeveniments s'està convertint en ingressos.">
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: d.bookingsConfirmed },
@@ -600,12 +600,12 @@ export default async function AdminDashboard() {
 
       {/* ═══ GRÀFIQUES COMPARATIVES ═══ */}
       <div className="admin-cr-chart-grid">
-        <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding>
+        <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding helpText="Compara els ingressos mensuals d'aquest any amb l'anterior per detectar tendències i estacionalitat.">
           <div className="admin-cr-card-pad">
             <MonthlyBarChart data={d.monthlyRevenue} />
           </div>
         </Card>
-        <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding>
+        <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding helpText="Desglossa quins tipus d'esdeveniment tens més presents al negoci. Ajuda a veure especialització i dependència.">
           <div className="admin-cr-card-pad flex items-center justify-center py-4">
             <DonutChart segments={d.eventTypeDistribution} />
           </div>
@@ -643,7 +643,7 @@ export default async function AdminDashboard() {
           </Card>
         </div>
         <div className="admin-cr-desktop-only">
-          <Card title="Activitat" subtitle="Últimes accions">
+          <Card title="Activitat" subtitle="Últimes accions" helpText="Recull els últims moviments registrats a l'admin per entendre què s'ha fet recentment.">
             <div className="admin-cr-list">
               {d.activities.map((activity, i) => (
                 <div key={i} className="admin-cr-activity-row">
@@ -693,22 +693,22 @@ export default async function AdminDashboard() {
       </Card>
 
       <div className="admin-cr-mini-grid">
-        <div className="admin-cr-mini-card admin-cr-mini-card--violet">
+        <div className="admin-cr-mini-card admin-cr-mini-card--violet" data-help-title="Conversió" data-help-desc="Percentatge de leads que acaben convertint-se en client. És una lectura ràpida de qualitat comercial.">
           <p className="admin-cr-stat-label">Conversió</p>
           <p className="admin-cr-mini-value">{d.conversionRate}%</p>
           <p className="admin-cr-meta">{d.wonLeads}/{d.leadsCount} entrades</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--amber">
+        <div className="admin-cr-mini-card admin-cr-mini-card--amber" data-help-title="Testimonis" data-help-desc="Resumeix quants testimonis tens publicats o pendents d'aprovar. Serveix per cuidar reputació i prova social.">
           <p className="admin-cr-stat-label">Testimonis</p>
           <p className="admin-cr-mini-value">{d.testimonialsApproved + d.testimonialsPending}</p>
           <p className="admin-cr-meta">{d.testimonialsPending} pendents</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--rose">
+        <div className="admin-cr-mini-card admin-cr-mini-card--rose" data-help-title="Valoració" data-help-desc="Mostra la puntuació mitjana actual del negoci com a lectura ràpida de reputació.">
           <p className="admin-cr-stat-label">Valoració</p>
           <p className="admin-cr-mini-value">⭐ {d.rating}</p>
           <p className="admin-cr-meta">Mitjana</p>
         </div>
-        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan">
+        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan" data-help-title="Inventari" data-help-desc="Resumeix l'estat ràpid del material: disponible, en ús, en manteniment o avariat.">
           <p className="admin-cr-stat-label">Inventari</p>
           <p className="admin-cr-mini-value">{d.inventoryAvailable}/{d.inventoryTotal}</p>
           <p className="admin-cr-meta">
@@ -720,7 +720,7 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <section className="admin-cr-audit">
+      <section className="admin-cr-audit" data-help-title="Auditoria recent" data-help-desc="Mostra les últimes accions administratives registrades per saber què s'ha canviat i quan.">
         <div className="admin-cr-audit-head">
           <h3 className="admin-cr-step-title">🧾 Auditoria recent</h3>
           <p className="admin-cr-small admin-cr-small--muted">Últimes accions d&apos;admin</p>
@@ -741,6 +741,8 @@ export default async function AdminDashboard() {
     </div>
   );
 }
+
+
 
 
 

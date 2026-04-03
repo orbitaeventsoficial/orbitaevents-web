@@ -522,6 +522,7 @@ export default function TextManagerPage() {
                   <button
                     onClick={() => setSearchTerm('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2"
+                    aria-label="Netejar cerca"
                   >
                     ✕
                   </button>

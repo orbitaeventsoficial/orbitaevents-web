@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  return {
   title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en Barcelona desde ${MIN_PRICE}€. Cumpleaños, aniversarios, despedidas y celebraciones privadas. Equipo profesional, presupuesto en 2h.`,
   keywords: ['DJ fiestas Barcelona', 'DJ fiesta cumpleaños Barcelona', 'DJ fiesta privada Barcelona', 'DJ Barcelona precio', 'contratar DJ Barcelona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas privadas en Barcelona. Cumpleaños, despedidas y celebraciones.',
     url: '/servicios/dj-fiestas-barcelona',
-    images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif', alt: 'DJ Fiestas Barcelona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Fiestas Barcelona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const barcelonaTowns = ['Barcelona', "L'Hospitalet de Llobregat", 'Badalona', 'Cornellà de Llobregat', 'Sant Boi de Llobregat', 'El Prat de Llobregat', 'Esplugues de Llobregat', 'Gavà', 'Viladecans', 'Castelldefels', 'Rubí', 'Molins de Rei'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DJFiestasBarcelonaPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DJFiestasBarcelonaPage({ params }: PageProps) {
       'Flexibilidad: Nos adaptamos al espacio y al horario',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
-    galleryImages: [
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-03.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-05.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-07.avif',
-      '/img/portfolio/discomovil/discomovil-03.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DJFiestasBarcelonaPage({ params }: PageProps) {
     </>
   );
 }
+

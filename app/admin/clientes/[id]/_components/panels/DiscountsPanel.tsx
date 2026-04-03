@@ -12,7 +12,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
   const codes = data.discountCodes || [];
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Descomptes del client" data-help-desc="Codis de descompte vinculats a aquest client: estat (actiu, esgotat, caducat), percentatge, vigència i usos.">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Descomptes</h2>
@@ -29,7 +29,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
           codes.map((dc) => {
             const status = getStatus(dc);
             return (
-              <div key={dc.id} className="rounded-xl border p-4">
+              <div key={dc.id} className="rounded-xl border p-4" data-help-title={`Codi ${dc.code}`} data-help-desc="Detall del descompte: percentatge, estat, vigència, usos i origen del codi.">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <code className="rounded px-2 py-1 text-sm font-mono">{dc.code}</code>

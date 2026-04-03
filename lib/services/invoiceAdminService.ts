@@ -1,17 +1,37 @@
 import { prisma } from '@/lib/prisma';
 import { createInvoiceFromBooking, markInvoiceAsPaid } from '@/lib/services/invoiceService';
 
-export async function listAdminInvoices() {
-  const invoices = await prisma.invoice.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 200,
-    include: {
-      booking: { select: { id: true, reference: true, status: true, eventDate: true } },
-      customer: { select: { id: true, name: true, email: true } },
-    },
-  });
+const DEFAULT_INVOICES_PAGE = 1;
+const DEFAULT_INVOICES_LIMIT = 50;
+const MAX_INVOICES_LIMIT = 200;
 
-  return { ok: true, invoices };
+export async function listAdminInvoices(input?: { page?: number; limit?: number }) {
+  const page = Math.max(1, Number(input?.page) || DEFAULT_INVOICES_PAGE);
+  const limit = Math.min(MAX_INVOICES_LIMIT, Math.max(1, Number(input?.limit) || DEFAULT_INVOICES_LIMIT));
+
+  const [invoices, total] = await Promise.all([
+    prisma.invoice.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        booking: { select: { id: true, reference: true, status: true, eventDate: true } },
+        customer: { select: { id: true, name: true, email: true } },
+      },
+    }),
+    prisma.invoice.count(),
+  ]);
+
+  return {
+    ok: true,
+    invoices,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.max(1, Math.ceil(total / limit)),
+    },
+  };
 }
 
 export async function createAdminInvoiceFromBooking(bookingId: string) {

@@ -353,9 +353,11 @@ export default function InventoryListClient() {
       subtitle={`${displayedItems.length} elements · ${formatNumber(totalValue)}€ invertits — equips, estat i amortització`}
       actions={
         <div className="flex gap-2">
-          <div className="flex rounded-xl border p-0 overflow-hidden">
+          <div role="tablist" aria-label="Vista d'inventari" className="flex rounded-xl border p-0 overflow-hidden">
             <button
               type="button"
+              role="tab"
+              aria-selected={viewMode === 'list'}
               onClick={() => toggleView('list')}
               className={`px-3 py-2 text-xs font-medium transition-colors ${
                 viewMode === 'list'
@@ -367,6 +369,8 @@ export default function InventoryListClient() {
             </button>
             <button
               type="button"
+              role="tab"
+              aria-selected={viewMode === 'grid'}
               onClick={() => toggleView('grid')}
               className={`px-3 py-2 text-xs font-medium transition-colors ${
                 viewMode === 'grid'
@@ -388,7 +392,7 @@ export default function InventoryListClient() {
     >
 
       {/* KPIs */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-help-title="Resum d'inventari" data-help-desc="KPIs ràpids: total d'elements, disponibles, en ús i valor total invertit en equip.">
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Elements</p>
           <p className="mt-2 text-3xl font-bold">{displayedItems.length}</p>
@@ -413,7 +417,7 @@ export default function InventoryListClient() {
         </div>
       </section>
 
-      <section className="rounded-2xl border p-4 space-y-3">
+      <section className="rounded-2xl border p-4 space-y-3" data-help-title="Equips i lots" data-help-desc="Agrupa elements d'inventari en lots (equip de so, pack llums, etc.) per preparar events ràpidament.">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-sm font-semibold">Equips / Lots</p>
           {bundleMessage && <p className="text-xs">{bundleMessage}</p>}
@@ -488,7 +492,7 @@ export default function InventoryListClient() {
 
       {/* Alertes d'estoc baix */}
       {lowStockItems.length > 0 && (
-        <div className="rounded-2xl border p-4">
+        <div className="rounded-2xl border p-4" data-help-title="Alerta d'estoc baix" data-help-desc="Consumibles que han arribat al mínim d'estoc configurat. Convé fer comanda o revisar disponibilitat.">
           <p className="text-sm font-semibold mb-2">Alerta d&apos;estoc baix</p>
           <div className="flex flex-wrap gap-2">
             {lowStockItems.map((item) => (
@@ -521,7 +525,7 @@ export default function InventoryListClient() {
         </div>
       )}
       {/* Cerca + Filtres */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-help-title="Cerca i filtres d'inventari" data-help-desc="Filtra per text, categoria o estat per reduir el llistat i trobar equip concret més ràpidament.">
         <input
           type="text"
           value={search}
@@ -579,7 +583,7 @@ export default function InventoryListClient() {
 
       {/* Vista Graella */}
       {viewMode === 'grid' ? (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-help-title="Graella d'inventari" data-help-desc="Vista visual de les peces amb foto, estat, valor i vida útil estimada.">
           {displayedItems.map((item) => {
             const catConf = getInventoryCategoryDisplay(item.category);
             const statusConf = getInventoryStatusDisplay(item.status);
@@ -651,7 +655,7 @@ export default function InventoryListClient() {
       ) : (
         <>
         {/* Vista Llista — Targetes mòbil */}
-        <section className="lg:hidden space-y-3">
+        <section className="lg:hidden space-y-3" data-help-title="Llistat mòbil d'inventari" data-help-desc="Cada targeta resumeix un equip i permet canviar-ne l'estat o obrir la fitxa completa des del mòbil.">
           {displayedItems.map((item) => {
             const catConf = getInventoryCategoryDisplay(item.category);
             const statusConf = getInventoryStatusDisplay(item.status);
@@ -721,7 +725,7 @@ export default function InventoryListClient() {
         </section>
 
         {/* Vista Llista — Taula escriptori */}
-        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
+        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" data-help-title="Taula d'inventari" data-help-desc="Vista d'escriptori amb codi, categoria, valor, vida útil, estat i accés directe a la fitxa de cada element.">
           <div className="overflow-x-auto">
             <table className="w-full text-sm" aria-label="Inventari d'equipament">
               <thead className="border-b">

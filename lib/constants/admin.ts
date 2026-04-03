@@ -39,6 +39,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'post-event': 'Post-esdeveniment',
   'google-reviews': 'Ressenyes de Google',
   portfolio: 'Portfolio',
+  'image-manager': 'Gestor d\'imatges',
 };
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {

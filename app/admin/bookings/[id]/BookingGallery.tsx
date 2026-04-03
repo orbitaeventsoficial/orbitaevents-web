@@ -270,6 +270,7 @@ export default function BookingGallery({ bookingId }: Props) {
                 onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }}
                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center"
                 title="Eliminar"
+                aria-label="Eliminar foto"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

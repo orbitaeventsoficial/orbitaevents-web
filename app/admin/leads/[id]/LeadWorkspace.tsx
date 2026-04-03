@@ -194,8 +194,8 @@ export default function LeadWorkspace({
   };
 
   return (
-    <div className="space-y-6">
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-6" data-help-title="Workspace del lead" data-help-desc="Aquest espai concentra seguiment comercial, documents i activitat cronològica de l'entrada.">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" data-help-title="KPI del lead" data-help-desc="Resumeixen tasques obertes, tasques completades, documents pujats i activitat registrada.">
         <div className="ap-card p-4">
           <p className="text-xs uppercase tracking-wide">Tasques obertes</p>
           <p className="mt-1 text-2xl font-semibold">{openTasks.length}</p>
@@ -215,7 +215,7 @@ export default function LeadWorkspace({
       </section>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section id="lead-tasks" className="ap-card p-5 xl:col-span-2">
+        <section id="lead-tasks" className="ap-card p-5 xl:col-span-2" data-help-title="Seguiment comercial" data-help-desc="Aquí gestiones les tasques reals per fer avançar el lead: trucades, seguiment, recordatoris i propers passos.">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold">Seguiment comercial (tasques)</h2>
             <span className="ap-badge px-2.5 py-1 text-xs">
@@ -307,7 +307,7 @@ export default function LeadWorkspace({
           </div>
         </section>
 
-        <section id="lead-documents" className="ap-card p-5">
+        <section id="lead-documents" className="ap-card p-5" data-help-title="Documents comercials" data-help-desc="Serveix per pujar i consultar pressupostos, contractes, factures o arxius vinculats a aquesta oportunitat.">
           <h2 className="text-lg font-semibold">Documents comercials</h2>
           <div className="mt-3 space-y-2">
             <input
@@ -379,7 +379,7 @@ export default function LeadWorkspace({
         </section>
       </div>
 
-      <section className="ap-card p-5">
+      <section className="ap-card p-5" data-help-title="Timeline comercial" data-help-desc="Registre cronològic de totes les accions: canvis d'estat, notes, trucades i activitats automàtiques. Pots netejar duplicats.">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-lg font-semibold">Timeline comercial</h2>
           <button
@@ -428,6 +428,7 @@ export default function LeadWorkspace({
     </div>
   );
 }
+
 
 
 

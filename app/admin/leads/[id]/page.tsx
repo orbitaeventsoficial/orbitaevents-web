@@ -289,7 +289,7 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       }
     >
-      <section className="rounded-2xl border p-6 shadow-sm">
+      <section className="rounded-2xl border p-6 shadow-sm" data-help-title="Resum executiu de l'entrada" data-help-desc="Resumeix valor estimat, antiguitat, estat del flux client, post-event i puntuació comercial abans d'entrar al detall.">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <div className="rounded-xl border px-4 py-3">
             <p className="text-xs uppercase tracking-wide">Valor estimat</p>
@@ -389,7 +389,7 @@ export default async function LeadDetailPage({ params }: Props) {
 
           {/* Booking */}
           {!lead.booking && (
-            <section className="rounded-xl border border-dashed p-6 text-center">
+            <section className="rounded-xl border border-dashed p-6 text-center" data-help-title="Crear reserva des de l'entrada" data-help-desc="Serveix per convertir aquesta oportunitat en reserva quan ja hi ha acord comercial però encara no existeix booking.">
               <p className="text-sm mb-3">Encara no hi ha cap reserva associada a aquesta entrada.</p>
               <Link
                 href={`/admin/bookings/new?leadId=${lead.id}`}
@@ -400,7 +400,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </section>
           )}
           {lead.booking && (
-            <section className="rounded-xl border p-6 shadow-sm">
+            <section className="rounded-xl border p-6 shadow-sm" data-help-title="Reserva associada" data-help-desc="Detall de la reserva convertida des d'aquesta entrada: dates, imports, pagaments, estat post-event i accions de seguiment.">
               <h2 className="text-lg font-semibold mb-4">
                 Reserva associada
               </h2>
@@ -579,7 +579,7 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Metadades */}
-          <section className="rounded-xl border p-6 shadow-sm">
+          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Detalls del registre" data-help-desc="Metadades tècniques de l'entrada: ID, idioma, dates de creació, actualització i contacte.">
             <h3 className="text-sm font-semibold mb-4">Detalls del registre</h3>
             <dl className="space-y-3 text-sm">
               <div>
@@ -633,7 +633,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </dl>
           </section>
 
-          <section className="rounded-xl border p-6 shadow-sm">
+          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Atribució / UTM" data-help-desc="D'on ve aquesta entrada: origen, paràmetres UTM i pàgina d'aterratge. Útil per avaluar campanyes de màrqueting.">
             <h3 className="inline-flex items-center gap-1 text-sm font-semibold mb-4">
               Atribució / UTM
               <InfoTooltip text={ADMIN_HELP.leadAttribution} />
@@ -678,7 +678,7 @@ export default async function LeadDetailPage({ params }: Props) {
           </section>
 
           {lead.customer && (
-            <section className="rounded-xl border p-6 shadow-sm">
+            <section className="rounded-xl border p-6 shadow-sm" data-help-title="Relació Client" data-help-desc="Dades del client vinculat: contacte, historial d'esdeveniments i despesa acumulada.">
               <h3 className="text-sm font-semibold mb-4">Relació Client</h3>
               <dl className="space-y-3 text-sm">
                 <div>
@@ -727,7 +727,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </section>
           )}
 
-          <section className="rounded-xl border p-6 shadow-sm">
+          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Historial del client" data-help-desc="Altres entrades i reserves del mateix client o email. Permet veure repetidors i context comercial acumulat.">
             <h3 className="text-sm font-semibold mb-4">
               Historial del client ({relatedLeads.length})
             </h3>
@@ -778,6 +778,8 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
+
+
 
 
 

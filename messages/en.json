@@ -384,11 +384,11 @@
       "badge": "DJ · Lighting · Theming · Production",
       "badgeEmoji": "🎵",
       "title1": "WE TURN YOUR EVENT INTO",
-      "title2": "A SPECTACLE.",
+      "title2": "SPECTACLE.",
       "rotatingTexts": [
-        "A SPECTACLE.",
-        "AN UNFORGETTABLE PARTY.",
-        "A UNIQUE EXPERIENCE.",
+        "SPECTACLE.",
+        "UNFORGETTABLE PARTY.",
+        "UNIQUE EXPERIENCE.",
         "PURE MAGIC."
       ],
       "subtitle": "DJ, lighting and theming for parties people actually remember. Barcelona & Girona. Quote in 2h.",
@@ -4015,8 +4015,21 @@
       }
     },
     "faqTitle": "Frequently Asked Questions -",
-    "galleryTitle": "Weddings we've done in {zone}",
-    "viewMoreWeddings": "View more weddings in our portfolio",
+    "galleryTitleByService": {
+      "bodas": "Weddings we have done in {zone}",
+      "fiestas": "Parties we have energized in {zone}",
+      "discomovil": "Mobile DJ setups we have run in {zone}"
+    },
+    "viewMoreByService": {
+      "bodas": "View more weddings in our portfolio",
+      "fiestas": "View more parties in our portfolio",
+      "discomovil": "View more mobile DJ events in our portfolio"
+    },
+    "galleryAltByService": {
+      "bodas": "Wedding in {zone} - photo {index}",
+      "fiestas": "Party in {zone} - photo {index}",
+      "discomovil": "Mobile DJ event in {zone} - photo {index}"
+    },
     "finalCta": {
       "titleBodas": "Is your wedding in",
       "titleOther": "Is your event in",
@@ -6505,14 +6518,14 @@
       "yours": "MADE TO SHINE."
     },
     "morphingTextsExtended": [
-      "FOR AUTHENTIC WEDDINGS.",
-      "FOR PARTIES WITH ENERGY.",
-      "FOR COMPANIES THAT WANT IMPACT.",
+      "AUTHENTIC WEDDINGS.",
+      "PARTIES WITH ENERGY.",
+      "COMPANIES WITH IMPACT.",
       "HALLOWEEN THAT HITS HARD.",
       "MAGIC WORLD THAT SURPRISES.",
-      "WITH KARAOKE IF YOU WANT IT.",
-      "WITH DETAILS THAT STAND OUT.",
-      "WITHOUT STRESS FOR YOU."
+      "KARAOKE IF YOU WANT IT.",
+      "DETAILS THAT STAND OUT.",
+      "WITHOUT STRESS."
     ]
   },
   "mobileServices": {
@@ -6861,5 +6874,6 @@
     "spamNote": "Check your spam folder if you don't see our email in the next few hours"
   }
 }
+
 
 

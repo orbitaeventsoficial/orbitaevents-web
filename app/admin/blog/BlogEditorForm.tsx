@@ -273,9 +273,9 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
         <section className="ap-card rounded-2xl p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Contingut</h2>
-            <div className="ap-tabs-nav">
+            <div role="tablist" aria-label="Idioma del contingut" className="ap-tabs-nav">
               {(['es', 'ca'] as Locale[]).map((l) => (
-                <button key={l} type="button" onClick={() => setActiveLocale(l)} className={getLocaleTabClass(activeLocale === l)}>
+                <button key={l} type="button" role="tab" aria-selected={activeLocale === l} onClick={() => setActiveLocale(l)} className={getLocaleTabClass(activeLocale === l)}>
                   {l === 'es' ? 'Castellà' : 'Català'}
                 </button>
               ))}

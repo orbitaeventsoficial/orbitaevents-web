@@ -183,7 +183,7 @@ export default function CustomerHeader({
   }, [id, refresh, toast]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur from-black/80 to-transparent">
+    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur from-black/80 to-transparent" data-help-title="Capçalera del client" data-help-desc="Resumeix identitat, estat, últim contacte, KPI ràpid i accions principals del client actual.">
       <div className="mx-auto max-w-7xl px-4 py-4 space-y-4">
         {/* Top row: Navigation + Status + Name */}
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -300,7 +300,7 @@ export default function CustomerHeader({
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" data-help-title="Accions ràpides del client" data-help-desc="Permeten crear pressupost, reserva, tasca, missatge o eliminar/anonimitzar el client.">
             <ActionButton
               href={`/admin/presupuestos?customerId=${id}`}
               label="Nou pressupost"
@@ -339,7 +339,7 @@ export default function CustomerHeader({
         </div>
 
         {/* KPIs */}
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5" data-help-title="KPI del client" data-help-desc="Resumeixen pròxim esdeveniment, pressupost, cobrat, marge i última comunicació del client.">
           <KpiChip
             label="Pròxim esdeveniment"
             value={formatDate(data.kpis.nextEventDate)}
@@ -365,7 +365,7 @@ export default function CustomerHeader({
         </div>
 
         {/* Estat del procés + següent acció */}
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-2" data-help-title="Estat i següent acció" data-help-desc="Explica en quina fase es troba el client i quina és la millor acció següent recomanada.">
           <div className="rounded-xl border p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider">On està aquest client</p>
             <div className="mt-2 flex items-center overflow-x-auto">
@@ -410,7 +410,7 @@ export default function CustomerHeader({
         </div>
 
         {/* Tabs - Desktop */}
-        <div className="hidden md:flex flex-wrap gap-1">
+        <div className="hidden md:flex flex-wrap gap-1" data-help-title="Pestanyes de la fitxa client" data-help-desc="Canvien entre resum, pressupostos, reserves, marge, comunicacions, tasques, descomptes, entrades i privacitat.">
           {TABS.map((item) => {
             const badge = item.badge?.(data);
             return (
@@ -553,6 +553,8 @@ function formatRelativeTime(dateStr: string): string {
   if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
   return formatDate(dateStr);
 }
+
+
 
 
 

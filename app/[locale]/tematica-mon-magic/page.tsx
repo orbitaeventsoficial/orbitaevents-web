@@ -5,10 +5,48 @@
 
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { PUBLIC_MON_MAGIC_IMAGES } from '@/lib/constants';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { getPublicServiceGalleryImages, getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 import ProductesMonMagic from './client';
+
+export const revalidate = 86400;
+
+type MonMagicImageSet = {
+  hero: string;
+  featured: string;
+  cartell: string;
+  mussolDecoratiu: string;
+  taulaCompleta: string;
+  gabiaPerga: string;
+  llegintCarta: string;
+};
+
+async function getMonMagicImageSet(): Promise<MonMagicImageSet> {
+  const fallback = PUBLIC_MON_MAGIC_IMAGES;
+  const heroOverride = await getManagedImageOverride('themes.monmagic.hero');
+  const featuredOverride = await getManagedImageOverride('themes.monmagic.featured');
+  const cartellOverride = await getManagedImageOverride('themes.monmagic.cartell');
+  const hero = heroOverride?.src || await getPublicServiceHeroImage('monmagic');
+  const photos = await getPublicServiceGalleryImages('monmagic', 7);
+
+  return {
+    hero,
+    featured: featuredOverride?.src || photos[0] || hero || fallback.featured,
+    cartell: cartellOverride?.src || photos[1] || fallback.cartell,
+    mussolDecoratiu: photos[2] || fallback.mussolDecoratiu,
+    taulaCompleta: photos[3] || fallback.taulaCompleta,
+    gabiaPerga: photos[4] || fallback.gabiaPerga,
+    llegintCarta: photos[5] || photos[4] || fallback.llegintCarta,
+  };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('monMagic');
+  const imageSet = await getMonMagicImageSet();
+  const managedOg = await getManagedImageOverride('seo.og.monmagic');
+  const managedFavicon = await getManagedImageOverride('layout.favicon.monmagic');
+  const ogImage = managedOg?.src || imageSet.hero;
   return {
     title: t('meta.title'),
     description: t('meta.description'),
@@ -30,10 +68,10 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       images: [
         {
-          url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
+          url: ogImage,
           width: 1200,
           height: 630,
-          alt: t('meta.title'),
+          alt: managedOg?.alt || t('meta.title'),
         },
       ],
     },
@@ -41,7 +79,12 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title: t('meta.title'),
       description: t('meta.description'),
-      images: ['/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif'],
+      images: [ogImage],
+    },
+    icons: {
+      icon: [
+        { url: managedFavicon?.src || '/favicon-mon-magic.svg', type: managedFavicon?.mimeType || 'image/svg+xml' },
+      ],
     },
     alternates: {
       canonical: '/tematica-mon-magic',
@@ -53,6 +96,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function TematicaMonMagicPage() {
-  return <ProductesMonMagic />;
+export default async function TematicaMonMagicPage() {
+  const imageSet = await getMonMagicImageSet();
+  return <ProductesMonMagic imageSet={imageSet} />;
 }

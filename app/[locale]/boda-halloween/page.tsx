@@ -4,25 +4,34 @@ import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: 'Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events',
-  description: 'Especialistas en bodas Halloween en Barcelona y Catalunya. Decoración, efectos especiales y DJ especializado. Presupuesto sin compromiso.',
-  keywords: ['boda halloween', 'boda halloween barcelona', 'boda tematica halloween', 'bodas tematicas barcelona', 'dj boda halloween'],
-  openGraph: {
-    title: 'Boda Halloween Barcelona | Especialistas en Bodas Temáticas',
-    description: 'Tematización completa, DJ especializado, efectos especiales. Haz tu boda inolvidable.',
-    type: 'website',
-    locale: 'es_ES',
-    siteName: 'Òrbita Events',
-  },
-  alternates: {
-    canonical: '/boda-halloween',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const managedFavicon = await getManagedImageOverride('layout.favicon.halloween');
 
+  return {
+    title: 'Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events',
+    description: 'Especialistas en bodas Halloween en Barcelona y Catalunya. Decoración, efectos especiales y DJ especializado. Presupuesto sin compromiso.',
+    keywords: ['boda halloween', 'boda halloween barcelona', 'boda tematica halloween', 'bodas tematicas barcelona', 'dj boda halloween'],
+    openGraph: {
+      title: 'Boda Halloween Barcelona | Especialistas en Bodas Temáticas',
+      description: 'Tematización completa, DJ especializado, efectos especiales. Haz tu boda inolvidable.',
+      type: 'website',
+      locale: 'es_ES',
+      siteName: 'Òrbita Events',
+    },
+    alternates: {
+      canonical: '/boda-halloween',
+    },
+    icons: {
+      icon: [
+        { url: managedFavicon?.src || '/favicon-halloween.svg', type: managedFavicon?.mimeType || 'image/svg+xml' },
+      ],
+    },
+  };
+}
 
 export default async function BodaHalloweenPage() {
   const t = await getTranslations('bodaHalloween');

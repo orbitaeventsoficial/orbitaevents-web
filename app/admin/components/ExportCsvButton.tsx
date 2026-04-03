@@ -66,6 +66,8 @@ export default function ExportCsvButton(props: ExportCsvProps) {
     <button
       type="button"
       onClick={handleExport}
+      data-help-title="Exportar CSV"
+      data-help-desc="Descarrega les dades visibles en un fitxer CSV per revisar-les fora del panell o compartir-les."
       className="ap-btn ap-btn--secondary"
     >
       Exportar CSV

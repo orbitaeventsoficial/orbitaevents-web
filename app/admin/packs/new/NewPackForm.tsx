@@ -4,13 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useAsyncForm } from '../../components/useAsyncForm';
 
 const inputClass = 'w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/90';
 
 export default function NewPackForm() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     slug: '',
     price: 0,
@@ -18,34 +17,34 @@ export default function NewPackForm() {
     service: 'discomovil',
     nameCa: '',
   });
+  const { submitting, error, run } = useAsyncForm();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+
     try {
-      const res = await fetchWithCsrf('/api/admin/packs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          slug: form.slug.trim().toLowerCase(),
-          service: form.service,
-          price: Number(form.price),
-          djHours: Number(form.djHours),
-          translations: [
-            { locale: 'ca', name: form.nameCa || form.slug, tagline: '', description: '', features: [] },
-          ],
-        }),
+      await run(async () => {
+        const res = await fetchWithCsrf('/api/admin/packs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: form.slug.trim().toLowerCase(),
+            service: form.service,
+            price: Number(form.price),
+            djHours: Number(form.djHours),
+            translations: [
+              { locale: 'ca', name: form.nameCa || form.slug, tagline: '', description: '', features: [] },
+            ],
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.pack?.id) {
+          throw new Error(data?.error || "No s'ha pogut crear el pack");
+        }
+        router.push(`/admin/packs/${data.pack.id}`);
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.pack?.id) {
-        throw new Error(data?.error || "No s'ha pogut crear el pack");
-      }
-      router.push(`/admin/packs/${data.pack.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error inesperat');
-    } finally {
-      setLoading(false);
+    } catch {
+      // L'error queda centralitzat al hook.
     }
   }
 
@@ -118,10 +117,10 @@ export default function NewPackForm() {
       <div className="mt-5 flex gap-3">
         <button
           type="submit"
-          disabled={loading}
+          disabled={submitting}
           className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
         >
-          {loading ? 'Creant...' : 'Crear pack'}
+          {submitting ? 'Creant...' : 'Crear pack'}
         </button>
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm">
           Cancel·lar

@@ -286,7 +286,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       {message && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs" role="alert">
           <span className="flex-1">{message}</span>
-          <button type="button" onClick={() => setMessage(null)} className="">✕</button>
+          <button type="button" onClick={() => setMessage(null)} className="" aria-label="Tancar missatge">✕</button>
         </div>
       )}
       {skippedDetails.length > 0 && (

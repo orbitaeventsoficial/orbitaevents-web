@@ -14,7 +14,7 @@ import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { VIP_SPEND_THRESHOLD, getCustomerSourceLabel } from '@/lib/constants';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -212,11 +212,11 @@ export default function AdminContactesPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             aria-label="Cercar client"
-            className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-1 transition-all"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-1 transition-all" data-help-title="Cercador de clients" data-help-desc="Troba clients per nom, email, telèfon, Instagram o codi de descompte sense recórrer tot el llistat."
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
           <ExportCsvButton
             filename="clients"
             headers={['Nom', 'Email', 'Telèfon', 'Ciutat', 'Font', 'Esdeveniments', 'Despesa total', 'VIP']}
@@ -246,7 +246,7 @@ export default function AdminContactesPage() {
 
       {/* Filtres d'execució */}
       {!loading && customers.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2" data-help-title="Filtres per prioritat" data-help-desc="Ordenen els clients segons urgència operativa o valor de seguiment.">
           {(['ALL', 'ALTA', 'MITJANA', 'BAIXA'] as const).map((value) => (
             <button
               key={value}
@@ -281,22 +281,24 @@ export default function AdminContactesPage() {
 
       {/* Empty */}
       {!loading && customers.length === 0 && (
-        <div className="text-center py-20" role="status" aria-live="polite">
-          <span className="text-4xl">👥</span>
-          <p className="text-lg mt-3">No hi ha clients</p>
-          <p className="text-sm mt-1 admin-tone-text-slate">Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment.</p>
+        <div role="status" aria-live="polite">
+          <AdminEmptyState
+            icon="👥"
+            title="No hi ha clients"
+            description="Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment."
+          />
         </div>
       )}
 
       {/* Customers List — Mobile cards */}
       {!loading && customers.length > 0 && (
-        <section className="lg:hidden space-y-3">
+        <section className="lg:hidden space-y-3" data-help-title="Llistat mòbil de clients" data-help-desc="Mostra cada client en format targeta amb prioritat, proper pas i accessos ràpids.">
           {filteredCustomers.map(({ customer, priority }) => {
             const nextStep = getNextStep(customer);
             return (
               <article
                 key={customer.id}
-                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
+                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral" data-help-title={customer.name} data-help-desc={`Client amb prioritat ${priority.level}. Aquí tens el proper pas i accessos ràpids a processos i fitxa completa.`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -343,12 +345,12 @@ export default function AdminContactesPage() {
                       {nextStep.label} →
                     </Link>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
                     <button
                       onClick={() => { setSelectedCustomer(customer); setShowActionModal(true); }}
                       type="button"
                       className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      title="Iniciar procés"
+                      title="Iniciar procés" data-help-title="Iniciar procés" data-help-desc="Obre el modal d'accions per iniciar un flux sobre aquest client, com seguiment o procés post-esdeveniment."
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -358,7 +360,7 @@ export default function AdminContactesPage() {
                     <Link
                       href={`/admin/clientes/${customer.id}`}
                       className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      title="Fitxa 360"
+                      title="Fitxa 360" data-help-title="Fitxa 360" data-help-desc="Obre la fitxa completa del client amb historial, reserves i context operatiu."
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -374,7 +376,7 @@ export default function AdminContactesPage() {
 
       {/* Customers List — Desktop table */}
       {!loading && customers.length > 0 && (
-        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden">
+        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" data-help-title="Taula de clients" data-help-desc="Vista d'escriptori del CRM amb informació resumida, prioritat, proper pas i accions ràpides.">
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
             <thead>
@@ -471,7 +473,7 @@ export default function AdminContactesPage() {
                     </div>
                   </td>
                   <td className="p-4 text-center">
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <div className="flex flex-wrap justify-center gap-2" data-help-title="Filtres per prioritat" data-help-desc="Ordenen els clients segons urgència operativa o valor de seguiment.">
                       <button
                         onClick={() => {
                           setSelectedCustomer(customer);
@@ -479,7 +481,7 @@ export default function AdminContactesPage() {
                         }}
                         type="button"
                         className="p-2 rounded-xl transition-all"
-                        title="Iniciar procés"
+                        title="Iniciar procés" data-help-title="Iniciar procés" data-help-desc="Obre el modal d'accions per iniciar un flux sobre aquest client, com seguiment o procés post-esdeveniment."
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -489,7 +491,7 @@ export default function AdminContactesPage() {
                       <Link
                         href={`/admin/clientes/${customer.id}`}
                         className="p-2 rounded-xl transition-all"
-                        title="Fitxa 360"
+                        title="Fitxa 360" data-help-title="Fitxa 360" data-help-desc="Obre la fitxa completa del client amb historial, reserves i context operatiu."
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -506,9 +508,9 @@ export default function AdminContactesPage() {
       )}
 
       {!loading && customers.length > 0 && (
-        <div className="flex flex-col items-center justify-center gap-2 text-xs sm:flex-row sm:justify-between">
+        <div className="flex flex-col items-center justify-center gap-2 text-xs sm:flex-row sm:justify-between" data-help-title="Paginació de clients" data-help-desc="Indica quants clients estàs veient i permet avançar o retrocedir de pàgina.">
           <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} visibles · {totalCustomers} clients</span>
-          <div className="flex gap-2">
+          <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
             <button
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
@@ -568,6 +570,9 @@ export default function AdminContactesPage() {
     </AdminPage>
   );
 }
+
+
+
 
 
 

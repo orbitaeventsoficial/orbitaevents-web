@@ -21,7 +21,7 @@ model Setting {
   key         String      @unique
   value       String
   type        SettingType @default(STRING)
-  category    String      // "stats", "contact", "pricing", "config"
+  category    String // "stats", "contact", "pricing", "config"
   label       String?
   description String?
   updatedAt   DateTime    @updatedAt
@@ -42,31 +42,31 @@ enum SettingType {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model InventoryItem {
-  id            String            @id @default(cuid())
-  code          String            @unique // "ALT-001", "FUM-001"
-  name          String
-  description   String?
-  category      InventoryCategory
-  watts         Int?
-  value         Float
-  status        ItemStatus        @default(AVAILABLE)
-  condition     ItemCondition     @default(GOOD)
-  isConsumable  Boolean           @default(false)
-  stockQuantity Int?
-  minStock      Int?
-  purchaseDate    DateTime?
-  purchasePrice   Float?
-  expectedLifeHours Float?  @default(2000)
-  imageUrl      String?
-  notes         String?
+  id                String            @id @default(cuid())
+  code              String            @unique // "ALT-001", "FUM-001"
+  name              String
+  description       String?
+  category          InventoryCategory
+  watts             Int?
+  value             Float
+  status            ItemStatus        @default(AVAILABLE)
+  condition         ItemCondition     @default(GOOD)
+  isConsumable      Boolean           @default(false)
+  stockQuantity     Int?
+  minStock          Int?
+  purchaseDate      DateTime?
+  purchasePrice     Float?
+  expectedLifeHours Float?            @default(2000)
+  imageUrl          String?
+  notes             String?
 
-  packItems     PackInventory[]
-  extraItems    ExtraInventory[]
-  bookingItems  BookingInventory[]
-  usageHistory  InventoryUsage[]
+  packItems    PackInventory[]
+  extraItems   ExtraInventory[]
+  bookingItems BookingInventory[]
+  usageHistory InventoryUsage[]
 
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category])
   @@index([status])
@@ -121,29 +121,29 @@ model InventoryUsage {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Pack {
-  id             String            @id @default(cuid())
-  code           String?           @unique
-  slug           String            @unique // "flash", "party-starter", "corporate"
+  id             String  @id @default(cuid())
+  code           String? @unique
+  slug           String  @unique // "flash", "party-starter", "corporate"
   service        String?
-  isActive       Boolean           @default(true)
-  isFeatured     Boolean           @default(false)
-  order          Int               @default(0)
+  isActive       Boolean @default(true)
+  isFeatured     Boolean @default(false)
+  order          Int     @default(0)
   price          Float
   originalPrice  Float?
-  extraHourPrice Float             @default(75)
+  extraHourPrice Float   @default(75)
   minGuests      Int?
   maxGuests      Int?
   djHours        Int
-  soundWatts     Int               @default(4000)
-  includesFog    Boolean           @default(true)
-  includesMic    Boolean           @default(false)
+  soundWatts     Int     @default(4000)
+  includesFog    Boolean @default(true)
+  includesMic    Boolean @default(false)
 
-  translations   PackTranslation[]
-  inventory      PackInventory[]
-  bookings       Booking[]
+  translations PackTranslation[]
+  inventory    PackInventory[]
+  bookings     Booking[]
 
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("packs")
 }
@@ -152,7 +152,7 @@ model PackTranslation {
   id          String   @id @default(cuid())
   packId      String
   pack        Pack     @relation(fields: [packId], references: [id], onDelete: Cascade)
-  locale      String   // "es", "ca", "en"
+  locale      String // "es", "ca", "en"
   name        String
   tagline     String?
   description String?  @db.Text
@@ -181,20 +181,20 @@ model PackInventory {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Extra {
-  id           String             @id @default(cuid())
-  slug         String             @unique
-  isActive     Boolean            @default(true)
-  price        Float
-  costPerUnit  Float?
-  priceType    PriceType          @default(FIXED)
-  order        Int                @default(0)
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  isActive    Boolean   @default(true)
+  price       Float
+  costPerUnit Float?
+  priceType   PriceType @default(FIXED)
+  order       Int       @default(0)
 
-  translations ExtraTranslation[]
-  inventory    ExtraInventory[]
+  translations  ExtraTranslation[]
+  inventory     ExtraInventory[]
   bookingExtras BookingExtra[]
 
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("extras")
 }
@@ -235,56 +235,56 @@ model ExtraInventory {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Customer {
-  id                String   @id @default(cuid())
-  customerNumber    Int?     @unique @default(autoincrement()) // Número de client: CLI-0001
+  id             String @id @default(cuid())
+  customerNumber Int?   @unique @default(autoincrement()) // Número de client: CLI-0001
 
   // Dades normalitzades
-  email             String   @unique
-  emailNormalized   String   @unique // lowercase, trimmed
-  phone             String?
-  phoneNormalized   String?  // només dígits, amb prefix internacional
-  name              String
-  nameNormalized    String   // lowercase, sense accents, per cerques
+  email           String  @unique
+  emailNormalized String  @unique // lowercase, trimmed
+  phone           String?
+  phoneNormalized String? // només dígits, amb prefix internacional
+  name            String
+  nameNormalized  String // lowercase, sense accents, per cerques
 
   // Document d'identitat (opcional, únic si present)
-  dni               String?
-  dniNormalized     String?  @unique // uppercase, sense espais ni guions
+  dni           String?
+  dniNormalized String? @unique // uppercase, sense espais ni guions
 
   // Instagram (opcional)
-  instagram         String?
+  instagram           String?
   instagramNormalized String? // sense @, lowercase
 
   // Metadades
-  preferredLocale   String   @default("es")
-  source            LeadSource @default(WEBSITE)
+  preferredLocale String     @default("es")
+  source          LeadSource @default(WEBSITE)
 
   // GDPR
-  gdprConsent       Boolean  @default(false)
-  gdprConsentDate   DateTime?
-  marketingConsent  Boolean  @default(false)
+  gdprConsent          Boolean   @default(false)
+  gdprConsentDate      DateTime?
+  marketingConsent     Boolean   @default(false)
   marketingConsentDate DateTime?
 
   // Estadístiques
-  totalEvents       Int      @default(0)
-  totalSpent        Float    @default(0)
-  lastEventDate     DateTime?
+  totalEvents   Int       @default(0)
+  totalSpent    Float     @default(0)
+  lastEventDate DateTime?
 
   // Relacions
-  leads             Lead[]
-  bookings          Booking[]
-  proposals         Proposal[]
-  invoices          Invoice[]
-  tasks             Task[]
-  testimonials      CustomerTestimonial[]
-  discountCodes     CustomerDiscountCode[]
-  activityLog       CustomerActivity[]
-  consentRecords    ConsentRecord[]
-  dataRequests      DataRequest[]
-  portalAccesses    ClientPortalAccess[]
+  leads          Lead[]
+  bookings       Booking[]
+  proposals      Proposal[]
+  invoices       Invoice[]
+  tasks          Task[]
+  testimonials   CustomerTestimonial[]
+  discountCodes  CustomerDiscountCode[]
+  activityLog    CustomerActivity[]
+  consentRecords ConsentRecord[]
+  dataRequests   DataRequest[]
+  portalAccesses ClientPortalAccess[]
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  mergedIntoId      String?  // Si s'ha fusionat amb un altre customer
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  mergedIntoId String? // Si s'ha fusionat amb un altre customer
 
   @@index([emailNormalized])
   @@index([phoneNormalized])
@@ -294,12 +294,12 @@ model Customer {
 }
 
 model CustomerActivity {
-  id          String   @id @default(cuid())
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  action      String   // "LEAD_CREATED", "BOOKING_CONFIRMED", "TESTIMONIAL_SUBMITTED", etc
-  details     Json?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  action     String // "LEAD_CREATED", "BOOKING_CONFIRMED", "TESTIMONIAL_SUBMITTED", etc
+  details    Json?
+  createdAt  DateTime @default(now())
 
   @@index([customerId])
   @@index([createdAt])
@@ -308,36 +308,36 @@ model CustomerActivity {
 
 // Testimonis dels clients (per generar canvas/imatges)
 model CustomerTestimonial {
-  id              String   @id @default(cuid())
-  customerId      String
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   // Contingut
-  text            String   @db.Text
-  rating          Int      @default(5) // 1-5
-  eventType       EventType?
-  eventDate       DateTime?
+  text      String     @db.Text
+  rating    Int        @default(5) // 1-5
+  eventType EventType?
+  eventDate DateTime?
 
   // Foto del client (opcional)
-  photoUrl        String?
+  photoUrl String?
 
   // Permisos
-  showName        Boolean  @default(true)
-  showPhoto       Boolean  @default(false)
-  isApproved      Boolean  @default(false) // Admin ha d'aprovar
+  showName   Boolean @default(true)
+  showPhoto  Boolean @default(false)
+  isApproved Boolean @default(false) // Admin ha d'aprovar
 
   // Canvas generat
-  canvasImageUrl  String?  // URL de la imatge generada
+  canvasImageUrl    String? // URL de la imatge generada
   canvasGeneratedAt DateTime?
 
   // Codi de descompte associat
-  discountCodeId  String?
+  discountCodeId String?
 
   // Token únic per al formulari públic
-  submissionToken String   @unique @default(cuid())
+  submissionToken String @unique @default(cuid())
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([customerId])
   @@index([isApproved])
@@ -346,28 +346,28 @@ model CustomerTestimonial {
 
 // Codis de descompte personalitzats per client
 model CustomerDiscountCode {
-  id              String   @id @default(cuid())
-  customerId      String
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  code            String   @unique
-  discountPercent Float    @default(10)
+  code            String @unique
+  discountPercent Float  @default(10)
 
   // Validesa
-  validFrom       DateTime @default(now())
-  validUntil      DateTime
+  validFrom  DateTime @default(now())
+  validUntil DateTime
 
   // Ús
-  maxUses         Int      @default(1)
-  currentUses     Int      @default(0)
+  maxUses     Int @default(1)
+  currentUses Int @default(0)
 
   // Origen
-  sourceType      String   // "POST_EVENT", "TESTIMONIAL", "REFERRAL", "MANUAL"
-  sourceId        String?  // ID del testimonial o booking
+  sourceType String // "POST_EVENT", "TESTIMONIAL", "REFERRAL", "MANUAL"
+  sourceId   String? // ID del testimonial o booking
 
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  usedAt          DateTime?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
 
   @@index([code])
   @@index([customerId])
@@ -379,11 +379,11 @@ model CustomerDiscountCode {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Lead {
-  id               String     @id @default(cuid())
+  id String @id @default(cuid())
 
   // Relació amb Customer (opcional, es crea quan es processa)
-  customerId       String?
-  customer         Customer?  @relation(fields: [customerId], references: [id])
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   name             String
   email            String
@@ -408,27 +408,27 @@ model Lead {
   assignedTo       String?
   preferredLocale  String     @default("es") // Idioma preferit del client (es, ca, en, ar, fr, zh)
 
-  notes            LeadNote[]
-  booking          Booking?
-  proposals        Proposal[]
-  activities       LeadActivity[]
-  tasks            LeadTask[]
-  universalTasks   Task[]
-  documents        LeadDocument[]
+  notes          LeadNote[]
+  booking        Booking?
+  proposals      Proposal[]
+  activities     LeadActivity[]
+  tasks          LeadTask[]
+  universalTasks Task[]
+  documents      LeadDocument[]
 
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  contactedAt      DateTime?
-  convertedAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contactedAt DateTime?
+  convertedAt DateTime?
 
   // Nurturing: seqüència de follow-ups automàtics
-  nurturingStep    Int        @default(0) // 0 = cap follow-up enviat, 1..N = pas actual
-  lastNurturingAt  DateTime?              // Quan es va enviar l'últim follow-up
-  nurturingDone    Boolean    @default(false) // True quan s'ha completat tota la cadència
+  nurturingStep   Int       @default(0) // 0 = cap follow-up enviat, 1..N = pas actual
+  lastNurturingAt DateTime? // Quan es va enviar l'últim follow-up
+  nurturingDone   Boolean   @default(false) // True quan s'ha completat tota la cadència
 
   // Cache de scoring (actualitzat pel cron commercial-daily)
-  cachedScore      Int?
-  cachedScoreAt    DateTime?
+  cachedScore   Int?
+  cachedScoreAt DateTime?
 
   @@index([status])
   @@index([eventType])
@@ -437,6 +437,7 @@ model Lead {
   @@index([email])
   @@index([status, createdAt]) // Consultes combinades
   @@index([priority, status]) // Per ordenar leads urgents
+  @@index([status, updatedAt]) // Per leads actius i frescor de pipeline
   @@map("leads")
 }
 
@@ -587,68 +588,68 @@ model LeadDocument {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Booking {
-  id             String        @id @default(cuid())
-  reference      String        @unique // "OE-2024-001"
-  leadId         String?       @unique
-  lead           Lead?         @relation(fields: [leadId], references: [id])
-  customerId     String?
-  customer       Customer?     @relation(fields: [customerId], references: [id])
+  id         String    @id @default(cuid())
+  reference  String    @unique // "OE-2024-001"
+  leadId     String?   @unique
+  lead       Lead?     @relation(fields: [leadId], references: [id])
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   // Client
   clientName      String
   clientEmail     String
   clientPhone     String
-  preferredLocale String        @default("es") // Idioma preferit (es, ca, en, ar, fr, zh)
+  preferredLocale String @default("es") // Idioma preferit (es, ca, en, ar, fr, zh)
 
   // Event
   eventType      EventType
   eventDate      DateTime
-  eventStartTime String?       // "20:00"
-  eventEndTime   String?       // "03:00"
+  eventStartTime String? // "20:00"
+  eventEndTime   String? // "03:00"
   eventLocation  String
   eventVenue     String?
   guestCount     Int
 
   // Services
-  packId         String
-  pack           Pack          @relation(fields: [packId], references: [id])
-  extras         BookingExtra[]
-  extraHours     Int           @default(0)
-  inventory      BookingInventory[]
+  packId     String
+  pack       Pack               @relation(fields: [packId], references: [id])
+  extras     BookingExtra[]
+  extraHours Int                @default(0)
+  inventory  BookingInventory[]
 
   // Pricing
-  subtotal       Float
-  discount       Float         @default(0)
-  discountCode   String?
-  vatRate        Float         @default(21)
-  vatAmount      Float
-  total          Float
+  subtotal     Float
+  discount     Float   @default(0)
+  discountCode String?
+  vatRate      Float   @default(21)
+  vatAmount    Float
+  total        Float
 
   // Payments
-  depositAmount  Float
-  depositPaid    Boolean       @default(false)
-  depositPaidAt  DateTime?
+  depositAmount   Float
+  depositPaid     Boolean   @default(false)
+  depositPaidAt   DateTime?
   remainingAmount Float
-  remainingPaid  Boolean       @default(false)
+  remainingPaid   Boolean   @default(false)
   remainingPaidAt DateTime?
 
   // Travel / distance tracking
-  distanceKm     Float?        // km anada i tornada
-  fuelCostPerKm  Float?        @default(0.15) // cost €/km (gasolina + desgast)
-  travelCost     Float?        // cost total desplaçament (calculat o manual)
+  distanceKm    Float? // km anada i tornada
+  fuelCostPerKm Float? @default(0.15) // cost €/km (gasolina + desgast)
+  travelCost    Float? // cost total desplaçament (calculat o manual)
 
   // Status
-  status         BookingStatus @default(PENDING)
-  notes          String?       @db.Text
+  status BookingStatus @default(PENDING)
+  notes  String?       @db.Text
 
   // Post-event
-  postEventReport    PostEventReport?
-  clientSurvey       ClientSurvey?
-  clientFeedback     ClientFeedback?
-  proposals          Proposal[]
-  invoices           Invoice[]
-  tasks              Task[]
-  portalAccesses     ClientPortalAccess[]
+  postEventReport      PostEventReport?
+  clientSurvey         ClientSurvey?
+  clientFeedback       ClientFeedback?
+  proposals            Proposal[]
+  invoices             Invoice[]
+  tasks                Task[]
+  portalAccesses       ClientPortalAccess[]
   collaboratorBookings CollaboratorBooking[]
   galleryPhotos        BookingGalleryPhoto[]
 
@@ -658,8 +659,8 @@ model Booking {
   reviewToken          String?
   reviewSubmittedAt    DateTime?
 
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([eventDate])
   @@index([status])
@@ -669,6 +670,7 @@ model Booking {
   @@index([reference]) // Per generació de referències
   @@index([status, eventDate]) // Consultes combinades
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
+  @@index([depositPaid, eventDate]) // Per filtres de cobrament i agenda
   @@map("bookings")
 }
 
@@ -730,27 +732,27 @@ enum InvoiceStatus {
 }
 
 model Proposal {
-  id            String         @id @default(cuid())
-  reference     String         @unique
-  customerId    String
-  customer      Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  leadId        String?
-  lead          Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  bookingId     String?
-  booking       Booking?       @relation(fields: [bookingId], references: [id], onDelete: SetNull)
-  status        ProposalStatus @default(DRAFT)
-  locale        String         @default("es")
-  currency      String         @default("EUR")
-  validityDays  Int            @default(15)
-  subtotal      Float
-  discount      Float          @default(0)
-  vatRate       Float          @default(21)
-  vatAmount     Float
-  total         Float
-  snapshot      Json
-  pdfUrl        String?
-  pdfKey        String?
-  tasks         Task[]
+  id           String         @id @default(cuid())
+  reference    String         @unique
+  customerId   String
+  customer     Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  leadId       String?
+  lead         Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  bookingId    String?
+  booking      Booking?       @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  status       ProposalStatus @default(DRAFT)
+  locale       String         @default("es")
+  currency     String         @default("EUR")
+  validityDays Int            @default(15)
+  subtotal     Float
+  discount     Float          @default(0)
+  vatRate      Float          @default(21)
+  vatAmount    Float
+  total        Float
+  snapshot     Json
+  pdfUrl       String?
+  pdfKey       String?
+  tasks        Task[]
 
   // Contracte (neix d'una proposta acceptada)
   contractReference  String?
@@ -763,13 +765,13 @@ model Proposal {
   depositAmount      Float?
   depositDueDate     DateTime?
   finalPaymentDue    DateTime?
-  cancellationPolicy String?        @db.Text
-  additionalClauses  String?        @db.Text
+  cancellationPolicy String?         @db.Text
+  additionalClauses  String?         @db.Text
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  sentAt        DateTime?
-  acceptedAt    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  sentAt     DateTime?
+  acceptedAt DateTime?
 
   @@index([customerId, createdAt])
   @@index([leadId])
@@ -780,45 +782,46 @@ model Proposal {
 }
 
 model Invoice {
-  id              String        @id @default(cuid())
-  reference       String        @unique // FAC-YYYY-NNNN
-  bookingId       String
-  booking         Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
-  customerId      String
-  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  id         String   @id @default(cuid())
+  reference  String   @unique // FAC-YYYY-NNNN
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
 
   // Dades fiscals (snapshot al moment de creació)
-  clientName      String
-  clientNIF       String?
-  clientAddress   String?
+  clientName    String
+  clientNIF     String?
+  clientAddress String?
 
   // Imports
-  subtotal        Float
-  discount        Float         @default(0)
-  vatRate         Float         @default(21)
-  vatAmount       Float
-  total           Float
+  subtotal  Float
+  discount  Float @default(0)
+  vatRate   Float @default(21)
+  vatAmount Float
+  total     Float
 
   // Estat
-  status          InvoiceStatus @default(DRAFT)
+  status InvoiceStatus @default(DRAFT)
 
   // Integració Holded
-  holdedInvoiceId   String?
-  holdedContactId   String?
-  holdedSyncedAt    DateTime?
-  holdedSyncError   String?
-  holdedInvoiceUrl  String?
+  holdedInvoiceId  String?
+  holdedContactId  String?
+  holdedSyncedAt   DateTime?
+  holdedSyncError  String?
+  holdedInvoiceUrl String?
 
   // PDF
-  pdfUrl          String?
-  pdfKey          String?
+  pdfUrl String?
+  pdfKey String?
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([bookingId])
   @@index([customerId])
   @@index([status])
+  @@index([customerId, status]) // Per cross-queries de client i estat
   @@map("invoices")
 }
 
@@ -919,64 +922,64 @@ model PostEventReport {
   punctuality      String? // EARLY, ON_TIME, SLIGHT_DELAY, DELAYED
 
   // EQUIP
-  soundQuality     Int?    // 1-5
-  maxVolumeUsed    Int?    // %
-  soundProblems    Boolean @default(false)
+  soundQuality        Int? // 1-5
+  maxVolumeUsed       Int? // %
+  soundProblems       Boolean  @default(false)
   soundProblemsDetail String?
-  lightingUsed     String[] // ["MOV-001", "MOV-002"]
-  effectsUsed      String[] // ["FUM-001"]
-  effectsReaction  String? // INDIFFERENT, GOOD, WOW, INCREDIBLE
-  backupNeeded     Boolean @default(false)
+  lightingUsed        String[] // ["MOV-001", "MOV-002"]
+  effectsUsed         String[] // ["FUM-001"]
+  effectsReaction     String? // INDIFFERENT, GOOD, WOW, INCREDIBLE
+  backupNeeded        Boolean  @default(false)
 
   // AMBIENT
-  temperature      String? // COLD, COOL, IDEAL, WARM, HOT
-  maxDancefloor    Int?    // %
-  peakTime         String? // "01:30"
-  avgDancing       String? // BELOW_25, 25_50, 50_75, ABOVE_75
-  overallVibe      String? // COLD, CORRECT, GOOD_VIBES, INCREDIBLE
+  temperature   String? // COLD, COOL, IDEAL, WARM, HOT
+  maxDancefloor Int? // %
+  peakTime      String? // "01:30"
+  avgDancing    String? // BELOW_25, 25_50, 50_75, ABOVE_75
+  overallVibe   String? // COLD, CORRECT, GOOD_VIBES, INCREDIBLE
 
   // MÚSICA
-  mainStyle        String?
-  genresWorked     String[]
-  genresFailed     String[]
-  hitSongs         String? @db.Text
-  memorableMoment  String? @db.Text
+  mainStyle       String?
+  genresWorked    String[]
+  genresFailed    String[]
+  hitSongs        String?  @db.Text
+  memorableMoment String?  @db.Text
 
   // ANIMACIÓ
-  animationLevel   String? // ZERO, MINIMAL, MODERATE, HIGH, SHOWMAN
-  microphoneUsed   Boolean @default(false)
-  gamesPlayed      String[]
+  animationLevel String? // ZERO, MINIMAL, MODERATE, HIGH, SHOWMAN
+  microphoneUsed Boolean  @default(false)
+  gamesPlayed    String[]
 
   // CLIENT
   perceivedSatisfaction String? // UNSATISFIED, CORRECT, HAPPY, DELIGHTED
-  clientComments   String? @db.Text
+  clientComments        String? @db.Text
 
   // INCIDÈNCIES
-  hadIncidents     Boolean @default(false)
-  incidentType     String? // TECHNICAL, LOGISTICS, CLIENT, PUBLIC, OTHER
+  hadIncidents        Boolean @default(false)
+  incidentType        String? // TECHNICAL, LOGISTICS, CLIENT, PUBLIC, OTHER
   incidentDescription String? @db.Text
-  incidentResolution String? @db.Text
-  incidentImpact   String? // NONE, MINIMAL, MODERATE, HIGH, CRITICAL
+  incidentResolution  String? @db.Text
+  incidentImpact      String? // NONE, MINIMAL, MODERATE, HIGH, CRITICAL
 
   // VALORACIÓ
-  overallRating    Int?    // 1-5
-  whatWorkedBest   String? @db.Text
-  whatToImprove    String? @db.Text
-  lessonsLearned   String? @db.Text
+  overallRating    Int? // 1-5
+  whatWorkedBest   String?  @db.Text
+  whatToImprove    String?  @db.Text
+  lessonsLearned   String?  @db.Text
   wouldRepeatVenue Boolean?
-  stressLevel      Int?    // 1-10
+  stressLevel      Int? // 1-10
 
   // MEDIA
-  photosTaken      Int?
-  videosTaken      Int?
-  iconicPhotoUrl   String?
-  mediaPermission  String? // YES_FULL, YES_ANONYMOUS, NO
+  photosTaken     Int?
+  videosTaken     Int?
+  iconicPhotoUrl  String?
+  mediaPermission String? // YES_FULL, YES_ANONYMOUS, NO
 
-  status           String  @default("DRAFT") // DRAFT, COMPLETED
-  completedAt      DateTime?
+  status      String    @default("DRAFT") // DRAFT, COMPLETED
+  completedAt DateTime?
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([bookingId])
   @@map("post_event_reports")
@@ -992,42 +995,42 @@ model ClientSurvey {
   booking   Booking @relation(fields: [bookingId], references: [id])
 
   // Valoracions 1-5
-  overallRating          Int
-  djMusicSelection       Int
-  djCrowdReading         Int
-  djEnergyAttitude       Int
-  djProfessionalism      Int
-  soundQuality           Int
-  volumeAdequate         Int
-  lightingQuality        Int
-  effectsQuality         Int?
-  priorCommunication     Int
-  punctuality            Int
-  flexibility            Int
+  overallRating      Int
+  djMusicSelection   Int
+  djCrowdReading     Int
+  djEnergyAttitude   Int
+  djProfessionalism  Int
+  soundQuality       Int
+  volumeAdequate     Int
+  lightingQuality    Int
+  effectsQuality     Int?
+  priorCommunication Int
+  punctuality        Int
+  flexibility        Int
 
   // Pista
-  dancefloorActivity     DancefloorLevel
-  guestsEnjoyment        GuestsEnjoyment
+  dancefloorActivity DancefloorLevel
+  guestsEnjoyment    GuestsEnjoyment
 
   // Recomanació
-  npsScore               Int // 0-10
-  wouldHireAgain         WouldHireAgain
+  npsScore       Int // 0-10
+  wouldHireAgain WouldHireAgain
 
   // Comentaris
-  bestMoment             String? @db.Text
-  missedSongs            String? @db.Text
-  improvements           String? @db.Text
-  additionalComments     String? @db.Text
+  bestMoment         String? @db.Text
+  missedSongs        String? @db.Text
+  improvements       String? @db.Text
+  additionalComments String? @db.Text
 
   // Permís testimoni
-  testimonialPermission  TestimonialPermission
+  testimonialPermission TestimonialPermission
 
-  sentAt                 DateTime?
-  reminderSentAt         DateTime?
-  submittedAt            DateTime @default(now())
+  sentAt         DateTime?
+  reminderSentAt DateTime?
+  submittedAt    DateTime  @default(now())
 
   // Testimoni creat
-  createdTestimonialId   String?
+  createdTestimonialId String?
 
   @@index([bookingId])
   @@map("client_surveys")
@@ -1064,24 +1067,24 @@ enum TestimonialPermission {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model ClientFeedback {
-  id               String   @id @default(cuid())
-  bookingId        String   @unique
-  booking          Booking  @relation(fields: [bookingId], references: [id])
+  id        String  @id @default(cuid())
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
   personalMessage  String?  @db.Text
   highlightMoments String[]
   iconicPhotoUrl   String?
 
-  discountCode     String   @unique
-  discountPercent  Float    @default(10)
+  discountCode       String    @unique
+  discountPercent    Float     @default(10)
   discountValidUntil DateTime
-  discountUsed     Boolean  @default(false)
-  discountUsedAt   DateTime?
+  discountUsed       Boolean   @default(false)
+  discountUsedAt     DateTime?
 
-  sentAt           DateTime?
-  sentVia          String?  // "email", "whatsapp"
+  sentAt  DateTime?
+  sentVia String? // "email", "whatsapp"
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([bookingId])
   @@map("client_feedbacks")
@@ -1104,7 +1107,7 @@ model DiscountCode {
   minOrderValue   Float?
   applicablePacks String[]
   isAccumulative  Boolean      @default(true)
-  sourceType      String?      // "POST_EVENT", "PROMOTION", "MANUAL"
+  sourceType      String? // "POST_EVENT", "PROMOTION", "MANUAL"
   sourceBookingId String?
   isActive        Boolean      @default(true)
   createdAt       DateTime     @default(now())
@@ -1124,9 +1127,9 @@ enum DiscountType {
 
 model Translation {
   id               String    @id @default(cuid())
-  namespace        String    // "hero", "stats", "packs", "faq"
-  key              String    // "title", "subtitle"
-  locale           String    // "es", "ca", "en"
+  namespace        String // "hero", "stats", "packs", "faq"
+  key              String // "title", "subtitle"
+  locale           String // "es", "ca", "en"
   value            String    @db.Text
   isAutoTranslated Boolean   @default(false)
   lastManualEdit   DateTime?
@@ -1189,8 +1192,8 @@ model LiveNotification {
 
 model AdminLog {
   id        String   @id @default(cuid())
-  action    String   // "CREATE", "UPDATE", "DELETE"
-  entity    String   // "lead", "booking", "pack"
+  action    String // "CREATE", "UPDATE", "DELETE"
+  entity    String // "lead", "booking", "pack"
   entityId  String?
   details   Json?
   userId    String?
@@ -1207,35 +1210,35 @@ model AdminLog {
 
 // Registre de Consentiments
 model ConsentRecord {
-  id               String   @id @default(cuid())
-  customerId       String?
-  customer         Customer? @relation(fields: [customerId], references: [id])
+  id         String    @id @default(cuid())
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   // Identificació (si no hi ha customer)
-  email            String?
-  ipAddress        String?
-  userAgent        String?
+  email     String?
+  ipAddress String?
+  userAgent String?
 
   // Tipus de consentiment
-  consentType      ConsentType
-  consentVersion   String   // Versió del document legal (ex: "2.1")
+  consentType    ConsentType
+  consentVersion String // Versió del document legal (ex: "2.1")
 
   // Estat
-  granted          Boolean  @default(false)
-  grantedAt        DateTime?
-  revokedAt        DateTime?
+  granted   Boolean   @default(false)
+  grantedAt DateTime?
+  revokedAt DateTime?
 
   // Context
-  source           String   // "WEBSITE", "FORM", "EMAIL", "ADMIN"
-  sourceUrl        String?  // URL on es va donar el consentiment
-  formId           String?  // ID del formulari
+  source    String // "WEBSITE", "FORM", "EMAIL", "ADMIN"
+  sourceUrl String? // URL on es va donar el consentiment
+  formId    String? // ID del formulari
 
   // Evidència
-  rawConsent       Json?    // Dades originals del formulari
-  checksumHash     String?  // Hash per verificació d'integritat
+  rawConsent   Json? // Dades originals del formulari
+  checksumHash String? // Hash per verificació d'integritat
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([customerId])
   @@index([email])
@@ -1245,71 +1248,71 @@ model ConsentRecord {
 }
 
 enum ConsentType {
-  GDPR_BASIC           // Consentiment bàsic RGPD
-  MARKETING_EMAIL      // Rebre emails comercials
-  MARKETING_SMS        // Rebre SMS comercials
-  MARKETING_WHATSAPP   // Rebre WhatsApp comercials
-  PROFILING            // Perfilat i decisions automatitzades
-  THIRD_PARTY          // Compartir amb tercers
-  COOKIES_ANALYTICS    // Cookies analítiques
-  COOKIES_MARKETING    // Cookies de màrqueting
-  COOKIES_FUNCTIONAL   // Cookies funcionals
-  TESTIMONIAL_PUBLIC   // Publicar testimoni públicament
-  PHOTO_USAGE          // Ús de fotos
+  GDPR_BASIC // Consentiment bàsic RGPD
+  MARKETING_EMAIL // Rebre emails comercials
+  MARKETING_SMS // Rebre SMS comercials
+  MARKETING_WHATSAPP // Rebre WhatsApp comercials
+  PROFILING // Perfilat i decisions automatitzades
+  THIRD_PARTY // Compartir amb tercers
+  COOKIES_ANALYTICS // Cookies analítiques
+  COOKIES_MARKETING // Cookies de màrqueting
+  COOKIES_FUNCTIONAL // Cookies funcionals
+  TESTIMONIAL_PUBLIC // Publicar testimoni públicament
+  PHOTO_USAGE // Ús de fotos
 }
 
 // Sol·licituds de Drets ARCO (Accés, Rectificació, Cancel·lació, Oposició)
 model DataRequest {
-  id              String            @id @default(cuid())
-  customerId      String?
-  customer        Customer?         @relation(fields: [customerId], references: [id])
+  id         String    @id @default(cuid())
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   // Identificació del sol·licitant
-  requesterEmail  String
-  requesterName   String
-  requesterPhone  String?
+  requesterEmail String
+  requesterName  String
+  requesterPhone String?
 
   // Verificació d'identitat
-  verificationToken    String   @unique @default(cuid())
-  verificationSentAt   DateTime?
-  verifiedAt           DateTime?
-  identityDocument     String?  // DNI/NIE (xifrat o hash)
-  identityVerified     Boolean  @default(false)
+  verificationToken  String    @unique @default(cuid())
+  verificationSentAt DateTime?
+  verifiedAt         DateTime?
+  identityDocument   String? // DNI/NIE (xifrat o hash)
+  identityVerified   Boolean   @default(false)
 
   // Tipus de sol·licitud
-  requestType     DataRequestType
+  requestType DataRequestType
 
   // Detalls
-  description     String?  @db.Text  // Què vol l'usuari exactament
-  specificData    String[] // Camps específics si és parcial
-  reason          String?  @db.Text  // Motiu (obligatori per algunes sol·licituds)
+  description  String?  @db.Text // Què vol l'usuari exactament
+  specificData String[] // Camps específics si és parcial
+  reason       String?  @db.Text // Motiu (obligatori per algunes sol·licituds)
 
   // Estat
-  status          DataRequestStatus @default(PENDING)
-  priority        Priority          @default(MEDIUM)
+  status   DataRequestStatus @default(PENDING)
+  priority Priority          @default(MEDIUM)
 
   // Processament
-  assignedTo      String?
-  processedAt     DateTime?
-  processedBy     String?
-  responseNotes   String?  @db.Text
+  assignedTo    String?
+  processedAt   DateTime?
+  processedBy   String?
+  responseNotes String?   @db.Text
 
   // Resposta
   responseType    DataResponseType?
-  responseData    Json?             // Dades exportades (si escau)
-  responseFileUrl String?           // URL del fitxer (si escau)
+  responseData    Json? // Dades exportades (si escau)
+  responseFileUrl String? // URL del fitxer (si escau)
   responseSentAt  DateTime?
 
   // Terminis legals
-  legalDeadline   DateTime          // 30 dies màxim per RGPD
-  extensionApplied Boolean @default(false)
-  extensionReason String?
+  legalDeadline    DateTime // 30 dies màxim per RGPD
+  extensionApplied Boolean  @default(false)
+  extensionReason  String?
 
   // Auditoria
-  auditTrail      Json?             // Historial de canvis
+  auditTrail Json? // Historial de canvis
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([customerId])
   @@index([requesterEmail])
@@ -1320,60 +1323,60 @@ model DataRequest {
 }
 
 enum DataRequestType {
-  ACCESS            // Dret d'accés - obtenir còpia de totes les dades
-  RECTIFICATION     // Dret de rectificació - corregir dades incorrectes
-  ERASURE           // Dret de supressió ("dret a l'oblit")
-  RESTRICTION       // Dret de limitació del tractament
-  PORTABILITY       // Dret de portabilitat - exportar dades
-  OBJECTION         // Dret d'oposició al tractament
-  AUTOMATED         // Drets sobre decisions automatitzades
+  ACCESS // Dret d'accés - obtenir còpia de totes les dades
+  RECTIFICATION // Dret de rectificació - corregir dades incorrectes
+  ERASURE // Dret de supressió ("dret a l'oblit")
+  RESTRICTION // Dret de limitació del tractament
+  PORTABILITY // Dret de portabilitat - exportar dades
+  OBJECTION // Dret d'oposició al tractament
+  AUTOMATED // Drets sobre decisions automatitzades
 }
 
 enum DataRequestStatus {
-  PENDING           // Pendent de verificació
+  PENDING // Pendent de verificació
   IDENTITY_REQUIRED // Cal verificar identitat
-  VERIFIED          // Identitat verificada, pendent processament
-  IN_PROGRESS       // En processament
-  COMPLETED         // Completada
-  REJECTED          // Rebutjada (amb motiu legal)
-  CANCELLED         // Cancel·lada pel sol·licitant
+  VERIFIED // Identitat verificada, pendent processament
+  IN_PROGRESS // En processament
+  COMPLETED // Completada
+  REJECTED // Rebutjada (amb motiu legal)
+  CANCELLED // Cancel·lada pel sol·licitant
 }
 
 enum DataResponseType {
-  DATA_PROVIDED     // Dades entregades
-  DATA_CORRECTED    // Dades corregides
-  DATA_DELETED      // Dades eliminades
-  REQUEST_DENIED    // Sol·licitud denegada (amb motiu)
-  PARTIAL_RESPONSE  // Resposta parcial
+  DATA_PROVIDED // Dades entregades
+  DATA_CORRECTED // Dades corregides
+  DATA_DELETED // Dades eliminades
+  REQUEST_DENIED // Sol·licitud denegada (amb motiu)
+  PARTIAL_RESPONSE // Resposta parcial
 }
 
 // Registre d'Auditoria de Privacitat
 model PrivacyAuditLog {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Entitat afectada
-  entityType    String   // "Customer", "Lead", "Booking", etc.
-  entityId      String
+  entityType String // "Customer", "Lead", "Booking", etc.
+  entityId   String
 
   // Acció realitzada
-  action        PrivacyAction
+  action PrivacyAction
 
   // Actor
-  performedBy   String?  // ID d'admin o "SYSTEM" o "USER"
-  performerIp   String?
+  performedBy        String? // ID d'admin o "SYSTEM" o "USER"
+  performerIp        String?
   performerUserAgent String?
 
   // Dades
-  previousData  Json?    // Estat anterior (per rectificacions/supressions)
-  newData       Json?    // Estat nou
+  previousData   Json? // Estat anterior (per rectificacions/supressions)
+  newData        Json? // Estat nou
   affectedFields String[] // Camps afectats
 
   // Context
-  requestId     String?  // ID de DataRequest si aplica
-  reason        String?  // Motiu de l'acció
-  legalBasis    String?  // Base legal (consentiment, contracte, etc.)
+  requestId  String? // ID de DataRequest si aplica
+  reason     String? // Motiu de l'acció
+  legalBasis String? // Base legal (consentiment, contracte, etc.)
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([entityType, entityId])
   @@index([action])
@@ -1383,44 +1386,44 @@ model PrivacyAuditLog {
 }
 
 enum PrivacyAction {
-  DATA_ACCESSED       // Dades consultades
-  DATA_EXPORTED       // Dades exportades
-  DATA_CREATED        // Dades creades
-  DATA_UPDATED        // Dades actualitzades
-  DATA_DELETED        // Dades eliminades
-  DATA_ANONYMIZED     // Dades anonimitzades
-  CONSENT_GRANTED     // Consentiment atorgat
-  CONSENT_REVOKED     // Consentiment revocat
-  ACCOUNT_DELETED     // Compte eliminat
-  RETENTION_APPLIED   // Política de retenció aplicada
+  DATA_ACCESSED // Dades consultades
+  DATA_EXPORTED // Dades exportades
+  DATA_CREATED // Dades creades
+  DATA_UPDATED // Dades actualitzades
+  DATA_DELETED // Dades eliminades
+  DATA_ANONYMIZED // Dades anonimitzades
+  CONSENT_GRANTED // Consentiment atorgat
+  CONSENT_REVOKED // Consentiment revocat
+  ACCOUNT_DELETED // Compte eliminat
+  RETENTION_APPLIED // Política de retenció aplicada
 }
 
 // Documents Legals (versions dels textos legals)
 model LegalDocument {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  type            LegalDocumentType
-  version         String   // "1.0", "1.1", "2.0"
-  locale          String   // "es", "ca", "en"
+  type    LegalDocumentType
+  version String // "1.0", "1.1", "2.0"
+  locale  String // "es", "ca", "en"
 
-  title           String
-  content         String   @db.Text
-  summary         String?  @db.Text  // Resum dels canvis
+  title   String
+  content String  @db.Text
+  summary String? @db.Text // Resum dels canvis
 
   // Vigència
-  effectiveFrom   DateTime
-  effectiveUntil  DateTime?
+  effectiveFrom  DateTime
+  effectiveUntil DateTime?
 
   // Metadades
-  isActive        Boolean  @default(true)
-  publishedAt     DateTime?
-  publishedBy     String?
+  isActive    Boolean   @default(true)
+  publishedAt DateTime?
+  publishedBy String?
 
   // Hash per verificació
-  contentHash     String?
+  contentHash String?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([type, version, locale])
   @@index([type, locale, isActive])
@@ -1428,50 +1431,50 @@ model LegalDocument {
 }
 
 enum LegalDocumentType {
-  PRIVACY_POLICY      // Política de privacitat
-  TERMS_CONDITIONS    // Termes i condicions
-  COOKIE_POLICY       // Política de cookies
-  CONSENT_FORM        // Formulari de consentiment
-  DATA_RETENTION      // Política de retenció
+  PRIVACY_POLICY // Política de privacitat
+  TERMS_CONDITIONS // Termes i condicions
+  COOKIE_POLICY // Política de cookies
+  CONSENT_FORM // Formulari de consentiment
+  DATA_RETENTION // Política de retenció
 }
 
 // Polítiques de Retenció de Dades
 model DataRetentionPolicy {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name            String
-  description     String?
+  name        String
+  description String?
 
   // Entitat
-  entityType      String   // "Customer", "Lead", "Booking"
+  entityType String // "Customer", "Lead", "Booking"
 
   // Condicions
-  retentionDays   Int      // Dies de retenció
-  condition       String?  // Condició SQL/lògica per aplicar
+  retentionDays Int // Dies de retenció
+  condition     String? // Condició SQL/lògica per aplicar
 
   // Acció
-  actionType      RetentionAction
+  actionType RetentionAction
 
   // Execució
-  isActive        Boolean  @default(true)
-  lastRunAt       DateTime?
-  nextRunAt       DateTime?
+  isActive  Boolean   @default(true)
+  lastRunAt DateTime?
+  nextRunAt DateTime?
 
   // Estadístiques
-  totalProcessed  Int      @default(0)
-  lastProcessedCount Int   @default(0)
+  totalProcessed     Int @default(0)
+  lastProcessedCount Int @default(0)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("data_retention_policies")
 }
 
 enum RetentionAction {
-  DELETE          // Eliminar completament
-  ANONYMIZE       // Anonimitzar (mantenir estadístiques)
-  ARCHIVE         // Arxivar (moure a cold storage)
-  NOTIFY          // Només notificar admin
+  DELETE // Eliminar completament
+  ANONYMIZE // Anonimitzar (mantenir estadístiques)
+  ARCHIVE // Arxivar (moure a cold storage)
+  NOTIFY // Només notificar admin
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1479,19 +1482,19 @@ enum RetentionAction {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model BlogPost {
-  id            String              @id @default(cuid())
-  slug          String              @unique
-  author        String              @default("Òrbita Events")
-  category      String              @default("general")
+  id            String                @id @default(cuid())
+  slug          String                @unique
+  author        String                @default("Òrbita Events")
+  category      String                @default("general")
   tags          String[]
   featuredImage String?
-  isPublished   Boolean             @default(false)
+  isPublished   Boolean               @default(false)
   publishedAt   DateTime?
-  viewCount     Int                 @default(0)
-  readingTime   Int?                // Minutes
+  viewCount     Int                   @default(0)
+  readingTime   Int? // Minutes
   translations  BlogPostTranslation[]
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 
   @@index([slug])
   @@index([category])
@@ -1500,14 +1503,14 @@ model BlogPost {
 }
 
 model BlogPostTranslation {
-  id          String   @id @default(cuid())
-  postId      String
-  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  locale      String   // "es", "ca"
-  title       String
-  excerpt     String   @db.Text
-  content     String   @db.Text
-  metaTitle   String?
+  id              String   @id @default(cuid())
+  postId          String
+  post            BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  locale          String // "es", "ca"
+  title           String
+  excerpt         String   @db.Text
+  content         String   @db.Text
+  metaTitle       String?
   metaDescription String?
 
   @@unique([postId, locale])
@@ -1520,12 +1523,12 @@ model BlogPostTranslation {
 
 model EmailTemplate {
   id          String   @id @default(cuid())
-  slug        String   // ex: "booking_confirmation", "post_event", "payment_reminder"
-  locale      String   // "ca", "es", "en"
+  slug        String // ex: "booking_confirmation", "post_event", "payment_reminder"
+  locale      String // "ca", "es", "en"
   subject     String
   bodyHtml    String   @db.Text
-  description String?  // Descripció per l'admin
-  variables   String?  // JSON: variables disponibles, ex: ["clientName","reference","eventDate"]
+  description String? // Descripció per l'admin
+  variables   String? // JSON: variables disponibles, ex: ["clientName","reference","eventDate"]
   isActive    Boolean  @default(true)
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
@@ -1540,38 +1543,38 @@ model EmailTemplate {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model Collaborator {
-  id               String   @id @default(cuid())
-  name             String
-  company          String?
-  email            String?
-  phone            String?
-  commissionPct    Float    @default(10)  // % comissió
-  pricingModel     CollaboratorPricingModel @default(DISCOUNT) // Model de preus
-  notes            String?  @db.Text
-  isActive         Boolean  @default(true)
+  id            String                   @id @default(cuid())
+  name          String
+  company       String?
+  email         String?
+  phone         String?
+  commissionPct Float                    @default(10) // % comissió
+  pricingModel  CollaboratorPricingModel @default(DISCOUNT) // Model de preus
+  notes         String?                  @db.Text
+  isActive      Boolean                  @default(true)
 
-  bookings         CollaboratorBooking[]
+  bookings CollaboratorBooking[]
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("collaborators")
 }
 
 model CollaboratorBooking {
-  id               String        @id @default(cuid())
-  collaboratorId   String
-  collaborator     Collaborator  @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
-  bookingId        String
-  booking          Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  collaboratorId String
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  bookingId      String
+  booking        Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
-  commissionPct    Float         // % comissió aplicat
-  commissionAmount Float         // Import comissió en €
-  collaboratorPrice Float?       // Preu que veu el col·laborador (si model DISCOUNT)
-  isPaid           Boolean       @default(false)
-  paidAt           DateTime?
+  commissionPct     Float // % comissió aplicat
+  commissionAmount  Float // Import comissió en €
+  collaboratorPrice Float? // Preu que veu el col·laborador (si model DISCOUNT)
+  isPaid            Boolean   @default(false)
+  paidAt            DateTime?
 
-  createdAt        DateTime      @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([collaboratorId, bookingId])
   @@index([bookingId])
@@ -1580,8 +1583,8 @@ model CollaboratorBooking {
 }
 
 enum CollaboratorPricingModel {
-  NET_PLUS_COMMISSION  // Preu net: col·lab afegeix la seva comissió
-  DISCOUNT             // Descompte: col·lab rep preu amb X% menys
+  NET_PLUS_COMMISSION // Preu net: col·lab afegeix la seva comissió
+  DISCOUNT // Descompte: col·lab rep preu amb X% menys
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1589,27 +1592,27 @@ enum CollaboratorPricingModel {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model CustomQuote {
-  id               String   @id @default(cuid())
-  name             String   // "DJ 3h sense altaveus - Client X"
-  clientName       String?
-  clientEmail      String?
+  id          String  @id @default(cuid())
+  name        String // "DJ 3h sense altaveus - Client X"
+  clientName  String?
+  clientEmail String?
 
   // Components (JSON array)
-  components       Json     // [{ type: "dj", hours: 3, unitCost: 25, total: 75 }, ...]
+  components Json // [{ type: "dj", hours: 3, unitCost: 25, total: 75 }, ...]
 
   // Totals
-  totalCost        Float    // Cost real total
-  suggestedPrice   Float    // Preu suggerit (cost + marge)
-  marginPct        Float    // Marge aplicat
-  finalPrice       Float?   // Preu final (si es modifica manualment)
+  totalCost      Float // Cost real total
+  suggestedPrice Float // Preu suggerit (cost + marge)
+  marginPct      Float // Marge aplicat
+  finalPrice     Float? // Preu final (si es modifica manualment)
 
   // Estat
-  status           CustomQuoteStatus @default(DRAFT)
-  sentAt           DateTime?
-  notes            String?  @db.Text
+  status CustomQuoteStatus @default(DRAFT)
+  sentAt DateTime?
+  notes  String?           @db.Text
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([createdAt])
@@ -1628,22 +1631,22 @@ enum CustomQuoteStatus {
 // ═══════════════════════════════════════════════════════════════════════════
 
 model BookingGalleryPhoto {
-  id          String   @id @default(cuid())
-  bookingId   String
-  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
-  photoUrl    String   // URL de la foto (uploads/bookings/{id}/gallery/{timestamp}.webp)
+  photoUrl     String // URL de la foto (uploads/bookings/{id}/gallery/{timestamp}.webp)
   thumbnailUrl String? // URL thumbnail (opcional, generat)
-  caption     String?  // Descripció breu
-  sortOrder   Int      @default(0)
+  caption      String? // Descripció breu
+  sortOrder    Int     @default(0)
 
   // Visibilitat
-  isPortfolio     Boolean  @default(false) // Mostrar al portfolio públic
-  isPortal        Boolean  @default(true)  // Mostrar al portal client
-  portfolioSlug   String?  // Carpeta del portfolio: "bodas", "discomovil", "fiestas-privadas", etc.
+  isPortfolio   Boolean @default(false) // Mostrar al portfolio públic
+  isPortal      Boolean @default(true) // Mostrar al portal client
+  portfolioSlug String? // Carpeta del portfolio: "bodas", "discomovil", "fiestas-privadas", etc.
 
-  uploadedBy  String?  // Admin que ha pujat
-  createdAt   DateTime @default(now())
+  uploadedBy String? // Admin que ha pujat
+  createdAt  DateTime @default(now())
 
   @@index([bookingId])
   @@index([isPortfolio])
@@ -1657,13 +1660,13 @@ model BookingGalleryPhoto {
 
 model PortfolioMedia {
   id           String          @id @default(cuid())
-  slug         String          // Categoria: "bodas", "discomovil", etc.
-  mediaUrl     String          // URL del fitxer
-  thumbnailUrl String?         // Thumbnail per vídeos
+  slug         String // Categoria: "bodas", "discomovil", etc.
+  mediaUrl     String // URL del fitxer
+  thumbnailUrl String? // Thumbnail per vídeos
   caption      String?
   mediaType    String          @default("image") // "image" | "video"
   sortOrder    Int             @default(0)
-  eventId      String?         // Opcional: vinculat a un event concret
+  eventId      String? // Opcional: vinculat a un event concret
   event        PortfolioEvent? @relation(fields: [eventId], references: [id], onDelete: SetNull)
   uploadedBy   String?
   createdAt    DateTime        @default(now())
@@ -1681,16 +1684,16 @@ model PortfolioMedia {
 model PortfolioEvent {
   id           String           @id @default(cuid())
   slug         String           @unique // URL: /portfolio/bodas/boda-laura-marc
-  categorySlug String           // "bodas", "discomovil", etc.
-  title        String           // "Boda Laura & Marc"
-  subtitle     String?          // "Masía Can Riera · Septiembre 2024"
-  venue        String?          // "Masía Can Riera"
-  location     String?          // "Girona"
+  categorySlug String // "bodas", "discomovil", etc.
+  title        String // "Boda Laura & Marc"
+  subtitle     String? // "Masía Can Riera · Septiembre 2024"
+  venue        String? // "Masía Can Riera"
+  location     String? // "Girona"
   eventDate    DateTime?
   guestCount   Int?
-  description  String?          // Text lliure de l'event
-  services     String[]         // ["DJ", "Iluminación", "Tematización"]
-  coverImage   String           // URL de la imatge hero
+  description  String? // Text lliure de l'event
+  services     String[] // ["DJ", "Iluminación", "Tematización"]
+  coverImage   String // URL de la imatge hero
   published    Boolean          @default(false)
   sortOrder    Int              @default(0)
   media        PortfolioMedia[]
@@ -1700,4 +1703,24 @@ model PortfolioEvent {
   @@index([categorySlug, published])
   @@index([published, sortOrder])
   @@map("portfolio_events")
+}
+
+model ImageAsset {
+  id        String   @id @default(cuid())
+  placement String
+  src       String
+  filePath  String?
+  alt       String?
+  label     String?
+  mimeType  String?
+  width     Int?
+  height    Int?
+  sizeBytes Int?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([placement])
+  @@index([placement, sortOrder])
+  @@map("image_assets")
 }

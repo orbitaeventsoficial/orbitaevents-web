@@ -1,4 +1,4 @@
-// app/components/home/GoogleReviewsRotating.tsx
+﻿// app/components/home/GoogleReviewsRotating.tsx
 // ═══════════════════════════════════════════════════════════════════════════
 // ÒRBITA EVENTS - GOOGLE REVIEWS 5★ ROTATIVAS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -117,7 +117,7 @@ function ReviewCard({ review }: { review: GoogleReview }) {
       initial={{ opacity: 0, scale: 0.98, y: 12 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.985, y: 8 }}
-      transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.44, ease: [0.22, 1, 0.36, 1] }}
       className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-md border border-white/10 ring-1 ring-white/[0.05] rounded-3xl p-8 md:p-10 shadow-2xl shadow-amber-500/10 max-w-4xl mx-auto"
     >
       {/* Ambient glow */}
@@ -204,13 +204,13 @@ export default function GoogleReviewsRotating({ showFooterCta = true, showHeader
     loadReviews();
   }, []);
 
-  // Auto-rotate reviews cada 8 segundos
+  // Auto-rotate reviews amb un ritme més pausat
   useEffect(() => {
     if (!isAutoPlaying || reviews.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % reviews.length);
-    }, 8000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [reviews.length, isAutoPlaying]);

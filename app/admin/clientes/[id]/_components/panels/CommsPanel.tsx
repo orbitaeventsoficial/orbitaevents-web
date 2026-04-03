@@ -41,11 +41,11 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   };
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Comunicacions" data-help-desc="Historial de correus enviats, notes internes i seguiment. Pots enviar plantilles predefinides o afegir notes ràpides.">
       <h2 className="text-lg font-semibold">Comunicacions</h2>
       <p className="mt-1 text-sm">Historial de correus, notes i seguiment.</p>
 
-      <div className="mt-3 rounded-xl border p-3">
+      <div className="mt-3 rounded-xl border p-3" data-help-title="Accions ràpides" data-help-desc="Accesos directes per enviar plantilles d'email o crear tasques de seguiment vinculades al client.">
         <p className="text-xs">Accions ràpides</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
@@ -75,7 +75,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
         </div>
       </div>
 
-      <div className="mt-3 rounded-xl border p-3">
+      <div className="mt-3 rounded-xl border p-3" data-help-title="Nota interna" data-help-desc="Escriu una nota de seguiment que quedarà registrada al timeline del client. Útil per apuntar trucades o decisions.">
         <p className="text-xs">Afegir nota interna</p>
         <textarea
           className="mt-2 w-full rounded-xl border px-3 py-2 text-sm"

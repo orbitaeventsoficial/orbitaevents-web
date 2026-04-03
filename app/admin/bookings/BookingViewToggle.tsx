@@ -19,9 +19,17 @@ export default function BookingViewToggle() {
   };
 
   return (
-    <div className="admin-tone-border-neutral admin-tone-bg-neutral flex shrink-0 overflow-hidden rounded-xl border">
+    <div
+      role="tablist"
+      aria-label="Vista de reserves"
+      data-help-title="Canvi de vista de reserves"
+      data-help-desc="Llista per revisar detall i accions concretes. Kanban per moure reserves ràpidament entre estats."
+      className="admin-tone-border-neutral admin-tone-bg-neutral flex shrink-0 overflow-hidden rounded-xl border"
+    >
       <button
         type="button"
+        role="tab"
+        aria-selected={current === 'list'}
         onClick={() => toggle('list')}
         className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           current === 'list'
@@ -33,6 +41,8 @@ export default function BookingViewToggle() {
       </button>
       <button
         type="button"
+        role="tab"
+        aria-selected={current === 'kanban'}
         onClick={() => toggle('kanban')}
         className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           current === 'kanban'

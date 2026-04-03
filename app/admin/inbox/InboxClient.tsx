@@ -351,9 +351,9 @@ export default function InboxClient({
   const totalUnread = stats.unreadLeads + imapUnread;
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div className="flex-1 flex overflow-hidden" data-help-title="Safata unificada" data-help-desc="Combina entrades web i correus IMAP en una sola vista perquè puguis decidir si respondre, convertir a lead o arxivar.">
       {/* Sidebar filters */}
-      <aside className="w-56 border-r p-4 hidden lg:block">
+      <aside className="w-56 border-r p-4 hidden lg:block" data-help-title="Filtres de la safata" data-help-desc="Permeten separar entrades web, correus IMAP, paperera i no llegits per reduir soroll.">
         <div className="space-y-1 mb-6">
           <button
             onClick={() => setActiveTab('all')}
@@ -453,8 +453,8 @@ export default function InboxClient({
       </aside>
 
       {/* Email list */}
-      <div className="w-96 border-r flex flex-col">
-        <div className="p-3 border-b">
+      <div className="w-96 border-r flex flex-col" data-help-title="Llista de missatges" data-help-desc="Mostra els missatges filtrats i et deixa cercar per remitent, assumpte o text del missatge.">
+        <div className="p-3 border-b" data-help-title="Cercador de la safata" data-help-desc="Filtra els missatges visibles sense recarregar la pàgina.">
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2">🔍</span>
             <input
@@ -516,7 +516,7 @@ export default function InboxClient({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" data-help-title="Accions del missatge" data-help-desc="Segons el tipus de missatge, aquí pots respondre, generar pressupost, obrir el lead, crear-lo o gestionar la paperera.">
                       {!email.read && <span className="w-2 h-2 rounded-full flex-shrink-0" />}
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
                         email.type === 'lead' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-bg-success admin-tone-text-success'
@@ -546,7 +546,7 @@ export default function InboxClient({
       </div>
 
       {/* Email detail */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col" data-help-title="Panell de detall" data-help-desc="Mostra el missatge seleccionat i concentra les accions útils: respondre, pressupostar, convertir a lead o moure a paperera.">
         {selectedEmail ? (
           <>
             <div className="p-6 border-b">
@@ -647,7 +647,7 @@ export default function InboxClient({
             </div>
 
             <div className="p-4 border-t">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" data-help-title="Accions del missatge" data-help-desc="Segons el tipus de missatge, aquí pots respondre, generar pressupost, obrir el lead, crear-lo o gestionar la paperera.">
                 <button
                   onClick={() => handleReply(selectedEmail)}
                   type="button"

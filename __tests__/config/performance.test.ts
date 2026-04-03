@@ -126,7 +126,7 @@ describe('Performance config', () => {
 
     it('should have brightness filter on images', () => {
       heroContent = fs.readFileSync(heroPath, 'utf-8');
-      expect(heroContent).toContain('brightness(0.6)');
+      expect(heroContent).toContain('brightness(0.72)');
     });
 
     it('should use logo as poster instead of hero-poster.webp', () => {

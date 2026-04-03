@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  return {
   title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para fiestas en la Costa Brava desde ${MIN_PRICE}€. Lloret de Mar, Tossa, Platja d'Aro, Roses y toda la costa. Equipo profesional resistente a exteriores.`,
   keywords: ['DJ fiestas Costa Brava', 'DJ fiesta Lloret de Mar', 'DJ fiesta Tossa de Mar', "DJ fiesta Platja d'Aro", 'DJ cumpleaños Costa Brava'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€`,
     description: "DJ profesional para fiestas en la Costa Brava. Lloret, Tossa, Platja d'Aro y toda la costa.",
     url: '/servicios/dj-fiestas-costa-brava',
-    images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.avif', alt: 'DJ Fiestas Costa Brava - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Fiestas Costa Brava - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const costaBravaTowns = ["Lloret de Mar", 'Tossa de Mar', "Platja d'Aro", 'Roses', 'Cadaqués', 'Palamós', 'Sant Antoni de Calonge', 'Sant Feliu de Guíxols', 'Blanes', 'Calella de Palafrugell', 'Begur', 'Empuriabrava'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('fiestas');
+  const galleryImages = await getPublicServiceGalleryImages('fiestas');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
       'Plan B preparado: Soluciones ante cambios de tiempo',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.avif',
-    galleryImages: [
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-09.avif',
-      '/img/portfolio/fiestas-privadas/fiestas-privadas-11.avif',
-      '/img/portfolio/discomovil/discomovil-04.avif',
-      '/img/portfolio/discomovil/discomovil-08.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
     </>
   );
 }
+

@@ -35,7 +35,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
   const past = data.bookings.filter((b) => !b.date || new Date(b.date) < now || b.status === 'CANCELLED');
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Reserves del client" data-help-desc="Mostra totes les reserves: properes amb countdown i pagaments, i passades/cancel·lades. Pots obrir la fitxa de cada event.">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Reserves / Dates</h2>
@@ -65,7 +65,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
             const statusColor = getBookingStatusBadgeClass(booking.status);
 
             return (
-              <div key={booking.id} className="rounded-xl border p-4">
+              <div key={booking.id} className="rounded-xl border p-4" data-help-title={`Reserva ${booking.reference || ''}`} data-help-desc="Fitxa resumida amb data, pack, pagaments i accés directe a la fitxa completa de l'esdeveniment.">
                 {/* Header: referència + badge */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold">{booking.reference || booking.id.slice(0, 8)}</p>

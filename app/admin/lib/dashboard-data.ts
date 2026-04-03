@@ -178,11 +178,14 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
   const smtpConfigured = isSmtpConfigured();
 
-  const [ga4, profitConfig, salutSnapshot] = await Promise.all([
+  // Serveis externs en paral·lel (no bloqueja les queries DB)
+  const servicesP = Promise.all([
     Promise.race([getGa4Report().catch(() => null), timeoutPromise(3000)]),
     getProfitabilityConfig(),
     getAdminHealthSnapshot().catch(() => null),
   ]);
+
+  const monthLabels = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
 
   const [
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
@@ -193,6 +196,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     upcomingTasks, staleLeadsCount, hotLeadsCount, quotesInFlightCount,
     checklistTodayDoneCount, checklistTodayPendingCount, commandLeads, commandBookings,
     marginBookings,
+    // Blocs 4+5+6 (abans seqüencials, ara paral·lels)
+    cashFlowResult, pipelineResult, pendingBookingsResult,
+    nextEventRaw, monthlyRevenueAgg, revenueTargetSetting,
+    monthlyRevenueData, eventTypeData,
   ] = await Promise.all([
     cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:leads:month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }), CacheTTL.SHORT).catch(() => 0),
@@ -236,7 +243,70 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
       select: { total: true, travelCost: true, pack: { select: { price: true } }, extras: { select: { price: true, quantity: true } } },
     }), CacheTTL.SHORT).catch(() => []),
+    // ─── Financial forecasts (abans bloc 4 seqüencial) ─────────────────
+    cachedQuery('admin:dashboard:cashflow', () => buildCashFlowForecast(2), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:pipeline', () => buildPipelineForecast(2), CacheTTL.SHORT).catch(() => []),
+    cachedQuery(`admin:dashboard:pending-payments:${dayKey}`, () => prisma.booking.findMany({
+      where: {
+        status: { in: ['CONFIRMED', 'PREPARING'] },
+        OR: [{ depositPaid: false }, { remainingPaid: false }],
+      },
+      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+    }), CacheTTL.SHORT).catch(() => []),
+    // ─── Next event + revenue (abans bloc 5 seqüencial) ────────────────
+    cachedQuery(`admin:dashboard:next-event:${dayKey}`, () => prisma.booking.findFirst({
+      where: { eventDate: { gte: now }, status: { in: ['CONFIRMED', 'PREPARING'] } },
+      orderBy: { eventDate: 'asc' },
+      select: {
+        id: true, reference: true, clientName: true, eventDate: true,
+        eventStartTime: true, eventLocation: true, eventVenue: true, eventType: true,
+        total: true, depositPaid: true, remainingPaid: true, status: true,
+        pack: { select: { translations: { where: { locale: 'ca' }, select: { name: true } } } },
+      },
+    }), CacheTTL.SHORT).catch(() => null),
+    cachedQuery(`admin:dashboard:revenue-month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.aggregate({
+      where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: startOfMonth } },
+      _sum: { total: true },
+    }), CacheTTL.SHORT).catch(() => ({ _sum: { total: null } })),
+    cachedQuery('admin:dashboard:revenue-target', () => prisma.setting.findUnique({
+      where: { key: 'dashboard.revenueTarget' },
+    }), CacheTTL.MEDIUM).catch(() => null),
+    // ─── Charts (abans bloc 6 seqüencial) ──────────────────────────────
+    cachedQuery('admin:dashboard:monthly-revenue-12', async () => {
+      const currentYear = now.getFullYear();
+      const allQueries = Array.from({ length: 12 }, (_, m) => {
+        const curStart = new Date(currentYear, m, 1);
+        const curEnd = new Date(currentYear, m + 1, 0, 23, 59, 59, 999);
+        const prevStart = new Date(currentYear - 1, m, 1);
+        const prevEnd = new Date(currentYear - 1, m + 1, 0, 23, 59, 59, 999);
+        return Promise.all([
+          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: curStart, lte: curEnd } }, _sum: { total: true } }),
+          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: prevStart, lte: prevEnd } }, _sum: { total: true } }),
+        ]);
+      });
+      const results = await Promise.all(allQueries);
+      return results.map(([cur, prev], m) => ({
+        label: monthLabels[m],
+        current: Number(cur._sum.total) || 0,
+        previous: Number(prev._sum.total) || 0,
+      }));
+    }, CacheTTL.MEDIUM).catch(() => monthLabels.map((l) => ({ label: l, current: 0, previous: 0 }))),
+    cachedQuery('admin:dashboard:event-type-dist', async () => {
+      const groups = await prisma.booking.groupBy({
+        by: ['eventType'],
+        where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
+        _count: true,
+      });
+      return groups.map((g) => ({
+        label: g.eventType || 'Altres',
+        value: g._count,
+        color: (g.eventType && EVENT_TYPE_CHART_COLORS[g.eventType]) || EVENT_TYPE_CHART_COLORS.OTHER,
+      }));
+    }, CacheTTL.MEDIUM).catch(() => []),
   ]);
+
+  // Await serveis externs (llançats abans, probablement ja resolts)
+  const [ga4, profitConfig, salutSnapshot] = await servicesP;
 
   // ─── Processat ───────────────────────────────────────────────────────────
 
@@ -359,62 +429,28 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ];
   const activities = activitiesRaw.length > 0 ? activitiesRaw : [{ icon: '✅', text: 'Tot al dia, sense activitat pendent', time: 'Ara' }];
 
-  // Financial forecasts (en paral·lel, resilients)
-  const [cashFlowResult, pipelineResult, pendingBookingsResult] = await Promise.all([
-    cachedQuery('admin:dashboard:cashflow', () => buildCashFlowForecast(2), CacheTTL.SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:pipeline', () => buildPipelineForecast(2), CacheTTL.SHORT).catch(() => []),
-    cachedQuery(`admin:dashboard:pending-payments:${dayKey}`, () => prisma.booking.findMany({
-      where: {
-        status: { in: ['CONFIRMED', 'PREPARING'] },
-        OR: [{ depositPaid: false }, { remainingPaid: false }],
-      },
-      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
-    }), CacheTTL.SHORT).catch(() => []),
-  ]);
-
-  const cashFlowNet30 = cashFlowResult.length > 0 ? cashFlowResult[0].netFlow : 0;
-  const pipelineWeighted30 = pipelineResult.length > 0 ? pipelineResult[0].combined : 0;
+  // ─── Processat blocs 4+5+6 (ara paral·lels, resultats ja disponibles) ──
+  const cashFlowNet30 = (cashFlowResult as Array<{ netFlow: number }>).length > 0 ? (cashFlowResult as Array<{ netFlow: number }>)[0].netFlow : 0;
+  const pipelineWeighted30 = (pipelineResult as Array<{ combined: number }>).length > 0 ? (pipelineResult as Array<{ combined: number }>)[0].combined : 0;
   let pendingPayments = 0;
-  for (const b of pendingBookingsResult) {
+  for (const b of pendingBookingsResult as Array<{ total: number; depositAmount: number; depositPaid: boolean; remainingPaid: boolean }>) {
     const deposit = Number(b.depositAmount) || 0;
     const total = Number(b.total) || 0;
     if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
     if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
   }
 
-  // Pròxim bolo: la reserva confirmada més propera
-  const [nextEventRaw, monthlyRevenue, revenueTargetSetting] = await Promise.all([
-    cachedQuery(`admin:dashboard:next-event:${dayKey}`, () => prisma.booking.findFirst({
-      where: { eventDate: { gte: now }, status: { in: ['CONFIRMED', 'PREPARING'] } },
-      orderBy: { eventDate: 'asc' },
-      select: {
-        id: true, reference: true, clientName: true, eventDate: true,
-        eventStartTime: true, eventLocation: true, eventVenue: true, eventType: true,
-        total: true, depositPaid: true, remainingPaid: true, status: true,
-        pack: { select: { translations: { where: { locale: 'ca' }, select: { name: true } } } },
-      },
-    }), CacheTTL.SHORT).catch(() => null),
-    cachedQuery(`admin:dashboard:revenue-month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.booking.aggregate({
-      where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: startOfMonth } },
-      _sum: { total: true },
-    }), CacheTTL.SHORT).catch(() => ({ _sum: { total: null } })),
-    cachedQuery('admin:dashboard:revenue-target', () => prisma.setting.findUnique({
-      where: { key: 'dashboard.revenueTarget' },
-    }), CacheTTL.MEDIUM).catch(() => null),
-  ]);
-
   let nextEvent: DashboardData['nextEvent'] = null;
   if (nextEventRaw) {
     const diffMs = new Date(nextEventRaw.eventDate).getTime() - now.getTime();
     const daysUntil = Math.max(0, Math.ceil(diffMs / 86400000));
-    // Checklist state for next event
     const checklistItems = await cachedQuery(
       `admin:dashboard:checklist-setting:${nextEventRaw.id}`,
       () => getBookingChecklist(nextEventRaw.id),
       CacheTTL.SHORT
     ).catch(() => DEFAULT_BOOKING_CHECKLIST_ITEMS);
     const checklistTotal = checklistItems.length;
-    const checklistDone = checklistItems.filter((item) => item.checked).length;
+    const checklistDone = checklistItems.filter((item: { checked: boolean }) => item.checked).length;
     nextEvent = {
       id: nextEventRaw.id,
       reference: nextEventRaw.reference,
@@ -435,47 +471,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     };
   }
 
-  const revenueThisMonth = Number(monthlyRevenue?._sum?.total) || 0;
-  const revenueTargetRaw = Number(revenueTargetSetting?.value);
+  const revenueThisMonth = Number((monthlyRevenueAgg as { _sum: { total: number | null } })?._sum?.total) || 0;
+  const revenueTargetRaw = Number((revenueTargetSetting as { value: string } | null)?.value);
   const revenueTarget = Number.isFinite(revenueTargetRaw) && revenueTargetRaw > 0 ? revenueTargetRaw : 3000;
   const revenueMonthPct = revenueTarget > 0 ? Math.min(100, Math.round((revenueThisMonth / revenueTarget) * 100)) : 0;
-
-  // ─── Monthly revenue bars (12 months current + previous year) ──────
-  const monthLabels = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
-  const [monthlyRevenueData, eventTypeData] = await Promise.all([
-    cachedQuery('admin:dashboard:monthly-revenue-12', async () => {
-      const currentYear = now.getFullYear();
-      // Totes les 24 queries en paral·lel (12 mesos × 2 anys)
-      const allQueries = Array.from({ length: 12 }, (_, m) => {
-        const curStart = new Date(currentYear, m, 1);
-        const curEnd = new Date(currentYear, m + 1, 0, 23, 59, 59, 999);
-        const prevStart = new Date(currentYear - 1, m, 1);
-        const prevEnd = new Date(currentYear - 1, m + 1, 0, 23, 59, 59, 999);
-        return Promise.all([
-          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: curStart, lte: curEnd } }, _sum: { total: true } }),
-          prisma.booking.aggregate({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, eventDate: { gte: prevStart, lte: prevEnd } }, _sum: { total: true } }),
-        ]);
-      });
-      const results = await Promise.all(allQueries);
-      return results.map(([cur, prev], m) => ({
-        label: monthLabels[m],
-        current: Number(cur._sum.total) || 0,
-        previous: Number(prev._sum.total) || 0,
-      }));
-    }, CacheTTL.MEDIUM).catch(() => monthLabels.map((l) => ({ label: l, current: 0, previous: 0 }))),
-    cachedQuery('admin:dashboard:event-type-dist', async () => {
-      const groups = await prisma.booking.groupBy({
-        by: ['eventType'],
-        where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-        _count: true,
-      });
-      return groups.map((g) => ({
-        label: g.eventType || 'Altres',
-        value: g._count,
-        color: (g.eventType && EVENT_TYPE_CHART_COLORS[g.eventType]) || EVENT_TYPE_CHART_COLORS.OTHER,
-      }));
-    }, CacheTTL.MEDIUM).catch(() => []),
-  ]);
 
   // ─── Smart alerts (PAS 4: avisos intel·ligents) ────────────────────
   // Checklist low + event imminent

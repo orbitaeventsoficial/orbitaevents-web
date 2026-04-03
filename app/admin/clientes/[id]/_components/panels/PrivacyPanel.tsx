@@ -95,9 +95,9 @@ export default function PrivacyPanel() {
   const revokedConsents = consents.filter((c) => !c.granted || c.revokedAt);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-help-title="Privacitat i RGPD" data-help-desc="Gestiona consentiments, exporta dades (Art. 15/20) i consulta sol·licituds de drets ARCO del client.">
       {/* Consentiments actius */}
-      <div className="rounded-2xl border admin-card-glass p-5">
+      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Consentiments" data-help-desc="Llista els consentiments actius i revocats del client: marketing, comunicacions, etc.">
         <h2 className="text-lg font-semibold">Consentiments</h2>
 
         {activeConsents.length === 0 && revokedConsents.length === 0 && (
@@ -148,7 +148,7 @@ export default function PrivacyPanel() {
       </div>
 
       {/* Accions RGPD */}
-      <div className="rounded-2xl border admin-card-glass p-5">
+      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Accions RGPD" data-help-desc="Exporta les dades del client en format complet (Art. 15) o portable (Art. 20) per complir amb la normativa.">
         <h2 className="text-lg font-semibold">Accions RGPD</h2>
         {exportMsg && (
           <p className="mt-2 text-sm rounded-xl border px-3 py-2">{exportMsg}</p>
@@ -174,7 +174,7 @@ export default function PrivacyPanel() {
       </div>
 
       {/* Sol·licituds ARCO */}
-      <div className="rounded-2xl border admin-card-glass p-5">
+      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Sol·licituds ARCO" data-help-desc="Registre de sol·licituds d'accés, rectificació, cancel·lació i oposició del client, amb estat i deadline legal.">
         <h2 className="text-lg font-semibold">Sol·licituds de drets (ARCO)</h2>
 
         {requests.length === 0 ? (

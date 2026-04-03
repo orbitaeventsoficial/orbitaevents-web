@@ -13,6 +13,9 @@ export const PRIVACY_CONSENT_LABELS: Record<string, string> = {
   PROFILING: 'Perfilat',
 };
 
+export const PRIVACY_CONSENT_STATUS_VALUES = ['active', 'revoked', 'all'] as const;
+export type PrivacyConsentStatus = (typeof PRIVACY_CONSENT_STATUS_VALUES)[number];
+
 export const PRIVACY_REQUEST_TYPE_LABELS: Record<string, string> = {
   ACCESS: 'Accés',
   RECTIFICATION: 'Rectificació',
@@ -61,7 +64,6 @@ export const PRIVACY_REQUEST_ARTICLES: Record<string, string> = {
   OBJECTION: '21',
   AUTOMATED: '22',
 };
-
 
 export function getPrivacyConsentLabel(consentType: string) {
   return PRIVACY_CONSENT_LABELS[consentType] || consentType;

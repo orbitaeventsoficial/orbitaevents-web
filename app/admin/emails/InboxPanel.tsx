@@ -162,7 +162,7 @@ export default function InboxPanel() {
   const unreadCount = emails.filter((email) => !email.isRead).length;
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Safata d'entrada IMAP" data-help-desc="Llista els emails rebuts a info@orbitaevents.com via IMAP. Pots llegir, eliminar i refrescar.">
       <div className="flex items-center justify-between border-b px-6 py-4">
         <div>
           <h2 className="flex items-center gap-2 font-semibold">
@@ -290,7 +290,7 @@ export default function InboxPanel() {
       )}
 
       {!loading && !error && total > limit && (
-        <div className="flex items-center justify-between border-t px-4 py-3">
+        <div className="flex items-center justify-between border-t px-4 py-3" data-help-title="Paginació" data-help-desc="Navega entre pàgines d'emails. Es mostren 20 per pàgina.">
           <span className="text-sm">Mostrant {page * limit + 1}-{Math.min((page + 1) * limit, total)} de {total}</span>
           <div className="flex gap-2">
             <button

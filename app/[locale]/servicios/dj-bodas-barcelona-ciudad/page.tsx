@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Barcelona Ciudad | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Barcelona ciudad desde ${MIN_PRICE}€. Eixample, Gràcia, Sarrià, Ciutat Vella. Desplazamiento incluido en toda la ciudad.`,
   keywords: ['DJ bodas Barcelona', 'DJ bodas Eixample', 'DJ bodas Gràcia', 'DJ bodas Sarrià', 'bodas Barcelona ciudad'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Barcelona Ciudad | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en Barcelona ciudad. Todos los distritos con desplazamiento incluido.',
     url: '/servicios/dj-bodas-barcelona-ciudad',
-    images: [{ url: '/img/portfolio/bodas/bodas-01.avif', alt: 'DJ Bodas Barcelona Ciudad - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Barcelona Ciudad - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const barcelonaCiudadDistricts = ['Eixample', 'Gràcia', 'Sarrià-Sant Gervasi', 'Ciutat Vella', 'Sant Martí', 'Les Corts', 'Sants-Montjuïc', 'Horta-Guinardó', 'Nou Barris', 'Sant Andreu', 'Pedralbes', 'Poblenou', 'El Born', 'Barceloneta'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasBarcelonaCiudadPage({ params }: PageProps) 
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-barcelona-ciudad' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasBarcelonaCiudadPage({ params }: PageProps) 
       'Conocemos las normativas: Horarios y límites de ruido',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-03.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-03.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasBarcelonaCiudadPage({ params }: PageProps) 
     </>
   );
 }
+

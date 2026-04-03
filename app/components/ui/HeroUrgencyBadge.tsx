@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,11 +66,11 @@ export default function HeroUrgencyBadge() {
     };
   }, [data.monthlyAvailability, tCommon]);
 
-  // Rotar entre Halloween i Món Màgic cada 5 segons
+  // Rotar entre Halloween i Món Màgic amb un ritme més pausat
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTheme(prev => prev === 'halloween' ? 'monMagic' : 'halloween');
-    }, 5000);
+    }, 9000);
 
     return () => clearInterval(interval);
   }, []);

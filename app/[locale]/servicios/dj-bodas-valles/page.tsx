@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Vallès desde ${MIN_PRICE}€. Granollers, Sabadell, Terrassa, Mollet. DJ local con desplazamiento incluido.`,
   keywords: ['DJ bodas Vallès', 'DJ bodas Granollers', 'DJ bodas Sabadell', 'DJ bodas Terrassa', 'bodas Vallès Oriental'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional local para bodas en el Vallès. Oriental y Occidental con desplazamiento incluido.',
     url: '/servicios/dj-bodas-valles',
-    images: [{ url: '/img/portfolio/bodas/bodas-05.avif', alt: 'DJ Bodas Vallès - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Vallès - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const vallesTowns = ['Granollers', 'Sabadell', 'Terrassa', 'Mollet del Vallès', 'Cardedeu', 'Sant Cugat del Vallès', 'Rubí', 'Cerdanyola del Vallès', 'Parets del Vallès', 'La Garriga', 'Caldes de Montbui', 'Sant Celoni', 'Montornès del Vallès'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-valles' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
       'Visita previa: Conocemos el espacio antes del evento',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-02.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-03.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
     </>
   );
 }
+

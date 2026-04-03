@@ -119,7 +119,7 @@ export default function CalendarDayClient() {
       back={{ href: '/admin/calendario', label: 'Calendari' }}
     >
       {/* Navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6" data-help-title="Navegació diària" data-help-desc="Canvia de dia, torna a avui o salta a la vista setmanal o mensual.">
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigateDay(-1)}
@@ -176,7 +176,7 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="overflow-hidden rounded-2xl border admin-card-glass">
+            <div className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Timeline del dia" data-help-desc="Distribueix les reserves per franges horàries i et deixa veure ràpidament la càrrega real del dia.">
               <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
@@ -295,7 +295,7 @@ export default function CalendarDayClient() {
           </div>
 
           {/* Detail sidebar */}
-          <div className="space-y-4">
+          <div className="space-y-4" data-help-title="Panell lateral del dia" data-help-desc="Resumeix estat, bloquejos i reserves del dia seleccionat amb accessos directes a cada booking.">
             {/* Summary card */}
             <div className="rounded-2xl border p-5 admin-card-glass">
               <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>

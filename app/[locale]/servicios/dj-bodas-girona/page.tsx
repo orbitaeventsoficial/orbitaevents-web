@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Girona | Ciudad y Provincia | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Girona desde ${MIN_PRICE}€. Cobertura en Girona ciudad, Figueres, Olot, Banyoles, Salt. Sonido profesional 4000W, iluminación y efectos. Presupuesto gratis.`,
   keywords: ['DJ bodas Girona', 'DJ bodas Figueres', 'DJ bodas Olot', 'DJ boda Banyoles', 'DJ matrimonio Girona', 'discomóvil Girona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Girona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en Girona. Ciudad, Figueres, Olot, Banyoles y toda la provincia.',
     url: '/servicios/dj-bodas-girona',
-    images: [{ url: '/img/portfolio/bodas/bodas-02.avif', alt: 'DJ Bodas Girona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Girona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const gironaTowns = ['Girona', 'Figueres', 'Olot', 'Banyoles', 'Salt', 'Blanes', 'Lloret de Mar', 'Roses', 'Palafrugell', 'Sant Feliu de Guíxols', 'Palamós', 'La Bisbal d\'Empordà', 'Ripoll', 'Besalú', 'Torroella de Montgrí', 'Cassà de la Selva'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-girona' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
       'Espacios históricos: Experiencia en monumentos y patrimonio protegido',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-09.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
     </>
   );
 }
+

@@ -1,3 +1,5 @@
+import googleReviewsData from '../../public/data/google-reviews.json';
+
 /**
  * CONFIGURACIÓ CENTRALITZADA D'ÒRBITA EVENTS
  *
@@ -144,7 +146,8 @@ export const SITE_CONFIG = {
 
     // URLs de assets
     logo: '/img/logoplanetatextdreta.svg',
-    favicon: '/favicon.ico',
+    favicon: '/favicon.svg',
+    appleTouchIcon: '/apple-touch-icon.png',
     ogImage: '/og-default.jpg',
 
     // Colores de marca
@@ -171,30 +174,12 @@ export const SITE_CONFIG = {
     citiesCovered: 2,
     recommendRate: 100,
     peoplesDancing: 5000,
-    avgRating: (() => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const data = require('../../public/data/google-reviews.json');
-        return data.rating || 5.0;
-      } catch { return 5.0; }
-    })(),
-    reviewCount: (() => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const data = require('../../public/data/google-reviews.json');
-        return data.total || 0;
-      } catch { return 0; }
-    })(),
+    avgRating: googleReviewsData.rating || 5.0,
+    reviewCount: googleReviewsData.total || 0,
     responseTime: '2h',
 
     // S'actualitza automàticament des de public/data/google-reviews.json
-    lastUpdated: (() => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const data = require('../../public/data/google-reviews.json');
-        return data.lastUpdated?.split('T')[0] || new Date().toISOString().split('T')[0];
-      } catch { return new Date().toISOString().split('T')[0]; }
-    })(),
+    lastUpdated: googleReviewsData.lastUpdated?.split('T')[0] || new Date().toISOString().split('T')[0],
   },
 
   // ============================================
@@ -296,5 +281,9 @@ export function isFeatureEnabled(feature: keyof typeof SITE_CONFIG.features): bo
 // ============================================
 type SocialPlatform = keyof typeof SITE_CONFIG.social;
 type WhatsAppMessageType = keyof typeof SITE_CONFIG.whatsapp.messages;
+
+
+
+
 
 

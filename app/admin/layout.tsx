@@ -89,6 +89,7 @@ function SidebarItem({
   icon,
   label,
   href,
+  description,
   isActive,
   badge,
   badgeColor = 'orange',
@@ -98,6 +99,7 @@ function SidebarItem({
   icon: string;
   label: string;
   href: string;
+  description?: string;
   isActive: boolean;
   badge?: string;
   badgeColor?: 'orange' | 'blue' | 'green' | 'red';
@@ -119,6 +121,8 @@ function SidebarItem({
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
       aria-current={isActive ? 'page' : undefined}
+      data-help-title={label}
+      data-help-desc={description || undefined}
       className={`admin-nav-item ${isActive ? 'admin-nav-item--active' : 'admin-nav-item--idle'}`}
     >
       {isActive && (
@@ -184,6 +188,7 @@ function BottomNavItem({
   icon,
   label,
   href,
+  description,
   isActive,
   badge,
   onPrefetch,
@@ -191,6 +196,7 @@ function BottomNavItem({
   icon: string;
   label: string;
   href: string;
+  description?: string;
   isActive: boolean;
   badge?: number;
   onPrefetch?: (href: string) => void;
@@ -201,6 +207,8 @@ function BottomNavItem({
       prefetch={false}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
+      data-help-title={label}
+      data-help-desc={description || undefined}
       className={`admin-bottom-nav-item ${isActive ? 'admin-bottom-nav-item--active' : 'admin-bottom-nav-item--idle'}`}
     >
       <span className="admin-bottom-nav-icon-wrap">
@@ -235,6 +243,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [customAdminCss, setCustomAdminCss] = useState('');
+  const [managedAdminLogoSrc, setManagedAdminLogoSrc] = useState('/img/logosoloplaneta.svg');
+  const [managedAppleTouchIconSrc, setManagedAppleTouchIconSrc] = useState('/apple-touch-icon.png');
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
   const { newLeadsCount, totalCount: notificationsCount } = useAdminAlerts();
@@ -256,6 +266,33 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadAdminCss();
   }, [loadAdminCss]);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadManagedBrandAssets() {
+      try {
+        const res = await fetch('/api/public/image-manager?key=layout.logo.admin&key=layout.appleTouchIcon', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        const managedAdminLogo = data?.data?.['layout.logo.admin']?.item?.src;
+        const managedAppleTouchIcon = data?.data?.['layout.appleTouchIcon']?.item?.src;
+        if (typeof managedAdminLogo === 'string' && managedAdminLogo.trim()) {
+          setManagedAdminLogoSrc(managedAdminLogo);
+        }
+        if (typeof managedAppleTouchIcon === 'string' && managedAppleTouchIcon.trim()) {
+          setManagedAppleTouchIconSrc(managedAppleTouchIcon);
+        }
+      } catch (error) {
+        console.warn("No s'ha pogut carregar els assets de marca de l'admin", error);
+      }
+    }
+
+    loadManagedBrandAssets();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const onCssUpdated = () => {
@@ -405,12 +442,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {/* PWA head tags — Next.js App Router hoists these to <head> */}
-      <link rel="manifest" href="/manifest.json" />
+      <link rel="manifest" href="/manifest.webmanifest" />
       <meta name="theme-color" content="#121417" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
-      <link rel="apple-touch-icon" href="/favicon-192.png" />
+      <link rel="apple-touch-icon" href={managedAppleTouchIconSrc} />
       <div
         className="admin-layout-shell"
         onClickCapture={blockInteractionInHelpMode}
@@ -434,13 +471,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <Link href="/admin" className="admin-sidebar-brand">
             <div className="admin-sidebar-logo-wrap">
               <Image
-                src="/img/logosoloplaneta.svg"
+                src={managedAdminLogoSrc}
                 alt="Òrbita"
                 width={40}
                 height={40}
                 sizes="40px"
                 quality={80}
-                className="admin-logo-img"
+                className="admin-logo-img" unoptimized={managedAdminLogoSrc.includes('/api/uploads/')}
               />
             </div>
             <div>
@@ -569,11 +606,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               <div className="admin-mobile-sidebar-brand">
                 <div className="admin-mobile-sidebar-logo">
                   <Image
-                    src="/img/logosoloplaneta.svg"
+                    src={managedAdminLogoSrc}
                     alt="Òrbita"
                     width={36}
                     height={36}
-                    className="admin-logo-img"
+                    className="admin-logo-img" unoptimized={managedAdminLogoSrc.includes('/api/uploads/')}
                   />
                 </div>
                 <div>
@@ -727,6 +764,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               icon={item.icon}
               label={item.label}
               href={item.href}
+              description={'description' in item && typeof item.description === 'string' ? item.description : undefined}
               isActive={item.href === '/admin' ? pathname === '/admin' : pathname?.startsWith(item.href) || false}
               badge={'badgeKey' in item && item.badgeKey === 'newLeads' ? newLeadsCount : undefined}
               onPrefetch={prefetchRoute}
@@ -748,6 +786,16 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

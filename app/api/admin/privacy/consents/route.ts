@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
+import { PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
 import { listConsents, revokeConsent, logPrivacyAction } from '@/lib/services/privacyService';
 import type { ConsentType } from '@prisma/client';
 
@@ -16,7 +17,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const status = (searchParams.get('status') || 'all') as 'active' | 'revoked' | 'all';
+    const rawStatus = searchParams.get('status');
+    const status: PrivacyConsentStatus = rawStatus && PRIVACY_CONSENT_STATUS_VALUES.includes(rawStatus as PrivacyConsentStatus)
+      ? (rawStatus as PrivacyConsentStatus)
+      : 'all';
     const consentType = searchParams.get('type') as ConsentType | null;
     const search = searchParams.get('q') || undefined;
     const limit = Math.min(Number(searchParams.get('limit')) || 50, 200);
@@ -95,3 +99,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+

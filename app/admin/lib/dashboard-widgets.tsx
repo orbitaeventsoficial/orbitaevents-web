@@ -160,6 +160,8 @@ export function MetricCard({
   changeType,
   icon,
   accent = 'cyan',
+  helpTitle,
+  helpText,
 }: {
   label: string;
   value: string | number;
@@ -167,6 +169,8 @@ export function MetricCard({
   changeType?: 'up' | 'down' | 'neutral';
   icon?: string;
   accent?: AccentColor;
+  helpTitle?: string;
+  helpText?: string;
 }) {
   const changeClassMap = {
     up: 'admin-ui-metric-change--up',
@@ -176,7 +180,7 @@ export function MetricCard({
   const accentClass = accentClassMap[accent];
 
   return (
-    <div className={`admin-ui-metric-card ${accentClass}`}>
+    <div className={`admin-ui-metric-card ${accentClass}`} data-help-title={helpTitle || label} data-help-desc={helpText}>
       <div className="admin-ui-metric-head">
         <div className="admin-ui-metric-copy">
           <p className="admin-ui-metric-label">{label}</p>
@@ -200,15 +204,17 @@ export function Card({
   action,
   noPadding,
   children,
+  helpText,
 }: {
   title?: string;
   subtitle?: string;
   action?: React.ReactNode;
   noPadding?: boolean;
   children: React.ReactNode;
+  helpText?: string;
 }) {
   return (
-    <div className="admin-ui-card">
+    <div className="admin-ui-card" data-help-title={title} data-help-desc={helpText}>
       {(title || subtitle || action) && (
         <div className="admin-ui-card-head">
           <div className="admin-ui-card-head-copy">
@@ -227,14 +233,16 @@ export function Button({
   variant = 'primary',
   icon,
   label,
+  helpText,
 }: {
   variant?: 'primary' | 'secondary' | 'ghost';
   icon?: string;
   label: string;
+  helpText?: string;
 }) {
   const className = `admin-ui-btn admin-ui-btn--${variant} admin-ui-btn--default`;
   return (
-    <button type="button" className={className}>
+    <button type="button" className={className} data-help-title={label} data-help-desc={helpText}>
       {icon && <span>{icon}</span>}
       <span>{label}</span>
     </button>
@@ -384,5 +392,6 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
     </div>
   );
 }
+
 
 

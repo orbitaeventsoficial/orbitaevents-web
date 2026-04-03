@@ -26,7 +26,7 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   gtag('event', action, params);
 }
 
-export default function BodasClient() {
+export default function BodasClient({ heroImage }: { heroImage: string }) {
   const t = useTranslations('pages.weddings');
   const messages = useMessages();
   const locale = useLocale();
@@ -68,7 +68,7 @@ export default function BodasClient() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-bg-main z-10" />
           <Image
-            src="/img/portfolio/bodas/bodas-01.avif"
+            src={heroImage}
             alt="DJ para bodas Òrbita Events"
             fill
             priority
@@ -316,3 +316,4 @@ export default function BodasClient() {
     </div>
   );
 }
+

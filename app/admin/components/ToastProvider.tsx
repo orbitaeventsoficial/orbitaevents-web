@@ -20,7 +20,7 @@ function Toast({ type, message, onClose }: { type: ToastType; message: string; o
       <span className="text-lg">{style.icon}</span>
       <p className="text-sm">{message}</p>
       {onClose && (
-        <button type="button" onClick={onClose} className="ml-2">✕</button>
+        <button type="button" onClick={onClose} className="ml-2" aria-label="Tancar notificació">✕</button>
       )}
     </div>
   );

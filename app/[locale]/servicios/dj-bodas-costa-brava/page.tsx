@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Costa Brava | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en la Costa Brava desde ${MIN_PRICE}€. Cadaqués, Tossa, Lloret, Begur y toda la costa. Sonido profesional resistente a exteriores.`,
   keywords: ['DJ bodas Costa Brava', 'DJ bodas Cadaqués', 'DJ bodas Tossa de Mar', 'DJ bodas Begur', 'bodas playa Costa Brava'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Costa Brava | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en la Costa Brava. Especialistas en bodas de costa y exteriores.',
     url: '/servicios/dj-bodas-costa-brava',
-    images: [{ url: '/img/portfolio/bodas/bodas-03.avif', alt: 'DJ Bodas Costa Brava - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Costa Brava - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const costaBravaTowns = ['Cadaqués', 'Roses', 'L\'Escala', 'L\'Estartit', 'Begur', 'Calella de Palafrugell', 'Llafranc', 'Tamariu', 'Palamós', 'Sant Antoni de Calonge', 'Platja d\'Aro', 'Sant Feliu de Guíxols', 'Tossa de Mar', 'Lloret de Mar', 'Blanes'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-costa-brava' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
       'Plan B preparado: Nos adaptamos a cambios de tiempo',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-03.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-04.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
     </>
   );
 }
+

@@ -90,7 +90,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
   }, []);
 
   return (
-    <aside className="rounded-2xl border p-4 lg:sticky lg:top-[220px]">
+    <aside className="rounded-2xl border p-4 lg:sticky lg:top-[220px]" data-help-title="Cronologia del client" data-help-desc="Agrupa l'activitat del client per dies i et deixa filtrar per pressupostos, reserves, tasques o comunicacions.">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -104,7 +104,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
       </div>
 
       {/* Filters */}
-      <div className="mt-3 flex flex-wrap gap-1">
+      <div className="mt-3 flex flex-wrap gap-1" data-help-title="Filtres de cronologia" data-help-desc="Serveixen per reduir la cronologia al tipus d'activitat que t'interessa revisar ara mateix.">
         {CUSTOMER_TIMELINE_FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.key}
@@ -212,3 +212,4 @@ function EmptyState({ filter }: { filter: TimelineFilter }) {
     </div>
   );
 }
+

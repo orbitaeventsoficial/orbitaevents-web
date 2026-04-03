@@ -10,7 +10,7 @@ import { usePacks } from '@/lib/hooks/usePacks';
 import { getPacksByService } from '@/config/packs-config';
 import Image from "next/image";
 
-export default function EmpresasClient() {
+export default function EmpresasClient({ heroImage }: { heroImage: string }) {
   const t = useTranslations('pages.corporate');
   const { track } = useAnalytics();
   const locale = useLocale();
@@ -38,7 +38,7 @@ export default function EmpresasClient() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-bg-main z-10" />
           <Image
-            src="/img/portfolio/eventos-empresa/eventos-empresa-02.avif"
+            src={heroImage}
             alt="Eventos corporativos Òrbita Events"
             fill
             priority
@@ -294,4 +294,5 @@ export default function EmpresasClient() {
     </div>
   );
 }
+
 

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import { ADMIN_ACTIVITY_CATEGORY_MAP } from '@/lib/constants/admin';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category'); // comms | automation | system | crud
   const days = Math.min(Number(searchParams.get('days')) || 7, 90);
@@ -13,7 +17,6 @@ export async function GET(request: NextRequest) {
 
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  // Filter by category → resolve to action names
   let actionFilter: string[] | undefined;
   if (category && category !== 'all') {
     actionFilter = Object.entries(ADMIN_ACTIVITY_CATEGORY_MAP)
@@ -45,7 +48,6 @@ export async function GET(request: NextRequest) {
     }),
   ]);
 
-  // Build stats grouped by category
   const stats: Record<string, { total: number; actions: Record<string, number> }> = {};
   for (const row of statsByAction) {
     const cat = ADMIN_ACTIVITY_CATEGORY_MAP[row.action] || 'other';

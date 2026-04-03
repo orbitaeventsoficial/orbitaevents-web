@@ -28,7 +28,7 @@ export default function BookingSectionNav() {
 
   return (
     <nav
-      className="admin-tone-border-neutral admin-tone-bg-neutral sticky top-[60px] z-20 -mx-6 mb-2 overflow-x-auto border-b px-6 py-2 backdrop-blur"
+      className="admin-tone-border-neutral admin-tone-bg-neutral sticky top-[60px] z-20 -mx-6 mb-2 overflow-x-auto border-b px-6 py-2 backdrop-blur" data-help-title="Navegació de la reserva" data-help-desc="Serveix per saltar ràpidament entre client, esdeveniment, serveis, finances, documents, comunicacions i historial de la reserva."
       aria-label="Seccions de la reserva"
     >
       <div className="flex gap-1">
@@ -52,4 +52,5 @@ export default function BookingSectionNav() {
     </nav>
   );
 }
+
 

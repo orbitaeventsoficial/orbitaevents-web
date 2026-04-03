@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -11,8 +11,8 @@ import { PUBLIC_HERO_KEN_BURNS_PRESETS, PUBLIC_HERO_MEDIA_FALLBACK } from '@/lib
 type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
 
 
-const IMAGE_DURATION = 7000;
-const VIDEO_MIN_DURATION = 10000;
+const IMAGE_DURATION = 9000;
+const VIDEO_MIN_DURATION = 12000;
 
 // Ken Burns — zoom in suau, cada direcció diferent
 
@@ -202,7 +202,7 @@ export default function HeroElegant() {
   useEffect(() => {
     const interval = setInterval(() => {
       setTextIndex((prev) => (prev + 1) % rotatingTexts.length);
-    }, 3500);
+    }, 4400);
     return () => clearInterval(interval);
   }, [rotatingTexts.length]);
 
@@ -402,7 +402,7 @@ export default function HeroElegant() {
                         initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
                         exit={{ opacity: 0, y: -18, filter: 'blur(10px)', scale: 0.98 }}
-                        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
                         className="absolute left-0 top-0 whitespace-nowrap bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite]"
                         style={{
                           backgroundImage: 'linear-gradient(90deg, #fcd34d, #f59e0b, #fb923c, #f59e0b, #fcd34d)',

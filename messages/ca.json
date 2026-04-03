@@ -395,11 +395,11 @@
       "badge": "DJ · Il·luminació · Tematització · Producció",
       "badgeEmoji": "🎵",
       "title1": "CONVERTIM EL TEU EVENT EN",
-      "title2": "UN ESPECTACLE.",
+      "title2": "ESPECTACLE.",
       "rotatingTexts": [
-        "UN ESPECTACLE.",
-        "UNA FESTA INOBLIDABLE.",
-        "UNA EXPERIÈNCIA ÚNICA.",
+        "ESPECTACLE.",
+        "FESTA INOBLIDABLE.",
+        "EXPERIÈNCIA ÚNICA.",
         "PURA MÀGIA."
       ],
       "subtitle": "DJ, il·luminació i tematització per a festes que la gent recorda. Barcelona i Girona. Pressupost en 2h.",
@@ -3108,8 +3108,21 @@
       }
     },
     "faqTitle": "Preguntes Freqüents -",
-    "galleryTitle": "Casaments que hem realitzat a {zone}",
-    "viewMoreWeddings": "Veure més casaments al nostre portfolio",
+    "galleryTitleByService": {
+      "bodas": "Casaments que hem realitzat a {zone}",
+      "fiestas": "Festes que hem animat a {zone}",
+      "discomovil": "Discomòbils que hem muntat a {zone}"
+    },
+    "viewMoreByService": {
+      "bodas": "Veure més casaments al nostre portfolio",
+      "fiestas": "Veure més festes al nostre portfolio",
+      "discomovil": "Veure més discomòbils al nostre portfolio"
+    },
+    "galleryAltByService": {
+      "bodas": "Casament a {zone} - foto {index}",
+      "fiestas": "Festa a {zone} - foto {index}",
+      "discomovil": "Discomòbil a {zone} - foto {index}"
+    },
     "finalCta": {
       "titleBodas": "El teu casament és a",
       "titleOther": "El teu event és a",
@@ -6774,14 +6787,14 @@
       "yours": "FETS PER BRILLAR."
     },
     "morphingTextsExtended": [
-      "PER A CASAMENTS AUTÈNTICS.",
-      "PER A FESTES QUE SUMEN.",
-      "PER A EMPRESES AMB IMPACTE.",
+      "CASAMENTS AUTÈNTICS.",
+      "FESTES AMB ÀNIMA.",
+      "EMPRESES AMB IMPACTE.",
       "HALLOWEEN QUE IMPRESSIONA.",
       "MÓN MÀGIC QUE SORPRÈN.",
-      "AMB KARAOKE SI EL VOLS.",
-      "AMB DETALLS QUE ES NOTEN.",
-      "I SENSE ESTRÈS PER A TU."
+      "KARAOKE SI EL VOLS.",
+      "DETALLS QUE ES NOTEN.",
+      "SENSE ESTRÈS PER A TU."
     ]
   },
   "mobileServices": {
@@ -7130,5 +7143,6 @@
     "spamNote": "Revisa la teva safata de correu brossa si no veus el nostre email en les pròximes hores"
   }
 }
+
 
 

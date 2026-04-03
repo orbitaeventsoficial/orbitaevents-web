@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
+  return {
   title: `Discomóvil Vallès | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en el Vallès desde ${MIN_PRICE}€. Granollers, Mollet, Sabadell, Terrassa, Cerdanyola. DJ profesional + equipo completo para fiestas privadas.`,
   keywords: ['discomovil Vallès', 'discomóvil Granollers', 'DJ fiesta Sabadell', 'discomóvil Terrassa', 'DJ fiestas Vallès Occidental Oriental'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `Discomóvil Vallès | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas en el Vallès Occidental y Oriental. Granollers, Sabadell, Terrassa y comarca.',
     url: '/servicios/discomovil-valles',
-    images: [{ url: '/img/portfolio/discomovil/discomovil-02.avif', alt: 'Discomóvil Vallès - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'Discomóvil Vallès - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const vallesTowns = ['Granollers', 'Mollet del Vallès', 'Sabadell', 'Terrassa', 'Cerdanyola del Vallès', 'Rubí', 'Sant Cugat del Vallès', 'Montcada i Reixac', 'Parets del Vallès', 'La Llagosta', 'Caldes de Montbui', 'Llinars del Vallès'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DiscomovilVallesPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DiscomovilVallesPage({ params }: PageProps) {
       'Fiestas temáticas: Especialistas en temáticas únicas',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/discomovil/discomovil-02.avif',
-    galleryImages: [
-      '/img/portfolio/discomovil/discomovil-14.avif',
-      '/img/portfolio/discomovil/discomovil-16.avif',
-      '/img/portfolio/discomovil/discomovil-18.avif',
-      '/img/portfolio/discomovil/discomovil-20.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DiscomovilVallesPage({ params }: PageProps) {
     </>
   );
 }
+

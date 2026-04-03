@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Baix Llobregat desde ${MIN_PRICE}€. Hospitalet, Cornellà, Sant Boi, El Prat. Desplazamiento incluido.`,
   keywords: ['DJ bodas Baix Llobregat', 'DJ bodas Hospitalet', 'DJ bodas Cornellà', 'DJ bodas Sant Boi', 'bodas Baix Llobregat'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Baix Llobregat. Toda la comarca con desplazamiento incluido.',
     url: '/servicios/dj-bodas-baix-llobregat',
-    images: [{ url: '/img/portfolio/bodas/bodas-02.avif', alt: 'DJ Bodas Baix Llobregat - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Baix Llobregat - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const baixLlobregatTowns = ['L\'Hospitalet de Llobregat', 'Cornellà de Llobregat', 'Sant Boi de Llobregat', 'El Prat de Llobregat', 'Viladecans', 'Gavà', 'Castelldefels', 'Esplugues de Llobregat', 'Sant Joan Despí', 'Sant Just Desvern', 'Sant Feliu de Llobregat', 'Molins de Rei', 'Martorell', 'Sant Andreu de la Barca'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-baix-llobregat' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
       'Conexión Barcelona: Fácil acceso desde la ciudad',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-03.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-07.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
     </>
   );
 }
+

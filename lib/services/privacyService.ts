@@ -10,6 +10,7 @@
  * - Política de retenció
  */
 
+import { PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
 import { prisma } from '@/lib/prisma';
 import { createHash, randomBytes } from 'crypto';
 import type {
@@ -164,13 +165,14 @@ export async function revokeConsent(
  * Llistar tots els consentiments amb paginació i filtre
  */
 export async function listConsents(opts: {
-  status?: 'active' | 'revoked' | 'all';
+  status?: PrivacyConsentStatus;
   consentType?: ConsentType;
   search?: string;
   limit?: number;
   offset?: number;
 } = {}) {
-  const { status = 'all', consentType, search, limit = 50, offset = 0 } = opts;
+  const status = opts.status && PRIVACY_CONSENT_STATUS_VALUES.includes(opts.status) ? opts.status : 'all';
+  const { consentType, search, limit = 50, offset = 0 } = opts;
 
   const where: Prisma.ConsentRecordWhereInput = {};
 
@@ -867,4 +869,5 @@ export async function checkGdprCompliance(customerId: string) {
     isCompliant: hasGdprConsent,
   };
 }
+
 

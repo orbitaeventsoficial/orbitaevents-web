@@ -188,7 +188,7 @@ export default async function EmailsAdminPage() {
       <EmailStatsCards stats={stats} />
 
       {stats.hasQueryErrors && (
-        <section className="rounded-2xl border p-4">
+        <section className="rounded-2xl border p-4" data-help-title="Avís de dades parcials" data-help-desc="Indica que alguna consulta ha fallat. El panell segueix operatiu, però algunes xifres poden estar incompletes.">
           <p className="text-sm">
             ⚠️ Algunes dades no s&apos;han pogut carregar. El panell continua operatiu, però cal revisar migracions/estructura de BD.
           </p>
@@ -196,7 +196,7 @@ export default async function EmailsAdminPage() {
       )}
 
       {/* Logs / Automatitzacions */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-help-title="Estat d'automatitzacions" data-help-desc="Resumeix activitat recent del sistema d'emails i l'última execució del cron.">
         <div className="rounded-2xl border p-5">
           <p className="text-xs uppercase">Emails 24h</p>
           <p className="mt-2 text-2xl font-semibold">{stats.recentEmailActions}</p>
@@ -238,7 +238,7 @@ export default async function EmailsAdminPage() {
         {/* Columna Principal (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
-          <section className="rounded-2xl border admin-card-glass overflow-hidden">
+          <section className="rounded-2xl border admin-card-glass overflow-hidden" data-help-title="Post-event pendents" data-help-desc="Llista reserves completades que encara no han rebut el correu post-event perquè puguis forçar-lo manualment.">
             <div className="px-6 py-4 border-b flex items-center justify-between">
               <div>
                 <h2 className="font-semibold">
@@ -295,7 +295,7 @@ export default async function EmailsAdminPage() {
           <ManualActionsPanel />
 
           {/* Google Reviews Link */}
-          <section className="rounded-2xl border admin-card-glass p-6">
+          <section className="rounded-2xl border admin-card-glass p-6" data-help-title="Enllaç de Google Reviews" data-help-desc="Tens a mà l'enllaç oficial perquè el client pugui deixar una ressenya pública a Google.">
             <h3 className="font-semibold mb-4">⭐ Google Reviews</h3>
             <p className="text-sm mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:

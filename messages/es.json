@@ -384,11 +384,11 @@
       "badge": "DJ · Iluminación · Tematización · Producción",
       "badgeEmoji": "🎵",
       "title1": "CONVERTIMOS TU EVENTO EN",
-      "title2": "UN ESPECTÁCULO.",
+      "title2": "ESPECTÁCULO.",
       "rotatingTexts": [
-        "UN ESPECTÁCULO.",
-        "UNA FIESTA INOLVIDABLE.",
-        "UNA EXPERIENCIA ÚNICA.",
+        "ESPECTÁCULO.",
+        "FIESTA INOLVIDABLE.",
+        "EXPERIENCIA ÚNICA.",
         "PURA MAGIA."
       ],
       "subtitle": "DJ, iluminación y tematización para fiestas que la gente recuerda. Barcelona y Girona. Presupuesto en 2h.",
@@ -4015,8 +4015,21 @@
       }
     },
     "faqTitle": "Preguntas Frecuentes -",
-    "galleryTitle": "Bodas que hemos realizado en {zone}",
-    "viewMoreWeddings": "Ver más bodas en nuestro portfolio",
+    "galleryTitleByService": {
+      "bodas": "Bodas que hemos realizado en {zone}",
+      "fiestas": "Fiestas que hemos animado en {zone}",
+      "discomovil": "Discomóviles que hemos montado en {zone}"
+    },
+    "viewMoreByService": {
+      "bodas": "Ver más bodas en nuestro portfolio",
+      "fiestas": "Ver más fiestas en nuestro portfolio",
+      "discomovil": "Ver más discomóviles en nuestro portfolio"
+    },
+    "galleryAltByService": {
+      "bodas": "Boda en {zone} - foto {index}",
+      "fiestas": "Fiesta en {zone} - foto {index}",
+      "discomovil": "Discomóvil en {zone} - foto {index}"
+    },
     "finalCta": {
       "titleBodas": "¿Tu boda es en",
       "titleOther": "¿Tu evento es en",
@@ -6505,14 +6518,14 @@
       "yours": "HECHOS PARA BRILLAR."
     },
     "morphingTextsExtended": [
-      "PARA BODAS AUTÉNTICAS.",
-      "PARA FIESTAS CON ENERGÍA.",
-      "PARA EMPRESAS CON IMPACTO.",
+      "BODAS AUTÉNTICAS.",
+      "FIESTAS CON ENERGÍA.",
+      "EMPRESAS CON IMPACTO.",
       "HALLOWEEN QUE IMPRESIONA.",
       "MUNDO MÁGICO QUE SORPRENDE.",
-      "CON KARAOKE SI LO QUIERES.",
-      "CON DETALLES QUE SE NOTAN.",
-      "Y SIN ESTRÉS PARA TI."
+      "KARAOKE SI LO QUIERES.",
+      "DETALLES QUE SE NOTAN.",
+      "SIN ESTRÉS PARA TI."
     ]
   },
   "mobileServices": {
@@ -6861,5 +6874,6 @@
     "spamNote": "Revisa tu bandeja de spam si no ves nuestro email en las próximas horas"
   }
 }
+
 
 

@@ -17,7 +17,7 @@ export default function MarginExtrasPanel({
   const margin = typeof subtotal === 'number' && typeof total === 'number' ? total - subtotal : undefined;
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Extres i marge" data-help-desc="Mostra subtotal, descompte, total i marge estimat del document actiu. Per editar extres, obre l'Studio.">
       <h2 className="text-lg font-semibold">Extres / Marge</h2>
       <p className="mt-1 text-sm">
         Document actiu: {data.active.source} {active?.reference ? `· ${active.reference}` : ''}
@@ -30,7 +30,7 @@ export default function MarginExtrasPanel({
         <Metric label="Marge estimat" value={money(margin)} />
       </div>
 
-      <div className="mt-4 rounded-xl border p-3 text-xs flex items-center justify-between">
+      <div className="mt-4 rounded-xl border p-3 text-xs flex items-center justify-between" data-help-title="Editar al Studio" data-help-desc="Si cal tocar extres, costos reals o detalls econòmics del pressupost actiu, aquí tens l'accés directe.">
         <span>Per editar extres i cost real, obre l&apos;Studio amb el proposal actiu.</span>
         {active && (
           <Link

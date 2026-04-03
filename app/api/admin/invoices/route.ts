@@ -15,7 +15,11 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    return NextResponse.json(await listAdminInvoices());
+    const { searchParams } = new URL(req.url);
+    return NextResponse.json(await listAdminInvoices({
+      page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
+      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
+    }));
   } catch (error) {
     log.error('Error llistant factures', error);
     return NextResponse.json({ ok: false, error: 'Error llistant factures' }, { status: 500 });

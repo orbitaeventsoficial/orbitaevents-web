@@ -65,7 +65,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
   };
 
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Tasques i notes" data-help-desc="Checklist operativa del client. Pots crear, completar, reobrir o eliminar tasques. Les tasques pendents apareixen al tauler general.">
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold">Tasques / Notes</h2>

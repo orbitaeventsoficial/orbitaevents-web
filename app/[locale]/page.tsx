@@ -9,6 +9,7 @@ import { getTranslations } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { listPublicPortfolioShowcaseStories } from '@/lib/services/publicPortfolioShowcaseService';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -150,9 +151,10 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 // PAGE PRINCIPAL - MEGA PACK
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default function HomePage() {
+export default async function HomePage() {
+  const portfolioStories = await listPublicPortfolioShowcaseStories();
   return (
-    <HomePageWrapper>
+    <HomePageWrapper mobilePortfolioStories={portfolioStories}>
       {/* Desktop: Contingut elegant */}
       <div className="min-h-screen bg-bg-main hidden md:block">
         {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
@@ -179,7 +181,7 @@ export default function HomePage() {
 
         {/* 5. PORTFOLIO - Fotos reals dels events */}
         <div data-section-id="portfolio" className="oe-section-divider">
-          <PortfolioShowcase />
+          <PortfolioShowcase stories={portfolioStories.filter((story) => story.showInDesktop)} />
         </div>
 
         {/* 6. COM FUNCIONA - 3 passos */}
@@ -216,6 +218,10 @@ export default function HomePage() {
     </HomePageWrapper>
   );
 }
+
+
+
+
 
 
 

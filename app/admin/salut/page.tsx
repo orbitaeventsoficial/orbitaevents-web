@@ -320,7 +320,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         ]}
       />
 
-      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass">
+      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" data-help-title="Filtres de salut" data-help-desc="Et deixen centrar-te només en crítics, avisos o un focus concret com inventari, packs, extres, leads, reserves o tasques.">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-white/85">Filtra el que vols veure</p>
@@ -349,7 +349,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
       </section>
 
       {priorityItems.length > 0 ? (
-        <section className="rounded-2xl border border-white/10 p-4 admin-card-glass">
+        <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" data-help-title="Prioritat d'avui" data-help-desc="Resumeix els tres punts més urgents perquè sàpigues per on començar sense llegir tota la pàgina.">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Prioritat d’avui</p>

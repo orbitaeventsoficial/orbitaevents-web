@@ -127,7 +127,7 @@ export default function ManualActionsPanel() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border admin-card-glass">
+    <section className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Accions manuals d'email" data-help-desc="Aquí pots forçar automatismes, enviar recordatoris o validar que el sistema de correu funciona sense esperar el cron.">
       <div className="border-b px-6 py-4">
         <h2 className="font-semibold">🔧 Accions Manuals</h2>
       </div>

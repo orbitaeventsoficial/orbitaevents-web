@@ -4,7 +4,7 @@ import { formatDate, formatDateSimple, formatNumber, getEventLabel, getLeadStatu
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   return (
-    <section className="rounded-2xl border p-5">
+    <section className="rounded-2xl border p-5" data-help-title="Entrades vinculades" data-help-desc="Historial de leads/oportunitats comercials d'aquest client, amb estat i data. Fes clic per obrir la fitxa del lead.">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Entrades vinculades</h2>

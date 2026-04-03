@@ -196,13 +196,13 @@ export default function BookingMarginCard({
     distanceKm !== (initialDistanceKm ?? 0);
 
   return (
-    <section className={`rounded-xl border shadow-sm p-6 ${marginBg}`}>
+    <section className={`rounded-xl border shadow-sm p-6 ${marginBg}`} data-help-title="Marge i costos" data-help-desc="Explica què costa realment aquest esdeveniment, quin marge deixa i com impacta el transport en la rendibilitat.">
       <h2 className="text-lg font-semibold mb-4">
         📊 Marge i Costos
       </h2>
 
       {/* KPI row */}
-      <div className="grid gap-4 sm:grid-cols-4 mb-6">
+      <div className="grid gap-4 sm:grid-cols-4 mb-6" data-help-title="KPI de marge" data-help-desc="Resumeixen ingrés total, cost directe, marge net i percentatge de marge d'aquesta reserva.">
         <div>
           <p className="text-xs font-medium uppercase">Ingrés total</p>
           <p className="text-lg font-bold">{formatCurrency(total)}</p>
@@ -230,7 +230,7 @@ export default function BookingMarginCard({
       </div>
 
       {/* Sumatori clar */}
-      <div className="mb-6 ap-card rounded-xl p-4">
+      <div className="mb-6 ap-card rounded-xl p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
@@ -267,7 +267,7 @@ export default function BookingMarginCard({
 
       {/* On va cada euro — desglossament del benefici */}
       {total > 0 && (
-        <div className="mb-6 rounded-xl border p-4">
+        <div className="mb-6 rounded-xl border p-4" data-help-title="On va cada euro" data-help-desc="Tradueix el marge a pots reals de negoci: combustible, vehicle, equip, operacions i benefici net.">
           <h3 className="text-sm font-semibold mb-1">On va cada euro d'aquest bolo</h3>
           <p className="text-[11px] mb-3">Desglossament pràctic: què es queda l'empresa, què s'ha de reservar, i què és benefici net.</p>
           <div className="space-y-2 text-xs">
@@ -350,7 +350,7 @@ export default function BookingMarginCard({
       )}
 
       {/* Cost breakdown */}
-      <div className="text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4">
+      <div className="text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
@@ -392,7 +392,7 @@ export default function BookingMarginCard({
       </div>
 
       {/* Editable travel fields */}
-      <div className="border-t admin-tone-border-neutral pt-4">
+      <div className="border-t admin-tone-border-neutral pt-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
         <h3 className="text-sm font-semibold mb-3">🚗 Desplaçament (editable)</h3>
         <p className="mb-3 text-xs">
           Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
@@ -464,6 +464,7 @@ export default function BookingMarginCard({
     </section>
   );
 }
+
 
 
 

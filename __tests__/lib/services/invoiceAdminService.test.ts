@@ -4,6 +4,7 @@ const { mockPrisma, mockCreateInvoice, mockMarkPaid } = vi.hoisted(() => ({
   mockPrisma: {
     invoice: {
       findMany: vi.fn(),
+      count: vi.fn(),
       findUnique: vi.fn(),
       findUniqueOrThrow: vi.fn(),
       update: vi.fn(),
@@ -29,6 +30,7 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.invoice.findMany.mockResolvedValue([]);
+  mockPrisma.invoice.count.mockResolvedValue(0);
   mockPrisma.invoice.findUnique.mockResolvedValue(null);
   mockPrisma.invoice.update.mockResolvedValue({});
   mockCreateInvoice.mockResolvedValue({ invoice: { id: 'inv-1' } });
@@ -40,6 +42,7 @@ describe('listAdminInvoices', () => {
     const result = await listAdminInvoices();
     expect(result.ok).toBe(true);
     expect(result.invoices).toEqual([]);
+    expect(result.pagination).toEqual({ page: 1, limit: 50, total: 0, pages: 1 });
   });
 });
 

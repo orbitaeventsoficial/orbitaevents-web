@@ -81,7 +81,7 @@ export default async function TasksPage({
       back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
       actions={
         <>
-          <div className="flex items-center gap-1 rounded-xl border p-0.5">
+          <div className="flex items-center gap-1 rounded-xl border p-0.5" data-help-title="Canvi de vista de tasques" data-help-desc="Kanban per moure feina ràpidament entre estats. Llista per revisar cada tasca amb més detall i context.">
             <Link
               href={`/admin/tasks?view=kanban${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
               className={`rounded px-2 py-1 text-xs font-medium transition-colors ${isKanban ? 'bg-white/10 text-white' : ''}`}
@@ -104,14 +104,16 @@ export default async function TasksPage({
     >
       {isKanban && (
         <AdminSection>
-          <TaskKanbanView />
+          <div data-help-title="Kanban de tasques" data-help-desc="Vista visual de tasques organitzades per estat. Arrossega per canviar estat o clica per obrir el detall.">
+            <TaskKanbanView />
+          </div>
         </AdminSection>
       )}
 
       {!isKanban && (
         <>
           <AdminSection compact>
-            <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
+            <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2" data-help-title="Filtres de tasques" data-help-desc="Serveixen per quedar-te només amb l'estat que vols revisar abans d'entrar al detall.">
               {customerId && <input type="hidden" name="customerId" value={customerId} />}
               <input type="hidden" name="view" value="list" />
               <label htmlFor="task-status-filter" className="ap-subtitle">Estat</label>
@@ -144,7 +146,7 @@ export default async function TasksPage({
                 }
               />
             ) : (
-              <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }}>
+              <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }} data-help-title="Llistat de tasques" data-help-desc="Cada fila representa una tasca operativa i et deixa saltar al client o lead relacionat i canviar-ne l'estat.">
                 {tasks.map((task) => {
                   const destinationHref = resolveDestination(task);
                   return (
@@ -175,7 +177,7 @@ export default async function TasksPage({
       )}
 
       {!isKanban && totalPages > 1 && (
-        <div className="flex items-center justify-between ap-subtitle">
+        <div className="flex items-center justify-between ap-subtitle" data-help-title="Paginació de tasques" data-help-desc="Permet navegar per totes les tasques quan la llista no cap en una sola pàgina.">
           <span>Pàgina {page} de {totalPages}</span>
           <div className="ap-header-actions">
             <Link

@@ -114,7 +114,7 @@ export default function CalendarWeekClient() {
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
       {/* Barra superior */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between" data-help-title="Navegació setmanal" data-help-desc="Canvia de setmana, torna a avui o salta entre vistes mensual, setmanal i diària.">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -182,7 +182,7 @@ export default function CalendarWeekClient() {
       </div>
 
       {/* Graella setmanal */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-2" data-help-title="Graella setmanal" data-help-desc="Cada columna representa un dia de la setmana amb reserves, bloquejos i accions ràpides per operar-hi.">
         {weekDays.map((day) => {
           const key = formatKey(day);
           const dayData = data?.days?.[key] ?? { reservas: [], bloqueos: [] };

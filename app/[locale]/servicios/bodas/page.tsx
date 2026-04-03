@@ -8,6 +8,7 @@ import nextDynamic from 'next/dynamic';
 
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 
 
 
@@ -20,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const packs = await getDbPacks({ service: 'bodas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('bodas');
   const t = await getTranslations({ locale, namespace: 'services.bodas' });
 
   return {
@@ -33,14 +35,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/bodas',
-      images: [{ url: '/img/portfolio/bodas/bodas-01.avif', alt: t('breadcrumb') }],
+      images: [{ url: heroImage, alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/bodas/bodas-01.avif'],
+      images: [heroImage],
     },
     robots: { index: true, follow: true },
   };
@@ -56,6 +58,7 @@ export default async function BodasPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const packs = await getDbPacks({ service: 'bodas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('bodas');
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -106,9 +109,10 @@ export default async function BodasPage({ params }: PageProps) {
         }))}
       />
 
-      <BodasClient />
+      <BodasClient heroImage={heroImage} />
 
       <FAQ items={faqItems} />
     </>
   );
 }
+

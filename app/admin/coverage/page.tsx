@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { COVERAGE_PROVINCES, type CoverageArea } from '@/lib/coverage';
@@ -119,10 +119,17 @@ export default function CoveragePage() {
 
   if (fetchError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
-        <button type="button" onClick={() => { setLoading(true); loadAreas(); }} className="ap-btn ap-btn--primary">Reintentar</button>
-      </div>
+      <AdminPage title="Cobertura" subtitle="Ciutats i províncies on opera Òrbita Events">
+        <AdminEmptyState
+          icon="⚠️"
+          title={fetchError}
+          action={
+            <button type="button" onClick={() => { setLoading(true); loadAreas(); }} className="ap-btn ap-btn--primary">
+              Reintentar
+            </button>
+          }
+        />
+      </AdminPage>
     );
   }
 
@@ -231,6 +238,8 @@ export default function CoveragePage() {
     </AdminPage>
   );
 }
+
+
 
 
 

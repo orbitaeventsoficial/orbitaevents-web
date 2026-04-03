@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
+  return {
   title: `Discomóvil Barcelona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en Barcelona desde ${MIN_PRICE}€. DJ profesional para fiestas privadas, cumpleaños y celebraciones. Sonido 4000W + iluminación completa. Presupuesto en 2h.`,
   keywords: ['discomovil Barcelona', 'discomóvil precio Barcelona', 'DJ fiesta Barcelona', 'discomóvil cumpleaños Barcelona', 'alquiler discomovil Barcelona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `Discomóvil Barcelona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas en Barcelona. Equipo completo de sonido e iluminación.',
     url: '/servicios/discomovil-barcelona',
-    images: [{ url: '/img/portfolio/discomovil/discomovil-01.avif', alt: 'Discomóvil Barcelona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'Discomóvil Barcelona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const barcelonaTowns = ['Barcelona', "L'Hospitalet de Llobregat", 'Badalona', 'Cornellà de Llobregat', 'Sant Boi de Llobregat', 'El Prat de Llobregat', 'Esplugues de Llobregat', 'Gavà', 'Viladecans', 'Castelldefels', 'Sant Feliu de Llobregat', 'Molins de Rei'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DiscomovilBarcelonaPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DiscomovilBarcelonaPage({ params }: PageProps) {
       'Montaje rápido: 45 minutos, sin complicaciones',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/discomovil/discomovil-01.avif',
-    galleryImages: [
-      '/img/portfolio/discomovil/discomovil-03.avif',
-      '/img/portfolio/discomovil/discomovil-05.avif',
-      '/img/portfolio/discomovil/discomovil-07.avif',
-      '/img/portfolio/discomovil/discomovil-09.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DiscomovilBarcelonaPage({ params }: PageProps) {
     </>
   );
 }
+

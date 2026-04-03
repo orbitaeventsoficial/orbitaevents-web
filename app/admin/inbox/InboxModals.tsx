@@ -279,7 +279,7 @@ export function QuoteModal({
           <h2 id="quote-title" className="text-lg font-semibold">
             📄 Pressupost personalitzat
           </h2>
-          <button onClick={onClose} type="button" className="rounded-xl p-2">
+          <button onClick={onClose} type="button" className="rounded-xl p-2" aria-label="Tancar modal">
             ✕
           </button>
         </div>

@@ -7,7 +7,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateSimple } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
 interface BlogPost {
   id: string;
@@ -165,17 +165,25 @@ export default function BlogAdminPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
         </div>
       ) : !loading && flashMessage?.type === 'error' && posts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-          <p className="text-amber-400 text-lg font-medium">{flashMessage.text}</p>
-          <button type="button" onClick={fetchPosts} className="ap-btn ap-btn--primary">Reintentar</button>
-        </div>
+        <AdminEmptyState
+          icon="⚠️"
+          title={flashMessage.text}
+          action={
+            <button type="button" onClick={fetchPosts} className="ap-btn ap-btn--primary">
+              Reintentar
+            </button>
+          }
+        />
       ) : posts.length === 0 ? (
-        <div className="ap-card ap-empty rounded-2xl">
-          <p className="ap-empty-title">Encara no hi ha posts</p>
-          <button onClick={() => router.push('/admin/blog/new')} type="button" className="ap-btn ap-btn--primary mt-4">
-            Crea el primer
-          </button>
-        </div>
+        <AdminEmptyState
+          icon="📝"
+          title="Encara no hi ha posts"
+          action={
+            <button onClick={() => router.push('/admin/blog/new')} type="button" className="ap-btn ap-btn--primary">
+              Crea el primer
+            </button>
+          }
+        />
       ) : (
         <>
           <section className="space-y-3 lg:hidden">

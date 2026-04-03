@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Garraf | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en el Garraf desde ${MIN_PRICE}€. Sitges, Vilanova, Cubelles. Especialistas en bodas de costa y chiringuitos.`,
   keywords: ['DJ bodas Garraf', 'DJ bodas Sitges', 'DJ bodas Vilanova', 'DJ bodas costa', 'bodas playa Garraf'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Garraf | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Garraf. Especialistas en bodas de costa y espacios con vistas al mar.',
     url: '/servicios/dj-bodas-garraf',
-    images: [{ url: '/img/portfolio/bodas/bodas-05.avif', alt: 'DJ Bodas Garraf - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Garraf - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const garrafTowns = ['Sitges', 'Vilanova i la Geltrú', 'Cubelles', 'Sant Pere de Ribes', 'Canyelles', 'Olivella', 'Garraf', 'Les Botigues de Sitges'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasGarrafPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-garraf' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasGarrafPage({ params }: PageProps) {
       'Equipo para exteriores: Protección contra humedad y viento',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-02.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-02.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasGarrafPage({ params }: PageProps) {
     </>
   );
 }
+

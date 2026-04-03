@@ -75,13 +75,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     >
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md admin-card-glass">
+      <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md admin-card-glass" data-help-title="Pestanyes d'economia" data-help-desc="Canvien la vista entre resum, cobraments, rendibilitat, tresoreria, previsions i configuració econòmica.">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => setActiveTab(tab.id)}
               className={`admin-economia-tab relative flex-1 rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 ${
                 isActive
@@ -164,7 +166,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border px-3 py-2 text-xs">
+              <div className="rounded-xl border px-3 py-2 text-xs" data-help-title="Com llegir el resum" data-help-desc="Explica ràpidament què vol dir cada indicador principal de cobrament per a un usuari que comença.">
                 <strong className="">Com llegir aquest resum:</strong> pendent = import total per cobrar, fora de termini = cobrament que ja havia d&apos;estar pagat, a 7 dies = cobrament proper.
               </div>
 
@@ -320,7 +322,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45 }}
-                  className="rounded-2xl border border-white/10 p-5 shadow-lg"
+                  className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament."
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-base font-bold">Top 5 &mdash; Millors marges</h2>
@@ -550,7 +552,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                   {/* Top + Risc */}
                   <div className="grid gap-5 xl:grid-cols-2">
-                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
                       <div className="flex items-center gap-2 mb-4">
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">🏆</span>
                         <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
@@ -589,7 +591,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       </div>
                     </section>
 
-                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
                       <div className="flex items-center gap-2 mb-4">
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
                         <h2 className="text-base font-bold">Esdeveniments en risc</h2>
@@ -631,7 +633,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   </div>
 
                   {/* Taula per canal */}
-                  <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
+                  <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">📊</span>
                       <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
@@ -916,5 +918,6 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     </AdminPage>
   );
 }
+
 
 

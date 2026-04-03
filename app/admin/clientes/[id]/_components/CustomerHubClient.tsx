@@ -292,11 +292,11 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         )}
 
         {/* Main content */}
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12" data-help-title="Layout de la fitxa client" data-help-desc="A l'esquerra tens el panell principal del client i a la dreta la cronologia d'activitat i context. ">
+          <div className="lg:col-span-8" data-help-title="Panell principal del client" data-help-desc="Canvia segons la pestanya activa i concentra la informació operativa principal del client.">
             {renderPanel()}
           </div>
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4" data-help-title="Cronologia lateral del client" data-help-desc="Mostra l'activitat del client ordenada en el temps per entendre el context abans d'actuar.">
             <PanelErrorBoundary panelName="Timeline">
               <TimelinePanel timeline={data.timeline} />
             </PanelErrorBoundary>
@@ -308,7 +308,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
           type="button"
           onClick={refresh}
           disabled={isPending}
-          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden"
+          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden" data-help-title="Refrescar fitxa client" data-help-desc="Torna a carregar les dades del hub client sense sortir de la fitxa, útil si acabes de fer canvis en una altra secció."
           aria-label="Refrescar dades"
         >
           <span className={isPending ? 'inline-block animate-spin' : ''}>🔄</span>
@@ -317,3 +317,4 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
     </HubContext.Provider>
   );
 }
+

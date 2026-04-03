@@ -1,0 +1,7 @@
+home: header=true footer=true bottomNav=false
+servicios: header=true footer=true bottomNav=true
+packs: header=true footer=true bottomNav=false
+portfolio: header=true footer=true bottomNav=true
+contacto: header=true footer=true bottomNav=false
+halloween: header=true footer=true bottomNav=false
+mon-magic: header=true footer=true bottomNav=false

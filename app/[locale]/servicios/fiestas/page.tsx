@@ -7,6 +7,7 @@ import FAQ from '@/components/seo/FAQ';
 import Client from './FiestasClient';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 
 
 // ===============================
@@ -23,6 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const packs = await getDbPacks({ service: 'fiestas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('fiestas');
   const t = await getTranslations({ locale, namespace: 'services.fiestas' });
 
   return {
@@ -36,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url: '/servicios/fiestas',
       images: [
         {
-          url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+          url: heroImage,
           alt: t('breadcrumb'),
         },
       ],
@@ -46,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'],
+      images: [heroImage],
     },
     robots: { index: true, follow: true },
     keywords: [
@@ -75,6 +77,7 @@ export default async function FiestasPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const packs = await getDbPacks({ service: 'fiestas', locale });
   const minPrice = getMinPrice(packs);
+  const heroImage = await getPublicServiceHeroImage('fiestas');
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -128,9 +131,10 @@ export default async function FiestasPage({ params }: PageProps) {
         }))}
       />
 
-      <Client />
+      <Client heroImage={heroImage} />
 
       <FAQ items={faqItems} />
     </>
   );
 }
+

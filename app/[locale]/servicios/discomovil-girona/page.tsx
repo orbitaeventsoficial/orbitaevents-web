@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
+  return {
   title: `Discomóvil Girona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `Discomóvil en Girona desde ${MIN_PRICE}€. Girona ciudad, Figueres, Olot, Costa Brava. DJ profesional + equipo completo para fiestas y celebraciones.`,
   keywords: ['discomovil Girona', 'discomóvil Costa Brava', 'DJ fiesta Girona', 'discomóvil Figueres', 'DJ fiestas provincia Girona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `Discomóvil Girona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para fiestas en Girona y provincia. Costa Brava, Empordà y toda la comarca.',
     url: '/servicios/discomovil-girona',
-    images: [{ url: '/img/portfolio/discomovil/discomovil-11.avif', alt: 'Discomóvil Girona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'Discomóvil Girona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const gironaTowns = ['Girona', 'Figueres', 'Olot', 'Salt', 'Blanes', 'Lloret de Mar', 'Tossa de Mar', 'Roses', 'Cadaqués', 'Palamós', 'Sant Feliu de Guíxols', 'Platja d\'Aro'];
 
@@ -34,6 +39,8 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function DiscomovilGironaPage({ params }: PageProps) {
   const { locale } = await params;
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('discomovil');
+  const galleryImages = await getPublicServiceGalleryImages('discomovil');
 
   const faqItems = [
     {
@@ -75,13 +82,8 @@ export default async function DiscomovilGironaPage({ params }: PageProps) {
       'Plan B siempre preparado: Nos adaptamos al clima',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/discomovil/discomovil-11.avif',
-    galleryImages: [
-      '/img/portfolio/discomovil/discomovil-13.avif',
-      '/img/portfolio/discomovil/discomovil-15.avif',
-      '/img/portfolio/discomovil/discomovil-17.avif',
-      '/img/portfolio/discomovil/discomovil-19.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -106,3 +108,4 @@ export default async function DiscomovilGironaPage({ params }: PageProps) {
     </>
   );
 }
+

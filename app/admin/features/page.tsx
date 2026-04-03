@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
-import { AdminPage } from '../components/AdminPage';
+import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -84,10 +84,17 @@ export default function FeaturesPage() {
 
   if (fetchError) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
-        <button type="button" onClick={() => { setLoading(true); loadFeatures(); }} className="ap-btn ap-btn--primary">Reintentar</button>
-      </div>
+      <AdminPage title="Funcionalitats" subtitle="Activa o desactiva funcionalitats del web">
+        <AdminEmptyState
+          icon="⚠️"
+          title={fetchError}
+          action={
+            <button type="button" onClick={() => { setLoading(true); loadFeatures(); }} className="ap-btn ap-btn--primary">
+              Reintentar
+            </button>
+          }
+        />
+      </AdminPage>
     );
   }
 
@@ -155,3 +162,5 @@ export default function FeaturesPage() {
     </AdminPage>
   );
 }
+
+

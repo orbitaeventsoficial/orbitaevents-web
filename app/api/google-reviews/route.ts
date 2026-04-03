@@ -18,8 +18,7 @@ import { getGoogleBusinessIntegrationConfig } from '@/lib/services/googleBusines
 import { readGoogleReviewsCache } from '@/lib/services/googleReviewsCacheService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { listApprovedDatabaseReviews } from '@/lib/services/publicTestimonialService';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { readStaticGoogleReviewsData } from '@/lib/services/googleReviewsStaticFile';
 import type { GoogleReview, GoogleBusinessProfileReview, StaticGoogleReview, GooglePlacesReview, GoogleReviewsResponse } from './reviews-types';
 import { LOCATION_API, shouldSkipDb, refreshGoogleAccessToken, mapStarRating, getRelativeTime } from './reviews-types';
 
@@ -30,22 +29,22 @@ export const revalidate = 1800;
 // OBTENIR RESSENYES DEL JSON ESTÀTIC (generat durant deploy)
 // ═══════════════════════════════════════════════════════════════════════════
 async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string; total?: number; rating?: number }> {
-  try {
-    const jsonPath = path.join(process.cwd(), 'public', 'data', 'google-reviews.json');
-    const content = await fs.readFile(jsonPath, 'utf-8');
-    const data = JSON.parse(content);
-    
-    const reviews: GoogleReview[] = (data.reviews || []).map((r: StaticGoogleReview) => ({
-      ...r,
-      source: 'json' as const,
-      language: 'ca',
-    }));
-    
-    return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
-  } catch (error) {
-    // Fitxer no existeix, normal si no s'ha executat el script
-    return { reviews: [] };
-  }
+  const data = readStaticGoogleReviewsData();
+
+  const reviews: GoogleReview[] = ((data.reviews || []) as StaticGoogleReview[]).map((r) => ({
+  author_name: r.author_name || 'Google User',
+  rating: r.rating || 5,
+  text: r.text || '',
+  time: r.time || 0,
+  relative_time_description: r.relative_time_description || '',
+  author_url: r.author_url,
+  profile_photo_url: r.profile_photo_url,
+  eventType: r.eventType,
+  source: 'json' as const,
+  language: r.language || 'ca',
+}));
+
+  return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -276,6 +275,9 @@ export async function GET() {
     );
   }
 }
+
+
+
 
 
 

@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiciosClient from './client';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
 
 
 
@@ -14,6 +15,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const description = t('meta.description');
   const keywords = t.raw('meta.keywords') as string[];
   const imageAlt = t('meta.imageAlt');
+  const heroImage = await getPublicServiceHeroImage('servicios');
   return {
     title,
     description,
@@ -24,14 +26,14 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       title,
       description,
       url: '/servicios',
-      images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif', alt: imageAlt }],
+      images: [{ url: heroImage, alt: imageAlt }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'],
+      images: [heroImage],
     },
     robots: { index: true, follow: true },
   };
@@ -41,6 +43,7 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('servicios');
 
   // Get all service data
   const serviciosConfig = [
@@ -72,7 +75,7 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
         ]}
       />
 
-      <ServiciosClient
+      <ServiciosClient heroImage={heroImage}
         servicios={servicios}
         texts={{
           badge: t('hero.badge'),
@@ -98,3 +101,6 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
     </div>
   );
 }
+
+
+

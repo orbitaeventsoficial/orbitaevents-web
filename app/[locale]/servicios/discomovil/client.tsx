@@ -25,7 +25,7 @@ function trackServiceEvent(action: string, params: AnalyticsParams) {
   gtag('event', action, params);
 }
 
-export default function DiscomovilClient() {
+export default function DiscomovilClient({ heroImage }: { heroImage: string }) {
   const t = useTranslations('pages.mobile');
   const locale = useLocale();
   const reduceMotion = useReducedMotion();
@@ -65,7 +65,7 @@ export default function DiscomovilClient() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-bg-main z-10" />
           <Image
-            src="/img/portfolio/discomovil/discomovil-01.avif"
+            src={heroImage}
             alt="Discomòvil Òrbita Events"
             fill
             priority
@@ -342,3 +342,4 @@ export default function DiscomovilClient() {
     </div>
   );
 }
+

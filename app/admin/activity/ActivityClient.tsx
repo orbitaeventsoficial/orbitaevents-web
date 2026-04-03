@@ -146,7 +146,7 @@ export default function ActivityClient() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-1.5">
+        <div role="navigation" aria-label="Filtres d'activitat" className="flex flex-wrap gap-1.5">
           {ACTIVITY_CATEGORY_OPTIONS.map((cat) => (
             <button
               key={cat.id}

@@ -7,11 +7,15 @@ import FAQ from '@/components/seo/FAQ';
 import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLandingPage';
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
+import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  return {
   title: `DJ Bodas Osona | Desde ${MIN_PRICE}€ | Òrbita Events`,
   description: `DJ para bodas en Osona desde ${MIN_PRICE}€. Vic, Manlleu, Torelló, Centelles. Especialistas en masías y entornos rurales.`,
   keywords: ['DJ bodas Osona', 'DJ bodas Vic', 'DJ bodas Manlleu', 'DJ bodas Torelló', 'bodas masías Osona'],
@@ -21,11 +25,12 @@ export const metadata: Metadata = {
     title: `DJ Bodas Osona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en Osona. Especialistas en masías y entornos rurales.',
     url: '/servicios/dj-bodas-osona',
-    images: [{ url: '/img/portfolio/bodas/bodas-04.avif', alt: 'DJ Bodas Osona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: 'DJ Bodas Osona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },
-};
+  };
+}
 
 const osonaTowns = ['Vic', 'Manlleu', 'Torelló', 'Centelles', 'Tona', 'Taradell', 'Sant Hipòlit de Voltregà', 'Roda de Ter', 'Seva', 'Les Masies de Voltregà', 'Sant Julià de Vilatorta', 'Gurb', 'Santa Eugènia de Berga', 'Balenyà'];
 
@@ -35,6 +40,8 @@ export default async function DJBodasOsonaPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.dj-bodas-osona' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const heroImage = await getPublicServiceHeroImage('bodas');
+  const galleryImages = await getPublicServiceGalleryImages('bodas');
 
   const faqItems = [];
   for (let i = 0; i < 5; i++) {
@@ -65,13 +72,8 @@ export default async function DJBodasOsonaPage({ params }: PageProps) {
       'Paisajes únicos: Bodas con vistas al Montseny y los Pirineos',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-05.avif',
-    ],
+    heroImage: heroImage,
+    galleryImages: galleryImages,
   };
 
   return (
@@ -96,3 +98,4 @@ export default async function DJBodasOsonaPage({ params }: PageProps) {
     </>
   );
 }
+

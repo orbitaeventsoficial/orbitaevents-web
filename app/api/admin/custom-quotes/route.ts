@@ -1,8 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import { createAdminCustomQuote, listAdminCustomQuotes } from '@/lib/services/customQuoteAdminService';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     return NextResponse.json(await listAdminCustomQuotes());
   } catch (error) {
@@ -12,6 +16,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const result = await createAdminCustomQuote(body);

@@ -14,7 +14,12 @@ export default function Tooltip({ text, children }: TooltipProps) {
   const id = useId();
 
   return (
-    <span className="admin-tooltip-wrap" aria-describedby={id}>
+    <span
+      className="admin-tooltip-wrap"
+      aria-describedby={id}
+      data-help-title="Ajuda contextual"
+      data-help-desc={text}
+    >
       {children}
       <span
         id={id}
@@ -26,4 +31,3 @@ export default function Tooltip({ text, children }: TooltipProps) {
     </span>
   );
 }
-

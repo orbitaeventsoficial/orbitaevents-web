@@ -158,6 +158,8 @@ export default function SortableList<T>({
             )}
             <div
               draggable
+              aria-roledescription="element ordenable"
+              aria-label={`Element ${idx + 1} de ${items.length} — arrossega per reordenar`}
               data-dragging={isDragging || undefined}
               onDragStart={(e) => handleDragStart(e, idx)}
               onDragEnd={handleDragEnd}

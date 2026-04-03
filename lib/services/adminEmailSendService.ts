@@ -1,4 +1,5 @@
 import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
+import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import {
@@ -10,7 +11,7 @@ import { resolveQuotePack } from '@/lib/services/quotes/quotePack';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { getAppBaseUrl } from '@/lib/site';
+import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 
 type QuoteAttachmentInput = {
   packId?: string;
@@ -34,9 +35,15 @@ type AdminEmailPayload = {
 const APP_BASE_URL = getAppBaseUrl().replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
 
-function bodyToHtml(body: string): string {
+async function getAdminEmailLogoUrl(): Promise<string> {
+  const managedLogo = await getManagedImageOverride('layout.logo.admin');
+  return absoluteUrl(managedLogo?.src || EMAIL_LOGO_URL, APP_BASE_URL);
+}
+
+async function bodyToHtml(body: string): Promise<string> {
   const escaped = escapeHtml(body.trim());
-  return `<p style="white-space:pre-line;font-family:'Segoe UI',Arial,sans-serif;">${escaped}</p>${getEmailSignatureHtml()}`;
+  const signatureHtml = await getEmailSignatureHtml();
+  return `<p style="white-space:pre-line;font-family:'Segoe UI',Arial,sans-serif;">${escaped}</p>${signatureHtml}`;
 }
 
 function normalizeLocale(locale?: string | null): string {
@@ -59,7 +66,7 @@ function getTemplateTexts(locale: string) {
   return { subtitle: 'Serveis professionals de DJ per al teu esdeveniment', footer: 'Gràcies per la teva confiança. Estem a la teva disposició.', legal: "Aquest és un missatge informatiu d'Òrbita Events." };
 }
 
-function buildBrandedEmailHtml(contentHtml: string, locale: string): string {
+function buildBrandedEmailHtml(contentHtml: string, locale: string, logoUrl: string): string {
   const t = getTemplateTexts(locale);
   return `<!doctype html>
 <html lang="${escapeHtml(locale)}">
@@ -69,7 +76,7 @@ function buildBrandedEmailHtml(contentHtml: string, locale: string): string {
         <table role="presentation" width="680" cellspacing="0" cellpadding="0" style="max-width:680px;width:100%;background:#ffffff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;">
           <tr><td style="background:linear-gradient(120deg,#111827 0%,#1f2937 50%,#0f172a 100%);padding:18px 24px;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
-              <td style="width:58px;vertical-align:middle;"><img src="${escapeHtml(EMAIL_LOGO_URL)}" alt="Òrbita Events" width="46" height="46" style="display:block;width:46px;height:46px;border-radius:10px;background:#ffffff;padding:4px;" /></td>
+              <td style="width:58px;vertical-align:middle;"><img src="${escapeHtml(logoUrl)}" alt="Òrbita Events" width="46" height="46" style="display:block;width:46px;height:46px;border-radius:10px;background:#ffffff;padding:4px;" /></td>
               <td style="vertical-align:middle;"><div style="font-size:20px;font-weight:800;letter-spacing:0.2px;color:#ffffff;">Òrbita Events</div><div style="margin-top:5px;font-size:13px;color:#cbd5e1;">${escapeHtml(t.subtitle)}</div></td>
             </tr></table>
           </td></tr>
@@ -145,10 +152,13 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
     attachments = [{ filename: `pressupost-${quoteData.quoteNumber}.html`, content: quoteHtml, contentType: 'text/html; charset=utf-8' }];
   }
 
+  const emailLogoUrl = await getAdminEmailLogoUrl();
+  const contentHtml = await bodyToHtml(translatedBody);
+
   await sendEmail({
     to,
     subject: translatedSubject,
-    html: buildBrandedEmailHtml(bodyToHtml(translatedBody), resolvedLocale),
+    html: buildBrandedEmailHtml(contentHtml, resolvedLocale, emailLogoUrl),
     replyTo,
     brandingStyle: emailCountBefore === 0 ? 'hero' : 'soft',
     attachments,
@@ -171,5 +181,9 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
+
+
+
+
 
 

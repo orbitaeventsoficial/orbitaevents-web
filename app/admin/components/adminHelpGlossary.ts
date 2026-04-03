@@ -38,25 +38,25 @@ const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
     id: 'lead',
     term: 'Entrada',
     description: 'Persona que ha preguntat, però encara no és client tancat.',
-    keywords: ['entrada', 'entrades', 'lead', 'leads'],
+    keywords: ['lead', 'leads', 'entrada comercial', 'nova entrada'],
   },
   client: {
     id: 'client',
     term: 'Client',
     description: 'Persona que ja tens desada com a client i pot tenir diversos esdeveniments.',
-    keywords: ['client', 'cliente', 'clients'],
+    keywords: ['client principal', 'fitxa client', 'client', 'clients'],
   },
   leadSource: {
     id: 'leadSource',
     term: 'Origen',
     description: "Canal d'entrada del lead: web, whatsapp, instagram, wallapop, recomanacio, etc.",
-    keywords: ['origen', 'source', 'canal'],
+    keywords: ['origen lead', 'lead source', 'canal lead', "canal d'entrada"],
   },
   leadStatus: {
     id: 'leadStatus',
     term: 'Estat entrada',
     description: 'Fase comercial actual del lead: nou, contactat, pressupost enviat, negociacio, guanyat o perdut.',
-    keywords: ['estat', 'estado', 'status', 'estat entrada', 'estat lead'],
+    keywords: ['estat entrada', 'estat lead', 'lead status', 'estat comercial'],
   },
   leadPriority: {
     id: 'leadPriority',
@@ -134,13 +134,13 @@ const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
     id: 'task',
     term: 'Tasca',
     description: 'Cosa pendent de fer: trucar, enviar pressupost, etc.',
-    keywords: ['tasca', 'task', 'tarea'],
+    keywords: ['tasca pendent', 'task', 'tarea', 'crear tasca'],
   },
   document: {
     id: 'document',
     term: 'Document',
     description: 'Arxiu desat del lead o client: pressupost, contracte, factura...',
-    keywords: ['document', 'documento', 'archivo'],
+    keywords: ['document adjunt', 'document', 'documento', 'arxiu document'],
   },
   quote: {
     id: 'quote',
@@ -152,7 +152,7 @@ const HELP_ENTRY_DEFS: Record<HelpEntryId, HelpEntry> = {
     id: 'booking',
     term: 'Reserva',
     description: 'Event ja confirmat i vinculat a un client.',
-    keywords: ['reserva', 'booking'],
+    keywords: ['reserva confirmada', 'booking', 'booking confirmat', 'fitxa reserva'],
   },
   billing: {
     id: 'billing',
@@ -242,5 +242,8 @@ export function matchHelpEntry(text: string): HelpEntry | null {
 
   return best?.entry || null;
 }
+
+
+
 
 

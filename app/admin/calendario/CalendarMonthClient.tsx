@@ -228,7 +228,7 @@ export default function CalendarMonthClient() {
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" data-help-title="Navegació de mes" data-help-desc="Canvia de mes, torna a avui o alterna entre vista mensual, setmanal i diària.">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -299,7 +299,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Stats ràpids del mes visible */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" data-help-title="Resum del calendari" data-help-desc="Resumeix reserves, bloquejos, dies lliures i dies mixtes del període visible per entendre ràpidament la càrrega del mes.">
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -350,7 +350,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" data-help-title="Llegenda del calendari" data-help-desc="Explica el significat visual de cada color abans d'entrar al detall del mes.">
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
@@ -380,7 +380,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Graella del calendari */}
-      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border p-0">
+      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border p-0" data-help-title="Graella del calendari" data-help-desc="Cada cel·la mostra reserves i bloquejos del dia. Arrossega una reserva a un altre dia per canviar-ne la data. Clica un dia per veure detalls.">
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -493,7 +493,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5">
+        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5" data-help-title="Detall del dia" data-help-desc="Mostra reserves i bloquejos del dia seleccionat. Pots bloquejar/desbloquejar dies, crear reserves o canviar dates.">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-semibold">

@@ -6,6 +6,8 @@ type ProposalListInput = {
   leadId?: string;
   bookingId?: string;
   status?: string | null;
+  page?: number;
+  limit?: number;
 };
 
 type ProposalCreateInput = {
@@ -43,6 +45,10 @@ type ProposalUpdateInput = {
   acceptedAt?: string | null;
 };
 
+const DEFAULT_PROPOSALS_PAGE = 1;
+const DEFAULT_PROPOSALS_LIMIT = 50;
+const MAX_PROPOSALS_LIMIT = 200;
+
 function normalizeProposalSnapshot(
   snapshot: Record<string, unknown> | undefined,
 ): Prisma.InputJsonValue | undefined {
@@ -63,23 +69,40 @@ async function generateProposalReference(): Promise<string> {
 }
 
 export async function listAdminProposals(input: ProposalListInput) {
-  const proposals = await prisma.proposal.findMany({
-    where: {
-      ...(input.customerId ? { customerId: input.customerId } : {}),
-      ...(input.leadId ? { leadId: input.leadId } : {}),
-      ...(input.bookingId ? { bookingId: input.bookingId } : {}),
-      ...(input.status && Object.values(ProposalStatus).includes(input.status as ProposalStatus)
-        ? { status: input.status as ProposalStatus }
-        : {}),
-    },
-    include: {
-      customer: { select: { id: true, name: true, email: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 200,
-  });
+  const page = Math.max(1, Number(input.page) || DEFAULT_PROPOSALS_PAGE);
+  const limit = Math.min(MAX_PROPOSALS_LIMIT, Math.max(1, Number(input.limit) || DEFAULT_PROPOSALS_LIMIT));
+  const where = {
+    ...(input.customerId ? { customerId: input.customerId } : {}),
+    ...(input.leadId ? { leadId: input.leadId } : {}),
+    ...(input.bookingId ? { bookingId: input.bookingId } : {}),
+    ...(input.status && Object.values(ProposalStatus).includes(input.status as ProposalStatus)
+      ? { status: input.status as ProposalStatus }
+      : {}),
+  };
 
-  return { ok: true, proposals };
+  const [proposals, total] = await Promise.all([
+    prisma.proposal.findMany({
+      where,
+      include: {
+        customer: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.proposal.count({ where }),
+  ]);
+
+  return {
+    ok: true,
+    proposals,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.max(1, Math.ceil(total / limit)),
+    },
+  };
 }
 
 export async function createAdminProposal(data: ProposalCreateInput) {
@@ -160,6 +183,3 @@ export async function updateAdminProposal(id: string, data: ProposalUpdateInput)
 
   return { status: 200, body: { ok: true, proposal } };
 }
-
-
-
