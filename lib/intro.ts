@@ -61,6 +61,7 @@ interface ClientIntroModeOptions {
   reduceMotion: boolean;
   userAgent: string;
   hasSeenDesktopIntro: string | null;
+  hasSeenMobileIntro: boolean;
 }
 
 export function getClientIntroMode({
@@ -70,13 +71,14 @@ export function getClientIntroMode({
   reduceMotion,
   userAgent,
   hasSeenDesktopIntro,
+  hasSeenMobileIntro,
 }: ClientIntroModeOptions): IntroMode {
   if (!isIntroPage(pathname)) {
     return 'none';
   }
 
   if (isMobileViewport) {
-    return 'mobile';
+    return hasSeenMobileIntro ? 'none' : 'mobile';
   }
 
   const forceIntro = new URLSearchParams(search).get('intro') === '1';
@@ -104,12 +106,13 @@ export function buildIntroBootstrapScript(): string {
         const isMobileViewport = window.innerWidth < 1024;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const hasSeenDesktopIntro = forceIntro ? null : sessionStorage.getItem('orbita-intro-seen');
+        const hasSeenMobileIntro = forceIntro ? false : localStorage.getItem('orbita-mobile-intro-seen') === 'true';
         const userAgent = navigator.userAgent.toLowerCase();
         const isBot = forceIntro ? false : botPatterns.some((pattern) => userAgent.includes(pattern));
         const mode = !isHomePage
           ? 'none'
           : isMobileViewport
-            ? 'mobile'
+            ? (hasSeenMobileIntro ? 'none' : 'mobile')
             : !reduceMotion && !isBot && (forceIntro || !hasSeenDesktopIntro)
               ? 'desktop'
               : 'none';
@@ -147,3 +150,5 @@ export function buildIntroBootstrapScript(): string {
     })();
   `;
 }
+
+

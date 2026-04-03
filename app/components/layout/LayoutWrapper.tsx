@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { trackPageView } from '@/app/lib/analytics';
 import { APP_IMMERSIVE_PAGES } from '@/lib/constants';
-import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, MOBILE_INTRO_COMPLETE_EVENT, MOBILE_INTRO_STORAGE_KEY } from '@/lib/intro';
+import { getClientIntroMode, hasSeenMobileIntro, isIntroPage, markMobileIntroSeen, MOBILE_INTRO_COMPLETE_EVENT, MOBILE_INTRO_STORAGE_KEY, type IntroMode } from '@/lib/intro';
 
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
 const Header = dynamic(
@@ -49,6 +49,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [showIntro, setShowIntro] = useState(false);
   const [hideHeaderOnMobileIntro, setHideHeaderOnMobileIntro] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [activeIntroMode, setActiveIntroMode] = useState<IntroMode>('none');
 
   // Funció per treure l'overlay negre
   const removeOverlay = useCallback(() => {
@@ -84,6 +85,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       userAgent: window.navigator.userAgent,
       hasSeenDesktopIntro: sessionStorage.getItem('orbita-intro-seen'),
+      hasSeenMobileIntro: hasSeenMobileIntro(localStorage),
     });
 
     document.documentElement.dataset.orbitaIntroMode = introMode;
@@ -91,6 +93,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     if (introMode === 'none') {
       setShowIntro(false);
       setHideHeaderOnMobileIntro(false);
+      setActiveIntroMode('none');
       removeOverlay();
       return;
     }
@@ -110,13 +113,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       document.documentElement.dataset.orbitaIntroMode = 'none';
     }, 6000);
 
-    if (introMode === 'mobile') {
-      setShowIntro(false);
-      removeOverlay();
-      window.clearTimeout(failsafeId);
-      return;
-    }
-
+    setActiveIntroMode(introMode);
+    setHideHeaderOnMobileIntro(introMode === 'mobile');
     setShowIntro(true);
     document.body.classList.add('hero-loading');
 
@@ -176,7 +174,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       return;
     }
 
-    if (hasSeenMobileIntro(sessionStorage)) {
+    if (hasSeenMobileIntro(localStorage) && activeIntroMode !== 'mobile') {
       setHideHeaderOnMobileIntro(false);
       return;
     }
@@ -207,11 +205,16 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   // Handler per quan acaba la intro
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
-    sessionStorage.setItem('orbita-intro-seen', 'true');
+    setHideHeaderOnMobileIntro(false);
+    if (activeIntroMode === 'mobile') {
+      markMobileIntroSeen(localStorage, window);
+    } else if (activeIntroMode === 'desktop') {
+      sessionStorage.setItem('orbita-intro-seen', 'true');
+    }
+    setActiveIntroMode('none');
     document.documentElement.dataset.orbitaIntroMode = 'none';
-    // Treure overlay amb fade
     removeOverlay();
-  }, [removeOverlay]);
+  }, [activeIntroMode, removeOverlay]);
 
   // Comprovar si és pàgina immersiva
   const isImmersive = APP_IMMERSIVE_PAGES.some(page => pathname?.includes(page));
@@ -236,14 +239,14 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Intro animada (només home, primer cop) - 4s total */}
+      {/* Intro animada (home) */}
       {showIntro && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={4000}
-          fadeMs={2200}
-          speedMultiplier={1.2}
-          holdMs={1000}
+          totalMs={activeIntroMode === 'mobile' ? 2200 : 4000}
+          fadeMs={activeIntroMode === 'mobile' ? 550 : 2200}
+          speedMultiplier={activeIntroMode === 'mobile' ? 1.05 : 1.2}
+          holdMs={activeIntroMode === 'mobile' ? 250 : 1000}
         />
       )}
 
@@ -274,6 +277,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     </>
   );
 }
+
+
 
 
 

@@ -6,7 +6,6 @@
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * Página principal móvil que integra todos los componentes:
- * - HeroPortalLogo intro (planeta animado)
  * - App Shell con PWA features
  * - Hero inmersivo
  * - Servicios en carrusel 3D
@@ -21,11 +20,9 @@
  * - Enlaces de redes sociales reales
  * - Textos usando sistema de traducciones
  * - Rutas con locale
- * - HeroPortalLogo intro en móvil
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import MobileAppShell from './MobileAppShell';
 import MobileErrorBoundary from './MobileErrorBoundary';
@@ -36,18 +33,16 @@ import MobileStatsSection from './MobileStatsSection';
 import MobileProcessSection from './MobileProcessSection';
 import MobilePortfolioShowcase from './MobilePortfolioShowcase';
 import FAQSection from '@/app/components/home/FAQSection';
+import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { hasSeenMobileIntro, markMobileIntroSeen } from '@/lib/intro';
 import { PUBLIC_MOBILE_HOME_GUARANTEES } from '@/lib/constants';
+import { hasSeenMobileIntro, markMobileIntroSeen, MOBILE_INTRO_COMPLETE_EVENT } from '@/lib/intro';
+import type { PublicPortfolioShowcaseStory } from '@/lib/services/publicPortfolioShowcaseService';
+import type { PublicMobileServiceCardId } from '@/lib/services/publicServiceMediaService';
 
-// Lazy load HeroPortalLogo
-const HeroPortalLogo = dynamic(
-  () => import('@/app/components/ui/HeroPortalLogo'),
-  { ssr: false }
-);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION DIVIDER — línia gradient subtil entre seccions
@@ -189,14 +184,14 @@ function MobileReviewsSection() {
     const interval = setInterval(() => {
       setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % reviews.length);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(interval);
   }, [reviews.length, userInteracted]);
 
   // Reprèn auto-rotate 8s després de l'última interacció
   useEffect(() => {
     if (!userInteracted) return;
-    const timer = setTimeout(() => setUserInteracted(false), 8000);
+    const timer = setTimeout(() => setUserInteracted(false), 12000);
     return () => clearTimeout(timer);
   }, [userInteracted, currentIndex]);
 
@@ -210,13 +205,13 @@ function MobileReviewsSection() {
   const handleDragEnd = useCallback((_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
-    if (swipe < -40 || velocity < -300) {
+    if (swipe < -56 || velocity < -360) {
       // Swipe left → next
       setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % reviews.length);
       setUserInteracted(true);
       haptic('light');
-    } else if (swipe > 40 || velocity > 300) {
+    } else if (swipe > 56 || velocity > 360) {
       // Swipe right → prev
       setDirection(-1);
       setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
@@ -270,10 +265,10 @@ function MobileReviewsSection() {
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.25}
               onDragEnd={handleDragEnd}
-              initial={reduceMotion ? false : { opacity: 0, x: direction * 80 }}
+              initial={reduceMotion ? false : { opacity: 0, x: direction * 52 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * 80 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * 52 }}
+              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
               className="relative bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-5 cursor-grab active:cursor-grabbing"
               style={{ touchAction: 'pan-y' }}
             >
@@ -387,6 +382,30 @@ function MobileFooter() {
   const t = useTranslations('mobileHome.footer');
   const { locale } = useMobile();
   const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const [managedMobileLogoSrc, setManagedMobileLogoSrc] = useState('/img/orbita-glyph.svg');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadManagedMobileLogo() {
+      try {
+        const res = await fetch('/api/public/image-manager?key=layout.logo.admin', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json().catch(() => ({}));
+        const managedLogo = data?.data?.['layout.logo.admin']?.item?.src;
+        if (!cancelled && typeof managedLogo === 'string' && managedLogo.trim()) {
+          setManagedMobileLogoSrc(managedLogo);
+        }
+      } catch (error) {
+        console.warn("[MobileHome] No s'ha pogut carregar el logo gestionat", error);
+      }
+    }
+
+    loadManagedMobileLogo();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const socialLinks = [
     SITE_CONFIG.social.instagram.enabled && SITE_CONFIG.social.instagram.url
@@ -404,7 +423,7 @@ function MobileFooter() {
         <div className="flex items-center justify-center gap-2 mb-4">
           <div className="w-10 h-10 rounded-full overflow-hidden">
             <Image
-              src="/img/orbita-glyph.svg"
+              src={managedMobileLogoSrc}
               alt="Òrbita Events"
               width={40}
               height={40}
@@ -471,35 +490,25 @@ function MobileFooter() {
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default function MobileHomePage() {
+export default function MobileHomePage({
+  portfolioStories = [],
+  serviceCardImages,
+}: {
+  portfolioStories?: PublicPortfolioShowcaseStory[];
+  serviceCardImages?: Record<PublicMobileServiceCardId, string>;
+}) {
   const [showIntro, setShowIntro] = useState(false);
-  const [introFinished, setIntroFinished] = useState(true);
 
   useEffect(() => {
-    if (!hasSeenMobileIntro(sessionStorage)) {
-      setShowIntro(true);
-    } else {
-      setIntroFinished(true);
-    }
+    const handler = () => setShowIntro(false);
+    window.addEventListener(MOBILE_INTRO_COMPLETE_EVENT, handler);
+    return () => window.removeEventListener(MOBILE_INTRO_COMPLETE_EVENT, handler);
   }, []);
 
-  useEffect(() => {
-    if (!showIntro) return;
-
-    const fallbackTimer = window.setTimeout(() => {
-      setShowIntro(false);
-      setIntroFinished(true);
-      markMobileIntroSeen(sessionStorage, window);
-    }, 2200);
-
-    return () => window.clearTimeout(fallbackTimer);
-  }, [showIntro]);
-
-  const handleIntroFinish = () => {
+  const handleIntroFinish = useCallback(() => {
+    markMobileIntroSeen(localStorage, window);
     setShowIntro(false);
-    setIntroFinished(true);
-    markMobileIntroSeen(sessionStorage, window);
-  };
+  }, []);
 
   return (
     <MobileErrorBoundary>
@@ -512,56 +521,65 @@ export default function MobileHomePage() {
         />
       )}
 
-      {/* Contingut mòbil sempre renderitzat darrere de la intro per evitar el primer fold negre */}
-      {introFinished && (
-        <MobileAppShell showSplash={false}>
-          {/* Hero */}
-          <MobileHeroUltimate />
+      <MobileAppShell showSplash={false}>
+        {/* Hero */}
+        <MobileHeroUltimate />
 
-          {/* Stats animats — per què triar Òrbita */}
-          <MobileStatsSection />
+        {/* Stats animats — per què triar Òrbita */}
+        <MobileStatsSection />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* Services */}
-          <MobileServicesCards />
+        {/* Services */}
+        <MobileServicesCards serviceCardImages={serviceCardImages} />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* Portfolio — fotos reals dels events */}
-          <MobilePortfolioShowcase />
+        {/* Portfolio — fotos reals dels events */}
+        <MobilePortfolioShowcase stories={portfolioStories} />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* Com funciona — 3 passos */}
-          <MobileProcessSection />
+        {/* Com funciona — 3 passos */}
+        <MobileProcessSection />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* Guarantees */}
-          <GuaranteeSection />
+        {/* Guarantees */}
+        <GuaranteeSection />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* Reviews */}
-          <MobileReviewsSection />
+        {/* Reviews */}
+        <MobileReviewsSection />
 
-          <SectionDivider />
+        <SectionDivider />
 
-          {/* FAQ - Preguntes freqüents amb JSON-LD schema */}
-          <FAQSection />
+        {/* FAQ - Preguntes freqüents amb JSON-LD schema */}
+        <FAQSection />
 
-          {/* Final CTA */}
-          <MobileCTAUrgency />
+        {/* Final CTA */}
+        <MobileCTAUrgency />
 
-          {/* Footer */}
-          <MobileFooter />
+        {/* Footer */}
+        <MobileFooter />
 
-        </MobileAppShell>
-      )}
+      </MobileAppShell>
     </MobileErrorBoundary>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

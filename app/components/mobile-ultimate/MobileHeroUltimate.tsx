@@ -10,8 +10,8 @@ import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
 
-const IMAGE_DURATION = 6500;
-const VIDEO_MIN_DURATION = 10000;
+const IMAGE_DURATION = 8500;
+const VIDEO_MIN_DURATION = 12000;
 
 function shuffle<T>(arr: T[]): T[] {
   const next = [...arr];
@@ -34,7 +34,7 @@ function MorphingText() {
 
   useEffect(() => {
     if (texts.length < 2 || reduceMotion) return;
-    const timer = window.setInterval(() => setIndex((prev) => (prev + 1) % texts.length), 3800);
+    const timer = window.setInterval(() => setIndex((prev) => (prev + 1) % texts.length), 4600);
     return () => window.clearInterval(timer);
   }, [texts, reduceMotion]);
 
@@ -46,7 +46,7 @@ function MorphingText() {
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-x-0 bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent"
         >
           {texts[index]}
@@ -88,17 +88,17 @@ export default function MobileHeroUltimate() {
   }, [currentItem?.type, mediaItems.length, slideIndex]);
 
   const handleVideoReady = useCallback(() => {
-    window.setTimeout(() => setVideoReady(true), 160);
+    window.setTimeout(() => setVideoReady(true), 120);
   }, []);
 
   return (
     <section
       aria-label="Hero"
-      className="relative min-h-[82svh] w-full overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #0b0b0b 0%, #1a120a 42%, #090909 100%)' }}
+      className="relative min-h-[100svh] w-full overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #050505 0%, #100d0a 42%, #090909 100%)' }}
     >
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/46 via-transparent to-black/72" />
         <AnimatePresence>
           {currentItem.type === 'video' ? (
             <motion.div
@@ -117,7 +117,7 @@ export default function MobileHeroUltimate() {
                 playsInline
                 preload="metadata"
                 className="h-full w-full object-cover"
-                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.6s ease', filter: 'brightness(0.72) saturate(1.08)' }}
+                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.45s ease', filter: 'brightness(0.6) saturate(0.94)' }}
                 onCanPlay={handleVideoReady}
               >
                 <source src={currentItem.url} type="video/mp4" />
@@ -126,10 +126,10 @@ export default function MobileHeroUltimate() {
           ) : (
             <motion.div
               key={`${currentItem.id}-${slideIndex}`}
-              initial={{ opacity: 0, scale: 1.03 }}
+              initial={{ opacity: 0, scale: 1.015 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1, ease: 'easeOut' }}
+              transition={{ duration: 0.9, ease: 'easeOut' }}
               className="absolute inset-0"
             >
               <Image
@@ -138,19 +138,19 @@ export default function MobileHeroUltimate() {
                 fill
                 priority={slideIndex === 0}
                 sizes="100vw"
-                quality={75}
+                quality={72}
                 className="object-cover"
-                style={{ filter: 'brightness(0.72) saturate(1.05)' }}
+                style={{ filter: 'brightness(0.6) saturate(0.94)' }}
               />
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.12),transparent_45%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.1),transparent_42%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
       </div>
 
-      <div className="relative z-10 flex min-h-[88svh] items-end px-5 pb-16 pt-32">
-        <div className="mx-auto w-full max-w-md rounded-[32px] border border-white/10 bg-black/30 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-sm">
+      <div className="relative z-10 flex min-h-[100svh] items-end px-5 pb-12 pt-20">
+        <div className="mx-auto w-full max-w-md rounded-[28px] border border-white/10 bg-black/24 p-4 shadow-[0_20px_70px_rgba(0,0,0,0.34)] backdrop-blur-md">
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -168,7 +168,7 @@ export default function MobileHeroUltimate() {
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.38, delay: 0.05 }}
-            className="text-[clamp(2.1rem,10vw,3rem)] font-black leading-[0.96] text-white"
+            className="text-[clamp(1.9rem,9vw,2.8rem)] font-black leading-[0.94] text-white"
           >
             {t('title')}
             <MorphingText />
@@ -178,7 +178,7 @@ export default function MobileHeroUltimate() {
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.3, delay: 0.12 }}
-            className="mt-3 max-w-sm text-[15px] leading-6 text-white/74"
+            className="mt-3 max-w-sm text-[15px] leading-6 text-white/72"
           >
             {t('subtitle')}
           </motion.p>
@@ -197,7 +197,7 @@ export default function MobileHeroUltimate() {
                 trackWhatsAppClick('mobile_hero');
                 trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero');
               }}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 px-5 py-4 text-sm font-black text-black shadow-[0_14px_40px_rgba(251,191,36,0.3)]"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_32px_rgba(251,191,36,0.24)]"
             >
               <span>{tCommon('buttons.whatsapp')}</span>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -208,14 +208,14 @@ export default function MobileHeroUltimate() {
               <Link
                 href={`/${locale}/packs`}
                 onClick={() => trackCTAClick('mobile_hero_packs_secondary', 'mobile_hero')}
-                className="flex items-center justify-center rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white/86"
+                className="flex items-center justify-center rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-white/86"
               >
                 {t('ctaPacks')}
               </Link>
               <Link
                 href={`/${locale}/configurador`}
                 onClick={() => trackCTAClick('mobile_hero_configurator_secondary', 'mobile_hero')}
-                className="flex items-center justify-center rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-white/70"
+                className="flex items-center justify-center rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm font-semibold text-white/70"
               >
                 {tCommon('buttons.requestQuoteFree')}
               </Link>
@@ -226,7 +226,7 @@ export default function MobileHeroUltimate() {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 0.28, delay: 0.28 }}
-            className="mt-4 flex flex-wrap gap-2 text-[12px] text-white/64"
+            className="mt-4 flex flex-wrap gap-2 text-[12px] text-white/62"
           >
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{t('location')}</span>
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{t('socialProof')}</span>
