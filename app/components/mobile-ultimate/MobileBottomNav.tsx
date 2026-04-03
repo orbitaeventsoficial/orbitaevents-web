@@ -42,7 +42,7 @@ function NavLink({ href, active, label, icon: Icon }: { href: string; active: bo
   const reduceMotion = useReducedMotion();
 
   return (
-    <Link href={href} className="relative flex min-w-[54px] flex-col items-center gap-0.5 px-1 py-1 text-center">
+    <Link href={href} className="relative flex min-w-[54px] flex-col items-center gap-0.5 px-1 py-1.5 text-center">
       <div className="relative flex h-6 items-center justify-center">
         <Icon active={active} />
         {active && (
@@ -53,7 +53,7 @@ function NavLink({ href, active, label, icon: Icon }: { href: string; active: bo
           />
         )}
       </div>
-      <span className={`text-[9px] font-medium leading-none ${active ? 'text-amber-300' : 'text-white/55'}`}>{label}</span>
+      <span className={`text-[9px] font-medium leading-none tracking-[0.01em] ${active ? 'text-amber-200' : 'text-white/50'}`}>{label}</span>
       {active && <span className="absolute -top-0.5 h-1 w-1 rounded-full bg-amber-400" />}
     </Link>
   );
@@ -87,15 +87,15 @@ export default function MobileBottomNav() {
       initial={reduceMotion ? false : { y: 64, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-      className="safe-bottom fixed bottom-0 left-0 right-0 z-50 px-3 pb-1"
+      className="safe-bottom fixed bottom-0 left-0 right-0 z-50 px-3.5 pb-2"
     >
-      <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_auto_1fr_1fr] items-end rounded-[22px] border border-white/10 bg-zinc-950/84 px-2 py-1 shadow-[0_14px_40px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+      <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_auto_1fr_1fr] items-end rounded-[24px] border border-white/8 bg-zinc-950/78 px-2.5 py-1.5 shadow-[0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl">
         <NavLink href={items[0].href} active={activeId === items[0].id} label={t(items[0].labelKey)} icon={items[0].icon} />
         <NavLink href={items[1].href} active={activeId === items[1].id} label={t(items[1].labelKey)} icon={items[1].icon} />
         <Link
           href={`/${locale}/configurador`}
           aria-label={t('fab.configurator')}
-          className="mb-0.5 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-500 text-black shadow-[0_8px_24px_rgba(251,191,36,0.3)]"
+          className="mb-1 flex h-10.5 w-10.5 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-400 text-black shadow-[0_8px_20px_rgba(251,191,36,0.24)]"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -107,4 +107,3 @@ export default function MobileBottomNav() {
     </motion.nav>
   );
 }
-
