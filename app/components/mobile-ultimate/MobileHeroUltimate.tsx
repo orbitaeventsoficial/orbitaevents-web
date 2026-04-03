@@ -98,7 +98,7 @@ export default function MobileHeroUltimate() {
       style={{ background: 'linear-gradient(180deg, #010101 0%, #070606 34%, #040404 100%)' }}
     >
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/68 via-black/22 to-black/86" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/46 via-black/14 to-black/74" />
         <AnimatePresence>
           {currentItem.type === 'video' ? (
             <motion.div
@@ -117,7 +117,7 @@ export default function MobileHeroUltimate() {
                 playsInline
                 preload="metadata"
                 className="h-full w-full object-cover"
-                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.45s ease', filter: 'brightness(0.54) saturate(0.88)' }}
+                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.45s ease', filter: 'brightness(0.66) saturate(0.94)', objectPosition: 'center 24%' }}
                 onCanPlay={handleVideoReady}
               >
                 <source src={currentItem.url} type="video/mp4" />
@@ -140,13 +140,13 @@ export default function MobileHeroUltimate() {
                 sizes="100vw"
                 quality={72}
                 className="object-cover"
-                style={{ filter: 'brightness(0.54) saturate(0.88)' }}
+                style={{ filter: 'brightness(0.66) saturate(0.94)', objectPosition: 'center 24%' }}
               />
             </motion.div>
           )}
         </AnimatePresence>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_22%_14%,rgba(251,191,36,0.10),transparent_30%),radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),transparent_44%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[64%] bg-gradient-to-t from-black via-black/84 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[54%] bg-gradient-to-t from-black/92 via-black/66 to-transparent" />
 
         {/* Slide indicators */}
         {mediaItems.length > 1 && (
@@ -165,8 +165,8 @@ export default function MobileHeroUltimate() {
         )}
       </div>
 
-      <div className="relative z-10 flex min-h-[100svh] items-end px-5 pb-16 pt-24">
-        <div className="relative mx-auto w-full max-w-md rounded-[32px] border border-white/[0.10] bg-[linear-gradient(180deg,rgba(18,18,18,0.32),rgba(8,8,8,0.20))] px-4 py-5 shadow-[0_24px_72px_rgba(0,0,0,0.40)] backdrop-blur-[20px]">
+      <div className="relative z-10 flex min-h-[100svh] items-end px-5 pb-10 pt-28">
+        <div className="relative mx-auto w-full max-w-md rounded-[32px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(20,20,20,0.18),rgba(8,8,8,0.10))] px-4 py-5 shadow-[0_20px_56px_rgba(0,0,0,0.32)] backdrop-blur-[12px]">
           {/* Glass top shine */}
           <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full" />
           <motion.div
@@ -255,3 +255,4 @@ export default function MobileHeroUltimate() {
     </section>
   );
 }
+

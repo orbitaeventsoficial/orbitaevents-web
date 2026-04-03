@@ -424,20 +424,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const isInteractiveControl = useCallback((target: EventTarget | null): boolean => {
-    if (!(target instanceof HTMLElement)) return false;
-    return Boolean(
-      target.closest('button, input, select, textarea, label, a, [role="button"], [contenteditable="true"]')
-    );
-  }, []);
 
   const blockInteractionInHelpMode = useCallback((event: React.SyntheticEvent) => {
     if (!helpModeEnabled) return;
     if (isHelpTarget(event.target)) return;
-    if (isInteractiveControl(event.target)) return;
     event.preventDefault();
     event.stopPropagation();
-  }, [helpModeEnabled, isHelpTarget, isInteractiveControl]);
+  }, [helpModeEnabled, isHelpTarget]);
 
   return (
     <>
@@ -786,6 +779,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </>
   );
 }
+
 
 
 

@@ -20,14 +20,12 @@ export function AdminHelpModeProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const saved = window.localStorage.getItem(STORAGE_KEY);
-    const seen = window.localStorage.getItem(SEEN_KEY);
 
     if (saved === '1' || saved === '0') {
       setEnabled(saved === '1');
-    } else if (!seen) {
-      setEnabled(true);
-      window.localStorage.setItem(SEEN_KEY, '1');
-      window.localStorage.setItem(STORAGE_KEY, '1');
+    } else {
+      setEnabled(false);
+      window.localStorage.setItem(STORAGE_KEY, '0');
     }
 
     setHydrated(true);
@@ -62,3 +60,4 @@ export function useAdminHelpMode() {
   }
   return ctx;
 }
+
