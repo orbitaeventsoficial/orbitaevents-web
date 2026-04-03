@@ -11,19 +11,23 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos } from '@/lib/constants';
+import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos, type PublicPortfolioShowcaseStory } from '@/lib/constants';
 
-const CATEGORIES = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.filter((item) => item.showInMobile);
-type CategoryId = (typeof CATEGORIES)[number]['id'];
+const DEFAULT_CATEGORIES: PublicPortfolioShowcaseStory[] = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.map((item) => ({
+  ...item,
+  photos: getPublicPortfolioShowcasePhotos(item.slug as never, Math.max(item.mobilePhotoCount, item.desktopPhotoCount)),
+})).filter((item) => item.showInMobile);
+type CategoryId = (typeof DEFAULT_CATEGORIES)[number]['id'];
 
-export default function MobilePortfolioShowcase() {
+export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }: { stories?: PublicPortfolioShowcaseStory[] }) {
   const t = useTranslations('homePage.portfolio');
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState<CategoryId>('discomovil');
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[0];
-  const activePhotos = getPublicPortfolioShowcasePhotos(active.slug, active.mobilePhotoCount);
+  const mobileStories = stories.filter((item) => item.showInMobile);
+  const active = mobileStories.find((c) => c.id === activeId) ?? mobileStories[0];
+  const activePhotos = active ? active.photos.slice(0, active.mobilePhotoCount) : []; 
 
   const handleTabClick = (id: CategoryId, index: number) => {
     setActiveId(id);
@@ -62,7 +66,7 @@ export default function MobilePortfolioShowcase() {
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-        {CATEGORIES.map((cat, i) => (
+        {mobileStories.map((cat, i) => (
           <button
             key={cat.id}
             onClick={() => handleTabClick(cat.id, i)}
@@ -173,3 +177,4 @@ export default function MobilePortfolioShowcase() {
     </section>
   );
 }
+

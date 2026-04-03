@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/lib/navigation';
+import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-media';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -126,17 +127,34 @@ function ServiceCard({
 
 // ── Main Carousel ────────────────────────────────────────────────────────────
 
-export default function MobileServicesCards() {
+const FALLBACK_SERVICE_IMAGES: Record<PublicMobileServiceCardId, string> = {
+  bodas: '/img/portfolio/bodas/bodas-01.avif',
+  halloween: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
+  monmagic: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
+  fiestas: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+  empresas: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
+};
+
+export default function MobileServicesCards({
+  serviceCardImages,
+}: {
+  serviceCardImages?: Record<PublicMobileServiceCardId, string>;
+}) {
   const { locale, haptic } = useMobile();
   const t = useTranslations('mobileServices');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const resolvedImages = useMemo(
+    () => ({ ...FALLBACK_SERVICE_IMAGES, ...serviceCardImages }),
+    [serviceCardImages]
+  );
+
   const SERVICES: Service[] = useMemo(() => [
     {
       id: 'bodas',
       emoji: '💒',
-      image: '/img/portfolio/bodas/bodas-01.avif',
+      image: resolvedImages.bodas,
       gradient: 'from-pink-500/14 via-rose-500/6 to-transparent',
       badgeKey: '',
       badgeColor: '',
@@ -146,7 +164,7 @@ export default function MobileServicesCards() {
     {
       id: 'halloween',
       emoji: '🎃',
-      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
+      image: resolvedImages.halloween,
       gradient: 'from-orange-500/14 via-red-500/6 to-transparent',
       badgeKey: 'halloween.badge',
       badgeColor: 'from-orange-500 to-red-500',
@@ -156,7 +174,7 @@ export default function MobileServicesCards() {
     {
       id: 'monmagic',
       emoji: '🪄',
-      image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
+      image: resolvedImages.monmagic,
       gradient: 'from-amber-500/14 via-purple-500/6 to-transparent',
       badgeKey: 'monmagic.badge',
       badgeColor: 'from-amber-500 to-yellow-500',
@@ -166,7 +184,7 @@ export default function MobileServicesCards() {
     {
       id: 'fiestas',
       emoji: '🎉',
-      image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+      image: resolvedImages.fiestas,
       gradient: 'from-purple-500/14 via-violet-500/6 to-transparent',
       badgeKey: '',
       badgeColor: '',
@@ -176,16 +194,14 @@ export default function MobileServicesCards() {
     {
       id: 'empresas',
       emoji: '🏢',
-      image: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
+      image: resolvedImages.empresas,
       gradient: 'from-blue-500/14 via-cyan-500/6 to-transparent',
       badgeKey: '',
       badgeColor: '',
       href: '/servicios/empresas',
       features: ['feature1', 'feature2', 'feature3'],
     },
-  ], []);
-
-  // Track active card via scroll position
+  ], [resolvedImages]);  // Track active card via scroll position
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -290,3 +306,8 @@ export default function MobileServicesCards() {
     </section>
   );
 }
+
+
+
+
+

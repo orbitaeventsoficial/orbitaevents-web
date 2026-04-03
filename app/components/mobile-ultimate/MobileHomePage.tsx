@@ -38,10 +38,9 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { PUBLIC_MOBILE_HOME_GUARANTEES } from '@/lib/constants';
+import { PUBLIC_MOBILE_HOME_GUARANTEES, type PublicPortfolioShowcaseStory } from '@/lib/constants';
 import { hasSeenMobileIntro, markMobileIntroSeen, MOBILE_INTRO_COMPLETE_EVENT } from '@/lib/intro';
-import type { PublicPortfolioShowcaseStory } from '@/lib/services/publicPortfolioShowcaseService';
-import type { PublicMobileServiceCardId } from '@/lib/services/publicServiceMediaService';
+import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-media';
 
 
 // ═══════════════════════════════════════════════════════════════════════════

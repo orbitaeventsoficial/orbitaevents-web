@@ -5,6 +5,7 @@
 import type { ExtraDefinition, ServiceSlug } from '@/app/config/packs-config';
 import { PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { HERO_MEDIA_DEFAULT_ITEMS } from '@/lib/constants/hero-media';
 import { getAppBaseUrl } from '@/lib/site';
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1553,6 +1554,11 @@ export const PUBLIC_PORTFOLIO_SHOWCASE_ITEMS = [
   },
 ] as const;
 
+export type PublicPortfolioShowcaseBaseItem = (typeof PUBLIC_PORTFOLIO_SHOWCASE_ITEMS)[number];
+export type PublicPortfolioShowcaseStory = PublicPortfolioShowcaseBaseItem & {
+  photos: string[];
+};
+
 export function getPublicPortfolioShowcasePhotos(
   slug: keyof typeof PORTFOLIO_IMAGES,
   limit: number
@@ -1664,14 +1670,12 @@ export const PUBLIC_FOOTER_TRUST_SIGNAL_META = [
 ] as const;
 
 
-export const PUBLIC_HERO_MEDIA_FALLBACK = [
-  { id: 'video-original', url: '/videos/hero-orbita-mobile.mp4', type: 'video', label: 'Vídeo' },
-  { id: 'img-disco-01', url: '/img/portfolio/discomovil/discomovil-01.avif', type: 'image', label: 'Discomòbil' },
-  { id: 'img-bodas-04', url: '/img/portfolio/bodas/bodas-04.avif', type: 'image', label: 'Bodes' },
-  { id: 'img-halloween-01', url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', type: 'image', label: 'Halloween' },
-  { id: 'img-magic-05', url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif', type: 'image', label: 'Món Màgic' },
-  { id: 'img-empresa-01', url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif', type: 'image', label: 'Empreses' },
-] as const;
+export const PUBLIC_HERO_MEDIA_FALLBACK = HERO_MEDIA_DEFAULT_ITEMS.map(({ id, url, type, label }) => ({
+  id,
+  url,
+  type,
+  label: label === 'Vídeo original' ? 'Vídeo' : label,
+})) as ReadonlyArray<{ id: string; url: string; type: 'video' | 'image'; label: string }>;
 
 
 export const PUBLIC_LANGUAGE_CODES = ['ca', 'es', 'en'] as const;
@@ -2191,6 +2195,8 @@ export const PRIORITY_FILTER_STYLES: Record<string, string> = {
   MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
   BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
 };
+
+
 
 
 

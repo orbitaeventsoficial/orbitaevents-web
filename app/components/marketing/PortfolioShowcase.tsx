@@ -9,10 +9,14 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos } from '@/lib/constants';
+import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos, type PublicPortfolioShowcaseStory } from '@/lib/constants';
 
-type EventStory = (typeof PUBLIC_PORTFOLIO_SHOWCASE_ITEMS)[number];
-const EVENT_STORIES = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.filter((item) => item.showInDesktop);
+type EventStory = PublicPortfolioShowcaseStory;
+
+const DEFAULT_EVENT_STORIES: EventStory[] = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.map((item) => ({
+  ...item,
+  photos: getPublicPortfolioShowcasePhotos(item.slug as never, Math.max(item.mobilePhotoCount, item.desktopPhotoCount)),
+})).filter((item) => item.showInDesktop);
 
 // ─── Story Card ────────────────────────────────────────────────────────────
 
@@ -29,7 +33,7 @@ function StoryCard({
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
-  const photos = getPublicPortfolioShowcasePhotos(story.slug, story.desktopPhotoCount);
+  const photos = story.photos.slice(0, story.desktopPhotoCount);
 
   // Auto-rotate photos every 3s always
   const [isHovered, setIsHovered] = useState(false);
@@ -181,7 +185,7 @@ function ScrollButton({
 
 // ─── Main Component ────────────────────────────────────────────────────────
 
-export default function PortfolioShowcase() {
+export default function PortfolioShowcase({ stories = DEFAULT_EVENT_STORIES }: { stories?: EventStory[] }) {
   const t = useTranslations('homePage.portfolio');
   const reduceMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -346,13 +350,13 @@ export default function PortfolioShowcase() {
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {/* Dues còpies per loop infinit sense salt */}
-        {[...EVENT_STORIES, ...EVENT_STORIES].map((story, i) => (
+        {[...stories.filter((story) => story.showInDesktop), ...stories.filter((story) => story.showInDesktop)].map((story, i) => (
           <StoryCard
             key={`${story.id}-${i}`}
             story={story}
             t={t}
             reduceMotion={reduceMotion}
-            index={i % EVENT_STORIES.length}
+            index={i % stories.filter((story) => story.showInDesktop).length}
           />
         ))}
       </div>
@@ -389,3 +393,4 @@ export default function PortfolioShowcase() {
     </section>
   );
 }
+

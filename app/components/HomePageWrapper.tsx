@@ -10,6 +10,8 @@
  */
 
 import { useState, useEffect, ReactNode } from 'react';
+import type { PublicPortfolioShowcaseStory } from '@/lib/constants';
+import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-media';
 import dynamic from 'next/dynamic';
 
 const MobileHomePage = dynamic(
@@ -17,7 +19,6 @@ const MobileHomePage = dynamic(
   { ssr: false }
 );
 
-/** Skeleton lleuger visible NOMÉS a mòbil mentre JS carrega */
 function MobileLoadingSkeleton() {
   return (
     <div className="md:hidden min-h-screen bg-bg-main flex flex-col items-center justify-center px-6">
@@ -31,9 +32,15 @@ function MobileLoadingSkeleton() {
 
 interface HomePageWrapperProps {
   children: ReactNode;
+  mobilePortfolioStories?: PublicPortfolioShowcaseStory[];
+  mobileServiceCardImages?: Record<PublicMobileServiceCardId, string>;
 }
 
-export default function HomePageWrapper({ children }: HomePageWrapperProps) {
+export default function HomePageWrapper({
+  children,
+  mobilePortfolioStories = [],
+  mobileServiceCardImages,
+}: HomePageWrapperProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -48,7 +55,6 @@ export default function HomePageWrapper({ children }: HomePageWrapperProps) {
     return () => mediaQuery.removeEventListener('change', syncViewport);
   }, []);
 
-  // Mentre JS no ha detectat viewport: desktop content + skeleton mòbil via CSS
   if (isMobile === null) {
     return (
       <>
@@ -58,5 +64,12 @@ export default function HomePageWrapper({ children }: HomePageWrapperProps) {
     );
   }
 
-  return isMobile ? <MobileHomePage /> : <>{children}</>;
+  return isMobile ? (
+    <MobileHomePage
+      portfolioStories={mobilePortfolioStories}
+      serviceCardImages={mobileServiceCardImages}
+    />
+  ) : (
+    <>{children}</>
+  );
 }
