@@ -42,9 +42,14 @@ async function getAllAssetsCached(): Promise<ImageAsset[]> {
     return allAssetsCache.rows;
   }
 
-  const rows = await prisma.imageAsset.findMany({ orderBy: { sortOrder: 'asc' } });
-  allAssetsCache = { rows, ts: now };
-  return rows;
+  try {
+    const rows = await prisma.imageAsset.findMany({ orderBy: { sortOrder: 'asc' } });
+    allAssetsCache = { rows, ts: now };
+    return rows;
+  } catch (e) {
+    console.error('[imageManager] DB unavailable, returning empty assets:', (e as Error).message);
+    return allAssetsCache?.rows ?? [];
+  }
 }
 
 // ---------------------------------------------------------------------------
