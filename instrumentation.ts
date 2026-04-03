@@ -94,21 +94,16 @@ async function autoSeedBlog() {
     // Esperar 30s i comprovar si hi ha posts
     await new Promise((resolve) => setTimeout(resolve, 30_000));
 
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+    const { prisma } = await import('@/lib/prisma');
 
-    try {
-      const count = await prisma.blogPost.count();
-      if (count === 0) {
-        console.log('[auto-seed] No hi ha blog posts, executant seed...');
-        const { seedBlog } = await import('./prisma/seed-blog');
-        await seedBlog();
-        console.log('[auto-seed] ✅ Blog seed completat');
-      } else {
-        console.log(`[auto-seed] Blog ja té ${count} posts, saltant seed.`);
-      }
-    } finally {
-      await prisma.$disconnect();
+    const count = await prisma.blogPost.count();
+    if (count === 0) {
+      console.log('[auto-seed] No hi ha blog posts, executant seed...');
+      const { seedBlog } = await import('./prisma/seed-blog');
+      await seedBlog();
+      console.log('[auto-seed] ✅ Blog seed completat');
+    } else {
+      console.log(`[auto-seed] Blog ja té ${count} posts, saltant seed.`);
     }
   } catch (e) {
     console.error('[auto-seed] Error:', e);

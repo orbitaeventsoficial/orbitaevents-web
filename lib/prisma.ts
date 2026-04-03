@@ -3,6 +3,14 @@
 
 import { PrismaClient } from '@prisma/client';
 
+function buildDatabaseUrl(): string {
+  const url = process.env.DATABASE_URL ?? '';
+  if (process.env.NODE_ENV === 'production' && url && !url.includes('connection_limit')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}connection_limit=10`;
+  }
+  return url;
+}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -17,8 +25,11 @@ export const prisma =
           ? ['query', 'error', 'warn']
           : ['error', 'warn']
         : ['error'],
+    datasources: {
+      db: {
+        url: buildDatabaseUrl(),
+      },
+    },
   });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+globalForPrisma.prisma = prisma;
