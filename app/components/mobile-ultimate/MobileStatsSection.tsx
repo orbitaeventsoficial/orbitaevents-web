@@ -128,7 +128,7 @@ export default function MobileStatsSection() {
       </motion.div>
 
       {/* Grid 2×2 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3.5">
         {PUBLIC_MOBILE_STATS_CONFIGS.map((config, i) => (
           <StatCard
             key={config.key}

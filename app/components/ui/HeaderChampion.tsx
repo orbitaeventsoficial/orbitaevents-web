@@ -77,6 +77,7 @@ export default function HeaderChampion() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>(null);
   const [managedLogoSrc, setManagedLogoSrc] = useState('/img/logoplanetatextdreta.svg');
 
   // Refs per scroll sense temblor
@@ -456,40 +457,38 @@ export default function HeaderChampion() {
                   </button>
                 </div>
 
-                <div className="flex-1 space-y-1 overflow-y-auto">
-                  {/* Respira card */}
+                <div className="flex-1 overflow-y-auto space-y-1" style={{ scrollbarWidth: 'none' }}>
+                  {/* Respira — featured card */}
                   <Link
                     href="/respira"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="mb-4 flex items-center gap-3 rounded-2xl border border-pink-400/25 bg-gradient-to-r from-pink-500/15 to-fuchsia-500/10 px-4 py-3.5 text-white active:scale-[0.98] transition-transform"
+                    className="mb-5 flex items-center gap-3 rounded-2xl border border-pink-400/20 bg-gradient-to-r from-pink-500/12 to-fuchsia-500/8 px-4 py-3 text-white active:scale-[0.98] transition-transform"
                   >
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-pink-500/20 text-lg">🌼</span>
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-pink-500/20 text-base">🌼</span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-white/90">{respiraLabel}</span>
-                      <span className="block text-xs text-white/50">{respiraTitle}</span>
+                      <span className="block text-sm font-bold text-white/85">{respiraLabel}</span>
+                      <span className="block text-[11px] text-white/40">{respiraTitle}</span>
                     </span>
-                    <svg className="h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-3.5 w-3.5 text-white/25 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
 
+                  {/* Nav items */}
                   {navItemsConfig.map((item) => {
                     const dropdownT = item.dropdownType === 'services' ? tServices : tZones;
+                    const isExpanded = mobileExpandedSection === item.href;
+                    const isServiceGrid = item.dropdownType === 'services';
 
                     return (
                       <div key={item.href}>
                         {item.dropdown ? (
-                          <div
-                            className="flex items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/70 rounded-xl cursor-pointer"
-                            role="button"
-                            tabIndex={0}
-                            aria-expanded={true}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                (e.currentTarget as HTMLElement).click();
-                              }
-                            }}
+                          /* Collapsable section header */
+                          <button
+                            type="button"
+                            onClick={() => setMobileExpandedSection(isExpanded ? null : item.href)}
+                            className="flex w-full items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/75 active:text-white rounded-xl transition-colors"
+                            aria-expanded={isExpanded}
                           >
                             <span className="flex items-center gap-2">
                               {tNav(item.labelKey)}
@@ -499,15 +498,16 @@ export default function HeaderChampion() {
                                 </span>
                               )}
                             </span>
-                            <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className={`w-3.5 h-3.5 text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
-                          </div>
+                          </button>
                         ) : (
+                          /* Direct link */
                           <Link
                             href={item.href}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/70 active:text-white active:bg-white/[0.04] rounded-xl transition-colors"
+                            className="flex items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/75 active:text-white active:bg-white/[0.04] rounded-xl transition-colors"
                           >
                             <span className="flex items-center gap-2">
                               {tNav(item.labelKey)}
@@ -520,26 +520,32 @@ export default function HeaderChampion() {
                           </Link>
                         )}
 
-                        {/* Subitems mòbil — grid compact */}
-                        {item.dropdown && (
-                          <div className="ml-1 mt-1 mb-2 space-y-0.5">
+                        {/* Subitems — col·lapsables, grid per serveis */}
+                        {item.dropdown && isExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                            className={`mt-1 mb-3 mx-1 p-2 rounded-2xl bg-white/[0.03] border border-white/[0.05] ${isServiceGrid ? 'grid grid-cols-2 gap-1' : 'space-y-0.5'}`}
+                          >
                             {item.dropdown.map((sub) => (
                               <Link
                                 key={sub.href}
                                 href={sub.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-white/50 active:text-white active:bg-white/[0.04] rounded-xl transition-colors"
+                                className={`flex items-center gap-2 px-3 py-2.5 text-white/55 active:text-white active:bg-white/[0.05] rounded-xl transition-colors ${isServiceGrid ? 'flex-col gap-1 py-3 text-center' : ''}`}
                               >
-                                <span className="w-7 h-7 rounded-lg bg-white/[0.05] flex items-center justify-center text-sm">{sub.icon}</span>
-                                <span className="font-medium">{dropdownT(sub.labelKey)}</span>
+                                <span className={`flex items-center justify-center text-sm ${isServiceGrid ? 'w-9 h-9 rounded-xl bg-white/[0.06]' : 'w-7 h-7 rounded-lg bg-white/[0.05]'}`}>{sub.icon}</span>
+                                <span className={`font-medium ${isServiceGrid ? 'text-xs leading-tight' : 'text-sm'}`}>{dropdownT(sub.labelKey)}</span>
                                 {sub.badge && (
-                                  <span className="text-[8px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded-md font-bold">
+                                  <span className="text-[7px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded-md font-bold">
                                     {sub.badge}
                                   </span>
                                 )}
                               </Link>
                             ))}
-                          </div>
+                          </motion.div>
                         )}
                       </div>
                     );

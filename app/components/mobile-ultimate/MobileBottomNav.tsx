@@ -89,13 +89,13 @@ export default function MobileBottomNav() {
       transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       className="safe-bottom fixed bottom-0 left-0 right-0 z-50 px-3.5 pb-2"
     >
-      <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_auto_1fr_1fr] items-end rounded-[24px] border border-white/[0.10] bg-zinc-950/85 px-2.5 py-1.5 shadow-[0_-4px_32px_rgba(0,0,0,0.4),0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_auto_1fr_1fr] items-end rounded-[24px] border border-white/[0.10] bg-zinc-950/90 px-2.5 py-1.5 shadow-[0_-8px_40px_rgba(0,0,0,0.5),0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-2xl">
         <NavLink href={items[0].href} active={activeId === items[0].id} label={t(items[0].labelKey)} icon={items[0].icon} />
         <NavLink href={items[1].href} active={activeId === items[1].id} label={t(items[1].labelKey)} icon={items[1].icon} />
         <Link
           href={`/${locale}/configurador`}
           aria-label={t('fab.configurator')}
-          className="mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-400 text-black shadow-[0_8px_24px_rgba(251,191,36,0.30)] active:scale-90 transition-transform"
+          className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-400 text-black shadow-[0_8px_24px_rgba(251,191,36,0.35)] ring-[3px] ring-zinc-950/80 active:scale-90 transition-transform"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

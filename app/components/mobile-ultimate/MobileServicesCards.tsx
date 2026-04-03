@@ -53,7 +53,7 @@ function ServiceCard({
     <motion.div
       whileTap={{ scale: 0.97 }}
       onClick={() => router.push(service.href)}
-      className="relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/15 shadow-lg cursor-pointer"
+      className="relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.3)] cursor-pointer"
     >
       {/* Background image */}
       <div className="absolute inset-0 z-0">
@@ -215,7 +215,7 @@ export default function MobileServicesCards({
         const cardWidth = el.firstElementChild
           ? (el.firstElementChild as HTMLElement).offsetWidth
           : 1;
-        const gap = 16; // gap-4
+        const gap = 12; // gap-3
         const idx = Math.round(scrollLeft / (cardWidth + gap));
         setActiveIndex(Math.min(idx, SERVICES.length - 1));
         ticking = false;
@@ -240,30 +240,24 @@ export default function MobileServicesCards({
   return (
     <section id="services-section" className="relative overflow-hidden py-8">
       {/* Header */}
-      <div className="mb-5 px-6 text-center">
-        <motion.span
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-amber-500 text-sm font-medium tracking-wider uppercase block"
-        >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-6 px-6 text-center"
+      >
+        <span className="inline-block px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wider uppercase mb-3">
           {t('sectionLabel')}
-        </motion.span>
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="mt-2 text-[1.9rem] font-black text-white"
-        >
+        </span>
+        <h2 className="text-3xl font-black text-white">
           {t('sectionTitle')}
-        </motion.h2>
-      </div>
+        </h2>
+      </motion.div>
 
       {/* Horizontal snap carousel */}
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto snap-x snap-proximity px-6 pb-2"
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory px-6 pb-2"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',

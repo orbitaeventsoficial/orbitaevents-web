@@ -95,7 +95,7 @@ function GuaranteeSection() {
         </motion.div>
 
         {/* Guarantees - Enhanced */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {guarantees.map((guarantee, i) => (
             <motion.div
               key={guarantee.titleKey}
@@ -279,7 +279,7 @@ function MobileReviewsSection() {
               animate={{ opacity: 1, x: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * 52 }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-              className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.03] backdrop-blur-sm border border-white/[0.12] rounded-3xl p-6 cursor-grab active:cursor-grabbing shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
+              className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 cursor-grab active:cursor-grabbing shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
               style={{ touchAction: 'pan-y' }}
             >
               {/* Quote */}
@@ -545,43 +545,43 @@ export default function MobileHomePage({
       )}
 
       <MobileAppShell showSplash={false}>
-        {/* Hero */}
+        {/* 1. Hero — primera impressió, què som */}
         <MobileHeroUltimate />
 
-        {/* Stats animats — per què triar Òrbita */}
-        <MobileStatsSection />
-
-        <SectionDivider />
-
-        {/* Services */}
+        {/* 2. Serveis — què oferim (prioritat: el client vol saber QUÈ fem) */}
         <MobileServicesCards serviceCardImages={serviceCardImages} />
 
         <SectionDivider />
 
-        {/* Portfolio — fotos reals dels events */}
+        {/* 3. Stats — per què confiar en nosaltres (reforç amb dades) */}
+        <MobileStatsSection />
+
+        <SectionDivider />
+
+        {/* 4. Portfolio — prova visual: resultats reals */}
         <MobilePortfolioShowcase stories={portfolioStories} />
 
         <SectionDivider />
 
-        {/* Com funciona — 3 passos */}
+        {/* 5. Com funciona — simplifica el camí a contractar */}
         <MobileProcessSection />
 
         <SectionDivider />
 
-        {/* Guarantees */}
-        <GuaranteeSection />
-
-        <SectionDivider />
-
-        {/* Reviews */}
+        {/* 6. Reviews — veu dels clients satisfets */}
         <MobileReviewsSection />
 
         <SectionDivider />
 
-        {/* FAQ - Preguntes freqüents amb JSON-LD schema */}
+        {/* 7. Garanties — elimina dubtes finals */}
+        <GuaranteeSection />
+
+        <SectionDivider />
+
+        {/* 8. FAQ — respon les últimes preguntes */}
         <FAQSection />
 
-        {/* Final CTA */}
+        {/* 9. CTA final — tancament amb urgència */}
         <MobileCTAUrgency />
 
         {/* Footer */}

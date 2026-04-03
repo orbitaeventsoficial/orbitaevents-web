@@ -419,6 +419,13 @@ export default function MobileAppShell({
       {/* Offline Banner */}
       <OfflineBanner isOnline={isOnline} />
 
+      {/* Floating Header — apareix en fer scroll up */}
+      <FloatingHeader
+        isVisible={isHeaderVisible}
+        scrollProgress={scrollY > 80 ? 1 : scrollY / 80}
+        locale={locale}
+      />
+
       {/* Main Content */}
       <div
         className="min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white safe-top safe-bottom"

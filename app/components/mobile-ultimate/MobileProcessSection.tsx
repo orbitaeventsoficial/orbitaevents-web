@@ -46,7 +46,7 @@ export default function MobileProcessSection() {
       </motion.div>
 
       {/* Steps */}
-      <div className="relative">
+      <div className="relative p-5 rounded-3xl bg-white/[0.03] border border-white/[0.06]">
         {steps.map((step, i) => {
           const style = PUBLIC_PROCESS_STEP_STYLES[i];
           return (

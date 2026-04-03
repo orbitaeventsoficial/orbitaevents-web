@@ -62,7 +62,7 @@ export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }
       {/* Category tabs */}
       <div
         ref={tabsRef}
-        className="flex gap-2.5 px-6 overflow-x-auto pb-1 mb-6 snap-x snap-proximity"
+        className="flex gap-2.5 px-6 overflow-x-auto pb-1 mb-6 snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
