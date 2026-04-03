@@ -49,8 +49,10 @@ import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-m
 
 function SectionDivider() {
   return (
-    <div className="px-12">
-      <div className="h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+    <div className="flex items-center justify-center gap-3 py-2 px-10">
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+      <div className="w-1 h-1 rounded-full bg-amber-500/30" />
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
     </div>
   );
 }
@@ -104,24 +106,33 @@ function GuaranteeSection() {
               whileTap={{ scale: 0.98 }}
               className="relative group"
             >
-              <div className="relative flex items-start gap-4 p-5 rounded-3xl bg-gradient-to-r from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden">
+              <div className="relative flex items-start gap-4 p-5 rounded-3xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.2)] overflow-hidden">
                 {/* Tap glow */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${guarantee.gradient} opacity-0 group-active:opacity-10 transition-opacity`} />
+                {/* Subtle top shine */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-                <div className="text-4xl flex-shrink-0">{guarantee.icon}</div>
+                <div className="relative flex-shrink-0">
+                  <div className="text-3xl w-12 h-12 rounded-2xl bg-white/[0.06] flex items-center justify-center">
+                    {guarantee.icon}
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
+                    <span className="text-amber-400 text-[8px] font-black">{i + 1}</span>
+                  </div>
+                </div>
 
-                <div className="flex-1">
-                  <h3 className="text-white font-black text-lg mb-1">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-white font-black text-base mb-1 leading-snug">
                     {t(guarantee.titleKey)}
                   </h3>
-                  <p className="text-white/70 text-sm leading-relaxed">
+                  <p className="text-white/55 text-sm leading-relaxed">
                     {t(guarantee.descKey)}
                   </p>
                 </div>
 
                 {/* Checkmark icon */}
-                <div className={`relative w-8 h-8 rounded-full bg-gradient-to-br ${guarantee.gradient} flex items-center justify-center shadow-lg`}>
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className={`relative w-7 h-7 rounded-full bg-gradient-to-br ${guarantee.gradient} flex items-center justify-center shadow-lg flex-shrink-0 mt-0.5`}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -268,11 +279,13 @@ function MobileReviewsSection() {
               animate={{ opacity: 1, x: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * 52 }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-              className="relative bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-5 cursor-grab active:cursor-grabbing"
+              className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.03] backdrop-blur-sm border border-white/[0.12] rounded-3xl p-6 cursor-grab active:cursor-grabbing shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
               style={{ touchAction: 'pan-y' }}
             >
               {/* Quote */}
-              <div className="absolute top-4 right-4 text-3xl text-amber-500/15 select-none">&ldquo;</div>
+              <div className="absolute top-4 right-5 text-5xl text-amber-400/10 select-none font-serif leading-none">&ldquo;</div>
+              {/* Top shine */}
+              <div className="absolute inset-x-0 top-0 h-px rounded-t-3xl bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
               {/* Author */}
               <div className="flex items-center gap-3 mb-4" style={{ fontFamily: 'Roboto, "Google Sans", system-ui, sans-serif' }}>
@@ -416,35 +429,46 @@ function MobileFooter() {
   ].filter(Boolean) as { name: string; url: string; icon: string }[];
 
   return (
-    <footer className="py-8 px-6 pb-32 border-t border-white/10">
-      <div className="text-center">
+    <footer className="relative py-10 px-6 pb-32 overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-32 bg-amber-500/8 rounded-full blur-[80px] pointer-events-none" />
+      {/* Top divider */}
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="w-1.5 h-1.5 rounded-full bg-amber-500/30 shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      </div>
+
+      <div className="relative text-center">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-full overflow-hidden">
+        <div className="flex items-center justify-center gap-2.5 mb-3">
+          <div className="w-9 h-9 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
             <Image
               src={managedMobileLogoSrc}
               alt="Òrbita Events"
-              width={40}
-              height={40}
+              width={36}
+              height={36}
               className="w-full h-full object-contain"
             />
           </div>
-          <span className="text-white font-bold text-xl">Òrbita Events</span>
+          <span className="text-lg font-black bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            Òrbita Events
+          </span>
         </div>
 
         {/* Tagline */}
-        <p className="text-white/50 text-sm mb-6">
+        <p className="text-white/40 text-sm mb-5">
           {t('tagline')}
         </p>
 
-        {/* Location */}
-        <div className="flex items-center justify-center gap-2 text-white/60 text-sm mb-4">
+        {/* Location pill */}
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs mb-5">
           <span>📍</span>
           <span>{t('location')}</span>
         </div>
 
         {/* Social links */}
-        <div className="flex justify-center gap-3 mb-6">
+        <div className="flex justify-center gap-2.5 mb-6">
           {socialLinks.map((social) => (
             <a
               key={social.name}
@@ -452,14 +476,14 @@ function MobileFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={social.name}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors"
+              className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 active:scale-95 active:bg-white/10 transition-all"
             >
               {social.icon === 'instagram' ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
               )}
@@ -468,16 +492,16 @@ function MobileFooter() {
         </div>
 
         {/* Legal */}
-        <div className="flex justify-center gap-4 text-white/50 text-xs">
-          <a href={`/${locale}/legal/privacidad`} className="hover:text-white/60">{t('legal.privacy')}</a>
-          <span>·</span>
-          <a href={`/${locale}/legal/cookies`} className="hover:text-white/60">{t('legal.cookies')}</a>
-          <span>·</span>
-          <a href={`/${locale}/legal/aviso-legal`} className="hover:text-white/60">{t('legal.legal')}</a>
+        <div className="flex justify-center gap-3 text-white/35 text-[11px] mb-4">
+          <a href={`/${locale}/legal/privacidad`} className="active:text-white/50 transition-colors">{t('legal.privacy')}</a>
+          <span className="text-white/15">·</span>
+          <a href={`/${locale}/legal/cookies`} className="active:text-white/50 transition-colors">{t('legal.cookies')}</a>
+          <span className="text-white/15">·</span>
+          <a href={`/${locale}/legal/aviso-legal`} className="active:text-white/50 transition-colors">{t('legal.legal')}</a>
         </div>
 
-        {/* Copyright - Dynamic year */}
-        <p className="text-white/40 text-xs mt-4">
+        {/* Copyright */}
+        <p className="text-white/25 text-[10px] tracking-wider">
           © {currentYear} Òrbita Events. {t('copyright')}
         </p>
       </div>

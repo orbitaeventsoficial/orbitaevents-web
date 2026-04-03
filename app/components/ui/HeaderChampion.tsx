@@ -436,36 +436,42 @@ export default function HeaderChampion() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-zinc-950 border-l border-zinc-800"
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-zinc-950/95 backdrop-blur-xl border-l border-white/[0.08]"
             >
-              <div className="flex flex-col h-full pt-24 pb-6 px-6">
-              <div className="flex-1 space-y-1 overflow-y-auto">
+              {/* Ambient glow */}
+              <div className="absolute top-20 right-0 w-48 h-48 bg-amber-500/8 rounded-full blur-[80px] pointer-events-none" />
+
+              <div className="flex flex-col h-full pt-20 pb-6 px-5 relative">
+                {/* Close hint */}
+                <div className="absolute top-7 right-5">
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/40 active:scale-90 transition-transform"
+                    aria-label="Tancar menú"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="flex-1 space-y-1 overflow-y-auto">
+                  {/* Respira card */}
                   <Link
                     href="/respira"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="
-                      mb-3 flex items-center justify-between
-                      rounded-xl border border-pink-300/40
-                      bg-gradient-to-r from-pink-500/90 via-fuchsia-500/90 to-rose-500/90
-                      px-4 py-3 text-white
-                      shadow-lg shadow-pink-500/25
-                    "
+                    className="mb-4 flex items-center gap-3 rounded-2xl border border-pink-400/25 bg-gradient-to-r from-pink-500/15 to-fuchsia-500/10 px-4 py-3.5 text-white active:scale-[0.98] transition-transform"
                   >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/25 text-base">🌼</span>
-                      <span className="min-w-0">
-                        <span className="block font-semibold">{respiraLabel}</span>
-                        <span className="block text-xs text-white/90">{respiraTitle}</span>
-                      </span>
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-pink-500/20 text-lg">🌼</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-white/90">{respiraLabel}</span>
+                      <span className="block text-xs text-white/50">{respiraTitle}</span>
                     </span>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg className="h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
-                  <p className="mb-3 px-1 text-xs leading-relaxed text-zinc-300">
-                    {respiraDescription}
-                  </p>
 
                   {navItemsConfig.map((item) => {
                     const dropdownT = item.dropdownType === 'services' ? tServices : tZones;
@@ -474,7 +480,7 @@ export default function HeaderChampion() {
                       <div key={item.href}>
                         {item.dropdown ? (
                           <div
-                            className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg cursor-pointer"
+                            className="flex items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/70 rounded-xl cursor-pointer"
                             role="button"
                             tabIndex={0}
                             aria-expanded={true}
@@ -488,25 +494,25 @@ export default function HeaderChampion() {
                             <span className="flex items-center gap-2">
                               {tNav(item.labelKey)}
                               {item.badge && (
-                                <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                                <span className="bg-amber-500/20 text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded-md">
                                   {item.badge}
                                 </span>
                               )}
                             </span>
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <svg className="w-3.5 h-3.5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
                         ) : (
                           <Link
                             href={item.href}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg"
+                            className="flex items-center justify-between px-3 py-3 text-[15px] font-semibold text-white/70 active:text-white active:bg-white/[0.04] rounded-xl transition-colors"
                           >
                             <span className="flex items-center gap-2">
                               {tNav(item.labelKey)}
                               {item.badge && (
-                                <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                                <span className="bg-amber-500/20 text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded-md">
                                   {item.badge}
                                 </span>
                               )}
@@ -514,20 +520,20 @@ export default function HeaderChampion() {
                           </Link>
                         )}
 
-                        {/* Subitems mòbil */}
+                        {/* Subitems mòbil — grid compact */}
                         {item.dropdown && (
-                          <div className="ml-4 mt-1 space-y-1">
+                          <div className="ml-1 mt-1 mb-2 space-y-0.5">
                             {item.dropdown.map((sub) => (
                               <Link
                                 key={sub.href}
                                 href={sub.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white rounded-lg"
+                                className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-white/50 active:text-white active:bg-white/[0.04] rounded-xl transition-colors"
                               >
-                                <span>{sub.icon}</span>
-                                <span>{dropdownT(sub.labelKey)}</span>
+                                <span className="w-7 h-7 rounded-lg bg-white/[0.05] flex items-center justify-center text-sm">{sub.icon}</span>
+                                <span className="font-medium">{dropdownT(sub.labelKey)}</span>
                                 {sub.badge && (
-                                  <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1 rounded">
+                                  <span className="text-[8px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded-md font-bold">
                                     {sub.badge}
                                   </span>
                                 )}
@@ -541,16 +547,16 @@ export default function HeaderChampion() {
                 </div>
 
                 {/* Language selector mòbil */}
-                <div className="py-4 border-t border-zinc-800">
+                <div className="py-3 border-t border-white/[0.06]">
                   <LanguageSelector />
                 </div>
 
                 {/* CTAs mòbil */}
-                <div className="space-y-3 pt-4 border-t border-zinc-800">
+                <div className="space-y-2.5 pt-3 border-t border-white/[0.06]">
                   <Link
                     href="/contacto"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-900 text-sm font-bold rounded-lg"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-black text-sm font-black rounded-2xl shadow-[0_8px_24px_rgba(251,191,36,0.25)] active:scale-[0.97] transition-transform"
                   >
                     {tHeader('cta')}
                   </Link>
@@ -558,9 +564,9 @@ export default function HeaderChampion() {
                     href={WHATSAPP_URL}
                     target="_blank" rel="noopener noreferrer"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-zinc-800 text-white text-sm font-semibold rounded-lg border border-zinc-700"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-white/[0.06] text-white text-sm font-semibold rounded-2xl border border-white/[0.10] active:scale-[0.97] transition-transform"
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4.5 h-4.5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
                     WhatsApp

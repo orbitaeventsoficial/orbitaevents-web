@@ -58,7 +58,7 @@ function StatCard({ config, label, sublabel, delay, started }: StatCardProps) {
           ? { duration: 0 }
           : { delay, duration: 0.34, ease: [0.22, 1, 0.36, 1] }
       }
-      className="relative flex flex-col items-center justify-center p-5 rounded-3xl border border-white/10 text-center overflow-hidden"
+      className="relative flex flex-col items-center justify-center p-5 rounded-3xl border border-white/[0.10] text-center overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
       style={{
         background: `radial-gradient(ellipse at 50% 0%, ${config.glow}, transparent 70%), rgba(255,255,255,0.04)`,
       }}
@@ -77,7 +77,10 @@ function StatCard({ config, label, sublabel, delay, started }: StatCardProps) {
         />
       )}
 
-      <span className="text-3xl mb-2 block">{config.emoji}</span>
+      {/* Top shine */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      <span className="text-[2rem] mb-2 block drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">{config.emoji}</span>
 
       <div
         className={`text-4xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-none mb-1`}

@@ -214,7 +214,7 @@ export default function MobileCTAUrgency() {
               }}
               className="relative block w-full"
             >
-              <div className="relative flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full shadow-lg shadow-amber-500/30 transition-all">
+              <div className="relative flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-black font-black rounded-full shadow-[0_12px_36px_rgba(245,158,11,0.35)] overflow-hidden transition-all">
                 <span>{tCommon('buttons.whatsapp')}</span>
                 <svg
                   className="w-4 h-4"

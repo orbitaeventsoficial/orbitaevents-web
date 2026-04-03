@@ -94,7 +94,7 @@ export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }
           {activePhotos[0] && (
             <Link
               href={`/portfolio/${active.slug}`}
-              className="block relative mx-6 rounded-2xl overflow-hidden h-72 mb-3 group"
+              className="block relative mx-6 rounded-3xl overflow-hidden h-72 mb-3 group shadow-[0_12px_40px_rgba(0,0,0,0.3)]"
             >
               <Image
                 src={activePhotos[0]}
@@ -124,7 +124,7 @@ export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }
               <Link
                 key={src}
                 href={`/portfolio/${active.slug}`}
-                className="snap-start flex-shrink-0 w-44 h-56 relative rounded-xl overflow-hidden bg-zinc-900 group"
+                className="snap-start flex-shrink-0 w-44 h-56 relative rounded-2xl overflow-hidden bg-zinc-900 group shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
               >
                 <Image
                   src={src}
@@ -141,7 +141,7 @@ export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }
             {/* "See all" card */}
             <Link
               href={`/portfolio/${active.slug}`}
-              className="snap-start flex-shrink-0 w-44 h-56 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform"
+              className="snap-start flex-shrink-0 w-44 h-56 rounded-2xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/[0.10] flex flex-col items-center justify-center gap-3 active:scale-95 transition-transform"
             >
               <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${active.mobileAccent} flex items-center justify-center`}>
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

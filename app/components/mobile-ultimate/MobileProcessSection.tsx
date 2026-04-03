@@ -60,22 +60,26 @@ export default function MobileProcessSection() {
                   ? { duration: 0 }
                   : { delay: i * 0.1, duration: 0.32, ease: [0.22, 1, 0.36, 1] }
               }
-              className="relative flex gap-4 pb-7 last:pb-0"
+              className="relative flex gap-4 pb-8 last:pb-0"
             >
-              {/* Icon + number */}
+              {/* Icon + number + connecting line */}
               <div className="relative flex-shrink-0">
                 <div
-                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center`}
+                  className={`relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center`}
                   style={{ boxShadow: `0 8px 28px ${style.glow}` }}
                 >
                   <span className="text-2xl">{style.emoji}</span>
                 </div>
                 {/* Number badge */}
-                <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
-                  <span className="text-white/70 text-[9px] font-black leading-none">
+                <div className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
+                  <span className="text-amber-400 text-[9px] font-black leading-none">
                     {step.number}
                   </span>
                 </div>
+                {/* Connecting line to next step */}
+                {i < steps.length - 1 && (
+                  <div className="absolute top-14 left-1/2 -translate-x-1/2 w-px h-8 bg-gradient-to-b from-white/15 to-transparent" />
+                )}
               </div>
 
               {/* Text */}
