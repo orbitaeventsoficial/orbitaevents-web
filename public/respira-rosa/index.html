@@ -354,7 +354,7 @@
     let currentStep = 0;
     let scheduledUntil = 0;
     let schedulerTimer = null;
-    const STEP_DURATION = 1.7;
+    const STEP_DURATION = 1.25;
     const SCHEDULER_LOOKAHEAD = 0.18;
     const SCHEDULER_INTERVAL = 120;
     const steps = document.querySelectorAll('.step');
@@ -369,69 +369,26 @@
       return audioCtx;
     }
 
-    function createBrownNoiseBuffer(ctx) {
-      const length = Math.max(1, Math.floor(ctx.sampleRate * 0.32));
-      const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      let lastOut = 0;
-      for (let i = 0; i < length; i += 1) {
-        const white = Math.random() * 2 - 1;
-        lastOut = (lastOut + 0.018 * white) / 1.018;
-        data[i] = lastOut * 2.1;
-      }
-      return buffer;
-    }
-
-    function playBubbleCluster(time, stepIndex) {
+    function loadBubbleSample() {
       const ctx = ensureAudioContext();
-      if (!ctx) return;
+      if (!ctx) return Promise.resolve(null);
+      if (window.__bubbleSampleBuffer) return Promise.resolve(window.__bubbleSampleBuffer);
+      if (window.__bubbleSamplePromise) return window.__bubbleSamplePromise;
 
-      const buffer = createBrownNoiseBuffer(ctx);
-      const clusterCount = 2 + ((stepIndex + 1) % 2);
-      const baseFreq = 300 - stepIndex * 18;
+      window.__bubbleSamplePromise = fetch("/respira-rosa/audio/bubble.mp3")
+        .then((res) => res.arrayBuffer())
+        .then((buf) => ctx.decodeAudioData(buf.slice(0)))
+        .then((decoded) => {
+          window.__bubbleSampleBuffer = decoded;
+          return decoded;
+        })
+        .catch(() => null);
 
-      for (let i = 0; i < clusterCount; i += 1) {
-        const start = time + i * 0.26 + Math.random() * 0.05;
-        const duration = 0.72 + Math.random() * 0.22;
-        const end = start + duration;
-        const freq = Math.max(140, baseFreq - i * 14 + Math.random() * 10);
-
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
-
-        const noiseFilter = ctx.createBiquadFilter();
-        noiseFilter.type = 'bandpass';
-        noiseFilter.frequency.setValueAtTime(freq * 0.95, start);
-        noiseFilter.Q.setValueAtTime(0.55 + Math.random() * 0.18, start);
-
-        const noiseGain = ctx.createGain();
-        noiseGain.gain.setValueAtTime(0.0001, start);
-        noiseGain.gain.exponentialRampToValueAtTime(0.0045 + Math.random() * 0.002, start + 0.12);
-        noiseGain.gain.exponentialRampToValueAtTime(0.0001, end);
-
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq * 0.92, start);
-        osc.frequency.exponentialRampToValueAtTime(freq * 1.28, end);
-
-        const oscGain = ctx.createGain();
-        oscGain.gain.setValueAtTime(0.0001, start);
-        oscGain.gain.exponentialRampToValueAtTime(0.016 + Math.random() * 0.006, start + 0.16);
-        oscGain.gain.exponentialRampToValueAtTime(0.0001, end);
-
-        noise.connect(noiseFilter);
-        noiseFilter.connect(noiseGain);
-        noiseGain.connect(ctx.destination);
-
-        osc.connect(oscGain);
-        oscGain.connect(ctx.destination);
-
-        noise.start(start);
-        noise.stop(end);
-        osc.start(start);
-        osc.stop(end);
-      }
+      return window.__bubbleSamplePromise;
     }
+
+    let loopSource = null;
+    let loopGain = null;
 
     function highlightStep(index) {
       steps.forEach(s => s.classList.remove('active'));
@@ -440,52 +397,51 @@
       }
     }
 
-    function scheduleLoop() {
-      if (!loopRunning) return;
-      const ctx = ensureAudioContext();
-      if (!ctx) return;
-
-      if (scheduledUntil === 0) {
-        scheduledUntil = ctx.currentTime + 0.04;
-      }
-
-      while (scheduledUntil < ctx.currentTime + SCHEDULER_LOOKAHEAD) {
-        const stepToPlay = currentStep;
-        const stepTime = scheduledUntil;
-        const delay = Math.max(0, (stepTime - ctx.currentTime) * 1000);
-        window.setTimeout(() => {
-          if (!loopRunning) return;
-          highlightStep(stepToPlay);
-        }, delay);
-        playBubbleCluster(stepTime, stepToPlay);
-        scheduledUntil += STEP_DURATION;
-        currentStep = (currentStep + 1) % steps.length;
-      }
-    }
-
-    function startLoop() {
+    async function startLoop() {
       if (loopRunning) return;
       const ctx = ensureAudioContext();
       if (!ctx) return;
+      const buffer = await loadBubbleSample();
+      if (!buffer) return;
+
       loopRunning = true;
       currentStep = 0;
-      scheduledUntil = ctx.currentTime + 0.06;
       highlightStep(0);
-      scheduleLoop();
-      schedulerTimer = window.setInterval(scheduleLoop, SCHEDULER_INTERVAL);
+
+      loopSource = ctx.createBufferSource();
+      loopSource.buffer = buffer;
+      loopSource.loop = true;
+      loopSource.playbackRate.setValueAtTime(1, ctx.currentTime);
+
+      loopGain = ctx.createGain();
+      loopGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      loopGain.gain.exponentialRampToValueAtTime(1.0, ctx.currentTime + 0.08);
+
+      loopSource.connect(loopGain);
+      loopGain.connect(ctx.destination);
+      loopSource.start();
     }
 
     function stopLoop() {
       loopRunning = false;
-      scheduledUntil = 0;
-      if (schedulerTimer) {
-        clearInterval(schedulerTimer);
-        schedulerTimer = null;
+      if (loopGain && audioCtx) {
+        try {
+          loopGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          loopGain.gain.setValueAtTime(Math.max(0.0001, loopGain.gain.value || 0.0001), audioCtx.currentTime);
+          loopGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+        } catch (e) {}
       }
+      if (loopSource) {
+        const sourceToStop = loopSource;
+        loopSource = null;
+        window.setTimeout(() => {
+          try { sourceToStop.stop(); } catch (e) {}
+        }, 90);
+      }
+      loopGain = null;
       steps.forEach(s => s.classList.remove('active'));
     }
-
-    const overlay = document.getElementById("overlay");
+const overlay = document.getElementById("overlay");
     const startBtn = document.getElementById("startBtn");
     const motionBtn = document.getElementById("motionBtn");
     const cardRoot = document.getElementById("cardRoot");
@@ -609,6 +565,19 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

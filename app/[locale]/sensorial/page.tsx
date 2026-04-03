@@ -794,8 +794,8 @@ export default function EspaiSensorial() {
   const [showExplanation, setShowExplanation] = useState(true);
   const [panelOpen, setPanelOpen] = useState(false);
   const [theme, setTheme] = useState<SensorialTheme>(PUBLIC_SENSORIAL_THEMES[0]);
-  const [intensity, setIntensity] = useState(15);  // Reduït per fluïdesa
-  const [speed, setSpeed] = useState(0.4);  // Reduït per fluïdesa
+  const [intensity, setIntensity] = useState(18);
+  const [speed, setSpeed] = useState(0.72);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
   const color = theme.colors[0];
@@ -807,6 +807,10 @@ export default function EspaiSensorial() {
 
   useEffect(() => {
     setTimeout(() => setReady(true), 300);
+  }, []);
+
+  useEffect(() => {
+    setTheme(PUBLIC_SENSORIAL_THEMES[Math.floor(Math.random() * PUBLIC_SENSORIAL_THEMES.length)] || PUBLIC_SENSORIAL_THEMES[0]);
   }, []);
 
   useEffect(() => {
@@ -949,6 +953,7 @@ export default function EspaiSensorial() {
     </main>
   );
 }
+
 
 
 
