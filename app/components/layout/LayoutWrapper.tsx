@@ -243,10 +243,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {showIntro && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={activeIntroMode === 'mobile' ? 2200 : 4000}
-          fadeMs={activeIntroMode === 'mobile' ? 550 : 2200}
-          speedMultiplier={activeIntroMode === 'mobile' ? 1.05 : 1.2}
-          holdMs={activeIntroMode === 'mobile' ? 250 : 1000}
+          totalMs={4000}
+          fadeMs={2200}
+          holdMs={1000}
+          speedMultiplier={1.2}
+          locale={pathname?.split('/')[1] || 'ca'}
         />
       )}
 

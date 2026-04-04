@@ -131,6 +131,13 @@ export function buildIntroBootstrapScript(): string {
           return;
         }
 
+        if (mode === 'mobile') {
+          var s = document.createElement('style');
+          s.id = 'mobile-intro-hide';
+          s.textContent = 'header,nav,.mobile-nav-bar{display:none!important}';
+          document.head.appendChild(s);
+        }
+
         document.body.classList.remove('hero-loading');
         document.body.classList.add('intro-done');
         if (overlay) {

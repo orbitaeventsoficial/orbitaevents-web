@@ -35,7 +35,7 @@ import MobilePortfolioShowcase from './MobilePortfolioShowcase';
 import FAQSection from '@/app/components/home/FAQSection';
 import HeroPortalLogo from '@/app/components/ui/HeroPortalLogo';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { PUBLIC_MOBILE_HOME_GUARANTEES, type PublicPortfolioShowcaseStory } from '@/lib/constants';
@@ -520,6 +520,7 @@ export default function MobileHomePage({
   portfolioStories?: PublicPortfolioShowcaseStory[];
   serviceCardImages?: Record<PublicMobileServiceCardId, string>;
 }) {
+  const locale = useLocale();
   const [showIntro, setShowIntro] = useState(false);
   const [introFading, setIntroFading] = useState(false);
 
@@ -542,6 +543,7 @@ export default function MobileHomePage({
     setTimeout(() => {
       setShowIntro(false);
       setIntroFading(false);
+      document.getElementById('mobile-intro-hide')?.remove();
     }, 300);
   }, []);
 
@@ -557,9 +559,11 @@ export default function MobileHomePage({
         <>
           <HeroPortalLogo
             onFinish={handleIntroFinish}
-            totalMs={1400}
-            fadeMs={800}
-            holdMs={400}
+            totalMs={4000}
+            fadeMs={2200}
+            holdMs={1000}
+            speedMultiplier={1.2}
+            locale={locale}
           />
           {/* Black curtain during fade gap */}
           {introFading && (

@@ -9,21 +9,30 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+const INTRO_TEXTS: Record<string, { tagline: string; skip: string }> = {
+  ca: { tagline: 'La màgia comença', skip: 'Toca per saltar' },
+  es: { tagline: 'La magia comienza', skip: 'Toca para saltar' },
+  en: { tagline: 'The magic begins', skip: 'Tap to skip' },
+};
+
 interface HeroPortalLogoProps {
   onFinish?: () => void;
   totalMs?: number;
   fadeMs?: number;
   speedMultiplier?: number;
   holdMs?: number;
+  locale?: string;
 }
 
 export default function HeroPortalLogo({
   onFinish,
-  totalMs = 1800,
-  fadeMs = 400,
+  totalMs = 2000,
+  fadeMs = 1000,
   speedMultiplier = 1,
-  holdMs = 0,
+  holdMs = 1000,
+  locale = 'ca',
 }: HeroPortalLogoProps) {
+  const texts = INTRO_TEXTS[locale] || INTRO_TEXTS.ca;
   const [visible, setVisible] = useState(true);
   const [phase, setPhase] = useState<'initial' | 'logo' | 'text' | 'exit'>('initial');
   const [isMobile, setIsMobile] = useState(false);
@@ -254,7 +263,7 @@ export default function HeroPortalLogo({
             }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            La màgia comença
+            {texts.tagline}
           </motion.p>
 
           {/* Indicador de skip en móvil */}
@@ -265,7 +274,7 @@ export default function HeroPortalLogo({
               animate={{ opacity: 0.6 }}
               transition={{ delay: 0.3 }}
             >
-              Toca per saltar
+              {texts.skip}
             </motion.p>
           )}
         </motion.div>

@@ -202,6 +202,16 @@
     opacity: 0 !important;
   }
 
+  /* MOBILE INTRO: Amaga header/nav mentre dura la intro mòbil.
+     El bootstrap script estableix data-orbita-intro-mode="mobile" al <html>
+     ABANS que el header es renderitzi, així el CSS ja està preparat al <head>. */
+  html[data-orbita-intro-mode="mobile"] header,
+  html[data-orbita-intro-mode="mobile"] nav,
+  html[data-orbita-intro-mode="mobile"] .mobile-nav-bar,
+  html[data-orbita-intro-mode="mobile"] .mobile-bottom-nav {
+    display: none !important;
+  }
+
   /* NOSCRIPT: Si no hi ha JS, mostrar contingut directament */
   body.no-intro #main-content,
   body.no-intro header,
