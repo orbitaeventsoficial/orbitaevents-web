@@ -14,7 +14,13 @@
     "hero": {
       "title1": "HALLOWEEN",
       "title2": "IMMERSIU",
-      "subtitle": "No és una festa amb quatre detalls. És un passatge encantat amb decoració real, DJ temàtic, boira i llum per convertir l'espai en una escena de terror memorable."
+      "subtitle": "No és una festa amb quatre detalls. És un passatge encantat amb decoració real, DJ temàtic, boira i llum per convertir l'espai en una escena de terror memorable.",
+      "kicker": "Passatge encantat · boira · llum · escena real",
+      "tags": {
+        "tag1": "Decoració real",
+        "tag2": "DJ temàtic",
+        "tag3": "Fum i llum sincronitzats"
+      }
     },
     "cta": {
       "reserve": "Vull un Halloween immersiu",
@@ -103,6 +109,21 @@
       "title": "Decoració",
       "titleHighlight": "arreu",
       "subtitle": "No és només música. Transformem l'espai complet.",
+      "label": "Escenografia",
+      "passatge": {
+        "title": "Passatge encantat",
+        "description": "No portem només objectes. Muntem una escena: punts d'impacte, racons foscos, textures, llum i volum perquè l'espai sembli habitat per la història que expliques."
+      },
+      "inclou": {
+        "title": "Inclou",
+        "item1": "Muntatge i desmuntatge",
+        "item2": "Transport i col·locació",
+        "item3": "Composició visual perquè llueixi també a fotos"
+      },
+      "footer": {
+        "title": "Tot inclòs en el preu",
+        "subtitle": "Muntatge, desmuntatge, transport i composició de l'escena"
+      },
       "items": [
         {
           "icon": "👻",
@@ -168,17 +189,6 @@
       ],
       "warning": "⚠️ Ja tenim consultes per aquestes dates"
     },
-    "hero": {
-      "title1": "HALLOWEEN",
-      "title2": "IMMERSIU",
-      "subtitle": "No és una festa amb quatre detalls. És un passatge encantat amb decoració real, DJ temàtic, boira i llum per convertir l'espai en una escena de terror memorable.",
-      "kicker": "Passatge encantat · boira · llum · escena real",
-      "tags": {
-        "tag1": "Decoració real",
-        "tag2": "DJ temàtic",
-        "tag3": "Fum i llum sincronitzats"
-      }
-    },
     "sections": {
       "gallery": "Escenes reals",
       "includes": "Com construïm l'escena",
@@ -186,68 +196,6 @@
       "urgencyLabel": "Disponibilitat",
       "faqLabel": "Preguntes freqüents",
       "close": "Tancament"
-    },
-    "decoration": {
-      "title": "Decoració",
-      "titleHighlight": "arreu",
-      "subtitle": "No és només música. Transformem l'espai complet.",
-      "label": "Escenografia",
-      "passatge": {
-        "title": "Passatge encantat",
-        "description": "No portem només objectes. Muntem una escena: punts d'impacte, racons foscos, textures, llum i volum perquè l'espai sembli habitat per la història que expliques."
-      },
-      "inclou": {
-        "title": "Inclou",
-        "item1": "Muntatge i desmuntatge",
-        "item2": "Transport i col·locació",
-        "item3": "Composició visual perquè llueixi també a fotos"
-      },
-      "footer": {
-        "title": "Tot inclòs en el preu",
-        "subtitle": "Muntatge, desmuntatge, transport i composició de l'escena"
-      },
-      "items": [
-        {
-          "icon": "👻",
-          "title": "2 Fantasmes Gegants",
-          "description": "Figures de 2m que es mouen amb el vent. Impacte visual garantit."
-        },
-        {
-          "icon": "🕷️",
-          "title": "Gàbies amb Taràntules",
-          "description": "Gàbies decoratives amb aranyes i ratpenats realistes."
-        },
-        {
-          "icon": "🧹",
-          "title": "Escombres de Bruixa",
-          "description": "Escombres decoratives per l'espai, perfectes per a photocall."
-        },
-        {
-          "icon": "🫕",
-          "title": "Caldero Màgic",
-          "description": "Caldero amb fum (gel sec) i llum verda. El centre de la festa."
-        },
-        {
-          "icon": "🕯️",
-          "title": "Espelmes LED",
-          "description": "Desenes d'espelmes sense flama per tot l'espai. Ambient màgic."
-        },
-        {
-          "icon": "🪞",
-          "title": "Miralls Estranys",
-          "description": "Miralls amb efectes que 'parlen' o mostren reflexos inquietants."
-        },
-        {
-          "icon": "🕸️",
-          "title": "Teranyines + Carabasses",
-          "description": "Clàssics de Halloween: teranyines arreu i carabasses LED."
-        },
-        {
-          "icon": "💀",
-          "title": "Esquelets i Calaveres",
-          "description": "Elements decoratius repartits estratègicament."
-        }
-      ]
     },
     "faqs": {
       "q1": {
@@ -6769,11 +6717,11 @@
   },
   "mobileHero": {
     "ctaPacks": "Veure packs i preus",
-    "title": "CREEM EVENTS",
-    "subtitle": "Casaments · Discomòbil · Festes privades · Esdeveniments temàtics",
+    "title": "CREEM MOMENTS",
+    "subtitle": "Tu gaudeixes. Nosaltres muntem tot.",
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
-    "socialProof": "5.0 · Opinions verificades",
+    "socialProof": "5.0 a Google",
     "whatsappMessage": "Hola! Vull informació per al meu esdeveniment.",
     "badges": {
       "halloween": "Agenda {year} oberta",
@@ -6781,20 +6729,18 @@
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "A LA TEVA MIDA.",
-      "magical": "AMB ÀNIMA I RITME.",
-      "brutal": "QUE LA GENT RECORDA.",
-      "yours": "FETS PER BRILLAR."
+      "unique": "PER AL TEU CASAMENT.",
+      "magical": "PER A LA TEVA FESTA.",
+      "brutal": "PER A LA TEVA NIT TEMÀTICA.",
+      "yours": "SENSE ESTRÈS."
     },
     "morphingTextsExtended": [
-      "CASAMENTS AUTÈNTICS.",
-      "FESTES AMB ÀNIMA.",
-      "EMPRESES AMB IMPACTE.",
-      "HALLOWEEN QUE IMPRESSIONA.",
-      "MÓN MÀGIC QUE SORPRÈN.",
-      "KARAOKE SI EL VOLS.",
-      "DETALLS QUE ES NOTEN.",
-      "SENSE ESTRÈS PER A TU."
+      "PER AL TEU CASAMENT.",
+      "PER A LA TEVA FESTA.",
+      "SENSE ESTRÈS.",
+      "PERQUÈ ES RECORDI.",
+      "PERQUÈ HO GAUDEIXIS.",
+      "AMB TOT EL COR."
     ]
   },
   "mobileServices": {
@@ -7143,6 +7089,3 @@
     "spamNote": "Revisa la teva safata de correu brossa si no veus el nostre email en les pròximes hores"
   }
 }
-
-
-

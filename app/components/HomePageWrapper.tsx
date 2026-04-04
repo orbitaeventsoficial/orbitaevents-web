@@ -21,12 +21,15 @@ const MobileHomePage = dynamic(
 
 function MobileLoadingSkeleton() {
   return (
-    <div className="md:hidden min-h-screen bg-bg-main flex flex-col items-center justify-center px-6">
-      <div className="w-16 h-16 rounded-full bg-white/5 oe-shimmer mb-6" />
-      <div className="h-8 w-64 rounded-lg bg-white/5 oe-shimmer mb-3" />
-      <div className="h-5 w-48 rounded-lg bg-white/5 oe-shimmer mb-8" />
-      <div className="h-12 w-52 rounded-full bg-amber-500/10 oe-shimmer" />
-    </div>
+    <>
+      <style>{`header, nav, .mobile-nav-bar { display: none !important; }`}</style>
+      <div className="md:hidden min-h-screen bg-black flex flex-col items-center justify-center px-6">
+        <div className="w-16 h-16 rounded-full bg-white/5 oe-shimmer mb-6" />
+        <div className="h-8 w-64 rounded-lg bg-white/5 oe-shimmer mb-3" />
+        <div className="h-5 w-48 rounded-lg bg-white/5 oe-shimmer mb-8" />
+        <div className="h-12 w-52 rounded-full bg-amber-500/10 oe-shimmer" />
+      </div>
+    </>
   );
 }
 
@@ -56,12 +59,7 @@ export default function HomePageWrapper({
   }, []);
 
   if (isMobile === null) {
-    return (
-      <>
-        {children}
-        <MobileLoadingSkeleton />
-      </>
-    );
+    return <MobileLoadingSkeleton />;
   }
 
   return isMobile ? (
@@ -73,3 +71,4 @@ export default function HomePageWrapper({
     <>{children}</>
   );
 }
+

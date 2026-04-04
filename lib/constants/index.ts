@@ -1776,7 +1776,7 @@ export const PUBLIC_EXPERIENCES_PAGE_ITEMS = [
     titleKey: 'monMagic.title',
     subtitleKey: 'monMagic.subtitle',
     descriptionKey: 'monMagic.description',
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
+    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
     gradient: 'from-purple-600 to-blue-600',
     bgGradient: 'from-purple-900/40 to-blue-900/40',
     badgeKey: 'badges.popular',
@@ -2195,6 +2195,7 @@ export const PRIORITY_FILTER_STYLES: Record<string, string> = {
   MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
   BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
 };
+
 
 
 

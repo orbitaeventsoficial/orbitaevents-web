@@ -521,6 +521,13 @@ export default function MobileHomePage({
   serviceCardImages?: Record<PublicMobileServiceCardId, string>;
 }) {
   const [showIntro, setShowIntro] = useState(false);
+  const [introFading, setIntroFading] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenMobileIntro(localStorage)) {
+      setShowIntro(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handler = () => setShowIntro(false);
@@ -530,20 +537,36 @@ export default function MobileHomePage({
 
   const handleIntroFinish = useCallback(() => {
     markMobileIntroSeen(localStorage, window);
-    setShowIntro(false);
+    setIntroFading(true);
+    // Brief black pause before content reveals
+    setTimeout(() => {
+      setShowIntro(false);
+      setIntroFading(false);
+    }, 300);
   }, []);
 
   return (
     <MobileErrorBoundary>
-      {/* Intro mágica - HeroPortalLogo - Optimitzada per mòbil */}
+      {/* Amaga header/nav del layout durant la intro */}
       {showIntro && (
-        <HeroPortalLogo
-          onFinish={handleIntroFinish}
-          fadeMs={2200}
-          holdMs={1000}
-        />
+        <style>{`header, nav, .mobile-nav-bar { display: none !important; }`}</style>
       )}
 
+      {/* Intro mágica - HeroPortalLogo - Optimitzada per mòbil */}
+      {showIntro ? (
+        <>
+          <HeroPortalLogo
+            onFinish={handleIntroFinish}
+            totalMs={1400}
+            fadeMs={800}
+            holdMs={400}
+          />
+          {/* Black curtain during fade gap */}
+          {introFading && (
+            <div className="fixed inset-0 z-[9998] bg-black" />
+          )}
+        </>
+      ) : (
       <MobileAppShell showSplash={false}>
         {/* 1. Hero — primera impressió, què som */}
         <MobileHeroUltimate />
@@ -588,6 +611,7 @@ export default function MobileHomePage({
         <MobileFooter />
 
       </MobileAppShell>
+      )}
     </MobileErrorBoundary>
   );
 }

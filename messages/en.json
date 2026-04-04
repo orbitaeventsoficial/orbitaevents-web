@@ -103,6 +103,21 @@
       "title": "Decoration",
       "titleHighlight": "everywhere",
       "subtitle": "It's not just music. We transform the entire space.",
+      "label": "Staging",
+      "passatge": {
+        "title": "Haunted passage",
+        "description": "We don't just bring objects. We build a scene: impact points, dark corners, textures, light and depth so the space feels inhabited by the story you're telling."
+      },
+      "inclou": {
+        "title": "Includes",
+        "item1": "Setup and takedown",
+        "item2": "Transport and placement",
+        "item3": "Visual composition so it looks great in photos too"
+      },
+      "footer": {
+        "title": "Everything included in the price",
+        "subtitle": "Setup, takedown, transport and scene composition"
+      },
       "items": [
         {
           "icon": "👻",
@@ -175,68 +190,6 @@
       "urgencyLabel": "Availability",
       "faqLabel": "Frequently asked questions",
       "close": "Closing"
-    },
-    "decoration": {
-      "title": "Decoration",
-      "titleHighlight": "everywhere",
-      "subtitle": "It's not just music. We transform the entire space.",
-      "label": "Staging",
-      "passatge": {
-        "title": "Haunted passage",
-        "description": "We don't just bring objects. We build a scene: impact points, dark corners, textures, light and depth so the space feels inhabited by the story you're telling."
-      },
-      "inclou": {
-        "title": "Includes",
-        "item1": "Setup and takedown",
-        "item2": "Transport and placement",
-        "item3": "Visual composition so it looks great in photos too"
-      },
-      "footer": {
-        "title": "Everything included in the price",
-        "subtitle": "Setup, takedown, transport and scene composition"
-      },
-      "items": [
-        {
-          "icon": "👻",
-          "title": "2 Giant Ghosts",
-          "description": "2m figures that move with the wind. Guaranteed visual impact."
-        },
-        {
-          "icon": "🕷️",
-          "title": "Cages with Tarantulas",
-          "description": "Decorative cages with realistic spiders and bats."
-        },
-        {
-          "icon": "🧹",
-          "title": "Witch's Brooms",
-          "description": "Decorative brooms around the space, perfect for photocalls."
-        },
-        {
-          "icon": "🫕",
-          "title": "Magic Cauldron",
-          "description": "Cauldron with smoke (dry ice) and green light. The center of the party."
-        },
-        {
-          "icon": "🕯️",
-          "title": "LED candles",
-          "description": "Dozens of flameless candles throughout the space. Magical atmosphere."
-        },
-        {
-          "icon": "🪞",
-          "title": "Strange Mirrors",
-          "description": "Mirrors with effects that 'talk' or show disturbing reflections."
-        },
-        {
-          "icon": "🕸️",
-          "title": "Cobwebs + Pumpkins",
-          "description": "Halloween classics: cobwebs everywhere and LED pumpkins."
-        },
-        {
-          "icon": "💀",
-          "title": "Skeletons and Skulls",
-          "description": "Decorative elements strategically distributed."
-        }
-      ]
     },
     "faqs": {
       "q1": {
@@ -6500,8 +6453,8 @@
   },
   "mobileHero": {
     "ctaPacks": "See packs & pricing",
-    "title": "WE CREATE EVENTS",
-    "subtitle": "Weddings · Mobile DJ · Private parties · Themed events",
+    "title": "WE CREATE MOMENTS",
+    "subtitle": "You enjoy. We handle everything.",
     "location": "Barcelona and Girona.",
     "scroll": "DISCOVER",
     "socialProof": "5.0 · Verified opinions",
@@ -6512,20 +6465,18 @@
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "TAILORED TO YOU.",
+      "unique": "FOR YOUR WEDDING.",
       "magical": "WITH REAL ENERGY.",
       "brutal": "THAT PEOPLE REMEMBER.",
       "yours": "MADE TO SHINE."
     },
     "morphingTextsExtended": [
-      "AUTHENTIC WEDDINGS.",
-      "PARTIES WITH ENERGY.",
-      "COMPANIES WITH IMPACT.",
-      "HALLOWEEN THAT HITS HARD.",
-      "MAGIC WORLD THAT SURPRISES.",
-      "KARAOKE IF YOU WANT IT.",
-      "DETAILS THAT STAND OUT.",
-      "WITHOUT STRESS."
+      "FOR YOUR WEDDING.",
+      "FOR YOUR PARTY.",
+      "STRESS-FREE.",
+      "TO BE REMEMBERED.",
+      "FOR YOU TO ENJOY.",
+      "WITH ALL OUR HEART."
     ]
   },
   "mobileServices": {
@@ -6874,6 +6825,3 @@
     "spamNote": "Check your spam folder if you don't see our email in the next few hours"
   }
 }
-
-
-

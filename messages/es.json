@@ -103,6 +103,21 @@
       "title": "Decoración",
       "titleHighlight": "por todas partes",
       "subtitle": "No es solo música. Transformamos el espacio completo.",
+      "label": "Escenografía",
+      "passatge": {
+        "title": "Pasaje encantado",
+        "description": "No traemos solo objetos. Montamos una escena: puntos de impacto, rincones oscuros, texturas, luz y volumen para que el espacio parezca habitado por la historia que cuentas."
+      },
+      "inclou": {
+        "title": "Incluye",
+        "item1": "Montaje y desmontaje",
+        "item2": "Transporte y colocación",
+        "item3": "Composición visual para que luzca también en fotos"
+      },
+      "footer": {
+        "title": "Todo incluido en el precio",
+        "subtitle": "Montaje, desmontaje, transporte y composición de la escena"
+      },
       "items": [
         {
           "icon": "👻",
@@ -175,68 +190,6 @@
       "urgencyLabel": "Disponibilidad",
       "faqLabel": "Preguntas frecuentes",
       "close": "Cierre"
-    },
-    "decoration": {
-      "title": "Decoración",
-      "titleHighlight": "por todas partes",
-      "subtitle": "No es solo música. Transformamos el espacio completo.",
-      "label": "Escenografía",
-      "passatge": {
-        "title": "Pasaje encantado",
-        "description": "No traemos solo objetos. Montamos una escena: puntos de impacto, rincones oscuros, texturas, luz y volumen para que el espacio parezca habitado por la historia que cuentas."
-      },
-      "inclou": {
-        "title": "Incluye",
-        "item1": "Montaje y desmontaje",
-        "item2": "Transporte y colocación",
-        "item3": "Composición visual para que luzca también en fotos"
-      },
-      "footer": {
-        "title": "Todo incluido en el precio",
-        "subtitle": "Montaje, desmontaje, transporte y composición de la escena"
-      },
-      "items": [
-        {
-          "icon": "👻",
-          "title": "2 Fantasmas Gigantes",
-          "description": "Figuras de 2m que se mueven con el viento. Impacto visual garantizado."
-        },
-        {
-          "icon": "🕷️",
-          "title": "Jaulas con Tarántulas",
-          "description": "Jaulas decorativas con arañas y murciélagos realistas."
-        },
-        {
-          "icon": "🧹",
-          "title": "Escobas de Bruja",
-          "description": "Escobas decorativas por el espacio, perfectas para photocall."
-        },
-        {
-          "icon": "🫕",
-          "title": "Caldero Mágico",
-          "description": "Caldero con humo (hielo seco) y luz verde. El centro de la fiesta."
-        },
-        {
-          "icon": "🕯️",
-          "title": "Velas LED",
-          "description": "Decenas de velas sin llama por todo el espacio. Ambiente mágico."
-        },
-        {
-          "icon": "🪞",
-          "title": "Espejos Extraños",
-          "description": "Espejos con efectos que 'hablan' o muestran reflejos inquietantes."
-        },
-        {
-          "icon": "🕸️",
-          "title": "Telarañas + Calabazas",
-          "description": "Clásicos de Halloween: telarañas por todas partes y calabazas LED."
-        },
-        {
-          "icon": "💀",
-          "title": "Esqueletos y Calaveras",
-          "description": "Elementos decorativos repartidos estratégicamente."
-        }
-      ]
     },
     "faqs": {
       "q1": {
@@ -6500,8 +6453,8 @@
   },
   "mobileHero": {
     "ctaPacks": "Ver packs y precios",
-    "title": "CREAMOS EVENTOS",
-    "subtitle": "Bodas · Discomóvil · Fiestas privadas · Eventos temáticos",
+    "title": "CREAMOS MOMENTOS",
+    "subtitle": "Tú disfrutas. Nosotros montamos todo.",
     "location": "Barcelona y Girona.",
     "scroll": "DESCUBRE",
     "socialProof": "5.0 · Opiniones verificadas",
@@ -6512,20 +6465,18 @@
       "rating": "5.0/5 · 50+ eventos"
     },
     "morphingTexts": {
-      "unique": "A TU MEDIDA.",
+      "unique": "PARA TU BODA.",
       "magical": "CON ALMA Y RITMO.",
       "brutal": "QUE TODOS RECUERDAN.",
       "yours": "HECHOS PARA BRILLAR."
     },
     "morphingTextsExtended": [
-      "BODAS AUTÉNTICAS.",
-      "FIESTAS CON ENERGÍA.",
-      "EMPRESAS CON IMPACTO.",
-      "HALLOWEEN QUE IMPRESIONA.",
-      "MUNDO MÁGICO QUE SORPRENDE.",
-      "KARAOKE SI LO QUIERES.",
-      "DETALLES QUE SE NOTAN.",
-      "SIN ESTRÉS PARA TI."
+      "PARA TU BODA.",
+      "PARA TU FIESTA.",
+      "SIN ESTRÉS.",
+      "PARA QUE SE RECUERDE.",
+      "PARA QUE LO DISFRUTES.",
+      "CON TODO EL ALMA."
     ]
   },
   "mobileServices": {
@@ -6874,6 +6825,3 @@
     "spamNote": "Revisa tu bandeja de spam si no ves nuestro email en las próximas horas"
   }
 }
-
-
-

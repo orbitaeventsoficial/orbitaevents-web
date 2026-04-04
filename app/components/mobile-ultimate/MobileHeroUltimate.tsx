@@ -14,7 +14,7 @@ const IMAGE_DURATION = 8500;
 
 function shuffle<T>(arr: T[]): T[] {
   const next = [...arr];
-  for (let i = next.length - 1; i > 0; i--) {
+  for (let i = next.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
     [next[i], next[j]] = [next[j], next[i]];
   }
@@ -38,15 +38,18 @@ function MorphingText() {
   }, [texts, reduceMotion]);
 
   return (
-    <span className="relative mt-2 block min-h-[2.15em] text-[clamp(1.72rem,8.1vw,2.42rem)] leading-[1.01] text-amber-200">
-      <AnimatePresence mode="wait">
+    <span
+      className="mt-1 block min-h-[2.2em] text-[clamp(2.4rem,10.5vw,3.4rem)] leading-[0.96] tracking-[-0.03em]"
+    >
+      <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={index}
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-x-0 bg-gradient-to-r from-amber-100 via-amber-300 to-orange-200 bg-clip-text text-transparent"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="block text-amber-300"
+          style={{ textShadow: '0 2px 12px rgba(251,191,36,0.5), 0 4px 24px rgba(0,0,0,0.8)' }}
         >
           {texts[index]}
         </motion.span>
@@ -135,9 +138,9 @@ export default function MobileHeroUltimate() {
               priority
               unoptimized
               sizes="100vw"
-              quality={70}
+              quality={72}
               className="object-cover"
-              style={{ filter: 'brightness(0.84) saturate(0.98)', objectPosition: 'center center' }}
+              style={{ filter: 'brightness(0.92) saturate(1)', objectPosition: 'center center' }}
               onLoad={handleImageLoaded}
               onError={handleImageError}
             />
@@ -148,17 +151,16 @@ export default function MobileHeroUltimate() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,214,153,0.14),transparent_32%),linear-gradient(180deg,rgba(28,24,24,0.92),rgba(8,8,8,0.78))]" />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/24 via-black/6 to-black/42" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_22%_14%,rgba(251,191,36,0.09),transparent_28%),radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),transparent_42%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/60 via-black/18 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[56%] bg-gradient-to-t from-black/95 via-black/70 to-transparent" />
 
         {mediaItems.length > 1 && (
-          <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 flex gap-1">
+          <div className="absolute top-14 left-1/2 z-20 flex -translate-x-1/2 gap-1">
             {mediaItems.slice(0, Math.min(mediaItems.length, 6)).map((_, i) => (
               <div
                 key={i}
                 className={`h-[2px] rounded-full transition-all duration-500 ${
-                  i === slideIndex % mediaItems.length ? 'w-5 bg-white/60' : 'w-1.5 bg-white/20'
+                  i === slideIndex % mediaItems.length ? 'w-5 bg-white/70' : 'w-1.5 bg-white/28'
                 }`}
               />
             ))}
@@ -166,49 +168,55 @@ export default function MobileHeroUltimate() {
         )}
       </div>
 
-      <div className="relative z-10 flex min-h-[100svh] items-end px-5 pb-8 pt-28">
-        <div className="relative mx-auto w-full max-w-md rounded-[32px] border border-white/[0.14] bg-[linear-gradient(180deg,rgba(10,10,10,0.14),rgba(10,10,10,0.06))] px-4 py-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)] backdrop-blur-[5px]">
-          <div className="absolute inset-x-6 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      <div className="relative z-10 flex min-h-[100svh] items-end px-6 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+        <div className="relative mx-auto w-full max-w-[25rem]">
 
+          {/* Badges */}
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.3 }}
-            className="mb-4 flex flex-wrap items-center gap-2"
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.32 }}
+            className="mb-3 flex flex-wrap items-center gap-2.5"
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-black/18 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/78">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-white/90 shadow-[0_8px_24px_rgba(0,0,0,0.3)] backdrop-blur-md">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
               {t('badges.halloween', { year: currentYear })}
             </span>
-            <span className="rounded-full border border-white/12 bg-black/14 px-3 py-1 text-[10px] font-semibold text-white/82">
-              {t('socialProof')}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/8 px-3.5 py-2 text-[12px] font-semibold text-white/90 shadow-[0_8px_24px_rgba(0,0,0,0.3)] backdrop-blur-md">
+              <span className="text-amber-400">★</span> {t('socialProof')}
             </span>
           </motion.div>
 
-          <motion.h1
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.38, delay: 0.05 }}
-            className="text-[clamp(1.78rem,8.1vw,2.48rem)] font-black leading-[1.01] tracking-[-0.03em] text-white"
-          >
-            {t('title')}
-            <MorphingText />
-          </motion.h1>
+          {/* Title + morphing */}
+          <div className="relative">
+            <motion.h1
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.42, delay: 0.06 }}
+              className="relative z-10 text-[clamp(2.4rem,10.5vw,3.4rem)] font-black leading-[0.96] tracking-[-0.03em] text-white"
+              style={{ textShadow: '0 2px 16px rgba(0,0,0,0.8), 0 4px 32px rgba(0,0,0,0.6)' }}
+            >
+              {t('title')}
+              <MorphingText />
+            </motion.h1>
+          </div>
 
+          {/* Subtitle + location */}
           <motion.p
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.3, delay: 0.12 }}
-            className="mt-4 max-w-[28ch] text-[13px] leading-[1.7] text-white/84"
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.3, delay: 0.14 }}
+            className="mt-3 text-[15px] leading-[1.4] text-white/80"
           >
-            {t('subtitle')}
+            {t('subtitle')} <span className="text-white/55">📍 {t('location')}</span>
           </motion.p>
 
+          {/* CTAs */}
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.34, delay: 0.18 }}
-            className="mt-6 grid gap-2.5"
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.36, delay: 0.22 }}
+            className="mt-5 space-y-2.5"
           >
             <a
               href={WHATSAPP_URL_WITH_MESSAGE(t('whatsappMessage'))}
@@ -218,44 +226,75 @@ export default function MobileHeroUltimate() {
                 trackWhatsAppClick('mobile_hero');
                 trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero');
               }}
-              className="flex items-center justify-center gap-2 rounded-[1.2rem] bg-gradient-to-r from-amber-200 via-amber-400 to-orange-300 px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_32px_rgba(251,191,36,0.22)] active:scale-[0.97] transition-transform"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 px-7 py-3.5 text-[17px] font-black text-black shadow-[0_12px_32px_rgba(251,191,36,0.35),0_0_0_1px_rgba(251,191,36,0.15)] active:scale-[0.97] transition-transform"
             >
-              <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               <span>{tCommon('buttons.whatsapp')}</span>
             </a>
 
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="flex items-center gap-2">
               <Link
                 href={`/${locale}/packs`}
                 onClick={() => trackCTAClick('mobile_hero_packs_secondary', 'mobile_hero')}
-                className="flex items-center justify-center rounded-[1.1rem] border border-white/[0.16] bg-black/14 px-4 py-2.75 text-sm font-bold text-white active:scale-[0.97] transition-transform"
+                className="flex flex-1 items-center justify-center rounded-xl border border-white/12 bg-white/6 px-3 py-2 text-[13px] font-semibold text-white/80 backdrop-blur-sm active:scale-[0.98] transition-transform"
               >
                 {t('ctaPacks')}
               </Link>
               <Link
                 href={`/${locale}/configurador`}
                 onClick={() => trackCTAClick('mobile_hero_configurator_secondary', 'mobile_hero')}
-                className="flex items-center justify-center rounded-[1.1rem] border border-white/[0.14] bg-black/10 px-4 py-2.75 text-sm font-semibold text-white/88 active:scale-[0.97] transition-transform"
+                className="flex flex-1 items-center justify-center rounded-xl border border-white/12 bg-white/6 px-3 py-2 text-[13px] font-semibold text-white/80 backdrop-blur-sm active:scale-[0.98] transition-transform"
               >
                 {tCommon('buttons.requestQuoteFree')}
               </Link>
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 0.28, delay: 0.28 }}
-            className="mt-5 flex items-center gap-2 text-[11px] text-white/72"
-          >
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.12] bg-black/12 px-3 py-1.5">
-              <span className="text-[10px]">📍</span> {t('location')}
-            </span>
           </motion.div>
         </div>
       </div>
     </section>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

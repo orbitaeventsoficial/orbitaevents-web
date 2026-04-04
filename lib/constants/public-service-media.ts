@@ -21,7 +21,7 @@ export const PUBLIC_SERVICE_MEDIA_CONFIG = {
   },
   monmagic: {
     portfolioSlug: 'fiestas-tematicas-mon-magic',
-    fallbackImage: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
+    fallbackImage: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
   },
   empresas: {
     portfolioSlug: 'eventos-empresa',
@@ -31,3 +31,4 @@ export const PUBLIC_SERVICE_MEDIA_CONFIG = {
 
 export type PublicServiceMediaKey = keyof typeof PUBLIC_SERVICE_MEDIA_CONFIG;
 export type PublicMobileServiceCardId = 'bodas' | 'halloween' | 'monmagic' | 'fiestas' | 'empresas';
+
