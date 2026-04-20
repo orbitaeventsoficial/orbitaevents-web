@@ -61,6 +61,9 @@ function MorphingText() {
 export default function MobileHeroUltimate() {
   const locale = useLocale();
   const t = useTranslations('mobileHero');
+  const taglineMain = t('tagline.main');
+  const taglineSecondary = t('tagline.secondary');
+  const taglineEverywhere = t('tagline.everywhere');
   const tCommon = useTranslations('common');
   const reduceMotion = useReducedMotion();
   const currentYear = useMemo(() => new Date().getFullYear(), []);
@@ -185,6 +188,17 @@ export default function MobileHeroUltimate() {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/8 px-3.5 py-2 text-[12px] font-semibold text-white/90 shadow-[0_8px_24px_rgba(0,0,0,0.3)] backdrop-blur-md">
               <span className="text-amber-400">★</span> {t('socialProof')}
             </span>
+          </motion.div>
+
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.38, delay: 0.08 }}
+            className="text-center space-y-1 uppercase tracking-[0.4em] text-white/70"
+          >
+            <p className="text-[0.55rem] text-white/60">{taglineMain}</p>
+            <p className="text-[1rem] font-black tracking-[0.3em] text-white">{taglineSecondary}</p>
+            <p className="text-[0.65rem] text-amber-300">{taglineEverywhere}</p>
           </motion.div>
 
           {/* Title + morphing */}

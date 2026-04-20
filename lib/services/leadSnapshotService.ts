@@ -129,7 +129,7 @@ export async function processLeadTechnicalSnapshot(input: {
   const lead = await prisma.lead.findUnique({
     where: { id: input.leadId },
     include: {
-      _count: { select: { notes: true, tasks: true, documents: true, activities: true } },
+      _count: { select: { notes: true, universalTasks: true, documents: true, activities: true } },
       booking: {
         select: {
           postEventEmailSent: true,
@@ -178,7 +178,7 @@ export async function processLeadTechnicalSnapshot(input: {
     },
     stats: {
       notes: lead._count.notes,
-      tasks: lead._count.tasks,
+      tasks: lead._count.universalTasks,
       documents: lead._count.documents,
       activities: lead._count.activities,
     },

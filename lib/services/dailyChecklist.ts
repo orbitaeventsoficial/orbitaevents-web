@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { TASK_SOURCE } from '@/lib/constants';
 
 function startOfToday() {
   const now = new Date();
@@ -55,7 +56,7 @@ export async function generateDailyChecklistTasks() {
       where: {
         status: { in: ['OPEN', 'IN_PROGRESS'] },
         dueDate: { lt: todayStart },
-        NOT: { createdBy: 'system:daily-checklist' },
+        NOT: { source: TASK_SOURCE.CHECKLIST },
       },
     }),
     prisma.booking.count({
@@ -108,20 +109,21 @@ export async function generateDailyChecklistTasks() {
   // Evitar acumulació: cancel·lar checklist antics no resolts.
   const staleCleanup = await prisma.task.updateMany({
     where: {
-      createdBy: 'system:daily-checklist',
+      source: TASK_SOURCE.CHECKLIST,
       status: { in: ['OPEN', 'IN_PROGRESS'] },
       dueDate: { lt: todayStart },
     },
     data: {
       status: 'CANCELLED',
       completedAt: now,
+      resolutionNote: 'Checklist diari vençut sense resoldre: cancel·lat automàticament.',
     },
   });
 
   // Retenció: eliminar històric de checklist automàtic antic per evitar inflar el panell.
   const oldChecklistCleanup = await prisma.task.deleteMany({
     where: {
-      createdBy: 'system:daily-checklist',
+      source: TASK_SOURCE.CHECKLIST,
       status: { in: ['CANCELLED', 'DONE'] },
       dueDate: { lt: retentionStart },
     },
@@ -129,7 +131,7 @@ export async function generateDailyChecklistTasks() {
 
   const existingToday = await prisma.task.findMany({
     where: {
-      createdBy: 'system:daily-checklist',
+      source: TASK_SOURCE.CHECKLIST,
       dueDate: {
         gte: todayStart,
         lte: todayEnd,
@@ -149,6 +151,7 @@ export async function generateDailyChecklistTasks() {
       priority: tpl.priority,
       dueDate: todayEnd,
       createdBy: 'system:daily-checklist',
+      source: TASK_SOURCE.CHECKLIST,
     }));
 
   const toCancelTodayIds = templates
@@ -170,6 +173,7 @@ export async function generateDailyChecklistTasks() {
       data: {
         status: 'CANCELLED',
         completedAt: now,
+        resolutionNote: 'Senyal desaparegut durant el dia: la tasca ja no és necessària.',
       },
     });
   }

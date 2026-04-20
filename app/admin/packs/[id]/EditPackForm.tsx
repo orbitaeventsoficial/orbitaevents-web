@@ -5,10 +5,12 @@ import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES } from '@/lib/constants';
+import { ADMIN_PACK_EDITOR_TABS, type PackEditorTab } from '@/lib/constants/admin';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 import { AdminHelpPanel } from '../../components/AdminHelpPanel';
+import { log } from '@/lib/logger';
 
-type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
+type EditorTab = PackEditorTab;
 
 interface PackTranslation {
   locale: string;
@@ -77,12 +79,9 @@ type RawBundleResponse = {
   itemIds?: Array<string | number | null>;
 };
 
-const TABS: Array<{ id: EditorTab; label: string; icon: string }> = [
-  { id: 'economic', label: 'Economia', icon: '💰' },
-  { id: 'content', label: 'Contingut', icon: '🎛️' },
-  { id: 'texts', label: 'Textos', icon: '🌐' },
-  { id: 'publish', label: 'Publicació', icon: '✅' },
-];
+type ComposerMode = 'base' | 'pro';
+
+const TABS = ADMIN_PACK_EDITOR_TABS;
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const calcCostHour = (price: number | null, life: number | null) =>
@@ -197,6 +196,25 @@ export default function EditPackForm({
   const extraDeltaEur = round2((recommended.extra || pricingHint.recommendedExtraHourPrice) - Number(formData.extraHourPrice));
   const totalUnits = packInventory.reduce((acc, row) => acc + Math.max(1, Number(row.quantity || 1)), 0);
   const baseCostPack = round2((recommended.inventoryCostHour + recommended.laborCostHour) * Math.max(1, Number(formData.djHours || 1)) + pricingModel.fixedPackCost);
+  const bundlePreview = useMemo(
+    () => bundles.find((bundle) => bundle.id === selectedBundleId) || null,
+    [bundles, selectedBundleId]
+  );
+  const composerSummary = useMemo(
+    () => ({
+      base: {
+        title: 'BASE',
+        description: 'Intenta muntar un pack curt però funcional: so, cabina, llum i un toc extra.',
+        picks: '1 so · 1 cabina · 2 llums · 1 micro · 1 efecte',
+      },
+      pro: {
+        title: 'PRO',
+        description: 'Puja la càrrega de so, llum i microfonia per a un muntatge més complet.',
+        picks: '2 so · 1 cabina · 3 llums · 2 micros · 2 efectes',
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
     if (!autoPricing) return;
@@ -229,7 +247,7 @@ export default function EditPackForm({
           setSelectedBundleId(next[0].id);
         }
       } catch (error) {
-        console.error('[EditPackForm] Error carregant bundles:', error);
+        log.error('[EditPackForm] Error carregant bundles', error);
       }
     };
     void loadBundles();
@@ -262,7 +280,7 @@ export default function EditPackForm({
   const updateTranslation = (locale: string, field: keyof PackTranslation, value: string | string[]) =>
     setTranslations((prev) => prev.map((t) => t.locale === locale ? { ...t, [field]: value } : t));
 
-  const autoComposeInventory = (mode: 'base' | 'pro') => {
+  const autoComposeInventory = (mode: ComposerMode) => {
     const classify = (item: InventoryItem) => {
       const text = `${item.category} ${item.name} ${item.code} ${item.description || ''}`.toLowerCase();
       if (/altavoz|speaker|sub|woofer|sound|audio|pa\b/.test(text)) return 'sound';
@@ -347,7 +365,7 @@ export default function EditPackForm({
     e.preventDefault(); setLoading(true); setError(null); setInfo(null); setSuccess(false);
     try {
       if (packInventory.length === 0) {
-        throw new Error('El pack no es pot desar buit. Afegeix inventari (manual o compositor automàtic).');
+        throw new Error('El pack no es pot desar buit. Afegeix inventari manualment o amb el compositor automàtic.');
       }
       if (Number(formData.price) <= 0 || Number(formData.extraHourPrice) <= 0) {
         throw new Error('Els preus han de ser superiors a 0€.');
@@ -390,7 +408,7 @@ export default function EditPackForm({
         <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'border-amber-400/50 bg-amber-500/15 text-amber-200' : 'border-white/10 bg-white/[0.02] text-white/60'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
-      {error && <div className="rounded-xl border p-4 text-sm">❌ {error}</div>}
+      {error && <div className="rounded-xl border p-4 text-sm">Error: {error}</div>}
 
       <AdminHelpPanel
         title="Com treballar aquest pack"
@@ -406,16 +424,16 @@ export default function EditPackForm({
           },
           {
             title: 'Semàfor',
-            body: 'Verd vol dir que el preu va bé. Taronja que va just. Roig que s hauria de revisar.',
+            body: 'Verd vol dir que el preu va bé. Taronja que va just. Roig que s\'hauria de revisar.',
           },
         ]}
       />
-      {info && <div className="rounded-xl border p-4 text-sm">ℹ️ {info}</div>}
-      {success && <div className="rounded-xl border p-4 text-sm">✅ Pack actualitzat correctament</div>}
+      {info && <div className="rounded-xl border p-4 text-sm">Info: {info}</div>}
+      {success && <div className="rounded-xl border p-4 text-sm">Pack actualitzat correctament</div>}
 
       {activeTab === 'economic' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">💰 Economia i semàfors</h3>
+          <h3 className="mb-4 text-lg font-semibold">Economia i semàfors</h3>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border p-3">
@@ -594,27 +612,20 @@ export default function EditPackForm({
 
             {activeTab === 'content' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">🧩 Inventari del pack</h3>
+          <h3 className="mb-4 text-lg font-semibold">Inventari del pack</h3>
           <p className="mb-3 text-xs">
-            Visual amb foto + drag and drop: arrossega de "Disponibles" a "Inclosos" per composar el pack.
+            Compon el pack com una peça operativa real: què hi entra, què és obligatori i quin cost base estàs arrossegant.
           </p>
 
-          <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Disponibles</p>
-              <p className="mt-1 text-sm text-white/75">Aquí tens el material que encara no forma part del pack.</p>
-            </div>
-            <div className="rounded-xl border p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Inclosos</p>
-              <p className="mt-1 text-sm text-white/75">Aquest és l equip que el pack arrossega per defecte.</p>
-            </div>
-            <div className="rounded-xl border p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Obligatori</p>
-              <p className="mt-1 text-sm text-white/75">Marca-ho si aquesta peça sempre ha d anar dins del pack.</p>
-            </div>
-            <div className="rounded-xl border p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Lots</p>
-              <p className="mt-1 text-sm text-white/75">Si treballes amb equips repetits, el lot t estalvia anar peça per peça.</p>
+          <div className="mb-4 rounded-2xl border border-cyan-400/20 bg-cyan-500/5 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200/80">Flux de treball</p>
+                <p className="mt-1 text-sm text-white/80">Primer decideix si comences manualment, des d'un lot o amb el compositor. Després revisa quantitats i marca com a obligatori només allò que realment defineix el pack.</p>
+              </div>
+              <span className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                {included.length} elements · {totalUnits} unitats
+              </span>
             </div>
           </div>
 
@@ -633,8 +644,67 @@ export default function EditPackForm({
             </div>
           </div>
 
+          <div className="mb-3 grid gap-3 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Compositor automàtic</p>
+                  <h4 className="mt-1 text-sm font-semibold text-white">Punt de partida, no decisió final</h4>
+                  <p className="mt-1 text-sm text-white/70">El compositor classifica per nom, codi, categoria i descripció. T'estalvia arrencar de zero, però sempre has de revisar el resultat abans de desar.</p>
+                </div>
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/70">
+                  Revisa quantitats i obligatorietat després
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {(Object.entries(composerSummary) as Array<[ComposerMode, typeof composerSummary.base]>).map(([mode, details]) => (
+                  <div key={mode} className={`rounded-2xl border p-4 ${mode === 'base' ? 'border-cyan-400/20 bg-cyan-500/5' : 'border-amber-400/20 bg-amber-500/5'}`}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-white">{details.title}</p>
+                        <p className="mt-1 text-xs text-white/60">{details.picks}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => autoComposeInventory(mode)}
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${mode === 'base' ? 'border-cyan-400/30 bg-cyan-500/10 text-cyan-100' : 'border-amber-400/30 bg-amber-500/10 text-amber-100'}`}
+                      >
+                        Aplicar {details.title}
+                      </button>
+                    </div>
+                    <p className="mt-3 text-sm text-white/70">{details.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Lots reutilitzables</p>
+              <h4 className="mt-1 text-sm font-semibold text-white">Afegeix peces que sempre viatgen juntes</h4>
+              <p className="mt-1 text-sm text-white/70">Els lots serveixen quan el pack repeteix una combinació real. Redueixen errors i acceleren la composició.</p>
+              {bundlePreview ? (
+                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-sm font-semibold text-white">{bundlePreview.name}</p>
+                  <p className="mt-1 text-xs text-white/60">{bundlePreview.itemIds.length} elements al lot seleccionat.</p>
+                  <button
+                    type="button"
+                    onClick={() => addBundleToPack(bundlePreview.id)}
+                    className="mt-4 rounded-xl border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                    disabled={!bundlePreview.id}
+                  >
+                    Afegir aquest lot al pack
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-sm text-white/60">
+                  Encara no hi ha cap lot seleccionat.
+                </div>
+              )}
+            </div>
+          </div>
+
           {bundles.length > 0 && (
-            <div className="mb-3 rounded-xl border p-3">
+            <div className="mb-3 rounded-2xl border admin-card-glass p-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Lots d'equip</p>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {bundles.map((bundle) => {
@@ -652,43 +722,18 @@ export default function EditPackForm({
                   );
                 })}
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => addBundleToPack(selectedBundleId)}
-                  disabled={!selectedBundleId}
-                  className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-                >
-                  + Afegir lot seleccionat al pack
-                </button>
-              </div>
             </div>
           )}
 
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => autoComposeInventory('base')}
-              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
-            >
-              Compositor automàtic BASE
-            </button>
-            <button
-              type="button"
-              onClick={() => autoComposeInventory('pro')}
-              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
-            >
-              Compositor automàtic PRO
-            </button>
-            <button
-              type="button"
               onClick={() => { setPackInventory([]); setInfo('Inventari del pack netejat.'); }}
-              className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100"
             >
               Buidar composició
             </button>
           </div>
-
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
             <input className={input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca element..." />
@@ -703,10 +748,13 @@ export default function EditPackForm({
               onDrop={dropOut}
               className={`rounded-xl border p-3 transition-all ${dropZone === 'available' ? 'admin-drop-active border-rose-400/60 bg-rose-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
-              <p className="mb-2 text-sm font-semibold">Disponibles ({available.length})</p>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold">Disponibles ({available.length})</p>
+                <span className="text-xs text-white/45">Arrossega cap a inclosos</span>
+              </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable aria-label={`${i.name} — arrossega per afegir al pack`} onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={i.id} draggable aria-label={`${i.name} · arrossega per afegir al pack`} onDragStart={(e) => onDragStart(e, i.id, 'available')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <NextImage src={i.imageUrl || '/placeholder.png'} alt={i.name} width={56} height={56} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
@@ -726,20 +774,34 @@ export default function EditPackForm({
               onDrop={dropIn}
               className={`rounded-xl border p-3 transition-all ${dropZone === 'included' ? 'admin-drop-active border-emerald-400/60 bg-emerald-500/10' : 'border-white/10 bg-white/[0.03]'}`}
             >
-              <p className="mb-2 text-sm font-semibold">Inclosos ({included.length})</p>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold">Inclosos ({included.length})</p>
+                <span className="text-xs text-white/45">Revisa quantitats i obligatorietat</span>
+              </div>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable aria-label={`${item.name} — arrossega per treure del pack`} onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
+                  <article key={item.id} draggable aria-label={`${item.name} · arrossega per treure del pack`} onDragStart={(e) => onDragStart(e, item.id, 'included')} className="admin-drag-item cursor-grab rounded-xl border p-2">
                     <div className="flex items-start gap-3">
                       <NextImage
-                      src={item.imageUrl || '/placeholder.png'}
-                      alt={item.name}
-                      width={56}
-                      height={56}
-                      className="h-14 w-14 rounded-md border object-cover"
-                    />
+                        src={item.imageUrl || '/placeholder.png'}
+                        alt={item.name}
+                        width={56}
+                        height={56}
+                        className="h-14 w-14 rounded-md border object-cover"
+                      />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">{item.name}</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-sm font-semibold">{item.name}</p>
+                          {row.isRequired ? (
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-100">
+                              Obligatori
+                            </span>
+                          ) : (
+                            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/60">
+                              Opcional
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p>
                         <p className="line-clamp-2 text-xs">{item.description || 'Sense descripció'}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -783,7 +845,7 @@ export default function EditPackForm({
 
       {activeTab === 'texts' && (
         <section className="rounded-2xl border p-6">
-          <h3 className="mb-4 text-lg font-semibold">🌐 Textos</h3>
+          <h3 className="mb-4 text-lg font-semibold">Textos</h3>
           <p className="mb-3 text-xs">Nom del pack editable + tagline + features per idioma.</p>
           <div className="grid gap-4">
             {SUPPORTED_LOCALES.map((locale) => {
@@ -825,7 +887,7 @@ export default function EditPackForm({
         </section>
       )}
 
-      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 text-lg font-semibold">✅ Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
+      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 text-lg font-semibold">Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
 
       <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border p-3 backdrop-blur">
         <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>
@@ -834,6 +896,3 @@ export default function EditPackForm({
     </form>
   );
 }
-
-
-

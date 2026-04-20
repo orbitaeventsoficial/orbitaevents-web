@@ -60,3 +60,6 @@ test-results/
 !public/respira-rosa/index.html
 screenshots/
 scripts/admin-screenshots/
+
+tmp/
+.codex-dev.pid

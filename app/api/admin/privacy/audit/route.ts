@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -29,9 +29,11 @@ export async function GET(req: NextRequest) {
       prisma.privacyAuditLog.count({ where }),
     ]);
 
-    return NextResponse.json({ success: true, data: logs, total });
+    return NextResponse.json({ ok: true, body: { logs, total } });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error desconegut';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
+
+

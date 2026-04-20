@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { formatDateTimeFull } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_BOOKING_HELP_3, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type ActivePortal = {
   id: string;
@@ -133,7 +134,7 @@ export default function ClientPortalAccessPanel({
   };
 
   return (
-    <section className="ap-card p-6">
+    <section className="ap-card p-6" {...helpAttrs(ADMIN_BOOKING_HELP_3.portal.root)}>
       <h2 className="mb-2 text-lg font-semibold">Portal client (link únic)</h2>
       <p className="mb-4 text-xs">
         Genera un enllaç privat sense login per compartir estat, serveis, pagaments i informació post-event.
@@ -166,7 +167,7 @@ export default function ClientPortalAccessPanel({
         </label>
       </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2" {...helpAttrs(ADMIN_BOOKING_HELP_3.portal.options)}>
         <label className="text-sm">
           Títol personalitzat (opcional)
           <input
@@ -187,7 +188,7 @@ export default function ClientPortalAccessPanel({
           />
         </label>
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2" {...helpAttrs(ADMIN_BOOKING_HELP_3.portal.options)}>
         <label className="text-sm">
           Color accent del portal
           <input
@@ -217,7 +218,7 @@ export default function ClientPortalAccessPanel({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2" {...helpAttrs(ADMIN_BOOKING_HELP_3.portal.actions)}>
         <button
           type="button"
           onClick={handleCreateLink}
@@ -270,3 +271,4 @@ export default function ClientPortalAccessPanel({
     </section>
   );
 }
+

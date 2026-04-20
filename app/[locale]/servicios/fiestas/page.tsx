@@ -8,17 +8,12 @@ import Client from './FiestasClient';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
+import { SERVICE_HUB_SEO } from '@/lib/serviceHubSeo';
 
+const SEO = SERVICE_HUB_SEO.fiestas;
 
-// ===============================
-// DATOS CENTRALIZADOS DESDE DB (con fallback a config)
-// ===============================
 const getMinPrice = (packs: { priceValue: number }[]) =>
   packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
-
-// ===============================
-// METADATA SEO (USANDO CONFIG)
-// ===============================
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -36,12 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/fiestas',
-      images: [
-        {
-          url: heroImage,
-          alt: t('breadcrumb'),
-        },
-      ],
+      images: [{ url: heroImage, alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
@@ -51,22 +41,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       images: [heroImage],
     },
     robots: { index: true, follow: true },
-    keywords: [
-      'fiestas privadas barcelona',
-      'dj cumpleaños barcelona',
-      'dj fiestas barcelona',
-      'despedidas barcelona',
-      'fiestas temáticas barcelona',
-      'dj fiestas girona',
-      'cumpleaños con dj',
-      'fiesta halloween barcelona',
-    ],
+    keywords: SEO.keywords,
   };
 }
 
-// ===============================
-// PÁGINA
-// ===============================
 type PageProps = {
   params: Promise<{ locale: string }>;
 };
@@ -79,7 +57,6 @@ export default async function FiestasPage({ params }: PageProps) {
   const minPrice = getMinPrice(packs);
   const heroImage = await getPublicServiceHeroImage('fiestas');
 
-  // Obtener FAQs del archivo de traducciones
   const faqItems = [];
   for (let i = 0; i < 6; i++) {
     try {
@@ -103,30 +80,21 @@ export default async function FiestasPage({ params }: PageProps) {
         ]}
       />
 
-      {/* JSON-LD tirando de packs-config */}
       <ServiceJsonLD
-        name="Fiestas Privadas Completas y Personalizadas"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/fiestas"
-        description={`Experiencias completas para fiestas privadas: desde cumpleaños temáticos hasta celebraciones familiares. DJ profesional, sonido 4.000W, iluminación LED, animación y juegos adaptados a todos los invitados. Tematización completa disponible (Halloween, años 80, mundo mágico, tropical). Desde ${minPrice}€.`}
-        serviceType={[
-          'DJ para fiestas',
-          'Fiestas privadas',
-          'Cumpleaños temáticos',
-          'Despedidas',
-          'Fiestas temáticas',
-          'Animación fiestas',
-          'Iluminación LED',
-        ]}
-        areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
+        description={SEO.jsonLd.description(minPrice)}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
-        availability="https://schema.org/InStock"
-        offers={packs.map((pack: { name: string; priceValue: number; slug: string; tagline: string }) => ({
+        availability={SEO.jsonLd.availability}
+        offers={packs.map((pack: { name: string; priceValue: number; slug: string }) => ({
           '@type': 'Offer',
           price: String(pack.priceValue),
           priceCurrency: 'EUR',
           availability: 'https://schema.org/InStock',
-          url: `/servicios/fiestas#${pack.slug}`,
+          url: `${SEO.jsonLd.offerUrlPrefix}${pack.slug}`,
           name: pack.name,
         }))}
       />
@@ -137,4 +105,3 @@ export default async function FiestasPage({ params }: PageProps) {
     </>
   );
 }
-

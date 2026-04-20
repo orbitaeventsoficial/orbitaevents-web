@@ -2,7 +2,7 @@ import type { EventType, LeadSource, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
-import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 type PersistContactLeadInput = {
   name: string;
@@ -19,6 +19,10 @@ type PersistContactLeadInput = {
   preferredLocale: string;
   updateNote: string;
   createNote: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  landingPage?: string;
 };
 
 type PersistContactLeadResult = {
@@ -50,6 +54,10 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           interestedExtras: input.extras && input.extras.length > 0 ? input.extras : existingLead.interestedExtras,
           source: input.source,
           preferredLocale: input.preferredLocale || existingLead.preferredLocale,
+          utmSource: input.utmSource || existingLead.utmSource,
+          utmMedium: input.utmMedium || existingLead.utmMedium,
+          utmCampaign: input.utmCampaign || existingLead.utmCampaign,
+          landingPage: input.landingPage || existingLead.landingPage,
           updatedAt: new Date(),
         },
       });
@@ -80,6 +88,10 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           status: 'NEW',
           priority: 'MEDIUM',
           preferredLocale: input.preferredLocale || 'ca',
+          utmSource: input.utmSource || null,
+          utmMedium: input.utmMedium || null,
+          utmCampaign: input.utmCampaign || null,
+          landingPage: input.landingPage || null,
         },
       });
       savedLeadId = newLead.id;
@@ -134,7 +146,7 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
         await prisma.customerActivity.create({
           data: {
             customerId: customer.id,
-            action: 'LEAD_CREATED',
+            action: CUSTOMER_ACTIVITY_ACTIONS.LEAD_CREATED,
             details,
           },
         });

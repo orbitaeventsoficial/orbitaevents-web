@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { mockPrisma, mockCalculateGoogleMapsDistance, mockGetFuelCostPerKmReference } = vi.hoisted(() => ({
   mockPrisma: {
-    booking: { create: vi.fn(), findFirst: vi.fn() },
+    booking: { create: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn() },
     lead: { findUnique: vi.fn(), update: vi.fn() },
     customer: { findUnique: vi.fn() },
     pack: { findUnique: vi.fn() },
     extra: { findUnique: vi.fn(), create: vi.fn() },
     packInventory: { findMany: vi.fn() },
-    bookingInventory: { count: vi.fn(), upsert: vi.fn() },
+    bookingInventory: { count: vi.fn(), upsert: vi.fn(), groupBy: vi.fn() },
     customerActivity: { create: vi.fn() },
     task: { create: vi.fn() },
     availability: { upsert: vi.fn() },
@@ -50,6 +50,8 @@ const MOCK_PACK = {
 function setupDefaults() {
   mockPrisma.pack.findUnique.mockResolvedValue(MOCK_PACK);
   mockPrisma.booking.findFirst.mockResolvedValue(null); // no previous bookings
+  mockPrisma.booking.findUnique.mockResolvedValue(null); // reference doesn't exist yet
+  mockPrisma.bookingInventory.groupBy.mockResolvedValue([]); // no overlapping items
   mockPrisma.booking.create.mockResolvedValue({
     id: 'booking-1',
     reference: 'OE-2026-001',
@@ -227,6 +229,7 @@ describe('createBookingFromInput', () => {
         status: 'OPEN',
         priority: 'HIGH',
         title: expect.stringContaining('OE-2026-001'),
+        source: 'BOOKING_CREATION',
       }),
     });
   });
@@ -366,7 +369,7 @@ describe('createBookingFromInput', () => {
     mockPrisma.packInventory.findMany.mockResolvedValue([
       { itemId: 'item-1', quantity: 1, item: { condition: 'GOOD' } },
     ]);
-    mockPrisma.bookingInventory.count.mockResolvedValue(1); // overlapping
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([{ itemId: 'item-1' }]); // overlapping
 
     await createBookingFromInput(BASE_INPUT);
 

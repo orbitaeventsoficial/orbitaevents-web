@@ -4,6 +4,7 @@
  */
 
 import { OFFERS, type ExtraDefinition, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
+import { resolvePackI18nKey } from '@/lib/pack-i18n';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ export function calculatePricingSummary(
   extrasCatalog: ExtraDefinition[],
   appliedDiscountCode: AppliedDiscountCode | null,
   discountCodeReason: string,
+  locale: string,
 ): PricingSummary {
   const basePrice = config.selectedPack?.priceValue || 0;
   const extrasPrice = config.extras.reduce((sum, extraId) => {
@@ -110,14 +112,14 @@ export function calculatePricingSummary(
   if (config.appliedOffer === 'early-bird' && subtotal >= (OFFERS.earlyBird.minAmount || 0)) {
     applicableOffers.push({
       discount: Math.round((subtotal * (OFFERS.earlyBird.discount || 0)) / 100),
-      reason: OFFERS.earlyBird.name,
+      reason: resolvePackI18nKey(OFFERS.earlyBird.name, locale) || OFFERS.earlyBird.name,
     });
   }
 
   if (config.extras.length >= (OFFERS.combo.minExtras || 3)) {
     applicableOffers.push({
       discount: Math.round((extrasPrice * (OFFERS.combo.discount || 0)) / 100),
-      reason: OFFERS.combo.name,
+      reason: resolvePackI18nKey(OFFERS.combo.name, locale) || OFFERS.combo.name,
     });
   }
 
@@ -127,7 +129,7 @@ export function calculatePricingSummary(
     if (seasonalMonths.includes(eventMonth)) {
       applicableOffers.push({
         discount: Math.round((subtotal * (OFFERS.seasonal.discount || 0)) / 100),
-        reason: OFFERS.seasonal.name,
+        reason: resolvePackI18nKey(OFFERS.seasonal.name, locale) || OFFERS.seasonal.name,
       });
     }
   }
@@ -188,3 +190,5 @@ export function getSelectedExtraNames(extraIds: string[], extrasCatalog: ExtraDe
     .map((id) => extrasCatalog.find((extra) => extra.id === id)?.name)
     .filter(Boolean) as string[];
 }
+
+

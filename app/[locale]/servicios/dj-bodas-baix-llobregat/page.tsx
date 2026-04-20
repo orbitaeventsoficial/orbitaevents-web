@@ -8,24 +8,26 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-baix-llobregat'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
   const galleryImages = await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en el Baix Llobregat desde ${MIN_PRICE}€. Hospitalet, Cornellà, Sant Boi, El Prat. Desplazamiento incluido.`,
-  keywords: ['DJ bodas Baix Llobregat', 'DJ bodas Hospitalet', 'DJ bodas Cornellà', 'DJ bodas Sant Boi', 'bodas Baix Llobregat'],
+  title: COPY.metadata.title(MIN_PRICE),
+  description: COPY.metadata.description(MIN_PRICE),
+  keywords: COPY.metadata.keywords,
   metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-baix-llobregat' },
   openGraph: {
-    title: `DJ Bodas Baix Llobregat | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en el Baix Llobregat. Toda la comarca con desplazamiento incluido.',
+    title: COPY.metadata.ogTitle(MIN_PRICE),
+    description: COPY.metadata.ogDescription,
     url: '/servicios/dj-bodas-baix-llobregat',
-    images: [{ url: heroImage, alt: 'DJ Bodas Baix Llobregat - Òrbita Events' }],
+    images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
     type: 'website',
   },
   robots: { index: true, follow: true },
@@ -58,19 +60,14 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
     zone: 'Baix Llobregat',
     zoneSlug: 'baix-llobregat',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Baix Llobregat',
-    heroSubtitle: 'Hospitalet · Cornellà · Sant Boi · El Prat · Toda la comarca',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: baixLlobregatTowns,
     // Keywords SEO reals
-    highlights: ['DJ boda Hospitalet', 'Bodas Castelldefels playa', 'Precio DJ boda', 'DJ boda Gavà Mar'],
-    description: `DJ profesional para bodas en el Baix Llobregat. Cubrimos toda la comarca con desplazamiento incluido.`,
-    whyChooseUs: [
-      'Toda la comarca: Hospitalet, Cornellà, Sant Boi y más',
-      'Bodas de playa: Castelldefels y Gavà Mar',
-      'Variedad de espacios: Masías, restaurantes y hoteles',
-      'Conexión Barcelona: Fácil acceso desde la ciudad',
-    ],
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
     heroImage: heroImage,
     galleryImages: galleryImages,
@@ -82,13 +79,13 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
         { name: tCommon('nav.home'), url: '/' },
         { name: tCommon('nav.services'), url: '/servicios' },
         { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Baix Llobregat', url: '/servicios/dj-bodas-baix-llobregat' },
+        { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-baix-llobregat' },
       ]} />
       <ServiceJsonLD
-        name="DJ Bodas Baix Llobregat"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-baix-llobregat"
-        description={`DJ profesional para bodas en el Baix Llobregat. Desplazamiento incluido. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Baix Llobregat', 'DJ bodas Hospitalet', 'DJ bodas Cornellà']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={baixLlobregatTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +95,3 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
     </>
   );
 }
-

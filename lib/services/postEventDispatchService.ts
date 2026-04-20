@@ -3,7 +3,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { getAppBaseUrl } from '@/lib/site';
-import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import {
   generatePostEventEmail,
   getPostEventSubject,
@@ -119,7 +119,7 @@ export async function sendPostEventEmailForBooking(
     await prisma.customerActivity.create({
       data: {
         customerId: booking.lead.customerId,
-        action: 'POST_EVENT_EMAIL_SENT',
+        action: CUSTOMER_ACTIVITY_ACTIONS.POST_EVENT_EMAIL_SENT,
         details: { bookingId: booking.id, bookingRef: booking.reference },
       },
     });
@@ -128,7 +128,7 @@ export async function sendPostEventEmailForBooking(
   if (options?.createAdminLog) {
     await prisma.adminLog.create({
       data: {
-        action: 'SEND_POST_EVENT_EMAIL',
+        action: CUSTOMER_ACTIVITY_ACTIONS.SEND_POST_EVENT_EMAIL,
         entity: 'booking',
         entityId: booking.id,
         details: { email, reference: booking.reference },

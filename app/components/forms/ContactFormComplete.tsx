@@ -22,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { trackLead, trackCTAClick } from '@/lib/analytics';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
+import { useUtmParams } from '@/lib/hooks/useUtmParams';
 
 // ============================================================
 // TIPUS
@@ -118,6 +119,7 @@ export default function ContactFormComplete({
   preselectedDate?: string;
 }) {
   const t = useTranslations('contactForm');
+  const utmParams = useUtmParams();
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -217,6 +219,7 @@ export default function ContactFormComplete({
           timestamp: new Date().toISOString(),
           source: 'contact-form-complete',
           turnstileToken,
+          ...utmParams,
         }),
       });
 

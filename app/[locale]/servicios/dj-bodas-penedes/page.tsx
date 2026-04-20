@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-penedes'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
-  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en el Penedès desde ${MIN_PRICE}€. Vilafranca, Sant Sadurní, Sitges. Especialistas en bodas en bodegas y viñedos.`,
-  keywords: ['DJ bodas Penedès', 'DJ bodas Vilafranca', 'DJ bodas Sant Sadurní', 'DJ bodas bodegas', 'bodas viñedos Penedès'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-bodas-penedes' },
-  openGraph: {
-    title: `DJ Bodas Penedès | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en el Penedès. Especialistas en bodegas y viñedos.',
-    url: '/servicios/dj-bodas-penedes',
-    images: [{ url: heroImage, alt: 'DJ Bodas Penedès - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-bodas-penedes' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-bodas-penedes',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -51,44 +52,42 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   const zoneConfig: ZoneConfig = {
     zone: 'Penedès',
     zoneSlug: 'penedes',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Penedès',
-    heroSubtitle: 'Vilafranca · Sant Sadurní · Sitges · Bodegas y viñedos',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: penedesTowns,
-    // Keywords SEO reals
-    highlights: ['Bodas bodega Penedès', 'DJ boda viñedos', 'Precio DJ boda', 'Bodas cava Sant Sadurní'],
-    description: `DJ profesional para bodas en el Penedès. Especialistas en bodas en bodegas y viñedos.`,
-    whyChooseUs: [
-      'Especialistas en bodegas: Codorníu, Freixenet, Torres...',
-      'Acústica en cavas: Sabemos ecualizar espacios subterráneos',
-      'Desplazamiento incluido: Toda la comarca cubierta',
-      'Generador propio: Por si la finca no tiene potencia',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Penedès', url: '/servicios/dj-bodas-penedes' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-penedes' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Bodas Penedès"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-penedes"
-        description={`DJ profesional para bodas en el Penedès. Especialistas en bodegas y viñedos. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Penedès', 'DJ bodas Vilafranca', 'DJ bodas bodegas']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={penedesTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +97,3 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
     </>
   );
 }
-

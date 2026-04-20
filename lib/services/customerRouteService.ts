@@ -1,4 +1,10 @@
 import { prisma } from '@/lib/prisma';
+import {
+  CUSTOMER_ACTIVITY_ACTIONS,
+  CUSTOMER_ANONYMIZED_NAME,
+  CUSTOMER_ANONYMIZED_NAME_NORMALIZED,
+  buildAnonymizedEmail,
+} from '@/lib/constants';
 
 type CustomerPatchInput = {
   name?: string;
@@ -8,6 +14,9 @@ type CustomerPatchInput = {
   preferredLocale?: 'ca' | 'es' | 'en';
   gdprConsent?: boolean;
   marketingConsent?: boolean;
+  birthday?: string | null;
+  referredById?: string | null;
+  dni?: string | null;
 };
 
 type CustomerRouteResult = {
@@ -22,7 +31,9 @@ export async function getCustomerDetail(id: string): Promise<CustomerRouteResult
       leads: { take: 10, orderBy: { createdAt: 'desc' } },
       bookings: { take: 10, orderBy: { createdAt: 'desc' } },
       proposals: { take: 10, orderBy: { createdAt: 'desc' } },
-      tasks: { where: { status: { not: 'DONE' } }, take: 10 },
+      tasks: { where: { status: { notIn: ['DONE', 'CANCELLED'] } }, take: 10 },
+      referredBy: { select: { id: true, name: true, email: true } },
+      referrals: { select: { id: true, name: true, email: true, totalEvents: true, totalSpent: true } },
       _count: {
         select: {
           leads: true,
@@ -30,6 +41,7 @@ export async function getCustomerDetail(id: string): Promise<CustomerRouteResult
           proposals: true,
           tasks: true,
           testimonials: true,
+          referrals: true,
         },
       },
     },
@@ -101,6 +113,21 @@ export async function updateCustomerFromInput(id: string, data: CustomerPatchInp
     }
   }
 
+  if (data.birthday !== undefined) {
+    updateData.birthday = data.birthday ? new Date(data.birthday) : null;
+  }
+
+  if (data.referredById !== undefined) {
+    updateData.referredById = data.referredById || null;
+  }
+
+  if (data.dni !== undefined) {
+    updateData.dni = data.dni?.trim() || null;
+    updateData.dniNormalized = data.dni
+      ? data.dni.toUpperCase().replace(/[\s-]/g, '').trim()
+      : null;
+  }
+
   const customer = await prisma.customer.update({
     where: { id },
     data: updateData,
@@ -109,7 +136,7 @@ export async function updateCustomerFromInput(id: string, data: CustomerPatchInp
   await prisma.customerActivity.create({
     data: {
       customerId: id,
-      action: 'PROFILE_UPDATED',
+      action: CUSTOMER_ACTIVITY_ACTIONS.PROFILE_UPDATED,
       details: { fields: Object.keys(updateData) },
     },
   });
@@ -138,10 +165,10 @@ export async function deleteCustomerOrAnonymize(id: string): Promise<CustomerRou
     await prisma.customer.update({
       where: { id },
       data: {
-        name: 'Client Anonimitzat',
-        nameNormalized: 'client anonimitzat',
-        email: `deleted-${id}@anonimitzat.local`,
-        emailNormalized: `deleted-${id}@anonimitzat.local`,
+        name: CUSTOMER_ANONYMIZED_NAME,
+        nameNormalized: CUSTOMER_ANONYMIZED_NAME_NORMALIZED,
+        email: buildAnonymizedEmail(id),
+        emailNormalized: buildAnonymizedEmail(id),
         phone: null,
         phoneNormalized: null,
         instagram: null,

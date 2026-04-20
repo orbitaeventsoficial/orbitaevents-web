@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { issueClientPortalAccess, getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { sendEmail } from '@/lib/email';
 import { log } from '@/lib/logger';
-import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 function getPortalCopy(locale: string | null | undefined, clientName: string) {
   const loc = (locale || 'ca').toLowerCase();
@@ -71,7 +71,7 @@ async function ensureCompletedBookingPortalAccess(options: {
 
   await prisma.adminLog.create({
     data: {
-      action: 'PORTAL_AUTO_CREATED',
+      action: CUSTOMER_ACTIVITY_ACTIONS.PORTAL_AUTO_CREATED,
       entity: 'booking',
       entityId: options.bookingId,
       details: { trigger: options.trigger, clientEmail: options.clientEmail || null },

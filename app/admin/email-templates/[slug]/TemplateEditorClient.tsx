@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { EditorControlStrip } from '../../components/EditorControlStrip';
 import SortableList from '../../components/SortableList';
 import { useToast } from '../../components/ToastProvider';
 import { SUPPORTED_LOCALES } from '@/lib/constants';
@@ -270,6 +271,30 @@ export default function TemplateEditorClient({
   };
 
   const selectedBlock = blocks.find((b) => b.id === selectedBlockId);
+  const hasSubject = subject.trim().length > 0;
+  const hasBlocks = blocks.length > 0;
+  const translatedLocaleReady = locale === 'ca' || hasBlocks;
+  const selectedBlockLabel = selectedBlock
+    ? BLOCK_CATALOG.find((catalogBlock) => catalogBlock.type === selectedBlock.type)?.label || selectedBlock.type
+    : 'Cap';
+  const actionTitle = loading
+    ? 'Esperar la càrrega abans d’editar la plantilla'
+    : saving
+      ? 'Deixar que la plantilla es desi correctament'
+      : !hasSubject || !hasBlocks
+        ? 'Completar primer la base mínima de la plantilla'
+        : translating
+          ? 'Deixar acabar la traducció abans de seguir'
+          : 'Refinar blocs, variables i preview abans de sortir';
+  const actionDescription = loading
+    ? 'Sense la plantilla carregada no toca intervenir sobre blocs ni idioma a cegues.'
+    : saving
+      ? 'Ara mateix el sistema està persistint l’assumpte i el cos HTML de la plantilla.'
+      : !hasSubject || !hasBlocks
+        ? 'El retorn més alt ara és assegurar assumpte i estructura mínima abans de perfilar el detall visual.'
+        : translating
+          ? 'La sessió està traduint contingut i convé no duplicar canvis fins que acabi.'
+          : 'Amb la base completa, el següent pas bo és revisar consistència de blocs, variables i preview abans de desar.';
 
   if (loading) {
     return (
@@ -282,6 +307,45 @@ export default function TemplateEditorClient({
 
   return (
     <div className="space-y-4">
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix la plantilla',
+          tone: loading ? 'default' : !hasSubject || !hasBlocks ? 'warning' : 'success',
+          stats: [
+            { label: 'Idioma', value: locale.toUpperCase(), hint: 'sessió activa' },
+            { label: 'Blocs', value: blocks.length, tone: hasBlocks ? 'success' : 'warning', hint: 'cos visible' },
+            { label: 'Variables', value: variables.length, hint: 'slots disponibles' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de desar',
+          tone: loading ? 'default' : saving || translating || !hasSubject || !hasBlocks ? 'warning' : 'info',
+          items: [
+            hasSubject ? 'La plantilla ja té assumpte editable en aquest idioma.' : 'Encara falta l’assumpte de la plantilla.',
+            hasBlocks
+              ? `Hi ha ${blocks.length} blocs actius i el bloc seleccionat ara és: ${selectedBlockLabel}.`
+              : 'Encara no hi ha estructura de blocs carregada per a aquesta plantilla.',
+            translating
+              ? `S’està traduint contingut cap a ${locale.toUpperCase()}.`
+              : translatedLocaleReady
+                ? `La sessió de ${locale.toUpperCase()} està operativa per editar i previsualitzar.`
+                : `La sessió de ${locale.toUpperCase()} encara necessita base per treballar-la amb criteri.`,
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: saving || translating || !hasSubject || !hasBlocks ? 'warning' : 'success',
+          secondaryPills: [
+            hasSubject ? 'Assumpte OK' : 'Assumpte pendent',
+            selectedBlock ? selectedBlockLabel : 'Sense selecció',
+          ],
+        }}
+      />
+
       <div className="ap-card flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-end">
         <div className="ap-tabs-nav">
           {SUPPORTED_LOCALES.map((l) => (

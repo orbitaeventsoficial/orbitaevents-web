@@ -1,11 +1,18 @@
-import { getTaskStatusLabel, TASK_STATUS_VALUES, formatDateSimple } from '@/lib/constants';
-import Link from 'next/link';
-import type { LeadTaskStatus } from '@prisma/client';
-import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
-import TaskRowActions from './TaskRowActions';
-import GenerateDailyChecklistButton from './GenerateDailyChecklistButton';
-import TaskKanbanView from './TaskKanbanView';
+import { TASK_QUEUE_VALUES, TASK_STATUS_VALUES } from '@/lib/constants';
+import type { TaskStatus } from '@/lib/services/tasks/leadScopedTaskService';
+import { AdminPage } from '@/app/admin/components/AdminPage';
+import {
+  TaskFiltersSection,
+  TaskKanbanSection,
+  TaskListSection,
+  TaskPageToolbar,
+  TaskPagination,
+  type TaskListItem,
+} from './TaskPageSections';
 import { fetchAdminTaskList } from '@/lib/services/tasks/taskList';
+import { loadTaskQueue, type TaskQueue } from '@/lib/services/tasks/taskQueueService';
+import TaskQueueBanner from './TaskQueueBanner';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,9 +20,15 @@ export const metadata = {
   title: 'Tasques | Òrbita Admin',
 };
 
-function isTaskStatus(value?: string): value is LeadTaskStatus {
+function isTaskStatus(value?: string): value is TaskStatus {
   if (!value) return false;
   return (TASK_STATUS_VALUES as readonly string[]).includes(value);
+}
+
+
+function isTaskQueue(value?: string): value is TaskQueue {
+  if (!value) return false;
+  return (TASK_QUEUE_VALUES as readonly string[]).includes(value);
 }
 
 function parsePage(value?: string) {
@@ -23,11 +36,7 @@ function parsePage(value?: string) {
   return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
 }
 
-function resolveDestination(task: {
-  title: string;
-  customer?: { id: string; name: string };
-  lead?: { id: string; name: string };
-}) {
+function resolveDestination(task: TaskListItem) {
   if (task.customer) return `/admin/clientes/${task.customer.id}`;
   if (task.lead) return `/admin/leads/${task.lead.id}`;
 
@@ -46,32 +55,92 @@ export default async function TasksPage({
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const viewParam = Array.isArray(searchParams?.view) ? searchParams?.view[0] : searchParams?.view;
-  const isKanban = viewParam === 'list' ? false : true;
+  const isKanban = viewParam !== 'list';
   const statusParam = Array.isArray(searchParams?.status) ? searchParams?.status[0] : searchParams?.status;
-  const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
+  const status: TaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
   const customerIdParam = Array.isArray(searchParams?.customerId) ? searchParams?.customerId[0] : searchParams?.customerId;
   const customerId = customerIdParam && customerIdParam.trim() ? customerIdParam.trim() : undefined;
+  const queueParam = Array.isArray(searchParams?.queue) ? searchParams?.queue[0] : searchParams?.queue;
+  const queueFilter = isTaskQueue(queueParam) ? queueParam : undefined;
   const pageParam = Array.isArray(searchParams?.page) ? searchParams?.page[0] : searchParams?.page;
   const page = parsePage(pageParam);
   const limit = 25;
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  const { tasks, total } = await fetchAdminTaskList({
-    status,
-    customerId,
-    page,
-    limit,
-    todayStart,
-  });
+  let taskResult: Awaited<ReturnType<typeof fetchAdminTaskList>>;
+  let queueSummary: Awaited<ReturnType<typeof loadTaskQueue>>;
+
+  if (queueFilter && !isKanban) {
+    queueSummary = await loadTaskQueue(todayStart);
+    const taskIds = queueSummary.items
+      .filter((item) => item.queue === queueFilter)
+      .map((item) => item.id);
+    taskResult = await fetchAdminTaskList({ status, customerId, taskIds, page, limit, todayStart });
+  } else {
+    [taskResult, queueSummary] = await Promise.all([
+      fetchAdminTaskList({ status, customerId, page, limit, todayStart }),
+      loadTaskQueue(todayStart),
+    ]);
+  }
+
+  const { tasks, total } = taskResult;
+  const openTasks = tasks.filter((task) => task.status === 'OPEN' || task.status === 'IN_PROGRESS').length;
+  const overdueTasks = tasks.filter(
+    (task) => task.dueDate && task.dueDate < todayStart && task.status !== 'DONE' && task.status !== 'CANCELLED'
+  ).length;
+  const dueTodayTasks = tasks.filter(
+    (task) => task.dueDate && task.dueDate.getTime() === todayStart.getTime() && task.status !== 'DONE' && task.status !== 'CANCELLED'
+  ).length;
+  const reactivationTasks = tasks.filter((task) => task.source === 'reactivation').length;
+  const blockedQueueCount = queueSummary.queues.BLOQUEJAT || 0;
+  const vipQueueCount = queueSummary.queues.VIP || 0;
+  const automaticSignals = [
+    queueSummary.total > 0 ? `${queueSummary.total} tasca${queueSummary.total > 1 ? 'ques' : ''} dins la queue operativa` : null,
+    dueTodayTasks > 0 ? `${dueTodayTasks} tasca${dueTodayTasks > 1 ? 'ques' : ''} per avui` : null,
+    vipQueueCount > 0 ? `${vipQueueCount} tasca${vipQueueCount > 1 ? 'ques' : ''} VIP` : null,
+    reactivationTasks > 0 ? `${reactivationTasks} reactivació${reactivationTasks > 1 ? 'ns' : ''} activa${reactivationTasks > 1 ? 'es' : ''}` : null,
+  ].filter(Boolean) as string[];
+  const manualSignals = [
+    overdueTasks > 0 ? `${overdueTasks} tasca${overdueTasks > 1 ? 'ques' : ''} vençuda${overdueTasks > 1 ? 'es' : ''}` : null,
+    blockedQueueCount > 0 ? `${blockedQueueCount} tasca${blockedQueueCount > 1 ? 'ques' : ''} bloquejada${blockedQueueCount > 1 ? 'es' : ''}` : null,
+    openTasks > 0 ? `${openTasks} tasca${openTasks > 1 ? 'ques' : ''} oberta${openTasks > 1 ? 'es' : ''}` : null,
+  ].filter(Boolean) as string[];
+  const nextStepHref = overdueTasks > 0
+    ? customerId
+      ? buildTaskListHref(customerId, false, status, 'VENÇUT')
+      : '/admin/tasks?view=list&queue=VENÇUT'
+    : blockedQueueCount > 0
+      ? customerId
+        ? buildTaskListHref(customerId, false, status, 'BLOQUEJAT')
+        : '/admin/tasks?view=list&queue=BLOQUEJAT'
+      : customerId
+        ? `/admin/clientes/${customerId}?tab=tasks`
+        : '/admin/tasks/new';
+  const nextStepLabel = overdueTasks > 0
+    ? 'Desbloquejar tasques vençudes'
+    : blockedQueueCount > 0
+      ? 'Revisar tasques bloquejades'
+      : customerId
+        ? 'Tornar al client'
+        : 'Crear tasca nova';
+  const nextStepDetail = overdueTasks > 0
+    ? 'La prioritat és recuperar execució que ja ha passat de data.'
+    : blockedQueueCount > 0
+      ? 'Hi ha feina parada que necessita decisió o context.'
+      : customerId
+        ? 'No hi ha tensió forta a la cua actual del client.'
+        : 'No hi ha cap front calent; pots crear o revisar feina nova.';
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const buildHref = (targetPage: number) => {
     const params = new URLSearchParams();
+    if (!isKanban) params.set('view', 'list');
     if (status) params.set('status', status);
     if (customerId) params.set('customerId', customerId);
     params.set('page', String(targetPage));
-    return `/admin/tasks?${params.toString()}`;
+    const query = params.toString();
+    return query ? '/admin/tasks?' + query : '/admin/tasks';
   };
 
   return (
@@ -79,122 +148,53 @@ export default async function TasksPage({
       title="Tasques"
       subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
       back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
-      actions={
-        <>
-          <div className="flex items-center gap-1 rounded-xl border p-0.5" data-help-title="Canvi de vista de tasques" data-help-desc="Kanban per moure feina ràpidament entre estats. Llista per revisar cada tasca amb més detall i context.">
-            <Link
-              href={`/admin/tasks?view=kanban${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${isKanban ? 'bg-white/10 text-white' : ''}`}
-            >
-              Kanban
-            </Link>
-            <Link
-              href={`/admin/tasks?view=list${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${!isKanban ? 'bg-white/10 text-white' : ''}`}
-            >
-              Llista
-            </Link>
-          </div>
-          <GenerateDailyChecklistButton />
-          <Link href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'} className="ap-btn ap-btn--primary">
-            + Nova tasca
-          </Link>
-        </>
-      }
+      actions={<TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />}
     >
-      {isKanban && (
-        <AdminSection>
-          <div data-help-title="Kanban de tasques" data-help-desc="Vista visual de tasques organitzades per estat. Arrossega per canviar estat o clica per obrir el detall.">
-            <TaskKanbanView />
-          </div>
-        </AdminSection>
-      )}
-
       {!isKanban && (
+        <OwnerControlStrip
+          system={{
+            eyebrow: 'Automàtic',
+            title: 'Què vigila el sistema',
+            tone: 'info',
+            items: automaticSignals,
+            emptyText: 'Sense senyals automàtiques destacades ara mateix.',
+          }}
+          manual={{
+            eyebrow: 'Manual',
+            title: 'Què et reclama decisió',
+            tone: manualSignals.length > 0 ? 'warning' : 'success',
+            items: manualSignals,
+            emptyText: 'No hi ha cap front manual calent a la cua actual.',
+          }}
+          nextStep={{
+            title: nextStepLabel,
+            detail: nextStepDetail,
+            href: nextStepHref,
+          }}
+        />
+      )}
+      {!isKanban && queueSummary.total > 0 && (
+        <TaskQueueBanner queues={queueSummary.queues} total={queueSummary.total} />
+      )}
+      {isKanban ? (
+        <TaskKanbanSection />
+      ) : (
         <>
-          <AdminSection compact>
-            <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2" data-help-title="Filtres de tasques" data-help-desc="Serveixen per quedar-te només amb l'estat que vols revisar abans d'entrar al detall.">
-              {customerId && <input type="hidden" name="customerId" value={customerId} />}
-              <input type="hidden" name="view" value="list" />
-              <label htmlFor="task-status-filter" className="ap-subtitle">Estat</label>
-              <select
-                id="task-status-filter"
-                name="status"
-                defaultValue={status || ''}
-              >
-                <option value="">Totes</option>
-                {TASK_STATUS_VALUES.map((value) => (
-                  <option key={value} value={value}>
-                    {getTaskStatusLabel(value)}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="ap-btn ap-btn--secondary">Aplicar</button>
-            </form>
-          </AdminSection>
-
-          <AdminSection flush>
-            {tasks.length === 0 ? (
-              <AdminEmptyState
-                icon="📝"
-                title="No hi ha tasques"
-                description="Crea una nova tasca per començar"
-                action={
-                  <Link href="/admin/tasks/new" className="ap-btn ap-btn--primary">
-                    + Nova tasca
-                  </Link>
-                }
-              />
-            ) : (
-              <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }} data-help-title="Llistat de tasques" data-help-desc="Cada fila representa una tasca operativa i et deixa saltar al client o lead relacionat i canviar-ne l'estat.">
-                {tasks.map((task) => {
-                  const destinationHref = resolveDestination(task);
-                  return (
-                    <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ transition: 'background var(--at-transition)' }}>
-                      <Link href={destinationHref} className="min-w-0 flex-1">
-                        <p className="text-sm truncate">{task.title}</p>
-                        <p className="ap-subtitle">
-                          {(task.customer?.name || task.lead?.name || 'Sense relació')} · {getTaskStatusLabel(task.status)}
-                        </p>
-                      </Link>
-                      <div className="flex shrink-0 items-center gap-3">
-                        <span className="ap-subtitle">
-                          {task.dueDate ? formatDateSimple(task.dueDate) : 'Sense data'}
-                        </span>
-                        <TaskRowActions
-                          taskId={task.id}
-                          status={task.status}
-                          destinationHref={destinationHref}
-                        />
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </AdminSection>
+          <TaskFiltersSection status={status} customerId={customerId} />
+          <TaskListSection tasks={tasks} resolveDestination={resolveDestination} />
         </>
       )}
-
-      {!isKanban && totalPages > 1 && (
-        <div className="flex items-center justify-between ap-subtitle" data-help-title="Paginació de tasques" data-help-desc="Permet navegar per totes les tasques quan la llista no cap en una sola pàgina.">
-          <span>Pàgina {page} de {totalPages}</span>
-          <div className="ap-header-actions">
-            <Link
-              href={buildHref(Math.max(1, page - 1))}
-              className={`ap-btn ap-btn--secondary ${page === 1 ? 'pointer-events-none opacity-40' : ''}`}
-            >
-              ← Anterior
-            </Link>
-            <Link
-              href={buildHref(Math.min(totalPages, page + 1))}
-              className={`ap-btn ap-btn--secondary ${page === totalPages ? 'pointer-events-none opacity-40' : ''}`}
-            >
-              Següent →
-            </Link>
-          </div>
-        </div>
-      )}
+      {!isKanban && <TaskPagination page={page} totalPages={totalPages} buildHref={buildHref} />}
     </AdminPage>
   );
+}
+
+function buildTaskListHref(customerId: string | undefined, isKanban: boolean, status?: TaskStatus, queue?: TaskQueue) {
+  const params = new URLSearchParams();
+  if (!isKanban) params.set('view', 'list');
+  if (status) params.set('status', status);
+  if (queue) params.set('queue', queue);
+  if (customerId) params.set('customerId', customerId);
+  const query = params.toString();
+  return query ? `/admin/tasks?${query}` : '/admin/tasks';
 }

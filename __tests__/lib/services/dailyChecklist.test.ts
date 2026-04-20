@@ -53,6 +53,7 @@ describe('generateDailyChecklistTasks', () => {
           title: expect.stringContaining('entrades noves'),
           priority: 'URGENT',
           createdBy: 'system:daily-checklist',
+          source: 'CHECKLIST',
         }),
       ]),
     });
@@ -140,10 +141,13 @@ describe('generateDailyChecklistTasks', () => {
     expect(mockPrisma.task.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          createdBy: 'system:daily-checklist',
+          source: 'CHECKLIST',
           status: { in: ['OPEN', 'IN_PROGRESS'] },
         }),
-        data: expect.objectContaining({ status: 'CANCELLED' }),
+        data: expect.objectContaining({
+          status: 'CANCELLED',
+          resolutionNote: expect.stringContaining('vençut'),
+        }),
       })
     );
   });
@@ -157,7 +161,7 @@ describe('generateDailyChecklistTasks', () => {
     expect(mockPrisma.task.deleteMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          createdBy: 'system:daily-checklist',
+          source: 'CHECKLIST',
           status: { in: ['CANCELLED', 'DONE'] },
         }),
       })
@@ -177,6 +181,17 @@ describe('generateDailyChecklistTasks', () => {
     const result = await generateDailyChecklistTasks();
 
     expect(result.todayCancelled).toBe(1);
+    expect(mockPrisma.task.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          id: { in: ['today-1'] },
+        }),
+        data: expect.objectContaining({
+          status: 'CANCELLED',
+          resolutionNote: expect.stringContaining('Senyal desaparegut'),
+        }),
+      })
+    );
   });
 
   it('retorna estructura de resultat completa', async () => {

@@ -4,9 +4,9 @@ const { mockPrisma, mockTryPortal, mockCalcDuration } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(),
     booking: { findUnique: vi.fn() },
-    bookingInventory: { count: vi.fn(), create: vi.fn(), findMany: vi.fn() },
-    inventoryItem: { update: vi.fn() },
-    inventoryUsage: { create: vi.fn() },
+    bookingInventory: { count: vi.fn(), create: vi.fn(), createMany: vi.fn(), findMany: vi.fn(), groupBy: vi.fn() },
+    inventoryItem: { update: vi.fn(), updateMany: vi.fn() },
+    inventoryUsage: { create: vi.fn(), createMany: vi.fn() },
     availability: { updateMany: vi.fn() },
     liveNotification: { create: vi.fn() },
   },
@@ -51,9 +51,13 @@ describe('applyBookingStatusSideEffects', () => {
     mockPrisma.booking.findUnique.mockResolvedValue(null);
     mockPrisma.bookingInventory.count.mockResolvedValue(0);
     mockPrisma.bookingInventory.create.mockResolvedValue({});
+    mockPrisma.bookingInventory.createMany.mockResolvedValue({ count: 0 });
     mockPrisma.bookingInventory.findMany.mockResolvedValue([]);
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([]);
     mockPrisma.inventoryItem.update.mockResolvedValue({});
+    mockPrisma.inventoryItem.updateMany.mockResolvedValue({ count: 0 });
     mockPrisma.inventoryUsage.create.mockResolvedValue({});
+    mockPrisma.inventoryUsage.createMany.mockResolvedValue({ count: 0 });
     mockPrisma.availability.updateMany.mockResolvedValue({});
     mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<void>) => {
       await fn({
@@ -78,15 +82,16 @@ describe('applyBookingStatusSideEffects', () => {
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CONFIRMED' }));
 
-    expect(mockPrisma.bookingInventory.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
+    expect(mockPrisma.bookingInventory.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({
         bookingId: 'booking-1',
         itemId: 'item-1',
         quantity: 1,
-      }),
+      })],
+      skipDuplicates: true,
     });
-    expect(mockPrisma.inventoryItem.update).toHaveBeenCalledWith({
-      where: { id: 'item-1' },
+    expect(mockPrisma.inventoryItem.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['item-1'] } },
       data: { status: 'IN_USE' },
     });
   });
@@ -102,7 +107,7 @@ describe('applyBookingStatusSideEffects', () => {
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CONFIRMED' }));
 
-    expect(mockPrisma.bookingInventory.create).not.toHaveBeenCalled();
+    expect(mockPrisma.bookingInventory.createMany).not.toHaveBeenCalled();
   });
 
   it('no assigna inventari si en ús per altra reserva activa', async () => {
@@ -113,11 +118,11 @@ describe('applyBookingStatusSideEffects', () => {
       },
       inventory: [],
     });
-    mockPrisma.bookingInventory.count.mockResolvedValue(1); // overlapping
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([{ itemId: 'item-1' }]); // overlapping
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CONFIRMED' }));
 
-    expect(mockPrisma.bookingInventory.create).not.toHaveBeenCalled();
+    expect(mockPrisma.bookingInventory.createMany).not.toHaveBeenCalled();
   });
 
   it('no fa res d\'inventari si CONFIRMED → CONFIRMED', async () => {
@@ -169,14 +174,19 @@ describe('applyBookingStatusSideEffects', () => {
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
 
-    expect(mockPrisma.inventoryUsage.create).toHaveBeenCalledTimes(2);
-    expect(mockPrisma.inventoryUsage.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        itemId: 'item-1',
-        bookingId: 'booking-1',
-        hoursUsed: 7,
-        notes: expect.stringContaining('OE-2026-001'),
-      }),
+    expect(mockPrisma.inventoryUsage.createMany).toHaveBeenCalledWith({
+      data: expect.arrayContaining([
+        expect.objectContaining({
+          itemId: 'item-1',
+          bookingId: 'booking-1',
+          hoursUsed: 7,
+          notes: expect.stringContaining('OE-2026-001'),
+        }),
+        expect.objectContaining({
+          itemId: 'item-2',
+          bookingId: 'booking-1',
+        }),
+      ]),
     });
   });
 
@@ -188,19 +198,19 @@ describe('applyBookingStatusSideEffects', () => {
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
 
-    expect(mockPrisma.inventoryUsage.create).not.toHaveBeenCalled();
+    expect(mockPrisma.inventoryUsage.createMany).not.toHaveBeenCalled();
   });
 
   it('allibera inventari si no té altres reserves actives', async () => {
     mockPrisma.bookingInventory.findMany.mockResolvedValue([
       { itemId: 'item-1', item: { id: 'item-1' } },
     ]);
-    mockPrisma.bookingInventory.count.mockResolvedValue(0); // no other active
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([]); // no other active
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
 
-    expect(mockPrisma.inventoryItem.update).toHaveBeenCalledWith({
-      where: { id: 'item-1' },
+    expect(mockPrisma.inventoryItem.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['item-1'] } },
       data: { status: 'AVAILABLE' },
     });
   });
@@ -209,11 +219,11 @@ describe('applyBookingStatusSideEffects', () => {
     mockPrisma.bookingInventory.findMany.mockResolvedValue([
       { itemId: 'item-1', item: { id: 'item-1' } },
     ]);
-    mockPrisma.bookingInventory.count.mockResolvedValue(2); // other active bookings
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([{ itemId: 'item-1' }]); // still active elsewhere
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'COMPLETED' }));
 
-    expect(mockPrisma.inventoryItem.update).not.toHaveBeenCalled();
+    expect(mockPrisma.inventoryItem.updateMany).not.toHaveBeenCalled();
   });
 
   it('crida tryEnsureCompletedBookingPortalAccess al completar', async () => {
@@ -252,12 +262,12 @@ describe('applyBookingStatusSideEffects', () => {
     mockPrisma.bookingInventory.findMany.mockResolvedValue([
       { itemId: 'item-1' },
     ]);
-    mockPrisma.bookingInventory.count.mockResolvedValue(0);
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([]); // no other active
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CANCELLED' }));
 
-    expect(mockPrisma.inventoryItem.update).toHaveBeenCalledWith({
-      where: { id: 'item-1' },
+    expect(mockPrisma.inventoryItem.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['item-1'] } },
       data: { status: 'AVAILABLE' },
     });
   });
@@ -266,11 +276,11 @@ describe('applyBookingStatusSideEffects', () => {
     mockPrisma.bookingInventory.findMany.mockResolvedValue([
       { itemId: 'item-1' },
     ]);
-    mockPrisma.bookingInventory.count.mockResolvedValue(1);
+    mockPrisma.bookingInventory.groupBy.mockResolvedValue([{ itemId: 'item-1' }]); // still active
 
     await applyBookingStatusSideEffects(makeInput({ newStatus: 'CANCELLED' }));
 
-    expect(mockPrisma.inventoryItem.update).not.toHaveBeenCalled();
+    expect(mockPrisma.inventoryItem.updateMany).not.toHaveBeenCalled();
   });
 
   // ─── General ──────────────────────────────────────────

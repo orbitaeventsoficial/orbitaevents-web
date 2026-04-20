@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -142,7 +142,13 @@ function CursorGlow({ containerRef }: { containerRef: React.RefObject<HTMLElemen
 
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
-  const rotatingTexts = t.raw('rotatingTexts') as string[];
+  const rotatingTextsRaw = t.raw('rotatingTexts') as string[] | undefined;
+  const rotatingTexts = Array.isArray(rotatingTextsRaw)
+    ? rotatingTextsRaw.filter((text) => typeof text === 'string' && text.trim().length > 0)
+    : [];
+  const hasRotatingLine = rotatingTexts.length > 0;
+  const hookLine1 = t('hook.line1');
+  const hookLine2 = t('hook.line2');
   const [textIndex, setTextIndex] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [mediaItems, setMediaItems] = useState<HeroMediaItem[]>([...PUBLIC_HERO_MEDIA_FALLBACK]);
@@ -200,11 +206,12 @@ export default function HeroElegant() {
 
   // Rotate text
   useEffect(() => {
+    if (!hasRotatingLine) return;
     const interval = setInterval(() => {
       setTextIndex((prev) => (prev + 1) % rotatingTexts.length);
     }, 4400);
     return () => clearInterval(interval);
-  }, [rotatingTexts.length]);
+  }, [hasRotatingLine, rotatingTexts.length]);
 
   // Rotate slides
   useEffect(() => {
@@ -225,7 +232,7 @@ export default function HeroElegant() {
     <section
       ref={sectionRef}
       aria-label="Hero"
-      className="relative min-h-[100svh] flex items-end overflow-hidden bg-black"
+      className="relative min-h-[100svh] flex items-center overflow-hidden bg-black"
     >
       {/* ── Background media — amb parallax ── */}
       <motion.div className="absolute inset-0" style={{ y: reduceMotion ? 0 : bgY }} aria-hidden="true">
@@ -359,7 +366,7 @@ export default function HeroElegant() {
 
       {/* ── Content — amb parallax fade-out ── */}
       <motion.div
-        className="relative z-10 w-full pb-20 md:pb-28 lg:pb-32 pt-40"
+        className="relative z-10 w-full pb-10 md:pb-14 lg:pb-16 pt-24 md:pt-28"
         style={reduceMotion ? {} : { opacity: contentOpacity, y: contentY }}
       >
         <div className="container mx-auto px-6 md:px-8 lg:px-12">
@@ -370,7 +377,7 @@ export default function HeroElegant() {
               initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 md:mb-8"
+              className="mb-4 md:mb-5"
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-white/70 text-xs md:text-sm font-medium tracking-wide uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -378,7 +385,28 @@ export default function HeroElegant() {
               </span>
             </motion.div>
 
-            {/* Title — staggered word reveal */}
+            {/* Hook — emotional opener with left accent bar */}
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-5 md:mb-6"
+            >
+              <div className="relative pl-5 border-l-[2px] border-amber-400/70">
+                <span
+                  aria-hidden
+                  className="absolute -left-[2px] top-0 h-full w-[2px] bg-gradient-to-b from-transparent via-amber-400 to-transparent animate-[gradient-shift_3s_ease_infinite] bg-[length:100%_200%]"
+                />
+                <p className="text-[0.72rem] md:text-[0.8rem] uppercase tracking-[0.32em] text-white/80 font-semibold leading-relaxed">
+                  {hookLine1}
+                </p>
+                <p className="text-[0.72rem] md:text-[0.8rem] uppercase tracking-[0.32em] text-amber-300 font-semibold leading-relaxed">
+                  {hookLine2}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Title - staggered word reveal */}
             <h1
               className="text-[2.5rem] leading-[0.95] md:text-6xl lg:text-7xl xl:text-[5.2rem] font-black text-white tracking-[-0.03em]"
               style={{ textShadow: '0 4px 60px rgba(0,0,0,0.6)' }}
@@ -386,33 +414,41 @@ export default function HeroElegant() {
               {reduceMotion ? (
                 <>
                   {t('title1')}
-                  <br />
-                  <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
-                    {rotatingTexts[textIndex]}
-                  </span>
+                  {hasRotatingLine ? (
+                    <>
+                      <br />
+                      <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                        {rotatingTexts[textIndex]}
+                      </span>
+                    </>
+                  ) : null}
                 </>
               ) : (
                 <>
                   <StaggeredWords text={t('title1')} delay={0.4} />
-                  <br />
-                  <span className="relative block mt-2 md:mt-4 h-[1.15em]">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={textIndex}
-                        initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
-                        exit={{ opacity: 0, y: -18, filter: 'blur(10px)', scale: 0.98 }}
-                        transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute left-0 top-0 whitespace-nowrap bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite]"
-                        style={{
-                          backgroundImage: 'linear-gradient(90deg, #fcd34d, #f59e0b, #fb923c, #f59e0b, #fcd34d)',
-                          textShadow: 'none',
-                        }}
-                      >
-                        {rotatingTexts[textIndex]}
-                      </motion.span>
-                    </AnimatePresence>
-                  </span>
+                  {hasRotatingLine ? (
+                    <>
+                      <br />
+                      <span className="relative block mt-2 md:mt-4 h-[1.15em]">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={textIndex}
+                            initial={{ opacity: 0, y: 28, filter: 'blur(14px)', scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+                            exit={{ opacity: 0, y: -18, filter: 'blur(10px)', scale: 0.98 }}
+                            transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
+                            className="absolute left-0 top-0 whitespace-nowrap bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite]"
+                            style={{
+                              backgroundImage: 'linear-gradient(90deg, #fcd34d, #f59e0b, #fb923c, #f59e0b, #fcd34d)',
+                              textShadow: 'none',
+                            }}
+                          >
+                            {rotatingTexts[textIndex]}
+                          </motion.span>
+                        </AnimatePresence>
+                      </span>
+                    </>
+                  ) : null}
                 </>
               )}
             </h1>
@@ -422,7 +458,7 @@ export default function HeroElegant() {
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="text-base md:text-lg lg:text-xl text-white/65 mt-5 md:mt-7 max-w-lg leading-relaxed font-light"
+              className="text-base md:text-lg lg:text-xl text-white/65 mt-4 md:mt-5 max-w-lg leading-relaxed font-light"
               style={{ textShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
             >
               {t('subtitle')}
@@ -433,7 +469,7 @@ export default function HeroElegant() {
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-wrap items-center gap-4 mt-8 md:mt-10"
+              className="flex flex-wrap items-center gap-4 mt-6 md:mt-7"
             >
               {/* Primary CTA — Preus */}
               <Link
@@ -465,45 +501,78 @@ export default function HeroElegant() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
+
+              {/* Tertiary CTA — Contact (text link with amber accent) */}
+              <Link
+                href="/contacto"
+                onClick={() => trackCTAClick('hero_contact_tertiary', 'hero_elegant')}
+                className="group inline-flex items-center gap-1.5 text-sm md:text-base font-medium text-white/60 hover:text-amber-300 transition-colors duration-300 ml-0 sm:ml-2"
+              >
+                <span className="hidden sm:inline text-white/35">·</span>
+                <span className="underline underline-offset-[6px] decoration-white/20 decoration-[1.5px] group-hover:decoration-amber-400/70 transition-colors">
+                  {t('ctaContact')}
+                </span>
+                <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
             </motion.div>
 
-            {/* Social proof — amb counter animat */}
+            {/* Social proof — premium glass capsule */}
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1.8 }}
-              className="flex flex-wrap items-center gap-4 md:gap-5 mt-8 md:mt-10"
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.8, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-6 md:mt-8"
             >
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.svg
-                      key={i}
-                      initial={reduceMotion ? false : { opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: 1.9 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                      className="w-4 h-4 text-amber-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </motion.svg>
-                  ))}
+              <div className="inline-flex flex-wrap items-center gap-4 md:gap-5 px-5 md:px-6 py-3 md:py-3.5 rounded-full border border-white/[0.08] bg-white/[0.04] backdrop-blur-md shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+                {/* Rating */}
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.svg
+                        key={i}
+                        initial={reduceMotion ? false : { opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 1.9 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                        className="w-4 h-4 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </motion.svg>
+                    ))}
+                  </div>
+                  <span className="text-white font-bold text-sm tracking-tight">{t('rating')}</span>
                 </div>
-                <span className="text-white font-bold text-sm">{t('rating')}</span>
+
+                <span className="w-px h-4 bg-white/15" />
+
+                {/* Counter */}
+                <span className="text-white/85 font-medium text-sm">
+                  <strong className="text-white font-bold"><AnimatedCounter value={50} suffix="+" /></strong>{' '}
+                  {t('socialProof').replace(/\d+\+?\s*/, '')}
+                </span>
+
+                <span className="w-px h-4 bg-white/15 hidden sm:block" />
+
+                {/* Response time */}
+                <span className="text-white/85 font-medium text-sm hidden sm:inline-flex items-center gap-1.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-white/55"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  {'<2h '}{t('responseLabel')}
+                </span>
+
+                <span className="w-px h-4 bg-white/15 hidden md:block" />
+
+                {/* Exclusivity — amber emphasis */}
+                <span className="text-amber-300 font-semibold text-sm hidden md:inline-flex items-center gap-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+                  </span>
+                  {t('exclusivity')}
+                </span>
               </div>
-              <span className="w-px h-4 bg-white/20" />
-              <span className="text-white/80 font-medium text-sm">
-                <strong className="text-white"><AnimatedCounter value={50} suffix="+" /></strong>{' '}
-                {t('socialProof').replace(/\d+\+?\s*/, '')}
-              </span>
-              <span className="w-px h-4 bg-white/20 hidden sm:block" />
-              <span className="text-white/80 font-medium text-sm hidden sm:block">{'<2h '}{t('responseLabel')}</span>
-              <span className="w-px h-4 bg-white/20 hidden md:block" />
-              <span className="text-amber-400/90 font-semibold text-sm hidden md:inline-flex items-center gap-1">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline-block"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                {t('exclusivity')}
-              </span>
             </motion.div>
 
           </div>
@@ -532,3 +601,6 @@ export default function HeroElegant() {
     </section>
   );
 }
+
+
+

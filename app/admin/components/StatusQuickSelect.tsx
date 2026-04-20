@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
 type StatusOption = {
   value: string;
@@ -50,8 +51,7 @@ export default function StatusQuickSelect({
       className="rounded-xl border px-2 py-1 text-[11px]"
       title={title}
       aria-label={title}
-      data-help-title={title}
-      data-help-desc="Canvia l'estat directament des de la llista sense haver d'obrir la fitxa completa."
+      {...helpAttrs(ADMIN_SHARED_HELP.statusQuickSelect(title))}
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>

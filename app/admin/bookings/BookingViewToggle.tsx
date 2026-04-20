@@ -1,10 +1,17 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { buildCustomerBookingListHref } from '@/lib/admin/customerWorkspaceHref';
+
+function buildBookingsHref(params: URLSearchParams) {
+  const query = params.toString();
+  return query ? `/admin/bookings?${query}` : '/admin/bookings';
+}
 
 export default function BookingViewToggle() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const customerId = searchParams?.get('customerId') || '';
   const current = searchParams?.get('view') || 'list';
 
   const toggle = (view: string) => {
@@ -15,7 +22,20 @@ export default function BookingViewToggle() {
       params.set('view', view);
     }
     params.delete('page');
-    router.push(`/admin/bookings?${params.toString()}`);
+    router.push(
+      customerId
+        ? buildCustomerBookingListHref(customerId, {
+            view: params.get('view'),
+            status: params.get('status'),
+            eventType: params.get('eventType'),
+            payment: params.get('payment'),
+            fromDate: params.get('fromDate'),
+            toDate: params.get('toDate'),
+            search: params.get('search'),
+            page: params.get('page') ? Number(params.get('page')) : null,
+          })
+        : buildBookingsHref(params)
+    );
   };
 
   return (

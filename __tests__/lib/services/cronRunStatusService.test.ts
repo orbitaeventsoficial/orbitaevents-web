@@ -156,4 +156,43 @@ describe('readCronRunStatuses', () => {
     // Preserves extra properties
     expect((result[0] as { name: string }).name).toBe('Cron A');
   });
+
+  // Regressió: `now?` injectat fa que la frontera de 26h sigui determinista.
+  // Abans `getCronHealth` cridava `Date.now()` internament, cosa que feia
+  // impossible testejar deterministament la frontera. Mateix patró que #263.
+  it('determinisme: frontera de 26h respecta el `now` injectat', async () => {
+    const anchorNow = new Date('2026-04-19T12:00:00Z');
+    const lastRun25h = new Date('2026-04-18T11:00:00Z').toISOString();
+    const lastRun27h = new Date('2026-04-18T09:00:00Z').toISOString();
+
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'cron.a.lastRun', value: lastRun25h },
+      { key: 'cron.a.lastStatus', value: 'ok' },
+      { key: 'cron.b.lastRun', value: lastRun27h },
+      { key: 'cron.b.lastStatus', value: 'ok' },
+    ]);
+
+    const result = await readCronRunStatuses([
+      { prefix: 'cron.a' },
+      { prefix: 'cron.b' },
+    ], anchorNow);
+
+    expect(result[0].health).toBe('ok'); // 25h < 26h
+    expect(result[1].health).toBe('warning'); // 27h > 26h
+  });
+
+  it('determinisme: dos reads amb el mateix `now` donen el mateix health', async () => {
+    const anchor = new Date('2026-04-19T12:00:00Z');
+    const lastRun = new Date('2026-04-18T11:00:00Z').toISOString();
+
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'cron.x.lastRun', value: lastRun },
+      { key: 'cron.x.lastStatus', value: 'ok' },
+    ]);
+
+    const a = await readCronRunStatus('cron.x', anchor);
+    const b = await readCronRunStatus('cron.x', anchor);
+    expect(a.health).toBe(b.health);
+    expect(a.health).toBe('ok');
+  });
 });

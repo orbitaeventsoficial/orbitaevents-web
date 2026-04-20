@@ -1,11 +1,13 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback, useDeferredValue, useMemo } from 'react';
 import Link from 'next/link';
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort, getSourceDisplay } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/PipelineBoard';
+import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type PipelineFilters = {
   status: string[];
@@ -46,6 +48,7 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
           ? 'admin-tone-border-info admin-tone-bg-info admin-tone-text-info'
           : 'admin-tone-border-neutral admin-tone-text-neutral hover:brightness-105'
       }`}
+      {...helpAttrs(ADMIN_PIPELINE_HELP.lead.chips)}
     >
       {label}
     </button>
@@ -82,14 +85,14 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       const res = await fetchWithCsrf(`/api/admin/leads?limit=500&pipeline=true${qs}`);
       if (!res.ok) {
         const errorBody = await res.text().catch(() => '');
-        console.error(`Pipeline error ${res.status}:`, errorBody);
+        log.error(`Pipeline error ${res.status}`, undefined, { context: { errorBody } });
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
     } catch (err) {
-      console.error('Error carregant pipeline', err);
+      log.error('Error carregant pipeline', err);
       toast.error(`Error carregant el pipeline: ${err instanceof Error ? err.message : 'desconegut'}`);
     } finally {
       setLoading(false);
@@ -151,7 +154,6 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const availablePriorities = useMemo(() => [...new Set(allLeads.map((l) => l.priority))].sort(), [allLeads]);
   const hasLocalFilters = localSearch || localPriority || localEventType || localSource;
 
-  // Metrics
   const columnCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const col of COLUMNS) counts[col.status] = filteredLeads.filter((l) => l.status === col.status).length;
@@ -164,22 +166,22 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const winRate = wonLeads + lostLeads > 0 ? Math.round((wonLeads / (wonLeads + lostLeads)) * 100) : 0;
 
   return (
-    <div className="space-y-3" data-help-title="Pipeline de leads" data-help-desc="Aquest tauler et permet veure en quin punt comercial està cada entrada i moure-la d'estat sense entrar a la fitxa.">
-      {/* Local filters */}
-      <div className="space-y-2" data-help-title="Filtres locals del pipeline" data-help-desc="Serveixen per reduir el soroll dins del pipeline actual sense tocar els filtres generals de la pàgina.">
+    <div className="space-y-3" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.board)}>
+      <div className="space-y-2" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.localFilters)}>
         <div className="relative">
           <input
             type="search"
             placeholder="Filtrar per nom, email, telèfon..."
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-8 pr-4 py-1.5 rounded-xl border text-xs focus:ring-1 transition-all bg-transparent" data-help-title="Cercador del pipeline" data-help-desc="Filtra entrades per nom, email o telèfon dins del pipeline que ja tens carregat."
+            className="w-full pl-8 pr-4 py-1.5 rounded-xl border text-xs focus:ring-1 transition-all bg-transparent"
+            {...helpAttrs(ADMIN_PIPELINE_HELP.lead.search)}
           />
           <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <div role="navigation" aria-label="Filtres de pipeline" className="flex flex-wrap gap-1.5" data-help-title="Xips de filtre del pipeline" data-help-desc="Activen filtres ràpids per prioritat, tipus d'esdeveniment i origen de la consulta.">
+        <div role="navigation" aria-label="Filtres de pipeline" className="flex flex-wrap gap-1.5" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.chips)}>
           {availablePriorities.map((p) => (
             <FilterChip key={p} label={PRIORITY_LABELS[p] || p} active={localPriority === p} onClick={() => setLocalPriority(localPriority === p ? null : p)} />
           ))}
@@ -198,6 +200,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                 type="button"
                 onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}
                 className="rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors"
+                {...helpAttrs(ADMIN_PIPELINE_HELP.lead.clearLocalFilters)}
               >
                 Netejar
               </button>
@@ -206,11 +209,11 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         </div>
       </div>
 
-      <div className="text-xs" data-help-title="Resum del pipeline" data-help-desc="Indica quantes entrades estàs veient ara i, si hi ha filtres locals, quantes queden fora de la vista.">
+      <div className="text-xs" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.summary)}>
         Pipeline: {totalLeads} entrades{hasLocalFilters ? ` (de ${allLeads.length} totals)` : ''}
       </div>
 
-      <div className="pb-2" data-help-title="Tauler kanban de leads" data-help-desc="Arrossega o fes servir les fletxes per moure una entrada entre columnes. Cada columna representa una fase comercial.">
+      <div className="pb-2" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.kanban)}>
         <PipelineBoard<PipelineLead>
           columnsDef={COLUMNS}
           items={filteredLeads}
@@ -239,7 +242,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         />
       </div>
 
-      <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" data-help-title="Mètriques del pipeline" data-help-desc="Resumeixen el nombre d'entrades obertes, guanyades, perdudes i la taxa de tancament.">
+      <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.metrics)}>
         <div className="admin-leads-metric admin-leads-metric--open rounded-xl border p-3">
           <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Obertes</p>
           <p className="admin-leads-metric-value mt-1 text-lg font-bold">{openLeads}</p>
@@ -261,8 +264,6 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   );
 }
 
-/* ── Card del pipeline ──────────────────────────────────────────── */
-
 function estimateScore(lead: PipelineLead): number | null {
   let score = 30;
   if (lead.budget) score += 20;
@@ -281,17 +282,19 @@ function PipelineCard({
   ctx: PipelineCardContext;
   onMoveStatus: (id: string, status: string) => Promise<void>;
 }) {
-  const { isUpdating, isDragging, statusIndex, columnCount, dragHandlers } = ctx;
+  const { isUpdating, statusIndex, columnCount, dragHandlers } = ctx;
   const col = COLUMNS[statusIndex];
-  const canMoveForward = statusIndex < columnCount - 2; // Can't move past WON
+  const canMoveForward = statusIndex < columnCount - 2;
   const canMoveBack = statusIndex > 0;
   const nextStatus = canMoveForward ? COLUMNS[statusIndex + 1].status : null;
   const prevStatus = canMoveBack ? COLUMNS[statusIndex - 1].status : null;
+  const cardHelp = ADMIN_PIPELINE_HELP.lead.card(lead.name, col.label);
 
   return (
     <div
       {...dragHandlers}
-      aria-label={`Lead ${lead.name}`} data-help-title={lead.name} data-help-desc={`Lead en estat ${col.label}. Pots obrir la fitxa o moure'l a la fase anterior o següent.`}
+      aria-label={`Lead ${lead.name}`}
+      {...helpAttrs(cardHelp)}
       className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 ${col.cardToneClass} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
@@ -304,31 +307,42 @@ function PipelineCard({
           {lead.name}
         </Link>
         <div className="flex items-center gap-1.5 shrink-0">
-          {prevStatus && (
-            <button
-              type="button"
-              onClick={() => onMoveStatus(lead.id, prevStatus)}
-              disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
-              title={`Moure a ${COLUMNS[statusIndex - 1].label}`}
-              aria-label={`Moure lead a ${COLUMNS[statusIndex - 1].label}`}
-            >
-              ←
-            </button>
-          )}
-          {nextStatus && (
-            <button
-              type="button"
-              onClick={() => onMoveStatus(lead.id, nextStatus)}
-              disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
-              title={`Moure a ${COLUMNS[statusIndex + 1].label}`}
-              aria-label={`Moure lead a ${COLUMNS[statusIndex + 1].label}`}
-            >
-              →
-            </button>
-          )}
-          <span className={`w-3 h-3 rounded-full ${PRIORITY_DOT_CLASS[lead.priority] || PRIORITY_DOT_CLASS.MEDIUM}`} title={lead.priority} />
+          {prevStatus && (() => {
+            const help = ADMIN_PIPELINE_HELP.lead.moveTo(COLUMNS[statusIndex - 1].label);
+            return (
+              <button
+                type="button"
+                onClick={() => onMoveStatus(lead.id, prevStatus)}
+                disabled={isUpdating}
+                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
+                title={help.title}
+                aria-label={help.title}
+                {...helpAttrs(help)}
+              >
+                ←
+              </button>
+            );
+          })()}
+          {nextStatus && (() => {
+            const help = ADMIN_PIPELINE_HELP.lead.moveTo(COLUMNS[statusIndex + 1].label);
+            return (
+              <button
+                type="button"
+                onClick={() => onMoveStatus(lead.id, nextStatus)}
+                disabled={isUpdating}
+                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                title={help.title}
+                aria-label={help.title}
+                {...helpAttrs(help)}
+              >
+                →
+              </button>
+            );
+          })()}
+          <span
+            className={`w-3 h-3 rounded-full ${PRIORITY_DOT_CLASS[lead.priority] || PRIORITY_DOT_CLASS.MEDIUM}`}
+            title={lead.priority}
+          />
         </div>
       </div>
 
@@ -342,7 +356,11 @@ function PipelineCard({
               ? 'admin-tone-bg-warning admin-tone-text-warning admin-tone-border-warning'
               : 'admin-tone-soft-danger admin-tone-border-danger';
           return (
-            <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`} title="Score de qualitat">
+            <span
+              className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`}
+              title={ADMIN_PIPELINE_HELP.lead.qualityScore.title}
+              {...helpAttrs(ADMIN_PIPELINE_HELP.lead.qualityScore)}
+            >
               {score}
             </span>
           );
@@ -393,6 +411,5 @@ function PipelineCard({
     </div>
   );
 }
-
 
 

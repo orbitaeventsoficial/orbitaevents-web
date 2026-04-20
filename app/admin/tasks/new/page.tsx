@@ -6,16 +6,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../../components/useAsyncForm';
+import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerHubTaskHref } from '@/lib/customer-hub/taskResultNotice';
 
 export default function NewTaskPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const customerId = searchParams?.get('customerId') || '';
-
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const formOrigin = searchParams?.get('source') || '';
+  const taskSource = searchParams?.get('taskSource') || '';
+  const dedupeKey = searchParams?.get('dedupeKey') || '';
+  const customerHubTasksHref = customerId ? buildCustomerWorkspaceTabHref(customerId, 'tasks') : '/admin/tasks';
+  const [title, setTitle] = useState(searchParams?.get('title') || '');
+  const [description, setDescription] = useState(searchParams?.get('description') || '');
   const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
+  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>(
+    normalizeTaskPriority(searchParams?.get('priority') ?? null)
+  );
   const { submitting, error, run } = useAsyncForm();
 
   const onSubmit = async (event: React.FormEvent) => {
@@ -35,13 +42,16 @@ export default function NewTaskPage() {
             priority,
             status: 'OPEN',
             createdBy: 'Admin',
+            source: taskSource || undefined,
+            dedupeKey: dedupeKey || undefined,
           }),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s’ha pogut crear la tasca');
 
         if (customerId) {
-          router.push(`/admin/clientes/${customerId}?tab=tasks`);
+          const taskResult = data?.reopened ? 'reopened' : data?.deduped ? 'deduped' : 'created';
+          router.push(buildCustomerHubTaskHref(customerId, formOrigin || null, taskResult));
         } else {
           router.push('/admin/tasks');
         }
@@ -55,8 +65,10 @@ export default function NewTaskPage() {
   return (
     <AdminPage
       title="Nova tasca"
-      subtitle="Crea una tasca operativa vinculada al client."
-      back={{ href: '/admin/tasks', label: 'Tasques' }}
+      subtitle={formOrigin === 'reactivation'
+        ? 'Deixa la reactivació registrada com a tasca explícita abans d’executar cap enviament.'
+        : 'Crea una tasca operativa vinculada al client.'}
+      back={{ href: customerHubTasksHref, label: customerId ? 'Client' : 'Tasques' }}
       className="max-w-3xl"
     >
       <form onSubmit={onSubmit} className="rounded-2xl border p-6 space-y-4">
@@ -117,7 +129,7 @@ export default function NewTaskPage() {
             {submitting ? 'Creant...' : 'Crear tasca'}
           </button>
           <Link
-            href={customerId ? `/admin/clientes/${customerId}?tab=tasks` : '/admin/tasks'}
+            href={customerHubTasksHref}
             className="rounded-xl border px-4 py-2 text-sm font-medium"
           >
             Cancel·lar
@@ -126,4 +138,11 @@ export default function NewTaskPage() {
       </form>
     </AdminPage>
   );
+}
+
+function normalizeTaskPriority(value: string | null): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
+  if (value === 'LOW' || value === 'MEDIUM' || value === 'HIGH' || value === 'URGENT') {
+    return value;
+  }
+  return 'MEDIUM';
 }

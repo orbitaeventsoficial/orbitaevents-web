@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import { mapLeadEventType, normalizeQuoteLocale, parseDateOrNull } from '@/lib/services/quotes/quoteParsing';
 import { ensureQuoteFollowUpTask } from '@/lib/services/tasks/quoteFollowUp';
 
@@ -82,7 +83,7 @@ export async function sendAdminProposal(id: string) {
   await prisma.customerActivity.create({
     data: {
       customerId: proposal.customerId,
-      action: 'PROPOSAL_SENT',
+      action: CUSTOMER_ACTIVITY_ACTIONS.PROPOSAL_SENT,
       details: { proposalId: proposal.id, reference: proposal.reference, total: proposal.total },
     },
   });

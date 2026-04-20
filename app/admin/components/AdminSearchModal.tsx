@@ -1,86 +1,106 @@
 'use client';
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { labelEstatReserva } from '@/lib/customer-hub/labels';
+import {
+  buildAdminCommandEntries,
+  buildAdminCommandItems,
+  buildAdminRecentEntries,
+  buildAdminSearchEntries,
+  buildAdminSelectableEntries,
+  filterAdminCommandItems,
+  type AdminPaletteBookingResult,
+  type AdminPaletteCustomerResult,
+  type AdminPaletteEntry,
+  type AdminPaletteLeadResult,
+  type AdminPaletteRecentItem,
+  type AdminPaletteSearchResults,
+} from '@/lib/services/adminCommandPaletteService';
+import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
+import { getPriorityItems, NAV_SECTIONS } from './nav-items';
 
-type LeadResult = {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  createdAt: string;
-};
-
-type BookingResult = {
-  id: string;
-  reference: string;
-  clientName: string;
-  clientEmail: string;
-  status: string;
-  eventDate: string;
-};
-
-type CustomerResult = {
-  id: string;
-  name: string;
-  email: string;
-  totalEvents: number;
-  lastEventDate: string | null;
-};
-
-type SearchResults = {
-  leads: LeadResult[];
-  bookings: BookingResult[];
-  customers: CustomerResult[];
-};
-
-const EMPTY_RESULTS: SearchResults = { leads: [], bookings: [], customers: [] };
-
+const EMPTY_RESULTS: AdminPaletteSearchResults = { leads: [], bookings: [], customers: [] };
 const RECENT_KEY = 'admin.recent';
 const MAX_RECENT = 8;
+const MIN_QUERY_LENGTH = 2;
 
-type RecentItem = { href: string; label: string; type: string };
-
-function getRecentItems(): RecentItem[] {
+function getRecentItems(): AdminPaletteRecentItem[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(RECENT_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    return raw ? (JSON.parse(raw) as AdminPaletteRecentItem[]) : [];
   } catch {
     return [];
   }
 }
 
-function addRecentItem(item: RecentItem) {
+function addRecentItem(item: AdminPaletteRecentItem) {
   if (typeof window === 'undefined') return;
   try {
-    const items = getRecentItems().filter((i) => i.href !== item.href);
+    const items = getRecentItems().filter((current) => current.href !== item.href);
     items.unshift(item);
-    localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, MAX_RECENT)));
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, MAX_RECENT)));
   } catch {
     // silent
   }
 }
 
-function RecentItems({ onClose }: { onClose: () => void }) {
-  const items = getRecentItems();
+function PaletteRow({
+  item,
+  selected,
+  onSelect,
+}: {
+  item: AdminPaletteEntry;
+  selected: boolean;
+  onSelect: (item: AdminPaletteEntry) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(item)}
+      className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm transition ${
+        selected ? 'border-cyan-400/60 bg-cyan-400/10' : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+      }`}
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="shrink-0 text-base">{item.icon}</span>
+        <div className="min-w-0">
+          <p className="truncate">{item.label}</p>
+          <p className="truncate text-[11px] opacity-60">{item.meta}</p>
+        </div>
+      </div>
+      <span className="shrink-0 text-[10px] uppercase tracking-wider opacity-55">{item.type}</span>
+    </button>
+  );
+}
+
+function RecentItems({
+  items,
+  selectedIndex,
+  startIndex,
+  onSelect,
+}: {
+  items: AdminPaletteRecentItem[];
+  selectedIndex: number;
+  startIndex: number;
+  onSelect: (item: AdminPaletteEntry) => void;
+}) {
   if (items.length === 0) return null;
 
+  const entries = buildAdminRecentEntries(items);
+
   return (
-    <div className="border-t px-4 py-3">
-      <p className="text-[11px] uppercase tracking-wider">Visitats recentment</p>
+    <div className="border-t border-white/10 px-4 py-3" {...helpAttrs(ADMIN_SHARED_HELP.recentItems)}>
+      <p className="text-[11px] uppercase tracking-wider opacity-60">Visitats recentment</p>
       <div className="mt-2 space-y-1">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
-          >
-            <span className="truncate">{item.label}</span>
-            <span className="text-[10px] shrink-0">{item.type}</span>
-          </Link>
+        {entries.map((item, index) => (
+          <PaletteRow
+            key={item.key}
+            item={item}
+            selected={selectedIndex === startIndex + index}
+            onSelect={onSelect}
+          />
         ))}
       </div>
     </div>
@@ -94,34 +114,47 @@ export default function AdminSearchModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResults>(EMPTY_RESULTS);
+  const [results, setResults] = useState<AdminPaletteSearchResults>(EMPTY_RESULTS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentItems, setRecentItems] = useState<AdminPaletteRecentItem[]>([]);
   const deferredQuery = useDeferredValue(query);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [open, onClose]);
+  const commandItems = useMemo(() => buildAdminCommandItems(getPriorityItems(0), NAV_SECTIONS), []);
+  const trimmedQuery = deferredQuery.trim().toLowerCase();
+  const isSearchingEntities = trimmedQuery.length >= MIN_QUERY_LENGTH;
+
+  const filteredCommandItems = useMemo(
+    () => filterAdminCommandItems(commandItems, trimmedQuery, 8),
+    [commandItems, trimmedQuery],
+  );
+
+  const commandEntries = useMemo(() => buildAdminCommandEntries(filteredCommandItems), [filteredCommandItems]);
+  const searchEntries = useMemo(() => buildAdminSearchEntries(results), [results]);
+  const recentEntries = useMemo(() => buildAdminRecentEntries(recentItems), [recentItems]);
+  const selectableEntries = useMemo(
+    () => buildAdminSelectableEntries({ isSearchingEntities, commandEntries, searchEntries, recentEntries }),
+    [isSearchingEntities, commandEntries, searchEntries, recentEntries],
+  );
 
   useEffect(() => {
     if (!open) return;
-    const timer = setTimeout(() => inputRef.current?.focus(), 50);
-    return () => clearTimeout(timer);
+    setRecentItems(getRecentItems());
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(timer);
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const search = deferredQuery.trim();
-    if (search.length < 2) {
+    if (search.length < MIN_QUERY_LENGTH) {
       setResults(EMPTY_RESULTS);
       setError(null);
+      setLoading(false);
       return;
     }
 
@@ -134,14 +167,27 @@ export default function AdminSearchModal({
       cache: 'no-store',
     })
       .then(async (res) => {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok) {
           throw new Error(data?.error || 'Error buscant');
         }
         setResults({
-          leads: data.leads || [],
-          bookings: data.bookings || [],
-          customers: data.customers || [],
+          leads: (data.leads || []).map((lead: AdminPaletteLeadResult) => ({
+            id: lead.id,
+            name: lead.name,
+            status: lead.status,
+          })),
+          bookings: (data.bookings || []).map((booking: AdminPaletteBookingResult & { status: string }) => ({
+            id: booking.id,
+            reference: booking.reference,
+            clientName: booking.clientName,
+            statusLabel: labelEstatReserva(booking.status),
+          })),
+          customers: (data.customers || []).map((customer: AdminPaletteCustomerResult) => ({
+            id: customer.id,
+            name: customer.name,
+            totalEvents: customer.totalEvents,
+          })),
         });
       })
       .catch((err) => {
@@ -154,166 +200,174 @@ export default function AdminSearchModal({
     return () => controller.abort();
   }, [deferredQuery, open]);
 
-  const hasResults = useMemo(() => {
-    return results.leads.length > 0 || results.bookings.length > 0 || results.customers.length > 0;
-  }, [results]);
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [trimmedQuery, results, recentItems, open]);
+
+  const closeAndReset = () => {
+    setQuery('');
+    setResults(EMPTY_RESULTS);
+    setError(null);
+    setSelectedIndex(0);
+    onClose();
+  };
+
+  const handleSelect = (item: AdminPaletteEntry) => {
+    addRecentItem({ href: item.href, label: item.label, type: item.type });
+    setRecentItems(getRecentItems());
+    closeAndReset();
+    router.push(item.href);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeAndReset();
+        return;
+      }
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (selectableEntries.length === 0) return;
+        setSelectedIndex((current) => (current + 1) % selectableEntries.length);
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (selectableEntries.length === 0) return;
+        setSelectedIndex((current) => (current - 1 + selectableEntries.length) % selectableEntries.length);
+        return;
+      }
+      if (event.key === 'Enter' && document.activeElement === inputRef.current && selectableEntries.length > 0) {
+        event.preventDefault();
+        handleSelect(selectableEntries[selectedIndex]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, selectableEntries, selectedIndex]);
+
+  const hasResults = commandEntries.length > 0 || searchEntries.length > 0;
+  const leadEntries = searchEntries.filter((entry) => entry.type === 'Entrada');
+  const bookingEntries = searchEntries.filter((entry) => entry.type === 'Reserva');
+  const customerEntries = searchEntries.filter((entry) => entry.type === 'Client');
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4 sm:p-6" role="presentation">
+    <div className="fixed inset-0 z-50 bg-black/60 p-4 backdrop-blur-sm sm:p-6" role="presentation" onClick={closeAndReset}>
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-search-title"
-        className="mx-auto max-w-2xl overflow-hidden rounded-2xl border shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+        className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#0b1117]/95 shadow-2xl"
+        {...helpAttrs(ADMIN_SHARED_HELP.searchModal)}
       >
-        <div className="flex items-center gap-3 border-b px-4 py-3">
-          <span className="">🔍</span>
+        <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+          <span className="text-base">⌘</span>
           <input
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cerca entrades, reserves o clients..."
-            aria-label="Cercar al panell d’administració"
-            className="w-full bg-transparent text-sm outline-none"
+            placeholder="Cerca o executa una acció..."
+            aria-label="Cercar o executar al panell d’administració"
+            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/45"
+            {...helpAttrs(ADMIN_SHARED_HELP.searchInput)}
           />
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl px-2 py-1 text-xs"
-          >
-            Esc
-          </button>
+          <div className="hidden rounded-lg border border-white/10 px-2 py-1 text-[11px] opacity-60 sm:block">↑↓ moure · Enter obrir</div>
+          <button type="button" onClick={closeAndReset} className="rounded-xl px-2 py-1 text-xs opacity-70 transition hover:opacity-100">Esc</button>
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className="px-4 py-3 text-xs" id="admin-search-title">
-            Escriu almenys 2 caràcters
+          <div className="px-4 py-3 text-xs opacity-60" id="admin-search-title">
+            {isSearchingEntities ? 'Comandes i resultats reals del CRM' : 'Obre una secció, reprèn feina recent o llança una acció'}
           </div>
 
-          {loading && (
-            <div className="px-4 pb-4 text-xs">Carregant resultats...</div>
+          {loading && <div className="px-4 pb-4 text-xs opacity-70">Carregant resultats...</div>}
+          {error && <div className="px-4 pb-4 text-xs text-rose-300">{error}</div>}
+
+          {!isSearchingEntities && (
+            <RecentItems items={recentItems} selectedIndex={selectedIndex} startIndex={0} onSelect={handleSelect} />
           )}
 
-          {error && (
-            <div className="px-4 pb-4 text-xs">{error}</div>
+          {commandEntries.length > 0 && (
+            <div className="border-t border-white/10 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider opacity-60">Comandes</p>
+              <div className="mt-2 space-y-1">
+                {commandEntries.map((item, index) => {
+                  const offset = isSearchingEntities ? 0 : recentEntries.length;
+                  return <PaletteRow key={item.key} item={item} selected={selectedIndex === offset + index} onSelect={handleSelect} />;
+                })}
+              </div>
+            </div>
           )}
 
-          {!loading && !error && query.trim().length >= 2 && !hasResults && (
-            <div className="px-4 pb-4 text-xs">Sense resultats.</div>
-          )}
-
-          {results.leads.length > 0 && (
-            <div className="border-t px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider">Entrades</p>
-              <div className="mt-2 space-y-2">
-                {results.leads.map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={`/admin/leads/${lead.id}`}
-                    onClick={() => { addRecentItem({ href: `/admin/leads/${lead.id}`, label: lead.name, type: 'Entrada' }); onClose(); }}
-                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
-                  >
-                    <span className="truncate">{lead.name}</span>
-                    <span className="text-[11px]">{lead.status}</span>
-                  </Link>
+          {isSearchingEntities && leadEntries.length > 0 && (
+            <div className="border-t border-white/10 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider opacity-60">Entrades</p>
+              <div className="mt-2 space-y-1">
+                {leadEntries.map((item, index) => (
+                  <PaletteRow key={item.key} item={item} selected={selectedIndex === commandEntries.length + index} onSelect={handleSelect} />
                 ))}
               </div>
             </div>
           )}
 
-          {results.bookings.length > 0 && (
-            <div className="border-t px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider">Reserves</p>
-              <div className="mt-2 space-y-2">
-                {results.bookings.map((booking) => (
-                  <Link
-                    key={booking.id}
-                    href={`/admin/bookings/${booking.id}`}
-                    onClick={() => { addRecentItem({ href: `/admin/bookings/${booking.id}`, label: `${booking.reference} · ${booking.clientName}`, type: 'Reserva' }); onClose(); }}
-                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
-                  >
-                    <span className="truncate">{booking.reference} · {booking.clientName}</span>
-                    <span className="text-[11px]">{labelEstatReserva(booking.status)}</span>
-                  </Link>
-                ))}
+          {isSearchingEntities && bookingEntries.length > 0 && (
+            <div className="border-t border-white/10 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider opacity-60">Reserves</p>
+              <div className="mt-2 space-y-1">
+                {bookingEntries.map((item, index) => {
+                  const start = commandEntries.length + leadEntries.length;
+                  return <PaletteRow key={item.key} item={item} selected={selectedIndex === start + index} onSelect={handleSelect} />;
+                })}
               </div>
             </div>
           )}
 
-          {results.customers.length > 0 && (
-            <div className="border-t px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider">Clients</p>
-              <div className="mt-2 space-y-2">
-                {results.customers.map((customer) => (
-                  <Link
-                    key={customer.id}
-                    href={`/admin/clientes/${customer.id}`}
-                    onClick={() => { addRecentItem({ href: `/admin/clientes/${customer.id}`, label: customer.name, type: 'Client' }); onClose(); }}
-                    className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm"
-                  >
-                    <span className="truncate">{customer.name}</span>
-                    <span className="text-[11px]">{customer.totalEvents} esdeveniments</span>
-                  </Link>
-                ))}
+          {isSearchingEntities && customerEntries.length > 0 && (
+            <div className="border-t border-white/10 px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider opacity-60">Clients</p>
+              <div className="mt-2 space-y-1">
+                {customerEntries.map((item, index) => {
+                  const start = commandEntries.length + leadEntries.length + bookingEntries.length;
+                  return <PaletteRow key={item.key} item={item} selected={selectedIndex === start + index} onSelect={handleSelect} />;
+                })}
               </div>
             </div>
           )}
 
-          {!hasResults && query.trim().length < 2 && (
-            <>
-              {/* Ítems recents */}
-              <RecentItems onClose={onClose} />
+          {!loading && !error && isSearchingEntities && !hasResults && (
+            <div className="border-t border-white/10 px-4 py-4 text-xs opacity-70">Sense coincidències. Prova amb nom de client, reserva, mòdul o acció.</div>
+          )}
 
-              <div className="border-t px-4 py-4">
-                <p className="text-[11px] uppercase tracking-wider">Accessos ràpids</p>
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                  {[
-                    { href: '/admin/leads', label: '👥 Entrades' },
-                    { href: '/admin/bookings', label: '📋 Reserves' },
-                    { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
-                    { href: '/admin/economia', label: '💶 Economia' },
-                    { href: '/admin/analytics', label: '📈 Analítica' },
-                    { href: '/admin/clientes', label: '👤 Clients' },
-                  ].map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={onClose}
-                      className="rounded-xl border px-3 py-2 text-sm"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
+          {!isSearchingEntities && (
+            <div className="border-t border-white/10 px-4 py-4">
+              <p className="mb-2 text-[11px] uppercase tracking-wider opacity-60">Dreceres de teclat</p>
+              <div className="grid gap-1.5 text-xs sm:grid-cols-2">
+                {[
+                  { keys: 'Ctrl/Cmd+K', desc: 'Obrir command palette' },
+                  { keys: 'Alt+1', desc: 'Entrades' },
+                  { keys: 'Alt+2', desc: 'Clients' },
+                  { keys: 'Alt+3', desc: 'Tasques' },
+                  { keys: 'Alt+4', desc: 'Reserves' },
+                  { keys: 'Alt+C', desc: 'Calendari' },
+                  { keys: 'Alt+N', desc: 'Accions ràpides (+)' },
+                ].map((shortcut) => (
+                  <div key={shortcut.keys} className="flex items-center gap-2">
+                    <kbd className="rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px]">{shortcut.keys}</kbd>
+                    <span>{shortcut.desc}</span>
+                  </div>
+                ))}
               </div>
-
-              {/* Dreceres de teclat */}
-              <div className="border-t px-4 py-4">
-                <p className="text-[11px] uppercase tracking-wider mb-2">Dreceres de teclat</p>
-                <div className="grid gap-1.5 sm:grid-cols-2 text-xs">
-                  {[
-                    { keys: 'Ctrl+K', desc: 'Obrir cercador' },
-                    { keys: 'Alt+1', desc: 'Entrades' },
-                    { keys: 'Alt+2', desc: 'Tasques' },
-                    { keys: 'Alt+3', desc: 'Correus' },
-                    { keys: 'Alt+4', desc: 'Reserves' },
-                    { keys: 'Alt+C', desc: 'Calendari' },
-                    { keys: 'Alt+N', desc: 'Acció ràpida (+)' },
-                  ].map((s) => (
-                    <div key={s.keys} className="flex items-center gap-2">
-                      <kbd className="rounded border px-1.5 py-0.5 font-mono text-[10px]">{s.keys}</kbd>
-                      <span>{s.desc}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
     </div>
   );
 }
-

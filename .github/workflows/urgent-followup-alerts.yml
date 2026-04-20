@@ -1,0 +1,24 @@
+name: Urgent Follow-Up Alerts
+
+on:
+  schedule:
+    # 4x diari en horari laboral europeu (UTC+2)
+    # 08:00 CEST = 06:00 UTC
+    # 12:00 CEST = 10:00 UTC
+    # 16:00 CEST = 14:00 UTC
+    # 20:00 CEST = 18:00 UTC
+    - cron: '0 6,10,14,18 * * *'
+  workflow_dispatch:
+
+jobs:
+  urgent-alerts:
+    name: Check urgent follow-ups
+    runs-on: ubuntu-latest
+    steps:
+      - name: urgent-followup-alerts
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/urgent-followup-alerts")
+          echo "urgent-followup-alerts: $status"
+          [ "$status" = "200" ] || exit 1

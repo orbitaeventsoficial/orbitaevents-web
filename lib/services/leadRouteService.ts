@@ -40,7 +40,7 @@ export async function getLeadDetail(id: string): Promise<LeadRouteResult> {
       convertedAt: true,
       notes: { orderBy: { createdAt: 'desc' }, take: 10 },
       activities: { orderBy: { createdAt: 'desc' }, take: 20 },
-      tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
+      universalTasks: { orderBy: { createdAt: 'desc' }, take: 10 },
       documents: { orderBy: { createdAt: 'desc' }, take: 10 },
       booking: {
         include: {
@@ -151,7 +151,6 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
     await tx.leadNote.deleteMany({ where: { leadId: id } });
     await tx.leadActivity.deleteMany({ where: { leadId: id } });
     await tx.task.deleteMany({ where: { leadId: id } });
-    await tx.leadTask.deleteMany({ where: { leadId: id } });
     await tx.leadDocument.deleteMany({ where: { leadId: id } });
     await tx.lead.delete({
       where: { id },
@@ -174,3 +173,4 @@ export async function deleteLeadIfAllowed(id: string): Promise<LeadRouteResult> 
 
   return { status: 200, body: { ok: true } };
 }
+

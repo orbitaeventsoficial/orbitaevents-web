@@ -29,11 +29,11 @@ function parseCronSummary(raw: string | null): unknown {
   }
 }
 
-function getCronHealth(lastRun: string | null, lastStatus: string | null): CronHealth {
+function getCronHealth(lastRun: string | null, lastStatus: string | null, now: Date = new Date()): CronHealth {
   if (!lastRun) return 'unknown';
   if (lastStatus === 'error') return 'error';
 
-  const hoursSinceRun = (Date.now() - new Date(lastRun).getTime()) / (1000 * 60 * 60);
+  const hoursSinceRun = (now.getTime() - new Date(lastRun).getTime()) / (1000 * 60 * 60);
   return hoursSinceRun <= 26 ? 'ok' : 'warning';
 }
 
@@ -62,12 +62,12 @@ export async function saveCronRunStatus(input: {
   ]);
 }
 
-export async function readCronRunStatus(prefix: string): Promise<CronRunSnapshot> {
-  const [snapshot] = await readCronRunStatuses([{ prefix }]);
+export async function readCronRunStatus(prefix: string, now?: Date): Promise<CronRunSnapshot> {
+  const [snapshot] = await readCronRunStatuses([{ prefix }], now);
   return snapshot;
 }
 
-export async function readCronRunStatuses<T extends { prefix: string }>(definitions: T[]): Promise<Array<T & CronRunSnapshot>> {
+export async function readCronRunStatuses<T extends { prefix: string }>(definitions: T[], now: Date = new Date()): Promise<Array<T & CronRunSnapshot>> {
   if (definitions.length === 0) {
     return [];
   }
@@ -97,7 +97,7 @@ export async function readCronRunStatuses<T extends { prefix: string }>(definiti
       lastStatus,
       lastSummary,
       lastMessage,
-      health: getCronHealth(lastRun, lastStatus),
+      health: getCronHealth(lastRun, lastStatus, now),
     };
   });
 }

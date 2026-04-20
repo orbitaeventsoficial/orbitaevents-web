@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { BOOKING_STATUS_ORDER, getBookingStatusDisplay } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_BOOKING_HELP_3, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 interface Props {
   bookingId: string;
@@ -72,7 +73,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
   };
 
   return (
-    <div className="relative">
+    <div className="relative" {...helpAttrs(ADMIN_BOOKING_HELP_3.status.root)}>
       <div className="flex flex-wrap gap-2">
         {BOOKING_STATUS_ORDER.map((status) => {
           const conf = getBookingStatusDisplay(status);
@@ -121,7 +122,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       {showConfirmComplete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" role="presentation">
           <div
-            className="mx-4 max-w-md rounded-2xl border p-6 shadow-xl"
+            className="mx-4 max-w-md rounded-2xl border p-6 shadow-xl" {...helpAttrs(ADMIN_BOOKING_HELP_3.status.complete)}
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-complete-title"
@@ -167,6 +168,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
     </div>
   );
 }
+
 
 
 

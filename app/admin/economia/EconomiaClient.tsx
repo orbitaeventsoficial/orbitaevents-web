@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import { ADMIN_ECONOMY_HELP, helpAttrs } from '../components/adminHelpContent';
 import PaymentToggleButton from './PaymentToggleButton';
 import PaymentReminderActions from './PaymentReminderActions';
 import { formatDateSimple, formatDateFull } from '@/lib/constants';
@@ -45,6 +47,22 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     () => props.upcomingDueRows.filter((row) => row.dueSoonRemaining).length,
     [props.upcomingDueRows]
   );
+  const cashFlowRows = props.cashFlow ?? [];
+  const forecastRows = props.forecast_pipeline ?? [];
+  const nextStepTitle = props.overdueTotal > 0
+    ? 'Atacar primer els cobraments fora de termini'
+    : props.riskProfitability.length > 0
+      ? 'Revisar els marges que ja cauen en risc'
+      : activeTab === 'config'
+        ? 'Ajustar models i costos amb el focus correcte'
+        : 'Mantenir caixa i marge sota govern';
+  const nextStepDetail = props.overdueTotal > 0
+    ? `Hi ha ${money(props.overdueTotal)} fora de termini i ${props.atRiskRows.length} cobraments amb tensió real.`
+    : props.riskProfitability.length > 0
+      ? `${props.riskProfitability.length} esdeveniments estan per sota del marge sa i convé entrar per rendibilitat.`
+      : activeTab === 'config'
+        ? 'La configuració és el front actiu: revisa el model abans de tocar més pantalles operatives.'
+        : 'Amb el primer nivell estable, el següent pas bo és seguir tresoreria, previsió i marge des del mateix cockpit.';
 
   return (
     <AdminPage
@@ -73,9 +91,60 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         </div>
       }
     >
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què veu el sistema a l’economia',
+          tone: props.hasReport ? 'info' : 'warning',
+          items: [
+            `${money(props.outstandingTotal)} pendents, ${money(props.monthCollected)} cobrats aquest mes i ${money(props.dueSoonTotal)} vencen en 7 dies.`,
+            props.hasReport
+              ? `${money(props.realized.netMargin)} de marge realitzat i ${money(props.forecast.netMargin)} de marge previst.`
+              : 'L’informe de rendibilitat encara no està disponible ara mateix.',
+            cashFlowRows.length > 0
+              ? `${cashFlowRows.length} mesos de tresoreria previstos i ${forecastRows.length} mesos de forecast comercial.`
+              : 'Sense previsió de tresoreria visible al primer nivell.',
+          ],
+          emptyText: 'Sense dades econòmiques no hi ha lectura automàtica del cockpit.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: props.overdueTotal > 0 || props.riskProfitability.length > 0 ? 'warning' : 'success',
+          items: [
+            props.overdueTotal > 0
+              ? `${overdueDepositCount} dipòsits i ${overdueRemainingCount} restes estan fora de termini.`
+              : 'No hi ha cobrament vençut al primer nivell.',
+            props.riskProfitability.length > 0
+              ? `${props.riskProfitability.length} esdeveniments cauen en marge baix.`
+              : 'No hi ha alertes de marge crític al primer nivell.',
+            activeTab === 'config'
+              ? 'La pestanya activa és configuració i concentra els ajustos sensibles de model.'
+              : `La pestanya activa és ${TABS.find((tab) => tab.id === activeTab)?.label || activeTab}.`,
+          ],
+          emptyText: 'No hi ha coll manual evident al primer nivell.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          title: nextStepTitle,
+          detail: nextStepDetail,
+          href: '/admin/economia',
+          ctaLabel:
+            props.overdueTotal > 0
+              ? 'Revisar cobraments'
+              : props.riskProfitability.length > 0
+                ? 'Revisar rendibilitat'
+                : 'Obrir economia',
+          secondaryAction:
+            activeTab !== 'resum'
+              ? { href: '/admin/economia', label: 'Tornar al resum' }
+              : undefined,
+        }}
+      />
+
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md admin-card-glass" data-help-title="Pestanyes d'economia" data-help-desc="Canvien la vista entre resum, cobraments, rendibilitat, tresoreria, previsions i configuració econòmica.">
+      <nav role="tablist" aria-label="Seccions d'economia" className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md admin-card-glass" {...helpAttrs(ADMIN_ECONOMY_HELP.tabs)}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
@@ -166,7 +235,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border px-3 py-2 text-xs" data-help-title="Com llegir el resum" data-help-desc="Explica ràpidament què vol dir cada indicador principal de cobrament per a un usuari que comença.">
+              <div className="rounded-xl border px-3 py-2 text-xs" {...helpAttrs(ADMIN_ECONOMY_HELP.summaryGuide)}>
                 <strong className="">Com llegir aquest resum:</strong> pendent = import total per cobrar, fora de termini = cobrament que ja havia d&apos;estar pagat, a 7 dies = cobrament proper.
               </div>
 
@@ -322,7 +391,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45 }}
-                  className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament."
+                  className="rounded-2xl border border-white/10 p-5 shadow-lg" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-base font-bold">Top 5 &mdash; Millors marges</h2>
@@ -552,7 +621,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                   {/* Top + Risc */}
                   <div className="grid gap-5 xl:grid-cols-2">
-                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">🏆</span>
                         <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
@@ -591,7 +660,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       </div>
                     </section>
 
-                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                       <div className="flex items-center gap-2 mb-4">
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">⚠️</span>
                         <h2 className="text-base font-bold">Esdeveniments en risc</h2>
@@ -633,7 +702,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   </div>
 
                   {/* Taula per canal */}
-                  <section className="rounded-2xl border border-white/10 p-5 shadow-lg" data-help-title="Top marges" data-help-desc="Mostra els esdeveniments amb millor marge perquè puguis detectar què està funcionant millor econòmicament.">
+                  <section className="rounded-2xl border border-white/10 p-5 shadow-lg" {...helpAttrs(ADMIN_ECONOMY_HELP.topMargins)}>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="flex h-8 w-8 items-center justify-center rounded-xl text-sm">📊</span>
                       <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
@@ -918,6 +987,4 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     </AdminPage>
   );
 }
-
-
 

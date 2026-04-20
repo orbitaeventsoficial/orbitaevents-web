@@ -1,5 +1,6 @@
 import { BookingStatus, LeadStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 type CustomerHubStatus = 'LEAD' | 'NEGOTIATION' | 'CONFIRMED' | 'POSTEVENT' | 'LOST';
 
@@ -52,7 +53,7 @@ export async function updateCustomerHubStatus(customerId: string, status: Custom
   await prisma.customerActivity.create({
     data: {
       customerId,
-      action: 'STATUS_CHANGED',
+      action: CUSTOMER_ACTIVITY_ACTIONS.STATUS_CHANGED,
       details: { newStatus: status },
     },
   });

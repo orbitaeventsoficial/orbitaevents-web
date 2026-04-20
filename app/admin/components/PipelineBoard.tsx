@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * PipelineBoard<T> — Component genèric de kanban amb drag & drop
@@ -23,11 +23,12 @@ import {
   type DragEvent,
   type MutableRefObject,
 } from 'react';
+import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
 export interface PipelineColumnDef {
   status: string;
   label: string;
-  toneClass: string;
+  toneClass?: string;
 }
 
 export interface PipelineColumn<T> extends PipelineColumnDef {
@@ -155,7 +156,7 @@ export default function PipelineBoard<T>({
   }
 
   return (
-    <div ref={(el) => { if (boardRef) boardRef.current = el; }} onScroll={onBoardScroll} className={gridClassName}>
+    <div ref={(el) => { if (boardRef) boardRef.current = el; }} onScroll={onBoardScroll} className={gridClassName} {...helpAttrs(ADMIN_SHARED_HELP.pipelineBoard)}>
       {columns.map((col, colIndex) => {
         const isExpanded = expandedColumns.has(col.status);
         const visibleItems = isExpanded ? col.items : col.items.slice(0, maxVisiblePerColumn);

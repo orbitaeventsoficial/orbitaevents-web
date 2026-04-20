@@ -9,7 +9,6 @@ type AdminHelpModeContextValue = {
 };
 
 const STORAGE_KEY = 'orbita.admin.help-mode';
-const SEEN_KEY = 'orbita.admin.help-mode.seen';
 
 const AdminHelpModeContext = createContext<AdminHelpModeContextValue | null>(null);
 
@@ -19,22 +18,14 @@ export function AdminHelpModeProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-
-    if (saved === '1' || saved === '0') {
-      setEnabled(saved === '1');
-    } else {
-      setEnabled(false);
-      window.localStorage.setItem(STORAGE_KEY, '0');
-    }
-
+    setEnabled(false);
+    window.localStorage.setItem(STORAGE_KEY, '0');
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated || typeof window === 'undefined') return;
     window.localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0');
-    window.localStorage.setItem(SEEN_KEY, '1');
   }, [enabled, hydrated]);
 
   const value = useMemo(
@@ -60,4 +51,3 @@ export function useAdminHelpMode() {
   }
   return ctx;
 }
-

@@ -1,4 +1,5 @@
 import googleReviewsData from '../../public/data/google-reviews.json';
+import { getSiteLocalizedText, getSitePublicCopy } from '@/lib/site-public-copy';
 
 /**
  * CONFIGURACIÓ CENTRALITZADA D'ÒRBITA EVENTS
@@ -8,6 +9,13 @@ import googleReviewsData from '../../public/data/google-reviews.json';
  * només ho canvies aquí. La resta s'actualitza automàticament.
  */
 
+const sitePublicCopy = getSitePublicCopy('ca');
+const siteWhatsappMessages = sitePublicCopy.whatsappMessages || {};
+const siteGoogleReviewsFallback = sitePublicCopy.googleReviews?.fallback?.description || '';
+const siteContactAutoReplyMessage = sitePublicCopy.contact?.success?.message || sitePublicCopy.contact?.responseTime || '';
+const siteScheduleCopy = sitePublicCopy.siteConfig?.schedule || {};
+const siteStatsCopy = sitePublicCopy.siteConfig?.stats || {};
+const siteStatsResponseTime = siteStatsCopy.responseTime || '';
 export const SITE_CONFIG = {
   // ============================================
   // INFORMACION DEL NEGOCIO
@@ -40,16 +48,16 @@ export const SITE_CONFIG = {
 
     // Horari d'atenció (display strings)
     schedule: {
-      weekdays: 'Dilluns a Divendres: 08:00 - 20:00',
-      saturday: 'Dissabte: 08:00 - 20:00',
-      sunday: 'Diumenge: 08:00 - 20:00',
-      note: 'Esdeveniments 24/7 amb reserva prèvia',
+      weekdays: siteScheduleCopy.weekdays || '',
+      saturday: siteScheduleCopy.saturday || '',
+      sunday: siteScheduleCopy.sunday || '',
+      note: siteScheduleCopy.note || '',
     },
 
     // Horari en format ISO (per Schema.org openingHoursSpecification)
     hours: {
-      weekdays: { open: '09:00', close: '20:00' },
-      saturday: { open: '10:00', close: '14:00' },
+      weekdays: { open: '08:00', close: '20:00' },
+      saturday: { open: '08:00', close: '20:00' },
     },
   },
 
@@ -75,7 +83,7 @@ export const SITE_CONFIG = {
     minRatingToShow: 5,
 
     // Text alternatiu quan no hi ha ressenyes o falla l'API
-    fallbackText: 'Nous a Google - sigues el primer en deixar-nos una ressenya!',
+    fallbackText: siteGoogleReviewsFallback,
   },
 
   // ============================================
@@ -118,22 +126,25 @@ export const SITE_CONFIG = {
 
     // Missatges predefinits per context
     messages: {
-      general: 'Hola! M\'interessa saber més sobre els vostres serveis d\'esdeveniments.',
-      bodas: 'Hola! M\'agradaria informació sobre els vostres serveis per a casaments.',
-      discomovil: 'Hola! Estic interessat a contractar una discòbil.',
-      empresas: 'Hola! Necessito un pressupost per a un esdeveniment corporatiu.',
-      produccion: 'Hola! M\'interessa una producció tècnica completa.',
-      fiestas: 'Hola! Vull animar la meva festa amb els vostres serveis.',
-      alquiler: 'Hola! Necessito llogar equipament per a un esdeveniment.',
-      configurador: (packName: string, precio: number) =>
-        `Hola! He configurat un pack "${packName}" (${precio} EUR). Podem parlar sobre la disponibilitat?`,
+      general: siteWhatsappMessages.general || '',
+      bodas: siteWhatsappMessages.bodas || '',
+      discomovil: siteWhatsappMessages.discomovil || '',
+      empresas: siteWhatsappMessages.empresas || '',
+      produccion: siteWhatsappMessages.produccion || '',
+      fiestas: siteWhatsappMessages.fiestas || '',
+      alquiler: siteWhatsappMessages.alquiler || '',
+      configurador: (packName: string, precio: number) => {
+        const base = siteWhatsappMessages.configurador || '';
+        const details = packName ? ` (${packName}${typeof precio === 'number' ? ` · ${precio} EUR` : ''})` : '';
+        return `${base}${details}`.trim();
+      },
     },
 
     // Horari de resposta automàtica
     autoReplySchedule: {
       enabled: false,
-      message: 'Gràcies per contactar-nos! Et respondrem en menys de 2 hores.',
-      officeHours: 'Tots els dies de 08:00-20:00',
+      message: siteContactAutoReplyMessage,
+      officeHours: siteScheduleCopy.officeHours || '',
     },
   },
 
@@ -168,7 +179,7 @@ export const SITE_CONFIG = {
       const diffYears = (now.getTime() - fundingDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
       return Math.max(3, Math.floor(diffYears));
     })(),
-    yearsLabel: 'Desde 2023',
+    yearsLabel: siteStatsCopy.yearsLabel || '',
     eventsCompleted: 50,
     happyClients: 50,
     citiesCovered: 2,
@@ -176,7 +187,7 @@ export const SITE_CONFIG = {
     peoplesDancing: 5000,
     avgRating: googleReviewsData.rating || 5.0,
     reviewCount: googleReviewsData.total || 0,
-    responseTime: '2h',
+    responseTime: siteStatsResponseTime,
 
     // S'actualitza automàticament des de public/data/google-reviews.json
     lastUpdated: googleReviewsData.lastUpdated?.split('T')[0] || new Date().toISOString().split('T')[0],
@@ -230,19 +241,32 @@ export const SITE_CONFIG = {
 type WhatsAppMessageData = { packName?: string; precio?: number };
 
 export function getWhatsAppUrl(messageType: keyof typeof SITE_CONFIG.whatsapp.messages = 'general', customData?: WhatsAppMessageData): string {
+  return getLocalizedWhatsAppUrl('ca', messageType, customData);
+}
+
+export function getLocalizedWhatsAppUrl(
+  locale: string,
+  messageType: keyof typeof SITE_CONFIG.whatsapp.messages = 'general',
+  customData?: WhatsAppMessageData,
+): string {
   const { number, messages } = SITE_CONFIG.whatsapp;
 
   let message: string;
-  if (typeof messages[messageType] === 'function') {
+  if (messageType === 'configurador') {
+    const base = getSiteLocalizedText('whatsappMessages.configurador', locale);
+    const details = customData?.packName
+      ? ` (${customData.packName}${typeof customData?.precio === 'number' ? ` · ${customData.precio} EUR` : ''})`
+      : '';
+    message = `${base}${details}`.trim();
+  } else if (typeof messages[messageType] === 'function') {
     message = (messages[messageType] as Function)(customData?.packName, customData?.precio);
   } else {
-    message = messages[messageType] as string;
+    message = getSiteLocalizedText(`whatsappMessages.${messageType}`, locale) || (messages[messageType] as string);
   }
 
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${number.replace(/\+/g, '')}?text=${encodedMessage}`;
 }
-
 /**
  * Formatea numero de telefono para enlaces
  */
@@ -281,6 +305,13 @@ export function isFeatureEnabled(feature: keyof typeof SITE_CONFIG.features): bo
 // ============================================
 type SocialPlatform = keyof typeof SITE_CONFIG.social;
 type WhatsAppMessageType = keyof typeof SITE_CONFIG.whatsapp.messages;
+
+
+
+
+
+
+
 
 
 

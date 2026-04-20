@@ -69,7 +69,7 @@ describe('enforceLeadSla', () => {
 
   it('crea tasca per lead sense tasques SLA existents', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: 'cust-1', assignedTo: 'admin', priority: 'HIGH', tasks: [] },
+      { id: 'lead-1', customerId: 'cust-1', assignedTo: 'admin', priority: 'HIGH', universalTasks: [] },
     ]);
 
     const result = await enforceLeadSla();
@@ -94,7 +94,7 @@ describe('enforceLeadSla', () => {
         customerId: null,
         assignedTo: null,
         priority: 'MEDIUM',
-        tasks: [{ id: 'task-1', status: 'OPEN', createdBy: 'SLA Bot' }],
+        universalTasks: [{ id: 'task-1', status: 'OPEN', createdBy: 'SLA Bot' }],
       },
     ]);
 
@@ -106,7 +106,7 @@ describe('enforceLeadSla', () => {
 
   it('crea activity per cada lead afectat', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'HIGH', tasks: [] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'HIGH', universalTasks: [] },
     ]);
 
     await enforceLeadSla();
@@ -122,7 +122,7 @@ describe('enforceLeadSla', () => {
 
   it('escala prioritat de LOW a HIGH', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'LOW', tasks: [] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'LOW', universalTasks: [] },
     ]);
 
     const result = await enforceLeadSla();
@@ -136,7 +136,7 @@ describe('enforceLeadSla', () => {
 
   it('escala prioritat de MEDIUM a HIGH', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'MEDIUM', tasks: [] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'MEDIUM', universalTasks: [] },
     ]);
 
     const result = await enforceLeadSla();
@@ -146,7 +146,7 @@ describe('enforceLeadSla', () => {
 
   it('no escala si ja és HIGH', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'HIGH', tasks: [] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'HIGH', universalTasks: [] },
     ]);
 
     const result = await enforceLeadSla();
@@ -157,7 +157,7 @@ describe('enforceLeadSla', () => {
 
   it('no escala si ja és URGENT', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'URGENT', tasks: [] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'URGENT', universalTasks: [] },
     ]);
 
     const result = await enforceLeadSla();
@@ -167,9 +167,9 @@ describe('enforceLeadSla', () => {
 
   it('processa múltiples leads', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([
-      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'LOW', tasks: [] },
-      { id: 'lead-2', customerId: 'cust-2', assignedTo: 'admin', priority: 'HIGH', tasks: [] },
-      { id: 'lead-3', customerId: null, assignedTo: null, priority: 'MEDIUM', tasks: [{ id: 't1' }] },
+      { id: 'lead-1', customerId: null, assignedTo: null, priority: 'LOW', universalTasks: [] },
+      { id: 'lead-2', customerId: 'cust-2', assignedTo: 'admin', priority: 'HIGH', universalTasks: [] },
+      { id: 'lead-3', customerId: null, assignedTo: null, priority: 'MEDIUM', universalTasks: [{ id: 't1' }] },
     ]);
 
     const result = await enforceLeadSla();

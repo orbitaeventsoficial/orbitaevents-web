@@ -1,10 +1,11 @@
-﻿// app/admin/inbox/compose/ComposeForm.tsx
+// app/admin/inbox/compose/ComposeForm.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatDateSimple, formatCurrency, getEventLabel } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { generateSmartTemplates, generateAllTemplates, type SmartTemplate } from '@/lib/services/inboxTemplateService';
 
 interface Lead {
   id: string;
@@ -31,6 +32,7 @@ interface Pack {
 interface Props {
   leads: Lead[];
   packs: Pack[];
+  returnHref: string;
   initialCustomer?: {
     id: string;
     name: string;
@@ -46,13 +48,14 @@ const ACTIVE_BUTTON = 'rounded-xl border px-4 py-2 text-sm font-medium admin-ton
 const CARD_SELECTED = 'rounded-xl border-2 p-4 text-left transition-colors admin-tone-soft-info admin-tone-border-info';
 const CARD_IDLE = 'ap-card rounded-xl border-2 p-4 text-left transition-colors hover:admin-tone-bg-neutral';
 
-export default function ComposeForm({ leads, packs, initialCustomer, initialTemplate }: Props) {
+export default function ComposeForm({ leads, packs, returnHref, initialCustomer, initialTemplate }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<'email' | 'quote'>('email');
   const [selectedLeadId, setSelectedLeadId] = useState('');
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [activeTemplateKey, setActiveTemplateKey] = useState<string | null>(null);
   const [locale, setLocale] = useState('ca');
   const [selectedPackId, setSelectedPackId] = useState('');
   const [price, setPrice] = useState('');
@@ -65,6 +68,37 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
   const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
   const selectedPack = packs.find((pack) => pack.id === selectedPackId);
+
+  const smartTemplates: SmartTemplate[] = useMemo(() => {
+    if (selectedLead) {
+      return generateSmartTemplates({
+        name: selectedLead.name,
+        email: selectedLead.email,
+        eventType: selectedLead.eventType,
+        eventDate: selectedLead.eventDate ? new Date(selectedLead.eventDate).toISOString() : null,
+        eventLocation: selectedLead.eventLocation,
+        guestCount: selectedLead.guestCount,
+        status: selectedLead.status,
+        locale: selectedLead.preferredLocale || locale,
+      });
+    }
+    if (initialCustomer) {
+      return generateAllTemplates({
+        name: initialCustomer.name,
+        email: initialCustomer.email,
+        locale: initialCustomer.preferredLocale || locale,
+      });
+    }
+    return generateAllTemplates({ name: '', locale });
+  }, [selectedLead, initialCustomer, locale]);
+
+  function applyTemplate(template: SmartTemplate) {
+    setSubject(template.subject);
+    setBody(template.body);
+    setActiveTemplateKey(template.key);
+    if (template.mode === 'quote') setMode('quote');
+    else setMode('email');
+  }
 
   useEffect(() => {
     if (selectedLead) {
@@ -144,7 +178,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
         if (res.ok) {
           setSent(true);
-          setTimeout(() => router.push('/admin/inbox'), 1500);
+          setTimeout(() => router.push(returnHref), 1500);
         } else {
           const data = await res.json();
           setError(data.error || 'Error enviant pressupost');
@@ -174,12 +208,13 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           leadId: selectedLeadId || undefined,
           customerId: initialCustomer?.id || undefined,
           locale,
+          templateKey: activeTemplateKey || undefined,
         }),
       });
 
       if (res.ok) {
         setSent(true);
-        setTimeout(() => router.push('/admin/inbox'), 1500);
+        setTimeout(() => router.push(returnHref), 1500);
       } else {
         const data = await res.json();
         setError(data.error || 'Error enviant email');
@@ -200,7 +235,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           aria-pressed={mode === 'email'}
           className={mode === 'email' ? ACTIVE_BUTTON : IDLE_BUTTON}
         >
-          ✉ï¸ Correu normal
+          ✉️ Correu normal
         </button>
         <button
           onClick={() => setMode('quote')}
@@ -212,8 +247,27 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
         </button>
       </div>
 
+      {mode === 'email' && smartTemplates.length > 0 && (
+        <div className="admin-card-glass rounded-xl border border-white/10 p-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider opacity-60">Plantilles intel·ligents</p>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {smartTemplates.map((tpl) => (
+              <button
+                key={tpl.key}
+                type="button"
+                onClick={() => applyTemplate(tpl)}
+                className="admin-stagger-item rounded-lg border border-white/10 p-3 text-left transition-colors hover:bg-white/[0.05]"
+              >
+                <p className="text-sm font-medium">{tpl.icon} {tpl.label}</p>
+                <p className="mt-0.5 text-[11px] opacity-50 line-clamp-1">{tpl.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="overflow-hidden rounded-2xl border admin-card-glass">
-        <div className="space-y-6 p-6">
+        <div className="space-y-6 p-4 sm:p-6">
           <div>
             <label className="mb-2 block text-sm font-medium">Selecciona entrada (opcional)</label>
             <select
@@ -407,12 +461,12 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           <div>
             {error && (
               <p className="text-sm admin-tone-text-danger" role="alert">
-                âŒ {error}
+                ❌ {error}
               </p>
             )}
           </div>
           <div className="flex gap-3">
-            <button onClick={() => router.push('/admin/inbox')} type="button" className="ap-btn ap-btn--secondary">
+            <button onClick={() => router.push(returnHref)} type="button" className="ap-btn ap-btn--secondary">
               Cancel·lar
             </button>
             <button
@@ -436,6 +490,5 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
     </div>
   );
 }
-
 
 

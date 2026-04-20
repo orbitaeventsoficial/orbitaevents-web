@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
-import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
+import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
 
 export default function CalendarMonthClient() {
   const toast = useToast();
@@ -30,6 +31,11 @@ export default function CalendarMonthClient() {
   const [blockingDate, setBlockingDate] = useState(false);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
+  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, tasks: true, social: true, followUps: true });
+
+  const toggleLayer = useCallback((layer: 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
+    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
+  }, []);
 
   const blockDay = useCallback(async (dateKey: string, note?: string) => {
     setBlockingDate(true);
@@ -180,6 +186,9 @@ export default function CalendarMonthClient() {
         reservaDays: 0,
         bloqueadoDays: 0,
         mixedDays: 0,
+        totalTasks: 0,
+        totalSocialPosts: 0,
+        workDays: 0,
       };
     }
 
@@ -189,6 +198,9 @@ export default function CalendarMonthClient() {
     let reservaDays = 0;
     let bloqueadoDays = 0;
     let mixedDays = 0;
+    let totalTasks = 0;
+    let totalSocialPosts = 0;
+    let workDays = 0;
 
     for (const cell of cells) {
       const dayData =
@@ -196,13 +208,20 @@ export default function CalendarMonthClient() {
         ({
           reservas: [],
           bloqueos: [],
+          tasks: [],
+          socialPosts: [],
+          followUps: [],
         } as CalendarApiDay);
 
       const hasReservas = dayData.reservas.length > 0;
       const hasBloqueos = dayData.bloqueos.length > 0;
+      const hasWork = dayData.tasks.length > 0 || dayData.socialPosts.length > 0;
 
       totalReservas += dayData.reservas.length;
       totalBloqueos += dayData.bloqueos.length;
+      totalTasks += dayData.tasks.length;
+      totalSocialPosts += dayData.socialPosts.length;
+      if (hasWork) workDays += 1;
 
       if (!hasReservas && !hasBloqueos) {
         freeDays += 1;
@@ -222,13 +241,16 @@ export default function CalendarMonthClient() {
       reservaDays,
       bloqueadoDays,
       mixedDays,
+      totalTasks,
+      totalSocialPosts,
+      workDays,
     };
   }, [cells, data]);
 
   return (
-    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
+    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" data-help-title="Navegació de mes" data-help-desc="Canvia de mes, torna a avui o alterna entre vista mensual, setmanal i diària.">
+      <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -298,8 +320,28 @@ export default function CalendarMonthClient() {
         </div>
       </div>
 
+
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+        <span className="font-semibold opacity-60">Capes:</span>
+        {[
+          ['bookings', 'Reserves'],
+          ['blocks', 'Bloquejos'],
+          ['tasks', 'Tasques'],
+          ['social', 'Social'],
+          ['followUps', 'Follow-ups'],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => toggleLayer(key as 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       {/* Stats ràpids del mes visible */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" data-help-title="Resum del calendari" data-help-desc="Resumeix reserves, bloquejos, dies lliures i dies mixtes del període visible per entendre ràpidament la càrrega del mes.">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-6" {...helpAttrs(ADMIN_CALENDAR_HELP.stats)}>
         <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-success admin-tone-border-success">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -347,10 +389,33 @@ export default function CalendarMonthClient() {
             </span>
           </div>
         </div>
-      </div>
+
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-info admin-tone-border-info">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-info">Tasques</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-info">{stats.totalTasks}</span>
+            </div>
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-info admin-tone-border-info admin-tone-text-info">
+              {stats.workDays} dies
+            </span>
+          </div>
+        </div>
+
+        <div className="admin-card-glass rounded-xl border p-2.5 sm:p-3 transition-all admin-tone-soft-warning admin-tone-border-warning">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide admin-tone-text-warning">Social</span>
+              <span className="text-xl sm:text-2xl font-bold admin-tone-text-warning">{stats.totalSocialPosts}</span>
+            </div>
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
+              Posts
+            </span>
+          </div>
+        </div>      </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" data-help-title="Llegenda del calendari" data-help-desc="Explica el significat visual de cada color abans d'entrar al detall del mes.">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-xl admin-card-glass border px-3 sm:px-4 py-2 text-sm" {...helpAttrs(ADMIN_CALENDAR_HELP.legend)}>
         <span className="font-medium">Llegenda:</span>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm bg-white/15 border border-white/20" />
@@ -370,21 +435,23 @@ export default function CalendarMonthClient() {
         </div>
       </div>
 
-      {/* Capçalera de dies */}
-      <div className="grid grid-cols-7 text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
-        {weekdayLabels.map((label) => (
-          <div key={label} className="py-2">
-            {label}
+      {/* Capçalera + graella amb scroll controlat en mòbil */}
+      <div className="overflow-x-auto rounded-2xl">
+        <div className="min-w-[720px]">
+          <div className="grid grid-cols-7 overflow-x-auto text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            {weekdayLabels.map((label) => (
+              <div key={label} className="py-2">
+                {label}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Graella del calendari */}
-      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border p-0" data-help-title="Graella del calendari" data-help-desc="Cada cel·la mostra reserves i bloquejos del dia. Arrossega una reserva a un altre dia per canviar-ne la data. Clica un dia per veure detalls.">
+          {/* Graella del calendari */}
+          <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-y-hidden overflow-x-auto rounded-2xl border p-0" {...helpAttrs(ADMIN_CALENDAR_HELP.monthGrid)}>
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
-            ({ reservas: [], bloqueos: [] } as CalendarApiDay);
+            ({ reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] } as CalendarApiDay);
 
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
@@ -436,7 +503,7 @@ export default function CalendarMonthClient() {
                 </span>
               </div>
               <div className="mt-1 flex-1 min-h-0 min-w-0 overflow-hidden">
-                {hasReservas && (
+                {visibleLayers.bookings && hasReservas && (
                   <div className="space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
                     {dayData.reservas.slice(0, 2).map((r) => (
                       <div
@@ -477,7 +544,7 @@ export default function CalendarMonthClient() {
                   </div>
                 )}
 
-                {hasBloqueos && (
+                {visibleLayers.blocks && hasBloqueos && (
                   <div className="line-clamp-1 text-[9px] sm:text-[10px] mt-0.5 admin-tone-text-danger/80">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
                     {dayData.bloqueos.length > 1
@@ -485,15 +552,35 @@ export default function CalendarMonthClient() {
                       : ''}
                   </div>
                 )}
+
+                {visibleLayers.tasks && dayData.tasks.length > 0 && (
+                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-[9px] sm:text-[10px] admin-tone-soft-info admin-tone-text-info">
+                    ✓ {dayData.tasks[0].title}{dayData.tasks.length > 1 ? ` +${dayData.tasks.length - 1}` : ''}
+                  </div>
+                )}
+
+                {visibleLayers.social && dayData.socialPosts.length > 0 && (
+                  <div className="mt-0.5 truncate rounded-md px-1 py-0.5 text-[9px] sm:text-[10px] admin-tone-soft-warning admin-tone-text-warning">
+                    📣 {dayData.socialPosts[0].title}{dayData.socialPosts.length > 1 ? ` +${dayData.socialPosts.length - 1}` : ''}
+                  </div>
+                )}
+
+                {visibleLayers.followUps && dayData.followUps.length > 0 && (
+                  <div className="mt-0.5 truncate rounded-md border border-rose-500/30 bg-rose-500/10 px-1 py-0.5 text-[9px] sm:text-[10px] text-rose-200">
+                    ☎ {dayData.followUps[0].name}{dayData.followUps.length > 1 ? ` +${dayData.followUps.length - 1}` : ''}
+                  </div>
+                )}
               </div>
             </button>
           );
         })}
+          </div>
+        </div>
       </div>
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5" data-help-title="Detall del dia" data-help-desc="Mostra reserves i bloquejos del dia seleccionat. Pots bloquejar/desbloquejar dies, crear reserves o canviar dates.">
+        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-semibold">
@@ -573,136 +660,136 @@ export default function CalendarMonthClient() {
             </div>
           )}
 
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {/* Reserves */}
-            <div className="flex flex-col">
-              <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
-                <span className="h-2 w-2 rounded-full" />
-                Reserves ({selectedDayData.payload?.reservas?.length || 0})
-              </h3>
-              <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
-                {selectedDayData.payload?.reservas?.length ? (
-                  selectedDayData.payload.reservas.map((r) => (
-                    <div
-                      key={r.id}
-                      className="rounded-xl border px-3 py-2.5 transition-all"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="font-medium text-sm">
-                          {r.clientName ?? 'Client sense nom'}
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            {visibleLayers.bookings && (
+              <div className="flex flex-col">
+                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                  <span className="h-2 w-2 rounded-full" />
+                  Reserves ({selectedDayData.payload?.reservas?.length || 0})
+                </h3>
+                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
+                  {selectedDayData.payload?.reservas?.length ? (
+                    selectedDayData.payload.reservas.map((r) => (
+                      <div key={r.id} className="rounded-xl border px-3 py-2.5 transition-all">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="font-medium text-sm">{r.clientName ?? 'Client sense nom'}</div>
+                          {r.estado && (
+                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                              {r.estado}
+                            </span>
+                          )}
                         </div>
-                        {r.estado && (
-                          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                            {r.estado}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1 text-xs">
-                        {r.ubicacion && (
-                          <>
-                            {r.ubicacion}
-                            {' · '}
-                          </>
-                        )}
-                        {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
-                      </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <Link
-                          href={`/admin/bookings/${r.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-[10px] font-medium hover:underline"
-                        >
-                          Reserva →
-                        </Link>
-                        {r.leadId && (
-                          <Link
-                            href={`/admin/leads/${r.leadId}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] font-medium hover:underline"
-                          >
-                            Entrada →
+                        <div className="mt-1 text-xs">
+                          {r.ubicacion && <>{r.ubicacion}{' · '}</>}
+                          {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <Link href={`/admin/bookings/${r.id}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                            Reserva →
                           </Link>
-                        )}
-                        {r.customerId && (
-                          <Link
-                            href={`/admin/clientes/${r.customerId}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] font-medium hover:underline"
-                          >
-                            👤 Client →
-                          </Link>
-                        )}
-                        {changingDateForBooking === r.id ? (
-                          <input
-                            type="date"
-                            autoFocus
-                            className="ap-input px-2 py-0.5 text-[10px]"
-                            defaultValue={r.fechaEvento.slice(0, 10)}
-                            onBlur={() => setChangingDateForBooking(null)}
-                            onChange={(e) => {
-                              const newDate = e.target.value;
-                              if (newDate && newDate !== r.fechaEvento.slice(0, 10)) {
-                                void moveBookingToDate(r.id, newDate);
-                                setChangingDateForBooking(null);
-                              }
-                            }}
-                          />
-                        ) : (
-                          <button
-                            onClick={() => setChangingDateForBooking(r.id)}
-                            className="rounded-xl border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
-                          >
-                            Canviar data
-                          </button>
-                        )}
+                          {r.leadId && (
+                            <Link href={`/admin/leads/${r.leadId}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                              Entrada →
+                            </Link>
+                          )}
+                          {r.customerId && (
+                            <Link href={`/admin/clientes/${r.customerId}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                              👤 Client →
+                            </Link>
+                          )}
+                          {changingDateForBooking === r.id ? (
+                            <input
+                              type="date"
+                              autoFocus
+                              className="ap-input px-2 py-0.5 text-[10px]"
+                              defaultValue={r.fechaEvento.slice(0, 10)}
+                              onBlur={() => setChangingDateForBooking(null)}
+                              onChange={(e) => {
+                                const newDate = e.target.value;
+                                if (newDate && newDate !== r.fechaEvento.slice(0, 10)) {
+                                  void moveBookingToDate(r.id, newDate);
+                                  setChangingDateForBooking(null);
+                                }
+                              }}
+                            />
+                          ) : (
+                            <button onClick={() => setChangingDateForBooking(r.id)} className="rounded-xl border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle">
+                              Canviar data
+                            </button>
+                          )}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
+                      Cap reserva en aquest dia
                     </div>
-                  ))
-                ) : (
-                  <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
-                    Cap reserva en aquest dia
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Bloquejos */}
-            <div className="flex flex-col">
-              <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
-                <span className="h-2 w-2 rounded-full" />
-                Bloquejos ({selectedDayData.payload?.bloqueos?.length || 0})
-              </h3>
-              <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
-                {selectedDayData.payload?.bloqueos?.length ? (
-                  selectedDayData.payload.bloqueos.map((b) => (
-                    <div
-                      key={b.id}
-                      className="rounded-xl border px-3 py-2.5"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="font-medium text-sm">
-                          Bloqueig
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => unblockDay(b.fecha.slice(0, 10))}
-                          className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle"
-                        >
-                          Desbloquejar
-                        </button>
-                      </div>
-                      <div className="mt-1 text-xs">
-                        {b.notas || b.motivo || 'Sense motiu especificat'}
-                      </div>
+            {(visibleLayers.tasks || visibleLayers.social || visibleLayers.followUps) && (
+              <div className="flex flex-col">
+                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                  <span className="h-2 w-2 rounded-full" />
+                  Feina ({(visibleLayers.tasks ? (selectedDayData.payload?.tasks?.length || 0) : 0) + (visibleLayers.social ? (selectedDayData.payload?.socialPosts?.length || 0) : 0) + (visibleLayers.followUps ? (selectedDayData.payload?.followUps?.length || 0) : 0)})
+                </h3>
+                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
+                  {visibleLayers.tasks && selectedDayData.payload?.tasks?.map((task) => (
+                    <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                      <div className="truncate text-sm font-medium">{task.title}</div>
+                      <div className="mt-1 text-xs opacity-70">Tasca · {resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
+                    </Link>
+                  ))}
+                  {visibleLayers.social && selectedDayData.payload?.socialPosts?.map((post) => (
+                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2.5 transition-all admin-card-glass">
+                      <div className="truncate text-sm font-medium">{post.title}</div>
+                      <div className="mt-1 text-xs opacity-70">Social · {resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
+                    </Link>
+                  ))}
+                  {visibleLayers.followUps && selectedDayData.payload?.followUps?.map((item) => (
+                    <Link key={item.leadId} href={`/admin/leads/${item.leadId}`} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all">
+                      <div className="truncate text-sm font-medium">Follow-up · {item.name}</div>
+                      <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
+                    </Link>
+                  ))}
+                  {(!visibleLayers.tasks || !selectedDayData.payload?.tasks?.length) && (!visibleLayers.social || !selectedDayData.payload?.socialPosts?.length) && (!visibleLayers.followUps || !selectedDayData.payload?.followUps?.length) && (
+                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
+                      Cap feina planificada en aquest dia
                     </div>
-                  ))
-                ) : (
-                  <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
-                    Dia no bloquejat
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {visibleLayers.blocks && (
+              <div className="flex flex-col">
+                <h3 className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide">
+                  <span className="h-2 w-2 rounded-full" />
+                  Bloquejos ({selectedDayData.payload?.bloqueos?.length || 0})
+                </h3>
+                <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
+                  {selectedDayData.payload?.bloqueos?.length ? (
+                    selectedDayData.payload.bloqueos.map((b) => (
+                      <div key={b.id} className="rounded-xl border px-3 py-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="font-medium text-sm">Bloqueig</div>
+                          <button type="button" onClick={() => unblockDay(b.fecha.slice(0, 10))} className="rounded-lg border px-2 py-0.5 text-[10px] font-medium transition-colors admin-tone-idle">
+                            Desbloquejar
+                          </button>
+                        </div>
+                        <div className="mt-1 text-xs">{b.notas || b.motivo || 'Sense motiu especificat'}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-xl border border-dashed px-3 py-4 text-center text-sm">
+                      Dia no bloquejat
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {selectedDayData.payload?.reservas?.[0] && (
@@ -721,5 +808,4 @@ export default function CalendarMonthClient() {
     </AdminPage>
   );
 }
-
 

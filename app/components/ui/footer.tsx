@@ -21,7 +21,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SERVICES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, WHATSAPP_URL } from '@/lib/constants';
+import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC_FOOTER_LEGAL_LINKS, PUBLIC_FOOTER_RESOURCES_LINKS, PUBLIC_FOOTER_SOCIAL_LINK_META, WHATSAPP_URL } from '@/lib/constants';
+import { PUBLIC_CORE_SERVICE_NAV } from '@/lib/publicServiceCatalog';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -180,17 +181,17 @@ export default function Footer() {
                 {t('sections.services')}
               </h3>
               <ul className="space-y-3">
-                {PUBLIC_FOOTER_SERVICES_LINKS.map((link) => (
-                  <li key={link.nameKey}>
+                {PUBLIC_CORE_SERVICE_NAV.map((link) => (
+                  <li key={link.footerNameKey}>
                     <Link
                       href={link.href}
-                      onClick={() => handleLinkClick('servicios', link.nameKey)}
+                      onClick={() => handleLinkClick('servicios', link.footerNameKey)}
                       className="text-white/60 hover:text-amber-400 text-sm transition-colors inline-flex items-center gap-2 group"
                     >
                       <span className="group-hover:scale-110 transition-transform">
                         {link.icon}
                       </span>
-                      {tFooterLinks(`services.${link.nameKey}`)}
+                      {tFooterLinks(`services.${link.footerNameKey}`)}
                     </Link>
                   </li>
                 ))}

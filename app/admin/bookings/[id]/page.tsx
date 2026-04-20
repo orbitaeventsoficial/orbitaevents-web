@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
-import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
@@ -17,21 +16,47 @@ import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
-import { BOOKING_ACTIVITY_ACTION_LABELS } from '@/lib/constants/admin';
-import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
-import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
-import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
 
-import { getBookingStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull, DEFAULT_EXPECTED_LIFE_HOURS } from '@/lib/constants';
+import { getBookingStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import Tooltip from '@/app/admin/components/Tooltip';
+import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNumericCompat } from './booking-utils';
-import { buildGoogleCalendarUrl, parseLogDetails, getPackTranslation } from './booking-utils';
+import { buildGoogleCalendarUrl, getPackTranslation } from './booking-utils';
+import type { CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
+import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: { id: string };
+}
+
+function getBookingTimelineKindLabel(kind: CanonicalTimelineEvent['kind']): string {
+  if (kind === 'message') return 'Comunicacio';
+  if (kind === 'task') return 'Tasca';
+  if (kind === 'proposal') return 'Pressupost';
+  if (kind === 'booking') return 'Reserva';
+  if (kind === 'system') return 'Sistema';
+  if (kind === 'crud') return 'Operacio';
+  return 'Activitat';
+}
+
+function getBookingTimelineSourceLabel(source: CanonicalTimelineEvent['source']): string {
+  if (source === 'adminLog') return 'Sistema';
+  if (source === 'leadActivity') return 'Lead';
+  if (source === 'customerActivity') return 'Client';
+  return 'Activitat';
+}
+
+function describeBookingTimelineEntry(entry: CanonicalTimelineEvent): string {
+  if (entry.body) return entry.body;
+  const metadata = entry.metadata || {};
+  const flow = typeof metadata.flow === 'string' ? metadata.flow : '';
+  const channel = typeof metadata.channel === 'string' ? metadata.channel : '';
+  const reference = typeof metadata.reference === 'string' ? metadata.reference : '';
+  return [flow, channel, reference ? `Ref. ${reference}` : ''].filter(Boolean).join(' · ');
 }
 
 async function getBooking(id: string) {
@@ -82,51 +107,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
     booking.pack.translations,
     booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
   );
-  // Paral·lelitzar totes les queries secundàries
-  const [commLogs, activityLogs, customer, activePortalAccess, profitabilityConfig, marginTargetSetting] = await Promise.all([
-    prisma.adminLog.findMany({
-      where: {
-        entity: 'booking',
-        entityId: booking.id,
-        action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    }),
-    prisma.adminLog.findMany({
-      where: { entity: 'booking', entityId: booking.id },
-      orderBy: { createdAt: 'desc' },
-      take: 30,
-    }),
-    booking.customerId
-      ? prisma.customer.findUnique({
-          where: { id: booking.customerId },
-          select: { id: true, totalEvents: true, totalSpent: true, lastEventDate: true },
-        })
-      : prisma.customer.findFirst({
-          where: { emailNormalized: booking.clientEmail.trim().toLowerCase() },
-          select: { id: true, totalEvents: true, totalSpent: true, lastEventDate: true },
-        }),
-    getActivePortalAccessForBooking(booking.id) as Promise<Parameters<typeof ClientPortalAccessPanel>[0]['initialActive']>,
-    getProfitabilityConfig(),
-    prisma.setting.findUnique({ where: { key: 'pricing.pack.marginTargetPct' } }),
-  ]);
-  const commStatuses = {
-    PAYMENT: deriveFlowStatus(commLogs, 'PAYMENT'),
-    POST_EVENT: deriveFlowStatus(commLogs, 'POST_EVENT'),
-    GENERAL: deriveFlowStatus(commLogs, 'GENERAL'),
-  } as const;
-  const reviewFlowStatus = booking.reviewSubmittedAt || booking.clientSurvey
-    ? 'RESPONDIDO'
-    : booking.postEventEmailSent
-      ? 'ENVIADO'
-      : 'FALTA_ENVIAR';
-  const internalPostEventStatus =
-    booking.postEventReport && booking.clientFeedback?.sentAt
-      ? 'COMPLETO'
-      : booking.postEventReport || booking.clientFeedback?.sentAt
-        ? 'EN_PROGRESO'
-        : 'PENDIENTE';
+  // Snapshot operacional unificat (§6.7 — Canvi #14):
+  // getBookingOperationalSnapshot consolida 8 queries paral·leles en una sola crida.
+  const ops = await getBookingOperationalSnapshot(booking);
+  const { commStatuses, recentCommRows, reviewFlowStatus, internalPostEventStatus, timeline: bookingTimeline, customer, profitabilityConfig, targetMarginPct, inventoryCost } = ops;
+  const activePortalAccess = ops.portalAccess as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
+
   const googleCalendarUrl = buildGoogleCalendarUrl({
     reference: booking.reference,
     clientName: booking.clientName,
@@ -137,82 +123,75 @@ export default async function BookingDetailPage({ params }: PageProps) {
     eventVenue: booking.eventVenue,
     notes: booking.notes,
   });
-  const recentCommRows = commLogs.slice(0, 12).map((logEntry) => {
-    const details = parseLogDetails(logEntry.details);
-    return {
-      id: logEntry.id,
-      createdAt: logEntry.createdAt,
-      action: logEntry.action,
-      flow: typeof details.flow === 'string' ? details.flow : '-',
-      channel: typeof details.channel === 'string' ? details.channel : '-',
-    };
-  });
-  const activityTimeline = activityLogs.map((entry) => {
-    const details = parseLogDetails(entry.details);
-    const config = BOOKING_ACTIVITY_ACTION_LABELS[entry.action] || { icon: '📋', label: entry.action };
-    let description = '';
-    if (entry.action === 'STATUS_CHANGE' && details.from && details.to) {
-      description = `${details.from} → ${details.to}`;
-    } else if (entry.action === 'UPDATE' && details.fields) {
-      description = `Camps: ${Array.isArray(details.fields) ? details.fields.join(', ') : String(details.fields)}`;
-    } else if (details.channel) {
-      description = `${details.flow || ''} · ${details.channel}`;
-    }
-    return {
-      id: entry.id,
-      icon: config.icon,
-      label: config.label,
-      description,
-      createdAt: entry.createdAt,
-    };
-  });
 
   const bookingCompat = booking as BookingNumericCompat;
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal = booking.extras?.reduce((sum: number, e: { price?: number | null; quantity?: number | null }) => sum + Number(e.price || 0) * (e.quantity || 1), 0) ?? 0;
   const extraHours = typeof bookingCompat.extraHours === 'number' ? bookingCompat.extraHours : 0;
   const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
-  const marginTargetRaw = Number(marginTargetSetting?.value);
-  const targetMarginPct = Number.isFinite(marginTargetRaw)
-    ? (marginTargetRaw > 1 ? marginTargetRaw : marginTargetRaw * 100)
-    : 35;
-  const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
-  const assignedItemIds = (booking.inventory || []).map((assigned: { itemId: string }) => assigned.itemId);
-  const usageByItem = assignedItemIds.length > 0
-    ? new Map(
-        (await prisma.inventoryUsage.groupBy({
-          by: ['itemId'],
-          where: { itemId: { in: assignedItemIds } },
-          _sum: { hoursUsed: true },
-        })).map((row: { itemId: string; _sum: { hoursUsed: number | null } }) => [row.itemId, row._sum.hoursUsed || 0] as [string, number])
-      )
-    : new Map<string, number>();
-  const inventoryCostReal = (booking.inventory || []).reduce((sum: number, assigned: { item: { purchasePrice: number | null; expectedLifeHours: number | null }; quantity: number | null }) => {
-    const perHour = calculateCostPerHour(assigned.item.purchasePrice, assigned.item.expectedLifeHours);
-    return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
-  }, 0);
-  const remainingHoursList = (booking.inventory || []).map((assigned: { item: { expectedLifeHours: number | null; name: string }; itemId: string }) => {
-    const expectedLifeHours = assigned.item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
-    const used = Number(usageByItem.get(assigned.itemId) || 0);
-    return Math.max(0, expectedLifeHours - used);
-  });
-  const inventoryRemainingHoursAvg = remainingHoursList.length > 0
-    ? remainingHoursList.reduce((acc: number, n: number) => acc + n, 0) / remainingHoursList.length
-    : null;
-  const inventoryRemainingHoursMin = remainingHoursList.length > 0
-    ? Math.min(...remainingHoursList)
-    : null;
+  const inventoryCostReal = inventoryCost.totalCost;
+  const inventoryRemainingHoursAvg = inventoryCost.remainingHoursAvg;
+  const inventoryRemainingHoursMin = inventoryCost.remainingHoursMin;
+  const daysUntil = Math.ceil((booking.eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const isPast = daysUntil < 0;
+  const isToday = daysUntil === 0;
+  const isSoon = daysUntil > 0 && daysUntil <= 7;
+  const directCostPreview =
+    (inventoryCostReal > 0 ? inventoryCostReal : packPrice * profitabilityConfig.packCostRatio) +
+    (extrasTotal * profitabilityConfig.extraCostRatio) +
+    (extraHours * extraHourPrice * profitabilityConfig.extraHourCostRatio) +
+    profitabilityConfig.fixedOperationalCost;
+  const previewMarginPct = booking.total > 0 ? ((Number(booking.total) - directCostPreview) / Number(booking.total)) * 100 : 0;
+  const ownerAutomaticSignals = [
+    !isPast && !isToday ? `Esdeveniment en ${daysUntil} ${daysUntil === 1 ? 'dia' : 'dies'}` : null,
+    booking.status === 'PREPARING' ? 'Reserva en preparació activa' : null,
+    reviewFlowStatus === 'ENVIADO' ? 'Flux client enviat i pendent de resposta' : null,
+    internalPostEventStatus === 'EN_PROGRESO' ? 'Post-event intern en progrés' : null,
+  ].filter(Boolean) as string[];
+  const ownerManualSignals = [
+    !booking.depositPaid ? 'Falta cobrar la paga i senyal' : null,
+    booking.depositPaid && !booking.remainingPaid ? 'Falta cobrar la resta' : null,
+    isToday && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' ? 'L’esdeveniment és avui' : null,
+    isSoon && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' ? 'Convé revisar checklist i timings' : null,
+    previewMarginPct < targetMarginPct ? `Marge per sota de l’objectiu (${previewMarginPct.toFixed(0)}% vs ${targetMarginPct.toFixed(0)}%)` : null,
+  ].filter(Boolean) as string[];
+  const ownerNextStep = !booking.depositPaid
+    ? {
+        title: 'Revisar cobrament inicial',
+        detail: `Paga i senyal pendent de ${formatCurrency(booking.depositAmount)}`,
+        href: '#sec-finances',
+      }
+    : booking.depositPaid && !booking.remainingPaid
+      ? {
+          title: 'Tancar cobrament final',
+          detail: `Resta pendent de ${formatCurrency(booking.remainingAmount)}`,
+          href: '#sec-finances',
+        }
+      : isSoon && booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED'
+        ? {
+            title: 'Revisar preparació operativa',
+            detail: 'Checklist, equipament i horaris haurien de quedar tancats ara',
+            href: '#sec-equipament',
+          }
+        : booking.status === 'COMPLETED' && !booking.postEventReport
+          ? {
+              title: 'Completar post-event',
+              detail: 'Falta tancar l’informe intern de l’esdeveniment',
+              href: '#sec-historial',
+            }
+          : {
+              title: 'Obrir marge i costos',
+              detail: 'No hi ha tensió crítica ara mateix; revisa salut econòmica i transport',
+              href: '#sec-marge',
+            };
 
   return (
     <AdminPage
+      className="admin-booking-page"
       title={`Reserva ${booking.reference}`}
       back={{ href: '/admin/bookings', label: 'Reserves' }}
       subtitle={
         (() => {
-          const daysUntil = Math.ceil((booking.eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-          const isPast = daysUntil < 0;
-          const isToday = daysUntil === 0;
-          const isSoon = daysUntil > 0 && daysUntil <= 7;
           return (
             <div className="flex items-center gap-3 flex-wrap">
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
@@ -260,12 +239,34 @@ export default async function BookingDetailPage({ params }: PageProps) {
       }
     >
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5" data-help-title="Resum executiu de la reserva" data-help-desc="Resumeix import, estat de pagament, flux client, post-event i vincle comercial abans d'entrar al detall operatiu.">
-        <div className="ap-card rounded-xl px-4 py-3">
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què vigila el sistema',
+          tone: 'info',
+          items: ownerAutomaticSignals,
+          emptyText: 'Sense senyals automàtiques destacades ara mateix.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'Què et reclama decisió',
+          tone: ownerManualSignals.length > 0 ? 'warning' : 'success',
+          items: ownerManualSignals,
+          emptyText: 'No hi ha cap front manual calent ara mateix.',
+        }}
+        nextStep={{
+          title: ownerNextStep.title,
+          detail: ownerNextStep.detail,
+          href: ownerNextStep.href,
+        }}
+      />
+
+      <section className="admin-booking-executive grid gap-3 sm:grid-cols-2 xl:grid-cols-5" {...helpAttrs(ADMIN_BOOKING_HELP.detail.executive)}>
+        <div className="admin-booking-summary-card ap-card rounded-xl px-4 py-3">
           <p className="text-xs uppercase tracking-wide">Total reserva</p>
           <p className="text-xl font-semibold">{formatCurrency(booking.total)}</p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'ap-card--success' : booking.depositPaid ? 'ap-card--warning' : 'ap-card--danger'}`}>
+        <div className={`admin-booking-summary-card rounded-xl border px-4 py-3 shadow-sm ${booking.depositPaid && booking.remainingPaid ? 'ap-card--success' : booking.depositPaid ? 'ap-card--warning' : 'ap-card--danger'}`}>
           <div className="flex items-center gap-2">
             <Tooltip text={booking.depositPaid && booking.remainingPaid ? 'Paga i senyal + resta pagats' : booking.depositPaid ? 'Paga i senyal pagada, falta la resta' : 'Cap pagament rebut'}>
               <span className={`inline-block w-2.5 h-2.5 rounded-full ${booking.depositPaid && booking.remainingPaid ? 'admin-tone-bg-success' : booking.depositPaid ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
@@ -276,7 +277,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             {booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
           </p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${reviewFlowStatus === 'RESPONDIDO' ? 'ap-card--success' : reviewFlowStatus === 'ENVIADO' ? 'ap-card--warning' : 'ap-card--danger'}`}>
+        <div className={`admin-booking-summary-card rounded-xl border px-4 py-3 shadow-sm ${reviewFlowStatus === 'RESPONDIDO' ? 'ap-card--success' : reviewFlowStatus === 'ENVIADO' ? 'ap-card--warning' : 'ap-card--danger'}`}>
           <div className="flex items-center gap-2">
             <span className={`inline-block w-2.5 h-2.5 rounded-full ${reviewFlowStatus === 'RESPONDIDO' ? 'admin-tone-bg-success' : reviewFlowStatus === 'ENVIADO' ? 'admin-tone-bg-warning' : 'admin-tone-bg-danger'}`} />
             <p className="text-xs uppercase tracking-wide">Flux client</p>
@@ -289,7 +290,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 : 'Falta enviar'}
           </p>
         </div>
-        <div className={`rounded-xl border px-4 py-3 shadow-sm ${internalPostEventStatus === 'COMPLETO' ? 'ap-card--success' : internalPostEventStatus === 'EN_PROGRESO' ? 'ap-card--warning' : ''}`}>
+        <div className={`admin-booking-summary-card rounded-xl border px-4 py-3 shadow-sm ${internalPostEventStatus === 'COMPLETO' ? 'ap-card--success' : internalPostEventStatus === 'EN_PROGRESO' ? 'ap-card--warning' : ''}`}>
           <div className="flex items-center gap-2">
             <span className={`inline-block w-2.5 h-2.5 rounded-full ${internalPostEventStatus === 'COMPLETO' ? 'admin-tone-bg-success' : internalPostEventStatus === 'EN_PROGRESO' ? 'admin-tone-bg-warning' : 'admin-tone-bg-neutral'}`} />
             <p className="text-xs uppercase tracking-wide">Post-event intern</p>
@@ -302,7 +303,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
                 : 'Pendent'}
           </p>
         </div>
-        <div className="ap-card rounded-xl px-4 py-3">
+        <div className="admin-booking-summary-card ap-card rounded-xl px-4 py-3">
           <p className="text-xs uppercase tracking-wide">Entrada comercial</p>
           <p className="text-xl font-semibold">
             {booking.lead ? (
@@ -317,7 +318,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       <BookingSectionNav />
 
       {/* Client Info */}
-      <section id="sec-client" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Informació del client" data-help-desc="Concentra les dades de contacte, accessos ràpids i historial resumit del client d'aquesta reserva.">
+      <section id="sec-client" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.client)}>
         <h2 className="text-lg font-semibold mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -349,7 +350,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               href={`/admin/leads/${booking.lead.id}`}
               className="text-sm hover:underline"
             >
-              Veure lead original →
+              Veure lead original
             </Link>
           </div>
         )}
@@ -364,9 +365,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
             </Link>
           )}
           <CalendarSyncButton bookingId={booking.id} />
-          <details className="relative group">
+          <details className="relative group" {...helpAttrs(ADMIN_BOOKING_HELP.detail.moreActions)}>
             <summary className="list-none ap-btn ap-btn--secondary text-xs cursor-pointer select-none">
-              Mes accions ▾
+              Mes accions v
             </summary>
             <div className="absolute right-0 top-full mt-1 z-20 w-52 rounded-xl border admin-tone-border-neutral admin-tone-bg-neutral py-1">
               <Link
@@ -401,7 +402,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Event Info */}
-      <section id="sec-event" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Detalls de l'esdeveniment" data-help-desc="Mostra quan i on passa l'esdeveniment, quin tipus és i quantes persones hi assistiran.">
+      <section id="sec-event" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.event)}>
         <h2 className="text-lg font-semibold mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -436,7 +437,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Services */}
-      <section id="sec-serveis" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Serveis contractats" data-help-desc="Desglossa el pack, els extres i les hores addicionals contractades per aquesta reserva.">
+      <section id="sec-serveis" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.services)}>
         <h2 className="text-lg font-semibold mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
@@ -491,7 +492,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="mt-4 flex items-center justify-between p-3 rounded-xl">
             <p className="font-medium">Hores extra</p>
             <p className="font-medium">
-              {booking.extraHours}h × {formatCurrency(booking.pack.extraHourPrice)} = {formatCurrency(booking.extraHours * booking.pack.extraHourPrice)}
+              {booking.extraHours}h x {formatCurrency(booking.pack.extraHourPrice)} = {formatCurrency(booking.extraHours * booking.pack.extraHourPrice)}
             </p>
           </div>
         )}
@@ -510,7 +511,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </div>
 
       {/* Pricing */}
-      <section id="sec-finances" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Resum econòmic" data-help-desc="Resumeix subtotal, descompte, IVA, total i estat actual dels cobraments de la reserva.">
+      <section id="sec-finances" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.finances)}>
         <h2 className="text-lg font-semibold mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -539,14 +540,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
             <p className="text-xs font-medium uppercase">Paga i Senyal (30%)</p>
             <p className="text-lg font-bold">{formatCurrency(booking.depositAmount)}</p>
             <span className={`text-xs ${booking.depositPaid ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
-              {booking.depositPaid ? '✓ Pagat' : '✗ Pendent'}
+              {booking.depositPaid ? 'Pagat' : 'Pendent'}
             </span>
           </div>
           <div className={`p-4 rounded-xl ${booking.remainingPaid ? 'ap-card--success' : 'ap-card--warning'}`}>
             <p className="text-xs font-medium uppercase">Resta</p>
             <p className="text-lg font-bold">{formatCurrency(booking.remainingAmount)}</p>
             <span className={`text-xs ${booking.remainingPaid ? 'admin-tone-text-success' : 'admin-tone-text-warning'}`}>
-              {booking.remainingPaid ? '✓ Pagat' : '○ Pendent'}
+              {booking.remainingPaid ? 'Pagat' : 'Pendent'}
             </span>
           </div>
         </div>
@@ -571,7 +572,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         eventLocation={booking.eventLocation}
         eventVenue={booking.eventVenue}
         inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
-        inventoryHours={inventoryHours > 0 ? inventoryHours : null}
+        inventoryHours={inventoryCost.hours > 0 ? inventoryCost.hours : null}
         inventoryRemainingHoursAvg={inventoryRemainingHoursAvg != null ? Number(inventoryRemainingHoursAvg.toFixed(1)) : null}
         inventoryRemainingHoursMin={inventoryRemainingHoursMin != null ? Number(inventoryRemainingHoursMin.toFixed(1)) : null}
         packCostRatio={profitabilityConfig.packCostRatio}
@@ -582,7 +583,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       />
       </div>
 
-      {/* Document Flow: Pressupost → Contracte → Factura */}
+      {/* Document Flow: Pressupost -> Contracte -> Factura */}
       <div id="sec-documents" className="scroll-mt-28">
       <DocumentFlowSection
         proposals={(booking.proposals as BookingProposalRow[]).map((p) => ({
@@ -626,7 +627,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      <section id="sec-comunicacions" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Historial de comunicacions" data-help-desc="Recull enviaments i respostes vinculades a la reserva per entendre què s'ha comunicat i per quin canal.">
+      <section id="sec-comunicacions" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.commHistory)}>
         <h2 className="text-lg font-semibold mb-4">Historial de comunicacions</h2>
         {recentCommRows.length === 0 ? (
           <p className="text-sm">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
@@ -657,32 +658,53 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Activity timeline */}
-      {activityTimeline.length > 0 && (
-        <section id="sec-historial" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Historial de canvis" data-help-desc="Mostra la traça administrativa dels canvis importants fets a la reserva al llarg del temps.">
-          <h2 className="text-lg font-semibold mb-4">Historial de canvis</h2>
-          <div className="relative pl-6 space-y-0">
-            <div className="absolute left-2 top-1 bottom-1 w-px admin-tone-bg-neutral" />
-            {activityTimeline.map((entry: { id: string; createdAt: Date; icon: string; label: string; description: string }) => (
-              <div key={entry.id} className="relative flex items-start gap-3 py-2.5">
-                <span className="absolute -left-4 top-3 w-2 h-2 rounded-full admin-tone-bg-neutral ring-2 ring-black" />
-                <span className="text-base leading-none">{entry.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{entry.label}</p>
-                  {entry.description && (
-                    <p className="text-xs opacity-50 mt-0.5">{entry.description}</p>
-                  )}
-                </div>
-                <span className="text-xs opacity-40 whitespace-nowrap overflow-hidden text-ellipsis shrink-0">
-                  {formatDateTimeFull(entry.createdAt)}
-                </span>
-              </div>
-            ))}
+      {bookingTimeline.length > 0 && (
+        <section id="sec-historial" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.activity)}>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold">Historial de canvis</h2>
+              <p className="mt-1 text-sm">Lectura canonica de l'activitat operativa d'aquesta reserva.</p>
+            </div>
+            <span className="ap-badge px-2.5 py-1 text-[11px]">{bookingTimeline.length} entrades</span>
+          </div>
+          <div className="space-y-3">
+            {bookingTimeline.map((entry) => {
+              const description = describeBookingTimelineEntry(entry);
+              return (
+                <article key={entry.id} className="ap-card rounded-2xl p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide admin-tone-text-neutral">
+                        <span>{getBookingTimelineSourceLabel(entry.source)}</span>
+                        <span>·</span>
+                        <span>{getBookingTimelineKindLabel(entry.kind)}</span>
+                      </div>
+                      <p className="text-sm font-semibold">{entry.title}</p>
+                      {description && (
+                        <p className="mt-1 text-xs admin-tone-text-slate">{description}</p>
+                      )}
+                      {entry.link && (
+                        <div className="mt-2">
+                          <Link href={entry.link.href} className="text-xs admin-tone-text-info underline decoration-current/30 transition-colors hover:opacity-80">
+                            {entry.link.label}
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-xs admin-tone-text-slate">{formatDateTimeFull(new Date(entry.occurredAt))}</p>
+                      {entry.actor && <p className="mt-1 text-[11px] admin-tone-text-neutral">{entry.actor}</p>}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
       )}
 
       {/* Gallery Section */}
-      <section id="sec-galeria" className="scroll-mt-28 ap-card rounded-xl p-6" data-help-title="Galeria de la reserva" data-help-desc="Permet consultar o gestionar imatges associades a aquest esdeveniment o a la seva documentació visual.">
+      <section id="sec-galeria" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.gallery)}>
         <BookingGallery bookingId={booking.id} />
       </section>
 
@@ -694,19 +716,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
             <div className={`p-4 rounded-xl border ${booking.postEventReport ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Informe Intern</p>
               <p className="text-sm">
-                {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
+                {booking.postEventReport ? 'Completat' : 'Pendent de completar'}
               </p>
             </div>
             <div className={`p-4 rounded-xl border ${booking.clientSurvey ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Enquesta Client</p>
               <p className="text-sm">
-                {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
+                {booking.clientSurvey ? `NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
             <div className={`p-4 rounded-xl border ${booking.clientFeedback ? 'ap-card--success' : ''}`}>
               <p className="font-medium">Feedback Enviat</p>
               <p className="text-sm">
-                {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}
+                {booking.clientFeedback ? `Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}
               </p>
             </div>
           </div>
@@ -738,6 +760,12 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
+
+
+
+
+
+
 
 
 

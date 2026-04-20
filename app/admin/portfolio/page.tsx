@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
   PORTFOLIO_MEDIA_ADMIN_EMPTY_STATE,
@@ -175,6 +177,7 @@ function CategorySection({
   const fileRef = useRef<HTMLInputElement>(null);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const replaceTargetRef = useRef<MediaItem | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const categoryEvents = useMemo(() => events.filter((eventItem) => eventItem.categorySlug === slug), [events, slug]);
   const coverMap = useMemo(() => {
@@ -201,7 +204,7 @@ function CategorySection({
       const items = Array.isArray(data.data) ? data.data : [];
       setMedia(items.length > 0 ? items : fallbackItems);
     } catch (err) {
-      console.error(`Error carregant ${slug}:`, err);
+      log.error(`Error carregant ${slug}`, err);
       setMedia(fallbackItems);
       setError(
         fallbackItems.length > 0
@@ -286,7 +289,7 @@ function CategorySection({
 
       await loadMedia();
     } catch (err) {
-      console.error('Error pujant media:', err);
+      log.error('Error pujant media', err);
       setError(err instanceof Error ? err.message : 'Error pujant media');
     } finally {
       setUploading(false);
@@ -312,7 +315,7 @@ function CategorySection({
       });
       setMedia((current) => current.map((entry) => (entry.id === item.id ? { ...entry, caption } : entry)));
     } catch (err) {
-      console.error('Error guardant caption:', err);
+      log.error('Error guardant caption', err);
       setError(err instanceof Error ? err.message : 'Error guardant caption');
     } finally {
       setSavingId(null);
@@ -330,7 +333,7 @@ function CategorySection({
       });
       await loadMedia();
     } catch (err) {
-      console.error('Error assignant event:', err);
+      log.error('Error assignant event', err);
       setError(err instanceof Error ? err.message : 'Error assignant event');
     } finally {
       setSavingId(null);
@@ -348,7 +351,7 @@ function CategorySection({
       });
       await onEventsRefresh();
     } catch (err) {
-      console.error('Error actualitzant portada:', err);
+      log.error('Error actualitzant portada', err);
       setError(err instanceof Error ? err.message : 'Error actualitzant portada');
     } finally {
       setSavingId(null);
@@ -356,7 +359,13 @@ function CategorySection({
   }, [onEventsRefresh]);
 
   const handleDelete = useCallback(async (item: MediaItem) => {
-    if (!window.confirm(`Segur que vols eliminar "${item.caption || 'aquest element'}"? Aquesta acció no es pot desfer.`)) return;
+    const confirmed = await confirm({
+      title: 'Eliminar media del portfolio',
+      message: `Segur que vols eliminar "${item.caption || 'aquest element'}"? Aquesta acció no es pot desfer.`,
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+    });
+    if (!confirmed) return;
     setSavingId(item.id);
     setError(null);
     try {
@@ -367,12 +376,12 @@ function CategorySection({
       await fetchWithCsrf(`/api/admin/portfolio/media?mediaId=${item.id}`, { method: 'DELETE' });
       await loadMedia();
     } catch (err) {
-      console.error('Error eliminant media:', err);
+      log.error('Error eliminant media', err);
       setError(err instanceof Error ? err.message : 'Error eliminant media');
     } finally {
       setSavingId(null);
     }
-  }, [coverMap, loadMedia]);
+  }, [confirm, coverMap, loadMedia]);
 
   const handleDrop = useCallback(async (targetId: string) => {
     if (!draggingId || draggingId === targetId) return;
@@ -390,7 +399,7 @@ function CategorySection({
     try {
       await persistSortOrder(normalized);
     } catch (err) {
-      console.error('Error reordenant media:', err);
+      log.error('Error reordenant media', err);
       setError('No s\'ha pogut guardar el nou ordre');
       await loadMedia();
     }
@@ -415,7 +424,7 @@ function CategorySection({
         <div className="flex items-center gap-2 text-xs text-white/60">
           <span className="rounded-full border border-white/10 px-2 py-1">{imageCount} fotos</span>
           <span className="rounded-full border border-white/10 px-2 py-1">{videoCount} vídeos</span>
-          <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>▾</span>
+          <span className={`text-base transition-transform ${expanded ? 'rotate-180' : ''}`}>â–¾</span>
         </div>
       </button>
 
@@ -429,7 +438,7 @@ function CategorySection({
           </div>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <button type="button" onClick={() => fileRef.current?.click()} className="rounded-2xl border-2 border-dashed border-white/15 p-8 text-left transition-colors hover:border-white/30 hover:bg-white/[0.03]">
-              <span className="mb-3 block text-3xl">＋</span>
+              <span className="mb-3 block text-3xl">ï¼‹</span>
               <p className="text-sm font-medium text-white/90">Afegir media a {name}</p>
               <p className="mt-1 text-xs text-white/50">Puja des de l'admin. El backend converteix imatges a AVIF, conserva l'ordre i deixa traça a la BBDD.</p>
               <p className="mt-2 text-xs text-white/35">{uploading ? 'Pujant...' : `Límit imatge: ${PORTFOLIO_MEDIA_IMAGE_MAX_SIZE / (1024 * 1024)}MB · vídeo: ${PORTFOLIO_MEDIA_VIDEO_MAX_SIZE / (1024 * 1024)}MB`}</p>
@@ -504,6 +513,7 @@ function CategorySection({
           )}
         </div>
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }
@@ -512,6 +522,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
   const [form, setForm] = useState<EventFormState>(EMPTY_EVENT_FORM);
 
   const handleSubmit = useCallback(async () => {
@@ -536,7 +547,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
       setShowForm(false);
       await onEventsRefresh();
     } catch (err) {
-      console.error('Error creant event:', err);
+      log.error('Error creant event', err);
       setError(err instanceof Error ? err.message : 'Error creant event');
     } finally {
       setSaving(false);
@@ -552,21 +563,27 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
       });
       await onEventsRefresh();
     } catch (err) {
-      console.error('Error actualitzant event:', err);
+      log.error('Error actualitzant event', err);
       setError(err instanceof Error ? err.message : 'Error actualitzant event');
     }
   }, [onEventsRefresh]);
 
   const deleteEvent = useCallback(async (id: string) => {
-    if (!window.confirm('Segur que vols eliminar aquest event del portfolio? Aquesta acció no es pot desfer.')) return;
+    const confirmed = await confirm({
+      title: 'Eliminar event del portfolio',
+      message: 'Segur que vols eliminar aquest event del portfolio? Aquesta acció no es pot desfer.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+    });
+    if (!confirmed) return;
     try {
       await fetchWithCsrf(`/api/admin/portfolio/events?id=${id}`, { method: 'DELETE' });
       await onEventsRefresh();
     } catch (err) {
-      console.error('Error eliminant event:', err);
+      log.error('Error eliminant event', err);
       setError(err instanceof Error ? err.message : 'Error eliminant event');
     }
-  }, [onEventsRefresh]);
+  }, [confirm, onEventsRefresh]);
 
   return (
     <div className="space-y-4">
@@ -622,6 +639,7 @@ function EventsManager({ events, onEventsRefresh }: { events: PortfolioEvent[]; 
           </div>
         ))}
       </div>
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }
@@ -642,7 +660,7 @@ export default function AdminPortfolioPage() {
       const data = await response.json();
       setEvents(data.events || []);
     } catch (err) {
-      console.error('Error carregant events:', err);
+      log.error('Error carregant events', err);
     } finally {
       setEventsLoading(false);
     }
@@ -678,6 +696,12 @@ export default function AdminPortfolioPage() {
     </div>
   );
 }
+
+
+
+
+
+
 
 
 

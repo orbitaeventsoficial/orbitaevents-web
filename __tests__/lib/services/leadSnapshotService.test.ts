@@ -151,7 +151,7 @@ describe('processLeadTechnicalSnapshot', () => {
 
   const DB_LEAD = {
     ...BASE_LEAD,
-    _count: { notes: 3, tasks: 2, documents: 1, activities: 5 },
+    _count: { notes: 3, universalTasks: 2, documents: 1, activities: 5 },
     booking: null,
   };
 

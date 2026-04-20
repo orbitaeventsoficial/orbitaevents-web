@@ -6,6 +6,7 @@ import { Pencil, Trash2, Plus } from 'lucide-react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateSimple } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
@@ -84,6 +85,36 @@ export default function BlogAdminPage() {
     }
   }, [searchParams]);
 
+  const publishedCount = posts.filter((post) => post.isPublished).length;
+  const draftCount = posts.length - publishedCount;
+  const translatedCount = posts.filter((post) => post.translations.length > 1).length;
+  const totalViews = posts.reduce((sum, post) => sum + post.viewCount, 0);
+  const busiestPost = posts.reduce<BlogPost | null>((current, post) => {
+    if (!current) return post;
+    return post.viewCount > current.viewCount ? post : current;
+  }, null);
+  const weakestLink = loading
+    ? 'El catàleg encara s’està carregant.'
+    : posts.length === 0
+      ? 'Encara no hi ha cap article visible al workspace.'
+      : draftCount > 0
+        ? `${draftCount} posts encara estan en esborrany i demanen revisió editorial.`
+        : 'Tots els posts visibles d’aquesta pàgina ja estan publicats.';
+  const actionTitle = loading
+    ? 'Esperar la lectura real del catàleg'
+    : posts.length === 0
+      ? 'Crear la primera peça editorial'
+      : draftCount > 0
+        ? 'Revisar primer els esborranys abans d’obrir més fronts'
+        : 'Refinar el catàleg publicat i seguir amb noves peces';
+  const actionDescription = loading
+    ? 'Sense el catàleg carregat no toca prendre decisions editorials a cegues.'
+    : posts.length === 0
+      ? 'Sense peces publicades o en esborrany no hi ha base editorial sobre la qual iterar.'
+      : draftCount > 0
+        ? 'El retorn més alt ara no és obrir més articles, sinó tancar o descartar els esborranys que ja estan al pipeline.'
+        : 'Amb la base publicada estable, el següent pas bo és millorar cobertura, idiomes o tracció del catàleg actual.';
+
   const handleDelete = async (id: string) => {
     const ok = await confirm({
       title: 'Eliminar post',
@@ -149,6 +180,48 @@ export default function BlogAdminPage() {
         </div>
       }
     >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix el catàleg editorial',
+          tone: loading ? 'default' : draftCount > 0 ? 'warning' : 'success',
+          stats: [
+            { label: 'Posts', value: total, hint: `${posts.length} visibles ara` },
+            { label: 'Publicats', value: publishedCount, tone: publishedCount > 0 ? 'success' : 'default', hint: 'en aquesta pàgina' },
+            { label: 'Esborranys', value: draftCount, tone: draftCount > 0 ? 'warning' : 'success', hint: `idioma ${locale.toUpperCase()}` },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de tocar el blog',
+          tone: loading ? 'default' : draftCount > 0 ? 'warning' : 'info',
+          items: [
+            weakestLink,
+            busiestPost
+              ? `${busiestPost.translations[0]?.title || 'Sense títol'} és ara mateix la peça amb més tracció visible (${busiestPost.viewCount} visites).`
+              : 'Quan hi hagi posts visibles, aquí apareixerà la peça amb més tracció.',
+            posts.length > 0
+              ? `${translatedCount} peces tenen més d’un idioma i la pàgina suma ${totalViews} visites visibles.`
+              : 'Sense posts visibles no hi ha encara tracció ni cobertura editorial a resumir.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: loading || draftCount > 0 || posts.length === 0 ? 'warning' : 'success',
+          primaryAction: {
+            href: '/admin/blog/new',
+            label: posts.length === 0 ? 'Crear primer post' : 'Nou post',
+          },
+          secondaryPills: [
+            locale.toUpperCase(),
+            totalPages > 1 ? `Pàgina ${page}/${totalPages}` : 'Catàleg curt',
+          ],
+        }}
+        className="mb-6"
+      />
+
       {flashMessage && (
         <div className={getFlashClass(flashMessage.type)} role={flashMessage.type === 'success' ? 'status' : 'alert'} aria-live="polite">
           <div className="flex items-center justify-between gap-4">

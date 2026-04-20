@@ -1,15 +1,11 @@
 'use client';
 
-/**
- * Galeria de fotos del booking.
- * Upload amb compressió WebP automàtica, gestió de visibilitat
- * (portal client / portfolio públic), eliminació individual.
- */
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { BOOKING_GALLERY_PORTFOLIO_CATEGORIES } from '@/lib/constants';
+import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { log } from '@/lib/logger';
 
 const MAX_DIMENSION = 1200;
 const WEBP_QUALITY = 0.85;
@@ -52,13 +48,7 @@ function optimizeImage(file: File): Promise<Blob> {
       const ctx = canvas.getContext('2d');
       if (!ctx) { reject(new Error('No canvas')); return; }
       ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob(
-        (blob) => {
-          if (blob) { resolve(blob); } else { reject(new Error('toBlob failed')); }
-        },
-        'image/webp',
-        WEBP_QUALITY
-      );
+      canvas.toBlob((blob) => { if (blob) { resolve(blob); } else { reject(new Error('toBlob failed')); } }, 'image/webp', WEBP_QUALITY);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Error carregant imatge')); };
     img.src = url;
@@ -78,10 +68,10 @@ export default function BookingGallery({ bookingId }: Props) {
       const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        setPhotos(data.data || []);
+        setPhotos(data.body || []);
       }
     } catch (err) {
-      console.error('Error carregant galeria:', err);
+      log.error('Error carregant galeria', err);
     } finally {
       setLoading(false);
     }
@@ -106,17 +96,14 @@ export default function BookingGallery({ bookingId }: Props) {
         formData.append('isPortal', 'true');
         formData.append('isPortfolio', 'false');
 
-        const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, {
-          method: 'POST',
-          body: formData,
-        });
+        const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, { method: 'POST', body: formData });
         if (res.ok) uploaded++;
         else {
           const d = await res.json().catch(() => ({}));
           setError(d?.error || 'Error pujant foto');
         }
       } catch (err) {
-        console.error('Error pujant:', err);
+        log.error('Error pujant', err);
         setError('Error processant imatge');
       }
     }
@@ -133,48 +120,33 @@ export default function BookingGallery({ bookingId }: Props) {
 
   const toggleFlag = async (photo: GalleryPhoto, flag: 'isPortal' | 'isPortfolio', portfolioSlug?: string) => {
     try {
-      const body: Record<string, unknown> = {
-        photoId: photo.id,
-        [flag]: !photo[flag],
-      };
-      if (flag === 'isPortfolio' && !photo.isPortfolio && portfolioSlug) {
-        body.portfolioSlug = portfolioSlug;
-      }
-      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      const body: Record<string, unknown> = { photoId: photo.id, [flag]: !photo[flag] };
+      if (flag === 'isPortfolio' && !photo.isPortfolio && portfolioSlug) body.portfolioSlug = portfolioSlug;
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       if (res.ok) await loadPhotos();
     } catch (err) {
-      console.error('Error actualitzant:', err);
+      log.error('Error actualitzant', err);
     }
   };
 
   const setPortfolioSlug = async (photo: GalleryPhoto, slug: string) => {
     try {
-      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ photoId: photo.id, portfolioSlug: slug }),
-      });
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ photoId: photo.id, portfolioSlug: slug }) });
       if (res.ok) await loadPhotos();
     } catch (err) {
-      console.error('Error actualitzant slug:', err);
+      log.error('Error actualitzant slug', err);
     }
   };
 
   const deletePhoto = async (photoId: string) => {
     try {
-      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery?photoId=${photoId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery?photoId=${photoId}`, { method: 'DELETE' });
       if (res.ok) {
         setPhotos((prev) => prev.filter((p) => p.id !== photoId));
         if (selectedId === photoId) setSelectedId(null);
       }
     } catch (err) {
-      console.error('Error eliminant:', err);
+      log.error('Error eliminant', err);
     }
   };
 
@@ -192,176 +164,63 @@ export default function BookingGallery({ bookingId }: Props) {
   const selected = selectedId ? photos.find((p) => p.id === selectedId) : null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.root)}>
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Galeria de fotos ({photos.length})</h2>
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
-        >
+        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>
           {uploading ? 'Pujant...' : 'Pujar fotos'}
         </button>
       </div>
 
       {error && <p className="text-sm text-red-400 rounded-xl border border-red-500/20 px-3 py-2">{error}</p>}
 
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(e) => e.target.files && handleUpload(e.target.files)}
-      />
+      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => e.target.files && handleUpload(e.target.files)} />
 
-      {/* Drop zone */}
       {photos.length === 0 && (
-        <div
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          className="rounded-2xl border-2 border-dashed border-white/20 p-12 text-center hover:border-white/40 transition-colors cursor-pointer"
-          onClick={() => fileRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
-        >
+        <div onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} className="rounded-2xl border-2 border-dashed border-white/20 p-12 text-center hover:border-white/40 transition-colors cursor-pointer" onClick={() => fileRef.current?.click()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.dropzone)}>
           <span className="text-4xl block mb-2">📷</span>
           <p className="text-sm">Arrossega fotos aquí o clica per pujar</p>
           <p className="text-xs opacity-50 mt-1">JPG, PNG, WebP · Compressió automàtica a WebP</p>
         </div>
       )}
 
-      {/* Photo grid */}
       {photos.length > 0 && (
-        <div
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
           {photos.map((photo) => (
-            <div
-              key={photo.id}
-              className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'
-              }`}
-              onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)}
-            >
-              <Image
-                src={photo.photoUrl}
-                alt={photo.caption || 'Foto event'}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
-              {/* Badges */}
-              <div className="absolute top-2 left-2 flex gap-1">
-                {photo.isPortal && (
-                  <span className="ap-badge ap-badge--info text-[9px]">Portal</span>
-                )}
-                {photo.isPortfolio && (
-                  <span className="ap-badge text-[9px]">Portfolio</span>
-                )}
-              </div>
-              {/* Delete on hover */}
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center"
-                title="Eliminar"
-                aria-label="Eliminar foto"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+            <div key={photo.id} className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${selectedId === photo.id ? 'admin-tone-border-info admin-tone-bg-info' : 'admin-tone-border-neutral hover:admin-tone-border-slate'}`} onClick={() => setSelectedId(selectedId === photo.id ? null : photo.id)} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.photo)}>
+              <Image src={photo.photoUrl} alt={photo.caption || 'Foto event'} fill className="object-cover" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+              <div className="absolute top-2 left-2 flex gap-1">{photo.isPortal && <span className="ap-badge ap-badge--info text-[9px]">Portal</span>}{photo.isPortfolio && <span className="ap-badge text-[9px]">Portfolio</span>}</div>
+              <button type="button" onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600/80 text-white rounded-full p-1.5 transition-opacity min-h-[32px] min-w-[32px] flex items-center justify-center" title={ADMIN_BOOKING_HELP.gallery.delete.title} aria-label={ADMIN_BOOKING_HELP.gallery.delete.title} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.delete)}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
           ))}
-
-          {/* Add more */}
-          <div
-            onClick={() => fileRef.current?.click()}
-            className="aspect-square rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-colors cursor-pointer"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
-          >
+          <div onClick={() => fileRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/40 transition-colors cursor-pointer" role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()} {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>
             <span className="text-3xl opacity-40">+</span>
           </div>
         </div>
       )}
 
-      {/* Selected photo details */}
       {selected && (
-        <div className="ap-card rounded-xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">Configuració de la foto</p>
-            <button
-              type="button"
-              onClick={() => setSelectedId(null)}
-              className="text-xs opacity-50 hover:opacity-100"
-            >
-              Tancar
-            </button>
-          </div>
-
-          {/* Portal toggle */}
-          <label className="flex items-center justify-between gap-3">
+        <div className="ap-card rounded-xl p-4 space-y-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.selected)}>
+          <div className="flex items-center justify-between"><p className="text-sm font-medium">Configuració de la foto</p><button type="button" onClick={() => setSelectedId(null)} className="text-xs opacity-50 hover:opacity-100">Tancar</button></div>
+          <label className="flex items-center justify-between gap-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portal)}>
             <span className="text-sm">Visible al portal client</span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={selected.isPortal}
-              onClick={() => toggleFlag(selected, 'isPortal')}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                selected.isPortal ? 'admin-tone-bg-info' : 'admin-tone-bg-neutral'
-              }`}
-            >
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-                selected.isPortal ? 'translate-x-6' : 'translate-x-1'
-              }`} />
+            <button type="button" role="switch" aria-checked={selected.isPortal} onClick={() => toggleFlag(selected, 'isPortal')} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selected.isPortal ? 'admin-tone-bg-info' : 'admin-tone-bg-neutral'}`}>
+              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${selected.isPortal ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
           </label>
-
-          {/* Portfolio toggle */}
-          <label className="flex items-center justify-between gap-3">
+          <label className="flex items-center justify-between gap-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portfolio)}>
             <span className="text-sm">Visible al portfolio públic</span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={selected.isPortfolio}
-              onClick={() => {
-                if (!selected.isPortfolio) {
-                  // Quan s'activa, seleccionar carpeta per defecte
-                  toggleFlag(selected, 'isPortfolio', selected.portfolioSlug || BOOKING_GALLERY_PORTFOLIO_CATEGORIES[0].slug);
-                } else {
-                  toggleFlag(selected, 'isPortfolio');
-                }
-              }}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                selected.isPortfolio ? 'admin-tone-bg-violet' : 'admin-tone-bg-neutral'
-              }`}
-            >
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-                selected.isPortfolio ? 'translate-x-6' : 'translate-x-1'
-              }`} />
+            <button type="button" role="switch" aria-checked={selected.isPortfolio} onClick={() => { if (!selected.isPortfolio) { toggleFlag(selected, 'isPortfolio', selected.portfolioSlug || BOOKING_GALLERY_PORTFOLIO_CATEGORIES[0].slug); } else { toggleFlag(selected, 'isPortfolio'); } }} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selected.isPortfolio ? 'admin-tone-bg-violet' : 'admin-tone-bg-neutral'}`}>
+              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${selected.isPortfolio ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
           </label>
-
-          {/* Portfolio category selector */}
           {selected.isPortfolio && (
-            <div>
+            <div {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portfolioFolder)}>
               <label htmlFor="portfolio-slug" className="text-xs opacity-50 block mb-1">Carpeta del portfolio</label>
-              <select
-                id="portfolio-slug"
-                value={selected.portfolioSlug || ''}
-                onChange={(e) => setPortfolioSlug(selected, e.target.value)}
-                className="ap-input w-full px-3 py-2.5 text-sm"
-              >
-                {BOOKING_GALLERY_PORTFOLIO_CATEGORIES.map((cat) => (
-                  <option key={cat.slug} value={cat.slug}>{cat.name}</option>
-                ))}
+              <select id="portfolio-slug" value={selected.portfolioSlug || ''} onChange={(e) => setPortfolioSlug(selected, e.target.value)} className="ap-input w-full px-3 py-2.5 text-sm">
+                {BOOKING_GALLERY_PORTFOLIO_CATEGORIES.map((cat) => <option key={cat.slug} value={cat.slug}>{cat.name}</option>)}
               </select>
             </div>
           )}
@@ -370,5 +229,4 @@ export default function BookingGallery({ bookingId }: Props) {
     </div>
   );
 }
-
 

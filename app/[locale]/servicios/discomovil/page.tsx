@@ -8,11 +8,12 @@ import Client from './client';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
+import { SERVICE_HUB_SEO } from '@/lib/serviceHubSeo';
 
+const SEO = SERVICE_HUB_SEO.discomovil;
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
   packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
-
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       images: [heroImage],
     },
     robots: { index: true, follow: true },
-    keywords: ['discomóvil barcelona', 'discomóvil girona', 'dj fiestas privadas barcelona', 'discomóvil cumpleaños', 'discomóvil bodas'],
+    keywords: SEO.keywords,
   };
 }
 
@@ -64,7 +65,9 @@ export default async function DiscomovilPage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   return (
@@ -77,21 +80,21 @@ export default async function DiscomovilPage({ params }: PageProps) {
         ]}
       />
       <ServiceJsonLD
-        name="Discomóvil Completa - Experiencia Personalizada"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/discomovil"
-        description={`Experiencia completa personalizada: DJ profesional, sonido EV profesional, iluminación LED ambiente y efectos especiales. Packs desde ${minPrice}€.`}
-        serviceType={['Discomóvil', 'DJ para fiestas', 'DJ bodas', 'DJ cumpleaños', 'Iluminación LED', 'Efectos especiales']}
-        areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
+        description={SEO.jsonLd.description(minPrice)}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
-        availability="https://schema.org/InStock"
+        availability={SEO.jsonLd.availability}
         offers={packs.map((pack: { name: string; priceValue: number; slug: string; tagline: string }) => ({
           '@type': 'Offer',
           name: pack.name,
           price: String(pack.priceValue),
           priceCurrency: 'EUR',
           availability: 'https://schema.org/InStock',
-          url: `/servicios/discomovil#${pack.slug}`,
+          url: `${SEO.jsonLd.offerUrlPrefix}${pack.slug}`,
           description: pack.tagline,
         }))}
       />
@@ -100,4 +103,3 @@ export default async function DiscomovilPage({ params }: PageProps) {
     </>
   );
 }
-

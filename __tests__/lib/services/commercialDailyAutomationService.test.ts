@@ -23,6 +23,8 @@ const {
   mockSendEmail,
   mockSendWhatsAppText,
   mockSaveCronRunStatus,
+  mockLoadDailyBrief,
+  mockLoadCapacityConflicts,
 } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(async (operations: Array<Promise<unknown>>) => Promise.all(operations)),
@@ -46,6 +48,8 @@ const {
   mockSendEmail: vi.fn(),
   mockSendWhatsAppText: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
+  mockLoadDailyBrief: vi.fn(),
+  mockLoadCapacityConflicts: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -69,6 +73,12 @@ vi.mock('@/lib/services/whatsappService', () => ({
 }));
 vi.mock('@/lib/services/cronRunStatusService', () => ({
   saveCronRunStatus: mockSaveCronRunStatus,
+}));
+vi.mock('@/lib/services/dailyBriefService', () => ({
+  loadDailyBrief: mockLoadDailyBrief,
+}));
+vi.mock('@/lib/services/capacityConflictService', () => ({
+  loadCapacityConflicts: mockLoadCapacityConflicts,
 }));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
@@ -103,6 +113,28 @@ beforeEach(() => {
   mockSendEmail.mockResolvedValue({ ok: true });
   mockSendWhatsAppText.mockResolvedValue({ ok: true });
   mockSaveCronRunStatus.mockResolvedValue({});
+  mockLoadDailyBrief.mockResolvedValue({
+    date: '2026-04-10',
+    greeting: 'Bon dia',
+    summary: 'Mock summary',
+    kpis: {
+      newLeadsToday: 0,
+      openLeads: 0,
+      overdueTasksCount: 0,
+      upcomingBookings7d: 0,
+      pendingPaymentsCount: 0,
+      forecastWeighted: 0,
+    },
+    alerts: [],
+    actions: [],
+    topCampaigns: [],
+  });
+  mockLoadCapacityConflicts.mockResolvedValue({
+    generatedAt: new Date().toISOString(),
+    windowDays: 14,
+    conflicts: [],
+    verdict: 'Cap conflicte de capacitat en els pròxims 14 dies.',
+  });
 });
 
 describe('runCommercialDailyAutomation', () => {
@@ -128,5 +160,150 @@ describe('runCommercialDailyAutomation', () => {
       })
     );
   });
-});
 
+  it("inclou alertes CRITICAL del Daily Brief al resum guardat i a l'email", async () => {
+    mockLoadDailyBrief.mockResolvedValue({
+      date: '2026-04-10',
+      greeting: 'Bon dia',
+      summary: 'Mock summary',
+      kpis: {
+        newLeadsToday: 0,
+        openLeads: 0,
+        overdueTasksCount: 0,
+        upcomingBookings7d: 0,
+        pendingPaymentsCount: 0,
+        forecastWeighted: 0,
+      },
+      alerts: [
+        {
+          level: 'CRITICAL',
+          icon: '🚨',
+          title: '3 entrades sense resposta (+24h)',
+          detail: 'Contacta-les avui o es perdran.',
+          href: '/admin/leads?status=NEW',
+        },
+      ],
+      actions: [],
+      topCampaigns: [],
+    });
+
+    const result = await runCommercialDailyAutomation();
+
+    expect(result.dailyBrief.criticalCount).toBe(1);
+    expect(result.dailyBrief.criticalAlerts[0]?.title).toContain('3 entrades sense resposta');
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining('Alertes crítiques del matí (1)'),
+    }));
+  });
+
+  it('inclou col·lisions d\'inventari a l\'email del resum', async () => {
+    const verdict = '1 conflicte en 1 dia. Revisa l\'inventari.';
+    mockLoadCapacityConflicts.mockResolvedValue({
+      generatedAt: new Date().toISOString(),
+      windowDays: 14,
+      conflicts: [
+        {
+          date: '2026-04-20',
+          itemId: 'item-1',
+          itemName: 'Altaveu JBL',
+          itemCode: 'SPK-JBL-01',
+          stockAvailable: 2,
+          totalDemanded: 4,
+          deficit: 2,
+          bookings: [
+            { bookingId: 'b1', clientName: 'Joan', quantity: 2 },
+            { bookingId: 'b2', clientName: 'Maria', quantity: 2 },
+          ],
+        },
+      ],
+      verdict,
+    });
+
+    const result = await runCommercialDailyAutomation();
+
+    expect(result.capacityConflicts.count).toBe(1);
+    expect(result.capacityConflicts.verdict).toBe(verdict);
+    expect(result.capacityConflicts.conflicts[0]?.itemName).toBe('Altaveu JBL');
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining('Col·lisions d\'inventari (1)'),
+    }));
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining('Altaveu JBL'),
+    }));
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining(verdict),
+    }));
+  });
+
+  it('inclou col·lisions d\'inventari al WhatsApp del resum', async () => {
+    const verdict = '1 conflicte en 1 dia. Revisa l\'inventari.';
+    mockLoadCapacityConflicts.mockResolvedValue({
+      generatedAt: new Date().toISOString(),
+      windowDays: 14,
+      conflicts: [
+        {
+          date: '2026-04-22',
+          itemId: 'item-2',
+          itemName: 'Focus LED',
+          itemCode: 'LGT-LED-03',
+          stockAvailable: 4,
+          totalDemanded: 7,
+          deficit: 3,
+          bookings: [
+            { bookingId: 'b3', clientName: 'Pere', quantity: 4 },
+            { bookingId: 'b4', clientName: 'Anna', quantity: 3 },
+          ],
+        },
+      ],
+      verdict,
+    });
+
+    await runCommercialDailyAutomation();
+
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('Col·lisions d\'inventari: 1'),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining(verdict),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('Focus LED (2026-04-22): falten 3 ud.'),
+    }));
+  });
+
+  it('inclou alertes CRITICAL del Daily Brief al WhatsApp del resum', async () => {
+    mockLoadDailyBrief.mockResolvedValue({
+      date: '2026-04-10',
+      greeting: 'Bon dia',
+      summary: 'Mock summary',
+      kpis: {
+        newLeadsToday: 0,
+        openLeads: 0,
+        overdueTasksCount: 0,
+        upcomingBookings7d: 0,
+        pendingPaymentsCount: 0,
+        forecastWeighted: 0,
+      },
+      alerts: [
+        {
+          level: 'CRITICAL',
+          icon: '📩',
+          title: '2 seguiments urgents',
+          detail: 'Leads esperant resposta fa +5 dies.',
+          href: '/admin/inbox',
+        },
+      ],
+      actions: [],
+      topCampaigns: [],
+    });
+
+    await runCommercialDailyAutomation();
+
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('🚨 Alertes crítiques del matí: 1'),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('• 2 seguiments urgents'),
+    }));
+  });
+});

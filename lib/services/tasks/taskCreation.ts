@@ -13,6 +13,10 @@ type UniversalTaskCreateInput = {
   assignedTo?: string | null;
   createdBy?: string | null;
   completedAt?: Date | null;
+  source?: string | null;
+  autoRule?: string | null;
+  dedupeKey?: string | null;
+  resolutionNote?: string | null;
 };
 
 export async function createUniversalTask(input: UniversalTaskCreateInput) {
@@ -30,6 +34,10 @@ export async function createUniversalTask(input: UniversalTaskCreateInput) {
       assignedTo: input.assignedTo ?? null,
       createdBy: input.createdBy ?? 'Sistema',
       completedAt: input.completedAt ?? null,
+      source: input.source ?? null,
+      autoRule: input.autoRule ?? null,
+      dedupeKey: input.dedupeKey ?? null,
+      resolutionNote: input.resolutionNote ?? null,
     },
   });
 }

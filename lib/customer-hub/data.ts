@@ -1,7 +1,7 @@
-import { Prisma, type CustomerActivity, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
+import { Prisma, type AdminLog, type CustomerActivity, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { findLeadTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadTaskFacade';
+import { findTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadScopedTaskService';
 
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
   select: {
@@ -10,15 +10,30 @@ export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
     name: true;
     email: true;
     phone: true;
+    phoneNormalized: true;
+    instagram: true;
     createdAt: true;
+    tags: true;
+    lifecycleStage: true;
+    healthScore: true;
+    preferences: true;
+    birthday: true;
+    lastContactedAt: true;
+    lastEventDate: true;
+    preferredLocale: true;
+    marketingConsent: true;
+    totalEvents: true;
+    totalSpent: true;
+    referredBy: { select: { id: true; name: true; email: true } };
+    referrals: { select: { id: true; name: true; email: true; totalEvents: true; totalSpent: true } };
   };
 }>;
 
 export type CustomerHubLead = Prisma.LeadGetPayload<{
   include: {
     activities: true;
-    tasks: true;
-    booking: { select: { id: true; reference: true; status: true; total: true } };
+    universalTasks: true;
+    booking: { select: { id: true; reference: true; status: true; total: true; depositAmount: true; remainingAmount: true; discountCode: true; eventType: true; eventDate: true; eventStartTime: true; eventEndTime: true; eventLocation: true; eventVenue: true; guestCount: true; depositPaid: true; remainingPaid: true } };
   };
 }>;
 
@@ -74,7 +89,7 @@ export async function resolveCustomerHubCustomerId(entityId: string): Promise<st
   );
   if (proposal?.customerId) return proposal.customerId;
 
-  const taskLink = await safeQuery(() => findLeadTaskLinkByTaskOrLegacyId(entityId), null);
+  const taskLink = await safeQuery(() => findTaskLinkByTaskOrLegacyId(entityId), null);
   if (taskLink?.customerId) return taskLink.customerId;
 
   const [leadActivity, leadDocument] = await Promise.all([
@@ -110,7 +125,22 @@ export async function fetchCustomerHubCustomerBase(
       name: true,
       email: true,
       phone: true,
+      phoneNormalized: true,
+      instagram: true,
       createdAt: true,
+      tags: true,
+      lifecycleStage: true,
+      healthScore: true,
+      preferences: true,
+      birthday: true,
+      lastContactedAt: true,
+      lastEventDate: true,
+      preferredLocale: true,
+      marketingConsent: true,
+      totalEvents: true,
+      totalSpent: true,
+      referredBy: { select: { id: true, name: true, email: true } },
+      referrals: { select: { id: true, name: true, email: true, totalEvents: true, totalSpent: true } },
     },
   });
 }
@@ -123,8 +153,8 @@ export async function fetchCustomerHubLeads(customerId: string): Promise<Custome
         orderBy: { createdAt: 'desc' },
         include: {
           activities: { orderBy: { createdAt: 'desc' }, take: 60 },
-          tasks: { orderBy: { createdAt: 'desc' }, take: 60 },
-          booking: { select: { id: true, reference: true, status: true, total: true } },
+          universalTasks: { orderBy: { createdAt: 'desc' }, take: 60 },
+          booking: { select: { id: true, reference: true, status: true, total: true, depositAmount: true, remainingAmount: true, discountCode: true, eventType: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true, eventVenue: true, guestCount: true, depositPaid: true, remainingPaid: true } },
         },
       }),
     []
@@ -167,6 +197,9 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
           []
         );
 
+  const bookingsRows = bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw;
+  const bookingIds = bookingsRows.map((booking) => booking.id);
+
   const customerTasks: Task[] = await safeQuery(
     () =>
       prisma.task.findMany({
@@ -187,6 +220,22 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
     []
   );
 
+  const adminLogs: AdminLog[] = await safeQuery(
+    () =>
+      prisma.adminLog.findMany({
+        where: {
+          OR: [
+            { entity: 'customer', entityId: customerId },
+            ...(leadIds.length > 0 ? [{ entity: 'lead', entityId: { in: leadIds } }] : []),
+            ...(bookingIds.length > 0 ? [{ entity: 'booking', entityId: { in: bookingIds } }] : []),
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 120,
+      }),
+    []
+  );
+
   const customerDiscountCodes: CustomerDiscountCode[] = await safeQuery(
     () =>
       prisma.customerDiscountCode.findMany({
@@ -199,9 +248,10 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
 
   return {
     proposals,
-    bookingsRows: bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw,
+    bookingsRows,
     customerTasks,
     activityLog,
+    adminLogs,
     customerDiscountCodes,
   };
 }
@@ -214,4 +264,3 @@ async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
     return fallback;
   }
 }
-

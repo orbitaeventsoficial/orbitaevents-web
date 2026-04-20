@@ -25,10 +25,14 @@ vi.mock('@/lib/utils/normalize', () => ({
   normalizeName: mockNormalizeName,
   normalizePhone: mockNormalizePhone,
 }));
-vi.mock('@/lib/constants', () => ({
-  PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita',
-  LEAD_STATUS_VALUES: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'],
-}));
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/constants')>();
+  return {
+    ...actual,
+    PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita',
+    LEAD_STATUS_VALUES: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'],
+  };
+});
 
 import { handleLeadStatusPatch } from '@/lib/services/leads/statusRouteHandler';
 import { NextRequest } from 'next/server';

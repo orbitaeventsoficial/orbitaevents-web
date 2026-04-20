@@ -4,6 +4,7 @@ import CalendarTokenManager from './CalendarTokenManager';
 import IntegrationSetupWizard from './IntegrationSetupWizard';
 import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
+import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { getAppBaseUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
@@ -53,6 +54,27 @@ export default async function IntegrationsPage() {
   const googleCalendarConnected = Boolean(map['integrations.googleCalendar.refreshToken']);
   const calendarIdConfigured = Boolean(map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID);
   const cronActive = String(map['emails.cron.lastStatus'] || '').toUpperCase() === 'OK';
+  const connectedCount = [
+    Boolean(map['integrations.google.refreshToken']),
+    Boolean(map['integrations.googleAds.refreshToken']),
+    Boolean(map['integrations.gmail.refreshToken']),
+    imapConfigured,
+    googleCalendarConnected,
+    Boolean(calendarFeedToken),
+  ].filter(Boolean).length;
+  const weakestLink = !Boolean(map['integrations.gmail.refreshToken'])
+    ? 'Gmail'
+    : !imapConfigured
+      ? 'IMAP'
+      : !googleCalendarConnected
+        ? 'Google Calendar'
+        : !Boolean(map['integrations.googleAds.refreshToken'])
+          ? 'Google Ads'
+          : !Boolean(map['integrations.google.refreshToken'])
+            ? 'Google Business'
+            : !calendarFeedToken
+              ? 'ICS'
+              : null;
 
   return (
     <AdminPage
@@ -60,6 +82,45 @@ export default async function IntegrationsPage() {
       subtitle="Sincronitza CRM, emails i calendari amb Google i mòbil."
       back={{ href: '/admin/settings', label: 'Configuració' }}
     >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Què tens connectat ara mateix',
+          stats: [
+            { label: 'Integracions', value: connectedCount, hint: 'actives' },
+            { label: 'IMAP', value: imapConfigured ? 'OK' : 'Pendent', tone: imapConfigured ? 'success' : 'warning' },
+            { label: 'Cron', value: cronActive ? 'OK' : 'Pendent', tone: cronActive ? 'success' : 'warning' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de tocar res',
+          items: [
+            weakestLink ? `${weakestLink} és ara mateix el punt més feble de la cadena d’integracions.` : 'Les integracions principals estan cobertes.',
+            imapConfigured ? 'La safata IMAP té les variables mínimes presents.' : `Falten variables IMAP: ${missingImapVars.join(', ')}.`,
+            googleCalendarConnected
+              ? `Google Calendar està connectat${calendarIdConfigured ? ' i té calendari objectiu disponible.' : ', però encara falta calendarId.'}`
+              : 'Google Calendar encara no està connectat.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: weakestLink ? `Regularitzar ${weakestLink} abans d’afegir més capes` : 'Mantenir les connexions i validar el recorregut complet',
+          description: weakestLink
+            ? 'El millor retorn aquí no és obrir totes les integracions alhora, sinó arreglar el primer punt dèbil de la cadena perquè CRM, calendari i notificacions tornin a parlar entre ells.'
+            : 'Si la base ja és estable, el següent pas és validar que els automatismes i els recorreguts reals continuen funcionant de punta a punta.',
+          primaryAction: {
+            href: !imapConfigured ? '/admin/inbox/settings' : '/admin/settings/integrations',
+            label: !imapConfigured ? 'Configurar IMAP' : 'Revisar integracions',
+          },
+          secondaryAction: { href: '/admin/settings', label: 'Tornar a configuració' },
+          secondaryPills: [
+            googleCalendarConnected ? 'Calendar connectat' : 'Calendar pendent',
+            calendarFeedToken ? 'ICS actiu' : 'ICS pendent',
+          ],
+        }}
+      />
+
       <IntegrationSetupWizard
         gmailConnected={Boolean(map['integrations.gmail.refreshToken'])}
         imapConfigured={imapConfigured}
@@ -118,7 +179,7 @@ export default async function IntegrationsPage() {
             <h2 className="text-lg font-semibold">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
-          <p className="mt-2 text-sm">Sincronització automàtica de reserves confirmades/preparació i baixa automàtica en cancel·lar.</p>
+          <p className="mt-2 text-sm">Sincronització automàtica de reserves confirmades/preparació, baixa automàtica en cancel·lar i alarmes pròpies 7 dies, 24 h i 2 h abans.</p>
           <p className="mt-1 text-xs">
             Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'} · Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
           </p>

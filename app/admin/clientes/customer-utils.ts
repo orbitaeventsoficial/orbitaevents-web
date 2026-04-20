@@ -18,6 +18,10 @@ export interface Customer {
   total_spent: number;
   is_vip: boolean;
   created_at: string;
+  // CRM Potenciat
+  tags?: string[];
+  lifecycleStage?: string;
+  healthScore?: number | null;
 }
 
 export interface CustomerStats {
@@ -25,27 +29,31 @@ export interface CustomerStats {
   vip: number;
   withEvents: number;
   recentMonth: number;
+  dormant?: number;
+  atRisk?: number;
+  highValue?: number;
 }
 
 export type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
 export { PRIORITY_FILTER_STYLES } from '@/lib/constants';
+import { EXECUTION_PRIORITY_HINTS, CUSTOMER_NEXT_STEPS } from '@/lib/constants';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 export function getNextStep(customer: Customer): { label: string; href: string; hint: string } {
   if ((customer.total_events || 0) > 0) {
     return {
-      label: 'Post-esdeveniment',
-      href: '/admin/post-event',
-      hint: 'Tancar cicle i demanar feedback',
+      label: CUSTOMER_NEXT_STEPS.POST_EVENT.label,
+      href: CUSTOMER_NEXT_STEPS.POST_EVENT.href,
+      hint: CUSTOMER_NEXT_STEPS.POST_EVENT.hint,
     };
   }
 
   return {
-    label: 'Crear pressupost',
-    href: `/admin/presupuestos?customerId=${encodeURIComponent(customer.id)}`,
-    hint: 'Primer pas per avançar venda',
+    label: CUSTOMER_NEXT_STEPS.CREATE_QUOTE.label,
+    href: `${CUSTOMER_NEXT_STEPS.CREATE_QUOTE.hrefTemplate}${encodeURIComponent(customer.id)}`,
+    hint: CUSTOMER_NEXT_STEPS.CREATE_QUOTE.hint,
   };
 }
 
@@ -55,17 +63,17 @@ export function getExecutionPriority(customer: Customer): { level: ExecutionPrio
   const hasContactChannel = Boolean(customer.email || customer.phone);
 
   if (customer.is_vip) {
-    return { level: 'ALTA', score: 100, hint: 'Client VIP: seguiment prioritari' };
+    return { level: 'ALTA', score: 100, hint: EXECUTION_PRIORITY_HINTS.VIP };
   }
   if ((customer.total_events || 0) === 0 && hasContactChannel && daysSinceCreated <= 3) {
-    return { level: 'ALTA', score: 90, hint: 'Lead recent sense esdeveniment' };
+    return { level: 'ALTA', score: 90, hint: EXECUTION_PRIORITY_HINTS.RECENT_LEAD };
   }
   if ((customer.total_events || 0) === 0 && daysSinceCreated <= 14) {
-    return { level: 'MITJANA', score: 60, hint: 'Oportunitat activa' };
+    return { level: 'MITJANA', score: 60, hint: EXECUTION_PRIORITY_HINTS.ACTIVE_OPPORTUNITY };
   }
   if ((customer.total_events || 0) > 0) {
-    return { level: 'MITJANA', score: 50, hint: 'Client amb potencial recurrència' };
+    return { level: 'MITJANA', score: 50, hint: EXECUTION_PRIORITY_HINTS.RECURRING_POTENTIAL };
   }
-  return { level: 'BAIXA', score: 20, hint: 'Seguiment no urgent' };
+  return { level: 'BAIXA', score: 20, hint: EXECUTION_PRIORITY_HINTS.LOW_URGENCY };
 }
 

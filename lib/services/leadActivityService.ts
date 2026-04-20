@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { mapLeadActivityToCanonicalEvent } from '@/lib/services/timelineQueryService';
 
 type LeadActivityInput = {
   type?: 'NOTE' | 'STATUS_CHANGE' | 'EMAIL' | 'CALL' | 'WHATSAPP' | 'DOCUMENT' | 'TASK' | 'SYSTEM';
@@ -19,7 +20,22 @@ export async function listLeadActivities(leadId: string) {
     where: { leadId },
     orderBy: { createdAt: 'desc' },
   });
-  return { ok: true, activities };
+
+  return {
+    ok: true,
+    activities: activities.map((activity) => ({
+      ...activity,
+      timeline: mapLeadActivityToCanonicalEvent({
+        id: activity.id,
+        type: activity.type,
+        title: activity.title,
+        description: activity.description,
+        createdAt: activity.createdAt,
+        createdBy: activity.createdBy,
+        leadId: activity.leadId,
+      }),
+    })),
+  };
 }
 
 export async function createLeadActivity(leadId: string, input: LeadActivityInput) {
@@ -33,7 +49,21 @@ export async function createLeadActivity(leadId: string, input: LeadActivityInpu
     },
   });
 
-  return { ok: true, activity };
+  return {
+    ok: true,
+    activity: {
+      ...activity,
+      timeline: mapLeadActivityToCanonicalEvent({
+        id: activity.id,
+        type: activity.type,
+        title: activity.title,
+        description: activity.description,
+        createdAt: activity.createdAt,
+        createdBy: activity.createdBy,
+        leadId: activity.leadId,
+      }),
+    },
+  };
 }
 
 export async function cleanupDuplicateLeadActivities(leadId: string) {

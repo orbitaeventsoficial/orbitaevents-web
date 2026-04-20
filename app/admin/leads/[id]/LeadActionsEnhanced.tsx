@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_ACTION_OPTIONS } from '@/lib/constants';
 import { getAdminLeadPackOptions } from '@/lib/constants/admin';
+import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 interface Props {
   leadId: string;
@@ -339,6 +340,7 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
+
 
 
 

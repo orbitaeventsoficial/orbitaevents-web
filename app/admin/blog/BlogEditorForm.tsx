@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { BLOG_CATEGORY_OPTIONS } from '@/lib/constants';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 
 type Locale = 'es' | 'ca';
 
@@ -78,6 +79,41 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
   const [activeLocale, setActiveLocale] = useState<Locale>('es');
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [formData, setFormData] = useState<FormState>(INITIAL_FORM);
+  const filledLocales = (['es', 'ca'] as Locale[]).filter((locale) => {
+    const translation = formData.translations[locale];
+    return Boolean(translation.title.trim() || translation.excerpt.trim() || translation.content.trim());
+  }).length;
+  const missingLocales = 2 - filledLocales;
+  const activeTranslation = formData.translations[activeLocale];
+  const activeWordCount = activeTranslation.content.trim()
+    ? activeTranslation.content.trim().split(/\s+/).length
+    : 0;
+  const seoReady = Boolean(
+    activeTranslation.metaTitle.trim() || activeTranslation.title.trim(),
+  ) && Boolean(activeTranslation.metaDescription.trim() || activeTranslation.excerpt.trim());
+  const workspaceTone = loading
+    ? 'default'
+    : saving || missingLocales > 0 || !formData.slug.trim()
+      ? 'warning'
+      : 'success';
+  const actionTitle = loading
+    ? 'Esperar la càrrega abans d’editar el post'
+    : saving
+      ? 'Deixar que el post es desi correctament'
+      : mode === 'create'
+        ? missingLocales > 0
+          ? 'Completar primer la base editorial del post'
+          : 'Revisar i crear la peça amb la base completa'
+        : missingLocales > 0
+          ? 'Regularitzar traduccions i SEO abans de sortir'
+          : 'Refinar el post i tornar al catàleg';
+  const actionDescription = loading
+    ? 'Sense el contingut carregat no toca prendre decisions editorials a cegues.'
+    : saving
+      ? 'Ara mateix el sistema està persistint els canvis i preparant el retorn al catàleg.'
+      : missingLocales > 0
+        ? 'El retorn més alt ara no és afegir més capes, sinó completar les peces bàsiques que encara falten per idioma.'
+        : 'Amb la base editorial coberta, el següent pas bo és polir SEO, estat de publicació i qualitat final abans de sortir.';
 
   useEffect(() => {
     if (mode !== 'edit' || !postId) return;
@@ -204,6 +240,48 @@ export default function BlogEditorForm({ mode, postId }: BlogEditorFormProps) {
 
   return (
     <>
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: mode === 'create' ? 'Quin estat té ara mateix el nou post' : 'Quin estat té ara mateix l’edició del post',
+          tone: workspaceTone,
+          stats: [
+            { label: 'Idiomes plens', value: filledLocales, tone: filledLocales === 2 ? 'success' : 'warning', hint: 'sobre 2' },
+            { label: 'Slug', value: formData.slug.trim() ? 'OK' : 'Pendent', tone: formData.slug.trim() ? 'success' : 'warning', hint: 'URL editorial' },
+            { label: activeLocale.toUpperCase(), value: activeWordCount, hint: 'paraules visibles' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de desar',
+          tone: loading ? 'default' : missingLocales > 0 || !seoReady ? 'warning' : 'info',
+          items: [
+            missingLocales > 0
+              ? `${missingLocales} idioma/es encara no tenen base editorial completa.`
+              : 'Les dues llengües ja tenen base editorial present al formulari.',
+            seoReady
+              ? `La pestanya ${activeLocale.toUpperCase()} ja té base SEO suficient per publicar sense buit evident.`
+              : `La pestanya ${activeLocale.toUpperCase()} encara depèn de títol/extracte o de SEO incomplet.`,
+            flashMessage
+              ? `Últim missatge de l’editor: ${flashMessage.text}`
+              : formData.isPublished
+                ? 'El post està marcat com a publicat dins del formulari.'
+                : 'El post continua en esborrany dins del formulari.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: loading || saving || missingLocales > 0 ? 'warning' : 'success',
+          secondaryPills: [
+            formData.isPublished ? 'Publicat' : 'Esborrany',
+            activeLocale.toUpperCase(),
+          ],
+        }}
+        className="mb-6"
+      />
+
       {flashMessage && (
         <div className={`mb-6 ${getFlashClass(flashMessage.type)}`} role={flashMessage.type === 'success' ? 'status' : 'alert'} aria-live="polite">
           <div className="flex items-center justify-between gap-4">

@@ -2,8 +2,8 @@ import { getAllPacks } from '@/app/config/packs-config';
 
 export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
   '1': '/admin/leads',
-  '2': '/admin/tasks',
-  '3': '/admin/emails',
+  '2': '/admin/clientes',
+  '3': '/admin/tasks',
   '4': '/admin/bookings',
   c: '/admin/calendario',
 };
@@ -41,6 +41,8 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   portfolio: 'Portfolio',
   'image-manager': 'Gestor d\'imatges',
 };
+
+export const ADMIN_CHANGE_COUNTER = 299;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -123,10 +125,10 @@ export const ADMIN_FAB_ITEMS = [
 ] as const;
 
 export const ADMIN_MOBILE_PRIMARY_NAV = [
-  { icon: '📊', label: 'Tauler', href: '/admin' },
   { icon: '📥', label: 'Entrades', href: '/admin/leads', badgeKey: 'newLeads' },
+  { icon: '👤', label: 'Clients', href: '/admin/clientes' },
   { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
-  { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
+  { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
 ] as const;
 
 
@@ -522,12 +524,16 @@ export const ADMIN_PDF_STUDIO_SERVICE_LABELS = {
 } as const;
 
 export const ADMIN_CRON_PREFIXES = [
+  { id: 'customerLifecycle', label: 'Lifecycle clients CRM', prefix: 'crm.customer-lifecycle', frequency: 'Diari' },
+  { id: 'taskAutomation', label: 'Tasques automàtiques', prefix: 'automation.tasks', frequency: 'Diari' },
   { id: 'commercial', label: 'Comercial diari', prefix: 'automation.commercial', frequency: 'Diari' },
   { id: 'fuel', label: 'Preu combustible', prefix: 'automation.fuel', frequency: 'Diari' },
   { id: 'invoiceSync', label: 'Sync factures', prefix: 'automation.invoiceSync', frequency: 'Diari' },
   { id: 'packPricing', label: 'Revisió preus packs', prefix: 'automation.packPricing', frequency: 'Diari' },
   { id: 'postEvent', label: 'Emails post-event', prefix: 'automation.postEvent', frequency: 'Diari' },
   { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari' },
+  { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)' },
+  { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari' },
 ] as const;
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
@@ -556,4 +562,82 @@ export const ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS = [
   { id: 'due-soon', label: 'Vencen aviat' },
 ] as const;
 
+// ─── Pack Editor Tabs ────────────────────────────────────────────────────
 
+export type PackEditorTab = 'economic' | 'content' | 'texts' | 'publish';
+
+export const ADMIN_PACK_EDITOR_TABS: ReadonlyArray<{ id: PackEditorTab; label: string; icon: string }> = [
+  { id: 'economic', label: 'Economia', icon: '💰' },
+  { id: 'content', label: 'Contingut', icon: '🎛️' },
+  { id: 'texts', label: 'Textos', icon: '🌐' },
+  { id: 'publish', label: 'Publicació', icon: '✅' },
+] as const;
+
+// ─── PDF Studio Defaults ────────────────────────────────────────────────
+
+export const ADMIN_PDF_STUDIO_DEFAULTS: Record<string, string> = {
+  conditionsText: `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 40 km.`,
+  whyChooseUs: 'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.',
+  brandTagline: 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
+  cancellationPolicy: 'Cancel·lació fins a 30 dies: 100% devolució. 15-30 dies: 50%. Menys de 15 dies: no reemborsable.',
+  brandName: 'Òrbita Events',
+  brandWebsite: 'orbitaevents.com',
+};
+
+// ─── Dashboard Pilot Steps (static config) ──────────────────────────────
+
+export const ADMIN_DASHBOARD_PILOT_STEPS = [
+  { id: 'leads', step: 'Pas 1', title: 'Respondre entrades', href: '/admin/leads', cta: 'Anar a entrades' },
+  { id: 'tasks', step: 'Pas 2', title: 'Executar tasques', href: '/admin/tasks', cta: 'Veure tasques' },
+  { id: 'postevent', step: 'Pas 3', title: 'Tancar post-esdeveniment', href: '/admin/emails', cta: 'Gestionar' },
+  { id: 'bookings', step: 'Pas 4', title: 'Preparar reserves', href: '/admin/bookings', cta: 'Veure reserves' },
+] as const;
+
+// ─── Dashboard Insight Colors ─────────────────────────────────────────
+
+export const ADMIN_DASHBOARD_INSIGHT_COLORS: Record<string, string> = {
+  success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  warning: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  danger: 'bg-red-500/10 border-red-500/20 text-red-400',
+  info: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+};
+
+// ─── Pricing Tabs ───────────────────────────────────────────────────────
+
+export type PricingTab = 'overview' | 'extras' | 'packs' | 'inventory';
+
+export const ADMIN_PRICING_TABS: ReadonlyArray<{ key: PricingTab; label: string; icon: string }> = [
+  { key: 'overview', label: 'Resum', icon: '📊' },
+  { key: 'extras', label: 'Extras', icon: '✨' },
+  { key: 'packs', label: 'Packs', icon: '📦' },
+  { key: 'inventory', label: 'Inventari', icon: '🔧' },
+] as const;
+
+// ─── Health Status Visual Mapping (semàfor compartit) ───────────────────
+
+export type HealthStatus = 'critical' | 'warning' | 'ok';
+
+export const ADMIN_HEALTH_STATUS_TONE: Record<HealthStatus, string> = {
+  critical: 'border-rose-500/20 bg-rose-500/5',
+  warning: 'border-amber-500/20 bg-amber-500/5',
+  ok: 'border-emerald-500/20 bg-emerald-500/5',
+};
+
+export const ADMIN_HEALTH_STATUS_LABEL: Record<HealthStatus, string> = {
+  critical: 'Cal actuar',
+  warning: 'Convé revisar',
+  ok: 'Correcte',
+};
+
+export const ADMIN_HEALTH_STATUS_DOT: Record<HealthStatus, string> = {
+  critical: 'bg-rose-400',
+  warning: 'bg-amber-400',
+  ok: 'bg-emerald-400',
+};
+
+export const ADMIN_HEALTH_STATUS_ORDER: Record<HealthStatus, number> = {
+  critical: 0,
+  warning: 1,
+  ok: 2,
+};
+export const ADMIN_WEEKDAY_SHORT_LABELS = ['Dg', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds'] as const;

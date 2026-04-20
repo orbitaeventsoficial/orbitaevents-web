@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDateFull, DEFAULT_LOCALE, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
+import { formatKey, isToday, resolveServiceLabel, HOURS, parseHour, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
 
 export default function CalendarDayClient() {
   const toast = useToast();
@@ -22,8 +23,12 @@ export default function CalendarDayClient() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [blockNote, setBlockNote] = useState('');
   const [showBlockForm, setShowBlockForm] = useState(false);
+  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, tasks: true, social: true, followUps: true });
 
   const dateKey = useMemo(() => formatKey(currentDate), [currentDate]);
+  const toggleLayer = useCallback((layer: 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
+    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
+  }, []);
   const nextDay = useMemo(() => {
     const d = new Date(currentDate);
     d.setDate(d.getDate() + 1);
@@ -31,7 +36,7 @@ export default function CalendarDayClient() {
   }, [currentDate]);
 
   const dayData = useMemo((): CalendarApiDay => {
-    if (!data?.days?.[dateKey]) return { reservas: [], bloqueos: [] };
+    if (!data?.days?.[dateKey]) return { reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     return data.days[dateKey];
   }, [data, dateKey]);
 
@@ -112,6 +117,10 @@ export default function CalendarDayClient() {
     });
   }, [dayData.reservas]);
 
+  const visibleTimelineBookings = useMemo(() => {
+    return visibleLayers.bookings ? timelineBookings : [];
+  }, [timelineBookings, visibleLayers.bookings]);
+
   return (
     <AdminPage
       title={`${weekdayLabel}, ${dayLabel}`}
@@ -119,7 +128,7 @@ export default function CalendarDayClient() {
       back={{ href: '/admin/calendario', label: 'Calendari' }}
     >
       {/* Navigation */}
-      <div className="flex items-center justify-between mb-6" data-help-title="Navegació diària" data-help-desc="Canvia de dia, torna a avui o salta a la vista setmanal o mensual.">
+      <div className="flex items-center justify-between mb-6" {...helpAttrs(ADMIN_CALENDAR_HELP.dayNavigation)}>
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigateDay(-1)}
@@ -160,6 +169,26 @@ export default function CalendarDayClient() {
         </div>
       </div>
 
+
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+        <span className="font-semibold opacity-60">Capes:</span>
+        {[
+          ['bookings', 'Reserves'],
+          ['blocks', 'Bloquejos'],
+          ['tasks', 'Tasques'],
+          ['social', 'Social'],
+          ['followUps', 'Follow-ups'],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => toggleLayer(key as 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       {loading && !data && (
         <div className="flex items-center justify-center py-24">
           <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
@@ -176,7 +205,7 @@ export default function CalendarDayClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Timeline column */}
           <div className="lg:col-span-2">
-            <div className="overflow-hidden rounded-2xl border admin-card-glass" data-help-title="Timeline del dia" data-help-desc="Distribueix les reserves per franges horàries i et deixa veure ràpidament la càrrega real del dia.">
+            <div className="overflow-hidden rounded-2xl border admin-card-glass" {...helpAttrs(ADMIN_CALENDAR_HELP.dayTimeline)}>
               <div className={`flex items-center justify-between border-b px-5 py-3 ${isTodayDate ? 'admin-card-glass' : ''} ${dayToneClasses.card}`}>
                 <div className="flex items-center gap-2">
                   {isBlocked && <span className="w-2.5 h-2.5 rounded-full" />}
@@ -238,7 +267,7 @@ export default function CalendarDayClient() {
               {/* Timeline grid */}
               <div className="relative">
                 {HOURS.map((hour) => {
-                  const bookingsAtHour = timelineBookings.filter((b) => {
+                  const bookingsAtHour = visibleTimelineBookings.filter((b) => {
                     if (b.startH === null) return false;
                     const end = b.endH ?? b.startH + 4;
                     return hour >= b.startH && hour < end;
@@ -275,10 +304,10 @@ export default function CalendarDayClient() {
                 })}
 
                 {/* Bookings without time */}
-                {timelineBookings.filter((b) => b.startH === null).length > 0 && (
+                {visibleTimelineBookings.filter((b) => b.startH === null).length > 0 && (
                   <div className="border-t px-5 py-3 admin-card-glass">
                     <p className="mb-2 text-xs">Sense hora definida:</p>
-                    {timelineBookings.filter((b) => b.startH === null).map((b) => (
+                    {visibleTimelineBookings.filter((b) => b.startH === null).map((b) => (
                       <Link
                         key={b.id}
                         href={`/admin/bookings/${b.id}`}
@@ -295,18 +324,22 @@ export default function CalendarDayClient() {
           </div>
 
           {/* Detail sidebar */}
-          <div className="space-y-4" data-help-title="Panell lateral del dia" data-help-desc="Resumeix estat, bloquejos i reserves del dia seleccionat amb accessos directes a cada booking.">
+          <div className="space-y-4" {...helpAttrs(ADMIN_CALENDAR_HELP.daySidebar)}>
             {/* Summary card */}
             <div className="rounded-2xl border p-5 admin-card-glass">
               <h3 className="mb-3 text-sm font-semibold">Resum del dia</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="">Reserves</span>
-                  <span className="font-medium">{dayData.reservas.length}</span>
+                  <span className="font-medium">{visibleLayers.bookings ? dayData.reservas.length : 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Bloquejos</span>
-                  <span className="font-medium">{dayData.bloqueos.length}</span>
+                  <span className="font-medium">{visibleLayers.blocks ? dayData.bloqueos.length : 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="">Feina pendent</span>
+                  <span className="font-medium">{(visibleLayers.tasks ? dayData.tasks.length : 0) + (visibleLayers.social ? dayData.socialPosts.length : 0) + (visibleLayers.followUps ? dayData.followUps.length : 0)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="">Estat</span>
@@ -317,8 +350,34 @@ export default function CalendarDayClient() {
               </div>
             </div>
 
+
+            {((visibleLayers.tasks && dayData.tasks.length > 0) || (visibleLayers.social && dayData.socialPosts.length > 0) || (visibleLayers.followUps && dayData.followUps.length > 0)) && (
+              <div className="rounded-2xl border p-5 admin-card-glass">
+                <h3 className="mb-3 text-sm font-semibold">Feina planificada</h3>
+                <div className="space-y-2">
+                  {visibleLayers.tasks && dayData.tasks.map((task) => (
+                    <Link key={task.id} href="/admin/tasks" className="block rounded-xl border px-3 py-2 admin-tone-soft-info">
+                      <div className="truncate text-sm font-medium">✓ {task.title}</div>
+                      <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
+                    </Link>
+                  ))}
+                  {visibleLayers.social && dayData.socialPosts.map((post) => (
+                    <Link key={post.id} href="/admin/social" className="block rounded-xl border px-3 py-2 admin-tone-soft-warning">
+                      <div className="truncate text-sm font-medium">📣 {post.title}</div>
+                      <div className="mt-1 text-xs opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
+                    </Link>
+                  ))}
+                  {visibleLayers.followUps && dayData.followUps.map((item) => (
+                    <Link key={item.leadId} href={`/admin/leads/${item.leadId}`} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2">
+                      <div className="truncate text-sm font-medium">☎ Follow-up · {item.name}</div>
+                      <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* Blockage details */}
-            {dayData.bloqueos.length > 0 && (
+            {visibleLayers.blocks && dayData.bloqueos.length > 0 && (
               <div className="rounded-2xl border p-5">
                 <h3 className="text-sm font-semibold mb-2">Bloquejos</h3>
                 {dayData.bloqueos.map((b) => (
@@ -330,7 +389,7 @@ export default function CalendarDayClient() {
             )}
 
             {/* Booking details */}
-            {dayData.reservas.map((b) => {
+            {visibleLayers.bookings && dayData.reservas.map((b) => {
               const badge = getBookingStatusBadgeDisplay(b.estado || '');
               return (
                 <Link
@@ -357,7 +416,7 @@ export default function CalendarDayClient() {
               );
             })}
 
-            {dayData.reservas.length === 0 && !isBlocked && (
+            {(visibleLayers.bookings ? dayData.reservas.length === 0 : true) && (!visibleLayers.blocks || !isBlocked) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
               <div className="rounded-2xl border p-5 text-center admin-card-glass">
                 <p className="text-sm">Dia lliure</p>
                 <Link
@@ -374,6 +433,4 @@ export default function CalendarDayClient() {
     </AdminPage>
   );
 }
-
-
 

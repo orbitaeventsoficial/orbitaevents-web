@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de FAQs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -30,12 +31,18 @@ async function getFaqs() {
 
 export default async function FAQPage() {
   const faqs = await getFaqs();
+  const activeFaqs = faqs.filter((f) => f.isActive);
+  const inactiveFaqs = faqs.filter((f) => !f.isActive);
+  const locales = new Set(faqs.flatMap((f) => f.translations.map((t) => t.locale)));
 
   const faqsByCategory = faqs.reduce((acc, faq) => {
     if (!acc[faq.category]) acc[faq.category] = [];
     acc[faq.category].push(faq);
     return acc;
   }, {} as Record<string, typeof faqs>);
+  const topCategory = Object.entries(faqsByCategory)
+    .sort((a, b) => b[1].length - a[1].length)[0];
+  const topCategoryConfig = topCategory ? getFaqCategoryDisplay(topCategory[0]) : null;
 
   return (
     <AdminPage
@@ -47,6 +54,36 @@ export default async function FAQPage() {
         </Link>
       }
     >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura editorial',
+          title: 'Què tens publicat ara mateix',
+          stats: [
+            { label: 'Preguntes', value: faqs.length },
+            { label: 'Actives', value: activeFaqs.length, tone: 'success' },
+            { label: 'Idiomes', value: locales.size },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans d’editar',
+          items: [
+            inactiveFaqs.length > 0 ? `${inactiveFaqs.length} preguntes estan inactives i poden deixar buits visibles.` : 'No hi ha preguntes inactives ara mateix.',
+            topCategoryConfig ? `${topCategoryConfig.icon} ${topCategoryConfig.label} és la categoria amb més volum ara mateix.` : 'Encara no hi ha una categoria dominant.',
+            locales.size < 3 ? 'No tots els idiomes tenen cobertura completa; convé revisar traduccions abans de publicar.' : 'La cobertura d’idiomes sembla completa a nivell de presència.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: inactiveFaqs.length > 0 ? 'Regularitzar les preguntes que no estan publicades' : 'Ampliar o polir la cobertura visible',
+          description: inactiveFaqs.length > 0
+            ? 'Abans de crear més contingut, comprova si les preguntes inactives s’han de recuperar, reescriure o eliminar.'
+            : 'Si no hi ha incidències evidents, el millor retorn és reforçar categories clau i mantenir coherència entre idiomes.',
+          primaryAction: { href: inactiveFaqs[0] ? `/admin/faq/${inactiveFaqs[0].id}` : '/admin/faq/new', label: inactiveFaqs[0] ? 'Editar una inactiva' : 'Crear nova pregunta' },
+          secondaryPills: topCategory ? [`Focus actual: ${topCategoryConfig?.label}`] : undefined,
+        }}
+      />
+
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Total Preguntes</p>
@@ -62,7 +99,7 @@ export default async function FAQPage() {
         </div>
         <div className="rounded-2xl border admin-card-glass p-4">
           <p className="text-xs font-medium uppercase">Idiomes</p>
-          <p className="mt-2 text-3xl font-bold">{new Set(faqs.flatMap((f) => f.translations.map((t) => t.locale))).size}</p>
+          <p className="mt-2 text-3xl font-bold">{locales.size}</p>
         </div>
       </section>
 

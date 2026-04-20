@@ -16,7 +16,10 @@ vi.mock('@/lib/services/clientPortalAccess', () => ({
   getActivePortalAccessForBooking: mockGetActiveAccess,
 }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
-vi.mock('@/lib/constants', () => ({ PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbitaevents.com' }));
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/constants')>();
+  return { ...actual, PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbitaevents.com' };
+});
 
 import { tryEnsureCompletedBookingPortalAccess } from '@/lib/services/bookingPortalCompletionService';
 

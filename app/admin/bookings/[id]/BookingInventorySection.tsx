@@ -12,6 +12,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 import { INVENTORY_CONDITION_OPTIONS } from '@/lib/constants';
 import { getInventoryCategoryDisplay } from '@/lib/inventory-utils';
+import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 interface InventoryItem {
   id: string;
@@ -247,7 +248,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   if (loading) {
     return (
-      <section className="ap-card rounded-xl p-6">
+      <section className="ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.root)}>
         <h2 className="text-lg font-semibold mb-4">Equipament assignat</h2>
         <p className="text-sm">Carregant...</p>
       </section>
@@ -255,7 +256,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
   }
 
   return (
-    <section className="ap-card rounded-xl p-6">
+    <section className="ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.root)}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">
           Equipament assignat
@@ -303,7 +304,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         </div>
       )}
       {bundles.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-wrap items-center gap-2" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.bundle)}>
           <select
             value={selectedBundleId}
             onChange={(e) => setSelectedBundleId(e.target.value)}
@@ -330,7 +331,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       {assigned.length === 0 ? (
         <p className="text-sm mb-4">Encara no hi ha equipament assignat</p>
       ) : (
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-4" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.assigned)}>
           {assigned.map((a) => (
             <div
               key={a.id}
@@ -407,7 +408,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       {/* Cerca d'equip disponible */}
       {showSearch && (
-        <div className="border-t admin-tone-border-neutral pt-4 space-y-3">
+        <div className="border-t admin-tone-border-neutral pt-4 space-y-3" {...helpAttrs(ADMIN_BOOKING_HELP_2.inventory.search)}>
           <input
             type="text"
             value={search}
@@ -452,6 +453,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     </section>
   );
 }
+
 
 
 

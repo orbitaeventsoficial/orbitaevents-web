@@ -12,98 +12,8 @@ import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/lib/navigation';
+import { PUBLIC_HOME_MOBILE_CARDS } from '@/lib/publicHomeShowcase';
 import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-media';
-
-// ── Interactive marquee hook ────────────────────────────────────────────────
-
-const MARQUEE_AUTO_SPEED = 0.35;
-const MARQUEE_MAX_SPEED = 4;
-
-function useMarquee(itemCount: number) {
-  const stripRef = useRef<HTMLDivElement>(null);
-  const offsetRef = useRef(0);
-  const speedRef = useRef(MARQUEE_AUTO_SPEED);
-  const inputRef = useRef<'none' | 'touch' | 'mouse'>('none');
-  const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (reduceMotion || itemCount === 0) return;
-    const strip = stripRef.current;
-    if (!strip) return;
-
-    let animId: number;
-
-    const getHalfWidth = () => {
-      const children = strip.children;
-      const half = Math.floor(children.length / 2);
-      let w = 0;
-      for (let i = 0; i < half; i++) {
-        w += (children[i] as HTMLElement).offsetWidth + 12;
-      }
-      return w;
-    };
-
-    const animate = () => {
-      const halfW = getHalfWidth();
-      if (halfW > 0) {
-        offsetRef.current -= speedRef.current;
-        if (offsetRef.current < -halfW) offsetRef.current += halfW;
-        if (offsetRef.current > 0) offsetRef.current -= halfW;
-        strip.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-      }
-      animId = requestAnimationFrame(animate);
-    };
-
-    const handlePointer = (clientX: number) => {
-      const rect = strip.parentElement?.getBoundingClientRect();
-      if (!rect) return;
-      const centerX = rect.left + rect.width / 2;
-      const normalized = (clientX - centerX) / (rect.width / 2);
-      speedRef.current = normalized * MARQUEE_MAX_SPEED;
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      inputRef.current = 'mouse';
-      handlePointer(e.clientX);
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      inputRef.current = 'touch';
-      if (e.touches[0]) handlePointer(e.touches[0].clientX);
-    };
-    const handleLeave = () => {
-      inputRef.current = 'none';
-      speedRef.current = MARQUEE_AUTO_SPEED;
-    };
-
-    // Gyroscope — only active when no direct touch/mouse input
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (inputRef.current !== 'none') return;
-      const gamma = e.gamma ?? 0;
-      const clamped = Math.max(-30, Math.min(30, gamma));
-      speedRef.current = (clamped / 30) * MARQUEE_MAX_SPEED;
-    };
-
-    const parent = strip.parentElement;
-    parent?.addEventListener('mousemove', handleMouseMove);
-    parent?.addEventListener('touchmove', handleTouchMove, { passive: true });
-    parent?.addEventListener('mouseleave', handleLeave);
-    parent?.addEventListener('touchend', handleLeave);
-    window.addEventListener('deviceorientation', handleOrientation);
-
-    animId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      parent?.removeEventListener('mousemove', handleMouseMove);
-      parent?.removeEventListener('touchmove', handleTouchMove);
-      parent?.removeEventListener('mouseleave', handleLeave);
-      parent?.removeEventListener('touchend', handleLeave);
-      window.removeEventListener('deviceorientation', handleOrientation);
-    };
-  }, [itemCount, reduceMotion]);
-
-  return stripRef;
-}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -221,7 +131,7 @@ function ServiceCard({
 const FALLBACK_SERVICE_IMAGES: Record<PublicMobileServiceCardId, string> = {
   bodas: '/img/portfolio/bodas/bodas-01.avif',
   halloween: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
-  monmagic: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
+  monmagic: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-hero.avif',
   fiestas: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
   empresas: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
 };
@@ -231,70 +141,57 @@ export default function MobileServicesCards({
 }: {
   serviceCardImages?: Record<PublicMobileServiceCardId, string>;
 }) {
-  const { locale } = useMobile();
+  const { locale, haptic } = useMobile();
   const t = useTranslations('mobileServices');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const resolvedImages = useMemo(
     () => ({ ...FALLBACK_SERVICE_IMAGES, ...serviceCardImages }),
     [serviceCardImages]
   );
 
-  const SERVICES: Service[] = useMemo(() => [
-    {
-      id: 'bodas',
-      emoji: '💒',
-      image: resolvedImages.bodas,
-      gradient: 'from-pink-500/14 via-rose-500/6 to-transparent',
-      badgeKey: '',
-      badgeColor: '',
-      href: '/servicios/bodas',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-    {
-      id: 'halloween',
-      emoji: '🎃',
-      image: resolvedImages.halloween,
-      gradient: 'from-orange-500/14 via-red-500/6 to-transparent',
-      badgeKey: 'halloween.badge',
-      badgeColor: 'from-orange-500 to-red-500',
-      href: '/tematica-halloween',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-    {
-      id: 'monmagic',
-      emoji: '🪄',
-      image: resolvedImages.monmagic,
-      gradient: 'from-amber-500/14 via-purple-500/6 to-transparent',
-      badgeKey: 'monmagic.badge',
-      badgeColor: 'from-amber-500 to-yellow-500',
-      href: '/tematica-mon-magic',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-    {
-      id: 'fiestas',
-      emoji: '🎉',
-      image: resolvedImages.fiestas,
-      gradient: 'from-purple-500/14 via-violet-500/6 to-transparent',
-      badgeKey: '',
-      badgeColor: '',
-      href: '/servicios/fiestas',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-    {
-      id: 'empresas',
-      emoji: '🏢',
-      image: resolvedImages.empresas,
-      gradient: 'from-blue-500/14 via-cyan-500/6 to-transparent',
-      badgeKey: '',
-      badgeColor: '',
-      href: '/servicios/empresas',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-  ], [resolvedImages]);
+  const SERVICES: Service[] = useMemo(() => (
+    PUBLIC_HOME_MOBILE_CARDS.map((service) => ({
+      ...service,
+      image: resolvedImages[service.id],
+      features: [...service.features],
+    }))
+  ), [resolvedImages]);  // Track active card via scroll position
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
 
-  // Duplicate for seamless loop
-  const loopServices = useMemo(() => [...SERVICES, ...SERVICES], [SERVICES]);
-  const stripRef = useMarquee(SERVICES.length);
+    let ticking = false;
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollLeft = el.scrollLeft;
+        const cardWidth = el.firstElementChild
+          ? (el.firstElementChild as HTMLElement).offsetWidth
+          : 1;
+        const gap = 12; // gap-3
+        const idx = Math.round(scrollLeft / (cardWidth + gap));
+        setActiveIndex(Math.min(idx, SERVICES.length - 1));
+        ticking = false;
+      });
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [SERVICES.length]);
+
+  const scrollToCard = useCallback((index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = el.children[index] as HTMLElement | undefined;
+    if (card) {
+      const scrollLeft = card.offsetLeft - (el.offsetWidth - card.offsetWidth) / 2;
+      el.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      haptic('light');
+    }
+  }, [haptic]);
 
   return (
     <section id="services-section" className="relative overflow-hidden py-8">
@@ -313,35 +210,52 @@ export default function MobileServicesCards({
         </h2>
       </motion.div>
 
-      {/* Interactive marquee carousel */}
-      <div className="relative overflow-hidden">
-        <div
-          ref={stripRef}
-          className="flex gap-3 will-change-transform"
-        >
-          {loopServices.map((service, index) => (
-            <div
-              key={`${service.id}-${index}`}
-              className="h-[360px] w-[84vw] max-w-[360px] flex-shrink-0"
-            >
-              <ServiceCard
-                service={service}
-                isActive={false}
-                locale={locale}
-                t={t}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Horizontal snap carousel */}
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory px-6 pb-2"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        <style jsx>{`
+          div::-webkit-scrollbar { display: none; }
+        `}</style>
+        {SERVICES.map((service, index) => (
+          <div
+            key={service.id}
+            className="snap-center h-[360px] w-[84vw] max-w-[360px] flex-shrink-0"
+          >
+            <ServiceCard
+              service={service}
+              isActive={activeIndex === index}
+              locale={locale}
+              t={t}
+            />
+          </div>
+        ))}
+      </div>
 
-        {/* Fade edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-[#030303] to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[#030303] to-transparent z-10" />
+      {/* Progress dots */}
+      <div className="flex justify-center gap-2 mt-5">
+        {SERVICES.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => scrollToCard(index)}
+            className={`h-[3px] rounded-full transition-all duration-300 ${
+              index === activeIndex
+                ? 'w-7 bg-amber-400'
+                : 'w-2 bg-white/20'
+            }`}
+            aria-label={`Servei ${index + 1}`}
+          />
+        ))}
       </div>
     </section>
   );
 }
-
 
 
 

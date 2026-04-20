@@ -28,17 +28,25 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import InfoTooltip from './InfoTooltip';
+import type { HelpCopy } from './adminHelpContent';
+import { helpAttrs } from './adminHelpContent';
 
 interface AdminPageProps {
   title: string;
   subtitle?: ReactNode;
-  back?: { href: string; label: string };
+  back?: { href: string; label: string; help?: HelpCopy };
   actions?: ReactNode;
   kpis?: ReactNode;
   tabs?: ReactNode;
   alert?: ReactNode;
   children: ReactNode;
   className?: string;
+  help?: HelpCopy;
+  headerHelp?: HelpCopy;
+  kpisHelp?: HelpCopy;
+  tabsHelp?: HelpCopy;
+  alertHelp?: HelpCopy;
+  contentHelp?: HelpCopy;
 }
 
 export function AdminPage({
@@ -51,13 +59,19 @@ export function AdminPage({
   alert,
   children,
   className = '',
+  help,
+  headerHelp,
+  kpisHelp,
+  tabsHelp,
+  alertHelp,
+  contentHelp,
 }: AdminPageProps) {
   return (
-    <div className={`ap-page ${className}`}>
-      <header className="ap-header">
+    <div className={`ap-page ${className}`} {...helpAttrs(help)}>
+      <header className="ap-header" {...helpAttrs(headerHelp)}>
         <div className="ap-header-left">
           {back && (
-            <Link href={back.href} className="ap-back">
+            <Link href={back.href} className="ap-back" {...helpAttrs(back.help)}>
               ← {back.label}
             </Link>
           )}
@@ -67,10 +81,10 @@ export function AdminPage({
         {actions && <div className="ap-header-actions">{actions}</div>}
       </header>
 
-      {kpis && <div className="ap-kpis">{kpis}</div>}
-      {alert && <div className="ap-alert">{alert}</div>}
-      {tabs && <nav className="ap-tabs-nav">{tabs}</nav>}
-      <div className="ap-content">{children}</div>
+      {kpis && <div className="ap-kpis" {...helpAttrs(kpisHelp)}>{kpis}</div>}
+      {alert && <div className="ap-alert" {...helpAttrs(alertHelp)}>{alert}</div>}
+      {tabs && <nav className="ap-tabs-nav" {...helpAttrs(tabsHelp)}>{tabs}</nav>}
+      <div className="ap-content" {...helpAttrs(contentHelp)}>{children}</div>
     </div>
   );
 }
@@ -83,6 +97,8 @@ interface AdminSectionProps {
   compact?: boolean;
   flush?: boolean;
   className?: string;
+  help?: HelpCopy;
+  headerHelp?: HelpCopy;
 }
 
 export function AdminSection({
@@ -93,12 +109,14 @@ export function AdminSection({
   compact = false,
   flush = false,
   className = '',
+  help,
+  headerHelp,
 }: AdminSectionProps) {
   const padClass = flush ? 'ap-section--flush' : compact ? 'ap-section--compact' : '';
   return (
-    <section className={`ap-section ${padClass} ${className}`}>
+    <section className={`ap-section ${padClass} ${className}`} {...helpAttrs(help)}>
       {(title || actions) && (
-        <div className="ap-section-head">
+        <div className="ap-section-head" {...helpAttrs(headerHelp)}>
           <div>
             {title && <h2 className="ap-section-title">{title}</h2>}
             {description && <p className="ap-section-desc">{description}</p>}
@@ -122,11 +140,12 @@ interface AdminKpiProps {
   trend?: ReactNode;
   href?: string;
   tooltip?: string;
+  help?: HelpCopy;
 }
 
-export function AdminKpi({ label, value, tone = 'neutral', trend, href, tooltip }: AdminKpiProps) {
+export function AdminKpi({ label, value, tone = 'neutral', trend, href, tooltip, help }: AdminKpiProps) {
   const content = (
-    <div className={`ap-kpi ap-kpi--${tone}`}>
+    <div className={`ap-kpi ap-kpi--${tone}`} {...helpAttrs(help)}>
       <span className="ap-kpi-label">{label} {tooltip && <InfoTooltip text={tooltip} />}</span>
       <span className="ap-kpi-value">{value}</span>
       {trend && <span className="ap-kpi-trend">{trend}</span>}
@@ -140,11 +159,12 @@ interface AdminEmptyStateProps {
   title: string;
   description?: string;
   action?: ReactNode;
+  help?: HelpCopy;
 }
 
-export function AdminEmptyState({ icon = '📭', title, description, action }: AdminEmptyStateProps) {
+export function AdminEmptyState({ icon = '📭', title, description, action, help }: AdminEmptyStateProps) {
   return (
-    <div className="ap-empty">
+    <div className="ap-empty" {...helpAttrs(help)}>
       <span className="ap-empty-icon">{icon}</span>
       <p className="ap-empty-title">{title}</p>
       {description && <p className="ap-empty-desc">{description}</p>}

@@ -1,11 +1,11 @@
 # Estat de l'Admin Òrbita Events — Referència Permanent
 
-> Última actualització: 2026-03-27
+> Última actualització: 2026-04-16
 > NO cal re-auditar cada sessió. Només actualitzar les seccions que canvien.
 
 ## Resum
 
-- **58 pàgines admin**, **148 rutes API**, **6 crons**, **~120 serveis**
+- **58 pàgines admin**, **148 rutes API**, **10 crons**, **~120 serveis**
 - Stack: Next.js 14 App Router, TypeScript, Prisma, PostgreSQL (Railway)
 - Admin 100% en català, PWA instal·lable
 - v2.1 · Prisma + Railway
@@ -245,11 +245,15 @@ Es tracta de conservar el que ja té valor, cosir el que avui està dispers, exp
 | Cron | Freqüència | Funció |
 |------|-----------|--------|
 | `commercial-daily` | Diari | Seqüències + SLA + recordatoris + scoring + resum |
+| `customer-lifecycle` | Diari | Recalcul lifecycleStage + healthScore |
 | `fuel-daily` | Diari | Preu MITECO → cost/km |
 | `invoice-sync` | Diari | Sync Holded |
+| `lead-cleanup` | Diari | Auto-LOST + auto-DELETE leads inactius |
 | `pack-pricing-check` | Diari | Alertes preus divergents >15% |
 | `post-event` | Diari | Emails post-event auto |
 | `reviews-sync` | Diari | SerpAPI → ressenyes Google a BD |
+| `tasks-auto` | Diari | Generació automàtica de tasques operatives |
+| `weekly-benchmark` | Setmanal (dl) | Email comparatiu setmanal |
 
 ## Serveis clau (lib/services/)
 

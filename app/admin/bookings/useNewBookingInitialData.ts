@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { BookingExtra, BookingFormData, BookingLeadData, BookingPack, RawExtraConfig } from './booking-form.types';
 import { INITIAL_BOOKING_FORM } from './booking-form.types';
+import { log } from '@/lib/logger';
 
 interface UseNewBookingInitialDataOptions {
   leadId: string | null;
@@ -86,7 +87,7 @@ export function useNewBookingInitialData({ leadId, dateParam }: UseNewBookingIni
           setForm((prev) => ({ ...prev, eventDate: dateParam }));
         }
       } catch (error) {
-        console.error('[NewBooking] Error carregant dades inicials:', error);
+        log.error('[NewBooking] Error carregant dades inicials', error);
       } finally {
         setLoading(false);
       }

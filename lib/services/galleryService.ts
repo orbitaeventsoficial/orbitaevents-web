@@ -90,31 +90,29 @@ export async function listPortalPhotos(bookingId: string) {
 /**
  * Llistar fotos per al portfolio públic (tots els bookings)
  */
-export async function listPortfolioPhotos(opts: { slug?: string; limit?: number; offset?: number } = {}) {
-  const { slug, limit = 50, offset = 0 } = opts;
+export async function listPortfolioPhotos(opts: { slug?: string; limit?: number; offset?: number; includeTotal?: boolean } = {}) {
+  const { slug, limit = 50, offset = 0, includeTotal = true } = opts;
 
   const where: { isPortfolio: boolean; portfolioSlug?: string } = { isPortfolio: true };
   if (slug) where.portfolioSlug = slug;
 
-  const [photos, total] = await Promise.all([
-    prisma.bookingGalleryPhoto.findMany({
-      where,
-      include: {
-        booking: {
-          select: {
-            eventType: true,
-            eventDate: true,
-            eventLocation: true,
-            eventVenue: true,
-          },
+  const photos = await prisma.bookingGalleryPhoto.findMany({
+    where,
+    include: {
+      booking: {
+        select: {
+          eventType: true,
+          eventDate: true,
+          eventLocation: true,
+          eventVenue: true,
         },
       },
-      orderBy: [{ booking: { eventDate: 'desc' } }, { sortOrder: 'asc' }],
-      take: limit,
-      skip: offset,
-    }),
-    prisma.bookingGalleryPhoto.count({ where }),
-  ]);
+    },
+    orderBy: [{ booking: { eventDate: 'desc' } }, { sortOrder: 'asc' }],
+    take: limit,
+    skip: offset,
+  });
+  const total = includeTotal ? await prisma.bookingGalleryPhoto.count({ where }) : photos.length;
 
   return { photos, total };
 }
@@ -175,5 +173,3 @@ export async function getGallerySummary(bookingId: string) {
   ]);
   return { total, portfolioCount, portalCount };
 }
-
-

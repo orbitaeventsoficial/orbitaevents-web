@@ -265,7 +265,7 @@ export function QuoteModal({
       onSent(`Pressupost enviat (${data.quoteNumber}) a ${recipient}`);
       onClose();
     } catch (error) {
-      console.error('Error sending quote:', error);
+      log.error('Error sending quote:', error);
       setError('Error enviant pressupost');
     } finally {
       setSending(false);

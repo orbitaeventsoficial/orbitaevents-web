@@ -4,6 +4,7 @@ import { formatNumber } from '@/lib/constants';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
 import { AdminPage } from '../components/AdminPage';
 import InfoTooltip from '../components/InfoTooltip';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import RunCommercialSequencesButton from './RunCommercialSequencesButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
 import SlaAutomationButton from './SlaAutomationButton';
@@ -100,6 +101,43 @@ export default async function SalesOpsPage() {
   const responseRateStatus: AuditStatus = responseRate30d >= 0.55 ? 'FORT' : responseRate30d >= 0.35 ? 'A_MILLORAR' : 'CRITIC';
   const pipelineStatus: AuditStatus = scored.length >= 10 ? 'FORT' : scored.length >= 5 ? 'A_MILLORAR' : 'CRITIC';
   const riskStatus: AuditStatus = riskLeads.length <= 5 ? 'FORT' : riskLeads.length <= 12 ? 'A_MILLORAR' : 'CRITIC';
+  const systemItems = [
+    `${scored.length} entrades obertes amb ${formatNumber(pipelineTotal)}€ a l'embut`,
+    `Previsió ponderada actual: ${formatNumber(forecastTotal)}€`,
+    `${sequenceExec30d} seqüències automàtiques executades en 30 dies`,
+    `Taxa de resposta comercial del ${toPct(responseRate30d)}`,
+  ].filter(Boolean);
+  const manualItems = [
+    slaSnapshot > 0 ? `${slaSnapshot} entrades porten més de 24h sense resposta` : '',
+    riskLeads.length > 0 ? `${riskLeads.length} oportunitats ja presenten risc de pèrdua` : '',
+    responseRateStatus !== 'FORT' ? 'La taxa de resposta comercial encara demana optimitzar missatges i seguiment' : '',
+    'Cal mantenir net l\'embut i revisar duplicats o camps crítics',
+  ].filter(Boolean);
+
+  const nextStep =
+    slaSnapshot > 0
+      ? {
+          title: 'Desbloquejar el temps de resposta avui',
+          detail: `Hi ha ${slaSnapshot} entrades amb més de 24h sense tocar. La prioritat és atacar-les abans de mirar optimització fina.`,
+          href: '/admin/leads',
+          ctaLabel: 'Obrir entrades',
+          secondaryAction: { href: '/admin/tasks', label: 'Veure tasques crítiques' },
+        }
+      : riskLeads.length > 0
+        ? {
+            title: 'Recuperar oportunitats en risc abans que es refredin',
+            detail: `${riskLeads.length} leads ja acumulen senyals de pèrdua. El següent pas és executar seguiment amb context, no només mirar mètriques.`,
+            href: '/admin/tasks',
+            ctaLabel: 'Executar seguiment',
+            secondaryAction: { href: '/admin/leads', label: 'Obrir embut' },
+          }
+        : {
+            title: 'Optimitzar el pipeline, no apagar focs',
+            detail: `El sistema no detecta un coll d'ampolla crític ara mateix. El millor retorn és revisar conversió, missatges i origen per pujar qualitat i tancament.`,
+            href: '/admin/leads',
+            ctaLabel: 'Revisar embut',
+            secondaryAction: { href: '/admin/analytics', label: 'Mirar analítica' },
+          };
 
   const auditRows = [
     { area: 'Velocitat de resposta', status: responseBacklogStatus, avui: `${slaSnapshot} entrades amb +24h sense resposta`, en30: 'Deixar-ho a 0 cada dia amb tasques automàtiques.', en90: 'Predicció de colls d\'ampolla per franja horària.', href: '/admin/leads', cta: 'Atacar entrades pendents' },
@@ -129,6 +167,27 @@ export default async function SalesOpsPage() {
         <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">Respostes 30d <InfoTooltip text="Comunicacions que han rebut resposta del client. Un % alt indica bona qualitat de contacte." /></p><p className="ap-kpi-value">{commResponded30d} · {toPct(responseRate30d)}</p></div>
         <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d <InfoTooltip text="Missatges automàtics enviats pel sistema (follow-ups, recordatoris, seqüències comercials)." /></p><p className="ap-kpi-value">{sequenceExec30d}</p></div>
       </section>
+
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què vigila el sistema',
+          tone: responseBacklogStatus === 'CRITIC' || responseRateStatus === 'CRITIC' ? 'warning' : 'info',
+          items: systemItems,
+          emptyText: 'Sense senyals automàtiques rellevants ara mateix.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: slaSnapshot > 0 || riskLeads.length > 0 ? 'warning' : 'success',
+          items: manualItems,
+          emptyText: 'Sense bloquejos manuals greus. Pots treballar millora i optimització.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          ...nextStep,
+        }}
+      />
 
       <section className="ap-card rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">

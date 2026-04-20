@@ -58,6 +58,7 @@ describe('runPackPricingCheck', () => {
       data: expect.objectContaining({
         priority: 'MEDIUM',
         createdBy: 'system:pack-pricing-check',
+        source: 'PACK_PRICING',
       }),
     });
   });

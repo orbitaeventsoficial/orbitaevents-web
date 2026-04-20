@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-maresme'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
-  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Arenys de Mar, Vilassar. Desplazamiento incluido.`,
-  keywords: ['DJ bodas Maresme', 'DJ bodas Mataró', 'DJ bodas Calella', 'DJ bodas Arenys de Mar', 'bodas Maresme'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-bodas-maresme' },
-  openGraph: {
-    title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en el Maresme. Toda la comarca con desplazamiento incluido.',
-    url: '/servicios/dj-bodas-maresme',
-    images: [{ url: heroImage, alt: 'DJ Bodas Maresme - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-bodas-maresme' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-bodas-maresme',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -51,44 +52,42 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   const zoneConfig: ZoneConfig = {
     zone: 'Maresme',
     zoneSlug: 'maresme',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Maresme',
-    heroSubtitle: 'Mataró · Calella · Arenys de Mar · Vilassar · Toda la comarca',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: maresmeTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Mataró', 'Bodas playa Maresme', 'Precio DJ boda', 'DJ boda Calella'],
-    description: `DJ profesional para bodas en el Maresme. Cubrimos toda la comarca con desplazamiento incluido.`,
-    whyChooseUs: [
-      'Toda la comarca: Mataró, Calella, Arenys y más',
-      'Desplazamiento incluido: Sin costes adicionales',
-      'Masías y costa: Experiencia en todo tipo de espacios',
-      'Adaptable: Preparados para limitaciones eléctricas',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Maresme', url: '/servicios/dj-bodas-maresme' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-maresme' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Bodas Maresme"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-maresme"
-        description={`DJ profesional para bodas en el Maresme. Desplazamiento incluido. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Maresme', 'DJ bodas Mataró', 'DJ bodas Calella']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={maresmeTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +97,3 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
     </>
   );
 }
-

@@ -2,10 +2,12 @@
 import { log } from '@/lib/logger';
 // Pàgina de configuració - Settings i estadístiques
 import { SETTINGS_CATEGORY_CONFIG } from '@/lib/constants';
+import { SETTINGS_SENSITIVE_KEY_FRAGMENTS, formatDateTimeFull } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SettingsClient from './SettingsClient';
 import DbReconnectButton from './DbReconnectButton';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -47,6 +49,15 @@ async function getSettings() {
 
 export default async function SettingsPage() {
   const settings = await getSettings();
+  const allSettings = Object.values(settings).flat();
+  const totalCategories = Object.keys(settings).length;
+  const sensitiveCount = allSettings.filter((setting) =>
+    SETTINGS_SENSITIVE_KEY_FRAGMENTS.some((fragment) => setting.key.toLowerCase().includes(fragment.toLowerCase()))
+  ).length;
+  const latestUpdate = allSettings.reduce<string | null>((latest, setting) => {
+    if (!latest) return setting.updatedAt;
+    return new Date(setting.updatedAt).getTime() > new Date(latest).getTime() ? setting.updatedAt : latest;
+  }, null);
 
   return (
     <AdminPage
@@ -54,15 +65,36 @@ export default async function SettingsPage() {
       subtitle="Gestiona les configuracions del sistema i estadístiques públiques"
       actions={<DbReconnectButton />}
     >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Configuració viva',
+          title: 'Què controla aquest espai',
+          description: 'Aquí no vens a inspeccionar claus una per una, sinó a governar el sistema: dades públiques, copy, integracions i paràmetres sensibles.',
+          stats: [
+            { label: 'Categories', value: totalCategories },
+            { label: 'Settings', value: allSettings.length },
+            { label: 'Sensibles', value: sensitiveCount, tone: 'warning' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què vigilar abans d’editar',
+          items: [
+            'Les estadístiques públiques s’actualitzen automàticament quan una reserva passa a COMPLETED.',
+            'Les claus sensibles queden ofuscades a la vista, però segueixen sent editables: toca-les només quan hi ha canvi real.',
+            latestUpdate ? `Últim canvi registrat: ${formatDateTimeFull(latestUpdate)}` : 'Sense actualitzacions registrades encara.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: 'Entra per la configuració que canvia comportament',
+          description: 'Si has de tocar negoci real, el millor primer pas sol ser empresa, pressupostos, catàleg o textos. No perdis temps navegant categories a cegues.',
+          primaryAction: { href: '/admin/settings/company', label: 'Obrir empresa i Holded' },
+          secondaryAction: { href: '/admin/settings/quotes', label: 'Obrir plantilla' },
+          secondaryPills: ['Catàleg de packs i preus', 'Textos i contingut públic'],
+        }}
+      />
 
-      {/* Info Alert */}
-      <div className="rounded-2xl border admin-card-glass p-4">
-        <p className="text-sm">
-          <strong>Nota:</strong> Les estadístiques públiques (esdeveniments, persones) s&apos;actualitzen
-          automàticament quan una reserva passa a <span className="font-semibold">COMPLETED</span>.
-          Pots editar-les manualment si cal ajustar els números inicials.
-        </p>
-      </div>
       {Object.keys(settings).length === 0 ? (
         <AdminEmptyState
           icon="⚙️"
@@ -73,61 +105,69 @@ export default async function SettingsPage() {
         <SettingsClient groupedSettings={settings} categoryConfig={SETTINGS_CATEGORY_CONFIG} />
       )}
 
-      {/* Quick Links */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="rounded-2xl border admin-card-glass p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Accessos directes</p>
+            <h2 className="mt-1 text-lg font-semibold text-white/90">Canvis que acostumen a tenir més impacte</h2>
+            <p className="mt-1 text-sm text-white/65">Entrades ràpides a les peces de configuració que més afecten venda, marca i operativa.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/presupuestos"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">🧾</div>
           <h3 className="font-semibold">Editor PDF de pressupost</h3>
-          <p className="text-sm">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
+          <p className="text-sm text-white/70">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
         </Link>
 
         <Link
           href="/admin/settings/quotes"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">📄</div>
           <h3 className="font-semibold">Plantilla de pressupostos</h3>
-          <p className="text-sm">Text, condicions i còpia interna dels pressupostos</p>
+          <p className="text-sm text-white/70">Text, condicions i còpia interna dels pressupostos</p>
         </Link>
 
         <Link
           href="/admin/catalog?tab=packs"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">📦</div>
           <h3 className="font-semibold">Catàleg</h3>
-          <p className="text-sm">Packs, extres, inventari i regles de preu</p>
+          <p className="text-sm text-white/70">Packs, extres, inventari i regles de preu</p>
         </Link>
 
         <Link
           href="/admin/text-manager"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold">Traduccions</h3>
-          <p className="text-sm">Gestiona el contingut multiidioma</p>
+          <p className="text-sm text-white/70">Gestiona el contingut multiidioma</p>
         </Link>
 
         <Link
           href="/admin/settings/company"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">🏢</div>
           <h3 className="font-semibold">Empresa i Holded</h3>
-          <p className="text-sm">Dades fiscals, IBAN, NIF i integració Holded</p>
+          <p className="text-sm text-white/70">Dades fiscals, IBAN, NIF i integració Holded</p>
         </Link>
 
         <Link
           href="/admin/faq"
-          className="rounded-2xl border admin-card-glass p-6 transition-all"
+          className="rounded-2xl border bg-white/[0.03] p-6 transition-all hover:bg-white/[0.06]"
         >
           <div className="text-2xl mb-2">❓</div>
           <h3 className="font-semibold">FAQs</h3>
-          <p className="text-sm">Edita les preguntes freqüents</p>
+          <p className="text-sm text-white/70">Edita les preguntes freqüents</p>
         </Link>
+        </div>
       </section>
     </AdminPage>
   );

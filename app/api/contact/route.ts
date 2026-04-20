@@ -62,6 +62,10 @@ export async function POST(req: NextRequest) {
       guestCount,
       extras,
       locale: formLocale,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      landingPage,
     } = parsed.data;
 
     const normalizedContact = contact?.trim() || '';
@@ -102,6 +106,10 @@ export async function POST(req: NextRequest) {
       extras,
       source: leadSource,
       preferredLocale: formLocale || locale || 'ca',
+      utmSource: utmSource || undefined,
+      utmMedium: utmMedium || undefined,
+      utmCampaign: utmCampaign || undefined,
+      landingPage: landingPage || undefined,
       updateNote: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
       createNote: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
     });

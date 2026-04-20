@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
 import CustomerHubClient from './_components/CustomerHubClient';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // METADATA
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
       description: `Gestió del client ${data.customer.name}`,
     };
   } catch (error) {
-    console.warn('[customerHub] metadata fallback', error);
+    log.warn('[customerHub] metadata fallback', { error: error instanceof Error ? error.message : String(error) });
     return {
       title: 'Client no trobat | Admin',
     };
@@ -49,7 +50,7 @@ async function CustomerHubLoader({ id }: { id: string }) {
     const data = await fetchCustomerHub(id);
     return <CustomerHubClient initial={data} />;
   } catch (error) {
-    console.warn('[customerHub] not found', error);
+    log.warn('[customerHub] not found', { error: error instanceof Error ? error.message : String(error) });
     notFound();
   }
 }

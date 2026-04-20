@@ -5,8 +5,7 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiciosClient from './client';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
-
-
+import { PUBLIC_SERVICE_CATALOG } from '@/lib/publicServiceCatalog';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
@@ -45,26 +44,18 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const heroImage = await getPublicServiceHeroImage('servicios');
 
-  // Get all service data
-  const serviciosConfig = [
-    { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '💍' },
-    { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '🎧' },
-    { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '🎉' },
-    { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '🧒' },
-    { key: 'empresas', href: '/servicios/empresas', popular: false, icon: 'briefcase', emoji: '💼' },
-  ];
-
-  const servicios = serviciosConfig.map(s => ({
-    ...s,
-    name: t(`items.${s.key}.name`),
-    tagline: t(`items.${s.key}.tagline`),
-    desc: t(`items.${s.key}.desc`),
-    features: t.raw(`items.${s.key}.features`) as string[],
-  }));
+  const servicios = PUBLIC_SERVICE_CATALOG
+    .filter((service) => service.showInServicesPage)
+    .map((service) => ({
+      ...service,
+      name: t(`items.${service.key}.name`),
+      tagline: t(`items.${service.key}.tagline`),
+      desc: t(`items.${service.key}.desc`),
+      features: t.raw(`items.${service.key}.features`) as string[],
+    }));
 
   return (
     <div className="relative">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black -z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.08),transparent_50%)] -z-10" />
 
@@ -75,7 +66,8 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
         ]}
       />
 
-      <ServiciosClient heroImage={heroImage}
+      <ServiciosClient
+        heroImage={heroImage}
         servicios={servicios}
         texts={{
           badge: t('hero.badge'),
@@ -95,12 +87,9 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
           ctaResponseTime: t('cta.responseTime'),
           ctaButton: t('cta.button'),
           ctaWhatsappMessage: t('cta.whatsappMessage'),
-          ctaWhatsappButton: t('cta.whatsappButton'),
+          ctaWhatsappButton: t('ctaWhatsappButton'),
         }}
       />
     </div>
   );
 }
-
-
-

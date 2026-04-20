@@ -78,6 +78,40 @@ export type MessageDTO = {
   leadId?: string;
 };
 
+export type CustomerCommSummaryDTO = {
+  total: number;
+  channels: {
+    EMAIL: number;
+    WHATSAPP: number;
+    CALL: number;
+    NOTE: number;
+    SYSTEM: number;
+  };
+  lastContactAt: string | null;
+  lastContactChannel: 'EMAIL' | 'WHATSAPP' | 'CALL' | 'NOTE' | 'SYSTEM' | null;
+  lastContactDirection: 'OUTBOUND' | 'INBOUND' | 'INTERNAL' | null;
+  pendingResponseFrom: 'TEAM' | 'CLIENT' | 'NONE';
+  daysSinceLastContact: number | null;
+  responseGap: number | null;
+};
+
+export type CustomerFollowUpItemDTO = {
+  leadId: string;
+  name: string;
+  phone: string | null;
+  urgency: 'URGENT' | 'NORMAL' | 'LOW';
+  daysSinceOutbound: number;
+  suggestedAction: string;
+};
+
+export type CustomerFollowUpSummaryDTO = {
+  total: number;
+  urgent: number;
+  normal: number;
+  low: number;
+  topItem: CustomerFollowUpItemDTO | null;
+};
+
 export type TimelineEventType =
   | 'PROPOSAL_CREATED'
   | 'PROPOSAL_SENT'
@@ -111,17 +145,88 @@ export type LeadDTO = {
   id: string;
   name: string;
   email: string;
+  phone?: string | null;
   eventType: string;
   eventDate?: string;
   status: string;
   priority: string;
   createdAt: string;
+  commercialBlocker?: {
+    label: string;
+    context?: string;
+    tone: 'DANGER' | 'WARNING' | 'INFO';
+  } | null;
   booking?: {
     id: string;
     reference: string;
     status: string;
     total: number;
+    depositAmount?: number;
+    remainingAmount?: number;
+    discountCode?: string;
+    eventType?: string;
+    date?: string;
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    venue?: string;
+    guestCount?: number;
+    packName?: string;
+    depositPaid?: boolean;
+    remainingPaid?: boolean;
   };
+};
+
+export type ReferralDTO = {
+  id: string;
+  name: string;
+  email: string;
+  totalEvents: number;
+  totalSpent: number;
+};
+
+export type CustomerPreferencesDTO = {
+  musicStyles?: string[];
+  preferredVenues?: string[];
+  specialNeeds?: string;
+  dietaryRestrictions?: string;
+  notes?: string;
+};
+
+export type CustomerInsightsDTO = {
+  nextAction: {
+    type: string;
+    label: string;
+    urgency: 'HIGH' | 'MEDIUM' | 'LOW';
+    context?: string;
+  };
+  commercialRisk: {
+    level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH';
+    label: string;
+    context?: string;
+  };
+  relationalHealth: 'EXCELLENT' | 'GOOD' | 'AT_RISK' | 'COLD' | 'LOST';
+  ltv: number;
+  recurrence: number;
+  completedEvents: number;
+  daysSinceLastContact: number | null;
+  daysSinceLastEvent: number | null;
+  daysUntilNextEvent: number | null;
+  openTasksCount: number;
+  pendingPaymentTotal: number;
+};
+
+export type CustomerReactivationDTO = {
+  reasonLabel: string;
+  priority: 'ALTA' | 'MITJANA' | 'BAIXA';
+  score: number;
+  suggestedChannels: Array<'whatsapp' | 'email' | 'instagram'>;
+  suggestedSubject: string;
+  suggestedMessage: string;
+  whatsappUrl: string | null;
+  mailtoUrl: string;
+  daysSinceLastEvent: number | null;
+  daysSinceLastContact: number | null;
 };
 
 export type CustomerHubDTO = {
@@ -131,8 +236,24 @@ export type CustomerHubDTO = {
     name: string;
     email?: string;
     phone?: string;
+    phoneNormalized?: string | null;
+    instagram?: string | null;
     status: HubStatus;
     createdAt: string;
+    // CRM Potenciat
+    tags?: string[];
+    lifecycleStage?: string;
+    healthScore?: number | null;
+    preferences?: CustomerPreferencesDTO | null;
+    birthday?: string | null;
+    lastContactedAt?: string | null;
+    lastEventDate?: string | null;
+    preferredLocale?: string;
+    marketingConsent?: boolean;
+    totalEvents?: number;
+    totalSpent?: number;
+    referredBy?: { id: string; name: string; email: string } | null;
+    referrals?: ReferralDTO[];
   };
   kpis: HubKpi;
   active: ActiveDocumentDTO;
@@ -140,8 +261,11 @@ export type CustomerHubDTO = {
   bookings: BookingDTO[];
   tasks: TaskDTO[];
   messages: MessageDTO[];
+  commSummary: CustomerCommSummaryDTO;
+  followUpSummary?: CustomerFollowUpSummaryDTO;
   timeline: TimelineEventDTO[];
   discountCodes: DiscountCodeDTO[];
   leads: LeadDTO[];
+  insights: CustomerInsightsDTO;
+  reactivation?: CustomerReactivationDTO | null;
 };
-

@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-valles'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
-  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en el Vallès desde ${MIN_PRICE}€. Granollers, Sabadell, Terrassa, Mollet. DJ local con desplazamiento incluido.`,
-  keywords: ['DJ bodas Vallès', 'DJ bodas Granollers', 'DJ bodas Sabadell', 'DJ bodas Terrassa', 'bodas Vallès Oriental'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-bodas-valles' },
-  openGraph: {
-    title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional local para bodas en el Vallès. Oriental y Occidental con desplazamiento incluido.',
-    url: '/servicios/dj-bodas-valles',
-    images: [{ url: heroImage, alt: 'DJ Bodas Vallès - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-bodas-valles' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-bodas-valles',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -51,44 +52,42 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   const zoneConfig: ZoneConfig = {
     zone: 'Vallès',
     zoneSlug: 'valles',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Vallès',
-    heroSubtitle: 'Granollers · Sabadell · Terrassa · Mollet · Toda la comarca',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: vallesTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Granollers', 'Bodas masía Vallès', 'Precio DJ boda', 'DJ boda Sabadell'],
-    description: `DJ profesional local para bodas en el Vallès. Base en Granollers, cubrimos Oriental y Occidental.`,
-    whyChooseUs: [
-      'DJ local: Base en Granollers, conocemos la zona',
-      'Desplazamiento incluido: Sin costes adicionales',
-      'Masías del Vallès: Can Bonastre, Cal Blay, Can Ribas...',
-      'Visita previa: Conocemos el espacio antes del evento',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Vallès', url: '/servicios/dj-bodas-valles' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-valles' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Bodas Vallès"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-valles"
-        description={`DJ profesional local para bodas en el Vallès. Desplazamiento incluido. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Vallès', 'DJ bodas Granollers', 'DJ bodas Sabadell', 'DJ bodas Terrassa']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={vallesTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +97,3 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
     </>
   );
 }
-

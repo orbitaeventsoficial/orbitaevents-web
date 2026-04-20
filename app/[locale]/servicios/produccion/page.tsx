@@ -4,9 +4,10 @@ import { Link } from '@/lib/navigation';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import { getSiteUrl } from '@/lib/site';
+import { STANDALONE_SERVICE_SEO } from '@/lib/standaloneServiceSeo';
 
-// Producció tècnica ja no és un servei amb packs — preu de referència fix
 const MIN_PRICE = 600;
+const SEO = STANDALONE_SERVICE_SEO.produccion;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
@@ -66,13 +67,13 @@ export default async function ProduccionPage({ params }: { params: { locale: str
   return (
     <section className="min-h-screen bg-bg-main py-20 relative">
       <ServiceJsonLD
-        name="Producción Técnica de Eventos"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/produccion"
-        description={`Producción técnica profesional para eventos. Equipo de sonido e iluminación con técnico incluido. Desde ${MIN_PRICE}€.`}
-        serviceType={['Producción técnica eventos', 'Alquiler equipo sonido con técnico', 'Técnico sonido eventos']}
-        areaServed={['Barcelona', 'Girona', 'Tarragona', 'Lleida', 'Granollers', 'Sabadell', 'Terrassa', 'Mataró']}
-        priceFrom={String(MIN_PRICE)}
-        priceCurrency="EUR"
+        description={SEO.jsonLd.description}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
+        priceFrom={SEO.jsonLd.priceFrom}
+        priceCurrency={SEO.jsonLd.priceCurrency}
       />
       <div className="mx-auto max-w-4xl px-4">
         <h1 className="text-4xl md:text-6xl font-black text-white mb-4">

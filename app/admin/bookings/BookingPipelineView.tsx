@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -7,6 +7,7 @@ import { BOOKING_PIPELINE_COLUMNS, BOOKING_STATUS_CONFIG, formatDateShort, forma
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/PipelineBoard';
+import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type PipelineBooking = {
   id: string;
@@ -102,7 +103,6 @@ export default function BookingPipelineView() {
 
   const cancelledCount = bookings.filter((b) => b.status === 'CANCELLED').length;
 
-  // Column totals for metrics
   const columnMetrics = useMemo(() =>
     COLUMNS_DEF.map((col) => {
       const colBookings = bookings.filter((b) => b.status === col.status);
@@ -141,9 +141,8 @@ export default function BookingPipelineView() {
   }, [bookings, toast]);
 
   return (
-    <div className="space-y-3" data-help-title="Pipeline de reserves" data-help-desc="Mostra totes les reserves actives per fase operativa. Pots canviar-ne l'estat des del mateix tauler.">
-      {/* Metrics per column */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" data-help-title="Mètriques de reserves" data-help-desc="Cada targeta resumeix quantes reserves hi ha en cada estat i quin import econòmic acumulen.">
+    <div className="space-y-3" {...helpAttrs(ADMIN_PIPELINE_HELP.booking.board)}>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" {...helpAttrs(ADMIN_PIPELINE_HELP.booking.metrics)}>
         {columnMetrics.map((col) => {
           const conf = BOOKING_STATUS_CONFIG[col.status];
           return (
@@ -157,34 +156,37 @@ export default function BookingPipelineView() {
       </div>
 
       {cancelledCount > 0 && (
-        <p className="text-xs text-center" data-help-title="Cancel·lades ocultes" data-help-desc="Les reserves cancel·lades no es mostren al kanban principal per no embrutar l'operativa activa.">
+        <p className="text-xs text-center" {...helpAttrs(ADMIN_PIPELINE_HELP.booking.hiddenCancelled)}>
           + {cancelledCount} cancel·lad{cancelledCount === 1 ? 'a' : 'es'} (ocultes del kanban)
         </p>
       )}
 
       {COLUMNS_DEF.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 md:hidden" data-help-title="Indicador de columna mòbil" data-help-desc="En mòbil serveix per saltar ràpidament entre columnes del kanban i saber on ets situat.">
-          {COLUMNS_DEF.map((col, index) => (
-            <button
-              key={col.status}
-              type="button"
-              onClick={() => {
-                const board = boardRef.current;
-                const column = board?.querySelector(`[data-pipeline-column="${col.status}"]`);
-                column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-              }}
-              className={`h-2.5 rounded-full transition-all ${
-                index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-black/15 dark:bg-white/20'
-              }`}
-              aria-label={`Anar a ${col.label}`}
-              aria-pressed={index === activeColumnIndex}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-1.5 md:hidden" {...helpAttrs(ADMIN_PIPELINE_HELP.booking.mobileColumnPicker)}>
+          {COLUMNS_DEF.map((col, index) => {
+            const help = ADMIN_PIPELINE_HELP.booking.moveTo(col.label);
+            return (
+              <button
+                key={col.status}
+                type="button"
+                onClick={() => {
+                  const board = boardRef.current;
+                  const column = board?.querySelector(`[data-pipeline-column="${col.status}"]`);
+                  column?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }}
+                className={`h-2.5 rounded-full transition-all ${
+                  index === activeColumnIndex ? 'w-6 bg-[var(--admin-accent)]' : 'w-2.5 bg-black/15 dark:bg-white/20'
+                }`}
+                aria-label={help.title}
+                aria-pressed={index === activeColumnIndex}
+                {...helpAttrs(help)}
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Kanban board */}
-      <div data-help-title="Kanban de reserves" data-help-desc="Arrossega o canvia l'estat de cada reserva segons el punt operatiu: confirmada, preparada, completada o altres fases.">
+      <div {...helpAttrs(ADMIN_PIPELINE_HELP.booking.kanban)}>
         <PipelineBoard<PipelineBooking>
           columnsDef={COLUMNS_DEF}
           items={bookings}
@@ -219,8 +221,6 @@ export default function BookingPipelineView() {
   );
 }
 
-/* ── Card de reserva ────────────────────────────────────────────── */
-
 function BookingCard({
   booking,
   ctx,
@@ -234,16 +234,17 @@ function BookingCard({
   const col = COLUMNS_DEF[statusIndex];
   const canForward = statusIndex < columnCount - 1;
   const canBack = statusIndex > 0;
+  const cardHelp = ADMIN_PIPELINE_HELP.booking.card(booking.reference, booking.clientName);
 
   return (
     <div
       {...dragHandlers}
-      aria-label={`Reserva ${booking.reference} — arrossega per moure`} data-help-title={booking.reference} data-help-desc={`Reserva de ${booking.clientName}. Pots obrir-la, revisar imports i moure-la a un altre estat.`}
+      aria-label={`Reserva ${booking.reference} — arrossega per moure`}
+      {...helpAttrs(cardHelp)}
       className={`admin-drag-item rounded-xl border p-3 transition-all hover:brightness-105 ${col.cardTone} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
-      {/* Header: ref + arrows */}
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/admin/bookings/${booking.id}`}
@@ -252,34 +253,41 @@ function BookingCard({
           {booking.reference}
         </Link>
         <div className="flex items-center gap-1 shrink-0">
-          {canBack && (
-            <button
-              type="button"
-              onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex - 1].status)}
-              disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
-              title={`Moure a ${COLUMNS_DEF[statusIndex - 1].label}`}
-              aria-label={`Moure reserva a ${COLUMNS_DEF[statusIndex - 1].label}`}
-            >
-              ←
-            </button>
-          )}
-          {canForward && (
-            <button
-              type="button"
-              onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex + 1].status)}
-              disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
-              title={`Moure a ${COLUMNS_DEF[statusIndex + 1].label}`}
-              aria-label={`Moure reserva a ${COLUMNS_DEF[statusIndex + 1].label}`}
-            >
-              →
-            </button>
-          )}
+          {canBack && (() => {
+            const help = ADMIN_PIPELINE_HELP.booking.moveTo(COLUMNS_DEF[statusIndex - 1].label);
+            return (
+              <button
+                type="button"
+                onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex - 1].status)}
+                disabled={isUpdating}
+                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                title={help.title}
+                aria-label={help.title}
+                {...helpAttrs(help)}
+              >
+                ←
+              </button>
+            );
+          })()}
+          {canForward && (() => {
+            const help = ADMIN_PIPELINE_HELP.booking.moveTo(COLUMNS_DEF[statusIndex + 1].label);
+            return (
+              <button
+                type="button"
+                onClick={() => onMoveStatus(booking.id, COLUMNS_DEF[statusIndex + 1].status)}
+                disabled={isUpdating}
+                className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
+                title={help.title}
+                aria-label={help.title}
+                {...helpAttrs(help)}
+              >
+                →
+              </button>
+            );
+          })()}
         </div>
       </div>
 
-      {/* Client name */}
       <p className="text-xs mt-1 truncate">
         {booking.customerId ? (
           <Link href={`/admin/clientes/${booking.customerId}`} className="hover:underline">
@@ -288,7 +296,6 @@ function BookingCard({
         ) : booking.clientName}
       </p>
 
-      {/* Indicators */}
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
         <span className="text-[10px]">{formatDateShort(booking.eventDate)}</span>
         <span className="font-semibold text-[10px]">{formatCurrency(booking.total)}</span>
@@ -304,25 +311,23 @@ function BookingCard({
         )}
       </div>
 
-      {/* Mobile move buttons */}
       <div className="mt-2 flex gap-1 md:hidden">
-        {COLUMNS_DEF.filter((c) => c.status !== COLUMNS_DEF[statusIndex].status).map((target) => (
-          <button
-            key={target.status}
-            onClick={() => onMoveStatus(booking.id, target.status)}
-            disabled={isUpdating}
-            className="ap-btn ap-btn--secondary flex-1 px-2.5 py-2 text-xs min-h-[44px] disabled:opacity-50"
-            aria-label={`Moure reserva a ${target.label}`}
-          >
-            {target.label}
-          </button>
-        ))}
+        {COLUMNS_DEF.filter((c) => c.status !== COLUMNS_DEF[statusIndex].status).map((target) => {
+          const help = ADMIN_PIPELINE_HELP.booking.moveTo(target.label);
+          return (
+            <button
+              key={target.status}
+              onClick={() => onMoveStatus(booking.id, target.status)}
+              disabled={isUpdating}
+              className="ap-btn ap-btn--secondary flex-1 px-2.5 py-2 text-xs min-h-[44px] disabled:opacity-50"
+              aria-label={help.title}
+              {...helpAttrs(help)}
+            >
+              {target.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
-
-
-
-
-

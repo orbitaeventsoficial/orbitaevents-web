@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import LanguageSelector, { LanguageSelectorMobile } from './LanguageSelector';
 import { WHATSAPP_URL } from '@/lib/constants';
+import { PUBLIC_CORE_SERVICE_NAV } from '@/lib/publicServiceCatalog';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVEGACIÓ - Configuració amb claus de traducció
@@ -37,10 +38,12 @@ const navItemsConfig: NavItemConfig[] = [
     href: '/servicios',
     dropdownType: 'services',
     dropdown: [
-      { labelKey: 'bodas', descKey: 'bodasDesc', href: '/servicios/bodas', icon: '💍' },
-      { labelKey: 'fiestas', descKey: 'fiestasDesc', href: '/servicios/fiestas', icon: '🎉' },
-      { labelKey: 'discomovil', descKey: 'discomovilDesc', href: '/servicios/discomovil', icon: '🎵' },
-      { labelKey: 'empresas', descKey: 'empresasDesc', href: '/servicios/empresas', icon: '💼' },
+      ...PUBLIC_CORE_SERVICE_NAV.map((service) => ({
+        labelKey: service.key,
+        descKey: service.headerDescKey,
+        href: service.href,
+        icon: service.icon,
+      })),
       { labelKey: 'monMagic', descKey: 'monMagicDesc', href: '/tematica-mon-magic', icon: '⚡', badge: 'EXCLUSIU' },
       { labelKey: 'halloween', descKey: 'halloweenDesc', href: '/tematica-halloween', icon: '🎃' },
     ]
@@ -181,7 +184,7 @@ export default function HeaderChampion() {
             {/* ════════════════════════════════════════════════════════════ */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 group shrink-0"
+              className="flex items-center gap-4 group shrink-0"
               style={{ touchAction: 'manipulation' }}
             >
               <Image
@@ -589,6 +592,3 @@ export default function HeaderChampion() {
     </>
   );
 }
-
-
-

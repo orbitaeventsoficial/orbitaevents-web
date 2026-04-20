@@ -1,3 +1,5 @@
+import { resolveEquipmentCatalogKey } from '@/lib/equipment-i18n';
+
 /**
  * INVENTARIO REAL DE EQUIPAMIENTO - ÒRBITA EVENTS
  */
@@ -36,17 +38,17 @@ export interface Equipment {
 export const CONTROLLERS: Equipment[] = [
   {
     id: "ddj-rev7",
-    name: "Pioneer DDJ-REV7",
+    name: "equipmentCatalog.items.ddj-rev7.name",
     brand: "Pioneer DJ",
     model: "DDJ-REV7",
     category: "controller",
     quantity: 1,
     specs: {
-      channels: "2 canales",
-      effects: "Profesional con FX",
-      connectivity: "USB, MIDI",
+      channels: "equipmentCatalog.items.ddj-rev7.specs.channels",
+      effects: "equipmentCatalog.items.ddj-rev7.specs.effects",
+      connectivity: "equipmentCatalog.items.ddj-rev7.specs.connectivity",
     },
-    description: "Controladora profesional Pioneer DJ de nivel club con motorized platters",
+    description: "equipmentCatalog.items.ddj-rev7.description",
     condition: "excellent",
     images: [
       "/img/equipment/ddj-rev7.webp"
@@ -60,17 +62,17 @@ export const CONTROLLERS: Equipment[] = [
 export const SPEAKERS: Equipment[] = [
   {
     id: "ev-etx-12p",
-    name: "EV ETX 2000W",
+    name: "equipmentCatalog.items.ev-etx-12p.name",
     brand: "Electro-Voice",
     model: "ETX-12P",
     category: "speaker",
     quantity: 2,
     specs: {
-      power: "2000W por unidad (4000W total)",
-      coverage: "Hasta 150-200 personas",
-      type: "Altavoz activo profesional",
+      power: "equipmentCatalog.items.ev-etx-12p.specs.power",
+      coverage: "equipmentCatalog.items.ev-etx-12p.specs.coverage",
+      type: "equipmentCatalog.items.ev-etx-12p.specs.type",
     },
-    description: "Sistema de altavoces profesional Electro-Voice, sonido cristalino y potente para cualquier evento",
+    description: "equipmentCatalog.items.ev-etx-12p.description",
     condition: "excellent",
     images: [
       "/img/equipment/ev-etx.webp"
@@ -84,57 +86,57 @@ export const SPEAKERS: Equipment[] = [
 export const LIGHTING: Equipment[] = [
   {
     id: "led-bash-bateria",
-    name: "LED Bash a Batería",
+    name: "equipmentCatalog.items.led-bash-bateria.name",
     brand: "Bash",
     category: "lighting",
     quantity: 2,
     specs: {
-      type: "Foco LED RGB a batería",
-      power: "LED de alta potencia",
-      modes: "Auto, Sound-activated, DMX",
-      battery: "Autonomía 8-12 horas",
+      type: "equipmentCatalog.items.led-bash-bateria.specs.type",
+      power: "equipmentCatalog.items.led-bash-bateria.specs.power",
+      modes: "equipmentCatalog.items.led-bash-bateria.specs.modes",
+      battery: "equipmentCatalog.items.led-bash-bateria.specs.battery",
     },
-    description: "Focos LED a batería ideales para iluminación sin cables en cualquier ubicación",
+    description: "equipmentCatalog.items.led-bash-bateria.description",
     condition: "excellent",
   },
   {
     id: "multibos-led",
-    name: "Multibos LED",
+    name: "equipmentCatalog.items.multibos-led.name",
     category: "lighting",
     quantity: 1,
     specs: {
-      type: "Sistema de iluminación completo",
-      coverage: "Ideal para fiestas hasta 50 personas",
-      modes: "Múltiples programas automáticos",
+      type: "equipmentCatalog.items.multibos-led.specs.type",
+      coverage: "equipmentCatalog.items.multibos-led.specs.coverage",
+      modes: "equipmentCatalog.items.multibos-led.specs.modes",
     },
-    description: "Sistema de iluminación compacto y versátil, perfecto para eventos pequeños y medianos",
+    description: "equipmentCatalog.items.multibos-led.description",
     condition: "excellent",
   },
   {
     id: "cabezas-moviles-beam",
-    name: "Cabezas Móviles Beam 150W LED",
+    name: "equipmentCatalog.items.cabezas-moviles-beam.name",
     category: "lighting",
     quantity: 4,
     specs: {
-      power: "150W LED por unidad",
-      type: "Moving Head Beam",
-      colors: "RGBW + Color Wheel",
-      modes: "Auto, Sound, DMX512",
+      power: "equipmentCatalog.items.cabezas-moviles-beam.specs.power",
+      type: "equipmentCatalog.items.cabezas-moviles-beam.specs.type",
+      colors: "equipmentCatalog.items.cabezas-moviles-beam.specs.colors",
+      modes: "equipmentCatalog.items.cabezas-moviles-beam.specs.modes",
     },
-    description: "Cabezas móviles tipo Beam profesionales, efectos espectaculares de luz",
+    description: "equipmentCatalog.items.cabezas-moviles-beam.description",
     condition: "excellent",
   },
   {
     id: "esferas-luz-calida",
-    name: "Esferas de Luz Cálida",
+    name: "equipmentCatalog.items.esferas-luz-calida.name",
     category: "lighting",
     quantity: 2,
     specs: {
-      type: "Iluminación ambiental",
-      power: "Alta potencia",
-      color: "Luz cálida",
+      type: "equipmentCatalog.items.esferas-luz-calida.specs.type",
+      power: "equipmentCatalog.items.esferas-luz-calida.specs.power",
+      color: "equipmentCatalog.items.esferas-luz-calida.specs.color",
     },
-    description: "Esferas de luz muy cálidas y potentes, ideales para dar ambiente e iluminación al punto",
+    description: "equipmentCatalog.items.esferas-luz-calida.description",
     condition: "excellent",
   },
 ];
@@ -145,30 +147,30 @@ export const LIGHTING: Equipment[] = [
 export const EFFECTS: Equipment[] = [
   {
     id: "maquina-humo-1800w",
-    name: "Máquina de Humo 1800W",
+    name: "equipmentCatalog.items.maquina-humo-1800w.name",
     category: "effect",
     quantity: 1,
     specs: {
-      power: "1800W",
-      output: "Alta producción de humo",
-      fluid: "Líquido profesional bajo olor",
-      heatUpTime: "5 minutos",
+      power: "equipmentCatalog.items.maquina-humo-1800w.specs.power",
+      output: "equipmentCatalog.items.maquina-humo-1800w.specs.output",
+      fluid: "equipmentCatalog.items.maquina-humo-1800w.specs.fluid",
+      heatUpTime: "equipmentCatalog.items.maquina-humo-1800w.specs.heatUpTime",
     },
-    description: "Máquina de humo profesional 1800W para efectos ambientales. Incluida en todos los packs.",
+    description: "equipmentCatalog.items.maquina-humo-1800w.description",
     condition: "excellent",
   },
   {
     id: "maquina-humo-bajo-3000w",
-    name: "Máquina de Humo Bajo 3000W",
+    name: "equipmentCatalog.items.maquina-humo-bajo-3000w.name",
     category: "effect",
     quantity: 0, // ALQUILER - No propio
     specs: {
-      power: "3000W",
-      type: "Low fog machine",
-      coverage: "Efecto de niebla a nivel del suelo",
-      note: "ALQUILER DISPONIBLE - Precio a consultar",
+      power: "equipmentCatalog.items.maquina-humo-bajo-3000w.specs.power",
+      type: "equipmentCatalog.items.maquina-humo-bajo-3000w.specs.type",
+      coverage: "equipmentCatalog.items.maquina-humo-bajo-3000w.specs.coverage",
+      note: "equipmentCatalog.items.maquina-humo-bajo-3000w.specs.note",
     },
-    description: "Máquina de humo bajo 3000W para efectos dramáticos a nivel del suelo (primeros bailes, entradas). Disponible mediante alquiler.",
+    description: "equipmentCatalog.items.maquina-humo-bajo-3000w.description",
     condition: "excellent",
   },
 ];
@@ -179,76 +181,76 @@ export const EFFECTS: Equipment[] = [
 export const ACCESSORIES: Equipment[] = [
   {
     id: "cabina-dj",
-    name: "Cabina DJ Profesional",
+    name: "equipmentCatalog.items.cabina-dj.name",
     category: "accessory",
     quantity: 1,
     specs: {
-      material: "Estructura profesional",
-      includes: "Soporte controladora + iluminación integrada",
+      material: "equipmentCatalog.items.cabina-dj.specs.material",
+      includes: "equipmentCatalog.items.cabina-dj.specs.includes",
     },
-    description: "Cabina DJ profesional, presentación elegante y funcional para cualquier evento",
+    description: "equipmentCatalog.items.cabina-dj.description",
     condition: "excellent",
   },
   {
     id: "microfono-inalambrico",
-    name: "Micrófono Inalámbrico",
+    name: "equipmentCatalog.items.microfono-inalambrico.name",
     category: "accessory",
     quantity: 1,
     specs: {
-      type: "Wireless",
-      range: "Hasta 100m",
-      batteryLife: "8-10 horas",
+      type: "equipmentCatalog.items.microfono-inalambrico.specs.type",
+      range: "equipmentCatalog.items.microfono-inalambrico.specs.range",
+      batteryLife: "equipmentCatalog.items.microfono-inalambrico.specs.batteryLife",
     },
-    description: "Micrófono inalámbrico profesional para discursos, ceremonias y karaoke",
+    description: "equipmentCatalog.items.microfono-inalambrico.description",
     condition: "excellent",
   },
   {
     id: "tripodes",
-    name: "Trípodes Profesionales",
+    name: "equipmentCatalog.items.tripodes.name",
     category: "accessory",
     quantity: 4,
     specs: {
-      height: "Hasta 3 metros",
-      type: "T-bar stands",
-      material: "Aluminio profesional",
+      height: "equipmentCatalog.items.tripodes.specs.height",
+      type: "equipmentCatalog.items.tripodes.specs.type",
+      material: "equipmentCatalog.items.tripodes.specs.material",
     },
-    description: "Trípodes profesionales para iluminación y efectos",
+    description: "equipmentCatalog.items.tripodes.description",
     condition: "excellent",
   },
   {
     id: "cableado-profesional",
-    name: "Cableado Profesional Completo",
+    name: "equipmentCatalog.items.cableado-profesional.name",
     category: "accessory",
     quantity: 1, // Set completo
     specs: {
-      includes: "XLR, DMX, Power, Audio",
-      length: "Múltiples longitudes disponibles",
+      includes: "equipmentCatalog.items.cableado-profesional.specs.includes",
+      length: "equipmentCatalog.items.cableado-profesional.specs.length",
     },
-    description: "Kit completo de cableado profesional certificado (audio, DMX, alimentación)",
+    description: "equipmentCatalog.items.cableado-profesional.description",
     condition: "excellent",
   },
   {
     id: "atrezzo-mon-magic",
-    name: "Atrezzo Temàtic Món Màgic",
+    name: "equipmentCatalog.items.atrezzo-mon-magic.name",
     category: "other",
     quantity: 1, // Set completo
     specs: {
-      includes: "Decoración temática completa",
-      theme: "Món Màgic",
+      includes: "equipmentCatalog.items.atrezzo-mon-magic.specs.includes",
+      theme: "equipmentCatalog.items.atrezzo-mon-magic.specs.theme",
     },
-    description: "Set completo de atrezzo temático de escuela de brujos para crear experiencias mágicas inolvidables",
+    description: "equipmentCatalog.items.atrezzo-mon-magic.description",
     condition: "excellent",
   },
   {
     id: "atrezzo-halloween",
-    name: "Atrezzo Temático Halloween",
+    name: "equipmentCatalog.items.atrezzo-halloween.name",
     category: "other",
     quantity: 1, // Set completo
     specs: {
-      includes: "Decoración temática completa",
-      theme: "Halloween",
+      includes: "equipmentCatalog.items.atrezzo-halloween.specs.includes",
+      theme: "equipmentCatalog.items.atrezzo-halloween.specs.theme",
     },
-    description: "Set completo de atrezzo temático de Halloween para fiestas terroríficamente divertidas",
+    description: "equipmentCatalog.items.atrezzo-halloween.description",
     condition: "excellent",
   },
 ];
@@ -339,3 +341,19 @@ export function validateInventory(): string[] {
 export default ALL_EQUIPMENT;
 
 
+
+export function getLocalizedEquipmentCatalog(locale: string): Equipment[] {
+  return ALL_EQUIPMENT.map((item) => ({
+    ...item,
+    name: resolveEquipmentCatalogKey(item.name, locale) || item.name,
+    description: resolveEquipmentCatalogKey(item.description, locale) || item.description,
+    specs: resolveLocalizedSpecs(item.specs, locale),
+  }));
+}
+
+function resolveLocalizedSpecs(specs: Equipment['specs'] | undefined, locale: string): Equipment['specs'] | undefined {
+  if (!specs) return specs;
+  return Object.fromEntries(
+    Object.entries(specs).map(([key, value]) => [key, resolveEquipmentCatalogKey(value, locale) || value])
+  );
+}

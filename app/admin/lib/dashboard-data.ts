@@ -6,7 +6,7 @@ import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
-import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS } from '@/lib/constants';
+import { formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN, EVENT_TYPE_CHART_COLORS, TASK_SOURCE } from '@/lib/constants';
 import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
@@ -235,8 +235,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery(`admin:dashboard:leads:stale:${dayKey}`, () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:hot', () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] }, priority: { in: ['HIGH', 'URGENT'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:quotes-in-flight', () => prisma.lead.count({ where: { status: { in: ['QUOTE_SENT', 'NEGOTIATING'] } } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery(`admin:dashboard:checklist:done:${dayKey}`, () => prisma.task.count({ where: { createdBy: 'system:daily-checklist', createdAt: { gte: todayStart, lte: todayEnd }, status: 'DONE' } }), CacheTTL.SHORT).catch(() => 0),
-    cachedQuery(`admin:dashboard:checklist:pending:${dayKey}`, () => prisma.task.count({ where: { createdBy: 'system:daily-checklist', createdAt: { gte: todayStart, lte: todayEnd }, status: { in: ['OPEN', 'IN_PROGRESS'] } } }), CacheTTL.SHORT).catch(() => 0),
+    cachedQuery(`admin:dashboard:checklist:done:${dayKey}`, () => prisma.task.count({ where: { source: TASK_SOURCE.CHECKLIST, createdAt: { gte: todayStart, lte: todayEnd }, status: 'DONE' } }), CacheTTL.SHORT).catch(() => 0),
+    cachedQuery(`admin:dashboard:checklist:pending:${dayKey}`, () => prisma.task.count({ where: { source: TASK_SOURCE.CHECKLIST, createdAt: { gte: todayStart, lte: todayEnd }, status: { in: ['OPEN', 'IN_PROGRESS'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:command:leads', () => prisma.lead.findMany({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } }, orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }], take: 6, select: { id: true, name: true, status: true, priority: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:margin:avg', () => prisma.booking.findMany({

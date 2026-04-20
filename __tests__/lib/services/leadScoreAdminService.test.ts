@@ -93,3 +93,42 @@ describe('createAdminLeadScoreSnapshot', () => {
     });
   });
 });
+
+// Regressió: `getAdminLeadScore` i `createAdminLeadScoreSnapshot` han de
+// propagar un `now?: Date` a `scoreLead` (i tenir un default de `new Date()`).
+// Abans, cridaven `scoreLead(lead)` sense `now`, de manera que l'endpoint
+// `/api/admin/leads/[id]/score` i la snapshot activity usaven el clock real
+// del server i no eren testables deterministament, tot i que `computeLeadInsights`
+// (Canvi #274) ja ho feia per al render del detall de lead.
+describe('propagació de `now` a scoreLead', () => {
+  it('getAdminLeadScore: passa el `now` injectat a scoreLead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(MOCK_LEAD);
+    const injectedNow = new Date('2026-06-15T12:00:00Z');
+
+    await getAdminLeadScore('lead-1', injectedNow);
+
+    expect(mockScoreLead).toHaveBeenCalledWith(
+      expect.objectContaining({ now: injectedNow }),
+    );
+  });
+
+  it('createAdminLeadScoreSnapshot: passa el `now` injectat a scoreLead', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(MOCK_LEAD);
+    const injectedNow = new Date('2026-06-15T12:00:00Z');
+
+    await createAdminLeadScoreSnapshot('lead-1', injectedNow);
+
+    expect(mockScoreLead).toHaveBeenCalledWith(
+      expect.objectContaining({ now: injectedNow }),
+    );
+  });
+
+  it('getAdminLeadScore: sense `now` explícit, usa un default (Date) i no string/undefined', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue(MOCK_LEAD);
+
+    await getAdminLeadScore('lead-1');
+
+    const passedInput = mockScoreLead.mock.calls[0][0] as Record<string, unknown>;
+    expect(passedInput.now).toBeInstanceOf(Date);
+  });
+});

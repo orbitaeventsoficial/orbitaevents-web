@@ -1,6 +1,7 @@
 import { EventType } from '@prisma/client';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
@@ -53,19 +54,33 @@ async function generateReference(): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `OE-${year}-`;
 
-  const lastBooking = await prisma.booking.findFirst({
-    where: { reference: { startsWith: prefix } },
-    orderBy: { reference: 'desc' },
-  });
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const lastBooking = await prisma.booking.findFirst({
+      where: { reference: { startsWith: prefix } },
+      orderBy: { reference: 'desc' },
+    });
 
-  let nextNumber = 1;
-  if (lastBooking) {
-    const raw = lastBooking.reference.split('-').pop();
-    const lastNumber = Number.parseInt(raw || '0', 10) || 0;
-    nextNumber = lastNumber + 1;
+    let nextNumber = 1;
+    if (lastBooking) {
+      const raw = lastBooking.reference.split('-').pop();
+      const lastNumber = Number.parseInt(raw || '0', 10) || 0;
+      nextNumber = lastNumber + 1 + attempt; // offset per retry
+    }
+
+    const candidate = `${prefix}${String(nextNumber).padStart(3, '0')}`;
+
+    // Verificar que no existeix (protecció contra race condition)
+    const exists = await prisma.booking.findUnique({
+      where: { reference: candidate },
+      select: { id: true },
+    });
+    if (!exists) return candidate;
   }
 
-  return `${prefix}${String(nextNumber).padStart(3, '0')}`;
+  // Fallback: afegir timestamp per garantir unicitat
+  const ts = Date.now().toString(36);
+  return `${prefix}${ts}`;
 }
 
 async function ensureOperatorSupportExtraId(): Promise<string> {
@@ -119,16 +134,26 @@ async function assignPackInventory(bookingId: string, packId: string) {
       include: { item: true },
     });
 
-    for (const row of packInventory) {
-      const overlapping = await prisma.bookingInventory.count({
-        where: {
-          itemId: row.itemId,
-          bookingId: { not: bookingId },
-          booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
-        },
-      });
-      if (overlapping > 0) continue;
+    if (packInventory.length === 0) return;
 
+    const itemIds = packInventory.map((r) => r.itemId);
+
+    // Batch: trobar tots els items ja assignats a reserves actives
+    const overlappingItems = await prisma.bookingInventory.groupBy({
+      by: ['itemId'],
+      where: {
+        itemId: { in: itemIds },
+        bookingId: { not: bookingId },
+        booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+      },
+    });
+    const busyItemIds = new Set(overlappingItems.map((o) => o.itemId));
+
+    // Filtrar items disponibles
+    const available = packInventory.filter((r) => !busyItemIds.has(r.itemId));
+
+    // Batch upsert dels disponibles
+    for (const row of available) {
       await prisma.bookingInventory.upsert({
         where: { bookingId_itemId: { bookingId, itemId: row.itemId } },
         create: {
@@ -143,7 +168,7 @@ async function assignPackInventory(bookingId: string, packId: string) {
       });
     }
   } catch (assignError) {
-    log.warn('No s’ha pogut auto-assignar inventari del pack a la reserva', {
+    log.warn('No s\'ha pogut auto-assignar inventari del pack a la reserva', {
       context: {
         bookingId,
         packId,
@@ -273,7 +298,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
     await prisma.customerActivity.create({
       data: {
         customerId: linkedCustomerId,
-        action: 'BOOKING_CREATED',
+        action: CUSTOMER_ACTIVITY_ACTIONS.BOOKING_CREATED,
         details: {
           bookingId: booking.id,
           reference: booking.reference,
@@ -298,6 +323,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
         status: 'OPEN',
         priority: 'HIGH',
         createdBy: 'system:auto-booking-create',
+        source: TASK_SOURCE.BOOKING_CREATION,
       },
     });
   }

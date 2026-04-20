@@ -4,7 +4,28 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ACTIVITY_CATEGORY_OPTIONS, ACTIVITY_DAYS_OPTIONS, formatDateTimeFull } from '@/lib/constants';
 import { ADMIN_ACTIVITY_ACTION_META, ADMIN_ACTIVITY_ENTITY_LINKS, ADMIN_ACTIVITY_STATS_CARDS } from '@/lib/constants/admin';
+import { log } from '@/lib/logger';
 import { useToast } from '../components/ToastProvider';
+
+interface TimelineLink {
+  label: string;
+  href: string;
+}
+
+interface TimelineEntry {
+  id: string;
+  source: 'customerActivity' | 'leadActivity' | 'adminLog';
+  entityType: string;
+  entityId?: string | null;
+  kind: string;
+  title: string;
+  body?: string;
+  actor?: string;
+  occurredAt: string;
+  metadata?: Record<string, unknown>;
+  link?: TimelineLink;
+  timelineType: string;
+}
 
 interface ActivityLog {
   id: string;
@@ -14,6 +35,7 @@ interface ActivityLog {
   details: Record<string, unknown> | null;
   category: string;
   createdAt: string;
+  timeline?: TimelineEntry;
 }
 
 interface CategoryStats {
@@ -44,6 +66,23 @@ function getActionMeta(action: string) {
   return ADMIN_ACTIVITY_ACTION_META[action] || { label: action, icon: '•', tone: 'admin-tone-text-neutral' };
 }
 
+function getSourceLabel(source?: TimelineEntry['source']): string {
+  if (source === 'customerActivity') return 'Client';
+  if (source === 'leadActivity') return 'Lead';
+  if (source === 'adminLog') return 'Sistema';
+  return 'Activitat';
+}
+
+function getKindLabel(kind?: string): string {
+  if (kind === 'message') return 'Comunicació';
+  if (kind === 'task') return 'Tasca';
+  if (kind === 'booking') return 'Reserva';
+  if (kind === 'proposal') return 'Pressupost';
+  if (kind === 'system') return 'Sistema';
+  if (kind === 'crud') return 'Operació';
+  return 'Activitat';
+}
+
 function formatDetails(details: Record<string, unknown> | null): string {
   if (!details) return '';
   const parts: string[] = [];
@@ -62,6 +101,19 @@ function formatDetails(details: Record<string, unknown> | null): string {
       .join(' · ');
   }
   return parts.join(' · ');
+}
+
+function getEntityLink(log: ActivityLog): string | null {
+  if (log.timeline?.link?.href) return log.timeline.link.href;
+  if (log.entityId && ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]) {
+    return `${ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]}/${log.entityId}`;
+  }
+  return null;
+}
+
+function getEntityLabel(log: ActivityLog): string {
+  if (log.timeline?.entityType && log.timeline.entityType !== 'other') return log.timeline.entityType;
+  return log.entity;
 }
 
 export default function ActivityClient() {
@@ -86,7 +138,7 @@ export default function ActivityClient() {
       const json: ActivityResponse = await res.json();
       setData(json);
     } catch (err) {
-      console.error('Activity fetch error:', err);
+      log.error('Activity fetch error', err);
       toast.error(err instanceof Error ? err.message : 'Error carregant activitat');
     } finally {
       setLoading(false);
@@ -116,12 +168,12 @@ export default function ActivityClient() {
           <button
             key={key}
             onClick={() => setCategory(category === key ? 'all' : key)}
-            className={`ap-card rounded-2xl p-4 text-left transition-all ${
-              category === key ? cardTone : 'admin-tone-idle hover:admin-tone-bg-neutral'
+            className={`admin-stagger-item rounded-2xl border border-white/10 p-4 text-left transition-all ${
+              category === key ? cardTone : 'admin-card-glass hover:bg-white/[0.03]'
             }`}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wide admin-tone-text-neutral">
+              <span className="text-xs uppercase tracking-wide opacity-60">
                 {icon} {label}
               </span>
               <span className={`text-xl font-bold ${total > 0 ? textTone : 'admin-tone-text-neutral'}`}>
@@ -177,7 +229,7 @@ export default function ActivityClient() {
           </select>
 
           <button onClick={fetchActivity} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" aria-label="Refrescar">
-            🔄
+            ↻
           </button>
         </div>
       </div>
@@ -193,50 +245,59 @@ export default function ActivityClient() {
 
       {!loading && data && (
         <>
-          <div className="mb-2 text-xs admin-tone-text-slate">
-            {data.total} accions en {days === 1 ? 'les últimes 24h' : `els últims ${days} dies`}
-            {data.pages > 1 && ` · Pàg. ${data.page}/${data.pages}`}
+          <div className="mb-2 flex flex-wrap items-center gap-2 text-xs admin-tone-text-slate">
+            <span>{data.total} accions en {days === 1 ? 'les últimes 24h' : `els últims ${days} dies`}</span>
+            {data.pages > 1 && <span>· Pàg. {data.page}/{data.pages}</span>}
+            <span>· Timeline canònica disponible</span>
           </div>
 
           <section className="space-y-3 lg:hidden" aria-label="Registre d'activitat del sistema">
             {data.logs.length === 0 ? (
-              <div className="ap-card ap-empty rounded-2xl">
+              <div className="admin-card-glass rounded-2xl border border-white/10 p-8 text-center">
                 <p className="ap-empty-title">Cap activitat en aquest període</p>
               </div>
             ) : (
-              data.logs.map((log) => {
-                const meta = getActionMeta(log.action);
-                const entityLink =
-                  log.entityId && ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]
-                    ? `${ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]}/${log.entityId}`
-                    : null;
-                const detailsText = formatDetails(log.details);
+              data.logs.map((entry) => {
+                const meta = getActionMeta(entry.action);
+                const entityLink = getEntityLink(entry);
+                const detailsText = formatDetails(entry.details);
+                const sourceLabel = getSourceLabel(entry.timeline?.source);
+                const kindLabel = getKindLabel(entry.timeline?.kind);
+                const entityLabel = getEntityLabel(entry);
 
                 return (
-                  <article key={log.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
+                  <article key={entry.id} className="admin-stagger-item admin-card-glass block rounded-2xl border border-white/10 p-4 transition-colors hover:bg-white/[0.03]">
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <span className={`${meta.tone} text-sm font-medium`}>
                         {meta.icon} {meta.label}
                       </span>
-                      <span className="whitespace-nowrap text-xs admin-tone-text-slate" title={formatDateTimeFull(log.createdAt)}>
-                        {formatTimeAgo(log.createdAt)}
+                      <span className="max-w-[9rem] truncate text-right text-xs admin-tone-text-slate sm:max-w-none sm:whitespace-nowrap" title={formatDateTimeFull(entry.createdAt)}>
+                        {formatTimeAgo(entry.createdAt)}
                       </span>
                     </div>
 
-                    {log.entity && (
+                    <div className="mb-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide admin-tone-text-neutral">
+                      <span>{sourceLabel}</span>
+                      <span>·</span>
+                      <span>{kindLabel}</span>
+                    </div>
+
+                    <p className="mb-1 text-sm truncate admin-tone-text-neutral">{entry.timeline?.title || meta.label}</p>
+
+                    {entityLabel && (
                       <div className="mb-1 text-sm admin-tone-text-neutral">
                         {entityLink ? (
                           <Link href={entityLink} className="admin-tone-text-info underline decoration-current/30 transition-colors hover:opacity-80">
-                            {log.entity}
-                            {log.entityId && (
-                              <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>
+                            {entityLabel}
+                            {entry.entityId && (
+                              <span className="ml-1 text-xs admin-tone-text-slate">{entry.entityId.slice(0, 8)}</span>
                             )}
                           </Link>
                         ) : (
                           <span>
-                            {log.entity}
-                            {log.entityId && (
-                              <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>
+                            {entityLabel}
+                            {entry.entityId && (
+                              <span className="ml-1 text-xs admin-tone-text-slate">{entry.entityId.slice(0, 8)}</span>
                             )}
                           </span>
                         )}
@@ -250,57 +311,66 @@ export default function ActivityClient() {
             )}
           </section>
 
-          <section className="hidden lg:block ap-table-wrap">
+          <section className="hidden lg:block admin-card-glass rounded-2xl border border-white/10 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="ap-table w-full min-w-[700px] text-sm" aria-label="Registre d'activitat del sistema">
+              <table className="ap-table w-full min-w-[920px] text-sm" aria-label="Registre d'activitat del sistema">
                 <thead className="ap-table-head">
                   <tr>
                     <th scope="col" className="ap-table-th w-16">Quan</th>
                     <th scope="col" className="ap-table-th">Acció</th>
+                    <th scope="col" className="ap-table-th">Font</th>
                     <th scope="col" className="ap-table-th">Entitat</th>
+                    <th scope="col" className="ap-table-th">Lectura</th>
                     <th scope="col" className="ap-table-th">Detalls</th>
                   </tr>
                 </thead>
                 <tbody className="ap-table-body">
                   {data.logs.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-12 text-center admin-tone-text-neutral">
+                      <td colSpan={6} className="px-4 py-12 text-center admin-tone-text-neutral">
                         Cap activitat en aquest període
                       </td>
                     </tr>
                   ) : (
-                    data.logs.map((log) => {
-                      const meta = getActionMeta(log.action);
-                      const entityLink =
-                        log.entityId && ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]
-                          ? `${ADMIN_ACTIVITY_ENTITY_LINKS[log.entity]}/${log.entityId}`
-                          : null;
+                    data.logs.map((entry) => {
+                      const meta = getActionMeta(entry.action);
+                      const entityLink = getEntityLink(entry);
+                      const sourceLabel = getSourceLabel(entry.timeline?.source);
+                      const kindLabel = getKindLabel(entry.timeline?.kind);
+                      const entityLabel = getEntityLabel(entry);
 
                       return (
-                        <tr key={log.id}>
-                          <td className="px-4 py-3 whitespace-nowrap admin-tone-text-slate" title={formatDateTimeFull(log.createdAt)}>
-                            {formatTimeAgo(log.createdAt)}
+                        <tr key={entry.id}>
+                          <td className="max-w-[8rem] px-4 py-3 truncate admin-tone-text-slate xl:max-w-none xl:whitespace-nowrap" title={formatDateTimeFull(entry.createdAt)}>
+                            {formatTimeAgo(entry.createdAt)}
                           </td>
                           <td className="px-4 py-3">
                             <span className={`${meta.tone} font-medium`}>
                               {meta.icon} {meta.label}
                             </span>
                           </td>
+                          <td className="px-4 py-3 text-xs admin-tone-text-slate">
+                            {sourceLabel}
+                            <span className="ml-2 admin-tone-text-neutral">{kindLabel}</span>
+                          </td>
                           <td className="px-4 py-3 admin-tone-text-neutral">
                             {entityLink ? (
                               <Link href={entityLink} className="admin-tone-text-info underline decoration-current/30 transition-colors hover:opacity-80">
-                                {log.entity}
-                                {log.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>}
+                                {entityLabel}
+                                {entry.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{entry.entityId.slice(0, 8)}</span>}
                               </Link>
                             ) : (
                               <span>
-                                {log.entity}
-                                {log.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{log.entityId.slice(0, 8)}</span>}
+                                {entityLabel}
+                                {entry.entityId && <span className="ml-1 text-xs admin-tone-text-slate">{entry.entityId.slice(0, 8)}</span>}
                               </span>
                             )}
                           </td>
-                          <td className="max-w-xs truncate px-4 py-3 text-xs admin-tone-text-slate" title={log.details ? JSON.stringify(log.details) : ''}>
-                            {formatDetails(log.details)}
+                          <td className="max-w-sm px-4 py-3 text-sm admin-tone-text-neutral">
+                            {entry.timeline?.title || meta.label}
+                          </td>
+                          <td className="max-w-xs truncate px-4 py-3 text-xs admin-tone-text-slate" title={entry.details ? JSON.stringify(entry.details) : ''}>
+                            {formatDetails(entry.details)}
                           </td>
                         </tr>
                       );

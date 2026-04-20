@@ -6,6 +6,8 @@ import { AdminPage, AdminKpiRow, AdminKpi } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateTime } from '@/lib/constants';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { log } from '@/lib/logger';
 
 type Testimonial = {
   id: string;
@@ -34,7 +36,7 @@ function StarRating({ rating }: { rating: number }) {
             key={star}
             className={`text-sm ${fill >= 1 ? 'text-amber-400' : fill > 0 ? 'text-amber-400/50' : 'text-white/10'}`}
           >
-            ★
+            â˜…
           </span>
         );
       })}
@@ -51,6 +53,7 @@ export default function AdminRessenyesPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [canvasPreview, setCanvasPreview] = useState<{ id: string; url: string } | null>(null);
   const toast = useToast();
+  const { confirm, dialogProps } = useConfirmDialog();
 
   const activeList = useMemo(
     () => (activeTab === 'pending' ? pending : approved),
@@ -83,7 +86,7 @@ export default function AdminRessenyesPage() {
       setPending(pendingData.testimonials || []);
       setApproved(approvedData.testimonials || []);
     } catch (error) {
-      console.error('[AdminRessenyes] Error carregant ressenyes:', error);
+      log.error('[AdminRessenyes] Error carregant ressenyes', error);
       toast.error('Error carregant ressenyes');
     } finally {
       setLoading(false);
@@ -95,7 +98,15 @@ export default function AdminRessenyesPage() {
   }, [load]);
 
   const updateStatus = async (id: string, action: 'approve' | 'hide' | 'delete') => {
-    if (action === 'delete' && !window.confirm('Segur que vols eliminar aquest testimoni? Aquesta acció no es pot desfer.')) return;
+    if (action === 'delete') {
+      const confirmed = await confirm({
+        title: 'Eliminar ressenya',
+        message: 'Segur que vols eliminar aquest testimoni? Aquesta acció no es pot desfer.',
+        variant: 'danger',
+        confirmLabel: 'Eliminar',
+      });
+      if (!confirmed) return;
+    }
     setBusyId(id);
 
     // Optimistic update
@@ -179,7 +190,7 @@ export default function AdminRessenyesPage() {
           <AdminKpi label="Total" value={pending.length + approved.length} />
           <AdminKpi
             label="Nota mitjana"
-            value={avgRating > 0 ? `${avgRating.toFixed(1)} ★` : '—'}
+            value={avgRating > 0 ? `${avgRating.toFixed(1)} â˜…` : 'â€”'}
             tone={avgRating >= 4 ? 'success' : avgRating >= 3 ? 'warning' : 'danger'}
           />
         </AdminKpiRow>
@@ -342,6 +353,8 @@ export default function AdminRessenyesPage() {
           </div>
         ))}
       </div>
+      <ConfirmDialog {...dialogProps} />
     </AdminPage>
   );
 }
+

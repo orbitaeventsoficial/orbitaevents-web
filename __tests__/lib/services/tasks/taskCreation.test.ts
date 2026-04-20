@@ -65,4 +65,36 @@ describe('createUniversalTask', () => {
       }),
     });
   });
+
+  it('accepta camps canònics source/autoRule/dedupeKey/resolutionNote', async () => {
+    await createUniversalTask({
+      title: 'Auto',
+      source: 'AUTOMATION',
+      autoRule: 'SLA_BROKEN',
+      dedupeKey: 'sla:lead-42',
+      resolutionNote: 'Tancada per duplicat',
+    });
+
+    expect(mockPrisma.task.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        source: 'AUTOMATION',
+        autoRule: 'SLA_BROKEN',
+        dedupeKey: 'sla:lead-42',
+        resolutionNote: 'Tancada per duplicat',
+      }),
+    });
+  });
+
+  it('defaults dels camps canònics a null quan no s\'especifiquen', async () => {
+    await createUniversalTask({ title: 'Manual' });
+
+    expect(mockPrisma.task.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        source: null,
+        autoRule: null,
+        dedupeKey: null,
+        resolutionNote: null,
+      }),
+    });
+  });
 });

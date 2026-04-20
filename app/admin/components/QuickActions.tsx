@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
 type CronSummary = {
   processed: number;
@@ -107,71 +108,31 @@ export default function QuickActions() {
   }
 
   return (
-    <section
-      className="rounded-2xl border admin-card-glass p-4"
-      data-help-title="Accions ràpides"
-      data-help-desc="Des d'aquí pots executar accions freqüents sense canviar de secció: escriure, revisar entrades o llançar automatismes puntuals."
-    >
+    <section className="rounded-2xl border admin-card-glass p-4" {...helpAttrs(ADMIN_SHARED_HELP.quickActionsPanel)}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase">Accions ràpides</p>
           <p className="text-sm mt-1">Operacions freqüents</p>
         </div>
-        <Link
-          href="/admin/emails"
-          className="text-xs transition-colors"
-          data-help-title="Obrir correus automàtics"
-          data-help-desc="T'envia a la secció on controles automatismes, plantilles i seguiment dels correus del sistema."
-        >
+        <Link href="/admin/emails" className="text-xs transition-colors" {...helpAttrs(ADMIN_SHARED_HELP.openAutomations)}>
           Obre correus automàtics →
         </Link>
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          href="/admin/inbox/compose"
-          className="rounded-xl border px-3 py-2 text-xs"
-          data-help-title="Nou email"
-          data-help-desc="Obre el redactor per enviar un correu manual des de la safata administrativa."
-        >
+        <Link href="/admin/inbox/compose" className="rounded-xl border px-3 py-2 text-xs" {...helpAttrs(ADMIN_SHARED_HELP.composeEmail)}>
           ✉️ Nou email
         </Link>
-        <Link
-          href="/admin/leads"
-          className="rounded-xl border px-3 py-2 text-xs"
-          data-help-title="Veure entrades"
-          data-help-desc="Et porta al tauler comercial per revisar consultes i oportunitats en curs."
-        >
+        <Link href="/admin/leads" className="rounded-xl border px-3 py-2 text-xs" {...helpAttrs(ADMIN_SHARED_HELP.viewLeads)}>
           👥 Veure entrades
         </Link>
-        <button
-          type="button"
-          onClick={runCron}
-          disabled={loading}
-          data-help-title="Executar post-event"
-          data-help-desc="Llança manualment el flux automàtic de correus post-esdeveniment si no vols esperar el cron programat."
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
-        >
+        <button type="button" onClick={runCron} disabled={loading} className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runPostEvent)}>
           {loading ? '⏳ Executant...' : '⏱️ Executar post-event'}
         </button>
-        <button
-          type="button"
-          onClick={runAll}
-          disabled={loading}
-          data-help-title="Executar-ho tot"
-          data-help-desc="Dispara els principals automatismes de seguiment i SLA en una sola acció."
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
-        >
+        <button type="button" onClick={runAll} disabled={loading} className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runAll)}>
           {loading ? '⏳ Executant...' : '🚀 Executar-ho tot (1 clic)'}
         </button>
-        <button
-          type="button"
-          onClick={runDailySummaryNow}
-          disabled={loading}
-          data-help-title="Resum diari ara"
-          data-help-desc="Força l'enviament del resum diari amb mètriques i activitat sense esperar l'execució programada."
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
-        >
+        <button type="button" onClick={runDailySummaryNow} disabled={loading} className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60" {...helpAttrs(ADMIN_SHARED_HELP.runDailySummary)}>
           {loading ? '⏳ Executant...' : '📊 Resum diari ara'}
         </button>
       </div>

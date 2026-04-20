@@ -70,27 +70,37 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
     });
 
     if (bookingWithPack?.pack?.inventory) {
-      for (const packItem of bookingWithPack.pack.inventory) {
-        const alreadyAssigned = bookingWithPack.inventory.some((bi) => bi.itemId === packItem.itemId);
-        if (!alreadyAssigned) {
-          const overlapping = await prisma.bookingInventory.count({
-            where: {
-              itemId: packItem.itemId,
-              bookingId: { not: bookingId },
-              booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
-            },
-          });
-          if (overlapping > 0) continue;
+      const alreadyAssignedIds = new Set(bookingWithPack.inventory.map((bi) => bi.itemId));
+      const toAssign = bookingWithPack.pack.inventory.filter((pi) => !alreadyAssignedIds.has(pi.itemId));
 
-          await prisma.bookingInventory.create({
-            data: {
+      if (toAssign.length > 0) {
+        // Batch: trobar items ocupats en reserves actives
+        const overlapping = await prisma.bookingInventory.groupBy({
+          by: ['itemId'],
+          where: {
+            itemId: { in: toAssign.map((pi) => pi.itemId) },
+            bookingId: { not: bookingId },
+            booking: { status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+          },
+        });
+        const busyIds = new Set(overlapping.map((o) => o.itemId));
+        const available = toAssign.filter((pi) => !busyIds.has(pi.itemId));
+
+        if (available.length > 0) {
+          await prisma.bookingInventory.createMany({
+            data: available.map((pi) => ({
               bookingId,
-              itemId: packItem.itemId,
-              quantity: packItem.quantity,
-              conditionBefore: packItem.item.condition,
-            },
+              itemId: pi.itemId,
+              quantity: pi.quantity,
+              conditionBefore: pi.item.condition,
+            })),
+            skipDuplicates: true,
           });
-          await prisma.inventoryItem.update({ where: { id: packItem.itemId }, data: { status: 'IN_USE' } });
+
+          await prisma.inventoryItem.updateMany({
+            where: { id: { in: available.map((pi) => pi.itemId) } },
+            data: { status: 'IN_USE' },
+          });
         }
       }
     }
@@ -104,28 +114,37 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
 
     const eventDuration = calculateEventDuration(existing.eventStartTime, existing.eventEndTime);
 
-    for (const bi of bookingInv) {
-      if (eventDuration > 0) {
-        await prisma.inventoryUsage.create({
-          data: {
-            itemId: bi.itemId,
-            bookingId,
-            hoursUsed: eventDuration,
-            notes: `Bolo ${existing.reference}`,
-          },
-        });
-      }
-
-      const otherActive = await prisma.bookingInventory.count({
-        where: {
+    // Batch: crear registres d'ús
+    if (eventDuration > 0 && bookingInv.length > 0) {
+      await prisma.inventoryUsage.createMany({
+        data: bookingInv.map((bi) => ({
           itemId: bi.itemId,
+          bookingId,
+          hoursUsed: eventDuration,
+          notes: `Bolo ${existing.reference}`,
+        })),
+      });
+    }
+
+    // Batch: trobar items encara actius en altres reserves
+    if (bookingInv.length > 0) {
+      const itemIds = bookingInv.map((bi) => bi.itemId);
+      const stillActive = await prisma.bookingInventory.groupBy({
+        by: ['itemId'],
+        where: {
+          itemId: { in: itemIds },
           bookingId: { not: bookingId },
           booking: { status: { in: [...ACTIVE_INVENTORY_BOOKING_STATUSES] } },
         },
       });
+      const stillActiveIds = new Set(stillActive.map((s) => s.itemId));
+      const toRelease = itemIds.filter((id) => !stillActiveIds.has(id));
 
-      if (otherActive === 0) {
-        await prisma.inventoryItem.update({ where: { id: bi.itemId }, data: { status: 'AVAILABLE' } });
+      if (toRelease.length > 0) {
+        await prisma.inventoryItem.updateMany({
+          where: { id: { in: toRelease } },
+          data: { status: 'AVAILABLE' },
+        });
       }
     }
 
@@ -145,17 +164,25 @@ export async function applyBookingStatusSideEffects(input: BookingStatusTransiti
     });
 
     const bookingInv = await prisma.bookingInventory.findMany({ where: { bookingId } });
-    for (const bi of bookingInv) {
-      const otherActive = await prisma.bookingInventory.count({
+
+    if (bookingInv.length > 0) {
+      const itemIds = bookingInv.map((bi) => bi.itemId);
+      const stillActive = await prisma.bookingInventory.groupBy({
+        by: ['itemId'],
         where: {
-          itemId: bi.itemId,
+          itemId: { in: itemIds },
           bookingId: { not: bookingId },
           booking: { status: { in: [...ACTIVE_INVENTORY_BOOKING_STATUSES] } },
         },
       });
+      const stillActiveIds = new Set(stillActive.map((s) => s.itemId));
+      const toRelease = itemIds.filter((id) => !stillActiveIds.has(id));
 
-      if (otherActive === 0) {
-        await prisma.inventoryItem.update({ where: { id: bi.itemId }, data: { status: 'AVAILABLE' } });
+      if (toRelease.length > 0) {
+        await prisma.inventoryItem.updateMany({
+          where: { id: { in: toRelease } },
+          data: { status: 'AVAILABLE' },
+        });
       }
     }
   }

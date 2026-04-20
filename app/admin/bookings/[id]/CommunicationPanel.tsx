@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatDateTime } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_BOOKING_HELP_3, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type FlowKey = 'PAYMENT' | 'POST_EVENT' | 'GENERAL';
 
@@ -65,13 +66,13 @@ export default function CommunicationPanel({
   ];
 
   return (
-    <section className="ap-card p-6">
+    <section className="ap-card p-6" {...helpAttrs(ADMIN_BOOKING_HELP_3.communication.root)}>
       <h2 className="text-lg font-semibold">Comunicacions multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
           return (
-            <div key={flow.key} className="ap-card admin-tone-border-neutral p-3">
+            <div key={flow.key} className="ap-card admin-tone-border-neutral p-3" {...helpAttrs(ADMIN_BOOKING_HELP_3.communication.flow)}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{flow.label}</p>
                 <p className="text-xs">
@@ -133,3 +134,4 @@ export default function CommunicationPanel({
     </section>
   );
 }
+

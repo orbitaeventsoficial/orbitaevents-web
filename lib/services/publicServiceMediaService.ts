@@ -5,8 +5,32 @@ import { listPortfolioPhotos } from '@/lib/services/galleryService';
 import { listPortfolioMedia } from '@/lib/services/portfolioMediaService';
 import { getManagedImageCollection, getManagedImageOverride } from '@/lib/services/imageManagerService';
 
+type ServiceMediaSnapshot = {
+  managedHeroSrc: string | null;
+  managedGalleryImages: string[];
+  mediaImages: string[];
+  bookingImages: string[];
+  fallbackImage: string;
+};
+
+const PUBLIC_MEDIA_LOOKUP_LIMIT = 12;
+const warningKeys = new Set<string>();
+const serviceMediaSnapshotCache = new Map<PublicServiceMediaKey, Promise<ServiceMediaSnapshot>>();
+let mobileServiceCardImagesCache: Promise<Record<PublicMobileServiceCardId, string>> | null = null;
+
 function dedupe(items: string[]) {
   return Array.from(new Set(items.filter(Boolean)));
+}
+
+function logPublicMediaWarning(scope: string, key: string, error: unknown) {
+  const warningKey = `${scope}:${key}`;
+  if (warningKeys.has(warningKey)) return;
+  warningKeys.add(warningKey);
+  console.error(`[public-media] ${scope} fallback for ${key}`, error);
+}
+
+function isProductionRuntime() {
+  return process.env.NODE_ENV === 'production';
 }
 
 function getManagedHeroPlacementKey(key: PublicServiceMediaKey): string | null {
@@ -36,69 +60,95 @@ export function getPublicServicePortfolioSlug(key: PublicServiceMediaKey) {
   return PUBLIC_SERVICE_MEDIA_CONFIG[key].portfolioSlug;
 }
 
-export async function getPublicServiceHeroImage(key: PublicServiceMediaKey): Promise<string> {
+async function resolveServiceMediaSnapshot(key: PublicServiceMediaKey): Promise<ServiceMediaSnapshot> {
   const config = PUBLIC_SERVICE_MEDIA_CONFIG[key];
-  const managedPlacementKey = getManagedHeroPlacementKey(key);
+  const managedHeroPlacementKey = getManagedHeroPlacementKey(key);
+  const managedGalleryPlacementKey = getManagedGalleryPlacementKey(key);
 
-  if (managedPlacementKey) {
-    const managed = await getManagedImageOverride(managedPlacementKey);
-    if (managed?.src) return managed.src;
+  let managedHeroSrc: string | null = null;
+  let managedGalleryImages: string[] = [];
+  let mediaImages: string[] = [];
+  let bookingImages: string[] = [];
+
+  if (managedHeroPlacementKey) {
+    try {
+      const managed = await getManagedImageOverride(managedHeroPlacementKey);
+      if (managed?.src) managedHeroSrc = managed.src;
+    } catch (error) {
+      logPublicMediaWarning('managed-hero', key, error);
+    }
+  }
+
+  if (managedGalleryPlacementKey) {
+    try {
+      const managedItems = await getManagedImageCollection(managedGalleryPlacementKey);
+      if (managedItems?.length) {
+        managedGalleryImages = managedItems.map((item) => item.src).filter(Boolean);
+      } else {
+        const managedSingle = await getManagedImageOverride(managedGalleryPlacementKey);
+        if (managedSingle?.src) managedGalleryImages = [managedSingle.src];
+      }
+    } catch (error) {
+      logPublicMediaWarning('managed-gallery', key, error);
+    }
   }
 
   try {
     const mediaItems = await listPortfolioMedia(config.portfolioSlug);
-    const mediaImage = mediaItems.find((item) => item.mediaType === 'image')?.mediaUrl;
-    if (mediaImage) return mediaImage;
-  } catch {
-    // continuar amb booking photos
+    mediaImages = mediaItems.filter((item) => item.mediaType === 'image').map((item) => item.mediaUrl);
+  } catch (error) {
+    logPublicMediaWarning('portfolio-media', key, error);
   }
 
   try {
-    const { photos } = await listPortfolioPhotos({ slug: config.portfolioSlug, limit: 1 });
-    const bookingImage = photos[0]?.photoUrl;
-    if (bookingImage) return bookingImage;
-  } catch {
-    // mantenir fallback estàtic
+    const { photos } = await listPortfolioPhotos({ slug: config.portfolioSlug, limit: PUBLIC_MEDIA_LOOKUP_LIMIT, includeTotal: false });
+    bookingImages = photos.map((photo) => photo.photoUrl);
+  } catch (error) {
+    logPublicMediaWarning('booking-gallery', key, error);
   }
 
-  return config.fallbackImage;
+  return {
+    managedHeroSrc,
+    managedGalleryImages: dedupe(managedGalleryImages),
+    mediaImages: dedupe(mediaImages),
+    bookingImages: dedupe(bookingImages),
+    fallbackImage: config.fallbackImage,
+  };
+}
+
+function getServiceMediaSnapshot(key: PublicServiceMediaKey) {
+  if (!isProductionRuntime()) {
+    return resolveServiceMediaSnapshot(key);
+  }
+
+  const cached = serviceMediaSnapshotCache.get(key);
+  if (cached) return cached;
+
+  const next = resolveServiceMediaSnapshot(key);
+  serviceMediaSnapshotCache.set(key, next);
+  return next;
+}
+
+export async function getPublicServiceHeroImage(key: PublicServiceMediaKey): Promise<string> {
+  const snapshot = await getServiceMediaSnapshot(key);
+  return snapshot.managedHeroSrc
+    || snapshot.mediaImages[0]
+    || snapshot.bookingImages[0]
+    || snapshot.fallbackImage;
 }
 
 export async function getPublicServiceGalleryImages(key: PublicServiceMediaKey, limit = 4): Promise<string[]> {
-  const config = PUBLIC_SERVICE_MEDIA_CONFIG[key];
-  const managedPlacementKey = getManagedGalleryPlacementKey(key);
+  const snapshot = await getServiceMediaSnapshot(key);
 
-  if (managedPlacementKey) {
-    const managedItems = await getManagedImageCollection(managedPlacementKey);
-    if (managedItems?.length) {
-      return managedItems.map((item) => item.src).slice(0, limit);
-    }
-
-    const managedSingle = await getManagedImageOverride(managedPlacementKey);
-    if (managedSingle?.src) return [managedSingle.src];
+  if (snapshot.managedGalleryImages.length > 0) {
+    return snapshot.managedGalleryImages.slice(0, limit);
   }
 
-  const collected: string[] = [];
-
-  try {
-    const mediaItems = await listPortfolioMedia(config.portfolioSlug);
-    collected.push(...mediaItems.filter((item) => item.mediaType === 'image').map((item) => item.mediaUrl));
-  } catch {
-    // continuar amb booking photos
-  }
-
-  try {
-    const { photos } = await listPortfolioPhotos({ slug: config.portfolioSlug, limit: Math.max(limit, 8) });
-    collected.push(...photos.map((photo) => photo.photoUrl));
-  } catch {
-    // mantenir fallback estàtic
-  }
-
-  const unique = dedupe(collected).slice(0, limit);
-  return unique.length > 0 ? unique : [config.fallbackImage];
+  const combined = dedupe([...snapshot.mediaImages, ...snapshot.bookingImages]).slice(0, limit);
+  return combined.length > 0 ? combined : [snapshot.fallbackImage];
 }
 
-export async function listPublicMobileServiceCardImages(): Promise<Record<PublicMobileServiceCardId, string>> {
+async function resolveMobileServiceCardImages(): Promise<Record<PublicMobileServiceCardId, string>> {
   const mapping: Record<PublicMobileServiceCardId, PublicServiceMediaKey> = {
     bodas: 'bodas',
     halloween: 'halloween',
@@ -107,16 +157,33 @@ export async function listPublicMobileServiceCardImages(): Promise<Record<Public
     empresas: 'empresas',
   };
 
-  const entries = await Promise.all(
-    Object.entries(mapping).map(async ([cardId, serviceKey]) => {
-      // Primer: override específic de la targeta mòbil
+  const entries: Array<readonly [PublicMobileServiceCardId, string]> = [];
+
+  for (const [cardId, serviceKey] of Object.entries(mapping)) {
+    try {
       const cardOverride = await getManagedImageOverride(`home.servicesCards.${cardId}`);
-      if (cardOverride?.src) return [cardId as PublicMobileServiceCardId, cardOverride.src] as const;
-      // Fallback: hero del servei (que ja passa pel manager services.*.hero)
-      return [cardId as PublicMobileServiceCardId, await getPublicServiceHeroImage(serviceKey)] as const;
-    })
-  );
+      if (cardOverride?.src) {
+        entries.push([cardId as PublicMobileServiceCardId, cardOverride.src] as const);
+        continue;
+      }
+    } catch (error) {
+      logPublicMediaWarning('mobile-card-override', cardId, error);
+    }
+
+    entries.push([cardId as PublicMobileServiceCardId, await getPublicServiceHeroImage(serviceKey)] as const);
+  }
 
   return Object.fromEntries(entries) as Record<PublicMobileServiceCardId, string>;
 }
 
+export async function listPublicMobileServiceCardImages(): Promise<Record<PublicMobileServiceCardId, string>> {
+  if (!isProductionRuntime()) {
+    return resolveMobileServiceCardImages();
+  }
+
+  if (!mobileServiceCardImagesCache) {
+    mobileServiceCardImagesCache = resolveMobileServiceCardImages();
+  }
+
+  return mobileServiceCardImagesCache;
+}

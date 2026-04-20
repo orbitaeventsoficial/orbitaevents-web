@@ -48,6 +48,22 @@ describe('getCustomerDetail', () => {
     expect(result.status).toBe(200);
     expect(result.body.ok).toBe(true);
   });
+
+  it('filtra tasques obertes excloent DONE i CANCELLED', async () => {
+    mockPrisma.customer.findUnique.mockResolvedValue({ id: 'c1', name: 'Maria', tasks: [] });
+
+    await getCustomerDetail('c1');
+
+    expect(mockPrisma.customer.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          tasks: expect.objectContaining({
+            where: { status: { notIn: ['DONE', 'CANCELLED'] } },
+          }),
+        }),
+      }),
+    );
+  });
 });
 
 describe('updateCustomerFromInput', () => {
@@ -122,6 +138,55 @@ describe('updateCustomerFromInput', () => {
       })
     );
   });
+
+  it('gestiona birthday com a Date', async () => {
+    await updateCustomerFromInput('c1', { birthday: '1990-05-15' });
+
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          birthday: new Date('1990-05-15'),
+        }),
+      })
+    );
+  });
+
+  it('gestiona birthday null', async () => {
+    await updateCustomerFromInput('c1', { birthday: null });
+
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          birthday: null,
+        }),
+      })
+    );
+  });
+
+  it('gestiona referredById', async () => {
+    await updateCustomerFromInput('c1', { referredById: 'c-referrer' });
+
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          referredById: 'c-referrer',
+        }),
+      })
+    );
+  });
+
+  it('normalitza DNI', async () => {
+    await updateCustomerFromInput('c1', { dni: ' 12345678-Z ' });
+
+    expect(mockPrisma.customer.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          dni: '12345678-Z',
+          dniNormalized: '12345678Z',
+        }),
+      })
+    );
+  });
 });
 
 describe('deleteCustomerOrAnonymize', () => {
@@ -142,7 +207,7 @@ describe('deleteCustomerOrAnonymize', () => {
     expect(result.body.anonymized).toBe(true);
     expect(mockPrisma.customer.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ name: 'Client Anonimitzat' }),
+        data: expect.objectContaining({ name: 'Client anonimitzat' }),
       })
     );
   });

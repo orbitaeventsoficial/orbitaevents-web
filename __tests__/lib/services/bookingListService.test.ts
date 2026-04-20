@@ -111,3 +111,51 @@ describe('listAdminBookings', () => {
     );
   });
 });
+
+// Regressió: `listAdminBookings` ha d'acceptar un `now?: Date` injectable per
+// calcular les finestres de `overdue` i `due-soon` de manera determinista.
+// Abans, cridava `new Date()` intern a la línia 41 i els tests no podien
+// verificar que les boundaries (eventDate < now+30, now+37, etc.) es
+// calculaven correctament segons un instant fix.
+describe('propagació de `now` a filtres de pagament', () => {
+  it('payment=overdue: usa `now` injectat per al límit d\'eventDate (depositPaid:false → now+30)', async () => {
+    const injectedNow = new Date('2026-06-15T00:00:00Z');
+
+    await listAdminBookings(
+      { locale: 'ca', page: 1, limit: 10, payment: 'overdue' },
+      injectedNow,
+    );
+
+    const call = mockPrisma.booking.findMany.mock.calls[0][0];
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    const orClause = andClauses.find((c) => c.OR) as { OR: Array<{ eventDate?: { lt: Date } }> };
+    expect(orClause.OR[0].eventDate?.lt).toEqual(new Date('2026-07-15T00:00:00Z'));
+    expect(orClause.OR[1].eventDate?.lt).toEqual(new Date('2026-06-22T00:00:00Z'));
+  });
+
+  it('payment=due-soon: usa `now` injectat per a les finestres de deposit/remaining', async () => {
+    const injectedNow = new Date('2026-06-15T00:00:00Z');
+
+    await listAdminBookings(
+      { locale: 'ca', page: 1, limit: 10, payment: 'due-soon' },
+      injectedNow,
+    );
+
+    const call = mockPrisma.booking.findMany.mock.calls[0][0];
+    const andClauses = call.where.AND as Record<string, unknown>[];
+    const orClause = andClauses.find((c) => c.OR) as { OR: Array<{ eventDate?: { gte: Date; lte: Date } }> };
+    expect(orClause.OR[0].eventDate).toEqual({
+      gte: new Date('2026-07-15T00:00:00Z'),
+      lte: new Date('2026-07-22T00:00:00Z'),
+    });
+    expect(orClause.OR[1].eventDate).toEqual({
+      gte: new Date('2026-06-22T00:00:00Z'),
+      lte: new Date('2026-06-29T00:00:00Z'),
+    });
+  });
+
+  it('sense `now` explícit, usa un default (Date) i no llança', async () => {
+    const result = await listAdminBookings({ locale: 'ca', page: 1, limit: 10, payment: 'overdue' });
+    expect(result.ok).toBe(true);
+  });
+});

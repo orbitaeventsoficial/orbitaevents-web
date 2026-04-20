@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -220,7 +220,7 @@ export default function CookieConsent() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={acceptAll}
-                      className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold whitespace-nowrap"
+                      className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-black text-xs font-bold whitespace-normal break-words sm:whitespace-nowrap"
                     >
                       {t('acceptAll')}
                     </button>

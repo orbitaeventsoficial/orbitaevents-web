@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ADMIN_WEATHER_DEFAULT_EMOJI, ADMIN_WEATHER_EMOJI, ADMIN_WEATHER_EMOJI_CA } from '@/lib/constants/admin';
+import { log } from '@/lib/logger';
 import type { WeatherForecast } from '@/lib/services/weatherService';
 
 function getWeatherEmoji(description: string): string {
@@ -50,7 +51,7 @@ export default function WeatherWidget() {
           setForecasts(data.forecasts);
         }
       } catch (error) {
-        console.error('Error carregant previsions meteorològiques', error);
+        log.error('Error carregant previsions meteorològiques', error);
         if (!cancelled) setLoadError(error instanceof Error ? error.message : "No s'ha pogut carregar el temps dels pròxims events");
       } finally {
         if (!cancelled) setLoading(false);

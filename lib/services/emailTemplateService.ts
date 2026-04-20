@@ -38,7 +38,10 @@ export async function getTemplate(
         source: 'db',
       };
     }
-  } catch {
+  } catch (error) {
+    // Prisma pot fallar si no hi ha connexió o la taula no existeix encara.
+    // Caiem al template per defecte en comptes de fer petar el mail entier.
+    console.warn(`[emailTemplateService] DB lookup failed for ${slug}/${locale}, falling back to default:`, error);
   }
 
   const defaults = getDefaultTemplate(slug, locale);

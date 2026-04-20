@@ -12,8 +12,9 @@ import {
 import { z } from 'zod';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_COPY, ADMIN_PDF_STUDIO_CUSTOM_PACK_ID, ADMIN_PDF_STUDIO_DEFAULT_SECTION_ORDER, ADMIN_PDF_STUDIO_DRAFT_KEY, ADMIN_PDF_STUDIO_OPERATOR_EXTRA_ID, ADMIN_PDF_STUDIO_SECTION_LABELS, ADMIN_PDF_STUDIO_SERVICE_LABELS } from '@/lib/constants/admin';
+import { log } from '@/lib/logger';
 
-// ─── Types ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type DocMode = 'quote' | 'contract';
 
@@ -78,7 +79,7 @@ export type StudioProps = {
   initialBrandLogoDataUrl?: string;
 };
 
-// ─── Constants ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const SECTION_LABELS: Record<SectionId, string> = ADMIN_PDF_STUDIO_SECTION_LABELS;
 
@@ -95,7 +96,7 @@ export const SERVICE_LABEL: Record<ServiceSlug, string> = ADMIN_PDF_STUDIO_SERVI
 export { ALL_SERVICES };
 export type { ExtraDefinition, PackDefinition, ServiceSlug };
 
-// ─── Validation ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const quoteStudioSchema = z.object({
   clientName: z.string().trim().min(2, 'Nom del client massa curt'),
@@ -105,7 +106,7 @@ export const quoteStudioSchema = z.object({
   basePrice: z.number().min(0),
 });
 
-// ─── Pure functions ─────────────────────────────────────────────────────
+// â”€â”€â”€ Pure functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function normalizeStudioLocale(value?: string): Locale {
   const raw = String(value || '').toLowerCase();
@@ -115,7 +116,7 @@ export function normalizeStudioLocale(value?: string): Locale {
 }
 
 export function formatEUR(value: number): string {
-  return `${Math.max(0, value).toFixed(2)}€`;
+  return `${Math.max(0, value).toFixed(2)}â‚¬`;
 }
 
 export function toFeatureLines(text: string): string[] {
@@ -146,7 +147,7 @@ export function buildPackFromForm(params: {
   };
 }
 
-// ─── Translation cache ──────────────────────────────────────────────────
+// â”€â”€â”€ Translation cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const pdfTranslationCache = new Map<string, Map<Locale, string>>();
 
@@ -201,7 +202,7 @@ export async function translateBatchForPdf(texts: string[], locale: Locale): Pro
       result.set(original, translated);
     }
   } catch (error) {
-    console.error('Error translating batch for PDF:', error);
+    log.error('Error translating batch for PDF', error);
     for (const original of toFetch) result.set(original, original);
   }
 

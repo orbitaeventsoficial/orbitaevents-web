@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { PUBLIC_VERIFIED_CUSTOMER_LABELS } from '@/lib/constants/index';
+import { PUBLIC_VERIFIED_CUSTOMER_LABELS, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants/index';
 import { prisma } from '@/lib/prisma';
 
 type Locale = 'ca' | 'es' | 'en';
@@ -189,7 +189,7 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
     await tx.customerActivity.create({
       data: {
         customerId: customer.id,
-        action: 'TESTIMONIAL_SUBMITTED',
+        action: CUSTOMER_ACTIVITY_ACTIONS.TESTIMONIAL_SUBMITTED,
         details: activityDetails,
       },
     });

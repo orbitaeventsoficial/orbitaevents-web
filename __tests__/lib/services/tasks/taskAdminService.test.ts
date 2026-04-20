@@ -4,6 +4,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     task: {
       findMany: vi.fn(),
+      findFirst: vi.fn(),
       count: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -24,6 +25,7 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.task.findMany.mockResolvedValue([]);
+  mockPrisma.task.findFirst.mockResolvedValue(null);
   mockPrisma.task.count.mockResolvedValue(0);
   mockPrisma.task.create.mockResolvedValue({ id: 't1', title: 'Test' });
   mockPrisma.task.update.mockResolvedValue({ id: 't1' });
@@ -103,6 +105,67 @@ describe('createAdminTask', () => {
     expect(mockPrisma.task.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         dueDate: expect.any(Date),
+      }),
+    });
+  });
+
+  it('accepta source i dedupeKey canònics per reactivació', async () => {
+    await createAdminTask({
+      title: 'Reactivar client',
+      source: 'REACTIVATION',
+      dedupeKey: 'reactivation:c1',
+    });
+
+    expect(mockPrisma.task.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        source: 'REACTIVATION',
+        dedupeKey: 'reactivation:c1',
+      }),
+    });
+  });
+
+  it('no crea duplicat si ja existeix una tasca oberta amb la mateixa dedupeKey', async () => {
+    mockPrisma.task.findFirst.mockResolvedValue({ id: 't-existing', title: 'Reactivar client' });
+
+    const result = await createAdminTask({
+      title: 'Reactivar client',
+      source: 'REACTIVATION',
+      dedupeKey: 'reactivation:c1',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.deduped).toBe(true);
+    expect(mockPrisma.task.create).not.toHaveBeenCalled();
+  });
+
+  it('reobre una reactivació tancada si torna a arribar la mateixa dedupeKey', async () => {
+    mockPrisma.task.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: 't-closed', status: 'DONE', source: 'REACTIVATION' });
+    mockPrisma.task.update.mockResolvedValue({ id: 't-closed', status: 'OPEN', source: 'REACTIVATION' });
+
+    const result = await createAdminTask({
+      customerId: 'c1',
+      title: 'Reactivar client',
+      description: 'Nou intent',
+      priority: 'HIGH',
+      source: 'REACTIVATION',
+      dedupeKey: 'reactivation:c1',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.reopened).toBe(true);
+    expect(mockPrisma.task.create).not.toHaveBeenCalled();
+    expect(mockPrisma.task.update).toHaveBeenCalledWith({
+      where: { id: 't-closed' },
+      data: expect.objectContaining({
+        customerId: 'c1',
+        title: 'Reactivar client',
+        description: 'Nou intent',
+        priority: 'HIGH',
+        source: 'REACTIVATION',
+        status: 'OPEN',
+        completedAt: null,
       }),
     });
   });

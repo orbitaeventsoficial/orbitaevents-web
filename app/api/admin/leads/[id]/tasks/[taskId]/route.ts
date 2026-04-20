@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
-import { deleteLeadTaskForRoute, updateLeadTaskForRoute } from '@/lib/services/leadTaskRouteService';
+import { deleteLeadScopedTaskForRoute, updateLeadScopedTaskForRoute } from '@/lib/services/leadScopedTaskRouteService';
 
 interface Params {
   params: { id: string; taskId: string };
@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Dades invàlides', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const result = await updateLeadTaskForRoute(params.id, params.taskId, parsed.data);
+    const result = await updateLeadScopedTaskForRoute(params.id, params.taskId, parsed.data);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof Error && error.message === 'TASK_NOT_FOUND') {
@@ -42,7 +42,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const result = await deleteLeadTaskForRoute(params.id, params.taskId);
+    const result = await deleteLeadScopedTaskForRoute(params.id, params.taskId);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof Error && error.message === 'TASK_NOT_FOUND') {
@@ -52,3 +52,4 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Error eliminant tasca' }, { status: 500 });
   }
 }
+

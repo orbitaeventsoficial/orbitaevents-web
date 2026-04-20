@@ -32,7 +32,10 @@ Per estat funcional i peces consolidades:
 1. Llegir `CLAUDE.md`.
 2. Llegir `docs/diario.md`.
 3. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
-4. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+4. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/protocol-producte-admin-ca.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
+5. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+
+Cap agent pot començar feina real al repo sense haver fet aquesta lectura mínima.
 
 ## Regles operatives
 
@@ -42,6 +45,8 @@ Per estat funcional i peces consolidades:
 - No tocar lògica de negoci, SEO, infra o components consolidats sense una raó explícita.
 - No prometre verificacions que no s'han executat.
 - Si una passada queda incompleta, s'ha d'explicar netament al `docs/diario.md`.
+- Si una passada no està realment tancada, no es pot presentar com a "gran", "quasi acabada" o "només queda el detall final". Cal dir explícitament si està `tancada` o `pendent`.
+- Queda prohibit reservar feina crítica o estructural per a una suposada passada "fina" posterior si això no s'ha advertit abans. No s'admet el patró de l'"últim 10-15%" descobert després.
 - Si s'elimina una feature, grep TOT el repo: component → hook → servei → API route → test → constants → i18n keys.
 
 ## Decision Tree — On va cada cosa?
@@ -358,4 +363,3 @@ Abans de proposar crear, auditar o modificar qualsevol d'això, consulta primer.
 - `docs/diario.md` s'ha d'actualitzar quan es tanca una passada rellevant.
 - El diari ha d'explicar què s'ha fet, amb quin criteri i quina validació real s'ha passat.
 - No escriure "final", "tot net" o equivalents si no està realment verificat.
-

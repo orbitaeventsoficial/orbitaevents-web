@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { formatCurrency } from '@/lib/constants';
+import { GOOGLE_CALENDAR_BOOKING_REMINDERS, GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY, GOOGLE_CALENDAR_SOCIAL_POST_REMINDERS, GOOGLE_CALENDAR_SOCIAL_POST_REMINDER_SUMMARY } from '@/lib/constants/googleCalendar';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_CAL_API = 'https://www.googleapis.com/calendar/v3';
 const REFRESH_TOKEN_KEY = 'integrations.googleCalendar.refreshToken';
 const CALENDAR_ID_KEY = 'integrations.googleCalendar.calendarId';
 const EVENT_KEY_PREFIX = 'integrations.googleCalendar.bookingEvent.';
+const SOCIAL_EVENT_KEY_PREFIX = 'integrations.googleCalendar.socialPostEvent.';
 
 type SyncStatus = 'synced' | 'deleted' | 'skipped' | 'error';
 type SyncAction = 'upsert' | 'delete';
@@ -43,6 +45,11 @@ type BookingData = {
 function eventSettingKey(bookingId: string): string {
   return `${EVENT_KEY_PREFIX}${bookingId}`;
 }
+
+function socialEventSettingKey(postId: string): string {
+  return `${SOCIAL_EVENT_KEY_PREFIX}${postId}`;
+}
+
 
 async function upsertSetting(key: string, value: string, label: string) {
   await prisma.setting.upsert({
@@ -91,6 +98,7 @@ function buildEventPayload(booking: BookingData) {
     `Estat CRM: ${booking.status}`,
     `Total: ${formatCurrency(booking.total)}`,
     `Cobrament: ${paymentStatus}`,
+    `Alarmes: ${GOOGLE_CALENDAR_BOOKING_REMINDER_SUMMARY}`,
     booking.notes ? `Notes: ${booking.notes}` : null,
   ]
     .filter(Boolean)
@@ -98,6 +106,11 @@ function buildEventPayload(booking: BookingData) {
 
   const start = parseTime(booking.eventDate, booking.eventStartTime);
   const end = parseTime(booking.eventDate, booking.eventEndTime);
+
+  const reminders = {
+    useDefault: false,
+    overrides: [...GOOGLE_CALENDAR_BOOKING_REMINDERS],
+  };
 
   if (start && end) {
     const safeEnd = new Date(end);
@@ -116,6 +129,7 @@ function buildEventPayload(booking: BookingData) {
         dateTime: safeEnd.toISOString(),
         timeZone: 'Europe/Madrid',
       },
+      reminders,
     };
   }
 
@@ -130,9 +144,51 @@ function buildEventPayload(booking: BookingData) {
     description,
     start: { date: getDateOnly(dayStart) },
     end: { date: getDateOnly(dayEnd) },
+    reminders,
   };
 }
 
+
+function buildSocialPostPayload(post: {
+  title: string;
+  platforms: string[];
+  contentType: string;
+  status: string;
+  scheduledAt: Date | null;
+  notes: string | null;
+}) {
+  if (!post.scheduledAt) throw new Error('Social post sense scheduledAt');
+
+  const start = new Date(post.scheduledAt);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 30);
+
+  const description = [
+    `Publicació social: ${post.title}`,
+    `Plataformes: ${post.platforms.join(', ')}`,
+    `Tipus: ${post.contentType}`,
+    `Estat: ${post.status}`,
+    `Alarmes: ${GOOGLE_CALENDAR_SOCIAL_POST_REMINDER_SUMMARY}`,
+    post.notes ? `Notes: ${post.notes}` : null,
+  ].filter(Boolean).join('\n');
+
+  return {
+    summary: `Publicar · ${post.platforms.join('/')} · ${post.title}`,
+    description,
+    start: {
+      dateTime: start.toISOString(),
+      timeZone: 'Europe/Madrid',
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone: 'Europe/Madrid',
+    },
+    reminders: {
+      useDefault: false,
+      overrides: GOOGLE_CALENDAR_SOCIAL_POST_REMINDERS,
+    },
+  };
+}
 async function getAccessToken(refreshToken: string): Promise<string> {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
@@ -367,5 +423,117 @@ export async function syncBookingToGoogleCalendar(
       bookingId,
       error: message,
     };
+  }
+}
+export async function syncSocialPostToGoogleCalendar(
+  postId: string,
+  forcedAction?: SyncAction
+): Promise<CalendarSyncResult> {
+  const post = await prisma.socialPost.findUnique({
+    where: { id: postId },
+    select: {
+      id: true,
+      title: true,
+      platforms: true,
+      contentType: true,
+      status: true,
+      scheduledAt: true,
+      notes: true,
+    },
+  });
+
+  const settings = await prisma.setting.findMany({
+    where: {
+      key: {
+        in: [REFRESH_TOKEN_KEY, CALENDAR_ID_KEY, socialEventSettingKey(postId)],
+      },
+    },
+    select: { key: true, value: true },
+  });
+  const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
+  const refreshToken = map[REFRESH_TOKEN_KEY];
+  const calendarId = map[CALENDAR_ID_KEY] || process.env.GOOGLE_CALENDAR_ID || 'primary';
+  const previousEventId = map[socialEventSettingKey(postId)] || null;
+
+  const action: SyncAction | null = forcedAction || (post && post.scheduledAt && ['DRAFT', 'SCHEDULED'].includes(post.status) ? 'upsert' : previousEventId ? 'delete' : null);
+
+  if (!action) {
+    return { ok: true, status: 'skipped', bookingId: postId, reason: 'Social post sense alarma sincronitzable' };
+  }
+
+  if (!refreshToken) {
+    return { ok: true, status: 'skipped', action, bookingId: postId, reason: 'Google Calendar no conectado' };
+  }
+
+  try {
+    const accessToken = await getAccessToken(refreshToken);
+
+    if (action === 'delete') {
+      if (previousEventId) {
+        const delRes = await googleCalendarFetch('DELETE', calendarId, `events/${encodeURIComponent(previousEventId)}`, accessToken);
+        if (!delRes.ok && delRes.status !== 404) {
+          const text = await delRes.text();
+          throw new Error(`Google Calendar social delete failed (${delRes.status}): ${text}`);
+        }
+      }
+      await deleteSetting(socialEventSettingKey(postId));
+      await prisma.adminLog.create({
+        data: {
+          action: 'CALENDAR_SYNC',
+          entity: 'socialPost',
+          entityId: postId,
+          details: { status: 'deleted', calendarId, eventId: previousEventId },
+        },
+      });
+      return { ok: true, status: 'deleted', action, bookingId: postId, eventId: previousEventId };
+    }
+
+    if (!post) {
+      return { ok: false, status: 'error', action, bookingId: postId, error: 'Social post no trobat' };
+    }
+
+    const payload = buildSocialPostPayload(post);
+    let eventId = previousEventId;
+    let response: Response;
+    if (eventId) {
+      response = await googleCalendarFetch('PATCH', calendarId, `events/${encodeURIComponent(eventId)}`, accessToken, payload);
+      if (response.status === 404) response = await googleCalendarFetch('POST', calendarId, 'events', accessToken, payload);
+    } else {
+      response = await googleCalendarFetch('POST', calendarId, 'events', accessToken, payload);
+    }
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Google Calendar social upsert failed (${response.status}): ${text}`);
+    }
+
+    const data = await response.json().catch(() => ({} as Record<string, unknown>));
+    eventId = typeof data.id === 'string' ? data.id : eventId;
+    if (eventId) {
+      await upsertSetting(socialEventSettingKey(postId), eventId, `Google Calendar event id for social post ${post.title}`);
+    }
+
+    await prisma.adminLog.create({
+      data: {
+        action: 'CALENDAR_SYNC',
+        entity: 'socialPost',
+        entityId: postId,
+        details: { status: 'synced', calendarId, eventId, socialStatus: post.status },
+      },
+    });
+
+    return { ok: true, status: 'synced', action, bookingId: postId, eventId: eventId || null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Error sincronizando Google Calendar social';
+    log.error('Google calendar social sync failed', error, { context: { postId, action } });
+    await prisma.adminLog.create({
+      data: {
+        action: 'CALENDAR_SYNC_ERROR',
+        entity: 'socialPost',
+        entityId: postId,
+        details: { action, error: message },
+      },
+    }).catch(() => null);
+    return { ok: false, status: 'error', action, bookingId: postId, error: message };
   }
 }

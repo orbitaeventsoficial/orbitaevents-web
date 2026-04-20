@@ -1,14 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import caMessages from '@/messages/ca.json';
 import { getSiteUrl } from '@/lib/site';
 import { inter, plusJakarta, jetbrains, cormorant } from '@/app/fonts';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { getHomeKeywords, getHomeMeta } from '@/lib/home-meta';
 
-type HomeMeta = { title?: string; description?: string; keywords?: string[]; ogTitle?: string; ogDescription?: string; ogImageAlt?: string };
-
-const homeMeta: HomeMeta = (caMessages as { homePage?: { meta?: HomeMeta } })?.homePage?.meta || {};
-const homeKeywords = Array.isArray(homeMeta.keywords) ? homeMeta.keywords : [];
+const homeMeta = getHomeMeta('ca');
+const homeKeywords = getHomeKeywords('ca');
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -26,18 +24,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const managedFavicon = await getManagedImageOverride('layout.favicon.main');
   const managedAppleTouchIcon = await getManagedImageOverride('layout.appleTouchIcon');
 
+  const siteTitle = homeMeta.title || 'Òrbita Events';
+  const siteDescription = homeMeta.description || '';
+  const openGraphTitle = homeMeta.ogTitle || siteTitle;
+  const openGraphDescription = homeMeta.ogDescription || siteDescription;
   const ogImage = managedOg?.src || '/og-default.jpg';
-  const ogAlt = managedOg?.alt || homeMeta.ogImageAlt || 'Òrbita Events';
+  const ogAlt = managedOg?.alt || homeMeta.ogImageAlt || siteTitle;
   const faviconUrl = managedFavicon?.src || '/favicon.svg';
   const appleTouchIconUrl = managedAppleTouchIcon?.src || '/apple-touch-icon.png';
 
   return {
     metadataBase: new URL(getSiteUrl()),
     title: {
-      default: homeMeta.title || 'Òrbita Events',
-      template: '%s | Òrbita Events',
+      default: siteTitle,
+      template: `%s | ${siteTitle}`,
     },
-    description: homeMeta.description || 'Experiències immersives per esdeveniments',
+    description: siteDescription,
     keywords: homeKeywords,
     authors: [{ name: 'Òrbita Events', url: getSiteUrl() }],
     creator: 'Òrbita Events',
@@ -47,8 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: 'ca_ES',
       url: '/',
       siteName: 'Òrbita Events',
-      title: homeMeta.ogTitle || homeMeta.title || 'Òrbita Events',
-      description: homeMeta.ogDescription || homeMeta.description || 'Experiències immersives per esdeveniments',
+      title: openGraphTitle,
+      description: openGraphDescription,
       images: [
         {
           url: ogImage,
@@ -62,8 +64,8 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       site: '@orbitaevents',
       creator: '@orbitaevents',
-      title: homeMeta.ogTitle || homeMeta.title || 'Òrbita Events',
-      description: homeMeta.ogDescription || homeMeta.description || 'Experiències immersives per esdeveniments',
+      title: openGraphTitle,
+      description: openGraphDescription,
       images: [ogImage],
     },
     alternates: {

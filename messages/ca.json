@@ -342,6 +342,15 @@
     "elegant": {
       "badge": "DJ · Il·luminació · Tematització · Producció",
       "badgeEmoji": "🎵",
+      "hook": {
+        "line1": "La gent no recorda el menú.",
+        "line2": "Recorda l'última cançó."
+      },
+      "tagline": {
+        "main": "CREEM MOMENTS",
+        "secondary": "PER AL TEU CASAMENT.",
+        "everywhere": "ARREU."
+      },
       "title1": "CONVERTIM EL TEU EVENT EN",
       "title2": "ESPECTACLE.",
       "rotatingTexts": [
@@ -2594,6 +2603,10 @@
         "caps-mobils-extra": {
           "name": "Caps Mòbils Extra (x2)",
           "description": "2 caps mòbils LED addicionals per ampliar la il·luminació"
+        },
+        "micro-inalambric": {
+          "name": "Micròfon sense fils",
+          "description": "Per a discursos, speeches o cerimònia"
         }
       },
       "from": "Des de",
@@ -4286,6 +4299,27 @@
     "configurador": "Hola! He configurat un pack. Podem parlar sobre disponibilitat?",
     "halloween": "Hola! Vull info sobre festes Halloween",
     "experiencias": "Hola! M'interessa una experiència temàtica personalitzada"
+  },
+  "packsOffers": {
+    "earlyBird": {
+      "name": "Reserva anticipada",
+      "description": "Reserva avui i estalvia un 10% al teu pack",
+      "badge": "🔥 OFERTA LIMITADA"
+    },
+    "packsBadges": {
+      "mostPopular": "Més popular",
+      "premium": "Premium"
+    },
+    "combo": {
+      "name": "Pack complet",
+      "description": "Contracta els 2 extras i estalvia un 10%",
+      "badge": "💎 COMBO"
+    },
+    "seasonal": {
+      "name": "Descompte temporada baixa",
+      "description": "Els events en temporada baixa tenen descompte",
+      "badge": "📅 TEMPORADA"
+    }
   },
   "mobileLanding": {
     "heroSlides": {
@@ -6718,6 +6752,11 @@
   "mobileHero": {
     "ctaPacks": "Veure packs i preus",
     "title": "CREEM MOMENTS",
+    "tagline": {
+      "main": "CREEM MOMENTS",
+      "secondary": "PER AL TEU CASAMENT.",
+      "everywhere": "ARREU."
+    },
     "subtitle": "Tu gaudeixes. Nosaltres muntem tot.",
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
@@ -7087,5 +7126,148 @@
     "backHome": "Tornar a l'inici",
     "viewPortfolio": "Veure portfolio",
     "spamNote": "Revisa la teva safata de correu brossa si no veus el nostre email en les pròximes hores"
+  },
+  "equipmentCatalog": {
+    "items": {
+      "ddj-rev7": {
+        "name": "Pioneer DDJ-REV7",
+        "description": "Controladora professional Pioneer DJ de nivell club amb plats motoritzats",
+        "specs": {
+          "channels": "2 canals",
+          "effects": "Professional amb FX",
+          "connectivity": "USB, MIDI"
+        }
+      },
+      "ev-etx-12p": {
+        "name": "EV ETX 2000W",
+        "description": "Sistema d'altaveus professional Electro-Voice, so cristal·lí i potent per a qualsevol esdeveniment",
+        "specs": {
+          "power": "2000W per unitat (4000W total)",
+          "coverage": "Fins a 150-200 persones",
+          "type": "Altaveu actiu professional"
+        }
+      },
+      "led-bash-bateria": {
+        "name": "LED Bash a Bateria",
+        "description": "Focus LED a bateria ideals per il·luminar sense cables en qualsevol ubicació",
+        "specs": {
+          "type": "Focus LED RGB a bateria",
+          "power": "LED d'alta potència",
+          "modes": "Auto, so, DMX",
+          "battery": "Autonomia 8-12 hores"
+        }
+      },
+      "multibos-led": {
+        "name": "Multibos LED",
+        "description": "Sistema d'il·luminació compacte i versàtil, perfecte per a esdeveniments petits i mitjans",
+        "specs": {
+          "type": "Sistema d'il·luminació complet",
+          "coverage": "Ideal per a festes fins a 50 persones",
+          "modes": "Múltiples programes automàtics"
+        }
+      },
+      "cabezas-moviles-beam": {
+        "name": "Caps Mòbils Beam 150W LED",
+        "description": "Caps mòbils tipus Beam professionals, amb efectes de llum espectaculars",
+        "specs": {
+          "power": "150W LED per unitat",
+          "type": "Moving Head Beam",
+          "colors": "RGBW + roda de color",
+          "modes": "Auto, so, DMX512"
+        }
+      },
+      "esferas-luz-calida": {
+        "name": "Esferes de Llum Càlida",
+        "description": "Esferes de llum molt càlides i potents, ideals per donar ambient i il·luminació al punt",
+        "specs": {
+          "type": "Il·luminació ambiental",
+          "power": "Alta potència",
+          "color": "Llum càlida"
+        }
+      },
+      "maquina-humo-1800w": {
+        "name": "Màquina de Fum 1800W",
+        "description": "Màquina de fum professional 1800W per a efectes ambientals. Inclosa a tots els packs.",
+        "specs": {
+          "power": "1800W",
+          "output": "Alta producció de fum",
+          "fluid": "Líquid professional de baixa olor",
+          "heatUpTime": "5 minuts"
+        }
+      },
+      "maquina-humo-bajo-3000w": {
+        "name": "Màquina de Fum Baix 3000W",
+        "description": "Màquina de fum baix 3000W per a efectes dramàtics arran de terra. Disponible mitjançant lloguer.",
+        "specs": {
+          "power": "3000W",
+          "type": "Low fog machine",
+          "coverage": "Efecte de boira arran de terra",
+          "note": "LLOGUER DISPONIBLE - Preu a consultar"
+        }
+      },
+      "cabina-dj": {
+        "name": "Cabina DJ Professional",
+        "description": "Cabina DJ professional, presentació elegant i funcional per a qualsevol esdeveniment",
+        "specs": {
+          "material": "Estructura professional",
+          "includes": "Suport controladora + il·luminació integrada"
+        }
+      },
+      "microfono-inalambrico": {
+        "name": "Micròfon Sense Fils",
+        "description": "Micròfon sense fils professional per a discursos, cerimònies i karaoke",
+        "specs": {
+          "type": "Wireless",
+          "range": "Fins a 100m",
+          "batteryLife": "8-10 hores"
+        }
+      },
+      "tripodes": {
+        "name": "Trípodes Professionals",
+        "description": "Trípodes professionals per a il·luminació i efectes",
+        "specs": {
+          "height": "Fins a 3 metres",
+          "type": "T-bar stands",
+          "material": "Alumini professional"
+        }
+      },
+      "cableado-profesional": {
+        "name": "Cablejat Professional Complet",
+        "description": "Kit complet de cablejat professional certificat (àudio, DMX, alimentació)",
+        "specs": {
+          "includes": "XLR, DMX, Power, Audio",
+          "length": "Múltiples longituds disponibles"
+        }
+      },
+      "atrezzo-mon-magic": {
+        "name": "Atrezzo Temàtic Món Màgic",
+        "description": "Set complet d'atrezzo temàtic d'escola de bruixeria per crear experiències màgiques inoblidables",
+        "specs": {
+          "includes": "Decoració temàtica completa",
+          "theme": "Món Màgic"
+        }
+      },
+      "atrezzo-halloween": {
+        "name": "Atrezzo Temàtic Halloween",
+        "description": "Set complet d'atrezzo temàtic de Halloween per a festes terroríficament divertides",
+        "specs": {
+          "includes": "Decoració temàtica completa",
+          "theme": "Halloween"
+        }
+      }
+    }
+  },
+  "siteConfig": {
+    "schedule": {
+      "weekdays": "Dilluns a Divendres: 08:00 - 20:00",
+      "saturday": "Dissabte: 08:00 - 20:00",
+      "sunday": "Diumenge: 08:00 - 20:00",
+      "note": "Esdeveniments 24/7 amb reserva prèvia",
+      "officeHours": "Tots els dies de 08:00-20:00"
+    },
+    "stats": {
+      "yearsLabel": "Des de 2023",
+      "responseTime": "2h"
+    }
   }
 }

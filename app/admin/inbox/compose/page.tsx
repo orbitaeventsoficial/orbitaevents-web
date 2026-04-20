@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import ComposeForm from './ComposeForm';
+import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,18 +68,20 @@ export default async function ComposePage({
   const customerId = searchParams?.customerId || '';
   const template = searchParams?.template || '';
   const { leads, packs, customer } = await getLeadsAndPacks(customerId || undefined);
+  const customerHubCommsHref = customerId ? buildCustomerWorkspaceTabHref(customerId, 'comms') : '/admin/inbox';
 
   return (
     <AdminPage
       title="Nou correu"
       subtitle="Envia pressupostos professionals i respon sol·licituds"
-      back={{ href: '/admin/inbox', label: 'Inbox' }}
+      back={{ href: customerHubCommsHref, label: customerId ? 'Client' : 'Inbox' }}
       className="max-w-4xl"
     >
 
       <ComposeForm
         leads={leads}
         packs={packs}
+        returnHref={customerHubCommsHref}
         initialCustomer={
           customer
             ? {
@@ -94,6 +97,4 @@ export default async function ComposePage({
     </AdminPage>
   );
 }
-
-
 

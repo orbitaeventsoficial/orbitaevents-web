@@ -1,14 +1,15 @@
 'use client';
 
-/**
- * Formulari d'edició d'un element d'inventari (client component)
- */
-
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { DEFAULT_EXPECTED_LIFE_HOURS, INVENTORY_CATEGORY_OPTIONS, INVENTORY_CONDITION_OPTIONS, INVENTORY_STATUS_OPTIONS } from '@/lib/constants';
+import {
+  DEFAULT_EXPECTED_LIFE_HOURS,
+  INVENTORY_CATEGORY_OPTIONS,
+  INVENTORY_CONDITION_OPTIONS,
+  INVENTORY_STATUS_OPTIONS,
+} from '@/lib/constants';
 
 interface ItemData {
   id: string;
@@ -31,6 +32,27 @@ interface ItemData {
 interface InventoryItemEditorProps {
   item?: ItemData;
   mode?: 'create' | 'edit';
+}
+
+const STATUS_TONE: Record<string, string> = {
+  AVAILABLE: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100',
+  IN_USE: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-100',
+  MAINTENANCE: 'border-amber-500/30 bg-amber-500/10 text-amber-100',
+  RETIRED: 'border-rose-500/30 bg-rose-500/10 text-rose-100',
+};
+
+const CONDITION_TONE: Record<string, string> = {
+  EXCELLENT: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100',
+  GOOD: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-100',
+  FAIR: 'border-amber-500/30 bg-amber-500/10 text-amber-100',
+  POOR: 'border-rose-500/30 bg-rose-500/10 text-rose-100',
+};
+
+const inputClass =
+  'mt-1 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/90 placeholder:text-white/35 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50';
+
+function formatEuro(value: number) {
+  return `${value.toFixed(2)}€`;
 }
 
 export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryItemEditorProps) {
@@ -58,6 +80,35 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
     stockQuantity: item?.stockQuantity?.toString() || '',
     minStock: item?.minStock?.toString() || '',
   });
+
+  const categoryMeta = useMemo(
+    () => INVENTORY_CATEGORY_OPTIONS.find((option) => option.value === form.category),
+    [form.category]
+  );
+  const statusMeta = useMemo(
+    () => INVENTORY_STATUS_OPTIONS.find((option) => option.value === form.status),
+    [form.status]
+  );
+  const conditionMeta = useMemo(
+    () => INVENTORY_CONDITION_OPTIONS.find((option) => option.value === form.condition),
+    [form.condition]
+  );
+
+  const currentValue = Number(form.value || 0);
+  const purchaseValue = Number(form.purchasePrice || 0);
+  const expectedLifeHours = Number(form.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS);
+  const hourlyCost = purchaseValue > 0
+    ? purchaseValue / Math.max(1, expectedLifeHours)
+    : 0;
+  const stockQuantity = Number(form.stockQuantity || 0);
+  const minStock = Number(form.minStock || 0);
+  const stockSummary = form.isConsumable
+    ? stockQuantity <= 0
+      ? 'Sense estoc'
+      : minStock > 0 && stockQuantity <= minStock
+        ? 'Estoc crític'
+        : 'Estoc correcte'
+    : 'No aplica';
 
   const updateField = (field: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -108,10 +159,11 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
       if (mode === 'create') {
         router.push('/admin/inventory');
-      } else {
-        setSuccess(true);
-        router.refresh();
+        return;
       }
+
+      setSuccess(true);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
@@ -121,7 +173,12 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
 
   const handleDelete = useCallback(async () => {
     if (mode === 'create' || !item) return;
-    const ok = await confirm({ title: 'Eliminar element', message: 'Segur que vols eliminar/retirar aquest element?', confirmLabel: 'Eliminar', variant: 'danger' });
+    const ok = await confirm({
+      title: 'Eliminar element',
+      message: 'Segur que vols eliminar o retirar aquest element?',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
     if (!ok) return;
 
     try {
@@ -138,252 +195,365 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     }
-  }, [item, mode, router, confirm]);
+  }, [confirm, item, mode, router]);
 
   return (
     <div className="space-y-4">
+      <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                {mode === 'create' ? 'Nou element' : 'Fitxa inventari'}
+              </span>
+              {statusMeta && (
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_TONE[form.status] || 'border-white/10 bg-white/5 text-white/80'}`}>
+                  {statusMeta.label}
+                </span>
+              )}
+              {conditionMeta && (
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${CONDITION_TONE[form.condition] || 'border-white/10 bg-white/5 text-white/80'}`}>
+                  {conditionMeta.label}
+                </span>
+              )}
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-semibold text-white">
+                {form.name.trim() || (mode === 'create' ? 'Element nou sense nom encara' : 'Element sense nom')}
+              </h1>
+              <p className="mt-1 max-w-3xl text-sm text-white/70">
+                {form.description.trim() || 'Defineix bé el material perquè packs, costos i operativa entenguin la mateixa veritat.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[28rem]">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wide text-white/45">Categoria</p>
+              <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wide text-white/45">Valor actual</p>
+              <p className="mt-2 text-sm font-semibold text-white">{currentValue > 0 ? formatEuro(currentValue) : 'Per definir'}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[11px] uppercase tracking-wide text-white/45">{form.isConsumable ? 'Estoc' : 'Cost/hora'}</p>
+              <p className="mt-2 text-sm font-semibold text-white">
+                {form.isConsumable ? stockSummary : hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'Sense amortització'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {error && (
-        <div className="rounded-xl border p-3">
+        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-rose-100">
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="rounded-xl border p-3">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-100">
           <p className="text-sm">Canvis desats correctament</p>
         </div>
       )}
 
-      {/* Informació bàsica */}
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">{mode === 'create' ? 'Nou element' : 'Editar element'}</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="inv-name" className="text-xs">Nom *</label>
-            <input
-              id="inv-name"
-              type="text"
-              value={form.name}
-              onChange={(e) => updateField('name', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
-          </div>
-          <div>
-            <label className="text-xs">Estat</label>
-            <div className="mt-1 flex gap-1.5 flex-wrap">
-              {INVENTORY_STATUS_OPTIONS.map((s) => (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => updateField('status', s.value)}
-                  className={`rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
-                    form.status === s.value
-                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-white/10 text-white/40 hover:bg-white/5'
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.85fr)]">
+        <div className="space-y-4">
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-sm font-semibold text-white">{mode === 'create' ? 'Identitat de l’element' : 'Dades principals'}</h2>
+                <p className="mt-1 text-xs text-white/55">Això és el que consumirà la resta del sistema quan aquest material entri a packs o càlculs.</p>
+              </div>
+              {categoryMeta && (
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/70">
+                  {categoryMeta.icon} {categoryMeta.label}
+                </span>
+              )}
             </div>
-          </div>
-        </div>
-        <div>
-          <label htmlFor="inv-description" className="text-xs">Descripció</label>
-          <textarea
-            id="inv-description"
-            value={form.description}
-            onChange={(e) => updateField('description', e.target.value)}
-            rows={2}
-            className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="inv-category" className="text-xs">Categoria</label>
-            <select
-              id="inv-category"
-              value={form.category}
-              onChange={(e) => updateField('category', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            >
-              {INVENTORY_CATEGORY_OPTIONS.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.icon} {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs">Condició</label>
-            <div className="mt-1 flex gap-1.5">
-              {INVENTORY_CONDITION_OPTIONS.map((c) => (
-                <button
-                  key={c.value}
-                  type="button"
-                  onClick={() => updateField('condition', c.value)}
-                  className={`flex-1 rounded-xl border px-1 py-1.5 text-[10px] font-medium transition-all ${
-                    form.condition === c.value
-                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
-                      : 'border-white/10 text-white/40 hover:bg-white/5'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="inv-watts" className="text-xs">Potència (W)</label>
-            <input
-              id="inv-watts"
-              type="number"
-              min={0}
-              value={form.watts}
-              onChange={(e) => updateField('watts', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
-          </div>
-          <div>
-            <label htmlFor="inv-value" className="text-xs">Valor actual (€) *</label>
-            <input
-              id="inv-value"
-              type="number"
-              min={0}
-              value={form.value}
-              onChange={(e) => updateField('value', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
-          </div>
-        </div>
-      </div>
 
-      {/* Consumible + estoc */}
-      <div className="rounded-2xl border p-5 space-y-4">
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.isConsumable}
-              onChange={(e) => updateField('isConsumable', e.target.checked)}
-              className="w-4 h-4 rounded"
-            />
-            <span className="text-sm">Es consumible</span>
-          </label>
-        </div>
-        {form.isConsumable && (
-          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="inv-name" className="text-xs">Nom *</label>
+                <input
+                  id="inv-name"
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="text-xs">Estat</label>
+                <div className="mt-1 flex gap-1.5 flex-wrap">
+                  {INVENTORY_STATUS_OPTIONS.map((status) => (
+                    <button
+                      key={status.value}
+                      type="button"
+                      onClick={() => updateField('status', status.value)}
+                      className={`rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
+                        form.status === status.value
+                          ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                          : 'border-white/10 text-white/40 hover:bg-white/5'
+                      }`}
+                    >
+                      {status.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div>
-              <label htmlFor="inv-stock" className="text-xs">Estoc actual</label>
-              <input
-                id="inv-stock"
-                type="number"
-                min={0}
-                value={form.stockQuantity}
-                onChange={(e) => updateField('stockQuantity', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              <label htmlFor="inv-description" className="text-xs">Descripció</label>
+              <textarea
+                id="inv-description"
+                value={form.description}
+                onChange={(e) => updateField('description', e.target.value)}
+                rows={3}
+                className={`${inputClass} resize-none`}
               />
             </div>
-            <div>
-              <label htmlFor="inv-min-stock" className="text-xs">Estoc mínim</label>
-              <input
-                id="inv-min-stock"
-                type="number"
-                min={0}
-                value={form.minStock}
-                onChange={(e) => updateField('minStock', e.target.value)}
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-              />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="inv-category" className="text-xs">Categoria</label>
+                <select
+                  id="inv-category"
+                  value={form.category}
+                  onChange={(e) => updateField('category', e.target.value)}
+                  className={inputClass}
+                >
+                  {INVENTORY_CATEGORY_OPTIONS.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.icon} {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs">Condició</label>
+                <div className="mt-1 flex gap-1.5 flex-wrap">
+                  {INVENTORY_CONDITION_OPTIONS.map((condition) => (
+                    <button
+                      key={condition.value}
+                      type="button"
+                      onClick={() => updateField('condition', condition.value)}
+                      className={`flex-1 rounded-xl border px-2 py-1.5 text-[10px] font-medium transition-all ${
+                        form.condition === condition.value
+                          ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                          : 'border-white/10 text-white/40 hover:bg-white/5'
+                      }`}
+                    >
+                      {condition.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Amortització */}
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Amortització</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="inv-purchase-price" className="text-xs">Preu compra (€)</label>
-            <input
-              id="inv-purchase-price"
-              type="number"
-              min={0}
-              value={form.purchasePrice}
-              onChange={(e) => updateField('purchasePrice', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="inv-watts" className="text-xs">Potència (W)</label>
+                <input
+                  id="inv-watts"
+                  type="number"
+                  min={0}
+                  value={form.watts}
+                  onChange={(e) => updateField('watts', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="inv-value" className="text-xs">Valor actual (€) *</label>
+                <input
+                  id="inv-value"
+                  type="number"
+                  min={0}
+                  value={form.value}
+                  onChange={(e) => updateField('value', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-sm font-semibold text-white">Estoc i consum</h2>
+                <p className="mt-1 text-xs text-white/55">Només activa aquesta part quan realment controles unitats fungibles o reposició.</p>
+              </div>
+              <label className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/85">
+                <input
+                  type="checkbox"
+                  checked={form.isConsumable}
+                  onChange={(e) => updateField('isConsumable', e.target.checked)}
+                  className="h-4 w-4 rounded"
+                />
+                Es consumible
+              </label>
+            </div>
+
+            {form.isConsumable ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="inv-stock" className="text-xs">Estoc actual</label>
+                  <input
+                    id="inv-stock"
+                    type="number"
+                    min={0}
+                    value={form.stockQuantity}
+                    onChange={(e) => updateField('stockQuantity', e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="inv-min-stock" className="text-xs">Estoc mínim</label>
+                  <input
+                    id="inv-min-stock"
+                    type="number"
+                    min={0}
+                    value={form.minStock}
+                    onChange={(e) => updateField('minStock', e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4 text-sm text-white/60">
+                Aquest element no es controla per estoc. Si és reposició, consumible o material fungible, activa el toggle.
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
+            <div>
+              <h2 className="text-sm font-semibold text-white">Amortització i cost</h2>
+              <p className="mt-1 text-xs text-white/55">La compra i la vida útil defineixen el cost/hora que després llegeixen els packs.</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label htmlFor="inv-purchase-price" className="text-xs">Preu compra (€)</label>
+                <input
+                  id="inv-purchase-price"
+                  type="number"
+                  min={0}
+                  value={form.purchasePrice}
+                  onChange={(e) => updateField('purchasePrice', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="inv-purchase-date" className="text-xs">Data compra</label>
+                <input
+                  id="inv-purchase-date"
+                  type="date"
+                  value={form.purchaseDate}
+                  onChange={(e) => updateField('purchaseDate', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="inv-life-hours" className="text-xs">Vida útil (hores)</label>
+                <input
+                  id="inv-life-hours"
+                  type="number"
+                  min={0}
+                  value={form.expectedLifeHours}
+                  onChange={(e) => updateField('expectedLifeHours', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <label htmlFor="inv-notes" className="text-xs">Notes internes</label>
+            <textarea
+              id="inv-notes"
+              value={form.notes}
+              onChange={(e) => updateField('notes', e.target.value)}
+              rows={4}
+              className={`${inputClass} resize-none`}
             />
-          </div>
-          <div>
-            <label htmlFor="inv-purchase-date" className="text-xs">Data compra</label>
-            <input
-              id="inv-purchase-date"
-              type="date"
-              value={form.purchaseDate}
-              onChange={(e) => updateField('purchaseDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
-          </div>
-          <div>
-            <label htmlFor="inv-life-hours" className="text-xs">Vida útil (hores)</label>
-            <input
-              id="inv-life-hours"
-              type="number"
-              min={0}
-              value={form.expectedLifeHours}
-              onChange={(e) => updateField('expectedLifeHours', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
-          </div>
+          </section>
         </div>
+
+        <aside className="space-y-4">
+          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <h2 className="text-sm font-semibold text-white">Lectura ràpida</h2>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <p className="text-[11px] uppercase tracking-wide text-white/45">Cost per hora estimat</p>
+                <p className="mt-2 text-lg font-semibold text-white">{hourlyCost > 0 ? `${hourlyCost.toFixed(2)}€/h` : 'No calculable'}</p>
+                <p className="mt-1 text-xs text-white/55">Compra ÷ vida útil. Si queda buit, el marge dels packs serà menys fiable.</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <p className="text-[11px] uppercase tracking-wide text-white/45">Consum i estoc</p>
+                <p className="mt-2 text-lg font-semibold text-white">{stockSummary}</p>
+                <p className="mt-1 text-xs text-white/55">
+                  {form.isConsumable
+                    ? `Estoc actual ${stockQuantity || 0} · mínim ${minStock || 0}.`
+                    : 'Sense control d’estoc perquè aquest element no és consumible.'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <p className="text-[11px] uppercase tracking-wide text-white/45">Categoria i estat</p>
+                <p className="mt-2 text-sm font-semibold text-white">{categoryMeta ? `${categoryMeta.icon} ${categoryMeta.label}` : form.category}</p>
+                <p className="mt-1 text-xs text-white/55">
+                  {statusMeta?.label || form.status} · {conditionMeta?.label || form.condition}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-cyan-400/20 bg-cyan-500/5 p-5">
+            <h2 className="text-sm font-semibold text-white">Checklist d’edició</h2>
+            <ul className="mt-3 space-y-2 text-sm text-white/75">
+              <li>Nom i descripció prou clars per identificar el material sense obrir cap altra pantalla.</li>
+              <li>Estat i condició alineats amb la realitat física, no amb el que voldríem que fos.</li>
+              <li>Compra, vida útil i valor revisats si l’element entra a packs o càlculs econòmics.</li>
+              <li>Si és consumible, estoc i mínim omplerts perquè el sistema pugui avisar abans de quedar-se curt.</li>
+            </ul>
+          </section>
+        </aside>
       </div>
 
-      {/* Notes */}
-      <div className="rounded-2xl border p-5">
-        <label htmlFor="inv-notes" className="text-xs">Notes internes</label>
-        <textarea
-          id="inv-notes"
-          value={form.notes}
-          onChange={(e) => updateField('notes', e.target.value)}
-          rows={2}
-          className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
-        />
-      </div>
-
-      {/* Accions */}
-      <div className="flex items-center gap-3">
+      <div className="sticky bottom-2 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-[#0f1218]/85 p-3 backdrop-blur">
         <button
           type="button"
           onClick={handleSave}
           disabled={saving || !form.name || !form.value}
-          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear element' : 'Desar canvis'}
         </button>
+
         {mode === 'edit' && (
           <button
             type="button"
             onClick={handleDelete}
-            className="rounded-xl border px-4 py-3 text-sm transition-colors"
+            className="rounded-xl border border-rose-500/30 px-4 py-3 text-sm text-rose-100 transition-colors hover:bg-rose-500/10"
           >
             Eliminar
           </button>
         )}
+
         {mode === 'create' && (
           <button
             type="button"
             onClick={() => router.push('/admin/inventory')}
-            className="rounded-xl border px-4 py-3 text-sm transition-colors"
+            className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/80 transition-colors hover:bg-white/5"
           >
             Cancel·lar
           </button>
         )}
       </div>
+
       <ConfirmDialog {...dialogProps} />
     </div>
   );
 }
-
-
-

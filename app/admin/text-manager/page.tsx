@@ -416,6 +416,11 @@ export default function TextManagerPage() {
     return counts;
   }, [currentTexts, originalTexts, getSection]);
 
+  const activeSectionMeta = useMemo(
+    () => (activeSection ? SECTIONS.find((section) => section.id === activeSection) ?? null : null),
+    [activeSection]
+  );
+
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
@@ -646,6 +651,59 @@ export default function TextManagerPage() {
             },
           ]}
         />
+
+        <section className="grid gap-3 lg:grid-cols-[1.1fr_1fr_1fr]">
+          <article className="rounded-2xl border admin-card-glass p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Sessió d’edició</p>
+            <h2 className="mt-2 text-lg font-semibold text-white/90">Què tens obert ara mateix</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Idioma</p>
+                <p className="mt-1 text-xl font-bold text-white">{LANGUAGE_META[activeLanguage].icon} {LANGUAGE_META[activeLanguage].label}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Canvis</p>
+                <p className="mt-1 text-xl font-bold text-white">{modifiedCount}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Visibles</p>
+                <p className="mt-1 text-xl font-bold text-white">{filteredTexts.length}</p>
+              </div>
+            </div>
+          </article>
+
+          <article className="rounded-2xl border border-cyan-500/25 bg-cyan-500/[0.06] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200/80">Focus</p>
+            <h2 className="mt-2 text-lg font-semibold text-white">Què estàs tocant de veritat</h2>
+            <div className="mt-4 space-y-2 text-sm text-white/75">
+              <p>{activeSectionMeta ? `${activeSectionMeta.icon} ${activeSectionMeta.name}` : 'Totes les seccions del catàleg de textos'}</p>
+              <p>{debouncedSearchTerm ? `Cerca activa: “${debouncedSearchTerm}”` : 'Sense cerca activa. Estàs navegant per estructura, no per paraula clau.'}</p>
+              <p>{showOnlyModified ? 'Vista reduïda només als textos modificats.' : 'Vista completa dels textos disponibles segons els filtres actuals.'}</p>
+              <p>{showComparison ? 'La comparació d’idiomes està oberta per validar coherència abans de desar.' : 'La comparació d’idiomes està tancada; obre-la només quan et calgui contrast ràpid.'}</p>
+            </div>
+          </article>
+
+          <article className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.06] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">Acció principal</p>
+            <h2 className="mt-2 text-lg font-semibold text-white">
+              {modifiedCount > 0 ? 'Acabar una passada neta i desar' : 'Trobar primer el bloc correcte'}
+            </h2>
+            <p className="mt-2 text-sm text-white/75">
+              {modifiedCount > 0
+                ? `Hi ha ${modifiedCount} canvis pendents en ${LANGUAGE_META[activeLanguage].label}. L’objectiu ara no és obrir més fronts, sinó validar coherència i tancar-los bé.`
+                : 'Sense canvis pendents. El millor primer pas és entrar per secció o cercar el copy exacte abans d’editar.'}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-sm">
+              <span className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-white/80">
+                Auto-traducció {modifiedCount > 0 ? 'preparada' : 'disponible'}
+              </span>
+              <span className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-white/80">
+                {activeSectionMeta ? `${sectionCounts[activeSectionMeta.id]?.modified || 0} canvis dins del focus actual` : `${modifiedCount} canvis totals`}
+              </span>
+            </div>
+          </article>
+        </section>
+
         <div className="flex flex-col gap-6 xl:flex-row">
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* SIDEBAR - SECCIONS */}
@@ -740,14 +798,14 @@ export default function TextManagerPage() {
             {/* Info de secció activa */}
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl  ${
-                SECTIONS.find(s => s.id === activeSection)?.color || 'from-white/20 to-white/10'
+                activeSectionMeta?.color || 'from-white/20 to-white/10'
               } text-white/90`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
-                  {SECTIONS.find(s => s.id === activeSection)?.icon}
-                  {SECTIONS.find(s => s.id === activeSection)?.name}
+                  {activeSectionMeta?.icon}
+                  {activeSectionMeta?.name}
                 </h2>
                 <p className="opacity-80 mt-1">
-                  {SECTIONS.find(s => s.id === activeSection)?.description}
+                  {activeSectionMeta?.description}
                 </p>
                 <div className="mt-2 text-sm opacity-70">
                   {sectionCounts[activeSection]?.total} textos
@@ -816,5 +874,4 @@ export default function TextManagerPage() {
     </div>
   );
 }
-
 

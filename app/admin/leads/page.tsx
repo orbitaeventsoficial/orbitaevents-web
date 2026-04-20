@@ -12,6 +12,8 @@ import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
 import { getLeadPriorityColorDisplay, getLeadStatusColorDisplay, LEAD_COLOR_DEFAULT_VARS } from './colorTheme';
 import ExportCsvButton from '../components/ExportCsvButton';
+import PipelineSuggestionsPanel from './PipelineSuggestionsPanel';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 
 export const dynamic = 'force-dynamic';
 
@@ -235,9 +237,50 @@ export default async function LeadsPage({
   const data = await getLeads({ status, priority, eventType, source, q, from, to, page });
   const leads = data.leads;
   const currentQuery = buildQuery(data.filters);
+  const newLeads = leads.filter((lead) => lead.status === 'NEW').length;
+  const hotLeads = leads.filter((lead) => lead.priority === 'HIGH' || lead.priority === 'URGENT').length;
+  const wonLeads = leads.filter((lead) => lead.status === 'WON').length;
+  const pipelineLinkedBookings = leads.filter((lead) => !!lead.booking).length;
+  const staleLeads = leads.filter((lead) => {
+    if (lead.status === 'WON' || lead.status === 'LOST') return false;
+    const hours = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / (1000 * 60 * 60));
+    return hours >= 24;
+  }).length;
+  const automaticSignals = [
+    newLeads > 0 ? `${newLeads} entrada${newLeads > 1 ? 'es' : ''} nova${newLeads > 1 ? 'es' : ''}` : null,
+    hotLeads > 0 ? `${hotLeads} entrada${hotLeads > 1 ? 'es' : ''} d’alta prioritat` : null,
+    pipelineLinkedBookings > 0 ? `${pipelineLinkedBookings} entrada${pipelineLinkedBookings > 1 ? 'es' : ''} ja vinculada${pipelineLinkedBookings > 1 ? 'es' : ''} a reserva` : null,
+  ].filter(Boolean) as string[];
+  const manualSignals = [
+    staleLeads > 0 ? `${staleLeads} entrada${staleLeads > 1 ? 'es' : ''} fa més de 24h sense tancar` : null,
+    newLeads > 0 ? `${newLeads} entrada${newLeads > 1 ? 'es' : ''} pendent${newLeads > 1 ? 's' : ''} de primera resposta` : null,
+    wonLeads === 0 && leads.length > 0 ? 'Cap entrada guanyada a la vista actual' : null,
+  ].filter(Boolean) as string[];
+  const nextStepHref = staleLeads > 0
+    ? '/admin/leads?status=NEW'
+    : newLeads > 0
+      ? '/admin/leads?status=NEW'
+      : hotLeads > 0
+        ? '/admin/leads?priority=HIGH&priority=URGENT'
+        : '/admin/intake';
+  const nextStepLabel = staleLeads > 0
+    ? 'Respondre entrades fredes'
+    : newLeads > 0
+      ? 'Atacar entrades noves'
+      : hotLeads > 0
+        ? 'Revisar prioritats altes'
+        : 'Crear entrada ràpida';
+  const nextStepDetail = staleLeads > 0
+    ? 'El risc principal és deixar refredar oportunitats que ja passen del llindar saludable.'
+    : newLeads > 0
+      ? 'La prioritat és fer la primera resposta comercial.'
+      : hotLeads > 0
+        ? 'Queden oportunitats calentes que mereixen atenció abans del detall.'
+        : 'No hi ha tensió crítica a la vista actual.';
 
   return (
     <AdminPage
+      className="admin-leads-page"
       title="Entrades"
       subtitle="Tauler comercial, seguiment i pipeline operatiu."
       actions={<div className="flex gap-2">
@@ -257,11 +300,33 @@ export default async function LeadsPage({
         <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>
       </div>}
     >
+    <PipelineSuggestionsPanel />
     <div
       id="leads-theme-root"
       className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què vigila el sistema',
+          tone: 'info',
+          items: automaticSignals,
+          emptyText: 'Sense senyals automàtiques destacades a la vista actual.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'Què et reclama decisió',
+          tone: manualSignals.length > 0 ? 'warning' : 'success',
+          items: manualSignals,
+          emptyText: 'No hi ha cap front manual calent a les entrades visibles.',
+        }}
+        nextStep={{
+          title: nextStepLabel,
+          detail: nextStepDetail,
+          href: nextStepHref,
+        }}
+      />
 
       <AdminHelpPanel
         title="Com treballar entrades"
@@ -282,7 +347,7 @@ export default async function LeadsPage({
         ]}
       />
 
-      <section className="rounded-2xl border p-2">
+      <section className="admin-leads-switcher rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/admin/leads"
@@ -313,7 +378,7 @@ export default async function LeadsPage({
       >
 
       {/* Mobile Card View */}
-      <section className="lg:hidden space-y-3">
+      <section className="admin-leads-mobile lg:hidden space-y-3">
         {leads.length === 0 ? (
           <div className="rounded-2xl border admin-card-glass p-8 text-center">
             <span className="text-4xl">📭</span>
@@ -328,7 +393,7 @@ export default async function LeadsPage({
             return (
               <article
                 key={lead.id}
-                className="rounded-2xl border p-4 transition-colors admin-card-glass"
+                className="admin-leads-mobile-card rounded-2xl border p-4 transition-colors admin-card-glass"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -405,7 +470,7 @@ export default async function LeadsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border p-0 overflow-hidden admin-card-glass">
+      <section className="admin-leads-table hidden lg:block rounded-2xl border p-0 overflow-hidden admin-card-glass">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1120px] text-sm" aria-label="Pipeline d'entrades">
             <thead className="border-b">
@@ -512,7 +577,7 @@ export default async function LeadsPage({
       </section>
 
       {data.pagination.totalPages > 1 && (
-        <section className="ap-card flex items-center justify-between rounded-2xl p-3 text-xs">
+        <section className="admin-leads-pagination ap-card flex items-center justify-between rounded-2xl p-3 text-xs">
           <span>
             Pàgina {data.pagination.page} de {data.pagination.totalPages}
           </span>
@@ -526,10 +591,10 @@ export default async function LeadsPage({
                 })()}`}
                 className="ap-btn ap-btn--secondary px-3 py-1 text-xs"
               >
-                â† Anterior
+                ← Anterior
               </Link>
             ) : (
-              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">â† Anterior</span>
+              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">← Anterior</span>
             )}
             {data.pagination.page < data.pagination.totalPages ? (
               <Link
@@ -554,7 +619,6 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
-
 
 
 

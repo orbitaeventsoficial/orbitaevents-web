@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
@@ -35,8 +35,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { bookingId } = createInvoiceSchema.parse(body);
-    return NextResponse.json(await createAdminInvoiceFromBooking(bookingId));
+    const parsed = createInvoiceSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'bookingId invàlid' }, { status: 400 });
+    }
+    return NextResponse.json(await createAdminInvoiceFromBooking(parsed.data.bookingId));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error creant factura';
     log.error('Error creant factura', error, {
@@ -45,3 +48,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: message }, { status: 400 });
   }
 }
+

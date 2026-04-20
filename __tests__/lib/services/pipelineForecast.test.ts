@@ -214,4 +214,49 @@ describe('buildPipelineForecast', () => {
 
     expect(result).toHaveLength(12);
   });
+
+  // Regressió: `buildPipelineForecast` ha de propagar `now` a `scoreLead` i
+  // acceptar un `now?` extern per fer-lo testable deterministament. Abans, la
+  // funció cridava `new Date()` internament i `scoreLead(lead)` sense `now`,
+  // fent que la probabilitat calculada depengués del rellotge real del server
+  // mentre la resta de la funció usava una copia congelada. Per valors concrets
+  // de fronteres això portava a inconsistències silencioses al dashboard de
+  // `/admin/economia` i al cockpit principal `/admin`.
+  it('determinisme: accepta `now` extern i el primer mes sempre és el següent', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    // Amb `now` = 2026-06-15, el primer mes del forecast ha de ser 2026-07
+    const result = await buildPipelineForecast(3, new Date('2026-06-15T12:00:00Z'));
+
+    expect(result[0].month).toBe('2026-07');
+    expect(result[1].month).toBe('2026-08');
+    expect(result[2].month).toBe('2026-09');
+  });
+
+  it('determinisme: `now` es propaga a scoreLead amb una còpia del lead que l\'inclou', async () => {
+    mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+    mockEstimateAmount.mockReturnValue(2000);
+    const leadFixture = makeLead({ eventDate: new Date('2026-08-15T00:00:00Z') });
+    mockPrisma.lead.findMany.mockResolvedValue([leadFixture]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const injectedNow = new Date('2026-06-15T12:00:00Z');
+    await buildPipelineForecast(3, injectedNow);
+
+    // scoreLead ha de rebre el lead amb `now` injectat
+    expect(mockScoreLead).toHaveBeenCalledWith(expect.objectContaining({ now: injectedNow }));
+  });
+
+  it('determinisme: dues crides amb el mateix `now` i mateixes dades donen el mateix resultat', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate: new Date('2026-08-15T00:00:00Z') })]);
+    mockPrisma.booking.findMany.mockResolvedValue([
+      { eventDate: new Date('2025-08-15T00:00:00Z'), total: 5000 },
+    ]);
+
+    const now = new Date('2026-06-15T12:00:00Z');
+    const a = await buildPipelineForecast(3, now);
+    const b = await buildPipelineForecast(3, now);
+    expect(a).toEqual(b);
+  });
 });

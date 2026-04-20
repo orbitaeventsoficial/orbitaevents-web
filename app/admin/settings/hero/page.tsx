@@ -1,17 +1,44 @@
 'use client';
 
 import Link from 'next/link';
+import { AdminPage } from '@/app/admin/components/AdminPage';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
+import { EditorControlStrip } from '@/app/admin/components/EditorControlStrip';
 
 export default function HeroMediaAdmin() {
   return (
-    <div className="mx-auto max-w-4xl p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Hero — Mitjans</h1>
-        <p className="mt-2 text-sm text-white/70">
-          Aquest bloc ja no es gestiona amb un sistema separat. El hero de la home ara forma part del gestor d’imatges unificat.
-        </p>
-      </div>
+    <AdminPage
+      title="Hero — Mitjans"
+      subtitle="Aquest bloc ja no es gestiona amb un sistema separat. El hero de la home ara forma part del gestor d’imatges unificat."
+      back={{ href: '/admin/settings', label: 'Configuració' }}
+    >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Font única',
+          title: 'Què controla ara aquest espai',
+          stats: [
+            { label: 'Placement', value: 'home.hero.slides' },
+            { label: 'Panells', value: '1', hint: 'unificat' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què ha canviat',
+          items: [
+            'El hero de la home ja no viu en un sistema separat.',
+            'Els uploads i l’ordre de slides passen pel mateix gestor d’imatges que la resta de col·leccions.',
+            'Aquest pont existeix només per evitar dubtes i rutes mortes dins de configuració.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: 'Treballar el hero des del gestor d’imatges',
+          description: 'Si has de canviar slides, ordre o assets del hero, el lloc correcte és el gestor d’imatges amb el placement `home.hero.slides`.',
+          primaryAction: { href: '/admin/image-manager', label: 'Anar al gestor d’imatges' },
+          secondaryAction: { href: '/admin/settings', label: 'Tornar a configuració' },
+          secondaryPills: ['Placement: home.hero.slides'],
+        }}
+      />
 
       <div className="grid gap-3 md:grid-cols-3">
         <AdminHelpLegend title="Font única" body="Els slides del hero viuen al placement `home.hero.slides` dins del gestor d’imatges." />
@@ -31,6 +58,6 @@ export default function HeroMediaAdmin() {
           Anar al gestor d’imatges
         </Link>
       </div>
-    </div>
+    </AdminPage>
   );
 }

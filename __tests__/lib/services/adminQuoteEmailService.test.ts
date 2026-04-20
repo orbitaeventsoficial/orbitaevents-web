@@ -74,7 +74,7 @@ vi.mock('@/lib/utils/normalize', () => ({
   normalizePhone: (p: string) => p.replace(/\s/g, ''),
 }));
 vi.mock('@/app/config/site-config', () => ({
-  SITE_CONFIG: { business: { email: 'admin@orbita.com' } },
+  SITE_CONFIG: { business: { email: 'admin@orbita.com' }, web: { url: 'https://test.orbita.events' } },
 }));
 
 import { sendAdminQuoteEmail } from '@/lib/services/adminQuoteEmailService';

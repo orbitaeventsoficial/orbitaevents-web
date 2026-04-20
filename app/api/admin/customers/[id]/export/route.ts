@@ -32,11 +32,11 @@ export async function GET(
       });
     }
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ ok: true, body: data });
   } catch (error) {
     console.error('Error exportant dades client:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }

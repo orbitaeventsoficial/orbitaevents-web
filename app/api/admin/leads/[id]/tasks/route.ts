@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
-import { createLeadTaskForRoute, listLeadTasksForRoute } from '@/lib/services/leadTaskRouteService';
+import { createLeadScopedTaskForRoute, listLeadScopedTasksForRoute } from '@/lib/services/leadScopedTaskRouteService';
 
 interface Params {
   params: { id: string };
@@ -16,13 +16,14 @@ const taskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   assignedTo: z.string().optional(),
   createdBy: z.string().optional(),
+  source: z.string().optional(),
 });
 
 export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    const result = await listLeadTasksForRoute(params.id);
+    const result = await listLeadScopedTasksForRoute(params.id);
     return NextResponse.json(result);
   } catch (error) {
     log.error('Error obtenint tasques', error);
@@ -40,10 +41,11 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Dades invàlides', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const result = await createLeadTaskForRoute(params.id, parsed.data);
+    const result = await createLeadScopedTaskForRoute(params.id, parsed.data);
     return NextResponse.json(result);
   } catch (error) {
     log.error('Error creant tasca', error);
     return NextResponse.json({ error: 'Error creant tasca' }, { status: 500 });
   }
 }
+

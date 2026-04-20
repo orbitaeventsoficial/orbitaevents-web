@@ -56,7 +56,6 @@ export async function runLeadCleanup(): Promise<{
       await tx.leadNote.deleteMany({ where: { leadId: { in: ids } } });
       await tx.leadActivity.deleteMany({ where: { leadId: { in: ids } } });
       await tx.task.deleteMany({ where: { leadId: { in: ids } } });
-      await tx.leadTask.deleteMany({ where: { leadId: { in: ids } } });
       await tx.leadDocument.deleteMany({ where: { leadId: { in: ids } } });
       const deleted = await tx.lead.deleteMany({ where: { id: { in: ids } } });
       autoDeleted = deleted.count;
@@ -70,3 +69,4 @@ export async function runLeadCleanup(): Promise<{
     autoDeleted,
   };
 }
+

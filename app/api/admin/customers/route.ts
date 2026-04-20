@@ -21,11 +21,16 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
+    const lifecycleStage = searchParams.get('lifecycleStage') as import('@prisma/client').CustomerLifecycle | null;
     const result = await listAdminCustomers({
       includeStats: searchParams.get('stats') === 'true',
       page: parseInt(searchParams.get('page') || '1', 10),
       limit: parseInt(searchParams.get('limit') || '25', 10),
       q: (searchParams.get('q') || '').trim(),
+      lifecycleStage: lifecycleStage || undefined,
+      tag: searchParams.get('tag') || undefined,
+      healthScoreMax: searchParams.get('healthScoreMax') ? parseInt(searchParams.get('healthScoreMax')!, 10) : undefined,
+      minSpent: searchParams.get('minSpent') ? parseInt(searchParams.get('minSpent')!, 10) : undefined,
     });
 
     return successResponse(result);

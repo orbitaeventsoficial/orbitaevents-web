@@ -8,24 +8,26 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-girona'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
   const galleryImages = await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Girona | Ciudad y Provincia | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en Girona desde ${MIN_PRICE}€. Cobertura en Girona ciudad, Figueres, Olot, Banyoles, Salt. Sonido profesional 4000W, iluminación y efectos. Presupuesto gratis.`,
-  keywords: ['DJ bodas Girona', 'DJ bodas Figueres', 'DJ bodas Olot', 'DJ boda Banyoles', 'DJ matrimonio Girona', 'discomóvil Girona'],
+  title: COPY.metadata.title(MIN_PRICE),
+  description: COPY.metadata.description(MIN_PRICE),
+  keywords: COPY.metadata.keywords,
   metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/dj-bodas-girona' },
   openGraph: {
-    title: `DJ Bodas Girona | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en Girona. Ciudad, Figueres, Olot, Banyoles y toda la provincia.',
+    title: COPY.metadata.ogTitle(MIN_PRICE),
+    description: COPY.metadata.ogDescription,
     url: '/servicios/dj-bodas-girona',
-    images: [{ url: heroImage, alt: 'DJ Bodas Girona - Òrbita Events' }],
+    images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
     type: 'website',
   },
   robots: { index: true, follow: true },
@@ -58,19 +60,14 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
     zone: 'Girona',
     zoneSlug: 'girona',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Girona',
-    heroSubtitle: 'Girona · Figueres · Olot · Banyoles · Toda la provincia',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: gironaTowns,
     // Keywords SEO reals
-    highlights: ['DJ boda Girona', 'Bodas masía Girona', 'Precio DJ boda', 'DJ boda provincia Girona'],
-    description: `¿Buscas un DJ para tu boda en Girona? En Òrbita Events somos especialistas en bodas en toda la provincia de Girona: desde la ciudad hasta el Empordà, pasando por la Garrotxa, el Gironès y la Selva.`,
-    whyChooseUs: [
-      'Cobertura completa: Trabajamos en toda la provincia de Girona',
-      'Experiencia en masías: Conocemos las particularidades de las masías del Empordà',
-      'Multilingüe: Catalán, castellano e inglés',
-      'Espacios históricos: Experiencia en monumentos y patrimonio protegido',
-    ],
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
     heroImage: heroImage,
     galleryImages: galleryImages,
@@ -82,13 +79,13 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
         { name: tCommon('nav.home'), url: '/' },
         { name: tCommon('nav.services'), url: '/servicios' },
         { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Girona', url: '/servicios/dj-bodas-girona' },
+        { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-girona' },
       ]} />
       <ServiceJsonLD
-        name="DJ Bodas Girona"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-girona"
-        description={`DJ profesional para bodas en Girona. Cobertura completa. Sonido 4000W, iluminación LED. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Girona', 'DJ bodas Figueres', 'DJ bodas Olot', 'Discomóvil Girona']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={gironaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +95,3 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
     </>
   );
 }
-

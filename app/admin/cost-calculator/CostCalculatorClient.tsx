@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '../components/ToastProvider';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 
 // ─── Component types ────────────────────────────────────────────────────────
 
@@ -99,6 +100,25 @@ export default function CostCalculatorClient() {
     const margin = suggestedPrice - totalCost;
     return { totalCost: Math.round(totalCost * 100) / 100, suggestedPrice, margin, marginPct };
   }, [components, marginPct]);
+  const totalHours = useMemo(
+    () => components.reduce((sum, component) => sum + (component.hours * component.quantity), 0),
+    [components],
+  );
+  const hasQuoteBase = quoteName.trim().length > 0;
+  const actionTitle = components.length === 0
+    ? 'Començar afegint la base del pressupost'
+    : !hasQuoteBase
+      ? 'Posar nom i tancar la base abans de desar'
+      : saving
+        ? 'Deixar que el pressupost es desi correctament'
+        : 'Refinar marge i cost abans de guardar';
+  const actionDescription = components.length === 0
+    ? 'Sense components no hi ha lectura econòmica real sobre la qual calcular marge o PVP.'
+    : !hasQuoteBase
+      ? 'El retorn més alt ara no és seguir afegint peces, sinó identificar el pressupost i tancar la base editable.'
+      : saving
+        ? 'Ara mateix el sistema està persistint el pressupost personalitzat.'
+        : 'Amb la base completa, el pas bo és ajustar marge i revisar el preu suggerit abans de desar.';
 
   // Drag & Drop
   const handleDragStart = (e: React.DragEvent, component: AvailableComponent) => {
@@ -148,6 +168,47 @@ export default function CostCalculatorClient() {
 
   return (
     <div className="grid lg:grid-cols-[300px_1fr] gap-6" data-help-title="Calculadora de costos" data-help-desc="Munta pressupostos personalitzats arrossegant components (DJ, so, llums, transport...). Calcula cost, marge i preu suggerit.">
+      <div className="lg:col-span-2">
+        <EditorControlStrip
+          overview={{
+            eyebrow: 'Cobertura',
+            title: 'Quin estat té ara mateix el pressupost',
+            tone: components.length === 0 ? 'default' : hasQuoteBase ? 'success' : 'warning',
+            stats: [
+              { label: 'Components', value: components.length, tone: components.length > 0 ? 'success' : 'warning', hint: 'base activa' },
+              { label: 'Cost total', value: `${totals.totalCost}€`, hint: 'cost real' },
+              { label: 'PVP suggerit', value: `${totals.suggestedPrice}€`, hint: `${marginPct}% marge` },
+            ],
+          }}
+          status={{
+            eyebrow: 'Estat',
+            title: 'Què convé revisar abans de desar',
+            tone: components.length === 0 || !hasQuoteBase || saving ? 'warning' : 'info',
+            items: [
+              components.length === 0
+                ? 'Encara no hi ha components al pressupost.'
+                : `Hi ha ${components.length} components i ${totalHours} hores/unitats agregades de treball.`,
+              hasQuoteBase
+                ? `El pressupost ja té nom: ${quoteName.trim()}.`
+                : 'Encara falta el nom del pressupost per deixar-lo identificat.',
+              clientName.trim()
+                ? `Client associat: ${clientName.trim()}.`
+                : 'No hi ha client associat a aquesta simulació.',
+            ],
+          }}
+          action={{
+            eyebrow: 'Acció principal',
+            title: actionTitle,
+            description: actionDescription,
+            tone: components.length === 0 || !hasQuoteBase || saving ? 'warning' : 'success',
+            secondaryPills: [
+              clientName.trim() ? 'Amb client' : 'Sense client',
+              saving ? 'Desant' : 'Sessió estable',
+            ],
+          }}
+        />
+      </div>
+
       {/* Sidebar — Components disponibles */}
       <div className="ap-card rounded-xl p-5" data-help-title="Components disponibles" data-help-desc="Arrossega o clica components per afegir-los al pressupost. Cada component té un cost/hora estimat.">
         <h3 className="text-sm font-bold text-white/70 uppercase tracking-wider mb-4">Components</h3>

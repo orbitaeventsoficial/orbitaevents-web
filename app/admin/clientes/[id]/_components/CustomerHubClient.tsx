@@ -1,16 +1,15 @@
 'use client';
 
-import { Component, createContext, useCallback, useContext, useState, useTransition, type ReactNode } from 'react';
+import { Component, createContext, useCallback, useContext, useEffect, useState, useTransition, type ReactNode } from 'react';
 import { log } from '@/lib/logger';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import CustomerHeader from './CustomerHeader';
 import TimelinePanel from './TimelinePanel';
 import dynamic from 'next/dynamic';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// LAZY LOADING DELS PANELS
-// Només el SummaryPanel es carrega immediatament, la resta sota demanda
-// ═══════════════════════════════════════════════════════════════════════════
+import { ADMIN_CUSTOMER_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { buildCustomerWorkspaceTabHref, parseCustomerWorkspaceTab, type CustomerWorkspaceTab } from '@/lib/admin/customerWorkspaceHref';
+import { getCustomerHubTaskNotice } from '@/lib/customer-hub/taskResultNotice';
 
 const SummaryPanel = dynamic(() => import('./panels/SummaryPanel'), {
   loading: () => <PanelSkeleton />,
@@ -48,10 +47,6 @@ const PrivacyPanel = dynamic(() => import('./panels/PrivacyPanel'), {
   loading: () => <PanelSkeleton />,
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CONTEXT PER COMPARTIR REFRESH ENTRE COMPONENTS
-// ═══════════════════════════════════════════════════════════════════════════
-
 type HubContextValue = {
   data: CustomerHubDTO;
   refreshing: boolean;
@@ -66,10 +61,6 @@ export function useHubContext() {
   if (!ctx) throw new Error('useHubContext must be used within CustomerHubClient');
   return ctx;
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ERROR BOUNDARY PER PANELS
-// ═══════════════════════════════════════════════════════════════════════════
 
 type ErrorBoundaryState = { hasError: boolean; error?: Error };
 
@@ -86,7 +77,7 @@ class PanelErrorBoundary extends Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
     log.error(`Error al panell ${this.props.panelName}:`, error);
   }
 
@@ -117,10 +108,6 @@ class PanelErrorBoundary extends Component<
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SKELETON LOADING
-// ═══════════════════════════════════════════════════════════════════════════
-
 function PanelSkeleton() {
   return (
     <div className="animate-pulse rounded-2xl border p-5">
@@ -135,46 +122,31 @@ function PanelSkeleton() {
   );
 }
 
-function TimelineSkeleton() {
-  return (
-    <aside className="rounded-2xl border p-4">
-      <div className="h-5 w-1/2 rounded" />
-      <div className="mt-3 space-y-2">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-16 rounded-xl" />
-        ))}
-      </div>
-    </aside>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════════════════════════
-
-type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
-
-const TABS: Array<{ key: TabKey; label: string; icon: string }> = [
-  { key: 'summary', label: 'Resum', icon: '📊' },
-  { key: 'proposals', label: 'Pressupostos', icon: '📄' },
-  { key: 'bookings', label: 'Reserves', icon: '📅' },
-  { key: 'margin', label: 'Marge', icon: '💰' },
-  { key: 'comms', label: 'Comunicacions', icon: '💬' },
-  { key: 'tasks', label: 'Tasques', icon: '✅' },
-  { key: 'discounts', label: 'Descomptes', icon: '🏷️' },
-  { key: 'leads', label: 'Entrades', icon: '📋' },
-  { key: 'privacy', label: 'Privacitat', icon: '🔒' },
-];
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
-
 export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO }) {
-  const [tab, setTab] = useState<TabKey>('summary');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const initialTab = parseCustomerWorkspaceTab(searchParams?.get('tab')) ?? 'summary';
+  const initialTaskNotice = getCustomerHubTaskNotice(searchParams?.get('taskSource'), searchParams?.get('taskResult'));
+  const [tab, setTab] = useState<CustomerWorkspaceTab>(initialTab);
+  const [taskNotice, setTaskNotice] = useState<string | null>(initialTaskNotice);
   const [data, setData] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const [refreshError, setRefreshError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialTaskNotice) return;
+
+    const taskSource = searchParams?.get('taskSource');
+    const taskResult = searchParams?.get('taskResult');
+    if (!taskSource || !taskResult) return;
+
+    const cleanHref = pathname
+      ? `${pathname}?tab=tasks`
+      : buildCustomerWorkspaceTabHref(initial.customer.id, 'tasks');
+
+    router.replace(cleanHref, { scroll: false });
+  }, [initial.customer.id, initialTaskNotice, pathname, router, searchParams]);
 
   const refresh = useCallback(() => {
     startTransition(async () => {
@@ -188,7 +160,6 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         }
       } catch (err) {
         setRefreshError(err instanceof Error ? err.message : 'Error refrescant');
-        // No fa re-throw, només mostra error
       }
     });
   }, [initial.customer.id]);
@@ -229,7 +200,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
       case 'tasks':
         return (
           <PanelErrorBoundary panelName="Tasques">
-            <TasksNotesPanel data={data} />
+            <TasksNotesPanel data={data} notice={taskNotice} onDismissNotice={() => setTaskNotice(null)} />
           </PanelErrorBoundary>
         );
       case 'discounts':
@@ -262,13 +233,11 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
   return (
     <HubContext.Provider value={contextValue}>
       <div className="space-y-4">
-        {/* Header */}
         <CustomerHeader data={data} tab={tab} setTab={setTab} />
 
-        {/* Refresh error banner */}
         {refreshError && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-xl border px-4 py-2 text-sm">
+            <div className="rounded-xl border px-4 py-2 text-sm" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshError)}>
               {refreshError}
               <button
                 type="button"
@@ -281,35 +250,40 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
           </div>
         )}
 
-        {/* Refreshing indicator */}
         {isPending && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-xl border px-4 py-2 text-sm">
+            <div className="rounded-xl border px-4 py-2 text-sm" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshing)}>
               <span className="mr-2 inline-block animate-spin">⟳</span>
               Actualitzant dades...
             </div>
           </div>
         )}
 
-        {/* Main content */}
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12" data-help-title="Layout de la fitxa client" data-help-desc="A l'esquerra tens el panell principal del client i a la dreta la cronologia d'activitat i context. ">
-          <div className="lg:col-span-8" data-help-title="Panell principal del client" data-help-desc="Canvia segons la pestanya activa i concentra la informació operativa principal del client.">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.layout)}>
+          <div className="min-w-0 lg:col-span-8" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.mainPanel)}>
             {renderPanel()}
           </div>
-          <div className="lg:col-span-4" data-help-title="Cronologia lateral del client" data-help-desc="Mostra l'activitat del client ordenada en el temps per entendre el context abans d'actuar.">
+          <div className="min-w-0 lg:col-span-4" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.timeline)}>
             <PanelErrorBoundary panelName="Timeline">
-              <TimelinePanel timeline={data.timeline} />
+              <TimelinePanel
+                timeline={data.timeline}
+                customerId={data.customer.id}
+                customerName={data.customer.name}
+                customerPhone={data.customer.phone}
+                insights={data.insights}
+                followUpSummary={data.followUpSummary}
+              />
             </PanelErrorBoundary>
           </div>
         </div>
 
-        {/* Floating refresh button (mobile) */}
         <button
           type="button"
           onClick={refresh}
           disabled={isPending}
-          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden" data-help-title="Refrescar fitxa client" data-help-desc="Torna a carregar les dades del hub client sense sortir de la fitxa, útil si acabes de fer canvis en una altra secció."
-          aria-label="Refrescar dades"
+          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden"
+          aria-label={ADMIN_CUSTOMER_HELP.hub.refresh.title}
+          {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refresh)}
         >
           <span className={isPending ? 'inline-block animate-spin' : ''}>🔄</span>
         </button>
@@ -317,4 +291,3 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
     </HubContext.Provider>
   );
 }
-

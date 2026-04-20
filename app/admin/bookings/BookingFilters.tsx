@@ -4,12 +4,20 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { BOOKING_STATUS_OPTIONS, EVENT_TYPE_OPTIONS } from '@/lib/constants';
 import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
+import { buildCustomerBookingListHref } from '@/lib/admin/customerWorkspaceHref';
+
+function buildBookingsHref(params: URLSearchParams) {
+  const query = params.toString();
+  return query ? `/admin/bookings?${query}` : '/admin/bookings';
+}
 
 export default function BookingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const customerId = searchParams?.get('customerId') || '';
+  const currentSearch = searchParams?.get('search') || '';
 
-  const [search, setSearch] = useState(searchParams?.get('search') || '');
+  const [search, setSearch] = useState(currentSearch);
   const status = searchParams?.get('status') || '';
   const eventType = searchParams?.get('eventType') || '';
   const payment = searchParams?.get('payment') || '';
@@ -27,20 +35,37 @@ export default function BookingFilters() {
           params.delete(key);
         }
       }
-      router.push(`/admin/bookings?${params.toString()}`);
+      const query = params.toString();
+      router.push(
+        customerId
+          ? buildCustomerBookingListHref(customerId, {
+              view: params.get('view'),
+              status: params.get('status'),
+              eventType: params.get('eventType'),
+              payment: params.get('payment'),
+              fromDate: params.get('fromDate'),
+              toDate: params.get('toDate'),
+              search: params.get('search'),
+              page: params.get('page') ? Number(params.get('page')) : null,
+            })
+          : buildBookingsHref(params)
+      );
     },
-    [router, searchParams],
+    [customerId, router, searchParams],
   );
 
   useEffect(() => {
+    setSearch(currentSearch);
+  }, [currentSearch]);
+
+  useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const current = searchParams?.get('search') || '';
-      if (search !== current) {
+      if (search !== currentSearch) {
         updateParams({ search });
       }
     }, 300);
     return () => window.clearTimeout(timeout);
-  }, [search, searchParams, updateParams]);
+  }, [currentSearch, search, updateParams]);
 
   const hasFilters = status || eventType || payment || fromDate || toDate || search;
 
@@ -135,7 +160,7 @@ export default function BookingFilters() {
             type="button"
             onClick={() => {
               setSearch('');
-              router.push('/admin/bookings');
+              router.push(customerId ? buildCustomerBookingListHref(customerId) : '/admin/bookings');
             }}
             className="rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
           >

@@ -14,9 +14,8 @@ import PaymentReminderActions from './PaymentReminderActions';
 import { formatDateSimple } from '@/lib/constants';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_ECONOMY_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { type PaymentRow, money, paymentStateBadge } from './economia-types';
-
-// ─── KpiCard ─────────────────────────────────────────────────────────────────
 
 export function KpiCard({ label, value, sub, color, borderColor, bgColor, delay = 0 }: {
   label: string;
@@ -33,6 +32,7 @@ export function KpiCard({ label, value, sub, color, borderColor, bgColor, delay 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay }}
       className={`rounded-xl border ${borderColor} ${bgColor} p-4 shadow-md admin-card-glass`}
+      {...helpAttrs(ADMIN_ECONOMY_HELP.kpiCard(label, sub))}
     >
       <p className="text-xs font-medium uppercase tracking-wider">{label}</p>
       <p className={`mt-1 text-2xl font-black tracking-tight ${color}`}>{value}</p>
@@ -41,12 +41,10 @@ export function KpiCard({ label, value, sub, color, borderColor, bgColor, delay 
   );
 }
 
-// ─── ProgressBar ─────────────────────────────────────────────────────────────
-
 export function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
   const width = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden" {...helpAttrs(ADMIN_ECONOMY_HELP.progressBar)}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${width}%` }}
@@ -56,8 +54,6 @@ export function ProgressBar({ value, max, color }: { value: number; max: number;
     </div>
   );
 }
-
-// ─── HealthScore ─────────────────────────────────────────────────────────────
 
 export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { overdueTotal: number; outstandingTotal: number; marginPct: number }) {
   const overdueRatio = outstandingTotal > 0 ? overdueTotal / outstandingTotal : 0;
@@ -78,6 +74,7 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center justify-center rounded-2xl border border-white/10 p-6 shadow-lg admin-card-glass"
+      {...helpAttrs(ADMIN_ECONOMY_HELP.healthScore)}
     >
       <p className="text-xs font-medium uppercase tracking-wider mb-3">Salut financera</p>
       <div className="relative w-28 h-28">
@@ -96,12 +93,10 @@ export function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { ove
           <span className={`text-2xl font-black ${color}`}>{score}</span>
         </div>
       </div>
-      <p className={`mt-2 text-sm font-bold ${color}`}>{label}</p>
+      <p className={`mt-2 text-sm font-bold ${color}`} {...helpAttrs(ADMIN_ECONOMY_HELP.healthLabel(label))}>{label}</p>
     </motion.div>
   );
 }
-
-// ─── PaymentTimelineBar ──────────────────────────────────────────────────────
 
 export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
   const rawDepositPct = row.total > 0 ? (row.depositAmount / row.total) * 100 : 30;
@@ -128,7 +123,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
   const remainingLabel = `Resta: ${money(row.remainingAmount)} ${row.remainingPaid ? '(pagat)' : '(pendent)'}`;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1" {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimeline)}>
       <div className="flex items-center gap-0.5 h-4 rounded-full overflow-hidden bg-white/5 w-full">
         <div
           className={`h-full ${depositColor} transition-all duration-300 relative group`}
@@ -139,6 +134,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={depositLabel}
+          {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(depositLabel))}
         >
           <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
             {depositPct > 15 ? `${Math.round(depositPct)}%` : ''}
@@ -153,6 +149,7 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={remainingLabel}
+          {...helpAttrs(ADMIN_ECONOMY_HELP.paymentTimelineSegment(remainingLabel))}
         >
           <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
             {remainingPct > 15 ? `${Math.round(remainingPct)}%` : ''}
@@ -172,8 +169,6 @@ export function PaymentTimelineBar({ row }: { row: PaymentRow }) {
     </div>
   );
 }
-
-// ─── CobramentFiltersSection ─────────────────────────────────────────────────
 
 type PaymentFilter = 'tots' | 'pendents' | 'vencits' | 'proxims' | 'pagats';
 
@@ -294,8 +289,7 @@ export function CobramentFiltersSection({
 
   return (
     <>
-      {/* Filter bar */}
-      <section className="rounded-xl border border-white/10 p-3 space-y-3">
+      <section className="rounded-xl border border-white/10 p-3 space-y-3" {...helpAttrs(ADMIN_ECONOMY_HELP.filters)}>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"
@@ -303,23 +297,26 @@ export function CobramentFiltersSection({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:outline-none"
+            {...helpAttrs(ADMIN_ECONOMY_HELP.search)}
           />
-          <ExportCsvButton
-            data={csvData}
-            filename="cobraments"
-            columns={[
-              { header: 'Referència', accessor: (r) => String(r.Referencia || '') },
-              { header: 'Client', accessor: (r) => String(r.Client || '') },
-              { header: 'Telèfon', accessor: (r) => String(r.Telefon || '') },
-              { header: 'Data event', accessor: (r) => String(r['Data event'] || '') },
-              { header: 'Total', accessor: (r) => Number(r.Total || 0) },
-              { header: 'Dipòsit', accessor: (r) => Number(r.Diposit || 0) },
-              { header: 'Dipòsit pagat', accessor: (r) => String(r['Diposit pagat'] || '') },
-              { header: 'Resta', accessor: (r) => Number(r.Resta || 0) },
-              { header: 'Resta pagat', accessor: (r) => String(r['Resta pagat'] || '') },
-              { header: 'Estat', accessor: (r) => String(r.Estat || '') },
-            ]}
-          />
+          <div {...helpAttrs(ADMIN_ECONOMY_HELP.exportCsv)}>
+            <ExportCsvButton
+              data={csvData}
+              filename="cobraments"
+              columns={[
+                { header: 'Referència', accessor: (r) => String(r.Referencia || '') },
+                { header: 'Client', accessor: (r) => String(r.Client || '') },
+                { header: 'Telèfon', accessor: (r) => String(r.Telefon || '') },
+                { header: 'Data event', accessor: (r) => String(r['Data event'] || '') },
+                { header: 'Total', accessor: (r) => Number(r.Total || 0) },
+                { header: 'Dipòsit', accessor: (r) => Number(r.Diposit || 0) },
+                { header: 'Dipòsit pagat', accessor: (r) => String(r['Diposit pagat'] || '') },
+                { header: 'Resta', accessor: (r) => Number(r.Resta || 0) },
+                { header: 'Resta pagat', accessor: (r) => String(r['Resta pagat'] || '') },
+                { header: 'Estat', accessor: (r) => String(r.Estat || '') },
+              ]}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {filterChips.map((chip) => (
@@ -332,6 +329,7 @@ export function CobramentFiltersSection({
                   ? 'border-amber-500/50 bg-amber-500/15 text-amber-200'
                   : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
               }`}
+              {...helpAttrs(ADMIN_ECONOMY_HELP.filterChip(chip.label))}
             >
               {chip.label}
               {chip.count !== undefined && (
@@ -342,15 +340,15 @@ export function CobramentFiltersSection({
         </div>
       </section>
 
-      {/* Bulk actions */}
       {selected.size > 0 && (
-        <section className="rounded-xl border p-3 flex flex-wrap items-center gap-3">
+        <section className="rounded-xl border p-3 flex flex-wrap items-center gap-3" {...helpAttrs(ADMIN_ECONOMY_HELP.bulkActions)}>
           <span className="text-sm font-medium">{selected.size} seleccionat{selected.size !== 1 ? 's' : ''}</span>
           <button
             type="button"
             onClick={() => bulkMarkPaid('depositPaid')}
             disabled={bulkBusy}
             className="rounded-xl border px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+            {...helpAttrs(ADMIN_ECONOMY_HELP.bulkDeposit)}
           >
             {bulkBusy ? '...' : 'Marcar dipòsit pagat'}
           </button>
@@ -359,6 +357,7 @@ export function CobramentFiltersSection({
             onClick={() => bulkMarkPaid('remainingPaid')}
             disabled={bulkBusy}
             className="rounded-xl border px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+            {...helpAttrs(ADMIN_ECONOMY_HELP.bulkRemaining)}
           >
             {bulkBusy ? '...' : 'Marcar resta pagada'}
           </button>
@@ -366,6 +365,7 @@ export function CobramentFiltersSection({
             type="button"
             onClick={() => setSelected(new Set())}
             className="text-xs text-white/40 hover:text-white/60"
+            {...helpAttrs(ADMIN_ECONOMY_HELP.clearSelection)}
           >
             Netejar selecció
           </button>
@@ -373,8 +373,7 @@ export function CobramentFiltersSection({
         </section>
       )}
 
-      {/* Table with timeline */}
-      <section className="rounded-2xl border p-3 shadow-lg overflow-x-auto">
+      <section className="rounded-2xl border p-3 shadow-lg overflow-x-auto" {...helpAttrs(ADMIN_ECONOMY_HELP.table)}>
         <table className="w-full text-sm" aria-label="Cobraments pendents">
           <thead>
             <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
@@ -432,7 +431,11 @@ export function CobramentFiltersSection({
                 </td>
                 <td className="px-2 py-2 text-right hidden sm:table-cell font-semibold text-xs">{money(row.total)}</td>
                 <td className="px-2 py-2">
-                  <Link href={`/admin/bookings/${row.id}`} className="text-xs text-white/40 hover:text-white/70">
+                  <Link
+                    href={`/admin/bookings/${row.id}`}
+                    className="text-xs text-white/40 hover:text-white/70"
+                    {...helpAttrs(ADMIN_ECONOMY_HELP.rowLink(row.reference))}
+                  >
                     &rarr;
                   </Link>
                 </td>

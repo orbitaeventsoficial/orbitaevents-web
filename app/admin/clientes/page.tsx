@@ -11,16 +11,32 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { VIP_SPEND_THRESHOLD, getCustomerSourceLabel } from '@/lib/constants';
-import { AdminEmptyState, AdminPage } from '../components/AdminPage';
-import { AdminHelpPanel } from '../components/AdminHelpPanel';
-import ExportCsvButton from '../components/ExportCsvButton';
+import {
+  VIP_SPEND_THRESHOLD,
+  CUSTOMER_SEGMENTS,
+  CUSTOMER_LIFECYCLE_LABELS,
+  CUSTOMER_LIFECYCLE_COLORS,
+  CUSTOMER_LIFECYCLE_VALUES,
+  type CustomerLifecycleValue,
+} from '@/lib/constants';
+import { AdminPage } from '../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { PRIORITY_FILTER_STYLES, getNextStep, getExecutionPriority } from './customer-utils';
+import { getExecutionPriority } from './customer-utils';
 import { AddCustomerModal, StartProcessModal } from './ClientesModals';
+import {
+  CustomersDesktopTable,
+  CustomersEmpty,
+  CustomersError,
+  CustomersHelpPanel,
+  CustomersLoading,
+  CustomersMobileList,
+  CustomersPagination,
+  CustomersPriorityFilters,
+  CustomersStatsActions,
+  CustomersToolbar,
+} from './CustomersPageSections';
 
 export default function AdminContactesPage() {
   const searchParams = useSearchParams();
@@ -35,16 +51,21 @@ export default function AdminContactesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 25;
   const [priorityFilter, setPriorityFilter] = useState<'ALL' | ExecutionPriority>('ALL');
+  const [lifecycleFilter, setLifecycleFilter] = useState<CustomerLifecycleValue | ''>('');
+  const [tagFilter, setTagFilter] = useState('');
+  const [healthScoreMax, setHealthScoreMax] = useState<number | null>(null);
+  const [minSpent, setMinSpent] = useState<number | null>(null);
   const reduceMotion = useReducedMotion();
-
-  // Modals
   const [showAddModal, setShowAddModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [addModalNotes, setAddModalNotes] = useState('');
 
+  const openActionModal = useCallback((customer: Customer) => {
+    setSelectedCustomer(customer);
+    setShowActionModal(true);
+  }, []);
 
-  // Fetch customers
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -58,6 +79,10 @@ export default function AdminContactesPage() {
         limit: String(pageSize),
       });
       if (search) params.set('q', search);
+      if (lifecycleFilter) params.set('lifecycleStage', lifecycleFilter);
+      if (tagFilter) params.set('tag', tagFilter);
+      if (healthScoreMax != null) params.set('healthScoreMax', String(healthScoreMax));
+      if (minSpent != null) params.set('minSpent', String(minSpent));
 
       const response = await fetchWithCsrf(`/api/admin/customers?${params.toString()}`, {
         credentials: 'include',
@@ -65,9 +90,7 @@ export default function AdminContactesPage() {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('No autoritzat');
-        }
+        if (response.status === 401) throw new Error('No autoritzat');
         throw new Error('Error carregant clients');
       }
 
@@ -92,6 +115,9 @@ export default function AdminContactesPage() {
         total_spent: typeof item.totalSpent === 'number' ? item.totalSpent : 0,
         is_vip: typeof item.totalSpent === 'number' ? item.totalSpent >= VIP_SPEND_THRESHOLD : false,
         created_at: String(item.createdAt || ''),
+        tags: Array.isArray(item.tags) ? item.tags as string[] : [],
+        lifecycleStage: item.lifecycleStage ? String(item.lifecycleStage) : undefined,
+        healthScore: typeof item.healthScore === 'number' ? item.healthScore : null,
       }));
 
       setCustomers(mappedCustomers);
@@ -108,7 +134,7 @@ export default function AdminContactesPage() {
       clearTimeout(tid);
       setLoading(false);
     }
-  }, [page, pageSize, search]);
+  }, [page, pageSize, search, lifecycleFilter, tagFilter, healthScoreMax, minSpent]);
 
   useEffect(() => {
     fetchCustomers();
@@ -123,7 +149,7 @@ export default function AdminContactesPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, lifecycleFilter, tagFilter, healthScoreMax, minSpent]);
 
   const filteredCustomers = useMemo(() => {
     const withPriority = customers.map((customer) => ({
@@ -144,394 +170,62 @@ export default function AdminContactesPage() {
 
     const date = searchParams?.get('date');
     setShowAddModal(true);
-    if (date) {
-      setAddModalNotes(`Origen calendari (${date})`);
-    }
+    if (date) setAddModalNotes(`Origen calendari (${date})`);
   }, [searchParams]);
-
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // RENDER
-  // ═══════════════════════════════════════════════════════════════════════════
-
   return (
     <AdminPage
       title="Clients"
       subtitle="CRM - Afegeix clients i inicia processos"
-      actions={
-        stats ? (
-          <div className="flex gap-3 flex-wrap">
-            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs">Total</p>
-            </div>
-            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
-              <p className="text-2xl font-bold">{stats.vip}</p>
-              <p className="text-xs">VIP</p>
-            </div>
-            <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
-              <p className="text-2xl font-bold">{stats.withEvents}</p>
-              <p className="text-xs">Amb esdeveniments</p>
-            </div>
-          </div>
-        ) : undefined
-      }
+      actions={<CustomersStatsActions stats={stats} />}
     >
-      <AdminHelpPanel
-        title="Com treballar clients"
-        description="Aquesta pantalla és el centre del CRM. Serveix per trobar persones ràpid, entendre qui necessita atenció i saber quin és el pas següent."
-        items={[
-          {
-            title: 'Prioritat',
-            body: 'La prioritat t ajuda a saber a qui convé moure abans.',
-          },
-          {
-            title: 'Proper pas',
-            body: 'Cada fila t orienta sobre la millor acció per fer avançar la relació.',
-          },
-          {
-            title: 'Fitxa 360',
-            body: 'La fitxa et dona la visió completa del client sense haver d anar buscant dades.',
-          },
-        ]}
+      <CustomersHelpPanel />
+      <CustomersToolbar
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        customers={customers}
+        onAddCustomer={() => setShowAddModal(true)}
       />
 
-      {/* Search & Add */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="search"
-            placeholder="Cercar per nom, email, telèfon, Instagram o codi descompte"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            aria-label="Cercar client"
-            className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-1 transition-all" data-help-title="Cercador de clients" data-help-desc="Troba clients per nom, email, telèfon, Instagram o codi de descompte sense recórrer tot el llistat."
+      {/* Filtres CRM: segments ràpids + lifecycle */}
+      <CrmSegmentFilters
+        lifecycleFilter={lifecycleFilter}
+        setLifecycleFilter={setLifecycleFilter}
+        tagFilter={tagFilter}
+        setTagFilter={setTagFilter}
+        healthScoreMax={healthScoreMax}
+        setHealthScoreMax={setHealthScoreMax}
+        minSpent={minSpent}
+        setMinSpent={setMinSpent}
+        stats={stats}
+      />
+
+      {!loading && customers.length > 0 && (
+        <CustomersPriorityFilters priorityFilter={priorityFilter} setPriorityFilter={setPriorityFilter} />
+      )}
+
+      {error && <CustomersError message={error} onRetry={fetchCustomers} />}
+      {loading && <CustomersLoading />}
+      {!loading && customers.length === 0 && <CustomersEmpty />}
+
+      {!loading && customers.length > 0 && (
+        <>
+          <CustomersMobileList filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
+          <CustomersDesktopTable filteredCustomers={filteredCustomers} onStartProcess={openActionModal} />
+          <CustomersPagination
+            page={page}
+            totalPages={totalPages}
+            filteredCount={filteredCustomers.length}
+            totalCustomers={totalCustomers}
+            setPage={setPage}
           />
-        </div>
-
-        <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
-          <ExportCsvButton
-            filename="clients"
-            headers={['Nom', 'Email', 'Telèfon', 'Ciutat', 'Font', 'Esdeveniments', 'Despesa total', 'VIP']}
-            rows={customers.map((c) => [
-              c.name,
-              c.email,
-              c.phone || '',
-              c.city || '',
-              getCustomerSourceLabel(c.source, ''),
-              String(c.total_events),
-              String(c.total_spent),
-              c.is_vip ? 'Sí' : 'No',
-            ])}
-          />
-          <button
-            onClick={() => setShowAddModal(true)}
-            type="button"
-            className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-all"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Afegir Client
-          </button>
-        </div>
-      </div>
-
-      {/* Filtres d'execució */}
-      {!loading && customers.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2" data-help-title="Filtres per prioritat" data-help-desc="Ordenen els clients segons urgència operativa o valor de seguiment.">
-          {(['ALL', 'ALTA', 'MITJANA', 'BAIXA'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setPriorityFilter(value)}
-              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
-                priorityFilter === value
-                  ? PRIORITY_FILTER_STYLES[value]
-                  : 'admin-tone-idle'
-              }`}
-            >
-              {value === 'ALL' ? 'Totes prioritats' : `Prioritat ${value.toLowerCase()}`}
-            </button>
-          ))}
-        </div>
+        </>
       )}
 
-      {/* Error */}
-      {error && (
-        <div className="border rounded-xl p-4 flex items-center justify-between" role="alert">
-          <p className="text-amber-400">{error}</p>
-          <button type="button" onClick={fetchCustomers} className="ap-btn ap-btn--primary text-sm">Reintentar</button>
-        </div>
-      )}
-
-      {/* Loading */}
-      {loading && (
-        <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
-        </div>
-      )}
-
-      {/* Empty */}
-      {!loading && customers.length === 0 && (
-        <div role="status" aria-live="polite">
-          <AdminEmptyState
-            icon="👥"
-            title="No hi ha clients"
-            description="Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment."
-          />
-        </div>
-      )}
-
-      {/* Customers List — Mobile cards */}
-      {!loading && customers.length > 0 && (
-        <section className="lg:hidden space-y-3" data-help-title="Llistat mòbil de clients" data-help-desc="Mostra cada client en format targeta amb prioritat, proper pas i accessos ràpids.">
-          {filteredCustomers.map(({ customer, priority }) => {
-            const nextStep = getNextStep(customer);
-            return (
-              <article
-                key={customer.id}
-                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral" data-help-title={customer.name} data-help-desc={`Client amb prioritat ${priority.level}. Aquí tens el proper pas i accessos ràpids a processos i fitxa completa.`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
-                        {customer.name.charAt(0).toUpperCase()}
-                      </div>
-                      <p className="font-medium truncate">
-                        {customer.customerNumber != null && (
-                          <span className="mr-1.5 text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
-                        )}
-                        {customer.name}
-                        {customer.is_vip && (
-                          <span className="ml-2 px-2 py-0.5 text-[10px] rounded-full font-medium bg-amber-500/20 text-amber-300">VIP</span>
-                        )}
-                      </p>
-                    </div>
-                    {customer.city && <p className="text-xs mt-1 ml-10">{customer.city}</p>}
-                    {customer.email && <p className="text-xs mt-0.5 ml-10 truncate">{customer.email}</p>}
-                    {customer.phone && <p className="text-xs mt-0.5 ml-10">{customer.phone}</p>}
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                      priority.level === 'ALTA' ? 'admin-tone-soft-danger'
-                        : priority.level === 'MITJANA' ? 'bg-amber-500/20 text-amber-300'
-                        : 'admin-tone-soft-success'
-                    }`}>
-                      {priority.level}
-                    </span>
-                    <p className="text-xs mt-1">{customer.total_events} events</p>
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center justify-between border-t pt-3 admin-tone-border-neutral">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium ${
-                      customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300'
-                        : customer.source === 'web' ? 'admin-tone-soft-success'
-                        : customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300'
-                        : 'bg-white/5 text-white/40'
-                    }`}>
-                      {getCustomerSourceLabel(customer.source)}
-                    </span>
-                    <Link href={nextStep.href} className="text-[11px] font-medium">
-                      {nextStep.label} →
-                    </Link>
-                  </div>
-                  <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
-                    <button
-                      onClick={() => { setSelectedCustomer(customer); setShowActionModal(true); }}
-                      type="button"
-                      className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      title="Iniciar procés" data-help-title="Iniciar procés" data-help-desc="Obre el modal d'accions per iniciar un flux sobre aquest client, com seguiment o procés post-esdeveniment."
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </button>
-                    <Link
-                      href={`/admin/clientes/${customer.id}`}
-                      className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      title="Fitxa 360" data-help-title="Fitxa 360" data-help-desc="Obre la fitxa completa del client amb historial, reserves i context operatiu."
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-      )}
-
-      {/* Customers List — Desktop table */}
-      {!loading && customers.length > 0 && (
-        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" data-help-title="Taula de clients" data-help-desc="Vista d'escriptori del CRM amb informació resumida, prioritat, proper pas i accions ràpides.">
-          <div className="overflow-x-auto">
-          <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
-            <thead>
-              <tr className="border-b transition-colors hover:bg-white/[0.03]">
-                <th scope="col" className="text-center p-4 font-medium">Nom</th>
-                <th scope="col" className="text-center p-4 font-medium hidden md:table-cell">Contacte</th>
-                <th scope="col" className="text-center p-4 font-medium hidden lg:table-cell">Font</th>
-                <th scope="col" className="text-center p-4 font-medium hidden sm:table-cell">Esdeveniments</th>
-                <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Prioritat</th>
-                <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Proper pas</th>
-                <th scope="col" className="text-center p-4 font-medium">Accions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCustomers.map(({ customer, priority }) => {
-                const nextStep = getNextStep(customer);
-                return (
-                <tr key={customer.id} className="border-b transition-colors hover:bg-white/[0.03]">
-                  <td className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">
-                        {customer.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                          {customer.customerNumber != null && (
-                            <span className="text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
-                          )}
-                          {customer.name}
-                          {customer.is_vip && (
-                            <span className="px-2 py-0.5 text-xs rounded-full font-medium">VIP</span>
-                          )}
-                        </p>
-                        {customer.city && <p className="text-sm truncate">{customer.city}</p>}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4 hidden md:table-cell text-center">
-                    <div className="space-y-1 min-w-0">
-                      {customer.email && (
-                        <p className="text-sm flex items-center justify-center gap-2">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                          <span className="max-w-[240px] truncate">{customer.email}</span>
-                        </p>
-                      )}
-                      {customer.phone && (
-                        <p className="text-sm flex items-center justify-center gap-2">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
-                          {customer.phone}
-                        </p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-4 hidden lg:table-cell text-center">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' :
-                      customer.source === 'web' ? 'admin-tone-soft-success' :
-                      customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
-                      'bg-white/5 text-white/40'
-                    }`}>
-                      {getCustomerSourceLabel(customer.source)}
-                    </span>
-                  </td>
-                  <td className="p-4 hidden sm:table-cell text-center">
-                    {customer.total_events || 0}
-                  </td>
-                  <td className="p-4 hidden xl:table-cell text-center">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${
-                        priority.level === 'ALTA'
-                          ? 'admin-tone-soft-danger'
-                          : priority.level === 'MITJANA'
-                            ? 'bg-amber-500/20 text-amber-300'
-                            : 'admin-tone-soft-success'
-                      }`}
-                      title={priority.hint}
-                    >
-                      {priority.level}
-                    </span>
-                  </td>
-                  <td className="p-4 hidden xl:table-cell text-center">
-                    <div className="space-y-1">
-                      <Link
-                        href={nextStep.href}
-                        className="inline-flex rounded-xl border px-2 py-1 text-xs font-semibold"
-                      >
-                        {nextStep.label}
-                      </Link>
-                      <p className="text-[11px]">{nextStep.hint}</p>
-                    </div>
-                  </td>
-                  <td className="p-4 text-center">
-                    <div className="flex flex-wrap justify-center gap-2" data-help-title="Filtres per prioritat" data-help-desc="Ordenen els clients segons urgència operativa o valor de seguiment.">
-                      <button
-                        onClick={() => {
-                          setSelectedCustomer(customer);
-                          setShowActionModal(true);
-                        }}
-                        type="button"
-                        className="p-2 rounded-xl transition-all"
-                        title="Iniciar procés" data-help-title="Iniciar procés" data-help-desc="Obre el modal d'accions per iniciar un flux sobre aquest client, com seguiment o procés post-esdeveniment."
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </button>
-                      <Link
-                        href={`/admin/clientes/${customer.id}`}
-                        className="p-2 rounded-xl transition-all"
-                        title="Fitxa 360" data-help-title="Fitxa 360" data-help-desc="Obre la fitxa completa del client amb historial, reserves i context operatiu."
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              )})}
-            </tbody>
-          </table>
-          </div>
-        </section>
-      )}
-
-      {!loading && customers.length > 0 && (
-        <div className="flex flex-col items-center justify-center gap-2 text-xs sm:flex-row sm:justify-between" data-help-title="Paginació de clients" data-help-desc="Indica quants clients estàs veient i permet avançar o retrocedir de pàgina.">
-          <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} visibles · {totalCustomers} clients</span>
-          <div className="flex gap-2" data-help-title="Accions de clients" data-help-desc="Des d'aquí pots exportar el CRM o crear un client nou manualment.">
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={page === 1}
-              className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
-            >
-              ← Anterior
-            </button>
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={page === totalPages}
-              className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
-            >
-              Següent →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: Afegir Client */}
       <AnimatePresence>
         {showAddModal && (
           <AddCustomerModal
@@ -548,16 +242,13 @@ export default function AdminContactesPage() {
               setSelectedCustomer(customer);
               setShowActionModal(true);
               if (duplicateWarnings.length > 0) {
-                setError(
-                  `Possible duplicat detectat automàticament (${duplicateWarnings.length}). Revisa'l abans de continuar.`
-                );
+                setError(`Possible duplicat detectat automàticament (${duplicateWarnings.length}). Revisa'l abans de continuar.`);
               }
             }}
           />
         )}
       </AnimatePresence>
 
-      {/* MODAL: Iniciar Procés */}
       <AnimatePresence>
         {showActionModal && selectedCustomer && (
           <StartProcessModal
@@ -571,9 +262,125 @@ export default function AdminContactesPage() {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CRM SEGMENT FILTERS
+// ═══════════════════════════════════════════════════════════════════════════
 
+function CrmSegmentFilters({
+  lifecycleFilter,
+  setLifecycleFilter,
+  tagFilter,
+  setTagFilter,
+  healthScoreMax,
+  setHealthScoreMax,
+  minSpent,
+  setMinSpent,
+  stats,
+}: {
+  lifecycleFilter: CustomerLifecycleValue | '';
+  setLifecycleFilter: (v: CustomerLifecycleValue | '') => void;
+  tagFilter: string;
+  setTagFilter: (v: string) => void;
+  healthScoreMax: number | null;
+  setHealthScoreMax: (v: number | null) => void;
+  minSpent: number | null;
+  setMinSpent: (v: number | null) => void;
+  stats: CustomerStats | null;
+}) {
+  const clearAll = () => {
+    setLifecycleFilter('');
+    setTagFilter('');
+    setHealthScoreMax(null);
+    setMinSpent(null);
+  };
 
+  return (
+    <div className="space-y-3">
+      {/* Segments ràpids */}
+      <div className="flex flex-wrap gap-2">
+        {CUSTOMER_SEGMENTS.map((seg) => {
+          const isActive =
+            ('lifecycleStage' in seg.filter && lifecycleFilter === seg.filter.lifecycleStage) ||
+            ('tag' in seg.filter && tagFilter === seg.filter.tag) ||
+            ('healthScoreMax' in seg.filter && healthScoreMax === seg.filter.healthScoreMax) ||
+            ('minSpent' in seg.filter && minSpent === seg.filter.minSpent);
 
+          const handleClick = () => {
+            if (isActive) {
+              clearAll();
+              return;
+            }
+            clearAll();
+            if ('lifecycleStage' in seg.filter) {
+              setLifecycleFilter(seg.filter.lifecycleStage as CustomerLifecycleValue);
+            } else if ('tag' in seg.filter) {
+              setTagFilter(seg.filter.tag as string);
+            } else if ('healthScoreMax' in seg.filter) {
+              setHealthScoreMax(seg.filter.healthScoreMax as number);
+            } else if ('minSpent' in seg.filter) {
+              setMinSpent(seg.filter.minSpent as number);
+            }
+          };
 
+          let badge: string | undefined;
+          if (seg.id === 'vip' && stats?.vip) badge = String(stats.vip);
+          if (seg.id === 'dormant' && stats?.dormant) badge = String(stats.dormant);
+          if (seg.id === 'at-risk' && stats?.atRisk) badge = String(stats.atRisk);
+          if (seg.id === 'high-value' && stats?.highValue) badge = String(stats.highValue);
 
+          return (
+            <button
+              key={seg.id}
+              type="button"
+              onClick={handleClick}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                isActive
+                  ? 'border-cyan-400/50 bg-cyan-500/20 text-cyan-200'
+                  : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
+              }`}
+            >
+              <span>{seg.icon}</span>
+              <span>{seg.label}</span>
+              {badge && (
+                <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                  isActive ? 'bg-cyan-500/30 text-cyan-100' : 'bg-white/10 text-white/50'
+                }`}>
+                  {badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
 
+        {(lifecycleFilter || tagFilter || healthScoreMax != null || minSpent != null) && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/40 hover:text-white/60 transition-colors"
+          >
+            Netejar filtres
+          </button>
+        )}
+      </div>
+
+      {/* Lifecycle dropdown (per filtrar manualment) */}
+      <div className="flex items-center gap-3">
+        <label htmlFor="lifecycle-filter" className="text-xs text-white/50">Fase:</label>
+        <select
+          id="lifecycle-filter"
+          value={lifecycleFilter}
+          onChange={(e) => {
+            clearAll();
+            setLifecycleFilter(e.target.value as CustomerLifecycleValue | '');
+          }}
+          className="rounded-lg border border-white/15 bg-transparent px-2.5 py-1 text-xs text-white/80 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+        >
+          <option value="">Totes les fases</option>
+          {CUSTOMER_LIFECYCLE_VALUES.map((val) => (
+            <option key={val} value={val}>{CUSTOMER_LIFECYCLE_LABELS[val]}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}

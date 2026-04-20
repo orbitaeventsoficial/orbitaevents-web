@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../../components/ToastProvider';
+import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface ImapConfig {
@@ -137,9 +138,83 @@ export default function ImapSettingsClient() {
     : config?.configured
       ? 'admin-tone-bg-danger'
       : 'admin-tone-bg-warning';
+  const sourceLabel =
+    config?.source === 'env'
+      ? 'Railway'
+      : config?.source === 'db'
+        ? 'Admin'
+        : 'Sense config';
+  const setupModeLabel = config?.configured
+    ? showForm
+      ? 'Editant'
+      : 'Actiu'
+    : 'Pendent';
+  const weakestLink = connection?.ok
+    ? null
+    : config?.configured
+      ? 'Les credencials existeixen però la connexió IMAP no és operativa.'
+      : 'La safata encara no té credencials mínimes per llegir correus.';
+  const sourceNote =
+    config?.source === 'env'
+      ? 'Railway té prioritat sobre qualsevol valor desat des de l’admin.'
+      : config?.source === 'db'
+        ? 'La configuració actual viu a base de dades i es pot actualitzar des d’aquesta pantalla.'
+        : 'Encara no hi ha cap font activa per a la safata IMAP.';
+  const actionTitle = !config?.configured
+    ? 'Completar la configuració mínima de la safata'
+    : connection?.ok
+      ? 'Mantenir la cadena estable i tornar a operativa'
+      : 'Regularitzar la connexió abans de confiar en la safata';
+  const actionDescription = !config?.configured
+    ? 'Sense host, usuari i contrasenya no hi ha importació real de correus cap a l’Inbox.'
+    : connection?.ok
+      ? 'La base és bona: el següent pas útil és tornar a la safata o revisar integracions si vols ampliar la cadena.'
+      : 'Abans d’obrir més automatismes o seguiments, cal validar credencials i provar connexió amb el servidor IMAP.';
 
   return (
     <div className="space-y-4">
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix la safata IMAP',
+          tone: connection?.ok ? 'success' : config?.configured ? 'warning' : 'default',
+          stats: [
+            { label: 'Connexió', value: connection?.ok ? 'OK' : config?.configured ? 'Error' : 'Pendent', tone: connection?.ok ? 'success' : 'warning' },
+            { label: 'Font', value: sourceLabel, hint: config?.configured ? 'credencial principal' : 'sense origen actiu' },
+            { label: 'Sessió', value: setupModeLabel, tone: showForm ? 'warning' : config?.configured ? 'success' : 'default' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de tocar correus',
+          tone: connection?.ok ? 'info' : config?.configured ? 'warning' : 'default',
+          items: [
+            weakestLink ?? 'La safata pot llegir correus i la connexió IMAP està operativa.',
+            sourceNote,
+            connection?.ok
+              ? 'La configuració actual respon correctament al test de connexió.'
+              : connection?.error
+                ? `Últim error detectat: ${connection.error}`
+                : 'Encara no hi ha cap test de connexió operatiu amb aquesta configuració.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: connection?.ok ? 'success' : 'warning',
+          primaryAction: {
+            href: connection?.ok ? '/admin/inbox' : '/admin/settings/integrations',
+            label: connection?.ok ? 'Tornar a la safata' : 'Veure integracions',
+          },
+          secondaryAction: { href: '/admin/settings', label: 'Configuració' },
+          secondaryPills: [
+            config?.configured ? 'Credencials presents' : 'Sense credencials',
+            config?.secure === false ? 'Sense SSL/TLS' : 'SSL/TLS',
+          ],
+        }}
+      />
+
       {/* Estat de connexió */}
       <div className={`${connectionTone} rounded-2xl border p-5`}>
         <div className="flex items-center justify-between">

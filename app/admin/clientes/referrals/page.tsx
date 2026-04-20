@@ -1,0 +1,31 @@
+import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
+import { loadReferralsSummary } from '@/lib/services/referralsService';
+import ReferralsClient from './ReferralsClient';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Referrals | Òrbita Admin',
+};
+
+export default async function ReferralsPage() {
+  const summary = await loadReferralsSummary();
+
+  return (
+    <AdminPage
+      title="Programa de referrals"
+      subtitle={`${summary.stats.totalReferrers} clients han portat ${summary.stats.totalReferred} clients nous · ${summary.candidates.length} candidats per preguntar`}
+      actions={
+        <Link
+          href="/admin/clientes"
+          className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+        >
+          ← Tornar al CRM
+        </Link>
+      }
+    >
+      <ReferralsClient summary={summary} />
+    </AdminPage>
+  );
+}

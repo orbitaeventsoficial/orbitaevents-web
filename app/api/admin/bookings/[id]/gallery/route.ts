@@ -24,11 +24,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
     const photos = await listGalleryPhotos(id);
-    return NextResponse.json({ success: true, data: photos });
+    return NextResponse.json({ ok: true, body: photos });
   } catch (error) {
     console.error('Error llistant galeria:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }
@@ -45,21 +45,21 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'Cal un fitxer' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Cal un fitxer' }, { status: 400 });
     }
 
     // Validar tipus
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP o AVIF.' },
+        { ok: false, error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP o AVIF.' },
         { status: 400 }
       );
     }
 
     // Validar mida (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ success: false, error: 'Fitxer massa gran (màx 10MB)' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Fitxer massa gran (màx 10MB)' }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -79,11 +79,11 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       uploadedBy: 'ADMIN',
     });
 
-    return NextResponse.json({ success: true, data: photo }, { status: 201 });
+    return NextResponse.json({ ok: true, body: photo }, { status: 201 });
   } catch (error) {
     console.error('Error pujant foto:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }
@@ -99,15 +99,15 @@ export async function PATCH(req: NextRequest) {
     const { photoId, ...data } = body;
 
     if (!photoId) {
-      return NextResponse.json({ success: false, error: 'Cal photoId' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Cal photoId' }, { status: 400 });
     }
 
     const photo = await updateGalleryPhoto(photoId, data);
-    return NextResponse.json({ success: true, data: photo });
+    return NextResponse.json({ ok: true, body: photo });
   } catch (error) {
     console.error('Error actualitzant foto:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }
@@ -123,15 +123,15 @@ export async function DELETE(req: NextRequest) {
     const photoId = searchParams.get('photoId');
 
     if (!photoId) {
-      return NextResponse.json({ success: false, error: 'Cal photoId' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Cal photoId' }, { status: 400 });
     }
 
     await deleteGalleryPhoto(photoId);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('Error eliminant foto:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }

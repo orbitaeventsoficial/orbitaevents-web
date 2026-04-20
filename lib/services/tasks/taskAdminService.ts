@@ -1,5 +1,7 @@
-import { LeadTaskStatus, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { OPEN_TASK_STATUSES } from '@/lib/constants';
+import type { TaskStatus } from '@/lib/services/tasks/leadScopedTaskService';
 
 export type AdminTaskCreateInput = {
   customerId?: string;
@@ -9,24 +11,29 @@ export type AdminTaskCreateInput = {
   title: string;
   description?: string;
   dueDate?: string;
-  status?: 'OPEN' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED';
+  status?: TaskStatus;
   priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   assignedTo?: string;
   createdBy?: string;
+  source?: string;
+  autoRule?: string;
+  dedupeKey?: string;
+  resolutionNote?: string;
 };
 
 export type AdminTaskUpdateInput = {
   title?: string;
   description?: string | null;
   dueDate?: string | null;
-  status?: 'OPEN' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED';
+  status?: TaskStatus;
   priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   assignedTo?: string | null;
 };
 
-function normalizeTaskStatus(status?: string): LeadTaskStatus | undefined {
-  return status && Object.values(LeadTaskStatus).includes(status as LeadTaskStatus)
-    ? (status as LeadTaskStatus)
+function normalizeTaskStatus(status?: string): TaskStatus | undefined {
+  const allowed: TaskStatus[] = ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
+  return status && allowed.includes(status as TaskStatus)
+    ? (status as TaskStatus)
     : undefined;
 }
 
@@ -67,6 +74,56 @@ export async function listAdminTasks(input: {
 
 export async function createAdminTask(input: AdminTaskCreateInput) {
   const normalizedStatus = normalizeTaskStatus(input.status);
+  const normalizedSource = input.source?.trim() || null;
+  const normalizedDedupeKey = input.dedupeKey?.trim() || null;
+  const reopenedStatus = normalizedStatus ?? 'OPEN';
+
+  if (normalizedDedupeKey) {
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        dedupeKey: normalizedDedupeKey,
+        status: { in: [...OPEN_TASK_STATUSES] },
+      },
+    });
+
+    if (existingTask) {
+      return { ok: true, task: existingTask, deduped: true as const };
+    }
+
+    if (normalizedSource === 'REACTIVATION') {
+      const closedReactivationTask = await prisma.task.findFirst({
+        where: {
+          dedupeKey: normalizedDedupeKey,
+          source: 'REACTIVATION',
+        },
+        orderBy: { updatedAt: 'desc' },
+      });
+
+      if (closedReactivationTask) {
+        const reopenedTask = await prisma.task.update({
+          where: { id: closedReactivationTask.id },
+          data: {
+            customerId: input.customerId || null,
+            leadId: input.leadId || null,
+            bookingId: input.bookingId || null,
+            proposalId: input.proposalId || null,
+            title: input.title,
+            description: input.description || null,
+            dueDate: input.dueDate ? new Date(input.dueDate) : null,
+            status: reopenedStatus,
+            priority: input.priority || 'MEDIUM',
+            assignedTo: input.assignedTo || null,
+            source: normalizedSource,
+            autoRule: input.autoRule?.trim() || null,
+            resolutionNote: input.resolutionNote?.trim() || null,
+            completedAt: reopenedStatus === 'DONE' ? new Date() : null,
+          },
+        });
+
+        return { ok: true, task: reopenedTask, reopened: true as const };
+      }
+    }
+  }
 
   const task = await prisma.task.create({
     data: {
@@ -77,11 +134,15 @@ export async function createAdminTask(input: AdminTaskCreateInput) {
       title: input.title,
       description: input.description || null,
       dueDate: input.dueDate ? new Date(input.dueDate) : null,
-      status: normalizedStatus ?? 'OPEN',
+      status: reopenedStatus,
       priority: input.priority || 'MEDIUM',
       assignedTo: input.assignedTo || null,
       createdBy: input.createdBy || 'Admin',
-      completedAt: normalizedStatus === 'DONE' ? new Date() : null,
+      source: normalizedSource,
+      autoRule: input.autoRule?.trim() || null,
+      dedupeKey: normalizedDedupeKey,
+      resolutionNote: input.resolutionNote?.trim() || null,
+      completedAt: reopenedStatus === 'DONE' ? new Date() : null,
     },
   });
 

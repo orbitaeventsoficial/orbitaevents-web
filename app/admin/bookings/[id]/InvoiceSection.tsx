@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatCurrency, getInvoiceStatusDisplay } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 interface InvoiceData {
   id: string;
@@ -65,7 +66,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
   const statusDisplay = activeInvoice ? getInvoiceStatusDisplay(activeInvoice.status) : null;
 
   return (
-    <div className="ap-card rounded-2xl p-5" data-help-title="Factura" data-help-desc="Des d'aquí pots generar, revisar, marcar com pagada o cancel·lar la factura vinculada a la reserva.">
+    <div className="ap-card rounded-2xl p-5" {...helpAttrs(ADMIN_BOOKING_HELP_2.invoice.root)}>
       <div className="mb-4 flex items-center gap-2">
         <span className="text-base">🧾</span>
         <h3 className="text-sm font-semibold uppercase tracking-wide">Factura</h3>
@@ -104,7 +105,7 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2" data-help-title="Accions de factura" data-help-desc="Mostren les accions disponibles segons l'estat actual: veure a Holded, marcar pagada, reintentar sync o cancel·lar.">
+          <div className="flex flex-wrap gap-2" {...helpAttrs(ADMIN_BOOKING_HELP_2.invoice.actions)}>
             {activeInvoice.holdedInvoiceUrl && (
               <a href={activeInvoice.holdedInvoiceUrl} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--secondary text-xs">
                 Veure a Holded
@@ -138,5 +139,6 @@ export default function InvoiceSection({ bookingId, invoices }: { bookingId: str
     </div>
   );
 }
+
 
 

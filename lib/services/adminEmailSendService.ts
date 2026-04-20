@@ -2,6 +2,7 @@ import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import {
   createQuoteFromLead,
   generateQuoteHTML,
@@ -12,6 +13,7 @@ import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
+import { recordEmailSend, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
 
 type QuoteAttachmentInput = {
   packId?: string;
@@ -30,6 +32,7 @@ type AdminEmailPayload = {
   customerId?: string;
   quote?: QuoteAttachmentInput | null;
   locale?: string | null;
+  templateKey?: string | null;
 };
 
 const APP_BASE_URL = getAppBaseUrl().replace(/\/+$/, '');
@@ -94,7 +97,7 @@ function buildBrandedEmailHtml(contentHtml: string, locale: string, logoUrl: str
 }
 
 export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
-  const { to, subject, body: messageBody, leadId, replyToId, customerId, quote, locale } = body || {};
+  const { to, subject, body: messageBody, leadId, replyToId, customerId, quote, locale, templateKey } = body || {};
   if (!to || !subject || !messageBody) {
     return { ok: false as const, status: 400, body: { error: 'Falten camps obligatoris: to, subject, body' } };
   }
@@ -154,11 +157,31 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
   const emailLogoUrl = await getAdminEmailLogoUrl();
   const contentHtml = await bodyToHtml(translatedBody);
+  let finalHtml = buildBrandedEmailHtml(contentHtml, resolvedLocale, emailLogoUrl);
+
+  // Tracking: crear registre i injectar pixel d'obertura
+  let trackingRecord: { id: string; trackingToken: string } | null = null;
+  try {
+    trackingRecord = await recordEmailSend({
+      templateKey: templateKey || null,
+      to,
+      subject: translatedSubject,
+      leadId: resolvedLeadId || null,
+      customerId: customerForLocale?.id || null,
+      locale: resolvedLocale,
+    });
+    const pixelUrl = `${APP_BASE_URL}/api/tracking/open/${trackingRecord.trackingToken}`;
+    finalHtml = wrapLinksForTracking(finalHtml, trackingRecord.trackingToken, APP_BASE_URL);
+    finalHtml = finalHtml.replace('</body>', `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none" /></body>`);
+  } catch (trackingError) {
+    // Tracking no ha de bloquejar l'enviament
+    console.error('[adminEmailSend] Tracking record failed:', trackingError);
+  }
 
   await sendEmail({
     to,
     subject: translatedSubject,
-    html: buildBrandedEmailHtml(contentHtml, resolvedLocale, emailLogoUrl),
+    html: finalHtml,
     replyTo,
     brandingStyle: emailCountBefore === 0 ? 'hero' : 'soft',
     attachments,
@@ -173,7 +196,7 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
     await prisma.customerActivity.create({
       data: {
         customerId: customerForLocale.id,
-        action: 'EMAIL_SENT',
+        action: CUSTOMER_ACTIVITY_ACTIONS.EMAIL_SENT,
         details: { to, subject: translatedSubject, source: 'admin_emails_send' },
       },
     });

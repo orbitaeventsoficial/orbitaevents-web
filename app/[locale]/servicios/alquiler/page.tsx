@@ -4,7 +4,9 @@ import { Link } from '@/lib/navigation';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import { getSiteUrl } from '@/lib/site';
+import { STANDALONE_SERVICE_SEO } from '@/lib/standaloneServiceSeo';
 
+const SEO = STANDALONE_SERVICE_SEO.alquiler;
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
@@ -64,12 +66,12 @@ export default async function AlquilerPage({ params }: { params: { locale: strin
   return (
     <section className="min-h-screen bg-bg-main py-20 relative">
       <ServiceJsonLD
-        name="Alquiler de Equipo de Sonido e Iluminación"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/alquiler"
-        description="Alquiler profesional de equipo de sonido (4000W EV ETX) e iluminación LED para eventos. Con o sin técnico. Toda Catalunya."
-        serviceType={['Alquiler equipo sonido', 'Alquiler iluminación eventos', 'Alquiler material audiovisual']}
-        areaServed={['Barcelona', 'Girona', 'Tarragona', 'Lleida', 'Granollers', 'Mataró', 'Sabadell', 'Terrassa']}
-        priceCurrency="EUR"
+        description={SEO.jsonLd.description}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
+        priceCurrency={SEO.jsonLd.priceCurrency}
       />
       <div className="mx-auto max-w-4xl px-4">
         <h1 className="text-4xl md:text-6xl font-black text-white mb-4">

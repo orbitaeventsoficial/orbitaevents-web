@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_PARTY_LANDING_COPY } from '@/lib/localPartyLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('fiestas');
+const COPY = LOCAL_PARTY_LANDING_COPY['dj-fiestas-costa-brava'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('fiestas');
-  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  await getPublicServiceGalleryImages('fiestas');
   return {
-  title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para fiestas en la Costa Brava desde ${MIN_PRICE}€. Lloret de Mar, Tossa, Platja d'Aro, Roses y toda la costa. Equipo profesional resistente a exteriores.`,
-  keywords: ['DJ fiestas Costa Brava', 'DJ fiesta Lloret de Mar', 'DJ fiesta Tossa de Mar', "DJ fiesta Platja d'Aro", 'DJ cumpleaños Costa Brava'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-fiestas-costa-brava' },
-  openGraph: {
-    title: `DJ Fiestas Costa Brava | Desde ${MIN_PRICE}€`,
-    description: "DJ profesional para fiestas en la Costa Brava. Lloret, Tossa, Platja d'Aro y toda la costa.",
-    url: '/servicios/dj-fiestas-costa-brava',
-    images: [{ url: heroImage, alt: 'DJ Fiestas Costa Brava - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-fiestas-costa-brava' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-fiestas-costa-brava',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -69,36 +70,33 @@ export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
     zone: 'Costa Brava',
     zoneSlug: 'costa-brava',
     service: 'fiestas',
-    heroTitle: 'DJ Fiestas Costa Brava',
-    heroSubtitle: "Lloret · Tossa · Platja d'Aro · Roses · Cadaqués · Palamós",
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: costaBravaTowns,
-    highlights: ['DJ fiestas Costa Brava precio', 'DJ fiesta Lloret de Mar', 'DJ fiesta Tossa', 'DJ cumpleaños Costa Brava'],
-    description: `DJ profesional para fiestas privadas en la Costa Brava. Especialistas en exterior y fiestas de verano en la costa.`,
-    whyChooseUs: [
-      'Expertos en exterior: Equipo resistente al mar',
-      'Toda la Costa Brava cubierta: De Blanes a Cadaqués',
-      'Desplazamiento incluido: Sin recargos por distancia',
-      'Plan B preparado: Soluciones ante cambios de tiempo',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
-        { name: 'DJ Fiestas Costa Brava', url: '/servicios/dj-fiestas-costa-brava' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-fiestas-costa-brava' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Fiestas Costa Brava"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-fiestas-costa-brava"
-        description={`DJ profesional para fiestas privadas en la Costa Brava. Exterior, villas y terrazas. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ fiestas Costa Brava', 'DJ fiesta Lloret de Mar', 'DJ fiesta exterior Costa Brava']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={costaBravaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -108,4 +106,3 @@ export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
     </>
   );
 }
-

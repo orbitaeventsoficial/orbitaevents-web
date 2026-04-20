@@ -4,8 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
 import { ADMIN_CANVAS_PRESET_SIZES, ADMIN_CANVAS_TEMPLATES } from '@/lib/constants/admin';
+import { log } from '@/lib/logger';
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type ElementType = 'text' | 'shape' | 'image';
 
@@ -40,7 +41,7 @@ interface CanvasTemplate {
 
 type PresetSize = 'story' | 'post' | 'landscape';
 
-// ─── Constants ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PRESET_SIZES: Record<PresetSize, { width: number; height: number; label: string }> = ADMIN_CANVAS_PRESET_SIZES;
 
@@ -53,7 +54,7 @@ const TEMPLATES: CanvasTemplate[] = ADMIN_CANVAS_TEMPLATES.map((template) => ({
 let nextId = 100;
 function genId() { return `el-${nextId++}`; }
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function CanvasEditorClient() {
   const toast = useToast();
@@ -72,7 +73,7 @@ export default function CanvasEditorClient() {
   const CANVAS_MAX_H = 700;
   const scale = Math.min(CANVAS_MAX_H / canvasSize.height, 500 / canvasSize.width);
 
-  // ─── Template loading ───────────────────────────────────────────────────
+  // â”€â”€â”€ Template loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function loadTemplate(tpl: CanvasTemplate) {
     setCanvasSize({ width: tpl.width, height: tpl.height });
@@ -86,7 +87,7 @@ export default function CanvasEditorClient() {
     setCanvasSize({ width: s.width, height: s.height });
   }
 
-  // ─── Element CRUD ───────────────────────────────────────────────────────
+  // â”€â”€â”€ Element CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function addText() {
     const el: CanvasElement = {
@@ -139,7 +140,7 @@ export default function CanvasEditorClient() {
     setElements(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
   }
 
-  // ─── Drag & Drop ───────────────────────────────────────────────────────
+  // â”€â”€â”€ Drag & Drop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handlePointerDown = useCallback((e: React.PointerEvent, elId: string) => {
     e.stopPropagation();
@@ -187,7 +188,7 @@ export default function CanvasEditorClient() {
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }, [elements]);
 
-  // ─── Keyboard shortcuts ─────────────────────────────────────────────────
+  // â”€â”€â”€ Keyboard shortcuts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -199,7 +200,7 @@ export default function CanvasEditorClient() {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  // ─── Export ─────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function exportPng() {
     setExporting(true);
@@ -220,14 +221,14 @@ export default function CanvasEditorClient() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exportant canvas', error);
+      log.error('Error exportant canvas', error);
       toast.error(error instanceof Error ? error.message : 'Error exportant la imatge');
     } finally {
       setExporting(false);
     }
   }
 
-  // ─── Render element ─────────────────────────────────────────────────────
+  // â”€â”€â”€ Render element â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function renderElement(el: CanvasElement) {
     const isSelected = el.id === selectedId;
@@ -306,11 +307,11 @@ export default function CanvasEditorClient() {
     return null;
   }
 
-  // ─── UI ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      {/* LEFT — Canvas */}
+      {/* LEFT â€” Canvas */}
       <div className="flex-1 min-w-0">
         {/* Toolbar */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -322,8 +323,8 @@ export default function CanvasEditorClient() {
           {selectedId && (
             <>
               <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary text-sm">Duplicar</button>
-              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary text-sm">↑ Capa</button>
-              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary text-sm">↓ Capa</button>
+              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary text-sm">â†‘ Capa</button>
+              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary text-sm">â†“ Capa</button>
               <button onClick={deleteSelected} className="ap-btn text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">Eliminar</button>
             </>
           )}
@@ -358,7 +359,7 @@ export default function CanvasEditorClient() {
         </p>
       </div>
 
-      {/* RIGHT — Panel */}
+      {/* RIGHT â€” Panel */}
       <div className="w-full lg:w-72 space-y-4">
         {/* Templates */}
         <div className="rounded-xl border p-4 admin-card-glass">
@@ -409,7 +410,7 @@ export default function CanvasEditorClient() {
         {selected && (
           <div className="rounded-xl border p-4 admin-card-glass">
             <h3 className="mb-3 text-sm font-medium">
-              Propietats — {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
+              Propietats â€” {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
             </h3>
 
             {/* Position */}
@@ -467,7 +468,7 @@ export default function CanvasEditorClient() {
                     {(['left', 'center', 'right'] as const).map(a => (
                       <button key={a} onClick={() => updateElement(selected.id, { textAlign: a })}
                         className={`flex-1 rounded-lg border px-2 py-1 text-xs ${selected.textAlign === a ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-                        {a === 'left' ? '◁' : a === 'center' ? '◈' : '▷'}
+                        {a === 'left' ? 'â—' : a === 'center' ? 'â—ˆ' : 'â–·'}
                       </button>
                     ))}
                   </div>
@@ -524,7 +525,7 @@ export default function CanvasEditorClient() {
                   el.id === selectedId ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'
                 }`}
               >
-                {el.type === 'text' ? `T: ${(el.text || '').slice(0, 25)}` : `■ ${el.shapeType || 'forma'}`}
+                {el.type === 'text' ? `T: ${(el.text || '').slice(0, 25)}` : `â–  ${el.shapeType || 'forma'}`}
               </button>
             ))}
             {elements.length === 0 && <p className="text-xs">Sense elements</p>}

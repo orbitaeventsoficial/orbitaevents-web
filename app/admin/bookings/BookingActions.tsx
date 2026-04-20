@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/app/admin/components/ToastProvider';
-import ConfirmDialog from '@/app/admin/components/ConfirmDialog';
-import { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
+import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
+import { ADMIN_ACTIONS_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { BOOKING_STATUS_OPTIONS, DELETABLE_BOOKING_STATUSES } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -35,7 +35,7 @@ export default function BookingActions({
     if (!canDelete || isDeleting) return;
     const confirmed = await confirm({
       title: 'Eliminar reserva',
-      message: 'Segur que vols eliminar aquesta reserva? Aquesta acci� no es pot desfer.',
+      message: 'Segur que vols eliminar aquesta reserva? Aquesta acció no es pot desfer.',
       variant: 'danger',
       confirmLabel: 'Eliminar',
     });
@@ -85,31 +85,23 @@ export default function BookingActions({
         onChange={(e) => handleStatusChange(e.target.value)}
         disabled={isUpdatingStatus}
         className="ap-input px-2 py-1.5 text-xs"
-        title="Canviar estat"
-        aria-label="Canviar estat reserva"
+        title={ADMIN_ACTIONS_HELP.booking.status.title}
+        aria-label={ADMIN_ACTIONS_HELP.booking.status.title}
+        {...helpAttrs(ADMIN_ACTIONS_HELP.booking.status)}
       >
         {BOOKING_STATUS_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>
         ))}
       </select>
-      <Link
-        href={calendarHref}
-        className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
-      >
+      <Link href={calendarHref} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.calendar)}>
         Calendari
       </Link>
       {customerId && (
-        <Link
-          href={`/admin/clientes/${customerId}`}
-          className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
-        >
+        <Link href={`/admin/clientes/${customerId}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.customer)}>
           Client
         </Link>
       )}
-      <Link
-        href={`/admin/bookings/${id}`}
-        className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
-      >
+      <Link href={`/admin/bookings/${id}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
         Veure
       </Link>
       {canDelete && (
@@ -119,6 +111,7 @@ export default function BookingActions({
           type="button"
           aria-busy={isDeleting}
           className="ap-btn admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger px-3 py-1.5 text-xs disabled:opacity-50"
+          {...helpAttrs(ADMIN_ACTIONS_HELP.booking.remove)}
         >
           {isDeleting ? 'Eliminant...' : 'Eliminar'}
         </button>
@@ -127,4 +120,3 @@ export default function BookingActions({
     </div>
   );
 }
-

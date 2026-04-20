@@ -1,6 +1,7 @@
 'use client';
 
 import { getBookingDocumentFlowStepStyle, getContractStatusLabel, getInvoiceStatusLabel, getProposalStatusDisplay } from '@/lib/constants';
+import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 interface ProposalDoc {
   id: string;
   reference: string;
@@ -41,7 +42,7 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
   const progressWidth = invoicePaid ? 'calc(100% - 3rem)' : hasInvoice ? 'calc(83% - 2.5rem)' : contractSigned ? 'calc(67% - 2rem)' : hasContract ? 'calc(50% - 1.5rem)' : proposalAccepted ? 'calc(33% - 1rem)' : hasProposal ? 'calc(16% - 0.5rem)' : '0%';
 
   return (
-    <section className="ap-card rounded-2xl p-6" data-help-title="Flux documental" data-help-desc="Resumeix en quin punt documental està la reserva: pressupost, contracte i factura, amb accés ràpid als PDFs o a Holded.">
+    <section className="ap-card rounded-2xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.documentFlow.root)}>
       <h2 className="mb-5 flex items-center gap-2 text-base font-semibold">Flux documental</h2>
 
       <div className="relative mb-6">
@@ -58,7 +59,7 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3" data-help-title="Passos del flux documental" data-help-desc="Cada targeta representa una etapa documental i mostra si està pendent, en curs o completada.">
+      <div className="grid grid-cols-3 gap-3" {...helpAttrs(ADMIN_BOOKING_HELP_2.documentFlow.steps)}>
         {steps.map((step, i) => (
           <div key={i} className={`${step.style.card} rounded-xl p-3.5 transition-all`}>
             <div className="mb-2 flex items-center gap-1.5">
@@ -76,4 +77,5 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
     </section>
   );
 }
+
 

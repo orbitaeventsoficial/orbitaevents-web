@@ -1,5 +1,6 @@
 import { SUPPORTED_LOCALES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
+import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 
 type CalendarDay = {
   reservas: {
@@ -22,6 +23,31 @@ type CalendarDay = {
     motivo: string | null;
     notas: string | null;
   }[];
+  tasks: {
+    id: string;
+    title: string;
+    dueDate: string;
+    status: string;
+    priority: string;
+    leadId: string | null;
+    customerId: string | null;
+    bookingId: string | null;
+  }[];
+  socialPosts: {
+    id: string;
+    title: string;
+    scheduledAt: string;
+    status: string;
+    platforms: string[];
+    contentType: string;
+  }[];
+  followUps: {
+    leadId: string;
+    name: string;
+    urgency: 'URGENT' | 'NORMAL' | 'LOW';
+    suggestedAction: string;
+    dueDate: string;
+  }[];
 };
 
 export async function getAdminCalendarMonth(from?: string | null, to?: string | null) {
@@ -32,64 +58,108 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
   const fromDate = new Date(from);
   const toDate = new Date(to);
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      eventDate: {
-        gte: fromDate,
-        lte: toDate,
+  const [bookings, availabilities, tasks, socialPosts, followUps] = await Promise.all([
+    prisma.booking.findMany({
+      where: {
+        eventDate: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        status: {
+          notIn: ['CANCELLED'],
+        },
       },
-      status: {
-        notIn: ['CANCELLED'],
-      },
-    },
-    select: {
-      id: true,
-      leadId: true,
-      customerId: true,
-      eventDate: true,
-      clientName: true,
-      eventLocation: true,
-      eventVenue: true,
-      status: true,
-      eventType: true,
-      total: true,
-      eventStartTime: true,
-      eventEndTime: true,
-      pack: {
-        select: {
-          slug: true,
-          translations: {
-            where: { locale: { in: [...SUPPORTED_LOCALES] } },
-            select: { locale: true, name: true },
+      select: {
+        id: true,
+        leadId: true,
+        customerId: true,
+        eventDate: true,
+        clientName: true,
+        eventLocation: true,
+        eventVenue: true,
+        status: true,
+        eventType: true,
+        total: true,
+        eventStartTime: true,
+        eventEndTime: true,
+        pack: {
+          select: {
+            slug: true,
+            translations: {
+              where: { locale: { in: [...SUPPORTED_LOCALES] } },
+              select: { locale: true, name: true },
+            },
           },
         },
       },
-    },
-    orderBy: {
-      eventDate: 'asc',
-    },
-  });
-
-  const availabilities = await prisma.availability.findMany({
-    where: {
-      date: {
-        gte: fromDate,
-        lte: toDate,
+      orderBy: {
+        eventDate: 'asc',
       },
-      status: 'BLOCKED',
-    },
-    select: {
-      id: true,
-      date: true,
-      note: true,
-    },
-  });
+    }),
+    prisma.availability.findMany({
+      where: {
+        date: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        status: 'BLOCKED',
+      },
+      select: {
+        id: true,
+        date: true,
+        note: true,
+      },
+    }),
+    prisma.task.findMany({
+      where: {
+        dueDate: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        status: {
+          in: ['OPEN', 'IN_PROGRESS'],
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        dueDate: true,
+        status: true,
+        priority: true,
+        leadId: true,
+        customerId: true,
+        bookingId: true,
+      },
+      orderBy: [{ dueDate: 'asc' }, { priority: 'desc' }],
+    }),
+    prisma.socialPost.findMany({
+      where: {
+        scheduledAt: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        status: {
+          in: ['DRAFT', 'SCHEDULED'],
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true,
+        status: true,
+        platforms: true,
+        contentType: true,
+      },
+      orderBy: [{ scheduledAt: 'asc' }, { createdAt: 'asc' }],
+    }),
+    loadPendingFollowUps(new Date(), 200),
+  ]);
 
   const days: Record<string, CalendarDay> = {};
   const currentDate = new Date(fromDate);
   while (currentDate <= toDate) {
     const key = currentDate.toISOString().slice(0, 10);
-    days[key] = { reservas: [], bloqueos: [] };
+    days[key] = { reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
@@ -130,5 +200,50 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     });
   }
 
+
+  for (const task of tasks) {
+    if (!task.dueDate) continue;
+    const key = task.dueDate.toISOString().slice(0, 10);
+    if (!days[key]) continue;
+
+    days[key].tasks.push({
+      id: task.id,
+      title: task.title,
+      dueDate: task.dueDate.toISOString(),
+      status: task.status,
+      priority: task.priority,
+      leadId: task.leadId ?? null,
+      customerId: task.customerId ?? null,
+      bookingId: task.bookingId ?? null,
+    });
+  }
+
+  for (const post of socialPosts) {
+    if (!post.scheduledAt) continue;
+    const key = post.scheduledAt.toISOString().slice(0, 10);
+    if (!days[key]) continue;
+
+    days[key].socialPosts.push({
+      id: post.id,
+      title: post.title,
+      scheduledAt: post.scheduledAt.toISOString(),
+      status: post.status,
+      platforms: post.platforms,
+      contentType: post.contentType,
+    });
+  }
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+  if (days[todayKey]) {
+    for (const item of followUps.items) {
+      days[todayKey].followUps.push({
+        leadId: item.leadId,
+        name: item.name,
+        urgency: item.urgency,
+        suggestedAction: item.suggestedAction,
+        dueDate: todayKey,
+      });
+    }
+  }
   return { status: 200, body: { days } };
 }

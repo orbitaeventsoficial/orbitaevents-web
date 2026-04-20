@@ -23,9 +23,9 @@ export async function GET(
         orderBy: { createdAt: 'desc' },
       }),
     ]);
-    return NextResponse.json({ success: true, consents, requests });
+    return NextResponse.json({ ok: true, body: { consents, requests } });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error desconegut';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }

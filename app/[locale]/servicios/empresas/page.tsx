@@ -8,11 +8,12 @@ import Client from './client';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
+import { SERVICE_HUB_SEO } from '@/lib/serviceHubSeo';
 
+const SEO = SERVICE_HUB_SEO.empresas;
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
   packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
-
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -30,12 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/empresas',
-      images: [
-        {
-          url: heroImage,
-          alt: t('breadcrumb'),
-        },
-      ],
+      images: [{ url: heroImage, alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
@@ -45,15 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       images: [heroImage],
     },
     robots: { index: true, follow: true },
-    keywords: [
-      'eventos corporativos barcelona',
-      'dj eventos empresa barcelona',
-      'team building barcelona',
-      'cenas de empresa barcelona',
-      'eventos empresariales',
-      'presentaciones corporativas',
-      'dj empresa girona',
-    ],
+    keywords: SEO.keywords,
   };
 }
 
@@ -69,7 +57,6 @@ export default async function EmpresasPage({ params }: PageProps) {
   const minPrice = getMinPrice(packs);
   const heroImage = await getPublicServiceHeroImage('empresas');
 
-  // Obtener FAQs del archivo de traducciones
   const faqItems = [];
   for (let i = 0; i < 6; i++) {
     try {
@@ -94,27 +81,20 @@ export default async function EmpresasPage({ params }: PageProps) {
       />
 
       <ServiceJsonLD
-        name="Eventos Corporativos Profesionales con Toque Humano"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/empresas"
-        description="Eventos corporativos que refuerzan tu marca: cenas de empresa, team building, presentaciones y networking elegante. Producción técnica profesional con sonido Pioneer + EV y coordinación completa."
-        serviceType={[
-          'Eventos corporativos',
-          'Team building',
-          'Cenas de empresa',
-          'Eventos empresariales',
-          'Networking empresarial',
-          'Presentaciones corporativas',
-        ]}
-        areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
+        description={SEO.jsonLd.description(minPrice)}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
-        availability="https://schema.org/InStock"
+        availability={SEO.jsonLd.availability}
         offers={packs.map((pack: { name: string; priceValue: number; slug: string; tagline: string }) => ({
           '@type': 'Offer',
           name: pack.name,
           price: String(pack.priceValue),
           priceCurrency: 'EUR',
-          url: `/servicios/empresas#${pack.slug}`,
+          url: `${SEO.jsonLd.offerUrlPrefix}${pack.slug}`,
           availability: 'https://schema.org/InStock',
           description: pack.tagline,
         }))}
@@ -126,5 +106,3 @@ export default async function EmpresasPage({ params }: PageProps) {
     </>
   );
 }
-
-

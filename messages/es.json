@@ -336,6 +336,15 @@
     "elegant": {
       "badge": "DJ · Iluminación · Tematización · Producción",
       "badgeEmoji": "🎵",
+      "hook": {
+        "line1": "La gente no recuerda el menú.",
+        "line2": "Recuerda la última canción."
+      },
+      "tagline": {
+        "main": "CREAMOS MOMENTOS",
+        "secondary": "PARA TU BODA.",
+        "everywhere": "EN TODAS PARTES."
+      },
       "title1": "CONVERTIMOS TU EVENTO EN",
       "title2": "ESPECTÁCULO.",
       "rotatingTexts": [
@@ -406,29 +415,7 @@
       "weddings": "Servicios de boda",
       "corporate": "Eventos corporativos",
       "parties": "Fiestas y celebraciones"
-    },
-    "rotatingHeadlines": [
-      {
-        "line1": "A las 4am tu suegra",
-        "line2": "BAILABA DESCALZA"
-      },
-      {
-        "line1": "El único DJ que te garantiza",
-        "line2": "FIESTAS ÉPICAS"
-      },
-      {
-        "line1": "Convertimos tu evento en",
-        "line2": "LEYENDA"
-      },
-      {
-        "line1": "No contrates un DJ",
-        "line2": "CONTRATA UNA EXPERIENCIA"
-      },
-      {
-        "line1": "Tu boda merece",
-        "line2": "SER INOLVIDABLE"
-      }
-    ]
+    }
   },
   "trust": {
     "headline": "+3 años creando experiencias únicas",
@@ -1538,15 +1525,6 @@
       "cookies": "Política de Cookies",
       "legalNotice": "Aviso Legal"
     }
-  },
-  "nav": {
-    "home": "Inicio",
-    "services": "Servicios",
-    "portfolio": "Portfolio",
-    "contact": "Contacto",
-    "configure": "Crear evento",
-    "requestQuote": "Pide Presupuesto",
-    "skip": "Saltar al contenido principal"
   },
   "bottomNav": {
     "home": "Inicio",
@@ -3019,6 +2997,10 @@
         "caps-mobils-extra": {
           "name": "Cabezas Móviles Extra (x2)",
           "description": "2 cabezas móviles LED adicionales para ampliar la iluminación"
+        },
+        "micro-inalambric": {
+          "name": "Micrófono inalámbrico",
+          "description": "Para discursos, speeches o ceremonia"
         }
       },
       "from": "Desde",
@@ -3887,11 +3869,6 @@
       "contact": "Contacto"
     }
   },
-  "error": {
-    "title": "Algo salió mal",
-    "description": "Ha ocurrido un error inesperado.",
-    "tryAgain": "Intentar de nuevo"
-  },
   "extras": {
     "confetti": "Cañón de confeti",
     "co2": "Cañón de CO2",
@@ -4570,6 +4547,27 @@
     "configurador": "¡Hola! He configurado un pack. ¿Podemos hablar sobre disponibilidad?",
     "halloween": "¡Hola! Quiero info sobre fiestas Halloween",
     "experiencias": "¡Hola! Me interesa una experiencia temática personalizada"
+  },
+  "packsOffers": {
+    "earlyBird": {
+      "name": "Reserva anticipada",
+      "description": "Reserva hoy y ahorra un 10% en tu pack",
+      "badge": "🔥 OFERTA LIMITADA"
+    },
+    "packsBadges": {
+      "mostPopular": "Más popular",
+      "premium": "Premium"
+    },
+    "combo": {
+      "name": "Pack completo",
+      "description": "Contrata los 2 extras y ahorra un 10%",
+      "badge": "💎 COMBO"
+    },
+    "seasonal": {
+      "name": "Descuento temporada baja",
+      "description": "Los eventos en temporada baja tienen descuento",
+      "badge": "📅 TEMPORADA"
+    }
   },
   "mobileLanding": {
     "heroSlides": {
@@ -6454,6 +6452,11 @@
   "mobileHero": {
     "ctaPacks": "Ver packs y precios",
     "title": "CREAMOS MOMENTOS",
+    "tagline": {
+      "main": "CREAMOS MOMENTOS",
+      "secondary": "PARA TU BODA.",
+      "everywhere": "EN TODAS PARTES."
+    },
     "subtitle": "Tú disfrutas. Nosotros montamos todo.",
     "location": "Barcelona y Girona.",
     "scroll": "DESCUBRE",
@@ -6823,5 +6826,148 @@
     "backHome": "Volver al inicio",
     "viewPortfolio": "Ver portfolio",
     "spamNote": "Revisa tu bandeja de spam si no ves nuestro email en las próximas horas"
+  },
+  "equipmentCatalog": {
+    "items": {
+      "ddj-rev7": {
+        "name": "Pioneer DDJ-REV7",
+        "description": "Controladora profesional Pioneer DJ de nivel club con platos motorizados",
+        "specs": {
+          "channels": "2 canales",
+          "effects": "Profesional con FX",
+          "connectivity": "USB, MIDI"
+        }
+      },
+      "ev-etx-12p": {
+        "name": "EV ETX 2000W",
+        "description": "Sistema de altavoces profesional Electro-Voice, sonido cristalino y potente para cualquier evento",
+        "specs": {
+          "power": "2000W por unidad (4000W total)",
+          "coverage": "Hasta 150-200 personas",
+          "type": "Altavoz activo profesional"
+        }
+      },
+      "led-bash-bateria": {
+        "name": "LED Bash a Batería",
+        "description": "Focos LED a batería ideales para iluminación sin cables en cualquier ubicación",
+        "specs": {
+          "type": "Foco LED RGB a batería",
+          "power": "LED de alta potencia",
+          "modes": "Auto, sonido, DMX",
+          "battery": "Autonomía 8-12 horas"
+        }
+      },
+      "multibos-led": {
+        "name": "Multibos LED",
+        "description": "Sistema de iluminación compacto y versátil, perfecto para eventos pequeños y medianos",
+        "specs": {
+          "type": "Sistema de iluminación completo",
+          "coverage": "Ideal para fiestas hasta 50 personas",
+          "modes": "Múltiples programas automáticos"
+        }
+      },
+      "cabezas-moviles-beam": {
+        "name": "Cabezas Móviles Beam 150W LED",
+        "description": "Cabezas móviles tipo Beam profesionales, efectos espectaculares de luz",
+        "specs": {
+          "power": "150W LED por unidad",
+          "type": "Moving Head Beam",
+          "colors": "RGBW + rueda de color",
+          "modes": "Auto, sonido, DMX512"
+        }
+      },
+      "esferas-luz-calida": {
+        "name": "Esferas de Luz Cálida",
+        "description": "Esferas de luz muy cálidas y potentes, ideales para dar ambiente e iluminación al punto",
+        "specs": {
+          "type": "Iluminación ambiental",
+          "power": "Alta potencia",
+          "color": "Luz cálida"
+        }
+      },
+      "maquina-humo-1800w": {
+        "name": "Máquina de Humo 1800W",
+        "description": "Máquina de humo profesional 1800W para efectos ambientales. Incluida en todos los packs.",
+        "specs": {
+          "power": "1800W",
+          "output": "Alta producción de humo",
+          "fluid": "Líquido profesional de bajo olor",
+          "heatUpTime": "5 minutos"
+        }
+      },
+      "maquina-humo-bajo-3000w": {
+        "name": "Máquina de Humo Bajo 3000W",
+        "description": "Máquina de humo bajo 3000W para efectos dramáticos a nivel del suelo. Disponible mediante alquiler.",
+        "specs": {
+          "power": "3000W",
+          "type": "Low fog machine",
+          "coverage": "Efecto de niebla a ras de suelo",
+          "note": "ALQUILER DISPONIBLE - Precio a consultar"
+        }
+      },
+      "cabina-dj": {
+        "name": "Cabina DJ Profesional",
+        "description": "Cabina DJ profesional, presentación elegante y funcional para cualquier evento",
+        "specs": {
+          "material": "Estructura profesional",
+          "includes": "Soporte controladora + iluminación integrada"
+        }
+      },
+      "microfono-inalambrico": {
+        "name": "Micrófono Inalámbrico",
+        "description": "Micrófono inalámbrico profesional para discursos, ceremonias y karaoke",
+        "specs": {
+          "type": "Wireless",
+          "range": "Hasta 100m",
+          "batteryLife": "8-10 horas"
+        }
+      },
+      "tripodes": {
+        "name": "Trípodes Profesionales",
+        "description": "Trípodes profesionales para iluminación y efectos",
+        "specs": {
+          "height": "Hasta 3 metros",
+          "type": "T-bar stands",
+          "material": "Aluminio profesional"
+        }
+      },
+      "cableado-profesional": {
+        "name": "Cableado Profesional Completo",
+        "description": "Kit completo de cableado profesional certificado (audio, DMX, alimentación)",
+        "specs": {
+          "includes": "XLR, DMX, Power, Audio",
+          "length": "Múltiples longitudes disponibles"
+        }
+      },
+      "atrezzo-mon-magic": {
+        "name": "Atrezzo Temático Mundo Mágico",
+        "description": "Set completo de atrezzo temático de escuela de brujos para crear experiencias mágicas inolvidables",
+        "specs": {
+          "includes": "Decoración temática completa",
+          "theme": "Mundo Mágico"
+        }
+      },
+      "atrezzo-halloween": {
+        "name": "Atrezzo Temático Halloween",
+        "description": "Set completo de atrezzo temático de Halloween para fiestas terroríficamente divertidas",
+        "specs": {
+          "includes": "Decoración temática completa",
+          "theme": "Halloween"
+        }
+      }
+    }
+  },
+  "siteConfig": {
+    "schedule": {
+      "weekdays": "Lunes a Viernes: 08:00 - 20:00",
+      "saturday": "Sábado: 08:00 - 20:00",
+      "sunday": "Domingo: 08:00 - 20:00",
+      "note": "Eventos 24/7 con reserva previa",
+      "officeHours": "Todos los días de 08:00-20:00"
+    },
+    "stats": {
+      "yearsLabel": "Desde 2023",
+      "responseTime": "2h"
+    }
   }
 }

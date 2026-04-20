@@ -6,6 +6,8 @@ import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import InboxClient from './InboxClient';
+import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +46,7 @@ async function getLeads() {
           guestCount: true,
           eventDate: true,
           eventLocation: true,
+          source: true,
         },
         orderBy: { createdAt: 'desc' },
         take: 50,
@@ -121,10 +124,42 @@ async function getQuotePacks(): Promise<QuotePackOption[]> {
 }
 
 import { isImapConfigured } from '@/lib/env';
+import PendingFollowUpsPanel from './PendingFollowUpsPanel';
 
 export default async function InboxPage() {
-  const [leads, stats, quotePacks] = await Promise.all([getLeads(), getStats(), getQuotePacks()]);
+  const [leads, stats, quotePacks, followUps] = await Promise.all([getLeads(), getStats(), getQuotePacks(), loadPendingFollowUps()]);
   const imapConfigured = isImapConfigured();
+  const automaticSignals = [
+    imapConfigured ? 'Correu IMAP configurat' : 'Només entren leads web; el correu real encara no està configurat',
+    stats.todayLeads > 0 ? `${stats.todayLeads} entrada${stats.todayLeads > 1 ? 'es' : ''} avui` : null,
+    followUps.total > 0 ? `${followUps.total} seguiment${followUps.total > 1 ? 's' : ''} pendent${followUps.total > 1 ? 's' : ''}` : null,
+  ].filter(Boolean) as string[];
+  const manualSignals = [
+    stats.unreadLeads > 0 ? `${stats.unreadLeads} entrada${stats.unreadLeads > 1 ? 'es' : ''} nova${stats.unreadLeads > 1 ? 'es' : ''}` : null,
+    followUps.urgent > 0 ? `${followUps.urgent} seguiment${followUps.urgent > 1 ? 's' : ''} urgent${followUps.urgent > 1 ? 's' : ''}` : null,
+    !imapConfigured ? 'Configurar IMAP per operar la safata real' : null,
+  ].filter(Boolean) as string[];
+  const nextStepHref = followUps.urgent > 0
+    ? '#pending-followups'
+    : stats.unreadLeads > 0
+      ? '#inbox-main'
+      : !imapConfigured
+        ? '/admin/inbox/settings'
+        : '/admin/inbox/compose';
+  const nextStepLabel = followUps.urgent > 0
+    ? 'Atacar seguiments urgents'
+    : stats.unreadLeads > 0
+      ? 'Revisar entrades noves'
+      : !imapConfigured
+        ? 'Configurar correu real'
+        : 'Enviar correu nou';
+  const nextStepDetail = followUps.urgent > 0
+    ? 'Hi ha leads contactats sense resposta que ja passen del llindar saludable.'
+    : stats.unreadLeads > 0
+      ? 'La prioritat és buidar les entrades noves abans que es refredin.'
+      : !imapConfigured
+        ? 'La safata encara no és completa fins que IMAP estigui connectat.'
+        : 'No hi ha tensió crítica ara mateix; pots iniciar comunicació nova.';
 
   return (
     <AdminPage
@@ -135,6 +170,29 @@ export default async function InboxPage() {
         <Link href="/admin/inbox/settings" className="ap-btn ap-btn--secondary">⚙️ Configuració</Link>
       </>}
     >
+      <div className="mx-4 mt-4 sm:mx-6">
+        <OwnerControlStrip
+          system={{
+            eyebrow: 'Automàtic',
+            title: 'Què vigila el sistema',
+            tone: 'info',
+            items: automaticSignals,
+            emptyText: 'Sense senyals automàtiques destacades ara mateix.',
+          }}
+          manual={{
+            eyebrow: 'Manual',
+            title: 'Què et reclama decisió',
+            tone: manualSignals.length > 0 ? 'warning' : 'success',
+            items: manualSignals,
+            emptyText: 'No hi ha cap front manual calent a la safata.',
+          }}
+          nextStep={{
+            title: nextStepLabel,
+            detail: nextStepDetail,
+            href: nextStepHref,
+          }}
+        />
+      </div>
 
       {/* Avís si IMAP no està configurat */}
       {!imapConfigured && (
@@ -157,18 +215,23 @@ export default async function InboxPage() {
         </div>
       )}
 
+      {/* Follow-ups pendents */}
+      <div id="pending-followups" className="mx-4 mt-4 scroll-mt-24 sm:mx-6">
+        <PendingFollowUpsPanel />
+      </div>
+
       {/* Main content */}
-      <InboxClient
-        initialLeads={leads}
-        stats={stats}
-        imapConfigured={imapConfigured}
-        quotePacks={quotePacks}
-      />
+      <div id="inbox-main" className="scroll-mt-24">
+        <InboxClient
+          initialLeads={leads}
+          stats={stats}
+          imapConfigured={imapConfigured}
+          quotePacks={quotePacks}
+        />
+      </div>
     </AdminPage>
   );
 }
-
-
 
 
 

@@ -2,10 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════
+import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
 type ConfirmVariant = 'danger' | 'warning' | 'info';
 
@@ -18,10 +15,6 @@ interface ConfirmDialogProps {
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// STYLES
-// ═══════════════════════════════════════════════════════════════════════════
 
 const VARIANT_STYLES: Record<ConfirmVariant, { button: string; icon: string }> = {
   danger: {
@@ -37,10 +30,6 @@ const VARIANT_STYLES: Record<ConfirmVariant, { button: string; icon: string }> =
     icon: 'ℹ️',
   },
 };
-
-// ═══════════════════════════════════════════════════════════════════════════
-// HOOK: useConfirmDialog
-// ═══════════════════════════════════════════════════════════════════════════
 
 export function useConfirmDialog() {
   const [state, setState] = useState<{
@@ -77,7 +66,7 @@ export function useConfirmDialog() {
         });
       });
     },
-    []
+    [],
   );
 
   const handleConfirm = () => {
@@ -103,15 +92,12 @@ export function useConfirmDialog() {
   return { confirm, dialogProps };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════
-
 export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirmar',  variant = 'danger',
+  confirmLabel = 'Confirmar',
+  variant = 'danger',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -119,16 +105,13 @@ export default function ConfirmDialog({
   const confirmRef = useRef<HTMLButtonElement>(null);
   const styles = VARIANT_STYLES[variant];
 
-  // Focus confirm button when opened
   useEffect(() => {
     if (open) {
-      // Small delay so portal mounts first
       const t = setTimeout(() => confirmRef.current?.focus(), 50);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  // Escape key
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -138,12 +121,13 @@ export default function ConfirmDialog({
     return () => document.removeEventListener('keydown', handler);
   }, [open, onCancel]);
 
-  // Lock body scroll
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   const handleConfirm = async () => {
@@ -163,14 +147,10 @@ export default function ConfirmDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
+      {...helpAttrs(ADMIN_SHARED_HELP.confirmDialog)}
     >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
-        onClick={onCancel}
-      />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150" onClick={onCancel} />
 
-      {/* Panel */}
       <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-2xl animate-in zoom-in-95 fade-in duration-200">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 text-xl">{styles.icon}</span>
@@ -190,6 +170,7 @@ export default function ConfirmDialog({
             onClick={onCancel}
             disabled={busy}
             className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+            {...helpAttrs(ADMIN_SHARED_HELP.confirmCancel)}
           >
             Cancel·lar
           </button>
@@ -199,6 +180,7 @@ export default function ConfirmDialog({
             onClick={handleConfirm}
             disabled={busy}
             className={`rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 ${styles.button}`}
+            {...helpAttrs(ADMIN_SHARED_HELP.confirmAccept)}
           >
             {busy ? (
               <span className="flex items-center gap-1.5">
@@ -212,12 +194,6 @@ export default function ConfirmDialog({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
-
-
-
-
-
-

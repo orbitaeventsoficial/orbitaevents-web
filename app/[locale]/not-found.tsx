@@ -1,5 +1,6 @@
 // app/[locale]/not-found.tsx
 import { Link } from '@/lib/navigation';
+import { PUBLIC_CORE_SERVICE_NAV } from '@/lib/publicServiceCatalog';
 import { useTranslations } from 'next-intl';
 
 export default function NotFound() {
@@ -47,18 +48,11 @@ export default function NotFound() {
             {t('lookingFor')}
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link href="/servicios/bodas" className="text-[var(--oe-gold)] no-underline hover:underline">
-              {t('links.djWeddings')}
-            </Link>
-            <Link href="/servicios/discomovil" className="text-[var(--oe-gold)] no-underline hover:underline">
-              {t('links.discomovil')}
-            </Link>
-            <Link href="/servicios/fiestas" className="text-[var(--oe-gold)] no-underline hover:underline">
-              {t('links.parties')}
-            </Link>
-            <Link href="/servicios/empresas" className="text-[var(--oe-gold)] no-underline hover:underline">
-              {t('links.corporate')}
-            </Link>
+            {PUBLIC_CORE_SERVICE_NAV.map((service) => (
+              <Link key={service.href} href={service.href} className="text-[var(--oe-gold)] no-underline hover:underline">
+                {t(`links.${service.notFoundLabelKey}`)}
+              </Link>
+            ))}
             <Link href="/contacto" className="text-[var(--oe-gold)] no-underline hover:underline">
               {t('links.contact')}
             </Link>

@@ -21,6 +21,8 @@ export interface LeadData {
   eventDate: Date | null;
   eventLocation: string | null;
   createdAt: Date;
+  updatedAt: Date;
+  source: string | null;
 }
 
 export interface ImapEmail {

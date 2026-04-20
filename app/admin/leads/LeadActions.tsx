@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { ADMIN_ACTIONS_HELP, helpAttrs } from '../components/adminHelpContent';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_OPTIONS, PRIORITY_LABELS } from '@/lib/constants';
 
@@ -26,24 +27,25 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
 
   const handleDelete = async () => {
     if (hasBooking) {
-      setActionError("No es pot eliminar una entrada amb reserva associada");
+      setActionError(ADMIN_ACTIONS_HELP.lead.removeBlockedBooking);
       return;
     }
 
-    const ok = await confirm({ title: 'Eliminar entrada', message: `Segur que vols eliminar l'entrada "${leadName}"?\n\nAquesta acció no es pot desfer.`, confirmLabel: 'Eliminar', variant: 'danger' });
+    const ok = await confirm({
+      title: 'Eliminar entrada',
+      message: `Segur que vols eliminar l'entrada "${leadName}"?\n\nAquesta acció no es pot desfer.`,
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
     if (!ok) return;
 
     setIsDeleting(true);
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, {
-        method: 'DELETE',
-      });
-
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}`, { method: 'DELETE' });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Error eliminant l'entrada");
       }
-
       router.refresh();
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Error eliminant l'entrada");
@@ -84,20 +86,26 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "Error actualitzant la prioritat");
+        throw new Error(data?.error || 'Error actualitzant la prioritat');
       }
       router.refresh();
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : "Error actualitzant la prioritat");
+      setActionError(error instanceof Error ? error.message : 'Error actualitzant la prioritat');
     } finally {
       setPriorityUpdating(false);
     }
   };
 
+  const deleteTitle = hasBooking
+    ? ADMIN_ACTIONS_HELP.lead.removeBlockedBooking
+    : currentStatus !== 'LOST'
+      ? ADMIN_ACTIONS_HELP.lead.removeBlockedStatus
+      : ADMIN_ACTIONS_HELP.lead.remove.desc;
+
   return (
     <div className="flex flex-col items-end gap-1">
       {actionError && (
-        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-[10px]">
+        <div className="ap-card admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger flex items-center gap-2 px-2 py-1 text-[10px]" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.error)}>
           <span>{actionError}</span>
           <button type="button" onClick={() => setActionError(null)} aria-label="Tancar error">✕</button>
         </div>
@@ -108,8 +116,10 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
           onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
           disabled={statusUpdating}
           className="ap-input px-2 py-1.5 text-xs"
-          title="Canviar estat"
-                >
+          title={ADMIN_ACTIONS_HELP.lead.status.title}
+          aria-label={ADMIN_ACTIONS_HELP.lead.status.title}
+          {...helpAttrs(ADMIN_ACTIONS_HELP.lead.status)}
+        >
           {LEAD_STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>{option.label}</option>
           ))}
@@ -119,28 +129,27 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
           onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
           disabled={priorityUpdating}
           className="ap-input px-2 py-1.5 text-xs"
-          title="Canviar prioritat"
-                >
+          title={ADMIN_ACTIONS_HELP.lead.priority.title}
+          aria-label={ADMIN_ACTIONS_HELP.lead.priority.title}
+          {...helpAttrs(ADMIN_ACTIONS_HELP.lead.priority)}
+        >
           {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
         {phone && (
           <a
-            href={`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
-              `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
-            )}`}
-            target="_blank" rel="noopener noreferrer"
+            href={`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
-            title="Envia per WhatsApp"
+            title={ADMIN_ACTIONS_HELP.lead.whatsappTitle}
+            {...helpAttrs(ADMIN_ACTIONS_HELP.lead.whatsapp)}
           >
             💬 WA
           </a>
         )}
-        <Link
-          href={`/admin/leads/${leadId}`}
-          className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
-        >
+        <Link href={`/admin/leads/${leadId}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.view)}>
           Veure
         </Link>
         <button
@@ -153,7 +162,8 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
               ? 'admin-tone-border-neutral admin-tone-bg-neutral admin-tone-text-neutral cursor-not-allowed'
               : 'admin-tone-border-danger admin-tone-bg-danger admin-tone-text-danger hover:brightness-105'
           }`}
-          title={hasBooking ? 'No es pot eliminar (té reserva)' : currentStatus !== 'LOST' ? 'Canvia a "Perdut" per poder eliminar' : 'Elimina entrada'}
+          title={deleteTitle}
+          {...helpAttrs(ADMIN_ACTIONS_HELP.lead.remove)}
         >
           {isDeleting ? '...' : '🗑️'}
         </button>
@@ -162,5 +172,3 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     </div>
   );
 }
-
-

@@ -443,7 +443,7 @@ function ExplanationModal({ onClose, color, t, tRich }: { onClose: () => void; c
       content: (
         <div className="space-y-4 text-white/70">
           <p>{tRich('tutorial.step3.intro')}</p>
-          <div className="grid grid-cols-4 gap-2 text-center text-2xl">
+          <div className="grid grid-cols-3 gap-2 text-center text-2xl sm:grid-cols-4">
             {['🌊', '🦄', '🚀', '🎃', '🐠', '🌈', '🎄', '🦁', '🍭', '🐉', '❄️', '🪩'].map((e, i) => (
               <motion.span
                 key={i}
@@ -659,7 +659,7 @@ function ControlPanel({
         {/* Temes */}
         <div className="mb-8">
           <h3 className="text-white/60 text-xs uppercase mb-3">🎨 {t('themesLabel')} ({filteredThemes.length})</h3>
-          <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
+          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 sm:grid-cols-4">
             {filteredThemes.map(themeItem => (
               <button
                 key={themeItem.id}

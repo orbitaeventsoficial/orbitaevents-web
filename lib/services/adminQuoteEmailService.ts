@@ -13,6 +13,7 @@ import { translateHtmlForLocale, translateTextForLocale } from '@/lib/services/t
 import { normalizeEmail, normalizePhone } from '@/lib/utils/normalize';
 import { mapLeadEventType, normalizeQuoteLocale, parseDateOrNull } from '@/lib/services/quotes/quoteParsing';
 import { ensureQuoteFollowUpTask } from '@/lib/services/tasks/quoteFollowUp';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 type ExtraInput = {
   name?: string;
@@ -285,7 +286,7 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
       await prisma.customerActivity.create({
         data: {
           customerId: lead.customerId,
-          action: 'QUOTE_SENT',
+          action: CUSTOMER_ACTIVITY_ACTIONS.QUOTE_SENT,
           details: { leadId: targetLeadId, quoteNumber: quoteData.quoteNumber, total: quoteData.total },
         },
       });
@@ -302,7 +303,7 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
     await prisma.customerActivity.create({
       data: {
         customerId: customer.id,
-        action: 'QUOTE_SENT',
+        action: CUSTOMER_ACTIVITY_ACTIONS.QUOTE_SENT,
         details: {
           quoteNumber: quoteData.quoteNumber,
           total: quoteData.total,

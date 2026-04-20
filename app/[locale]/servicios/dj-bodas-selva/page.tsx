@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-selva'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
-  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en La Selva desde ${MIN_PRICE}€. Blanes, Lloret, Santa Coloma, Hostalric. Costa y interior de Girona.`,
-  keywords: ['DJ bodas La Selva', 'DJ bodas Blanes', 'DJ bodas Lloret', 'DJ bodas Santa Coloma', 'bodas La Selva Girona'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-bodas-selva' },
-  openGraph: {
-    title: `DJ Bodas La Selva | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en La Selva. Costa y interior de la comarca de Girona.',
-    url: '/servicios/dj-bodas-selva',
-    images: [{ url: heroImage, alt: 'DJ Bodas La Selva - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-bodas-selva' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-bodas-selva',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -51,44 +52,42 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   const zoneConfig: ZoneConfig = {
     zone: 'La Selva',
     zoneSlug: 'selva',
     service: 'bodas',
-    heroTitle: 'DJ Bodas La Selva',
-    heroSubtitle: 'Blanes · Lloret · Santa Coloma · Hostalric · Costa e interior',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: selvaTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Lloret', 'Bodas Blanes Costa Brava', 'Precio DJ boda', 'Bodas playa Lloret'],
-    description: `DJ profesional para bodas en La Selva. Costa e interior de la comarca entre Barcelona y Girona.`,
-    whyChooseUs: [
-      'Costa e interior: Blanes, Lloret y masías del interior',
-      'Ubicación estratégica: Entre Barcelona y Girona',
-      'Desplazamiento incluido: Toda la comarca cubierta',
-      'Jardines botánicos: Marimurtra y espacios únicos',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas La Selva', url: '/servicios/dj-bodas-selva' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-selva' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Bodas La Selva"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-selva"
-        description={`DJ profesional para bodas en La Selva. Costa e interior. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas La Selva', 'DJ bodas Blanes', 'DJ bodas Lloret']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={selvaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -98,4 +97,3 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
     </>
   );
 }
-

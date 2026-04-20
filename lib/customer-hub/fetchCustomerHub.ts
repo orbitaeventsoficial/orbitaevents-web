@@ -1,7 +1,12 @@
 import type { CustomerDiscountCode, Proposal } from '@prisma/client';
-import type { CustomerHubDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
+import type { CustomerHubDTO, CustomerCommSummaryDTO, CustomerFollowUpSummaryDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
 import { resolveActiveDocument } from './proposalActive';
 import { buildTimeline } from './timeline';
+import { buildLeadCommercialBlocker } from './leadCommercialBlocker';
+import { computeCustomerInsights } from '@/lib/services/customerInsightsService';
+import { loadCommTimeline } from '@/lib/services/commTimelineService';
+import { detectPendingFollowUps, deriveLeadResponseState } from '@/lib/services/responseTrackingService';
+import { generateReactivationCandidates } from '@/lib/services/reactivationService';
 import {
   type CustomerHubActivityLite,
   type CustomerHubTaskLite,
@@ -36,8 +41,9 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const leads = await fetchCustomerHubLeads(resolvedCustomerId);
   const leadIds = leads.map((lead) => lead.id);
+  const primaryLeadId = leads[0]?.id ?? null;
 
-  const { proposals, bookingsRows, customerTasks, activityLog, customerDiscountCodes } =
+  const { proposals, bookingsRows, customerTasks, activityLog, adminLogs, customerDiscountCodes } =
     await fetchCustomerHubCollections(resolvedCustomerId, leadIds);
 
   const proposalsMapped = proposals.map((proposal: Proposal) => ({
@@ -85,7 +91,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const tasks: TaskDTO[] = customerTasks.length > 0
     ? customerTasks.map((task) => mapTask(task))
-    : leads.flatMap((lead) => lead.tasks.map((task) => mapTask(task, lead.id)));
+    : leads.flatMap((lead) => lead.universalTasks.map((task) => mapTask(task, lead.id))); 
 
   const leadMessages: MessageDTO[] = leads.flatMap((lead) =>
     lead.activities
@@ -122,6 +128,84 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const messages = [...leadMessages, ...customerNotes]
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, 120);
+
+  const commSummary: CustomerCommSummaryDTO = primaryLeadId
+    ? await loadCommTimeline(primaryLeadId, resolvedCustomerId).then((summary) => ({
+        total: summary.total,
+        channels: summary.channels,
+        lastContactAt: summary.lastContactAt,
+        lastContactChannel: summary.lastContactChannel,
+        lastContactDirection: summary.lastContactDirection,
+        pendingResponseFrom: summary.pendingResponseFrom,
+        daysSinceLastContact: summary.daysSinceLastContact,
+        responseGap: summary.responseGap,
+      }))
+    : {
+        total: 0,
+        channels: {
+          EMAIL: 0,
+          WHATSAPP: 0,
+          CALL: 0,
+          NOTE: 0,
+          SYSTEM: 0,
+        },
+        lastContactAt: null,
+        lastContactChannel: null,
+        lastContactDirection: null,
+        pendingResponseFrom: 'NONE',
+        daysSinceLastContact: null,
+        responseGap: null,
+      };
+
+  const pendingFollowUps = detectPendingFollowUps({
+    leads: leads.map((lead) => {
+      const responseState = deriveLeadResponseState(
+        lead.activities
+          .filter((activity) => activity.type === 'EMAIL' || activity.type === 'WHATSAPP')
+          .map((activity) => ({
+            createdAt: activity.createdAt,
+            metadata: activity.metadata,
+          })),
+        lead.contactedAt
+      );
+
+      return {
+        id: lead.id,
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        eventType: lead.eventType,
+        status: lead.status,
+        preferredLocale: lead.preferredLocale || 'ca',
+        contactedAt: lead.contactedAt,
+        lastOutboundAt: responseState.lastOutboundAt,
+        outboundCount: responseState.outboundCount,
+        lastInboundAt: responseState.lastInboundAt,
+      };
+    }),
+    now: new Date(),
+  });
+
+  const followUpSummary: CustomerFollowUpSummaryDTO = {
+    total: pendingFollowUps.total,
+    urgent: pendingFollowUps.urgent,
+    normal: pendingFollowUps.normal,
+    low: pendingFollowUps.low,
+    topItem: pendingFollowUps.items[0]
+      ? {
+          leadId: pendingFollowUps.items[0].leadId,
+          name: pendingFollowUps.items[0].name,
+          phone: pendingFollowUps.items[0].phone,
+          urgency: pendingFollowUps.items[0].urgency,
+          daysSinceOutbound: pendingFollowUps.items[0].daysSinceOutbound,
+          suggestedAction: pendingFollowUps.items[0].suggestedAction,
+        }
+      : null,
+  };
+
+  const pendingFollowUpByLeadId = new Map(
+    pendingFollowUps.items.map((item) => [item.leadId, item])
+  );
 
   const active = resolveActiveDocument(proposalsMapped);
   const activeProposal = active.proposalId
@@ -172,16 +256,32 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       id: activity.id,
       action: activity.action,
       createdAt: activity.createdAt,
+      details: activity.details && typeof activity.details === 'object'
+        ? (activity.details as Record<string, unknown>)
+        : null,
     })),
     leadActivities: leads.flatMap((lead) =>
       lead.activities.map((activity) => ({
         id: activity.id,
         type: activity.type,
         title: activity.title,
+        description: activity.description,
         createdAt: activity.createdAt,
+        createdBy: activity.createdBy,
         leadId: lead.id,
       }))
     ),
+    adminLogs: adminLogs.map((log) => ({
+      id: log.id,
+      action: log.action,
+      entity: log.entity,
+      entityId: log.entityId,
+      details: log.details && typeof log.details === 'object'
+        ? (log.details as Record<string, unknown>)
+        : null,
+      createdAt: log.createdAt,
+      userId: log.userId,
+    })),
   });
 
   const discountCodes: DiscountCodeDTO[] = customerDiscountCodes.map((discountCode: CustomerDiscountCode) => ({
@@ -201,30 +301,63 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     id: lead.id,
     name: lead.name,
     email: lead.email,
+    phone: lead.phone,
     eventType: lead.eventType,
     eventDate: lead.eventDate?.toISOString(),
     status: lead.status,
     priority: lead.priority,
     createdAt: lead.createdAt.toISOString(),
+    commercialBlocker: buildLeadCommercialBlocker({
+      status: lead.status,
+      booking: lead.booking ? { id: lead.booking.id } : null,
+      followUp: pendingFollowUpByLeadId.get(lead.id) ?? null,
+    }),
     booking: lead.booking
       ? {
           id: lead.booking.id,
           reference: lead.booking.reference,
           status: lead.booking.status,
           total: lead.booking.total,
+          depositAmount: typeof lead.booking.depositAmount === 'number' ? lead.booking.depositAmount : undefined,
+          remainingAmount: typeof lead.booking.remainingAmount === 'number' ? lead.booking.remainingAmount : undefined,
+          discountCode: lead.booking.discountCode || undefined,
+          eventType: lead.booking.eventType || undefined,
+          date: lead.booking.eventDate?.toISOString(),
+          startTime: lead.booking.eventStartTime || undefined,
+          endTime: lead.booking.eventEndTime || undefined,
+          location: lead.booking.eventLocation || undefined,
+          venue: lead.booking.eventVenue || undefined,
+          guestCount: typeof lead.booking.guestCount === 'number' ? lead.booking.guestCount : undefined,
+          depositPaid: lead.booking.depositPaid ?? undefined,
+          remainingPaid: lead.booking.remainingPaid ?? undefined,
         }
       : undefined,
   }));
 
-  return {
+  const hubBase = {
     customer: {
       id: customerBase.id,
-      customerNumber: customerBase.customerNumber ?? null,
+      customerNumber: customerBase.customerNumber,
       name: customerBase.name,
       email: customerBase.email || undefined,
       phone: customerBase.phone || undefined,
+      phoneNormalized: customerBase.phoneNormalized,
+      instagram: customerBase.instagram,
       status,
       createdAt: customerBase.createdAt.toISOString(),
+      tags: customerBase.tags,
+      lifecycleStage: customerBase.lifecycleStage,
+      healthScore: customerBase.healthScore,
+      preferences: (customerBase.preferences as Record<string, unknown> | null) as CustomerHubDTO['customer']['preferences'],
+      birthday: customerBase.birthday?.toISOString() || null,
+      lastContactedAt: customerBase.lastContactedAt?.toISOString() || null,
+      lastEventDate: customerBase.lastEventDate?.toISOString() || null,
+      preferredLocale: customerBase.preferredLocale,
+      marketingConsent: customerBase.marketingConsent,
+      totalEvents: customerBase.totalEvents,
+      totalSpent: customerBase.totalSpent,
+      referredBy: customerBase.referredBy,
+      referrals: customerBase.referrals,
     },
     kpis: {
       nextEventDate,
@@ -238,34 +371,60 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     bookings,
     tasks,
     messages,
+    commSummary,
+    followUpSummary,
     timeline,
     discountCodes,
     leads: leadsDTO,
   };
+
+  const insights = computeCustomerInsights(hubBase as CustomerHubDTO);
+  const hasActiveCommercialFlow = leads.some((lead) => !['WON', 'LOST'].includes(lead.status))
+    || bookings.some((booking) => booking.date && new Date(booking.date) > new Date() && booking.status !== 'CANCELLED');
+  const reactivation = hasActiveCommercialFlow
+    ? null
+    : generateReactivationCandidates({
+        customers: [
+          {
+            id: customerBase.id,
+            name: customerBase.name,
+            email: customerBase.email || '',
+            phone: customerBase.phone,
+            phoneNormalized: customerBase.phoneNormalized,
+            instagram: customerBase.instagram,
+            lifecycleStage: customerBase.lifecycleStage || 'NEW',
+            totalEvents: customerBase.totalEvents || 0,
+            totalSpent: customerBase.totalSpent || 0,
+            healthScore: customerBase.healthScore,
+            lastEventDate: customerBase.lastEventDate,
+            lastContactedAt: customerBase.lastContactedAt,
+            preferredLocale: customerBase.preferredLocale || 'ca',
+            marketingConsent: customerBase.marketingConsent ?? false,
+          },
+        ],
+        now: new Date(),
+      })[0] || null;
+
+  return { ...hubBase, insights, reactivation };
 }
 
-function mapTask(task: CustomerHubTaskLite, leadIdOverride?: string): TaskDTO {
+function mapTask(task: CustomerHubTaskLite, leadId?: string): TaskDTO {
   return {
     id: task.id,
     title: task.title,
     dueDate: task.dueDate?.toISOString(),
     done: task.status === 'DONE',
-    priority:
-      task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
-        ? task.priority
-        : undefined,
-    leadId: leadIdOverride || task.leadId || undefined,
+    priority: task.priority === 'URGENT' ? 'HIGH' : (task.priority as TaskDTO['priority']) || 'MEDIUM',
+    leadId: task.leadId || leadId,
   };
 }
 
 function resolveManualStatus(activities: CustomerHubActivityLite[]): HubStatus | null {
-  const lastStatusChange = activities.find((activity) => activity.action === 'STATUS_CHANGED');
-  const details = lastStatusChange?.details;
-  const raw =
-    details && typeof details === 'object' && 'newStatus' in details
-      ? (details as { newStatus?: string }).newStatus
-      : undefined;
-  if (!raw) return null;
-  const allowed: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
-  return allowed.includes(raw as HubStatus) ? (raw as HubStatus) : null;
+  for (const activity of activities) {
+    if (activity.action === 'HUB_STATUS_SET' && activity.details && typeof activity.details === 'object') {
+      const nextStatus = (activity.details as { status?: HubStatus }).status;
+      if (nextStatus) return nextStatus;
+    }
+  }
+  return null;
 }

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_LEAD_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type SnapshotAction = 'save_document' | 'send_email';
 
@@ -76,7 +77,7 @@ export default function LeadTechnicalSnapshotPanel({
   }
 
   return (
-    <details open className="ap-card p-6">
+    <details open className="ap-card p-6" {...helpAttrs(ADMIN_LEAD_HELP_2.snapshot.root)}>
       <summary className="cursor-pointer text-sm font-semibold">
         Snapshot técnico (JSON)
       </summary>
@@ -134,6 +135,7 @@ export default function LeadTechnicalSnapshotPanel({
     </details>
   );
 }
+
 
 
 

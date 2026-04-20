@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_PARTY_LANDING_COPY } from '@/lib/localPartyLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('fiestas');
+const COPY = LOCAL_PARTY_LANDING_COPY['dj-fiestas-maresme'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('fiestas');
-  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  await getPublicServiceGalleryImages('fiestas');
   return {
-  title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para fiestas en el Maresme desde ${MIN_PRICE}€. Mataró, Calella, Pineda y toda la costa. Cumpleaños, aniversarios y fiestas privadas con equipo profesional.`,
-  keywords: ['DJ fiestas Maresme', 'DJ fiesta Mataró', 'DJ fiesta Calella', 'DJ cumpleaños Maresme', 'contratar DJ Maresme'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-fiestas-maresme' },
-  openGraph: {
-    title: `DJ Fiestas Maresme | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para fiestas en el Maresme. Mataró, Calella, Pineda y toda la costa.',
-    url: '/servicios/dj-fiestas-maresme',
-    images: [{ url: heroImage, alt: 'DJ Fiestas Maresme - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-fiestas-maresme' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-fiestas-maresme',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -69,36 +70,33 @@ export default async function DJFiestasMaresmePage({ params }: PageProps) {
     zone: 'Maresme',
     zoneSlug: 'maresme',
     service: 'fiestas',
-    heroTitle: 'DJ Fiestas Maresme',
-    heroSubtitle: 'Mataró · Calella · Pineda · Arenys · Canet · Malgrat',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: maresmeTowns,
-    highlights: ['DJ fiestas Maresme precio', 'DJ fiesta Mataró', 'DJ cumpleaños Calella', 'DJ fiestas costa Maresme'],
-    description: `DJ profesional para fiestas privadas en el Maresme. Especialistas en fiestas de verano y celebraciones en la costa.`,
-    whyChooseUs: [
-      'Conocemos el Maresme: Somos de la zona',
-      'Fiestas de verano: Expertos en exterior y costa',
-      'Desplazamiento incluido: Sin costes extra a la comarca',
-      'Open format: La música que vosotros queráis',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
-        { name: 'DJ Fiestas Maresme', url: '/servicios/dj-fiestas-maresme' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-fiestas-maresme' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Fiestas Maresme"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-fiestas-maresme"
-        description={`DJ profesional para fiestas privadas en el Maresme. Mataró, Calella y toda la costa. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ fiestas Maresme', 'DJ fiesta Mataró', 'DJ fiesta Calella Pineda']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={maresmeTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -108,4 +106,3 @@ export default async function DJFiestasMaresmePage({ params }: PageProps) {
     </>
   );
 }
-

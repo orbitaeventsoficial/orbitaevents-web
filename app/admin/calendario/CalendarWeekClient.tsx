@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse } from './calendar-utils';
-import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses } from './calendar-utils';
+import { weekdayLabelsFull as weekdayLabels, formatKey, getWeekDays, isToday, resolveServiceLabel, resolveTimeLabel, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
 
 export default function CalendarWeekClient() {
   const toast = useToast();
@@ -22,8 +23,12 @@ export default function CalendarWeekClient() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [blockingDate, setBlockingDate] = useState<string | null>(null);
   const [blockNote, setBlockNote] = useState('');
+  const [visibleLayers, setVisibleLayers] = useState({ bookings: true, blocks: true, tasks: true, social: true, followUps: true });
 
   const weekDays = useMemo(() => getWeekDays(baseDate), [baseDate]);
+  const toggleLayer = useCallback((layer: 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps') => {
+    setVisibleLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
+  }, []);
 
   const fromStr = useMemo(() => formatKey(weekDays[0]), [weekDays]);
   const toStr = useMemo(() => {
@@ -100,21 +105,27 @@ export default function CalendarWeekClient() {
   const stats = useMemo(() => {
     let reservas = 0;
     let bloqueos = 0;
+    let tasks = 0;
+    let social = 0;
+    let followUps = 0;
     for (const day of weekDays) {
       const key = formatKey(day);
       const dayData = data?.days?.[key];
       if (dayData) {
         reservas += dayData.reservas.length;
         bloqueos += dayData.bloqueos.length;
+        tasks += dayData.tasks.length;
+        social += dayData.socialPosts.length;
+        followUps += dayData.followUps.length;
       }
     }
-    return { reservas, bloqueos };
+    return { reservas, bloqueos, tasks, social, followUps };
   }, [weekDays, data]);
 
   return (
-    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i disponibilitat per planificar events.">
+    <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
       {/* Barra superior */}
-      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between" data-help-title="Navegació setmanal" data-help-desc="Canvia de setmana, torna a avui o salta entre vistes mensual, setmanal i diària.">
+      <div className="flex flex-col gap-3 rounded-2xl border admin-card-glass p-3 sm:p-4 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.weekNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -165,7 +176,7 @@ export default function CalendarWeekClient() {
             {weekLabel}
           </div>
           <div className="text-sm">
-            {stats.reservas} reserves · {stats.bloqueos} bloquejos
+            {stats.reservas} reserves · {stats.bloqueos} bloquejos · {stats.tasks + stats.social + stats.followUps} feines
           </div>
           {loading && (
             <div className="flex items-center gap-2 text-sm" role="status" aria-live="polite">
@@ -181,11 +192,32 @@ export default function CalendarWeekClient() {
         </div>
       </div>
 
-      {/* Graella setmanal */}
-      <div className="grid grid-cols-7 gap-2" data-help-title="Graella setmanal" data-help-desc="Cada columna representa un dia de la setmana amb reserves, bloquejos i accions ràpides per operar-hi.">
+
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border admin-card-glass px-3 py-2 text-xs">
+        <span className="font-semibold opacity-60">Capes:</span>
+        {[
+          ['bookings', 'Reserves'],
+          ['blocks', 'Bloquejos'],
+          ['tasks', 'Tasques'],
+          ['social', 'Social'],
+          ['followUps', 'Follow-ups'],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => toggleLayer(key as 'bookings' | 'blocks' | 'tasks' | 'social' | 'followUps')}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${visibleLayers[key as keyof typeof visibleLayers] ? 'bg-white/10 border-white/20' : 'border-white/10 opacity-45'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {/* Graella setmanal amb scroll controlat en mòbil */}
+      <div className="overflow-x-auto rounded-2xl">
+        <div className="grid min-w-[980px] grid-cols-7 gap-2 overflow-x-auto" {...helpAttrs(ADMIN_CALENDAR_HELP.weekGrid)}>
         {weekDays.map((day) => {
           const key = formatKey(day);
-          const dayData = data?.days?.[key] ?? { reservas: [], bloqueos: [] };
+          const dayData = data?.days?.[key] ?? { reservas: [], bloqueos: [], tasks: [], socialPosts: [], followUps: [] };
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
           const todayClass = isToday(day);
@@ -267,7 +299,7 @@ export default function CalendarWeekClient() {
               )}
 
               {/* Bloquejos */}
-              {hasBloqueos && dayData.bloqueos.map((b) => (
+              {visibleLayers.blocks && hasBloqueos && dayData.bloqueos.map((b) => (
                 <div
                   key={b.id}
                   className="mb-2 rounded-xl border px-2.5 py-2 text-xs admin-tone-soft-danger admin-tone-border-danger"
@@ -281,7 +313,37 @@ export default function CalendarWeekClient() {
 
               {/* Reserves */}
               <div className="flex-1 space-y-1.5 overflow-auto">
-                {dayData.reservas.map((r) => (
+                {visibleLayers.tasks && dayData.tasks.map((task) => (
+                  <Link
+                    key={task.id}
+                    href="/admin/tasks"
+                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-info"
+                  >
+                    <div className="truncate text-xs font-semibold">✓ {task.title}</div>
+                    <div className="mt-0.5 text-[10px] opacity-70">{resolveWorkTimeLabel(task.dueDate)} · {task.priority}</div>
+                  </Link>
+                ))}
+                {visibleLayers.social && dayData.socialPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href="/admin/social"
+                    className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass admin-tone-soft-warning"
+                  >
+                    <div className="truncate text-xs font-semibold">📣 {post.title}</div>
+                    <div className="mt-0.5 text-[10px] opacity-70">{resolveWorkTimeLabel(post.scheduledAt)} · {post.platforms.join(', ')}</div>
+                  </Link>
+                ))}
+                {visibleLayers.followUps && dayData.followUps.map((item) => (
+                  <Link
+                    key={item.leadId}
+                    href={`/admin/leads/${item.leadId}`}
+                    className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-2.5 py-2 transition-all"
+                  >
+                    <div className="truncate text-xs font-semibold">☎ {item.name}</div>
+                    <div className="mt-0.5 text-[10px] opacity-70">{item.urgency}</div>
+                  </Link>
+                ))}
+                {visibleLayers.bookings && dayData.reservas.map((r) => (
                   <Link
                     key={r.id}
                     href={`/admin/bookings/${r.id}`}
@@ -308,7 +370,7 @@ export default function CalendarWeekClient() {
                     </div>
                   </Link>
                 ))}
-                {!hasReservas && !hasBloqueos && (
+                {(!visibleLayers.bookings || !hasReservas) && (!visibleLayers.blocks || !hasBloqueos) && (!visibleLayers.tasks || dayData.tasks.length === 0) && (!visibleLayers.social || dayData.socialPosts.length === 0) && (!visibleLayers.followUps || dayData.followUps.length === 0) && (
                   <div className="flex h-full items-center justify-center text-xs">
                     Lliure
                   </div>
@@ -327,6 +389,7 @@ export default function CalendarWeekClient() {
             </div>
           );
         })}
+        </div>
       </div>
     </AdminPage>
   );

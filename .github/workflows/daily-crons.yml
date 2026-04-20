@@ -66,3 +66,52 @@ jobs:
             "https://orbitaevents.com/api/cron/commercial-daily")
           echo "commercial-daily: $status"
           [ "$status" = "200" ] || exit 1
+
+      - name: customer-lifecycle
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/customer-lifecycle")
+          echo "customer-lifecycle: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: tasks-auto
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/tasks-auto")
+          echo "tasks-auto: $status"
+          [ "$status" = "200" ] || exit 1
+
+      - name: urgent-followup-alerts
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/urgent-followup-alerts")
+          echo "urgent-followup-alerts: $status"
+          [ "$status" = "200" ] || exit 1
+
+  # Benchmark setmanal — només dilluns
+  # El job s'executa cada dia però el step-level "Check if Monday" el bloqueja
+  # excepte els dilluns (o via workflow_dispatch manual).
+  weekly-benchmark:
+    name: Weekly benchmark (Monday only)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Monday
+        id: check-day
+        run: |
+          if [ "$(date -u +%u)" = "1" ]; then
+            echo "is_monday=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_monday=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: weekly-benchmark
+        if: steps.check-day.outputs.is_monday == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/weekly-benchmark")
+          echo "weekly-benchmark: $status"
+          [ "$status" = "200" ] || exit 1

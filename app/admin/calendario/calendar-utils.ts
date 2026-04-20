@@ -25,6 +25,31 @@ export type CalendarApiDay = {
     motivo?: string | null;
     notas?: string | null;
   }[];
+  tasks: {
+    id: string;
+    title: string;
+    dueDate: string;
+    status: string;
+    priority: string;
+    leadId?: string | null;
+    customerId?: string | null;
+    bookingId?: string | null;
+  }[];
+  socialPosts: {
+    id: string;
+    title: string;
+    scheduledAt: string;
+    status: string;
+    platforms: string[];
+    contentType: string;
+  }[];
+  followUps: {
+    leadId: string;
+    name: string;
+    urgency: 'URGENT' | 'NORMAL' | 'LOW';
+    suggestedAction: string;
+    dueDate: string;
+  }[];
 };
 
 export type CalendarApiResponse = {
@@ -173,4 +198,10 @@ export function parseHour(timeStr?: string | null): number | null {
   if (!timeStr) return null;
   const m = timeStr.match(/^(\d{1,2})/);
   return m ? parseInt(m[1], 10) : null;
+}
+export function resolveWorkTimeLabel(dateIso: string): string {
+  return new Date(dateIso).toLocaleTimeString(DEFAULT_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }

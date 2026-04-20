@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER } from '@/lib/constants';
+import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -125,7 +126,7 @@ export default function LeadGuidedFlow({
   }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
 
   return (
-    <section className="ap-card p-5" data-help-title="Pipeline comercial guiat" data-help-desc="Et diu en quin pas està l'entrada i suggereix la millor acció següent per fer-la avançar.">
+    <section className="ap-card p-5" {...helpAttrs(ADMIN_LEAD_HELP.guided.root)}>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -194,7 +195,7 @@ export default function LeadGuidedFlow({
       </div>
 
       {/* Next suggested action + quick actions */}
-      <div className="mt-4 flex flex-wrap items-center gap-2" data-help-title="Accions ràpides del lead" data-help-desc="Permeten executar el següent pas recomanat, crear tasca de seguiment o marcar l'entrada com a perduda o reoberta.">
+      <div className="mt-4 flex flex-wrap items-center gap-2" {...helpAttrs(ADMIN_LEAD_HELP.guided.actions)}>
         {nextAction && (
           nextAction.href ? (
             <Link
@@ -258,6 +259,7 @@ export default function LeadGuidedFlow({
     </section>
   );
 }
+
 
 
 

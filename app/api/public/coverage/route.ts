@@ -4,15 +4,18 @@ import { getEnabledCoverageAreas, getEnabledCoverageCities } from '@/lib/coverag
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const [areas, cities] = await Promise.all([
-    getEnabledCoverageAreas(),
-    getEnabledCoverageCities(),
-  ]);
+  try {
+    const [areas, cities] = await Promise.all([
+      getEnabledCoverageAreas(),
+      getEnabledCoverageCities(),
+    ]);
 
-  return NextResponse.json({
-    ok: true,
-    areas,
-    cities,
-  });
+    return NextResponse.json({ ok: true, areas, cities });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'Error loading coverage data' },
+      { status: 500 }
+    );
+  }
 }
 

@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_LEAD_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
-type LeadTask = {
+type LeadScopedTask = {
   id: string;
   title: string;
   description?: string | null;
@@ -24,6 +25,21 @@ type LeadDocument = {
   createdAt: string;
 };
 
+type LeadTimeline = {
+  id: string;
+  source: 'customerActivity' | 'leadActivity' | 'adminLog';
+  entityType: string;
+  entityId?: string | null;
+  kind: string;
+  title: string;
+  body?: string;
+  actor?: string;
+  occurredAt: string;
+  metadata?: Record<string, unknown>;
+  link?: { label: string; href: string };
+  timelineType: string;
+};
+
 type LeadActivity = {
   id: string;
   type: string;
@@ -31,8 +47,24 @@ type LeadActivity = {
   description?: string | null;
   createdBy?: string | null;
   createdAt: string;
+  timeline?: LeadTimeline;
 };
 
+function getActivityTone(type: string) {
+  if (type === 'EMAIL') return 'admin-tone-text-info';
+  if (type === 'WHATSAPP') return 'admin-tone-text-success';
+  if (type === 'CALL') return 'admin-tone-text-warning';
+  if (type === 'TASK') return 'admin-tone-text-info';
+  if (type === 'NOTE') return 'admin-tone-text-neutral';
+  return 'admin-tone-text-slate';
+}
+
+function getActivityKindLabel(kind?: string) {
+  if (kind === 'message') return 'Comunicació';
+  if (kind === 'task') return 'Tasca';
+  if (kind === 'note') return 'Nota';
+  return 'Activitat';
+}
 
 export default function LeadWorkspace({
   leadId,
@@ -41,7 +73,7 @@ export default function LeadWorkspace({
   initialActivities,
 }: {
   leadId: string;
-  initialTasks: LeadTask[];
+  initialTasks: LeadScopedTask[];
   initialDocuments: LeadDocument[];
   initialActivities: LeadActivity[];
 }) {
@@ -194,8 +226,8 @@ export default function LeadWorkspace({
   };
 
   return (
-    <div className="space-y-6" data-help-title="Workspace del lead" data-help-desc="Aquest espai concentra seguiment comercial, documents i activitat cronològica de l'entrada.">
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" data-help-title="KPI del lead" data-help-desc="Resumeixen tasques obertes, tasques completades, documents pujats i activitat registrada.">
+    <div className="space-y-6" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.root)}>
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.kpis)}>
         <div className="ap-card p-4">
           <p className="text-xs uppercase tracking-wide">Tasques obertes</p>
           <p className="mt-1 text-2xl font-semibold">{openTasks.length}</p>
@@ -215,15 +247,15 @@ export default function LeadWorkspace({
       </section>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section id="lead-tasks" className="ap-card p-5 xl:col-span-2" data-help-title="Seguiment comercial" data-help-desc="Aquí gestiones les tasques reals per fer avançar el lead: trucades, seguiment, recordatoris i propers passos.">
+        <section id="lead-tasks" className="ap-card p-5 xl:col-span-2" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.tasks)}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Seguiment comercial (tasques)</h2>
+            <h2 className="text-lg font-semibold">Seguiment comercial</h2>
             <span className="ap-badge px-2.5 py-1 text-xs">
               {openTasks.length} pendents
             </span>
           </div>
           <p className="mt-1 text-sm">
-            Llista de coses que has de fer per tancar aquest lead: trucades, seguiment i properes accions.
+            Tasques operatives sobre el lead, ja recolzades en el model canònic de `Task`.
           </p>
 
           <div className="mt-4 grid gap-2 md:grid-cols-12">
@@ -307,7 +339,7 @@ export default function LeadWorkspace({
           </div>
         </section>
 
-        <section id="lead-documents" className="ap-card p-5" data-help-title="Documents comercials" data-help-desc="Serveix per pujar i consultar pressupostos, contractes, factures o arxius vinculats a aquesta oportunitat.">
+        <section id="lead-documents" className="ap-card p-5" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.documents)}>
           <h2 className="text-lg font-semibold">Documents comercials</h2>
           <div className="mt-3 space-y-2">
             <input
@@ -379,9 +411,12 @@ export default function LeadWorkspace({
         </section>
       </div>
 
-      <section className="ap-card p-5" data-help-title="Timeline comercial" data-help-desc="Registre cronològic de totes les accions: canvis d'estat, notes, trucades i activitats automàtiques. Pots netejar duplicats.">
+      <section className="ap-card p-5" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.timeline)}>
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Timeline comercial</h2>
+          <div>
+            <h2 className="text-lg font-semibold">Timeline comercial</h2>
+            <p className="mt-1 text-sm">Lectura canònica del que passa amb aquest lead.</p>
+          </div>
           <button
             type="button"
             onClick={cleanDuplicateActivities}
@@ -401,16 +436,23 @@ export default function LeadWorkspace({
               <div key={activity.id} className="ap-card p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm font-semibold">{activity.title || activity.type}</p>
-                    {activity.description && (
-                      <p className="text-xs">{activity.description}</p>
+                    <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide admin-tone-text-neutral">
+                      <span>{activity.timeline?.source === 'leadActivity' ? 'Lead' : 'Activitat'}</span>
+                      <span>·</span>
+                      <span>{getActivityKindLabel(activity.timeline?.kind)}</span>
+                    </div>
+                    <p className={`text-sm font-semibold ${getActivityTone(activity.type)}`}>
+                      {activity.timeline?.title || activity.title || activity.type}
+                    </p>
+                    {(activity.timeline?.body || activity.description) && (
+                      <p className="text-xs">{activity.timeline?.body || activity.description}</p>
                     )}
-                    {activity.createdBy && (
-                      <p className="text-xs">Per: {activity.createdBy}</p>
+                    {(activity.timeline?.actor || activity.createdBy) && (
+                      <p className="text-xs">Per: {activity.timeline?.actor || activity.createdBy}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="text-xs">{formatDateTime(activity.createdAt)}</div>
+                    <div className="text-xs">{formatDateTime(activity.timeline?.occurredAt || activity.createdAt)}</div>
                     <button
                       type="button"
                       onClick={() => deleteActivity(activity.id)}
@@ -428,12 +470,4 @@ export default function LeadWorkspace({
     </div>
   );
 }
-
-
-
-
-
-
-
-
 

@@ -209,7 +209,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
       </div>
       
       {/* Días de la semana */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-2 overflow-x-auto">
         {PUBLIC_CALENDAR_DAY_SHORT[locale].map((day, i) => (
           <div
             key={day}
@@ -224,7 +224,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
       </div>
       
       {/* Grid de días */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 overflow-x-auto">
         {/* Espacios vacíos */}
         {Array.from({ length: offset }).map((_, i) => (
           <div key={`empty-${i}`} className="aspect-square" />

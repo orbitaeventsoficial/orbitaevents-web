@@ -17,9 +17,7 @@ interface ForecastMonth {
   combined: number;
 }
 
-export async function buildPipelineForecast(monthsAhead = 6): Promise<ForecastMonth[]> {
-  const now = new Date();
-
+export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Date()): Promise<ForecastMonth[]> {
   // 1. Pipeline ponderat — leads actius
   const activeLeads = await prisma.lead.findMany({
     where: {
@@ -43,7 +41,7 @@ export async function buildPipelineForecast(monthsAhead = 6): Promise<ForecastMo
   // Agrupar pipeline per mes d'event
   const pipelineByMonth = new Map<string, number>();
   for (const lead of activeLeads) {
-    const { probability } = scoreLead(lead);
+    const { probability } = scoreLead({ ...lead, now });
     const amount = estimateLeadAmount({ budget: lead.budget, eventType: lead.eventType });
     const weighted = amount * probability;
 

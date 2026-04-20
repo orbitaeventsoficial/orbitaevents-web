@@ -28,6 +28,7 @@ import WebVitalsReporter from '@/app/components/analytics/WebVitalsReporter';
 import ExitIntentModal from '@/app/components/ui/ExitIntentModal';
 import { absoluteUrl, getSiteUrl } from '@/lib/site';
 import { buildIntroBootstrapScript } from '@/lib/intro';
+import { getHomeMeta } from '@/lib/home-meta';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -53,6 +54,7 @@ const DISCO_PRICE = getMinPriceByService('discomovil');
 const FIESTAS_PRICE = getMinPriceByService('fiestas');
 
 const INTRO_BOOTSTRAP_SCRIPT = buildIntroBootstrapScript();
+const DEFAULT_HOME_META = getHomeMeta('es');
 
 const JSON_LD_ORGANIZATION = getPublicOrganizationJsonLd({
   minServicePrice: MIN_SERVICE_PRICE,
@@ -74,20 +76,7 @@ export const metadata: Metadata = {
   },
   description:
     `Creamos experiencias únicas: bodas, fiestas temáticas y eventos corporativos. DJ profesional + tematización completa. Desde ${MIN_SERVICE_PRICE} EUR. Barcelona y Girona. Valoración 5.0/5.`,
-  keywords: [
-    'DJ bodas Barcelona',
-    'DJ bodas Girona',
-    'discomovil Barcelona',
-    'DJ eventos empresa',
-    'fiesta tematica Halloween',
-    'fiesta Harry Potter Barcelona',
-    'sonido e iluminacion bodas',
-    'DJ Costa Brava',
-    'DJ Maresme',
-    'DJ Valles',
-    'animacion bodas',
-    'efectos especiales eventos',
-  ],
+  keywords: DEFAULT_HOME_META.keywords,
   authors: [{ name: 'Orbita Events', url: getSiteUrl() }],
   creator: 'Orbita Events',
   publisher: 'Orbita Events',
@@ -101,7 +90,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: getSiteUrl(),
     siteName: 'Orbita Events',
-    title: 'Experiencias inmersivas para eventos | DJ + tematización Barcelona',
+    title: DEFAULT_HOME_META.ogTitle,
     description:
       `Creamos experiencias únicas: bodas, fiestas temáticas y eventos corporativos. DJ profesional + tematización completa. Desde ${MIN_SERVICE_PRICE} EUR. Valoración 5.0/5.`,
     images: [
@@ -109,14 +98,14 @@ export const metadata: Metadata = {
         url: '/og-default.jpg',
         width: 1200,
         height: 630,
-        alt: 'Orbita Events - DJ bodas Barcelona',
+        alt: DEFAULT_HOME_META.ogImageAlt,
         type: 'image/jpeg',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Experiencias inmersivas para eventos | Orbita Events',
+    title: DEFAULT_HOME_META.ogTitle,
     description:
       `Bodas, fiestas temáticas y eventos corporativos. DJ + tematización completa. Desde ${MIN_SERVICE_PRICE} EUR. Valoración 5.0/5.`,
     images: ['/og-default.jpg'],
@@ -271,6 +260,7 @@ export default async function LocaleLayout({
     </>
   );
 }
+
 
 
 

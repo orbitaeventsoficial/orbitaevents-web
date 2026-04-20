@@ -226,6 +226,10 @@ export const contactSchema = (t: Record<string, string>) => z.object({
   extras: z.array(z.string()).optional(),
   locale: z.string().optional(),
   turnstileToken: z.string().optional(),
+  utmSource: z.string().max(200).optional(),
+  utmMedium: z.string().max(200).optional(),
+  utmCampaign: z.string().max(200).optional(),
+  landingPage: z.string().max(500).optional(),
 }).superRefine((data, ctx) => {
   if (!data.contact && !data.email && !data.phone) {
     ctx.addIssue({

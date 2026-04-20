@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 interface ChecklistItem {
   id: string;
@@ -102,8 +103,8 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
   const tone = progressTone(pct);
 
   return (
-    <section className="ap-card rounded-2xl p-5">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="ap-card rounded-2xl p-5" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.root)}>
+      <div className="mb-4 flex items-center justify-between" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.progress)}>
         <div>
           <h3 className="text-base font-semibold">Preparació del bolo</h3>
           <p className="mt-0.5 text-xs admin-tone-text-neutral">{done}/{total} completat</p>
@@ -118,7 +119,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
 
       <ul className="space-y-1">
         {items.map((item) => (
-          <li key={item.id} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:admin-tone-bg-neutral">
+          <li key={item.id} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:admin-tone-bg-neutral" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.item)}>
             <button
               type="button"
               onClick={() => toggle(item.id)}
@@ -160,10 +161,11 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
           </button>
         </div>
       ) : (
-        <button type="button" onClick={() => setAdding(true)} className="admin-tone-idle mt-3 w-full rounded-xl border border-dashed px-3 py-2 text-center text-sm transition-colors">
+        <button type="button" onClick={() => setAdding(true)} className="admin-tone-idle mt-3 w-full rounded-xl border border-dashed px-3 py-2 text-center text-sm transition-colors" {...helpAttrs(ADMIN_BOOKING_HELP_2.checklist.add)}>
           + Afegir ítem
         </button>
       )}
     </section>
   );
 }
+

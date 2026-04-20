@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_LEAD_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
   const [saving, setSaving] = useState(false);
@@ -29,7 +30,7 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
   }
 
   return (
-    <div className="mt-2">
+    <div className="mt-2" {...helpAttrs(ADMIN_LEAD_HELP_2.score.root)}>
       <button
         type="button"
         onClick={saveSnapshot}
@@ -42,4 +43,5 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
     </div>
   );
 }
+
 

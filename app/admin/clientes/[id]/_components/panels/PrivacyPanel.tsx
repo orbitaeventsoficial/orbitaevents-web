@@ -5,6 +5,8 @@ import { useHubContext } from '../CustomerHubClient';
 import { formatDateTime } from '@/lib/constants';
 import { getPrivacyConsentLabel, getPrivacyRequestStatusDisplay, getPrivacyRequestTypeLabel } from '@/lib/constants/privacy';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_CUSTOMER_PANEL_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { log } from '@/lib/logger';
 
 type ConsentRecord = {
   id: string;
@@ -41,11 +43,11 @@ export default function PrivacyPanel() {
         const res = await fetch(`/api/admin/customers/${customerId}/consents`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          setConsents(data.consents || []);
-          setRequests(data.requests || []);
+          setConsents(data.body?.consents || []);
+          setRequests(data.body?.requests || []);
         }
       } catch (err) {
-        console.error('Error carregant privacitat:', err);
+        log.error('Error carregant privacitat', err);
       } finally {
         setLoading(false);
       }
@@ -66,10 +68,7 @@ export default function PrivacyPanel() {
   const handleExport = async (portable: boolean) => {
     setExporting(true);
     try {
-      const res = await fetchWithCsrf(
-        `/api/admin/customers/${customerId}/export?portable=${portable ? '1' : '0'}&download=1`,
-        { cache: 'no-store' }
-      );
+      const res = await fetchWithCsrf(`/api/admin/customers/${customerId}/export?portable=${portable ? '1' : '0'}&download=1`, { cache: 'no-store' });
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -83,7 +82,7 @@ export default function PrivacyPanel() {
         setExportMsg('Error exportant dades');
       }
     } catch (err) {
-      console.error('Error exportant:', err);
+      log.error('Error exportant', err);
       setExportMsg('Error de connexió');
     } finally {
       setExporting(false);
@@ -95,14 +94,11 @@ export default function PrivacyPanel() {
   const revokedConsents = consents.filter((c) => !c.granted || c.revokedAt);
 
   return (
-    <div className="space-y-4" data-help-title="Privacitat i RGPD" data-help-desc="Gestiona consentiments, exporta dades (Art. 15/20) i consulta sol·licituds de drets ARCO del client.">
-      {/* Consentiments actius */}
-      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Consentiments" data-help-desc="Llista els consentiments actius i revocats del client: marketing, comunicacions, etc.">
+    <div className="space-y-4" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.root)}>
+      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.consents)}>
         <h2 className="text-lg font-semibold">Consentiments</h2>
 
-        {activeConsents.length === 0 && revokedConsents.length === 0 && (
-          <p className="mt-3 text-sm opacity-50">Cap consentiment registrat.</p>
-        )}
+        {activeConsents.length === 0 && revokedConsents.length === 0 && <p className="mt-3 text-sm opacity-50">Cap consentiment registrat.</p>}
 
         {activeConsents.length > 0 && (
           <div className="mt-3 space-y-2">
@@ -110,13 +106,8 @@ export default function PrivacyPanel() {
               <div key={c.id} className="flex items-center justify-between rounded-xl border p-3">
                 <div>
                   <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
-                  <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
-                    Actiu
-                  </span>
-                  <p className="text-xs opacity-50 mt-0.5">
-                    {c.source} · v{c.consentVersion}
-                    {c.grantedAt && <> · {formatDateTime(c.grantedAt)}</>}
-                  </p>
+                  <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">Actiu</span>
+                  <p className="text-xs opacity-50 mt-0.5">{c.source} · v{c.consentVersion}{c.grantedAt && <> · {formatDateTime(c.grantedAt)}</>}</p>
                 </div>
               </div>
             ))}
@@ -125,20 +116,14 @@ export default function PrivacyPanel() {
 
         {revokedConsents.length > 0 && (
           <details className="mt-3">
-            <summary className="cursor-pointer text-sm opacity-60 hover:opacity-100 transition-opacity">
-              Revocats / Inactius ({revokedConsents.length})
-            </summary>
+            <summary className="cursor-pointer text-sm opacity-60 hover:opacity-100 transition-opacity">Revocats / Inactius ({revokedConsents.length})</summary>
             <div className="mt-2 space-y-2">
               {revokedConsents.map((c) => (
                 <div key={c.id} className="flex items-center justify-between rounded-xl border p-3 opacity-50">
                   <div>
                     <span className="text-sm font-medium">{getPrivacyConsentLabel(c.consentType)}</span>
-                    <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
-                      Revocat
-                    </span>
-                    <p className="text-xs opacity-50 mt-0.5">
-                      {c.revokedAt && <>Revocat: {formatDateTime(c.revokedAt)}</>}
-                    </p>
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">Revocat</span>
+                    <p className="text-xs opacity-50 mt-0.5">{c.revokedAt && <>Revocat: {formatDateTime(c.revokedAt)}</>}</p>
                   </div>
                 </div>
               ))}
@@ -147,18 +132,16 @@ export default function PrivacyPanel() {
         )}
       </div>
 
-      {/* Accions RGPD */}
-      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Accions RGPD" data-help-desc="Exporta les dades del client en format complet (Art. 15) o portable (Art. 20) per complir amb la normativa.">
+      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.gdprActions)}>
         <h2 className="text-lg font-semibold">Accions RGPD</h2>
-        {exportMsg && (
-          <p className="mt-2 text-sm rounded-xl border px-3 py-2">{exportMsg}</p>
-        )}
+        {exportMsg && <p className="mt-2 text-sm rounded-xl border px-3 py-2">{exportMsg}</p>}
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => handleExport(false)}
             disabled={exporting}
             className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+            {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.exportFull)}
           >
             {exporting ? 'Exportant...' : 'Exportar dades (Art. 15)'}
           </button>
@@ -167,14 +150,14 @@ export default function PrivacyPanel() {
             onClick={() => handleExport(true)}
             disabled={exporting}
             className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]"
+            {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.exportPortable)}
           >
             Exportar portable (Art. 20)
           </button>
         </div>
       </div>
 
-      {/* Sol·licituds ARCO */}
-      <div className="rounded-2xl border admin-card-glass p-5" data-help-title="Sol·licituds ARCO" data-help-desc="Registre de sol·licituds d'accés, rectificació, cancel·lació i oposició del client, amb estat i deadline legal.">
+      <div className="rounded-2xl border admin-card-glass p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.privacy.requests)}>
         <h2 className="text-lg font-semibold">Sol·licituds de drets (ARCO)</h2>
 
         {requests.length === 0 ? (
@@ -186,22 +169,12 @@ export default function PrivacyPanel() {
               return (
                 <div key={r.id} className="rounded-xl border p-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">
-                      {getPrivacyRequestTypeLabel(r.requestType)}
-                    </span>
-                    <span className={`text-xs font-medium ${statusCfg.color}`}>
-                      {statusCfg.label}
-                    </span>
+                    <span className="text-sm font-medium">{getPrivacyRequestTypeLabel(r.requestType)}</span>
+                    <span className={`text-xs font-medium ${statusCfg.color}`}>{statusCfg.label}</span>
                     <span className="text-xs opacity-40">{formatDateTime(r.createdAt)}</span>
                   </div>
-                  {r.description && (
-                    <p className="mt-1 text-xs opacity-60">{r.description}</p>
-                  )}
-                  {r.legalDeadline && r.status !== 'COMPLETED' && r.status !== 'REJECTED' && (
-                    <p className="mt-1 text-xs">
-                      Deadline: {formatDateTime(r.legalDeadline)}
-                    </p>
-                  )}
+                  {r.description && <p className="mt-1 text-xs opacity-60">{r.description}</p>}
+                  {r.legalDeadline && r.status !== 'COMPLETED' && r.status !== 'REJECTED' && <p className="mt-1 text-xs">Deadline: {formatDateTime(r.legalDeadline)}</p>}
                 </div>
               );
             })}
@@ -211,5 +184,3 @@ export default function PrivacyPanel() {
     </div>
   );
 }
-
-

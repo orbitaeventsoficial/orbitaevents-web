@@ -33,7 +33,7 @@ interface InsightInput {
   leadsThisWeek?: number;
 }
 
-export function generateDashboardInsights(input: InsightInput): DashboardInsight[] {
+export function generateDashboardInsights(input: InsightInput, now: Date = new Date()): DashboardInsight[] {
   const insights: DashboardInsight[] = [];
 
   // Leads calents sense resposta
@@ -145,8 +145,8 @@ export function generateDashboardInsights(input: InsightInput): DashboardInsight
   // Objectiu mensual
   if (input.revenueTarget > 0) {
     const pct = Math.round((input.revenueThisMonth / input.revenueTarget) * 100);
-    const dayOfMonth = new Date().getDate();
-    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const dayOfMonth = now.getDate();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const expectedPct = Math.round((dayOfMonth / daysInMonth) * 100);
 
     if (pct >= expectedPct + 10) {

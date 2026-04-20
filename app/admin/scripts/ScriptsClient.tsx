@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ADMIN_SCRIPT_CATEGORY_INFO } from '@/lib/constants/admin';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 
 interface ScriptInfo {
   name: string;
@@ -243,6 +244,18 @@ export default function ScriptsClient() {
     }
     return groups;
   }, [filtered]);
+  const dangerousCount = SCRIPTS.filter((script) => script.danger).length;
+  const activeCategoryInfo = filter ? ADMIN_SCRIPT_CATEGORY_INFO[filter as ScriptInfo['category']] : null;
+  const actionTitle = !filter
+    ? 'Entrar per categoria abans d’executar res'
+    : dangerousCount > 0 && filter === 'fix'
+      ? `Revisar ${activeCategoryInfo?.label || 'la categoria'} amb criteri abans de llançar scripts de correcció`
+      : `Treballar ${activeCategoryInfo?.label || 'la categoria'} amb la comanda correcta`;
+  const actionDescription = !filter
+    ? 'El retorn aquí no és mirar 30 scripts a la vegada, sinó acotar per categoria i copiar només la comanda que toca.'
+    : filter === 'fix'
+      ? 'Aquesta categoria toca dades reals. Cal mirar primer el text, arguments i si hi ha dry-run abans de disparar res.'
+      : 'Amb la categoria acotada, el següent pas bo és copiar la comanda correcta i executar-la al terminal amb el context adequat.';
 
   const copyCommand = (cmd: string) => {
     navigator.clipboard.writeText(cmd);
@@ -252,6 +265,45 @@ export default function ScriptsClient() {
 
   return (
     <div className="space-y-6">
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix el catàleg de scripts',
+          tone: filter ? 'info' : 'default',
+          stats: [
+            { label: 'Scripts', value: SCRIPTS.length, hint: 'catàleg total' },
+            { label: 'Categories', value: Object.keys(ADMIN_SCRIPT_CATEGORY_INFO).length, hint: 'blocs operatius' },
+            { label: 'Destructius', value: dangerousCount, tone: dangerousCount > 0 ? 'warning' : 'success', hint: 'requereixen criteri' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans d’executar',
+          tone: filter === 'fix' || filter === 'audit' ? 'warning' : filter ? 'info' : 'default',
+          items: [
+            filter
+              ? `Filtre actiu sobre ${activeCategoryInfo?.label || filter}: ${filtered.length} scripts visibles.`
+              : 'Sense filtre actiu: estàs veient el catàleg complet de scripts i eines.',
+            dangerousCount > 0
+              ? `${dangerousCount} scripts estan marcats com a destructius o de correcció delicada.`
+              : 'No hi ha scripts marcats com a destructius.',
+            copiedCommand
+              ? `Última comanda copiada: ${copiedCommand}`
+              : 'Encara no has copiat cap comanda en aquesta sessió.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: filter === 'fix' || filter === 'audit' ? 'warning' : 'success',
+          secondaryPills: [
+            filter ? activeCategoryInfo?.label || filter : 'Sense filtre',
+            copiedCommand ? 'Comanda copiada' : 'Sense còpia',
+          ],
+        }}
+      />
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {(Object.entries(ADMIN_SCRIPT_CATEGORY_INFO) as Array<[ScriptInfo['category'], (typeof ADMIN_SCRIPT_CATEGORY_INFO)[ScriptInfo['category']]]>).map(([key, info]) => {
           const count = SCRIPTS.filter((s) => s.category === key).length;

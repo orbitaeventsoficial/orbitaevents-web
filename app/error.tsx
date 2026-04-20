@@ -1,5 +1,5 @@
 "use client";
-import caMessages from '@/messages/ca.json';
+import { getErrorPageCopy } from '@/lib/public-error-copy';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
@@ -10,9 +10,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  type ErrorPageMessages = { title?: string; defaultMessage?: string; tryAgain?: string; backToHome?: string; errorCode?: string };
-
-  const t: ErrorPageMessages = (caMessages as { errorPage?: ErrorPageMessages }).errorPage || {};
+  const t = getErrorPageCopy('ca');
 
   useEffect(() => {
     Sentry.captureException(error);
@@ -49,6 +47,8 @@ export default function Error({
     </div>
   );
 }
+
+
 
 
 

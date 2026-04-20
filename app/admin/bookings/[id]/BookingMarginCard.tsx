@@ -3,7 +3,17 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import {
+  calculateBillableTravelKm,
+  calculateTravelBlocks,
+  calculateTravelCharge,
+  calculateTravelCost,
+  DEFAULT_VEHICLE_COST_PER_KM,
+  getIncludedTravelOneWayKm,
+  INCLUDED_TRAVEL_KM,
+  TRAVEL_BLOCK_EUR,
+  TRAVEL_BLOCK_KM,
+} from '@/lib/services/travelCost';
 import { formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
@@ -32,7 +42,6 @@ interface BookingMarginProps {
   targetMarginPct: number;
 }
 
-
 export default function BookingMarginCard({
   bookingId,
   total,
@@ -57,12 +66,10 @@ export default function BookingMarginCard({
   const router = useRouter();
   const toast = useToast();
 
-  // Editable travel fields
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
   const resolvedCostPerKm = initialVehicleCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
   const [vehicleCostPerKm] = useState(resolvedCostPerKm);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const lastDistanceDestinationRef = useRef('');
@@ -82,7 +89,6 @@ export default function BookingMarginCard({
   const extrasCost = extrasTotal * extraCostRatio;
   const extraHoursCost = extraHours * extraHourPrice * extraHourCostRatio;
 
-  // Margin calculation
   const directCost =
     packCostUsed +
     extrasCost +
@@ -144,11 +150,11 @@ export default function BookingMarginCard({
         }),
       });
       if (!res.ok) {
-        console.error('[BookingMarginCard] Error desant distància:', res.status);
+        log.error('[BookingMarginCard] Error desant distancia', { status: res.status });
         toast.error('Error desant la distància');
       }
     } catch (err) {
-      console.error('[BookingMarginCard] Error desant distància:', err);
+      log.error('[BookingMarginCard] Error desant distancia', err);
       toast.error('Error desant la distància');
     }
   }, [bookingId, vehicleCostPerKm, toast]);
@@ -172,7 +178,7 @@ export default function BookingMarginCard({
       setDistanceKm(nextDistanceKm);
       lastDistanceDestinationRef.current = destination;
       void persistDistance(nextDistanceKm);
-      setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada+tornada`);
+      setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada i tornada`);
     } catch (error) {
       setDistanceMessage(error instanceof Error ? error.message : 'Error calculant ruta');
     } finally {
@@ -192,55 +198,70 @@ export default function BookingMarginCard({
     return () => clearTimeout(timer);
   }, [eventLocation, eventVenue, calculateDistanceForDestination]);
 
-  const hasChanged =
-    distanceKm !== (initialDistanceKm ?? 0);
+  const hasChanged = distanceKm !== (initialDistanceKm ?? 0);
 
   return (
-    <section className={`rounded-xl border shadow-sm p-6 ${marginBg}`} data-help-title="Marge i costos" data-help-desc="Explica què costa realment aquest esdeveniment, quin marge deixa i com impacta el transport en la rendibilitat.">
-      <h2 className="text-lg font-semibold mb-4">
-        📊 Marge i Costos
-      </h2>
-
-      {/* KPI row */}
-      <div className="grid gap-4 sm:grid-cols-4 mb-6" data-help-title="KPI de marge" data-help-desc="Resumeixen ingrés total, cost directe, marge net i percentatge de marge d'aquesta reserva.">
+    <section
+      className={`admin-booking-margin rounded-xl border shadow-sm p-6 ${marginBg}`}
+      data-help-title="Marge i costos"
+      data-help-desc="Explica què costa realment aquest esdeveniment, quin marge deixa i com impacta el transport en la rendibilitat."
+    >
+      <div className="admin-booking-margin-hero mb-6">
         <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">Cabina econòmica</p>
+          <h2 className="mt-2 text-lg font-semibold">Marge i costos</h2>
+          <p className="mt-1 text-sm opacity-80">
+            Llegeix en un cop d'ull què deixa la reserva, on marxa cada euro i si el desplaçament està ben cobert.
+          </p>
+        </div>
+        <div className="admin-booking-margin-badge">
+          <span className={`text-xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</span>
+          <span className="text-[11px] uppercase tracking-wide opacity-70">Marge actual</span>
+        </div>
+      </div>
+
+      <div
+        className="admin-booking-margin-kpis mb-6 grid gap-4 sm:grid-cols-4"
+        data-help-title="KPI de marge"
+        data-help-desc="Resumeixen ingrés total, cost directe, marge net i percentatge de marge d'aquesta reserva."
+      >
+        <div className="admin-booking-margin-kpi">
           <p className="text-xs font-medium uppercase">Ingrés total</p>
           <p className="text-lg font-bold">{formatCurrency(total)}</p>
         </div>
-        <div>
+        <div className="admin-booking-margin-kpi">
           <p className="text-xs font-medium uppercase">Cost directe</p>
           <p className="text-lg font-bold">{formatCurrency(directCost)}</p>
         </div>
-        <div>
+        <div className="admin-booking-margin-kpi">
           <p className="text-xs font-medium uppercase">Marge net</p>
           <p className={`text-lg font-bold ${marginColor}`}>{formatCurrency(netMargin)}</p>
         </div>
-        <div>
-          <Tooltip text="Calculat pel motor de cost (costEngine.ts) — pack, extras, transport, operacional">
-            <p className="text-xs font-medium uppercase">% Marge</p>
+        <div className="admin-booking-margin-kpi">
+          <Tooltip text="Calculat pel motor de cost: pack, extres, transport i cost operacional.">
+            <p className="text-xs font-medium uppercase">% marge</p>
           </Tooltip>
           <p className={`text-2xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</p>
           <p className={`text-[11px] mt-0.5 ${marginColor}`}>
             {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
-             marginPct >= 30 ? 'Acceptable. Considera reduir costos o augmentar preu.' :
+             marginPct >= 30 ? 'Acceptable. Encara hi ha marge per optimitzar.' :
              marginPct >= 15 ? 'Vigilar. Revisa descomptes i transport.' :
-             'Crític! Revisa preu o costos.'}
+             'Crític. Revisa preu o costos.'}
           </p>
         </div>
       </div>
 
-      {/* Sumatori clar */}
-      <div className="mb-6 ap-card rounded-xl p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
+      <div className="mb-6 admin-booking-margin-panel ap-card rounded-xl p-4" data-help-title="Sumatori de costos i marge" data-help-desc="Desglossa d'on surt el cost directe i com es compara el marge real amb el marge objectiu.">
         <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
         <div className="space-y-1.5 text-xs">
-          <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
+          <div className="flex justify-between"><span>Cost pack (real o estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
           <div className="flex justify-between"><span>Cost extres</span><span>{formatCurrency(extrasCost)}</span></div>
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
           <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(fixedOperationalCost)}</span></div>
-          <div className="flex justify-between"><span title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
+          <div className="flex justify-between"><span title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
           <div className="flex justify-between border-t admin-tone-border-neutral pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
           <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
-          <div className="flex justify-between"><span>Diferencial de marge (ingrés - cost)</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
+          <div className="flex justify-between"><span>Diferencial de marge</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
           <div className="flex justify-between"><span>Marge objectiu ({targetMarginPct.toFixed(1)}%)</span><span>{formatCurrency(targetMarginAmount)}</span></div>
           <div className="flex justify-between">
             <span>Diferencial vs objectiu</span>
@@ -250,13 +271,13 @@ export default function BookingMarginCard({
           </div>
           {typeof inventoryRemainingHoursAvg === 'number' && (
             <div className="flex justify-between border-t admin-tone-border-neutral pt-1.5">
-              <span>Vida útil mitjana material assignat</span>
+              <span>Vida útil mitjana del material assignat</span>
               <span>{inventoryRemainingHoursAvg.toFixed(0)}h restants</span>
             </div>
           )}
           {typeof inventoryRemainingHoursMin === 'number' && (
             <div className="flex justify-between">
-              <span>Element més crític (mínim)</span>
+              <span>Element més crític</span>
               <span className={inventoryRemainingHoursMin < 200 ? 'admin-tone-text-danger' : 'admin-tone-text-neutral'}>
                 {inventoryRemainingHoursMin.toFixed(0)}h restants
               </span>
@@ -265,123 +286,113 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      {/* On va cada euro — desglossament del benefici */}
       {total > 0 && (
-        <div className="mb-6 rounded-xl border p-4" data-help-title="On va cada euro" data-help-desc="Tradueix el marge a pots reals de negoci: combustible, vehicle, equip, operacions i benefici net.">
+        <div className="mb-6 admin-booking-margin-panel rounded-xl border p-4" data-help-title="On va cada euro" data-help-desc="Tradueix el marge a pots reals de negoci: combustible, vehicle, equip, operacions i benefici net.">
           <h3 className="text-sm font-semibold mb-1">On va cada euro d'aquest bolo</h3>
-          <p className="text-[11px] mb-3">Desglossament pràctic: què es queda l'empresa, què s'ha de reservar, i què és benefici net.</p>
+          <p className="text-[11px] mb-3">Desglossament pràctic del que reserva l'empresa i del que realment queda com a benefici.</p>
           <div className="space-y-2 text-xs">
-            {/* Benzina / combustible */}
             <div className="flex items-start justify-between gap-2">
               <div>
-                <span className="font-medium">Combustible (benzina)</span>
-                <p className="text-[10px]">Pot «Gasolina» — usar per repostar la furgoneta</p>
+                <span className="font-medium">Combustible</span>
+                <p className="text-[10px]">Pot “Gasolina” per repostar i cobrir ruta</p>
               </div>
               <span className="shrink-0 font-semibold">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.55 : 0)}
               </span>
             </div>
-            {/* Manteniment vehicle */}
             <div className="flex items-start justify-between gap-2">
               <div>
                 <span className="font-medium">Manteniment vehicle</span>
-                <p className="text-[10px]">Pot «Vehicle» — rodes, oli, revisió, assegurança, ITV</p>
+                <p className="text-[10px]">Pot “Vehicle” per rodes, oli, revisions, assegurança i ITV</p>
               </div>
               <span className="shrink-0 font-semibold">
                 {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.45 : 0)}
               </span>
             </div>
-            {/* Amortització equip */}
             <div className="flex items-start justify-between gap-2">
               <div>
-                <span className="font-medium">Amortització equip (so, llum, etc.)</span>
-                <p className="text-[10px]">Pot «Equip» — per quan calgui comprar recanvis o equip nou</p>
+                <span className="font-medium">Amortització equip</span>
+                <p className="text-[10px]">Pot “Equip” per recanvis i renovació de material</p>
               </div>
               <span className="shrink-0 font-semibold">{formatCurrency(packCostUsed)}</span>
             </div>
-            {/* Cost operacional */}
             <div className="flex items-start justify-between gap-2">
               <div>
-                <span className="font-medium">Costos operatius fixes</span>
-                <p className="text-[10px]">Pot «Operacions» — assegurança RC, llicències, material fungible</p>
+                <span className="font-medium">Costos operatius fixos</span>
+                <p className="text-[10px]">Pot “Operacions” per assegurança RC, llicències i fungible</p>
               </div>
               <span className="shrink-0 font-semibold">{formatCurrency(fixedOperationalCost)}</span>
             </div>
-            {/* Extres */}
             {extrasCost > 0 && (
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="font-medium">Cost extres</span>
-                  <p className="text-[10px]">Pot «Extres» — productes i material addicional</p>
+                  <p className="text-[10px]">Pot “Extres” per material i productes addicionals</p>
                 </div>
                 <span className="shrink-0 font-semibold">{formatCurrency(extrasCost)}</span>
               </div>
             )}
-            {/* Hores extra */}
             {extraHoursCost > 0 && (
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="font-medium">Cost hores extra</span>
-                  <p className="text-[10px]">Pot «Personal» — compensació per hores extra treballades</p>
+                  <p className="text-[10px]">Pot “Personal” per compensar hores addicionals treballades</p>
                 </div>
                 <span className="shrink-0 font-semibold">{formatCurrency(extraHoursCost)}</span>
               </div>
             )}
-            {/* Separador */}
             <div className="border-t admin-tone-border-neutral pt-2 mt-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="font-bold">Benefici net (el que queda per a tu)</span>
-                  <p className="text-[10px]">Compte corrent de l'empresa — sou, inversions, estalvi</p>
+                  <span className="font-bold">Benefici net</span>
+                  <p className="text-[10px]">Compte principal per sou, estalvi i reinversió</p>
                 </div>
                 <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'admin-tone-text-success' : 'admin-tone-text-danger'}`}>
                   {formatCurrency(netMargin)}
                 </span>
               </div>
             </div>
-            {/* Consell */}
             <div className="border-t admin-tone-border-neutral pt-2 mt-1">
               <p className="text-[10px] leading-relaxed">
-                <strong>Consell pràctic:</strong> Obre 4 comptes/pots al banc: <strong>Gasolina</strong> (repostar), <strong>Equip</strong> (recanvis i equip nou), <strong>Operacions</strong> (assegurança, llicències), i <strong>Benefici</strong> (sou i estalvi). Després de cada bolo, transfereix automàticament els imports d'amunt a cada pot. Així mai et quedaràs sense per a manteniment o reposició d'equip.
+                <strong>Consell pràctic:</strong> separa com a mínim els pots de <strong>Gasolina</strong>, <strong>Equip</strong>, <strong>Operacions</strong> i <strong>Benefici</strong>. Després de cada bolo, mou-hi aquests imports i evitaràs tensions de caixa quan toqui manteniment o renovació.
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Cost breakdown */}
-      <div className="text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
+      <div className="admin-booking-margin-breakdown text-sm space-y-1 mb-6 border-t admin-tone-border-neutral pt-4" data-help-title="Desglossament de costos" data-help-desc="Mostra el detall tècnic del cost del pack, extres, hores extra i desplaçament usat per calcular el marge.">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
               ? `Pack (inventari real${inventoryHours ? ` · ${inventoryHours.toFixed(1)}h` : ''})`
               : `Pack (${(packCostRatio * 100).toFixed(0)}% de ${formatCurrency(packPrice)})`}
           </span>
-          <span className="">{formatCurrency(packCostUsed)}</span>
+          <span>{formatCurrency(packCostUsed)}</span>
         </div>
         {extrasTotal > 0 && (
           <div className="flex justify-between">
-            <span>Extras ({(extraCostRatio * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
-            <span className="">{formatCurrency(extrasCost)}</span>
+            <span>Extres ({(extraCostRatio * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
+            <span>{formatCurrency(extrasCost)}</span>
           </div>
         )}
         {extraHours > 0 && (
           <div className="flex justify-between">
             <span>Hores extra ({extraHours}h × {formatCurrency(extraHourPrice)})</span>
-            <span className="">{formatCurrency(extraHoursCost)}</span>
+            <span>{formatCurrency(extraHoursCost)}</span>
           </div>
         )}
         <div className="flex justify-between">
           <span>Cost operacional fix</span>
-          <span className="">{formatCurrency(fixedOperationalCost)}</span>
+          <span>{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
           <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>
-          <span className="">{formatCurrency(calculatedTravelCost)}</span>
+          <span>{formatCurrency(calculatedTravelCost)}</span>
         </div>
         <div className="flex justify-between">
           <span>Suplement client ({travelBlocks} trams)</span>
-          <span className="">{formatCurrency(calculatedTravelCharge)}</span>
+          <span>{formatCurrency(calculatedTravelCharge)}</span>
         </div>
         <div className="flex justify-between">
           <span>Marge transport</span>
@@ -391,9 +402,8 @@ export default function BookingMarginCard({
         </div>
       </div>
 
-      {/* Editable travel fields */}
-      <div className="border-t admin-tone-border-neutral pt-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
-        <h3 className="text-sm font-semibold mb-3">🚗 Desplaçament (editable)</h3>
+      <div className="admin-booking-travel-editor border-t admin-tone-border-neutral pt-4" data-help-title="Desplaçament editable" data-help-desc="Permet ajustar o recalcular la distància del servei i veure com canvien costos, suplement i marge del transport.">
+        <h3 className="text-sm font-semibold mb-3">Desplaçament editable</h3>
         <p className="mb-3 text-xs">
           Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
         </p>
@@ -422,22 +432,22 @@ export default function BookingMarginCard({
               {formatCurrency(calculatedTravelCost)}
             </div>
             <p className="mt-1 text-[11px]">
-              {travelBlocks} trams × {TRAVEL_BLOCK_EUR} €
+              {travelBlocks} trams · {TRAVEL_BLOCK_EUR} €
             </p>
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="ap-card rounded-xl p-3">
+          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
             <p className="text-[11px] uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-[11px]">{distanceKm.toFixed(1)} km × {vehicleCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-[11px]">{distanceKm.toFixed(1)} km · {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
-          <div className="ap-card rounded-xl p-3">
+          <div className="admin-booking-travel-card ap-card rounded-xl p-3">
             <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-[11px]">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
+            <p className="text-[11px]">{travelBlocks} trams · {TRAVEL_BLOCK_EUR} €</p>
           </div>
-          <div className={`rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+          <div className={`admin-booking-travel-card rounded-xl border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
             <p className="text-[11px] uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}
@@ -457,16 +467,10 @@ export default function BookingMarginCard({
             disabled={saving}
             className="mt-3 ap-btn ap-btn--primary text-sm disabled:opacity-50"
           >
-            {saving ? '⏳ Desant...' : '💾 Desar canvis'}
+            {saving ? 'Desant...' : 'Desar canvis'}
           </button>
         )}
       </div>
     </section>
   );
 }
-
-
-
-
-
-

@@ -364,7 +364,7 @@ export default function IntakePage() {
           </div>
           <div>
             <label className="text-xs">Prioritat</label>
-            <div className="mt-1 grid grid-cols-4 gap-2">
+            <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {INTAKE_PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
@@ -498,7 +498,4 @@ export default function IntakePage() {
     </AdminPage>
   );
 }
-
-
-
 

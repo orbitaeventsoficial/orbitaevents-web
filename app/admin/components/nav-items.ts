@@ -1,6 +1,6 @@
 type BadgeColor = 'orange' | 'blue' | 'green' | 'red';
 
-interface NavItem {
+export interface NavItem {
   icon: string;
   label: string;
   href: string;
@@ -9,7 +9,7 @@ interface NavItem {
   badgeColor?: BadgeColor;
 }
 
-interface NavSection {
+export interface NavSection {
   title: string;
   defaultOpen: boolean;
   items: NavItem[];
@@ -37,6 +37,11 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🤝', label: 'Col·laboradors', href: '/admin/collaborators', description: 'Gestiona equip extern, disponibilitat, tarifes i relació amb col·laboradors.' },
       { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', description: 'Llegeix, classifica i respon correus entrants des del panell.', badge: 'IMAP', badgeColor: 'blue' },
       { icon: '📊', label: 'Sales Ops', href: '/admin/sales-ops', description: 'Executa seqüències comercials, SLA i automatismes de seguiment.' },
+      { icon: '💤', label: 'Reactivació', href: '/admin/clientes/reactivation', description: 'Clients dormants, en risc o d’alt valor amb missatge suggerit per contactar-los.' },
+      { icon: '🔥', label: 'Reengagement leads', href: '/admin/leads/reengagement', description: 'Leads dormants, pressupostos sense resposta i negociacions refredades.' },
+      { icon: '🎁', label: 'Referrals', href: '/admin/clientes/referrals', description: 'Top referrers, valor generat i candidats per preguntar.' },
+      { icon: '📣', label: 'Campanyes', href: '/admin/campaigns', description: 'Comunicacions massives suggerides per segment CRM (dormants, upsell, temporada).' },
+      { icon: '📊', label: 'Capacitat', href: '/admin/calendario/capacity', description: 'Visió global de càrrega operativa per dia amb col·lisions i disponibilitat.' },
       { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake', description: 'Crea una nova entrada ràpidament quan reps una consulta fora del flux habitual.' },
     ],
   },
@@ -61,6 +66,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: '🤖', label: 'Correus', href: '/admin/emails', description: 'Controla automatismes, enviaments i seguiment de comunicacions.', badge: 'AUTO', badgeColor: 'green' },
       { icon: '✉️', label: 'Plantilles email', href: '/admin/email-templates', description: 'Edita els missatges base perquè l’operativa i la comunicació siguin coherents.' },
       { icon: '🖼️', label: 'Portfolio', href: '/admin/portfolio', description: 'Mantén l’aparador visual de la marca i els casos que ajuden a vendre.' },
+      { icon: '📱', label: 'Social', href: '/admin/social', description: 'Planifica, programa i publica contingut a xarxes socials.' },
     ],
   },
   {
@@ -69,6 +75,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event', description: 'Tanca el cicle després de cada bolo amb informes, feedback i correus finals.' },
       { icon: '📈', label: 'Analítica', href: '/admin/analytics', description: 'Llegeix patrons de negoci i trànsit per decidir millor on actuar.' },
+      { icon: '📊', label: 'Reporting Executiu', href: '/admin/reporting', description: 'Facturació, marge, conversió per origen, recurrència i tendència mensual.' },
       { icon: '❓', label: 'FAQ', href: '/admin/faq', description: 'Edita respostes freqüents per reduir dubtes i càrrega comercial repetitiva.' },
       { icon: '✏️', label: 'Textos', href: '/admin/text-manager', description: 'Centralitza i mantén els textos reutilitzables del projecte.' },
       { icon: '🖼️', label: 'Imatges', href: '/admin/image-manager', description: 'Govern central de placements visuals i overrides manuals compartits.' },
@@ -79,6 +86,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: 'Configuració',
     defaultOpen: false,
     items: [
+      { icon: '📖', label: 'Manual', href: '/admin/manual', description: 'Guia de possibilitats per entendre què pot fer tota la maquinària i on actuar.' },
       { icon: '⚙️', label: 'General', href: '/admin/settings', description: 'Ajusta la configuració base del sistema i del comportament global de l’admin.' },
       { icon: '📊', label: 'Estadístiques web', href: '/admin/stats', description: 'Segueix mètriques públiques del web sense entrar a eines externes.' },
       { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage', description: 'Defineix on opera l’empresa i com es trasllada això a filtres i vendes.' },

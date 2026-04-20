@@ -159,7 +159,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     } catch {
       // Ignore malformed consent values.
     }
-  }, [pathname]);
+  }, [activeIntroMode, pathname]);
 
   useEffect(() => {
     const isHomePage = isIntroPage(pathname);
@@ -200,7 +200,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener(MOBILE_INTRO_COMPLETE_EVENT, handleIntroComplete);
     };
-  }, [pathname]);
+  }, [activeIntroMode, pathname]);
 
   // Handler per quan acaba la intro
   const handleIntroFinish = useCallback(() => {
@@ -278,6 +278,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     </>
   );
 }
+
+
 
 
 

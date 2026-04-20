@@ -471,6 +471,68 @@ describe('dashboardInsightsService', () => {
         expect(insight.type).toBe('success');
       }
     });
+
+    // Regressió: abans, `generateDashboardInsights` cridava `new Date()` tres cops
+    // internament (dayOfMonth, year, month) per calcular el ritme esperat. Això
+    // feia que la banda del dashboard a `/admin` fos no-determinística en tests
+    // i impossible de reproduir quan es regenerava l'estat d'un dia anterior.
+    // Ara accepta `now?: Date` com a segon paràmetre.
+    it('determinisme: `now` dia 5 d\'un mes de 30 dies → expectedPct ~17%, marca "ahead" amb 40%', () => {
+      // Dia 5 de juny (30 dies) → expected 17%, actual 40% → +23pp → "ahead"
+      const result = generateDashboardInsights(
+        {
+          ...baseInput(),
+          revenueTarget: 10000,
+          revenueThisMonth: 4000, // 40%
+        },
+        new Date('2026-06-05T12:00:00Z'),
+      );
+      const insight = result.find((i) => i.id === 'revenue-ahead');
+      expect(insight).toBeDefined();
+      expect(insight!.type).toBe('success');
+    });
+
+    it('determinisme: `now` dia 25 d\'un mes de 30 dies → expectedPct ~83%, marca "behind" amb 40%', () => {
+      // Dia 25 de juny (30 dies) → expected 83%, actual 40% → -43pp → "behind"
+      const result = generateDashboardInsights(
+        {
+          ...baseInput(),
+          revenueTarget: 10000,
+          revenueThisMonth: 4000, // 40%
+        },
+        new Date('2026-06-25T12:00:00Z'),
+      );
+      const insight = result.find((i) => i.id === 'revenue-behind');
+      expect(insight).toBeDefined();
+      expect(insight!.type).toBe('warning');
+    });
+
+    it('determinisme: dues crides amb el mateix `now` donen el mateix resultat', () => {
+      const now = new Date('2026-06-15T00:00:00Z');
+      const input = {
+        ...baseInput(),
+        revenueTarget: 10000,
+        revenueThisMonth: 5000,
+      };
+      const a = generateDashboardInsights(input, now);
+      const b = generateDashboardInsights(input, now);
+      expect(a).toEqual(b);
+    });
+
+    it('determinisme: calcula daysInMonth correctament per febrer no bixest', () => {
+      // Febrer 2026 té 28 dies. Dia 14 → expected 50%
+      const result = generateDashboardInsights(
+        {
+          ...baseInput(),
+          revenueTarget: 10000,
+          revenueThisMonth: 5000, // 50%
+        },
+        new Date('2026-02-14T12:00:00Z'),
+      );
+      // Ni "ahead" ni "behind" perquè expected ≈ actual
+      expect(result.find((i) => i.id === 'revenue-ahead')).toBeUndefined();
+      expect(result.find((i) => i.id === 'revenue-behind')).toBeUndefined();
+    });
   });
 
   // ─── Combinació de situacions ──────────────────────────────────────────────

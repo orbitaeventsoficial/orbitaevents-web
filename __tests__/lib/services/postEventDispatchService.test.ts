@@ -22,10 +22,14 @@ vi.mock('@/app/config/site-config', () => ({
   },
 }));
 vi.mock('@/lib/site', () => ({ getAppBaseUrl: () => 'https://test.orbita.events' }));
-vi.mock('@/lib/constants', () => ({
-  PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita',
-  toIntlLocale: (l: string) => l === 'es' ? 'es-ES' : l === 'en' ? 'en-GB' : 'ca-ES',
-}));
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/constants')>();
+  return {
+    ...actual,
+    PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita',
+    toIntlLocale: (l: string) => l === 'es' ? 'es-ES' : l === 'en' ? 'en-GB' : 'ca-ES',
+  };
+});
 vi.mock('@/lib/services/postEventEmailService', () => ({
   normalizeLocale: (l: string) => l || 'ca',
   resolvePackName: () => 'Premium',

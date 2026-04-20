@@ -5,25 +5,43 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import { getSiteUrl } from '@/lib/site';
 
 export const revalidate = 86400;
+type PageProps = {
+  params: { locale: string };
+};
 
-export async function generateMetadata(): Promise<Metadata> {
+const OG_LOCALE: Record<string, string> = {
+  ca: 'ca_ES',
+  es: 'es_ES',
+  en: 'en_US',
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const locale = params.locale || 'ca';
+  const tMeta = await getTranslations({ locale, namespace: 'bodaHalloweenPage' });
   const managedFavicon = await getManagedImageOverride('layout.favicon.halloween');
 
   return {
-    title: 'Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events',
-    description: 'Especialistas en bodas Halloween en Barcelona y Catalunya. Decoración, efectos especiales y DJ especializado. Presupuesto sin compromiso.',
+    title: tMeta('meta.title'),
+    description: tMeta('meta.description'),
     keywords: ['boda halloween', 'boda halloween barcelona', 'boda tematica halloween', 'bodas tematicas barcelona', 'dj boda halloween'],
+    metadataBase: new URL(getSiteUrl()),
     openGraph: {
-      title: 'Boda Halloween Barcelona | Especialistas en Bodas Temáticas',
-      description: 'Tematización completa, DJ especializado, efectos especiales. Haz tu boda inolvidable.',
+      title: tMeta('meta.ogTitle'),
+      description: tMeta('meta.ogDescription'),
       type: 'website',
-      locale: 'es_ES',
+      locale: OG_LOCALE[locale] || OG_LOCALE.ca,
       siteName: 'Òrbita Events',
     },
     alternates: {
       canonical: '/boda-halloween',
+      languages: {
+        ca: '/ca/boda-halloween',
+        es: '/es/boda-halloween',
+        en: '/en/boda-halloween',
+      },
     },
     icons: {
       icon: [
@@ -33,9 +51,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function BodaHalloweenPage() {
-  const t = await getTranslations('bodaHalloween');
-  const tWhatsapp = await getTranslations('whatsappMessages');
+export default async function BodaHalloweenPage({ params }: PageProps) {
+  const locale = params.locale || 'ca';
+  const t = await getTranslations({ locale, namespace: 'bodaHalloween' });
+  const tMeta = await getTranslations({ locale, namespace: 'bodaHalloweenPage' });
+  const tWhatsapp = await getTranslations({ locale, namespace: 'whatsappMessages' });
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}?text=${encodeURIComponent(tWhatsapp('bodas'))}`;
 
   const FEATURE_ICONS = {
@@ -55,8 +75,8 @@ export default async function BodaHalloweenPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Service',
-            name: 'Boda Halloween Barcelona',
-            description: 'Servicio especializado en bodas temáticas Halloween en Barcelona y Catalunya.',
+            name: tMeta('meta.ogTitle'),
+            description: tMeta('meta.description'),
             provider: {
               '@type': 'LocalBusiness',
               name: SITE_CONFIG.business.name,
@@ -71,6 +91,7 @@ export default async function BodaHalloweenPage() {
             },
             areaServed: ['Barcelona', 'Girona', 'Costa Brava', 'Maresme'],
             serviceType: 'Wedding DJ and Event Production',
+            inLanguage: locale,
           }),
         }}
       />

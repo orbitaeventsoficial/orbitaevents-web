@@ -102,7 +102,7 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = Object.fromEntries(
 
 /** Emoji + label (default display) */
 export const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: 'ðŸ’ Casament',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',
@@ -115,7 +115,7 @@ export const EVENT_TYPE_LABELS: Record<string, string> = {
 
 /** Emoji only (for compact views like pipeline cards) */
 export const EVENT_TYPE_ICONS: Record<string, string> = {
-  WEDDING: 'ðŸ’',
+  WEDDING: '💍',
   BIRTHDAY: '🎂',
   CORPORATE: '🎯',
   COMMUNION: '⛪',
@@ -643,14 +643,14 @@ export const SOURCE_LABELS: Record<string, string> = {
 };
 
 export const SOURCE_ICONS: Record<string, string> = {
-  WEBSITE: 'ðŸŒ',
-  CONFIGURATOR: '⚙ï¸',
+  WEBSITE: '🌐',
+  CONFIGURATOR: '⚙️',
   PHONE: '📞',
   WHATSAPP: '💬',
   INSTAGRAM: '📸',
   WALLAPOP: '🟣',
   REFERRAL: '👥',
-  GOOGLE: 'ðŸ”',
+  GOOGLE: '🔍',
   OTHER: '📩',
 };
 
@@ -670,9 +670,9 @@ export const LEAD_STATUS_ACTION_OPTIONS = [
   { value: 'NEW', label: 'Nova entrada', tone: 'admin-tone-bg-info', icon: '🆕' },
   { value: 'CONTACTED', label: 'Contactat', tone: 'admin-tone-bg-warning', icon: '📞' },
   { value: 'QUOTE_SENT', label: 'Pressupost enviat', tone: 'admin-tone-bg-neutral', icon: '📄' },
-  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: 'ðŸ¤' },
+  { value: 'NEGOTIATING', label: 'En negociació', tone: 'admin-tone-bg-warning', icon: '🤝' },
   { value: 'WON', label: 'Guanyat!', tone: 'admin-tone-bg-success', icon: '✅' },
-  { value: 'LOST', label: 'Perdut', tone: 'admin-tone-bg-danger', icon: 'âŒ' },
+  { value: 'LOST', label: 'Perdut', tone: 'admin-tone-bg-danger', icon: '❌' },
 ] as const;
 
 export const LEAD_PIPELINE_COLUMNS = [
@@ -748,7 +748,7 @@ export const INVENTORY_CATEGORY_LABELS: Record<string, string> = {
   SOUND: '🔊 So',
   LIGHTING: '💡 Il·lum.',
   EFFECTS: '✨ Efectes',
-  STRUCTURE: 'ðŸ—ï¸ Estruct.',
+  STRUCTURE: '🏗️ Estruct.',
   CABLING: '🔌 Cable',
   TECH: '💻 Tech',
   DECORATION_HP: '🎃 Deco HP',
@@ -782,7 +782,7 @@ export const SETTINGS_CATEGORY_CONFIG: Record<string, { label: string; icon: str
   },
   company: {
     label: 'Empresa',
-    icon: 'ðŸ¢',
+    icon: '🏢',
     description: 'Dades legals i nom comercial (edita a Configuració empresa)',
   },
   holded: {
@@ -802,7 +802,7 @@ export const SETTINGS_CATEGORY_CONFIG: Record<string, { label: string; icon: str
   },
   config: {
     label: 'Configuració General',
-    icon: '⚙ï¸',
+    icon: '⚙️',
     description: 'Altres configuracions del sistema',
   },
   social: {
@@ -847,9 +847,9 @@ export const INTAKE_SOURCE_OPTIONS = [
   { value: 'WHATSAPP', label: 'WhatsApp', icon: '💬' },
   { value: 'INSTAGRAM', label: 'Instagram', icon: '📸' },
   { value: 'WALLAPOP', label: 'Wallapop', icon: '🟢' },
-  { value: 'REFERRAL', label: 'Boca-orella', icon: '🗣ï¸' },
-  { value: 'GOOGLE', label: 'Google', icon: 'ðŸ”' },
-  { value: 'WEBSITE', label: 'Web', icon: 'ðŸŒ' },
+  { value: 'REFERRAL', label: 'Boca-orella', icon: '🗣️' },
+  { value: 'GOOGLE', label: 'Google', icon: '🔍' },
+  { value: 'WEBSITE', label: 'Web', icon: '🌐' },
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ] as const;
 
@@ -865,7 +865,7 @@ export const INTAKE_SOURCE_SELECTED_STYLES: Record<string, string> = {
 };
 
 export const INTAKE_EVENT_TYPE_OPTIONS = [
-  { value: 'WEDDING', label: 'Casament', icon: 'ðŸ’' },
+  { value: 'WEDDING', label: 'Casament', icon: '💍' },
   { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
   { value: 'CORPORATE', label: 'Corporatiu', icon: '🎯' },
   { value: 'COMMUNION', label: 'Comunió', icon: '⛪' },
@@ -887,7 +887,7 @@ export const INVENTORY_CATEGORY_OPTIONS = [
   { value: 'SOUND', label: 'So', icon: '🔊' },
   { value: 'LIGHTING', label: 'Il·luminació', icon: '💡' },
   { value: 'EFFECTS', label: 'Efectes', icon: '✨' },
-  { value: 'STRUCTURE', label: 'Estructura', icon: 'ðŸ—ï¸' },
+  { value: 'STRUCTURE', label: 'Estructura', icon: '🏗️' },
   { value: 'CABLING', label: 'Cablejat', icon: '🔌' },
   { value: 'TECH', label: 'Tecnologia', icon: '💻' },
   { value: 'DECORATION_HP', label: 'Deco HP', icon: '🎃' },
@@ -932,10 +932,10 @@ export function getFaqCategoryDisplay(category: string) {
 }
 export const ACTIVITY_CATEGORY_OPTIONS = [
   { id: 'all', label: 'Tot', icon: '📊' },
-  { id: 'comms', label: 'Comunicacions', icon: '✉ï¸' },
+  { id: 'comms', label: 'Comunicacions', icon: '✉️' },
   { id: 'automation', label: 'Automatitzacions', icon: '⚡' },
   { id: 'system', label: 'Sistema', icon: '🔄' },
-  { id: 'crud', label: 'Operacions', icon: 'ðŸ“' },
+  { id: 'crud', label: 'Operacions', icon: '📝' },
 ] as const;
 
 export const ACTIVITY_DAYS_OPTIONS = [
@@ -977,19 +977,19 @@ export const EMAIL_ACTIVITY_DISPLAY: Record<string, { label: string; icon: strin
   },
   TESTIMONIAL_SUBMITTED: {
     label: 'Valoració rebuda',
-    icon: 'â­',
+    icon: '⭐',
     bg: 'admin-tone-bg-warning',
     text: 'admin-tone-text-warning',
   },
   DISCOUNT_CODE_GENERATED: {
     label: 'Codi descompte generat',
-    icon: 'ðŸŽ',
+    icon: '🎁',
     bg: 'admin-tone-bg-success',
     text: 'admin-tone-text-success',
   },
   LEAD_EMAIL_SENT: {
     label: 'Confirmació lead enviada',
-    icon: '✉ï¸',
+    icon: '✉️',
     bg: 'admin-tone-bg-violet',
     text: 'admin-tone-text-violet',
   },
@@ -1023,6 +1023,32 @@ export const TASK_KANBAN_COLUMNS = [
   { status: 'IN_PROGRESS', label: 'En curs', toneClass: '', cardTone: 'border-amber-500/20 bg-amber-500/10' },
   { status: 'DONE', label: 'Fetes', toneClass: '', cardTone: 'border-emerald-500/20 bg-emerald-500/10' },
 ] as const;
+
+export const TASK_SOURCE = {
+  AUTOMATION: 'AUTOMATION',
+  CHECKLIST: 'CHECKLIST',
+  PACK_PRICING: 'PACK_PRICING',
+  BOOKING_COMPLETION: 'BOOKING_COMPLETION',
+  BOOKING_CREATION: 'BOOKING_CREATION',
+  CUSTOMER_CREATION: 'CUSTOMER_CREATION',
+  REACTIVATION: 'REACTIVATION',
+} as const;
+export type TaskSource = (typeof TASK_SOURCE)[keyof typeof TASK_SOURCE];
+
+// Canonical registry of Task dedupeKey prefixes. All producers must build their
+// dedupeKey through these helpers — the prefix strings should never be inlined.
+export const TASK_DEDUPE_KEY = {
+  welcomeEmail: (leadId: string) => `welcome-email:${leadId}`,
+  preEventChecklist: (bookingId: string) => `pre-event-checklist:${bookingId}`,
+  sla: (entityId: string) => `sla:${entityId}`,
+  stale: (entityId: string) => `stale:${entityId}`,
+  prep: (bookingId: string) => `prep:${bookingId}`,
+  payment: (bookingId: string) => `payment:${bookingId}`,
+  postEvent: (bookingId: string) => `postevent:${bookingId}`,
+  atRisk: (customerId: string) => `atrisk:${customerId}`,
+  quote: (entityId: string) => `quote:${entityId}`,
+  reactivation: (customerId: string) => `reactivation:${customerId}`,
+} as const;
 
 export const CANVAS_COLOR_OPTIONS = ['#ffffff', '#06b6d4', '#f97316', '#eab308', '#22c55e', '#ec4899', '#a855f7', '#ef4444', '#000000', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)'] as const;
 
@@ -1414,20 +1440,13 @@ export const PUBLIC_MONTH_KEYS = [
 
 export const PUBLIC_BOTTOM_NAV_ITEMS = [
   { href: '/', icon: 'Home', labelKey: 'home', exactMatch: true },
-  { href: '/servicios/bodas', icon: 'Briefcase', labelKey: 'services', exactMatch: false },
+  { href: '/servicios', icon: 'Briefcase', labelKey: 'services', exactMatch: false },
   { href: '/configurador', icon: 'Calculator', labelKey: 'configure', exactMatch: true, highlight: true },
   { href: '/portfolio', icon: 'Image', labelKey: 'portfolio', exactMatch: true },
   { href: '/contacto', icon: 'MessageCircle', labelKey: 'contact', exactMatch: true },
 ] as const;
 
 export const PUBLIC_FOOTER_DEFAULT_COVERAGE = ['Barcelona', 'Girona', 'Costa Brava', 'Maresme', 'Vallès'] as const;
-
-export const PUBLIC_FOOTER_SERVICES_LINKS = [
-  { nameKey: 'djWeddings', href: '/servicios/bodas', icon: '💍' },
-  { nameKey: 'privateParties', href: '/servicios/fiestas', icon: '🎉' },
-  { nameKey: 'corporateEvents', href: '/servicios/empresas', icon: '💼' },
-  { nameKey: 'discomovil', href: '/servicios/discomovil', icon: '🎵' },
-] as const;
 
 export const PUBLIC_FOOTER_EXPERIENCES_LINKS = [
   { nameKey: 'monMagic', href: '/tematica-mon-magic', icon: '🪄' },
@@ -1460,111 +1479,6 @@ export const PUBLIC_PROCESS_STEP_STYLES = [
 
 export const PUBLIC_FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7'] as const;
 
-
-export const PUBLIC_PORTFOLIO_SHOWCASE_ITEMS = [
-  {
-    id: 'discomovil',
-    slug: 'discomovil',
-    translationKey: 'discomovil',
-    emoji: '🎧',
-    mobileAccent: 'from-amber-500 to-orange-500',
-    mobileBorder: 'border-amber-500/50',
-    mobileText: 'text-amber-400',
-    mobileBg: 'bg-amber-500/10',
-    desktopAccent: 'from-amber-500/30 to-orange-500/10',
-    mobilePhotoCount: 6,
-    desktopPhotoCount: 10,
-    showInMobile: true,
-    showInDesktop: true,
-  },
-  {
-    id: 'halloween',
-    slug: 'fiestas-tematicas-halloween',
-    translationKey: 'halloween',
-    emoji: '🎃',
-    mobileAccent: 'from-orange-600 to-red-700',
-    mobileBorder: 'border-orange-500/50',
-    mobileText: 'text-orange-400',
-    mobileBg: 'bg-orange-500/10',
-    desktopAccent: 'from-purple-500/30 to-red-500/10',
-    mobilePhotoCount: 6,
-    desktopPhotoCount: 10,
-    showInMobile: true,
-    showInDesktop: true,
-  },
-  {
-    id: 'monMagic',
-    slug: 'fiestas-tematicas-mon-magic',
-    translationKey: 'monMagic',
-    emoji: '🪄',
-    mobileAccent: 'from-purple-600 to-pink-600',
-    mobileBorder: 'border-purple-500/50',
-    mobileText: 'text-purple-400',
-    mobileBg: 'bg-purple-500/10',
-    desktopAccent: 'from-blue-500/30 to-cyan-500/10',
-    mobilePhotoCount: 6,
-    desktopPhotoCount: 9,
-    showInMobile: true,
-    showInDesktop: true,
-  },
-  {
-    id: 'bodas',
-    slug: 'bodas',
-    translationKey: 'bodas',
-    emoji: '💍',
-    mobileAccent: 'from-pink-500 to-rose-500',
-    mobileBorder: 'border-pink-500/50',
-    mobileText: 'text-pink-400',
-    mobileBg: 'bg-pink-500/10',
-    desktopAccent: 'from-rose-500/30 to-pink-500/10',
-    mobilePhotoCount: 4,
-    desktopPhotoCount: 4,
-    showInMobile: true,
-    showInDesktop: true,
-  },
-  {
-    id: 'empreses',
-    slug: 'eventos-empresa',
-    translationKey: 'empreses',
-    emoji: '🏢',
-    mobileAccent: 'from-blue-500 to-cyan-500',
-    mobileBorder: 'border-blue-500/50',
-    mobileText: 'text-blue-400',
-    mobileBg: 'bg-blue-500/10',
-    desktopAccent: 'from-emerald-500/30 to-teal-500/10',
-    mobilePhotoCount: 6,
-    desktopPhotoCount: 9,
-    showInMobile: true,
-    showInDesktop: true,
-  },
-  {
-    id: 'privades',
-    slug: 'fiestas-privadas',
-    translationKey: 'privades',
-    emoji: '🎉',
-    mobileAccent: 'from-emerald-500 to-teal-500',
-    mobileBorder: 'border-emerald-500/50',
-    mobileText: 'text-emerald-400',
-    mobileBg: 'bg-emerald-500/10',
-    desktopAccent: 'from-emerald-500/30 to-teal-500/10',
-    mobilePhotoCount: 6,
-    desktopPhotoCount: 6,
-    showInMobile: true,
-    showInDesktop: false,
-  },
-] as const;
-
-export type PublicPortfolioShowcaseBaseItem = (typeof PUBLIC_PORTFOLIO_SHOWCASE_ITEMS)[number];
-export type PublicPortfolioShowcaseStory = PublicPortfolioShowcaseBaseItem & {
-  photos: string[];
-};
-
-export function getPublicPortfolioShowcasePhotos(
-  slug: keyof typeof PORTFOLIO_IMAGES,
-  limit: number
-) {
-  return (PORTFOLIO_IMAGES[slug] ?? []).slice(0, limit).map((image) => image.src);
-}
 
 export const PUBLIC_HALLOWEEN_DECORATION_ITEMS = [
   { icon: '👻', key: 0 },
@@ -1680,18 +1594,6 @@ export const PUBLIC_HERO_MEDIA_FALLBACK = HERO_MEDIA_DEFAULT_ITEMS.map(({ id, ur
 
 export const PUBLIC_LANGUAGE_CODES = ['ca', 'es', 'en'] as const;
 export const PUBLIC_LANGUAGE_SHORT_NAMES: Record<(typeof PUBLIC_LANGUAGE_CODES)[number], string> = { ca: 'CA', es: 'ES', en: 'EN' };
-
-export const PUBLIC_MOBILE_HOME_GUARANTEES = [
-  { icon: '🛡️', titleKey: 'satisfaction.title', descKey: 'satisfaction.desc', gradient: 'from-green-500 to-emerald-500' },
-  { icon: '🔧', titleKey: 'backup.title', descKey: 'backup.desc', gradient: 'from-blue-500 to-cyan-500' },
-  { icon: '⚡', titleKey: 'response.title', descKey: 'response.desc', gradient: 'from-amber-500 to-orange-500' },
-] as const;
-
-export const PUBLIC_SERVICES_GRID_PILLARS = [
-  { key: 'dj', iconKey: 'dj', accent: 'from-amber-500 to-orange-500', accentLight: 'text-amber-400', glowColor: 'rgba(251, 191, 36, 0.08)', href: '/servicios/fiestas' },
-  { key: 'theming', iconKey: 'theme', accent: 'from-purple-500 to-pink-500', accentLight: 'text-purple-400', glowColor: 'rgba(168, 85, 247, 0.08)', href: '/portfolio' },
-  { key: 'production', iconKey: 'production', accent: 'from-cyan-500 to-blue-500', accentLight: 'text-cyan-400', glowColor: 'rgba(6, 182, 212, 0.08)', href: '/servicios/empresas' },
-] as const;
 
 export const PUBLIC_GARANTIA_CONFIG = [
   { key: 'response', iconKey: 'Clock', highlight: '<2h', color: 'from-amber-500 to-orange-500' },
@@ -2074,15 +1976,15 @@ export const PUBLIC_BLOG_CATEGORY_COLORS: Record<string, string> = {
 export type PublicTestimonialApiLocale = 'ca' | 'es' | 'en';
 export const PUBLIC_TESTIMONIAL_API_MESSAGES: Record<PublicTestimonialApiLocale, Record<string, string>> = {
   ca: {
-    success: 'Valoraci+� enviada correctament',
-    invalid: 'Dades no v+�lides',
-    processing: 'Error processant la valoraci+�',
+    success: 'Valoració enviada correctament',
+    invalid: 'Dades no vàlides',
+    processing: 'Error processant la valoració',
     fetching: 'Error carregant valoracions',
   },
   es: {
-    success: 'Valoraci+�n enviada correctamente',
-    invalid: 'Datos inv+�lidos',
-    processing: 'Error procesando la valoraci+�n',
+    success: 'Valoración enviada correctamente',
+    invalid: 'Datos inválidos',
+    processing: 'Error procesando la valoración',
     fetching: 'Error cargando valoraciones',
   },
   en: {
@@ -2196,10 +2098,7 @@ export const PRIORITY_FILTER_STYLES: Record<string, string> = {
   BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
 };
 
+export * from './customer-crm';
+export * from './social';
 
-
-
-
-
-
-
+export * from '../publicHomeShowcase';

@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos, type PublicPortfolioShowcaseStory } from '@/lib/constants';
+import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos, type PublicPortfolioShowcaseStory } from '@/lib/publicHomeShowcase';
 
 const DEFAULT_CATEGORIES: PublicPortfolioShowcaseStory[] = PUBLIC_PORTFOLIO_SHOWCASE_ITEMS.map((item) => ({
   ...item,

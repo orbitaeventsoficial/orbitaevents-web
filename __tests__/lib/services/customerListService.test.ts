@@ -39,7 +39,11 @@ describe('listAdminCustomers', () => {
 
     expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ OR: expect.any(Array) }),
+        where: expect.objectContaining({
+          AND: expect.arrayContaining([
+            expect.objectContaining({ OR: expect.any(Array) }),
+          ]),
+        }),
       })
     );
   });
@@ -75,5 +79,87 @@ describe('listAdminCustomers', () => {
     expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ skip: 40, take: 20 })
     );
+  });
+
+  it('aplica filtre healthScoreMax', async () => {
+    await listAdminCustomers({ includeStats: false, page: 1, limit: 10, q: '', healthScoreMax: 40 });
+
+    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          AND: expect.arrayContaining([
+            expect.objectContaining({ healthScore: { lte: 40 } }),
+          ]),
+        }),
+      })
+    );
+  });
+
+  it('aplica filtre minSpent', async () => {
+    await listAdminCustomers({ includeStats: false, page: 1, limit: 10, q: '', minSpent: 2000 });
+
+    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          AND: expect.arrayContaining([
+            expect.objectContaining({ totalSpent: { gte: 2000 } }),
+          ]),
+        }),
+      })
+    );
+  });
+
+  it('stats inclou highValue count', async () => {
+    mockPrisma.customer.count.mockResolvedValue(5);
+
+    const result = await listAdminCustomers({ includeStats: true, page: 1, limit: 10, q: '' });
+
+    const stats = result.stats as Record<string, number>;
+    expect(stats.highValue).toBeDefined();
+  });
+});
+
+// Regressió: `listAdminCustomers` ha d'acceptar un `now?: Date` injectable per
+// calcular la finestra "recentMonth" (clients creats en els últims 30 dies).
+// Abans, cridava `new Date()` intern a la línia 81 i la stat podia divergir
+// del render si la page caiga a banda i banda d'una frontera horària.
+describe('propagació de `now` a stat `recentMonth`', () => {
+  it('stats=true amb `now` injectat: filtra createdAt > now-1mes', async () => {
+    const injectedNow = new Date('2026-06-15T12:00:00Z');
+    const expectedThreshold = new Date('2026-05-15T12:00:00Z');
+
+    await listAdminCustomers(
+      { includeStats: true, page: 1, limit: 10, q: '' },
+      injectedNow,
+    );
+
+    const recentMonthCall = mockPrisma.customer.count.mock.calls.find((call) => {
+      const where = call[0]?.where as { createdAt?: { gt?: Date } } | undefined;
+      return where?.createdAt?.gt !== undefined;
+    });
+    expect(recentMonthCall).toBeDefined();
+    const actualThreshold = recentMonthCall![0].where.createdAt.gt as Date;
+    expect(actualThreshold.toISOString()).toBe(expectedThreshold.toISOString());
+  });
+
+  it('sense `now` explícit: usa default i no llança', async () => {
+    mockPrisma.customer.count.mockResolvedValue(3);
+
+    const result = await listAdminCustomers({ includeStats: true, page: 1, limit: 10, q: '' });
+
+    const stats = result.stats as Record<string, number>;
+    expect(stats.recentMonth).toBeDefined();
+  });
+
+  it('`now` injectat no muta entre crides (new Date(now) evita setMonth damnifiqui l\'argument)', async () => {
+    const injectedNow = new Date('2026-06-15T12:00:00Z');
+    const originalTime = injectedNow.getTime();
+
+    await listAdminCustomers(
+      { includeStats: true, page: 1, limit: 10, q: '' },
+      injectedNow,
+    );
+
+    expect(injectedNow.getTime()).toBe(originalTime);
   });
 });

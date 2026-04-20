@@ -38,7 +38,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { PUBLIC_MOBILE_HOME_GUARANTEES, type PublicPortfolioShowcaseStory } from '@/lib/constants';
+import { PUBLIC_MOBILE_HOME_GUARANTEES, type PublicPortfolioShowcaseStory } from '@/lib/publicHomeShowcase';
 import { hasSeenMobileIntro, markMobileIntroSeen, MOBILE_INTRO_COMPLETE_EVENT } from '@/lib/intro';
 import type { PublicMobileServiceCardId } from '@/lib/constants/public-service-media';
 

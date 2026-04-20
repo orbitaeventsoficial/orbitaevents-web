@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API ROUTE: Admin Privacy Consents
  * Llistar i gestionar consentiments RGPD
  */
@@ -34,11 +34,11 @@ export async function GET(req: NextRequest) {
       offset,
     });
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ ok: true, body: result });
   } catch (error) {
     console.error('Error llistant consentiments:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }
@@ -54,7 +54,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!consentId && (!customerId || !consentType)) {
       return NextResponse.json(
-        { success: false, error: 'Cal consentId o customerId + consentType' },
+        { ok: false, error: 'Cal consentId o customerId + consentType' },
         { status: 400 }
       );
     }
@@ -64,7 +64,7 @@ export async function DELETE(req: NextRequest) {
       const { prisma } = await import('@/lib/prisma');
       const consent = await prisma.consentRecord.findUnique({ where: { id: consentId } });
       if (!consent) {
-        return NextResponse.json({ success: false, error: 'Consentiment no trobat' }, { status: 404 });
+        return NextResponse.json({ ok: false, error: 'Consentiment no trobat' }, { status: 404 });
       }
       await revokeConsent(
         consent.customerId || consent.email || '',
@@ -90,13 +90,14 @@ export async function DELETE(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('Error revocant consentiment:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Error desconegut' },
+      { ok: false, error: error instanceof Error ? error.message : 'Error desconegut' },
       { status: 500 }
     );
   }
 }
+
 

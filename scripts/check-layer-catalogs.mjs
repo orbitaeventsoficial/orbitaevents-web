@@ -26,6 +26,15 @@ const allowedCatalogs = new Set([
   'app/admin/leads/colorTheme.ts::LEAD_COLOR_OPTIONS',
   'app/admin/bookings/BookingPipelineView.tsx::COLUMNS_DEF',
   'app/admin/leads/LeadPipelineView.tsx::COLUMNS',
+  // i18n adapter map: not a domain catalog, only routes locale -> messages JSON.
+  'lib/equipment-i18n.ts::MESSAGES',
+  // Editorial showcase data for homepage — deliberately separated from lib/constants (Canvi #124-125).
+  'lib/publicHomeShowcase.ts::PUBLIC_PORTFOLIO_SHOWCASE_ITEMS',
+  'lib/publicHomeShowcase.ts::PUBLIC_MOBILE_HOME_GUARANTEES',
+  // Private filter set for multi-touch attribution algorithm — not a shared domain catalog (Canvi #128).
+  'lib/services/attributionService.ts::COMM_ACTIVITY_TYPES',
+  // Catalan day abbreviations for social performance display — presentation-only, not a shared domain catalog.
+  'lib/services/socialPerformanceService.ts::DAY_NAMES',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;
@@ -77,3 +86,5 @@ for (const finding of findings) {
 console.error('');
 console.error('Move declarative catalogs to lib/constants/* or add a deliberate allowlist entry with justification.');
 process.exit(1);
+
+

@@ -50,8 +50,15 @@ const ZONE_RULES: Array<{ slug: string; matcher: (values: string[]) => boolean }
   { slug: 'discomovil-girona', matcher: (values) => values.includes('girona') },
   { slug: 'discomovil-valles', matcher: (values) => values.some((v) => ['sabadell', 'terrassa', 'granollers', 'valles', 'valles occidental', 'valles oriental'].includes(v)) },
   { slug: 'dj-fiestas-barcelona', matcher: (values) => values.includes('barcelona') },
+  { slug: 'dj-fiestas-girona', matcher: (values) => values.includes('girona') },
   { slug: 'dj-fiestas-maresme', matcher: (values) => values.some((v) => ['maresme', 'mataro', 'calella', 'arenys de mar', 'pineda de mar'].includes(v)) },
+  { slug: 'dj-fiestas-valles', matcher: (values) => values.some((v) => ['sabadell', 'terrassa', 'granollers', 'valles', 'valles occidental', 'valles oriental'].includes(v)) },
   { slug: 'dj-fiestas-costa-brava', matcher: (values) => values.some((v) => ['costa brava', 'girona', 'blanes', 'lloret de mar', 'palamos', 'palafrugell'].includes(v)) },
+  { slug: 'dj-fiestas-baix-llobregat', matcher: (values) => values.some((v) => ['baix llobregat', 'hospitalet de llobregat', 'cornella de llobregat', 'el prat de llobregat', 'sant boi de llobregat'].includes(v)) },
+  { slug: 'dj-fiestas-garraf', matcher: (values) => values.some((v) => ['garraf', 'sitges', 'vilanova i la geltru'].includes(v)) },
+  { slug: 'discomovil-baix-llobregat', matcher: (values) => values.some((v) => ['baix llobregat', 'hospitalet de llobregat', 'cornella de llobregat', 'el prat de llobregat', 'sant boi de llobregat'].includes(v)) },
+  { slug: 'discomovil-garraf', matcher: (values) => values.some((v) => ['garraf', 'sitges', 'vilanova i la geltru'].includes(v)) },
+  { slug: 'discomovil-costa-brava', matcher: (values) => values.some((v) => ['costa brava', 'girona', 'blanes', 'lloret de mar', 'palamos', 'palafrugell'].includes(v)) },
 ];
 
 function normalize(value: string): string {

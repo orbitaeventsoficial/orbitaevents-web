@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('bodas');
+const COPY = LOCAL_SERVICE_LANDING_COPY['dj-bodas-emporda'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('bodas');
-  const galleryImages = await getPublicServiceGalleryImages('bodas');
+  await getPublicServiceGalleryImages('bodas');
   return {
-  title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en el Empordà desde ${MIN_PRICE}€. Figueres, Roses, Cadaqués, L'Escala. Especialistas en bodas con encanto empordanés.`,
-  keywords: ['DJ bodas Empordà', 'DJ bodas Figueres', 'DJ bodas Roses', 'DJ bodas Costa Brava', 'bodas Empordà'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-bodas-emporda' },
-  openGraph: {
-    title: `DJ Bodas Empordà | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para bodas en el Empordà. Especialistas en masías empordanesas y bodas con vistas al Mediterráneo.',
-    url: '/servicios/dj-bodas-emporda',
-    images: [{ url: heroImage, alt: 'DJ Bodas Empordà - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-bodas-emporda' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-bodas-emporda',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -51,45 +52,42 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
       if (q && a && !q.includes('faq.')) {
         faqItems.push({ q, a });
       }
-    } catch { break; }
+    } catch {
+      break;
+    }
   }
 
   const zoneConfig: ZoneConfig = {
     zone: 'Empordà',
     zoneSlug: 'emporda',
     service: 'bodas',
-    heroTitle: 'DJ Bodas Empordà',
-    heroSubtitle: 'Figueres · Roses · Cadaqués · Costa Brava Nord',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: empordaTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Roses', 'Bodas masía Empordà', 'Precio DJ boda', 'Bodas Costa Brava'],
-    description: `DJ profesional para bodas en el Empordà. Especialistas en masías empordanesas y espacios con vistas al Mediterráneo.`,
-    whyChooseUs: [
-      'Masías con historia: Conocemos los mejores espacios del Empordà',
-      'Costa Brava Nord: Bodas frente al mar en Roses y Cadaqués',
-      'Idiomas: Hablamos catalán, castellano, inglés y francés',
-      'Desplazamiento incluido: Cubrimos todo el Alt y Baix Empordà',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    // Imatges
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
-        { name: 'DJ Bodas Empordà', url: '/servicios/dj-bodas-emporda' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-bodas-emporda' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Bodas Empordà"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-bodas-emporda"
-        description={`DJ profesional para bodas en el Empordà. Masías y costa. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ bodas Empordà', 'DJ bodas Figueres', 'DJ bodas Roses', 'DJ bodas Cadaqués']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={empordaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -99,4 +97,3 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
     </>
   );
 }
-

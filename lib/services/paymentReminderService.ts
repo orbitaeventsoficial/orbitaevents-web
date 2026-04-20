@@ -13,6 +13,7 @@ import {
   PAYMENT_REMINDER_DAYS_BEFORE_EVENT,
   PAYMENT_REMINDER_MIN_DAYS_BETWEEN,
   PLACEHOLDER_EMAIL_DOMAIN,
+  CUSTOMER_ACTIVITY_ACTIONS,
   formatCurrency,
   formatDateFull,
 } from '@/lib/constants';
@@ -68,7 +69,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
     try {
       const recentReminder = await prisma.adminLog.findFirst({
         where: {
-          action: 'PAYMENT_REMINDER_SENT',
+          action: CUSTOMER_ACTIVITY_ACTIONS.PAYMENT_REMINDER_SENT,
           entityId: booking.id,
           createdAt: {
             gte: new Date(now.getTime() - PAYMENT_REMINDER_MIN_DAYS_BETWEEN * 24 * 60 * 60 * 1000),
@@ -138,7 +139,7 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
 
       await prisma.adminLog.create({
         data: {
-          action: 'PAYMENT_REMINDER_SENT',
+          action: CUSTOMER_ACTIVITY_ACTIONS.PAYMENT_REMINDER_SENT,
           entity: 'booking',
           entityId: booking.id,
           details: {

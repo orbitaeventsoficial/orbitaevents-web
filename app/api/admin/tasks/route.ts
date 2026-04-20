@@ -16,6 +16,10 @@ const createTaskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   assignedTo: z.string().optional(),
   createdBy: z.string().optional(),
+  source: z.string().optional(),
+  autoRule: z.string().optional(),
+  dedupeKey: z.string().optional(),
+  resolutionNote: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {

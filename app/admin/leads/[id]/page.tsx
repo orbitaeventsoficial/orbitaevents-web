@@ -8,12 +8,16 @@ import LeadWorkspace from './LeadWorkspace';
 import LeadNotesPanel from './LeadNotesPanel';
 import LeadGuidedFlow from './LeadGuidedFlow';
 import { scoreLead } from '@/lib/services/commercialScoring';
+import { computeLeadInsights } from '@/lib/services/leadInsightsService';
 import ScoreSnapshotButton from './ScoreSnapshotButton';
+import LeadInsightsBanner from './LeadInsightsBanner';
+import LeadScoreBreakdown from './LeadScoreBreakdown';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import InfoTooltip from '@/app/admin/components/InfoTooltip';
 import { ADMIN_HELP } from '@/app/admin/components/adminHelpGlossary';
+import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,7 +99,7 @@ export default async function LeadDetailPage({ params }: Props) {
         orderBy: { createdAt: 'desc' },
         take: 20,
       },
-      tasks: { orderBy: { createdAt: 'desc' } },
+      universalTasks: { orderBy: { createdAt: 'desc' } },
       documents: { orderBy: { createdAt: 'desc' } },
       activities: { orderBy: { createdAt: 'desc' } },
       booking: {
@@ -208,7 +212,7 @@ export default async function LeadDetailPage({ params }: Props) {
     },
     stats: {
       notes: lead.notes.length,
-      tasks: lead.tasks.length,
+      tasks: lead.universalTasks.length,
       documents: lead.documents.length,
       activities: lead.activities.length,
     },
@@ -217,7 +221,7 @@ export default async function LeadDetailPage({ params }: Props) {
   const technicalSnapshotJson = JSON.stringify(technicalSnapshot, null, 2);
   const internalSnapshotEmail = process.env.CONTACT_TO || SITE_CONFIG.business.email;
 
-  const serializedTasks = lead.tasks.map((task) => ({
+  const serializedTasks = lead.universalTasks.map((task) => ({
     ...task,
     dueDate: task.dueDate ? task.dueDate.toISOString() : null,
     createdAt: task.createdAt.toISOString(),
@@ -234,10 +238,44 @@ export default async function LeadDetailPage({ params }: Props) {
     ...activity,
     createdAt: activity.createdAt.toISOString(),
   }));
-  const openTasksCount = lead.tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED').length;
+  const openTasksCount = lead.universalTasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED').length;
+
+  const leadInsights = computeLeadInsights({
+    lead: {
+      id: lead.id,
+      status: lead.status,
+      priority: lead.priority,
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt,
+      contactedAt: lead.contactedAt,
+      convertedAt: lead.convertedAt,
+      eventDate: lead.eventDate,
+      eventType: lead.eventType,
+      budget: lead.budget,
+      phone: lead.phone,
+      eventLocation: lead.eventLocation,
+      guestCount: lead.guestCount,
+      interestedPackId: lead.interestedPackId,
+      source: lead.source,
+    },
+    tasks: lead.universalTasks.map((t) => ({ status: t.status, dueDate: t.dueDate, title: t.title })),
+    activities: lead.activities.map((a) => ({ createdAt: a.createdAt, type: a.type })),
+    booking: lead.booking ? {
+      status: lead.booking.status,
+      total: lead.booking.total,
+      depositPaid: lead.booking.depositPaid,
+      remainingPaid: lead.booking.remainingPaid,
+      depositAmount: lead.booking.depositAmount,
+    } : null,
+    relatedLeads: relatedLeads.map((r) => ({
+      status: r.status,
+      booking: r.booking ? { total: r.booking.total } : null,
+    })),
+  });
 
   return (
     <AdminPage
+      className="admin-lead-detail-page"
       title={lead.name}
       back={{ href: '/admin/leads', label: 'Entrades' }}
       subtitle={
@@ -289,20 +327,20 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       }
     >
-      <section className="rounded-2xl border p-6 shadow-sm" data-help-title="Resum executiu de l'entrada" data-help-desc="Resumeix valor estimat, antiguitat, estat del flux client, post-event i puntuació comercial abans d'entrar al detall.">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-xl border px-4 py-3">
-            <p className="text-xs uppercase tracking-wide">Valor estimat</p>
+      <section className="admin-lead-executive rounded-2xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.executive)}>
+        <div className="admin-lead-executive-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="admin-stagger-item rounded-xl border border-white/10 px-4 py-3 hover:bg-white/[0.03] transition-colors">
+            <p className="text-xs uppercase tracking-wide opacity-60">Valor estimat</p>
             <p className="text-xl font-semibold">
               {estimatedRevenue !== null ? `${formatNumber(estimatedRevenue)}€` : '—'}
             </p>
           </div>
-          <div className="rounded-xl border px-4 py-3">
-            <p className="text-xs uppercase tracking-wide">Antiguitat de l&apos;entrada</p>
+          <div className="admin-stagger-item rounded-xl border border-white/10 px-4 py-3 hover:bg-white/[0.03] transition-colors">
+            <p className="text-xs uppercase tracking-wide opacity-60">Antiguitat de l&apos;entrada</p>
             <p className="text-xl font-semibold">{leadAgeDays} dies</p>
           </div>
-          <div className="rounded-xl border px-4 py-3">
-            <p className="text-xs uppercase tracking-wide">Flux client</p>
+          <div className="admin-stagger-item rounded-xl border border-white/10 px-4 py-3 hover:bg-white/[0.03] transition-colors">
+            <p className="text-xs uppercase tracking-wide opacity-60">Flux client</p>
             <p className="text-xl font-semibold">
               {reviewFlowStatus === 'RESPONDIDO'
                 ? 'Respost'
@@ -313,8 +351,8 @@ export default async function LeadDetailPage({ params }: Props) {
                     : 'Sense reserva'}
             </p>
           </div>
-          <div className="rounded-xl border px-4 py-3">
-            <p className="text-xs uppercase tracking-wide">Post-event intern</p>
+          <div className="admin-stagger-item rounded-xl border border-white/10 px-4 py-3 hover:bg-white/[0.03] transition-colors">
+            <p className="text-xs uppercase tracking-wide opacity-60">Post-event intern</p>
             <p className="text-xl font-semibold">
               {internalPostEventStatus === 'COMPLETO'
                 ? 'Completat'
@@ -325,8 +363,8 @@ export default async function LeadDetailPage({ params }: Props) {
                     : 'Sense reserva'}
             </p>
           </div>
-          <div className="rounded-xl border px-4 py-3">
-            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide">
+          <div className="admin-stagger-item rounded-xl border border-white/10 px-4 py-3 hover:bg-white/[0.03] transition-colors">
+            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide opacity-60">
               Puntuació entrada
               <InfoTooltip text={ADMIN_HELP.leadScore} />
             </p>
@@ -337,6 +375,28 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <LeadInsightsBanner
+        insights={leadInsights}
+        leadId={lead.id}
+        customerId={lead.customerId}
+        bookingId={lead.booking?.id}
+      />
+
+      <LeadScoreBreakdown
+        lead={{
+          status: lead.status,
+          createdAt: lead.createdAt.toISOString(),
+          updatedAt: lead.updatedAt.toISOString(),
+          eventDate: lead.eventDate?.toISOString() ?? null,
+          budget: lead.budget,
+          phone: lead.phone,
+          eventLocation: lead.eventLocation,
+          guestCount: lead.guestCount,
+          interestedPackId: lead.interestedPackId,
+          source: lead.source,
+        }}
+      />
 
       <LeadGuidedFlow
         leadId={lead.id}
@@ -389,46 +449,46 @@ export default async function LeadDetailPage({ params }: Props) {
 
           {/* Booking */}
           {!lead.booking && (
-            <section className="rounded-xl border border-dashed p-6 text-center" data-help-title="Crear reserva des de l'entrada" data-help-desc="Serveix per convertir aquesta oportunitat en reserva quan ja hi ha acord comercial però encara no existeix booking.">
-              <p className="text-sm mb-3">Encara no hi ha cap reserva associada a aquesta entrada.</p>
+            <section className="rounded-xl border border-dashed border-white/10 p-6 text-center admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.createBooking)}>
+              <p className="text-sm mb-3 opacity-70">Encara no hi ha cap reserva associada a aquesta entrada.</p>
               <Link
                 href={`/admin/bookings/new?leadId=${lead.id}`}
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors"
+                className="ap-btn ap-btn--primary"
               >
                 📅 Crear reserva des d&apos;aquesta entrada
               </Link>
             </section>
           )}
           {lead.booking && (
-            <section className="rounded-xl border p-6 shadow-sm" data-help-title="Reserva associada" data-help-desc="Detall de la reserva convertida des d'aquesta entrada: dates, imports, pagaments, estat post-event i accions de seguiment.">
+            <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.booking)}>
               <h2 className="text-lg font-semibold mb-4">
                 Reserva associada
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="ap-card p-4">
+                <div className="rounded-xl border border-white/10 p-4 hover:bg-white/[0.03] transition-colors">
                   <p className="font-medium">
                     📅 {formatDateFull(lead.booking.eventDate)}
                   </p>
-                  <p className="text-sm">Ref: {lead.booking.reference}</p>
-                  <p className="text-sm">Tipus: {lead.booking.eventType}</p>
-                  <p className="text-sm">Ubicació: {lead.booking.eventLocation}</p>
-                  <p className="text-sm">Convidats: {lead.booking.guestCount}</p>
+                  <p className="text-sm opacity-70">Ref: {lead.booking.reference}</p>
+                  <p className="text-sm opacity-70">Tipus: {lead.booking.eventType}</p>
+                  <p className="text-sm opacity-70">Ubicació: {lead.booking.eventLocation}</p>
+                  <p className="text-sm opacity-70">Convidats: {lead.booking.guestCount}</p>
                 </div>
-                <div className="ap-card p-4">
+                <div className="rounded-xl border border-white/10 p-4 hover:bg-white/[0.03] transition-colors">
                   <p className="text-lg font-bold">
                     {formatNumber(lead.booking.total)}€
                   </p>
-                  <p className="text-sm">Estat: {lead.booking.status}</p>
-                  <p className="text-sm">Subtotal: {formatNumber(lead.booking.subtotal)}€</p>
-                  <p className="text-sm">IVA: {formatNumber(lead.booking.vatAmount)}€</p>
-                  <p className="text-sm">
+                  <p className="text-sm opacity-70">Estat: {lead.booking.status}</p>
+                  <p className="text-sm opacity-70">Subtotal: {formatNumber(lead.booking.subtotal)}€</p>
+                  <p className="text-sm opacity-70">IVA: {formatNumber(lead.booking.vatAmount)}€</p>
+                  <p className="text-sm opacity-70">
                     Dipòsit: {lead.booking.depositPaid ? 'Pagat' : 'Pendent'} ({formatNumber(lead.booking.depositAmount)}€)
                   </p>
-                  <p className="text-sm">
+                  <p className="text-sm opacity-70">
                     Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({formatNumber(lead.booking.remainingAmount)}€)
                   </p>
                 </div>
-                <div className="ap-card p-4 md:col-span-2">
+                <div className="rounded-xl border border-white/10 p-4 md:col-span-2">
                   <h4 className="text-sm font-semibold mb-2">Post-event i automatitzacions</h4>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="text-sm">
@@ -579,7 +639,7 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Metadades */}
-          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Detalls del registre" data-help-desc="Metadades tècniques de l'entrada: ID, idioma, dates de creació, actualització i contacte.">
+          <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.record)}>
             <h3 className="text-sm font-semibold mb-4">Detalls del registre</h3>
             <dl className="space-y-3 text-sm">
               <div>
@@ -633,7 +693,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </dl>
           </section>
 
-          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Atribució / UTM" data-help-desc="D'on ve aquesta entrada: origen, paràmetres UTM i pàgina d'aterratge. Útil per avaluar campanyes de màrqueting.">
+          <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.attribution)}>
             <h3 className="inline-flex items-center gap-1 text-sm font-semibold mb-4">
               Atribució / UTM
               <InfoTooltip text={ADMIN_HELP.leadAttribution} />
@@ -678,7 +738,7 @@ export default async function LeadDetailPage({ params }: Props) {
           </section>
 
           {lead.customer && (
-            <section className="rounded-xl border p-6 shadow-sm" data-help-title="Relació Client" data-help-desc="Dades del client vinculat: contacte, historial d'esdeveniments i despesa acumulada.">
+            <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.customer)}>
               <h3 className="text-sm font-semibold mb-4">Relació Client</h3>
               <dl className="space-y-3 text-sm">
                 <div>
@@ -727,7 +787,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </section>
           )}
 
-          <section className="rounded-xl border p-6 shadow-sm" data-help-title="Historial del client" data-help-desc="Altres entrades i reserves del mateix client o email. Permet veure repetidors i context comercial acumulat.">
+          <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.history)}>
             <h3 className="text-sm font-semibold mb-4">
               Historial del client ({relatedLeads.length})
             </h3>
@@ -739,7 +799,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <Link
                     key={item.id}
                     href={`/admin/leads/${item.id}`}
-                    className="ap-card block p-3"
+                    className="admin-card-glass block rounded-xl border border-white/10 p-3 hover:bg-white/[0.03] transition-colors"
                   >
                     <p className="text-sm font-medium">
                       {getEventLabel(item.eventType)} · {item.status}
@@ -778,6 +838,7 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
+
 
 
 

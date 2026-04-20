@@ -2,13 +2,11 @@
 // Este archivo DEBE exportar su propio HTML completo porque está fuera del [locale] layout
 // y el root layout usa componentes que requieren next-intl
 
-import caMessages from '@/messages/ca.json';
+import { getNotFoundCopy } from '@/lib/public-error-copy';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function NotFound() {
-  type NotFoundMessages = { title?: string; description?: string; backToHome?: string };
-
-  const t: NotFoundMessages = (caMessages as { notFound?: NotFoundMessages }).notFound || {};
+  const t = getNotFoundCopy('ca');
 
   return (
     <html lang="ca">
@@ -94,5 +92,7 @@ export default function NotFound() {
     </html>
   );
 }
+
+
 
 

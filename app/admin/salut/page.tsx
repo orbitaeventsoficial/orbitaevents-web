@@ -1,8 +1,17 @@
 import Link from 'next/link';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
+import { ADMIN_SALUT_HELP, helpAttrs } from '../components/adminHelpContent';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminEmptyState, AdminKpi, AdminKpiRow, AdminPage, AdminSection } from '../components/AdminPage';
 import { formatDateTimeFull } from '@/lib/constants';
-import { ADMIN_SALUT_FOCUS_FILTER_OPTIONS, ADMIN_SALUT_STATUS_FILTER_OPTIONS } from '@/lib/constants/admin';
+import {
+  ADMIN_SALUT_FOCUS_FILTER_OPTIONS,
+  ADMIN_SALUT_STATUS_FILTER_OPTIONS,
+  ADMIN_HEALTH_STATUS_TONE,
+  ADMIN_HEALTH_STATUS_LABEL,
+  ADMIN_HEALTH_STATUS_DOT,
+  ADMIN_HEALTH_STATUS_ORDER,
+} from '@/lib/constants/admin';
 import { getAdminHealthSnapshot, type AdminHealthItem, type AdminHealthSection } from '@/lib/services/adminHealthService';
 
 export const dynamic = 'force-dynamic';
@@ -11,29 +20,10 @@ export const metadata = {
   title: 'Salut — Òrbita Admin',
 };
 
-const STATUS_TONE: Record<AdminHealthItem['status'], string> = {
-  critical: 'border-rose-500/20 bg-rose-500/5',
-  warning: 'border-amber-500/20 bg-amber-500/5',
-  ok: 'border-emerald-500/20 bg-emerald-500/5',
-};
-
-const STATUS_LABEL: Record<AdminHealthItem['status'], string> = {
-  critical: 'Cal actuar',
-  warning: 'Convé revisar',
-  ok: 'Correcte',
-};
-
-const STATUS_DOT: Record<AdminHealthItem['status'], string> = {
-  critical: 'bg-rose-400',
-  warning: 'bg-amber-400',
-  ok: 'bg-emerald-400',
-};
-
-const STATUS_ORDER: Record<AdminHealthItem['status'], number> = {
-  critical: 0,
-  warning: 1,
-  ok: 2,
-};
+const STATUS_TONE = ADMIN_HEALTH_STATUS_TONE;
+const STATUS_LABEL = ADMIN_HEALTH_STATUS_LABEL;
+const STATUS_DOT = ADMIN_HEALTH_STATUS_DOT;
+const STATUS_ORDER = ADMIN_HEALTH_STATUS_ORDER;
 
 type StatusFilter = (typeof ADMIN_SALUT_STATUS_FILTER_OPTIONS)[number]['id'];
 type FocusFilter = (typeof ADMIN_SALUT_FOCUS_FILTER_OPTIONS)[number]['id'];
@@ -287,6 +277,39 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
   };
   const hasActiveFilters = activeStatus !== 'all' || activeFocus !== 'all';
   const priorityItems = buildPriorityItems(filteredSections);
+  const summary = hasActiveFilters ? filteredSummary : snapshot.summary;
+  const systemItems = [
+    `${summary.ok} blocs estan correctes segons l'últim càlcul`,
+    summary.warning > 0 ? `${summary.warning} punts estan en ambre i convé revisar-los abans que creixin` : '',
+    summary.critical > 0 ? `${summary.critical} incidències crítiques poden tocar operativa, diners o qualitat` : '',
+    `Últim càlcul registrat a ${formatDateTimeFull(snapshot.generatedAt)}`,
+  ].filter(Boolean);
+  const manualItems = [
+    priorityItems[0] ? `${priorityItems[0].item.title}: ${priorityItems[0].item.impact}` : '',
+    priorityItems[1] ? `${priorityItems[1].item.title}: ${priorityItems[1].item.impact}` : '',
+    priorityItems[2] ? `${priorityItems[2].item.title}: ${priorityItems[2].item.impact}` : '',
+    priorityItems.length === 0 ? 'No hi ha focus manual urgent ara mateix. Pots usar la pantalla per control preventiu.' : '',
+  ].filter(Boolean);
+  const nextStep =
+    priorityItems[0]
+      ? {
+          title: `Atacar primer ${priorityItems[0].item.title}`,
+          detail: `${priorityItems[0].item.impact} El primer tall no és llegir-ho tot, sinó obrir directament el bloc que aquest senyal ja marca com a prioritari.`,
+          href: priorityItems[0].item.href,
+          ctaLabel: priorityItems[0].item.actionLabel,
+          secondaryAction: priorityItems[1]
+            ? { href: priorityItems[1].item.href, label: priorityItems[1].item.actionLabel }
+            : undefined,
+        }
+      : {
+          title: 'Mantenir control preventiu, no apagar focs',
+          detail: 'Ara mateix no hi ha un focus crític clar. El millor següent pas és mantenir observació i usar els filtres per revisar àrees sensibles abans que es degradin.',
+          href: activeStatus !== 'all' || activeFocus !== 'all' ? '/admin/salut' : '/admin/crons',
+          ctaLabel: activeStatus !== 'all' || activeFocus !== 'all' ? 'Veure salut completa' : 'Obrir Crons',
+          secondaryAction: activeStatus !== 'all' || activeFocus !== 'all'
+            ? { href: '/admin/crons', label: 'Obrir Crons' }
+            : undefined,
+        };
 
   return (
     <AdminPage
@@ -320,7 +343,28 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
         ]}
       />
 
-      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" data-help-title="Filtres de salut" data-help-desc="Et deixen centrar-te només en crítics, avisos o un focus concret com inventari, packs, extres, leads, reserves o tasques.">
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què vigila el sistema',
+          tone: summary.critical > 0 ? 'warning' : 'info',
+          items: systemItems,
+          emptyText: 'Sense senyals rellevants de salut ara mateix.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: priorityItems.length > 0 ? 'warning' : 'success',
+          items: manualItems,
+          emptyText: 'Sense focus manual urgent ara mateix.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          ...nextStep,
+        }}
+      />
+
+      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.filters)}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-white/85">Filtra el que vols veure</p>
@@ -349,7 +393,7 @@ export default async function SalutPage({ searchParams }: { searchParams?: Promi
       </section>
 
       {priorityItems.length > 0 ? (
-        <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" data-help-title="Prioritat d'avui" data-help-desc="Resumeix els tres punts més urgents perquè sàpigues per on començar sense llegir tota la pàgina.">
+        <section className="rounded-2xl border border-white/10 p-4 admin-card-glass" {...helpAttrs(ADMIN_SALUT_HELP.priorities)}>
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Prioritat d’avui</p>

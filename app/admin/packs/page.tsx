@@ -19,6 +19,36 @@ export const metadata = {
 
 type PackFocus = 'alert' | 'critical-margin' | 'missing-capacity' | 'partial-cost' | 'without-inventory';
 
+function renderPackInventoryPreview(pack: Awaited<ReturnType<typeof getPacks>>[number]) {
+  if (pack.inventory.length === 0) {
+    return <p className="text-xs text-white/40">Sense equip base assignat</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1.5">
+        {pack.inventory.slice(0, 4).map((row) => (
+          <span
+            key={row.item.code}
+            className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100"
+          >
+            {row.item.name}
+            {row.quantity > 1 ? ` ×${row.quantity}` : ''}
+          </span>
+        ))}
+        {pack.inventory.length > 4 && (
+          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/70">
+            +{pack.inventory.length - 4} més
+          </span>
+        )}
+      </div>
+      <p className="text-[11px] text-white/55">
+        {pack.inventory.filter((row) => row.isRequired).length} obligatoris · {pack.inventory.reduce((sum, row) => sum + Math.max(1, row.quantity), 0)} unitats totals
+      </p>
+    </div>
+  );
+}
+
 function resolvePackFocus(value?: string | string[]): PackFocus | null {
   const raw = Array.isArray(value) ? value[0] : value;
   if (!raw) return null;
@@ -368,8 +398,12 @@ export default async function PacksPage({
                         </span>
                       )}
                     </div>
-                    <div className="text-xs">
-                      <span>{pack.inventory.length} elements inventari</span>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="font-semibold text-white/80">Equip del pack</span>
+                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                      </div>
+                      {renderPackInventoryPreview(pack)}
                     </div>
                   </div>
 
@@ -381,10 +415,10 @@ export default async function PacksPage({
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}`}
+                      href={`/admin/packs/${pack.id}?tab=content`}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
-                      📦 Inventari
+                      📦 Equip
                     </Link>
                   </div>
                 </div>
@@ -528,8 +562,12 @@ export default async function PacksPage({
                         </span>
                       )}
                     </div>
-                    <div className="text-xs">
-                      <span>{pack.inventory.length} elements inventari</span>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="font-semibold text-white/80">Equip del pack</span>
+                        <span className="text-white/55">{pack.inventory.length} elements</span>
+                      </div>
+                      {renderPackInventoryPreview(pack)}
                     </div>
                   </div>
 
@@ -541,10 +579,10 @@ export default async function PacksPage({
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}`}
+                      href={`/admin/packs/${pack.id}?tab=content`}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
-                      📦 Inventari
+                      📦 Equip
                     </Link>
                   </div>
                 </div>

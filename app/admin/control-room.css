@@ -17,22 +17,6 @@ html.admin-mode .admin-shell .admin-control-room > * + * {
   margin-top: 0.75rem;
 }
 
-html.admin-mode .admin-shell .admin-control-room .admin-cr-header {
-  border: 1px solid var(--at-border);
-  background: var(--at-surface);
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
-
-html.admin-mode .admin-shell .admin-control-room .admin-cr-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 html.admin-mode .admin-shell .admin-control-room .admin-cr-title {
   color: var(--at-text);
   font-size: 1.1rem;
@@ -46,12 +30,6 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-subtitle {
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-mobile-only {
   display: inline-flex;
-}
-
-html.admin-mode .admin-shell .admin-control-room .admin-cr-desktop-actions {
-  display: none;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-links {
@@ -402,7 +380,6 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { ba
 
 @media (min-width: 640px) {
   html.admin-mode .admin-shell .admin-control-room .admin-cr-mobile-only { display: none; }
-  html.admin-mode .admin-shell .admin-control-room .admin-cr-desktop-actions { display: flex; }
   html.admin-mode .admin-shell .admin-control-room .admin-cr-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html.admin-mode .admin-shell .admin-control-room .admin-cr-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.admin-mode .admin-shell .admin-control-room .admin-cr-banner { flex-direction: row; align-items: center; justify-content: space-between; }
@@ -432,3 +409,643 @@ html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--ghost:hover { ba
 
 
 
+
+/* ==========================================================================
+   VISUAL UPGRADE — Semàfors, Glows, Micro-animacions, Polish Premium
+   ========================================================================== */
+
+/* ── Hero header gradient + glow ── */
+html.admin-mode .admin-shell .admin-control-room .admin-hero-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--at-gold) 20%, var(--at-border) 80%);
+  background:
+    radial-gradient(ellipse 120% 100% at 15% 0%, color-mix(in oklab, var(--at-gold) 12%, transparent 88%), transparent 50%),
+    radial-gradient(ellipse 80% 80% at 85% 20%, color-mix(in oklab, var(--at-violet) 8%, transparent 92%), transparent 50%),
+    linear-gradient(170deg, var(--at-surface), var(--at-panel));
+  box-shadow: var(--at-shadow-lg);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-hero-glow {
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 70%;
+  height: 120%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--at-gold) 10%, transparent 90%), transparent 70%);
+  pointer-events: none;
+  animation: admin-hero-glow-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes admin-hero-glow-drift {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  100% { transform: translate(15%, 8%) scale(1.15); opacity: 0.3; }
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-hero-title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--at-text) 30%, var(--at-gold-text) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-hero-subtitle {
+  font-size: 0.875rem;
+  color: var(--at-muted);
+  margin-top: 0.25rem;
+}
+
+/* ── Semàfor glow pulsar (per l'event imminent) ── */
+@keyframes admin-glow-pulse-anim {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3), var(--at-shadow-md); }
+  50% { box-shadow: 0 0 20px 4px rgba(245, 158, 11, 0.15), var(--at-shadow-md); }
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-glow-pulse {
+  animation: admin-glow-pulse-anim 2.5s ease-in-out infinite;
+}
+
+/* ── Progress bar animació d'entrada ── */
+html.admin-mode .admin-shell .admin-control-room .admin-progress-animated {
+  animation: admin-progress-fill 1.2s var(--at-ease-out) forwards;
+  transform-origin: left;
+}
+
+@keyframes admin-progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ── Stagger animation per KPI cards ── */
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item {
+  animation: admin-stagger-in 0.5s var(--at-ease-out) both;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(1) { animation-delay: 0ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(2) { animation-delay: 50ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(3) { animation-delay: 100ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(4) { animation-delay: 150ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(5) { animation-delay: 200ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(6) { animation-delay: 250ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(7) { animation-delay: 300ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(8) { animation-delay: 350ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(9) { animation-delay: 400ms; }
+html.admin-mode .admin-shell .admin-control-room .admin-stagger-item:nth-child(10) { animation-delay: 450ms; }
+
+@keyframes admin-stagger-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Semàfor dots amb glow ── */
+html.admin-mode .admin-shell .admin-control-room .bg-rose-400 {
+  box-shadow: 0 0 8px 2px rgba(251, 113, 133, 0.5);
+}
+html.admin-mode .admin-shell .admin-control-room .bg-amber-400 {
+  box-shadow: 0 0 8px 2px rgba(251, 191, 36, 0.4);
+}
+html.admin-mode .admin-shell .admin-control-room .bg-emerald-400 {
+  box-shadow: 0 0 8px 2px rgba(52, 211, 153, 0.4);
+}
+html.admin-mode .admin-shell .admin-control-room .bg-cyan-400 {
+  box-shadow: 0 0 8px 2px rgba(34, 211, 238, 0.4);
+}
+
+/* ── Radar cards amb gradient de fons subtil ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--rose {
+  background: linear-gradient(145deg, var(--at-surface), color-mix(in oklab, var(--at-cr-rose) 6%, var(--at-surface) 94%));
+  border-color: color-mix(in oklab, var(--at-cr-rose) 30%, var(--at-border) 70%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--rose:hover {
+  border-color: var(--at-cr-rose);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--at-cr-rose) 20%, transparent 80%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--amber {
+  background: linear-gradient(145deg, var(--at-surface), color-mix(in oklab, var(--at-cr-amber) 6%, var(--at-surface) 94%));
+  border-color: color-mix(in oklab, var(--at-cr-amber) 30%, var(--at-border) 70%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--amber:hover {
+  border-color: var(--at-cr-amber);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--at-cr-amber) 20%, transparent 80%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--emerald {
+  background: linear-gradient(145deg, var(--at-surface), color-mix(in oklab, var(--at-cr-emerald) 5%, var(--at-surface) 95%));
+  border-color: color-mix(in oklab, var(--at-cr-emerald) 20%, var(--at-border) 80%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--emerald:hover {
+  border-color: var(--at-cr-emerald);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--at-cr-emerald) 15%, transparent 85%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--cyan {
+  background: linear-gradient(145deg, var(--at-surface), color-mix(in oklab, var(--at-info) 5%, var(--at-surface) 95%));
+  border-color: color-mix(in oklab, var(--at-info) 25%, var(--at-border) 75%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-radar-card--cyan:hover {
+  border-color: var(--at-info);
+  box-shadow: 0 0 14px color-mix(in oklab, var(--at-info) 18%, transparent 82%);
+}
+
+/* ── Metric cards hover amb glow subtil ── */
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
+  transition: border-color 150ms ease, box-shadow 250ms ease, transform 200ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card:hover {
+  transform: translateY(-2px);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-success) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-cr-rose) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-cr-amber) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-info) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--purple:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-violet) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky:hover {
+  box-shadow: 0 4px 20px color-mix(in oklab, var(--at-cr-sky) 12%, transparent 88%), var(--at-shadow-md);
+}
+
+/* ── Pilot steps amb gradient subtil i hover ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step {
+  transition: border-color 150ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step:hover {
+  transform: translateY(-1px);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--rose {
+  background: linear-gradient(160deg, var(--at-panel), color-mix(in oklab, var(--at-cr-rose) 5%, var(--at-panel) 95%));
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--rose:hover {
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-rose) 15%, transparent 85%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--amber {
+  background: linear-gradient(160deg, var(--at-panel), color-mix(in oklab, var(--at-cr-amber) 5%, var(--at-panel) 95%));
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--amber:hover {
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-amber) 15%, transparent 85%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--sky {
+  background: linear-gradient(160deg, var(--at-panel), color-mix(in oklab, var(--at-cr-sky) 5%, var(--at-panel) 95%));
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--sky:hover {
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-sky) 15%, transparent 85%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--emerald {
+  background: linear-gradient(160deg, var(--at-panel), color-mix(in oklab, var(--at-cr-emerald) 5%, var(--at-panel) 95%));
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-step--emerald:hover {
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-emerald) 15%, transparent 85%);
+}
+
+/* ── Mini cards amb hover glow ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card {
+  transition: border-color 150ms ease, box-shadow 250ms ease, transform 200ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card:hover {
+  transform: translateY(-1px);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--violet:hover {
+  border-color: var(--at-violet);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-violet) 15%, transparent 85%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--amber:hover {
+  border-color: var(--at-cr-amber);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-amber) 15%, transparent 85%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--rose:hover {
+  border-color: var(--at-cr-rose);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-cr-rose) 15%, transparent 85%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card--cyan:hover {
+  border-color: var(--at-info);
+  box-shadow: 0 4px 16px color-mix(in oklab, var(--at-info) 15%, transparent 85%);
+}
+
+/* ── Quick links hover premium ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link {
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: color-mix(in oklab, var(--at-info) 8%, var(--at-panel) 92%);
+}
+
+/* ── Cards amb subtle top gradient line ── */
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card {
+  transition: box-shadow 250ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ── Command center cards amb hover state ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-command-card,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-info-card {
+  transition: border-color 150ms ease, box-shadow 250ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-command-card:hover,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-info-card:hover {
+  border-color: var(--at-border-s);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Panels amb top border accent ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--pilot {
+  border-top: 2px solid var(--at-cr-emerald);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--checklist {
+  border-top: 2px solid var(--at-info);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--command {
+  border-top: 2px solid var(--at-violet);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel--radar {
+  border-top: 2px solid var(--at-cyan);
+}
+
+/* ── Status chips amb millor contrast ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--new {
+  box-shadow: 0 0 6px color-mix(in oklab, var(--at-cr-sky) 30%, transparent 70%);
+}
+html.admin-mode .admin-shell .admin-control-room .admin-cr-status-chip--won {
+  box-shadow: 0 0 6px color-mix(in oklab, var(--at-cr-emerald) 30%, transparent 70%);
+}
+
+/* ── Avatar round amb glow on hover ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link:hover .admin-cr-avatar-round {
+  border-color: var(--at-info);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--at-info) 25%, transparent 75%);
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-row-link:hover .admin-cr-avatar-box {
+  border-color: var(--at-info);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--at-info) 20%, transparent 80%);
+}
+
+/* ── Audit section hover ── */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-row {
+  transition: background 120ms ease;
+}
+
+html.admin-mode .admin-shell .admin-control-room .admin-cr-audit-row:hover {
+  background: var(--at-cr-bg-hover);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  html.admin-mode .admin-shell .admin-control-room .admin-hero-glow,
+  html.admin-mode .admin-shell .admin-control-room .admin-glow-pulse,
+  html.admin-mode .admin-shell .admin-control-room .admin-progress-animated,
+  html.admin-mode .admin-shell .admin-control-room .admin-stagger-item,
+  html.admin-mode .admin-shell .admin-control-room .admin-cr-step,
+  html.admin-mode .admin-shell .admin-control-room .admin-cr-mini-card,
+  html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link,
+  html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* CUSTOMER HUB VISUAL                                                       */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+html.admin-mode .admin-shell .admin-customer-header {
+  background:
+    radial-gradient(circle at top left, color-mix(in oklab, var(--at-info) 18%, transparent 82%), transparent 28%),
+    linear-gradient(180deg, color-mix(in oklab, var(--at-panel) 78%, black 22%), transparent 100%);
+}
+
+html.admin-mode .admin-shell .admin-customer-hero {
+  position: relative;
+}
+
+html.admin-mode .admin-shell .admin-customer-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in oklab, var(--at-info) 22%, transparent 78%), transparent 34%),
+    radial-gradient(circle at 88% 12%, color-mix(in oklab, var(--at-violet) 18%, transparent 82%), transparent 30%),
+    linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 78%, black 22%), color-mix(in oklab, var(--at-panel) 86%, black 14%));
+  border: 1px solid color-mix(in oklab, var(--at-info) 22%, var(--at-border) 78%);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+}
+
+html.admin-mode .admin-shell .admin-customer-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.admin-mode .admin-shell .admin-customer-avatar {
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+}
+
+html.admin-mode .admin-shell .admin-customer-actions {
+  align-items: flex-start;
+}
+
+html.admin-mode .admin-shell .admin-customer-action-link {
+  min-height: 2.75rem;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-customer-action--cyan {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--at-info) 82%, white 18%), color-mix(in oklab, var(--at-info) 54%, black 46%));
+}
+
+html.admin-mode .admin-shell .admin-customer-action--indigo {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--at-violet) 60%, white 8%), color-mix(in oklab, var(--at-violet) 44%, black 56%));
+}
+
+html.admin-mode .admin-shell .admin-customer-action--amber {
+  background: color-mix(in oklab, var(--at-brand-vivid) 18%, transparent 82%);
+  border-color: color-mix(in oklab, var(--at-brand-vivid) 38%, var(--at-border) 62%);
+}
+
+html.admin-mode .admin-shell .admin-customer-action--slate {
+  background: color-mix(in oklab, var(--at-panel) 88%, white 12%);
+  border-color: color-mix(in oklab, var(--at-border-strong) 80%, white 20%);
+}
+
+html.admin-mode .admin-shell .admin-customer-kpi {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-panel) 90%, white 10%), color-mix(in oklab, var(--at-surface) 92%, black 8%));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-customer-stage-card,
+html.admin-mode .admin-shell .admin-customer-next-card {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-panel) 92%, white 8%), color-mix(in oklab, var(--at-surface) 94%, black 6%));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+}
+
+html.admin-mode .admin-shell .admin-customer-next-card a {
+  background: color-mix(in oklab, var(--at-info) 16%, transparent 84%);
+  border-color: color-mix(in oklab, var(--at-info) 34%, var(--at-border) 66%);
+}
+
+html.admin-mode .admin-shell .admin-customer-tabs button {
+  backdrop-filter: blur(14px);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card,
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-action-card,
+html.admin-mode .admin-shell .admin-customer-summary > div.rounded-2xl.border {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 90%, white 10%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
+  border-color: var(--at-border);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--contact {
+  border-color: color-mix(in oklab, var(--at-info) 24%, var(--at-border) 76%);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--ops {
+  border-color: color-mix(in oklab, var(--at-violet) 22%, var(--at-border) 78%);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--finance {
+  border-color: color-mix(in oklab, var(--at-brand-vivid) 28%, var(--at-border) 72%);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--event {
+  border-color: color-mix(in oklab, var(--at-success) 28%, var(--at-border) 72%);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--quick {
+  border-color: color-mix(in oklab, var(--at-info) 18%, var(--at-border) 82%);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-stat {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-action-card {
+  min-height: 12rem;
+}
+
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-action-card a,
+html.admin-mode .admin-shell .admin-customer-summary .admin-customer-card--quick a {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+
+@media (max-width: 767px) {
+  html.admin-mode .admin-shell .admin-customer-hero::before {
+    border-radius: 1.2rem;
+  }
+
+  html.admin-mode .admin-shell .admin-customer-summary .admin-customer-action-card {
+    min-height: auto;
+  }
+}
+
+html.admin-mode .admin-shell .admin-booking-page .ap-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--at-info) 16%, var(--at-border) 84%);
+  background:
+    radial-gradient(circle at 10% 8%, color-mix(in oklab, var(--at-info) 18%, transparent 82%), transparent 32%),
+    radial-gradient(circle at 92% 10%, color-mix(in oklab, var(--at-brand-vivid) 14%, transparent 86%), transparent 28%),
+    linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 82%, white 8%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
+}
+
+html.admin-mode .admin-shell .admin-booking-page .ap-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 44%, transparent 100%);
+}
+
+html.admin-mode .admin-shell .admin-booking-page .ap-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.admin-mode .admin-shell .admin-booking-executive {
+  margin-top: 0.35rem;
+}
+
+html.admin-mode .admin-shell .admin-booking-summary-card {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 90%, white 10%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
+  border-color: var(--at-border);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-booking-panel,
+html.admin-mode .admin-shell .admin-booking-margin {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 91%, white 9%), color-mix(in oklab, var(--at-panel) 93%, black 7%));
+  border-color: var(--at-border);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+}
+
+html.admin-mode .admin-shell .admin-booking-section-nav {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-booking-section-nav-list {
+  padding-bottom: 0.125rem;
+}
+
+html.admin-mode .admin-shell .admin-booking-section-nav-item {
+  border: 1px solid transparent;
+  background: color-mix(in oklab, var(--at-panel) 86%, transparent 14%);
+}
+
+html.admin-mode .admin-shell .admin-booking-section-nav-item:hover {
+  border-color: color-mix(in oklab, var(--at-info) 18%, var(--at-border) 82%);
+  background: color-mix(in oklab, var(--at-panel) 70%, white 30%);
+}
+
+html.admin-mode .admin-shell .admin-booking-section-nav-item--active {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+html.admin-mode .admin-shell .admin-booking-margin-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+html.admin-mode .admin-shell .admin-booking-margin-badge {
+  min-width: 8rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklab, var(--at-info) 20%, var(--at-border) 80%);
+  background: color-mix(in oklab, var(--at-panel) 85%, white 15%);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+html.admin-mode .admin-shell .admin-booking-margin-kpi,
+html.admin-mode .admin-shell .admin-booking-margin-panel,
+html.admin-mode .admin-shell .admin-booking-travel-card {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-panel) 92%, white 8%), color-mix(in oklab, var(--at-surface) 94%, black 6%));
+  border: 1px solid var(--at-border);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-booking-margin-kpi {
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+html.admin-mode .admin-shell .admin-booking-margin-breakdown {
+  background: color-mix(in oklab, var(--at-panel) 70%, transparent 30%);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+html.admin-mode .admin-shell .admin-booking-travel-editor {
+  background: color-mix(in oklab, var(--at-panel) 52%, transparent 48%);
+  border-radius: 1rem;
+  padding-top: 1rem;
+}
+
+@media (max-width: 767px) {
+  html.admin-mode .admin-shell .admin-booking-margin-hero {
+    flex-direction: column;
+  }
+
+  html.admin-mode .admin-shell .admin-booking-margin-badge {
+    width: 100%;
+    align-items: flex-start;
+  }
+}
+
+html.admin-mode .admin-shell .admin-leads-page .ap-header,
+html.admin-mode .admin-shell .admin-lead-detail-page .ap-header {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--at-brand-vivid) 16%, var(--at-border) 84%);
+  background:
+    radial-gradient(circle at 8% 10%, color-mix(in oklab, var(--at-brand-vivid) 18%, transparent 82%), transparent 30%),
+    radial-gradient(circle at 90% 12%, color-mix(in oklab, var(--at-info) 14%, transparent 86%), transparent 28%),
+    linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 80%, white 10%), color-mix(in oklab, var(--at-panel) 92%, black 8%));
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.18);
+}
+
+html.admin-mode .admin-shell .admin-leads-page .ap-header::before,
+html.admin-mode .admin-shell .admin-lead-detail-page .ap-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 42%, transparent 100%);
+}
+
+html.admin-mode .admin-shell .admin-leads-page .ap-header > *,
+html.admin-mode .admin-shell .admin-lead-detail-page .ap-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.admin-mode .admin-shell .admin-leads-switcher,
+html.admin-mode .admin-shell .admin-leads-mobile-card,
+html.admin-mode .admin-shell .admin-leads-table,
+html.admin-mode .admin-shell .admin-leads-pagination,
+html.admin-mode .admin-shell .admin-lead-executive,
+html.admin-mode .admin-shell .admin-lead-summary-card,
+html.admin-mode .admin-shell .admin-leads-pipeline-card,
+html.admin-mode .admin-shell .admin-leads-pipeline-empty {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--at-surface) 90%, white 10%), color-mix(in oklab, var(--at-panel) 93%, black 7%));
+  border-color: var(--at-border);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+}
+
+html.admin-mode .admin-shell .admin-leads-pipeline .admin-leads-metric {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
+}
+
+html.admin-mode .admin-shell .admin-leads-pipeline-card {
+  backdrop-filter: blur(12px);
+}
+
+html.admin-mode .admin-shell .admin-leads-table table thead {
+  background: color-mix(in oklab, var(--at-panel) 82%, white 18%);
+}
+
+html.admin-mode .admin-shell .admin-leads-mobile-card:hover,
+html.admin-mode .admin-shell .admin-leads-pipeline-card:hover {
+  transform: translateY(-1px);
+}

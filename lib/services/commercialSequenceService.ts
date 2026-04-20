@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { COMMERCIAL_SEQUENCE_STEP_COPY } from '@/lib/constants';
+import { deriveLeadResponseState } from '@/lib/services/responseTrackingService';
 import { log } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -111,6 +112,11 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
       createdAt: true,
       nurturingStep: true,
       lastNurturingAt: true,
+      activities: {
+        where: { type: { in: ['EMAIL', 'WHATSAPP'] } },
+        select: { createdAt: true, metadata: true },
+        orderBy: { createdAt: 'desc' },
+      },
     },
     take: 500,
   });
@@ -132,6 +138,12 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
     const nextStepIndex = lead.nurturingStep; // 0-based index into cadence
     const nextStepDef = cadence[nextStepIndex];
     if (!nextStepDef) continue;
+
+    const responseState = deriveLeadResponseState(lead.activities, lead.createdAt);
+    if (responseState.lastInboundAt && responseState.lastOutboundAt && responseState.lastInboundAt > responseState.lastOutboundAt) {
+      summary.skippedNotReady += 1;
+      continue;
+    }
 
     // Comprovar si ja ha passat prou temps
     if (!isReadyForNextStep(lead, nextStepDef)) {

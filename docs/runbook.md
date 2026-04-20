@@ -60,16 +60,23 @@ npx tsx scripts/export-backup.ts
 
 | Cron | Endpoint | Freqüència | Funció |
 |------|----------|------------|--------|
-| commercial-daily | `/api/admin/crons/commercial-daily` | Diari 8:00 | Lead scoring, recordatoris pagament, alertes |
-| invoice-sync | `/api/admin/crons/invoice-sync` | Cada 6h | Sincronitza factures Holded |
-| pack-pricing-check | `/api/admin/crons/pack-pricing-check` | Setmanal | Alerta si preus packs divergeixen >15% |
+| commercial-daily | `/api/cron/commercial-daily` | Diari | Lead scoring, seqüències comercials, recordatoris pagament, alertes, resum diari |
+| customer-lifecycle | `/api/cron/customer-lifecycle` | Diari | Recalcul lifecycleStage i healthScore de clients |
+| fuel-daily | `/api/cron/fuel-daily` | Diari | Preu MITECO → cost/km |
+| invoice-sync | `/api/cron/invoice-sync` | Diari | Sync factures Holded |
+| lead-cleanup | `/api/cron/lead-cleanup` | Diari | Auto-LOST i auto-DELETE de leads inactius |
+| pack-pricing-check | `/api/cron/pack-pricing-check` | Diari | Alertes si preus packs divergeixen >15% |
+| post-event | `/api/cron/post-event` | Diari | Emails post-event automàtics |
+| reviews-sync | `/api/cron/reviews-sync` | Diari | SerpAPI → ressenyes Google a BD |
+| tasks-auto | `/api/cron/tasks-auto` | Diari | Generació automàtica de tasques (SLA, stale, prep, payment, etc.) |
+| weekly-benchmark | `/api/cron/weekly-benchmark` | Setmanal (dl) | Email comparatiu setmanal (dilluns) |
 
 ### Un cron no s'executa
 
 1. **Verificar logs**: Railway dashboard → Logs → buscar `[CRON]`
 2. **Executar manualment**:
    ```bash
-   curl -X POST https://orbitaevents.com/api/admin/crons/commercial-daily \
+   curl -X POST https://orbitaevents.com/api/cron/commercial-daily \
      -H "Authorization: Bearer $CRON_SECRET"
    ```
 3. Si falla amb error 500 → revisar logs Sentry

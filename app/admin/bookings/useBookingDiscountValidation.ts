@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { BookingDiscountValidation, BookingPack, BookingSelectedExtras } from './booking-form.types';
+import { log } from '@/lib/logger';
 
 interface UseBookingDiscountValidationOptions {
   packs: Pick<BookingPack, 'id' | 'price'>[];
@@ -55,7 +56,7 @@ export function useBookingDiscountValidation({
         }
       }
     } catch (error) {
-      console.error('[NewBooking] Error validant codi descompte:', error);
+      log.error('[NewBooking] Error validant codi descompte', error);
       onValidationError('Error validant el codi de descompte');
     } finally {
       setValidatingCode(false);

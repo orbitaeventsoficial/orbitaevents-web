@@ -216,9 +216,16 @@ describe('findDuplicates', () => {
     mockPrisma.customer.findMany.mockResolvedValue([]);
     await findDuplicates({ email: 'test@test.com' }, 'cust-self');
 
-    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith({
-      where: { id: { not: 'cust-self' }, mergedIntoId: null },
-    });
+    expect(mockPrisma.customer.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          id: { not: 'cust-self' },
+          mergedIntoId: null,
+          OR: expect.any(Array),
+        }),
+        take: 100,
+      })
+    );
   });
 });
 

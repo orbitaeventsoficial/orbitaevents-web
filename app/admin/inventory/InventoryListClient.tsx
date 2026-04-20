@@ -4,56 +4,35 @@
  * Client component per la llista d'inventari amb filtres, cerca i vistes.
  */
 
-interface BundleApiItem {
-  id: string | number;
-  name: string;
-  itemIds: (string | number)[];
-}
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { AdminPage } from '../components/AdminPage';
+import { ADMIN_INVENTORY_HELP, helpAttrs } from '../components/adminHelpContent';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import {
-  CATEGORY_CONFIG,
-  STATUS_CONFIG,
-  getInventoryCategoryDisplay,
-  getInventoryStatusDisplay,
-  getInventoryConditionLabel,
-  calculateLifeRemainingPercent,
-} from '@/lib/inventory-utils';
-import { DEFAULT_EXPECTED_LIFE_HOURS, INVENTORY_CATEGORY_OPTIONS, INVENTORY_STATUS_OPTIONS, formatNumber } from '@/lib/constants';
+  DEFAULT_EXPECTED_LIFE_HOURS,
+  INVENTORY_CATEGORY_OPTIONS,
+  INVENTORY_STATUS_OPTIONS,
+  formatNumber,
+} from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 import { useToast } from '../components/ToastProvider';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
-
-interface InventoryItem {
-  id: string;
-  code: string;
-  name: string;
-  description: string | null;
-  category: string;
-  watts: number | null;
-  value: number;
-  status: string;
-  condition: string;
-  isConsumable: boolean;
-  stockQuantity: number | null;
-  minStock: number | null;
-  imageUrl: string | null;
-  purchasePrice: number | null;
-  expectedLifeHours: number | null;
-  totalHoursUsed: number;
-  packItems: Array<{ id: string; pack: { id: string; slug: string } }>;
-  _count: { bookingItems: number; usageHistory: number };
-}
-
-interface Stats {
-  [category: string]: { count: number; totalValue: number };
-}
-
-type ViewMode = 'list' | 'grid';
+import type { BundleApiItem, InventoryItem, Stats, ViewMode } from './inventory-list.types';
+import {
+  InventoryBundlesSection,
+  InventoryDesktopTableSection,
+  InventoryEmptyState,
+  InventoryFiltersSection,
+  InventoryGridSection,
+  InventoryHealthFocus,
+  InventoryLowStockAlert,
+  InventoryMobileListSection,
+  InventorySummarySection,
+  InventoryToolbar,
+} from './InventoryListSections';
 
 export default function InventoryListClient() {
   const toast = useToast();
@@ -83,6 +62,14 @@ export default function InventoryListClient() {
     }
     return 'list';
   });
+
+  const resetFilters = useCallback(() => {
+    setSearch('');
+    setSearchQuery('');
+    setFilterCategory(null);
+    setFilterStatus(null);
+    router.replace('/admin/inventory');
+  }, [router]);
 
   const fetchData = useCallback(async () => {
     setFetchError(null);
@@ -141,7 +128,7 @@ export default function InventoryListClient() {
       setBundles(next);
       if (!selectedBundleId && next.length > 0) setSelectedBundleId(next[0].id);
     } catch {
-      setBundleMessage('No s’han pogut carregar els lots.');
+      setBundleMessage('No s\'han pogut carregar els lots.');
     }
   }, [selectedBundleId]);
 
@@ -154,13 +141,15 @@ export default function InventoryListClient() {
     localStorage.setItem('inventory-view', mode);
   }, []);
 
-  const lowStockItems = useMemo(() =>
-    items.filter((i) =>
-      i.isConsumable &&
-      i.stockQuantity != null &&
-      i.minStock != null &&
-      i.stockQuantity <= i.minStock
-    ),
+  const lowStockItems = useMemo(
+    () =>
+      items.filter(
+        (i) =>
+          i.isConsumable &&
+          i.stockQuantity != null &&
+          i.minStock != null &&
+          i.stockQuantity <= i.minStock
+      ),
     [items]
   );
 
@@ -177,12 +166,12 @@ export default function InventoryListClient() {
           return item.value === 0;
         case 'end-of-life': {
           const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
-          return life > 0 && (item.totalHoursUsed / life) >= 0.95;
+          return life > 0 && item.totalHoursUsed / life >= 0.95;
         }
         case 'aging': {
           const lifeA = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
           const ratioA = lifeA > 0 ? item.totalHoursUsed / lifeA : 0;
-          return ratioA >= 0.80 && ratioA < 0.95;
+          return ratioA >= 0.8 && ratioA < 0.95;
         }
         case 'unused':
           return item.purchasePrice != null && item.purchasePrice > 0 && item.packItems.length === 0 && item._count.bookingItems === 0;
@@ -213,8 +202,8 @@ export default function InventoryListClient() {
     }
   }, [healthFilter]);
 
-  const totalValue = useMemo(() =>
-    displayedItems.reduce((sum, item) => sum + item.value, 0),
+  const totalValue = useMemo(
+    () => displayedItems.reduce((sum, item) => sum + item.value, 0),
     [displayedItems]
   );
 
@@ -232,31 +221,73 @@ export default function InventoryListClient() {
     const q = bundleItemSearch.trim().toLowerCase();
     return items
       .filter((item) => !selectedBundle?.itemIds.includes(item.id))
-      .filter((item) =>
-        !q || item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q)
-      )
+      .filter((item) => !q || item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q))
       .slice(0, 20);
   }, [items, selectedBundle, bundleItemSearch]);
 
-  const handleStatusChange = useCallback(async (itemId: string, newStatus: string) => {
-    try {
-      const res = await fetchWithCsrf(`/api/admin/inventory/${itemId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
+  const selectedBundleCoverage = selectedBundle?.itemIds.length || 0;
+  const hasActiveFilters = Boolean(search || filterCategory || filterStatus || healthFilter);
+  const nextStepTitle = fetchError
+    ? 'Recuperar la lectura d’inventari abans d’actuar'
+    : lowStockItems.length > 0
+      ? 'Atacar primer el stock crític'
+      : healthFilter === 'missing-cost'
+        ? 'Omplir cost i vida útil dels equips incomplets'
+        : healthFilter === 'end-of-life' || healthFilter === 'aging'
+          ? 'Revisar els equips més tensats abans d’ampliar catàleg'
+          : selectedBundleCoverage === 0
+            ? 'Definir un lot útil abans de seguir afinant'
+            : 'Mantenir inventari, lots i salut sota control';
+  const nextStepDetail = fetchError
+    ? 'Sense lectura estable no toca canviar lots, estat ni decisions de manteniment.'
+    : lowStockItems.length > 0
+      ? 'Ja tens detectats els consumibles o ítems que han arribat al mínim i són el coll més immediat.'
+      : healthFilter === 'missing-cost'
+        ? 'Aquest focus ja t’aïlla els equips que no permeten llegir bé amortització ni valor real.'
+        : healthFilter === 'end-of-life' || healthFilter === 'aging'
+          ? 'La lectura de salut ja t’està separant els equips que demanen revisió abans de seguir explotant-los.'
+          : selectedBundleCoverage === 0
+            ? 'Sense un lot mínim definit costa reutilitzar configuracions i veure cobertura real d’equip.'
+            : 'Amb stock i salut estables, el pas útil és polir lots, cerca i vista segons el bloc que governes.';
+  const nextStepHref = fetchError
+    ? '/admin/inventory'
+    : lowStockItems.length > 0
+      ? '/admin/inventory?health=low-stock'
+      : healthFilter === 'missing-cost'
+        ? '/admin/inventory?health=missing-cost'
+        : healthFilter === 'end-of-life' || healthFilter === 'aging'
+          ? `/admin/inventory?health=${healthFilter}`
+          : '/admin/inventory';
+  const nextStepLabel = fetchError
+    ? 'Recarregar inventari'
+    : lowStockItems.length > 0
+      ? 'Obrir stock crític'
+      : healthFilter
+        ? 'Mantenir aquest focus'
+        : 'Revisar inventari';
 
-      if (!res.ok) {
-        console.error('[Inventory] Error canviant estat:', res.status);
-        toast.error('Error canviant l\'estat de l\'equip');
-        return;
+  const handleStatusChange = useCallback(
+    async (itemId: string, newStatus: string) => {
+      try {
+        const res = await fetchWithCsrf(`/api/admin/inventory/${itemId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
+        if (!res.ok) {
+          log.error('[Inventory] Error canviant estat', { status: res.status });
+          toast.error("Error canviant l'estat de l'equip");
+          return;
+        }
+        fetchData();
+      } catch (error) {
+        log.error('[Inventory] Error actualitzant item', error);
+        toast.error("Error actualitzant l'equip");
       }
-      fetchData();
-    } catch (error) {
-      console.error('[Inventory] Error actualitzant item:', error);
-      toast.error('Error actualitzant l\'equip');
-    }
-  }, [fetchData, toast]);
+    },
+    [fetchData, toast]
+  );
 
   const saveBundles = useCallback(async (nextBundles: InventoryBundle[]) => {
     setBundles(nextBundles);
@@ -269,12 +300,12 @@ export default function InventoryListClient() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        setBundleMessage(data?.error || 'No s’han pogut desar els lots.');
+        setBundleMessage(data?.error || 'No s\'han pogut desar els lots.');
         return;
       }
       setBundleMessage('Lots desats correctament.');
     } catch {
-      setBundleMessage('No s’han pogut desar els lots.');
+      setBundleMessage('No s\'han pogut desar els lots.');
     } finally {
       setSavingBundles(false);
     }
@@ -290,11 +321,14 @@ export default function InventoryListClient() {
     void saveBundles(next);
   }, [bundleNameDraft, bundles, saveBundles]);
 
-  const renameSelectedBundle = useCallback((name: string) => {
-    if (!selectedBundle) return;
-    const next = bundles.map((b) => (b.id === selectedBundle.id ? { ...b, name } : b));
-    setBundles(next);
-  }, [bundles, selectedBundle]);
+  const renameSelectedBundle = useCallback(
+    (name: string) => {
+      if (!selectedBundle) return;
+      const next = bundles.map((b) => (b.id === selectedBundle.id ? { ...b, name } : b));
+      setBundles(next);
+    },
+    [bundles, selectedBundle]
+  );
 
   const persistRenameSelectedBundle = useCallback(() => {
     if (!selectedBundle) return;
@@ -308,25 +342,31 @@ export default function InventoryListClient() {
     void saveBundles(next);
   }, [bundles, selectedBundle, saveBundles]);
 
-  const addItemToBundle = useCallback((itemId: string) => {
-    if (!selectedBundle) return;
-    const next = bundles.map((b) =>
-      b.id === selectedBundle.id
-        ? { ...b, itemIds: Array.from(new Set([...b.itemIds, itemId])) }
-        : b
-    );
-    void saveBundles(next);
-  }, [bundles, selectedBundle, saveBundles]);
+  const addItemToBundle = useCallback(
+    (itemId: string) => {
+      if (!selectedBundle) return;
+      const next = bundles.map((b) =>
+        b.id === selectedBundle.id
+          ? { ...b, itemIds: Array.from(new Set([...b.itemIds, itemId])) }
+          : b
+      );
+      void saveBundles(next);
+    },
+    [bundles, selectedBundle, saveBundles]
+  );
 
-  const removeItemFromBundle = useCallback((itemId: string) => {
-    if (!selectedBundle) return;
-    const next = bundles.map((b) =>
-      b.id === selectedBundle.id
-        ? { ...b, itemIds: b.itemIds.filter((id) => id !== itemId) }
-        : b
-    );
-    void saveBundles(next);
-  }, [bundles, selectedBundle, saveBundles]);
+  const removeItemFromBundle = useCallback(
+    (itemId: string) => {
+      if (!selectedBundle) return;
+      const next = bundles.map((b) =>
+        b.id === selectedBundle.id
+          ? { ...b, itemIds: b.itemIds.filter((id) => id !== itemId) }
+          : b
+      );
+      void saveBundles(next);
+    },
+    [bundles, selectedBundle, saveBundles]
+  );
 
   if (loading) {
     return (
@@ -342,7 +382,9 @@ export default function InventoryListClient() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <p className="text-amber-400 text-lg font-medium">{fetchError}</p>
-        <button type="button" onClick={() => { setLoading(true); fetchData(); }} className="ap-btn ap-btn--primary">Reintentar</button>
+        <button type="button" onClick={() => { setLoading(true); fetchData(); }} className="ap-btn ap-btn--primary">
+          Reintentar
+        </button>
       </div>
     );
   }
@@ -353,501 +395,110 @@ export default function InventoryListClient() {
       subtitle={`${displayedItems.length} elements · ${formatNumber(totalValue)}€ invertits — equips, estat i amortització`}
       actions={
         <div className="flex gap-2">
-          <div role="tablist" aria-label="Vista d'inventari" className="flex rounded-xl border p-0 overflow-hidden">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === 'list'}
-              onClick={() => toggleView('list')}
-              className={`px-3 py-2 text-xs font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-cyan-500/20 text-cyan-200'
-                  : 'bg-white/5 text-white/40 hover:bg-white/10/50'
-              }`}
-            >
-              Llista
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={viewMode === 'grid'}
-              onClick={() => toggleView('grid')}
-              className={`px-3 py-2 text-xs font-medium transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-cyan-500/20 text-cyan-200'
-                  : 'bg-white/5 text-white/40 hover:bg-white/10/50'
-              }`}
-            >
-              Graella
-            </button>
-          </div>
-          <Link
-            href="/admin/inventory/new"
-            className="ap-btn ap-btn--primary"
-          >
+          <InventoryToolbar viewMode={viewMode} toggleView={toggleView} />
+          <Link href="/admin/inventory/new" className="ap-btn ap-btn--primary" {...helpAttrs(ADMIN_INVENTORY_HELP.newItem)}>
             + Nou Element
           </Link>
         </div>
       }
     >
-
-      {/* KPIs */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-help-title="Resum d'inventari" data-help-desc="KPIs ràpids: total d'elements, disponibles, en ús i valor total invertit en equip.">
-        <div className="rounded-2xl border admin-card-glass p-4">
-          <p className="text-xs font-medium uppercase">Total Elements</p>
-          <p className="mt-2 text-3xl font-bold">{displayedItems.length}</p>
-        </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
-          <p className="text-xs font-medium uppercase">Disponibles</p>
-          <p className="mt-2 text-3xl font-bold">
-            {displayedItems.filter((i) => i.status === 'AVAILABLE').length}
-          </p>
-        </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
-          <p className="text-xs font-medium uppercase">En ús</p>
-          <p className="mt-2 text-3xl font-bold">
-            {displayedItems.filter((i) => i.status === 'IN_USE').length}
-          </p>
-        </div>
-        <div className="rounded-2xl border admin-card-glass p-4">
-          <p className="text-xs font-medium uppercase">Valor Total</p>
-          <p className="mt-2 text-3xl font-bold">
-            {formatNumber(totalValue)}€
-          </p>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border p-4 space-y-3" data-help-title="Equips i lots" data-help-desc="Agrupa elements d'inventari en lots (equip de so, pack llums, etc.) per preparar events ràpidament.">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-sm font-semibold">Equips / Lots</p>
-          {bundleMessage && <p className="text-xs">{bundleMessage}</p>}
-          {savingBundles && <p className="text-xs">Desant...</p>}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={selectedBundleId}
-            onChange={(e) => setSelectedBundleId(e.target.value)}
-            className="rounded-xl border px-3 py-2 text-xs"
-          >
-            {bundles.map((bundle) => (
-              <option key={bundle.id} value={bundle.id}>
-                {bundle.name} ({bundle.itemIds.length})
-              </option>
-            ))}
-          </select>
-          <input
-            value={bundleNameDraft}
-            onChange={(e) => setBundleNameDraft(e.target.value)}
-            placeholder="Nou lot"
-            className="rounded-xl border px-3 py-2 text-xs"
-          />
-          <button type="button" onClick={createBundle} className="rounded-xl border px-3 py-2 text-xs">
-            + Crear lot
-          </button>
-        </div>
-        {selectedBundle && (
-          <div className="grid gap-3 lg:grid-cols-2">
-            <div className="space-y-2">
-              <input
-                value={selectedBundle.name}
-                onChange={(e) => renameSelectedBundle(e.target.value)}
-                onBlur={persistRenameSelectedBundle}
-                className="w-full rounded-xl border px-3 py-2 text-sm"
-              />
-              <button type="button" onClick={deleteSelectedBundle} className="rounded-xl border px-3 py-1.5 text-xs">
-                Eliminar lot
-              </button>
-            </div>
-            <div className="space-y-2">
-              <input
-                value={bundleItemSearch}
-                onChange={(e) => setBundleItemSearch(e.target.value)}
-                placeholder="Afegir element per nom o codi"
-                className="w-full rounded-xl border px-3 py-2 text-xs"
-              />
-              <div className="max-h-24 overflow-auto space-y-1">
-                {candidateItems.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => addItemToBundle(item.id)}
-                    className="w-full text-left rounded-xl border px-3 py-2 text-xs"
-                  >
-                    + {item.code} · {item.name}
-                  </button>
-                ))}
-              </div>
-              <div className="max-h-24 overflow-auto space-y-1">
-                {selectedBundleItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-xl border px-3 py-2 text-xs">
-                    <span>{item.code} · {item.name}</span>
-                    <button type="button" onClick={() => removeItemFromBundle(item.id)} className="px-2 py-1 rounded-lg hover:bg-white/10 transition-colors">Treure</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Alertes d'estoc baix */}
-      {lowStockItems.length > 0 && (
-        <div className="rounded-2xl border p-4" data-help-title="Alerta d'estoc baix" data-help-desc="Consumibles que han arribat al mínim d'estoc configurat. Convé fer comanda o revisar disponibilitat.">
-          <p className="text-sm font-semibold mb-2">Alerta d&apos;estoc baix</p>
-          <div className="flex flex-wrap gap-2">
-            {lowStockItems.map((item) => (
-              <Link
-                key={item.id}
-                href={`/admin/inventory/${item.id}`}
-                className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs"
-              >
-                <code className="font-mono">{item.code}</code>
-                <span>{item.name}</span>
-                <span className="font-bold">{item.stockQuantity}/{item.minStock}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-
-      {activeHealthLabel && (
-        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 admin-card-glass">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200/80">Focus de salut</p>
-              <p className="mt-1 text-sm text-white/80">{activeHealthLabel}</p>
-            </div>
-            <Link href="/admin/inventory" className="ap-btn ap-btn--secondary text-sm">
-              Veure tot l’inventari
-            </Link>
-          </div>
-        </div>
-      )}
-      {/* Cerca + Filtres */}
-      <div className="space-y-3" data-help-title="Cerca i filtres d'inventari" data-help-desc="Filtra per text, categoria o estat per reduir el llistat i trobar equip concret més ràpidament.">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cercar per nom o codi..."
-          className="w-full rounded-xl border px-4 py-3 text-sm "
-        />
-
-        <div className="grid gap-2 sm:grid-cols-3">
-          <label className="flex items-center gap-2 rounded-xl border px-3 py-2">
-            <span className="shrink-0 text-xs">Categoria</span>
-            <select
-              value={filterCategory ?? ''}
-              onChange={(e) => setFilterCategory(e.target.value || null)}
-              className="w-full rounded-xl border px-2 py-1.5 text-xs "
-            >
-              <option value="">Totes</option>
-              {categories.map((cat) => {
-                const conf = CATEGORY_CONFIG[cat];
-                const count = stats[cat]?.count || 0;
-                return (
-                  <option key={cat} value={cat}>
-                    {conf.icon} {conf.label} ({count})
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-
-          <label className="flex items-center gap-2 rounded-xl border px-3 py-2">
-            <span className="shrink-0 text-xs">Estat</span>
-            <select
-              value={filterStatus ?? ''}
-              onChange={(e) => setFilterStatus(e.target.value || null)}
-              className="w-full rounded-xl border px-2 py-1.5 text-xs "
-            >
-              <option value="">Tots</option>
-              {statuses.map((st) => (
-                <option key={st} value={st}>
-                  {STATUS_CONFIG[st].label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <button
-            type="button"
-            onClick={() => { setSearch(''); setSearchQuery(''); setFilterCategory(null); setFilterStatus(null); router.replace('/admin/inventory'); }}
-            className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors"
-          >
-            Netejar filtres
-          </button>
-        </div>
-      </div>
-
-      {/* Vista Graella */}
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què veu el sistema a l’inventari',
+          tone: displayedItems.length > 0 ? 'info' : 'warning',
+          items: [
+            `${displayedItems.length} equips visibles i ${formatNumber(totalValue)}€ de valor dins la lectura actual.`,
+            lowStockItems.length > 0
+              ? `${lowStockItems.length} ítems marquen stock crític o al mínim.`
+              : 'No hi ha stock crític detectat al primer nivell.',
+            selectedBundleCoverage > 0
+              ? `El lot seleccionat cobreix ${selectedBundleCoverage} equips.`
+              : 'Cap lot seleccionat amb cobertura útil ara mateix.',
+          ],
+          emptyText: 'Sense lectura d’inventari no hi ha resum automàtic del canal.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: hasActiveFilters || savingBundles || bundleMessage ? 'warning' : 'success',
+          items: [
+            activeHealthLabel
+              ? activeHealthLabel
+              : 'No hi ha focus de salut actiu en aquesta sessió.',
+            hasActiveFilters
+              ? 'Hi ha filtres o cerca actius sobre la lectura actual.'
+              : 'Sense filtres manuals: veus l’inventari complet.',
+            savingBundles
+              ? 'Hi ha canvis de lots desant-se ara mateix.'
+              : bundleMessage
+                ? bundleMessage
+                : 'Els lots no mostren incidències a primer nivell.',
+          ],
+          emptyText: 'No hi ha coll manual evident a primer nivell.',
+        }}
+        nextStep={{
+          title: nextStepTitle,
+          detail: nextStepDetail,
+          href: nextStepHref,
+          ctaLabel: nextStepLabel,
+          secondaryAction:
+            hasActiveFilters
+              ? { href: '/admin/inventory', label: 'Veure tot l’inventari' }
+              : selectedBundleCoverage > 0
+                ? { href: '/admin/inventory/new', label: 'Afegir equip nou' }
+                : undefined,
+        }}
+      />
+      <InventorySummarySection displayedItems={displayedItems} totalValue={totalValue} />
+      <InventoryBundlesSection
+        bundles={bundles}
+        selectedBundleId={selectedBundleId}
+        bundleNameDraft={bundleNameDraft}
+        bundleItemSearch={bundleItemSearch}
+        selectedBundle={selectedBundle}
+        selectedBundleItems={selectedBundleItems}
+        candidateItems={candidateItems}
+        bundleMessage={bundleMessage}
+        savingBundles={savingBundles}
+        setSelectedBundleId={setSelectedBundleId}
+        setBundleNameDraft={setBundleNameDraft}
+        setBundleItemSearch={setBundleItemSearch}
+        createBundle={createBundle}
+        renameSelectedBundle={renameSelectedBundle}
+        persistRenameSelectedBundle={persistRenameSelectedBundle}
+        deleteSelectedBundle={deleteSelectedBundle}
+        addItemToBundle={addItemToBundle}
+        removeItemFromBundle={removeItemFromBundle}
+      />
+      <InventoryLowStockAlert lowStockItems={lowStockItems} />
+      <InventoryHealthFocus activeHealthLabel={activeHealthLabel} />
+      <InventoryFiltersSection
+        search={search}
+        setSearch={setSearch}
+        filterCategory={filterCategory}
+        setFilterCategory={setFilterCategory}
+        filterStatus={filterStatus}
+        setFilterStatus={setFilterStatus}
+        categories={categories}
+        statuses={statuses}
+        stats={stats}
+        resetFilters={resetFilters}
+      />
       {viewMode === 'grid' ? (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-help-title="Graella d'inventari" data-help-desc="Vista visual de les peces amb foto, estat, valor i vida útil estimada.">
-          {displayedItems.map((item) => {
-            const catConf = getInventoryCategoryDisplay(item.category);
-            const statusConf = getInventoryStatusDisplay(item.status);
-            const lifePercent = calculateLifeRemainingPercent(
-              item.totalHoursUsed,
-              item.expectedLifeHours
-            );
-
-            return (
-              <Link
-                key={item.id}
-                href={`/admin/inventory/${item.id}`}
-                className="group rounded-2xl border p-0 overflow-hidden transition-all"
-              >
-                {/* Foto */}
-                <div className="aspect-video relative overflow-hidden">
-                  {item.imageUrl ? (
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform"
-                      unoptimized={item.imageUrl.startsWith('data:') || item.imageUrl.includes('/api/uploads/')}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">
-                      {catConf.icon}
-                    </div>
-                  )}
-                  <span className={`absolute top-2 right-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text} admin-card-glass`}>
-                    {statusConf.label}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <code className="text-xs font-mono px-2 py-0.5 rounded">
-                      {item.code}
-                    </code>
-                    <span className="text-xs">{catConf.label}</span>
-                  </div>
-                  <p className="font-medium text-sm truncate">{item.name}</p>
-                  <div className="flex items-center justify-between text-xs">
-                    <span>{formatNumber(item.value)}€</span>
-                    <span>{item.totalHoursUsed}h</span>
-                  </div>
-                  {item.purchasePrice && (
-                    <p className="text-[11px]">
-                      Resten aprox. {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h útils
-                    </p>
-                  )}
-                  {/* Barra de vida */}
-                  <div className="h-1.5 w-full rounded-full bg-white/10">
-                    <div
-                      className={`h-1.5 rounded-full ${
-                        lifePercent > 40 ? 'bg-emerald-400' :
-                        lifePercent > 20 ? 'bg-amber-400' :
-                        lifePercent > 5 ? 'bg-orange-400' : 'bg-rose-400'
-                      }`}
-                      style={{ width: `${Math.max(lifePercent, 3)}%` }}
-                    />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </section>
+        <InventoryGridSection displayedItems={displayedItems} />
       ) : (
         <>
-        {/* Vista Llista — Targetes mòbil */}
-        <section className="lg:hidden space-y-3" data-help-title="Llistat mòbil d'inventari" data-help-desc="Cada targeta resumeix un equip i permet canviar-ne l'estat o obrir la fitxa completa des del mòbil.">
-          {displayedItems.map((item) => {
-            const catConf = getInventoryCategoryDisplay(item.category);
-            const statusConf = getInventoryStatusDisplay(item.status);
-            const condLabel = getInventoryConditionLabel(item.condition);
-
-            return (
-              <article
-                key={item.id}
-                className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
-              >
-                {/* Fila superior: nom/codi + valor/estat */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/admin/inventory/${item.id}`}
-                      className="font-medium text-sm leading-tight transition-colors block truncate"
-                    >
-                      {item.name}
-                    </Link>
-                    <code className="text-[11px] font-mono mt-0.5 inline-block opacity-60">
-                      {item.code}
-                    </code>
-                  </div>
-                  <div className="text-right shrink-0 space-y-1">
-                    <p className="text-sm font-semibold">{formatNumber(item.value)}€</p>
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
-                      {statusConf.label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Fila inferior: categoria, condició, watts, accions */}
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-2 min-w-0">
-                    <span className="inline-flex items-center gap-1 text-xs opacity-70">
-                      {catConf.icon} {catConf.label}
-                    </span>
-                    <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium">
-                      {condLabel}
-                    </span>
-                    {item.watts ? (
-                      <span className="text-[11px] opacity-60">{item.watts}W</span>
-                    ) : null}
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
-                    <select
-                      value={item.status}
-                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                      className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-[11px] font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}
-                    >
-                      {statuses.map((st) => (
-                        <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
-                      ))}
-                    </select>
-                    <Link
-                      href={`/admin/inventory/${item.id}`}
-                      className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-white/5 hover:bg-white/10"
-                    >
-                      Fitxa
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-
-        {/* Vista Llista — Taula escriptori */}
-        <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" data-help-title="Taula d'inventari" data-help-desc="Vista d'escriptori amb codi, categoria, valor, vida útil, estat i accés directe a la fitxa de cada element.">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm" aria-label="Inventari d'equipament">
-              <thead className="border-b">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Codi</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Nom</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Categoria</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Watts</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Valor</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Hores</th>
-                  <th scope="col" className="px-4 py-3 text-left font-medium">Estat</th>
-                  <th scope="col" className="px-4 py-3 text-right font-medium">Accions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y admin-tone-border-subtle">
-                {displayedItems.map((item) => {
-                  const catConf = getInventoryCategoryDisplay(item.category);
-                  const statusConf = getInventoryStatusDisplay(item.status);
-                  const tableLifePct = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
-
-                  return (
-                    <tr key={item.id} className="transition-colors hover:bg-white/[0.03]">
-                      <td className="px-4 py-3">
-                        <code className="text-xs font-mono px-2 py-1 rounded">
-                          {item.code}
-                        </code>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/inventory/${item.id}`}
-                          className="font-medium transition-colors"
-                        >
-                          {item.name}
-                        </Link>
-                        {item.description && (
-                          <p className="text-xs truncate max-w-[200px]">
-                            {item.description}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-xs">
-                        {catConf.icon} {catConf.label}
-                      </td>
-                      <td className="px-4 py-3">
-                        {item.watts ? `${item.watts}W` : '—'}
-                      </td>
-                      <td className="px-4 py-3">
-                        {formatNumber(item.value)}€
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="text-xs space-y-1">
-                          <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
-                          {item.purchasePrice && (
-                            <p>
-                              ↓ {Math.max(0, (item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS) - item.totalHoursUsed).toFixed(0)}h restants
-                            </p>
-                          )}
-                          <div className="h-1 w-full rounded-full bg-white/10 max-w-[80px]">
-                            <div
-                              className={`h-1 rounded-full ${
-                                tableLifePct > 40 ? 'bg-emerald-400' :
-                                tableLifePct > 20 ? 'bg-amber-400' :
-                                tableLifePct > 5 ? 'bg-orange-400' : 'bg-rose-400'
-                              }`}
-                              style={{ width: `${Math.max(tableLifePct, 5)}%` }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={item.status}
-                          onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}
-                        >
-                          {statuses.map((st) => (
-                            <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Link
-                          href={`/admin/inventory/${item.id}`}
-                          className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors"
-                        >
-                          Fitxa
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          <InventoryMobileListSection displayedItems={displayedItems} statuses={statuses} handleStatusChange={handleStatusChange} />
+          <InventoryDesktopTableSection displayedItems={displayedItems} statuses={statuses} handleStatusChange={handleStatusChange} />
         </>
       )}
-
       {displayedItems.length === 0 && (
-        <div className="rounded-2xl border admin-card-glass p-12 text-center">
-          <span className="text-4xl">📦</span>
-          <p className="mt-4">No hi ha elements que coincideixin amb els filtres</p>
-          {(search || filterCategory || filterStatus || healthFilter) && (
-            <button
-              type="button"
-              onClick={() => { setSearch(''); setSearchQuery(''); setFilterCategory(null); setFilterStatus(null); router.replace('/admin/inventory'); }}
-              className="mt-2 text-sm hover:underline"
-            >
-              Netejar filtres
-            </button>
-          )}
-        </div>
+        <InventoryEmptyState
+          hasFilters={Boolean(search || filterCategory || filterStatus || healthFilter)}
+          resetFilters={resetFilters}
+        />
       )}
     </AdminPage>
   );
 }
-
-
-
-
-
-
-
-
-

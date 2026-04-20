@@ -336,6 +336,15 @@
     "elegant": {
       "badge": "DJ · Lighting · Theming · Production",
       "badgeEmoji": "🎵",
+      "hook": {
+        "line1": "People don't remember the menu.",
+        "line2": "They remember the last song."
+      },
+      "tagline": {
+        "main": "WE CREATE MOMENTS",
+        "secondary": "FOR YOUR WEDDING.",
+        "everywhere": "EVERYWHERE."
+      },
       "title1": "WE TURN YOUR EVENT INTO",
       "title2": "SPECTACLE.",
       "rotatingTexts": [
@@ -406,29 +415,7 @@
       "weddings": "wedding services",
       "corporate": "Corporate events",
       "parties": "Parties and celebrations"
-    },
-    "rotatingHeadlines": [
-      {
-        "line1": "At 4am your mother-in-law",
-        "line2": "I DANCED BAREFOOT"
-      },
-      {
-        "line1": "The only DJ that guarantees you",
-        "line2": "EPIC PARTIES"
-      },
-      {
-        "line1": "We turn your event into",
-        "line2": "LEGEND"
-      },
-      {
-        "line1": "Don't hire a DJ",
-        "line2": "HIRE AN EXPERIENCE"
-      },
-      {
-        "line1": "Your wedding deserves",
-        "line2": "BE UNFORGETTABLE"
-      }
-    ]
+    }
   },
   "trust": {
     "headline": "+3 years creating unique experiences",
@@ -1538,15 +1525,6 @@
       "cookies": "Cookies Policy",
       "legalNotice": "Legal Notice"
     }
-  },
-  "nav": {
-    "home": "Start",
-    "services": "Services",
-    "portfolio": "Portfolio",
-    "contact": "Contact",
-    "configure": "Create event",
-    "requestQuote": "Request a quote",
-    "skip": "Skip to main content"
   },
   "bottomNav": {
     "home": "Start",
@@ -3019,6 +2997,10 @@
         "caps-mobils-extra": {
           "name": "Extra Moving Heads (x2)",
           "description": "2 additional LED moving heads to enhance the lighting"
+        },
+        "micro-inalambric": {
+          "name": "Wireless microphone",
+          "description": "For speeches, talks or ceremony"
         }
       },
       "from": "From",
@@ -3887,11 +3869,6 @@
       "contact": "Contact"
     }
   },
-  "error": {
-    "title": "something went wrong",
-    "description": "An unexpected error has occurred.",
-    "tryAgain": "try again"
-  },
   "extras": {
     "confetti": "confetti cannon",
     "co2": "CO2 cannon",
@@ -4570,6 +4547,27 @@
     "configurador": "Hello! I have configured a pack. Can we talk about availability?",
     "halloween": "Hello! I want information about Halloween parties",
     "experiencias": "Hello! I am interested in a personalized thematic experience"
+  },
+  "packsOffers": {
+    "earlyBird": {
+      "name": "Early booking",
+      "description": "Book today and save 10% on your pack",
+      "badge": "🔥 LIMITED OFFER"
+    },
+    "packsBadges": {
+      "mostPopular": "Most popular",
+      "premium": "Premium"
+    },
+    "combo": {
+      "name": "Full pack",
+      "description": "Book the 2 extras and save 10%",
+      "badge": "💎 COMBO"
+    },
+    "seasonal": {
+      "name": "Low season discount",
+      "description": "Events in low season get a discount",
+      "badge": "📅 SEASON"
+    }
   },
   "mobileLanding": {
     "heroSlides": {
@@ -6454,6 +6452,11 @@
   "mobileHero": {
     "ctaPacks": "See packs & pricing",
     "title": "WE CREATE MOMENTS",
+    "tagline": {
+      "main": "WE CREATE MOMENTS",
+      "secondary": "FOR YOUR WEDDING.",
+      "everywhere": "EVERYWHERE."
+    },
     "subtitle": "You enjoy. We handle everything.",
     "location": "Barcelona and Girona.",
     "scroll": "DISCOVER",
@@ -6823,5 +6826,148 @@
     "backHome": "Back to home",
     "viewPortfolio": "View portfolio",
     "spamNote": "Check your spam folder if you don't see our email in the next few hours"
+  },
+  "equipmentCatalog": {
+    "items": {
+      "ddj-rev7": {
+        "name": "Pioneer DDJ-REV7",
+        "description": "Professional Pioneer DJ controller with club-level motorized platters",
+        "specs": {
+          "channels": "2 channels",
+          "effects": "Professional with FX",
+          "connectivity": "USB, MIDI"
+        }
+      },
+      "ev-etx-12p": {
+        "name": "EV ETX 2000W",
+        "description": "Professional Electro-Voice speaker system with crystal-clear, powerful sound for any event",
+        "specs": {
+          "power": "2000W per unit (4000W total)",
+          "coverage": "Up to 150-200 people",
+          "type": "Professional active speaker"
+        }
+      },
+      "led-bash-bateria": {
+        "name": "Battery LED Bash",
+        "description": "Battery-powered LED fixtures ideal for cable-free lighting anywhere",
+        "specs": {
+          "type": "Battery RGB LED fixture",
+          "power": "High-power LED",
+          "modes": "Auto, sound, DMX",
+          "battery": "8-12 hour autonomy"
+        }
+      },
+      "multibos-led": {
+        "name": "Multibos LED",
+        "description": "Compact and versatile lighting system, perfect for small and medium events",
+        "specs": {
+          "type": "Complete lighting system",
+          "coverage": "Ideal for parties up to 50 people",
+          "modes": "Multiple automatic programs"
+        }
+      },
+      "cabezas-moviles-beam": {
+        "name": "Beam Moving Heads 150W LED",
+        "description": "Professional beam moving heads with spectacular light effects",
+        "specs": {
+          "power": "150W LED per unit",
+          "type": "Moving Head Beam",
+          "colors": "RGBW + color wheel",
+          "modes": "Auto, sound, DMX512"
+        }
+      },
+      "esferas-luz-calida": {
+        "name": "Warm Light Spheres",
+        "description": "Very warm and powerful light spheres, ideal for ambience and accent lighting",
+        "specs": {
+          "type": "Ambient lighting",
+          "power": "High power",
+          "color": "Warm light"
+        }
+      },
+      "maquina-humo-1800w": {
+        "name": "Smoke Machine 1800W",
+        "description": "Professional 1800W smoke machine for atmospheric effects. Included in all packs.",
+        "specs": {
+          "power": "1800W",
+          "output": "High smoke output",
+          "fluid": "Low-odor professional fluid",
+          "heatUpTime": "5 minutes"
+        }
+      },
+      "maquina-humo-bajo-3000w": {
+        "name": "Low Fog Machine 3000W",
+        "description": "3000W low fog machine for dramatic ground-level effects. Available as rental.",
+        "specs": {
+          "power": "3000W",
+          "type": "Low fog machine",
+          "coverage": "Ground-level fog effect",
+          "note": "RENTAL AVAILABLE - Price on request"
+        }
+      },
+      "cabina-dj": {
+        "name": "Professional DJ Booth",
+        "description": "Professional DJ booth with an elegant, functional presentation for any event",
+        "specs": {
+          "material": "Professional structure",
+          "includes": "Controller support + integrated lighting"
+        }
+      },
+      "microfono-inalambrico": {
+        "name": "Wireless Microphone",
+        "description": "Professional wireless microphone for speeches, ceremonies and karaoke",
+        "specs": {
+          "type": "Wireless",
+          "range": "Up to 100m",
+          "batteryLife": "8-10 hours"
+        }
+      },
+      "tripodes": {
+        "name": "Professional Tripods",
+        "description": "Professional tripods for lighting and effects",
+        "specs": {
+          "height": "Up to 3 meters",
+          "type": "T-bar stands",
+          "material": "Professional aluminum"
+        }
+      },
+      "cableado-profesional": {
+        "name": "Complete Professional Cabling",
+        "description": "Complete kit of certified professional cabling (audio, DMX, power)",
+        "specs": {
+          "includes": "XLR, DMX, Power, Audio",
+          "length": "Multiple lengths available"
+        }
+      },
+      "atrezzo-mon-magic": {
+        "name": "Magic World Themed Props",
+        "description": "Complete themed prop set inspired by a wizard school for unforgettable magical experiences",
+        "specs": {
+          "includes": "Complete themed decoration",
+          "theme": "Magic World"
+        }
+      },
+      "atrezzo-halloween": {
+        "name": "Halloween Themed Props",
+        "description": "Complete Halloween prop set for terrifyingly fun parties",
+        "specs": {
+          "includes": "Complete themed decoration",
+          "theme": "Halloween"
+        }
+      }
+    }
+  },
+  "siteConfig": {
+    "schedule": {
+      "weekdays": "Monday to Friday: 08:00 - 20:00",
+      "saturday": "Saturday: 08:00 - 20:00",
+      "sunday": "Sunday: 08:00 - 20:00",
+      "note": "Events 24/7 with prior booking",
+      "officeHours": "Every day from 08:00-20:00"
+    },
+    "stats": {
+      "yearsLabel": "Since 2023",
+      "responseTime": "2h"
+    }
   }
 }

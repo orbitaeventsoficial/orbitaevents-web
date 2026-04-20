@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import ImagePlacementCard from './ImagePlacementCard';
 import type { ImageManagerSection } from './image-manager-config';
 import type { PlacementRow } from './ImagePlacementCard';
@@ -54,6 +55,32 @@ export default function ImageManagerPage() {
     const manual = placements.filter((p) => p.override.mode === 'manual').length;
     return { total: placements.length, manual, auto: placements.length - manual };
   }, [placements]);
+  const filteredManual = useMemo(
+    () => filtered.filter((placement) => placement.override.mode === 'manual').length,
+    [filtered],
+  );
+  const coverageMode = stats.total === 0 ? 'default' : stats.manual > 0 ? 'warning' : 'success';
+  const sectionLabel =
+    activeSection === 'all'
+      ? 'Totes les seccions'
+      : sections.find((section) => section.id === activeSection)?.name || 'Secció activa';
+  const weakestLink = loading
+    ? 'Encara s’està carregant la monocapa visual del projecte.'
+    : error
+      ? 'Ara mateix hi ha un error de càrrega i el gestor no reflecteix l’estat real dels placements.'
+      : stats.manual > 0
+        ? `${stats.manual} placements depenen de override manual i convé revisar si encara cal mantenir-los fora de l’auto.`
+        : 'La cobertura actual viu tota dins de la jerarquia automàtica.';
+  const actionTitle = error
+    ? 'Recuperar primer la lectura real del gestor'
+    : filteredManual > 0
+      ? 'Revisar overrides manuals abans d’afegir més imatges'
+      : 'Governar la monocapa visual des de secció i cerca';
+  const actionDescription = error
+    ? 'Si el gestor no carrega bé, el següent pas útil no és tocar placements a cegues sinó recuperar la lectura real de dades.'
+    : filteredManual > 0
+      ? 'El millor retorn aquí és validar quins placements continuen necessitant override manual i quins poden tornar a la jerarquia automàtica.'
+      : 'Amb la base estable, el treball bo és ordenar per secció, cercar el placement correcte i mantenir la monocapa neta, no duplicar camins visuals.';
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -76,6 +103,41 @@ export default function ImageManagerPage() {
           </span>
         </div>
       </div>
+
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix la monocapa visual',
+          tone: coverageMode,
+          stats: [
+            { label: 'Placements', value: stats.total, hint: `${sections.length} seccions` },
+            { label: 'Manuals', value: stats.manual, tone: stats.manual > 0 ? 'warning' : 'success', hint: 'override explícit' },
+            { label: 'Auto', value: stats.auto, tone: stats.auto > 0 ? 'success' : 'default', hint: 'jerarquia automàtica' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de tocar imatges',
+          tone: error ? 'warning' : stats.manual > 0 ? 'warning' : 'info',
+          items: [
+            weakestLink,
+            `Secció activa: ${sectionLabel}. ${filtered.length} placements visibles amb el filtre actual.`,
+            search.trim()
+              ? `La cerca actual és "${search.trim()}" i està acotant el treball sobre el catàleg.`
+              : 'Sense cerca activa: el workspace està mostrant la cobertura completa del catàleg.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: error || filteredManual > 0 ? 'warning' : 'success',
+          secondaryPills: [
+            activeSection === 'all' ? 'Vista global' : sectionLabel,
+            search.trim() ? 'Cerca activa' : 'Sense cerca',
+          ],
+        }}
+      />
 
       <AdminHelpPanel
         title="Com funciona"

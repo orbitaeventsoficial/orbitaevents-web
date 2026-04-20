@@ -202,6 +202,24 @@ describe('runCommercialSequences', () => {
     );
   });
 
+
+  it('no executa nurturing si el lead ja ha respost després de l’últim outbound', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([
+      makeLead({
+        activities: [
+          { createdAt: new Date(Date.now() - 30 * 60 * 60 * 1000), metadata: { direction: 'inbound' } },
+          { createdAt: new Date(Date.now() - 40 * 60 * 60 * 1000), metadata: { direction: 'outbound' } },
+        ],
+      }),
+    ]);
+
+    const result = await runCommercialSequences();
+
+    expect(result.executed).toBe(0);
+    expect(result.skippedNotReady).toBe(1);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+    expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+  });
   it('compta errors sense parar', async () => {
     mockSendEmail.mockRejectedValue(new Error('SMTP down'));
     mockPrisma.lead.findMany.mockResolvedValue([makeLead(), makeLead({ id: 'lead-2' })]);

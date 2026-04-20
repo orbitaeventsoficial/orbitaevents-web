@@ -14,7 +14,7 @@ function buildLeadScoring(lead: {
   interestedPackId: string | null;
   source: string | null;
   eventType: string | null;
-}) {
+}, now: Date) {
   const scoring = scoreLead({
     status: lead.status,
     createdAt: lead.createdAt,
@@ -26,6 +26,7 @@ function buildLeadScoring(lead: {
     guestCount: lead.guestCount,
     interestedPackId: lead.interestedPackId,
     source: lead.source,
+    now,
   });
 
   const amount = estimateLeadAmount({ budget: lead.budget, eventType: lead.eventType });
@@ -34,13 +35,13 @@ function buildLeadScoring(lead: {
   return { scoring, weightedAmount };
 }
 
-export async function getAdminLeadScore(id: string) {
+export async function getAdminLeadScore(id: string, now: Date = new Date()) {
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) {
     return { status: 404, body: { ok: false, error: 'Lead no trobat' } };
   }
 
-  const { scoring, weightedAmount } = buildLeadScoring(lead);
+  const { scoring, weightedAmount } = buildLeadScoring(lead, now);
 
   return {
     status: 200,
@@ -56,13 +57,13 @@ export async function getAdminLeadScore(id: string) {
   };
 }
 
-export async function createAdminLeadScoreSnapshot(id: string) {
+export async function createAdminLeadScoreSnapshot(id: string, now: Date = new Date()) {
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) {
     return { status: 404, body: { ok: false, error: 'Lead no trobat' } };
   }
 
-  const { scoring, weightedAmount } = buildLeadScoring(lead);
+  const { scoring, weightedAmount } = buildLeadScoring(lead, now);
 
   await prisma.leadActivity.create({
     data: {

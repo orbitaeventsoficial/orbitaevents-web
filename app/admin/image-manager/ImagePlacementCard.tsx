@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 import type { ImagePlacementDefinition } from './image-manager-config';
 
 export type ImageManagerAssetClient = {
@@ -77,13 +78,13 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       });
       const data = await res.json();
       if (!data.ok) {
-        console.error('Error pujant imatge:', data.error);
+        log.error('Error pujant imatge', data.error);
         setLocalError(typeof data.error === 'string' ? data.error : 'No s ha pogut pujar la imatge');
         return;
       }
       onReload();
     } catch (err) {
-      console.error('Error pujant imatge:', err);
+      log.error('Error pujant imatge', err);
       setLocalError('Error pujant imatge');
     } finally {
       setUploading(false);
@@ -113,7 +114,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       setLocalError(null);
       onReload();
     } catch (err) {
-      console.error('Error eliminant asset:', err);
+      log.error('Error eliminant asset', err);
       setLocalError('Error eliminant asset');
     }
   }, [placement.key, onReload]);
@@ -128,7 +129,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       setLocalError(null);
       onReload();
     } catch (err) {
-      console.error('Error canviant a auto:', err);
+      log.error('Error canviant a auto', err);
       setLocalError('Error tornant a mode automatic');
     }
   }, [placement.key, onReload]);
@@ -147,7 +148,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       setLocalError(null);
       onReload();
     } catch (err) {
-      console.error('Error desant alt:', err);
+      log.error('Error desant alt', err);
       setLocalError('Error desant l alt');
     }
   }, [placement.key, isCollection, onReload]);
@@ -173,7 +174,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
       setLocalError(null);
       onReload();
     } catch (err) {
-      console.error('Error reordenant:', err);
+      log.error('Error reordenant', err);
       setLocalError('Error reordenant la colleccio');
     }
   }, [placement.key, items, onReload]);
@@ -227,12 +228,12 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                 <div className="flex gap-1">
                   {idx > 0 && (
                     <button type="button" onClick={() => handleMoveItem(item.id, -1)} className="rounded px-1.5 py-0.5 text-xs text-white/50 hover:bg-white/10" aria-label="Moure amunt">
-                      ←
+                      â†
                     </button>
                   )}
                   {idx < items.length - 1 && (
                     <button type="button" onClick={() => handleMoveItem(item.id, 1)} className="rounded px-1.5 py-0.5 text-xs text-white/50 hover:bg-white/10" aria-label="Moure avall">
-                      →
+                      â†’
                     </button>
                   )}
                 </div>
@@ -251,7 +252,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
                     className="rounded px-1.5 py-0.5 text-xs text-red-400/70 hover:bg-red-500/10"
                     aria-label="Eliminar"
                   >
-                    ✕
+                    âœ•
                   </button>
                 </div>
               </div>
@@ -283,7 +284,7 @@ export default function ImagePlacementCard({ placement, onReload }: Props) {
               className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-xs text-red-400 hover:bg-red-500/20"
               aria-label="Eliminar imatge"
             >
-              ✕
+              âœ•
             </button>
           </div>
           <div className="space-y-3">

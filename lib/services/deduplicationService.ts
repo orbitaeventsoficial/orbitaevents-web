@@ -12,6 +12,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import {
   normalizeEmail,
   normalizePhone,
@@ -62,20 +63,50 @@ export async function findDuplicates(
   input: CustomerInput,
   excludeId?: string
 ): Promise<DuplicateMatch[]> {
-  const matches: DuplicateMatch[] = [];
-
   // Normalitzar input
   const normalizedEmail = input.email ? normalizeEmail(input.email) : null;
   const normalizedPhone = input.phone ? normalizePhone(input.phone) : null;
   const normalizedName = input.name ? normalizeName(input.name) : null;
   const normalizedInstagram = input.instagram ? normalizeInstagram(input.instagram) : null;
 
-  // Obtenir tots els clients (exclou el propi si s'especifica)
-  const customers = await prisma.customer.findMany({
-    where: excludeId ? { id: { not: excludeId }, mergedIntoId: null } : { mergedIntoId: null },
+  // Construir OR conditions per trobar candidats a la BD (en lloc de carregar-los tots)
+  const orConditions: Prisma.CustomerWhereInput[] = [];
+
+  if (normalizedEmail) {
+    orConditions.push({ emailNormalized: normalizedEmail });
+  }
+  if (normalizedPhone) {
+    orConditions.push({ phoneNormalized: normalizedPhone });
+    // Telèfon parcial: últims 6 dígits
+    if (normalizedPhone.length >= 6) {
+      orConditions.push({ phoneNormalized: { endsWith: normalizedPhone.slice(-6) } });
+    }
+  }
+  if (normalizedInstagram) {
+    orConditions.push({ instagramNormalized: normalizedInstagram });
+  }
+  if (normalizedName) {
+    // Buscar per prefix del nom normalitzat (cobreix >70% similitud en la majoria de casos)
+    const namePrefix = normalizedName.slice(0, Math.max(3, Math.floor(normalizedName.length * 0.6)));
+    orConditions.push({ nameNormalized: { startsWith: namePrefix } });
+  }
+
+  // Si no tenim cap condició de cerca, no hi ha candidats
+  if (orConditions.length === 0) return [];
+
+  const baseWhere: Prisma.CustomerWhereInput = {
+    mergedIntoId: null,
+    ...(excludeId ? { id: { not: excludeId } } : {}),
+  };
+
+  const candidates = await prisma.customer.findMany({
+    where: { ...baseWhere, OR: orConditions },
+    take: 100, // Límit raonable per evitar problemes de memòria
   });
 
-  for (const customer of customers) {
+  const matches: DuplicateMatch[] = [];
+
+  for (const customer of candidates) {
     const reasons: MatchReason[] = [];
     let totalScore = 0;
 
@@ -124,7 +155,6 @@ export async function findDuplicates(
       const similarity = calculateSimilarity(normalizedName, customer.nameNormalized);
 
       if (similarity >= 0.9) {
-        // Molt similar (>90%)
         reasons.push({
           field: 'name',
           type: 'exact',
@@ -134,7 +164,6 @@ export async function findDuplicates(
         });
         totalScore += 70;
       } else if (similarity >= 0.7) {
-        // Similar (>70%)
         reasons.push({
           field: 'name',
           type: 'similar',
@@ -162,17 +191,15 @@ export async function findDuplicates(
       totalScore += 60;
     }
 
-    // Si hi ha algun match amb puntuació >= 40, afegir a la llista
     if (reasons.length > 0 && totalScore >= 40) {
       matches.push({
         customer,
-        matchScore: Math.min(totalScore, 100), // Max 100
+        matchScore: Math.min(totalScore, 100),
         matchReasons: reasons,
       });
     }
   }
 
-  // Ordenar per score descendent
   return matches.sort((a, b) => b.matchScore - a.matchScore);
 }
 
@@ -319,7 +346,7 @@ export async function mergeCustomers(
   await prisma.customerActivity.create({
     data: {
       customerId: primaryId,
-      action: 'CUSTOMERS_MERGED',
+      action: CUSTOMER_ACTIVITY_ACTIONS.CUSTOMERS_MERGED,
       details: {
         mergedIds: duplicateIds,
         fieldsUpdated,

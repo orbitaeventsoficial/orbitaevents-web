@@ -10,7 +10,6 @@ const { mockPrisma } = vi.hoisted(() => ({
     leadNote: { deleteMany: vi.fn() },
     leadActivity: { deleteMany: vi.fn() },
     task: { deleteMany: vi.fn() },
-    leadTask: { deleteMany: vi.fn() },
     leadDocument: { deleteMany: vi.fn() },
     $transaction: vi.fn(),
   },
@@ -54,6 +53,7 @@ describe('runLeadCleanup', () => {
     expect(result.autoDeleted).toBe(2);
     expect(mockPrisma.leadNote.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.leadActivity.deleteMany).toHaveBeenCalled();
+    expect(mockPrisma.task.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.lead.deleteMany).toHaveBeenCalledWith({
       where: { id: { in: ['old1', 'old2'] } },
     });

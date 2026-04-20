@@ -7,6 +7,7 @@ import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 import { applyBookingStatusSideEffects, type ManagedBookingStatus } from '@/lib/services/bookingStatusTransitionService';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
+import { mapAdminLogToCanonicalEvent } from '@/lib/services/timelineQueryService';
 
 type ExistingBookingRecord = {
   id: string;
@@ -225,6 +226,7 @@ export async function deleteBookingIfAllowed(existing: Pick<ExistingBookingRecor
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
+
 
 
 

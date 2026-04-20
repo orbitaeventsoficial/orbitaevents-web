@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { log } from '@/lib/logger';
 
 type LeadPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
@@ -30,7 +31,7 @@ export default function LeadQuickPriority({
       if (!res.ok) throw new Error();
       router.refresh();
     } catch (error) {
-      console.error('[LeadQuickPriority] Error canviant prioritat:', error);
+      log.error('[LeadQuickPriority] Error canviant prioritat', error);
       toast.error('Error canviant la prioritat');
     } finally {
       setSaving(false);

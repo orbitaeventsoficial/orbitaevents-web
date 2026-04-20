@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { normalizeDni } from '@/lib/utils/normalize';
 import { findDuplicates } from '@/lib/services/deduplicationService';
+import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 
 type CustomerCreateInput = {
   name?: string;
@@ -81,7 +82,7 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
     await tx.customerActivity.create({
       data: {
         customerId: created.id,
-        action: 'CUSTOMER_CREATED',
+        action: CUSTOMER_ACTIVITY_ACTIONS.CUSTOMER_CREATED,
         details: {
           source: customerSource,
           preferredLocale: preferredLocale || 'es',
@@ -94,7 +95,7 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
       await tx.customerActivity.create({
         data: {
           customerId: created.id,
-          action: 'INITIAL_NOTES',
+          action: CUSTOMER_ACTIVITY_ACTIONS.INITIAL_NOTES,
           details: { notes: initialNotes },
         },
       });
@@ -114,6 +115,7 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
         status: 'OPEN',
         priority: 'HIGH',
         createdBy: 'system:auto-customer-create',
+        source: TASK_SOURCE.CUSTOMER_CREATION,
       },
     });
 
@@ -136,7 +138,7 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
       await prisma.customerActivity.create({
         data: {
           customerId: customer.id,
-          action: 'DUPLICATE_WARNING',
+          action: CUSTOMER_ACTIVITY_ACTIONS.DUPLICATE_WARNING,
           details: {
             count: duplicateWarnings.length,
             topScore: duplicateWarnings[0]?.matchScore || 0,

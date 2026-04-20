@@ -3,7 +3,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
-import { LEAD_STATUS_VALUES, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { LEAD_STATUS_VALUES, PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 type LeadStatus = (typeof LEAD_STATUS_VALUES)[number];
 
@@ -120,7 +120,7 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
       await prisma.customerActivity.create({
         data: {
           customerId: linkedCustomerId,
-          action: 'LEAD_CONVERTED',
+          action: CUSTOMER_ACTIVITY_ACTIONS.LEAD_CONVERTED,
           details: {
             leadId: existingLead.id,
             fromStatus: existingLead.status,

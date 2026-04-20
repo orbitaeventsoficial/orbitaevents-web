@@ -24,6 +24,9 @@ const updateCustomerSchema = z.object({
   preferredLocale: z.enum(['ca', 'es', 'en']).optional(),
   gdprConsent: z.boolean().optional(),
   marketingConsent: z.boolean().optional(),
+  birthday: z.string().optional().nullable(),
+  referredById: z.string().optional().nullable(),
+  dni: z.string().optional().nullable(),
 });
 
 export async function GET(

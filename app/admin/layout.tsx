@@ -6,11 +6,13 @@ import Image from 'next/image';
 import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
+import { ADMIN_LAYOUT_HELP, helpAttrs } from './components/adminHelpContent';
 import { ToastProvider } from './components/ToastProvider';
-import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
-import { ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
+import { getPriorityItems, NAV_SECTIONS, type NavSection } from './components/nav-items';
+import { ADMIN_CHANGE_COUNTER, ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
+import { log } from '@/lib/logger';
 import './admin-theme.css';
 import './control-room.css';
 
@@ -23,7 +25,7 @@ const AdminHelpOverlay = dynamicImport(() => import('./components/AdminHelpOverl
 
 
 /**
- * 🎨 ADMIN LAYOUT - Òrbita Events
+ * ORBITA ADMIN LAYOUT - shell principal del panel admin de Orbita Events
  * Estil sobri i professional amb focus en llegibilitat
  * Mobile-first design amb bottom navigation
  */
@@ -55,7 +57,7 @@ function FloatingAddButton() {
   }, [open]);
 
   return (
-    <div ref={ref} className="fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
+    <div ref={ref} className="fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6" {...helpAttrs(ADMIN_LAYOUT_HELP.quickActionsGroup)}>
       {open && (
         <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-2">
           {ADMIN_FAB_ITEMS.map((item) => (
@@ -64,6 +66,8 @@ function FloatingAddButton() {
               href={item.href}
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-black/80 px-4 py-2.5 text-sm font-medium text-white/90 shadow-lg backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
+              data-help-title={item.label}
+              {...helpAttrs('description' in item && typeof item.description === 'string' ? { title: item.label, desc: item.description } : undefined)}
             >
               <span className="text-base">{item.icon}</span>
               <span>{item.label}</span>
@@ -78,6 +82,7 @@ function FloatingAddButton() {
         aria-label="Accions rapides"
         aria-expanded={open}
         className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${open ? 'bg-white/20 rotate-45' : 'bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400'}`}
+        {...helpAttrs(ADMIN_LAYOUT_HELP.quickActionsFab)}
       >
         <span className="text-2xl font-bold text-white transition-transform">+</span>
       </button>
@@ -121,8 +126,7 @@ function SidebarItem({
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
       aria-current={isActive ? 'page' : undefined}
-      data-help-title={label}
-      data-help-desc={description || undefined}
+      {...helpAttrs(description ? { title: label, desc: description } : undefined)}
       className={`admin-nav-item ${isActive ? 'admin-nav-item--active' : 'admin-nav-item--idle'}`}
     >
       {isActive && (
@@ -174,16 +178,17 @@ function SidebarSection({
         type="button"
         onClick={toggle}
         className="admin-nav-section-btn"
+        {...helpAttrs(ADMIN_LAYOUT_HELP.navSection(title))}
       >
         <span>{title}</span>
-        <span className={`admin-nav-section-caret ${open ? 'admin-nav-section-caret--open' : ''}`}>⌄</span>
+        <span className={`admin-nav-section-caret ${open ? 'admin-nav-section-caret--open' : ''}`}>▾</span>
       </button>
       {open && <div className="admin-nav-section-content">{children}</div>}
     </div>
   );
 }
 
-// Bottom Navigation Item para móvil
+// Bottom navigation item per a mòbil
 function BottomNavItem({
   icon,
   label,
@@ -207,8 +212,7 @@ function BottomNavItem({
       prefetch={false}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
-      data-help-title={label}
-      data-help-desc={description || undefined}
+      {...helpAttrs(description ? { title: label, desc: description } : undefined)}
       className={`admin-bottom-nav-item ${isActive ? 'admin-bottom-nav-item--active' : 'admin-bottom-nav-item--idle'}`}
     >
       <span className="admin-bottom-nav-icon-wrap">
@@ -247,7 +251,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [managedAppleTouchIconSrc, setManagedAppleTouchIconSrc] = useState('/apple-touch-icon.png');
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
-  const { newLeadsCount, totalCount: notificationsCount } = useAdminAlerts();
+  const {
+    newLeadsCount,
+    inboxUnreadCount,
+    packPriceAlertsCount,
+    financeAlertsCount,
+    totalCount: notificationsCount,
+  } = useAdminAlerts();
   useCsrfFetch();
 
   const loadAdminCss = useCallback(async () => {
@@ -259,7 +269,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         setCustomAdminCss(data.css);
       }
     } catch (error) {
-      console.warn("No s'ha pogut carregar el CSS admin personalitzat", error);
+      log.warn("No s'ha pogut carregar el CSS admin personalitzat", { error: error instanceof Error ? error.message : String(error) });
     }
   }, []);
 
@@ -284,7 +294,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           setManagedAppleTouchIconSrc(managedAppleTouchIcon);
         }
       } catch (error) {
-        console.warn("No s'ha pogut carregar els assets de marca de l'admin", error);
+        log.warn("No s'ha pogut carregar els assets de marca de l'admin", { error: error instanceof Error ? error.message : String(error) });
       }
     }
 
@@ -313,17 +323,17 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     if (isLocalhost) {
       navigator.serviceWorker.getRegistrations()
         .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
-        .catch((error) => { console.warn("No s'han pogut netejar els service workers locals", error); });
+        .catch((error) => { log.warn("No s'han pogut netejar els service workers locals", { error: error instanceof Error ? error.message : String(error) }); });
       return;
     }
 
     navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.warn("No s'ha pogut registrar el service worker admin", error);
+      log.warn("No s'ha pogut registrar el service worker admin", { error: error instanceof Error ? error.message : String(error) });
     });
   }, []);
 
   useEffect(() => {
-    const criticalRoutes = ['/admin/leads', '/admin/bookings', '/admin/tasks', '/admin/economia', '/admin/catalog'];
+    const criticalRoutes = ['/admin/leads', '/admin/clientes', '/admin/bookings', '/admin/tasks', '/admin/inbox'];
     const run = () => criticalRoutes.forEach((href) => router.prefetch(href));
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
@@ -357,7 +367,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      // Ctrl/Cmd+K → Cercador
+      if (helpModeEnabled) {
+        if (event.key === 'Escape') return;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      // Ctrl/Cmd+K obre el cercador
       const isK = event.key.toLowerCase() === 'k';
       if ((event.metaKey || event.ctrlKey) && isK) {
         event.preventDefault();
@@ -365,7 +382,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Alt+número → navegació ràpida
+      // Alt+numero obre navegacio rapida
       if (event.altKey && !event.ctrlKey && !event.metaKey) {
         const target = ADMIN_SHORTCUT_ROUTES[event.key.toLowerCase()];
         if (target) {
@@ -373,20 +390,63 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           router.push(target);
           return;
         }
-        // Alt+N → obrir FAB (simula click)
+        // Alt+N obre el FAB (simula click)
         if (event.key.toLowerCase() === 'n') {
           event.preventDefault();
-          const fab = document.querySelector('[aria-label="Accions ràpides"]') as HTMLButtonElement | null;
+          const fab = document.querySelector('[aria-label="Accions rapides"]') as HTMLButtonElement | null;
           fab?.click();
         }
       }
     };
-    window.addEventListener('keydown', handleShortcut);
-    return () => window.removeEventListener('keydown', handleShortcut);
-  }, [router]);
+    window.addEventListener('keydown', handleShortcut, true);
+    return () => window.removeEventListener('keydown', handleShortcut, true);
+  }, [helpModeEnabled, router]);
 
   const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
-  const navSections = NAV_SECTIONS;
+  const navSections = useMemo<NavSection[]>(() => NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.map((item) => {
+      if (item.href !== '/admin/inbox') return item;
+      if (inboxUnreadCount > 0) {
+        return { ...item, badge: String(inboxUnreadCount), badgeColor: 'red' };
+      }
+      return { ...item, badge: 'IMAP', badgeColor: 'blue' };
+    }),
+  })), [inboxUnreadCount]);
+
+  const notificationsLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (newLeadsCount > 0) parts.push(`${newLeadsCount} entrades noves`);
+    if (inboxUnreadCount > 0) parts.push(`${inboxUnreadCount} correus no llegits`);
+    if (packPriceAlertsCount > 0) parts.push(`${packPriceAlertsCount} alertes de preus`);
+    if (financeAlertsCount > 0) parts.push(`${financeAlertsCount} alertes de finances`);
+    if (notificationsCount === 0) return 'Notificacions';
+    return `Notificacions: ${parts.join(' · ') || `${notificationsCount} pendents`}`;
+  }, [financeAlertsCount, inboxUnreadCount, newLeadsCount, notificationsCount, packPriceAlertsCount]);
+
+  const notificationBreakdown = useMemo(() => {
+    const items: Array<{
+      key: string;
+      label: string;
+      shortLabel: string;
+      count: number;
+      tone: 'lead' | 'mail' | 'risk';
+    }> = [];
+
+    if (newLeadsCount > 0) {
+      items.push({ key: 'lead', label: 'Entrades noves', shortLabel: 'Leads', count: newLeadsCount, tone: 'lead' });
+    }
+    if (inboxUnreadCount > 0) {
+      items.push({ key: 'mail', label: 'Correus no llegits', shortLabel: 'Mail', count: inboxUnreadCount, tone: 'mail' });
+    }
+
+    const riskCount = packPriceAlertsCount + financeAlertsCount;
+    if (riskCount > 0) {
+      items.push({ key: 'risk', label: 'Alertes crítiques', shortLabel: 'Risc', count: riskCount, tone: 'risk' });
+    }
+
+    return items;
+  }, [financeAlertsCount, inboxUnreadCount, newLeadsCount, packPriceAlertsCount]);
 
   const isActive = useCallback((href: string): boolean => {
     return href === '/admin' ? pathname === '/admin' : (pathname?.startsWith(href) ?? false);
@@ -396,7 +456,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     router.prefetch(href);
   }, [router]);
 
-  // Obtenir nom de la pàgina actual per al breadcrumb
+  // Obtenir nom de la pagina actual per al breadcrumb
   const getPageName = useCallback(() => {
     if (!pathname) return 'Tauler';
     const segments = pathname.split('/').filter(Boolean);
@@ -434,7 +494,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* PWA head tags — Next.js App Router hoists these to <head> */}
+      {/* PWA head tags: Next.js App Router els puja a head */}
       <link rel="manifest" href="/manifest.webmanifest" />
       <meta name="theme-color" content="#121417" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -525,7 +585,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           aria-label="Obrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
-          className="admin-icon-btn admin-icon-btn--left"
+          className="admin-icon-btn admin-icon-btn--left" {...helpAttrs(ADMIN_LAYOUT_HELP.menuButton)}
         >
           <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -539,12 +599,22 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <span className="admin-mobile-subtitle">{getPageName()}</span>
         </div>
 
+        <div
+          aria-label={`Canvi número ${ADMIN_CHANGE_COUNTER}`}
+          title={`Canvi #${ADMIN_CHANGE_COUNTER}`}
+          className="admin-change-counter-chip admin-change-counter-chip--mobile"
+        >
+          <span className="admin-change-counter-chip-label">Canvi</span>
+          <span className="admin-change-counter-chip-value">#{ADMIN_CHANGE_COUNTER}</span>
+        </div>
+
         <div className="admin-mobile-actions">
           <button
             type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
-            className={`admin-help-btn ${
+            {...helpAttrs(ADMIN_LAYOUT_HELP.helpToggle)}
+            className={`admin-help-btn relative z-[80] ${
               helpModeEnabled
                 ? 'admin-help-btn--active'
                 : 'admin-help-btn--idle'
@@ -552,29 +622,40 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             aria-label="Activar o desactivar mode ajuda"
             aria-pressed={helpModeEnabled}
           >
-            ❓ Ajuda
+            Ajuda
           </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
             className="admin-icon-btn"
             aria-label="Cercar (Ctrl+K)"
+            {...helpAttrs(ADMIN_LAYOUT_HELP.search)}
           >
-            🔍
+            ⌕
           </button>
           <Link
             href="/admin/settings/notifications"
             className="admin-icon-btn admin-icon-btn--notif"
-            aria-label="Notificacions"
+            aria-label={notificationsLabel}
+            {...helpAttrs(ADMIN_LAYOUT_HELP.notifications)}
           >
             <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notificationsCount > 0 && (
-              <span className="admin-notif-dot" />
+              <span className="admin-notif-dot">{notificationsCount > 99 ? '99+' : notificationsCount}</span>
             )}
           </Link>
         </div>
+        {notificationBreakdown.length > 0 && (
+          <div className="admin-header-alert-strip admin-header-alert-strip--mobile" aria-label={notificationsLabel}>
+            {notificationBreakdown.map((item) => (
+              <span key={item.key} className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}>
+                <strong>{item.count}</strong> {item.shortLabel}
+              </span>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Mobile Sidebar Overlay - Con animación */}
@@ -616,6 +697,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 aria-label="Tancar menú admin"
                 onClick={() => setSidebarOpen(false)}
                 className="admin-icon-btn"
+                {...helpAttrs(ADMIN_LAYOUT_HELP.closeMenu)}
               >
                 <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -668,6 +750,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
                 className="admin-mobile-sidebar-foot-link"
+                {...helpAttrs(ADMIN_LAYOUT_HELP.settings)}
               >
                 <div className="admin-mobile-sidebar-foot-avatar">
                   A
@@ -692,51 +775,85 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <span className="admin-desktop-breadcrumb-sep">/</span>
           <span className="admin-desktop-breadcrumb-current">{getPageName()}</span>
         </div>
+        <div
+          aria-label={`Canvi número ${ADMIN_CHANGE_COUNTER}`}
+          title={`Canvi #${ADMIN_CHANGE_COUNTER}`}
+          className="admin-change-counter-chip admin-change-counter-chip--desktop"
+        >
+          <span className="admin-change-counter-chip-label">Canvi</span>
+          <span className="admin-change-counter-chip-value">#{ADMIN_CHANGE_COUNTER}</span>
+        </div>
         <div className="admin-desktop-actions">
+          {notificationBreakdown.length > 0 && (
+            <div className="admin-header-alert-strip" aria-label={notificationsLabel}>
+              {notificationBreakdown.map((item) => (
+                <span
+                  key={item.key}
+                  className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}
+                  title={`${item.label}: ${item.count}`}
+                >
+                  <strong>{item.count}</strong> {item.shortLabel}
+                </span>
+              ))}
+            </div>
+          )}
           <button
             type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
-            className={`admin-help-btn ${
+            className={`admin-help-btn relative z-[80] ${
               helpModeEnabled
                 ? 'admin-help-btn--active'
                 : 'admin-help-btn--idle'
             }`}
             aria-pressed={helpModeEnabled}
             aria-label="Activar o desactivar mode ajuda"
+            {...helpAttrs(ADMIN_LAYOUT_HELP.helpToggle)}
           >
-            ❓ Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
+            Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
           </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
             className="admin-desktop-search-btn"
             aria-label="Cercar (Ctrl+K)"
+            {...helpAttrs(ADMIN_LAYOUT_HELP.search)}
           >
-            🔍 Cercar
-            <span className="admin-desktop-kbd">Ctrl/⌘K</span>
+            Cercar
+            <span className="admin-desktop-kbd">Ctrl/Cmd+K</span>
+            <span className="admin-desktop-search-icon">⌕</span>
           </button>
           <Link
             href="/admin/settings/notifications"
             className="admin-icon-btn admin-icon-btn--notif"
-            aria-label="Notificacions"
+            aria-label={notificationsLabel}
+            {...helpAttrs(ADMIN_LAYOUT_HELP.notifications)}
           >
             🔔
             {notificationsCount > 0 && (
-              <span className="admin-notif-dot" />
+              <span className="admin-notif-dot">{notificationsCount > 99 ? '99+' : notificationsCount}</span>
             )}
           </Link>
           <div className="admin-desktop-sep" />
           <Link
             href="/admin/settings"
             className="admin-desktop-user"
+            {...helpAttrs(ADMIN_LAYOUT_HELP.settings)}
           >
-            <div className="admin-desktop-user-avatar">
-              A
-            </div>
+            <div className="admin-desktop-user-avatar">A</div>
             <span className="admin-desktop-user-label">Admin</span>
+            <span className="admin-desktop-user-subtitle">Configuració</span>
           </Link>
         </div>
+        {notificationBreakdown.length > 0 && (
+          <div className="admin-header-alert-strip admin-header-alert-strip--mobile" aria-label={notificationsLabel}>
+            {notificationBreakdown.map((item) => (
+              <span key={item.key} className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}>
+                <strong>{item.count}</strong> {item.shortLabel}
+              </span>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -758,7 +875,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               label={item.label}
               href={item.href}
               description={'description' in item && typeof item.description === 'string' ? item.description : undefined}
-              isActive={item.href === '/admin' ? pathname === '/admin' : pathname?.startsWith(item.href) || false}
+              isActive={pathname?.startsWith(item.href) || false}
               badge={'badgeKey' in item && item.badgeKey === 'newLeads' ? newLeadsCount : undefined}
               onPrefetch={prefetchRoute}
             />
@@ -768,7 +885,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             onClick={() => setSidebarOpen(true)}
             className="admin-bottom-nav-item admin-bottom-nav-item--idle"
           >
-            <span className="admin-bottom-nav-icon-wrap">☰</span>
+            <span className="admin-bottom-nav-icon-wrap">⋯</span>
             <span className="admin-bottom-nav-label">Més</span>
           </button>
         </div>
@@ -779,21 +896,5 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

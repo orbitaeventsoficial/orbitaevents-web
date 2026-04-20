@@ -119,6 +119,48 @@ describe('syncBookingToGoogleCalendar', () => {
     delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   });
 
+  it('inclou alarmes pròpies al payload de l\'event', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue(mockBooking);
+    mockPrisma.setting.findMany.mockResolvedValue([
+      { key: 'integrations.googleCalendar.refreshToken', value: 'rt123' },
+      { key: 'integrations.googleCalendar.calendarId', value: 'cal1' },
+    ]);
+
+    let capturedPayload: Record<string, unknown> | undefined;
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ access_token: 'at123' }),
+      })
+      .mockImplementationOnce((_url, init) => {
+        capturedPayload = JSON.parse(String((init as RequestInit).body));
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 'gcal-event-2' }),
+        });
+      });
+
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'test-id';
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET = 'test-secret';
+
+    await syncBookingToGoogleCalendar('b1');
+
+    expect(capturedPayload).toBeDefined();
+    const reminders = capturedPayload!.reminders as { useDefault: boolean; overrides: Array<{ method: string; minutes: number }> };
+    expect(reminders.useDefault).toBe(false);
+    expect(reminders.overrides).toHaveLength(4);
+    expect(reminders.overrides[0]).toEqual({ method: 'popup', minutes: 7 * 24 * 60 });
+    expect(reminders.overrides[1]).toEqual({ method: 'popup', minutes: 24 * 60 });
+    expect(reminders.overrides[2]).toEqual({ method: 'email', minutes: 24 * 60 });
+    expect(reminders.overrides[3]).toEqual({ method: 'popup', minutes: 2 * 60 });
+
+    // Descripció inclou resum d'alarmes
+    expect(capturedPayload!.description).toContain('Alarmes:');
+
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  });
+
   it('elimina event del calendari per reserva CANCELLED', async () => {
     mockPrisma.booking.findUnique.mockResolvedValue({ ...mockBooking, status: 'CANCELLED' });
     mockPrisma.setting.findMany.mockResolvedValue([

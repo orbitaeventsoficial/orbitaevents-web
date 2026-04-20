@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
+import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { DEFAULT_VEHICLE_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { useToast } from '../components/ToastProvider';
 import BookingPricingSummary from './BookingPricingSummary';
@@ -31,6 +32,7 @@ export default function NewBookingForm() {
   const leadId = searchParams?.get('leadId') ?? null;
   const customerId = searchParams?.get('customerId') ?? null;
   const dateParam = searchParams?.get('date') ?? null;
+  const customerHubBookingsHref = customerId ? buildCustomerWorkspaceTabHref(customerId, 'bookings') : '/admin/bookings';
 
   const { form, setForm, packs, extras, loading, leadData, fuelReferenceInfo } = useNewBookingInitialData({ leadId, dateParam });
   const [selectedExtras, setSelectedExtras] = useState<BookingSelectedExtras>({});
@@ -123,7 +125,7 @@ export default function NewBookingForm() {
     <AdminPage
       title="Nova reserva"
       subtitle={leadData ? `Des de l'entrada de ${leadData.name}` : 'Crear una reserva manualment'}
-      back={{ href: '/admin/bookings', label: 'Reserves' }}
+      back={{ href: customerHubBookingsHref, label: customerId ? 'Client' : 'Reserves' }}
       className="max-w-5xl"
     >
       {error && (
@@ -210,7 +212,7 @@ export default function NewBookingForm() {
           {submitting ? 'Creant reserva...' : 'Crear reserva'}
         </button>
         <Link
-          href="/admin/bookings"
+          href={customerHubBookingsHref}
           className="ap-btn ap-btn--secondary px-4 py-3 text-sm"
         >
           Cancel·lar

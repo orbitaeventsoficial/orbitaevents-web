@@ -1,0 +1,52 @@
+import { NextRequest } from 'next/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { mockRequireAuth, mockSendAdminEmail } = vi.hoisted(() => ({
+  mockRequireAuth: vi.fn(),
+  mockSendAdminEmail: vi.fn(),
+}));
+
+vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/services/adminEmailSendService', () => ({ sendAdminEmail: mockSendAdminEmail }));
+vi.mock('@/lib/logger', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
+
+import { POST } from '@/app/api/admin/emails/send/route';
+
+function makeReq(body: Record<string, unknown>) {
+  return new NextRequest('http://localhost/api/admin/emails/send', {
+    method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+describe('POST /api/admin/emails/send', () => {
+  beforeEach(() => { vi.clearAllMocks(); mockRequireAuth.mockReturnValue(null); mockSendAdminEmail.mockResolvedValue({ status: 200, body: { ok: true } }); });
+
+  it('rebutja sense auth', async () => {
+    mockRequireAuth.mockReturnValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }));
+    expect((await POST(makeReq({}))).status).toBe(401);
+  });
+
+  it('envia email correctament', async () => {
+    const res = await POST(makeReq({ to: 'a@b.cat', subject: 'Hola' }));
+    expect(res.status).toBe(200);
+    expect(mockSendAdminEmail).toHaveBeenCalledWith({ to: 'a@b.cat', subject: 'Hola' });
+  });
+
+  it('passthrough status del servei', async () => {
+    mockSendAdminEmail.mockResolvedValueOnce({ status: 400, body: { error: 'Missing to' } });
+    const res = await POST(makeReq({}));
+    expect(res.status).toBe(400);
+  });
+
+  it('retorna 504 si timeout SMTP', async () => {
+    mockSendAdminEmail.mockRejectedValueOnce(new Error('Connection timeout'));
+    const res = await POST(makeReq({ to: 'a@b.cat' }));
+    expect(res.status).toBe(504);
+  });
+
+  it('retorna 500 si error genèric', async () => {
+    mockSendAdminEmail.mockRejectedValueOnce(new Error('Unknown'));
+    const res = await POST(makeReq({ to: 'a@b.cat' }));
+    expect(res.status).toBe(500);
+  });
+});

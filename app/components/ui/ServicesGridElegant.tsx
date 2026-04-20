@@ -4,7 +4,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { Link, useRouter } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, useCallback } from 'react';
-import { PUBLIC_SERVICES_GRID_PILLARS } from '@/lib/constants';
+import { PUBLIC_HOME_SHOWCASE_PILLARS } from '@/lib/publicHomeShowcase';
 
 // ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
 
@@ -63,7 +63,7 @@ export default function ServicesGridElegant() {
   }, [focusedCard, router]);
 
   const pillarIcons = { dj: IconDJ, theme: IconTheme, production: IconProduction } as const;
-  const pillars = PUBLIC_SERVICES_GRID_PILLARS.map((pillar) => ({ ...pillar, Icon: pillarIcons[pillar.iconKey] }));
+  const pillars = PUBLIC_HOME_SHOWCASE_PILLARS.map((pillar) => ({ ...pillar, Icon: pillarIcons[pillar.iconKey] }));
 
   return (
     <section ref={sectionRef} className="py-16 md:py-24 bg-bg-main relative overflow-hidden">

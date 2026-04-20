@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 const EXAMPLE_CSS = `/* Exemple: admin pastel i semàfors */
@@ -361,6 +362,24 @@ export default function AdminCssManagerPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const cssLines = css.trim() ? css.split('\n').length : 0;
+  const cssChars = css.length;
+  const hasCustomCss = css.trim().length > 0;
+  const workspaceTone = loading ? 'default' : hasCustomCss ? 'success' : 'warning';
+  const actionTitle = loading
+    ? 'Esperar la càrrega abans d’editar el panell'
+    : saving
+      ? 'Deixar que el CSS es desi i s’apliqui en viu'
+      : hasCustomCss
+        ? 'Refinar el tema viu sense trencar la monocapa'
+        : 'Carregar una base abans de tocar el panell';
+  const actionDescription = loading
+    ? 'Sense la lectura real del CSS actual no toca editar a cegues.'
+    : saving
+      ? 'Ara mateix el sistema està persistint el tema i aplicant-lo al panell admin.'
+      : hasCustomCss
+        ? 'El millor retorn aquí és ajustar el tema actual o partir d’una paleta coherent, no acumular proves inconnexes.'
+        : 'Si encara no hi ha CSS propi, el pas bo és carregar un exemple o una paleta per establir una base editable.';
 
   function applyLiveCss(nextCss: string) {
     if (typeof document === 'undefined') return;
@@ -423,6 +442,47 @@ export default function AdminCssManagerPage() {
 
   return (
     <AdminPage title="CSS Manager" subtitle="Editor de CSS del panell admin. S'aplica en viu a tot /admin." className="admin-css-manager-page">
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura',
+          title: 'Quin estat té ara mateix el tema visual de l’admin',
+          tone: workspaceTone,
+          stats: [
+            { label: 'CSS propi', value: hasCustomCss ? 'Sí' : 'No', tone: hasCustomCss ? 'success' : 'warning', hint: 'tema carregat' },
+            { label: 'Línies', value: cssLines, hint: 'bloc actual' },
+            { label: 'Paletes', value: PALETTES.length, hint: 'bases suggerides' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Què convé revisar abans de tocar el tema',
+          tone: loading ? 'default' : saving || !hasCustomCss ? 'warning' : 'info',
+          items: [
+            loading
+              ? 'El gestor encara està carregant el CSS actiu del panell.'
+              : hasCustomCss
+                ? `Hi ha ${cssChars} caràcters de CSS actiu preparats per editar i aplicar en viu.`
+                : 'Encara no hi ha CSS propi guardat per a l’admin.',
+            saving
+              ? 'Hi ha un desat en curs i convé no encadenar més canvis fins que acabi.'
+              : 'L’editor aplica el canvi en viu al mateix panell admin mentre treballes.',
+            msg
+              ? `Últim missatge del workspace: ${msg}`
+              : 'Sense missatge recent: el workspace està en estat neutre.',
+          ],
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          tone: loading || saving || !hasCustomCss ? 'warning' : 'success',
+          secondaryPills: [
+            hasCustomCss ? 'Tema viu' : 'Sense base',
+            saving ? 'Desant' : 'Sessió estable',
+          ],
+        }}
+        className="mb-6"
+      />
 
       <section className="admin-css-panel rounded-2xl border p-5">
         <div className="mb-3 flex items-center justify-between">

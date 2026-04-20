@@ -24,12 +24,13 @@ import { useAnalytics } from '@/lib/hooks/useAnalytics';
 import { useBookedDates } from '@/lib/hooks/useBookedDates';
 import { useConfiguratorExtras } from '@/lib/hooks/useConfiguratorExtras';
 import { useConfiguratorLeadForm } from '@/lib/hooks/useConfiguratorLeadForm';
+import { useUtmParams } from '@/lib/hooks/useUtmParams';
 import { usePacks } from '@/lib/hooks/usePacks';
 import { filterCompatibleExtras } from '@/lib/extrasCompatibility';
 // jspdf carrega lazy — només quan l'usuari clica "Descarregar PDF"
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 import { toIntlLocale } from '@/lib/constants';
-import { getWhatsAppUrl } from '@/config/site-config';
+import { getLocalizedWhatsAppUrl } from '@/config/site-config';
 
 import { type EventType, type ConfigState, type AppliedDiscountCode, type PricingSummary, type ClosingPricingSummary, EVENT_TYPE_SERVICE_MAP, EVENT_TYPE_CARDS, EVENT_AMBIENTS, getPacksForEventType, getMinPriceForEventType, calculatePricingSummary, calculateClosingPricing, toggleExtraSelection, filterUnavailableExtras, getSelectedExtraNames } from './configurador-utils';
 
@@ -114,6 +115,7 @@ function Step4SuccessCard({
 
 interface Step4LeadFormProps {
   t: ConfiguratorTranslations;
+  locale: 'ca' | 'es' | 'en';
   formData: { name: string; contact: string };
   formError: string;
   sending: boolean;
@@ -131,6 +133,7 @@ interface Step4LeadFormProps {
 
 function Step4LeadForm({
   t,
+  locale,
   formData,
   formError,
   sending,
@@ -238,7 +241,7 @@ function Step4LeadForm({
       <div className="text-center pt-4 border-t border-border">
         <p className="text-xs text-text-muted mb-2">{t('step4.preferWhatsApp')}</p>
         <a
-          href={getWhatsAppUrl('configurador', { packName: packName ?? undefined, precio: finalPrice })}
+          href={getLocalizedWhatsAppUrl(locale, 'configurador', { packName: packName ?? undefined, precio: finalPrice })}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] transition-colors"
@@ -421,6 +424,7 @@ export default function ConfiguradorClient() {
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const dateLocale = toIntlLocale(locale);
   const { track } = useAnalytics();
+  const utmParams = useUtmParams();
   const fallbackPacks = useMemo(() => getAllPacks(), []);
   const { packs: allPacks } = usePacks({
     locale,
@@ -451,7 +455,7 @@ export default function ConfiguradorClient() {
   const isDateBooked = selectedDate ? bookedDates.has(selectedDate) : false;
   const trimmedDiscountCode = discountCodeInput.trim();
   const discountCodeReason = appliedDiscountCode ? t('step3.discountCodeReason', { code: appliedDiscountCode.code }) : '';
-  const pricing = useMemo(() => calculatePricingSummary(config, extrasCatalog, appliedDiscountCode, discountCodeReason), [config, extrasCatalog, appliedDiscountCode, discountCodeReason]);
+  const pricing = useMemo(() => calculatePricingSummary(config, extrasCatalog, appliedDiscountCode, discountCodeReason, locale), [config, extrasCatalog, appliedDiscountCode, discountCodeReason, locale]);
   const closingPricing = useMemo(() => calculateClosingPricing(pricing), [pricing]);
   const earlyBirdDiscount = closingPricing.earlyBirdDiscount;
   const finalPrice = closingPricing.finalPrice;
@@ -1037,6 +1041,7 @@ export default function ConfiguradorClient() {
       guests: config.guests,
       extras: getSelectedExtraNames(config.extras, extrasCatalog),
       turnstileToken: token,
+      ...utmParams,
     }),
     onSuccess: () => {
       track('Configurador_DirectSubmit_Success', {
@@ -1111,6 +1116,7 @@ export default function ConfiguradorClient() {
         ) : (
           <Step4LeadForm
             t={t}
+            locale={locale}
             formData={formData}
             formError={formError}
             sending={sending}
@@ -1242,6 +1248,11 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
+
+
+
+
+
 
 
 

@@ -42,7 +42,7 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
       createdAt: { lte: threshold },
     },
     include: {
-      tasks: {
+      universalTasks: {
         where: {
           status: { in: ['OPEN', 'IN_PROGRESS'] },
           createdBy: 'SLA Bot',
@@ -58,7 +58,7 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
   const affectedLeadIds: string[] = [];
 
   for (const lead of staleLeads) {
-    if (lead.tasks.length > 0) continue;
+    if (lead.universalTasks.length > 0) continue;
     affectedLeadIds.push(lead.id);
 
     const due = new Date();

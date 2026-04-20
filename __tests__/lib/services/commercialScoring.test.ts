@@ -156,6 +156,42 @@ describe('commercialScoring', () => {
       expect(pitjor.probability).toBeGreaterThanOrEqual(0.02);
     });
 
+    // --- Determinisme temporal (`now` injectat) ---
+
+    it('determinisme: dos scoring amb el mateix `now` lògic donen el mateix resultat', () => {
+      const now = new Date('2026-04-19T10:00:00Z');
+      const input = baseLead({
+        status: 'CONTACTED',
+        updatedAt: new Date('2026-04-16T10:00:00Z'),
+        eventDate: new Date('2026-05-19T10:00:00Z'),
+        now,
+      });
+      const a = scoreLead(input);
+      const b = scoreLead(input);
+      expect(a.score).toBe(b.score);
+      expect(a.band).toBe(b.band);
+      expect(a.riskFlags).toEqual(b.riskFlags);
+    });
+
+    it('determinisme: la frontera de 72h stale respecta el `now` injectat', () => {
+      const baseInput = baseLead({
+        status: 'CONTACTED',
+        updatedAt: new Date('2026-04-16T10:00:00Z'),
+      });
+      const just71h = scoreLead({
+        ...baseInput,
+        now: new Date('2026-04-19T09:00:00Z'),
+      });
+      expect(just71h.riskFlags).not.toContain('Sense seguiment 72h+');
+
+      const just73h = scoreLead({
+        ...baseInput,
+        now: new Date('2026-04-19T11:00:00Z'),
+      });
+      expect(just73h.riskFlags).toContain('Sense seguiment 72h+');
+      expect(just73h.score).toBeLessThan(just71h.score);
+    });
+
     // --- Bandes (LOW / MEDIUM / HIGH) ---
 
     it('score ≥ 70 → HIGH, score ≥ 45 → MEDIUM, resta → LOW', () => {

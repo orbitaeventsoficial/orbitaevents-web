@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { TASK_SOURCE, TASK_DEDUPE_KEY } from '@/lib/constants';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -71,17 +72,26 @@ export async function onLeadCreated(
       return { triggered: false, action: 'welcome-email', detail: 'No valid email' };
     }
 
-    // Create a task to send the welcome email (processed by the commercial-daily cron)
-    await prisma.task.create({
-      data: {
-        title: `Enviar welcome email a ${lead.name}`,
-        description: `Auto-trigger: enviar email de benvinguda immediat a ${lead.email}`,
-        status: 'OPEN',
-        priority: 'HIGH',
-        dueDate: new Date(), // Today = immediate
-        leadId: lead.id,
-      },
+    // Canonical dedup via dedupeKey — evita duplicats en retry del dispatcher o double-click de l'API
+    const result = await prisma.task.createMany({
+      data: [
+        {
+          title: `Enviar welcome email a ${lead.name}`,
+          description: `Auto-trigger: enviar email de benvinguda immediat a ${lead.email}`,
+          status: 'OPEN',
+          priority: 'HIGH',
+          dueDate: new Date(),
+          leadId: lead.id,
+          source: TASK_SOURCE.AUTOMATION,
+          dedupeKey: TASK_DEDUPE_KEY.welcomeEmail(lead.id),
+        },
+      ],
+      skipDuplicates: true,
     });
+
+    if (result.count === 0) {
+      return { triggered: false, action: 'welcome-email', detail: 'Welcome email already queued' };
+    }
 
     log.info(`[AutoTrigger] Welcome email task creada per lead ${leadId}`);
     return { triggered: true, action: 'welcome-email', detail: `Task created for ${lead.email}` };
@@ -107,15 +117,6 @@ export async function onBookingConfirmed(
       return { triggered: false, action: 'pre-event-checklist', detail: 'Booking not found' };
     }
 
-    // Check if checklist already exists
-    const existingChecklist = await prisma.task.findFirst({
-      where: { bookingId, title: { contains: 'Checklist pre-event' } },
-    });
-
-    if (existingChecklist) {
-      return { triggered: false, action: 'pre-event-checklist', detail: 'Checklist already exists' };
-    }
-
     // Generate checklist items based on event type
     const baseItems = [
       'Confirmar hora d\'arribada amb el client',
@@ -134,19 +135,28 @@ export async function onBookingConfirmed(
     const eventItems = typeSpecificItems[booking.eventType || ''] || [];
     const allItems = [...baseItems, ...eventItems];
 
-    // Create all checklist items as individual tasks linked to the booking
     const dueDate = booking.eventDate ? new Date(booking.eventDate.getTime() - 2 * 24 * 60 * 60 * 1000) : null;
 
-    await prisma.task.create({
-      data: {
-        title: `Checklist pre-event: ${booking.clientName}`,
-        description: allItems.map((item, i) => `${i + 1}. ${item}`).join('\n'),
-        status: 'OPEN',
-        priority: 'HIGH',
-        dueDate,
-        bookingId: booking.id,
-      },
+    // Canonical dedup via dedupeKey + createMany({skipDuplicates:true}) — same pattern as taskAutomationService
+    const result = await prisma.task.createMany({
+      data: [
+        {
+          title: `Checklist pre-event: ${booking.clientName}`,
+          description: allItems.map((item, i) => `${i + 1}. ${item}`).join('\n'),
+          status: 'OPEN',
+          priority: 'HIGH',
+          dueDate,
+          bookingId: booking.id,
+          source: TASK_SOURCE.AUTOMATION,
+          dedupeKey: TASK_DEDUPE_KEY.preEventChecklist(booking.id),
+        },
+      ],
+      skipDuplicates: true,
     });
+
+    if (result.count === 0) {
+      return { triggered: false, action: 'pre-event-checklist', detail: 'Checklist already exists' };
+    }
 
     log.info(`[AutoTrigger] Checklist pre-event creat per booking ${bookingId} (${allItems.length} ítems)`);
     return { triggered: true, action: 'pre-event-checklist', detail: `${allItems.length} items created` };

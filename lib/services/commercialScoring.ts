@@ -11,6 +11,7 @@ type ScoreInput = {
   guestCount?: number | null;
   interestedPackId?: string | null;
   source?: string | null;
+  now?: Date;
 };
 
 type LeadScoreResult = {
@@ -36,6 +37,7 @@ const STATUS_BASE = LEAD_SCORING_STATUS_BASE;
 const STATUS_PROBABILITY = LEAD_SCORING_STATUS_PROBABILITY;
 
 export function scoreLead(input: ScoreInput): LeadScoreResult {
+  const nowMs = (input.now ?? new Date()).getTime();
   const reasons: string[] = [];
   const riskFlags: string[] = [];
   let score = STATUS_BASE[input.status] ?? 25;
@@ -62,7 +64,7 @@ export function scoreLead(input: ScoreInput): LeadScoreResult {
 
   if (input.eventDate) {
     const daysToEvent = Math.ceil(
-      (new Date(input.eventDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      (new Date(input.eventDate).getTime() - nowMs) / (1000 * 60 * 60 * 24)
     );
     if (daysToEvent >= 7 && daysToEvent <= 120) {
       score += 10;
@@ -82,7 +84,7 @@ export function scoreLead(input: ScoreInput): LeadScoreResult {
   if (input.guestCount && input.guestCount >= 40) score += 3;
   if (input.interestedPackId) score += 4;
 
-  const staleHours = (Date.now() - new Date(input.updatedAt).getTime()) / (1000 * 60 * 60);
+  const staleHours = (nowMs - new Date(input.updatedAt).getTime()) / (1000 * 60 * 60);
   if (staleHours > 72 && !['WON', 'LOST'].includes(input.status)) {
     score -= 12;
     riskFlags.push('Sense seguiment 72h+');

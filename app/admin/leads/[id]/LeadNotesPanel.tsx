@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { ADMIN_LEAD_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type LeadNoteItem = {
   id: string;
@@ -85,7 +86,7 @@ export default function LeadNotesPanel({
   };
 
   return (
-    <section className="ap-card p-6">
+    <section className="ap-card p-6" {...helpAttrs(ADMIN_LEAD_HELP_2.notes.root)}>
       <div className="mb-4 flex items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">Notes ({notes.length})</h2>
         <button
@@ -132,6 +133,7 @@ export default function LeadNotesPanel({
     </section>
   );
 }
+
 
 
 

@@ -112,15 +112,15 @@ describe('createCustomerFromInput', () => {
     });
   });
 
-  it('crea tasca de validació dins la transacció', async () => {
-    let taskCreated = false;
+  it('crea tasca de validació dins la transacció amb source canònic', async () => {
+    let taskCreatePayload: Record<string, unknown> | null = null;
     mockPrisma.$transaction.mockImplementation(async (fn: (tx: unknown) => Promise<unknown>) => {
       const tx = {
         customer: { create: vi.fn().mockResolvedValue(MOCK_CUSTOMER) },
         customerActivity: { create: vi.fn().mockResolvedValue({}) },
         task: {
-          create: vi.fn().mockImplementation(() => {
-            taskCreated = true;
+          create: vi.fn().mockImplementation((args: { data: Record<string, unknown> }) => {
+            taskCreatePayload = args.data;
             return {};
           }),
         },
@@ -130,7 +130,13 @@ describe('createCustomerFromInput', () => {
 
     await createCustomerFromInput({ name: 'Maria', email: 'maria@test.com' });
 
-    expect(taskCreated).toBe(true);
+    expect(taskCreatePayload).not.toBeNull();
+    expect(taskCreatePayload).toMatchObject({
+      customerId: MOCK_CUSTOMER.id,
+      status: 'OPEN',
+      priority: 'HIGH',
+      source: 'CUSTOMER_CREATION',
+    });
   });
 
   it('crea activity amb notes inicials si existeixen', async () => {

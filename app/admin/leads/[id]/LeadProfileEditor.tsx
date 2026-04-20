@@ -8,6 +8,7 @@ import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VAL
 import { fetchWithCsrf } from '@/lib/csrf';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useConfirmDialog } from '../../components/ConfirmDialog';
+import { ADMIN_LEAD_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
 type LeadProfile = {
   id: string;
@@ -147,7 +148,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   };
 
   return (
-    <section className="ap-card p-6">
+    <section className="ap-card p-6" {...helpAttrs(ADMIN_LEAD_HELP_2.profile.root)}>
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Fitxa del lead</h2>
@@ -417,3 +418,4 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     </section>
   );
 }
+

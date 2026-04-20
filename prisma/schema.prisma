@@ -107,6 +107,7 @@ model InventoryUsage {
   itemId    String
   item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   bookingId String?
+  booking   Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   usedAt    DateTime      @default(now())
   hoursUsed Float?
   notes     String?
@@ -269,6 +270,17 @@ model Customer {
   totalSpent    Float     @default(0)
   lastEventDate DateTime?
 
+  // CRM Potenciat
+  tags            String[]          @default([]) // Etiquetes lliures: "VIP", "Corporatiu", "Repeater", etc.
+  lifecycleStage  CustomerLifecycle @default(NEW)
+  preferences     Json? // Gustos musicals, venues preferits, necessitats especials
+  healthScore     Int? // 0-100, calculat pel cron
+  birthday        DateTime?
+  lastContactedAt DateTime?
+  referredById    String?
+  referredBy      Customer?         @relation("CustomerReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals       Customer[]        @relation("CustomerReferrals")
+
   // Relacions
   leads          Lead[]
   bookings       Booking[]
@@ -290,7 +302,20 @@ model Customer {
   @@index([phoneNormalized])
   @@index([nameNormalized])
   @@index([dniNormalized])
+  @@index([lifecycleStage])
+  @@index([healthScore])
+  @@index([referredById])
   @@map("customers")
+}
+
+enum CustomerLifecycle {
+  NEW // Acaba d'entrar, encara sense booking
+  PROSPECT // Té lead actiu però sense conversió
+  FIRST_TIME // Ha fet 1 booking (primer event)
+  RETURNING // Ha fet 2+ bookings
+  VIP // Alta recurrència o alt valor
+  DORMANT // >6 mesos sense activitat
+  CHURNED // >12 mesos sense activitat, considerat perdut
 }
 
 model CustomerActivity {
@@ -383,7 +408,7 @@ model Lead {
 
   // Relació amb Customer (opcional, es crea quan es processa)
   customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   name             String
   email            String
@@ -412,7 +437,6 @@ model Lead {
   booking        Booking?
   proposals      Proposal[]
   activities     LeadActivity[]
-  tasks          LeadTask[]
   universalTasks Task[]
   documents      LeadDocument[]
 
@@ -492,18 +516,22 @@ enum LeadActivityType {
   SYSTEM
 }
 
-enum LeadTaskStatus {
+enum TaskStatus {
   OPEN
   IN_PROGRESS
   DONE
   CANCELLED
+
+  @@map("LeadTaskStatus")
 }
 
-enum LeadTaskPriority {
+enum TaskPriority {
   LOW
   MEDIUM
   HIGH
   URGENT
+
+  @@map("LeadTaskPriority")
 }
 
 enum LeadDocumentType {
@@ -546,25 +574,6 @@ model LeadActivity {
   @@map("lead_activities")
 }
 
-model LeadTask {
-  id          String           @id @default(cuid())
-  leadId      String
-  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  title       String
-  description String?          @db.Text
-  dueDate     DateTime?
-  status      LeadTaskStatus   @default(OPEN)
-  priority    LeadTaskPriority @default(MEDIUM)
-  assignedTo  String?
-  createdBy   String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  completedAt DateTime?
-
-  @@index([leadId, status])
-  @@map("lead_tasks")
-}
-
 model LeadDocument {
   id        String             @id @default(cuid())
   leadId    String
@@ -591,9 +600,9 @@ model Booking {
   id         String    @id @default(cuid())
   reference  String    @unique // "OE-2024-001"
   leadId     String?   @unique
-  lead       Lead?     @relation(fields: [leadId], references: [id])
+  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
   customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   // Client
   clientName      String
@@ -652,6 +661,9 @@ model Booking {
   portalAccesses       ClientPortalAccess[]
   collaboratorBookings CollaboratorBooking[]
   galleryPhotos        BookingGalleryPhoto[]
+  inventoryUsages      InventoryUsage[]
+  availability         Availability[]
+  socialPosts          SocialPost[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -773,6 +785,7 @@ model Proposal {
   sentAt     DateTime?
   acceptedAt DateTime?
 
+  @@index([status])
   @@index([customerId, createdAt])
   @@index([leadId])
   @@index([bookingId])
@@ -826,31 +839,38 @@ model Invoice {
 }
 
 model Task {
-  id               String           @id @default(cuid())
+  id               String       @id @default(cuid())
   customerId       String?
-  customer         Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customer         Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   leadId           String?
-  lead             Lead?            @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  lead             Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
   bookingId        String?
-  booking          Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  booking          Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   proposalId       String?
-  proposal         Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull)
-  legacyLeadTaskId String?          @unique
+  proposal         Proposal?    @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  legacyLeadTaskId String?      @unique
   title            String
-  description      String?          @db.Text
+  description      String?      @db.Text
   dueDate          DateTime?
-  status           LeadTaskStatus   @default(OPEN)
-  priority         LeadTaskPriority @default(MEDIUM)
+  status           TaskStatus   @default(OPEN)
+  priority         TaskPriority @default(MEDIUM)
   assignedTo       String?
   createdBy        String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  source           String?
+  autoRule         String?
+  dedupeKey        String?      @unique
+  resolutionNote   String?      @db.Text
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
   completedAt      DateTime?
 
+  @@index([status])
   @@index([customerId, status, dueDate])
   @@index([leadId, status])
   @@index([bookingId])
   @@index([proposalId])
+  @@index([source])
+  @@index([autoRule])
   @@map("tasks")
 }
 
@@ -893,6 +913,7 @@ model Availability {
   date      DateTime           @unique
   status    AvailabilityStatus @default(AVAILABLE)
   bookingId String?
+  booking   Booking?           @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   note      String?
   updatedAt DateTime           @updatedAt
 
@@ -913,7 +934,7 @@ enum AvailabilityStatus {
 model PostEventReport {
   id        String  @id @default(cuid())
   bookingId String  @unique
-  booking   Booking @relation(fields: [bookingId], references: [id])
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   // TIMING
   actualStartTime  String?
@@ -992,7 +1013,7 @@ model PostEventReport {
 model ClientSurvey {
   id        String  @id @default(cuid())
   bookingId String  @unique
-  booking   Booking @relation(fields: [bookingId], references: [id])
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   // Valoracions 1-5
   overallRating      Int
@@ -1069,7 +1090,7 @@ enum TestimonialPermission {
 model ClientFeedback {
   id        String  @id @default(cuid())
   bookingId String  @unique
-  booking   Booking @relation(fields: [bookingId], references: [id])
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   personalMessage  String?  @db.Text
   highlightMoments String[]
@@ -1539,6 +1560,31 @@ model EmailTemplate {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TRACKING D'EMAILS ENVIATS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model EmailSend {
+  id            String   @id @default(cuid())
+  trackingToken String   @unique @default(cuid())
+  templateKey   String? // 'primer-contacte', 'seguiment', etc.
+  to            String
+  subject       String
+  leadId        String?
+  customerId    String?
+  locale        String?
+  sentAt        DateTime @default(now())
+  openedAt      DateTime?
+  openCount     Int      @default(0)
+  clickedAt     DateTime?
+  clickCount    Int      @default(0)
+
+  @@index([templateKey])
+  @@index([leadId])
+  @@index([sentAt])
+  @@map("email_sends")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // COL·LABORADORS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1723,4 +1769,80 @@ model ImageAsset {
   @@index([placement])
   @@index([placement, sortOrder])
   @@map("image_assets")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SOCIAL MEDIA CALENDAR
+// ═══════════════════════════════════════════════════════════════════════════
+
+enum SocialPlatform {
+  INSTAGRAM
+  TIKTOK
+  FACEBOOK
+  LINKEDIN
+  X
+  PINTEREST
+  YOUTUBE
+}
+
+enum SocialPostStatus {
+  IDEA
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SocialContentType {
+  IMAGE
+  VIDEO
+  CAROUSEL
+  REEL
+  STORY
+  TEXT
+}
+
+enum SocialCategory {
+  EVENT_SHOWCASE
+  BEHIND_SCENES
+  TESTIMONIAL
+  PROMO
+  TIPS
+  TEAM
+  SEASONAL
+  COLLAB
+}
+
+model SocialPost {
+  id          String            @id @default(cuid())
+  title       String
+  caption     String?           @db.Text
+  hashtags    String[]
+  platforms   SocialPlatform[]
+  status      SocialPostStatus  @default(IDEA)
+  contentType SocialContentType @default(IMAGE)
+  category    SocialCategory?
+
+  // Planificació
+  scheduledAt DateTime?
+  publishedAt DateTime?
+
+  // Media (URLs o paths)
+  mediaUrls String[]
+
+  // Relació opcional amb booking/event per contingut derivat
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  // Notes internes
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([category])
+  @@index([bookingId])
+  @@map("social_posts")
 }

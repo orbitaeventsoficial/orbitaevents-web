@@ -6,48 +6,35 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import AnimacionInfantilClient from './AnimacionInfantilClient';
 import { getSiteUrl } from '@/lib/site';
+import { STANDALONE_SERVICE_SEO } from '@/lib/standaloneServiceSeo';
 
-
+const SEO = STANDALONE_SERVICE_SEO['animacion-infantil'];
 
 export const metadata: Metadata = {
-  title: 'Animació Infantil Barcelona | Festes Infantils Professionals | Òrbita Events',
-  description:
-    'Animació infantil professional per a festes, comunions i esdeveniments. Jocs, pintacares, màgia, globoflèxia, tallers i música infantil. Barcelona i Girona.',
+  title: SEO.metadata.title,
+  description: SEO.metadata.description,
   metadataBase: new URL(getSiteUrl()),
   alternates: { canonical: '/servicios/animacion-infantil' },
   openGraph: {
-    title: 'Animació Infantil | Festes per als Més Petits',
-    description:
-      'Animadors professionals per a festes infantils. Jocs, màgia, pintacares, globoflèxia i molt més. Diversió garantida!',
+    title: SEO.metadata.openGraphTitle,
+    description: SEO.metadata.openGraphDescription,
     url: '/servicios/animacion-infantil',
     images: [
       {
-        url: '/api/og?title=Animacio%20Infantil%20Barcelona',
-        alt: 'Animació infantil amb jocs i activitats',
+        url: SEO.metadata.openGraphImage!,
+        alt: SEO.metadata.openGraphImageAlt,
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Animació Infantil | Festes Infantils Barcelona',
-    description:
-      'Animadors professionals + Jocs + Màgia + Pintacares + Globoflèxia. Festes inoblidables per als petits!',
-    images: ['/api/og?title=Animacio%20Infantil'],
+    title: SEO.metadata.twitterTitle,
+    description: SEO.metadata.twitterDescription,
+    images: [SEO.metadata.twitterImage!],
   },
   robots: { index: true, follow: true },
-  keywords: [
-    'animació infantil Barcelona',
-    'festes infantils Girona',
-    'animadors infantils',
-    'pintacares Barcelona',
-    'màgia infantil',
-    'globoflèxia festes',
-    'jocs infantils',
-    'comunions Barcelona',
-    'festes aniversari nens',
-    'tallers infantils',
-  ],
+  keywords: SEO.metadata.keywords,
 };
 
 type PageProps = {
@@ -83,22 +70,14 @@ export default async function AnimacionInfantilPage({ params }: PageProps) {
       />
 
       <ServiceJsonLD
-        name="Animació Infantil Professional"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/animacion-infantil"
-        description="Servei d'animació infantil complet: jocs, pintacares, màgia, globoflèxia, tallers creatius i música infantil. Animadors professionals per a festes d'aniversari, comunions i esdeveniments familiars. Barcelona i Girona."
-        serviceType={[
-          'Animació infantil',
-          'Festes infantils',
-          'Pintacares',
-          'Màgia infantil',
-          'Globoflèxia',
-          'Tallers creatius',
-          'Jocs infantils',
-        ]}
-        areaServed={['Barcelona', 'Girona', 'Maresme', 'Vallès']}
-        priceFrom="150"
-        priceCurrency="EUR"
-        availability="https://schema.org/InStock"
+        description={SEO.jsonLd.description}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
+        priceFrom={SEO.jsonLd.priceFrom}
+        priceCurrency={SEO.jsonLd.priceCurrency}
+        availability={SEO.jsonLd.availability}
       />
 
       <AnimacionInfantilClient />

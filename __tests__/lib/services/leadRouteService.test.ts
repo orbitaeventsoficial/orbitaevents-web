@@ -9,7 +9,6 @@ const { mockPrisma } = vi.hoisted(() => ({
     leadNote: { deleteMany: vi.fn() },
     leadActivity: { deleteMany: vi.fn() },
     leadDocument: { deleteMany: vi.fn() },
-    leadTask: { deleteMany: vi.fn() },
     task: { deleteMany: vi.fn() },
     adminLog: { create: vi.fn() },
     $transaction: vi.fn(),
@@ -33,14 +32,12 @@ beforeEach(() => {
     leadNote: { deleteMany: mockPrisma.leadNote.deleteMany },
     leadActivity: { deleteMany: mockPrisma.leadActivity.deleteMany },
     task: { deleteMany: mockPrisma.task.deleteMany },
-    leadTask: { deleteMany: mockPrisma.leadTask.deleteMany },
     leadDocument: { deleteMany: mockPrisma.leadDocument.deleteMany },
     lead: { delete: vi.fn().mockResolvedValue({ id: 'l1' }) },
   }));
   mockPrisma.leadNote.deleteMany.mockResolvedValue({});
   mockPrisma.leadActivity.deleteMany.mockResolvedValue({});
   mockPrisma.leadDocument.deleteMany.mockResolvedValue({});
-  mockPrisma.leadTask.deleteMany.mockResolvedValue({});
   mockPrisma.task.deleteMany.mockResolvedValue({});
 });
 
@@ -127,46 +124,31 @@ describe('deleteLeadIfAllowed', () => {
     expect(result.status).toBe(404);
   });
 
+  it('retorna 400 si no està perdut', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', name: 'Maria', email: 'm@test.com', status: 'NEW', booking: null });
+
+    const result = await deleteLeadIfAllowed('l1');
+
+    expect(result.status).toBe(400);
+  });
+
   it('retorna 400 si té reserva', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({
-      id: 'l1',
-      name: 'Test',
-      status: 'LOST',
-      booking: { id: 'b1' },
-    });
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', name: 'Maria', email: 'm@test.com', status: 'LOST', booking: { id: 'b1' } });
 
     const result = await deleteLeadIfAllowed('l1');
 
     expect(result.status).toBe(400);
   });
 
-  it('rebutja eliminar lead que no és LOST', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({
-      id: 'l1',
-      name: 'Test',
-      email: 'test@test.com',
-      status: 'NEW',
-      booking: null,
-    });
-
-    const result = await deleteLeadIfAllowed('l1');
-
-    expect(result.status).toBe(400);
-    expect(result.body.error).toContain('Perdut');
-  });
-
-  it('elimina lead LOST en transaction', async () => {
-    mockPrisma.lead.findUnique.mockResolvedValue({
-      id: 'l1',
-      name: 'Test',
-      email: 'test@test.com',
-      status: 'LOST',
-      booking: null,
-    });
+  it('elimina en cascade i registra adminLog', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', name: 'Maria', email: 'm@test.com', status: 'LOST', booking: null });
 
     const result = await deleteLeadIfAllowed('l1');
 
     expect(result.status).toBe(200);
     expect(mockPrisma.$transaction).toHaveBeenCalled();
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ action: 'DELETE', entity: 'lead', entityId: 'l1' }),
+    }));
   });
 });

@@ -12,6 +12,7 @@ import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../components/useAsyncForm';
+import { log } from '@/lib/logger';
 
 type DiscountCode = {
   id: string;
@@ -84,7 +85,7 @@ export default function DiscountCodesPage() {
       if (error instanceof DOMException && error.name === 'AbortError') {
         setError('La connexió ha trigat massa. Reintenta.');
       } else {
-        console.error('[DiscountCodes] Error carregant codis:', error);
+        log.error('[DiscountCodes] Error carregant codis', error);
         setError('Error carregant codis de descompte');
       }
     } finally {
@@ -157,7 +158,7 @@ export default function DiscountCodesPage() {
       await loadCodes();
       toast.success(!active ? 'Codi activat' : 'Codi desactivat');
     } catch (error) {
-      console.error('[DiscountCodes] Error canviant estat:', error);
+      log.error('[DiscountCodes] Error canviant estat', error);
       toast.error(error instanceof Error ? error.message : 'Error canviant l\'estat del codi');
     }
   };
@@ -280,7 +281,7 @@ export default function DiscountCodesPage() {
             </div>
             <div>
               <label htmlFor="dc-value" className="text-xs">
-                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(€)'}
+                Valor * {form.type === 'PERCENTAGE' ? '(%)' : '(â‚¬)'}
               </label>
               <input
                 id="dc-value"
@@ -317,7 +318,7 @@ export default function DiscountCodesPage() {
               />
             </div>
             <div>
-              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (€)</label>
+              <label htmlFor="dc-min-order" className="text-xs">Comanda mínima (â‚¬)</label>
               <input
                 id="dc-min-order"
                 type="number"
@@ -388,7 +389,7 @@ export default function DiscountCodesPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <span className="font-bold text-lg">
-                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
+                    {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}
                   </span>
                   <span className={`block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-center ${
                     active ? 'admin-tone-soft-success' : 'bg-white/5 text-white/40'
@@ -451,7 +452,7 @@ export default function DiscountCodesPage() {
                       {c.description && <p className="text-[10px] mt-0.5">{c.description}</p>}
                     </td>
                     <td className="px-4 py-3">{c.type === 'PERCENTAGE' ? 'Percentatge' : 'Import fix'}</td>
-                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}</td>
+                    <td className="px-4 py-3 font-semibold">{c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}â‚¬`}</td>
                     <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-white/60'}`}>
                       {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-[10px]">Caducat</span>}
@@ -501,3 +502,4 @@ export default function DiscountCodesPage() {
     </AdminPage>
   );
 }
+

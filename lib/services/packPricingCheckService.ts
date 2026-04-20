@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { OPEN_TASK_STATUSES } from '@/lib/constants';
+import { OPEN_TASK_STATUSES, TASK_SOURCE } from '@/lib/constants';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 
 const DIVERGENCE_THRESHOLD_PCT = 15;
@@ -59,6 +59,7 @@ export async function runPackPricingCheck(): Promise<PackPricingCheckResult> {
         priority: Math.abs(health.divergencePct) >= 30 ? 'HIGH' : 'MEDIUM',
         status: 'OPEN',
         createdBy: 'system:pack-pricing-check',
+        source: TASK_SOURCE.PACK_PRICING,
       },
     });
     tasksCreated++;

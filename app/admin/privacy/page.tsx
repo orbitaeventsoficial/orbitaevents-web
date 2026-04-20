@@ -6,6 +6,7 @@ import { formatDateTime } from '@/lib/constants';
 import { PRIVACY_AUDIT_ACTION_LABELS, getPrivacyConsentLabel, getPrivacyPriorityDisplay, getPrivacyRequestStatusDisplay, getPrivacyRequestTypeLabel } from '@/lib/constants/privacy';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 
 type PrivacyStats = {
   consents: { total: number; active: number };
@@ -79,10 +80,10 @@ export default function AdminPrivacyPage() {
       const res = await fetchWithCsrf('/api/admin/privacy/audit?limit=100', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        setAuditLogs(data.data || []);
+        setAuditLogs(data.body?.logs || []);
       }
     } catch (err) {
-      console.error('Error carregant audit log:', err);
+      log.error('Error carregant audit log', err);
     } finally {
       setAuditLoading(false);
     }
@@ -96,11 +97,11 @@ export default function AdminPrivacyPage() {
       const res = await fetchWithCsrf(`/api/admin/privacy/consents?${params}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        setConsents(data.data?.items || []);
-        setConsentsTotal(data.data?.total || 0);
+        setConsents(data.body?.items || []);
+        setConsentsTotal(data.body?.total || 0);
       }
     } catch (err) {
-      console.error('Error carregant consentiments:', err);
+      log.error('Error carregant consentiments', err);
     } finally {
       setConsentsLoading(false);
     }
@@ -123,7 +124,7 @@ export default function AdminPrivacyPage() {
         if (statsRes.ok) { const d = await statsRes.json(); setStats(d.data); }
       }
     } catch (err) {
-      console.error('Error revocant consentiment:', err);
+      log.error('Error revocant consentiment', err);
       setActionMsg('Error revocant consentiment');
       setTimeout(() => setActionMsg(null), 4000);
     } finally {
@@ -155,7 +156,7 @@ export default function AdminPrivacyPage() {
         setFetchError('La connexió ha trigat massa. Reintenta.');
       } else {
         setFetchError('Error carregant dades de privacitat.');
-        console.error('Error carregant dades privacitat:', err);
+        log.error('Error carregant dades privacitat', err);
       }
     } finally {
       clearTimeout(tid);
@@ -187,7 +188,7 @@ export default function AdminPrivacyPage() {
         setTimeout(() => setActionMsg(null), 4000);
       }
     } catch (error) {
-      console.error('Error processant sol·licitud:', error);
+      log.error('Error processant sol┬Àlicitud', error);
       setActionMsg('Error de connexió');
       setTimeout(() => setActionMsg(null), 4000);
     } finally {
@@ -630,7 +631,7 @@ export default function AdminPrivacyPage() {
                         <span className="text-xs opacity-60">{log.performedBy || 'SYSTEM'}</span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-xs opacity-60 truncate max-w-[200px] block">{log.reason || '—'}</span>
+                        <span className="text-xs opacity-60 truncate max-w-[200px] block">{log.reason || '-'}</span>
                       </td>
                       <td className="px-4 py-3 text-right text-xs opacity-60">
                         {formatDateTime(log.createdAt)}
@@ -647,31 +648,31 @@ export default function AdminPrivacyPage() {
       {/* RGPD info box */}
       <details className="rounded-2xl border admin-card-glass p-4">
         <summary className="cursor-pointer text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">
-          Informació RGPD — Articles aplicables
+          Informació RGPD - Articles aplicables
         </summary>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm opacity-70">
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 15 — Accés</p>
+            <p className="font-semibold">Art. 15 - Accés</p>
             <p className="text-xs mt-1">El client pot obtenir còpia de totes les dades personals.</p>
           </div>
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 16 — Rectificació</p>
+            <p className="font-semibold">Art. 16 - Rectificació</p>
             <p className="text-xs mt-1">Corregir dades inexactes o incompletes.</p>
           </div>
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 17 — Supressió</p>
+            <p className="font-semibold">Art. 17 - Supressió</p>
             <p className="text-xs mt-1">Dret a l&apos;oblit: eliminar dades personals.</p>
           </div>
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 18 — Limitació</p>
+            <p className="font-semibold">Art. 18 - Limitació</p>
             <p className="text-xs mt-1">Restringir el tractament en certs supòsits.</p>
           </div>
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 20 — Portabilitat</p>
+            <p className="font-semibold">Art. 20 - Portabilitat</p>
             <p className="text-xs mt-1">Rebre dades en format estructurat i portable.</p>
           </div>
           <div className="rounded-xl border p-3">
-            <p className="font-semibold">Art. 21 — Oposició</p>
+            <p className="font-semibold">Art. 21 - Oposició</p>
             <p className="text-xs mt-1">Oposar-se al tractament per màrqueting directe.</p>
           </div>
         </div>
@@ -679,6 +680,7 @@ export default function AdminPrivacyPage() {
     </AdminPage>
   );
 }
+
 
 
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { LEAD_STATUS_OPTIONS } from '@/lib/constants';
+import { log } from '@/lib/logger';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -31,7 +32,7 @@ export default function LeadQuickStatus({
       if (!res.ok) throw new Error();
       router.refresh();
     } catch (error) {
-      console.error('[LeadQuickStatus] Error canviant estat:', error);
+      log.error('[LeadQuickStatus] Error canviant estat', error);
       toast.error('Error canviant l\'estat');
     } finally {
       setSaving(false);

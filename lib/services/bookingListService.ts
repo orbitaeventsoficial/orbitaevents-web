@@ -30,7 +30,7 @@ export async function listAdminBookings(input: {
   payment?: string | null;
   page: number;
   limit: number;
-}) {
+}, now: Date = new Date()) {
   const validStatus = input.status && Object.values(BookingStatus).includes(input.status as BookingStatus)
     ? (input.status as BookingStatus)
     : undefined;
@@ -38,7 +38,6 @@ export async function listAdminBookings(input: {
     ? (input.eventType as EventType)
     : undefined;
   const paymentFilter = resolvePaymentFilter(input.payment);
-  const now = new Date();
   const overdueEventDateLimit = addDays(now, 30);
   const overdueRemainingDateLimit = addDays(now, 7);
   const dueSoonDepositFrom = addDays(now, 30);

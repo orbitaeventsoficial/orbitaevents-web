@@ -4,10 +4,17 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     booking: { findMany: vi.fn() },
     availability: { findMany: vi.fn() },
+    task: { findMany: vi.fn() },
+    socialPost: { findMany: vi.fn() },
+    lead: { findMany: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/responseTrackingService', () => ({
+  loadPendingFollowUps: vi.fn().mockResolvedValue({ total: 0, urgent: 0, items: [] }),
+  deriveLeadResponseState: vi.fn(),
+}));
 
 import { getAdminCalendarMonth } from '@/lib/services/adminCalendarMonthService';
 
@@ -15,6 +22,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.booking.findMany.mockResolvedValue([]);
   mockPrisma.availability.findMany.mockResolvedValue([]);
+  mockPrisma.task.findMany.mockResolvedValue([]);
+  mockPrisma.socialPost.findMany.mockResolvedValue([]);
+  mockPrisma.lead.findMany.mockResolvedValue([]);
 });
 
 describe('getAdminCalendarMonth', () => {

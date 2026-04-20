@@ -24,7 +24,16 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.leadActivity.findMany.mockResolvedValue([]);
-  mockPrisma.leadActivity.create.mockResolvedValue({ id: 'act-1' });
+  mockPrisma.leadActivity.create.mockResolvedValue({
+    id: 'act-1',
+    leadId: 'lead-1',
+    type: 'SYSTEM',
+    title: 'Test',
+    description: null,
+    createdBy: null,
+    createdAt: new Date('2026-01-01T10:00:00Z'),
+    metadata: null,
+  });
   mockPrisma.leadActivity.findFirst.mockResolvedValue({ id: 'act-1' });
   mockPrisma.leadActivity.delete.mockResolvedValue({});
   mockPrisma.leadActivity.deleteMany.mockResolvedValue({ count: 0 });
@@ -32,7 +41,10 @@ beforeEach(() => {
 
 describe('listLeadActivities', () => {
   it('retorna activitats', async () => {
-    mockPrisma.leadActivity.findMany.mockResolvedValue([{ id: 'a1' }, { id: 'a2' }]);
+    mockPrisma.leadActivity.findMany.mockResolvedValue([
+      { id: 'a1', leadId: 'lead-1', type: 'SYSTEM', title: 'A', description: null, createdBy: null, createdAt: new Date('2026-01-01T10:00:00Z'), metadata: null },
+      { id: 'a2', leadId: 'lead-1', type: 'NOTE', title: 'B', description: null, createdBy: null, createdAt: new Date('2026-01-02T10:00:00Z'), metadata: null },
+    ]);
     const result = await listLeadActivities('lead-1');
     expect(result.ok).toBe(true);
     expect(result.activities).toHaveLength(2);

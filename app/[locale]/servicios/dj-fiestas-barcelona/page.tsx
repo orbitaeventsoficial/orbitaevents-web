@@ -8,27 +8,28 @@ import ZoneLandingPage, { type ZoneConfig } from '@/components/zones/ZoneLanding
 import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
-
+import { LOCAL_PARTY_LANDING_COPY } from '@/lib/localPartyLandingCopy';
 
 const MIN_PRICE = getMinPriceByService('fiestas');
+const COPY = LOCAL_PARTY_LANDING_COPY['dj-fiestas-barcelona'];
 
 export async function generateMetadata(): Promise<Metadata> {
   const heroImage = await getPublicServiceHeroImage('fiestas');
-  const galleryImages = await getPublicServiceGalleryImages('fiestas');
+  await getPublicServiceGalleryImages('fiestas');
   return {
-  title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para fiestas en Barcelona desde ${MIN_PRICE}€. Cumpleaños, aniversarios, despedidas y celebraciones privadas. Equipo profesional, presupuesto en 2h.`,
-  keywords: ['DJ fiestas Barcelona', 'DJ fiesta cumpleaños Barcelona', 'DJ fiesta privada Barcelona', 'DJ Barcelona precio', 'contratar DJ Barcelona'],
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: '/servicios/dj-fiestas-barcelona' },
-  openGraph: {
-    title: `DJ Fiestas Barcelona | Desde ${MIN_PRICE}€`,
-    description: 'DJ profesional para fiestas privadas en Barcelona. Cumpleaños, despedidas y celebraciones.',
-    url: '/servicios/dj-fiestas-barcelona',
-    images: [{ url: heroImage, alt: 'DJ Fiestas Barcelona - Òrbita Events' }],
-    type: 'website',
-  },
-  robots: { index: true, follow: true },
+    title: COPY.metadata.title(MIN_PRICE),
+    description: COPY.metadata.description(MIN_PRICE),
+    keywords: COPY.metadata.keywords,
+    metadataBase: new URL(getSiteUrl()),
+    alternates: { canonical: '/servicios/dj-fiestas-barcelona' },
+    openGraph: {
+      title: COPY.metadata.ogTitle(MIN_PRICE),
+      description: COPY.metadata.ogDescription,
+      url: '/servicios/dj-fiestas-barcelona',
+      images: [{ url: heroImage, alt: COPY.metadata.imageAlt }],
+      type: 'website',
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -69,36 +70,33 @@ export default async function DJFiestasBarcelonaPage({ params }: PageProps) {
     zone: 'Barcelona',
     zoneSlug: 'barcelona',
     service: 'fiestas',
-    heroTitle: 'DJ Fiestas Barcelona',
-    heroSubtitle: 'Cumpleaños · Despedidas · Aniversarios · Celebraciones Privadas',
+    heroTitle: COPY.zone.heroTitle,
+    heroSubtitle: COPY.zone.heroSubtitle,
     minPrice: MIN_PRICE,
     towns: barcelonaTowns,
-    highlights: ['DJ fiestas Barcelona precio', 'DJ cumpleaños Barcelona', 'DJ fiesta privada Barcelona', 'contratar DJ Barcelona'],
-    description: `DJ profesional para todo tipo de fiestas en Barcelona. Equipo completo, open format y adaptación total a tu celebración.`,
-    whyChooseUs: [
-      'Open format: Ponemos lo que tú y tus invitados queráis',
-      'Desplazamiento incluido a Barcelona y área metropolitana',
-      'Experiencia: Más de 200 fiestas privadas realizadas',
-      'Flexibilidad: Nos adaptamos al espacio y al horario',
-    ],
-    faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: heroImage,
-    galleryImages: galleryImages,
+    highlights: COPY.zone.highlights,
+    description: COPY.zone.description(MIN_PRICE),
+    whyChooseUs: COPY.zone.whyChooseUs,
+    faqs: faqItems.map((f) => ({ question: f.q, answer: f.a })),
+    heroImage,
+    galleryImages,
   };
 
   return (
     <>
-      <Breadcrumbs items={[
-        { name: tCommon('nav.home'), url: '/' },
-        { name: tCommon('nav.services'), url: '/servicios' },
-        { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
-        { name: 'DJ Fiestas Barcelona', url: '/servicios/dj-fiestas-barcelona' },
-      ]} />
+      <Breadcrumbs
+        items={[
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
+          { name: COPY.breadcrumbLabel, url: '/servicios/dj-fiestas-barcelona' },
+        ]}
+      />
       <ServiceJsonLD
-        name="DJ Fiestas Barcelona"
+        name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-fiestas-barcelona"
-        description={`DJ profesional para fiestas privadas en Barcelona. Cumpleaños, despedidas y celebraciones. Desde ${MIN_PRICE}€.`}
-        serviceType={['DJ fiestas Barcelona', 'DJ cumpleaños Barcelona', 'DJ fiesta privada Barcelona']}
+        description={COPY.serviceJsonLd.description(MIN_PRICE)}
+        serviceType={COPY.serviceJsonLd.serviceType}
         areaServed={barcelonaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
@@ -108,4 +106,3 @@ export default async function DJFiestasBarcelonaPage({ params }: PageProps) {
     </>
   );
 }
-

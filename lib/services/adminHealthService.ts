@@ -140,6 +140,14 @@ function addDays(date: Date, days: number): Date {
   return next;
 }
 
+/**
+ * Retorna la forma singular o plural catalana segons el comptador. Úsa-ho
+ * amb frases completes: `${n} ${plural(n, 'tasca oberta', 'tasques obertes')}`.
+ */
+function plural(count: number, singular: string, pluralForm: string): string {
+  return count === 1 ? singular : pluralForm;
+}
+
 function formatDateParam(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
@@ -531,7 +539,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'operations',
       status: 'warning',
       title: 'Reserves properes sense paga i senyal',
-      reason: `${unpaidUpcomingBookingsCount} reserva${unpaidUpcomingBookingsCount > 1 ? 's' : ''} propera${unpaidUpcomingBookingsCount > 1 ? 'es' : ''} encara no té${unpaidUpcomingBookingsCount > 1 ? 'nen' : ''} dipòsit.`,
+      reason: `${unpaidUpcomingBookingsCount} ${plural(unpaidUpcomingBookingsCount, 'reserva propera encara no té', 'reserves properes encara no tenen')} dipòsit.`,
       impact: 'Tens feina a calendari amb caixa encara sense protegir.',
       actionLabel: 'Revisar reserves',
       href: upcomingBookingsHref,
@@ -546,7 +554,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'operations',
       status: 'critical',
       title: 'Cobraments de reserves vençuts',
-      reason: `${overdueDepositCount} bestreta${overdueDepositCount === 1 ? '' : 's'} i ${overdueRemainingCount} saldo${overdueRemainingCount === 1 ? '' : 's'} ja haurien d’estar cobrats.`,
+      reason: `${overdueDepositCount} ${plural(overdueDepositCount, 'bestreta', 'bestretes')} i ${overdueRemainingCount} ${plural(overdueRemainingCount, 'saldo', 'saldos')} ja haurien d’estar cobrats.`,
       impact: 'No és només caixa pendent: és reserva activa treballant sense el cobrament que tocava.',
       actionLabel: 'Obrir reserves',
       href: overduePaymentsHref,
@@ -561,7 +569,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'operations',
       status: 'warning',
       title: 'Cobraments a punt de vèncer',
-      reason: `${dueSoonDepositCount} bestreta${dueSoonDepositCount === 1 ? '' : 's'} i ${dueSoonRemainingCount} saldo${dueSoonRemainingCount === 1 ? '' : 's'} vencen en els pròxims 7 dies.`,
+      reason: `${dueSoonDepositCount} ${plural(dueSoonDepositCount, 'bestreta', 'bestretes')} i ${dueSoonRemainingCount} ${plural(dueSoonRemainingCount, 'saldo', 'saldos')} vencen en els pròxims 7 dies.`,
       impact: 'Si no es mou ara, el problema financer passarà a ser urgent molt aviat.',
       actionLabel: 'Preparar seguiment',
       href: dueSoonPaymentsHref,
@@ -575,7 +583,7 @@ export async function getAdminHealthSnapshot(): Promise<AdminHealthSnapshot> {
       scope: 'operations',
       status: 'warning',
       title: 'Tasques vençudes',
-      reason: `Hi ha ${overdueTasksCount} tasca${overdueTasksCount > 1 ? 's' : ''} oberta${overdueTasksCount > 1 ? 'es' : ''} fora de termini.`,
+      reason: `Hi ha ${overdueTasksCount} ${plural(overdueTasksCount, 'tasca oberta', 'tasques obertes')} fora de termini.`,
       impact: 'La feina diària perd ritme i es poden encadenar petits colls d’ampolla.',
       actionLabel: 'Obrir tasques',
       href: '/admin/tasks',

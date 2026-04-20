@@ -9,10 +9,10 @@ import nextDynamic from 'next/dynamic';
 import { getDbPacks } from '@/lib/packs-db';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage } from '@/lib/services/publicServiceMediaService';
-
-
+import { SERVICE_HUB_SEO } from '@/lib/serviceHubSeo';
 
 const BodasClient = nextDynamic(() => import('./client'));
+const SEO = SERVICE_HUB_SEO.bodas;
 
 const getMinPrice = (packs: { priceValue: number }[]) =>
   packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
@@ -27,8 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: t('meta.title', { price: minPrice }),
     description: t('meta.description', { price: minPrice }),
-    keywords:
-      'dj bodas barcelona, dj boda girona, dj bodas maresme, dj bodas costa brava, sonido bodas, musica boda, efectos especiales bodas',
+    keywords: SEO.keywords,
     metadataBase: new URL(getSiteUrl()),
     alternates: { canonical: '/servicios/bodas' },
     openGraph: {
@@ -60,7 +59,6 @@ export default async function BodasPage({ params }: PageProps) {
   const minPrice = getMinPrice(packs);
   const heroImage = await getPublicServiceHeroImage('bodas');
 
-  // Obtener FAQs del archivo de traducciones
   const faqItems = [];
   for (let i = 0; i < 6; i++) {
     try {
@@ -85,17 +83,11 @@ export default async function BodasPage({ params }: PageProps) {
       />
 
       <ServiceJsonLD
-        name="Experiencia Completa para Bodas"
+        name={SEO.jsonLd.name}
         slugPath="/servicios/bodas"
-        description={`Experiencia completa personalizada para bodas: DJ profesional, sonido EV 4.000W, iluminación de ambiente y efectos especiales adaptados a vuestra historia. Packs desde ${minPrice}€.`}
-        serviceType={[
-          'DJ para bodas',
-          'Sonido e iluminación bodas',
-          'Producción musical bodas',
-          'Efectos especiales bodas',
-          'Animación bodas',
-        ]}
-        areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
+        description={SEO.jsonLd.description(minPrice)}
+        serviceType={SEO.jsonLd.serviceType}
+        areaServed={SEO.jsonLd.areaServed}
         priceFrom={String(minPrice)}
         priceCurrency="EUR"
         offers={packs.map((p: { name: string; priceValue: number; slug: string; tagline: string }) => ({
@@ -104,7 +96,7 @@ export default async function BodasPage({ params }: PageProps) {
           price: String(p.priceValue),
           priceCurrency: 'EUR',
           availability: 'https://schema.org/InStock',
-          url: `/servicios/bodas#${p.slug}`,
+          url: `${SEO.jsonLd.offerUrlPrefix}${p.slug}`,
           description: p.tagline,
         }))}
       />
@@ -115,4 +107,3 @@ export default async function BodasPage({ params }: PageProps) {
     </>
   );
 }
-

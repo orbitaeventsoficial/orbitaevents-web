@@ -11,10 +11,18 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import ConfirmDialog from '@/app/admin/components/ConfirmDialog';
 import { useConfirmDialog } from '@/app/admin/components/ConfirmDialog';
 import { formatDate, formatNumber } from '@/lib/constants';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES I CONSTANTS
-// ═══════════════════════════════════════════════════════════════════════════
+import { ADMIN_CUSTOMER_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { log } from '@/lib/logger';
+import {
+  buildCustomerBookingCreateHref,
+  buildCustomerComposeHref,
+  buildCustomerProposalHref,
+  buildCustomerTaskCreateHref,
+} from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
+import { buildCustomerCommercialPriority } from '@/lib/customer-hub/commercialPriority';
+import InsightsBanner from './InsightsBanner';
+import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
 type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
 
@@ -64,10 +72,6 @@ function getInitials(name: string): string {
     .join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
-
 export default function CustomerHeader({
   data,
   tab,
@@ -85,11 +89,14 @@ export default function CustomerHeader({
   const { confirm, dialogProps } = useConfirmDialog();
 
   const id = data.customer.id;
+  const customerProposalHref = buildCustomerProposalHref(id);
+  const customerBookingCreateHref = buildCustomerBookingCreateHref(id);
+  const customerTaskCreateHref = buildCustomerTaskCreateHref(id);
+  const customerComposeHref = buildCustomerComposeHref(id);
   const status = data.customer.status;
   const statusLabel = labelEstatClient(status);
   const statusStyle = CUSTOMER_HUB_STATUS_TONES[status] || CUSTOMER_HUB_STATUS_TONES.default;
 
-  // Calcular temps des de l'últim contacte
   const lastContactText = data.kpis.lastContactAt
     ? formatRelativeTime(data.kpis.lastContactAt)
     : 'mai contactat';
@@ -124,44 +131,54 @@ export default function CustomerHeader({
   }, [confirm, hasProtectedData, data.customer.name, id, toast, router]);
 
   const currentStageIndex = CUSTOMER_HUB_STAGE_ORDER.indexOf(status);
+  const openTasks = data.tasks.filter((task) => !task.done).length;
+  const draftProposals = data.proposals.filter((proposal) => proposal.status === 'DRAFT').length;
+  const nextActionLink = buildCustomerNextActionLink({
+    customerId: id,
+    customerName: data.customer.name,
+    customerPhone: data.customer.phone,
+    nextAction: data.insights.nextAction,
+    commSummary: data.commSummary,
+  });
+  const commercialPriority = buildCustomerCommercialPriority({
+    insights: data.insights,
+    followUpSummary: data.followUpSummary,
+  });
+  const ownerWatchItems = [
+    data.insights.commercialRisk.level !== 'NONE'
+      ? data.insights.commercialRisk.label
+      : null,
+    data.insights.relationalHealth === 'AT_RISK' || data.insights.relationalHealth === 'COLD' || data.insights.relationalHealth === 'LOST'
+      ? `Salut relacional: ${data.insights.relationalHealth.toLowerCase()}`
+      : null,
+    data.kpis.nextEventDate
+      ? `Pròxim esdeveniment: ${formatDate(data.kpis.nextEventDate)}`
+      : null,
+  ].filter(Boolean) as string[];
+  const ownerManualItems = [
+    draftProposals > 0
+      ? `${draftProposals} pressupost${draftProposals > 1 ? 's' : ''} en esborrany`
+      : null,
+    openTasks > 0
+      ? `${openTasks} tasca${openTasks > 1 ? 'ques' : ''} oberta${openTasks > 1 ? 'es' : ''}`
+      : null,
+    commercialPriority?.detail || null,
+  ].filter(Boolean) as string[];
+  const ownerNextStep = nextActionLink
+    ? {
+        label: nextActionLink.label,
+        href: nextActionLink.href,
+        external: nextActionLink.external,
+        detail: data.insights.nextAction.context || commercialPriority?.detail || 'Acció assistida recomanada pel sistema',
+      }
+    : {
+        label: 'Enviar missatge',
+        href: customerComposeHref,
+        external: false,
+        detail: commercialPriority?.detail || 'No hi ha un bloqueig fort, però convé mantenir relació activa',
+      };
 
-  const nextAction = (() => {
-    if (status === 'LEAD') {
-      return {
-        label: 'Crear pressupost',
-        href: `/admin/presupuestos?customerId=${id}`,
-        description: 'Primer pas per avançar aquest client.',
-      };
-    }
-    if (status === 'NEGOTIATION') {
-      return {
-        label: 'Enviar seguiment',
-        href: `/admin/inbox/compose?customerId=${id}&template=recordatori`,
-        description: 'Fer seguiment de proposta i desbloquejar decisió.',
-      };
-    }
-    if (status === 'CONFIRMED') {
-      return {
-        label: 'Revisar reserva',
-        href: `/admin/bookings?customerId=${id}`,
-        description: "Validar preparació d'equip, horari i logística.",
-      };
-    }
-    if (status === 'POSTEVENT') {
-      return {
-        label: 'Tancar post-esdeveniment',
-        href: '/admin/post-event',
-        description: 'Enviar post-event, feedback i tancar cicle.',
-      };
-    }
-    return {
-      label: 'Reactivar oportunitat',
-      href: `/admin/leads?q=${encodeURIComponent(data.customer.email || data.customer.name)}`,
-      description: 'Revisa context i decideix si es pot reobrir.',
-    };
-  })();
 
-  // Handler per canviar estat del client manualment
   const changeStatus = useCallback(async (newStatus: HubStatus) => {
     setActionLoading(`status-${newStatus}`);
     setMenuOpen(false);
@@ -175,7 +192,7 @@ export default function CustomerHeader({
         refresh();
       }
     } catch (err) {
-      console.error('Error canviant estat del client', err);
+      log.error('Error canviant estat del client', err);
       toast.error('Error canviant l\'estat del client');
     } finally {
       setActionLoading(null);
@@ -183,154 +200,156 @@ export default function CustomerHeader({
   }, [id, refresh, toast]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 backdrop-blur from-black/80 to-transparent" data-help-title="Capçalera del client" data-help-desc="Resumeix identitat, estat, últim contacte, KPI ràpid i accions principals del client actual.">
-      <div className="mx-auto max-w-7xl px-4 py-4 space-y-4">
-        {/* Top row: Navigation + Status + Name */}
+    <header className="admin-customer-header sticky top-0 z-30 border-b border-white/10 backdrop-blur from-black/80 to-transparent" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.root)}>
+      <div className="admin-customer-hero mx-auto max-w-7xl px-4 py-4 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-4 min-w-0">
-            {/* Avatar */}
             <div
-              className={`hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white/90 shadow-lg ring-1 ring-white/10 ${CUSTOMER_HUB_AVATAR_TONES[status] || CUSTOMER_HUB_AVATAR_TONES.default}`}
+              className={`admin-customer-avatar hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white/90 shadow-lg ring-1 ring-white/10 ${CUSTOMER_HUB_AVATAR_TONES[status] || CUSTOMER_HUB_AVATAR_TONES.default}`}
             >
               {getInitials(data.customer.name)}
             </div>
             <div className="min-w-0 flex-1">
-            {/* Breadcrumb + Status */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Link
-                href="/admin/clientes"
-                className="text-xs transition-colors"
-              >
-                ← Clients
-              </Link>
-
-              {/* Status badge amb dropdown */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold transition-colors ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} hover:opacity-80`}
-                  disabled={actionLoading !== null}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link
+                  href="/admin/clientes"
+                  className="text-xs transition-colors"
+                  {...helpAttrs(ADMIN_CUSTOMER_HELP.header.backToCustomers)}
                 >
-                  {actionLoading?.startsWith('status') ? '...' : statusLabel}
-                  <span className="ml-1">▾</span>
-                </button>
+                  ← Clients
+                </Link>
 
-                {menuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setMenuOpen(false)}
-                    />
-                    <div className="absolute left-0 top-full z-50 mt-1 rounded-xl border py-1 shadow-xl min-w-[140px]">
-                      {CUSTOMER_HUB_STAGE_ORDER.map((s) => {
-                        const style = CUSTOMER_HUB_STATUS_TONES[s];
-                        const isActive = s === status;
-                        return (
-                          <button
-                            key={s}
-                            type="button"
-                            onClick={() => changeStatus(s)}
-                            disabled={isActive}
-                            className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
-                              isActive
-                                ? 'bg-white/10 font-semibold'
-                                : 'hover:bg-white/10'
-                            } ${style.text}`}
-                          >
-                            {labelEstatClient(s)}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold transition-colors ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} hover:opacity-80`}
+                    disabled={actionLoading !== null}
+                    {...helpAttrs(ADMIN_CUSTOMER_HELP.header.statusToggle)}
+                  >
+                    {actionLoading?.startsWith('status') ? '...' : statusLabel}
+                    <span className="ml-1">▾</span>
+                  </button>
+
+                  {menuOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <div className="absolute left-0 top-full z-50 mt-1 rounded-xl border py-1 shadow-xl min-w-[140px]">
+                        {CUSTOMER_HUB_STAGE_ORDER.map((s) => {
+                          const style = CUSTOMER_HUB_STATUS_TONES[s];
+                          const isActive = s === status;
+                          const help = ADMIN_CUSTOMER_HELP.header.statusOption(labelEstatClient(s));
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => changeStatus(s)}
+                              disabled={isActive}
+                              className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
+                                isActive
+                                  ? 'bg-white/10 font-semibold'
+                                  : 'hover:bg-white/10'
+                              } ${style.text}`}
+                              {...helpAttrs(help)}
+                            >
+                              {labelEstatClient(s)}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <span className="text-[10px]" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.lastContact)}>
+                  · Últim contacte: {lastContactText}
+                </span>
               </div>
 
-              {/* Last contact indicator */}
-              <span className="text-[10px]">
-                · Últim contacte: {lastContactText}
-              </span>
-            </div>
+              <h1 className="mt-1 truncate text-xl font-semibold">
+                {data.customer.customerNumber != null && (
+                  <span className="mr-2 text-sm font-mono text-white/40">
+                    CLI-{String(data.customer.customerNumber).padStart(4, '0')}
+                  </span>
+                )}
+                {data.customer.name}
+              </h1>
 
-            {/* Client name + code */}
-            <h1 className="mt-1 truncate text-xl font-semibold">
-              {data.customer.customerNumber != null && (
-                <span className="mr-2 text-sm font-mono text-white/40">
-                  CLI-{String(data.customer.customerNumber).padStart(4, '0')}
-                </span>
-              )}
-              {data.customer.name}
-            </h1>
-
-            {/* Contact info */}
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              {data.customer.email && (
-                <a
-                  href={`mailto:${data.customer.email}`}
-                  className="transition-colors"
-                >
-                  {data.customer.email}
-                </a>
-              )}
-              {data.customer.phone && (
-                <>
-                  <span>·</span>
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                {data.customer.email && (
                   <a
-                    href={`tel:${data.customer.phone}`}
+                    href={`mailto:${data.customer.email}`}
                     className="transition-colors"
                   >
-                    {data.customer.phone}
+                    {data.customer.email}
                   </a>
-                </>
-              )}
-              {data.customer.phone && (
-                <a
-                  href={`https://wa.me/${data.customer.phone.replace(/\D/g, '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-1"
-                  title="Obrir WhatsApp"
-                >
-                  💬
-                </a>
-              )}
-            </div>
+                )}
+                {data.customer.phone && (
+                  <>
+                    <span>·</span>
+                    <a
+                      href={`tel:${data.customer.phone}`}
+                      className="transition-colors"
+                    >
+                      {data.customer.phone}
+                    </a>
+                  </>
+                )}
+                {data.customer.phone && (
+                  <a
+                    href={`https://wa.me/${data.customer.phone.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1"
+                    title={ADMIN_CUSTOMER_HELP.header.whatsapp.title}
+                    {...helpAttrs(ADMIN_CUSTOMER_HELP.header.whatsapp)}
+                  >
+                    💬
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-2" data-help-title="Accions ràpides del client" data-help-desc="Permeten crear pressupost, reserva, tasca, missatge o eliminar/anonimitzar el client.">
+          <div className="admin-customer-actions flex flex-wrap gap-2" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.quickActions)}>
             <ActionButton
-              href={`/admin/presupuestos?customerId=${id}`}
+              href={customerProposalHref}
               label="Nou pressupost"
               color="cyan"
               icon="📄"
+              help={ADMIN_CUSTOMER_HELP.header.action('Nou pressupost', 'Crea una proposta nova ja vinculada a aquest client.')}
             />
             <ActionButton
-              href={`/admin/bookings/new?customerId=${id}`}
+              href={customerBookingCreateHref}
               label="Nova reserva"
               color="indigo"
               icon="📅"
+              help={ADMIN_CUSTOMER_HELP.header.action('Nova reserva', 'Crea una reserva nova vinculada a aquest client.')}
             />
             <ActionButton
-              href={`/admin/tasks/new?customerId=${id}`}
+              href={customerTaskCreateHref}
               label="Nova tasca"
               color="amber"
               icon="✅"
+              help={ADMIN_CUSTOMER_HELP.header.action('Nova tasca', 'Afegeix una tasca operativa o comercial associada al client.')}
             />
             <ActionButton
-              href={`/admin/inbox/compose?customerId=${id}`}
+              href={customerComposeHref}
               label="Missatge"
               color="slate"
               icon="✉️"
+              help={ADMIN_CUSTOMER_HELP.header.action('Missatge', 'Obre el redactor de correu amb aquest client ja preseleccionat.')}
             />
             <button
               type="button"
               onClick={deleteCustomer}
               disabled={actionLoading === 'delete'}
               className="rounded-xl px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20"
-              title={hasProtectedData ? 'Anonimitzar client (té registres vinculats)' : 'Eliminar client'}
+              title={hasProtectedData ? ADMIN_CUSTOMER_HELP.header.deleteProtected.title : ADMIN_CUSTOMER_HELP.header.deletePlain.title}
+              {...helpAttrs(hasProtectedData ? ADMIN_CUSTOMER_HELP.header.deleteProtected : ADMIN_CUSTOMER_HELP.header.deletePlain)}
             >
               <span>🗑️</span>
               <span className="hidden sm:inline">{actionLoading === 'delete' ? 'Eliminant...' : 'Eliminar'}</span>
@@ -338,8 +357,7 @@ export default function CustomerHeader({
           </div>
         </div>
 
-        {/* KPIs */}
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5" data-help-title="KPI del client" data-help-desc="Resumeixen pròxim esdeveniment, pressupost, cobrat, marge i última comunicació del client.">
+        <div className="admin-customer-kpis grid gap-2 sm:grid-cols-2 lg:grid-cols-5" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpis)}>
           <KpiChip
             label="Pròxim esdeveniment"
             value={formatDate(data.kpis.nextEventDate)}
@@ -364,9 +382,41 @@ export default function CustomerHeader({
           />
         </div>
 
-        {/* Estat del procés + següent acció */}
-        <div className="grid gap-3 lg:grid-cols-2" data-help-title="Estat i següent acció" data-help-desc="Explica en quina fase es troba el client i quina és la millor acció següent recomanada.">
-          <div className="rounded-xl border p-3">
+        <OwnerControlStrip
+          className="lg:grid-cols-[1.1fr_1.1fr_1.3fr]"
+          system={{
+            eyebrow: 'Automàtic',
+            title: 'Què veu el sistema',
+            tone: 'info',
+            items: ownerWatchItems,
+            emptyText: 'Sense alertes automàtiques destacades ara mateix.',
+          }}
+          manual={{
+            eyebrow: 'Manual',
+            title: 'On et cal intervenir',
+            tone: ownerManualItems.length > 0 ? 'warning' : 'success',
+            items: ownerManualItems,
+            emptyText: 'No hi ha cap front manual calent a la capçalera.',
+          }}
+          nextStep={{
+            title: ownerNextStep.label,
+            detail: ownerNextStep.detail,
+            href: ownerNextStep.href,
+            external: ownerNextStep.external,
+          }}
+        />
+
+        {/* Insights banner — motor intel·ligent */}
+        <InsightsBanner
+          insights={data.insights}
+          customerId={id}
+          customerName={data.customer.name}
+          customerPhone={data.customer.phone}
+          commSummary={data.commSummary}
+        />
+
+        <div className="admin-customer-rail" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stage)}>
+          <div className="admin-customer-stage-card rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.stageProgress)}>
             <p className="text-[11px] font-semibold uppercase tracking-wider">On està aquest client</p>
             <div className="mt-2 flex items-center overflow-x-auto">
               {CUSTOMER_HUB_STAGE_ORDER.map((stage, idx) => {
@@ -396,23 +446,12 @@ export default function CustomerHeader({
               })}
             </div>
           </div>
-
-          <div className="rounded-xl border p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider">Següent millor acció</p>
-            <p className="mt-1 text-sm">{nextAction.description}</p>
-            <Link
-              href={nextAction.href}
-              className="mt-2 inline-flex rounded-xl border px-3 py-1.5 text-xs font-semibold"
-            >
-              {nextAction.label}
-            </Link>
-          </div>
         </div>
 
-        {/* Tabs - Desktop */}
-        <div className="hidden md:flex flex-wrap gap-1" data-help-title="Pestanyes de la fitxa client" data-help-desc="Canvien entre resum, pressupostos, reserves, marge, comunicacions, tasques, descomptes, entrades i privacitat.">
+        <div className="admin-customer-tabs hidden md:flex flex-wrap gap-1" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.tabs)}>
           {TABS.map((item) => {
             const badge = item.badge?.(data);
+            const help = ADMIN_CUSTOMER_HELP.header.tab(item.label);
             return (
               <button
                 key={item.key}
@@ -423,6 +462,7 @@ export default function CustomerHeader({
                     ? 'bg-white text-black shadow-sm'
                     : 'admin-tone-idle'
                 }`}
+                {...helpAttrs(help)}
               >
                 <span className="text-base">{item.icon}</span>
                 {item.label}
@@ -442,8 +482,7 @@ export default function CustomerHeader({
           })}
         </div>
 
-        {/* Tabs - Mobile */}
-        <div className="md:hidden">
+        <div className="md:hidden" {...helpAttrs(ADMIN_CUSTOMER_HELP.header.mobileTabs)}>
           <select
             value={tab}
             onChange={(e) => setTab(e.target.value as TabKey)}
@@ -466,32 +505,31 @@ export default function CustomerHeader({
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SUBCOMPONENTS
-// ═══════════════════════════════════════════════════════════════════════════
-
 function ActionButton({
   href,
   label,
   color,
   icon,
+  help,
 }: {
   href: string;
   label: string;
   color: 'cyan' | 'indigo' | 'amber' | 'slate';
   icon: string;
+  help: { title: string; desc: string };
 }) {
   const colorStyles = {
-    cyan: 'ap-btn ap-btn--primary',
-    indigo: 'ap-btn ap-btn--secondary',
-    amber: 'ap-badge ap-badge--warning',
-    slate: 'admin-tone-idle',
+    cyan: 'admin-customer-action admin-customer-action--cyan ap-btn ap-btn--primary',
+    indigo: 'admin-customer-action admin-customer-action--indigo ap-btn ap-btn--secondary',
+    amber: 'admin-customer-action admin-customer-action--amber ap-badge ap-badge--warning',
+    slate: 'admin-customer-action admin-customer-action--slate admin-tone-idle',
   };
 
   return (
     <Link
       href={href}
-      className={`rounded-xl px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 ${colorStyles[color]}`}
+      className={`admin-customer-action-link rounded-xl px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1.5 ${colorStyles[color]}`}
+      {...helpAttrs(help)}
     >
       <span>{icon}</span>
       <span className="hidden sm:inline">{label}</span>
@@ -510,11 +548,12 @@ function KpiChip({
 }) {
   return (
     <div
-      className={`rounded-xl border px-3 py-2 transition-colors ${
+      className={`admin-customer-kpi rounded-xl border px-3 py-2 transition-colors ${
         highlight
           ? 'border-cyan-500/30 bg-cyan-500/5'
           : 'admin-tone-border-neutral admin-tone-bg-neutral'
       }`}
+      {...helpAttrs(ADMIN_CUSTOMER_HELP.header.kpi(label))}
     >
       <p className="text-[11px] uppercase tracking-wider">{label}</p>
       <p
@@ -527,10 +566,6 @@ function KpiChip({
     </div>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════════════════
 
 function money(value?: number): string {
   if (typeof value !== 'number') return '—';
@@ -553,17 +588,3 @@ function formatRelativeTime(dateStr: string): string {
   if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
   return formatDate(dateStr);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

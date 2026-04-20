@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
 
 type ProposalItem = {
   id: string;
@@ -82,6 +83,9 @@ export default function ProposalsList({
   const totalValue = proposals
     .filter((proposal) => proposal.status === 'ACCEPTED')
     .reduce((sum, proposal) => sum + proposal.total, 0);
+
+  const getProposalHref = (proposal: ProposalItem) =>
+    buildCustomerProposalHref(proposal.customerId, proposal.id);
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -203,7 +207,7 @@ export default function ProposalsList({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <Link
-                    href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                    href={getProposalHref(proposal)}
                     className="font-medium hover:underline"
                   >
                     {proposal.reference}
@@ -224,7 +228,7 @@ export default function ProposalsList({
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Link
-                  href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                  href={getProposalHref(proposal)}
                   className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                 >
                   ✏️ Editar
@@ -300,7 +304,7 @@ export default function ProposalsList({
                 <tr key={proposal.id} className="transition-colors hover:bg-white/[0.03]">
                   <td className="px-4 py-3">
                     <Link
-                      href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                      href={getProposalHref(proposal)}
                       className="font-medium hover:underline"
                     >
                       {proposal.reference}
@@ -330,7 +334,7 @@ export default function ProposalsList({
                       </summary>
                       <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border bg-black/95 p-1 shadow-xl backdrop-blur-sm">
                         <Link
-                          href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${proposal.customerId}`}
+                          href={getProposalHref(proposal)}
                           className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                         >
                           ✏️ Editar

@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 interface AdminAlerts {
   newLeadsCount: number;
+  inboxUnreadCount: number;
   packPriceAlertsCount: number;
   financeAlertsCount: number;
   totalCount: number;
@@ -11,6 +12,7 @@ interface AdminAlerts {
 
 export function useAdminAlerts(): AdminAlerts {
   const [newLeadsCount, setNewLeadsCount] = useState(0);
+  const [inboxUnreadCount, setInboxUnreadCount] = useState(0);
   const [packPriceAlertsCount, setPackPriceAlertsCount] = useState(0);
   const [financeAlertsCount, setFinanceAlertsCount] = useState(0);
 
@@ -20,6 +22,18 @@ export function useAdminAlerts(): AdminAlerts {
       if (res.ok) {
         const data = await res.json();
         setNewLeadsCount(data.count || 0);
+      }
+    } catch {
+      // Silently fail
+    }
+  }, []);
+
+  const fetchInboxUnreadCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/inbox/messages?action=count', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setInboxUnreadCount(data.unread || 0);
       }
     } catch {
       // Silently fail
@@ -52,9 +66,10 @@ export function useAdminAlerts(): AdminAlerts {
 
   const fetchAll = useCallback(() => {
     fetchNewLeadsCount();
+    fetchInboxUnreadCount();
     fetchPackPriceAlertsCount();
     fetchFinanceAlertsCount();
-  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
+  }, [fetchNewLeadsCount, fetchInboxUnreadCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   // Càrrega inicial en idle per no bloquejar render
   useEffect(() => {
@@ -71,6 +86,12 @@ export function useAdminAlerts(): AdminAlerts {
     return () => globalThis.clearTimeout(timeoutId);
   }, [fetchAll]);
 
+  // Polling lleuger per reflectir entrades i correus nous sense recarregar
+  useEffect(() => {
+    const intervalId = window.setInterval(fetchAll, 60000);
+    return () => window.clearInterval(intervalId);
+  }, [fetchAll]);
+
   // Refresc quan la pestanya torna visible
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -82,8 +103,9 @@ export function useAdminAlerts(): AdminAlerts {
 
   return {
     newLeadsCount,
+    inboxUnreadCount,
     packPriceAlertsCount,
     financeAlertsCount,
-    totalCount: newLeadsCount + packPriceAlertsCount + financeAlertsCount,
+    totalCount: newLeadsCount + inboxUnreadCount + packPriceAlertsCount + financeAlertsCount,
   };
 }

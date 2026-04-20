@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { BOOKING_STATUS_OPTIONS, DASHBOARD_WIDGET_COLOR_MAP, LEAD_STATUS_OPTIONS } from '@/lib/constants';
+import { ADMIN_ACTIONS_HELP, helpAttrs } from '../components/adminHelpContent';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -180,7 +181,7 @@ export function MetricCard({
   const accentClass = accentClassMap[accent];
 
   return (
-    <div className={`admin-ui-metric-card ${accentClass}`} data-help-title={helpTitle || label} data-help-desc={helpText}>
+    <div className={`admin-ui-metric-card ${accentClass}`} {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.metricCard(helpTitle || label, helpText))}>
       <div className="admin-ui-metric-head">
         <div className="admin-ui-metric-copy">
           <p className="admin-ui-metric-label">{label}</p>
@@ -214,7 +215,7 @@ export function Card({
   helpText?: string;
 }) {
   return (
-    <div className="admin-ui-card" data-help-title={title} data-help-desc={helpText}>
+    <div className="admin-ui-card" {...helpAttrs(title ? ADMIN_ACTIONS_HELP.dashboardWidget.card(title, helpText) : undefined)}>
       {(title || subtitle || action) && (
         <div className="admin-ui-card-head">
           <div className="admin-ui-card-head-copy">
@@ -242,7 +243,7 @@ export function Button({
 }) {
   const className = `admin-ui-btn admin-ui-btn--${variant} admin-ui-btn--default`;
   return (
-    <button type="button" className={className} data-help-title={label} data-help-desc={helpText}>
+    <button type="button" className={className} {...helpAttrs(ADMIN_ACTIONS_HELP.dashboardWidget.button(label, helpText))}>
       {icon && <span>{icon}</span>}
       <span>{label}</span>
     </button>

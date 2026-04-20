@@ -10,12 +10,17 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
-  const snapshot = await getSlaSnapshot();
 
-  return NextResponse.json({
-    ok: true,
-    ...snapshot,
-  });
+  try {
+    const snapshot = await getSlaSnapshot();
+    return NextResponse.json({ ok: true, ...snapshot });
+  } catch (error) {
+    log.error('Error reading SLA snapshot', error);
+    return NextResponse.json(
+      { ok: false, error: 'No s\'ha pogut llegir l\'estat SLA' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

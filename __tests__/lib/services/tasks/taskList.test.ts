@@ -56,6 +56,23 @@ describe('fetchAdminTaskList', () => {
     expect(call.where.NOT).toHaveLength(2);
   });
 
+  it('filtra per taskIds abans de paginar', async () => {
+    await fetchAdminTaskList({ page: 2, limit: 10, todayStart: TODAY, taskIds: ['t-vip-1', 't-vip-2'] });
+
+    const findCall = mockPrisma.task.findMany.mock.calls[0][0];
+    const countCall = mockPrisma.task.count.mock.calls[0][0];
+    expect(findCall.where.id).toEqual({ in: ['t-vip-1', 't-vip-2'] });
+    expect(countCall.where.id).toEqual({ in: ['t-vip-1', 't-vip-2'] });
+    expect(findCall.skip).toBe(10);
+  });
+
+  it('retorna buit sense tocar Prisma si taskIds es buit', async () => {
+    const result = await fetchAdminTaskList({ page: 1, limit: 10, todayStart: TODAY, taskIds: [] });
+
+    expect(result).toEqual({ tasks: [], total: 0 });
+    expect(mockPrisma.task.findMany).not.toHaveBeenCalled();
+    expect(mockPrisma.task.count).not.toHaveBeenCalled();
+  });
   it('mapeja resultats amb lead i customer', async () => {
     mockPrisma.task.findMany.mockResolvedValue([
       {

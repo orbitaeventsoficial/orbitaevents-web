@@ -6,14 +6,37 @@ import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-da
 import { formatDateTimeFull, formatCurrency, formatDate, getEventLabel } from '@/lib/constants';
 import { generateDashboardInsights, type DashboardInsight } from '@/lib/services/dashboardInsightsService';
 import WeatherWidget from './components/WeatherWidget';
+import { ADMIN_DASHBOARD_HELP, helpAttrs } from './components/adminHelpContent';
 import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
 import { LEAD_STATUS_OPTIONS, BOOKING_STATUS_OPTIONS } from '@/lib/constants';
+import { ADMIN_DASHBOARD_PILOT_STEPS, ADMIN_DASHBOARD_INSIGHT_COLORS } from '@/lib/constants/admin';
+import { loadDailyBrief } from '@/lib/services/dailyBriefService';
+import DailyBriefPanel from './components/DailyBriefPanel';
+import { loadOperationalPulse } from '@/lib/services/operationalPulseService';
+import OperationalPulsePanel from './components/OperationalPulsePanel';
+import { loadCaptureHealth } from '@/lib/services/captureHealthService';
+import CaptureHealthPanel from './components/CaptureHealthPanel';
+import { loadMultiTouchReport } from '@/lib/services/attributionService';
+import AttributionPanel from './components/AttributionPanel';
+import { loadAnomalyReport } from '@/lib/services/dailyAnomalyService';
+import AnomalyPanel from './components/AnomalyPanel';
+import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
+import CapacityConflictPanel from './components/CapacityConflictPanel';
+import { OwnerControlStrip } from './components/OwnerControlStrip';
 
 // Removed: all widget components now in lib/dashboard-widgets.tsx
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  const d = await fetchDashboardData();
+  const [d, dailyBrief, pulse, captureHealth, attribution, anomalies, capacityConflicts] = await Promise.all([
+    fetchDashboardData(),
+    loadDailyBrief(),
+    loadOperationalPulse(),
+    loadCaptureHealth(),
+    loadMultiTouchReport(90),
+    loadAnomalyReport(),
+    loadCapacityConflicts(),
+  ]);
 
   const insights = generateDashboardInsights({
     leadsThisMonth: d.leadsThisMonth,
@@ -38,44 +61,66 @@ export default async function AdminDashboard() {
     inventoryBroken: d.inventoryBroken,
   });
 
-  const pilotToday = [
-    {
-      id: 'leads',
-      step: 'Pas 1',
-      title: 'Respondre entrades',
+  const pilotDynamic: Record<string, { description: string; tone: string }> = {
+    leads: {
       description: d.leadsThisMonth > 0 ? `${d.leadsThisMonth} consultes aquest mes` : 'No hi ha noves consultes',
-      href: '/admin/leads',
-      cta: 'Anar a entrades',
       tone: d.leadsThisMonth > 0 ? 'amber' : 'emerald',
     },
-    {
-      id: 'tasks',
-      step: 'Pas 2',
-      title: 'Executar tasques',
+    tasks: {
       description: d.upcomingTasks.length > 0 ? `${d.upcomingTasks.length} tasques obertes` : 'Cap tasca pendent',
-      href: '/admin/tasks',
-      cta: 'Veure tasques',
       tone: d.upcomingTasks.length > 0 ? 'amber' : 'emerald',
     },
-    {
-      id: 'postevent',
-      step: 'Pas 3',
-      title: 'Tancar post-esdeveniment',
+    postevent: {
       description: d.postEventPending > 0 ? `${d.postEventPending} correus pendents` : 'Post-esdeveniment al dia',
-      href: '/admin/emails',
-      cta: 'Gestionar',
       tone: d.postEventPending > 0 ? 'rose' : 'emerald',
     },
-    {
-      id: 'bookings',
-      step: 'Pas 4',
-      title: 'Preparar reserves',
+    bookings: {
       description: d.bookingsConfirmed > 0 ? `${d.bookingsConfirmed} reserves confirmades` : 'Sense reserves confirmades',
-      href: '/admin/bookings',
-      cta: 'Veure reserves',
       tone: 'sky',
     },
-  ] as const;
+  };
+  const pilotToday = ADMIN_DASHBOARD_PILOT_STEPS.map((step) => ({
+    ...step,
+    ...pilotDynamic[step.id],
+  }));
+  const criticalHealthCount = d.salutSnapshot?.summary.critical || 0;
+  const warningHealthCount = d.salutSnapshot?.summary.warning || 0;
+  const manualDecisionCount = d.alerts.length + d.upcomingTasks.length;
+  const autoSignals = [
+    {
+      label: 'Crons clau',
+      value: `${d.cronMap['emails.cron.lastStatus'] || '—'} · ${d.cronMap['automation.commercial.lastStatus'] || '—'}`,
+    },
+    {
+      label: 'Salut vigilada',
+      value: criticalHealthCount > 0 ? `${criticalHealthCount} crítics` : warningHealthCount > 0 ? `${warningHealthCount} avisos` : 'Tot correcte',
+    },
+    {
+      label: 'Checklist d’avui',
+      value: `${d.checklistTodayDoneCount} fetes · ${d.checklistTodayPendingCount} pendents`,
+    },
+  ];
+  const ownerDecisions = [
+    {
+      label: 'Alertes obertes',
+      value: d.alerts.length > 0 ? `${d.alerts.length} a revisar` : 'Cap alerta oberta',
+    },
+    {
+      label: 'Tasques obertes',
+      value: d.upcomingTasks.length > 0 ? `${d.upcomingTasks.length} pendents` : 'Sense cua oberta',
+    },
+    {
+      label: 'Cobraments pendents',
+      value: d.pendingPayments > 0 ? `${Math.round(d.pendingPayments)} € per cobrar` : 'Cap import pendent',
+    },
+  ];
+  const ownerAutomaticSignals = autoSignals.map((item) => `${item.label}: ${item.value}`);
+  const ownerManualSignals = ownerDecisions.map((item) => `${item.label}: ${item.value}`);
+  const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
+  const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
+  const nextPriorityDetail = d.alerts[0]?.description || (d.upcomingTasks[0]?.lead?.name ? `Relacionat amb ${d.upcomingTasks[0].lead.name}` : 'Obre el workspace que concentra la feina pendent.');
+  const operationHref = d.nextEvent ? `/admin/bookings/${d.nextEvent.id}` : '/admin/bookings';
+  const operationLabel = d.nextEvent ? `${d.nextEvent.clientName} · ${d.nextEvent.daysUntil === 0 ? 'avui' : d.nextEvent.daysUntil === 1 ? 'demà' : `d'aquí ${d.nextEvent.daysUntil} dies`}` : 'Sense bolo imminent';
 
   return (
     <div className="admin-control-room">
@@ -91,25 +136,60 @@ export default async function AdminDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Link href="/admin/analytics" className="hidden sm:inline-flex">
-                <Button variant="secondary" icon="📈" label="Analítica" helpText="Obre els informes detallats del negoci: ingressos, conversió, canals i rendiment." />
+                <Button variant="secondary" icon="📈" label="Analítica" helpText={ADMIN_DASHBOARD_HELP.analyticsButton} />
               </Link>
               <Link href="/admin/leads">
-                <Button variant="primary" icon="+" label="Nou lead" helpText="Crea manualment una entrada nova quan una consulta no ha arribat sola des de la web o el correu." />
+                <Button variant="primary" icon="+" label="Nou lead" helpText={ADMIN_DASHBOARD_HELP.newLeadButton} />
               </Link>
             </div>
           </div>
           <div className="admin-cr-quick-links mt-4">
-            <Link href="/admin/inbox" className="admin-cr-quick-link" data-help-title="Inbox (IMAP)" data-help-desc="Centralitza els correus entrants per convertir-los en leads, seguir converses i no deixar cap consulta sense resposta.">📥 Inbox (IMAP)</Link>
-            <Link href="/admin/emails" className="admin-cr-quick-link" data-help-title="Correus automàtics" data-help-desc="Gestiona les seqüències automàtiques i els enviaments operatius abans i després dels esdeveniments.">🤖 Correus automàtics</Link>
-            <Link href="/admin/bookings" className="admin-cr-quick-link" data-help-title="Reserves" data-help-desc="Obre el tauler complet de reserves per revisar estats, preparar esdeveniments i seguir cobraments.">📋 Reserves</Link>
-            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" data-help-title="Cobraments vençuts" data-help-desc="Filtra directament les reserves amb pagaments que ja haurien d'haver entrat i requereixen seguiment.">💸 Cobraments vençuts</Link>
-            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" data-help-title="Cobraments que vencen aviat" data-help-desc="Mostra les reserves amb pagaments a punt de vèncer per poder anticipar recordatoris.">⏳ Vencen aviat</Link>
-            <Link href="/admin/economia" className="admin-cr-quick-link" data-help-title="Economia" data-help-desc="Accedeix a la visió financera: factures, pressupostos, fluxos i marge del negoci.">💶 Economia</Link>
-            <Link href="/admin/salut" className="admin-cr-quick-link" data-help-title="Salut" data-help-desc="Revisa alertes i incidències del sistema, dades, automatitzacions i operativa general.">🩺 Salut</Link>
-            <Link href="/admin/calendario" className="admin-cr-quick-link" data-help-title="Calendari" data-help-desc="Consulta l'agenda d'esdeveniments i planifica el volum de feina dels pròxims dies.">📅 Calendari</Link>
+            <Link href="/admin/inbox" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.inbox)}>📥 Inbox (IMAP)</Link>
+            <Link href="/admin/emails" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.emails)}>🤖 Correus automàtics</Link>
+            <Link href="/admin/bookings" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.bookings)}>📋 Reserves</Link>
+            <Link href="/admin/bookings?payment=overdue" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.overdue)}>💸 Cobraments vençuts</Link>
+            <Link href="/admin/bookings?payment=due-soon" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.dueSoon)}>⏳ Vencen aviat</Link>
+            <Link href="/admin/economia" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.economy)}>💶 Economia</Link>
+            <Link href="/admin/salut" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.health)}>🩺 Salut</Link>
+            <Link href="/admin/calendario" className="admin-cr-quick-link" {...helpAttrs(ADMIN_DASHBOARD_HELP.quickLinks.calendar)}>📅 Calendari</Link>
           </div>
         </div>
       </div>
+
+      <OwnerControlStrip
+        className="lg:grid-cols-[1.2fr_1fr_1fr]"
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què està fent el sistema per tu',
+          tone: 'info',
+          items: ownerAutomaticSignals,
+          emptyText: 'Sense senyals automàtiques destacades ara mateix.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On tu has de decidir',
+          tone: manualDecisionCount > 0 ? 'warning' : 'success',
+          items: ownerManualSignals,
+          emptyText: 'No hi ha cap front manual calent ara mateix.',
+        }}
+        nextStep={{
+          title: nextPriorityTitle,
+          detail: nextPriorityDetail,
+          href: nextPriorityHref,
+          secondaryAction: {
+            href: operationHref,
+            label: operationLabel,
+          },
+        }}
+      />
+
+      {/* ═══ DAILY BRIEF ═══ */}
+      <DailyBriefPanel brief={dailyBrief} />
+      {anomalies.anomalies.length > 0 && <AnomalyPanel report={anomalies} />}
+      {capacityConflicts.conflicts.length > 0 && <CapacityConflictPanel report={capacityConflicts} />}
+      <CaptureHealthPanel report={captureHealth} />
+      <AttributionPanel report={attribution} />
+      <OperationalPulsePanel pulse={pulse} />
 
       {/* ═══ PRÒXIM BOLO ═══ */}
       {d.nextEvent && (
@@ -174,7 +254,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* ═══ OBJECTIU MENSUAL — amb RadialProgress ═══ */}
-      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass" data-help-title="Objectiu mensual d'ingressos" data-help-desc="Resumeix quant has facturat aquest mes respecte de l'objectiu configurat. T'ajuda a veure si vas per sota, en línia o per sobre del ritme previst.">
+      <section className="rounded-2xl border border-white/10 p-4 sm:p-5 admin-card-glass" {...helpAttrs(ADMIN_DASHBOARD_HELP.revenueGoal)}>
         <div className="flex items-center gap-5">
           <RadialProgress
             value={d.revenueMonthPct}
@@ -203,7 +283,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--pilot" data-help-title="Pilot automàtic d'avui" data-help-desc="És una ruta guiada per a un usuari novell: primer entrades, després tasques, post-esdeveniment i finalment reserves. Pots saltar passos si ja saps què toca.">
+      <section className="admin-cr-panel admin-cr-panel--pilot" {...helpAttrs(ADMIN_DASHBOARD_HELP.pilot)}>
         <div className="admin-cr-panel-head">
           <div>
             <p className="admin-cr-kicker admin-cr-kicker--pilot">Mode Solo</p>
@@ -213,8 +293,8 @@ export default async function AdminDashboard() {
           <span className="admin-cr-pill admin-cr-pill--pilot">4 passos clars</span>
         </div>
         <div className="admin-cr-chip-row">
-          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber" data-help-title="Comença pel pas 2" data-help-desc="Et porta directament a tasques si ja has resolt les entrades i vols avançar feina operativa.">Comença per pas 2</Link>
-          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose" data-help-title="Comença pel pas 3" data-help-desc="Et porta a correus automàtics si vols tancar la part post-esdeveniment sense seguir l'ordre complet.">Comença per pas 3</Link>
+          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep2)}>Comença per pas 2</Link>
+          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose" {...helpAttrs(ADMIN_DASHBOARD_HELP.startStep3)}>Comença per pas 3</Link>
         </div>
         <div className="admin-cr-grid-4">
           {pilotToday.map((item) => {
@@ -234,7 +314,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--checklist" data-help-title="Checklist d'avui" data-help-desc="Concentra les tasques diàries obertes i el progrés del dia. Serveix per no perdre el fil operatiu.">
+      <section className="admin-cr-panel admin-cr-panel--checklist" {...helpAttrs(ADMIN_DASHBOARD_HELP.checklist)}>
         <div className="admin-cr-panel-row">
           <div>
             <p className="admin-cr-kicker admin-cr-kicker--cyan">Checklist d&apos;avui</p>
@@ -265,7 +345,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--command" data-help-title="Centre de comandament" data-help-desc="Permet moure estats clau de leads i reserves sense entrar a cada fitxa. És per operativa ràpida des del dashboard.">
+      <section className="admin-cr-panel admin-cr-panel--command" {...helpAttrs(ADMIN_DASHBOARD_HELP.commandCenter)}>
         <div className="admin-cr-panel-head-block">
           <p className="admin-cr-kicker admin-cr-kicker--violet">Centre de comandament</p>
           <h2 className="admin-cr-h2">Mou estats sense canviar de pantalla</h2>
@@ -329,7 +409,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--radar" data-help-title="Radar d'execució" data-help-desc="Resumeix en semàfors on hi ha urgència real: leads aturats, oportunitats calentes i pressupostos en curs.">
+      <section className="admin-cr-panel admin-cr-panel--radar" {...helpAttrs(ADMIN_DASHBOARD_HELP.executionRadar)}>
         <div className="admin-cr-panel-head-block">
           <p className="admin-cr-kicker admin-cr-kicker--cyan">Radar d&apos;execució</p>
           <h2 className="admin-cr-h2">On posar el focus avui</h2>
@@ -387,20 +467,12 @@ export default async function AdminDashboard() {
       {insights.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 space-y-3">
           <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Què necessites saber avui</p>
-          {insights.map((insight) => {
-            const colors = {
-              success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-              warning: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
-              danger: 'bg-red-500/10 border-red-500/20 text-red-400',
-              info: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
-            };
-            return (
-              <div key={insight.id} className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${colors[insight.type]}`}>
+          {insights.map((insight) => (
+              <div key={insight.id} className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${ADMIN_DASHBOARD_INSIGHT_COLORS[insight.type] || ''}`}>
                 <span className="text-lg flex-shrink-0">{insight.icon}</span>
                 <p className="text-sm font-medium leading-relaxed">{insight.text}</p>
               </div>
-            );
-          })}
+          ))}
         </div>
       )}
 
@@ -431,7 +503,7 @@ export default async function AdminDashboard() {
       <QuickActions />
 
       <section className="admin-cr-info-grid">
-        <div className="admin-cr-info-card">
+        <div className="admin-cr-info-card" {...helpAttrs(ADMIN_DASHBOARD_HELP.businessHealth)}>
           <p className="admin-cr-kicker">Salut del negoci</p>
           {d.salutSnapshot ? (
             <>
@@ -455,7 +527,7 @@ export default async function AdminDashboard() {
                   </span>
                 )}
               </div>
-              <div className="admin-cr-health-grid">
+              <div className="admin-cr-health-grid" {...helpAttrs(ADMIN_DASHBOARD_HELP.monitoredAreas)}>
                 {d.salutSnapshot.sections.map((section) => {
                   const hasCritical = section.counts.critical > 0;
                   const hasWarning = section.counts.warning > 0;
@@ -464,7 +536,7 @@ export default async function AdminDashboard() {
                   const count = hasCritical ? section.counts.critical : hasWarning ? section.counts.warning : 0;
                   const href = hasCritical ? '/admin/salut?status=critical' : hasWarning ? '/admin/salut?status=warning' : '/admin/salut';
                   return (
-                    <Link key={section.scope} href={href} className="admin-cr-health-item hover:opacity-80 transition-opacity">
+                    <Link key={section.scope} href={href} className="admin-cr-health-item hover:opacity-80 transition-opacity" data-help-title={section.label} data-help-desc={hasCritical ? `Té ${section.counts.critical} punt${section.counts.critical > 1 ? "s" : ""} crític${section.counts.critical > 1 ? "s" : ""}.` : hasWarning ? `Té ${section.counts.warning} avís${section.counts.warning > 1 ? "os" : ""} actiu${section.counts.warning > 1 ? "s" : ""}.` : "No té incidències obertes ara mateix."}>
                       <span className={`inline-block w-2 h-2 rounded-full ${dot}`} />
                       <p className="admin-cr-health-label">{section.label}</p>
                       <p className={`admin-cr-health-value ${tone}`}>
@@ -482,9 +554,9 @@ export default async function AdminDashboard() {
                   .slice(0, 3);
                 if (topItems.length === 0) return null;
                 return (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-3 space-y-2" {...helpAttrs(ADMIN_DASHBOARD_HELP.priorityIssues)}>
                     {topItems.map((item) => (
-                      <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]">
+                      <Link key={item.id} href={item.href} className="flex items-start gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]" data-help-title={item.title} data-help-desc={item.reason}>
                         <span className={`mt-0.5 inline-block w-2 h-2 rounded-full shrink-0 ${item.status === 'critical' ? 'bg-rose-400' : 'bg-amber-400'}`} />
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-white/90 truncate">{item.title}</p>
@@ -516,7 +588,7 @@ export default async function AdminDashboard() {
             <p className="admin-cr-footnote">
               Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
             </p>
-            <Link href="/admin/salut" className="admin-cr-link-inline">Obrir Salut</Link>
+            <Link href="/admin/salut" className="admin-cr-link-inline" {...helpAttrs(ADMIN_DASHBOARD_HELP.openHealth)}>Obrir Salut</Link>
           </div>
         </div>
         <div className="admin-cr-info-card">
@@ -571,7 +643,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="admin-cr-chart-grid">
-        <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding helpText="Mostra l'evolució recent del trànsit web per veure si hi ha moviment d'audiència i captació.">
+        <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.traffic30d}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: d.ga4Sessions || '-' },
@@ -580,7 +652,7 @@ export default async function AdminDashboard() {
             {!d.ga4Available && <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>}
           </div>
         </Card>
-        <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding helpText="Compara el volum d'entrades amb els tancaments per entendre el rendiment comercial del període.">
+        <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.leadsConversion}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.leadsSeries, stroke: '#34d399', label: 'Entrades', value: d.leadsThisMonth },
@@ -588,7 +660,7 @@ export default async function AdminDashboard() {
             ]} />
           </div>
         </Card>
-        <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding helpText="Relaciona reserves confirmades i facturació per veure si la càrrega d'esdeveniments s'està convertint en ingressos.">
+        <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.bookingsRevenue}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
               { data: d.bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: d.bookingsConfirmed },
@@ -600,12 +672,12 @@ export default async function AdminDashboard() {
 
       {/* ═══ GRÀFIQUES COMPARATIVES ═══ */}
       <div className="admin-cr-chart-grid">
-        <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding helpText="Compara els ingressos mensuals d'aquest any amb l'anterior per detectar tendències i estacionalitat.">
+        <Card title="Ingressos mensuals" subtitle="Comparativa amb any anterior" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.monthlyRevenue}>
           <div className="admin-cr-card-pad">
             <MonthlyBarChart data={d.monthlyRevenue} />
           </div>
         </Card>
-        <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding helpText="Desglossa quins tipus d'esdeveniment tens més presents al negoci. Ajuda a veure especialització i dependència.">
+        <Card title="Distribució per tipus" subtitle="Reserves confirmades/completades" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.eventMix}>
           <div className="admin-cr-card-pad flex items-center justify-center py-4">
             <DonutChart segments={d.eventTypeDistribution} />
           </div>
@@ -643,7 +715,7 @@ export default async function AdminDashboard() {
           </Card>
         </div>
         <div className="admin-cr-desktop-only">
-          <Card title="Activitat" subtitle="Últimes accions" helpText="Recull els últims moviments registrats a l'admin per entendre què s'ha fet recentment.">
+          <Card title="Activitat" subtitle="Últimes accions" helpText={ADMIN_DASHBOARD_HELP.cards.activity}>
             <div className="admin-cr-list">
               {d.activities.map((activity, i) => (
                 <div key={i} className="admin-cr-activity-row">
@@ -693,22 +765,22 @@ export default async function AdminDashboard() {
       </Card>
 
       <div className="admin-cr-mini-grid">
-        <div className="admin-cr-mini-card admin-cr-mini-card--violet" data-help-title="Conversió" data-help-desc="Percentatge de leads que acaben convertint-se en client. És una lectura ràpida de qualitat comercial.">
+        <div className="admin-cr-mini-card admin-cr-mini-card--violet" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.conversion)}>
           <p className="admin-cr-stat-label">Conversió</p>
           <p className="admin-cr-mini-value">{d.conversionRate}%</p>
           <p className="admin-cr-meta">{d.wonLeads}/{d.leadsCount} entrades</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--amber" data-help-title="Testimonis" data-help-desc="Resumeix quants testimonis tens publicats o pendents d'aprovar. Serveix per cuidar reputació i prova social.">
+        <div className="admin-cr-mini-card admin-cr-mini-card--amber" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.testimonials)}>
           <p className="admin-cr-stat-label">Testimonis</p>
           <p className="admin-cr-mini-value">{d.testimonialsApproved + d.testimonialsPending}</p>
           <p className="admin-cr-meta">{d.testimonialsPending} pendents</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--rose" data-help-title="Valoració" data-help-desc="Mostra la puntuació mitjana actual del negoci com a lectura ràpida de reputació.">
+        <div className="admin-cr-mini-card admin-cr-mini-card--rose" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.rating)}>
           <p className="admin-cr-stat-label">Valoració</p>
           <p className="admin-cr-mini-value">⭐ {d.rating}</p>
           <p className="admin-cr-meta">Mitjana</p>
         </div>
-        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan" data-help-title="Inventari" data-help-desc="Resumeix l'estat ràpid del material: disponible, en ús, en manteniment o avariat.">
+        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan" {...helpAttrs(ADMIN_DASHBOARD_HELP.miniCards.inventory)}>
           <p className="admin-cr-stat-label">Inventari</p>
           <p className="admin-cr-mini-value">{d.inventoryAvailable}/{d.inventoryTotal}</p>
           <p className="admin-cr-meta">
@@ -720,7 +792,7 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <section className="admin-cr-audit" data-help-title="Auditoria recent" data-help-desc="Mostra les últimes accions administratives registrades per saber què s'ha canviat i quan.">
+      <section className="admin-cr-audit" {...helpAttrs(ADMIN_DASHBOARD_HELP.recentAudit)}>
         <div className="admin-cr-audit-head">
           <h3 className="admin-cr-step-title">🧾 Auditoria recent</h3>
           <p className="admin-cr-small admin-cr-small--muted">Últimes accions d&apos;admin</p>
@@ -741,9 +813,6 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
-
-
 
 
 

@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!mediaPreview) {
     try {
-      const { photos } = await listPortfolioPhotos({ slug, limit: 1 });
+      const { photos } = await listPortfolioPhotos({ slug, limit: 1, includeTotal: false });
       mediaPreview = photos[0]?.photoUrl;
     } catch {
       // continuar amb altres fallbacks
@@ -144,7 +144,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
 
   let bookingImages: GalleryItem[] = [];
   try {
-    const { photos } = await listPortfolioPhotos({ slug, limit: 100 });
+    const { photos } = await listPortfolioPhotos({ slug, limit: 100, includeTotal: false });
     bookingImages = photos.map((p) => ({
       src: p.photoUrl,
       alt: p.caption || `${category?.name || slug} - foto event`,
@@ -356,5 +356,3 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     </>
   );
 }
-
-

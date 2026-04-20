@@ -16,18 +16,22 @@
     "assets:sync:full": "pnpm run assets:sync && pnpm run sync:reviews:if-configured",
     "logos:sync": "node scripts/sync-client-logos.mjs",
     "i18n:packs:guard": "npx tsx scripts/check-packs-i18n.ts",
+    "i18n:equipment:guard": "npx tsx scripts/check-equipment-i18n.ts",
     "i18n:packs:sync": "npx tsx scripts/sync-packs-to-db.ts",
     "i18n:packs:fix-or-alert": "pnpm run i18n:packs:sync && pnpm run i18n:packs:guard",
     "autofix:finance:health": "npx tsx scripts/autofix-finance-health.ts",
     "autofix:system:health": "npx tsx scripts/autofix-system-health.ts",
     "theme:admin:check": "node scripts/admin-theme-autofix.mjs --check",
+    "qa:visual-overflow": "node scripts/check-visual-overflow.mjs",
     "theme:admin:fix": "node scripts/admin-theme-autofix.mjs --fix",
     "autofix:master": "npx tsx scripts/autofix-master.ts",
     "autofix": "pnpm run autofix:master",
     "qa:scan:web": "node scripts/scan-i18n-leaks.mjs",
     "qa:smoke:i18n": "node scripts/smoke-i18n.mjs",
     "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('pnpm run assets:sync:full',{stdio:'inherit'});\"",
-    "build": "pnpm run arch:layer:check && pnpm run build:assets && pnpm run i18n:packs:guard && next build",
+    "build": "pnpm run build:ci",
+    "build:ci": "pnpm run validate:core && next build",
+    "build:with-assets": "pnpm run build:assets && pnpm run build:ci",
     "start": "next start",
     "lint": "next lint",
     "generate:portfolio": "node scripts/generate-portfolio-config.mjs",
@@ -49,7 +53,15 @@
     "test:e2e:report": "playwright show-report",
     "scan:hardcoded": "node scripts/scan-hardcoded.js",
     "arch:layer:check": "node scripts/check-layer-catalogs.mjs",
-    "validate:core": "pnpm run arch:layer:check && npx tsc --noEmit && pnpm run i18n:packs:guard"
+    "arch:task-canonical:check": "node scripts/check-task-canonical.mjs",
+    "validate:core": "pnpm run qa:protocol && pnpm run qa:protocol:test && pnpm run qa:encoding && pnpm run qa:message-imports && pnpm run arch:layer:check && pnpm run arch:task-canonical:check && npx tsc --noEmit && pnpm run i18n:packs:guard && pnpm run i18n:equipment:guard",
+    "qa:encoding": "node scripts/check-mojibake.mjs --paths app lib messages prisma",
+    "qa:encoding:changed": "node scripts/check-mojibake.mjs --changed",
+    "qa:protocol": "node scripts/check-admin-change-log.mjs",
+    "qa:message-imports": "node scripts/check-message-imports.mjs",
+    "qa:protocol:test": "vitest run __tests__/scripts/",
+    "qa:patches": "node scripts/check-patches.mjs",
+    "qa:language": "node scripts/check-language-quality.mjs"
   },
   "prisma": {
     "seed": "pnpm exec ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -130,5 +142,3 @@
     ]
   }
 }
-
-

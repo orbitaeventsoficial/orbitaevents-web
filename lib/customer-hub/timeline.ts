@@ -1,27 +1,25 @@
 import type { BookingDTO, MessageDTO, ProposalDTO, TaskDTO, TimelineEventDTO } from './dto';
 import { labelEstatReserva } from './labels';
+import {
+  canonicalEventsToTimeline,
+  mapAdminLogToCanonicalEvent,
+  mapCustomerActivityToCanonicalEvent,
+  mapLeadActivityToCanonicalEvent,
+} from '@/lib/services/timelineQueryService';
 
 type BuildTimelineInput = {
   proposals: ProposalDTO[];
   bookings: BookingDTO[];
   tasks: TaskDTO[];
   messages: MessageDTO[];
-  customerActivities: Array<{ id: string; action: string; createdAt: Date }>;
-  leadActivities: Array<{ id: string; type: string; title?: string | null; createdAt: Date; leadId: string }>;
+  customerActivities: Array<{ id: string; action: string; createdAt: Date; details?: Record<string, unknown> | null }>;
+  leadActivities: Array<{ id: string; type: string; title?: string | null; description?: string | null; createdAt: Date; createdBy?: string | null; leadId: string }>;
+  adminLogs?: Array<{ id: string; action: string; entity: string; entityId?: string | null; details?: Record<string, unknown> | null; createdAt: Date; userId?: string | null }>;
 };
 
 export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
   const events: TimelineEventDTO[] = [];
   const bookingStatusLabel = (status: string) => labelEstatReserva(status).toLowerCase();
-  const activityLabel = (action: string) => {
-    if (action === 'NOTE_ADDED') return 'Nota interna afegida';
-    if (action === 'MESSAGE_SENT') return 'Missatge enviat';
-    if (action === 'TASK_CREATED') return 'Tasca creada';
-    if (action === 'TASK_DONE') return 'Tasca completada';
-    if (action === 'PROPOSAL_SENT') return 'Pressupost enviat';
-    if (action === 'BOOKING_CONFIRMED') return 'Reserva confirmada';
-    return action;
-  };
 
   for (const p of input.proposals) {
     events.push({
@@ -85,29 +83,35 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       type: channelType,
       at: m.sentAt || m.createdAt,
       title: `${channelIcon}${m.subject || m.bodyPreview || 'Comunicació'}`,
+      meta: {
+        channel: m.channel,
+        direction: m.direction || null,
+        preview: m.bodyPreview || null,
+      },
       link: m.leadId ? { label: 'Veure entrada', href: `/admin/leads/${m.leadId}` } : undefined,
     });
   }
 
-  for (const a of input.customerActivities) {
-    events.push({
-      id: `ca:${a.id}`,
-      type: 'ACTIVITY',
-      at: a.createdAt.toISOString(),
-      title: activityLabel(a.action),
-    });
-  }
+  const activityEvents = canonicalEventsToTimeline([
+    ...input.customerActivities.map((activity) => mapCustomerActivityToCanonicalEvent({
+      id: activity.id,
+      action: activity.action,
+      createdAt: activity.createdAt,
+      details: activity.details ?? null,
+    })),
+    ...input.leadActivities.map((activity) => mapLeadActivityToCanonicalEvent(activity)),
+    ...(input.adminLogs || []).map((log) => mapAdminLogToCanonicalEvent({
+      id: log.id,
+      action: log.action,
+      entity: log.entity,
+      entityId: log.entityId ?? null,
+      details: log.details ?? null,
+      createdAt: log.createdAt,
+      userId: log.userId ?? null,
+    })),
+  ]);
 
-  for (const a of input.leadActivities) {
-    events.push({
-      id: `la:${a.id}`,
-      type: 'ACTIVITY',
-      at: a.createdAt.toISOString(),
-      title: a.title || activityLabel(a.type),
-      link: { label: 'Veure entrada', href: `/admin/leads/${a.leadId}` },
-    });
-  }
-
+  events.push(...activityEvents);
   events.sort((a, b) => (a.at < b.at ? 1 : -1));
   return events.slice(0, 250);
 }
