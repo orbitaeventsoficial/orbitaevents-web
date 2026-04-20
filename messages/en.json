@@ -14,7 +14,13 @@
     "hero": {
       "title1": "IMMERSIVE",
       "title2": "HALLOWEEN",
-      "subtitle": "This is not a party with a few props. It is a haunted passage built with real decoration, thematic DJ, fog and lighting to turn the whole space into a memorable horror scene."
+      "subtitle": "This is not a party with a few props. It is a haunted passage built with real decoration, thematic DJ, fog and lighting to turn the whole space into a memorable horror scene.",
+      "kicker": "Haunted passage · fog · light · real scene",
+      "tags": {
+        "tag1": "Real decoration",
+        "tag2": "Themed DJ",
+        "tag3": "Synced smoke & lights"
+      }
     },
     "cta": {
       "reserve": "I want an immersive Halloween",

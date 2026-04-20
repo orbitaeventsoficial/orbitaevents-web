@@ -694,6 +694,7 @@ Criteri pràctic:
 **EN MARXA**: experiència premium real, no només funcional. Canvi #77: auditoria visual/overflow global del repo iniciada per `codex`, treballant per `codex`, tancament pendent.
 **FET** *(2026-04-10 per `claude`)*: visual premium aplicat a Lead detail (executive KPIs → glass+stagger, booking section → glass cards), Tasks (llista → glass cards amb indicador vençut), Social (KPIs → glass+stagger, posts → glass cards, idees → glass, calendari → glass). 0 hex hardcoded nous.
 **FET** *(2026-04-10 per `claude` — Canvi #74)*: Activity — KPI stats cards, mobile cards i desktop table amb `admin-card-glass` + `admin-stagger-item` + hover subtle. Empty state coherent.
+**FET** *(2026-04-20 per `codex` — Canvi #300)*: `Stats` entra al patró shared de configuració/editorial amb `EditorControlStrip`; el workspace deixa de començar només per comptadors i targetes locals i passa a resumir cobertura pública, overrides manuals, sessió oberta i següent pas abans d’editar.
 **SEGÜENT**: revisar responsive 375px de les pàgines tocades (Activity, Leads detail, Tasks, Social).
 **PENDENT CRÍTIC**: identitat visual coherent entre admin, web pública i mòduls nous.
 **MÉS ENDAVANT**: sistema visual formalitzat. Tokens, ritmes, components premium compartits. Mobile admin d'alt nivell.
@@ -4375,6 +4376,18 @@ px tsc --noEmit OK · git diff --check OK.
 - Efecte: el tancament de sessió ja no depèn de recordar “què faltava”; el registre queda net i amb següent pas executable visible.
 - Verificació del tall: `pnpm run qa:protocol` OK.
 - `ADMIN_CHANGE_COUNTER` puja a `299`; el següent canvi real ha de ser `#300`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #300 — 2026-04-20 — codex (FET)
+**`Stats` entra a `EditorControlStrip` i deixa de començar només per comptadors i targetes locals sense una lectura inicial shared de configuració pública.**
+- Context: després dels `Canvi #269`, `#281`, `#283`, `#286`, `#289`, `#291` i `#296`, la monocapa shared de configuració/editorial ja cobria bona part dels workspaces sensibles. `app/admin/stats/page.tsx` continuava sent útil però massa cru a l’entrada: hi havia prou estat real (`stats`, `manualStats`, `editingStat`, `fallback`, `calculated`) per governar la capa pública, però tot quedava dispers entre dos comptadors, targetes i el bloc final d’ajuda.
+- `app/admin/stats/page.tsx`: integrat `EditorControlStrip` al capdamunt del workspace. `overview` resumeix volum total, pes automàtic i overrides manuals; `status` fa emergir si hi ha edició oberta i quina és la desviació manual més gran; `action` diferencia entre tancar la sessió activa, revisar overrides antics o mantenir el catàleg en automàtic.
+- El canvi no toca la lògica de càrrega, desat ni reset: reutilitza `stats`, `manualStats`, `editingStat`, `fallback`, `calculated` i l’estat real de la sessió, de manera que la capa shared respon al mateix contracte viu del workspace i no afegeix cap resum paral·lel o hardcoded.
+- Efecte: `Stats` deixa de ser només una pantalla tècnica de manteniment i entra també dins del mateix llenguatge visual shared dels workspaces de configuració/editorial, amb lectura clara de cobertura, override i focus abans d’editar.
+- Verificació del tall: `npx tsc --noEmit --pretty false` OK. `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `300`; el següent canvi real ha de ser `#301`.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`

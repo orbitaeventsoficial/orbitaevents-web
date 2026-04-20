@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { log } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -225,6 +225,35 @@ export default function GoogleReviewsRotating({ showFooterCta = true, showHeader
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
 
+  const touchStateRef = useRef<{ x: number; y: number; t: number } | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStateRef.current = { x: touch.clientX, y: touch.clientY, t: Date.now() };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const start = touchStateRef.current;
+      touchStateRef.current = null;
+      if (!start || reviews.length <= 1) return;
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      const dt = Date.now() - start.t;
+      if (Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy) * 1.2 || dt > 900) return;
+      setIsAutoPlaying(false);
+      if (dx < 0) {
+        setCurrentIndex((prev) => (prev + 1) % reviews.length);
+      } else {
+        setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
+      }
+    },
+    [reviews.length]
+  );
+
   const formattedLastUpdated = (() => {
     if (!lastUpdated) return null;
     const parsed = new Date(lastUpdated);
@@ -339,7 +368,11 @@ export default function GoogleReviewsRotating({ showFooterCta = true, showHeader
         )}
 
         {/* Carousel */}
-        <div className="relative">
+        <div
+          className="relative touch-pan-y select-none"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <AnimatePresence mode="wait">
             <ReviewCard key={currentIndex} review={reviews[currentIndex]} />
           </AnimatePresence>

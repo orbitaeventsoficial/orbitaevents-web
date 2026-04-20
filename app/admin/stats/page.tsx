@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { EditorControlStrip } from '../components/EditorControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -137,21 +138,84 @@ export default function StatsPage() {
   }
 
   const manualStats = stats.filter(s => s.isManual).length;
+  const automaticStats = stats.length - manualStats;
+  const topManualStat =
+    stats
+      .filter((stat) => stat.isManual)
+      .sort((left, right) => Math.abs(right.fallback - right.calculated) - Math.abs(left.fallback - left.calculated))[0] ?? null;
+  const isEditing = editingStat !== null;
+  const statusItems = [
+    manualStats > 0
+      ? `${manualStats} estadística${manualStats === 1 ? '' : 's'} dep${manualStats === 1 ? 'èn' : 'enen'} ara mateix d’un valor manual per sobre del càlcul automàtic.`
+      : 'Tot el catàleg viu ara mateix en mode automàtic, sense overrides manuals actius.',
+    topManualStat
+      ? `La desviació manual més gran és a ${topManualStat.label}: ${topManualStat.fallback} en lloc de ${topManualStat.calculated}.`
+      : 'No hi ha cap desajust manual rellevant per revisar abans de publicar canvis.',
+    isEditing
+      ? 'Hi ha una edició oberta: convé tancar-la o desar-la abans de saltar a una altra estadística.'
+      : 'No hi ha cap sessió d’edició oberta; pots entrar directament a la xifra que vulguis governar.',
+  ];
+  const actionTitle = isEditing
+    ? 'Tanca la sessió oberta abans de tocar una altra xifra'
+    : manualStats > 0
+      ? 'Revisa si els overrides manuals continuen tenint sentit'
+      : 'Mantén el catàleg en mode automàtic i toca només el que canvia negoci';
+  const actionDescription = isEditing
+    ? 'La prioritat correcta és desar o cancel·lar l’edició activa. Un cop tancada, baixa a la llista i valida si aquella dada ha d’entrar manualment o tornar al càlcul viu.'
+    : manualStats > 0
+      ? 'Aquest espai és per corregir el missatge públic quan el càlcul no explica bé el negoci. Si un override ja no cal, torna’l a automàtic abans d’afegir-ne un altre.'
+      : 'La millor disciplina aquí és no inventar números. Si el càlcul ja representa bé l’activitat real, baixa a la llista només quan hi hagi un motiu comercial clar per intervenir.';
 
   return (
     <AdminPage
       title="Estadístiques"
       subtitle="Gestiona les estadístiques que es mostren al lloc web"
     >
+      <EditorControlStrip
+        overview={{
+          eyebrow: 'Cobertura pública',
+          title: 'Què controla aquest espai',
+          description: 'Aquí governes els números visibles de la web pública. El valor bo no és tenir moltes targetes, sinó saber si el que veu el client surt de dades reals o d’un override conscient.',
+          stats: [
+            { label: 'Stats', value: stats.length },
+            { label: 'Automàtiques', value: automaticStats, tone: automaticStats > 0 ? 'success' : 'default' },
+            { label: 'Manuals', value: manualStats, tone: manualStats > 0 ? 'warning' : 'default' },
+          ],
+        }}
+        status={{
+          eyebrow: 'Estat',
+          title: 'Com està la capa pública ara mateix',
+          items: statusItems,
+          stats: topManualStat
+            ? [
+                { label: 'Override principal', value: topManualStat.label, hint: `${topManualStat.fallback} manual vs ${topManualStat.calculated} automàtic`, tone: 'warning' },
+              ]
+            : undefined,
+          tone: manualStats > 0 || isEditing ? 'warning' : 'success',
+        }}
+        action={{
+          eyebrow: 'Acció principal',
+          title: actionTitle,
+          description: actionDescription,
+          primaryAction: { href: '#stats-list', label: 'Anar a la llista' },
+          secondaryAction: { href: '#stats-help', label: 'Veure criteri' },
+          secondaryPills: isEditing
+            ? ['Hi ha una edició oberta']
+            : manualStats > 0
+              ? ['Prioritza overrides manuals antics']
+              : ['No cal tocar res si el càlcul ja és correcte'],
+          tone: isEditing || manualStats > 0 ? 'warning' : 'success',
+        }}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border p-4">
+        <div className="rounded-xl border admin-card-glass p-4">
           <div className="text-sm font-medium">Valors automàtics</div>
-          <div className="mt-1 text-3xl font-bold">{stats.length - manualStats}</div>
+          <div className="mt-1 text-3xl font-bold">{automaticStats}</div>
           <div className="mt-1 text-xs">Calculats des de la BD</div>
         </div>
-        <div className="rounded-xl border p-4">
+        <div className="rounded-xl border admin-card-glass p-4">
           <div className="text-sm font-medium">Valors manuals</div>
           <div className="mt-1 text-3xl font-bold">{manualStats}</div>
           <div className="mt-1 text-xs">Configurats manualment</div>
@@ -159,7 +223,7 @@ export default function StatsPage() {
       </div>
 
       {/* Stats List */}
-      <div className="space-y-4">
+      <div id="stats-list" className="space-y-4">
         {stats.map((stat) => (
           <div
             key={stat.key}
@@ -196,7 +260,7 @@ export default function StatsPage() {
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="text-xs mb-1">Valor Manual</div>
                 <div className="text-2xl font-bold">
-                  {stat.fallback || '—'}
+                  {stat.isManual ? stat.fallback : '—'}
                 </div>
               </div>
             </div>
@@ -255,7 +319,7 @@ export default function StatsPage() {
       </div>
 
       {/* Info */}
-      <div className="rounded-xl border p-4">
+      <div id="stats-help" className="rounded-xl border admin-card-glass p-4">
         <h3 className="mb-2 text-sm font-semibold">ℹ️ Com funciona</h3>
         <ul className="space-y-1 text-sm">
           <li>• Els <strong>valors automàtics</strong> es calculen des de les reserves completades</li>

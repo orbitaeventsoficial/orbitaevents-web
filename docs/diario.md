@@ -1,3 +1,9 @@
+## 2026-04-20 — Canvi #300: `Stats` entra a `EditorControlStrip` (codex)
+- `app/admin/stats/page.tsx` ja no comença només per comptadors i targetes locals: ara obre amb una lectura shared de cobertura, estat i acció principal.
+- La capa visual nova reutilitza estat real del workspace (`stats`, `manualStats`, `editingStat`, `fallback`, `calculated`) per resumir volum públic, overrides manuals, desviació principal i focus correcte abans d’editar.
+- Efecte: `stats` entra també al mateix llenguatge visual shared de configuració/editorial sense crear cap resum paral·lel al manteniment real de xifres públiques.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
 ## 2026-04-20 — Canvi #299: tancament documentat de sessió i sanejament del registre (codex)
 - [docs/protocol-producte-admin-ca.md](D:\orbitaevents\docs\protocol-producte-admin-ca.md) ja no presenta `leadTaskFacade` i `leadTaskRouteService` com a wrappers vius: queda clar que només són rastre històric de la migració.
 - [docs/diario.md](D:\orbitaevents\docs\diario.md) queda sanejat, sense bytes nuls ni control chars incrustats.

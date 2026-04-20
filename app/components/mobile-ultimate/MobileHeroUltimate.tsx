@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useState, useCallback } from 'react';
+import { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -118,11 +118,42 @@ export default function MobileHeroUltimate() {
     setSlideIndex((prev) => (prev + 1) % mediaItems.length);
   }, [imageFallbackItems, mediaItems.length]);
 
+  const touchStateRef = useRef<{ x: number; y: number; t: number } | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    touchStateRef.current = { x: touch.clientX, y: touch.clientY, t: Date.now() };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const start = touchStateRef.current;
+      touchStateRef.current = null;
+      if (!start) return;
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      const dt = Date.now() - start.t;
+      if (Math.abs(dx) < 50) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      if (dt > 900) return;
+      if (mediaItems.length < 2) return;
+      setSlideIndex((prev) =>
+        dx < 0 ? (prev + 1) % mediaItems.length : (prev - 1 + mediaItems.length) % mediaItems.length
+      );
+    },
+    [mediaItems.length]
+  );
+
   return (
     <section
       aria-label="Hero"
-      className="relative min-h-[100svh] w-full overflow-hidden"
+      className="relative min-h-[100svh] w-full overflow-hidden touch-pan-y"
       style={{ background: 'linear-gradient(180deg, #010101 0%, #070606 34%, #040404 100%)' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">

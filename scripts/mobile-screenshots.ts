@@ -19,9 +19,8 @@ async function main() {
   // Pre-set session flags to skip intro and cookies
   await page.goto(`${BASE_URL}/ca`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.evaluate(() => {
-    // Skip intro on next load (key with hyphens!)
-    sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
-    // Accept cookies to hide banner
+    localStorage.setItem('orbita-mobile-intro-seen', 'true');
+    sessionStorage.setItem('orbita-intro-seen', 'true');
     localStorage.setItem('orbita_cookie_consent', JSON.stringify({
       necessary: true, analytics: false, marketing: false, timestamp: new Date().toISOString()
     }));
@@ -58,9 +57,9 @@ async function main() {
   const context2 = await browser.newContext({ ...DEVICE, locale: 'ca' });
   const page2 = await context2.newPage();
   await page2.goto(`${BASE_URL}/ca`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  // Skip intro but leave cookies
   await page2.evaluate(() => {
-    sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+    localStorage.setItem('orbita-mobile-intro-seen', 'true');
+    sessionStorage.setItem('orbita-intro-seen', 'true');
   });
   await page2.goto(`${BASE_URL}/ca`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page2.waitForTimeout(7000); // Wait for cookie banner to appear (2s delay + render)

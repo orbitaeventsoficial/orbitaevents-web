@@ -59,6 +59,7 @@ test-results/
 *.html
 !public/respira-rosa/index.html
 screenshots/
+screenshots-mobile/
 scripts/admin-screenshots/
 
 tmp/

@@ -14,7 +14,13 @@
     "hero": {
       "title1": "HALLOWEEN",
       "title2": "INMERSIVO",
-      "subtitle": "No es una fiesta con cuatro detalles. Es un pasaje encantado con decoración real, DJ temático, niebla y luz para convertir el espacio en una escena de terror memorable."
+      "subtitle": "No es una fiesta con cuatro detalles. Es un pasaje encantado con decoración real, DJ temático, niebla y luz para convertir el espacio en una escena de terror memorable.",
+      "kicker": "Pasaje encantado · niebla · luz · escena real",
+      "tags": {
+        "tag1": "Decoración real",
+        "tag2": "DJ temático",
+        "tag3": "Humo y luz sincronizados"
+      }
     },
     "cta": {
       "reserve": "Quiero un Halloween inmersivo",

@@ -21,6 +21,7 @@ import {
   useRef,
   type ReactNode,
   type DragEvent,
+  type PointerEvent as ReactPointerEvent,
   type MutableRefObject,
 } from 'react';
 import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
@@ -44,6 +45,13 @@ export interface PipelineCardContext {
     draggable: boolean;
     onDragStart: (e: DragEvent) => void;
     onDragEnd: () => void;
+    onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void;
+    onPointerMove: (e: ReactPointerEvent<HTMLElement>) => void;
+    onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void;
+    onPointerCancel: () => void;
+    style?: {
+      touchAction: 'none' | 'pan-y';
+    };
     'data-dragging'?: true;
   };
 }
@@ -76,6 +84,14 @@ type ColumnViewportState = {
   height: number;
 };
 
+type TouchDragState = {
+  itemId: string;
+  startX: number;
+  startY: number;
+  pointerId: number;
+  isActive: boolean;
+};
+
 export default function PipelineBoard<T>({
   columnsDef,
   items,
@@ -103,6 +119,7 @@ export default function PipelineBoard<T>({
   const [expandedColumns, setExpandedColumns] = useState<Set<string>>(new Set());
   const [columnViewport, setColumnViewport] = useState<Record<string, ColumnViewportState>>({});
   const columnBodyRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const touchDragRef = useRef<TouchDragState | null>(null);
 
   const columns = useMemo<PipelineColumn<T>[]>(
     () => columnsDef.map((def) => ({
@@ -146,6 +163,19 @@ export default function PipelineBoard<T>({
     if (!item || getStatus(item) === targetStatus) return;
     onMoveStatus(draggingId, targetStatus);
   }, [draggingId, items, getId, getStatus, onMoveStatus]);
+
+  const clearTouchDrag = useCallback(() => {
+    touchDragRef.current = null;
+    setDraggingId(null);
+    setDragOverStatus(null);
+  }, []);
+
+  const resolveDropStatusFromPoint = useCallback((clientX: number, clientY: number) => {
+    if (typeof document === 'undefined') return null;
+    const element = document.elementFromPoint(clientX, clientY);
+    const column = element instanceof HTMLElement ? element.closest<HTMLElement>('[data-pipeline-column]') : null;
+    return column?.dataset.pipelineColumn || null;
+  }, []);
 
   if (loading) {
     return (
@@ -260,6 +290,58 @@ export default function PipelineBoard<T>({
                             setDraggingId(null);
                             setDragOverStatus(null);
                           },
+                          onPointerDown: (e: ReactPointerEvent<HTMLElement>) => {
+                            if (isUpdating || e.pointerType !== 'touch') return;
+                            touchDragRef.current = {
+                              itemId,
+                              startX: e.clientX,
+                              startY: e.clientY,
+                              pointerId: e.pointerId,
+                              isActive: false,
+                            };
+                          },
+                          onPointerMove: (e: ReactPointerEvent<HTMLElement>) => {
+                            const touchDrag = touchDragRef.current;
+                            if (!touchDrag || touchDrag.pointerId !== e.pointerId || e.pointerType !== 'touch') return;
+
+                            const deltaX = e.clientX - touchDrag.startX;
+                            const deltaY = e.clientY - touchDrag.startY;
+
+                            if (!touchDrag.isActive) {
+                              if (Math.abs(deltaY) > 18 && Math.abs(deltaY) > Math.abs(deltaX) * 1.2) {
+                                touchDragRef.current = null;
+                                return;
+                              }
+
+                              if (Math.abs(deltaX) < 12 && Math.abs(deltaY) < 12) return;
+
+                              touchDrag.isActive = true;
+                              setDraggingId(itemId);
+                            }
+
+                            e.preventDefault();
+                            const targetStatus = resolveDropStatusFromPoint(e.clientX, e.clientY);
+                            setDragOverStatus(targetStatus);
+                          },
+                          onPointerUp: (e: ReactPointerEvent<HTMLElement>) => {
+                            const touchDrag = touchDragRef.current;
+                            if (!touchDrag || touchDrag.pointerId !== e.pointerId || e.pointerType !== 'touch') return;
+
+                            if (touchDrag.isActive) {
+                              e.preventDefault();
+                              const targetStatus = resolveDropStatusFromPoint(e.clientX, e.clientY);
+                              if (targetStatus) {
+                                handleDrop(targetStatus);
+                                return;
+                              }
+                            }
+
+                            clearTouchDrag();
+                          },
+                          onPointerCancel: clearTouchDrag,
+                          style: touchDragRef.current?.itemId === itemId && touchDragRef.current?.isActive
+                            ? { touchAction: 'none' }
+                            : { touchAction: 'pan-y' },
                           ...(isDragging ? { 'data-dragging': true as const } : {}),
                         },
                       })}
