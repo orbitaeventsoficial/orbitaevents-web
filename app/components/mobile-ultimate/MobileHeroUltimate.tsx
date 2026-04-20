@@ -12,6 +12,23 @@ type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
 
 const IMAGE_DURATION = 8500;
 
+const HERO_PARTICLES = [
+  { x: 8, y: 18, size: 2.5, delay: 0, dur: 7 },
+  { x: 22, y: 34, size: 1.8, delay: 0.8, dur: 9 },
+  { x: 34, y: 12, size: 2.2, delay: 2.1, dur: 8 },
+  { x: 48, y: 28, size: 1.5, delay: 0.3, dur: 10 },
+  { x: 62, y: 16, size: 2.8, delay: 1.6, dur: 7.5 },
+  { x: 76, y: 32, size: 1.8, delay: 2.4, dur: 8.5 },
+  { x: 88, y: 22, size: 2, delay: 0.6, dur: 9.5 },
+  { x: 14, y: 52, size: 1.6, delay: 1.3, dur: 7.2 },
+  { x: 38, y: 62, size: 2.1, delay: 0.1, dur: 8.3 },
+  { x: 58, y: 48, size: 1.7, delay: 2.2, dur: 9.1 },
+  { x: 72, y: 58, size: 2.4, delay: 0.9, dur: 7.8 },
+  { x: 90, y: 46, size: 1.9, delay: 1.8, dur: 8.6 },
+  { x: 28, y: 72, size: 1.5, delay: 0.4, dur: 9.3 },
+  { x: 68, y: 68, size: 2, delay: 1.5, dur: 7.6 },
+];
+
 function shuffle<T>(arr: T[]): T[] {
   const next = [...arr];
   for (let i = next.length - 1; i > 0; i -= 1) {
@@ -150,7 +167,7 @@ export default function MobileHeroUltimate() {
   return (
     <section
       aria-label="Hero"
-      className="relative min-h-[100svh] w-full overflow-hidden touch-pan-y"
+      className="relative min-h-[100svh] w-full overflow-hidden touch-pan-y oe-film-grain"
       style={{ background: 'linear-gradient(180deg, #010101 0%, #070606 34%, #040404 100%)' }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -187,6 +204,34 @@ export default function MobileHeroUltimate() {
 
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-[56%] bg-gradient-to-t from-black/95 via-black/70 to-transparent" />
+
+        {!reduceMotion && (
+          <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]">
+            {HERO_PARTICLES.map((p, i) => (
+              <motion.span
+                key={i}
+                className="absolute rounded-full bg-amber-200/50"
+                style={{
+                  left: `${p.x}%`,
+                  top: `${p.y}%`,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  boxShadow: '0 0 6px rgba(253, 224, 164, 0.6)',
+                }}
+                animate={{
+                  y: [0, -14, 0],
+                  opacity: [0.25, 0.7, 0.25],
+                }}
+                transition={{
+                  duration: p.dur,
+                  delay: p.delay,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {mediaItems.length > 1 && (
           <div className="absolute top-14 left-1/2 z-20 flex -translate-x-1/2 gap-1">

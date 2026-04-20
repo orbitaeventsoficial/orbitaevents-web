@@ -47,8 +47,7 @@ const nextConfig = {
     // Detectar si estamos en desarrollo
     const isDev = process.env.NODE_ENV === 'development';
     const scriptSrc = [
-      "script-src 'self' 'unsafe-inline'",
-      ...(isDev ? ["'unsafe-eval'"] : []),
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
       'https://challenges.cloudflare.com',
