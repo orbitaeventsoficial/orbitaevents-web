@@ -8,6 +8,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import { persistContactLead } from '@/lib/services/contactLeadCaptureService';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 import { toIntlLocale } from '@/lib/constants';
 import { CONTACT_COPY, EVENT_TYPE_LABELS, resolveLocale, contactSchema, parseGuestCount, mapEventType, determineSource } from './contact-copy';
 
@@ -245,7 +246,8 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-      const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+      const recipientsList = await getRecipientsAsString('leads');
+      const adminEmail = (recipientsList || SITE_CONFIG.business.email).trim();
       const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
 
       sendEmailWithTimeout(

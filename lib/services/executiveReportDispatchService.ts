@@ -3,10 +3,11 @@ import { sendEmail } from '@/lib/email';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { buildExecutiveReport } from '@/lib/services/executiveReportService';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 
 export async function sendExecutiveReport() {
   const report = await buildExecutiveReport();
-  const recipient = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+  const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
 
   const html = `
     <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">

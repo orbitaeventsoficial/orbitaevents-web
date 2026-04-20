@@ -7,6 +7,7 @@
 
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { getEventLabel, getSourceDisplay, formatDateSimple, formatDate, formatCurrency } from '@/lib/constants';
 import { log } from '@/lib/logger';
@@ -99,8 +100,9 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
 
     const adminEmailHtml = generateAdminEmailHTML(lead, eventLabel, sourceLabel, timestamp);
 
+    const to = await getRecipientsAsString('leads');
     await sendEmail({
-      to: process.env.CONTACT_TO || SITE_CONFIG.business.email,
+      to: to || SITE_CONFIG.business.email,
       subject: `🚀 NOU LEAD: ${lead.name} - ${eventLabel} ${lead.estimatedPrice ? `(${lead.estimatedPrice}€)` : ''}`,
       html: adminEmailHtml,
       replyTo: lead.email.includes('@') && !lead.email.includes('temp-') ? lead.email : undefined,

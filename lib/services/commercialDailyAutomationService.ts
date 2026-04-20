@@ -11,6 +11,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 
 const COMMERCIAL_SCORING_BATCH_SIZE = 50;
 
@@ -162,7 +163,7 @@ export async function runCommercialDailyAutomation() {
     </div>
   `;
 
-  const recipient = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+  const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
   await sendEmail({ to: recipient, subject, html });
 
   const waTo = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');

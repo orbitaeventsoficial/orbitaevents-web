@@ -11,6 +11,7 @@ import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import {
   type PendingFollowUp,
@@ -237,7 +238,7 @@ export async function runUrgentFollowUpAlerts(
 
   try {
     const { subject, html } = buildUrgentAlertEmail(newAlerts);
-    const recipient = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+    const recipient = (await getRecipientsAsString('urgent')) || SITE_CONFIG.business.email;
     await sendEmail({ to: recipient, subject, html });
     emailSent = true;
   } catch (err) {

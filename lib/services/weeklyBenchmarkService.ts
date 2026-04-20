@@ -10,6 +10,7 @@ import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { log } from '@/lib/logger';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -151,7 +152,7 @@ export async function runWeeklyBenchmark(now: Date = new Date()): Promise<Weekly
   });
 
   // Send email
-  const recipient = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+  const recipient = (await getRecipientsAsString('reports')) || SITE_CONFIG.business.email;
   const html = buildEmailHtml(report);
   try {
     await sendEmail({

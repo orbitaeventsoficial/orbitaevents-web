@@ -3,6 +3,7 @@ import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { formatDateTimeFull } from '@/lib/constants';
+import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 
 interface LeadSnapshotInput {
   lead: {
@@ -215,7 +216,7 @@ export async function processLeadTechnicalSnapshot(input: {
     return { status: 200, body: { ok: true, documentId: doc.id } };
   }
 
-  const recipient = input.recipient || process.env.CONTACT_TO?.trim() || SITE_CONFIG.business.email;
+  const recipient = input.recipient || (await getRecipientsAsString('leads')) || SITE_CONFIG.business.email;
   const subject = `Instantània tècnica lead ${lead.name} (${lead.id})`;
 
   await sendEmail({

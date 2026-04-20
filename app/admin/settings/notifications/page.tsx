@@ -7,6 +7,7 @@ import { AdminPage } from '../../components/AdminPage';
 import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
+import { RecipientsManager } from './RecipientsManager';
 
 interface NotificationConfig {
   smtp: {
@@ -419,6 +420,8 @@ export default function SettingsNotificationsPage() {
           </p>
         )}
       </section>
+
+      <RecipientsManager />
 
       <section className="rounded-xl border p-6 shadow-sm admin-card-glass">
         <h2 className="mb-4 text-lg font-semibold">⚙️ Configuració Actual</h2>
