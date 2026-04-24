@@ -3,6 +3,7 @@ import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { COMMERCIAL_SEQUENCE_STEP_COPY } from '@/lib/constants';
 import { deriveLeadResponseState } from '@/lib/services/responseTrackingService';
+import { recordLeadCommercialSequenceStepSent } from '@/lib/services/leadActivityService';
 import { log } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -210,22 +211,15 @@ export async function runCommercialSequences(): Promise<SequenceRunSummary> {
           summary.exhausted += 1;
         }
 
-        await prisma.leadActivity.create({
-          data: {
-            leadId: lead.id,
-            type: channelUsed === 'email' ? 'EMAIL' : 'WHATSAPP',
-            title: copy.activity,
-            description: `Pas ${nextStepDef.step}/${maxStep} (${templateSlug}) · canal ${channelUsed}`,
-            createdBy: 'Sequence Bot',
-            metadata: {
-              step: nextStepDef.step,
-              totalSteps: maxStep,
-              templateSlug,
-              channel: channelUsed,
-              locale,
-              delayHours: nextStepDef.delayHours,
-            },
-          },
+        await recordLeadCommercialSequenceStepSent({
+          leadId: lead.id,
+          channel: channelUsed,
+          activityTitle: copy.activity,
+          step: nextStepDef.step,
+          totalSteps: maxStep,
+          templateSlug,
+          locale,
+          delayHours: nextStepDef.delayHours,
         });
       }
 

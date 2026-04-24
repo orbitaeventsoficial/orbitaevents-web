@@ -4,7 +4,9 @@ import { getLeadStatusDisplay, WHATSAPP_URL, formatDateSimple, getSourceDisplay 
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +16,8 @@ export const metadata = {
 
 async function getMessagesData() {
   try {
-    const [recentLeads, pendingLeads, todayLeads] = await Promise.all([
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [recentLeads, pendingLeads, todayLeads, stalePendingLeads] = await Promise.all([
       prisma.lead.findMany({
         where: {
           message: { not: null },
@@ -38,12 +41,19 @@ async function getMessagesData() {
           },
         },
       }),
+      prisma.lead.count({
+        where: {
+          status: 'NEW',
+          createdAt: { lt: twentyFourHoursAgo },
+        },
+      }),
     ]);
 
     return {
       recentLeads,
       pendingLeads,
       todayLeads,
+      stalePendingLeads,
     };
   } catch (error) {
     log.error('Error obtenint missatges:', error);
@@ -51,6 +61,7 @@ async function getMessagesData() {
       recentLeads: [],
       pendingLeads: 0,
       todayLeads: 0,
+      stalePendingLeads: 0,
     };
   }
 }
@@ -70,9 +81,79 @@ function timeAgo(date: Date): string {
 
 export default async function MensajesPage() {
   const data = await getMessagesData();
+  const withoutContact = data.recentLeads.filter((lead) => !lead.phone && !lead.email).length;
+  const pendingNoNotesInSample = data.recentLeads.filter(
+    (lead) => lead.status === 'NEW' && (lead.notes?.length ?? 0) === 0,
+  ).length;
+  const systemItems = [
+    `Pendents (NEW): ${data.pendingLeads}`,
+    `Rebudes avui: ${data.todayLeads}`,
+    `Amb missatge (últimes 20): ${data.recentLeads.length}`,
+  ];
+  const manualItems: string[] = [];
+  if (data.stalePendingLeads > 0)
+    manualItems.push(
+      `${data.stalePendingLeads} entrad${data.stalePendingLeads === 1 ? 'a' : 'es'} NEW de més de 24h sense gestió`,
+    );
+  if (pendingNoNotesInSample > 0)
+    manualItems.push(`${pendingNoNotesInSample} pendents sense cap nota (mostra recent)`);
+  if (withoutContact > 0)
+    manualItems.push(`${withoutContact} entrades de la mostra sense telèfon ni email`);
+  const nextStep =
+    data.recentLeads.length === 0
+      ? {
+          title: 'Encara no hi ha missatges',
+          detail:
+            'Cap entrada amb missatge ha arribat. Comparteix el formulari de contacte o WhatsApp per obrir el primer canal.',
+          href: '/admin/leads',
+          ctaLabel: 'Obrir entrades',
+        }
+      : data.stalePendingLeads > 0
+        ? {
+            title: `Respon ${data.stalePendingLeads} entrad${data.stalePendingLeads === 1 ? 'a' : 'es'} NEW de més de 24h`,
+            detail:
+              'Superar les 24h sense resposta trenca la promesa comercial. Obre les entrades noves filtrades i tanca aquest backlog.',
+            href: '/admin/leads?status=NEW',
+            ctaLabel: 'Obrir entrades NEW',
+          }
+        : data.pendingLeads > 0
+          ? {
+              title: `Respon ${data.pendingLeads} entrad${data.pendingLeads === 1 ? 'a' : 'es'} nov${data.pendingLeads === 1 ? 'a' : 'es'}`,
+              detail:
+                'Encara no porten 24h però estan en estat NEW sense contacte. Obre-les i mou-les a la següent etapa.',
+              href: '/admin/leads?status=NEW',
+              ctaLabel: 'Obrir entrades NEW',
+            }
+          : {
+              title: 'Safata de missatges al dia',
+              detail:
+                'Sense pendents NEW. Aprofita per revisar la mostra recent i verifica que tot té nota de seguiment.',
+              href: '/admin/leads',
+              ctaLabel: 'Obrir entrades',
+            };
+  const manualTone: 'info' | 'warning' | 'success' =
+    data.stalePendingLeads > 0 ? 'warning' : data.pendingLeads > 0 ? 'info' : 'success';
 
   return (
     <AdminPage title="Missatges" subtitle="Gestiona les comunicacions amb la clientela">
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'BBDD',
+          title: 'Safata de comunicació',
+          tone: data.pendingLeads === 0 ? 'success' : 'info',
+          items: systemItems,
+          emptyText: 'Sense moviment recent.',
+        }}
+        manual={{
+          eyebrow: 'Pendents manuals',
+          title: 'Què requereix la teva mà',
+          tone: manualTone,
+          items: manualItems,
+          emptyText: 'Cap acció manual pendent.',
+        }}
+        nextStep={nextStep}
+        className="mb-2"
+      />
       <section className="ap-kpi-row sm:grid-cols-3">
         <div className="ap-kpi ap-kpi--warning">
           <p className="ap-kpi-label">Pendents de contactar</p>
@@ -92,7 +173,7 @@ export default async function MensajesPage() {
       <section className="flex flex-wrap gap-3">
         <Link
           href="/admin/leads?status=NEW"
-          className="ap-btn ap-btn--primary"
+          className="ap-btn ap-btn--primary w-full sm:w-auto"
         >
           🔵 Veure noves ({data.pendingLeads})
         </Link>
@@ -100,13 +181,13 @@ export default async function MensajesPage() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="ap-btn ap-btn--secondary"
+          className="ap-btn ap-btn--secondary w-full sm:w-auto"
         >
           💬 Obrir WhatsApp Web
         </a>
         <Link
           href="/admin/leads"
-          className="ap-btn ap-btn--secondary"
+          className="ap-btn ap-btn--secondary w-full sm:w-auto"
         >
           👥 Totes les entrades
         </Link>
@@ -154,7 +235,7 @@ export default async function MensajesPage() {
             const sourceIcon = getSourceDisplay(lead.source).icon;
             return (
               <div key={lead.id} className="p-4 transition-colors hover:bg-white/[0.03]">
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold admin-tone-soft-info admin-tone-text-info">
                     {lead.name.charAt(0)}
                   </div>
@@ -170,14 +251,14 @@ export default async function MensajesPage() {
                     <p className="mt-1 line-clamp-2 text-sm">
                       {lead.message || 'Sense missatge'}
                     </p>
-                    <div className="mt-2 flex items-center gap-3 text-xs">
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
                       <span>{timeAgo(lead.createdAt)}</span>
                       {lead.email && <span>{lead.email}</span>}
                       {lead.phone && <span>{lead.phone}</span>}
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2 self-start sm:self-auto">
                     {lead.phone && (
                       <a
                         href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
@@ -190,7 +271,7 @@ export default async function MensajesPage() {
                       </a>
                     )}
                     <Link
-                      href={`/admin/leads/${lead.id}`}
+                      href={buildLeadWorkspaceHref(lead.id)}
                       className="ap-btn ap-btn--secondary h-8 w-8 p-0"
                       title="Obre"
                     >

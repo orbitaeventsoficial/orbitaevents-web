@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { FollowUpSummary, PendingFollowUp } from '@/lib/services/responseTrackingService';
 
 const URGENCY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
@@ -72,7 +73,7 @@ export default function PendingFollowUpsPanel() {
                     {style.label} · {item.daysSinceOutbound}d
                   </span>
                   <Link
-                    href={`/admin/leads/${item.leadId}`}
+                    href={buildLeadWorkspaceHref(item.leadId)}
                     className="text-sm font-medium hover:underline truncate"
                   >
                     {item.name}
@@ -83,7 +84,7 @@ export default function PendingFollowUpsPanel() {
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 <Link
-                  href={`/admin/inbox/compose?leadId=${item.leadId}&template=seguiment`}
+                  href={buildLeadComposeHref(item.leadId, 'seguiment')}
                   className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
                 >
                   ✉️ Email
@@ -99,7 +100,7 @@ export default function PendingFollowUpsPanel() {
                   </a>
                 )}
                 <Link
-                  href={`/admin/leads/${item.leadId}`}
+                  href={buildLeadWorkspaceHref(item.leadId)}
                   className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
                 >
                   Obrir

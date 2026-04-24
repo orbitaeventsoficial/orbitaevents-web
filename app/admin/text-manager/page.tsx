@@ -4,9 +4,35 @@ import { log } from '@/lib/logger';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { TextNode, Section, TranslationComparison } from './text-manager-config';
 import { LANGUAGE_META, SECTIONS } from './text-manager-config';
+
+type OwnerTone = 'info' | 'warning' | 'success';
+type OwnerStripConfig = {
+  system: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  manual: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  nextStep: {
+    eyebrow: string;
+    title: string;
+    detail: string;
+    href: string;
+    ctaLabel: string;
+  };
+};
 
 export default function TextManagerPage() {
   // Estats principals
@@ -421,6 +447,110 @@ export default function TextManagerPage() {
     [activeSection]
   );
 
+  const strip = useMemo<OwnerStripConfig>(() => {
+    const totalTexts = Object.keys(currentTexts).length;
+    const modifiedSections = Object.values(sectionCounts).filter((section) => section.modified > 0).length;
+    const visibleSectionTotal = activeSection ? sectionCounts[activeSection]?.total ?? 0 : SECTIONS.length;
+
+    const systemItems: string[] = [];
+    if (totalTexts > 0) {
+      systemItems.push(`${totalTexts} textos carregats a ${LANGUAGE_META[activeLanguage].label}`);
+    }
+    if (activeSectionMeta) {
+      systemItems.push(`${activeSectionMeta.icon} ${activeSectionMeta.name} · ${visibleSectionTotal} textos al focus`);
+    } else {
+      systemItems.push(`${SECTIONS.length} seccions disponibles al catàleg`);
+    }
+    if (filteredTexts.length !== totalTexts || debouncedSearchTerm || showOnlyModified) {
+      systemItems.push(`${filteredTexts.length} textos visibles segons els filtres actuals`);
+    }
+
+    const manualItems: string[] = [];
+    if (modifiedCount > 0) {
+      manualItems.push(`${modifiedCount} ${modifiedCount === 1 ? 'text pendent de desar' : 'textos pendents de desar'}`);
+    }
+    if (modifiedSections > 0) {
+      manualItems.push(`${modifiedSections} ${modifiedSections === 1 ? 'secció tocada' : 'seccions tocades'} en aquesta passada`);
+    }
+    if (debouncedSearchTerm) {
+      manualItems.push(`Cerca activa: "${debouncedSearchTerm}"`);
+    }
+    if (showComparison) {
+      manualItems.push('Comparació d’idiomes oberta per validar coherència');
+    }
+    if (showOnlyModified) {
+      manualItems.push('Vista reduïda només a textos modificats');
+    }
+    if (changeHistory.length > 0) {
+      manualItems.push(`${changeHistory.length} moviments al mini-historial de sessió`);
+    }
+
+    const nextStep =
+      modifiedCount > 0
+        ? {
+            eyebrow: 'Següent pas · Tancar passada',
+            title: `Desar ${modifiedCount} ${modifiedCount === 1 ? 'canvi pendent' : 'canvis pendents'}`,
+            detail: showComparison
+              ? 'La comparació ja és oberta. Valida coherència entre idiomes i desa abans d’obrir una altra secció.'
+              : `Hi ha canvis vius a ${LANGUAGE_META[activeLanguage].label}. Abans d’obrir més fronts, valida el copy i desa aquesta passada.`,
+            href: '#text-manager-save',
+            ctaLabel: 'Anar a desar',
+          }
+        : debouncedSearchTerm
+          ? {
+              eyebrow: 'Següent pas · Afinar focus',
+              title: 'Resoldre la cerca activa',
+              detail: 'Tens una cerca oberta. Decideix si cal editar aquest bloc o neteja-la per tornar a navegació estructurada.',
+              href: '#text-manager-search',
+              ctaLabel: 'Revisar cerca',
+            }
+          : activeSectionMeta
+            ? {
+                eyebrow: 'Següent pas · Secció',
+                title: `Entrar a ${activeSectionMeta.name}`,
+                detail: `El focus actual ja està acotat. Revisa els ${visibleSectionTotal} textos de la secció i obre comparació només si hi ha dubte semàntic.`,
+                href: '#text-manager-content',
+                ctaLabel: 'Obrir contingut',
+              }
+            : {
+                eyebrow: 'Següent pas',
+                title: 'Triar el primer bloc a editar',
+                detail: 'Sense canvis pendents ni cerca activa. El camí net és entrar per secció abans de tocar cap text del catàleg.',
+                href: '#text-manager-sections',
+                ctaLabel: 'Obrir seccions',
+              };
+
+    return {
+      system: {
+        eyebrow: 'Automàtic · Catàleg',
+        title: totalTexts > 0 ? 'Catàleg editorial carregat' : 'Sense textos carregats',
+        tone: totalTexts > 0 ? 'info' : 'warning',
+        items: systemItems,
+        emptyText: 'Sense catàleg visible al gestor.',
+      },
+      manual: {
+        eyebrow: 'Manual · Sessió',
+        title: manualItems.length === 0 ? 'Sessió neta' : `${manualItems.length} senyals de sessió`,
+        tone: modifiedCount > 0 ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
+        items: manualItems,
+        emptyText: 'Sense canvis pendents, filtres ni comparacions obertes.',
+      },
+      nextStep,
+    };
+  }, [
+    activeLanguage,
+    activeSection,
+    activeSectionMeta,
+    changeHistory.length,
+    currentTexts,
+    debouncedSearchTerm,
+    filteredTexts.length,
+    modifiedCount,
+    sectionCounts,
+    showComparison,
+    showOnlyModified,
+  ]);
+
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
@@ -456,12 +586,12 @@ export default function TextManagerPage() {
         <div className="border-b">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <span className="text-sm font-semibold">🌐 Idioma de treball:</span>
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setActiveLanguage('es')}
-                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                    className={`min-h-[44px] px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'es'
                         ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
                         : 'admin-tone-idle'
@@ -471,7 +601,7 @@ export default function TextManagerPage() {
                   </button>
                   <button
                     onClick={() => setActiveLanguage('ca')}
-                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                    className={`min-h-[44px] px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'ca'
                         ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
                         : 'admin-tone-idle'
@@ -481,7 +611,7 @@ export default function TextManagerPage() {
                   </button>
                   <button
                     onClick={() => setActiveLanguage('en')}
-                    className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                    className={`min-h-[44px] px-4 py-2 rounded-xl font-semibold transition-all ${
                       activeLanguage === 'en'
                         ? 'admin-tone-soft-warning admin-tone-text-warning admin-tone-border-warning scale-105 border'
                         : 'admin-tone-idle'
@@ -514,6 +644,7 @@ export default function TextManagerPage() {
             <div className="w-full lg:flex-1 lg:max-w-xl">
               <div className="relative">
                 <input
+                  id="text-manager-search"
                   type="text"
                   placeholder="Cercar textos... (path o contingut)"
                   value={searchTerm}
@@ -540,7 +671,7 @@ export default function TextManagerPage() {
               {/* Toggle modificats */}
               <button
                 onClick={() => setShowOnlyModified(!showOnlyModified)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
                     : 'admin-tone-idle'
@@ -552,7 +683,7 @@ export default function TextManagerPage() {
               {/* Comparar idiomes */}
               <button
                 onClick={() => setShowComparison(!showComparison)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
                     : 'admin-tone-idle'
@@ -566,7 +697,7 @@ export default function TextManagerPage() {
               {modifiedCount > 0 && (
                 <button
                   onClick={handleRevertAll}
-                  className="px-4 py-2 rounded-xl text-sm font-medium border transition-all"
+                  className="min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium border transition-all"
                 >
                   ↩️ Revertir ({modifiedCount})
                 </button>
@@ -574,9 +705,10 @@ export default function TextManagerPage() {
 
               {/* Desar */}
               <button
+                id="text-manager-save"
                 onClick={handleSave}
                 disabled={saving || modifiedCount === 0}
-                className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
+                className={`min-h-[44px] w-full rounded-xl px-6 py-2.5 font-bold transition-all flex items-center justify-center gap-2 sm:w-auto ${
                   modifiedCount > 0
                     ? 'ap-btn ap-btn--primary hover:scale-105'
                     : 'admin-tone-idle opacity-50 cursor-not-allowed'
@@ -652,6 +784,12 @@ export default function TextManagerPage() {
           ]}
         />
 
+        <OwnerControlStrip
+          system={strip.system}
+          manual={strip.manual}
+          nextStep={strip.nextStep}
+        />
+
         <section className="grid gap-3 lg:grid-cols-[1.1fr_1fr_1fr]">
           <article className="rounded-2xl border admin-card-glass p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Sessió d’edició</p>
@@ -709,7 +847,7 @@ export default function TextManagerPage() {
           {/* SIDEBAR - SECCIONS */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <aside className="w-full xl:w-72 xl:flex-shrink-0">
-            <div className="space-y-2 xl:sticky xl:top-32">
+            <div id="text-manager-sections" className="space-y-2 xl:sticky xl:top-32">
               {/* Mostrar tot */}
               <button
                 onClick={() => setActiveSection(null)}
@@ -795,6 +933,7 @@ export default function TextManagerPage() {
           {/* CONTINGUT PRINCIPAL */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <main className="flex-1 min-w-0">
+            <div id="text-manager-content" />
             {/* Info de secció activa */}
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl  ${
@@ -874,4 +1013,3 @@ export default function TextManagerPage() {
     </div>
   );
 }
-

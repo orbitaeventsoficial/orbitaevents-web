@@ -11,6 +11,7 @@ import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
 import { type ContractData } from '@/lib/services/documentService';
 import { log } from '@/lib/logger';
+import { recordLeadContractCancelled, recordLeadContractSent } from '@/lib/services/leadActivityService';
 
 async function getCompanyConfig() {
   const settings = await prisma.setting.findMany({
@@ -273,13 +274,10 @@ export async function sendContract(proposalId: string): Promise<void> {
   });
 
   if (proposal.leadId) {
-    await prisma.leadActivity.create({
-      data: {
-        leadId: proposal.leadId,
-        type: 'DOCUMENT',
-        title: 'Contracte enviat',
-        description: `Contracte ${proposal.contractReference} enviat per email a ${proposal.customer.email}`,
-      },
+    await recordLeadContractSent({
+      leadId: proposal.leadId,
+      contractReference: proposal.contractReference,
+      to: proposal.customer.email,
     });
 
     await prisma.leadDocument.create({
@@ -345,13 +343,9 @@ export async function cancelContract(proposalId: string) {
   log.info(`Contracte cancel·lat: ${proposal.contractReference}`);
 
   if (proposal.leadId) {
-    await prisma.leadActivity.create({
-      data: {
-        leadId: proposal.leadId,
-        type: 'SYSTEM',
-        title: 'Contracte cancel·lat',
-        description: `Contracte ${proposal.contractReference} cancel·lat`,
-      },
+    await recordLeadContractCancelled({
+      leadId: proposal.leadId,
+      contractReference: proposal.contractReference,
     });
   }
 

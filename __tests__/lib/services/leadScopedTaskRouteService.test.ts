@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findUnique: vi.fn() },
-    leadActivity: { create: vi.fn() },
   },
 }));
 
@@ -18,6 +17,11 @@ const { mockTaskService } = vi.hoisted(() => ({
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/services/tasks/leadScopedTaskService', () => mockTaskService);
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadTaskCreated: vi.fn(),
+  recordLeadTaskUpdated: vi.fn(),
+  recordLeadTaskDeleted: vi.fn(),
+}));
 
 import {
   createLeadScopedTaskForRoute,
@@ -25,11 +29,11 @@ import {
   listLeadScopedTasksForRoute,
   updateLeadScopedTaskForRoute,
 } from '@/lib/services/leadScopedTaskRouteService';
+import { recordLeadTaskCreated, recordLeadTaskDeleted, recordLeadTaskUpdated } from '@/lib/services/leadActivityService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.lead.findUnique.mockResolvedValue({ customerId: 'cust-1' });
-  mockPrisma.leadActivity.create.mockResolvedValue({ id: 'act-1' });
 });
 
 describe('leadScopedTaskRouteService', () => {
@@ -46,7 +50,7 @@ describe('leadScopedTaskRouteService', () => {
   });
 
   describe('createLeadScopedTaskForRoute', () => {
-    it('crea la tasca usant customerId del lead i registra activitat', async () => {
+    it('crea la tasca usant customerId del lead i registra activitat via capa shared', async () => {
       const task = { id: 'task-1', title: 'Preparar proposta', status: 'OPEN', priority: 'HIGH' };
       mockTaskService.createLeadScopedTask.mockResolvedValue(task);
 
@@ -55,15 +59,13 @@ describe('leadScopedTaskRouteService', () => {
 
       expect(result).toEqual({ ok: true, task });
       expect(mockTaskService.createLeadScopedTask).toHaveBeenCalledWith('lead-1', 'cust-1', input);
-      expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          leadId: 'lead-1',
-          type: 'TASK',
-          title: 'Tasca creada',
-          description: 'Preparar proposta',
-          createdBy: 'Admin',
-          metadata: { taskId: 'task-1', status: 'OPEN', priority: 'HIGH' },
-        }),
+      expect(recordLeadTaskCreated).toHaveBeenCalledWith({
+        leadId: 'lead-1',
+        taskId: 'task-1',
+        title: 'Preparar proposta',
+        status: 'OPEN',
+        priority: 'HIGH',
+        createdBy: 'Admin',
       });
     });
 
@@ -74,14 +76,19 @@ describe('leadScopedTaskRouteService', () => {
       await createLeadScopedTaskForRoute('lead-2', { title: 'Seguiment' });
 
       expect(mockTaskService.createLeadScopedTask).toHaveBeenCalledWith('lead-2', null, { title: 'Seguiment' });
-      expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ createdBy: 'Admin' }),
+      expect(recordLeadTaskCreated).toHaveBeenCalledWith({
+        leadId: 'lead-2',
+        taskId: 'task-2',
+        title: 'Seguiment',
+        status: 'OPEN',
+        priority: 'MEDIUM',
+        createdBy: 'Admin',
       });
     });
   });
 
   describe('updateLeadScopedTaskForRoute', () => {
-    it('actualitza la tasca i deixa traça a leadActivity', async () => {
+    it('actualitza la tasca i deixa traça via capa shared', async () => {
       const task = { id: 'task-3', title: 'Trucar venue', status: 'DONE', priority: 'URGENT' };
       mockTaskService.updateLeadScopedTask.mockResolvedValue(task);
 
@@ -89,32 +96,27 @@ describe('leadScopedTaskRouteService', () => {
 
       expect(result).toEqual({ ok: true, task });
       expect(mockTaskService.updateLeadScopedTask).toHaveBeenCalledWith('task-3', 'lead-3', { status: 'DONE' });
-      expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          leadId: 'lead-3',
-          title: 'Tasca actualitzada',
-          description: 'Trucar venue',
-          metadata: { taskId: 'task-3', status: 'DONE', priority: 'URGENT' },
-        }),
+      expect(recordLeadTaskUpdated).toHaveBeenCalledWith({
+        leadId: 'lead-3',
+        taskId: 'task-3',
+        title: 'Trucar venue',
+        status: 'DONE',
+        priority: 'URGENT',
       });
     });
   });
 
   describe('deleteLeadScopedTaskForRoute', () => {
-    it('elimina la tasca i registra l’activitat de tancament', async () => {
+    it('elimina la tasca i registra l’activitat de tancament via capa shared', async () => {
       mockTaskService.deleteLeadScopedTask.mockResolvedValue(undefined);
 
       const result = await deleteLeadScopedTaskForRoute('lead-4', 'task-4');
 
       expect(result).toEqual({ ok: true });
       expect(mockTaskService.deleteLeadScopedTask).toHaveBeenCalledWith('task-4', 'lead-4');
-      expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          leadId: 'lead-4',
-          type: 'TASK',
-          title: 'Tasca eliminada',
-          metadata: { taskId: 'task-4' },
-        }),
+      expect(recordLeadTaskDeleted).toHaveBeenCalledWith({
+        leadId: 'lead-4',
+        taskId: 'task-4',
       });
     });
   });

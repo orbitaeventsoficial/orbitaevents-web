@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { CANVAS_COLOR_OPTIONS } from '@/lib/constants';
 import { ADMIN_CANVAS_PRESET_SIZES, ADMIN_CANVAS_TEMPLATES } from '@/lib/constants/admin';
@@ -40,6 +41,30 @@ interface CanvasTemplate {
 }
 
 type PresetSize = 'story' | 'post' | 'landscape';
+type OwnerTone = 'info' | 'warning' | 'success';
+type OwnerStripConfig = {
+  system: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  manual: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  nextStep: {
+    eyebrow: string;
+    title: string;
+    detail: string;
+    href: string;
+    ctaLabel: string;
+  };
+};
 
 // â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -68,6 +93,117 @@ export default function CanvasEditorClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const selected = elements.find(e => e.id === selectedId) || null;
+  const activePreset = useMemo(
+    () =>
+      (Object.keys(PRESET_SIZES) as PresetSize[]).find(
+        (preset) =>
+          PRESET_SIZES[preset].width === canvasSize.width &&
+          PRESET_SIZES[preset].height === canvasSize.height,
+      ) ?? null,
+    [canvasSize.height, canvasSize.width],
+  );
+  const selectedTemplateName = useMemo(
+    () =>
+      TEMPLATES.find(
+        (template) =>
+          template.width === canvasSize.width &&
+          template.height === canvasSize.height &&
+          template.bg === canvasBg &&
+          template.elements.length === elements.length,
+      )?.name ?? null,
+    [canvasBg, canvasSize.height, canvasSize.width, elements.length],
+  );
+  const strip = useMemo<OwnerStripConfig>(() => {
+    const textCount = elements.filter((element) => element.type === 'text').length;
+    const shapeCount = elements.filter((element) => element.type === 'shape').length;
+
+    const systemItems: string[] = [
+      `${canvasSize.width}×${canvasSize.height}px${activePreset ? ` · ${PRESET_SIZES[activePreset].label}` : ''}`,
+      `${elements.length} ${elements.length === 1 ? 'element' : 'elements'} · ${textCount} text · ${shapeCount} formes`,
+    ];
+    if (selectedTemplateName) {
+      systemItems.push(`Base carregada: ${selectedTemplateName}`);
+    }
+
+    const manualItems: string[] = [];
+    if (selected) {
+      manualItems.push(`Element seleccionat: ${selected.type === 'text' ? 'text' : selected.type === 'shape' ? 'forma' : 'imatge'}`);
+    }
+    if (dragging) {
+      manualItems.push('Hi ha un element en moviment');
+    }
+    if (resizing) {
+      manualItems.push('Hi ha un element redimensionant-se');
+    }
+    if (exporting) {
+      manualItems.push('Exportació PNG en curs');
+    }
+    if (elements.length === 0) {
+      manualItems.push('Canvas buit, pendent de crear la primera peça');
+    }
+
+    const nextStep =
+      exporting
+        ? {
+            eyebrow: 'Següent pas · Exportació',
+            title: 'Esperar que acabi l’exportació',
+            detail: 'El canvas s’està renderitzant a PNG. No obris un altre front fins que acabi la descàrrega.',
+            href: '#canvas-toolbar',
+            ctaLabel: 'Veure toolbar',
+          }
+        : elements.length === 0
+          ? {
+              eyebrow: 'Següent pas · Primera peça',
+              title: 'Carregar plantilla o afegir text',
+              detail: 'El canvas és buit. El camí net és carregar una plantilla o crear el primer element abans d’ajustar propietats.',
+              href: '#canvas-templates',
+              ctaLabel: 'Obrir plantilles',
+            }
+          : selected
+            ? {
+                eyebrow: 'Següent pas · Ajust fi',
+                title: 'Editar l’element seleccionat',
+                detail: 'Ja tens focus actiu. Ajusta posició, mida, color o copy abans d’exportar la peça.',
+                href: '#canvas-properties',
+                ctaLabel: 'Obrir propietats',
+              }
+            : {
+                eyebrow: 'Següent pas',
+                title: 'Seleccionar capa o exportar',
+                detail: 'La composició ja és viva. Pots seleccionar una capa per polir-la o exportar directament el PNG.',
+                href: '#canvas-layers',
+                ctaLabel: 'Obrir capes',
+              };
+
+    return {
+      system: {
+        eyebrow: 'Automàtic · Composició',
+        title: elements.length > 0 ? 'Canvas en construcció' : 'Canvas buit',
+        tone: elements.length > 0 ? 'info' : 'warning',
+        items: systemItems,
+        emptyText: 'Sense configuració visible al canvas.',
+      },
+      manual: {
+        eyebrow: 'Manual · Sessió',
+        title: manualItems.length === 0 ? 'Cap tensió manual' : `${manualItems.length} senyals de sessió`,
+        tone: exporting || dragging || resizing ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
+        items: manualItems,
+        emptyText: 'Sense selecció, moviments ni exportació en curs.',
+      },
+      nextStep,
+    };
+  }, [
+    activePreset,
+    canvasBg,
+    canvasSize.height,
+    canvasSize.width,
+    dragging,
+    elements,
+    exporting,
+    resizing,
+    selected,
+    selectedTemplateName,
+  ]);
 
   // Scale canvas to fit viewport
   const CANVAS_MAX_H = 700;
@@ -310,29 +446,36 @@ export default function CanvasEditorClient() {
   // â”€â”€â”€ UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="space-y-6">
+      <OwnerControlStrip
+        system={strip.system}
+        manual={strip.manual}
+        nextStep={strip.nextStep}
+      />
+
+      <div className="flex flex-col gap-6 lg:flex-row">
       {/* LEFT â€” Canvas */}
       <div className="flex-1 min-w-0">
         {/* Toolbar */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button onClick={addText} className="ap-btn ap-btn--secondary text-sm">+ Text</button>
-          <button onClick={() => addShape('rect')} className="ap-btn ap-btn--secondary text-sm">+ Rectangle</button>
-          <button onClick={() => addShape('circle')} className="ap-btn ap-btn--secondary text-sm">+ Cercle</button>
-          <button onClick={() => addShape('line')} className="ap-btn ap-btn--secondary text-sm">+ Línia</button>
-          <div className="w-px bg-white/10 mx-1" />
+        <div id="canvas-toolbar" className="mb-4 flex flex-wrap gap-2">
+          <button onClick={addText} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Text</button>
+          <button onClick={() => addShape('rect')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Rectangle</button>
+          <button onClick={() => addShape('circle')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Cercle</button>
+          <button onClick={() => addShape('line')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">+ Línia</button>
+          <div className="mx-1 hidden w-px bg-white/10 sm:block" />
           {selectedId && (
             <>
-              <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary text-sm">Duplicar</button>
-              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary text-sm">â†‘ Capa</button>
-              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary text-sm">â†“ Capa</button>
-              <button onClick={deleteSelected} className="ap-btn text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">Eliminar</button>
+              <button onClick={duplicateSelected} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">Duplicar</button>
+              <button onClick={() => moveLayer('up')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">â†‘ Capa</button>
+              <button onClick={() => moveLayer('down')} className="ap-btn ap-btn--secondary min-h-[40px] text-sm">â†“ Capa</button>
+              <button onClick={deleteSelected} className="ap-btn min-h-[40px] text-sm admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger">Eliminar</button>
             </>
           )}
-          <div className="flex-1" />
+          <div className="hidden flex-1 sm:block" />
           <button
             onClick={exportPng}
             disabled={exporting}
-            className="ap-btn ap-btn--primary text-sm disabled:opacity-50"
+            className="ap-btn ap-btn--primary min-h-[44px] w-full text-sm disabled:opacity-50 sm:ml-auto sm:w-auto"
           >
             {exporting ? 'Exportant...' : 'Descarregar PNG'}
           </button>
@@ -340,7 +483,7 @@ export default function CanvasEditorClient() {
 
         {/* Canvas area */}
         <div
-          className="relative mx-auto overflow-hidden rounded-xl border admin-card-glass"
+          className="relative mx-auto max-w-full overflow-hidden rounded-xl border admin-card-glass"
           style={{
             width: canvasSize.width * scale,
             height: canvasSize.height * scale,
@@ -362,9 +505,9 @@ export default function CanvasEditorClient() {
       {/* RIGHT â€” Panel */}
       <div className="w-full lg:w-72 space-y-4">
         {/* Templates */}
-        <div className="rounded-xl border p-4 admin-card-glass">
+        <div id="canvas-templates" className="rounded-xl border p-4 admin-card-glass">
           <h3 className="mb-3 text-sm font-medium">Plantilles</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-2">
             {TEMPLATES.map(tpl => (
               <button
                 key={tpl.name}
@@ -381,12 +524,12 @@ export default function CanvasEditorClient() {
         {/* Canvas size */}
         <div className="rounded-xl border p-4 admin-card-glass">
           <h3 className="mb-3 text-sm font-medium">Mida</h3>
-          <div className="flex gap-2 mb-3">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row">
             {(Object.keys(PRESET_SIZES) as PresetSize[]).map(k => (
               <button
                 key={k}
                 onClick={() => setPresetSize(k)}
-                className={`flex-1 px-2 py-1.5 rounded-xl text-xs border ${
+                className={`min-h-[40px] flex-1 rounded-xl border px-2 py-1.5 text-xs ${
                   canvasSize.width === PRESET_SIZES[k].width && canvasSize.height === PRESET_SIZES[k].height
                     ? 'border admin-tone-soft-info admin-tone-border-info admin-tone-text-info'
                     : 'border admin-tone-idle'
@@ -408,13 +551,13 @@ export default function CanvasEditorClient() {
 
         {/* Element properties */}
         {selected && (
-          <div className="rounded-xl border p-4 admin-card-glass">
+          <div id="canvas-properties" className="rounded-xl border p-4 admin-card-glass">
             <h3 className="mb-3 text-sm font-medium">
               Propietats â€” {selected.type === 'text' ? 'Text' : selected.type === 'shape' ? 'Forma' : 'Imatge'}
             </h3>
 
             {/* Position */}
-            <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
                 <label className="mb-0.5 block text-[10px]">X</label>
                 <input type="number" min={0} value={selected.x} onChange={e => updateElement(selected.id, { x: +e.target.value })}
@@ -464,7 +607,7 @@ export default function CanvasEditorClient() {
                 </div>
                 <div className="mb-2">
                   <label className="mb-0.5 block text-[10px]">Alineació</label>
-                  <div className="flex gap-1">
+                  <div className="grid grid-cols-3 gap-1">
                     {(['left', 'center', 'right'] as const).map(a => (
                       <button key={a} onClick={() => updateElement(selected.id, { textAlign: a })}
                         className={`flex-1 rounded-lg border px-2 py-1 text-xs ${selected.textAlign === a ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info' : 'admin-tone-idle'}`}>
@@ -514,7 +657,7 @@ export default function CanvasEditorClient() {
         )}
 
         {/* Layers */}
-        <div className="rounded-xl border p-4 admin-card-glass">
+        <div id="canvas-layers" className="rounded-xl border p-4 admin-card-glass">
           <h3 className="mb-3 text-sm font-medium">Capes ({elements.length})</h3>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {[...elements].reverse().map(el => (
@@ -531,6 +674,7 @@ export default function CanvasEditorClient() {
             {elements.length === 0 && <p className="text-xs">Sense elements</p>}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

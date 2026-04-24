@@ -2,7 +2,6 @@ import { sendEmail, getEmailSignatureHtml } from '@/lib/email';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import {
   createQuoteFromLead,
   generateQuoteHTML,
@@ -14,6 +13,8 @@ import { translateTextForLocale } from '@/lib/services/translationService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 import { recordEmailSend, wrapLinksForTracking } from '@/lib/services/emailTrackingService';
+import { recordCustomerEmailSent } from '@/lib/services/customerActivityService';
+import { recordLeadEmailSent } from '@/lib/services/leadActivityService';
 
 type QuoteAttachmentInput = {
   packId?: string;
@@ -189,24 +190,24 @@ export async function sendAdminEmail(body: AdminEmailPayload | undefined) {
 
   if (resolvedLeadId) {
     await prisma.leadNote.create({ data: { leadId: resolvedLeadId, content: `📧 Email enviat: ${translatedSubject}${attachments ? '\n📎 Amb pressupost adjunt' : ''}` } });
-    await prisma.leadActivity.create({ data: { leadId: resolvedLeadId, type: 'EMAIL', title: 'Email enviat', description: `${translatedSubject}${attachments ? ' (amb pressupost)' : ''}`, createdBy: 'Admin' } });
+    await recordLeadEmailSent({
+      leadId: resolvedLeadId,
+      subject: translatedSubject,
+      hasAttachments: Boolean(attachments),
+    });
   }
 
   if (customerForLocale?.id) {
-    await prisma.customerActivity.create({
-      data: {
-        customerId: customerForLocale.id,
-        action: CUSTOMER_ACTIVITY_ACTIONS.EMAIL_SENT,
-        details: { to, subject: translatedSubject, source: 'admin_emails_send' },
-      },
+    await recordCustomerEmailSent({
+      customerId: customerForLocale.id,
+      to,
+      subject: translatedSubject,
+      source: 'admin_emails_send',
     });
   }
 
   return { ok: true as const, status: 200, body: { ok: true } };
 }
-
-
-
 
 
 

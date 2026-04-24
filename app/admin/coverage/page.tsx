@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { COVERAGE_PROVINCES, type CoverageArea } from '@/lib/coverage';
 
@@ -135,12 +136,81 @@ export default function CoveragePage() {
 
   const activeAreas = areas.filter(a => a.enabled).length;
   const provinces = Array.from(new Set(areas.map(a => a.province)));
+  const inactiveAreas = areas.length - activeAreas;
+  const emptyProvinces = COVERAGE_PROVINCES.filter((province) => !areas.some((area) => area.province === province));
+  const topProvince = provinces
+    .map((province) => ({
+      province,
+      count: areas.filter((area) => area.province === province).length,
+      active: areas.filter((area) => area.province === province && area.enabled).length,
+    }))
+    .sort((a, b) => b.count - a.count)[0];
+  const systemItems = [
+    `${areas.length} ciutats governades dins de ${provinces.length} províncies`,
+    `${activeAreas} actives i ${inactiveAreas} desactivades al mapa comercial`,
+    topProvince ? `${topProvince.province} concentra ${topProvince.count} ciutats (${topProvince.active} actives)` : '',
+    emptyProvinces.length > 0 ? `${emptyProvinces.length} províncies del catàleg base encara no tenen cap ciutat` : '',
+  ].filter(Boolean);
+  const manualItems = [
+    newCity.trim() ? `Hi ha una ciutat en preparació: ${newCity.trim()}` : '',
+    inactiveAreas > 0 ? `${inactiveAreas} ${inactiveAreas === 1 ? 'ciutat desactivada' : 'ciutats desactivades'} demanen criteri manual` : '',
+    emptyProvinces.length > 0 ? `Províncies sense cobertura: ${emptyProvinces.slice(0, 2).join(', ')}${emptyProvinces.length > 2 ? '...' : ''}` : '',
+    adding ? 'S\'està desant una nova ciutat ara mateix' : '',
+  ].filter(Boolean);
+  const nextStep =
+    newCity.trim()
+      ? {
+          title: 'Tancar l’alta abans de seguir ampliant mapa',
+          detail: `Ja tens ${newCity.trim()} en preparació. El següent pas és validar província i donar-la d'alta abans de tocar estats o revisar la resta de cobertura.`,
+          href: '/admin/coverage',
+          ctaLabel: 'Acabar aquesta alta',
+        }
+      : inactiveAreas > 0
+        ? {
+            title: 'Revisar la cobertura desactivada abans d’ampliar',
+            detail: `Hi ha ${inactiveAreas} ciutats desactivades. El millor següent pas és confirmar si són baixes reals o cobertura latent abans d'afegir nous punts al mapa.`,
+            href: '/admin/coverage',
+            ctaLabel: 'Revisar ciutats',
+          }
+        : emptyProvinces.length > 0
+          ? {
+              title: 'Omplir províncies sense cap punt de cobertura',
+              detail: `Encara tens ${emptyProvinces.length} províncies del catàleg base sense cap ciutat. El retorn ara és ampliar cobertura mínima abans de polir detall fi.`,
+              href: '/admin/coverage',
+              ctaLabel: 'Ampliar cobertura',
+            }
+          : {
+              title: 'Mantenir cobertura neta, no afegir soroll',
+              detail: 'El mapa de cobertura no mostra un buit crític immediat. El següent pas és mantenir-lo coherent i actuar només quan hi ha canvi comercial real.',
+              href: '/admin',
+              ctaLabel: 'Tornar al panell',
+            };
 
   return (
     <AdminPage
       title="Cobertura"
       subtitle="Ciutats i províncies on opera Òrbita Events"
     >
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què governa el mapa',
+          tone: inactiveAreas > 0 || emptyProvinces.length > 0 ? 'warning' : 'info',
+          items: systemItems,
+          emptyText: 'Sense senyals de cobertura rellevants ara mateix.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: manualItems.length > 0 ? 'warning' : 'success',
+          items: manualItems,
+          emptyText: 'Cap tensió manual visible a la cobertura ara mateix.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          ...nextStep,
+        }}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

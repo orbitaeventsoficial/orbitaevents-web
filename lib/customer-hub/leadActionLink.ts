@@ -1,3 +1,4 @@
+import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { LeadDTO } from './dto';
 
 export type LeadActionLink = {
@@ -27,20 +28,20 @@ export function buildLeadActionLink(lead: LeadDTO): LeadActionLink {
     lead.commercialBlocker?.label === 'Primera resposta pendent'
   ) {
     return {
-      href: `/admin/inbox/compose?leadId=${lead.id}&template=recordatori`,
+      href: buildLeadComposeHref(lead.id, 'recordatori'),
       label: lead.commercialBlocker.label === 'Pressupost pendent' ? 'Enviar recordatori' : 'Preparar seguiment',
     };
   }
 
   if (lead.commercialBlocker?.label === 'Passar a reserva') {
     return {
-      href: `/admin/leads/${lead.id}`,
+      href: buildLeadWorkspaceHref(lead.id),
       label: 'Tancar conversió',
     };
   }
 
   return {
-    href: `/admin/leads/${lead.id}`,
+    href: buildLeadWorkspaceHref(lead.id),
     label: 'Obrir lead',
   };
 }

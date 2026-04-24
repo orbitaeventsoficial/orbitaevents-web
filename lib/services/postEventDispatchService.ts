@@ -10,6 +10,8 @@ import {
   normalizeLocale,
   resolvePackName,
 } from '@/lib/services/postEventEmailService';
+import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
+import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
 
 export type PostEventDispatchResult = {
   bookingId: string;
@@ -116,23 +118,18 @@ export async function sendPostEventEmailForBooking(
   });
 
   if (booking.lead?.customerId) {
-    await prisma.customerActivity.create({
-      data: {
-        customerId: booking.lead.customerId,
-        action: CUSTOMER_ACTIVITY_ACTIONS.POST_EVENT_EMAIL_SENT,
-        details: { bookingId: booking.id, bookingRef: booking.reference },
-      },
+    await recordCustomerPostEventEmailSent({
+      customerId: booking.lead.customerId,
+      bookingId: booking.id,
+      bookingRef: booking.reference,
     });
   }
 
   if (options?.createAdminLog) {
-    await prisma.adminLog.create({
-      data: {
-        action: CUSTOMER_ACTIVITY_ACTIONS.SEND_POST_EVENT_EMAIL,
-        entity: 'booking',
-        entityId: booking.id,
-        details: { email, reference: booking.reference },
-      },
+    await recordBookingCommunicationLog({
+      action: CUSTOMER_ACTIVITY_ACTIONS.SEND_POST_EVENT_EMAIL,
+      bookingId: booking.id,
+      details: { email, reference: booking.reference },
     });
   }
 

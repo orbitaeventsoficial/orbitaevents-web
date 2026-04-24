@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildCustomerTaskCreateHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 export default function TasksNotesPanel({
   data,
@@ -77,7 +78,7 @@ function TaskColumn({ title, items, busyTaskId, confirmingDeleteId, onToggleDone
   return (
     <div className="min-w-0" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.column(title))}>
       <p className="text-xs uppercase tracking-wider">{title}</p>
-      <div className="mt-2 space-y-2 min-w-0">{items.length === 0 ? <p className="rounded-xl border p-3 text-xs">Sense tasques.</p> : items.map((task) => <article key={task.id} className="min-w-0 overflow-hidden rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.task(task.title))}><p className="text-sm break-words">{task.title}</p><p className="mt-1 text-[11px]">{task.dueDate ? formatDate(task.dueDate) : 'Sense venciment'}</p><div className="mt-2 flex flex-wrap items-center gap-2"><button type="button" onClick={() => onToggleDone(task.id)} disabled={busyTaskId === task.id} className="rounded border px-2 py-1 text-xs disabled:opacity-60">{busyTaskId === task.id ? 'Desant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}</button><button type="button" onClick={() => onDelete(task.id)} disabled={busyTaskId === task.id} className={`rounded border px-2 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === task.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}>{confirmingDeleteId === task.id ? 'Segur?' : 'Eliminar'}</button>{task.leadId && <Link href={`/admin/leads/${task.leadId}`} className="min-w-0 max-w-full truncate text-xs">Obrir entrada</Link>}</div></article>)}</div>
+      <div className="mt-2 space-y-2 min-w-0">{items.length === 0 ? <p className="rounded-xl border p-3 text-xs">Sense tasques.</p> : items.map((task) => <article key={task.id} className="min-w-0 overflow-hidden rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.tasks.task(task.title))}><p className="text-sm break-words">{task.title}</p><p className="mt-1 text-[11px]">{task.dueDate ? formatDate(task.dueDate) : 'Sense venciment'}</p><div className="mt-2 flex flex-wrap items-center gap-2"><button type="button" onClick={() => onToggleDone(task.id)} disabled={busyTaskId === task.id} className="rounded border px-2 py-1 text-xs disabled:opacity-60">{busyTaskId === task.id ? 'Desant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}</button><button type="button" onClick={() => onDelete(task.id)} disabled={busyTaskId === task.id} className={`rounded border px-2 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === task.id ? 'border-rose-500 admin-tone-soft-danger' : ''}`}>{confirmingDeleteId === task.id ? 'Segur?' : 'Eliminar'}</button>{task.leadId && <Link href={buildLeadWorkspaceHref(task.leadId)} className="min-w-0 max-w-full truncate text-xs">Obrir entrada</Link>}</div></article>)}</div>
     </div>
   );
 }

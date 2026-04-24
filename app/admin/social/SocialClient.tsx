@@ -315,8 +315,8 @@ export default function SocialClient({
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setView('list')}
             type="button"
@@ -331,12 +331,12 @@ export default function SocialClient({
           >
             Calendari
           </button>
-          <span className="ml-2 text-xs opacity-50">{filteredPosts.length} de {totalPosts}</span>
+          <span className="text-xs opacity-50 sm:ml-2">{filteredPosts.length} de {totalPosts}</span>
         </div>
         <button
           onClick={() => { setEditingPost(null); setShowCreate(true); }}
           type="button"
-          className="ap-btn ap-btn--primary"
+          className="ap-btn ap-btn--primary w-full sm:w-auto"
         >
           + Nova publicació
         </button>
@@ -352,7 +352,7 @@ export default function SocialClient({
       {/* Ideas Panel — auto-generades des de bookings, testimonials, portfolio i events futurs */}
       {ideas.length > 0 && (
         <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.04] p-4 admin-card-glass">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <span>💡</span>
@@ -364,7 +364,7 @@ export default function SocialClient({
             <button
               onClick={() => setShowIdeas((v) => !v)}
               type="button"
-              className="rounded-lg border border-white/10 px-2 py-1 text-[11px] hover:bg-white/5"
+              className="rounded-lg border border-white/10 px-2 py-1 text-[11px] hover:bg-white/5 sm:self-auto self-start"
             >
               {showIdeas ? 'Amagar' : 'Mostrar'}
             </button>
@@ -433,7 +433,7 @@ export default function SocialClient({
           ) : (
             filteredPosts.map((post) => (
               <div key={post.id} className="admin-stagger-item rounded-xl border border-white/10 admin-card-glass p-4 hover:bg-white/[0.04] transition-colors">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${STATUS_TONE[post.status]}`}>
@@ -455,7 +455,7 @@ export default function SocialClient({
                       <p className="mt-1 text-[11px] text-cyan-400/60">{post.hashtags.map((h) => `#${h}`).join(' ')}</p>
                     )}
                   </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0 text-right max-w-[140px] sm:max-w-none">
+                  <div className="flex flex-col gap-2 text-left sm:max-w-none sm:shrink-0 sm:items-end sm:text-right max-w-full">
                     <span className="text-[11px] opacity-50">
                       {post.scheduledAt ? `Programat: ${formatDateTime(post.scheduledAt)}` : formatDate(post.createdAt)}
                     </span>
@@ -463,11 +463,11 @@ export default function SocialClient({
                     {!post.publishedAt && post.scheduledAt && ['DRAFT', 'SCHEDULED'].includes(post.status) && (
                       <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] text-cyan-200">⏰ Alarma Calendar</span>
                     )}
-                    <div className="flex items-center gap-1 mt-1">
+                    <div className="mt-1 flex flex-wrap items-center gap-1">
                       <select
                         value={post.status}
                         onChange={(e) => handleStatusChange(post.id, e.target.value)}
-                        className="rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-[10px]"
+                        className="min-w-0 rounded border border-white/10 bg-transparent px-1.5 py-0.5 text-[10px]"
                       >
                         {Object.entries(SOCIAL_POST_STATUSES).map(([, val]) => (
                           <option key={val} value={val}>{SOCIAL_POST_STATUS_LABELS[val]}</option>
@@ -499,7 +499,7 @@ export default function SocialClient({
       {/* Calendar View */}
       {view === 'calendar' && (
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between gap-2">
             <button
               onClick={() => setCalMonth((m) => {
                 const d = new Date(m.year, m.month - 1, 1);
@@ -510,7 +510,7 @@ export default function SocialClient({
             >
               ◀
             </button>
-            <h3 className="text-sm font-semibold">
+            <h3 className="min-w-0 text-center text-sm font-semibold">
               {new Date(calMonth.year, calMonth.month).toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' })}
             </h3>
             <button
@@ -709,7 +709,7 @@ function SocialPostModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Estat</label>
             <select value={status} onChange={(e) => setStatus(e.target.value)} className="ap-input w-full">
@@ -757,11 +757,11 @@ function SocialPostModal({
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="ap-input w-full" />
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
           <button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
             Cancel·lar
           </button>
-          <button type="submit" disabled={saving || !title.trim() || platforms.length === 0} className="ap-btn ap-btn--primary px-6 py-2 disabled:opacity-50">
+          <button type="submit" disabled={saving || !title.trim() || platforms.length === 0} className="ap-btn ap-btn--primary px-6 py-2 disabled:opacity-50 sm:w-auto w-full">
             {saving ? 'Desant...' : post ? 'Desar canvis' : 'Crear publicació'}
           </button>
         </div>

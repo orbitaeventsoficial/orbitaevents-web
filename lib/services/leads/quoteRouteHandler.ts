@@ -6,6 +6,7 @@ import { resolveQuotePack } from '@/lib/services/quotes/quotePack';
 import { requireAuth } from '@/lib/auth';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { getAppBaseUrl } from '@/lib/site';
+import { recordLeadQuoteGenerated } from '@/lib/services/leadActivityService';
 
 type LeadQuoteRow = {
   id: string;
@@ -170,19 +171,10 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string) {
       },
     });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId,
-        type: 'DOCUMENT',
-        title: 'Pressupost generat',
-        description: documentTitle,
-        metadata: {
-          quoteNumber,
-          total: quoteData.total,
-          source: 'lead_quote_route',
-        },
-        createdBy: 'Sistema',
-      },
+    await recordLeadQuoteGenerated({
+      leadId,
+      quoteNumber,
+      total: quoteData.total,
     });
 
     const html = generateQuoteHTML(quoteData, {

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
+import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
@@ -670,6 +671,115 @@ export default function AdminPortfolioPage() {
     void loadEvents();
   }, [loadEvents]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const applyHash = () => {
+      if (window.location.hash === '#media') setTab('media');
+      else if (window.location.hash === '#events') setTab('events');
+    };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+  }, []);
+
+  const strip = useMemo(() => {
+    const total = events.length;
+    const publishedCount = events.filter((event) => event.published).length;
+    const draftCount = total - publishedCount;
+    const withoutCover = events.filter((event) => !event.coverImage).length;
+    const withoutMedia = events.filter((event) => (event._count?.media ?? 0) === 0).length;
+    const totalMediaLinked = events.reduce((sum, event) => sum + (event._count?.media ?? 0), 0);
+    const emptyCategories = PORTFOLIO_CATEGORIES.filter(
+      (category) => !events.some((event) => event.categorySlug === category.slug),
+    );
+    const systemItems = [
+      `Events totals: ${total} (${publishedCount} publicats · ${draftCount} esborranys)`,
+      `Peces vinculades: ${totalMediaLinked}`,
+      `Categories actives: ${PORTFOLIO_CATEGORIES.length - emptyCategories.length}/${PORTFOLIO_CATEGORIES.length}`,
+    ];
+    const manualItems: string[] = [];
+    if (withoutCover > 0) manualItems.push(`${withoutCover} event${withoutCover === 1 ? '' : 's'} sense portada`);
+    if (withoutMedia > 0) manualItems.push(`${withoutMedia} event${withoutMedia === 1 ? '' : 's'} sense media vinculat`);
+    if (draftCount > 0) manualItems.push(`${draftCount} esborrany${draftCount === 1 ? '' : 's'} pendent${draftCount === 1 ? '' : 's'} de publicar`);
+    if (emptyCategories.length > 0) manualItems.push(`Categories buides: ${emptyCategories.map((category) => category.name).join(', ')}`);
+    let nextStep: {
+      title: string;
+      detail: string;
+      href: string;
+      ctaLabel: string;
+      secondary?: { href: string; label: string };
+    };
+    if (total === 0) {
+      nextStep = {
+        title: 'Crea el primer event del portfolio',
+        detail: 'Sense events no hi ha pàgina pública. Obre Events i crea el primer cas per tenir presència.',
+        href: '#events',
+        ctaLabel: 'Crear primer event',
+      };
+    } else if (withoutCover > 0) {
+      nextStep = {
+        title: `Assigna portada a ${withoutCover} event${withoutCover === 1 ? '' : 's'}`,
+        detail: 'Els events sense portada es veuen buits a la web. Des de Media tria una peça i marca-la com a portada.',
+        href: '#media',
+        ctaLabel: 'Obrir Media',
+        secondary: { href: '#events', label: 'Revisar events' },
+      };
+    } else if (withoutMedia > 0) {
+      nextStep = {
+        title: `Vincula media a ${withoutMedia} event${withoutMedia === 1 ? '' : 's'}`,
+        detail: 'Events sense media no tenen galeria pública. Des de Media selecciona peces i vincula-les a l\'event.',
+        href: '#media',
+        ctaLabel: 'Obrir Media',
+      };
+    } else if (draftCount > 0) {
+      nextStep = {
+        title: `Publica ${draftCount} esborrany${draftCount === 1 ? '' : 's'}`,
+        detail: 'Els esborranys existeixen a l\'admin però no es veuen públicament. Revisa-los i publica els que estiguin a punt.',
+        href: '#events',
+        ctaLabel: 'Obrir Events',
+      };
+    } else if (emptyCategories.length > 0) {
+      nextStep = {
+        title: `Afegeix events a ${emptyCategories.length} categoria${emptyCategories.length === 1 ? '' : 'es'} buida${emptyCategories.length === 1 ? '' : 'es'}`,
+        detail: `Sense events, les categories es veuen desertes. Pendents: ${emptyCategories.map((category) => category.name).join(', ')}.`,
+        href: '#events',
+        ctaLabel: 'Obrir Events',
+      };
+    } else {
+      nextStep = {
+        title: 'Portfolio al dia',
+        detail: 'Tots els events tenen portada i media vinculat. Continua mantenint la cadència de publicació.',
+        href: '#events',
+        ctaLabel: 'Obrir Events',
+      };
+    }
+    const manualTone: 'info' | 'warning' | 'success' =
+      withoutCover > 0 || withoutMedia > 0 ? 'warning' : draftCount > 0 ? 'info' : 'success';
+    return {
+      system: {
+        eyebrow: 'BBDD',
+        title: 'Inventari actual',
+        tone: total === 0 ? 'warning' : 'info',
+        items: systemItems,
+        emptyText: 'Sense events encara.',
+      } as const,
+      manual: {
+        eyebrow: 'Pendents manuals',
+        title: 'Què requereix la teva mà',
+        tone: manualTone,
+        items: manualItems,
+        emptyText: 'Cap acció manual pendent.',
+      } as const,
+      nextStep: {
+        title: nextStep.title,
+        detail: nextStep.detail,
+        href: nextStep.href,
+        ctaLabel: nextStep.ctaLabel,
+        secondaryAction: nextStep.secondary,
+      },
+    };
+  }, [events]);
+
   return (
     <div className="space-y-6">
       <FullscreenPreview preview={preview} onClose={() => setPreview(null)} />
@@ -677,11 +787,14 @@ export default function AdminPortfolioPage() {
         <h1 className="text-2xl font-bold text-white/95">Portfolio</h1>
         <p className="mt-1 text-sm text-white/50">Gestor visual únic del portfolio: miniatures, destinació real, portada, ordre, substitució i assignació d'events.</p>
       </div>
+      <OwnerControlStrip system={strip.system} manual={strip.manual} nextStep={strip.nextStep} className="mb-2" />
       <div className="grid gap-3 lg:grid-cols-3">
         <AdminHelpLegend title="Què estàs veient" body="Media gestiona fitxers i ordre. Events gestiona la pàgina pública i les seves metadades." />
         <AdminHelpLegend title="Com treballar" body="Primer crea o revisa l'event. Després vincula les imatges, tria portada i ordena la galeria des de Media." />
         <AdminHelpLegend title="Protecció" body="Les peces marcades com a portada no es deixen eliminar a cegues. Així s'evita trencar la web sense voler." />
       </div>
+      <div id="media" />
+      <div id="events" />
       <div className="flex gap-2">
         <button type="button" onClick={() => setTab('media')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'media' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Media</button>
         <button type="button" onClick={() => setTab('events')} className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${tab === 'events' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>Events</button>

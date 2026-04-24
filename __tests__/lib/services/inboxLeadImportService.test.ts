@@ -12,7 +12,6 @@ const { mockPrisma, mockFetchEmailByUid, mockExtractLeadData } = vi.hoisted(() =
       findFirst: vi.fn(),
       create: vi.fn(),
     },
-    leadActivity: { create: vi.fn() },
   },
   mockFetchEmailByUid: vi.fn(),
   mockExtractLeadData: vi.fn(),
@@ -23,8 +22,13 @@ vi.mock('@/lib/imap', () => ({ fetchEmailByUid: mockFetchEmailByUid }));
 vi.mock('@/lib/services/emailLeadExtractionService', () => ({
   extractLeadDataFromEmail: mockExtractLeadData,
 }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadCreatedFromInbox: vi.fn(),
+  recordLeadUpdatedFromInbox: vi.fn(),
+}));
 
 import { importLeadFromInboxMessage } from '@/lib/services/inboxLeadImportService';
+import { recordLeadCreatedFromInbox, recordLeadUpdatedFromInbox } from '@/lib/services/leadActivityService';
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 function makeEmailResult(overrides = {}) {
@@ -73,7 +77,6 @@ beforeEach(() => {
   });
   mockPrisma.leadNote.findFirst.mockResolvedValue(null);
   mockPrisma.leadNote.create.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -155,21 +158,16 @@ describe('creació nou lead', () => {
     expect(noteContent).toContain('Revisar manualment');
   });
 
-  it('crea leadActivity amb metadades', async () => {
+  it('registra leadActivity shared amb metadades', async () => {
     await importLeadFromInboxMessage(100);
 
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          type: 'SYSTEM',
-          title: expect.stringContaining('creat'),
-          metadata: expect.objectContaining({
-            uid: 100,
-            subject: 'Consulta boda setembre',
-          }),
-        }),
-      })
-    );
+    expect(recordLeadCreatedFromInbox).toHaveBeenCalledWith({
+      leadId: 'new-lead-1',
+      senderAddress: 'client@example.com',
+      uid: 100,
+      subject: 'Consulta boda setembre',
+      usedFallback: false,
+    });
   });
 
   it('usa fallback email si IMAP no retorna res', async () => {
@@ -276,6 +274,20 @@ describe('actualització lead existent', () => {
     expect(result.status).toBe(200);
     expect(result.body.action).toBe('already_imported');
     expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+  });
+
+  it('registra activitat shared quan actualitza lead existent', async () => {
+    mockPrisma.lead.findFirst.mockResolvedValue(existingLead);
+
+    await importLeadFromInboxMessage(100);
+
+    expect(recordLeadUpdatedFromInbox).toHaveBeenCalledWith({
+      leadId: 'existing-lead-1',
+      senderAddress: 'client@example.com',
+      uid: 100,
+      subject: 'Consulta boda setembre',
+      usedFallback: false,
+    });
   });
 
   it('inclou missatge merged amb marker', async () => {

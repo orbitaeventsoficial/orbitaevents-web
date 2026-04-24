@@ -13,6 +13,7 @@ import { fetchAdminTaskList } from '@/lib/services/tasks/taskList';
 import { loadTaskQueue, type TaskQueue } from '@/lib/services/tasks/taskQueueService';
 import TaskQueueBanner from './TaskQueueBanner';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ function parsePage(value?: string) {
 
 function resolveDestination(task: TaskListItem) {
   if (task.customer) return `/admin/clientes/${task.customer.id}`;
-  if (task.lead) return `/admin/leads/${task.lead.id}`;
+  if (task.lead) return buildLeadWorkspaceHref(task.lead.id);
 
   const title = task.title.toLowerCase();
   if (title.includes('entrades')) return '/admin/leads?status=NEW';

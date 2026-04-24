@@ -11,6 +11,7 @@ import { getRecipientsAsString } from '@/lib/services/notificationRecipientsServ
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { getEventLabel, getSourceDisplay, formatDateSimple, formatDate, formatCurrency } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { absoluteUrl } from '@/lib/site';
 
 
@@ -38,6 +39,10 @@ interface NotificationResult {
   success: boolean;
   channel: 'email' | 'whatsapp' | 'webhook';
   error?: string;
+}
+
+function buildLeadAdminUrl(leadId: string): string {
+  return absoluteUrl(buildLeadWorkspaceHref(leadId));
 }
 
 // ============================================
@@ -153,7 +158,7 @@ ${lead.message ? `💬 "${lead.message}"` : ''}
 ${lead.packName ? `📦 Pack: ${lead.packName}` : ''}
 ${lead.estimatedPrice ? `💵 Estimat: ${lead.estimatedPrice}€` : ''}
 
-🔗 Admin: ${absoluteUrl(`/admin/leads/${lead.id}`)}`;
+🔗 Admin: ${buildLeadAdminUrl(lead.id)}`;
 
       await fetch(process.env.WHATSAPP_WEBHOOK_URL, {
         method: 'POST',
@@ -205,7 +210,7 @@ async function sendWhatsAppAPI(lead: LeadNotificationData): Promise<Notification
         to: process.env.ADMIN_WHATSAPP?.replace(/[^\d]/g, '') || SITE_CONFIG.business.phone.replace(/[^\d]/g, ''),
         type: 'text',
         text: {
-          body: `🚀 NOU LEAD: ${lead.name}\n${eventLabel}\n${lead.phone || lead.email}\n\nAdmin: ${absoluteUrl(`/admin/leads/${lead.id}`)}`
+          body: `🚀 NOU LEAD: ${lead.name}\n${eventLabel}\n${lead.phone || lead.email}\n\nAdmin: ${buildLeadAdminUrl(lead.id)}`
         }
       }),
     });
@@ -233,7 +238,7 @@ function generateWhatsAppLink(lead: LeadNotificationData): string {
   const message = `🚀 NOU LEAD: ${lead.name} - ${eventLabel}
 📱 ${lead.phone || 'Sense telèfon'}
 📧 ${lead.email}
-🔗 ${absoluteUrl(`/admin/leads/${lead.id}`)}`;
+🔗 ${buildLeadAdminUrl(lead.id)}`;
 
   const adminPhone = (process.env.ADMIN_WHATSAPP || SITE_CONFIG.business.phone).replace(/[^\d]/g, '');
   return `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
@@ -275,7 +280,7 @@ async function sendLeadWebhook(lead: LeadNotificationData): Promise<Notification
           estimatedPrice: lead.estimatedPrice,
           source: lead.source,
           createdAt: lead.createdAt,
-          adminUrl: absoluteUrl(`/admin/leads/${lead.id}`),
+          adminUrl: buildLeadAdminUrl(lead.id),
         },
       }),
     });
@@ -408,7 +413,7 @@ function generateAdminEmailHTML(
       ` : ''}
 
       <!-- CTAs -->
-      <a href="${absoluteUrl(`/admin/leads/${lead.id}`)}" class="cta-button">
+      <a href="${buildLeadAdminUrl(lead.id)}" class="cta-button">
         📋 Veure Lead a l'Admin
       </a>
 

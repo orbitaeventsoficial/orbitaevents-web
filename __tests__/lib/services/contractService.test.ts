@@ -8,7 +8,6 @@ const { mockPrisma, mockGenerateContractPDF, mockSendEmail } = vi.hoisted(() => 
       update: vi.fn(),
     },
     setting: { findMany: vi.fn() },
-    leadActivity: { create: vi.fn() },
     leadDocument: { create: vi.fn() },
   },
   mockGenerateContractPDF: vi.fn(),
@@ -28,6 +27,10 @@ vi.mock('@/app/config/site-config', () => ({
   },
 }));
 vi.mock('@/lib/services/travelCost', () => ({ INCLUDED_TRAVEL_KM: 100 }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadContractSent: vi.fn(),
+  recordLeadContractCancelled: vi.fn(),
+}));
 
 import {
   generateContractFromProposal,
@@ -37,6 +40,7 @@ import {
   getDefaultCancellationPolicy,
   getDefaultTermsAndConditions,
 } from '@/lib/services/contractService';
+import { recordLeadContractCancelled, recordLeadContractSent } from '@/lib/services/leadActivityService';
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 const COMPANY_SETTINGS = [
@@ -108,7 +112,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.setting.findMany.mockResolvedValue(COMPANY_SETTINGS);
   mockPrisma.proposal.update.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockPrisma.leadDocument.create.mockResolvedValue({});
   mockGenerateContractPDF.mockResolvedValue(fakePdfDoc);
   mockSendEmail.mockResolvedValue(undefined);
@@ -290,7 +293,7 @@ describe('sendContract', () => {
     expect(sentUpdate).toBeDefined();
   });
 
-  it('crea leadActivity i leadDocument si hi ha leadId', async () => {
+  it('registra leadActivity shared i crea leadDocument si hi ha leadId', async () => {
     mockPrisma.proposal.findUniqueOrThrow
       .mockResolvedValueOnce(makeProposal({
         contractReference: 'CTR-2026-AB12',
@@ -305,15 +308,11 @@ describe('sendContract', () => {
 
     await sendContract('prop-1');
 
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          leadId: 'lead-1',
-          type: 'DOCUMENT',
-          title: 'Contracte enviat',
-        }),
-      })
-    );
+    expect(recordLeadContractSent).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      contractReference: 'CTR-2026-AB12',
+      to: 'joan@example.com',
+    });
     expect(mockPrisma.leadDocument.create).toHaveBeenCalled();
   });
 
@@ -419,15 +418,10 @@ describe('cancelContract', () => {
 
     await cancelContract('prop-1');
 
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          leadId: 'lead-1',
-          type: 'SYSTEM',
-          title: 'Contracte cancel·lat',
-        }),
-      })
-    );
+    expect(recordLeadContractCancelled).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      contractReference: 'CTR-2026-TEST',
+    });
   });
 
   it('retorna 400 si no hi ha contracte', async () => {
@@ -475,7 +469,7 @@ describe('cancelContract', () => {
 
     await cancelContract('prop-1');
 
-    expect(mockPrisma.leadActivity.create).not.toHaveBeenCalled();
+    expect(recordLeadContractCancelled).not.toHaveBeenCalled();
   });
 });
 

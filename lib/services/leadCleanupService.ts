@@ -1,15 +1,21 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { OPEN_LEAD_STATUSES } from '@/lib/constants';
+import { markLeadAsLost } from '@/lib/services/leadLossService';
 
 /**
  * Lead Cleanup Service
  *
- * 1. Auto-LOST: leads amb data d'event passada que encara estan oberts
- * 2. Auto-DELETE: leads LOST de fa +90 dies sense reserva
+ * 1. Auto-LOST: leads amb data d'event passada que encara estan oberts.
+ *    Cada lead auto-perdut queda classificat amb lostReason='EVENT_PASSED'
+ *    via markLeadAsLost(), de manera que l'audit trail i l'analítica de
+ *    pèrdues tenen dades reals sense dependre d'intervenció manual.
+ * 2. Auto-DELETE: leads LOST de fa +90 dies sense reserva.
  */
 
 const DAYS_BEFORE_DELETE = 90;
+const AUTO_LOST_ACTOR = 'system:lead-cleanup';
+const AUTO_LOST_REASON = 'EVENT_PASSED';
 
 export async function runLeadCleanup(): Promise<{
   autoLost: number;
@@ -17,26 +23,38 @@ export async function runLeadCleanup(): Promise<{
 }> {
   const now = new Date();
 
-  // 1. Marca com LOST els leads amb data d'event passada
-  const autoLostResult = await prisma.lead.updateMany({
+  // 1. Marca com LOST els leads amb data d'event passada, amb motiu canònic
+  const openLeadsWithPastEvent = await prisma.lead.findMany({
     where: {
       status: { in: [...OPEN_LEAD_STATUSES] },
       eventDate: { not: null, lt: now },
     },
-    data: {
-      status: 'LOST',
-    },
+    select: { id: true },
   });
 
-  if (autoLostResult.count > 0) {
-    log.info(`Lead cleanup: ${autoLostResult.count} leads marcats com LOST (data event passada)`);
+  let autoLost = 0;
+  for (const lead of openLeadsWithPastEvent) {
+    const result = await markLeadAsLost({
+      leadId: lead.id,
+      reason: AUTO_LOST_REASON,
+      actor: AUTO_LOST_ACTOR,
+      now,
+    });
+    if (result.ok) {
+      autoLost += 1;
+    } else {
+      log.warn(`Lead cleanup: no s'ha pogut marcar com LOST el lead ${lead.id}: ${result.error}`);
+    }
+  }
+
+  if (autoLost > 0) {
+    log.info(`Lead cleanup: ${autoLost} leads marcats com LOST (data event passada, motiu ${AUTO_LOST_REASON})`);
   }
 
   // 2. Elimina leads LOST de fa +90 dies (sense reserva)
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_BEFORE_DELETE);
 
-  // Primer troba els leads que es poden eliminar
   const leadsToDelete = await prisma.lead.findMany({
     where: {
       status: 'LOST',
@@ -51,7 +69,6 @@ export async function runLeadCleanup(): Promise<{
   if (leadsToDelete.length > 0) {
     const ids = leadsToDelete.map((l) => l.id);
 
-    // Elimina en transaction (cascade manual)
     await prisma.$transaction(async (tx) => {
       await tx.leadNote.deleteMany({ where: { leadId: { in: ids } } });
       await tx.leadActivity.deleteMany({ where: { leadId: { in: ids } } });
@@ -65,8 +82,7 @@ export async function runLeadCleanup(): Promise<{
   }
 
   return {
-    autoLost: autoLostResult.count,
+    autoLost,
     autoDeleted,
   };
 }
-

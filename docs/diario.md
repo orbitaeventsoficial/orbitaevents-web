@@ -1,3 +1,408 @@
+## 2026-04-24 — Canvi #377: el kanban de leads també exigeix `lostReason` abans de moure a `LOST` (codex)
+- `app/admin/leads/LeadPipelineView.tsx`: el moviment ràpid cap a `LOST` deixa de fer canvi optimista directe i obre `LeadLostStatusPrompt` amb el lead pendent. La confirmació només persisteix quan hi ha `lostReason` i reutilitza `patchLeadStatus()` amb `{ status:'LOST', lostReason, note }`.
+- El flux ràpid de la resta d’estats no canvia: el kanban continua movent `NEW/CONTACTED/QUOTE_SENT/NEGOTIATING/WON` amb el mateix patró de toast i actualització local.
+- Efecte: queda tancat l’últim forat operatiu del cicle de pèrdua. Ni el detall ni el board poden enviar un lead a `LOST` sense classificació canònica.
+- Validació: `pnpm vitest run __tests__/app/admin/leads/LeadQuickStatus.test.tsx` OK (2 tests sobre el contracte shared del prompt); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #376: auditoria confirma canonització CTA de leads 100% — SEGÜENT §6.11 tancat com a FET (claude)
+- Grep de `/admin/leads/` a tot el codebase: 87 ocurrències en 30 fitxers, totes classificades. 0 CTAs candidats al helper `buildLeadWorkspaceHref` pendents. Les restants són URLs API (`/api/admin/leads/*`), imports (`@/app/admin/leads/colorTheme`), rutes especials que no són fitxa de lead (`/reengagement`), o strings de test/e2e.
+- `docs/protocol-producte-admin-ca.md` · §6.11: el `SEGÜENT` obsolet de "continuar auditoria estructural CTAs executives" es converteix en `FET` amb evidència empírica. La canonització és 100%, no "pràcticament exhaustiva" com deia el #326.
+- Sense canvis de codi/schema/tests — tall documental.
+- Validació: `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #375: el Lead Hub ja captura `lostReason` i nota abans de marcar un lead com a perdut (codex)
+- `app/admin/leads/leadStatusClient.ts`: helper shared `patchLeadStatus()` perquè els callers del detall reutilitzin el mateix `PATCH /api/admin/leads/:id/status` amb shape `{status, lostReason?, note?}`.
+- `app/admin/leads/LeadLostStatusPrompt.tsx`: formulari shared per a la pèrdua amb select dels motius canònics i textarea de nota interna.
+- `app/admin/leads/LeadQuickStatus.tsx`, `LeadActions.tsx`, `app/admin/leads/[id]/LeadActionsEnhanced.tsx` i `LeadGuidedFlow.tsx`: quan el canvi és cap a `LOST`, la UI ja no envia directament `{status:'LOST'}`; obre el prompt shared, exigeix `lostReason` i confirma amb el path canònic.
+- `__tests__/app/admin/leads/LeadQuickStatus.test.tsx`: 2 tests nous per blindar que els canvis normals segueixen fent `PATCH {status}` i que `LOST` envia `{status, lostReason, note}`.
+- Efecte: el detall del lead deixa enrere el path legacy sense context cap a `LOST`. La captura de pèrdua entra ja a la UI operativa principal i alimenta correctament `markLeadAsLost()`, `leadActivity` i l’analítica.
+- Validació: `pnpm vitest run __tests__/app/admin/leads/LeadQuickStatus.test.tsx` OK (2 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #374: decisió canònica — `leadActivity` continua com a font canònica de comunicacions, no es crea `CommunicationEvent` (claude)
+- `docs/protocol-producte-admin-ca.md` · §6.15: el `SEGÜENT` obert des de #352 (si calia `CommunicationEvent`) es tanca com a `FET` amb les raons completes. El `PENDENT CRÍTIC` es reescriu per documentar la direcció preferida (unificar `customerActivity` + `leadActivity` en un `TimelineEvent` polimòrfic) sense que sigui feina immediata.
+- Raons de la decisió: (1) el PENDENT CRÍTIC apunta cap a menys entitats, no més; (2) després del #373 totes les escriptures passen per helpers shared tipats; (3) camps "hot" per SLA/analítica poden viure com a derivats al `Lead` si calen; (4) queries tipades sobre comms es cobreixen amb helpers de lectura sense tocar schema.
+- Sense canvis de codi/schema/tests — tall purament documental en la línia del #356.
+- Validació: `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #373: el cicle de pèrdua de lead comparteix també l’escriptura de `leadActivity` (claude)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadLost()` per centralitzar l’activitat `Lead perdut` (STATUS_CHANGE amb metadata canònica fromStatus/toStatus/reason/note). Import de tipus `LeadLostReason` preserva la tipificació estricta sense crear cicle.
+- `lib/services/leadLossService.ts`: `markLeadAsLost()` deixa de fer `leadActivity.create(...)` inline i delega al servei shared. `buildLostActivityDescription` segueix al consumer (continua exportat/testat).
+- `__tests__/lib/services/leadActivityService.test.ts`: test del helper shared amb payload canònic complet; `leadLossService.test.ts` segueix verd sense canvis.
+- Efecte: tancat el cicle iniciat al #352 — tots els consumidors del repo passen per helpers shared de `leadActivityService`. El grep `leadActivity\.create\(` dins `lib/services/` només retorna l’owner.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadLossService.test.ts` OK (36 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #372: `Sales Ops` incorpora `LossBreakdownPanel` i fa visible la lectura de pèrdues comercials (codex)
+- `app/admin/sales-ops/LossBreakdownPanel.tsx`: component nou per llegir `LossSummary` dins del workspace de vendes. Rep snapshot inicial del servidor, es revalida contra `/api/admin/reports/lead-losses?days=90` i mostra KPI de motiu principal, totals comercials/automàtics, donut `byReason`, barres `bySource` i línia `byMonth`.
+- `app/admin/sales-ops/page.tsx`: `Sales Ops` carrega `loadLossReport({ sinceDays: 90 })` en paral·lel amb la resta de mètriques i injecta el panell després de l’`OwnerControlStrip`, sense obrir una segona lògica local de càlcul.
+- `__tests__/app/admin/sales-ops/LossBreakdownPanel.test.tsx`: 3 tests nous per blindar render inicial, refresh via endpoint i fallback buit.
+- Efecte: l’audit trail de pèrdues deixa de viure només a schema/servei/endpoint i entra a la superfície operativa del propietari. `Sales Ops` pot llegir ja motiu comercial dominant, canals amb més pèrdua i tendència mensual sense sortir del cockpit.
+- Validació: `pnpm vitest run __tests__/app/admin/sales-ops/LossBreakdownPanel.test.tsx` OK (3 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #371: el cicle de snapshot tècnic del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadTechnicalSnapshotSaved()` i `recordLeadTechnicalSnapshotSent()` per centralitzar les activitats `Instantània tècnica desada` i `Instantània tècnica enviada`.
+- `lib/services/leadSnapshotService.ts`: deixa de fer `leadActivity.create(...)` inline tant al flux `save_document` com al flux `send_email` i delega aquestes dues escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leadSnapshotService.test.ts`: cobertura ajustada perquè els helpers shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle de snapshot tècnic del lead ja no manté semàntica local duplicada dins el servei; les dues activitats passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadSnapshotService.test.ts` OK; `npx tsc --noEmit --pretty false` continua trencat per fixtures de `LossSummary` a `executiveReport*`; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #370: la ruta de canvi d’estat del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadStatusChanged()` per centralitzar l’activitat `Canvi d'estat`.
+- `lib/services/leads/statusRouteHandler.ts`: deixa de fer `leadActivity.create(...)` inline al path legacy de canvi d’estat i delega aquesta escriptura al servei shared, mantenint `markLeadAsLost()` per al path canònic de pèrdua.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leads/statusRouteHandler.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el canvi d’estat legacy del lead ja no manté una semàntica local duplicada dins la ruta; `Canvi d'estat` passa també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leads/statusRouteHandler.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #369: l’automatització SLA del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadSlaTaskCreated()` per centralitzar l’activitat `SLA incomplert: tasca automàtica creada`.
+- `lib/services/slaAutomationService.ts`: deixa de fer `leadActivity.create(...)` inline a `enforceLeadSla()` i delega aquesta escriptura al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `slaAutomationService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: l’automatització SLA del lead ja no manté una semàntica local duplicada dins el servei; l’activitat de tasca automàtica passa també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/slaAutomationService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #368: el snapshot manual de scoring del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadScoreSnapshot()` per centralitzar l’activitat `Scoring snapshot`.
+- `lib/services/leadScoreAdminService.ts`: deixa de fer `leadActivity.create(...)` inline a `createAdminLeadScoreSnapshot()` i delega aquesta escriptura al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leadScoreAdminService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: la snapshot manual de scoring del lead ja no manté una semàntica local duplicada dins el servei; `Scoring snapshot` passa també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadScoreAdminService.test.ts` OK; `npx tsc --noEmit --pretty false` continua trencat per un error aliè a `__tests__/lib/services/executiveReportPdfService.test.ts`; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #366: la ruta de generació de pressupost de lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadQuoteGenerated()` per centralitzar l’activitat `Pressupost generat`.
+- `lib/services/leads/quoteRouteHandler.ts`: deixa de fer `leadActivity.create(...)` inline a `handleLeadQuotePost()` i delega aquesta escriptura al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `quoteRouteHandler.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: la generació de pressupost de lead ja no manté una semàntica local duplicada dins la ruta; `Pressupost generat` passa també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/quoteRouteHandler.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #364: el motor de seqüències comercials comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadCommercialSequenceStepSent()` per centralitzar l’activitat generada quan una seqüència comercial envia un pas de nurturing.
+- `lib/services/commercialSequenceService.ts`: deixa de fer `leadActivity.create(...)` inline i delega l’escriptura shared, mantenint el `adminLog` `COMM_SEQUENCE_EXEC` al mateix lloc.
+- `__tests__/lib/services/leadActivityService.test.ts` i `commercialSequenceService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el motor de nurturing comercial ja no manté una semàntica local duplicada dins del servei; els passos enviats passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/commercialSequenceService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #362: el cicle d’importació Inbox del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadUpdatedFromInbox()` i `recordLeadCreatedFromInbox()` per centralitzar les activitats d’importació Inbox sobre el lead.
+- `lib/services/inboxLeadImportService.ts`: deixa de fer `leadActivity.create(...)` inline tant al flux d’update com al de creació i delega aquestes escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `inboxLeadImportService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle d’importació Inbox del lead ja no manté una semàntica local duplicada dins el servei; `Lead actualitzat/creat des d’Inbox` passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/inboxLeadImportService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #361: el cicle de notes del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadNoteAdded()` per centralitzar l’activitat `Nota afegida` sobre el lead.
+- `lib/services/leadNoteService.ts`: deixa de fer `leadActivity.create(...)` inline a `createLeadNote()` i delega aquesta escriptura al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leadNoteService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle de notes del lead ja no manté una semàntica local duplicada dins el servei; `Nota afegida` passa també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadNoteService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #359: el cicle de tasques scoped del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadTaskCreated()`, `recordLeadTaskUpdated()` i `recordLeadTaskDeleted()` per centralitzar les activitats de task scoped sobre el lead.
+- `lib/services/leadScopedTaskRouteService.ts`: deixa de fer `leadActivity.create(...)` inline a `createLeadScopedTaskForRoute()`, `updateLeadScopedTaskForRoute()` i `deleteLeadScopedTaskForRoute()` i delega aquestes tres escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leadScopedTaskRouteService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle de tasks scoped del lead ja no manté una semàntica local duplicada dins el route adapter; `task created/updated/deleted` passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadScopedTaskRouteService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #357: el cicle de documents del lead comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadDocumentAdded()` i `recordLeadDocumentDeleted()` per centralitzar les activitats de documents del lead.
+- `lib/services/leadDocumentService.ts`: deixa de fer `leadActivity.create(...)` inline a `uploadLeadDocument()` i `deleteLeadDocument()` i delega aquestes dues escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `leadDocumentService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle documental del lead ja no manté una semàntica local duplicada dins el servei; `document added/deleted` passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/leadDocumentService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #355: el cicle de contracte comparteix també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadContractSent()` i `recordLeadContractCancelled()` per centralitzar les activitats de contracte del lead.
+- `lib/services/contractService.ts`: deixa de fer `leadActivity.create(...)` inline a `sendContract()` i `cancelContract()` i delega aquestes dues escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts` i `contractService.test.ts`: cobertura ajustada perquè el helper shared i el consumidor validin la delegació canònica.
+- Efecte: el cicle de contracte ja no manté una semàntica local duplicada dins el servei; `contract sent/cancelled` passen també per una sola porta d’entrada shared al domini `leadActivity`.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/contractService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #352: els emails comercials de lead comparteixen també l’escriptura de `leadActivity` (codex)
+- `lib/services/leadActivityService.ts`: nous helpers `recordLeadEmailSent()` i `recordLeadQuoteSent()` per centralitzar les activitats sortints d’email comercial sobre el lead.
+- `lib/services/adminEmailSendService.ts` i `lib/services/adminQuoteEmailService.ts`: deixen de fer `leadActivity.create(...)` inline i deleguen aquestes escriptures al servei shared.
+- `__tests__/lib/services/leadActivityService.test.ts`, `adminEmailSendService.test.ts` i `adminQuoteEmailService.test.ts`: cobertura ajustada perquè el helper shared i els dos consumidors validin la delegació canònica.
+- Efecte: el clúster d’emails comercials del lead deixa de repartir la mateixa semàntica d’activitat entre dos serveis; el domini guanya una sola porta d’entrada per aquests events sortints.
+- Validació: `pnpm vitest run __tests__/lib/services/leadActivityService.test.ts __tests__/lib/services/adminEmailSendService.test.ts __tests__/lib/services/adminQuoteEmailService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #351: el post-event de reserva comparteix també l’escriptura residual de `customerActivity` (codex)
+- `lib/services/customerActivityService.ts`: nou helper shared `recordCustomerPostEventEmailSent()` per centralitzar `POST_EVENT_EMAIL_SENT` quan el client rep el correu post-event d’una reserva completada.
+- `lib/services/postEventDispatchService.ts`: deixa de fer `customerActivity.create(...)` inline i delega aquesta activitat al nou helper shared.
+- `__tests__/lib/services/customerActivityService.test.ts` i `__tests__/lib/services/postEventDispatchService.test.ts`: cobertura ajustada perquè el helper nou quedi blindat i el consumidor validi la delegació shared; el test de post-event afirma també el contracte shared d’`adminLog` ja vigent.
+- Efecte: el cicle post-event de reserva ja no manté una excepció local dins `customerActivity`; el correu post-event passa també per la mateixa norma canònica de lectures i escriptures shared.
+- Validació: `pnpm vitest run __tests__/lib/services/customerActivityService.test.ts __tests__/lib/services/postEventDispatchService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #350: la norma canònica queda escrita explícitament al protocol (codex)
+- `docs/protocol-producte-admin-ca.md`: afegida la norma explícita de lectures i escriptures canòniques dins `§2.1 Principis invariables`.
+- La regla deixa escrit que, si un domini ja té capa shared, no es reobre una query crua ni una escriptura inline des de pàgines, routes o serveis; si la capa no arriba, primer s’amplia i després es reconnecten consumidors.
+- Efecte: la disciplina arquitectònica aplicada durant la sèrie recent de canvis queda formalitzada com a protocol viu del repo i no només com a criteri implícit de treball.
+- Validació: `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #349: els residuals no comercials de `customerActivity` passen també per la capa shared (codex)
+- `lib/services/customerActivityService.ts`: nous helpers `recordCustomerProcessStarted()` i `recordCustomerTestimonialSubmitted()` per centralitzar dues escriptures residuals que encara vivien inline fora de la capa shared.
+- `lib/services/deduplicationService.ts`: el log de `CUSTOMERS_MERGED` deixa de fer `customerActivity.create(...)` directe i reaprofita `recordCustomersMerged()`.
+- `lib/services/customerProcessService.ts`: l'inici de `review_request`, `post_event`, `welcome` i `promo` deixa de persistir l'activitat localment i delega a `recordCustomerProcessStarted()`.
+- `lib/services/publicTestimonialService.ts`: `TESTIMONIAL_SUBMITTED` deixa d'escriure's manualment dins la transacció i passa a `recordCustomerTestimonialSubmitted(..., tx)`.
+- `__tests__/lib/services/deduplicationService.test.ts`, `customerProcessService.test.ts` i `publicTestimonialService.test.ts`: cobertura ajustada perquè els tres consumidors validin la delegació a la capa shared.
+- Efecte: la semàntica residual de `customerActivity` queda més monocapa també fora del cicle comercial principal; fusió de clients, processos de client i testimoni públic deixen de mantenir escriptures inline disperses.
+- Validació: `pnpm vitest run __tests__/lib/services/deduplicationService.test.ts __tests__/lib/services/customerProcessService.test.ts __tests__/lib/services/publicTestimonialService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #348: el lifecycle base de client comparteix també l’escriptura de `customerActivity` (codex)
+- `lib/services/customerActivityService.ts`: nous helpers shared per al lifecycle base: `recordCustomerCreated()`, `recordCustomerInitialNotes()`, `recordCustomerDuplicateWarning()`, `recordCustomerLeadCreated()`, `recordCustomerProfileUpdated()`, `recordCustomerStatusChanged()`, `recordLeadConverted()` i `recordCustomerBookingCreated()`. Accepten també client transaccional quan toca.
+- `lib/services/customerCreationService.ts`, `contactLeadCaptureService.ts`, `customerStatusService.ts`, `customerRouteService.ts`, `leads/statusRouteHandler.ts` i `bookingCreationService.ts`: deixen de fer `customerActivity.create(...)` directament per aquestes accions base del cicle.
+- Efecte: el cicle principal client/leads/reserva deixa de repartir la semàntica d’activitat entre múltiples serveis i passa a tenir una sola capa shared per aquests events fundacionals del CRM.
+- Validació: `npx vitest run __tests__/lib/services/customerActivityService.test.ts __tests__/lib/services/customerCreationService.test.ts __tests__/lib/services/contactLeadCaptureService.test.ts __tests__/lib/services/customerStatusService.test.ts __tests__/lib/services/customerRouteService.test.ts __tests__/lib/services/bookingCreationService.test.ts __tests__/lib/services/leads/statusRouteHandler.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #347: el clúster de comunicacions de reserva comparteix també l’escriptura de `adminLog` (codex)
+- `lib/services/bookingCommunicationLogService.ts`: nou servei shared `recordBookingCommunicationLog()` per centralitzar els logs de comunicació de reserva sobre `adminLog`.
+- `lib/services/bookingCommunicationService.ts`, `lib/services/paymentReminderService.ts` i `lib/services/postEventDispatchService.ts`: deixen de fer `adminLog.create(...)` directament per `COMM_SENT`, `COMM_RESPONDED`, `PAYMENT_REMINDER_SENT` i `SEND_POST_EVENT_EMAIL`, i deleguen al helper shared.
+- `__tests__/lib/services/bookingCommunicationLogService.test.ts`: cobertura nova del servei shared; les suites de `bookingCommunicationService`, `paymentReminderService` i `postEventDispatchService` continuen passant.
+- Efecte: el clúster de booking comms ja no reparteix la mateixa escriptura de log tècnic entre tres serveis; queda una sola porta d’entrada per aquests events de reserva.
+- Validació: `npx vitest run __tests__/lib/services/bookingCommunicationLogService.test.ts __tests__/lib/services/bookingCommunicationService.test.ts __tests__/lib/services/paymentReminderService.test.ts __tests__/lib/services/postEventDispatchService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #346: les sortides comercials comparteixen també l’escriptura de `customerActivity` (codex)
+- `lib/services/customerActivityService.ts`: nous helpers `recordCustomerEmailSent()`, `recordCustomerQuoteSent()` i `recordCustomerProposalSent()` per concentrar les escriptures de `EMAIL_SENT`, `QUOTE_SENT` i `PROPOSAL_SENT`.
+- `lib/services/adminEmailSendService.ts`, `lib/services/adminQuoteEmailService.ts` i `lib/services/proposalDispatchService.ts`: deixen de fer `customerActivity.create(...)` directament per aquests casos i deleguen la semàntica al servei shared.
+- `__tests__/lib/services/customerActivityService.test.ts`: cobertura nova dels tres helpers shared.
+- Efecte: el clúster de sortides comercials/email deixa de repetir l’escriptura de `customerActivity` en tres serveis diferents; la semàntica d’activitat del client queda més concentrada i reutilitzable.
+- Validació: `npx vitest run __tests__/lib/services/customerActivityService.test.ts __tests__/lib/services/adminEmailSendService.test.ts __tests__/lib/services/adminQuoteEmailService.test.ts __tests__/lib/services/proposalDispatchService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #345: el `Customer Hub` deixa de derivar localment notes i estat manual des de `activityLog` (codex)
+- `lib/services/customerActivityService.ts`: nou helper `deriveCustomerHubActivitySummary()` per derivar `customerNotes` i `manualStatus` a partir de l’historial del client.
+- `lib/customer-hub/fetchCustomerHub.ts`: el hub deixa de reconstruir localment aquesta interpretació de `activityLog` i delega la derivació al servei shared.
+- `__tests__/lib/services/customerActivityService.test.ts`: cobertura nova del helper per blindar la derivació de notes i estat manual.
+- Efecte: el `Customer Hub` manté el mateix comportament, però deixa de tenir semàntica pròpia enganxada al fetcher per interpretar `customerActivity`; aquesta lectura queda una mica més monocapa.
+- Validació: `npx vitest run __tests__/lib/services/customerActivityService.test.ts __tests__/lib/customer-hub/fetchCustomerHub.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #344: `Sales Ops` i automatitzacions comercials comparteixen també la mètrica de `COMM_SEQUENCE_EXEC` (codex)
+- `lib/services/timelineQueryService.ts`: nou helper `fetchRecentCommercialSequenceMetrics()` per centralitzar el recompte recent de `COMM_SEQUENCE_EXEC`.
+- `lib/services/adminAutomationService.ts` i `app/admin/sales-ops/page.tsx`: deixen de comptar `adminLog` localment per aquesta mètrica i passen a consumir el helper shared.
+- `__tests__/lib/services/adminAutomationService.test.ts` i `__tests__/lib/services/timelineQueryService.test.ts`: cobertura ampliada del nou helper i dels consumidors reconnectats.
+- Efecte: la lectura comercial recent deixa de tenir una segona duplicació per a seqüències executades; `Sales Ops` i l’automatització comparteixen ja la mateixa porta d’entrada per aquesta mètrica.
+- Validació: `npx vitest run __tests__/lib/services/adminAutomationService.test.ts __tests__/lib/services/timelineQueryService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #343: `Economia` treu a servei shared els historials de configuració basats en `adminLog` (codex)
+- `lib/services/adminConfigHistoryService.ts`: nou servei shared amb `readProfitabilityConfigHistory()`, `readPackPricingModelHistory()` i `normalizePackPricingConfigHistory()` per concentrar la lectura i normalització dels canvis de configuració financera.
+- `app/admin/economia/page.tsx`: la pàgina deixa de reconstruir localment els dos historials (`finance.profitabilityConfig` i `pricing.pack.modelConfig`) amb queries i mappers gairebé duplicats sobre `adminLog`.
+- `__tests__/lib/services/adminConfigHistoryService.test.ts`: cobertura nova del servei perquè la frontera compartida quedi blindada amb mapping i normalització.
+- Efecte: `Economia` continua sent un visor de log tècnic per canvis de configuració, però deixa de carregar i normalitzar aquests historials des de la pàgina; el bloc queda centralitzat en una sola capa reutilitzable.
+- Validació: `npx vitest run __tests__/lib/services/adminConfigHistoryService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #342: el `Customer Hub` deixa també la lectura local de `customerActivity` per a notes i estat manual (codex)
+- `lib/services/customerActivityService.ts`: nou helper shared `readCustomerActivityLog()` perquè la lectura base d’historial de `customerActivity` no continuï repartida entre consumidor i consumidor.
+- `lib/customer-hub/data.ts`: `fetchCustomerHubCollections()` deixa de consultar `prisma.customerActivity.findMany(...)` directament i delega l’historial del client al nou helper shared.
+- `__tests__/lib/services/customerActivityService.test.ts`: cobertura nova del helper per deixar blindada la frontera compartida.
+- Efecte: el `Customer Hub` manté notes internes i estat manual des de `customerActivity`, però deixa de carregar-ho amb una query crua pròpia dins el seu data layer; la lectura base del log del client passa a tenir una sola porta d’entrada compartida.
+- Validació: `npx vitest run __tests__/lib/services/customerActivityService.test.ts __tests__/lib/customer-hub/fetchCustomerHub.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-24 — Canvi #341: `Emails` deixa de comptar `customerActivity` cru localment per al feed recent (codex)
+- `lib/services/customerActivityService.ts`: nou helper shared `readRecentEmailActivitySummary()` i constant `EMAIL_ACTIVITY_ACTIONS` per concentrar el feed recent i els comptadors d’enviaments/testimonis relacionats amb email.
+- `app/admin/emails/page.tsx`: el panell deixa de construir `recentActivity`, `recentEmailActions` i `recentTestimonials` amb queries locals a `customerActivity` i delega aquesta lectura al contracte shared.
+- `__tests__/lib/services/customerActivityService.test.ts`: cobertura nova del helper perquè el bloc d’Emails quedi blindat amb una frontera reutilitzable i tipada.
+- Efecte: `Emails` continua sent una vista operativa del cicle post-event/testimonis, però deixa enrere una altra lectura local paral·lela de `customerActivity`; la semàntica recent del feed queda centralitzada en una capa shared.
+- Validació: `npx vitest run __tests__/lib/services/customerActivityService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-23 — Canvi #340: `/api/admin/activity` deixa de governar `adminLog` cru des de la route (codex)
+- `lib/services/timelineQueryService.ts`: nou helper `fetchCanonicalAdminActivityPage()` que concentra la paginació, el filtrat per categoria, les estadístiques i el mapping a timeline canònica de l’activitat d’admin.
+- `app/api/admin/activity/route.ts`: la route passa a ser un adaptador prim; deixa de decidir `findMany`/`count`/`groupBy` directament sobre Prisma i delega tota la lectura al contracte shared.
+- `__tests__/lib/services/timelineQueryService.test.ts`: cobertura nova del helper paginat perquè el workspace d’activitat quedi blindat també a nivell de contracte compartit.
+- Efecte: `/admin/activity` continua sent un visor de log tècnic, però deixa de tenir una semàntica de dades pròpia i deriva també la seva lectura des d’una capa única reutilitzable. Això baixa un altre consumidor directe de `adminLog` cru fora del servei canònic.
+- Validació: `npx vitest run __tests__/lib/services/timelineQueryService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-23 — Canvi #339: el `Customer Hub` elimina també la col·lecció crua `adminLogs` que ja no consumia (codex)
+- `lib/customer-hub/data.ts`: `fetchCustomerHubCollections()` deixa de carregar `adminLog` per customer/lead/booking, perquè aquest bloc ja no alimentava cap sortida viva del hub després de la migració canònica de timeline.
+- `lib/customer-hub/fetchCustomerHub.ts`: el contracte intern es simplifica i deixa d’esperar `adminLogs` dins les col·leccions del hub.
+- `__tests__/lib/customer-hub/fetchCustomerHub.test.ts`: mocks i fixtures ajustats al contracte net.
+- Efecte: el `Customer Hub` deixa de pagar una query crua sobrera en cada càrrega; la cronologia continua entrant només per `fetchCanonicalEventsForCustomer()`, que és la font real que ja governa el hub.
+- Validació: `npx vitest run __tests__/lib/customer-hub/fetchCustomerHub.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-23 — Canvi #338: l’auditoria recent del dashboard deixa també el `adminLog` cru (codex)
+- `app/admin/lib/dashboard-data.ts`: s’elimina la query `admin:dashboard:timeline:admin-logs`; el bloc `recentAdminLogs` passa a derivar-se de `recentCanonicalTimeline`, filtrant els events `source === 'adminLog'`.
+- `app/admin/page.tsx`: la secció “Auditoria recent” deixa de pintar `action · entity` crus i reutilitza el text/temps/enllaç resolts per la capa canònica.
+- Efecte: el dashboard ja no manté una segona lectura específica d’`adminLog` per a l’auditoria recent; la secció passa a recolzar-se en la mateixa narrativa canònica que la resta de la timeline executiva.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-23 — Canvi #337: `Economia` deixa també la lectura crua de comunicacions de booking (codex)
+- `lib/services/timelineQueryService.ts`: nou helper batch `fetchCanonicalCommunicationEventsForBookings()` per agrupar `COMM_SENT/COMM_RESPONDED` de múltiples reserves en una sola passada canònica, sense reconstruccions locals disperses.
+- `app/admin/economia/page.tsx`: la pàgina deixa de consultar `adminLog` cru per booking i passa a consumir directament el helper batch de la capa canònica abans de calcular `paymentFlowState`.
+- `__tests__/lib/services/timelineQueryService.test.ts`: cobertura nova del helper batch perquè la capa canònica blindi també aquest ús massiu de reserves.
+- Efecte: `Economia` ja no només comparteix la semàntica del flux de cobrament, sinó també la manera de recuperar les comunicacions; queda tancat el residual de query crua de booking-communications dins aquest workspace.
+- Validació: `npx vitest run __tests__/lib/services/timelineQueryService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-23 — Canvi #336: `Sales Ops` i les automatitzacions comercials passen també per la mètrica canònica de comunicacions (codex)
+- `lib/services/timelineQueryService.ts`: nou helper `fetchRecentCanonicalCommunicationMetrics()` amb resum pur `summarizeCanonicalCommunicationMetrics()`, perquè els comptadors de `COMM_SENT/COMM_RESPONDED` deixin de viure escampats fora de la capa canònica.
+- `lib/services/adminAutomationService.ts` i `lib/services/commercialDailyAutomationService.ts`: `readCommercialSequenceMetrics()` i el resum comercial diari deixen de comptar `adminLog` cru directament i reutilitzen la nova mètrica canònica per `commSent`, `commResponded` i `responseRate`.
+- `app/admin/sales-ops/page.tsx`: els KPI de comunicacions/respostes a 30 dies passen també pel mateix helper compartit; `COMM_SEQUENCE_EXEC` es manté separat perquè continua sent una mètrica d’automatització, no de timeline de conversa.
+- `__tests__/lib/services/timelineQueryService.test.ts`, `adminAutomationService.test.ts` i `commercialDailyAutomationService.test.ts`: cobertura ampliada del helper nou i dels dos consumidors de serveis.
+- Efecte: `Sales Ops`, el resum comercial diari i la lectura de seqüències deixen de mantenir una altra lectura paral·lela de comunicacions; el recompte passa a tenir una sola semàntica compartida dins la capa de timeline.
+- Validació: `npx vitest run __tests__/lib/services/timelineQueryService.test.ts __tests__/lib/services/adminAutomationService.test.ts __tests__/lib/services/commercialDailyAutomationService.test.ts` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #328: el radar del dashboard reaprofita els drivers canònics del pipeline (codex)
+- `app/admin/page.tsx`: la secció “Radar d’execució” deixa d’estar lligada només als tres comptadors locals (`staleLeadsCount`, `hotLeadsCount`, `quotesInFlightCount`) i, quan el `pulse` aporta `pipelineDrivers`, els reutilitza directament com a targetes prioritzades.
+- Es manté fallback als comptadors locals quan no hi ha drivers, així que no es perd cap cobertura ni es crea una dependència dura nova.
+- Efecte: el dashboard deixa de tenir dues lectures paral·leles del pipeline i comença a reutilitzar la mateixa font canònica tant al panell de pols com al radar d’execució.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #327: el pols operatiu explica quins senyals degraden el pipeline (codex)
+- `lib/services/operationalPulseService.ts`: el contracte del `pulse` guanya `pipelineDrivers`, derivats directament de `loadPipelineSuggestions()` i limitats als senyals `CRITICAL/HIGH` més rellevants. No s’inventa cap resum paral·lel: es reaprofita la mateixa font canònica del pipeline.
+- `app/admin/components/OperationalPulsePanel.tsx`: el panell mostra ara un bloc “Què degrada el pipeline” amb les 2-3 causes accionables i el seu destí clicable.
+- `__tests__/lib/services/operationalPulseService.test.ts` i `__tests__/lib/services/executiveCockpitService.test.ts`: cobertura i fixtures alineades al nou contracte.
+- Efecte: el dashboard deixa de mostrar només la mètrica agregada de `Salut pipeline` i fa visible el perquè operatiu de la degradació.
+- Validació: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/operationalPulseService.test.ts __tests__/lib/services/executiveCockpitService.test.ts` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #326: residual final de UI (`tasks`, `intake` i domini `leads`) passa al helper canònic (codex)
+- `app/admin/tasks/TaskKanbanView.tsx` i `app/admin/tasks/page.tsx`: les tasques vinculades a lead deixen d’obrir la fitxa amb literals directes.
+- `app/admin/intake/page.tsx`: l’acció posterior a crear una entrada nova passa a `buildLeadWorkspaceHref`.
+- `app/admin/leads/reengagement/LeadReengagementClient.tsx`, `LeadPipelineView.tsx`, `LeadActions.tsx`, `page.tsx` i `app/admin/leads/[id]/page.tsx`: el propi domini `leads` deixa també de fabricar rutes UI literals i reutilitza el contracte comú.
+- Efecte: la canonització de navegació de lead queda pràcticament exhaustiva a la UI; el que resta amb `/admin/leads/...` és essencialment API o rutes especials com `reengagement`.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #325: calendari, reserves i superfícies comercials passen també al helper canònic de lead (codex)
+- `app/admin/calendario/CalendarMonthClient.tsx`, `CalendarWeekClient.tsx` i `CalendarDayClient.tsx`: reserves i follow-ups vinculats deixen d’obrir leads amb literals directes.
+- `app/admin/bookings/BookingClientEventSection.tsx`, `app/admin/bookings/page.tsx` i `app/admin/bookings/[id]/page.tsx`: els punts que obren la fitxa de lead vinculada passen a `buildLeadWorkspaceHref`.
+- `app/admin/presupuestos/ProposalsList.tsx`, `app/admin/sales-ops/page.tsx`, `app/admin/reporting/page.tsx` i `app/admin/mensajes/page.tsx`: CTAs comercials i de seguiment cap a leads passen també al contracte canònic.
+- Efecte: la major part de la UI operativa que navegava a leads ja no fabrica `'/admin/leads/${id}'` a mà.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #324: UI operativa d’inbox, customer hub i dashboard passa al helper canònic de lead (codex)
+- `app/admin/inbox/InboxLeadContext.tsx` i `app/admin/inbox/InboxClient.tsx`: obrir lead complet o navegar després d’importar/seleccionar una entrada deixa de construir rutes literals i passa per `buildLeadWorkspaceHref`.
+- `app/admin/clientes/[id]/_components/panels/CommsPanel.tsx`, `TasksNotesPanel.tsx`, `LeadsPanel.tsx` i `SummaryPanel.tsx`: els CTAs d’“Obrir lead” o “Obrir fitxa de la lead” dins customer hub passen també al contracte canònic.
+- `app/admin/page.tsx` i `app/admin/lib/dashboard-data.ts`: dashboard principal i timeline recent deixen de fabricar `'/admin/leads/${id}'` directament.
+- Efecte: la canonització de navegació de lead entra també a superfícies UI operatives compartides del dia a dia.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #323: notificacions de lead passen també pel contracte canònic (codex)
+- `lib/services/notificationService.ts`: els enllaços absoluts de lead dins email, WhatsApp i webhook deixen de construir `'/admin/leads/${id}'` directament i passen per `buildLeadWorkspaceHref` via `buildLeadAdminUrl`.
+- `__tests__/lib/services/notificationService.test.ts`: mock explícit de `notificationRecipientsService` perquè el test deixi de dependre de Prisma/BD local i validi només la capa de notificacions.
+- Efecte: el contracte de navegació de lead arriba també a notificacions sortints, i la prova del servei queda estabilitzada per futures passades.
+- Validació: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/notificationService.test.ts` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #322: capa servei de links de lead passa al helper canònic (codex)
+- `lib/services/executiveCockpitService.ts`, `lib/services/nextBestActionService.ts`, `lib/customer-hub/timeline.ts`, `lib/services/adminCommandPaletteService.ts` i `lib/services/timelineQueryService.ts`: els enllaços de lead deixen de fabricar `'/admin/leads/${id}'` directament i passen a resoldre’s amb `buildLeadWorkspaceHref`.
+- Efecte: el contracte canònic de navegació de lead deixa de quedar limitat a banners/panells i entra també a la capa servei que alimenta cockpit, següent acció, timeline i command palette.
+- Validació: `npx tsc --noEmit --pretty false` OK; `npx vitest run __tests__/lib/services/adminCommandPaletteService.test.ts __tests__/lib/services/executiveCockpitService.test.ts __tests__/lib/customer-hub/timeline.test.ts` OK; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #321: CTA de lead canònics per banners i panells executius (codex)
+- `lib/admin/leadWorkspaceHref.ts`: nou helper canònic per resoldre destins de lead (`workspace`, `compose`, `payments`, `tasks`) sense tornar a construir literals dispersos.
+- `app/admin/leads/[id]/LeadInsightsBanner.tsx`: les accions recomanades passen a consumir el helper i deixen de barrejar anchors, compose i derivacions a bookings/tasks amb lògica duplicada.
+- `lib/customer-hub/leadActionLink.ts` i `app/admin/inbox/PendingFollowUpsPanel.tsx`: els CTAs de seguiment i obertura de lead reaprofiten el mateix contracte, de manera que banners i panells executius apunten als mateixos destins suportats.
+- `__tests__/lib/admin/leadWorkspaceHref.test.ts`: prova focalitzada per blindar el contracte del helper nou.
+- Efecte: queda tancada una primera capa del pendent estructural d’auditar CTAs fora de Customer/Lead Hub perquè les superfícies executives deixin de construir rutes ad hoc.
+- Validació: `npx tsc --noEmit --pretty false` pendent; `pnpm run qa:protocol` pendent.
+
+## 2026-04-22 — Canvi #320: review responsive final `375px` sobre `Missatges`, `Privacitat` i `Text Manager` (codex)
+- `app/admin/mensajes/page.tsx`: els CTAs principals passen a ample complet en mòbil i les files de missatges recents permeten apilar millor avatar, metadades i accions.
+- `app/admin/privacy/page.tsx`: tabs de pàgina, filtres i accions de processat/revocació deixen de dependre d’una sola fila rígida i poden ocupar ample complet en mòbil estret.
+- `app/admin/text-manager/page.tsx`: selectors d’idioma i toolbar sticky de sessió guanyen altura mínima i el CTA de desar pot baixar a ample complet quan no hi ha espai lateral.
+- Efecte: queda tancada la review transversal curta de regressions mòbils sobre els workspaces shared més recents.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #319: passada responsive menor `375px` sobre `Calendari` i `Canvas` (codex)
+- `app/admin/calendario/CalendarMonthClient.tsx`: la toolbar superior i el panell d’accions del detall del dia ara permeten apilar CTAs en mòbil estret, i el botó de confirmació de bloqueig deixa de competir en una sola línia.
+- `app/admin/canvas/CanvasEditorClient.tsx`: la toolbar d’edició, el CTA d’exportació, la graella de plantilles, els presets de mida i els controls d’alineació es relaxen perquè no pressionin l’ample curt.
+- Efecte: la segona onada responsive tanca també els dos últims workspaces shared nous perquè `calendario` i `canvas` no depenguin de files rígides a `375px`.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #318: `Canvas Editor` entra a `OwnerControlStrip` (codex)
+- `app/admin/canvas/CanvasEditorClient.tsx` ja no depèn només de toolbar, canvas i panell lateral: ara obre també amb una lectura shared de la composició viva, la sessió manual i el següent pas.
+- La capa visual nova reutilitza estat real del workspace (`canvasSize`, `elements`, `selected`, `dragging`, `resizing`, `exporting`) per resumir preset/composició, element seleccionat, moviments manuals i CTA cap a `templates`, `properties`, `layers` o `toolbar`.
+- Efecte: `canvas` deixa de ser només un editor aïllat i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense tocar ni el flux d’exportació ni l’edició directa del llenç.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #317: `Calendari` entra a `OwnerControlStrip` (codex)
+- `app/admin/calendario/CalendarMonthClient.tsx` ja no depèn només de toolbar, KPI-cards i graella: ara obre també amb una lectura shared de l’ocupació visible, la tensió manual i el següent pas.
+- La capa visual nova reutilitza estat real del workspace (`stats`, `visibleLayers`, `selectedDayData`, `showBlockForm`, `draggingBookingId`) per resumir reserves/bloquejos, dies mixtes, capes amagades, detall obert i moviments manuals sense tocar ni drag&drop ni bloquejos.
+- Efecte: la vista mes de `calendario` deixa de ser només una graella operativa i entra també dins del mateix llenguatge visual shared dels workspaces de propietari, amb CTA cap a setmana, dia o detall seleccionat.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #316: `Text Manager` entra a `OwnerControlStrip` (codex)
+- `app/admin/text-manager/page.tsx` ja no depèn només del header sticky, els filtres i les targetes de sessió: ara obre també amb una lectura shared del catàleg editorial, la sessió viva i el següent pas.
+- La capa visual nova reutilitza estat real del workspace (`currentTexts`, `filteredTexts`, `modifiedCount`, `sectionCounts`, `activeSection`, `debouncedSearchTerm`, `showComparison`, `showOnlyModified`, `changeHistory`) per resumir volum, focus, tensió de sessió i CTA cap a `search`, `save`, `sections` o `content`.
+- Efecte: `text-manager` deixa de ser només un editor potent però cru i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense tocar lògica d’autotraducció ni el header sticky.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #315: `Privacitat` entra a `OwnerControlStrip` (codex)
+- `app/admin/privacy/page.tsx` ja no comença només per KPI-cards, pestanyes i llistats RGPD: ara obre amb una lectura shared del front legal actiu, backlog manual i següent pas.
+- La capa visual nova reutilitza l'estat real del workspace (`stats`, `requests`, `consents`, `consentsTotal`, `auditLogs`, `pageTab`) per resumir tensions de termini, base activa de consentiments i traça d'auditoria sense tocar cap fetch ni cap acció RGPD.
+- Efecte: `privacy` deixa de ser només un panell legal operatiu i entra també dins del mateix llenguatge visual shared dels workspaces de propietari, amb hash-sync de pestanyes perquè el `nextStep` pugui obrir `requests`, `consents` o `audit` sense duplicar navegació.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #314: `Missatges` entra a `OwnerControlStrip` (codex, recollint tall de claude)
+- `app/admin/mensajes/page.tsx` ja no comença només per KPI-cards, CTAs i llistat de converses: ara obre amb una lectura shared de safata, pendents manuals i següent pas.
+- La capa visual nova reutilitza l'estat real del workspace (`recentLeads`, `pendingLeads`, `todayLeads`, `stalePendingLeads`, notes/contacte de la mostra) per resumir volum de missatges, backlog NEW >24h, entrades sense nota i mostres sense canal de contacte.
+- Efecte: `mensajes` deixa de ser només una safata tàctica i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense duplicar la lògica comercial de `/admin/leads`.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #313: passada responsive `375px` sobre `Activity`, `Emails`, `Lead detail` i `Social` (codex)
+- `app/admin/activity/ActivityClient.tsx`: barra de filtres/controls apilable i paginació amb amplada mínima per no col·lapsar en mòbil estret.
+- `app/admin/emails/page.tsx`: capçalera i files de la cua post-event passen a apilar-se bé a `375px`, amb email trencable i CTA separat.
+- `app/admin/leads/[id]/page.tsx` + `LeadWorkspace.tsx`: CTA principals, bloc de reserva, headers de secció, formularis i timeline es relaxen perquè no forcin una sola línia en ample curt.
+- `app/admin/social/SocialClient.tsx`: toolbar, panell d’idees, targetes de llista, header de calendari i footer del modal deixen de pressionar l’ample mòbil.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #312: `Portfolio` entra a `OwnerControlStrip` (claude)
+- `app/admin/portfolio/page.tsx` ja no comença només per dues legendes i tabs `Media`/`Events`: ara obre amb una lectura shared de catàleg d'events, backlog i següent pas abans de baixar a tab.
+- La capa visual nova reutilitza l'array `events` ja carregat via `loadEvents` per resumir events totals (publicats/esborranys), peces vinculades (sumant `_count.media`), categories actives vs totals, events sense portada, sense media, esborranys pendents i categories buides. El `nextStep` prioritza `total=0` → `#events`, portades buides → `#media`, media buit → `#media`, esborranys → `#events`, categories buides → `#events`, al dia. Les CTAs sincronitzen `tab` via listener `hashchange`.
+- Efecte: `portfolio` entra també al mateix llenguatge visual shared dels workspaces de propietari sense crear cap resum paral·lel al catàleg real ni tocar les sub-components `CategorySection` / `EventsManager`.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #311: `Funcionalitats` entra a `OwnerControlStrip` (codex)
+- `app/admin/features/page.tsx` ja no comença només per stats i llistat de toggles: ara obre amb una lectura shared de catàleg, decisió manual i següent pas.
+- La capa visual nova reutilitza estat real del workspace (`features`, `saving`) per resumir volum actiu/inactiu, primera peça activa, primera peça apagada i qualsevol mutació en curs.
+- Efecte: `features` deixa de ser només un switchboard tècnic i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense crear cap resum paral·lel al catàleg real.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #310: `Catàleg` (hub) entra a `OwnerControlStrip` (claude)
+- `app/admin/catalog/page.tsx` ja no comença només per pestanyes (packs/extres/inventari/preus): ara obre amb una lectura shared de salut del catàleg, backlog i següent pas abans de decidir pestanya.
+- La capa visual nova reutilitza `sortedRows`, `greenCount`, `amberCount`, `redCount`, `avgMargin`, `targetMarginPct`, `pricingConfig` ja computats via `computePackPricingHealth` per resumir distribució semàfor, marge vs objectiu, packs crítics (amb nom del més crític), sense inventari, a vigilar i amb desviació ≥20%. El `nextStep` reutilitza el sistema `?focus=critical-margin`/`?focus=without-inventory` ja existent a `/admin/packs`.
+- Efecte: `catalog` entra també al mateix llenguatge visual shared dels workspaces de propietari sense afegir cap resum paral·lel ni duplicar el motor de salut (ja compartit amb `/admin/packs` Canvi #303).
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #308: `Ressenyes` entra a `OwnerControlStrip` (claude)
+- `app/admin/ressenyes/page.tsx` ja no comença només per KPI-row i pestanyes pending/approved: ara obre amb una lectura shared de catàleg de social proof, backlog i següent pas abans de baixar al detall.
+- La capa visual nova reutilitza `pending`, `approved`, `avgRating` ja existents per resumir volum i nota mitjana, i fa emergir pendents per moderar, pendents de fa >7 dies, pendents i aprovades amb <4★. Les CTAs apunten a ancoratges `#pendents` / `#aprovades` amb `hashchange` listener que sincronitza `activeTab` sense duplicar els botons de pestanya.
+- Efecte: `ressenyes` entra també al mateix llenguatge visual shared dels workspaces de propietari sense afegir cap resum paral·lel ni duplicar l'estat de moderació.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #309: `Cobertura` entra a `OwnerControlStrip` (codex)
+- `app/admin/coverage/page.tsx` ja no comença només per stats, formulari i llistat per províncies: ara obre amb una lectura shared de mapa, intervenció manual i següent pas.
+- La capa visual nova reutilitza estat real del workspace (`areas`, `newCity`, `newProvince`, `adding`) per resumir cobertura activa, províncies buides, focus provincial dominant i tensió manual de la sessió.
+- Efecte: `coverage` deixa de ser només un mantenidor administratiu i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense crear cap resum paral·lel al mapa real.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #306: `Codis de descompte` entra a `OwnerControlStrip` (claude)
+- `app/admin/discount-codes/page.tsx` ja no comença només per KPI-grid i formulari/llista: ara obre amb una lectura shared de catàleg promocional, backlog i següent pas abans de baixar al detall.
+- La capa visual nova reutilitza `codes`, `stats` i la funció `isExpired` ja existents per resumir volum (total/actius/caducats), usos acumulats i backlog (caducats amb bandera activa, esgotats, ≤7 dies per caducar, ≥80% usos, actius sense ús). El següent pas apunta a ancoratges `#nou-codi` (amb `useEffect` que obre el formulari automàticament) i `#codis-list` sense duplicar l'acció del botó `+ Nou codi`.
+- Efecte: `discount-codes` entra també al mateix llenguatge visual shared dels workspaces de propietari sense afegir cap resum paral·lel ni duplicar l'estat de creació/activació.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #305: `Emails Automàtics` entra a `OwnerControlStrip` (codex)
+- `app/admin/emails/page.tsx` ja no comença només per stats, automatitzacions i blocs laterals: ara obre amb una lectura shared de sistema, intervenció manual i següent pas.
+- La capa visual nova reutilitza estat real del workspace (`stats`, `pendingBookings`, estat del cron, errors parcials) per resumir captació amb email, cua post-event, activitat recent, salut del cron i focus manual de la sessió.
+- Efecte: `emails` deixa de ser només un panell operatiu dispers i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense crear cap resum paral·lel a la cua real.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #304: `Post-event` entra a `OwnerControlStrip` (claude)
+- `app/admin/post-event/page.tsx` ja no comença només per KPI-row i targetes workflow: ara obre amb una lectura shared de cicle tancat, backlog i següent pas abans d’entrar als submòduls.
+- La capa visual nova reutilitza `data` ja carregat (`recentBookings`, `pendingReports`, `pendingSurveys`, `completedReports`, `completedSurveys`) per resumir informes tancats i enquestes rebudes amb taxa de resposta, events sense informe, esborranys i enquestes pendents. El següent pas pre-fill `bookingId` quan hi ha events sense informe.
+- Efecte: `post-event` entra també al mateix llenguatge visual shared dels workspaces de propietari sense crear resum paral·lel.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #303: `Packs` (llistat) entra a `OwnerControlStrip` (claude)
+- `app/admin/packs/page.tsx` ja no comença només per KPI-cards i graella: ara obre amb una lectura shared de catàleg, salut i següent pas abans de baixar a la graella.
+- La capa visual nova reutilitza els senyals ja computats (`pricingHealthByPack`, `packSignalsById`, `pricingAlertsCount`, `activeFocus`, `packsInSync`) per resumir volum/conversió, alertes de preu, marge crític, sense equip, càlcul parcial i sense rang de convidats. El següent pas reutilitza el sistema `?focus=...` existent.
+- Efecte: `packs` entra també al mateix llenguatge visual shared dels workspaces de propietari sense afegir cap resum paral·lel ni duplicar el motor de salut.
+- Validació: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-22 — Canvi #302: `Activity` entra a `OwnerControlStrip` (codex)
+- `app/admin/activity/ActivityClient.tsx` ja no comença només per filtres, KPI-cards i taula/tarjetes: ara obre amb una lectura shared de sistema, intervenció manual i següent pas.
+- La capa visual nova reutilitza estat real de la vista (`data`, `stats`, `category`, `days`, `page`, fonts de timeline) per resumir volum, categoria dominant, pes de la lectura canònica i focus manual de la sessió.
+- Efecte: `activity` deixa de ser només un registre útil però pla i entra també dins del mateix llenguatge visual shared dels workspaces de propietari sense crear cap resum paral·lel al feed real.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-22 — Canvi #301: `Pressupostos` (llistat) entra a `OwnerControlStrip` (claude)
+- `app/admin/presupuestos/page.tsx` ja no comença només per KPI-cards i taula: ara obre amb una lectura shared de catàleg comercial, tensió operativa i següent pas abans de baixar al detall.
+- La capa visual nova reutilitza les propostes ja carregades (`proposals` recents + quotes `LeadDocument`), incorporant `bookingId` al `select` per detectar acceptades sense reserva. Resum: enviades fredes ≥7d, acceptades sense booking, esborranys oberts ≥14d, expirades i rebutjades recents; següent pas prioritza conversió > follow-up > neteja > creació.
+- Efecte: `presupuestos` entra també al mateix llenguatge visual shared dels workspaces de propietari sense afegir cap resum paral·lel ni duplicar l’`stats` client-side de `ProposalsList`.
+- Validació: `npx tsc --noEmit --pretty false` OK.
+
 ## 2026-04-20 — Canvi #300: `Stats` entra a `EditorControlStrip` (codex)
 - `app/admin/stats/page.tsx` ja no comença només per comptadors i targetes locals: ara obre amb una lectura shared de cobertura, estat i acció principal.
 - La capa visual nova reutilitza estat real del workspace (`stats`, `manualStats`, `editingStat`, `fallback`, `calculated`) per resumir volum públic, overrides manuals, desviació principal i focus correcte abans d’editar.
@@ -9265,6 +9670,39 @@ px tsc --noEmit OK
 - el card de placement ja no usa `alert()` per validar uploads i passa a mostrar feedback inline dins del mateix panell
 - la reordenació de col·leccions es manté operativa via `PATCH` del manager per a hero slides, logos i altres col·leccions manuals
 - la pantalla antiga de `settings/hero` deixa de comportar-se com a gestor separat i queda com a pont cap al `image manager`
+- `Canvi #335` fa que [app/admin/economia/page.tsx](D:\orbitaevents\app\admin\economia\page.tsx) deixi de calcular `paymentFlowState` sobre `adminLog` cru i passi per la capa canònica: `mapAdminLogToCanonicalEvent()` + `deriveFlowStatusFromTimeline()`.
+- Amb això, la lectura financera de cobrament queda alineada amb la mateixa semàntica de comunicacions que ja governa `Bookings`, dashboard i la resta de workspaces consolidats.
+- Validació del tall: `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #334` porta també el dashboard a la capa canònica de timeline recent: [timelineQueryService.ts](D:\orbitaevents\lib\services\timelineQueryService.ts) exporta `fetchRecentCanonicalEvents()` i [dashboard-data.ts](D:\orbitaevents\app\admin\lib\dashboard-data.ts) deixa de barrejar `customerActivity` i `adminLog` amb queries separades.
+- El resum recent del dashboard guanya també visibilitat de `leadActivity`, que fins ara quedava fora d’aquesta lectura executiva.
+- Cobertura ampliada a [timelineQueryService.test.ts](D:\orbitaevents\__tests__\lib\services\timelineQueryService.test.ts).
+- Validació del tall: `npx vitest run __tests__/lib/services/timelineQueryService.test.ts` OK, `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #333` fa explícita la separació interna de la cronologia del `Customer Hub`: [timeline.ts](D:\orbitaevents\lib\customer-hub\timeline.ts) exporta ara `buildCustomerBusinessTimelineEvents()` i `buildCustomerActivityTimelineEvents()`, i [fetchCustomerHub.ts](D:\orbitaevents\lib\customer-hub\fetchCustomerHub.ts) les compon de manera visible.
+- Això no canvia la sortida funcional del hub, però sí que tanca una ambigüitat estructural: la cronologia deixa de ser un builder híbrid i queda preparada per rematar la migració canònica sense tornar a obrir l’arquitectura.
+- Cobertura ampliada a [fetchCustomerHub.test.ts](D:\orbitaevents\__tests__\lib\customer-hub\fetchCustomerHub.test.ts) i [timeline.test.ts](D:\orbitaevents\__tests__\lib\customer-hub\timeline.test.ts).
+- Validació del tall: `npx vitest run __tests__/lib/customer-hub/fetchCustomerHub.test.ts __tests__/lib/customer-hub/timeline.test.ts` OK, `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #332` fa el primer pas fort de migració de la cronologia del `Customer Hub` cap a la capa canònica: [fetchCustomerHub.ts](D:\orbitaevents\lib\customer-hub\fetchCustomerHub.ts) carrega `fetchCanonicalEventsForCustomer()`, [timeline.ts](D:\orbitaevents\lib\customer-hub\timeline.ts) accepta `canonicalEvents` i [timelineQueryService.ts](D:\orbitaevents\lib\services\timelineQueryService.ts) preserva `preview` des del `body`.
+- Això permet que activitat i comunicacions del client deixin de remapejar-se a mà dins el hub, mentre propostes, reserves i tasques continuen entrant pel builder de negoci.
+- Cobertura ampliada a [fetchCustomerHub.test.ts](D:\orbitaevents\__tests__\lib\customer-hub\fetchCustomerHub.test.ts) i [timeline.test.ts](D:\orbitaevents\__tests__\lib\customer-hub\timeline.test.ts).
+- Validació del tall: `npx vitest run __tests__/lib/customer-hub/fetchCustomerHub.test.ts __tests__/lib/customer-hub/timeline.test.ts` OK, `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #331` converteix [communicationStatusService.ts](D:\orbitaevents\lib\services\communicationStatusService.ts) en monocapa real: el servei ara deriva estat i històric recent tant des d’`adminLog` cru com des de timeline canònica.
+- [bookingOperationalService.ts](D:\orbitaevents\lib\services\bookingOperationalService.ts) deixa enrere els helpers locals oberts al Canvi `#330` i reaprofita el servei compartit.
+- Cobertura ampliada a [communicationStatusService.test.ts](D:\orbitaevents\__tests__\lib\services\communicationStatusService.test.ts) i revalidació de [bookingOperationalService.test.ts](D:\orbitaevents\__tests__\lib\services\bookingOperationalService.test.ts).
+- Validació del tall: `npx vitest run __tests__/lib/services/communicationStatusService.test.ts __tests__/lib/services/bookingOperationalService.test.ts` OK, `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #330` elimina una altra lectura paral·lela de comunicacions: [bookingOperationalService.ts](D:\orbitaevents\lib\services\bookingOperationalService.ts) ja no consulta `adminLog` a banda per `COMM_SENT/COMM_RESPONDED`, sinó que deriva `commStatuses` i `recentCommRows` des de la mateixa timeline canònica del booking.
+- La cobertura de [bookingOperationalService.test.ts](D:\orbitaevents\__tests__\lib\services\bookingOperationalService.test.ts) queda alineada al nou contracte i valida els fluxos `PAYMENT` / `POST_EVENT` des d’events canònics.
+- Validació del tall: `npx vitest run __tests__/lib/services/bookingOperationalService.test.ts` OK, `npx tsc --noEmit --pretty false` OK, `pnpm run qa:protocol` OK.
+
+- `Canvi #329` tanca una capa paral·lela de comunicacions: `loadCommTimeline()` passa a derivar el resum des dels fetchers de timeline canònica (`fetchCanonicalEventsForLead/Customer`) i deixa de llegir `leadActivity` pel seu compte.
+- Inbox ja no reconstrueix el resum al client des de `/api/admin/leads/[id]/activities`; [CommSummaryPanel.tsx](D:\orbitaevents\app\admin\inbox\CommSummaryPanel.tsx) consumeix ara `/api/admin/leads/[id]/comm-summary`, i el nou endpoint delega al mateix servei canònic que usa el Customer Hub.
+- Cobertura afegida a `__tests__/lib/services/commTimelineService.test.ts` per blindar la derivació des d’events canònics.
+- Validació del tall: `npx tsc --noEmit --pretty false` OK, `npx vitest run __tests__/lib/services/commTimelineService.test.ts` OK, `pnpm run qa:protocol` OK.
+
 - l’API antiga de `hero-media` queda reconnectada a `home.hero.slides` perquè qualsevol ús residual continuï passant per la capa central
 
 ### Validació:
@@ -9345,3 +9783,160 @@ ext build (d2e25747)
 ### Validació
 - `npx tsc --noEmit --pretty false` OK
 - Pendent de guard final de protocol al tancament del tall
+
+## 2026-04-24 — `check-language-quality` entra a `validate:core` + norma de tancament rigorós escrita al §2.1 (Canvi #354, claude)
+
+### Context
+El guard lingüístic `scripts/check-language-quality.mjs` ja existia com a entry `qa:language` al `package.json` però no entrava al pipeline. El §6.14 tenia `SEGÜENT: crear check-language-quality.mjs si check-patches genera falsos positius lingüístics` obert des del Canvi #127. El script detecta dos anti-patterns lingüístics: (a) apòstrof català dins strings single-quoted (`'d'avui'`, `'l'admin'`, `'s'ha'`...) que trenquen el string a parser o fan sortir text corrupte; (b) plurals castellans incorrectes tipus `respostas`/`tascas`/`pressuposts` dins strings visibles.
+
+### Canvi
+- `package.json` — `validate:core` passa de 9 a 10 guards: `pnpm run qa:language` inserit entre `qa:encoding` i `qa:message-imports`. L'scan es valida a cada tall sense dependre d'ordre manual.
+- `__tests__/scripts/check-language-quality.test.ts` — test nou amb 7 casos que blinden el guard: clean file passa, apòstrof detectat en single-quote (`CATALAN_APOSTROPHE_IN_SINGLE_QUOTE`), no-flag en double-quote, plurals incorrectes `respostas` i `tascas` detectats (`WRONG_CATALAN_PLURAL_S`), skip `__tests__/`, skip `.test.` files. Patró alineat amb `check-task-canonical.test.ts`: fixture temporal via `mkdtempSync` + `spawnSync`. Entra automàticament a `qa:protocol:test` (que corre `__tests__/scripts/`).
+- `docs/protocol-producte-admin-ca.md` §2.1 — afegida la **norma de tancament rigorós de tall**. Cada Canvi #N requereix: tests nous, `validate:core` verd 100%, `qa:protocol` OK, entrada completa al §9 (context, bullets, verificació, comptador, autors), entrada al diari, actualització del §6 afectat, i regles noves escrites al protocol. Aplica a `claude`, `codex` i `user`. Segueix el patró del Canvi #350: el que era context oral passa a protocol viu.
+- `docs/protocol-producte-admin-ca.md` §6.14 — `SEGÜENT: crear check-language-quality.mjs...` tancat amb la cita del Canvi #354.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-language-quality.test.ts` OK (7 tests)
+- `pnpm run qa:language` OK — 917 fitxers, 0 findings
+- `pnpm run validate:core` OK — 10/10 guards (qa:protocol, qa:protocol:test, qa:encoding, qa:language, qa:message-imports, arch:layer:check, arch:task-canonical:check, tsc, i18n:packs:guard, i18n:equipment:guard)
+- `pnpm run qa:protocol` OK
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 354. Següent canvi real ha de ser `#355`.
+
+## 2026-04-24 — Migracions Railway verificades i `SEGÜENT` obsolets de §6.2 i §6.4 tancats (Canvi #356, claude)
+
+### Context
+Al Canvi #354 (mateix dia) vaig executar `npx prisma migrate status` contra `DIRECT_DATABASE_URL` i la resposta va ser `Database schema is up to date!` amb 20/20 migracions aplicades. Però el protocol mantenia dos `SEGÜENT` obsolets que feien referència a migracions ja desplegades: §6.2 (línia 538) apuntava a `20260410140000_drop_lead_task_model` i §6.4 (línia 594) a `20260418120000_add_task_dedupe_source_fields`. Deixar-ho obert creava risc de confusió — un agent futur podia intentar redesplegar, o creure que hi havia deute actiu quan ja s'havia resolt.
+
+### Canvi
+- `docs/protocol-producte-admin-ca.md` §6.2 — `SEGÜENT: desplegar migració 20260410140000_drop_lead_task_model a Railway...` reemplaçat per un `FET` amb cita al Canvi #356. El pendent restant del bloc queda només com a `MÉS ENDAVANT` (eliminar `legacyLeadTaskId` quan no hi hagi dades).
+- `docs/protocol-producte-admin-ca.md` §6.4 — `SEGÜENT: desplegar migració a Railway` reemplaçat per un `FET` amb cita al Canvi #356. Fa explícit que els 4 camps canònics de `Task` i els 6 backfills SQL ja corren a producció.
+- Sense canvi de codi ni de schema — consolidació documental pura sobre feina ja efectiva al servidor.
+
+### Validació
+- `npx prisma migrate status` contra Railway OK — `Database schema is up to date!` (20 migracions)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 356. Següent canvi real ha de ser `#357`.
+
+## 2026-04-24 — Audit trail backend de pèrdua de lead: `lostReason`, `lostAt` i `leadLossService` (Canvi #358, claude)
+
+### Context
+El §6.15 llistava `[LOW] Audit trail de decisions administratives — Log de qui/perquè es va perdre un lead` com a `MÉS ENDAVANT` obert. Quan un lead passava a `LOST` al `statusRouteHandler`, només deixava una `leadActivity` genèrica `'Canvi d'estat: X → LOST'` sense motiu ni metadades. Cap query podia respondre a preguntes operatives bàsiques: "quants leads hem perdut per preu aquest trimestre?", "quines zones ens descarten?", "té sentit el preu actual del pack X?". Zero visibilitat sobre pèrdues comercials.
+
+### Canvi
+- `prisma/schema.prisma` — model `Lead` guanya `lostReason String?` i `lostAt DateTime?` (opcionals per retrocompatibilitat) + `@@index([lostReason])` per agregacions per motiu.
+- `prisma/migrations/20260424120000_add_lead_lost_reason/migration.sql` — nova migració amb `ALTER TABLE` + `CREATE INDEX`. **Pendent de desplegament a Railway** via `prisma migrate deploy`.
+- `lib/constants/leadLoss.ts` — nou sub-mòdul canònic: `LEAD_LOST_REASONS` (tuple `as const` amb 8 motius: PRICE_TOO_HIGH, DATE_UNAVAILABLE, COMPETITOR_CHOSEN, EVENT_CANCELLED, NO_RESPONSE, NOT_QUALIFIED, OUT_OF_AREA, OTHER), type `LeadLostReason`, `LEAD_LOST_REASON_LABELS` (Record català) i guard `isLeadLostReason()`. Sub-mòdul dedicat (no al `lib/constants/index.ts`) per no arrossegar el graf complet en tests aïllats — mateix patró que `lib/constants/notifications.ts` (Canvi #354).
+- `lib/services/leadLossService.ts` — servei nou: `markLeadAsLost({leadId, reason, note?, actor?, now?})` valida amb `isLeadLostReason`, busca el lead, l'actualitza a `LOST`+`lostReason`+`lostAt`, i crea `leadActivity` amb `type='STATUS_CHANGE'`, `title='Lead perdut'`, `description` (label català + nota trimejada), `metadata={fromStatus,toStatus,reason,note}`, `createdBy` (actor o `'Admin'`). Retorna `{ok:true, lead}` o `{ok:false, status, error}` (400 per motiu invàlid, 404 per lead no trobat). També exporta `buildLostActivityDescription()` com a funció pura.
+- `__tests__/lib/services/leadLossService.test.ts` — 8 tests: `buildLostActivityDescription` (label-only, label+note amb trim, 3 labels canònics verificats) i `markLeadAsLost` (reason invàlid → 400 sense tocar DB, lead not found → 404 sense `update`, happy path amb tots els camps correctes al `update` i `leadActivity.create`, defaults quan `actor` i `now` no venen, acceptació dels 8 motius canònics un per un).
+- Aquest tall **NO** connecta el servei al `statusRouteHandler.ts` — el contracte HTTP actual només accepta `{status}` i el Lead Hub no té form de pèrdua. Ambdós són territori codex (UI/route handler).
+
+### Validació
+- `npx prisma generate` OK
+- `npx vitest run __tests__/lib/services/leadLossService.test.ts` OK (8 tests)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK
+
+### Següent (codex)
+- Ampliar `statusRouteHandler.ts` perquè accepti `{status, lostReason, note}` quan `status === 'LOST'` i delegui al servei nou.
+- Afegir form de pèrdua al Lead Hub amb select dels 8 motius + textarea de nota.
+- Desplegar migració `20260424120000_add_lead_lost_reason` a Railway (`prisma migrate deploy` contra `DIRECT_DATABASE_URL`).
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 358. Següent canvi real ha de ser `#359`.
+
+## 2026-04-24 — Servei d'analítica de pèrdues de lead: `leadLossAnalyticsService` (Canvi #360, claude)
+
+### Context
+El Canvi #358 va afegir `Lead.lostReason` + `Lead.lostAt` + el servei `markLeadAsLost()` per escriure'ls. Però escriure dades sense poder llegir-les agregades no aporta visibilitat — l'audit trail només és útil quan algú pot preguntar "quin motiu de pèrdua predomina aquest trimestre?", "la meva conversió per font millora?" o "quines zones ens descarten més?". Aquest tall tanca la meitat de lectura amb una capa canònica alineada amb la resta de serveis d'analítica (`leadInsightsService`, `executiveReportService`).
+
+### Canvi
+- `lib/services/leadLossAnalyticsService.ts` — nou servei amb dues superfícies: funció pura `computeLossSummary(leads)` i wrapper async `loadLossReport({sinceDays?, now?})`. El `LossSummary` retornat agrega per 4 dimensions:
+  - `byReason`: només els 8 motius canònics de `LEAD_LOST_REASONS`, ordenats per count desc, amb label català via `LEAD_LOST_REASON_LABELS`. Motius amb count 0 exclosos.
+  - `byEventType` i `bySource`: tots els valors presents, labels humanitzats automàticament.
+  - `byMonth`: ISO `YYYY-MM` ordenat cronològicament.
+  - `total`, `uncategorized` (leads LOST amb motiu null o string no canònic), `topReason` (el #1 o null si no hi ha dades).
+  - Percentatges amb 1 decimal.
+- El wrapper `loadLossReport` accepta `sinceDays` (default 90) i `now` (injectable per tests). La query filtra `status: 'LOST'` amb `OR: [{lostAt in window}, {lostAt:null, updatedAt in window}]` — així el report funciona des del dia 1 sense esperar backfill dels leads anteriors al #358.
+- `__tests__/lib/services/leadLossAnalyticsService.test.ts` — 10 tests purs sobre `computeLossSummary`: empty input, agregació ordenada per count desc, reason `null`+`BOGUS` → `uncategorized`, breakdown per eventType/source amb labels humanitzats, `byMonth` cronològic, leads sense `lostAt` exclosos del mes, exclusió de reasons amb count 0, shares amb 1 decimal, 8 motius canònics acceptats.
+- Bug corregit en el mateix tall: el helper `lead(overrides)` inicial usava `overrides.key ?? defaultValue` i sobreescrivia `null` explícit (rebutjant tests 3 i 7). Substituït per `'key' in overrides` per preservar null com a valor vàlid.
+- Aquest tall **NO** crea endpoint HTTP ni UI — són territori codex.
+
+### Validació
+- `npx vitest run __tests__/lib/services/leadLossAnalyticsService.test.ts` OK (10 tests)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK — 354 canvis registrats, current #361
+
+### Següent (codex)
+- Endpoint `GET /api/admin/reports/lead-losses?days=90` que cridi `loadLossReport()`.
+- Panell `LossBreakdownPanel` a `Sales Ops` o `Reporting executiu`: KPI `topReason` + donut `byReason` + bar `bySource` + line `byMonth`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 360 al tancament del meu tall; codex ha pujat a 361 amb el seu següent canvi paral·lel. El següent canvi real ha de ser `#362`.
+
+## 2026-04-24 — Endpoint `GET /api/admin/reports/lead-losses` exposa el `LossSummary` (Canvi #363, claude)
+
+### Context
+El Canvi #360 va crear `leadLossAnalyticsService.loadLossReport()` però només vivia a `lib/services/`. Sense endpoint HTTP, cap UI podia consumir el `LossSummary` — ni el futur panell `LossBreakdownPanel` a `Sales Ops` / `Reporting executiu`, ni tests E2E, ni integracions externes. Aquest tall tanca el pas del contracte del servei al perímetre HTTP en pur territori Claude (route + parser + test). La UI/navegació queda per codex.
+
+### Canvi
+- `app/api/admin/reports/lead-losses/route.ts` — nou `GET` handler. Patró idèntic a `/api/admin/reports/executive`: `requireAuth` + `requirePermission('read')` + `export const dynamic = 'force-dynamic'`. Accepta `?days=N` via `req.nextUrl.searchParams`. `parseSinceDays()` intern aplica `DEFAULT_DAYS=90`, clampa a `[MIN_DAYS=1, MAX_DAYS=365]` i ignora valors no numèrics (reutilitza el default). Delega a `loadLossReport({sinceDays})`. Retorna `{ok:true, sinceDays, summary}`.
+- `__tests__/app/api/admin/reports-lead-losses-route.test.ts` — 8 tests amb mocks hoisted: auth/permission errors, default 90 dies, custom days passthrough, clamping a 365 i a 1, invalid numeric → default, forma completa de la resposta.
+
+### Validació
+- `npx vitest run __tests__/app/api/admin/reports-lead-losses-route.test.ts` OK (8 tests)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK — 356 canvis registrats, current #363
+
+### Següent (codex)
+- Panell `LossBreakdownPanel` a `Sales Ops` o `Reporting executiu` consumint l'endpoint: KPI `topReason` + donut `byReason` + bar `bySource` + line `byMonth`.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 363. Següent canvi real ha de ser `#364`.
+
+## 2026-04-24 — Cron `lead-cleanup` classifica pèrdues automàtiques amb motiu canònic `EVENT_PASSED` (Canvi #365, claude)
+
+### Context
+El Canvi #358 va afegir `Lead.lostReason` i `markLeadAsLost()`, però el cron diari `leadCleanupService.runLeadCleanup()` — auto-LOST dels leads amb data d'event passada — continuava amb `prisma.lead.updateMany({data:{status:'LOST'}})` inline, sense motiu ni `leadActivity`. Cada dia el cron contaminava el `LossSummary` del Canvi #360 amb registres `uncategorized`. Aquest tall tanca la monocapa: totes les transicions a LOST (manuals i automàtiques) passen pel servei canònic.
+
+### Canvi
+- `lib/constants/leadLoss.ts` — `LEAD_LOST_REASONS` 8 → 9 motius: afegit `EVENT_PASSED` ("Data d'esdeveniment passada sense conversió"). Diferent de `EVENT_CANCELLED` (client cancel·la) i `NO_RESPONSE` (client no respon).
+- `lib/services/leadCleanupService.ts` — el bloc auto-LOST substitueix `updateMany` per `findMany({select:{id:true}}) + loop markLeadAsLost()`. Constants `AUTO_LOST_ACTOR='system:lead-cleanup'` i `AUTO_LOST_REASON='EVENT_PASSED'` al cap del fitxer. Cada lead genera `status='LOST'`, `lostReason='EVENT_PASSED'`, `lostAt=now` i una `leadActivity` amb metadata completa. Falls de `markLeadAsLost` (lead esborrat entre queries) van a `log.warn` sense pujar `autoLost`. El bloc auto-DELETE no canvia.
+- `__tests__/lib/services/leadCleanupService.test.ts` — 5 tests (abans 3): mock `markLeadAsLost` hoisted, 2 `findMany` amb `mockResolvedValueOnce` (auto-LOST, auto-DELETE), casos que cobreixen crida amb reason+actor canònics, count correcte quan un fail es mescla amb ok, auto-DELETE intacte, no-op si res a fer, `now` compartit entre iteracions.
+
+### Efecte pràctic
+`loadLossReport()` distingeix a partir d'ara pèrdues automàtiques (soroll informatiu) de pèrdues comercials reals. El KPI "top motiu" del futur panell serà net.
+
+### Validació
+- `npx vitest run __tests__/lib/services/leadCleanupService.test.ts __tests__/lib/services/leadLossService.test.ts __tests__/lib/services/leadLossAnalyticsService.test.ts` OK (23 tests)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK — 358 canvis registrats, current #365
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 365. Codex ha tancat `#364` en paral·lel (commercialSequenceService → leadActivity shared). Següent canvi real ha de ser `#366`.
+
+## 2026-04-24 — Informe executiu incorpora `lossSummary`: pèrdues arriben a CSV, PDF i email dispatch (Canvi #367, claude)
+
+### Context
+Els Canvis #358, #360, #363 i #365 han construït l'audit trail complet de pèrdues: schema → write manual (`markLeadAsLost`) → write automàtic (cron `lead-cleanup` amb `EVENT_PASSED`) → read agregada (`computeLossSummary`) → HTTP endpoint. Però el `ExecutiveReport` — font única de veritat del reporting setmanal, connectat a CSV (Canvi #146), PDF (Canvi #153) i email (dispatch service) — no incloïa aquesta dimensió. Les pèrdues vivien en una superfície aïllada. Aquest tall les integra al mateix paquet executiu que l'usuari rep cada setmana.
+
+### Canvi
+- `lib/services/executiveReportService.ts` — `ExecutiveReport` guanya `lossSummary: LossSummary`. `buildExecutiveReport()` afegeix consulta paral·lela dins del `Promise.all` (no afegeix latència) amb filtre `status:'LOST'` i finestra 90 dies (`OR: [{lostAt: gte}, {lostAt:null, updatedAt: gte}]`). La llista es passa a `computeLossSummary()` pura. `exportExecutiveReportCsv()` afegeix la secció `ANÀLISI DE PÈRDUES` amb total, uncategorized, motiu principal i breakdown per motiu.
+- `__tests__/lib/services/executiveReportService.test.ts` — `sampleReport` guanya `lossSummary` realista; 3 tests nous (breakdown CSV, edge case `topReason: null`, assertion de secció); suite nova amb 2 tests de `buildExecutiveReport` (empty state + 3 leads reals via `mockResolvedValueOnce`).
+- `__tests__/lib/services/executiveReportPdfService.test.ts` — `makeReport()` guanya `lossSummary` buit (camp obligatori).
+- `__tests__/lib/services/executiveReportDispatchService.test.ts` — **fix adjacent pre-existent**: mock de `notificationRecipientsService.getRecipientsAsString` mancava, causava `TypeError` via `prisma.setting.findUnique`. Regressió del commit `643d5015`. Afegit mock. Reparació íntegra §2.1.5.
+
+### Valor de negoci
+L'email executiu setmanal ara mostra pèrdues agregades. CSV i PDF les tenen automàticament. L'usuari veu ingressos, forecast i pèrdues al mateix lloc.
+
+### Validació
+- `npx vitest run __tests__/lib/services/executiveReportService.test.ts __tests__/lib/services/executiveReportPdfService.test.ts __tests__/lib/services/executiveReportDispatchService.test.ts` OK (23 tests)
+- `pnpm run validate:core` OK — 10/10 guards
+- `pnpm run qa:protocol` OK — 360 canvis registrats, current #367
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 367. Codex ha tancat `#366` en paral·lel (quoteRouteHandler → leadActivity shared). Següent canvi real ha de ser `#368`.

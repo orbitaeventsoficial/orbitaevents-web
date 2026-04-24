@@ -3,6 +3,11 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { normalizeDni } from '@/lib/utils/normalize';
 import { findDuplicates } from '@/lib/services/deduplicationService';
+import {
+  recordCustomerCreated,
+  recordCustomerDuplicateWarning,
+  recordCustomerInitialNotes,
+} from '@/lib/services/customerActivityService';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
 
 type CustomerCreateInput = {
@@ -79,26 +84,15 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
       },
     });
 
-    await tx.customerActivity.create({
-      data: {
-        customerId: created.id,
-        action: CUSTOMER_ACTIVITY_ACTIONS.CUSTOMER_CREATED,
-        details: {
-          source: customerSource,
-          preferredLocale: preferredLocale || 'es',
-          hasInitialNotes: Boolean(initialNotes),
-        },
-      },
-    });
+    await recordCustomerCreated({
+      customerId: created.id,
+      source: customerSource,
+      preferredLocale: preferredLocale || 'es',
+      hasInitialNotes: Boolean(initialNotes),
+    }, tx);
 
     if (initialNotes) {
-      await tx.customerActivity.create({
-        data: {
-          customerId: created.id,
-          action: CUSTOMER_ACTIVITY_ACTIONS.INITIAL_NOTES,
-          details: { notes: initialNotes },
-        },
-      });
+      await recordCustomerInitialNotes(created.id, initialNotes, tx);
     }
 
     const dueDate = new Date();
@@ -135,20 +129,15 @@ export async function createCustomerFromInput(body: CustomerCreateInput): Promis
     );
 
     if (duplicateWarnings.length > 0) {
-      await prisma.customerActivity.create({
-        data: {
-          customerId: customer.id,
-          action: CUSTOMER_ACTIVITY_ACTIONS.DUPLICATE_WARNING,
-          details: {
-            count: duplicateWarnings.length,
-            topScore: duplicateWarnings[0]?.matchScore || 0,
-            topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
-              id: dup.customer.id,
-              name: dup.customer.name,
-              score: dup.matchScore,
-            })),
-          },
-        },
+      await recordCustomerDuplicateWarning({
+        customerId: customer.id,
+        count: duplicateWarnings.length,
+        topScore: duplicateWarnings[0]?.matchScore || 0,
+        topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
+          id: dup.customer.id,
+          name: dup.customer.name,
+          score: dup.matchScore,
+        })),
       });
     }
   } catch (dupError) {

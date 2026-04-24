@@ -7,6 +7,7 @@ import {
   type LeadScopedTaskUpdateInput,
   updateLeadScopedTask,
 } from '@/lib/services/tasks/leadScopedTaskService';
+import { recordLeadTaskCreated, recordLeadTaskDeleted, recordLeadTaskUpdated } from '@/lib/services/leadActivityService';
 
 export type LeadScopedTaskRouteInput = LeadScopedTaskInput;
 export type LeadScopedTaskRouteUpdateInput = LeadScopedTaskUpdateInput;
@@ -24,15 +25,13 @@ export async function createLeadScopedTaskForRoute(leadId: string, input: LeadSc
 
   const task = await createLeadScopedTask(leadId, lead?.customerId ?? null, input);
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId,
-      type: 'TASK',
-      title: 'Tasca creada',
-      description: input.title,
-      metadata: { taskId: task.id, status: task.status, priority: task.priority },
-      createdBy: input.createdBy ?? 'Admin',
-    },
+  await recordLeadTaskCreated({
+    leadId,
+    taskId: task.id,
+    title: input.title,
+    status: task.status,
+    priority: task.priority,
+    createdBy: input.createdBy ?? 'Admin',
   });
 
   return { ok: true, task };
@@ -41,14 +40,12 @@ export async function createLeadScopedTaskForRoute(leadId: string, input: LeadSc
 export async function updateLeadScopedTaskForRoute(leadId: string, taskId: string, input: LeadScopedTaskRouteUpdateInput) {
   const task = await updateLeadScopedTask(taskId, leadId, input);
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId,
-      type: 'TASK',
-      title: 'Tasca actualitzada',
-      description: task.title,
-      metadata: { taskId: task.id, status: task.status, priority: task.priority },
-    },
+  await recordLeadTaskUpdated({
+    leadId,
+    taskId: task.id,
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
   });
 
   return { ok: true, task };
@@ -57,13 +54,9 @@ export async function updateLeadScopedTaskForRoute(leadId: string, taskId: strin
 export async function deleteLeadScopedTaskForRoute(leadId: string, taskId: string) {
   await deleteLeadScopedTask(taskId, leadId);
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId,
-      type: 'TASK',
-      title: 'Tasca eliminada',
-      metadata: { taskId },
-    },
+  await recordLeadTaskDeleted({
+    leadId,
+    taskId,
   });
 
   return { ok: true };

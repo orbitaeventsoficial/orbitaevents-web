@@ -4,6 +4,10 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { formatDateTimeFull } from '@/lib/constants';
 import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
+import {
+  recordLeadTechnicalSnapshotSaved,
+  recordLeadTechnicalSnapshotSent,
+} from '@/lib/services/leadActivityService';
 
 interface LeadSnapshotInput {
   lead: {
@@ -202,15 +206,10 @@ export async function processLeadTechnicalSnapshot(input: {
       },
     });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId: lead.id,
-        type: 'DOCUMENT',
-        title: 'Instantània tècnica desada',
-        description: title,
-        metadata: { documentId: doc.id },
-        createdBy: 'Sistema',
-      },
+    await recordLeadTechnicalSnapshotSaved({
+      leadId: lead.id,
+      title,
+      documentId: doc.id,
     });
 
     return { status: 200, body: { ok: true, documentId: doc.id } };
@@ -230,15 +229,9 @@ export async function processLeadTechnicalSnapshot(input: {
     }),
   });
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId: lead.id,
-      type: 'EMAIL',
-      title: 'Instantània tècnica enviada',
-      description: `Enviat a ${recipient}`,
-      metadata: { recipient, kind: 'technical_snapshot' },
-      createdBy: 'Sistema',
-    },
+  await recordLeadTechnicalSnapshotSent({
+    leadId: lead.id,
+    recipient,
   });
 
   await prisma.leadNote.create({

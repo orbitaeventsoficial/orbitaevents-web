@@ -22,16 +22,20 @@ vi.mock('@/app/config/site-config', () => ({
 vi.mock('@/lib/site', () => ({
   getAppBaseUrl: () => 'https://test.orbita.events',
 }));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomerProcessStarted: vi.fn(),
+}));
 
 import { startCustomerProcess } from '@/lib/services/customerProcessService';
+import { recordCustomerProcessStarted } from '@/lib/services/customerActivityService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.customer.findUnique.mockResolvedValue(null);
-  mockPrisma.customerActivity.create.mockResolvedValue({});
   mockPrisma.discountCode.create.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
   mockSendTestimonialEmail.mockResolvedValue({});
+  vi.mocked(recordCustomerProcessStarted).mockResolvedValue({});
 });
 
 describe('startCustomerProcess', () => {
@@ -105,11 +109,9 @@ describe('startCustomerProcess', () => {
 
     await startCustomerProcess({ customerId: 'c1', processType: 'welcome' });
 
-    expect(mockPrisma.customerActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        customerId: 'c1',
-        action: 'welcome',
-      }),
+    expect(recordCustomerProcessStarted).toHaveBeenCalledWith({
+      customerId: 'c1',
+      processType: 'welcome',
     });
   });
 });

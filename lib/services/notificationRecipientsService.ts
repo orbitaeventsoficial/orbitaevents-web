@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { NOTIFICATION_CATEGORIES, type NotificationCategory } from '@/lib/constants/notifications';
 
 const SETTING_KEY = 'notification.recipients.v1';
 
-export const NOTIFICATION_CATEGORIES = ['leads', 'reports', 'urgent'] as const;
-export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
+export { NOTIFICATION_CATEGORIES, type NotificationCategory };
 
 export interface NotificationRecipient {
   email: string;

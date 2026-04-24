@@ -12,6 +12,7 @@ import { loadPendingFollowUps, type FollowUpSummary, type PendingFollowUp } from
 import { loadCapacityConflicts, type CapacityConflictReport, type CapacityConflict } from '@/lib/services/capacityConflictService';
 import { loadPipelineSuggestions, type PipelineSuggestion } from '@/lib/services/leadPipelineSuggestionsService';
 import { prisma } from '@/lib/prisma';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { LeadStatus } from '@prisma/client';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -172,7 +173,7 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
         icon: urgent ? '🔥' : '📞',
         title: `Contactar ${lead.name}`,
         subtitle: `Lead nou fa ${Math.round(hoursOld)}h — ${lead.eventType || 'event'}`,
-        href: `/admin/leads/${lead.id}`,
+        href: buildLeadWorkspaceHref(lead.id),
         score: 0,
         entity: { type: 'lead', id: lead.id, name: lead.name },
         reasoning: urgent
@@ -195,7 +196,7 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
         icon: '⏰',
         title: `${lead.overdueTasks} ${lead.overdueTasks > 1 ? 'tasques vençudes' : 'tasca vençuda'} — ${lead.name}`,
         subtitle: `Estat: ${lead.status}`,
-        href: `/admin/leads/${lead.id}`,
+        href: buildLeadWorkspaceHref(lead.id),
         score: 0,
         entity: { type: 'lead', id: lead.id, name: lead.name },
         reasoning: `${lead.overdueTasks} tasques pendents amb data vençuda`,
@@ -215,7 +216,7 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
         icon: '📋',
         title: `Seguiment pressupost — ${lead.name}`,
         subtitle: `${dSinceActivity} dies sense resposta`,
-        href: `/admin/leads/${lead.id}`,
+        href: buildLeadWorkspaceHref(lead.id),
         score: 0,
         entity: { type: 'lead', id: lead.id, name: lead.name },
         reasoning: `Pressupost enviat fa ${dSinceActivity} dies sense resposta del client`,
@@ -236,7 +237,7 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
         icon: '📅',
         title: `Tancar reserva — ${lead.name}`,
         subtitle: `Event en ${dUntilEvent} dies sense reserva`,
-        href: `/admin/leads/${lead.id}`,
+        href: buildLeadWorkspaceHref(lead.id),
         score: 0,
         entity: { type: 'lead', id: lead.id, name: lead.name },
         reasoning: `L'esdeveniment és en ${dUntilEvent} dies i encara no hi ha reserva confirmada`,
@@ -257,7 +258,7 @@ function extractLeadActions(leads: NBALeadInput[], now: Date): NextBestAction[] 
         icon: '💤',
         title: `Negociació freda — ${lead.name}`,
         subtitle: `${dSinceActivity} dies sense moviment`,
-        href: `/admin/leads/${lead.id}`,
+        href: buildLeadWorkspaceHref(lead.id),
         score: 0,
         entity: { type: 'lead', id: lead.id, name: lead.name },
         reasoning: `Negociació parada fa ${dSinceActivity} dies — risc de pèrdua`,
@@ -360,7 +361,7 @@ function extractTaskActions(tasks: NBATaskInput[], now: Date): NextBestAction[] 
     const entityId = task.bookingId || task.customerId || task.leadId || task.id;
     const href = task.bookingId ? `/admin/bookings/${task.bookingId}`
       : task.customerId ? `/admin/clientes/${task.customerId}`
-      : task.leadId ? `/admin/leads/${task.leadId}`
+      : task.leadId ? buildLeadWorkspaceHref(task.leadId)
       : '/admin/tasks';
 
     actions.push({
@@ -405,7 +406,7 @@ function extractFollowUpActions(followUps: FollowUpSummary): NextBestAction[] {
       icon: '🚨',
       title: `Seguiment urgent — ${fu.name}`,
       subtitle: `${fu.daysSinceOutbound} dies sense resposta — ${fu.suggestedAction}`,
-      href: `/admin/leads/${fu.leadId}`,
+      href: buildLeadWorkspaceHref(fu.leadId),
       score: 0,
       entity: { type: 'lead', id: fu.leadId, name: fu.name },
       reasoning: `Lead contactat ${fu.outboundCount} vegades, ${fu.daysSinceOutbound} dies sense resposta — ${fu.suggestedAction}`,
@@ -424,7 +425,7 @@ function extractFollowUpActions(followUps: FollowUpSummary): NextBestAction[] {
       icon: '📩',
       title: `Seguiment — ${fu.name}`,
       subtitle: `${fu.daysSinceOutbound} dies sense resposta`,
-      href: `/admin/leads/${fu.leadId}`,
+      href: buildLeadWorkspaceHref(fu.leadId),
       score: 0,
       entity: { type: 'lead', id: fu.leadId, name: fu.name },
       reasoning: `Lead sense resposta des de fa ${fu.daysSinceOutbound} dies`,

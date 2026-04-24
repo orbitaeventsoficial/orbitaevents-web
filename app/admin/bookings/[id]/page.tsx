@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Detall de reserva amb canvi d'estat
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
@@ -220,7 +221,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               )}
               {booking.lead && (
                 <Link
-                  href={`/admin/leads/${booking.lead.id}`}
+                  href={buildLeadWorkspaceHref(booking.lead.id)}
                   className="ap-btn ap-btn--secondary"
                 >
                   Entrada original
@@ -307,7 +308,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <p className="text-xs uppercase tracking-wide">Entrada comercial</p>
           <p className="text-xl font-semibold">
             {booking.lead ? (
-              <Link href={`/admin/leads/${booking.lead.id}`} className="transition-colors">
+              <Link href={buildLeadWorkspaceHref(booking.lead.id)} className="transition-colors">
                 {booking.lead.status}
               </Link>
             ) : 'Sense lead'}
@@ -347,7 +348,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         {booking.lead && (
           <div className="mt-4 pt-4 border-t admin-tone-border-neutral">
             <Link
-              href={`/admin/leads/${booking.lead.id}`}
+              href={buildLeadWorkspaceHref(booking.lead.id)}
               className="text-sm hover:underline"
             >
               Veure lead original
@@ -760,7 +761,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
-
 
 
 

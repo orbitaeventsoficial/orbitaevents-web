@@ -1,11 +1,8 @@
-// lib/services/commTimelineService.ts
-// ═══════════════════════════════════════════════════════════════════════════
-// COMMUNICATION TIMELINE SERVICE
-// Unifica email, notes, WhatsApp, trucades i accions de seguiment en una
-// sola narrativa de comunicació per lead/client. Funció pura + wrapper.
-// ═══════════════════════════════════════════════════════════════════════════
-
-import { prisma } from '@/lib/prisma';
+import {
+  fetchCanonicalEventsForCustomer,
+  fetchCanonicalEventsForLead,
+  type CanonicalTimelineEvent,
+} from '@/lib/services/timelineQueryService';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -57,6 +54,12 @@ export type CommTimelineInput = {
   now: Date;
 };
 
+type CommTimelineCanonicalInput = {
+  events: CanonicalTimelineEvent[];
+  customerId: string | null;
+  now: Date;
+};
+
 // ───────────────────────────────────────────────────────────────────────────
 // CHANNEL MAPPING
 // ───────────────────────────────────────────────────────────────────────────
@@ -81,34 +84,38 @@ function inferDirection(entry: CommTimelineRawEntry): CommDirection {
   return 'OUTBOUND';
 }
 
-// ───────────────────────────────────────────────────────────────────────────
-// PURE FUNCTION
-// ───────────────────────────────────────────────────────────────────────────
+function inferDirectionFromCanonicalEvent(event: CanonicalTimelineEvent): CommDirection {
+  if (event.timelineType === 'NOTE_ADDED') return 'INTERNAL';
 
-export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary {
-  const { activities, customerId, now } = input;
+  const direction = event.metadata?.direction;
+  if (direction === 'INBOUND' || direction === 'OUTBOUND' || direction === 'INTERNAL') {
+    return direction;
+  }
 
-  // Filter to comm-relevant types
-  const commTypes = new Set(['EMAIL', 'WHATSAPP', 'CALL', 'NOTE']);
-  const commActivities = activities.filter((a) => commTypes.has(a.type));
+  if (event.timelineType === 'EMAIL_RECEIVED') return 'INBOUND';
 
-  const entries: CommEntry[] = commActivities.map((a) => ({
-    id: a.id,
-    channel: TYPE_TO_CHANNEL[a.type] ?? 'SYSTEM',
-    direction: inferDirection(a),
-    title: a.title ?? a.type,
-    body: a.description,
-    author: a.createdBy,
-    occurredAt: a.createdAt.toISOString(),
-    leadId: a.leadId,
-    customerId,
-    metadata: a.metadata,
-  }));
+  const actor = (event.actor ?? '').toLowerCase();
+  if (actor === 'system' || actor === 'scoring bot') return 'INTERNAL';
 
-  // Sort newest first
+  const text = `${event.title} ${event.body ?? ''}`.toLowerCase();
+  if (text.includes('rebut') || text.includes('entrant') || text.includes('client escriu') || text.includes('resposta del client')) {
+    return 'INBOUND';
+  }
+
+  return 'OUTBOUND';
+}
+
+function mapCanonicalEventToChannel(event: CanonicalTimelineEvent): CommChannel | null {
+  if (event.timelineType === 'MESSAGE_SENT' || event.timelineType === 'EMAIL_RECEIVED') return 'EMAIL';
+  if (event.timelineType === 'WHATSAPP_SENT') return 'WHATSAPP';
+  if (event.timelineType === 'PHONE_CALL') return 'CALL';
+  if (event.timelineType === 'NOTE_ADDED') return 'NOTE';
+  return null;
+}
+
+function summarizeEntries(entries: CommEntry[], now: Date): CommTimelineSummary {
   entries.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime());
 
-  // Channel counts
   const channels: Record<CommChannel, number> = {
     EMAIL: 0,
     WHATSAPP: 0,
@@ -116,12 +123,11 @@ export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary
     NOTE: 0,
     SYSTEM: 0,
   };
-  for (const e of entries) {
-    channels[e.channel]++;
+  for (const entry of entries) {
+    channels[entry.channel]++;
   }
 
-  // Last contact (non-internal)
-  const contactEntries = entries.filter((e) => e.direction !== 'INTERNAL');
+  const contactEntries = entries.filter((entry) => entry.direction !== 'INTERNAL');
   const lastContactEntry = contactEntries[0] ?? null;
   const lastContactAt = lastContactEntry ? lastContactEntry.occurredAt : null;
   const lastContactChannel = lastContactEntry ? lastContactEntry.channel : null;
@@ -136,9 +142,8 @@ export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary
     ? Math.floor((now.getTime() - new Date(lastContactAt).getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
-  // Response gap: time between last outbound and last inbound
-  const lastOutbound = entries.find((e) => e.direction === 'OUTBOUND');
-  const lastInbound = entries.find((e) => e.direction === 'INBOUND');
+  const lastOutbound = entries.find((entry) => entry.direction === 'OUTBOUND');
+  const lastInbound = entries.find((entry) => entry.direction === 'INBOUND');
   let responseGap: number | null = null;
   if (lastOutbound && lastInbound) {
     const outDate = new Date(lastOutbound.occurredAt).getTime();
@@ -160,6 +165,54 @@ export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+// PURE FUNCTION
+// ───────────────────────────────────────────────────────────────────────────
+
+export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary {
+  const { activities, customerId, now } = input;
+  const commTypes = new Set(['EMAIL', 'WHATSAPP', 'CALL', 'NOTE']);
+  const entries: CommEntry[] = activities
+    .filter((activity) => commTypes.has(activity.type))
+    .map((a) => ({
+    id: a.id,
+    channel: TYPE_TO_CHANNEL[a.type] ?? 'SYSTEM',
+    direction: inferDirection(a),
+    title: a.title ?? a.type,
+    body: a.description,
+    author: a.createdBy,
+    occurredAt: a.createdAt.toISOString(),
+    leadId: a.leadId,
+    customerId,
+    metadata: a.metadata,
+  }));
+  return summarizeEntries(entries, now);
+}
+
+export function buildCommTimelineFromCanonicalEvents(input: CommTimelineCanonicalInput): CommTimelineSummary {
+  const { events, customerId, now } = input;
+  const entries: CommEntry[] = events
+    .map((event) => {
+      const channel = mapCanonicalEventToChannel(event);
+      if (!channel) return null;
+      return {
+        id: event.id,
+        channel,
+        direction: inferDirectionFromCanonicalEvent(event),
+        title: event.title,
+        body: event.body ?? null,
+        author: event.actor ?? null,
+        occurredAt: event.occurredAt,
+        leadId: event.entityType === 'lead' && event.entityId ? event.entityId : null,
+        customerId,
+        metadata: event.metadata ?? null,
+      } satisfies CommEntry;
+    })
+    .filter((entry): entry is CommEntry => entry !== null);
+
+  return summarizeEntries(entries, now);
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 // WRAPPER
 // ───────────────────────────────────────────────────────────────────────────
 
@@ -168,38 +221,9 @@ export async function loadCommTimeline(
   customerId: string | null = null,
   now: Date = new Date(),
 ): Promise<CommTimelineSummary> {
-  // Load activities from all leads (if customer, include all leads)
-  const leadIds: string[] = [leadId];
+  const events = customerId
+    ? await fetchCanonicalEventsForCustomer(customerId, 100)
+    : await fetchCanonicalEventsForLead(leadId, 100);
 
-  if (customerId) {
-    const customerLeads = await prisma.lead.findMany({
-      where: { customerId },
-      select: { id: true },
-    });
-    for (const cl of customerLeads) {
-      if (!leadIds.includes(cl.id)) leadIds.push(cl.id);
-    }
-  }
-
-  const activities = await prisma.leadActivity.findMany({
-    where: {
-      leadId: { in: leadIds },
-      type: { in: ['EMAIL', 'WHATSAPP', 'CALL', 'NOTE'] },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-  });
-
-  const rawActivities: CommTimelineRawEntry[] = activities.map((a) => ({
-    id: a.id,
-    type: a.type,
-    title: a.title,
-    description: a.description,
-    createdBy: a.createdBy,
-    createdAt: a.createdAt,
-    leadId: a.leadId,
-    metadata: a.metadata as Record<string, unknown> | null,
-  }));
-
-  return buildCommTimeline({ activities: rawActivities, customerId, now });
+  return buildCommTimelineFromCanonicalEvents({ events, customerId, now });
 }

@@ -2,14 +2,45 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CalendarApiDay, CalendarApiResponse, MonthYear, CalendarCell } from './calendar-utils';
 import { weekdayLabels, resolveServiceLabel, resolveTimeLabel, formatKey, getMonthDays, addMonths, monthLabel, isToday, getCalendarTone, getCalendarToneClasses, resolveWorkTimeLabel } from './calendar-utils';
+
+type OwnerTone = 'info' | 'warning' | 'success';
+type OwnerStripConfig = {
+  system: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  manual: {
+    eyebrow: string;
+    title: string;
+    tone: OwnerTone;
+    items: string[];
+    emptyText: string;
+  };
+  nextStep: {
+    eyebrow: string;
+    title: string;
+    detail: string;
+    href: string;
+    ctaLabel: string;
+    secondaryAction?: {
+      href: string;
+      label: string;
+    };
+  };
+};
 
 export default function CalendarMonthClient() {
   const toast = useToast();
@@ -247,15 +278,119 @@ export default function CalendarMonthClient() {
     };
   }, [cells, data]);
 
+  const strip = useMemo<OwnerStripConfig>(() => {
+    const hiddenLayers = Object.entries(visibleLayers)
+      .filter(([, visible]) => !visible)
+      .map(([layer]) => layer);
+    const selectedPayload = selectedDayData.payload;
+    const selectedHasItems = selectedPayload
+      ? selectedPayload.reservas.length +
+          selectedPayload.bloqueos.length +
+          selectedPayload.tasks.length +
+          selectedPayload.socialPosts.length +
+          selectedPayload.followUps.length
+      : 0;
+
+    const systemItems: string[] = [];
+    systemItems.push(`${stats.totalReservas} reserves · ${stats.totalBloqueos} bloquejos al rang visible`);
+    systemItems.push(`${stats.freeDays} dies lliures · ${stats.mixedDays} dies mixtes · ${stats.workDays} dies amb feina`);
+    if (stats.totalTasks > 0 || stats.totalSocialPosts > 0) {
+      systemItems.push(`${stats.totalTasks} tasques · ${stats.totalSocialPosts} posts socials`);
+    }
+
+    const manualItems: string[] = [];
+    if (stats.mixedDays > 0) {
+      manualItems.push(`${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'} amb reserva i bloqueig`);
+    }
+    if (hiddenLayers.length > 0) {
+      manualItems.push(`${hiddenLayers.length} ${hiddenLayers.length === 1 ? 'capa amagada' : 'capes amagades'} a la lectura actual`);
+    }
+    if (selectedDayData.key && selectedHasItems > 0) {
+      manualItems.push(`${selectedHasItems} elements oberts al detall del ${formatDateShort(selectedDayData.key)}`);
+    }
+    if (showBlockForm && selectedDayData.key) {
+      manualItems.push(`Bloqueig manual en preparació per al ${formatDateShort(selectedDayData.key)}`);
+    }
+    if (draggingBookingId) {
+      manualItems.push('Hi ha una reserva en moviment via drag & drop');
+    }
+
+    const nextStep =
+      stats.mixedDays > 0
+        ? {
+            eyebrow: 'Següent pas · Conflicte',
+            title: `Revisar ${stats.mixedDays} ${stats.mixedDays === 1 ? 'dia mixt' : 'dies mixtes'}`,
+            detail: 'Els dies mixtes combinen reserva i bloqueig. Revisa el detall del calendari abans de moure o tancar disponibilitat.',
+            href: '/admin/calendario?view=day',
+            ctaLabel: 'Obrir vista dia',
+            secondaryAction: { href: '/admin/calendario?view=week', label: 'Vista setmana' },
+          }
+        : stats.totalReservas === 0 && stats.totalBloqueos === 0
+          ? {
+              eyebrow: 'Següent pas · Disponibilitat',
+              title: 'Calendari visible sense ocupació',
+              detail: 'El rang visible no té reserves ni bloquejos. Pots bloquejar absències o preparar la propera planificació comercial.',
+              href: '#calendar-detail',
+              ctaLabel: 'Obrir detall',
+            }
+          : selectedDayData.key && selectedHasItems > 0
+            ? {
+                eyebrow: 'Següent pas · Dia obert',
+                title: `Treballar el ${formatDateShort(selectedDayData.key)}`,
+                detail: 'Ja tens un dia seleccionat amb activitat. Tanca moviments, bloquejos o accions ràpides des del panell de detall.',
+                href: '#calendar-detail',
+                ctaLabel: 'Anar al detall',
+              }
+            : {
+                eyebrow: 'Següent pas',
+                title: 'Ocupació visible sota control',
+                detail: 'El mes visible no mostra conflictes forts. Si vols més precisió operativa, baixa a setmana o dia.',
+                href: '/admin/calendario?view=week',
+                ctaLabel: 'Obrir vista setmana',
+                secondaryAction: { href: '/admin/calendario?view=day', label: 'Vista dia' },
+              };
+
+    return {
+      system: {
+        eyebrow: 'Automàtic · Ocupació',
+        title: stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'Mapa d’ocupació visible' : 'Calendari visible buit',
+        tone: stats.mixedDays > 0 ? 'warning' : stats.totalReservas > 0 || stats.totalBloqueos > 0 ? 'info' : 'success',
+        items: systemItems,
+        emptyText: 'Sense ocupació visible al rang carregat.',
+      },
+      manual: {
+        eyebrow: 'Manual · Operativa',
+        title: manualItems.length === 0 ? 'Cap tensió manual' : `${manualItems.length} senyals per revisar`,
+        tone: stats.mixedDays > 0 || showBlockForm || draggingBookingId ? 'warning' : manualItems.length > 0 ? 'info' : 'success',
+        items: manualItems,
+        emptyText: 'Sense conflictes, capes amagades ni moviments manuals oberts.',
+      },
+      nextStep,
+    };
+  }, [
+    draggingBookingId,
+    selectedDayData.key,
+    selectedDayData.payload,
+    showBlockForm,
+    stats,
+    visibleLayers,
+  ]);
+
   return (
     <AdminPage title="Calendari" subtitle="Visualitza reserves, bloquejos i feina planificada per executar el negoci.">
+      <OwnerControlStrip
+        system={strip.system}
+        manual={strip.manual}
+        nextStep={strip.nextStep}
+      />
+
       {/* Barra superior: selector de mes + meta info */}
       <div className="flex flex-col gap-2 rounded-xl border admin-card-glass p-2.5 sm:p-3 md:flex-row md:items-center md:justify-between" {...helpAttrs(ADMIN_CALENDAR_HELP.monthNavigation)}>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
-            className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
           >
             ← Anterior
           </button>
@@ -274,25 +409,25 @@ export default function CalendarMonthClient() {
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
-            className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
           >
             Mes següent →
           </button>
-          <div className="flex rounded-lg border overflow-hidden ml-2">
+          <div className="ml-0 flex w-full flex-wrap overflow-hidden rounded-lg border sm:w-auto md:ml-2">
             <span className="inline-flex items-center border-r px-2.5 py-1.5 text-xs font-semibold admin-tone-soft-warning admin-tone-border-warning admin-tone-text-warning">
               Mes
             </span>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=week')}
-              className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 border-r"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center border-r px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
             >
               Setmana
             </button>
             <button
               type="button"
               onClick={() => router.push('/admin/calendario?view=day')}
-              className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10"
+              className="inline-flex min-h-[40px] flex-1 items-center justify-center px-2.5 py-1.5 text-xs font-medium transition-all hover:bg-white/10 sm:flex-none"
             >
               Dia
             </button>
@@ -523,7 +658,7 @@ export default function CalendarMonthClient() {
                         <div className="truncate font-semibold">
                           {r.leadId ? (
                             <Link
-                              href={`/admin/leads/${r.leadId}`}
+                              href={buildLeadWorkspaceHref(r.leadId)}
                               onClick={(event) => event.stopPropagation()}
                               className="hover:underline"
                             >
@@ -580,7 +715,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls */}
       {selectedDayData.date && (
-        <div className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
+        <div id="calendar-detail" className="rounded-2xl border admin-card-glass p-4 sm:p-5" {...helpAttrs(ADMIN_CALENDAR_HELP.monthDayDetail)}>
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-semibold">
@@ -595,13 +730,13 @@ export default function CalendarMonthClient() {
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/admin/clientes?add=1&date=${selectedDayData.key}`}
-                  className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all active:scale-[0.98] sm:w-auto sm:px-4 sm:text-sm"
                 >
                   + Nou client
                 </Link>
                 <Link
                   href={`/admin/bookings/new?date=${selectedDayData.key}`}
-                  className="inline-flex items-center gap-1.5 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-lg transition-all active:scale-[0.98]"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-white shadow-lg transition-all active:scale-[0.98] sm:w-auto sm:px-4 sm:text-sm"
                 >
                   + Nova reserva
                 </Link>
@@ -609,7 +744,7 @@ export default function CalendarMonthClient() {
                   <button
                     type="button"
                     onClick={() => unblockDay(selectedDayData.key!)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
+                    className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all active:scale-[0.98] sm:w-auto sm:px-4 sm:text-sm"
                   >
                     Desbloquejar dia
                   </button>
@@ -617,7 +752,7 @@ export default function CalendarMonthClient() {
                   <button
                     type="button"
                     onClick={() => setShowBlockForm((v) => !v)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all active:scale-[0.98]"
+                    className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all active:scale-[0.98] sm:w-auto sm:px-4 sm:text-sm"
                   >
                     Bloquejar dia
                   </button>
@@ -646,7 +781,7 @@ export default function CalendarMonthClient() {
                 type="button"
                 disabled={blockingDate}
                 onClick={() => blockDay(selectedDayData.key!, blockNote)}
-                className="ap-btn ap-btn--primary text-sm disabled:opacity-50"
+                className="ap-btn ap-btn--primary min-h-[44px] w-full text-sm disabled:opacity-50 sm:w-auto"
               >
                 {blockingDate ? 'Bloquejant...' : 'Confirmar bloqueig'}
               </button>
@@ -688,7 +823,7 @@ export default function CalendarMonthClient() {
                             Reserva →
                           </Link>
                           {r.leadId && (
-                            <Link href={`/admin/leads/${r.leadId}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                            <Link href={buildLeadWorkspaceHref(r.leadId)} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
                               Entrada →
                             </Link>
                           )}
@@ -749,7 +884,7 @@ export default function CalendarMonthClient() {
                     </Link>
                   ))}
                   {visibleLayers.followUps && selectedDayData.payload?.followUps?.map((item) => (
-                    <Link key={item.leadId} href={`/admin/leads/${item.leadId}`} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all">
+                    <Link key={item.leadId} href={buildLeadWorkspaceHref(item.leadId)} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all">
                       <div className="truncate text-sm font-medium">Follow-up · {item.name}</div>
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
                     </Link>
@@ -808,4 +943,3 @@ export default function CalendarMonthClient() {
     </AdminPage>
   );
 }
-

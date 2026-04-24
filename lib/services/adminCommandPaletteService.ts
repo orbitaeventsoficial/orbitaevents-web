@@ -1,3 +1,5 @@
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+
 export type AdminPaletteNavItem = {
   icon: string;
   label: string;
@@ -169,7 +171,7 @@ export function buildAdminSearchEntries(results: AdminPaletteSearchResults): Adm
   return [
     ...results.leads.map((lead) => ({
       key: `lead-${lead.id}`,
-      href: `/admin/leads/${lead.id}`,
+      href: buildLeadWorkspaceHref(lead.id),
       label: lead.name,
       meta: lead.status,
       type: 'Entrada',

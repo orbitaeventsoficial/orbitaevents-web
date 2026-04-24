@@ -35,6 +35,10 @@ const allowedCatalogs = new Set([
   'lib/services/attributionService.ts::COMM_ACTIVITY_TYPES',
   // Catalan day abbreviations for social performance display — presentation-only, not a shared domain catalog.
   'lib/services/socialPerformanceService.ts::DAY_NAMES',
+  // Pseudo-random visual particle coordinates for the mobile hero — presentation-only runtime data, not a shared domain catalog (Canvi #354).
+  'app/components/mobile-ultimate/MobileHeroUltimate.tsx::HERO_PARTICLES',
+  // Local filter subset of CUSTOMER_ACTIVITY_ACTIONS used only inside customerActivityService to query recent email-bearing activity (Canvi #353, follows the COMM_ACTIVITY_TYPES precedent).
+  'lib/services/customerActivityService.ts::EMAIL_ACTIVITY_ACTIONS',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;

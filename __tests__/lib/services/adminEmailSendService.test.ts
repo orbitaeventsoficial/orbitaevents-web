@@ -5,8 +5,7 @@ const { mockPrisma, mockSendEmail, mockTranslate, mockResolveQuotePack, mockGetT
     lead: { findUnique: vi.fn() },
     customer: { findUnique: vi.fn() },
     leadNote: { create: vi.fn() },
-    leadActivity: { create: vi.fn(), count: vi.fn() },
-    customerActivity: { create: vi.fn() },
+    leadActivity: { count: vi.fn() },
   },
   mockSendEmail: vi.fn(),
   mockTranslate: vi.fn(),
@@ -53,17 +52,23 @@ vi.mock('@/lib/site', () => ({
 vi.mock('@/lib/services/imageManagerService', () => ({
   getManagedImageOverride: vi.fn().mockResolvedValue(null),
 }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadEmailSent: vi.fn(),
+}));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomerEmailSent: vi.fn(),
+}));
 
 import { sendAdminEmail } from '@/lib/services/adminEmailSendService';
+import { recordLeadEmailSent } from '@/lib/services/leadActivityService';
+import { recordCustomerEmailSent } from '@/lib/services/customerActivityService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.lead.findUnique.mockResolvedValue(null);
   mockPrisma.customer.findUnique.mockResolvedValue(null);
   mockPrisma.leadNote.create.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockPrisma.leadActivity.count.mockResolvedValue(0);
-  mockPrisma.customerActivity.create.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
   mockTranslate.mockImplementation((text: string) => Promise.resolve(text));
   mockResolveQuotePack.mockResolvedValue({ name: 'Basic', price: 500, djHours: 4, extraHourPrice: 75, description: 'Pack bàsic' });
@@ -99,7 +104,7 @@ describe('sendAdminEmail', () => {
     );
   });
 
-  it('crea leadNote i leadActivity si leadId', async () => {
+  it('crea leadNote i registra leadActivity via capa shared si leadId', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({ id: 'l1', preferredLocale: 'ca' });
 
     await sendAdminEmail({
@@ -110,10 +115,14 @@ describe('sendAdminEmail', () => {
     });
 
     expect(mockPrisma.leadNote.create).toHaveBeenCalled();
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalled();
+    expect(recordLeadEmailSent).toHaveBeenCalledWith({
+      leadId: 'l1',
+      subject: 'Seguiment',
+      hasAttachments: false,
+    });
   });
 
-  it('crea customerActivity si customerId', async () => {
+  it('registra customerActivity via capa shared si customerId', async () => {
     mockPrisma.customer.findUnique.mockResolvedValue({ id: 'cust1', preferredLocale: 'es' });
 
     await sendAdminEmail({
@@ -123,14 +132,12 @@ describe('sendAdminEmail', () => {
       customerId: 'cust1',
     });
 
-    expect(mockPrisma.customerActivity.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          customerId: 'cust1',
-          action: 'EMAIL_SENT',
-        }),
-      })
-    );
+    expect(recordCustomerEmailSent).toHaveBeenCalledWith({
+      customerId: 'cust1',
+      to: 'client@test.com',
+      subject: 'Info',
+      source: 'admin_emails_send',
+    });
   });
 
   it('retorna 400 si quote sense pack vàlid', async () => {

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../../components/AdminPage';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
@@ -279,7 +280,7 @@ export default async function LeadDetailPage({ params }: Props) {
       title={lead.name}
       back={{ href: '/admin/leads', label: 'Entrades' }}
       subtitle={
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
             {statusConf.label}
           </span>
@@ -290,11 +291,11 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       }
       actions={
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {lead.customerId && (
             <Link
               href={`/admin/clientes/${lead.customerId}`}
-              className="ap-btn ap-btn--secondary"
+              className="ap-btn ap-btn--secondary w-full sm:w-auto"
             >
               👤 Fitxa Client
             </Link>
@@ -306,13 +307,13 @@ export default async function LeadDetailPage({ params }: Props) {
                   `Hola ${lead.name}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
                 )}`}
                 target="_blank" rel="noopener noreferrer"
-                className="ap-btn ap-btn--primary"
+                className="ap-btn ap-btn--primary w-full sm:w-auto"
               >
                 💬 WhatsApp
               </a>
               <a
                 href={`tel:${lead.phone}`}
-                className="ap-btn ap-btn--secondary"
+                className="ap-btn ap-btn--secondary w-full sm:w-auto"
               >
                 📞 Trucar
               </a>
@@ -320,7 +321,7 @@ export default async function LeadDetailPage({ params }: Props) {
           )}
           <a
             href={`mailto:${lead.email}`}
-            className="ap-btn ap-btn--secondary"
+            className="ap-btn ap-btn--secondary w-full sm:w-auto"
           >
             ✉️ Email
           </a>
@@ -569,12 +570,12 @@ export default async function LeadDetailPage({ params }: Props) {
                       )}
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                     <form action="/api/admin/emails/send-post-event" method="POST">
                       <input type="hidden" name="bookingId" value={lead.booking.id} />
                       <button
                         type="submit"
-                        className="ap-btn ap-btn--primary inline-flex items-center px-3 py-1.5 text-xs"
+                        className="ap-btn ap-btn--primary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto"
                       >
                         Enviar enllaç valoració
                       </button>
@@ -586,7 +587,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ap-btn ap-btn--primary inline-flex items-center px-3 py-1.5 text-xs"
+                        className="ap-btn ap-btn--primary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto"
                       >
                         Enviar per WhatsApp
                       </a>
@@ -596,21 +597,21 @@ export default async function LeadDetailPage({ params }: Props) {
                         href={reviewUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs"
+                        className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto"
                       >
                         Obrir formulari client
                       </a>
                     )}
-                    <Link href={`/admin/bookings/${lead.booking.id}`} className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
+                    <Link href={`/admin/bookings/${lead.booking.id}`} className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
                       Veure reserva completa
                     </Link>
-                    <Link href="/admin/post-event/reports" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
+                    <Link href="/admin/post-event/reports" className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
                       Informes post-event
                     </Link>
-                    <Link href="/admin/post-event/surveys" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
+                    <Link href="/admin/post-event/surveys" className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
                       Enquestes client
                     </Link>
-                    <Link href="/admin/emails" className="ap-btn ap-btn--secondary inline-flex items-center px-3 py-1.5 text-xs">
+                    <Link href="/admin/emails" className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
                       Automatitzacions de correu
                     </Link>
                   </div>
@@ -798,7 +799,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 {relatedLeads.map((item) => (
                   <Link
                     key={item.id}
-                    href={`/admin/leads/${item.id}`}
+                    href={buildLeadWorkspaceHref(item.id)}
                     className="admin-card-glass block rounded-xl border border-white/10 p-3 hover:bg-white/[0.03] transition-colors"
                   >
                     <p className="text-sm font-medium">
@@ -838,8 +839,6 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
-
-
 
 
 

@@ -1,14 +1,15 @@
 import type { CustomerDiscountCode, Proposal } from '@prisma/client';
 import type { CustomerHubDTO, CustomerCommSummaryDTO, CustomerFollowUpSummaryDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
 import { resolveActiveDocument } from './proposalActive';
-import { buildTimeline } from './timeline';
+import { buildCustomerActivityTimelineEvents, buildCustomerBusinessTimelineEvents } from './timeline';
 import { buildLeadCommercialBlocker } from './leadCommercialBlocker';
 import { computeCustomerInsights } from '@/lib/services/customerInsightsService';
+import { deriveCustomerHubActivitySummary } from '@/lib/services/customerActivityService';
 import { loadCommTimeline } from '@/lib/services/commTimelineService';
 import { detectPendingFollowUps, deriveLeadResponseState } from '@/lib/services/responseTrackingService';
 import { generateReactivationCandidates } from '@/lib/services/reactivationService';
+import { fetchCanonicalEventsForCustomer } from '@/lib/services/timelineQueryService';
 import {
-  type CustomerHubActivityLite,
   type CustomerHubTaskLite,
   fetchCustomerHubCollections,
   fetchCustomerHubCustomerBase,
@@ -43,7 +44,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const leadIds = leads.map((lead) => lead.id);
   const primaryLeadId = leads[0]?.id ?? null;
 
-  const { proposals, bookingsRows, customerTasks, activityLog, adminLogs, customerDiscountCodes } =
+  const { proposals, bookingsRows, customerTasks, activityLog, customerDiscountCodes } =
     await fetchCustomerHubCollections(resolvedCustomerId, leadIds);
 
   const proposalsMapped = proposals.map((proposal: Proposal) => ({
@@ -114,16 +115,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       }))
   );
 
-  const customerNotes: MessageDTO[] = activityLog.map((activity) => ({
-    id: `ca-${activity.id}`,
-    channel: 'NOTE',
-    subject: activity.action,
-    bodyPreview:
-      activity.details && typeof activity.details === 'object'
-        ? JSON.stringify(activity.details).slice(0, 160)
-        : undefined,
-    createdAt: activity.createdAt.toISOString(),
-  }));
+  const { customerNotes, manualStatus } = deriveCustomerHubActivitySummary(activityLog);
 
   const messages = [...leadMessages, ...customerNotes]
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
@@ -212,6 +204,8 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     ? proposalsMapped.find((proposal) => proposal.id === active.proposalId)
     : undefined;
 
+  const canonicalEvents = await fetchCanonicalEventsForCustomer(resolvedCustomerId, 250);
+
   const totalQuoted = proposalsMapped.reduce((sum, proposal) => sum + (proposal.total || 0), 0);
   const totalPaid = bookingsRows.reduce((sum, bookingRow) => {
     let paid = 0;
@@ -244,45 +238,25 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const status = deriveHubStatus({
     leadStatuses: leads.map((lead) => lead.status),
     bookingStatuses: bookingsRows.map((bookingRow) => bookingRow.status),
-    manualStatus: resolveManualStatus(activityLog),
+    manualStatus,
   });
 
-  const timeline = buildTimeline({
-    proposals: proposalsMapped,
-    bookings,
-    tasks,
-    messages,
-    customerActivities: activityLog.map((activity) => ({
-      id: activity.id,
-      action: activity.action,
-      createdAt: activity.createdAt,
-      details: activity.details && typeof activity.details === 'object'
-        ? (activity.details as Record<string, unknown>)
-        : null,
-    })),
-    leadActivities: leads.flatMap((lead) =>
-      lead.activities.map((activity) => ({
-        id: activity.id,
-        type: activity.type,
-        title: activity.title,
-        description: activity.description,
-        createdAt: activity.createdAt,
-        createdBy: activity.createdBy,
-        leadId: lead.id,
-      }))
-    ),
-    adminLogs: adminLogs.map((log) => ({
-      id: log.id,
-      action: log.action,
-      entity: log.entity,
-      entityId: log.entityId,
-      details: log.details && typeof log.details === 'object'
-        ? (log.details as Record<string, unknown>)
-        : null,
-      createdAt: log.createdAt,
-      userId: log.userId,
-    })),
-  });
+  const timeline = [
+    ...buildCustomerBusinessTimelineEvents({
+      proposals: proposalsMapped,
+      bookings,
+      tasks,
+      messages,
+    }),
+    ...buildCustomerActivityTimelineEvents({
+      customerActivities: [],
+      leadActivities: [],
+      adminLogs: [],
+      canonicalEvents,
+    }),
+  ]
+    .sort((a, b) => (a.at < b.at ? 1 : -1))
+    .slice(0, 250);
 
   const discountCodes: DiscountCodeDTO[] = customerDiscountCodes.map((discountCode: CustomerDiscountCode) => ({
     id: discountCode.id,
@@ -417,14 +391,4 @@ function mapTask(task: CustomerHubTaskLite, leadId?: string): TaskDTO {
     priority: task.priority === 'URGENT' ? 'HIGH' : (task.priority as TaskDTO['priority']) || 'MEDIUM',
     leadId: task.leadId || leadId,
   };
-}
-
-function resolveManualStatus(activities: CustomerHubActivityLite[]): HubStatus | null {
-  for (const activity of activities) {
-    if (activity.action === 'HUB_STATUS_SET' && activity.details && typeof activity.details === 'object') {
-      const nextStatus = (activity.details as { status?: HubStatus }).status;
-      if (nextStatus) return nextStatus;
-    }
-  }
-  return null;
 }

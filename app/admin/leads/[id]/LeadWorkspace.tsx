@@ -248,9 +248,9 @@ export default function LeadWorkspace({
 
       <div className="grid gap-6 xl:grid-cols-3">
         <section id="lead-tasks" className="ap-card p-5 xl:col-span-2" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.tasks)}>
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold">Seguiment comercial</h2>
-            <span className="ap-badge px-2.5 py-1 text-xs">
+            <span className="ap-badge w-fit px-2.5 py-1 text-xs">
               {openTasks.length} pendents
             </span>
           </div>
@@ -260,19 +260,19 @@ export default function LeadWorkspace({
 
           <div className="mt-4 grid gap-2 md:grid-cols-12">
             <input
-              className="ap-input px-3 py-2 text-sm md:col-span-5"
+              className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-5"
               placeholder="Ex: Trucar per tancar pressupost"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
             />
             <input
               type="date"
-              className="ap-input px-3 py-2 text-sm md:col-span-3"
+              className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-3"
               value={taskDueDate}
               onChange={(e) => setTaskDueDate(e.target.value)}
             />
             <select
-              className="ap-input px-3 py-2 text-sm md:col-span-2"
+              className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-2"
               value={taskPriority}
               onChange={(e) => setTaskPriority(e.target.value)}
             >
@@ -306,7 +306,7 @@ export default function LeadWorkspace({
                         {task.dueDate ? `Venciment ${task.dueDate.slice(0, 10)}` : 'Sense data'} · Prioritat {task.priority} · Estat {task.status}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {task.status !== 'DONE' ? (
                         <button
                           type="button"
@@ -412,7 +412,7 @@ export default function LeadWorkspace({
       </div>
 
       <section className="ap-card p-5" {...helpAttrs(ADMIN_LEAD_HELP_2.workspace.timeline)}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Timeline comercial</h2>
             <p className="mt-1 text-sm">Lectura canònica del que passa amb aquest lead.</p>
@@ -451,7 +451,7 @@ export default function LeadWorkspace({
                       <p className="text-xs">Per: {activity.timeline?.actor || activity.createdBy}</p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <div className="text-xs">{formatDateTime(activity.timeline?.occurredAt || activity.createdAt)}</div>
                     <button
                       type="button"
@@ -470,4 +470,3 @@ export default function LeadWorkspace({
     </div>
   );
 }
-

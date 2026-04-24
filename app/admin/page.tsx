@@ -1,5 +1,6 @@
 import Tooltip from './components/Tooltip';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import QuickActions from './components/QuickActions';
 import StatusQuickSelect from './components/StatusQuickSelect';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
@@ -121,6 +122,62 @@ export default async function AdminDashboard() {
   const nextPriorityDetail = d.alerts[0]?.description || (d.upcomingTasks[0]?.lead?.name ? `Relacionat amb ${d.upcomingTasks[0].lead.name}` : 'Obre el workspace que concentra la feina pendent.');
   const operationHref = d.nextEvent ? `/admin/bookings/${d.nextEvent.id}` : '/admin/bookings';
   const operationLabel = d.nextEvent ? `${d.nextEvent.clientName} · ${d.nextEvent.daysUntil === 0 ? 'avui' : d.nextEvent.daysUntil === 1 ? 'demà' : `d'aquí ${d.nextEvent.daysUntil} dies`}` : 'Sense bolo imminent';
+  const pipelineRadarItems = pulse.pipelineDrivers.length > 0
+    ? pulse.pipelineDrivers.slice(0, 3).map((driver) => {
+        const tone = driver.priority === 'CRITICAL'
+          ? {
+              card: 'admin-cr-radar-card--rose',
+              dot: 'bg-rose-400',
+              value: 'admin-cr-tone-rose',
+            }
+          : {
+              card: 'admin-cr-radar-card--amber',
+              dot: 'bg-amber-400',
+              value: 'admin-cr-tone-amber',
+            };
+        return {
+          href: driver.href,
+          label: driver.title,
+          tooltip: driver.detail,
+          value: driver.count,
+          detail: driver.detail,
+          cardClass: tone.card,
+          dotClass: tone.dot,
+          valueClass: tone.value,
+        };
+      })
+    : [
+        {
+          href: '/admin/leads',
+          label: 'Temps sense resposta',
+          tooltip: "Leads NEW/CONTACTED amb >24h sense canvi d'estat",
+          value: d.staleLeadsCount,
+          detail: 'Leads amb més de 24h sense avançar.',
+          cardClass: d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald',
+          dotClass: d.staleLeadsCount > 0 ? 'bg-rose-400' : 'bg-emerald-400',
+          valueClass: d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald',
+        },
+        {
+          href: '/admin/leads',
+          label: 'Leads calents',
+          tooltip: 'Prioritat HIGH o URGENT, en estat actiu',
+          value: d.hotLeadsCount,
+          detail: 'Prioritat alta/urgent.',
+          cardClass: d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald',
+          dotClass: d.hotLeadsCount > 0 ? 'bg-amber-400' : 'bg-emerald-400',
+          valueClass: d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald',
+        },
+        {
+          href: '/admin/presupuestos',
+          label: 'Pressupostos en joc',
+          tooltip: 'Leads en estat QUOTE_SENT o NEGOTIATING',
+          value: d.quotesInFlightCount,
+          detail: 'Enviats o negociant.',
+          cardClass: d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald',
+          dotClass: d.quotesInFlightCount > 0 ? 'bg-cyan-400' : 'bg-emerald-400',
+          valueClass: d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald',
+        },
+      ];
 
   return (
     <div className="admin-control-room">
@@ -364,7 +421,7 @@ export default async function AdminDashboard() {
                 d.commandLeads.map((lead) => (
                   <div key={lead.id} className="admin-cr-list-row">
                     <div className="admin-cr-list-content">
-                      <Link href={`/admin/leads/${lead.id}`} className="admin-cr-list-link">{lead.name}</Link>
+                      <Link href={buildLeadWorkspaceHref(lead.id)} className="admin-cr-list-link">{lead.name}</Link>
                       <p className="admin-cr-meta">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
                     </div>
                     <StatusQuickSelect
@@ -416,36 +473,18 @@ export default async function AdminDashboard() {
           <p className="admin-cr-small admin-cr-small--muted">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
         </div>
         <div className="admin-cr-grid-3">
-          <Link href="/admin/leads" className={`admin-cr-radar-card ${d.staleLeadsCount > 0 ? 'admin-cr-radar-card--rose' : 'admin-cr-radar-card--emerald'}`}>
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-3 h-3 rounded-full ${d.staleLeadsCount > 0 ? 'bg-rose-400' : 'bg-emerald-400'}`} />
-              <Tooltip text="Leads NEW/CONTACTED amb >24h sense canvi d'estat">
-                <p className="admin-cr-stat-label">Temps sense resposta</p>
-              </Tooltip>
-            </div>
-            <p className={`admin-cr-radar-value ${d.staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald'}`}>{d.staleLeadsCount}</p>
-            <p className="admin-cr-small">Leads amb més de 24h sense avançar.</p>
-          </Link>
-          <Link href="/admin/leads" className={`admin-cr-radar-card ${d.hotLeadsCount > 0 ? 'admin-cr-radar-card--amber' : 'admin-cr-radar-card--emerald'}`}>
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-3 h-3 rounded-full ${d.hotLeadsCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-              <Tooltip text="Prioritat HIGH o URGENT, en estat actiu">
-                <p className="admin-cr-stat-label">Leads calents</p>
-              </Tooltip>
-            </div>
-            <p className={`admin-cr-radar-value ${d.hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald'}`}>{d.hotLeadsCount}</p>
-            <p className="admin-cr-small">Prioritat alta/urgent.</p>
-          </Link>
-          <Link href="/admin/presupuestos" className={`admin-cr-radar-card ${d.quotesInFlightCount > 0 ? 'admin-cr-radar-card--cyan' : 'admin-cr-radar-card--emerald'}`}>
-            <div className="flex items-center gap-2">
-              <span className={`inline-block w-3 h-3 rounded-full ${d.quotesInFlightCount > 0 ? 'bg-cyan-400' : 'bg-emerald-400'}`} />
-              <Tooltip text="Leads en estat QUOTE_SENT o NEGOTIATING">
-                <p className="admin-cr-stat-label">Pressupostos en joc</p>
-              </Tooltip>
-            </div>
-            <p className={`admin-cr-radar-value ${d.quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald'}`}>{d.quotesInFlightCount}</p>
-            <p className="admin-cr-small">Enviats o negociant.</p>
-          </Link>
+          {pipelineRadarItems.map((item) => (
+            <Link key={`${item.label}:${item.href}`} href={item.href} className={`admin-cr-radar-card ${item.cardClass}`}>
+              <div className="flex items-center gap-2">
+                <span className={`inline-block w-3 h-3 rounded-full ${item.dotClass}`} />
+                <Tooltip text={item.tooltip}>
+                  <p className="admin-cr-stat-label">{item.label}</p>
+                </Tooltip>
+              </div>
+              <p className={`admin-cr-radar-value ${item.valueClass}`}>{item.value}</p>
+              <p className="admin-cr-small">{item.detail}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -598,7 +637,7 @@ export default async function AdminDashboard() {
               <p className="admin-cr-empty-text">Sense tasques pendents</p>
             ) : (
               d.upcomingTasks.map((task) => {
-                const taskHref = task.lead ? `/admin/leads/${task.lead.id}` : '/admin/tasks';
+                const taskHref = task.lead ? buildLeadWorkspaceHref(task.lead.id) : '/admin/tasks';
                 const taskMeta = task.lead?.name || 'Sense lead assignat';
 
                 return (
@@ -735,7 +774,7 @@ export default async function AdminDashboard() {
         {d.recentLeads.length > 0 ? (
           <div className="admin-cr-divide-list">
             {d.recentLeads.map((lead) => (
-              <Link key={lead.id} href={`/admin/leads/${lead.id}`} className="admin-cr-row-link">
+              <Link key={lead.id} href={buildLeadWorkspaceHref(lead.id)} className="admin-cr-row-link">
                 <div className="admin-cr-row-main">
                   <div className="admin-cr-avatar-round">{lead.name?.charAt(0).toUpperCase() || '?'}</div>
                   <div className="admin-cr-list-content">
@@ -802,10 +841,10 @@ export default async function AdminDashboard() {
         ) : (
           <div className="admin-cr-divide-list">
             {d.recentAdminLogs.map((logItem) => (
-              <div key={logItem.id} className="admin-cr-audit-row">
-                <span className="admin-cr-truncate">{logItem.action} · {logItem.entity}</span>
-                <span className="admin-cr-meta">{timeAgo(new Date(logItem.createdAt))}</span>
-              </div>
+              <Link key={logItem.id} href={logItem.href} className="admin-cr-audit-row admin-cr-list-row--link">
+                <span className="admin-cr-truncate">{logItem.text}</span>
+                <span className="admin-cr-meta">{logItem.time}</span>
+              </Link>
             ))}
           </div>
         )}
@@ -813,9 +852,6 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
-
-
 
 
 

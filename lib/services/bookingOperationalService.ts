@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
+import { buildRecentCommRowsFromTimeline, deriveFlowStatusFromTimeline } from '@/lib/services/communicationStatusService';
 import { getBookingChecklist, type BookingChecklistItem } from '@/lib/services/bookingChecklistService';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { getProfitabilityConfig, type ProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -50,14 +50,16 @@ type DocumentSummary = {
 type CommRow = {
   id: string;
   createdAt: Date;
-  action: string;
+  action: 'COMM_SENT' | 'COMM_RESPONDED';
   flow: string;
   channel: string;
 };
 
+type FlowKey = 'PAYMENT' | 'POST_EVENT' | 'GENERAL';
+
 export type BookingOperationalSnapshot = {
   checklist: BookingChecklistItem[];
-  commStatuses: Record<'PAYMENT' | 'POST_EVENT' | 'GENERAL', CommFlowStatus>;
+  commStatuses: Record<FlowKey, CommFlowStatus>;
   recentCommRows: CommRow[];
   reviewFlowStatus: ReviewFlowStatus;
   internalPostEventStatus: InternalPostEventStatus;
@@ -197,7 +199,6 @@ export async function getBookingOperationalSnapshot(booking: {
 }): Promise<BookingOperationalSnapshot> {
   const [
     checklist,
-    commLogs,
     timeline,
     customer,
     portalAccess,
@@ -206,20 +207,6 @@ export async function getBookingOperationalSnapshot(booking: {
     inventoryCost,
   ] = await Promise.all([
     safeFetch(() => getBookingChecklist(booking.id), [], 'checklist'),
-    safeFetch(
-      () =>
-        prisma.adminLog.findMany({
-          where: {
-            entity: 'booking',
-            entityId: booking.id,
-            action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 100,
-        }),
-      [],
-      'commLogs',
-    ),
     safeFetch(() => fetchCanonicalEventsForBooking(booking.id, 30), [], 'timeline'),
     safeFetch(() => fetchCustomerContext(booking.customerId, booking.clientEmail), null, 'customer'),
     safeFetch(() => getActivePortalAccessForBooking(booking.id), null, 'portalAccess'),
@@ -237,21 +224,12 @@ export async function getBookingOperationalSnapshot(booking: {
   ]);
 
   const commStatuses = {
-    PAYMENT: deriveFlowStatus(commLogs, 'PAYMENT'),
-    POST_EVENT: deriveFlowStatus(commLogs, 'POST_EVENT'),
-    GENERAL: deriveFlowStatus(commLogs, 'GENERAL'),
-  } as Record<'PAYMENT' | 'POST_EVENT' | 'GENERAL', CommFlowStatus>;
+    PAYMENT: deriveFlowStatusFromTimeline(timeline, 'PAYMENT'),
+    POST_EVENT: deriveFlowStatusFromTimeline(timeline, 'POST_EVENT'),
+    GENERAL: deriveFlowStatusFromTimeline(timeline, 'GENERAL'),
+  } as Record<FlowKey, CommFlowStatus>;
 
-  const recentCommRows: CommRow[] = commLogs.slice(0, 12).map((logEntry: { id: string; createdAt: Date; action: string; details: unknown }) => {
-    const details = (logEntry.details && typeof logEntry.details === 'object' ? logEntry.details : {}) as Record<string, unknown>;
-    return {
-      id: logEntry.id,
-      createdAt: logEntry.createdAt,
-      action: logEntry.action,
-      flow: typeof details.flow === 'string' ? details.flow : '-',
-      channel: typeof details.channel === 'string' ? details.channel : '-',
-    };
-  });
+  const recentCommRows = buildRecentCommRowsFromTimeline(timeline) as CommRow[];
 
   const marginTargetRaw = Number(marginTargetSetting?.value);
   const targetMarginPct = Number.isFinite(marginTargetRaw)

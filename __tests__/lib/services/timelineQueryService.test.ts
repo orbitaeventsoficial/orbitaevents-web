@@ -6,7 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     booking: { findMany: vi.fn(), findUnique: vi.fn() },
     customerActivity: { findMany: vi.fn() },
     leadActivity: { findMany: vi.fn() },
-    adminLog: { findMany: vi.fn() },
+    adminLog: { findMany: vi.fn(), count: vi.fn(), groupBy: vi.fn() },
   },
 }));
 
@@ -18,6 +18,12 @@ import {
   mapLeadActivityToCanonicalEvent,
   mapAdminLogToCanonicalEvent,
   canonicalEventsToTimeline,
+  summarizeCanonicalCommunicationMetrics,
+  fetchRecentCanonicalEvents,
+  fetchRecentCanonicalCommunicationMetrics,
+  fetchRecentCommercialSequenceMetrics,
+  fetchCanonicalCommunicationEventsForBookings,
+  fetchCanonicalAdminActivityPage,
   fetchCanonicalEventsForCustomer,
   fetchCanonicalEventsForLead,
   fetchCanonicalEventsForBooking,
@@ -31,6 +37,8 @@ beforeEach(() => {
   mockPrisma.customerActivity.findMany.mockResolvedValue([]);
   mockPrisma.leadActivity.findMany.mockResolvedValue([]);
   mockPrisma.adminLog.findMany.mockResolvedValue([]);
+  mockPrisma.adminLog.count.mockResolvedValue(0);
+  mockPrisma.adminLog.groupBy.mockResolvedValue([]);
 });
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -185,6 +193,46 @@ describe('canonicalEventsToTimeline', () => {
       source: 'adminLog',
       entityType: 'booking',
       kind: 'booking',
+    });
+  });
+});
+
+describe('summarizeCanonicalCommunicationMetrics', () => {
+  it('compta enviaments i respostes a partir dels events canònics', () => {
+    const metrics = summarizeCanonicalCommunicationMetrics([
+      mapAdminLogToCanonicalEvent({
+        id: 'al-1',
+        action: 'COMM_SENT',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote', channel: 'email' },
+        createdAt: new Date('2026-01-01T10:00:00Z'),
+        userId: 'admin',
+      }),
+      mapAdminLogToCanonicalEvent({
+        id: 'al-2',
+        action: 'COMM_SENT',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote', channel: 'whatsapp' },
+        createdAt: new Date('2026-01-01T11:00:00Z'),
+        userId: 'admin',
+      }),
+      mapAdminLogToCanonicalEvent({
+        id: 'al-3',
+        action: 'COMM_RESPONDED',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote' },
+        createdAt: new Date('2026-01-01T12:00:00Z'),
+        userId: null,
+      }),
+    ]);
+
+    expect(metrics).toEqual({
+      commSent: 2,
+      commResponded: 1,
+      responseRate: 0.5,
     });
   });
 });
@@ -440,5 +488,242 @@ describe('fetchCanonicalEventsForBooking', () => {
     mockPrisma.adminLog.findMany.mockRejectedValue(new Error('db down'));
     const events = await fetchCanonicalEventsForBooking('b-1');
     expect(events).toEqual([]);
+  });
+});
+
+describe('fetchRecentCanonicalEvents', () => {
+  it('fusiona customerActivity, leadActivity i adminLog per data descendent', async () => {
+    mockPrisma.customerActivity.findMany.mockResolvedValue([
+      { id: 'ca-1', action: 'NOTE_ADDED', details: null, createdAt: new Date('2026-01-02T10:00:00Z') },
+    ]);
+    mockPrisma.leadActivity.findMany.mockResolvedValue([
+      {
+        id: 'la-1',
+        type: 'EMAIL',
+        title: 'Email',
+        description: 'Cos',
+        createdAt: new Date('2026-01-03T10:00:00Z'),
+        createdBy: 'Admin',
+        leadId: 'lead-1',
+      },
+    ]);
+    mockPrisma.adminLog.findMany.mockResolvedValue([
+      {
+        id: 'al-1',
+        action: 'CREATE',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: null,
+        createdAt: new Date('2026-01-01T10:00:00Z'),
+        userId: null,
+      },
+    ]);
+
+    const events = await fetchRecentCanonicalEvents(5);
+    expect(events.map((event) => event.id)).toEqual(['la:la-1', 'ca:ca-1', 'al:al-1']);
+  });
+
+  it('respecta el límit final', async () => {
+    mockPrisma.customerActivity.findMany.mockResolvedValue(
+      Array.from({ length: 4 }, (_, i) => ({
+        id: `ca-${i}`,
+        action: 'NOTE_ADDED',
+        details: null,
+        createdAt: new Date(`2026-01-0${i + 1}T10:00:00Z`),
+      }))
+    );
+    mockPrisma.leadActivity.findMany.mockResolvedValue([]);
+    mockPrisma.adminLog.findMany.mockResolvedValue([]);
+
+    const events = await fetchRecentCanonicalEvents(2);
+    expect(events).toHaveLength(2);
+    expect(events[0].id).toBe('ca:ca-3');
+    expect(events[1].id).toBe('ca:ca-2');
+  });
+});
+
+describe('fetchRecentCanonicalCommunicationMetrics', () => {
+  it('llegeix COMM_SENT/COMM_RESPONDED i en deriva mètriques canòniques', async () => {
+    mockPrisma.adminLog.findMany.mockResolvedValue([
+      {
+        id: 'al-1',
+        action: 'COMM_SENT',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote', channel: 'email' },
+        createdAt: new Date('2026-01-01T10:00:00Z'),
+        userId: 'admin',
+      },
+      {
+        id: 'al-2',
+        action: 'COMM_RESPONDED',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote' },
+        createdAt: new Date('2026-01-01T11:00:00Z'),
+        userId: null,
+      },
+    ]);
+
+    const metrics = await fetchRecentCanonicalCommunicationMetrics(new Date('2025-12-31T00:00:00Z'));
+
+    expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+          createdAt: { gte: new Date('2025-12-31T00:00:00Z') },
+        },
+      })
+    );
+    expect(metrics).toEqual({
+      commSent: 1,
+      commResponded: 1,
+      responseRate: 1,
+    });
+  });
+});
+
+describe('fetchRecentCommercialSequenceMetrics', () => {
+  it('llegeix COMM_SEQUENCE_EXEC des d’una sola mètrica shared', async () => {
+    mockPrisma.adminLog.count.mockResolvedValue(7);
+
+    const result = await fetchRecentCommercialSequenceMetrics(new Date('2025-12-31T00:00:00Z'));
+
+    expect(mockPrisma.adminLog.count).toHaveBeenCalledWith({
+      where: {
+        action: 'COMM_SEQUENCE_EXEC',
+        createdAt: { gte: new Date('2025-12-31T00:00:00Z') },
+      },
+    });
+    expect(result).toEqual({ sequenceExec: 7 });
+  });
+});
+
+describe('fetchCanonicalCommunicationEventsForBookings', () => {
+  it('agrupa per booking els COMM_SENT/COMM_RESPONDED ja mapejats a capa canònica', async () => {
+    mockPrisma.adminLog.findMany.mockResolvedValue([
+      {
+        id: 'al-1',
+        action: 'COMM_SENT',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'payment', channel: 'email' },
+        createdAt: new Date('2026-01-01T10:00:00Z'),
+        userId: 'admin',
+      },
+      {
+        id: 'al-2',
+        action: 'COMM_RESPONDED',
+        entity: 'booking',
+        entityId: 'b-2',
+        details: { flow: 'payment' },
+        createdAt: new Date('2026-01-01T11:00:00Z'),
+        userId: null,
+      },
+    ]);
+
+    const grouped = await fetchCanonicalCommunicationEventsForBookings(['b-1', 'b-2'], 2000);
+
+    expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          entity: 'booking',
+          entityId: { in: ['b-1', 'b-2'] },
+          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+        },
+        take: 2000,
+      })
+    );
+    expect(grouped['b-1']?.[0]?.title).toBe('Email enviat');
+    expect(grouped['b-2']?.[0]?.title).toBe('Resposta rebuda');
+  });
+});
+
+describe('fetchCanonicalAdminActivityPage', () => {
+  it('llegeix adminLog paginat i retorna timeline canònica per cada fila', async () => {
+    mockPrisma.adminLog.findMany.mockResolvedValue([
+      {
+        id: 'al-1',
+        action: 'COMM_SENT',
+        entity: 'booking',
+        entityId: 'b-1',
+        details: { flow: 'quote', channel: 'email' },
+        createdAt: new Date('2026-01-01T10:00:00Z'),
+        userId: 'admin',
+      },
+    ]);
+    mockPrisma.adminLog.count.mockResolvedValue(1);
+
+    const result = await fetchCanonicalAdminActivityPage({
+      since: new Date('2025-12-31T00:00:00Z'),
+      category: 'comms',
+      page: 2,
+      limit: 25,
+    });
+
+    expect(mockPrisma.adminLog.findMany).toHaveBeenCalledWith({
+      where: {
+        createdAt: { gte: new Date('2025-12-31T00:00:00Z') },
+        action: { in: ['COMM_SENT', 'COMM_RESPONDED', 'COMM_SEQUENCE_EXEC', 'COMM_SEQUENCE_BATCH', 'SEND_POST_EVENT_EMAIL', 'PAYMENT_REMINDER_SENT'] },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: 25,
+      take: 25,
+    });
+    expect(result.logs[0]).toMatchObject({
+      id: 'al-1',
+      category: 'comms',
+      createdAt: '2026-01-01T10:00:00.000Z',
+      timeline: {
+        id: 'al:al-1',
+        source: 'adminLog',
+        title: 'Email enviat',
+      },
+    });
+    expect(result.total).toBe(1);
+    expect(result.page).toBe(2);
+    expect(result.pages).toBe(1);
+  });
+
+  it('agrega estadístiques per categoria des del groupBy', async () => {
+    mockPrisma.adminLog.groupBy.mockResolvedValue([
+      { action: 'COMM_SENT', _count: 4 },
+      { action: 'AUTOMATION_RUN_ALL', _count: 2 },
+      { action: 'DELETE', _count: 1 },
+    ]);
+
+    const result = await fetchCanonicalAdminActivityPage({
+      since: new Date('2025-12-31T00:00:00Z'),
+    });
+
+    expect(mockPrisma.adminLog.groupBy).toHaveBeenCalledWith({
+      by: ['action'],
+      where: { createdAt: { gte: new Date('2025-12-31T00:00:00Z') } },
+      _count: true,
+      orderBy: { _count: { action: 'desc' } },
+    });
+    expect(result.stats).toEqual({
+      comms: { total: 4, actions: { COMM_SENT: 4 } },
+      automation: { total: 2, actions: { AUTOMATION_RUN_ALL: 2 } },
+      crud: { total: 1, actions: { DELETE: 1 } },
+    });
+  });
+
+  it('retorna buit si la categoria no mapeja cap acció coneguda', async () => {
+    const result = await fetchCanonicalAdminActivityPage({
+      since: new Date('2025-12-31T00:00:00Z'),
+      category: 'unknown',
+      page: 3,
+      limit: 10,
+    });
+
+    expect(mockPrisma.adminLog.findMany).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      logs: [],
+      total: 0,
+      stats: {},
+      page: 3,
+      pages: 0,
+    });
   });
 });

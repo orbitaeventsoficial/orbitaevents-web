@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
+import { recordLeadScoreSnapshot } from '@/lib/services/leadActivityService';
 
 function buildLeadScoring(lead: {
   id: string;
@@ -65,22 +66,14 @@ export async function createAdminLeadScoreSnapshot(id: string, now: Date = new D
 
   const { scoring, weightedAmount } = buildLeadScoring(lead, now);
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId: lead.id,
-      type: 'SYSTEM',
-      title: 'Scoring snapshot',
-      description: `Score ${scoring.score} (${scoring.band}) · Prob ${(scoring.probability * 100).toFixed(1)}% · Weighted ${weightedAmount.toFixed(2)}€`,
-      createdBy: 'Scoring Bot',
-      metadata: {
-        score: scoring.score,
-        band: scoring.band,
-        probability: scoring.probability,
-        weightedAmount,
-        reasons: scoring.reasons,
-        riskFlags: scoring.riskFlags,
-      },
-    },
+  await recordLeadScoreSnapshot({
+    leadId: lead.id,
+    score: scoring.score,
+    band: scoring.band,
+    probability: scoring.probability,
+    weightedAmount,
+    reasons: scoring.reasons,
+    riskFlags: scoring.riskFlags,
   });
 
   return {

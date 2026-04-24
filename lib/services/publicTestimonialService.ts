@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
-import { PUBLIC_VERIFIED_CUSTOMER_LABELS, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants/index';
+import { PUBLIC_VERIFIED_CUSTOMER_LABELS } from '@/lib/constants/index';
 import { prisma } from '@/lib/prisma';
+import { recordCustomerTestimonialSubmitted } from '@/lib/services/customerActivityService';
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -179,20 +179,13 @@ export async function submitPublicTestimonial(input: SubmitPublicTestimonialInpu
       data: { discountCodeId: discountCode },
     });
 
-    const activityDetails: Prisma.InputJsonValue = {
+    await recordCustomerTestimonialSubmitted({
+      customerId: customer.id,
       testimonialId: testimonial.id,
       rating: input.rating,
       discountCode,
       discountPercent,
-    };
-
-    await tx.customerActivity.create({
-      data: {
-        customerId: customer.id,
-        action: CUSTOMER_ACTIVITY_ACTIONS.TESTIMONIAL_SUBMITTED,
-        details: activityDetails,
-      },
-    });
+    }, tx);
 
     return {
       customerId: customer.id,

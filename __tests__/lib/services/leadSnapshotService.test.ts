@@ -1,13 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockSendEmail,
+  mockRecordLeadTechnicalSnapshotSaved,
+  mockRecordLeadTechnicalSnapshotSent,
+} = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findUnique: vi.fn() },
     leadDocument: { create: vi.fn() },
-    leadActivity: { create: vi.fn() },
     leadNote: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
+  mockRecordLeadTechnicalSnapshotSaved: vi.fn(),
+  mockRecordLeadTechnicalSnapshotSent: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -17,6 +23,13 @@ vi.mock('@/app/config/site-config', () => ({
 }));
 vi.mock('@/lib/utils/sanitize', () => ({ escapeHtml: (s: string) => s }));
 vi.mock('@/lib/constants', () => ({ formatDateTimeFull: () => '2026-03-18 12:00' }));
+vi.mock('@/lib/services/notificationRecipientsService', () => ({
+  getRecipientsAsString: vi.fn(async () => ''),
+}));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadTechnicalSnapshotSaved: mockRecordLeadTechnicalSnapshotSaved,
+  recordLeadTechnicalSnapshotSent: mockRecordLeadTechnicalSnapshotSent,
+}));
 
 import {
   buildLeadTechnicalSnapshot,
@@ -144,9 +157,10 @@ describe('processLeadTechnicalSnapshot', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockPrisma.leadDocument.create.mockResolvedValue({ id: 'doc-1' });
-    mockPrisma.leadActivity.create.mockResolvedValue({});
     mockPrisma.leadNote.create.mockResolvedValue({});
     mockSendEmail.mockResolvedValue(undefined);
+    mockRecordLeadTechnicalSnapshotSaved.mockResolvedValue({});
+    mockRecordLeadTechnicalSnapshotSent.mockResolvedValue({});
   });
 
   const DB_LEAD = {
@@ -185,12 +199,10 @@ describe('processLeadTechnicalSnapshot', () => {
         mimeType: 'application/json',
       }),
     });
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead-1',
-        type: 'DOCUMENT',
-        title: expect.stringContaining('tècnica'),
-      }),
+    expect(mockRecordLeadTechnicalSnapshotSaved).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      title: 'Snapshot tècnic 2026-03-18 12:00',
+      documentId: 'doc-1',
     });
   });
 
@@ -211,14 +223,9 @@ describe('processLeadTechnicalSnapshot', () => {
         subject: expect.stringContaining('Joan Garcia'),
       }),
     );
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        type: 'EMAIL',
-        metadata: expect.objectContaining({
-          recipient: 'admin@test.com',
-          kind: 'technical_snapshot',
-        }),
-      }),
+    expect(mockRecordLeadTechnicalSnapshotSent).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      recipient: 'admin@test.com',
     });
     expect(mockPrisma.leadNote.create).toHaveBeenCalledOnce();
   });

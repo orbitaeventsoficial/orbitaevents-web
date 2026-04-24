@@ -1,7 +1,8 @@
-import { Prisma, type AdminLog, type CustomerActivity, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
+import { Prisma, type CustomerDiscountCode, type Proposal, type Task } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { findTaskLinkByTaskOrLegacyId } from '@/lib/services/tasks/leadScopedTaskService';
+import { readCustomerActivityLog, type CustomerActivityLogEntry } from '@/lib/services/customerActivityService';
 
 export type CustomerHubCustomer = Prisma.CustomerGetPayload<{
   select: {
@@ -41,12 +42,7 @@ export type CustomerHubBooking = Prisma.BookingGetPayload<{
   include: { pack: { include: { translations: true } } };
 }>;
 
-export type CustomerHubActivityLite = {
-  id: string;
-  action: string;
-  createdAt: Date;
-  details: Prisma.JsonValue | null;
-};
+export type CustomerHubActivityLite = CustomerActivityLogEntry;
 
 export type CustomerHubTaskLite = {
   id: string;
@@ -198,7 +194,6 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
         );
 
   const bookingsRows = bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw;
-  const bookingIds = bookingsRows.map((booking) => booking.id);
 
   const customerTasks: Task[] = await safeQuery(
     () =>
@@ -210,29 +205,8 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
     []
   );
 
-  const activityLog: CustomerActivity[] = await safeQuery(
-    () =>
-      prisma.customerActivity.findMany({
-        where: { customerId },
-        orderBy: { createdAt: 'desc' },
-        take: 120,
-      }),
-    []
-  );
-
-  const adminLogs: AdminLog[] = await safeQuery(
-    () =>
-      prisma.adminLog.findMany({
-        where: {
-          OR: [
-            { entity: 'customer', entityId: customerId },
-            ...(leadIds.length > 0 ? [{ entity: 'lead', entityId: { in: leadIds } }] : []),
-            ...(bookingIds.length > 0 ? [{ entity: 'booking', entityId: { in: bookingIds } }] : []),
-          ],
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 120,
-      }),
+  const activityLog: CustomerActivityLogEntry[] = await safeQuery(
+    () => readCustomerActivityLog(customerId),
     []
   );
 
@@ -251,7 +225,6 @@ export async function fetchCustomerHubCollections(customerId: string, leadIds: s
     bookingsRows,
     customerTasks,
     activityLog,
-    adminLogs,
     customerDiscountCodes,
   };
 }

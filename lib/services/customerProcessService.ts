@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { sendEmail, sendTestimonialApprovedEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getAppBaseUrl } from '@/lib/site';
+import { recordCustomerProcessStarted } from '@/lib/services/customerActivityService';
 
 export type CustomerProcessType = 'review_request' | 'post_event' | 'welcome' | 'promo';
 
@@ -181,12 +182,9 @@ export async function startCustomerProcess(input: { customerId: string; bookingI
       break;
   }
 
-  await prisma.customerActivity.create({
-    data: {
-      customerId,
-      action: processType,
-      details: { description: `Procés "${processType}" iniciat` },
-    },
+  await recordCustomerProcessStarted({
+    customerId,
+    processType,
   }).catch((err) => log.error('[customerProcess] activity log failed:', err));
 
   return {

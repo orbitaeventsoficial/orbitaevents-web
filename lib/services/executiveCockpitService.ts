@@ -13,6 +13,7 @@ import { loadPendingFollowUps, type FollowUpSummary } from '@/lib/services/respo
 import { loadCapacityConflicts, type CapacityConflictReport } from '@/lib/services/capacityConflictService';
 import { loadPipelineSuggestions, type PipelineSuggestion } from '@/lib/services/leadPipelineSuggestionsService';
 import { loadAnomalyReport, type AnomalyReport } from '@/lib/services/dailyAnomalyService';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -101,7 +102,7 @@ export function assemblePriorityActions(input: CockpitAssemblyInput): CockpitPri
       icon: '🚨',
       label: `Follow-up urgent: ${item.name}`,
       detail: `${item.daysSinceOutbound} dies sense resposta — ${item.suggestedAction}`,
-      href: `/admin/leads/${item.leadId}`,
+      href: buildLeadWorkspaceHref(item.leadId),
       source: 'followUps',
       urgency: 'CRITICAL',
     });
@@ -262,7 +263,7 @@ const EMPTY_BRIEF: DailyBrief = {
   kpis: { newLeadsToday: 0, openLeads: 0, overdueTasksCount: 0, upcomingBookings7d: 0, pendingPaymentsCount: 0, forecastWeighted: 0 },
   alerts: [], actions: [], topCampaigns: [],
 };
-const EMPTY_PULSE: OperationalPulse = { overallLevel: 'GOOD', overallScore: 50, metrics: [], generatedAt: '' };
+const EMPTY_PULSE: OperationalPulse = { overallLevel: 'GOOD', overallScore: 50, metrics: [], pipelineDrivers: [], generatedAt: '' };
 const EMPTY_FOLLOWUPS: FollowUpSummary = { generatedAt: '', total: 0, urgent: 0, normal: 0, low: 0, items: [] };
 const EMPTY_CAPACITY: CapacityConflictReport = { generatedAt: '', windowDays: 14, conflicts: [], verdict: '' };
 const EMPTY_ANOMALIES: AnomalyReport = { generatedAt: '', windowDays: 30, anomalies: [], verdict: '' };

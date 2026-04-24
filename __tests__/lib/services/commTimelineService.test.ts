@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildCommTimeline, type CommTimelineRawEntry, type CommTimelineInput } from '@/lib/services/commTimelineService';
+import { buildCommTimeline, buildCommTimelineFromCanonicalEvents, type CommTimelineRawEntry, type CommTimelineInput } from '@/lib/services/commTimelineService';
+import type { CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 
 const NOW = new Date('2026-04-10T10:00:00Z');
 
@@ -19,6 +20,23 @@ function makeEntry(overrides: Partial<CommTimelineRawEntry> = {}): CommTimelineR
 
 function makeInput(activities: CommTimelineRawEntry[], overrides: Partial<CommTimelineInput> = {}): CommTimelineInput {
   return { activities, customerId: null, now: NOW, ...overrides };
+}
+
+function makeCanonicalEvent(overrides: Partial<CanonicalTimelineEvent> = {}): CanonicalTimelineEvent {
+  return {
+    id: overrides.id ?? 'la:a1',
+    source: overrides.source ?? 'leadActivity',
+    entityType: overrides.entityType ?? 'lead',
+    entityId: overrides.entityId ?? 'lead-1',
+    kind: overrides.kind ?? 'message',
+    title: overrides.title ?? 'Follow-up',
+    body: overrides.body,
+    actor: overrides.actor ?? 'Admin',
+    occurredAt: overrides.occurredAt ?? '2026-04-09T10:00:00.000Z',
+    metadata: overrides.metadata,
+    link: overrides.link,
+    timelineType: overrides.timelineType ?? 'MESSAGE_SENT',
+  };
 }
 
 describe('buildCommTimeline', () => {
@@ -162,5 +180,29 @@ describe('buildCommTimeline', () => {
     const result = buildCommTimeline(makeInput(activities, { customerId: 'cust-1' }));
     expect(result.entries[0].customerId).toBe('cust-1');
     expect(result.entries[0].metadata).toEqual({ templateId: 'tpl-1' });
+  });
+
+  it('deriva el resum també des d’events canònics', () => {
+    const result = buildCommTimelineFromCanonicalEvents({
+      events: [
+        makeCanonicalEvent({ id: 'msg-1', timelineType: 'MESSAGE_SENT', occurredAt: '2026-04-09T10:00:00.000Z' }),
+        makeCanonicalEvent({
+          id: 'msg-2',
+          timelineType: 'EMAIL_RECEIVED',
+          title: 'Resposta del client',
+          occurredAt: '2026-04-10T08:00:00.000Z',
+        }),
+        makeCanonicalEvent({ id: 'note-1', timelineType: 'NOTE_ADDED', kind: 'activity', occurredAt: '2026-04-10T09:00:00.000Z' }),
+      ],
+      customerId: 'cust-1',
+      now: NOW,
+    });
+
+    expect(result.total).toBe(3);
+    expect(result.channels.EMAIL).toBe(2);
+    expect(result.channels.NOTE).toBe(1);
+    expect(result.lastContactDirection).toBe('INBOUND');
+    expect(result.pendingResponseFrom).toBe('TEAM');
+    expect(result.entries[0].customerId).toBe('cust-1');
   });
 });

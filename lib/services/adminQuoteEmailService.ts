@@ -13,7 +13,8 @@ import { translateHtmlForLocale, translateTextForLocale } from '@/lib/services/t
 import { normalizeEmail, normalizePhone } from '@/lib/utils/normalize';
 import { mapLeadEventType, normalizeQuoteLocale, parseDateOrNull } from '@/lib/services/quotes/quoteParsing';
 import { ensureQuoteFollowUpTask } from '@/lib/services/tasks/quoteFollowUp';
-import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import { recordCustomerQuoteSent } from '@/lib/services/customerActivityService';
+import { recordLeadQuoteSent } from '@/lib/services/leadActivityService';
 
 type ExtraInput = {
   name?: string;
@@ -267,28 +268,18 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
         createdBy: 'Admin',
       },
     });
-    await prisma.leadActivity.create({
-      data: {
-        leadId: targetLeadId,
-        type: 'EMAIL',
-        title: 'Pressupost enviat',
-        description: documentTitle,
-        metadata: {
-          quoteNumber: quoteData.quoteNumber,
-          to: recipientEmail,
-          total: quoteData.total,
-          source: 'email_quote_route',
-        },
-        createdBy: 'Admin',
-      },
+    await recordLeadQuoteSent({
+      leadId: targetLeadId,
+      quoteNumber: quoteData.quoteNumber,
+      to: recipientEmail,
+      total: quoteData.total,
     });
     if (lead.customerId) {
-      await prisma.customerActivity.create({
-        data: {
-          customerId: lead.customerId,
-          action: CUSTOMER_ACTIVITY_ACTIONS.QUOTE_SENT,
-          details: { leadId: targetLeadId, quoteNumber: quoteData.quoteNumber, total: quoteData.total },
-        },
+      await recordCustomerQuoteSent({
+        customerId: lead.customerId,
+        leadId: targetLeadId,
+        quoteNumber: quoteData.quoteNumber,
+        total: quoteData.total,
       });
     }
     await ensureQuoteFollowUpTask({
@@ -300,17 +291,12 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
   }
 
   if (!lead && customer?.id) {
-    await prisma.customerActivity.create({
-      data: {
-        customerId: customer.id,
-        action: CUSTOMER_ACTIVITY_ACTIONS.QUOTE_SENT,
-        details: {
-          quoteNumber: quoteData.quoteNumber,
-          total: quoteData.total,
-          to: recipientEmail,
-          source: 'email_quote_route',
-        },
-      },
+    await recordCustomerQuoteSent({
+      customerId: customer.id,
+      quoteNumber: quoteData.quoteNumber,
+      total: quoteData.total,
+      to: recipientEmail,
+      source: 'email_quote_route',
     });
   }
 
@@ -358,5 +344,3 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
     },
   };
 }
-
-

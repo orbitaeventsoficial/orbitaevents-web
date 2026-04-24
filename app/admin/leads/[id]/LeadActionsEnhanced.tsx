@@ -6,6 +6,8 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_ACTION_OPTIONS } from '@/lib/constants';
 import { getAdminLeadPackOptions } from '@/lib/constants/admin';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import LeadLostStatusPrompt from '../LeadLostStatusPrompt';
+import { patchLeadStatus } from '../leadStatusClient';
 
 interface Props {
   leadId: string;
@@ -29,6 +31,10 @@ export default function LeadActionsEnhanced({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [optimisticStatus, setOptimisticStatus] = useState(currentStatus);
+  const [statusBusy, setStatusBusy] = useState(false);
+  const [showLostPrompt, setShowLostPrompt] = useState(false);
+  const [lostReason, setLostReason] = useState('');
+  const [lostNote, setLostNote] = useState('');
 
   // Pack options from packs-config (real prices)
   const PACK_OPTIONS = useMemo(() => getAdminLeadPackOptions(), []);
@@ -57,26 +63,23 @@ export default function LeadActionsEnhanced({
     : parseCustomPrice() ?? selectedPackInfo?.price ?? 0;
 
   const handleStatusChange = async (newStatus: string) => {
-    if (newStatus === optimisticStatus) return;
+    if (newStatus === optimisticStatus || statusBusy) return;
+    if (newStatus === 'LOST') {
+      setShowLostPrompt(true);
+      return;
+    }
 
     setError(null);
     setSuccess(null);
     const previousStatus = optimisticStatus;
     setOptimisticStatus(newStatus);
+    setStatusBusy(true);
 
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
+      const payload = await patchLeadStatus({
+        leadId,
+        status: newStatus as 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON',
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Error actualitzant estat');
-      }
-
-      const payload = await res.json();
       const customerId = payload?.lead?.customerId as string | undefined;
 
       setSuccess('Estat actualitzat!');
@@ -92,6 +95,43 @@ export default function LeadActionsEnhanced({
     } catch (e) {
       setOptimisticStatus(previousStatus);
       setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
+  const handleLostConfirm = async () => {
+    if (!lostReason || statusBusy) return;
+
+    setError(null);
+    setSuccess(null);
+    const previousStatus = optimisticStatus;
+    setOptimisticStatus('LOST');
+    setStatusBusy(true);
+
+    try {
+      await patchLeadStatus({
+        leadId,
+        status: 'LOST',
+        lostReason,
+        note: lostNote,
+      });
+
+      setShowLostPrompt(false);
+      setLostReason('');
+      setLostNote('');
+      setSuccess('Lead marcat com a perdut.');
+
+      startTransition(() => {
+        router.refresh();
+      });
+
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (e) {
+      setOptimisticStatus(previousStatus);
+      setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setStatusBusy(false);
     }
   };
 
@@ -173,7 +213,7 @@ export default function LeadActionsEnhanced({
             <button
               key={status.value}
               onClick={() => handleStatusChange(status.value)}
-              disabled={isPending || status.value === optimisticStatus}
+              disabled={isPending || statusBusy || status.value === optimisticStatus}
               type="button"
               aria-pressed={status.value === optimisticStatus}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-sm transition-colors ${
@@ -193,6 +233,23 @@ export default function LeadActionsEnhanced({
             </button>
           ))}
         </div>
+
+        <LeadLostStatusPrompt
+          open={showLostPrompt}
+          lostReason={lostReason}
+          note={lostNote}
+          saving={isPending || statusBusy}
+          title="Per tancar el lead com a perdut cal registrar el motiu comercial."
+          confirmLabel="Confirmar pèrdua"
+          onLostReasonChange={setLostReason}
+          onNoteChange={setLostNote}
+          onCancel={() => {
+            setShowLostPrompt(false);
+            setLostReason('');
+            setLostNote('');
+          }}
+          onConfirm={handleLostConfirm}
+        />
       </section>
 
       {/* Generar Pressupost */}
@@ -340,8 +397,6 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
-
-
 
 
 

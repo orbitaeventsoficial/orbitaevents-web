@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useDeferredValue, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ComposeModal, QuoteModal } from './InboxModals';
@@ -206,7 +207,7 @@ export default function InboxClient({
         return;
       }
       setFlashMessage({ type: 'success', text: data.action === 'updated' ? `Entrada actualitzada: ${data.lead.name}` : `Entrada creada: ${data.lead.name}` });
-      router.push(`/admin/leads/${data.lead.id}`);
+      router.push(buildLeadWorkspaceHref(data.lead.id));
       router.refresh();
     } catch (error) {
       log.error('Error importing lead from email:', error);
@@ -321,7 +322,7 @@ export default function InboxClient({
         activeTab={activeTab}
         handleReply={handleReply}
         handleOpenQuote={() => setShowQuote(true)}
-        handleOpenLead={(leadId) => router.push(`/admin/leads/${leadId}`)}
+        handleOpenLead={(leadId) => router.push(buildLeadWorkspaceHref(leadId))}
         handleImportLeadFromEmail={handleImportLeadFromEmail}
         handleMoveToTrash={handleMoveToTrash}
         handleRestoreEmail={handleRestoreEmail}

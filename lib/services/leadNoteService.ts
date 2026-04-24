@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { recordLeadNoteAdded } from '@/lib/services/leadActivityService';
 
 function extractUid(content: string): string | null {
   const match = content.match(/\(UID\s*(\d+)\)/i);
@@ -30,14 +31,10 @@ export async function createLeadNote(leadId: string, content: string, createdBy?
     },
   });
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId,
-      type: 'NOTE',
-      title: 'Nota afegida',
-      description: trimmed.slice(0, 200),
-      createdBy: author,
-    },
+  await recordLeadNoteAdded({
+    leadId,
+    content: trimmed,
+    createdBy: author,
   });
 
   return { status: 200, body: { ok: true, note } };

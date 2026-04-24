@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockCreateUniversalTask } = vi.hoisted(() => ({
+const { mockPrisma, mockCreateUniversalTask, mockRecordLeadSlaTaskCreated } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       count: vi.fn(),
@@ -8,14 +8,17 @@ const { mockPrisma, mockCreateUniversalTask } = vi.hoisted(() => ({
       update: vi.fn(),
     },
     task: { count: vi.fn() },
-    leadActivity: { create: vi.fn() },
   },
   mockCreateUniversalTask: vi.fn(),
+  mockRecordLeadSlaTaskCreated: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/services/tasks/taskCreation', () => ({
   createUniversalTask: mockCreateUniversalTask,
+}));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadSlaTaskCreated: mockRecordLeadSlaTaskCreated,
 }));
 
 import { getSlaSnapshot, enforceLeadSla } from '@/lib/services/slaAutomationService';
@@ -26,8 +29,8 @@ beforeEach(() => {
   mockPrisma.lead.findMany.mockResolvedValue([]);
   mockPrisma.lead.update.mockResolvedValue({});
   mockPrisma.task.count.mockResolvedValue(0);
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockCreateUniversalTask.mockResolvedValue({});
+  mockRecordLeadSlaTaskCreated.mockResolvedValue({});
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -111,12 +114,9 @@ describe('enforceLeadSla', () => {
 
     await enforceLeadSla();
 
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead-1',
-        type: 'TASK',
-        createdBy: 'SLA Bot',
-      }),
+    expect(mockRecordLeadSlaTaskCreated).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      slaHours: 24,
     });
   });
 

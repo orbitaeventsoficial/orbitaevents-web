@@ -30,6 +30,11 @@ beforeEach(() => {
     { status: 'WON', _count: 2 },
   ]);
   mockPrisma.booking.aggregate.mockResolvedValue({ _sum: { total: 15000 }, _count: 10 });
+  // 3 crides consecutives a lead.findMany a buildExecutiveReport:
+  //   1) openLeads — leads oberts per scoring
+  //   2) monthlyLeads (groupBy) — NO usa findMany sinó groupBy, queda per sota
+  //   3) lostLeads — Canvi #366, finestra 90 dies
+  // mockResolvedValue aplica el mateix []per defecte a totes les crides
   mockPrisma.lead.findMany.mockResolvedValue([]);
   mockPrisma.lead.count.mockResolvedValue(1);
   mockPrisma.customer.count.mockResolvedValue(50);
@@ -120,6 +125,20 @@ const sampleReport: ExecutiveReport = {
   topRiskLeads: [
     { id: 'l1', name: 'Risk Lead', status: 'NEW', assignedTo: null, source: 'web', score: 15, probability: 0.05, weightedAmount: 75 },
   ],
+  lossSummary: {
+    total: 6,
+    uncategorized: 1,
+    autoTotal: 0,
+    commercialTotal: 5,
+    byReason: [
+      { key: 'PRICE_TOO_HIGH', label: 'Preu massa alt', count: 3, share: 50 },
+      { key: 'NO_RESPONSE', label: 'Sense resposta', count: 2, share: 33.3 },
+    ],
+    byEventType: [{ key: 'WEDDING', label: 'Wedding', count: 5, share: 83.3 }],
+    bySource: [{ key: 'WEBSITE', label: 'Website', count: 4, share: 66.7 }],
+    byMonth: [{ monthIso: '2026-04', count: 6 }],
+    topReason: { reason: 'PRICE_TOO_HIGH', label: 'Preu massa alt', count: 3, share: 50 },
+  },
 };
 
 describe('exportExecutiveReportCsv', () => {
@@ -135,6 +154,7 @@ describe('exportExecutiveReportCsv', () => {
     expect(csv).toContain('MARGE');
     expect(csv).toContain('TENDÈNCIA MENSUAL');
     expect(csv).toContain('LEADS EN RISC');
+    expect(csv).toContain('ANÀLISI DE PÈRDUES');
   });
 
   it('inclou KPIs principals correctes', () => {
@@ -206,5 +226,71 @@ describe('exportExecutiveReportCsv', () => {
     expect(csv).toContain('Clients recurrents,30');
     expect(csv).toContain('25.0');
     expect(csv).toContain('1.80');
+  });
+
+  it('inclou anàlisi de pèrdues amb motiu principal i breakdown (Canvi #366)', () => {
+    const csv = exportExecutiveReportCsv(sampleReport);
+
+    expect(csv).toContain('ANÀLISI DE PÈRDUES');
+    expect(csv).toContain('Total leads perduts,6');
+    expect(csv).toContain('Sense motiu classificat,1');
+    expect(csv).toContain('Motiu comercial principal,Preu massa alt,3,50%');
+    expect(csv).toContain('Preu massa alt,3,50%');
+    expect(csv).toContain('Sense resposta,2,33.3%');
+  });
+
+  it('pot serialitzar report sense topReason (lossSummary buit)', () => {
+    const emptyLossReport: ExecutiveReport = {
+      ...sampleReport,
+      lossSummary: {
+        total: 0,
+        uncategorized: 0,
+        autoTotal: 0,
+        commercialTotal: 0,
+        byReason: [],
+        byEventType: [],
+        bySource: [],
+        byMonth: [],
+        topReason: null,
+      },
+    };
+
+    const csv = exportExecutiveReportCsv(emptyLossReport);
+
+    expect(csv).toContain('ANÀLISI DE PÈRDUES');
+    expect(csv).toContain('Total leads perduts,0');
+    expect(csv).not.toContain('Motiu comercial principal,');
+  });
+});
+
+describe('buildExecutiveReport — lossSummary (Canvi #366)', () => {
+  it('inclou lossSummary amb estructura buida quan no hi ha leads LOST', async () => {
+    const report = await buildExecutiveReport();
+
+    expect(report.lossSummary).toBeDefined();
+    expect(report.lossSummary.total).toBe(0);
+    expect(report.lossSummary.byReason).toEqual([]);
+    expect(report.lossSummary.topReason).toBeNull();
+  });
+
+  it('agrega lossSummary amb dades reals de leads LOST', async () => {
+    const lostAt = new Date('2026-04-10T12:00:00.000Z');
+    // buildExecutiveReport fa 2 crides consecutives a lead.findMany:
+    //   1) openLeads (scoring)
+    //   2) lostLeads (loss summary, Canvi #367)
+    mockPrisma.lead.findMany
+      .mockResolvedValueOnce([]) // openLeads
+      .mockResolvedValueOnce([
+        { id: 'lost1', name: 'Perdut 1', lostReason: 'PRICE_TOO_HIGH', lostAt, eventType: 'WEDDING', source: 'WEBSITE', budget: null, eventLocation: null },
+        { id: 'lost2', name: 'Perdut 2', lostReason: 'PRICE_TOO_HIGH', lostAt, eventType: 'WEDDING', source: 'WEBSITE', budget: null, eventLocation: null },
+        { id: 'lost3', name: 'Perdut 3', lostReason: 'NO_RESPONSE', lostAt, eventType: 'BIRTHDAY', source: 'INSTAGRAM', budget: null, eventLocation: null },
+      ]); // lostLeads
+
+    const report = await buildExecutiveReport();
+
+    expect(report.lossSummary.total).toBe(3);
+    expect(report.lossSummary.topReason?.reason).toBe('PRICE_TOO_HIGH');
+    expect(report.lossSummary.topReason?.count).toBe(2);
+    expect(report.lossSummary.byReason.map((r) => r.key)).toEqual(['PRICE_TOO_HIGH', 'NO_RESPONSE']);
   });
 });

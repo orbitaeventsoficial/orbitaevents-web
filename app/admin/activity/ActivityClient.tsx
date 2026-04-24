@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ACTIVITY_CATEGORY_OPTIONS, ACTIVITY_DAYS_OPTIONS, formatDateTimeFull } from '@/lib/constants';
 import { ADMIN_ACTIVITY_ACTION_META, ADMIN_ACTIVITY_ENTITY_LINKS, ADMIN_ACTIVITY_STATS_CARDS } from '@/lib/constants/admin';
 import { log } from '@/lib/logger';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 
 interface TimelineLink {
@@ -116,6 +117,10 @@ function getEntityLabel(log: ActivityLog): string {
   return log.entity;
 }
 
+function formatWindowLabel(days: number): string {
+  return days === 1 ? 'les últimes 24h' : `els últims ${days} dies`;
+}
+
 export default function ActivityClient() {
   const toast = useToast();
   const [data, setData] = useState<ActivityResponse | null>(null);
@@ -152,6 +157,73 @@ export default function ActivityClient() {
   useEffect(() => {
     setPage(1);
   }, [category, days]);
+
+  const activeCategoryLabel = ACTIVITY_CATEGORY_OPTIONS.find((option) => option.id === category)?.label || 'Tot';
+  const windowLabel = formatWindowLabel(days);
+  const dominantCategory = data?.stats
+    ? Object.entries(data.stats)
+        .filter(([, value]) => value.total > 0)
+        .sort(([, a], [, b]) => b.total - a.total)[0]
+    : null;
+  const dominantCategoryMeta = dominantCategory
+    ? ADMIN_ACTIVITY_STATS_CARDS.find((card) => card.key === dominantCategory[0])
+    : null;
+  const timelineLinkedCount = data?.logs.filter((entry) => Boolean(entry.timeline?.title || entry.timeline?.link?.href)).length || 0;
+  const sourceCounts = data?.logs.reduce<Record<string, number>>((acc, entry) => {
+    const source = entry.timeline?.source || 'adminLog';
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {}) || {};
+  const sourceEntries = Object.entries(sourceCounts).sort(([, a], [, b]) => b - a);
+  const systemItems = data
+    ? [
+        `${data.total} accions detectades en ${windowLabel}`,
+        dominantCategoryMeta && dominantCategory ? `${dominantCategoryMeta.label} lidera la lectura amb ${dominantCategory[1].total} moviments` : '',
+        timelineLinkedCount > 0 ? `${timelineLinkedCount} registres ja arriben amb lectura canònica visible` : 'Sense registres amb lectura canònica visible en aquesta finestra',
+        sourceEntries[0] ? `${getSourceLabel(sourceEntries[0][0] as TimelineEntry['source'])} és la font principal ara mateix (${sourceEntries[0][1]})` : '',
+      ].filter(Boolean)
+    : [];
+  const manualItems = data
+    ? [
+        category !== 'all' ? `Filtre actiu: ${activeCategoryLabel}` : 'Sense filtre de categoria: lectura transversal del sistema',
+        days !== 7 ? `Finestra manual ajustada a ${windowLabel}` : 'Finestra estàndard de 7 dies activa',
+        data.logs.length === 0 ? 'La combinació actual no retorna activitat; convé obrir la finestra o treure filtre' : '',
+        data.pages > 1 ? `La lectura ocupa ${data.pages} pàgines i ara mateix estàs a la ${data.page}` : '',
+      ].filter(Boolean)
+    : [];
+  const nextStep = data
+    ? data.logs.length === 0
+      ? {
+          title: 'Recuperar context abans de diagnosticar',
+          detail: `Amb ${activeCategoryLabel.toLowerCase()} i ${windowLabel} no hi ha moviment visible. El següent pas correcte és ampliar la finestra o tornar al global abans de donar res per estable.`,
+          href: '/admin/activity',
+          ctaLabel: 'Obrir vista completa',
+          secondaryAction: { href: '/admin/crons', label: 'Obrir Crons' },
+        }
+      : category !== 'all'
+        ? {
+            title: `Tancar el focus de ${activeCategoryLabel.toLowerCase()} sense perdre context`,
+            detail: `La vista està filtrada i ja tens prou senyal per revisar aquest bloc. Després del tall, convé tornar al global per confirmar si el patró és local o sistèmic.`,
+            href: '/admin/activity',
+            ctaLabel: 'Veure activitat completa',
+            secondaryAction: { href: '/admin', label: 'Tornar al panell' },
+          }
+        : dominantCategoryMeta && dominantCategory
+          ? {
+              title: `Entrar al coll principal de ${dominantCategoryMeta.label.toLowerCase()}`,
+              detail: `${dominantCategoryMeta.label} concentra ara mateix ${dominantCategory[1].total} moviments. El següent pas és validar si aquest volum reflecteix bon ritme o soroll operatiu abans de baixar al detall registre per registre.`,
+              href: '/admin/activity',
+              ctaLabel: 'Revisar aquesta cua',
+              secondaryAction: { href: '/admin/crons', label: 'Cruïlla amb Crons' },
+            }
+          : {
+              title: 'Mantenir lectura executiva del sistema',
+              detail: 'No hi ha un coll clar per categoria. El millor següent pas és conservar la vista global i baixar només als registres que trenquen el ritme normal.',
+              href: '/admin/activity',
+              ctaLabel: 'Continuar lectura',
+              secondaryAction: { href: '/admin', label: 'Tornar al panell' },
+            }
+    : null;
 
   const statsCards = data?.stats ? (
     <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -197,7 +269,30 @@ export default function ActivityClient() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      {!loading && data && nextStep && (
+        <OwnerControlStrip
+          system={{
+            eyebrow: 'Automàtic',
+            title: 'Què està movent el sistema',
+            tone: data.total > 0 ? 'info' : 'warning',
+            items: systemItems,
+            emptyText: 'Sense activitat rellevant detectada en aquesta finestra.',
+          }}
+          manual={{
+            eyebrow: 'Manual',
+            title: 'On cal criteri teu',
+            tone: category !== 'all' || days !== 7 || data.logs.length === 0 ? 'warning' : 'success',
+            items: manualItems,
+            emptyText: 'La vista global no et reclama cap ajust manual ara mateix.',
+          }}
+          nextStep={{
+            eyebrow: 'Següent pas',
+            ...nextStep,
+          }}
+        />
+      )}
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <div role="navigation" aria-label="Filtres d'activitat" className="flex flex-wrap gap-1.5">
           {ACTIVITY_CATEGORY_OPTIONS.map((cat) => (
             <button
@@ -214,11 +309,11 @@ export default function ActivityClient() {
           ))}
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="ap-input rounded-xl px-3 py-1.5 text-xs"
+            className="ap-input min-w-0 flex-1 rounded-xl px-3 py-1.5 text-xs sm:flex-none"
             aria-label="Període de temps"
           >
             {ACTIVITY_DAYS_OPTIONS.map((opt) => (
@@ -228,7 +323,7 @@ export default function ActivityClient() {
             ))}
           </select>
 
-          <button onClick={fetchActivity} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" aria-label="Refrescar">
+          <button onClick={fetchActivity} className="ap-btn ap-btn--secondary shrink-0 px-3 py-1.5 text-xs" aria-label="Refrescar">
             ↻
           </button>
         </div>
@@ -246,7 +341,7 @@ export default function ActivityClient() {
       {!loading && data && (
         <>
           <div className="mb-2 flex flex-wrap items-center gap-2 text-xs admin-tone-text-slate">
-            <span>{data.total} accions en {days === 1 ? 'les últimes 24h' : `els últims ${days} dies`}</span>
+            <span>{data.total} accions en {windowLabel}</span>
             {data.pages > 1 && <span>· Pàg. {data.page}/{data.pages}</span>}
             <span>· Timeline canònica disponible</span>
           </div>
@@ -382,11 +477,11 @@ export default function ActivityClient() {
           </section>
 
           {data.pages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
+                className="ap-btn ap-btn--secondary min-w-[7.5rem] px-3 py-1.5 text-xs"
               >
                 ← Anterior
               </button>
@@ -396,7 +491,7 @@ export default function ActivityClient() {
               <button
                 onClick={() => setPage((p) => Math.min(data.pages, p + 1))}
                 disabled={page >= data.pages}
-                className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs"
+                className="ap-btn ap-btn--secondary min-w-[7.5rem] px-3 py-1.5 text-xs"
               >
                 Següent →
               </button>
@@ -407,4 +502,3 @@ export default function ActivityClient() {
     </div>
   );
 }
-

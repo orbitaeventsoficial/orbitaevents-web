@@ -17,8 +17,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     extra: { findMany: vi.fn() },
     leadNote: { create: vi.fn() },
     leadDocument: { create: vi.fn() },
-    leadActivity: { create: vi.fn(), count: vi.fn() },
-    customerActivity: { create: vi.fn() },
+    leadActivity: { count: vi.fn() },
   },
 }));
 
@@ -69,6 +68,12 @@ vi.mock('@/lib/services/quoteTemplateService', () => mockTemplateService);
 vi.mock('@/lib/services/translationService', () => mockTranslation);
 vi.mock('@/lib/services/quotes/quoteParsing', () => mockParsing);
 vi.mock('@/lib/services/tasks/quoteFollowUp', () => mockFollowUp);
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadQuoteSent: vi.fn(),
+}));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomerQuoteSent: vi.fn(),
+}));
 vi.mock('@/lib/utils/normalize', () => ({
   normalizeEmail: (e: string) => e.toLowerCase().trim(),
   normalizePhone: (p: string) => p.replace(/\s/g, ''),
@@ -78,6 +83,8 @@ vi.mock('@/app/config/site-config', () => ({
 }));
 
 import { sendAdminQuoteEmail } from '@/lib/services/adminQuoteEmailService';
+import { recordLeadQuoteSent } from '@/lib/services/leadActivityService';
+import { recordCustomerQuoteSent } from '@/lib/services/customerActivityService';
 
 const defaultTemplate = {
   validityDays: 30,
@@ -140,9 +147,7 @@ beforeEach(() => {
   mockPrisma.customer.findFirst.mockResolvedValue(null);
   mockPrisma.leadNote.create.mockResolvedValue({});
   mockPrisma.leadDocument.create.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockPrisma.leadActivity.count.mockResolvedValue(0);
-  mockPrisma.customerActivity.create.mockResolvedValue({});
 });
 
 // ═══════════ VALIDACIÓ ═══════════
@@ -213,7 +218,12 @@ describe('sendAdminQuoteEmail — amb lead', () => {
     });
     expect(mockPrisma.leadNote.create).toHaveBeenCalled();
     expect(mockPrisma.leadDocument.create).toHaveBeenCalled();
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalled();
+    expect(recordLeadQuoteSent).toHaveBeenCalledWith({
+      leadId: 'lead1',
+      quoteNumber: 'ORB-2026-100',
+      to: 'test@test.com',
+      total: 1815,
+    });
     expect(mockEmail.sendEmail).toHaveBeenCalled();
   });
 
@@ -231,11 +241,11 @@ describe('sendAdminQuoteEmail — amb lead', () => {
   it('registra activitat customer si lead té customerId', async () => {
     await sendAdminQuoteEmail({ leadId: 'lead1', packId: 'premium', price: 1500 });
 
-    expect(mockPrisma.customerActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        customerId: 'cust1',
-        action: 'QUOTE_SENT',
-      }),
+    expect(recordCustomerQuoteSent).toHaveBeenCalledWith({
+      customerId: 'cust1',
+      leadId: 'lead1',
+      quoteNumber: 'ORB-2026-100',
+      total: 1815,
     });
   });
 

@@ -4,6 +4,7 @@ import { formatDate, formatDateSimple, formatNumber, getEventLabel, getLeadStatu
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
 import { buildLeadActionLink } from '@/lib/customer-hub/leadActionLink';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { getTopCustomerHubLead, sortCustomerHubLeads } from '@/lib/customer-hub/topLead';
 
 const BLOCKER_TONE_CLASS: Record<'DANGER' | 'WARNING' | 'INFO', string> = {
@@ -64,7 +65,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
           const actionLink = buildLeadActionLink(lead);
           return (
             <article key={lead.id} className="rounded-xl border p-4 transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.card(lead.name))}>
-              <Link href={`/admin/leads/${lead.id}`} className="block">
+              <Link href={buildLeadWorkspaceHref(lead.id)} className="block">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold">{lead.name}</p>
                   <div className="flex flex-wrap items-center gap-2">

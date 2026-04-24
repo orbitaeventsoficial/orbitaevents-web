@@ -25,6 +25,8 @@ const {
   mockSaveCronRunStatus,
   mockLoadDailyBrief,
   mockLoadCapacityConflicts,
+  mockFetchRecentCanonicalCommunicationMetrics,
+  mockGetRecipientsAsString,
 } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(async (operations: Array<Promise<unknown>>) => Promise.all(operations)),
@@ -50,6 +52,8 @@ const {
   mockSaveCronRunStatus: vi.fn(),
   mockLoadDailyBrief: vi.fn(),
   mockLoadCapacityConflicts: vi.fn(),
+  mockFetchRecentCanonicalCommunicationMetrics: vi.fn(),
+  mockGetRecipientsAsString: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -80,6 +84,12 @@ vi.mock('@/lib/services/dailyBriefService', () => ({
 vi.mock('@/lib/services/capacityConflictService', () => ({
   loadCapacityConflicts: mockLoadCapacityConflicts,
 }));
+vi.mock('@/lib/services/timelineQueryService', () => ({
+  fetchRecentCanonicalCommunicationMetrics: mockFetchRecentCanonicalCommunicationMetrics,
+}));
+vi.mock('@/lib/services/notificationRecipientsService', () => ({
+  getRecipientsAsString: mockGetRecipientsAsString,
+}));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
     business: {
@@ -101,9 +111,11 @@ beforeEach(() => {
     Promise.resolve({ id: where.id, cachedScore: data.cachedScore })
   );
   mockPrisma.lead.count.mockResolvedValue(51);
-  mockPrisma.adminLog.count
-    .mockResolvedValueOnce(20)
-    .mockResolvedValueOnce(5);
+  mockFetchRecentCanonicalCommunicationMetrics.mockResolvedValue({
+    commSent: 20,
+    commResponded: 5,
+    responseRate: 0.25,
+  });
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockPrisma.task.count.mockResolvedValue(7);
   mockRunCommercialSequences.mockResolvedValue({ executed: 4, sentEmail: 3, sentWhatsapp: 1, exhausted: 1 });
@@ -113,6 +125,7 @@ beforeEach(() => {
   mockSendEmail.mockResolvedValue({ ok: true });
   mockSendWhatsAppText.mockResolvedValue({ ok: true });
   mockSaveCronRunStatus.mockResolvedValue({});
+  mockGetRecipientsAsString.mockResolvedValue('');
   mockLoadDailyBrief.mockResolvedValue({
     date: '2026-04-10',
     greeting: 'Bon dia',
@@ -159,6 +172,11 @@ describe('runCommercialDailyAutomation', () => {
         data: expect.objectContaining({ action: 'AUTOMATION_DAILY_SUMMARY_SENT' }),
       })
     );
+    expect(result.kpi24h).toMatchObject({
+      commSent: 20,
+      commResponded: 5,
+      responseRate: 0.25,
+    });
   });
 
   it("inclou alertes CRITICAL del Daily Brief al resum guardat i a l'email", async () => {

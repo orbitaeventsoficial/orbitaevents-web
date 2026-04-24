@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { scoreLead } from '@/lib/services/commercialScoring';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { LeadData } from './inbox-types';
 
 const BAND_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -65,7 +66,7 @@ export default function InboxLeadContext({ lead }: { lead: LeadData }) {
         <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
         <p className="mt-1 text-sm font-semibold">{hint.label}</p>
         <Link
-          href={`/admin/leads/${lead.id}`}
+          href={buildLeadWorkspaceHref(lead.id)}
           className="mt-2 inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
         >
           Obrir lead complet

@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { LEAD_STATUS_OPTIONS } from '@/lib/constants';
 import { log } from '@/lib/logger';
-
-type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
+import LeadLostStatusPrompt from './LeadLostStatusPrompt';
+import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 
 export default function LeadQuickStatus({
   leadId,
@@ -19,17 +18,19 @@ export default function LeadQuickStatus({
   const router = useRouter();
   const toast = useToast();
   const [saving, setSaving] = useState(false);
+  const [showLostPrompt, setShowLostPrompt] = useState(false);
+  const [lostReason, setLostReason] = useState('');
+  const [lostNote, setLostNote] = useState('');
 
   const onChange = async (nextStatus: LeadStatus) => {
     if (saving || nextStatus === currentStatus) return;
+    if (nextStatus === 'LOST') {
+      setShowLostPrompt(true);
+      return;
+    }
     setSaving(true);
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      if (!res.ok) throw new Error();
+      await patchLeadStatus({ leadId, status: nextStatus });
       router.refresh();
     } catch (error) {
       log.error('[LeadQuickStatus] Error canviant estat', error);
@@ -39,22 +40,63 @@ export default function LeadQuickStatus({
     }
   };
 
+  const confirmLostStatus = async () => {
+    if (!lostReason || saving) return;
+    setSaving(true);
+    try {
+      await patchLeadStatus({
+        leadId,
+        status: 'LOST',
+        lostReason,
+        note: lostNote,
+      });
+      setShowLostPrompt(false);
+      setLostReason('');
+      setLostNote('');
+      router.refresh();
+    } catch (error) {
+      log.error('[LeadQuickStatus] Error marcant lead com a perdut', error);
+      toast.error('Error canviant l\'estat');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <select
-      value={currentStatus}
-      onChange={(e) => onChange(e.target.value as LeadStatus)}
-      disabled={saving}
-      className="rounded-xl border px-2 py-1 text-[11px]"
-      title="Canviar estat"
-      aria-label="Canviar estat"
-        >
-      {LEAD_STATUS_OPTIONS.map((option) => (
-        <option key={option.value} value={option.value}>{option.label}</option>
-      ))}
-    </select>
+    <div className="space-y-2">
+      <select
+        value={currentStatus}
+        onChange={(e) => onChange(e.target.value as LeadStatus)}
+        disabled={saving}
+        className="rounded-xl border px-2 py-1 text-[11px]"
+        title="Canviar estat"
+        aria-label="Canviar estat"
+      >
+        {LEAD_STATUS_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+
+      <LeadLostStatusPrompt
+        open={showLostPrompt}
+        lostReason={lostReason}
+        note={lostNote}
+        saving={saving}
+        title="Per marcar aquest lead com a perdut cal classificar-ne el motiu."
+        confirmLabel="Marcar perdut"
+        onLostReasonChange={setLostReason}
+        onNoteChange={setLostNote}
+        onCancel={() => {
+          if (saving) return;
+          setShowLostPrompt(false);
+          setLostReason('');
+          setLostNote('');
+        }}
+        onConfirm={confirmLostStatus}
+      />
+    </div>
   );
 }
-
 
 
 

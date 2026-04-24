@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { ReengagementCandidate, ReengagementPriority } from '@/lib/services/leadReengagementService';
 
 type SerializedCandidate = Omit<ReengagementCandidate, 'eventDate'> & { eventDate: string | null };
@@ -154,7 +155,7 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
                   </div>
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                     <Link
-                      href={`/admin/leads/${c.leadId}`}
+                      href={buildLeadWorkspaceHref(c.leadId)}
                       className="text-sm font-semibold hover:text-cyan-300 transition-colors"
                     >
                       {c.name}
@@ -254,7 +255,7 @@ export default function LeadReengagementClient({ initialCandidates }: Props) {
                   {copied === c.leadId ? '✓ Copiat' : 'Copiar missatge'}
                 </button>
                 <Link
-                  href={`/admin/leads/${c.leadId}`}
+                  href={buildLeadWorkspaceHref(c.leadId)}
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] hover:bg-white/10"
                 >
                   Veure fitxa →

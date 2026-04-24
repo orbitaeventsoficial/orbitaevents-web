@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { BOOKING_COMMUNICATION_COPY, toIntlLocale } from '@/lib/constants';
+import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
 export type BookingCommAction = 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded';
 export type BookingCommChannel = 'email' | 'whatsapp';
@@ -87,13 +88,10 @@ export async function executeBookingCommunication(bookingId: string, payload: { 
   if (payload.action === 'send_email') {
     const content = buildEmailContent(payload.flow, booking);
     await sendEmail({ to: booking.clientEmail, subject: content.subject, html: content.html });
-    await prisma.adminLog.create({
-      data: {
-        action: 'COMM_SENT',
-        entity: 'booking',
-        entityId: booking.id,
-        details: { flow: payload.flow, channel: 'email', to: booking.clientEmail },
-      },
+    await recordBookingCommunicationLog({
+      action: 'COMM_SENT',
+      bookingId: booking.id,
+      details: { flow: payload.flow, channel: 'email', to: booking.clientEmail },
     });
     return { ok: true as const, status: 200, body: { ok: true } };
   }
@@ -105,17 +103,14 @@ export async function executeBookingCommunication(bookingId: string, payload: { 
     if (!waResult.ok) {
       return { ok: false as const, status: 500, body: { ok: false, error: waResult.error || 'No s\'ha pogut enviar WhatsApp' } };
     }
-    await prisma.adminLog.create({
-      data: {
-        action: 'COMM_SENT',
-        entity: 'booking',
-        entityId: booking.id,
-        details: {
-          flow: payload.flow,
-          channel: 'whatsapp',
-          to: booking.clientPhone,
-          providerMessageId: waResult.providerMessageId || null,
-        },
+    await recordBookingCommunicationLog({
+      action: 'COMM_SENT',
+      bookingId: booking.id,
+      details: {
+        flow: payload.flow,
+        channel: 'whatsapp',
+        to: booking.clientPhone,
+        providerMessageId: waResult.providerMessageId || null,
       },
     });
     return { ok: true as const, status: 200, body: { ok: true } };
@@ -125,28 +120,22 @@ export async function executeBookingCommunication(bookingId: string, payload: { 
     if (!payload.channel) {
       return { ok: false as const, status: 400, body: { ok: false, error: 'Canal obligatori' } };
     }
-    await prisma.adminLog.create({
-      data: {
-        action: 'COMM_SENT',
-        entity: 'booking',
-        entityId: booking.id,
-        details: {
-          flow: payload.flow,
-          channel: payload.channel,
-          to: payload.channel === 'whatsapp' ? booking.clientPhone : booking.clientEmail,
-        },
+    await recordBookingCommunicationLog({
+      action: 'COMM_SENT',
+      bookingId: booking.id,
+      details: {
+        flow: payload.flow,
+        channel: payload.channel,
+        to: payload.channel === 'whatsapp' ? booking.clientPhone : booking.clientEmail,
       },
     });
     return { ok: true as const, status: 200, body: { ok: true } };
   }
 
-  await prisma.adminLog.create({
-    data: {
-      action: 'COMM_RESPONDED',
-      entity: 'booking',
-      entityId: booking.id,
-      details: { flow: payload.flow },
-    },
+  await recordBookingCommunicationLog({
+    action: 'COMM_RESPONDED',
+    bookingId: booking.id,
+    details: { flow: payload.flow },
   });
   return { ok: true as const, status: 200, body: { ok: true } };
 }

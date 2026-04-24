@@ -1,18 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockScoreLead, mockEstimateAmount } = vi.hoisted(() => ({
+const { mockPrisma, mockScoreLead, mockEstimateAmount, mockRecordLeadScoreSnapshot } = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findUnique: vi.fn() },
-    leadActivity: { create: vi.fn() },
   },
   mockScoreLead: vi.fn(),
   mockEstimateAmount: vi.fn(),
+  mockRecordLeadScoreSnapshot: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/services/commercialScoring', () => ({
   scoreLead: mockScoreLead,
   estimateLeadAmount: mockEstimateAmount,
+}));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadScoreSnapshot: mockRecordLeadScoreSnapshot,
 }));
 
 import {
@@ -46,9 +49,9 @@ const MOCK_SCORING = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.lead.findUnique.mockResolvedValue(null);
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockScoreLead.mockReturnValue(MOCK_SCORING);
   mockEstimateAmount.mockReturnValue(2000);
+  mockRecordLeadScoreSnapshot.mockResolvedValue({});
 });
 
 describe('getAdminLeadScore', () => {
@@ -83,13 +86,14 @@ describe('createAdminLeadScoreSnapshot', () => {
 
     expect(result.status).toBe(200);
     expect(result.body.score).toBe(75);
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead-1',
-        type: 'SYSTEM',
-        title: 'Scoring snapshot',
-        createdBy: 'Scoring Bot',
-      }),
+    expect(mockRecordLeadScoreSnapshot).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      score: 75,
+      band: 'HOT',
+      probability: 0.65,
+      weightedAmount: 1300,
+      reasons: ['Event proper', 'Pressupost alt'],
+      riskFlags: [],
     });
   });
 });

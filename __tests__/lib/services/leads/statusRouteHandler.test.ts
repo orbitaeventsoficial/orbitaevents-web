@@ -1,6 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockRequireAuth, mockNormalizeEmail, mockNormalizeName, mockNormalizePhone } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockRequireAuth,
+  mockNormalizeEmail,
+  mockNormalizeName,
+  mockNormalizePhone,
+  mockMarkLeadAsLost,
+  mockRecordLeadStatusChanged,
+} = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       findUnique: vi.fn(),
@@ -8,18 +16,21 @@ const { mockPrisma, mockRequireAuth, mockNormalizeEmail, mockNormalizeName, mock
     },
     customer: { upsert: vi.fn() },
     leadNote: { create: vi.fn() },
-    leadActivity: { create: vi.fn() },
     customerActivity: { create: vi.fn() },
   },
   mockRequireAuth: vi.fn(),
   mockNormalizeEmail: vi.fn(),
   mockNormalizeName: vi.fn(),
   mockNormalizePhone: vi.fn(),
+  mockMarkLeadAsLost: vi.fn(),
+  mockRecordLeadStatusChanged: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({ log: { error: vi.fn() } }));
 vi.mock('@/lib/auth', () => ({ requireAuth: mockRequireAuth }));
+vi.mock('@/lib/services/leadLossService', () => ({ markLeadAsLost: mockMarkLeadAsLost }));
+vi.mock('@/lib/services/leadActivityService', () => ({ recordLeadStatusChanged: mockRecordLeadStatusChanged }));
 vi.mock('@/lib/utils/normalize', () => ({
   normalizeEmail: mockNormalizeEmail,
   normalizeName: mockNormalizeName,
@@ -52,8 +63,8 @@ beforeEach(() => {
   mockPrisma.lead.update.mockResolvedValue({ id: 'l1', status: 'CONTACTED' });
   mockPrisma.customer.upsert.mockResolvedValue({ id: 'cust1' });
   mockPrisma.leadNote.create.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockPrisma.customerActivity.create.mockResolvedValue({});
+  mockRecordLeadStatusChanged.mockResolvedValue({});
   mockNormalizeEmail.mockReturnValue('test@test.com');
   mockNormalizeName.mockReturnValue('test');
   mockNormalizePhone.mockReturnValue('+34600000000');
@@ -106,7 +117,11 @@ describe('handleLeadStatusPatch', () => {
     expect(body.ok).toBe(true);
     expect(mockPrisma.lead.update).toHaveBeenCalled();
     expect(mockPrisma.leadNote.create).toHaveBeenCalled();
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalled();
+    expect(mockRecordLeadStatusChanged).toHaveBeenCalledWith({
+      leadId: 'l1',
+      fromStatus: 'NEW',
+      toStatus: 'CONTACTED',
+    });
   });
 
   it('crea customer si email real i no linked', async () => {
@@ -165,5 +180,119 @@ describe('handleLeadStatusPatch', () => {
         }),
       })
     );
+  });
+
+  describe('canonical LOST path (Canvi #368)', () => {
+    it('delega a markLeadAsLost quan status=LOST amb lostReason vàlid', async () => {
+      mockMarkLeadAsLost.mockResolvedValue({
+        ok: true,
+        lead: {
+          id: 'l1',
+          status: 'LOST',
+          lostReason: 'PRICE_TOO_HIGH',
+          lostAt: new Date('2026-04-24T10:00:00.000Z'),
+        },
+      });
+
+      const result = await handleLeadStatusPatch(
+        makeRequest({ status: 'LOST', lostReason: 'PRICE_TOO_HIGH', note: 'Pressupost 2k sobre 1.5k' }),
+        'l1',
+      );
+      const body = await result.json();
+
+      expect(result.status).toBe(200);
+      expect(body.ok).toBe(true);
+      expect(body.lead.lostReason).toBe('PRICE_TOO_HIGH');
+      expect(mockMarkLeadAsLost).toHaveBeenCalledWith({
+        leadId: 'l1',
+        reason: 'PRICE_TOO_HIGH',
+        note: 'Pressupost 2k sobre 1.5k',
+        actor: 'Admin',
+      });
+      // El path canònic no toca el flux legacy
+      expect(mockPrisma.lead.findUnique).not.toHaveBeenCalled();
+      expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+      expect(mockPrisma.leadNote.create).not.toHaveBeenCalled();
+    });
+
+    it('passa note=null si no ve al body', async () => {
+      mockMarkLeadAsLost.mockResolvedValue({
+        ok: true,
+        lead: { id: 'l1', status: 'LOST', lostReason: 'NO_RESPONSE', lostAt: new Date() },
+      });
+
+      await handleLeadStatusPatch(
+        makeRequest({ status: 'LOST', lostReason: 'NO_RESPONSE' }),
+        'l1',
+      );
+
+      expect(mockMarkLeadAsLost).toHaveBeenCalledWith(
+        expect.objectContaining({ note: null }),
+      );
+    });
+
+    it('retorna 400 si markLeadAsLost rebutja el motiu com a invàlid', async () => {
+      mockMarkLeadAsLost.mockResolvedValue({
+        ok: false,
+        status: 400,
+        error: 'Motiu de pèrdua invàlid',
+      });
+
+      const result = await handleLeadStatusPatch(
+        makeRequest({ status: 'LOST', lostReason: 'BOGUS_REASON' }),
+        'l1',
+      );
+      const body = await result.json();
+
+      expect(result.status).toBe(400);
+      expect(body.error).toBe('Motiu de pèrdua invàlid');
+    });
+
+    it('retorna 404 si markLeadAsLost no troba el lead', async () => {
+      mockMarkLeadAsLost.mockResolvedValue({
+        ok: false,
+        status: 404,
+        error: 'Lead no trobat',
+      });
+
+      const result = await handleLeadStatusPatch(
+        makeRequest({ status: 'LOST', lostReason: 'PRICE_TOO_HIGH' }),
+        'l1',
+      );
+
+      expect(result.status).toBe(404);
+    });
+
+    it('LOST sense lostReason segueix el path legacy (retrocompatibilitat)', async () => {
+      mockPrisma.lead.findUnique.mockResolvedValue({
+        id: 'l1',
+        status: 'NEGOTIATING',
+        email: 'test@placeholder.orbita',
+        customerId: null,
+        contactedAt: new Date(),
+        convertedAt: null,
+      });
+
+      await handleLeadStatusPatch(makeRequest({ status: 'LOST' }), 'l1');
+
+      expect(mockMarkLeadAsLost).not.toHaveBeenCalled();
+      expect(mockPrisma.lead.update).toHaveBeenCalled();
+    });
+
+    it('LOST amb lostReason buit també cau al path legacy', async () => {
+      mockPrisma.lead.findUnique.mockResolvedValue({
+        id: 'l1',
+        status: 'NEGOTIATING',
+        email: 'test@placeholder.orbita',
+        customerId: null,
+        contactedAt: new Date(),
+        convertedAt: null,
+      });
+
+      await handleLeadStatusPatch(makeRequest({ status: 'LOST', lostReason: '' }), 'l1');
+
+      expect(mockMarkLeadAsLost).not.toHaveBeenCalled();
+      expect(mockPrisma.lead.update).toHaveBeenCalled();
+    });
   });
 });

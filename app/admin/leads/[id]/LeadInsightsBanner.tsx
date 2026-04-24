@@ -2,7 +2,12 @@
 
 import Link from 'next/link';
 import type { LeadInsights } from '@/lib/services/leadInsightsService';
-import { buildCustomerTaskListHref } from '@/lib/admin/customerWorkspaceHref';
+import {
+  buildLeadComposeHref,
+  buildLeadPaymentsHref,
+  buildLeadTaskHref,
+  buildLeadWorkspaceHref,
+} from '@/lib/admin/leadWorkspaceHref';
 
 const URGENCY_COLOR: Record<string, string> = {
   HIGH: 'border-rose-500/40 bg-rose-500/10',
@@ -18,21 +23,13 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
 };
 
 const ACTION_CTA: Record<string, { href: (input: { leadId: string; customerId?: string | null; bookingId?: string | null }) => string; label: string }> = {
-  CONTACT_NOW: { href: ({ leadId }) => `/admin/leads/${leadId}#contact`, label: 'Contactar' },
-  FOLLOW_UP: { href: ({ leadId }) => `/admin/inbox/compose?leadId=${leadId}`, label: 'Enviar seguiment' },
+  CONTACT_NOW: { href: ({ leadId }) => buildLeadWorkspaceHref(leadId, 'contact'), label: 'Contactar' },
+  FOLLOW_UP: { href: ({ leadId }) => buildLeadComposeHref(leadId), label: 'Enviar seguiment' },
   SEND_QUOTE: { href: ({ leadId }) => `/admin/presupuestos?leadId=${leadId}`, label: 'Crear pressupost' },
-  CLOSE_DEAL: { href: ({ leadId }) => `/admin/leads/${leadId}#actions`, label: 'Tancar acord' },
-  COLLECT_PAYMENT: {
-    href: ({ bookingId, customerId, leadId }) =>
-      bookingId ? `/admin/bookings/${bookingId}` : customerId ? `/admin/bookings?customerId=${customerId}` : `/admin/leads/${leadId}`,
-    label: 'Revisar cobraments',
-  },
-  COMPLETE_TASK: {
-    href: ({ leadId, customerId }) =>
-      customerId ? buildCustomerTaskListHref(customerId) : `/admin/leads/${leadId}`,
-    label: 'Veure tasques',
-  },
-  RE_ENGAGE: { href: ({ leadId }) => `/admin/inbox/compose?leadId=${leadId}`, label: 'Reactivar' },
+  CLOSE_DEAL: { href: ({ leadId }) => buildLeadWorkspaceHref(leadId, 'actions'), label: 'Tancar acord' },
+  COLLECT_PAYMENT: { href: ({ bookingId, customerId, leadId }) => buildLeadPaymentsHref({ bookingId, customerId, leadId }), label: 'Revisar cobraments' },
+  COMPLETE_TASK: { href: ({ leadId, customerId }) => buildLeadTaskHref({ leadId, customerId }), label: 'Veure tasques' },
+  RE_ENGAGE: { href: ({ leadId }) => buildLeadComposeHref(leadId), label: 'Reactivar' },
 };
 
 function formatCurrency(val: number): string {

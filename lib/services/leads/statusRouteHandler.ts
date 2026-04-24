@@ -3,7 +3,10 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
-import { LEAD_STATUS_VALUES, PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import { LEAD_STATUS_VALUES, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { recordLeadConverted } from '@/lib/services/customerActivityService';
+import { markLeadAsLost } from '@/lib/services/leadLossService';
+import { recordLeadStatusChanged } from '@/lib/services/leadActivityService';
 
 type LeadStatus = (typeof LEAD_STATUS_VALUES)[number];
 
@@ -13,10 +16,28 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
 
   try {
     const body = await req.json();
-    const { status } = body as { status?: string };
+    const { status, lostReason, note } = body as { status?: string; lostReason?: string; note?: string };
 
     if (!status || !LEAD_STATUS_VALUES.includes(status as LeadStatus)) {
       return NextResponse.json({ error: 'Estat invàlid' }, { status: 400 });
+    }
+
+    // Canonical path for LOST with reason — delegates to markLeadAsLost() so the
+    // audit trail (lostReason, lostAt, leadActivity metadata) stays consistent
+    // regardless of whether the transition is manual or automatic.
+    if (status === 'LOST' && typeof lostReason === 'string' && lostReason.length > 0) {
+      const lossResult = await markLeadAsLost({
+        leadId,
+        reason: lostReason,
+        note: typeof note === 'string' ? note : null,
+        actor: 'Admin',
+      });
+
+      if (!lossResult.ok) {
+        return NextResponse.json({ error: lossResult.error }, { status: lossResult.status });
+      }
+
+      return NextResponse.json({ ok: true, lead: lossResult.lead });
     }
 
     const existingLead = await prisma.lead.findUnique({
@@ -107,41 +128,33 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
       },
     });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId,
-        type: 'STATUS_CHANGE',
-        title: "Canvi d'estat",
-        description: `${existingLead.status} → ${status}`,
-      },
+    await recordLeadStatusChanged({
+      leadId,
+      fromStatus: existingLead.status,
+      toStatus: status,
     });
 
     if (status === 'WON' && linkedCustomerId) {
-      await prisma.customerActivity.create({
-        data: {
-          customerId: linkedCustomerId,
-          action: CUSTOMER_ACTIVITY_ACTIONS.LEAD_CONVERTED,
-          details: {
-            leadId: existingLead.id,
-            fromStatus: existingLead.status,
-            toStatus: status,
-            eventType: existingLead.eventType,
-            eventDate: existingLead.eventDate,
-            eventLocation: existingLead.eventLocation,
-            guestCount: existingLead.guestCount,
-            budget: existingLead.budget,
-            message: existingLead.message,
-            interestedPackId: existingLead.interestedPackId,
-            interestedExtras: existingLead.interestedExtras,
-            source: existingLead.source,
-            preferredLocale: existingLead.preferredLocale,
-            attribution: {
-              utmSource: existingLead.utmSource,
-              utmMedium: existingLead.utmMedium,
-              utmCampaign: existingLead.utmCampaign,
-              landingPage: existingLead.landingPage,
-            },
-          },
+      await recordLeadConverted({
+        customerId: linkedCustomerId,
+        leadId: existingLead.id,
+        fromStatus: existingLead.status,
+        toStatus: status,
+        eventType: existingLead.eventType,
+        eventDate: existingLead.eventDate,
+        eventLocation: existingLead.eventLocation,
+        guestCount: existingLead.guestCount,
+        budget: existingLead.budget,
+        message: existingLead.message,
+        interestedPackId: existingLead.interestedPackId,
+        interestedExtras: existingLead.interestedExtras,
+        source: existingLead.source,
+        preferredLocale: existingLead.preferredLocale,
+        attribution: {
+          utmSource: existingLead.utmSource,
+          utmMedium: existingLead.utmMedium,
+          utmCampaign: existingLead.utmCampaign,
+          landingPage: existingLead.landingPage,
         },
       });
     }

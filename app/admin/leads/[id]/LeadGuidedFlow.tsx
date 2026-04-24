@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER } from '@/lib/constants';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import LeadLostStatusPrompt from '../LeadLostStatusPrompt';
+import { patchLeadStatus } from '../leadStatusClient';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -39,6 +41,10 @@ export default function LeadGuidedFlow({
   const [status, setStatus] = useState<LeadStatus>(currentStatus);
   const [error, setError] = useState<string | null>(null);
   const [creatingTask, setCreatingTask] = useState(false);
+  const [statusBusy, setStatusBusy] = useState(false);
+  const [showLostPrompt, setShowLostPrompt] = useState(false);
+  const [lostReason, setLostReason] = useState('');
+  const [lostNote, setLostNote] = useState('');
 
   const isLost = status === 'LOST';
   const currentIndex = getStatusIndex(status);
@@ -55,21 +61,18 @@ export default function LeadGuidedFlow({
   }, [currentIndex, hasCustomer, hasBooking]);
 
   const updateStatus = async (nextStatus: LeadStatus) => {
+    if (statusBusy) return;
+    if (nextStatus === 'LOST') {
+      setShowLostPrompt(true);
+      return;
+    }
     setError(null);
     const previous = status;
     setStatus(nextStatus);
+    setStatusBusy(true);
 
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "No s'ha pogut actualitzar l'estat");
-      }
-      const payload = await res.json();
+      const payload = await patchLeadStatus({ leadId, status: nextStatus });
       const customerId = payload?.lead?.customerId as string | undefined;
       startTransition(() => {
         if (nextStatus === 'WON' && customerId) {
@@ -81,6 +84,34 @@ export default function LeadGuidedFlow({
     } catch (e) {
       setStatus(previous);
       setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
+  const confirmLostStatus = async () => {
+    if (!lostReason || statusBusy) return;
+    setError(null);
+    const previous = status;
+    setStatus('LOST');
+    setStatusBusy(true);
+
+    try {
+      await patchLeadStatus({
+        leadId,
+        status: 'LOST',
+        lostReason,
+        note: lostNote,
+      });
+      setShowLostPrompt(false);
+      setLostReason('');
+      setLostNote('');
+      startTransition(() => router.refresh());
+    } catch (e) {
+      setStatus(previous);
+      setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setStatusBusy(false);
     }
   };
 
@@ -162,7 +193,7 @@ export default function LeadGuidedFlow({
           const stepIndex = getStatusIndex(step.status);
           const isDone = currentIndex > stepIndex;
           const isActive = currentIndex === stepIndex && !isLost;
-          const canClick = !isLost && !isPending && stepIndex > currentIndex;
+          const canClick = !isLost && !isPending && !statusBusy && stepIndex > currentIndex;
 
           const stepClass = isActive
             ? step.activeColor
@@ -208,7 +239,7 @@ export default function LeadGuidedFlow({
             <button
               type="button"
               onClick={nextAction.action}
-              disabled={isPending}
+              disabled={isPending || statusBusy}
               className="ap-btn ap-btn--primary px-4 py-2 text-xs disabled:opacity-50"
             >
               {nextAction.label} →
@@ -238,7 +269,7 @@ export default function LeadGuidedFlow({
           <button
             type="button"
             onClick={() => updateStatus('LOST')}
-            disabled={isPending}
+            disabled={isPending || statusBusy}
             className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
           >
             Marcar perdut
@@ -249,18 +280,33 @@ export default function LeadGuidedFlow({
           <button
             type="button"
             onClick={() => updateStatus('NEW')}
-            disabled={isPending}
+            disabled={isPending || statusBusy}
             className="ap-btn ap-btn--secondary px-3 py-2 text-xs disabled:opacity-50"
           >
             Reobrir entrada
           </button>
         )}
       </div>
+
+      <LeadLostStatusPrompt
+        open={showLostPrompt}
+        lostReason={lostReason}
+        note={lostNote}
+        saving={isPending || statusBusy}
+        title="Per marcar aquesta entrada com a perduda cal classificar-ne el motiu."
+        confirmLabel="Guardar motiu i tancar"
+        onLostReasonChange={setLostReason}
+        onNoteChange={setLostNote}
+        onCancel={() => {
+          setShowLostPrompt(false);
+          setLostReason('');
+          setLostNote('');
+        }}
+        onConfirm={confirmLostStatus}
+      />
     </section>
   );
 }
-
-
 
 
 

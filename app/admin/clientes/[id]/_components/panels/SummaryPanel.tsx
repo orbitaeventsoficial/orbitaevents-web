@@ -31,6 +31,7 @@ import {
   buildCustomerTaskCreateHref,
 } from '@/lib/admin/customerWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
 type CustomerEditableFields = {
@@ -612,7 +613,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 {topLeadActionUrgency && (
                   <p className="mt-1 text-[11px] opacity-60">{topLeadActionUrgency}</p>
                 )}
-                <a href={`/admin/leads/${topLead.id}`} className="mt-3 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
+                <a href={buildLeadWorkspaceHref(topLead.id)} className="mt-3 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
                   Obrir fitxa de la lead
                 </a>
                 {topLead.booking && (

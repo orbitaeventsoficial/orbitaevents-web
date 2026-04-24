@@ -6,9 +6,10 @@
  * No acumulable amb descomptes web (per defecte)
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDateSimple } from '@/lib/constants';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../components/useAsyncForm';
@@ -98,6 +99,12 @@ export default function DiscountCodesPage() {
     loadCodes();
   }, [loadCodes]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#nou-codi') {
+      setShowForm(true);
+    }
+  }, []);
+
   const updateField = (field: keyof FormData, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -165,6 +172,165 @@ export default function DiscountCodesPage() {
 
   const isExpired = (d: string) => new Date(d) < new Date();
 
+  const strip = useMemo(() => {
+    if (!stats) return null;
+
+    const now = Date.now();
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+    const expiredFlaggedActive = codes.filter((c) => c.isActive && isExpired(c.validUntil)).length;
+    const exhaustedFlaggedActive = codes.filter(
+      (c) => c.isActive && c.maxUses != null && c.currentUses >= c.maxUses,
+    ).length;
+    const nearMaxUses = codes.filter(
+      (c) =>
+        c.isActive &&
+        !isExpired(c.validUntil) &&
+        c.maxUses != null &&
+        c.currentUses < c.maxUses &&
+        c.currentUses / c.maxUses >= 0.8,
+    ).length;
+    const aboutToExpire = codes.filter((c) => {
+      if (!c.isActive || isExpired(c.validUntil)) return false;
+      const until = new Date(c.validUntil).getTime();
+      return until - now <= SEVEN_DAYS;
+    }).length;
+    const unusedActive = codes.filter(
+      (c) => c.isActive && !isExpired(c.validUntil) && c.currentUses === 0,
+    ).length;
+    const firstExpiredFlag = codes.find((c) => c.isActive && isExpired(c.validUntil));
+
+    const systemItems: string[] = [];
+    if (stats.total > 0) {
+      systemItems.push(`${stats.total} codis al catàleg · ${stats.active} actius · ${stats.expired} caducats`);
+    }
+    if (stats.totalUses > 0) {
+      systemItems.push(`${stats.totalUses} ${stats.totalUses === 1 ? 'ús acumulat' : 'usos acumulats'}`);
+    }
+    if (stats.total === 0) {
+      systemItems.push('Cap codi creat encara');
+    }
+
+    const manualItems: string[] = [];
+    if (expiredFlaggedActive > 0) {
+      manualItems.push(
+        `${expiredFlaggedActive} ${expiredFlaggedActive === 1 ? 'codi caducat encara marcat' : 'codis caducats encara marcats'} actius`,
+      );
+    }
+    if (exhaustedFlaggedActive > 0) {
+      manualItems.push(
+        `${exhaustedFlaggedActive} ${exhaustedFlaggedActive === 1 ? 'codi ha' : 'codis han'} esgotat els usos màxims`,
+      );
+    }
+    if (aboutToExpire > 0) {
+      manualItems.push(
+        `${aboutToExpire} ${aboutToExpire === 1 ? 'codi caduca' : 'codis caduquen'} en ≤7 dies`,
+      );
+    }
+    if (nearMaxUses > 0) {
+      manualItems.push(
+        `${nearMaxUses} ${nearMaxUses === 1 ? 'codi està' : 'codis estan'} a ≥80% d'usos`,
+      );
+    }
+    if (unusedActive > 0) {
+      manualItems.push(
+        `${unusedActive} ${unusedActive === 1 ? 'codi actiu sense ús' : 'codis actius sense cap ús'}`,
+      );
+    }
+
+    const systemTone: 'info' | 'warning' | 'success' =
+      stats.total === 0 ? 'info' : stats.active === 0 ? 'warning' : 'success';
+
+    const manualTone: 'info' | 'warning' | 'success' =
+      expiredFlaggedActive > 0 || exhaustedFlaggedActive > 0
+        ? 'warning'
+        : manualItems.length > 0
+          ? 'info'
+          : 'success';
+
+    const nextStep =
+      stats.total === 0
+        ? {
+            eyebrow: 'Següent pas · Primer codi',
+            title: 'Crear el primer codi de descompte',
+            detail:
+              'Encara no hi ha cap codi promocional. Activa un per enganxar campanyes, referits o segones reserves.',
+            href: '#nou-codi',
+            ctaLabel: 'Obrir formulari',
+          }
+        : expiredFlaggedActive > 0
+          ? {
+              eyebrow: 'Següent pas · Higiene',
+              title: `Desactivar ${expiredFlaggedActive} ${expiredFlaggedActive === 1 ? 'codi caducat' : 'codis caducats'}`,
+              detail: firstExpiredFlag
+                ? `"${firstExpiredFlag.code}" i ${expiredFlaggedActive - 1 >= 0 ? expiredFlaggedActive - 1 : 0} més tenen la bandera activa tot i haver caducat. Desactiva'ls per evitar errors d'aplicació.`
+                : 'Hi ha codis caducats amb la bandera activa. Desactiva\'ls per evitar errors d\'aplicació.',
+              href: '#codis-list',
+              ctaLabel: 'Revisar llista',
+            }
+          : exhaustedFlaggedActive > 0
+            ? {
+                eyebrow: 'Següent pas · Usos',
+                title: 'Tancar codis esgotats',
+                detail: `${exhaustedFlaggedActive} ${exhaustedFlaggedActive === 1 ? 'codi ha' : 'codis han'} arribat al màxim d'usos però continuen actius. Desactiva\'ls per mantenir el catàleg net.`,
+                href: '#codis-list',
+                ctaLabel: 'Revisar llista',
+              }
+            : aboutToExpire > 0
+              ? {
+                  eyebrow: 'Següent pas · Renovació',
+                  title: `${aboutToExpire} ${aboutToExpire === 1 ? 'codi caduca' : 'codis caduquen'} aviat`,
+                  detail:
+                    'Revisa si cal crear un codi de relleu abans que caduqui. Sense codi viu no pots aplicar promoció en aquest període.',
+                  href: '#nou-codi',
+                  ctaLabel: 'Nou codi',
+                  secondaryAction: { href: '#codis-list', label: 'Veure llista' },
+                }
+              : stats.active === 0 && stats.total > 0
+                ? {
+                    eyebrow: 'Següent pas · Reviu',
+                    title: 'Cap codi actiu ara mateix',
+                    detail:
+                      'Tots els codis del catàleg estan inactius o caducats. Activa\'n un d\'existent o crea\'n un de nou.',
+                    href: '#codis-list',
+                    ctaLabel: 'Revisar catàleg',
+                    secondaryAction: { href: '#nou-codi', label: 'Nou codi' },
+                  }
+                : {
+                    eyebrow: 'Següent pas',
+                    title: 'Catàleg de codis al dia',
+                    detail: `${stats.active} ${stats.active === 1 ? 'codi actiu disponible' : 'codis actius disponibles'}. Aprofita per crear codis dirigits (referits, campanyes, segona reserva).`,
+                    href: '#nou-codi',
+                    ctaLabel: 'Nou codi',
+                  };
+
+    return {
+      system: {
+        eyebrow: 'Automàtic · Catàleg',
+        title:
+          stats.total === 0
+            ? 'Sense codis encara'
+            : stats.active === 0
+              ? 'Sense codi actiu'
+              : 'Catàleg promocional',
+        tone: systemTone,
+        items: systemItems,
+        emptyText: 'Encara no hi ha codis.',
+      },
+      manual: {
+        eyebrow: 'Manual · Backlog',
+        title:
+          manualItems.length === 0
+            ? 'Cap senyal manual'
+            : `${manualItems.length} ${manualItems.length === 1 ? 'senyal per revisar' : 'senyals per revisar'}`,
+        tone: manualTone,
+        items: manualItems,
+        emptyText: 'Sense codis caducats, esgotats ni propers a vèncer.',
+      },
+      nextStep,
+    };
+  }, [codes, stats]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -204,6 +370,14 @@ export default function DiscountCodesPage() {
       }
       className="max-w-5xl"
     >
+      {strip && (
+        <OwnerControlStrip
+          className="mb-2"
+          system={strip.system}
+          manual={strip.manual}
+          nextStep={strip.nextStep}
+        />
+      )}
       {stats && (
         <div className="grid gap-4 sm:grid-cols-4">
           <div className="rounded-2xl border p-4">
@@ -236,6 +410,7 @@ export default function DiscountCodesPage() {
         </div>
       )}
 
+      <div id="nou-codi" aria-hidden="true" />
       {showForm && (
         <div className="rounded-2xl border p-5 space-y-4">
           <h2 className="text-sm font-semibold">Nou codi de descompte</h2>
@@ -374,6 +549,8 @@ export default function DiscountCodesPage() {
           </div>
         </div>
       )}
+
+      <div id="codis-list" aria-hidden="true" />
 
       <section className="lg:hidden space-y-3">
         {codes.map((c) => {

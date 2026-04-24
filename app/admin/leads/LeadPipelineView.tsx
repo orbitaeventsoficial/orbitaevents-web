@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useCallback, useDeferredValue, useMemo } from 'react';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort, getSourceDisplay } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/PipelineBoard';
 import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import LeadLostStatusPrompt from './LeadLostStatusPrompt';
+import { patchLeadStatus } from './leadStatusClient';
 
 type PipelineFilters = {
   status: string[];
@@ -60,6 +63,9 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [pendingLossLead, setPendingLossLead] = useState<Pick<PipelineLead, 'id' | 'name'> | null>(null);
+  const [lostReason, setLostReason] = useState('');
+  const [lostNote, setLostNote] = useState('');
 
   const [localSearch, setLocalSearch] = useState('');
   const [localPriority, setLocalPriority] = useState<string | null>(null);
@@ -124,23 +130,18 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const moveLeadStatus = useCallback(async (leadId: string, newStatus: string) => {
     const currentLead = allLeads.find((lead) => lead.id === leadId);
     if (!currentLead || currentLead.status === newStatus) return;
+    if (newStatus === 'LOST') {
+      setPendingLossLead({ id: currentLead.id, name: currentLead.name });
+      return;
+    }
     const previousStatus = currentLead.status;
 
     setLeadStatusInState(leadId, newStatus);
     setUpdatingId(leadId);
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!res.ok) {
-        setLeadStatusInState(leadId, previousStatus);
-        toast.error('Error movent l\'entrada');
-      } else {
-        const targetLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
-        toast.success(`Entrada moguda a ${targetLabel}`);
-      }
+      await patchLeadStatus({ leadId, status: newStatus as 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' });
+      const targetLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
+      toast.success(`Entrada moguda a ${targetLabel}`);
     } catch {
       setLeadStatusInState(leadId, previousStatus);
       toast.error('Error de connexió movent l\'entrada');
@@ -148,6 +149,29 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       setUpdatingId(null);
     }
   }, [allLeads, setLeadStatusInState, toast]);
+
+  const confirmLossStatus = useCallback(async () => {
+    if (!pendingLossLead || !lostReason || updatingId) return;
+
+    setUpdatingId(pendingLossLead.id);
+    try {
+      await patchLeadStatus({
+        leadId: pendingLossLead.id,
+        status: 'LOST',
+        lostReason,
+        note: lostNote,
+      });
+      setLeadStatusInState(pendingLossLead.id, 'LOST');
+      toast.success('Entrada moguda a Perdut');
+      setPendingLossLead(null);
+      setLostReason('');
+      setLostNote('');
+    } catch {
+      toast.error('Error de connexió movent l\'entrada');
+    } finally {
+      setUpdatingId(null);
+    }
+  }, [lostNote, lostReason, pendingLossLead, setLeadStatusInState, toast, updatingId]);
 
   const availableEventTypes = useMemo(() => [...new Set(allLeads.map((l) => l.eventType))].sort(), [allLeads]);
   const availableSources = useMemo(() => [...new Set(allLeads.map((l) => l.source))].sort(), [allLeads]);
@@ -167,6 +191,24 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 
   return (
     <div className="space-y-3" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.board)}>
+      <LeadLostStatusPrompt
+        open={Boolean(pendingLossLead)}
+        lostReason={lostReason}
+        note={lostNote}
+        saving={Boolean(updatingId)}
+        title={pendingLossLead ? `Per marcar "${pendingLossLead.name}" com a perdut cal classificar-ne el motiu.` : undefined}
+        confirmLabel="Marcar perdut"
+        onLostReasonChange={setLostReason}
+        onNoteChange={setLostNote}
+        onCancel={() => {
+          if (updatingId) return;
+          setPendingLossLead(null);
+          setLostReason('');
+          setLostNote('');
+        }}
+        onConfirm={confirmLossStatus}
+      />
+
       <div className="space-y-2" {...helpAttrs(ADMIN_PIPELINE_HELP.lead.localFilters)}>
         <div className="relative">
           <input
@@ -301,7 +343,7 @@ function PipelineCard({
     >
       <div className="flex items-start justify-between gap-2">
         <Link
-          href={`/admin/leads/${lead.id}`}
+          href={buildLeadWorkspaceHref(lead.id)}
           className="text-sm font-semibold text-white transition-colors line-clamp-1"
         >
           {lead.name}
@@ -411,5 +453,3 @@ function PipelineCard({
     </div>
   );
 }
-
-

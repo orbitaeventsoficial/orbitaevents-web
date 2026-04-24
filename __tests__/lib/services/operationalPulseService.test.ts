@@ -13,6 +13,7 @@ function makeInput(overrides: Partial<PulseInput> = {}): PulseInput {
     overdueTasksRate: overrides.overdueTasksRate ?? 3,
     paymentCollectionRate: overrides.paymentCollectionRate ?? 98,
     customerRetentionRate: overrides.customerRetentionRate ?? 75,
+    pipelineDrivers: overrides.pipelineDrivers ?? [],
     now: overrides.now ?? NOW,
   };
 }
@@ -21,6 +22,29 @@ describe('generateOperationalPulse', () => {
   it('retorna 8 mètriques', () => {
     const result = generateOperationalPulse(makeInput());
     expect(result.metrics).toHaveLength(8);
+  });
+
+  it('propaga drivers de pipeline sense inventar resum paral·lel', () => {
+    const result = generateOperationalPulse(makeInput({
+      pipelineDrivers: [
+        {
+          type: 'HOT_UNCONTACTED',
+          priority: 'CRITICAL',
+          title: '2 entrades sense contactar',
+          detail: 'La més antiga fa 6h.',
+          href: '/admin/leads?status=NEW',
+          count: 2,
+        },
+      ],
+    }));
+
+    expect(result.pipelineDrivers).toEqual([
+      expect.objectContaining({
+        type: 'HOT_UNCONTACTED',
+        priority: 'CRITICAL',
+        href: '/admin/leads?status=NEW',
+      }),
+    ]);
   });
 
   it('overall EXCELLENT quan tot perfecte', () => {

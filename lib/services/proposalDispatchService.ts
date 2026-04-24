@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
-import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 import { mapLeadEventType, normalizeQuoteLocale, parseDateOrNull } from '@/lib/services/quotes/quoteParsing';
 import { ensureQuoteFollowUpTask } from '@/lib/services/tasks/quoteFollowUp';
+import { recordCustomerProposalSent } from '@/lib/services/customerActivityService';
 
 type ProposalSnapshot = {
   customer?: { name?: string; phone?: string };
@@ -80,12 +80,11 @@ export async function sendAdminProposal(id: string) {
     },
   });
 
-  await prisma.customerActivity.create({
-    data: {
-      customerId: proposal.customerId,
-      action: CUSTOMER_ACTIVITY_ACTIONS.PROPOSAL_SENT,
-      details: { proposalId: proposal.id, reference: proposal.reference, total: proposal.total },
-    },
+  await recordCustomerProposalSent({
+    customerId: proposal.customerId,
+    proposalId: proposal.id,
+    reference: proposal.reference,
+    total: proposal.total,
   });
 
   await ensureQuoteFollowUpTask({
@@ -99,5 +98,4 @@ export async function sendAdminProposal(id: string) {
 
   return { status: 200, body: { ok: true, proposal } };
 }
-
 

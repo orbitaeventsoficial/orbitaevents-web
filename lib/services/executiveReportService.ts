@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
+import { computeLossSummary, type LossReportLead, type LossSummary } from '@/lib/services/leadLossAnalyticsService';
 
 export type ConversionBySource = {
   source: string;
@@ -63,6 +64,7 @@ export type ExecutiveReport = {
     probability: number;
     weightedAmount: number;
   }>;
+  lossSummary: LossSummary;
 };
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -160,6 +162,27 @@ export function exportExecutiveReportCsv(report: ExecutiveReport): string {
       lead.weightedAmount.toFixed(2),
     ]));
   }
+  lines.push('');
+
+  // ── Loss summary ──
+  lines.push('ANÀLISI DE PÈRDUES');
+  lines.push(csvRow(['Total leads perduts', report.lossSummary.total]));
+  lines.push(csvRow(['Pèrdues comercials', report.lossSummary.commercialTotal]));
+  lines.push(csvRow(['Auto-descartats (data event passada)', report.lossSummary.autoTotal]));
+  lines.push(csvRow(['Sense motiu classificat', report.lossSummary.uncategorized]));
+  if (report.lossSummary.topReason) {
+    lines.push(csvRow([
+      'Motiu comercial principal',
+      report.lossSummary.topReason.label,
+      report.lossSummary.topReason.count,
+      `${report.lossSummary.topReason.share}%`,
+    ]));
+  }
+  lines.push('');
+  lines.push(csvRow(['Motiu', 'Quantitat', 'Percentatge']));
+  for (const entry of report.lossSummary.byReason) {
+    lines.push(csvRow([entry.label, entry.count, `${entry.share}%`]));
+  }
 
   return lines.join('\n');
 }
@@ -175,10 +198,13 @@ export async function buildExecutiveReport(): Promise<ExecutiveReport> {
 
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
+  const lostLeadsSince = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
   const [
     leadStats, bookingStats, openLeads, customers, slaBroken,
     leadsBySource, returningCustomers, avgEventsRaw,
     bookingsWithCost, monthlyLeads, monthlyBookings,
+    lostLeadsRaw,
   ] = await Promise.all([
     prisma.lead.groupBy({
       by: ['status'],
@@ -241,6 +267,26 @@ export async function buildExecutiveReport(): Promise<ExecutiveReport> {
       where: { status: { in: ['CONFIRMED', 'COMPLETED'] }, createdAt: { gte: sixMonthsAgo } },
       select: { createdAt: true, total: true },
     }).catch(() => [] as Array<{ createdAt: Date; total: number }>),
+    // Lost leads (finestra 90 dies) per al Loss summary del Canvi #360
+    prisma.lead.findMany({
+      where: {
+        status: 'LOST',
+        OR: [
+          { lostAt: { gte: lostLeadsSince } },
+          { lostAt: null, updatedAt: { gte: lostLeadsSince } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        lostReason: true,
+        lostAt: true,
+        eventType: true,
+        source: true,
+        budget: true,
+        eventLocation: true,
+      },
+    }).catch(() => [] as LossReportLead[]),
   ]);
 
   const statusMap = leadStats.reduce<Record<string, number>>((acc, row) => {
@@ -380,6 +426,7 @@ export async function buildExecutiveReport(): Promise<ExecutiveReport> {
         probability: lead.probability,
         weightedAmount: lead.weightedAmount,
       })),
+    lossSummary: computeLossSummary(lostLeadsRaw as LossReportLead[]),
   };
 }
 

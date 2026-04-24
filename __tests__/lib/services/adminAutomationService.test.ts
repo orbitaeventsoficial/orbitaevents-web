@@ -1,11 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockRunSequences, mockEnforceSla } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockRunSequences,
+  mockEnforceSla,
+  mockFetchRecentCanonicalCommunicationMetrics,
+  mockFetchRecentCommercialSequenceMetrics,
+} = vi.hoisted(() => ({
   mockPrisma: {
-    adminLog: { count: vi.fn(), create: vi.fn() },
+    adminLog: { create: vi.fn() },
   },
   mockRunSequences: vi.fn(),
   mockEnforceSla: vi.fn(),
+  mockFetchRecentCanonicalCommunicationMetrics: vi.fn(),
+  mockFetchRecentCommercialSequenceMetrics: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -14,6 +22,10 @@ vi.mock('@/lib/services/commercialSequenceService', () => ({
 }));
 vi.mock('@/lib/services/slaAutomationService', () => ({
   enforceLeadSla: mockEnforceSla,
+}));
+vi.mock('@/lib/services/timelineQueryService', () => ({
+  fetchRecentCanonicalCommunicationMetrics: mockFetchRecentCanonicalCommunicationMetrics,
+  fetchRecentCommercialSequenceMetrics: mockFetchRecentCommercialSequenceMetrics,
 }));
 
 import {
@@ -25,18 +37,27 @@ import {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockPrisma.adminLog.count.mockResolvedValue(0);
   mockPrisma.adminLog.create.mockResolvedValue({});
   mockRunSequences.mockResolvedValue({ executed: 5, sentEmail: 3, sentWhatsapp: 2, exhausted: 1 });
   mockEnforceSla.mockResolvedValue({ createdTasks: 2, escalated: 1 });
+  mockFetchRecentCanonicalCommunicationMetrics.mockResolvedValue({
+    commSent: 0,
+    commResponded: 0,
+    responseRate: 0,
+  });
+  mockFetchRecentCommercialSequenceMetrics.mockResolvedValue({
+    sequenceExec: 0,
+  });
 });
 
 describe('readCommercialSequenceMetrics', () => {
   it('retorna mètriques', async () => {
-    mockPrisma.adminLog.count
-      .mockResolvedValueOnce(10)
-      .mockResolvedValueOnce(3)
-      .mockResolvedValueOnce(5);
+    mockFetchRecentCanonicalCommunicationMetrics.mockResolvedValueOnce({
+      commSent: 10,
+      commResponded: 3,
+      responseRate: 0.3,
+    });
+    mockFetchRecentCommercialSequenceMetrics.mockResolvedValueOnce({ sequenceExec: 5 });
 
     const result = await readCommercialSequenceMetrics();
 

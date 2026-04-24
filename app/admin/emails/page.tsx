@@ -1,10 +1,10 @@
 // app/admin/emails/page.tsx
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { formatDateTime, formatDateSimple, PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
@@ -12,14 +12,13 @@ import RecentEmailsTable from './RecentEmailsTable';
 import ManualActionsPanel from './ManualActionsPanel';
 import InboxPanel from './InboxPanel';
 import SendPostEventButton from './SendPostEventButton';
+import { readRecentEmailActivitySummary, type RecentEmailActivity } from '@/lib/services/customerActivityService';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Emails Automàtics | Òrbita Admin',
 };
-
-type RecentEmailActivity = Prisma.CustomerActivityGetPayload<{ include: { customer: true } }>;
 
 async function getEmailStats() {
   const now = new Date();
@@ -46,9 +45,7 @@ async function getEmailStats() {
     postEventPending,
     testimonials,
     discountCodes,
-    recentActivity,
-    recentEmailActions,
-    recentTestimonials,
+    emailActivitySummary,
     cronSettings,
   ] = await Promise.all([
     safe('leadsWithEmail', 0, () =>
@@ -84,32 +81,20 @@ async function getEmailStats() {
         where: { createdAt: { gte: thirtyDaysAgo } },
       })
     ),
-    safe('recentActivity', [] as RecentEmailActivity[], () =>
-      prisma.customerActivity.findMany({
-        where: {
-          action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED', 'DISCOUNT_CODE_GENERATED', 'LEAD_EMAIL_SENT'] },
-          createdAt: { gte: sevenDaysAgo },
-        },
-        include: { customer: true },
-        orderBy: { createdAt: 'desc' },
-        take: 20,
-      })
-    ),
-    safe('recentEmailActions', 0, () =>
-      prisma.customerActivity.count({
-        where: {
-          action: { in: ['POST_EVENT_EMAIL_SENT', 'LEAD_EMAIL_SENT'] },
-          createdAt: { gte: twentyFourHoursAgo },
-        },
-      })
-    ),
-    safe('recentTestimonials', 0, () =>
-      prisma.customerActivity.count({
-        where: {
-          action: { in: ['TESTIMONIAL_SUBMITTED'] },
-          createdAt: { gte: sevenDaysAgo },
-        },
-      })
+    safe(
+      'emailActivitySummary',
+      {
+        recentActivity: [] as RecentEmailActivity[],
+        recentEmailActions: 0,
+        recentTestimonials: 0,
+      },
+      () =>
+        readRecentEmailActivitySummary({
+          recentSince: sevenDaysAgo,
+          recentLimit: 20,
+          emailsSince: twentyFourHoursAgo,
+          testimonialsSince: sevenDaysAgo,
+        })
     ),
     safe('cronSettings', [] as Awaited<ReturnType<typeof prisma.setting.findMany>>, () =>
       prisma.setting.findMany({
@@ -129,9 +114,9 @@ async function getEmailStats() {
     postEventPending,
     testimonials,
     discountCodes,
-    recentActivity,
-    recentEmailActions,
-    recentTestimonials,
+    recentActivity: emailActivitySummary.recentActivity,
+    recentEmailActions: emailActivitySummary.recentEmailActions,
+    recentTestimonials: emailActivitySummary.recentTestimonials,
     cronLastRun: cronMap['emails.cron.lastRun'] || null,
     cronLastStatus: cronMap['emails.cron.lastStatus'] || null,
     cronLastMessage: cronMap['emails.cron.lastMessage'] || null,
@@ -176,6 +161,61 @@ async function getPendingPostEventBookings() {
 export default async function EmailsAdminPage() {
   const stats = await getEmailStats();
   const pendingBookings = await getPendingPostEventBookings();
+  const cronStatus = stats.cronLastStatus?.toLowerCase() || null;
+  const systemItems = [
+    `${stats.leadsWithEmail} leads amb email capturats en els últims 30 dies`,
+    `${stats.postEventSent} post-event totals enviats i ${stats.postEventPending} pendents ara mateix`,
+    `${stats.recentEmailActions} enviaments automàtics en 24h i ${stats.recentTestimonials} testimonis rebuts en 7 dies`,
+    stats.cronLastRun
+      ? `Últim cron d'emails: ${formatDateTime(stats.cronLastRun)} (${stats.cronLastStatus || 'sense estat'})`
+      : 'El cron d\'emails encara no té cap execució registrada',
+  ].filter(Boolean);
+  const manualItems = [
+    stats.postEventPending > 0
+      ? `${stats.postEventPending} reserves completades encara esperen correu post-event`
+      : '',
+    pendingBookings[0]
+      ? `La cua manual arrenca per ${pendingBookings[0].clientName} (${formatDateSimple(pendingBookings[0].eventDate)})`
+      : '',
+    stats.hasQueryErrors
+      ? 'Hi ha consultes fallides; convé revisar migracions o estructura abans de confiar en totes les xifres'
+      : '',
+    cronStatus && cronStatus !== 'ok'
+      ? `L'últim cron va quedar en ${stats.cronLastStatus}; cal validar missatge i resum abans d'assumir automatització sana`
+      : '',
+  ].filter(Boolean);
+  const nextStep =
+    stats.postEventPending > 0
+      ? {
+          title: 'Buidar la cua post-event abans que es refredi',
+          detail: `Hi ha ${stats.postEventPending} enviaments post-event pendents. El següent pas correcte és forçar la cua manual i només després revisar si el problema és puntual o estructural.`,
+          href: '/admin/emails',
+          ctaLabel: 'Atacar la cua manual',
+          secondaryAction: { href: '/admin/inbox', label: 'Obrir Safata' },
+        }
+      : stats.hasQueryErrors
+        ? {
+            title: 'Recuperar confiança en les dades abans d’optimitzar',
+            detail: 'El panell continua operatiu, però hi ha consultes parcials. El primer pas és estabilitzar estructura i cron perquè la lectura torni a ser fiable.',
+            href: '/admin/settings/integrations',
+            ctaLabel: 'Revisar integracions',
+            secondaryAction: { href: '/admin/salut', label: 'Obrir Salut' },
+          }
+        : cronStatus && cronStatus !== 'ok'
+          ? {
+              title: 'Validar el cron d’emails abans d’escapar a configuració',
+              detail: `L'última execució ha quedat en ${stats.cronLastStatus}. El millor següent pas és revisar estat i missatge del cron abans de tocar plantilles o panells laterals.`,
+              href: '/admin/crons',
+              ctaLabel: 'Revisar Crons',
+              secondaryAction: { href: '/admin/emails', label: 'Tornar al panell' },
+            }
+          : {
+              title: 'Optimitzar conversa i reputació, no apagar focs',
+              detail: 'No hi ha una incidència dura visible al sistema d’emails. El millor següent pas és treballar plantilles, proves manuals i captura de ressenyes amb el flux estable.',
+              href: '/admin/email-templates',
+              ctaLabel: 'Obrir plantilles',
+              secondaryAction: { href: '/admin/google-reviews', label: 'Veure Google Reviews' },
+            };
 
   return (
     <AdminPage
@@ -183,6 +223,27 @@ export default async function EmailsAdminPage() {
       subtitle="Control i configuració del sistema d'emails automàtics"
       back={{ href: '/admin', label: 'Panell' }}
     >
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què mou el sistema d’emails',
+          tone: stats.postEventPending > 0 || (cronStatus !== null && cronStatus !== 'ok') ? 'warning' : 'info',
+          items: systemItems,
+          emptyText: 'Sense senyals automàtiques rellevants al sistema d’emails.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal intervenir',
+          tone: manualItems.length > 0 ? 'warning' : 'success',
+          items: manualItems,
+          emptyText: 'Cap cua manual crítica oberta ara mateix al panell d’emails.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          ...nextStep,
+        }}
+      />
+
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />
@@ -239,7 +300,7 @@ export default async function EmailsAdminPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
           <section className="rounded-2xl border admin-card-glass overflow-hidden" data-help-title="Post-event pendents" data-help-desc="Llista reserves completades que encara no han rebut el correu post-event perquè puguis forçar-lo manualment.">
-            <div className="px-6 py-4 border-b flex items-center justify-between">
+            <div className="flex flex-col gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
                 <h2 className="font-semibold">
                   ⏳ Emails Post-Event Pendents
@@ -248,7 +309,7 @@ export default async function EmailsAdminPage() {
                   Events completats fa 1-7 dies sense email enviat
                 </p>
               </div>
-              <span className="text-sm font-bold px-3 py-1 rounded-full">
+              <span className="w-fit text-sm font-bold px-3 py-1 rounded-full">
                 {pendingBookings.length}
               </span>
             </div>
@@ -261,15 +322,17 @@ export default async function EmailsAdminPage() {
             ) : (
               <div className="divide-y admin-tone-border-subtle">
                 {pendingBookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between transition-colors">
-                    <div>
+                  <div key={booking.id} className="flex flex-col gap-3 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <div className="min-w-0">
                       <p className="font-medium">{booking.clientName}</p>
-                      <p className="text-sm">{booking.clientEmail}</p>
+                      <p className="break-all text-sm">{booking.clientEmail}</p>
                       <p className="text-xs mt-1">
                         Event: {formatDateSimple(booking.eventDate)} · Ref: {booking.reference}
                       </p>
                     </div>
-                    <SendPostEventButton bookingId={booking.id} />
+                    <div className="sm:shrink-0">
+                      <SendPostEventButton bookingId={booking.id} />
+                    </div>
                   </div>
                 ))}
               </div>

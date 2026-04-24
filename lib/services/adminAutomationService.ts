@@ -2,20 +2,23 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { runCommercialSequences } from '@/lib/services/commercialSequenceService';
 import { enforceLeadSla } from '@/lib/services/slaAutomationService';
+import {
+  fetchRecentCanonicalCommunicationMetrics,
+  fetchRecentCommercialSequenceMetrics,
+} from '@/lib/services/timelineQueryService';
 
 export async function readCommercialSequenceMetrics() {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const [commSent, commResponded, sequenceExec] = await Promise.all([
-    prisma.adminLog.count({ where: { action: 'COMM_SENT', createdAt: { gte: since } } }),
-    prisma.adminLog.count({ where: { action: 'COMM_RESPONDED', createdAt: { gte: since } } }),
-    prisma.adminLog.count({ where: { action: 'COMM_SEQUENCE_EXEC', createdAt: { gte: since } } }),
+  const [commMetrics, sequenceExec] = await Promise.all([
+    fetchRecentCanonicalCommunicationMetrics(since),
+    fetchRecentCommercialSequenceMetrics(since),
   ]);
 
   return {
-    commSent,
-    commResponded,
-    responseRate: commSent > 0 ? commResponded / commSent : 0,
-    sequenceExec,
+    commSent: commMetrics.commSent,
+    commResponded: commMetrics.commResponded,
+    responseRate: commMetrics.responseRate,
+    sequenceExec: sequenceExec.sequenceExec,
   };
 }
 

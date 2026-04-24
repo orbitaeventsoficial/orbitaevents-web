@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { ADMIN_ACTIVITY_ACTION_META } from '@/lib/constants/admin';
+import { ADMIN_ACTIVITY_ACTION_META, ADMIN_ACTIVITY_CATEGORY_MAP } from '@/lib/constants/admin';
 import type { TimelineEventDTO } from '@/lib/customer-hub/dto';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 export type CanonicalTimelineEvent = {
   id: string;
@@ -16,6 +17,40 @@ export type CanonicalTimelineEvent = {
   metadata?: Record<string, unknown>;
   link?: { label: string; href: string };
   timelineType: TimelineEventDTO['type'];
+};
+
+export type CanonicalCommunicationMetrics = {
+  commSent: number;
+  commResponded: number;
+  responseRate: number;
+};
+
+export type CommercialSequenceMetrics = {
+  sequenceExec: number;
+};
+
+export type CanonicalAdminActivityLog = {
+  id: string;
+  action: string;
+  entity: string;
+  entityId: string | null;
+  details: Record<string, unknown> | null;
+  category: string;
+  createdAt: string;
+  timeline: CanonicalTimelineEvent;
+};
+
+export type CanonicalAdminActivityCategoryStats = {
+  total: number;
+  actions: Record<string, number>;
+};
+
+export type CanonicalAdminActivityPageResult = {
+  logs: CanonicalAdminActivityLog[];
+  total: number;
+  stats: Record<string, CanonicalAdminActivityCategoryStats>;
+  page: number;
+  pages: number;
 };
 
 type CustomerActivityLike = {
@@ -185,7 +220,7 @@ function mapAdminLogToTimelineType(log: AdminLogLike): TimelineEventDTO['type'] 
 function buildAdminLogLink(log: AdminLogLike): CanonicalTimelineEvent['link'] {
   if (!log.entityId) return undefined;
   if (log.entity === 'booking') return { label: 'Veure reserva', href: `/admin/bookings/${log.entityId}` };
-  if (log.entity === 'lead') return { label: 'Veure entrada', href: `/admin/leads/${log.entityId}` };
+  if (log.entity === 'lead') return { label: 'Veure entrada', href: buildLeadWorkspaceHref(log.entityId) };
   if (log.entity === 'customer') return { label: 'Veure client', href: `/admin/clientes/${log.entityId}` };
   if (log.entity === 'proposal') return { label: 'Obrir', href: `/admin/presupuestos?proposalId=${log.entityId}` };
   return undefined;
@@ -235,7 +270,7 @@ export function mapLeadActivityToCanonicalEvent(activity: LeadActivityLike): Can
       ? (activity.metadata as Record<string, unknown>)
       : undefined,
     timelineType,
-    link: { label: 'Veure entrada', href: `/admin/leads/${activity.leadId}` },
+    link: { label: 'Veure entrada', href: buildLeadWorkspaceHref(activity.leadId) },
   };
 }
 
@@ -273,11 +308,279 @@ export function canonicalEventsToTimeline(events: CanonicalTimelineEvent[]): Tim
         entityId: event.entityId,
         kind: event.kind,
         actor: event.actor,
+        ...(event.body ? { preview: event.body } : {}),
         ...(event.metadata || {}),
       },
       link: event.link,
     }))
     .sort((a, b) => (a.at < b.at ? 1 : -1));
+}
+
+export function summarizeCanonicalCommunicationMetrics(
+  events: CanonicalTimelineEvent[]
+): CanonicalCommunicationMetrics {
+  const commResponded = events.filter(
+    (event) => event.title === 'Resposta rebuda' || event.title === 'Resposta del client'
+  ).length;
+  const commSent = Math.max(events.length - commResponded, 0);
+
+  return {
+    commSent,
+    commResponded,
+    responseRate: commSent > 0 ? commResponded / commSent : 0,
+  };
+}
+
+export async function fetchRecentCanonicalEvents(
+  limit: number = DEFAULT_FETCH_LIMIT
+): Promise<CanonicalTimelineEvent[]> {
+  const [customerActivities, leadActivities, adminLogs] = await Promise.all([
+    safeFetch(
+      () =>
+        prisma.customerActivity.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        }),
+      [],
+      'fetchRecentCanonicalEvents:customerActivity'
+    ),
+    safeFetch(
+      () =>
+        prisma.leadActivity.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        }),
+      [],
+      'fetchRecentCanonicalEvents:leadActivity'
+    ),
+    safeFetch(
+      () =>
+        prisma.adminLog.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+        }),
+      [],
+      'fetchRecentCanonicalEvents:adminLog'
+    ),
+  ]);
+
+  const events: CanonicalTimelineEvent[] = [
+    ...customerActivities.map((activity) =>
+      mapCustomerActivityToCanonicalEvent({
+        id: activity.id,
+        action: activity.action,
+        createdAt: activity.createdAt,
+        details: activity.details ?? undefined,
+      })
+    ),
+    ...leadActivities.map((activity) =>
+      mapLeadActivityToCanonicalEvent({
+        id: activity.id,
+        type: activity.type,
+        title: activity.title,
+        description: activity.description,
+        createdAt: activity.createdAt,
+        createdBy: activity.createdBy,
+        leadId: activity.leadId,
+        metadata: activity.metadata ?? undefined,
+      })
+    ),
+    ...adminLogs.map((logRow) =>
+      mapAdminLogToCanonicalEvent({
+        id: logRow.id,
+        action: logRow.action,
+        entity: logRow.entity,
+        entityId: logRow.entityId ?? null,
+        details: logRow.details ?? undefined,
+        createdAt: logRow.createdAt,
+        userId: logRow.userId ?? null,
+      })
+    ),
+  ];
+
+  return sortCanonicalDesc(events).slice(0, limit);
+}
+
+export async function fetchRecentCanonicalCommunicationMetrics(
+  since: Date
+): Promise<CanonicalCommunicationMetrics> {
+  const adminLogs = await safeFetch(
+    () =>
+      prisma.adminLog.findMany({
+        where: {
+          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+          createdAt: { gte: since },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    [],
+    'fetchRecentCanonicalCommunicationMetrics:adminLog'
+  );
+
+  const events = adminLogs.map((logRow) =>
+    mapAdminLogToCanonicalEvent({
+      id: logRow.id,
+      action: logRow.action,
+      entity: logRow.entity,
+      entityId: logRow.entityId ?? null,
+      details: logRow.details ?? undefined,
+      createdAt: logRow.createdAt,
+      userId: logRow.userId ?? null,
+    })
+  );
+
+  return summarizeCanonicalCommunicationMetrics(events);
+}
+
+export async function fetchRecentCommercialSequenceMetrics(
+  since: Date
+): Promise<CommercialSequenceMetrics> {
+  const sequenceExec = await safeFetch(
+    () =>
+      prisma.adminLog.count({
+        where: {
+          action: 'COMM_SEQUENCE_EXEC',
+          createdAt: { gte: since },
+        },
+      }),
+    0,
+    'fetchRecentCommercialSequenceMetrics:adminLogCount'
+  );
+
+  return { sequenceExec };
+}
+
+export async function fetchCanonicalCommunicationEventsForBookings(
+  bookingIds: string[],
+  limit: number = 2000
+): Promise<Record<string, CanonicalTimelineEvent[]>> {
+  if (bookingIds.length === 0) return {};
+
+  const adminLogs = await safeFetch(
+    () =>
+      prisma.adminLog.findMany({
+        where: {
+          entity: 'booking',
+          entityId: { in: bookingIds },
+          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      }),
+    [],
+    'fetchCanonicalCommunicationEventsForBookings:adminLog'
+  );
+
+  return adminLogs.reduce<Record<string, CanonicalTimelineEvent[]>>((acc, logRow) => {
+    const bookingId = logRow.entityId;
+    if (!bookingId) return acc;
+    if (!acc[bookingId]) acc[bookingId] = [];
+    acc[bookingId].push(
+      mapAdminLogToCanonicalEvent({
+        id: logRow.id,
+        action: logRow.action,
+        entity: logRow.entity,
+        entityId: bookingId,
+        details: logRow.details ?? undefined,
+        createdAt: logRow.createdAt,
+        userId: logRow.userId ?? null,
+      })
+    );
+    return acc;
+  }, {});
+}
+
+export async function fetchCanonicalAdminActivityPage(options: {
+  since: Date;
+  category?: string | null;
+  page?: number;
+  limit?: number;
+}): Promise<CanonicalAdminActivityPageResult> {
+  const { since, category = 'all', page = 1, limit = 50 } = options;
+
+  let actionFilter: string[] | undefined;
+  if (category && category !== 'all') {
+    actionFilter = Object.entries(ADMIN_ACTIVITY_CATEGORY_MAP)
+      .filter(([, currentCategory]) => currentCategory === category)
+      .map(([action]) => action);
+
+    if (actionFilter.length === 0) {
+      return { logs: [], total: 0, stats: {}, page, pages: 0 };
+    }
+  }
+
+  const where = {
+    createdAt: { gte: since },
+    ...(actionFilter ? { action: { in: actionFilter } } : {}),
+  };
+
+  const [logs, total, statsByAction] = await Promise.all([
+    safeFetch(
+      () =>
+        prisma.adminLog.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+      [],
+      'fetchCanonicalAdminActivityPage:adminLog'
+    ),
+    safeFetch(
+      () => prisma.adminLog.count({ where }),
+      0,
+      'fetchCanonicalAdminActivityPage:adminLogCount'
+    ),
+    safeFetch(
+      () =>
+        prisma.adminLog.groupBy({
+          by: ['action'],
+          where: { createdAt: { gte: since } },
+          _count: true,
+          orderBy: { _count: { action: 'desc' } },
+        }),
+      [] as Array<{ action: string; _count: number }>,
+      'fetchCanonicalAdminActivityPage:adminLogStats'
+    ),
+  ]);
+
+  const stats: Record<string, CanonicalAdminActivityCategoryStats> = {};
+  for (const row of statsByAction) {
+    const currentCategory = ADMIN_ACTIVITY_CATEGORY_MAP[row.action] || 'other';
+    if (!stats[currentCategory]) stats[currentCategory] = { total: 0, actions: {} };
+    stats[currentCategory].total += row._count;
+    stats[currentCategory].actions[row.action] = row._count;
+  }
+
+  return {
+    logs: logs.map((logRow) => {
+      const details = logRow.details && typeof logRow.details === 'object'
+        ? (logRow.details as Record<string, unknown>)
+        : null;
+      return {
+        id: logRow.id,
+        action: logRow.action,
+        entity: logRow.entity,
+        entityId: logRow.entityId ?? null,
+        details,
+        category: ADMIN_ACTIVITY_CATEGORY_MAP[logRow.action] || 'other',
+        createdAt: logRow.createdAt.toISOString(),
+        timeline: mapAdminLogToCanonicalEvent({
+          id: logRow.id,
+          action: logRow.action,
+          entity: logRow.entity,
+          entityId: logRow.entityId ?? null,
+          details: logRow.details ?? undefined,
+          createdAt: logRow.createdAt,
+          userId: logRow.userId ?? null,
+        }),
+      };
+    }),
+    total,
+    stats,
+    page,
+    pages: total > 0 ? Math.ceil(total / limit) : 0,
+  };
 }
 
 const DEFAULT_FETCH_LIMIT = 120;

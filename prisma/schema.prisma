@@ -445,6 +445,10 @@ model Lead {
   contactedAt DateTime?
   convertedAt DateTime?
 
+  // Audit trail de pèrdua: per què i quan s'ha marcat el lead com LOST
+  lostReason String?
+  lostAt     DateTime?
+
   // Nurturing: seqüència de follow-ups automàtics
   nurturingStep   Int       @default(0) // 0 = cap follow-up enviat, 1..N = pas actual
   lastNurturingAt DateTime? // Quan es va enviar l'últim follow-up
@@ -462,6 +466,7 @@ model Lead {
   @@index([status, createdAt]) // Consultes combinades
   @@index([priority, status]) // Per ordenar leads urgents
   @@index([status, updatedAt]) // Per leads actius i frescor de pipeline
+  @@index([lostReason]) // Audit trail: query per motiu de pèrdua
   @@map("leads")
 }
 

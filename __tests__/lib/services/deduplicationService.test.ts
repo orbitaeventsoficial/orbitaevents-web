@@ -23,8 +23,12 @@ vi.mock('@/lib/utils/normalize', () => ({
   normalizeName: (n: string) => n.toLowerCase().trim(),
   normalizeInstagram: (i: string) => i.toLowerCase().replace(/[^a-z0-9._]/g, ''),
 }));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomersMerged: vi.fn(),
+}));
 
 import { findDuplicates, mergeCustomers } from '@/lib/services/deduplicationService';
+import { recordCustomersMerged } from '@/lib/services/customerActivityService';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -245,7 +249,6 @@ describe('mergeCustomers', () => {
       { ...dup1, leads: [], testimonials: [], discountCodes: [] },
     ]);
     mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customerActivity.create.mockResolvedValue({});
     mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, totalEvents: 5, totalSpent: 7000 });
 
     const result = await mergeCustomers('p', ['d1']);
@@ -272,7 +275,6 @@ describe('mergeCustomers', () => {
       { ...dup1, leads: [], testimonials: [], discountCodes: [] },
     ]);
     mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customerActivity.create.mockResolvedValue({});
     mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, gdprConsent: true, marketingConsent: true });
 
     const result = await mergeCustomers('p', ['d1']);
@@ -289,7 +291,6 @@ describe('mergeCustomers', () => {
       { ...dup1, leads: [], testimonials: [], discountCodes: [] },
     ]);
     mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customerActivity.create.mockResolvedValue({});
     mockPrisma.customer.findUnique.mockResolvedValue({ ...primary, phone: '+34699999999', instagram: '@joan_insta' });
 
     const result = await mergeCustomers('p', ['d1']);
@@ -306,19 +307,16 @@ describe('mergeCustomers', () => {
       { ...dup, leads: [], testimonials: [], discountCodes: [] },
     ]);
     mockPrisma.$transaction.mockResolvedValue([]);
-    mockPrisma.customerActivity.create.mockResolvedValue({});
     mockPrisma.customer.findUnique.mockResolvedValue(primary);
 
     await mergeCustomers('p', ['d1']);
 
-    expect(mockPrisma.customerActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        customerId: 'p',
-        action: 'CUSTOMERS_MERGED',
-        details: expect.objectContaining({
-          mergedIds: ['d1'],
-        }),
-      }),
+    expect(recordCustomersMerged).toHaveBeenCalledWith({
+      customerId: 'p',
+      mergedIds: ['d1'],
+      fieldsUpdated: [],
+      totalEventsAfterMerge: 4,
+      totalSpentAfterMerge: 6000,
     });
   });
 });

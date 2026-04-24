@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import LeadActions from './LeadActions';
@@ -401,7 +402,7 @@ export default async function LeadsPage({
                       {lead.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <Link href={`/admin/leads/${lead.id}`} className="font-medium truncate block">
+                      <Link href={buildLeadWorkspaceHref(lead.id)} className="font-medium truncate block">
                         {lead.name}
                       </Link>
                       <p className="text-xs truncate">{lead.email}</p>
@@ -433,7 +434,7 @@ export default async function LeadsPage({
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/admin/leads/${lead.id}`}
+                      href={buildLeadWorkspaceHref(lead.id)}
                       className="rounded-xl border px-2 py-1 text-[11px] font-medium"
                     >
                       Obrir fitxa
@@ -507,7 +508,7 @@ export default async function LeadsPage({
                     <tr key={lead.id} className="transition-colors hover:bg-white/[0.03]">
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[180px]">
+                          <Link href={buildLeadWorkspaceHref(lead.id)} className="font-medium whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[180px]">
                             {lead.name}
                           </Link>
                           {lead.customerId && (
@@ -619,7 +620,6 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
-
 
 
 

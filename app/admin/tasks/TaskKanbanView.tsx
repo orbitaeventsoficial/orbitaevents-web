@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { TASK_KANBAN_COLUMNS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -221,7 +222,7 @@ export default function TaskKanbanView() {
                       </Link>
                     )}
                     {task.leadId && (
-                      <Link href={`/admin/leads/${task.leadId}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                      <Link href={buildLeadWorkspaceHref(task.leadId)} className="hover:underline" onClick={(e) => e.stopPropagation()}>
                         👥 {task.leadName || 'Entrada'}
                       </Link>
                     )}

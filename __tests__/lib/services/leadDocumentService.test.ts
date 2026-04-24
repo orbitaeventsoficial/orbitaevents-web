@@ -8,7 +8,6 @@ const { mockPrisma, mockUploadFile, mockDeleteFile } = vi.hoisted(() => ({
       create: vi.fn(),
       delete: vi.fn(),
     },
-    leadActivity: { create: vi.fn() },
   },
   mockUploadFile: vi.fn(),
   mockDeleteFile: vi.fn(),
@@ -19,20 +18,24 @@ vi.mock('@/lib/storage', () => ({
   uploadFile: mockUploadFile,
   deleteFile: mockDeleteFile,
 }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadDocumentAdded: vi.fn(),
+  recordLeadDocumentDeleted: vi.fn(),
+}));
 
 import {
   listLeadDocuments,
   uploadLeadDocument,
   deleteLeadDocument,
 } from '@/lib/services/leadDocumentService';
+import { recordLeadDocumentAdded, recordLeadDocumentDeleted } from '@/lib/services/leadActivityService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.leadDocument.findMany.mockResolvedValue([]);
   mockPrisma.leadDocument.findFirst.mockResolvedValue(null);
-  mockPrisma.leadDocument.create.mockResolvedValue({ id: 'doc1', title: 'Test' });
+  mockPrisma.leadDocument.create.mockResolvedValue({ id: 'doc1', title: 'Test', type: 'FILE' });
   mockPrisma.leadDocument.delete.mockResolvedValue({});
-  mockPrisma.leadActivity.create.mockResolvedValue({});
   mockUploadFile.mockResolvedValue({ publicUrl: '/api/uploads/test.pdf', path: 'leads/l1/documents/test.pdf' });
   mockDeleteFile.mockResolvedValue(undefined);
 });
@@ -123,7 +126,13 @@ describe('uploadLeadDocument', () => {
     expect(result.status).toBe(200);
     expect(mockUploadFile).toHaveBeenCalled();
     expect(mockPrisma.leadDocument.create).toHaveBeenCalled();
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalled();
+    expect(recordLeadDocumentAdded).toHaveBeenCalledWith({
+      leadId: 'l1',
+      documentId: 'doc1',
+      documentType: 'FILE',
+      title: 'Document Test',
+      createdBy: 'Admin',
+    });
   });
 });
 
@@ -147,7 +156,11 @@ describe('deleteLeadDocument', () => {
     expect(result.status).toBe(200);
     expect(mockDeleteFile).toHaveBeenCalledWith('leads/l1/documents/test.pdf');
     expect(mockPrisma.leadDocument.delete).toHaveBeenCalled();
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalled();
+    expect(recordLeadDocumentDeleted).toHaveBeenCalledWith({
+      leadId: 'l1',
+      documentId: 'doc1',
+      title: 'Test',
+    });
   });
 
   it('elimina document sense filePath', async () => {

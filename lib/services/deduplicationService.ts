@@ -13,6 +13,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import { recordCustomersMerged } from '@/lib/services/customerActivityService';
 import {
   normalizeEmail,
   normalizePhone,
@@ -343,17 +344,12 @@ export async function mergeCustomers(
   ]);
 
   // 4. Log de l'activitat
-  await prisma.customerActivity.create({
-    data: {
-      customerId: primaryId,
-      action: CUSTOMER_ACTIVITY_ACTIONS.CUSTOMERS_MERGED,
-      details: {
-        mergedIds: duplicateIds,
-        fieldsUpdated,
-        totalEventsAfterMerge: totalEvents,
-        totalSpentAfterMerge: totalSpent,
-      } as Prisma.InputJsonValue,
-    },
+  await recordCustomersMerged({
+    customerId: primaryId,
+    mergedIds: duplicateIds,
+    fieldsUpdated,
+    totalEventsAfterMerge: totalEvents,
+    totalSpentAfterMerge: totalSpent,
   });
 
   // 5. Retornar resultat
@@ -410,5 +406,4 @@ function calculateSimilarity(str1: string, str2: string): number {
   const distance = matrix[len1][len2];
   return 1 - distance / maxLen;
 }
-
 

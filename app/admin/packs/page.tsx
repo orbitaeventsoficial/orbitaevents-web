@@ -8,6 +8,7 @@ import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { PACK_SERVICE_OPTIONS } from '@/lib/constants';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 
@@ -186,6 +187,111 @@ export default async function PacksPage({
       }[activeFocus]
     : null;
 
+  const activePacks = packs.filter((p) => p.isActive).length;
+  const featuredPacks = packs.filter((p) => p.isFeatured).length;
+  const totalBookings = packs.reduce((sum, p) => sum + p._count.bookings, 0);
+  const totalLeads = packs.reduce((sum, p) => sum + p.leadsCount, 0);
+  const signalsList = Array.from(packSignalsById.values());
+  const criticalMarginCount = signalsList.filter((s) => s.criticalMargin).length;
+  const missingCapacityCount = signalsList.filter((s) => s.missingCapacity).length;
+  const withoutInventoryCount = signalsList.filter((s) => s.withoutInventory).length;
+  const partialCostCount = signalsList.filter((s) => s.hasPartialCost).length;
+  const conversionRate = totalLeads > 0 ? Math.round((totalBookings / totalLeads) * 100) : null;
+
+  const packsSystemItems: string[] = [];
+  if (packs.length > 0) {
+    packsSystemItems.push(
+      `${packs.length} packs · ${activePacks} actius${featuredPacks > 0 ? ` · ${featuredPacks} destacats` : ''}`
+    );
+  }
+  if (totalBookings > 0 || totalLeads > 0) {
+    packsSystemItems.push(
+      `${totalBookings} reserves · ${totalLeads} consultes${conversionRate !== null ? ` · ${conversionRate}% conv.` : ''}`
+    );
+  }
+  if (!packsInSync) {
+    packsSystemItems.push(`BD ${packs.length} ≠ config ${configPacks.length} — sync pendent`);
+  }
+  if (activeFocusLabel) {
+    packsSystemItems.push(`Focus actiu: ${activeFocusLabel} · ${filteredPacks.length} pack(s)`);
+  }
+
+  const packsManualItems: string[] = [];
+  if (pricingAlertsCount > 0) {
+    packsManualItems.push(`${pricingAlertsCount} packs amb preu desalineat (divergència ≥${pricingConfig.alertDivergencePct}%)`);
+  }
+  if (criticalMarginCount > 0) {
+    packsManualItems.push(`${criticalMarginCount} packs en zona crítica de marge`);
+  }
+  if (withoutInventoryCount > 0) {
+    packsManualItems.push(`${withoutInventoryCount} packs sense equip base assignat`);
+  }
+  if (partialCostCount > 0) {
+    packsManualItems.push(`${partialCostCount} packs amb càlcul parcial (falta preu o vida útil a items)`);
+  }
+  if (missingCapacityCount > 0) {
+    packsManualItems.push(`${missingCapacityCount} packs sense rang clar de convidats`);
+  }
+
+  const packsNextStep = packs.length === 0
+    ? {
+        eyebrow: 'Següent pas · Iniciar',
+        title: 'Configurar catàleg de packs',
+        detail: 'Encara no hi ha packs a la BD. Executa el seed o crea el primer pack per obrir el catàleg comercial.',
+        href: '/admin/packs/new',
+        ctaLabel: 'Nou pack',
+      }
+    : !packsInSync
+    ? {
+        eyebrow: 'Següent pas · Sync',
+        title: 'Sincronitzar BD amb el config',
+        detail: `BD ${packs.length} ≠ config ${configPacks.length}. Executa el sync per alinear el catàleg productiu amb la font de veritat del repo.`,
+        href: '/admin/packs',
+        ctaLabel: 'Tornar a la taula',
+        secondaryAction: { href: '/admin/pricing', label: 'Obrir pricing' },
+      }
+    : pricingAlertsCount > 0
+    ? {
+        eyebrow: 'Següent pas · Preu',
+        title: 'Tancar divergències de preu',
+        detail: `${pricingAlertsCount} ${pricingAlertsCount === 1 ? 'pack supera' : 'packs superen'} el llindar del ${pricingConfig.alertDivergencePct}% entre públic i recomanat. Ajusta o justifica la divergència.`,
+        href: '/admin/packs?focus=alert',
+        ctaLabel: 'Filtrar alertes',
+        secondaryAction: { href: '/admin/pricing', label: 'Obrir pricing' },
+      }
+    : criticalMarginCount > 0
+    ? {
+        eyebrow: 'Següent pas · Marge',
+        title: 'Revisar packs amb marge crític',
+        detail: `${criticalMarginCount} ${criticalMarginCount === 1 ? 'pack està' : 'packs estan'} per sota del marge objectiu. Puja preu, baixa cost o retira del catàleg públic.`,
+        href: '/admin/packs?focus=critical-margin',
+        ctaLabel: 'Filtrar marge crític',
+      }
+    : withoutInventoryCount > 0
+    ? {
+        eyebrow: 'Següent pas · Equip',
+        title: 'Assignar equip base a packs',
+        detail: `${withoutInventoryCount} ${withoutInventoryCount === 1 ? 'pack no té' : 'packs no tenen'} equip base definit. Sense inventari assignat el cost real queda invisible.`,
+        href: '/admin/packs?focus=without-inventory',
+        ctaLabel: 'Filtrar sense equip',
+      }
+    : partialCostCount > 0 || missingCapacityCount > 0
+    ? {
+        eyebrow: 'Següent pas · Higiene',
+        title: 'Completar dades de càlcul',
+        detail: 'Queden packs amb càlcul parcial o sense rang de convidats clar. Petits arreglaments però necessaris per càlcul de preu net.',
+        href: partialCostCount > 0 ? '/admin/packs?focus=partial-cost' : '/admin/packs?focus=missing-capacity',
+        ctaLabel: 'Revisar focus',
+      }
+    : {
+        eyebrow: 'Següent pas',
+        title: 'Catàleg al dia',
+        detail: 'Sense alertes visibles al catàleg. Aprofita per revisar extras, crear un pack nou o obrir el cockpit de preus.',
+        href: '/admin/packs/new',
+        ctaLabel: 'Nou pack',
+        secondaryAction: { href: '/admin/packs/extras', label: 'Veure extres' },
+      };
+
   return (
     <AdminPage
       title="Packs"
@@ -219,6 +325,29 @@ export default async function PacksPage({
         </div>
       }
     >
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic · Catàleg de packs',
+          title: packs.length === 0 ? 'Sense packs' : `${packs.length} packs al catàleg`,
+          tone: packsInSync && packs.length > 0 ? 'info' : 'warning',
+          items: packsSystemItems,
+          emptyText: 'Encara no hi ha packs configurats.',
+        }}
+        manual={{
+          eyebrow: 'Manual · Salut del catàleg',
+          title: packsManualItems.length === 0
+            ? 'Cap alerta visible'
+            : `${packsManualItems.length} senyals per revisar`,
+          tone: (pricingAlertsCount > 0 || criticalMarginCount > 0)
+            ? 'warning'
+            : packsManualItems.length > 0
+            ? 'info'
+            : 'success',
+          items: packsManualItems,
+          emptyText: 'Cap pack requereix intervenció manual ara mateix.',
+        }}
+        nextStep={packsNextStep}
+      />
 
       <nav className="flex flex-wrap gap-2">
         <Link

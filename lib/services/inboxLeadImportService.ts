@@ -2,6 +2,7 @@ import type { EventType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { fetchEmailByUid } from '@/lib/imap';
 import { extractLeadDataFromEmail } from '@/lib/services/emailLeadExtractionService';
+import { recordLeadCreatedFromInbox, recordLeadUpdatedFromInbox } from '@/lib/services/leadActivityService';
 
 type FallbackEmailPayload = {
   fromAddress?: string;
@@ -157,19 +158,12 @@ export async function importLeadFromInboxMessage(uidNum: number, fallbackEmail: 
       },
     });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId: updated.id,
-        type: 'SYSTEM',
-        title: 'Lead actualitzat des d’Inbox',
-        description: `Importació automàtica des d’email ${senderAddress}`,
-        createdBy: 'Admin Inbox',
-        metadata: {
-          uid: uidNum,
-          subject,
-          usedFallback: !email,
-        },
-      },
+    await recordLeadUpdatedFromInbox({
+      leadId: updated.id,
+      senderAddress,
+      uid: uidNum,
+      subject,
+      usedFallback: !email,
     });
 
     return {
@@ -223,19 +217,12 @@ export async function importLeadFromInboxMessage(uidNum: number, fallbackEmail: 
     },
   });
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId: created.id,
-      type: 'SYSTEM',
-      title: 'Lead creat des d’Inbox',
-      description: `Importació automàtica des d’email ${senderAddress}`,
-      createdBy: 'Admin Inbox',
-      metadata: {
-        uid: uidNum,
-        subject,
-        usedFallback: !email,
-      },
-    },
+  await recordLeadCreatedFromInbox({
+    leadId: created.id,
+    senderAddress,
+    uid: uidNum,
+    subject,
+    usedFallback: !email,
   });
 
   return {

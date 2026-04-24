@@ -3,10 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { ADMIN_ACTIONS_HELP, helpAttrs } from '../components/adminHelpContent';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_OPTIONS, PRIORITY_LABELS } from '@/lib/constants';
+import LeadLostStatusPrompt from './LeadLostStatusPrompt';
+import { patchLeadStatus, type LeadStatus } from './leadStatusClient';
 
 interface LeadActionsProps {
   leadId: string;
@@ -23,6 +26,9 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [priorityUpdating, setPriorityUpdating] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [showLostPrompt, setShowLostPrompt] = useState(false);
+  const [lostReason, setLostReason] = useState('');
+  const [lostNote, setLostNote] = useState('');
   const { confirm, dialogProps } = useConfirmDialog();
 
   const handleDelete = async () => {
@@ -54,19 +60,36 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     }
   };
 
-  const handleStatusChange = async (nextStatus: LeadActionsProps['currentStatus']) => {
+  const handleStatusChange = async (nextStatus: LeadStatus) => {
     if (statusUpdating || nextStatus === currentStatus) return;
+    if (nextStatus === 'LOST') {
+      setShowLostPrompt(true);
+      return;
+    }
     setStatusUpdating(true);
     try {
-      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
+      await patchLeadStatus({ leadId, status: nextStatus });
+      router.refresh();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Error actualitzant l'estat");
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
+  const handleLostConfirm = async () => {
+    if (!lostReason || statusUpdating) return;
+    setStatusUpdating(true);
+    try {
+      await patchLeadStatus({
+        leadId,
+        status: 'LOST',
+        lostReason,
+        note: lostNote,
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "Error actualitzant l'estat");
-      }
+      setShowLostPrompt(false);
+      setLostReason('');
+      setLostNote('');
       router.refresh();
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Error actualitzant l'estat");
@@ -149,7 +172,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
             💬 WA
           </a>
         )}
-        <Link href={`/admin/leads/${leadId}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.view)}>
+        <Link href={buildLeadWorkspaceHref(leadId)} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.lead.view)}>
           Veure
         </Link>
         <button
@@ -169,6 +192,23 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         </button>
         <ConfirmDialog {...dialogProps} />
       </div>
+      <LeadLostStatusPrompt
+        open={showLostPrompt}
+        lostReason={lostReason}
+        note={lostNote}
+        saving={statusUpdating}
+        title="Per tancar aquesta entrada com a perduda cal deixar motiu i, si cal, context."
+        confirmLabel="Guardar pèrdua"
+        onLostReasonChange={setLostReason}
+        onNoteChange={setLostNote}
+        onCancel={() => {
+          if (statusUpdating) return;
+          setShowLostPrompt(false);
+          setLostReason('');
+          setLostNote('');
+        }}
+        onConfirm={handleLostConfirm}
+      />
     </div>
   );
 }

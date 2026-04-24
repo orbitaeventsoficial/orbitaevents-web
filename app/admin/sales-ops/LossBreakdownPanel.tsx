@@ -1,0 +1,291 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import type { LossBreakdownEntry, LossSummary, MonthlyLossPoint } from '@/lib/services/leadLossAnalyticsService';
+
+type LossBreakdownPanelProps = {
+  initialSummary: LossSummary;
+  days?: number;
+};
+
+type LossApiResponse = {
+  ok: boolean;
+  sinceDays: number;
+  summary: LossSummary;
+};
+
+function buildDonutGradient(entries: LossBreakdownEntry[]): string {
+  if (entries.length === 0) {
+    return 'conic-gradient(rgba(255,255,255,0.08) 0deg 360deg)';
+  }
+
+  const palette = [
+    '#22d3ee',
+    '#f59e0b',
+    '#34d399',
+    '#f472b6',
+    '#818cf8',
+    '#fb7185',
+  ];
+
+  let current = 0;
+  const stops = entries.map((entry, index) => {
+    const size = (entry.share / 100) * 360;
+    const start = current;
+    const end = index === entries.length - 1 ? 360 : current + size;
+    current = end;
+    const color = palette[index % palette.length];
+    return `${color} ${start}deg ${end}deg`;
+  });
+
+  return `conic-gradient(${stops.join(', ')})`;
+}
+
+function buildTrendPolyline(points: MonthlyLossPoint[]): string {
+  if (points.length === 0) return '';
+  if (points.length === 1) return '8,64 152,64';
+
+  const max = Math.max(...points.map((point) => point.count), 1);
+  return points
+    .map((point, index) => {
+      const x = 8 + (index / (points.length - 1)) * 144;
+      const y = 64 - ((point.count / max) * 48);
+      return `${x},${y}`;
+    })
+    .join(' ');
+}
+
+function formatMonth(monthIso: string): string {
+  const [year, month] = monthIso.split('-').map(Number);
+  if (!year || !month) return monthIso;
+  return new Intl.DateTimeFormat('ca-ES', { month: 'short', year: '2-digit', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(year, month - 1, 1))
+  );
+}
+
+export default function LossBreakdownPanel({
+  initialSummary,
+  days = 90,
+}: LossBreakdownPanelProps) {
+  const [summary, setSummary] = useState(initialSummary);
+  const [status, setStatus] = useState<'idle' | 'refreshing' | 'error'>('idle');
+
+  useEffect(() => {
+    let active = true;
+
+    async function refresh() {
+      setStatus('refreshing');
+
+      try {
+        const response = await fetch(`/api/admin/reports/lead-losses?days=${days}`, {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = (await response.json()) as LossApiResponse;
+        if (!active || !payload.ok) return;
+        setSummary(payload.summary);
+        setStatus('idle');
+      } catch {
+        if (!active) return;
+        setStatus('error');
+      }
+    }
+
+    void refresh();
+
+    return () => {
+      active = false;
+    };
+  }, [days]);
+
+  const donutEntries = summary.byReason.slice(0, 5);
+  const donutGradient = useMemo(() => buildDonutGradient(donutEntries), [donutEntries]);
+  const trendPoints = useMemo(() => buildTrendPolyline(summary.byMonth), [summary.byMonth]);
+  const topSources = summary.bySource.slice(0, 5);
+  const topSourceMax = Math.max(...topSources.map((entry) => entry.count), 1);
+  const narrative = summary.topReason
+    ? `${summary.topReason.label} lidera la pèrdua comercial amb ${summary.topReason.count} leads (${summary.topReason.share}%).`
+    : summary.autoTotal > 0
+      ? 'La finestra actual només acumula auto-descartats per data passada; no hi ha un motiu comercial dominant.'
+      : 'Sense prou pèrdues classificades per llegir un patró comercial dominant.';
+
+  return (
+    <section className="ap-card rounded-2xl p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Pèrdues de lead</p>
+          <h2 className="mt-2 text-lg font-semibold">Per què es refreda l&apos;embut</h2>
+          <p className="mt-1 max-w-3xl text-sm admin-tone-text-neutral">
+            Lectura dels últims {days} dies sobre el motiu de pèrdua, els canals afectats i la tendència mensual.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+              status === 'error'
+                ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
+                : 'border-cyan-500/25 bg-cyan-500/10 text-cyan-100'
+            }`}
+          >
+            {status === 'refreshing' ? 'Actualitzant dades' : status === 'error' ? 'Mostrant snapshot inicial' : 'Dades sincronitzades'}
+          </span>
+          <a
+            href={`/api/admin/reports/lead-losses?days=${days}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ap-btn ap-btn--secondary text-xs"
+          >
+            Exportar JSON
+          </a>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Motiu principal</p>
+          <p className="mt-2 text-lg font-semibold text-white">{summary.topReason?.label ?? 'Sense patró comercial clar'}</p>
+          <p className="mt-1 text-xs admin-tone-text-neutral">
+            {summary.topReason ? `${summary.topReason.count} leads · ${summary.topReason.share}% del total` : 'Cap motiu comercial domina la mostra actual.'}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Leads perduts</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{summary.total}</p>
+          <p className="mt-1 text-xs admin-tone-text-neutral">{summary.commercialTotal} comercials · {summary.autoTotal} automàtics</p>
+        </div>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100/80">Auto-descartats</p>
+          <p className="mt-2 text-2xl font-semibold text-amber-200">{summary.autoTotal}</p>
+          <p className="mt-1 text-xs text-amber-50/75">Leads amb `EVENT_PASSED` fora del càlcul del motiu comercial principal.</p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">Sense classificar</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{summary.uncategorized}</p>
+          <p className="mt-1 text-xs admin-tone-text-neutral">Pèrdues sense motiu canònic o amb dades antigues encara no sanejades.</p>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.05] p-4">
+        <p className="text-sm text-cyan-50/90">{narrative}</p>
+      </div>
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_1fr_1fr]">
+        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold text-white">Mix de motius</h3>
+              <p className="mt-1 text-xs admin-tone-text-neutral">Distribució de pèrdues classificades per motiu canònic.</p>
+            </div>
+          </div>
+
+          {donutEntries.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center">
+              <div
+                aria-label="Donut de motius de pèrdua"
+                className="mx-auto h-40 w-40 rounded-full border border-white/10"
+                style={{ backgroundImage: donutGradient }}
+              >
+                <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-[#04131c]/95 text-center">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/45">Leads</p>
+                    <p className="mt-1 text-2xl font-semibold text-white">{summary.total}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-2">
+                {donutEntries.map((entry, index) => (
+                  <div key={entry.key} className="flex items-center justify-between gap-3 rounded-xl border border-white/8 bg-black/10 px-3 py-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span
+                        aria-hidden="true"
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: ['#22d3ee', '#f59e0b', '#34d399', '#f472b6', '#818cf8'][index % 5] }}
+                      />
+                      <span className="text-white/85">{entry.label}</span>
+                    </div>
+                    <span className="text-white/65">{entry.count} · {entry.share}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm admin-tone-text-neutral">Encara no hi ha pèrdues classificades dins la finestra seleccionada.</p>
+          )}
+        </article>
+
+        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <h3 className="text-sm font-semibold text-white">Canals més afectats</h3>
+          <p className="mt-1 text-xs admin-tone-text-neutral">On es concentren més pèrdues dins la finestra actual.</p>
+
+          {topSources.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              {topSources.map((entry) => {
+                const width = Math.max((entry.count / topSourceMax) * 100, 8);
+                return (
+                  <div key={entry.key}>
+                    <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+                      <span className="text-white/85">{entry.label}</span>
+                      <span className="text-white/60">{entry.count} · {entry.share}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-white/8">
+                      <div className="h-2 rounded-full bg-cyan-300/80" style={{ width: `${width}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="mt-4 text-sm admin-tone-text-neutral">Sense fonts de pèrdua registrades encara.</p>
+          )}
+        </article>
+
+        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <h3 className="text-sm font-semibold text-white">Tendència mensual</h3>
+          <p className="mt-1 text-xs admin-tone-text-neutral">Evolució dels leads perduts per mes natural.</p>
+
+          {summary.byMonth.length > 0 ? (
+            <>
+              <div className="mt-4 rounded-xl border border-white/8 bg-black/10 p-3">
+                <svg viewBox="0 0 160 72" className="h-28 w-full" role="img" aria-label="Tendència mensual de pèrdues">
+                  <path d="M8 64 H152" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                  <polyline
+                    fill="none"
+                    stroke="rgba(34,211,238,0.95)"
+                    strokeWidth="3"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    points={trendPoints}
+                  />
+                  {summary.byMonth.map((point, index) => {
+                    const max = Math.max(...summary.byMonth.map((item) => item.count), 1);
+                    const x = summary.byMonth.length === 1 ? 80 : 8 + (index / (summary.byMonth.length - 1)) * 144;
+                    const y = 64 - ((point.count / max) * 48);
+                    return <circle key={point.monthIso} cx={x} cy={y} r="3.5" fill="#67e8f9" />;
+                  })}
+                </svg>
+              </div>
+              <div className="mt-3 grid gap-2">
+                {summary.byMonth.slice(-4).map((point) => (
+                  <div key={point.monthIso} className="flex items-center justify-between rounded-xl border border-white/8 bg-black/10 px-3 py-2 text-xs">
+                    <span className="text-white/80">{formatMonth(point.monthIso)}</span>
+                    <span className="text-white/60">{point.count} leads</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-4 text-sm admin-tone-text-neutral">Encara no hi ha prou historial per dibuixar tendència.</p>
+          )}
+        </article>
+      </div>
+    </section>
+  );
+}
+
+export { buildDonutGradient, buildTrendPolyline, formatMonth };

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail, mockBuildReport } = vi.hoisted(() => ({
+const { mockPrisma, mockSendEmail, mockBuildReport, mockGetRecipientsAsString } = vi.hoisted(() => ({
   mockPrisma: {
     adminLog: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
   mockBuildReport: vi.fn(),
+  mockGetRecipientsAsString: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -13,6 +14,9 @@ vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/logger', () => ({ log: { warn: vi.fn() } }));
 vi.mock('@/lib/services/executiveReportService', () => ({
   buildExecutiveReport: mockBuildReport,
+}));
+vi.mock('@/lib/services/notificationRecipientsService', () => ({
+  getRecipientsAsString: mockGetRecipientsAsString,
 }));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: { business: { email: 'info@test.com', phone: '+34600000000' } },
@@ -36,6 +40,7 @@ beforeEach(() => {
   });
   mockSendEmail.mockResolvedValue({});
   mockPrisma.adminLog.create.mockResolvedValue({});
+  mockGetRecipientsAsString.mockResolvedValue('reports@test.com');
 });
 
 describe('sendExecutiveReport', () => {

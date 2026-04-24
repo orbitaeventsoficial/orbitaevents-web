@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { Prisma } from '@prisma/client';
 import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
@@ -562,7 +563,7 @@ export default async function BookingsPage({
                         )}
                         <div className="text-xs truncate max-w-[150px]">{booking.eventLocation}</div>
                         {booking.lead && (
-                          <Link href={`/admin/leads/${booking.lead.id}`} className="text-[10px] hover:underline">
+                          <Link href={buildLeadWorkspaceHref(booking.lead.id)} className="text-[10px] hover:underline">
                             Entrada: {booking.lead.name}
                           </Link>
                         )}

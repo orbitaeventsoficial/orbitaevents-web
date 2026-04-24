@@ -1,13 +1,20 @@
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { prisma } from '@/lib/prisma';
 import { formatNumber } from '@/lib/constants';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
+import {
+  fetchRecentCanonicalCommunicationMetrics,
+  fetchRecentCommercialSequenceMetrics,
+} from '@/lib/services/timelineQueryService';
 import { AdminPage } from '../components/AdminPage';
 import InfoTooltip from '../components/InfoTooltip';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import LossBreakdownPanel from './LossBreakdownPanel';
 import RunCommercialSequencesButton from './RunCommercialSequencesButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
 import SlaAutomationButton from './SlaAutomationButton';
+import { loadLossReport } from '@/lib/services/leadLossAnalyticsService';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +52,7 @@ function statusPanel(status: AuditStatus) {
 
 export default async function SalesOpsPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const [leadGroups, leads, slaSnapshot, commSent30d, commResponded30d, sequenceExec30d] = await Promise.all([
+  const [leadGroups, leads, slaSnapshot, commMetrics30d, sequenceExec30d, lossSummary] = await Promise.all([
     prisma.lead.groupBy({ by: ['source', 'status', 'assignedTo'], _count: true }).catch(() => []),
     prisma.lead.findMany({
       where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } },
@@ -56,9 +63,19 @@ export default async function SalesOpsPage() {
       orderBy: { createdAt: 'desc' }, take: 1000,
     }).catch(() => []),
     prisma.lead.count({ where: { status: 'NEW', createdAt: { lte: new Date(Date.now() - 24 * 60 * 60 * 1000) } } }).catch(() => 0),
-    prisma.adminLog.count({ where: { action: 'COMM_SENT', createdAt: { gte: thirtyDaysAgo } } }).catch(() => 0),
-    prisma.adminLog.count({ where: { action: 'COMM_RESPONDED', createdAt: { gte: thirtyDaysAgo } } }).catch(() => 0),
-    prisma.adminLog.count({ where: { action: 'COMM_SEQUENCE_EXEC', createdAt: { gte: thirtyDaysAgo } } }).catch(() => 0),
+    fetchRecentCanonicalCommunicationMetrics(thirtyDaysAgo),
+    fetchRecentCommercialSequenceMetrics(thirtyDaysAgo),
+    loadLossReport({ sinceDays: 90 }).catch(() => ({
+      total: 0,
+      uncategorized: 0,
+      autoTotal: 0,
+      commercialTotal: 0,
+      byReason: [],
+      byEventType: [],
+      bySource: [],
+      byMonth: [],
+      topReason: null,
+    })),
   ]);
 
   const sourceMap = new Map<string, { total: number; won: number }>();
@@ -96,6 +113,8 @@ export default async function SalesOpsPage() {
   const pipelineTotal = scored.reduce((sum, l) => sum + l.amount, 0);
   const avgScore = scored.length ? scored.reduce((sum, l) => sum + l.scoring.score, 0) / scored.length : 0;
   const riskLeads = scored.filter((lead) => lead.scoring.band === 'LOW' || lead.scoring.riskFlags.length > 0).sort((a, b) => a.scoring.score - b.scoring.score).slice(0, 20);
+  const commSent30d = commMetrics30d.commSent;
+  const commResponded30d = commMetrics30d.commResponded;
   const responseRate30d = commSent30d > 0 ? commResponded30d / commSent30d : 0;
   const responseBacklogStatus: AuditStatus = slaSnapshot === 0 ? 'FORT' : slaSnapshot <= 3 ? 'A_MILLORAR' : 'CRITIC';
   const responseRateStatus: AuditStatus = responseRate30d >= 0.55 ? 'FORT' : responseRate30d >= 0.35 ? 'A_MILLORAR' : 'CRITIC';
@@ -104,7 +123,7 @@ export default async function SalesOpsPage() {
   const systemItems = [
     `${scored.length} entrades obertes amb ${formatNumber(pipelineTotal)}€ a l'embut`,
     `Previsió ponderada actual: ${formatNumber(forecastTotal)}€`,
-    `${sequenceExec30d} seqüències automàtiques executades en 30 dies`,
+    `${sequenceExec30d.sequenceExec} seqüències automàtiques executades en 30 dies`,
     `Taxa de resposta comercial del ${toPct(responseRate30d)}`,
   ].filter(Boolean);
   const manualItems = [
@@ -165,7 +184,7 @@ export default async function SalesOpsPage() {
       <section className="ap-kpi-row xl:grid-cols-3">
         <div className="ap-kpi"><p className="ap-kpi-label">Comunicacions 30d <InfoTooltip text="Total d'emails, missatges i trucades enviats en els últims 30 dies a leads i clients." /></p><p className="ap-kpi-value">{commSent30d}</p></div>
         <div className="ap-kpi ap-kpi--info"><p className="ap-kpi-label">Respostes 30d <InfoTooltip text="Comunicacions que han rebut resposta del client. Un % alt indica bona qualitat de contacte." /></p><p className="ap-kpi-value">{commResponded30d} · {toPct(responseRate30d)}</p></div>
-        <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d <InfoTooltip text="Missatges automàtics enviats pel sistema (follow-ups, recordatoris, seqüències comercials)." /></p><p className="ap-kpi-value">{sequenceExec30d}</p></div>
+        <div className="ap-kpi"><p className="ap-kpi-label">Seqüències auto 30d <InfoTooltip text="Missatges automàtics enviats pel sistema (follow-ups, recordatoris, seqüències comercials)." /></p><p className="ap-kpi-value">{sequenceExec30d.sequenceExec}</p></div>
       </section>
 
       <OwnerControlStrip
@@ -188,6 +207,8 @@ export default async function SalesOpsPage() {
           ...nextStep,
         }}
       />
+
+      <LossBreakdownPanel initialSummary={lossSummary} days={90} />
 
       <section className="ap-card rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -263,7 +284,7 @@ export default async function SalesOpsPage() {
                 </div>
                 {lead.scoring.riskFlags.length > 0 && <p className="mt-1 text-xs admin-tone-text-neutral">Riscos: {lead.scoring.riskFlags.join(', ')}</p>}
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Link href={`/admin/leads/${lead.id}`} className="ap-btn ap-btn--secondary text-xs">Obrir entrada</Link>
+                  <Link href={buildLeadWorkspaceHref(lead.id)} className="ap-btn ap-btn--secondary text-xs">Obrir entrada</Link>
                   {lead.phone && <a href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer" className="ap-btn ap-btn--primary text-xs">WhatsApp</a>}
                 </div>
               </div>

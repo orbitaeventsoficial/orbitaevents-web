@@ -2,6 +2,7 @@ import type { LeadDocumentType } from '@prisma/client';
 import { LEAD_DOCUMENT_ALLOWED_MIME_TYPES, LEAD_DOCUMENT_TYPE_VALUES, LEAD_DOCUMENT_UPLOAD_MAX_SIZE_BYTES } from '@/lib/constants';
 import { prisma } from '@/lib/prisma';
 import { deleteFile, uploadFile } from '@/lib/storage';
+import { recordLeadDocumentAdded, recordLeadDocumentDeleted } from '@/lib/services/leadActivityService';
 
 
 export async function listLeadDocuments(leadId: string) {
@@ -58,15 +59,12 @@ export async function uploadLeadDocument(leadId: string, formData: FormData) {
     },
   });
 
-  await prisma.leadActivity.create({
-    data: {
-      leadId,
-      type: 'DOCUMENT',
-      title: 'Document afegit',
-      description: title,
-      metadata: { documentId: doc.id, type: doc.type },
-      createdBy,
-    },
+  await recordLeadDocumentAdded({
+    leadId,
+    documentId: doc.id,
+    documentType: doc.type,
+    title,
+    createdBy,
   });
 
   return { status: 200, body: { ok: true, document: doc } };
@@ -95,15 +93,10 @@ export async function deleteLeadDocument(leadId: string, documentId: string) {
   }
 
   await prisma.leadDocument.delete({ where: { id: doc.id } });
-  await prisma.leadActivity.create({
-    data: {
-      leadId: doc.leadId,
-      type: 'DOCUMENT',
-      title: 'Document eliminat',
-      description: doc.title,
-      metadata: { documentId: doc.id },
-      createdBy: 'Admin',
-    },
+  await recordLeadDocumentDeleted({
+    leadId: doc.leadId,
+    documentId: doc.id,
+    title: doc.title,
   });
 
   return { status: 200, body: { ok: true } };

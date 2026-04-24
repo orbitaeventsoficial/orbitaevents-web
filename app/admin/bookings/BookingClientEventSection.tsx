@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, EVENT_TYPE_VALUES } from '@/lib/constants';
 
 interface LeadData {
@@ -51,7 +52,7 @@ export default function BookingClientEventSection({
             Entrada vinculada: <strong>{leadData.name}</strong> · {leadData.email}
             {leadData.budget && ` · Pressupost: ${leadData.budget}`}
           </div>
-          <Link href={`/admin/leads/${leadData.id}`} className="text-xs">
+          <Link href={buildLeadWorkspaceHref(leadData.id)} className="text-xs">
             Veure entrada →
           </Link>
         </div>

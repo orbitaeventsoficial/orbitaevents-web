@@ -2,6 +2,7 @@ import { EventType } from '@prisma/client';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { CUSTOMER_ACTIVITY_ACTIONS, TASK_SOURCE } from '@/lib/constants';
+import { recordCustomerBookingCreated } from '@/lib/services/customerActivityService';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
@@ -295,18 +296,13 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   await assignPackInventory(booking.id, booking.packId);
 
   if (linkedCustomerId) {
-    await prisma.customerActivity.create({
-      data: {
-        customerId: linkedCustomerId,
-        action: CUSTOMER_ACTIVITY_ACTIONS.BOOKING_CREATED,
-        details: {
-          bookingId: booking.id,
-          reference: booking.reference,
-          eventDate: booking.eventDate,
-          eventType: booking.eventType,
-          status: booking.status,
-        },
-      },
+    await recordCustomerBookingCreated({
+      customerId: linkedCustomerId,
+      bookingId: booking.id,
+      reference: booking.reference,
+      eventDate: booking.eventDate,
+      eventType: booking.eventType,
+      status: booking.status,
     });
 
     const prepDueDate = new Date(booking.eventDate);

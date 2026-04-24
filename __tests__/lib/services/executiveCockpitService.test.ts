@@ -33,6 +33,7 @@ const briefWithAlerts: DailyBrief = {
 
 const okPulse: OperationalPulse = {
   overallLevel: 'GOOD', overallScore: 72, generatedAt: now.toISOString(),
+  pipelineDrivers: [],
   metrics: [
     { key: 'response', label: 'Temps resposta', value: 4, unit: 'h', level: 'GOOD', target: '<6h' },
     { key: 'followUp', label: 'Seguiment', value: 80, unit: '%', level: 'GOOD', target: '>70%' },
@@ -41,6 +42,7 @@ const okPulse: OperationalPulse = {
 
 const criticalPulse: OperationalPulse = {
   overallLevel: 'CRITICAL', overallScore: 30, generatedAt: now.toISOString(),
+  pipelineDrivers: [],
   metrics: [
     { key: 'response', label: 'Temps resposta', value: 20, unit: 'h', level: 'CRITICAL', target: '<6h' },
     { key: 'followUp', label: 'Seguiment', value: 30, unit: '%', level: 'WARNING', target: '>70%' },

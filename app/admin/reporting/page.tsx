@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { buildExecutiveReport } from '@/lib/services/executiveReportService';
@@ -394,7 +395,7 @@ export default async function ReportingPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs opacity-60">{currency(lead.weightedAmount)}</span>
                     <Link
-                      href={`/admin/leads/${lead.id}`}
+                      href={buildLeadWorkspaceHref(lead.id)}
                       className="rounded border border-white/10 px-2 py-0.5 text-[10px] hover:bg-white/10"
                     >
                       Obrir

@@ -2,7 +2,8 @@ import type { EventType, LeadSource, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
-import { PLACEHOLDER_EMAIL_DOMAIN, CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { recordCustomerLeadCreated } from '@/lib/services/customerActivityService';
 
 type PersistContactLeadInput = {
   name: string;
@@ -136,19 +137,12 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           data: { customerId: customer.id },
         });
 
-        const details: Prisma.InputJsonValue = {
+        await recordCustomerLeadCreated({
+          customerId: customer.id,
           leadId: savedLeadId,
           eventType: input.eventType,
           source: input.source,
           packId: input.packId || null,
-        };
-
-        await prisma.customerActivity.create({
-          data: {
-            customerId: customer.id,
-            action: CUSTOMER_ACTIVITY_ACTIONS.LEAD_CREATED,
-            details,
-          },
         });
       } catch (customerError) {
         log.error('Error creant/actualitzant customer des del formulari de contacte', customerError);

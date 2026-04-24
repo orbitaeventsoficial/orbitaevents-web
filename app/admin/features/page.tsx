@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -99,9 +100,64 @@ export default function FeaturesPage() {
   }
 
   const activeCount = features.filter(f => f.enabled).length;
+  const inactiveCount = features.length - activeCount;
+  const firstDisabled = features.find((feature) => !feature.enabled);
+  const firstEnabled = features.find((feature) => feature.enabled);
+  const systemItems = [
+    `${features.length} funcionalitats governades des d'aquest panell`,
+    `${activeCount} actives i ${inactiveCount} desactivades ara mateix`,
+    firstEnabled ? `La primera funcionalitat activa visible és ${firstEnabled.label}` : '',
+    saving ? `Canvi en curs sobre ${features.find((feature) => feature.key === saving)?.label || saving}` : '',
+  ].filter(Boolean);
+  const manualItems = [
+    inactiveCount > 0 ? `${inactiveCount} ${inactiveCount === 1 ? 'funcionalitat desactivada' : 'funcionalitats desactivades'} demanen criteri de producte` : '',
+    firstDisabled ? `La següent peça desactivada és ${firstDisabled.label}` : '',
+    saving ? 'Hi ha una mutació en curs; convé esperar abans d’encadenar més canvis' : '',
+  ].filter(Boolean);
+  const nextStep =
+    saving
+      ? {
+          title: 'Deixar acabar el canvi abans de tocar res més',
+          detail: 'Hi ha una funcionalitat canviant d’estat ara mateix. El primer pas és deixar tancar la mutació abans d’engegar una segona decisió de producte.',
+          href: '/admin/features',
+          ctaLabel: 'Esperar i revisar',
+        }
+      : firstDisabled
+        ? {
+            title: `Decidir si ${firstDisabled.label} ha d’entrar ja`,
+            detail: `El panell no mostra un incendi tècnic; el següent pas útil és revisar la primera funcionalitat apagada i confirmar si continua sent una decisió vàlida de producte.`,
+            href: '/admin/features',
+            ctaLabel: 'Revisar funcionalitats',
+          }
+        : {
+            title: 'Mantenir el catàleg estable, no canviar per inèrcia',
+            detail: 'Tot el catàleg visible està actiu. Si no hi ha una decisió de negoci clara, el millor següent pas és mantenir estabilitat.',
+            href: '/admin',
+            ctaLabel: 'Tornar al panell',
+          };
 
   return (
     <AdminPage title="Funcionalitats" subtitle="Activa o desactiva funcionalitats del web">
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic',
+          title: 'Què governa aquest catàleg',
+          tone: inactiveCount > 0 ? 'warning' : 'info',
+          items: systemItems,
+          emptyText: 'Sense senyals rellevants al catàleg de funcionalitats.',
+        }}
+        manual={{
+          eyebrow: 'Manual',
+          title: 'On et cal decidir',
+          tone: manualItems.length > 0 ? 'warning' : 'success',
+          items: manualItems,
+          emptyText: 'Cap decisió manual urgent visible ara mateix.',
+        }}
+        nextStep={{
+          eyebrow: 'Següent pas',
+          ...nextStep,
+        }}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

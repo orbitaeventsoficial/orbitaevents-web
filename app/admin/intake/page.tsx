@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { AdminPage } from '../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS, INTAKE_SOURCE_SELECTED_STYLES } from '@/lib/constants';
 
 type DuplicateWarning = {
@@ -212,7 +213,7 @@ export default function IntakePage() {
           </p>
           <div className="mt-3 flex gap-2">
             <Link
-              href={`/admin/leads/${success.id}`}
+              href={buildLeadWorkspaceHref(success.id)}
               className="rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
             >
               Obrir entrada →
@@ -498,4 +499,3 @@ export default function IntakePage() {
     </AdminPage>
   );
 }
-

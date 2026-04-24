@@ -5,15 +5,19 @@ const {
   mockFetchCustomerHubCustomerBase,
   mockFetchCustomerHubLeads,
   mockFetchCustomerHubCollections,
-  mockBuildTimeline,
+  mockBuildCustomerBusinessTimelineEvents,
+  mockBuildCustomerActivityTimelineEvents,
   mockLoadCommTimeline,
+  mockFetchCanonicalEventsForCustomer,
 } = vi.hoisted(() => ({
   mockResolveCustomerHubCustomerId: vi.fn(),
   mockFetchCustomerHubCustomerBase: vi.fn(),
   mockFetchCustomerHubLeads: vi.fn(),
   mockFetchCustomerHubCollections: vi.fn(),
-  mockBuildTimeline: vi.fn(),
+  mockBuildCustomerBusinessTimelineEvents: vi.fn(),
+  mockBuildCustomerActivityTimelineEvents: vi.fn(),
   mockLoadCommTimeline: vi.fn(),
+  mockFetchCanonicalEventsForCustomer: vi.fn(),
 }));
 
 vi.mock('@/lib/customer-hub/data', () => ({
@@ -24,11 +28,16 @@ vi.mock('@/lib/customer-hub/data', () => ({
 }));
 
 vi.mock('@/lib/customer-hub/timeline', () => ({
-  buildTimeline: mockBuildTimeline,
+  buildCustomerBusinessTimelineEvents: mockBuildCustomerBusinessTimelineEvents,
+  buildCustomerActivityTimelineEvents: mockBuildCustomerActivityTimelineEvents,
 }));
 
 vi.mock('@/lib/services/commTimelineService', () => ({
   loadCommTimeline: mockLoadCommTimeline,
+}));
+
+vi.mock('@/lib/services/timelineQueryService', () => ({
+  fetchCanonicalEventsForCustomer: mockFetchCanonicalEventsForCustomer,
 }));
 
 import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
@@ -80,7 +89,9 @@ beforeEach(() => {
     },
   ]);
 
-  mockBuildTimeline.mockReturnValue([]);
+  mockBuildCustomerBusinessTimelineEvents.mockReturnValue([]);
+  mockBuildCustomerActivityTimelineEvents.mockReturnValue([]);
+  mockFetchCanonicalEventsForCustomer.mockResolvedValue([]);
   mockLoadCommTimeline.mockResolvedValue({
     entries: [],
     total: 3,
@@ -107,7 +118,6 @@ describe('fetchCustomerHub', () => {
       bookingsRows: [],
       customerTasks: [],
       activityLog: [],
-      adminLogs: [],
       customerDiscountCodes: [],
     });
 
@@ -139,7 +149,6 @@ describe('fetchCustomerHub', () => {
         },
       ],
       activityLog: [],
-      adminLogs: [],
       customerDiscountCodes: [],
     });
 
@@ -162,7 +171,6 @@ describe('fetchCustomerHub', () => {
       bookingsRows: [],
       customerTasks: [],
       activityLog: [],
-      adminLogs: [],
       customerDiscountCodes: [],
     });
 
@@ -185,6 +193,23 @@ describe('fetchCustomerHub', () => {
       daysSinceLastContact: 2,
       responseGap: 5,
     });
+  });
+
+  it('carrega també la timeline canònica del customer abans de construir la cronologia', async () => {
+    mockFetchCustomerHubCollections.mockResolvedValue({
+      proposals: [],
+      bookingsRows: [],
+      customerTasks: [],
+      activityLog: [],
+      customerDiscountCodes: [],
+    });
+
+    await fetchCustomerHub('cust-1');
+
+    expect(mockFetchCanonicalEventsForCustomer).toHaveBeenCalledWith('cust-1', 250);
+    expect(mockBuildCustomerActivityTimelineEvents).toHaveBeenCalledWith(expect.objectContaining({
+      canonicalEvents: [],
+    }));
   });
 
   it('deriva follow-up canònic pendent des dels leads del customer hub', async () => {
@@ -219,7 +244,6 @@ describe('fetchCustomerHub', () => {
       bookingsRows: [],
       customerTasks: [],
       activityLog: [],
-      adminLogs: [],
       customerDiscountCodes: [],
     });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
@@ -268,7 +269,7 @@ export default function ProposalsList({
                 )}
                 {proposal.leadId && (
                   <Link
-                    href={`/admin/leads/${proposal.leadId}`}
+                    href={buildLeadWorkspaceHref(proposal.leadId)}
                     className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                   >
                     📋 Entrada
@@ -374,7 +375,7 @@ export default function ProposalsList({
                         )}
                         {proposal.leadId && (
                           <Link
-                            href={`/admin/leads/${proposal.leadId}`}
+                            href={buildLeadWorkspaceHref(proposal.leadId)}
                             className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                           >
                             📋 Entrada
@@ -407,7 +408,7 @@ export default function ProposalsList({
                   </p>
                 </div>
                 <Link
-                  href={`/admin/leads/${quote.leadId}`}
+                  href={buildLeadWorkspaceHref(quote.leadId)}
                   className="text-xs opacity-60 hover:opacity-100"
                 >
                   Veure lead →

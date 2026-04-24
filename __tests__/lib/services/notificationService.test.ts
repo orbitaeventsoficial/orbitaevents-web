@@ -6,6 +6,9 @@ const { mockSendEmail } = vi.hoisted(() => ({
 
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
+vi.mock('@/lib/services/notificationRecipientsService', () => ({
+  getRecipientsAsString: vi.fn().mockResolvedValue('alerts@orbitaevents.com'),
+}));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
     business: { phone: '+34612345678', phoneDisplay: '612 345 678', email: 'info@orbitaevents.com' },

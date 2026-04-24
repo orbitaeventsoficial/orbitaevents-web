@@ -54,7 +54,7 @@
     "scan:hardcoded": "node scripts/scan-hardcoded.js",
     "arch:layer:check": "node scripts/check-layer-catalogs.mjs",
     "arch:task-canonical:check": "node scripts/check-task-canonical.mjs",
-    "validate:core": "pnpm run qa:protocol && pnpm run qa:protocol:test && pnpm run qa:encoding && pnpm run qa:message-imports && pnpm run arch:layer:check && pnpm run arch:task-canonical:check && npx tsc --noEmit && pnpm run i18n:packs:guard && pnpm run i18n:equipment:guard",
+    "validate:core": "pnpm run qa:protocol && pnpm run qa:protocol:test && pnpm run qa:encoding && pnpm run qa:language && pnpm run qa:message-imports && pnpm run arch:layer:check && pnpm run arch:task-canonical:check && npx tsc --noEmit && pnpm run i18n:packs:guard && pnpm run i18n:equipment:guard",
     "qa:encoding": "node scripts/check-mojibake.mjs --paths app lib messages prisma",
     "qa:encoding:changed": "node scripts/check-mojibake.mjs --changed",
     "qa:protocol": "node scripts/check-admin-change-log.mjs",

@@ -12,6 +12,7 @@ import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
 import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
+import { fetchRecentCanonicalCommunicationMetrics } from '@/lib/services/timelineQueryService';
 
 const COMMERCIAL_SCORING_BATCH_SIZE = 50;
 
@@ -75,14 +76,15 @@ export async function runCommercialDailyAutomation() {
   }
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const [commSent24h, commResponded24h, openLeads, openTasks] = await Promise.all([
-    prisma.adminLog.count({ where: { action: 'COMM_SENT', createdAt: { gte: since24h } } }),
-    prisma.adminLog.count({ where: { action: 'COMM_RESPONDED', createdAt: { gte: since24h } } }),
+  const [commMetrics24h, openLeads, openTasks] = await Promise.all([
+    fetchRecentCanonicalCommunicationMetrics(since24h),
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
     prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
   ]);
 
-  const responseRate = commSent24h > 0 ? commResponded24h / commSent24h : 0;
+  const commSent24h = commMetrics24h.commSent;
+  const commResponded24h = commMetrics24h.commResponded;
+  const responseRate = commMetrics24h.responseRate;
   const criticalBriefAlerts = dailyBrief.alerts.filter((alert) => alert.level === 'CRITICAL');
 
   const summary = {

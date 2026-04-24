@@ -1,21 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma, mockSendEmail, mockSendWhatsAppText } = vi.hoisted(() => ({
+const {
+  mockPrisma,
+  mockSendEmail,
+  mockSendWhatsAppText,
+  mockRecordLeadCommercialSequenceStepSent,
+} = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       findMany: vi.fn(),
       update: vi.fn(),
     },
-    leadActivity: { create: vi.fn() },
     adminLog: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
   mockSendWhatsAppText: vi.fn(),
+  mockRecordLeadCommercialSequenceStepSent: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/services/whatsappService', () => ({ sendWhatsAppText: mockSendWhatsAppText }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadCommercialSequenceStepSent: mockRecordLeadCommercialSequenceStepSent,
+}));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
 import { runCommercialSequences, DEFAULT_NURTURING_CADENCE } from '@/lib/services/commercialSequenceService';
@@ -41,10 +49,10 @@ describe('runCommercialSequences', () => {
     vi.clearAllMocks();
     mockPrisma.lead.findMany.mockResolvedValue([]);
     mockPrisma.lead.update.mockResolvedValue({});
-    mockPrisma.leadActivity.create.mockResolvedValue({});
     mockPrisma.adminLog.create.mockResolvedValue({});
     mockSendEmail.mockResolvedValue(undefined);
     mockSendWhatsAppText.mockResolvedValue({ ok: false }); // WhatsApp off per defecte
+    mockRecordLeadCommercialSequenceStepSent.mockResolvedValue({});
   });
 
   it('retorna summary buit sense leads', async () => {
@@ -169,22 +177,20 @@ describe('runCommercialSequences', () => {
     });
   });
 
-  it('crea leadActivity amb canal i metadades', async () => {
+  it('delegates leadActivity al helper shared amb canal i metadades', async () => {
     mockPrisma.lead.findMany.mockResolvedValue([makeLead()]);
 
     await runCommercialSequences();
 
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead-1',
-        type: 'EMAIL',
-        createdBy: 'Sequence Bot',
-        metadata: expect.objectContaining({
-          step: 1,
-          channel: 'email',
-          locale: 'ca',
-        }),
-      }),
+    expect(mockRecordLeadCommercialSequenceStepSent).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      channel: 'email',
+      activityTitle: expect.any(String),
+      step: 1,
+      totalSteps: DEFAULT_NURTURING_CADENCE.length,
+      templateSlug: 'follow-up-1',
+      locale: 'ca',
+      delayHours: 24,
     });
   });
 

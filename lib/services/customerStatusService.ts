@@ -1,6 +1,6 @@
 import { BookingStatus, LeadStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
+import { recordCustomerStatusChanged } from '@/lib/services/customerActivityService';
 
 type CustomerHubStatus = 'LEAD' | 'NEGOTIATION' | 'CONFIRMED' | 'POSTEVENT' | 'LOST';
 
@@ -50,14 +50,7 @@ export async function updateCustomerHubStatus(customerId: string, status: Custom
     });
   }
 
-  await prisma.customerActivity.create({
-    data: {
-      customerId,
-      action: CUSTOMER_ACTIVITY_ACTIONS.STATUS_CHANGED,
-      details: { newStatus: status },
-    },
-  });
+  await recordCustomerStatusChanged(customerId, status);
 
   return { ok: true, status };
 }
-

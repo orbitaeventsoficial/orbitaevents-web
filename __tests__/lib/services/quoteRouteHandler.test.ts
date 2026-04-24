@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockRecordLeadQuoteGenerated } = vi.hoisted(() => ({
   mockPrisma: {
     $queryRaw: vi.fn(),
     lead: { updateMany: vi.fn() },
     leadNote: { create: vi.fn() },
     leadDocument: { create: vi.fn() },
-    leadActivity: { create: vi.fn() },
   },
+  mockRecordLeadQuoteGenerated: vi.fn(),
 }));
 
 const { mockAuth } = vi.hoisted(() => ({
@@ -40,6 +40,9 @@ vi.mock('@/lib/services/documentService', () => mockDocService);
 vi.mock('@/lib/services/quotes/quotePack', () => mockQuotePack);
 vi.mock('@/lib/services/quoteTemplateService', () => mockTemplateService);
 vi.mock('@/lib/site', () => mockSite);
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadQuoteGenerated: mockRecordLeadQuoteGenerated,
+}));
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
@@ -106,7 +109,7 @@ beforeEach(() => {
   mockPrisma.lead.updateMany.mockResolvedValue({ count: 1 });
   mockPrisma.leadNote.create.mockResolvedValue({ id: 'n1' });
   mockPrisma.leadDocument.create.mockResolvedValue({ id: 'd1' });
-  mockPrisma.leadActivity.create.mockResolvedValue({ id: 'a1' });
+  mockRecordLeadQuoteGenerated.mockResolvedValue({ id: 'a1' });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -208,12 +211,10 @@ describe('handleLeadQuotePost', () => {
         mimeType: 'text/html',
       }),
     });
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead1',
-        type: 'DOCUMENT',
-        title: 'Pressupost generat',
-      }),
+    expect(mockRecordLeadQuoteGenerated).toHaveBeenCalledWith({
+      leadId: 'lead1',
+      quoteNumber: 'ORB-2026-001',
+      total: 1500,
     });
   });
 

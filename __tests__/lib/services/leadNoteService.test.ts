@@ -10,17 +10,20 @@ const { mockPrisma } = vi.hoisted(() => ({
       delete: vi.fn(),
       deleteMany: vi.fn(),
     },
-    leadActivity: { create: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadNoteAdded: vi.fn(),
+}));
 
 import {
   createLeadNote,
   cleanupDuplicateLeadNotes,
   deleteLeadNote,
 } from '@/lib/services/leadNoteService';
+import { recordLeadNoteAdded } from '@/lib/services/leadActivityService';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -30,7 +33,6 @@ beforeEach(() => {
   mockPrisma.leadNote.findFirst.mockResolvedValue({ id: 'note-1' });
   mockPrisma.leadNote.delete.mockResolvedValue({});
   mockPrisma.leadNote.deleteMany.mockResolvedValue({ count: 0 });
-  mockPrisma.leadActivity.create.mockResolvedValue({});
 });
 
 describe('createLeadNote', () => {
@@ -56,14 +58,12 @@ describe('createLeadNote', () => {
     expect(result.status).toBe(404);
   });
 
-  it('crea leadActivity associada', async () => {
+  it('registra leadActivity associada via capa shared', async () => {
     await createLeadNote('lead-1', 'Nota important');
-    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        leadId: 'lead-1',
-        type: 'NOTE',
-        title: 'Nota afegida',
-      }),
+    expect(recordLeadNoteAdded).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      content: 'Nota important',
+      createdBy: 'Admin',
     });
   });
 

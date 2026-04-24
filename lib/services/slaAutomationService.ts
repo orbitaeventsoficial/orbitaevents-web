@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { createUniversalTask } from '@/lib/services/tasks/taskCreation';
+import { recordLeadSlaTaskCreated } from '@/lib/services/leadActivityService';
 
 const SLA_HOURS = 24;
 
@@ -76,15 +77,9 @@ export async function enforceLeadSla(): Promise<SlaAutomationSummary> {
       assignedTo: lead.assignedTo || null,
     });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId: lead.id,
-        type: 'TASK',
-        title: 'SLA incomplert: tasca automàtica creada',
-        description: `Es crea tasca automàtica en superar ${SLA_HOURS}h en estat NEW.`,
-        createdBy: 'SLA Bot',
-        metadata: { slaHours: SLA_HOURS },
-      },
+    await recordLeadSlaTaskCreated({
+      leadId: lead.id,
+      slaHours: SLA_HOURS,
     });
 
     if (lead.priority === 'LOW' || lead.priority === 'MEDIUM') {

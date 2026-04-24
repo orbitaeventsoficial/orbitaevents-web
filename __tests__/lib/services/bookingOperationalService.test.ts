@@ -4,7 +4,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const { mockPrisma, mockGetBookingChecklist, mockGetActivePortalAccess, mockGetProfitabilityConfig, mockFetchCanonicalEventsForBooking } = vi.hoisted(() => ({
   mockPrisma: {
-    adminLog: { findMany: vi.fn() },
     customer: { findUnique: vi.fn(), findFirst: vi.fn() },
     setting: { findUnique: vi.fn() },
     inventoryUsage: { groupBy: vi.fn() },
@@ -74,7 +73,6 @@ beforeEach(() => {
   mockGetBookingChecklist.mockResolvedValue([
     { id: 'c1', label: 'Item 1', checked: false },
   ]);
-  mockPrisma.adminLog.findMany.mockResolvedValue([]);
   mockFetchCanonicalEventsForBooking.mockResolvedValue([]);
   mockPrisma.customer.findUnique.mockResolvedValue({
     id: 'cust-1', totalEvents: 5, totalSpent: 10000, lastEventDate: new Date('2026-03-01'),
@@ -129,10 +127,29 @@ describe('getBookingOperationalSnapshot', () => {
   // ─── commStatuses ───────────────────────────────────────────────────
 
   it('deriva commStatuses de commLogs', async () => {
-    const now = new Date();
-    mockPrisma.adminLog.findMany.mockResolvedValue([
-      { id: 'log-1', action: 'COMM_SENT', createdAt: now, details: { flow: 'PAYMENT', channel: 'email' } },
-      { id: 'log-2', action: 'COMM_RESPONDED', createdAt: now, details: { flow: 'PAYMENT' } },
+    mockFetchCanonicalEventsForBooking.mockResolvedValue([
+      {
+        id: 'al:log-1',
+        source: 'adminLog',
+        entityType: 'booking',
+        entityId: 'booking-1',
+        kind: 'booking',
+        title: 'Comunicació enviada',
+        occurredAt: '2026-04-22T10:00:00.000Z',
+        metadata: { flow: 'PAYMENT', channel: 'email' },
+        timelineType: 'BOOKING_CREATED',
+      },
+      {
+        id: 'al:log-2',
+        source: 'adminLog',
+        entityType: 'booking',
+        entityId: 'booking-1',
+        kind: 'booking',
+        title: 'Resposta del client',
+        occurredAt: '2026-04-22T12:00:00.000Z',
+        metadata: { flow: 'PAYMENT' },
+        timelineType: 'BOOKING_CREATED',
+      },
     ]);
 
     const result = await getBookingOperationalSnapshot(makeBookingInput());
@@ -142,18 +159,37 @@ describe('getBookingOperationalSnapshot', () => {
   });
 
   it('genera recentCommRows a partir de commLogs', async () => {
-    const now = new Date();
-    mockPrisma.adminLog.findMany.mockResolvedValue([
-      { id: 'log-1', action: 'COMM_SENT', createdAt: now, details: { flow: 'PAYMENT', channel: 'email' } },
-      { id: 'log-2', action: 'COMM_RESPONDED', createdAt: now, details: { flow: 'POST_EVENT' } },
+    mockFetchCanonicalEventsForBooking.mockResolvedValue([
+      {
+        id: 'al:log-1',
+        source: 'adminLog',
+        entityType: 'booking',
+        entityId: 'booking-1',
+        kind: 'booking',
+        title: 'Comunicació enviada',
+        occurredAt: '2026-04-22T10:00:00.000Z',
+        metadata: { flow: 'PAYMENT', channel: 'email' },
+        timelineType: 'BOOKING_CREATED',
+      },
+      {
+        id: 'al:log-2',
+        source: 'adminLog',
+        entityType: 'booking',
+        entityId: 'booking-1',
+        kind: 'booking',
+        title: 'Resposta del client',
+        occurredAt: '2026-04-22T09:00:00.000Z',
+        metadata: { flow: 'POST_EVENT' },
+        timelineType: 'BOOKING_CREATED',
+      },
     ]);
 
     const result = await getBookingOperationalSnapshot(makeBookingInput());
 
     expect(result.recentCommRows).toHaveLength(2);
     expect(result.recentCommRows[0]).toEqual({
-      id: 'log-1',
-      createdAt: now,
+      id: 'al:log-1',
+      createdAt: new Date('2026-04-22T10:00:00.000Z'),
       action: 'COMM_SENT',
       flow: 'PAYMENT',
       channel: 'email',

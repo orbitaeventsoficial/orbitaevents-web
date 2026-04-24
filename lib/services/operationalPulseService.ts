@@ -8,7 +8,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
-import { loadPipelineSuggestions } from '@/lib/services/leadPipelineSuggestionsService';
+import { loadPipelineSuggestions, type PipelineSuggestion, type SuggestionPriority } from '@/lib/services/leadPipelineSuggestionsService';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -25,10 +25,20 @@ export type PulseMetric = {
   target: string;
 };
 
+export type PulsePipelineDriver = {
+  type: PipelineSuggestion['type'];
+  priority: Exclude<SuggestionPriority, 'INFO'>;
+  title: string;
+  detail: string;
+  href: string;
+  count: number;
+};
+
 export type OperationalPulse = {
   overallLevel: PulseLevel;
   overallScore: number;
   metrics: PulseMetric[];
+  pipelineDrivers: PulsePipelineDriver[];
   generatedAt: string;
 };
 
@@ -41,6 +51,7 @@ export type PulseInput = {
   overdueTasksRate: number;
   paymentCollectionRate: number;
   customerRetentionRate: number;
+  pipelineDrivers?: PulsePipelineDriver[];
   now: Date;
 };
 
@@ -158,6 +169,7 @@ export function generateOperationalPulse(input: PulseInput): OperationalPulse {
     overallLevel,
     overallScore,
     metrics,
+    pipelineDrivers: input.pipelineDrivers ?? [],
     generatedAt: input.now.toISOString(),
   };
 }
@@ -247,6 +259,17 @@ export async function loadOperationalPulse(now: Date = new Date()): Promise<Oper
   const overdueTasksRate = totalTasks > 0 ? (overdueTasks / totalTasks) * 100 : 0;
   const paymentCollectionRate = totalBookings > 0 ? (paidBookings / totalBookings) * 100 : 100;
   const customerRetentionRate = totalCustomers > 0 ? (activeCustomers / totalCustomers) * 100 : 0;
+  const pipelineDrivers: PulsePipelineDriver[] = pipelineSuggestions
+    .filter((suggestion): suggestion is PipelineSuggestion & { priority: Exclude<SuggestionPriority, 'INFO'> } => suggestion.priority !== 'INFO')
+    .slice(0, 3)
+    .map((suggestion) => ({
+      type: suggestion.type,
+      priority: suggestion.priority,
+      title: suggestion.title,
+      detail: suggestion.detail,
+      href: suggestion.href,
+      count: suggestion.count,
+    }));
 
   return generateOperationalPulse({
     avgResponseHours,
@@ -257,6 +280,7 @@ export async function loadOperationalPulse(now: Date = new Date()): Promise<Oper
     overdueTasksRate,
     paymentCollectionRate,
     customerRetentionRate,
+    pipelineDrivers,
     now,
   });
 }

@@ -6,6 +6,7 @@ import { getTranslatedPackName } from '@/lib/pack-name';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import InfoTooltip from '../components/InfoTooltip';
 
 export const dynamic = 'force-dynamic';
@@ -109,8 +110,97 @@ export default async function PostEventPage() {
     },
   ] as const;
 
+  const bookingsWithoutReport = data.recentBookings.length;
+  const totalSurveyFlow = data.pendingSurveys + data.completedSurveys;
+  const surveyResponseRate = totalSurveyFlow > 0
+    ? Math.round((data.completedSurveys / totalSurveyFlow) * 100)
+    : null;
+
+  const systemItems: string[] = [];
+  if (data.completedReports > 0) {
+    systemItems.push(`${data.completedReports} informes interns tancats`);
+  }
+  if (data.completedSurveys > 0) {
+    systemItems.push(
+      `${data.completedSurveys} enquestes rebudes${surveyResponseRate !== null ? ` · ${surveyResponseRate}% resposta` : ''}`
+    );
+  }
+  if (data.completedReports === 0 && data.completedSurveys === 0) {
+    systemItems.push('Encara no hi ha cicle post-event tancat amb informe ni enquesta rebuda');
+  }
+
+  const manualItems: string[] = [];
+  if (bookingsWithoutReport > 0) {
+    manualItems.push(`${bookingsWithoutReport} events completats sense informe intern`);
+  }
+  if (data.pendingReports > 0) {
+    manualItems.push(`${data.pendingReports} informes en esborrany per completar`);
+  }
+  if (data.pendingSurveys > 0) {
+    manualItems.push(`${data.pendingSurveys} enquestes encara sense enviar al client`);
+  }
+
+  const nextStep = bookingsWithoutReport > 0
+    ? {
+        eyebrow: 'Següent pas · Informe',
+        title: `Crear informe del primer event pendent`,
+        detail: `${bookingsWithoutReport} ${bookingsWithoutReport === 1 ? 'event completat no té' : 'events completats no tenen'} informe intern. Tancar el cicle operatiu comença per aquí.`,
+        href: `/admin/post-event/reports/new?bookingId=${data.recentBookings[0]!.id}`,
+        ctaLabel: 'Crear informe',
+        secondaryAction: { href: '/admin/post-event/reports', label: 'Veure tots' },
+      }
+    : data.pendingReports > 0
+    ? {
+        eyebrow: 'Següent pas · Tancar',
+        title: 'Completar informes en esborrany',
+        detail: `${data.pendingReports} ${data.pendingReports === 1 ? 'informe intern està' : 'informes interns estan'} en DRAFT. Tanca'ls per poder processar feedback i aprenentatges.`,
+        href: '/admin/post-event/reports',
+        ctaLabel: 'Revisar esborranys',
+      }
+    : data.pendingSurveys > 0
+    ? {
+        eyebrow: 'Següent pas · Enquestes',
+        title: 'Enviar enquestes pendents',
+        detail: `${data.pendingSurveys} ${data.pendingSurveys === 1 ? 'event completat no ha' : 'events completats no han'} rebut l'enquesta al client. Sense resposta no hi ha NPS ni testimonis.`,
+        href: '/admin/post-event/surveys',
+        ctaLabel: 'Gestionar enquestes',
+      }
+    : {
+        eyebrow: 'Següent pas',
+        title: 'Cicle post-event al dia',
+        detail: 'Tots els events tenen informe, les enquestes s\'envien i el backlog està net. Aprofita per enviar agraïments i codis de referits.',
+        href: '/admin/post-event/feedback',
+        ctaLabel: 'Feedback al client',
+        secondaryAction: { href: '/admin/post-event/playbook', label: 'Obrir playbook' },
+      };
+
   return (
     <AdminPage title="Post-Event" subtitle="Gestiona informes, enquestes i feedback dels esdeveniments">
+      <OwnerControlStrip
+        system={{
+          eyebrow: 'Automàtic · Cicle tancat',
+          title: data.completedReports > 0 || data.completedSurveys > 0
+            ? 'Historial post-event'
+            : 'Sense historial encara',
+          tone: data.completedReports > 0 || data.completedSurveys > 0 ? 'success' : 'info',
+          items: systemItems,
+          emptyText: 'Encara no hi ha informes ni enquestes tancades.',
+        }}
+        manual={{
+          eyebrow: 'Manual · Backlog',
+          title: manualItems.length === 0
+            ? 'Cap backlog visible'
+            : `${manualItems.length} senyals per revisar`,
+          tone: bookingsWithoutReport > 0 || data.pendingReports > 0
+            ? 'warning'
+            : manualItems.length > 0
+            ? 'info'
+            : 'success',
+          items: manualItems,
+          emptyText: 'Tots els events tenen informe i enquesta al dia.',
+        }}
+        nextStep={nextStep}
+      />
       <section className="ap-kpi-row lg:grid-cols-4">
         <div className="ap-kpi ap-kpi--warning">
           <p className="ap-kpi-label">Informes pendents <InfoTooltip text="Esdeveniments completats que encara no tenen informe intern. Fes-lo per tancar el cicle operatiu." /></p>

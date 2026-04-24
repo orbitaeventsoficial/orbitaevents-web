@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import {
-  CUSTOMER_ACTIVITY_ACTIONS,
   CUSTOMER_ANONYMIZED_NAME,
   CUSTOMER_ANONYMIZED_NAME_NORMALIZED,
   buildAnonymizedEmail,
 } from '@/lib/constants';
+import { recordCustomerProfileUpdated } from '@/lib/services/customerActivityService';
 
 type CustomerPatchInput = {
   name?: string;
@@ -133,13 +133,7 @@ export async function updateCustomerFromInput(id: string, data: CustomerPatchInp
     data: updateData,
   });
 
-  await prisma.customerActivity.create({
-    data: {
-      customerId: id,
-      action: CUSTOMER_ACTIVITY_ACTIONS.PROFILE_UPDATED,
-      details: { fields: Object.keys(updateData) },
-    },
-  });
+  await recordCustomerProfileUpdated(id, Object.keys(updateData));
 
   return { status: 200, body: { ok: true, customer } };
 }

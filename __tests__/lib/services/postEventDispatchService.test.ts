@@ -7,8 +7,6 @@ const { mockPrisma, mockSendEmail } = vi.hoisted(() => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
-    customerActivity: { create: vi.fn() },
-    adminLog: { create: vi.fn() },
   },
   mockSendEmail: vi.fn(),
 }));
@@ -36,16 +34,22 @@ vi.mock('@/lib/services/postEventEmailService', () => ({
   getPostEventSubject: () => 'Subject',
   generatePostEventEmail: () => '<html>email</html>',
 }));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomerPostEventEmailSent: vi.fn(),
+}));
+vi.mock('@/lib/services/bookingCommunicationLogService', () => ({
+  recordBookingCommunicationLog: vi.fn(),
+}));
 
 import { listPendingPostEventBookings, sendPostEventEmailForBooking } from '@/lib/services/postEventDispatchService';
+import { recordCustomerPostEventEmailSent } from '@/lib/services/customerActivityService';
+import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.booking.findMany.mockResolvedValue([]);
   mockPrisma.booking.findUnique.mockResolvedValue(null);
   mockPrisma.booking.update.mockResolvedValue({});
-  mockPrisma.customerActivity.create.mockResolvedValue({});
-  mockPrisma.adminLog.create.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
 });
 
@@ -143,7 +147,7 @@ describe('sendPostEventEmailForBooking', () => {
     );
   });
 
-  it('crea customerActivity si customer linked', async () => {
+  it('registra POST_EVENT_EMAIL_SENT via capa shared si customer linked', async () => {
     mockPrisma.booking.findUnique.mockResolvedValue({
       id: 'b1',
       status: 'COMPLETED',
@@ -159,10 +163,14 @@ describe('sendPostEventEmailForBooking', () => {
 
     await sendPostEventEmailForBooking('b1');
 
-    expect(mockPrisma.customerActivity.create).toHaveBeenCalled();
+    expect(recordCustomerPostEventEmailSent).toHaveBeenCalledWith({
+      customerId: 'cust1',
+      bookingId: 'b1',
+      bookingRef: 'REF-001',
+    });
   });
 
-  it('crea adminLog si opció activada', async () => {
+  it('registra adminLog shared si opció activada', async () => {
     mockPrisma.booking.findUnique.mockResolvedValue({
       id: 'b1',
       status: 'COMPLETED',
@@ -178,6 +186,10 @@ describe('sendPostEventEmailForBooking', () => {
 
     await sendPostEventEmailForBooking('b1', { createAdminLog: true });
 
-    expect(mockPrisma.adminLog.create).toHaveBeenCalled();
+    expect(recordBookingCommunicationLog).toHaveBeenCalledWith({
+      action: 'SEND_POST_EVENT_EMAIL',
+      bookingId: 'b1',
+      details: { email: 'maria@test.com', reference: 'REF-001' },
+    });
   });
 });

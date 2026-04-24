@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateFull, DEFAULT_LOCALE, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -368,7 +369,7 @@ export default function CalendarDayClient() {
                     </Link>
                   ))}
                   {visibleLayers.followUps && dayData.followUps.map((item) => (
-                    <Link key={item.leadId} href={`/admin/leads/${item.leadId}`} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2">
+                    <Link key={item.leadId} href={buildLeadWorkspaceHref(item.leadId)} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2">
                       <div className="truncate text-sm font-medium">☎ Follow-up · {item.name}</div>
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
                     </Link>
@@ -433,4 +434,3 @@ export default function CalendarDayClient() {
     </AdminPage>
   );
 }
-

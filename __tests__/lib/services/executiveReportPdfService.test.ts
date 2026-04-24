@@ -39,6 +39,17 @@ function makeReport(overrides: Partial<ExecutiveReport> = {}): ExecutiveReport {
       { id: 'l1', name: 'Maria', status: 'CONTACTED', assignedTo: null, source: 'WEB', score: 25, probability: 0.3, weightedAmount: 900 },
       { id: 'l2', name: 'Jordi', status: 'NEW', assignedTo: 'Anna', source: 'REFERRAL', score: 15, probability: 0.15, weightedAmount: 450 },
     ],
+    lossSummary: {
+      total: 0,
+      uncategorized: 0,
+      autoTotal: 0,
+      commercialTotal: 0,
+      byReason: [],
+      byEventType: [],
+      bySource: [],
+      byMonth: [],
+      topReason: null,
+    },
     ...overrides,
   };
 }

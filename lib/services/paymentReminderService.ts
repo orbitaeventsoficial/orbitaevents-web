@@ -18,6 +18,7 @@ import {
   formatDateFull,
 } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
 interface PaymentReminderResult {
   checked: number;
@@ -137,17 +138,14 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
         html,
       });
 
-      await prisma.adminLog.create({
-        data: {
-          action: CUSTOMER_ACTIVITY_ACTIONS.PAYMENT_REMINDER_SENT,
-          entity: 'booking',
-          entityId: booking.id,
-          details: {
-            pendingAmount,
-            daysToEvent,
-            clientEmail: booking.clientEmail,
-            locale,
-          },
+      await recordBookingCommunicationLog({
+        action: CUSTOMER_ACTIVITY_ACTIONS.PAYMENT_REMINDER_SENT,
+        bookingId: booking.id,
+        details: {
+          pendingAmount,
+          daysToEvent,
+          clientEmail: booking.clientEmail,
+          locale,
         },
       });
 
@@ -160,4 +158,3 @@ export async function sendPaymentReminders(): Promise<PaymentReminderResult> {
 
   return result;
 }
-

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { buildCommTimeline, type CommChannel, type CommTimelineRawEntry, type CommTimelineSummary } from '@/lib/services/commTimelineService';
+import type { CommChannel, CommTimelineSummary } from '@/lib/services/commTimelineService';
 
 const CHANNEL_ICON: Record<CommChannel, string> = {
   EMAIL: '📧',
@@ -34,22 +34,11 @@ export default function CommSummaryPanel({ leadId }: { leadId: string }) {
     setLoading(true);
     setTimeline(null);
 
-    fetch(`/api/admin/leads/${leadId}/activities`)
+    fetch(`/api/admin/leads/${leadId}/comm-summary`)
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        const activities: CommTimelineRawEntry[] = (data.activities ?? data ?? []).map((a: Record<string, unknown>) => ({
-          id: a.id as string,
-          type: a.type as string,
-          title: (a.title as string) ?? null,
-          description: (a.description as string) ?? null,
-          createdBy: (a.createdBy as string) ?? null,
-          createdAt: new Date(a.createdAt as string),
-          leadId,
-          metadata: (a.metadata as Record<string, unknown>) ?? null,
-        }));
-        const result = buildCommTimeline({ activities, customerId: null, now: new Date() });
-        setTimeline(result);
+        setTimeline(data as CommTimelineSummary);
         setLoading(false);
       })
       .catch(() => {

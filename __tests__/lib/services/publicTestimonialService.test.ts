@@ -22,12 +22,16 @@ const { mockPrisma } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
+vi.mock('@/lib/services/customerActivityService', () => ({
+  recordCustomerTestimonialSubmitted: vi.fn(),
+}));
 
 import {
   listApprovedPublicTestimonials,
   listApprovedDatabaseReviews,
   submitPublicTestimonial,
 } from '@/lib/services/publicTestimonialService';
+import { recordCustomerTestimonialSubmitted } from '@/lib/services/customerActivityService';
 
 const MOCK_TESTIMONIALS = [
   {
@@ -277,5 +281,24 @@ describe('submitPublicTestimonial', () => {
     });
 
     expect(result.customerId).toBe('existing-cust');
+  });
+
+  it('registra TESTIMONIAL_SUBMITTED via capa shared', async () => {
+    await submitPublicTestimonial({
+      name: 'Maria',
+      email: 'maria@test.com',
+      rating: 5,
+      comment: 'Test',
+      allowGoogleShare: false,
+      consentPhotoPublication: false,
+    });
+
+    expect(recordCustomerTestimonialSubmitted).toHaveBeenCalledWith({
+      customerId: 'cust-1',
+      testimonialId: 'test-1',
+      rating: 5,
+      discountCode: expect.stringMatching(/^OE-[A-Z0-9]{6}$/),
+      discountPercent: 5,
+    }, expect.any(Object));
   });
 });

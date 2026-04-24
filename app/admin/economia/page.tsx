@@ -1,13 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { buildProfitabilityReport, normalizeProfitabilityConfig } from '@/lib/services/profitabilityService';
-import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
+import { deriveFlowStatusFromTimeline } from '@/lib/services/communicationStatusService';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
-import { computePackPricingHealth, getPackPricingModelConfigEditable, type PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import { computePackPricingHealth, getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
 import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
 import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
 import { buildCacAnalysis } from '@/lib/services/cacAnalysis';
+import { fetchCanonicalCommunicationEventsForBookings } from '@/lib/services/timelineQueryService';
+import { readPackPricingModelHistory, readProfitabilityConfigHistory } from '@/lib/services/adminConfigHistoryService';
 import EconomiaClient from './EconomiaClient';
 
 export const dynamic = 'force-dynamic';
@@ -20,39 +22,6 @@ function addDays(date: Date, days: number) {
 
 function startOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-
-function normalizePackConfig(raw: unknown, fallback: PackPricingModelConfig): PackPricingModelConfig {
-  if (!raw || typeof raw !== 'object') return fallback;
-  const value = raw as Record<string, unknown>;
-  const parseNum = (key: keyof PackPricingModelConfig) => {
-    const n = Number(value[key]);
-    return Number.isFinite(n) ? n : fallback[key] as number;
-  };
-
-  const specialistServicesRaw = value.specialistServices;
-  const specialistServices = Array.isArray(specialistServicesRaw)
-    ? specialistServicesRaw.map((item) => String(item || '').trim().toLowerCase()).filter(Boolean)
-    : String(specialistServicesRaw ?? fallback.specialistServices.join(','))
-      .split(',')
-      .map((item) => item.trim().toLowerCase())
-      .filter(Boolean);
-
-  return {
-    marginTargetPct: Math.max(0.1, Math.min(0.9, parseNum('marginTargetPct'))),
-    socialSecurityPct: Math.max(0, Math.min(1, parseNum('socialSecurityPct'))),
-    withholdingPct: Math.max(0, Math.min(1, parseNum('withholdingPct'))),
-    operatorNetCostPerHour: Math.max(0, parseNum('operatorNetCostPerHour')),
-    specialistNetCostPerHour: Math.max(0, parseNum('specialistNetCostPerHour')),
-    operatorCostPerHour: Math.max(0, parseNum('operatorCostPerHour')),
-    specialistCostPerHour: Math.max(0, parseNum('specialistCostPerHour')),
-    specialistServices,
-    supportOperatorMinGuests: Math.max(1, parseNum('supportOperatorMinGuests')),
-    supportOperatorMinDjHours: Math.max(1, parseNum('supportOperatorMinDjHours')),
-    supportOperatorMinWatts: Math.max(1, parseNum('supportOperatorMinWatts')),
-    fixedPackCost: Math.max(0, parseNum('fixedPackCost')),
-    alertDivergencePct: Math.max(1, parseNum('alertDivergencePct')),
-  };
 }
 
 export default async function EconomiaPage() {
@@ -80,12 +49,7 @@ export default async function EconomiaPage() {
     remainingPaidAt: Date | null;
   }> = [];
 
-  let commLogs: Array<{
-    entityId: string | null;
-    action: string;
-    createdAt: Date;
-    details: unknown;
-  }> = [];
+  let canonicalCommEventsByBooking: Record<string, Awaited<ReturnType<typeof fetchCanonicalCommunicationEventsForBookings>>[string]> = {};
 
   try {
     bookings = await prisma.booking.findMany({
@@ -110,28 +74,16 @@ export default async function EconomiaPage() {
     });
 
     if (bookings.length > 0) {
-      commLogs = await prisma.adminLog.findMany({
-        where: {
-          entity: 'booking',
-          entityId: { in: bookings.map((b) => b.id) },
-          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 2000,
-      });
+      canonicalCommEventsByBooking = await fetchCanonicalCommunicationEventsForBookings(
+        bookings.map((b) => b.id),
+        2000
+      );
     }
   } catch (error) {
     log.error('Error carregant dades financeres', error);
     bookings = [];
-    commLogs = [];
+    canonicalCommEventsByBooking = {};
   }
-
-  const logsByBooking = commLogs.reduce<Record<string, typeof commLogs>>((acc, item) => {
-    if (!item.entityId) return acc;
-    if (!acc[item.entityId]) acc[item.entityId] = [];
-    acc[item.entityId].push(item);
-    return acc;
-  }, {});
 
   const rows = bookings.map((booking) => {
     const depositDueAt = addDays(new Date(booking.eventDate), -30);
@@ -140,7 +92,7 @@ export default async function EconomiaPage() {
     const overdueRemaining = !booking.remainingPaid && remainingDueAt < now;
     const dueSoonDeposit = !booking.depositPaid && depositDueAt >= now && depositDueAt <= weekAhead;
     const dueSoonRemaining = !booking.remainingPaid && remainingDueAt >= now && remainingDueAt <= weekAhead;
-    const paymentFlow = deriveFlowStatus(logsByBooking[booking.id] || [], 'PAYMENT');
+    const paymentFlow = deriveFlowStatusFromTimeline(canonicalCommEventsByBooking[booking.id] || [], 'PAYMENT');
 
     return {
       ...booking,
@@ -210,32 +162,6 @@ export default async function EconomiaPage() {
   } catch (error) {
     log.error('[Economia] Error carregant dades', error);
   }
-
-  // History logs
-  const historyLogs = await prisma.adminLog.findMany({
-    where: {
-      entity: 'setting',
-      entityId: 'finance.profitabilityConfig',
-      action: 'UPDATE',
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 120,
-  });
-
-  const historyEntries = historyLogs.map((logItem) => {
-    const details = (logItem.details && typeof logItem.details === 'object'
-      ? (logItem.details as Record<string, unknown>)
-      : {}) as Record<string, unknown>;
-    const before = normalizeProfitabilityConfig(details.before);
-    const after = normalizeProfitabilityConfig(details.after);
-    return {
-      id: logItem.id,
-      createdAt: logItem.createdAt.toISOString(),
-      role: typeof details.role === 'string' ? details.role : 'OWNER',
-      before,
-      after,
-    };
-  });
 
   // Serialize profitability rows for client
   const serializeRow = (row: { id: string; reference: string; clientName: string; eventDate: Date; source: string; netMargin: number; marginPct: number; travelCost: number }) => ({
@@ -339,27 +265,10 @@ export default async function EconomiaPage() {
     },
     { healthy: 0, warning: 0, critical: 0 }
   );
-  const packPricingHistoryLogs = await prisma.adminLog.findMany({
-    where: {
-      entity: 'setting',
-      entityId: 'pricing.pack.modelConfig',
-      action: 'UPDATE',
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 120,
-  });
-  const packPricingHistoryEntries = packPricingHistoryLogs.map((logItem) => {
-    const details = (logItem.details && typeof logItem.details === 'object'
-      ? (logItem.details as Record<string, unknown>)
-      : {}) as Record<string, unknown>;
-    return {
-      id: logItem.id,
-      createdAt: logItem.createdAt.toISOString(),
-      role: typeof details.role === 'string' ? details.role : 'OWNER',
-      before: normalizePackConfig(details.before, packPricingConfig),
-      after: normalizePackConfig(details.after, packPricingConfig),
-    };
-  });
+  const [historyEntries, packPricingHistoryEntries] = await Promise.all([
+    readProfitabilityConfigHistory(),
+    readPackPricingModelHistory(packPricingConfig),
+  ]);
 
   // Dades addicionals: tresoreria, previsions, vehicle, CAC
   const [cashFlow, forecastPipeline, vehicleConfig, cacByChannel] = await Promise.all([

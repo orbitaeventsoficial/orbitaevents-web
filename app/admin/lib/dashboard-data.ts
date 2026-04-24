@@ -11,6 +11,8 @@ import { isImapConfigured, isSmtpConfigured } from '@/lib/env';
 import { getBookingChecklist, DEFAULT_BOOKING_CHECKLIST_ITEMS } from '@/lib/services/bookingChecklistService';
 import { isBuildPrerenderPhase } from '@/lib/build-phase';
 import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services/adminHealthService';
+import { fetchRecentCanonicalEvents, type CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -53,6 +55,33 @@ function toDateKey(date: Date): string {
 
 function timeoutPromise(ms: number): Promise<null> {
   return new Promise((resolve) => setTimeout(() => resolve(null), ms));
+}
+
+function mapCanonicalEventToDashboardTimelineItem(
+  event: CanonicalTimelineEvent
+): { id: string; icon: string; text: string; time: string; ts: number; href: string } {
+  const icon = event.kind === 'message'
+    ? '💬'
+    : event.kind === 'booking'
+      ? '📋'
+      : event.kind === 'proposal'
+        ? '📄'
+        : event.kind === 'task'
+          ? '✅'
+          : event.source === 'customerActivity'
+            ? '⭐'
+            : '🛠️';
+  const href = event.link?.href
+    || (event.entityType === 'lead' && event.entityId ? buildLeadWorkspaceHref(event.entityId) : '/admin/activity');
+  const occurredAt = new Date(event.occurredAt);
+  return {
+    id: `canonical-${event.id}`,
+    icon,
+    text: event.title,
+    time: timeAgo(occurredAt),
+    ts: occurredAt.getTime(),
+    href,
+  };
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -111,7 +140,7 @@ export interface DashboardData {
   upcomingTasks: { id: string; title: string; dueDate: Date | null; status: string; lead: { id: string; name: string } | null }[];
   commandLeads: { id: string; name: string; status: string; priority: string; createdAt: Date }[];
   commandBookings: { id: string; reference: string | null; clientName: string; status: string; eventDate: Date }[];
-  recentAdminLogs: { id: string; action: string; entity: string; createdAt: Date }[];
+  recentAdminLogs: { id: string; text: string; time: string; href: string }[];
   // Margin
   avgMarginPct: number;
   // Financial forecasts
@@ -192,7 +221,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     customersCount, googleReviewStats, testimonialsPending,
     recentLeads, upcomingBookings, inventoryStats, avgRating, wonLeads,
     leadsRecent30, bookingsRecent30, postEventPending, cronSettings, dbHealthy,
-    recentLeadsTimeline, recentBookingsTimeline, recentCustomerActivity, recentAdminLogs,
+    recentLeadsTimeline, recentBookingsTimeline, recentCanonicalTimeline,
     upcomingTasks, staleLeadsCount, hotLeadsCount, quotesInFlightCount,
     checklistTodayDoneCount, checklistTodayPendingCount, commandLeads, commandBookings,
     marginBookings,
@@ -229,8 +258,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     (isBuildPrerenderPhase() ? Promise.resolve(false) : prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false)),
     cachedQuery('admin:dashboard:timeline:leads', () => prisma.lead.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:timeline:bookings', () => prisma.booking.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, clientName: true, reference: true, createdAt: true, status: true } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:timeline:activity', () => prisma.customerActivity.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } } }), CacheTTL.SHORT).catch(() => []),
-    cachedQuery('admin:dashboard:timeline:admin-logs', () => prisma.adminLog.findMany({ take: 6, orderBy: { createdAt: 'desc' }, select: { id: true, action: true, entity: true, createdAt: true } }), CacheTTL.SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:timeline:canonical', () => fetchRecentCanonicalEvents(8), CacheTTL.SHORT).catch(() => []),
     cachedQuery('admin:dashboard:tasks:upcoming', () => prisma.task.findMany({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }, take: 6, orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }], select: { id: true, title: true, dueDate: true, status: true, lead: { select: { id: true, name: true } } } }), CacheTTL.SHORT).catch(() => []),
     cachedQuery(`admin:dashboard:leads:stale:${dayKey}`, () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED'] }, createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:leads:hot', () => prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] }, priority: { in: ['HIGH', 'URGENT'] } } }), CacheTTL.SHORT).catch(() => 0),
@@ -408,11 +436,21 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ];
 
   const timeline = [
-    ...recentLeadsTimeline.map((lead) => ({ id: `lead-${lead.id}`, icon: '👥', text: `Nou lead: ${lead.name}`, time: timeAgo(new Date(lead.createdAt)), ts: new Date(lead.createdAt).getTime(), href: `/admin/leads/${lead.id}` })),
+    ...recentLeadsTimeline.map((lead) => ({ id: `lead-${lead.id}`, icon: '👥', text: `Nou lead: ${lead.name}`, time: timeAgo(new Date(lead.createdAt)), ts: new Date(lead.createdAt).getTime(), href: buildLeadWorkspaceHref(lead.id) })),
     ...recentBookingsTimeline.map((booking) => ({ id: `booking-${booking.id}`, icon: '📋', text: `Reserva ${booking.reference} · ${booking.clientName}`, time: timeAgo(new Date(booking.createdAt)), ts: new Date(booking.createdAt).getTime(), href: `/admin/bookings/${booking.id}` })),
-    ...recentCustomerActivity.map((activity) => ({ id: `activity-${activity.id}`, icon: '⭐', text: `${activity.action} · ${activity.customer?.name || 'Client'}`, time: timeAgo(new Date(activity.createdAt)), ts: new Date(activity.createdAt).getTime(), href: '/admin/emails' })),
-    ...recentAdminLogs.map((logItem) => ({ id: `adminlog-${logItem.id}`, icon: '🛠️', text: `${logItem.action} · ${logItem.entity}`, time: timeAgo(new Date(logItem.createdAt)), ts: new Date(logItem.createdAt).getTime(), href: '/admin/settings' })),
+    ...recentCanonicalTimeline.map((event) => mapCanonicalEventToDashboardTimelineItem(event)),
   ].sort((a, b) => b.ts - a.ts).slice(0, 10);
+
+  const recentAdminLogs = recentCanonicalTimeline
+    .filter((event) => event.source === 'adminLog')
+    .map((event) => mapCanonicalEventToDashboardTimelineItem(event))
+    .slice(0, 6)
+    .map((item) => ({
+      id: item.id,
+      text: item.text,
+      time: item.time,
+      href: item.href,
+    }));
 
   const alerts: DashboardAlert[] = [
     ...(!ga4Status.ready ? [{ type: 'error', title: 'GA4 pendent', description: ga4Status.reason || 'Configura GA4 al panell d\'analítica', href: '/admin/analytics', action: 'Configurar' }] : []),
@@ -547,5 +585,3 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     timeline, alerts, activities, healthItems, cronMap, salutSnapshot,
   };
 }
-
-

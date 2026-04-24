@@ -55,6 +55,34 @@ export default function OperationalPulsePanel({ pulse }: { pulse: OperationalPul
           </div>
         ))}
       </div>
+
+      {pulse.pipelineDrivers.length > 0 && (
+        <div className="mt-3 rounded-xl border border-white/10 bg-black/10 p-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Què degrada el pipeline</p>
+          </div>
+          <div className="mt-2 space-y-2">
+            {pulse.pipelineDrivers.map((driver) => (
+              <a
+                key={`${driver.type}:${driver.href}`}
+                href={driver.href}
+                className="block rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 transition-colors hover:bg-white/[0.06]"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{driver.title}</p>
+                    <p className="mt-1 text-xs opacity-70">{driver.detail}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${LEVEL_COLOR[driver.priority === 'CRITICAL' ? 'CRITICAL' : 'WARNING']}`}>
+                    {driver.priority}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
