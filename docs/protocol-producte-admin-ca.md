@@ -172,6 +172,8 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Interfície de propietari obligatòria**: qualsevol pantalla que governi negoci, operativa o risc ha de poder-se llegir d'un cop d'ull. La UI ha de separar clarament què és `automàtic` i què és `manual`, fer visibles semàfors, prioritat i següent pas, i reduir dependència de memòria o lectura tècnica.
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
+- **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
+- **Norma operativa de no-col·lisió entre agents**: `claude` i `codex` treballen concurrents sobre el mateix repo. Abans d'atacar un `SEGÜENT` cal mirar la darrera finestra de canvis `#N` al §9 i veure quin perímetre està ocupat ara mateix (el `ADMIN_CHANGE_COUNTER` pot pujar preemptivament per l'altre agent entre dues consultes). Dos indicadors: (1) si el counter està per sobre del darrer Canvi registrat al §9, és que l'altre agent ha reservat el número i està escrivint-ne el contingut — no es pren aquest número, el següent agent usa `counter + 1`; (2) abans de començar un tall, cal triar un **front diferent** al que ha tocat l'altre agent les darreres hores (si `codex` està al Lead Hub `LOST`, `claude` ataca bookings/tasks/social; i al revés). Si tot i així es detecta col·lisió (p.ex. edits paral·leles al mateix fitxer), el tall es replanteja o s'espera. Val la pena perdre una ronda abans que fer feina que es trepitgi.
 
 ## 2.1.0 Característiques exigides del repo
 - **Monocapa real**: cada valor de domini, label, acció, to, icona o regla viu en un sol lloc i la resta importa.
@@ -647,7 +649,7 @@ Criteri pràctic:
 **FET** *(2026-04-19 per `codex` — Canvi #228)*: el context de client a `Bookings` ja no es perd en interaccions bàsiques de UI. `BookingFilters.tsx` i `BookingViewToggle.tsx` reutilitzen `buildCustomerBookingListHref()` quan hi ha `customerId`, de manera que `Netejar filtres` i el canvi `Llista/Kanban` es mantenen dins la cua del mateix client en lloc de tornar silenciosament a `/admin/bookings`.
 **FET** *(2026-04-19 per `codex` — Canvi #229)*: `LeadInsightsBanner` deixa d’apuntar a filtres no suportats. Les CTAs `Revisar cobraments` i `Veure tasques` resolen ara destins reals segons context: reserva concreta si existeix, llista de tasques del client si hi ha `customerId`, i fallback a la pròpia fitxa de lead quan no hi ha millor target operatiu.
 **FET** *(2026-04-19 per `codex` — Canvi #231)*: `PendingFollowUpsPanel` d’Inbox deixa d’obrir el redactor amb `customerId=` buit. El CTA d’email fa servir ara `leadId` i manté el context real del follow-up pendent.
-**SEGÜENT**: decidir si aquest mateix criteri de “CTA només cap a destins realment suportats” s’ha d’auditar també a altres banners o targetes executives fora de Customer/Lead Hub.
+**FET** *(2026-04-24 per `claude` — Canvi #378)*: el criteri "CTA només cap a destins realment suportats" està auditat també fora de Customer/Lead Hub — no es necessita cap tall de codi. Únic candidat tangible: `app/admin/tasks/TaskQueueBanner.tsx`, que només fa filtres interns a `/admin/tasks?queue=X` sense cap CTA extern. La resta de banners executius (`LeadInsightsBanner`, `clientes/.../InsightsBanner`) ja viuen dins Lead/Customer Hub i es cobreixen pels Canvis `#229` i `#231`.
 **PENDENT CRÍTIC**: Customer Hub com a cervell comercial. Evitar client repartit en pantalles paral·leles.
 **MÉS ENDAVANT**: segments intel·ligents, reactivació assistida i automatismes comercials amb traçabilitat.
 
@@ -5238,6 +5240,18 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `codex`
 - Treballant per: `codex`
 - Tancat per: `codex`
+
+### Canvi #378 — 2026-04-24 — claude (FET)
+**Normes operatives "go" + no-col·lisió entre agents escrites al §2.1 + tancat el `SEGÜENT` del §6.5 (auditoria CTAs destins suportats fora Customer/Lead Hub).**
+- Context: el propietari ha explicitat a la sessió del 2026-04-24 dues regles de treball que no estaven al protocol i que feien perdre temps i tokens: (1) `go` sol vol dir "continua segons el protocol + checklist", no és invitació a preguntar direcció; (2) `claude` i `codex` treballen concurrents i han de coordinar-se via el `ADMIN_CHANGE_COUNTER` i atacant fronts diferents (les col·lisions fan perdre rondes). Aquestes dues normes havien de quedar al protocol per no repetir-les oralment cada sessió. Paral·lelament, el §6.5 mantenia obert un `SEGÜENT` des del `#231` sobre auditar el criteri "CTA només cap a destins realment suportats" fora de Customer/Lead Hub.
+- `docs/protocol-producte-admin-ca.md` · §2.1 Principis invariables: afegides dues normes operatives al final del bloc de bullets. (1) **Norma operativa de "go" del propietari**: `go` sol = continua checklist, no preguntar direcció, atacar `SEGÜENT` acotats dels §6.N seguint la norma de tancament rigorós. (2) **Norma operativa de no-col·lisió entre agents**: mirar el counter abans d'atacar, respectar el `counter + 1` si l'altre agent ha reservat número, i triar front diferent al que ha tocat l'altre agent les darreres hores (si `codex` toca Lead Hub, `claude` ataca bookings/tasks/social; i viceversa).
+- `docs/protocol-producte-admin-ca.md` · §6.5: el `SEGÜENT` de "auditar CTAs executives fora Customer/Lead Hub" es converteix en `FET` amb evidència. Únic candidat tangible fora de Lead/Customer Hub és `app/admin/tasks/TaskQueueBanner.tsx`, que només fa filtres interns a `/admin/tasks?queue=X` (router.push amb searchParams dins el propi workspace) i no té cap CTA extern que pugui apuntar a destí no suportat. Els altres banners executius (`LeadInsightsBanner`, `clientes/.../InsightsBanner`) viuen dins Lead/Customer Hub i ja es van cobrir als Canvis `#229` i `#231`. Cap tall de codi necessari.
+- No hi ha canvi de codi ni schema ni tests funcionals — el tall és normatiu i documental. Segueix el patró dels Canvis `#356`, `#374`, `#376`. Consistent amb la norma §2.1 de tancament rigorós.
+- Verificació del tall: `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `378`; el següent canvi real ha de ser `#379`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #360 — 2026-04-24 — claude (FET)
 **Servei d'analítica de pèrdues de lead: `leadLossAnalyticsService` amb agregació multidimensional.**

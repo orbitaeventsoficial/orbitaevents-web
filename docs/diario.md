@@ -1,3 +1,9 @@
+## 2026-04-24 — Canvi #378: normes operatives "go" + no-col·lisió entre agents al §2.1; tancat `SEGÜENT` §6.5 sobre CTAs destins suportats (claude)
+- `docs/protocol-producte-admin-ca.md` · §2.1: afegides dues normes operatives perquè no es repeteixin oralment cada sessió. (1) `go` del propietari = continua checklist, no preguntar direcció. (2) No-col·lisió entre `claude` i `codex`: mirar counter + front diferent al que ha tocat l'altre agent.
+- `docs/protocol-producte-admin-ca.md` · §6.5: `SEGÜENT` obsolet sobre auditar CTAs executives fora Customer/Lead Hub convertit en `FET`. Únic candidat tangible `TaskQueueBanner.tsx` només fa filtres interns, cap CTA extern. Cap tall de codi necessari.
+- Sense canvis de codi/schema/tests — tall normatiu i documental.
+- Validació: `pnpm run qa:protocol` OK.
+
 ## 2026-04-24 — Canvi #377: el kanban de leads també exigeix `lostReason` abans de moure a `LOST` (codex)
 - `app/admin/leads/LeadPipelineView.tsx`: el moviment ràpid cap a `LOST` deixa de fer canvi optimista directe i obre `LeadLostStatusPrompt` amb el lead pendent. La confirmació només persisteix quan hi ha `lostReason` i reutilitza `patchLeadStatus()` amb `{ status:'LOST', lostReason, note }`.
 - El flux ràpid de la resta d’estats no canvia: el kanban continua movent `NEW/CONTACTED/QUOTE_SENT/NEGOTIATING/WON` amb el mateix patró de toast i actualització local.
