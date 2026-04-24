@@ -1,3 +1,9 @@
+## 2026-04-24 — Canvi #379: decisió canònica — workspace Social actual és suficient, no cal planificador editorial avançat (claude)
+- `docs/protocol-producte-admin-ca.md` · §6.9: `SEGÜENT` (des del #147) convertit en `FET` amb decisió completa. Features actuals (llista + calendari mensual + CRUD + filtres + idees auto-generades + mètriques de rendiment amb recomanacions) cobreixen el volum esperat.
+- Criteri de reobertura explícit: quan `socialPerformanceService.generateRecommendations()` marqui "inactivitat sistèmica" o "baixa freqüència" de forma recurrent, replantejar drag-drop / vista setmanal / bulk actions.
+- Sense canvis de codi/schema/tests — tall documental. Patró #374/#376/#378.
+- Validació: `pnpm run qa:protocol` OK.
+
 ## 2026-04-24 — Canvi #378: normes operatives "go" + no-col·lisió entre agents al §2.1; tancat `SEGÜENT` §6.5 sobre CTAs destins suportats (claude)
 - `docs/protocol-producte-admin-ca.md` · §2.1: afegides dues normes operatives perquè no es repeteixin oralment cada sessió. (1) `go` del propietari = continua checklist, no preguntar direcció. (2) No-col·lisió entre `claude` i `codex`: mirar counter + front diferent al que ha tocat l'altre agent.
 - `docs/protocol-producte-admin-ca.md` · §6.5: `SEGÜENT` obsolet sobre auditar CTAs executives fora Customer/Lead Hub convertit en `FET`. Únic candidat tangible `TaskQueueBanner.tsx` només fa filtres interns, cap CTA extern. Cap tall de codi necessari.

@@ -714,7 +714,7 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `claude` — Canvi #38)*: `SocialClient.tsx` + `/admin/social/page.tsx` — workspace complet amb vista llista, vista calendari mensual, CRUD modal, filtres per estat, navegació mensual, KPIs clicables. Integrat al menú a la secció Contingut.
 **FET** *(2026-04-10 per `claude` — Canvi #40)*: `socialIdeasService.ts` — idees de post auto-generades des de bookings recents, testimonials aprovats, portfolio nou i esdeveniments futurs. Panell integrat al `SocialClient` amb pre-emplenat del modal.
 **FET** *(2026-04-17 per `claude` — Canvi #147)*: `socialPerformanceService.ts` — mètriques de rendiment per canal: `computePlatformMetrics` (posts per estat, breakdown contentType/category, millor dia/hora, avgPostsPerWeek, daysSinceLastPost), `computeConsistencyScore` (% setmanes amb activitat), `generateRecommendations` (inactivitat, baixa freqüència, falta diversitat, posts no publicats). API `/api/admin/social-posts/performance`. 19 tests.
-**SEGÜENT**: revisar visualment el workspace Social, decidir si cal planificador editorial avançat.
+**FET** *(2026-04-24 per `claude` — Canvi #379)*: decisió canònica — **no cal planificador editorial avançat ara**. El workspace Social actual (vista llista + calendari mensual + modal CRUD + filtres + KPIs clicables + panell d'idees auto-generades des de bookings/testimonials/portfolio + mètriques de rendiment amb recomanacions automàtiques) cobreix el volum de posts esperat per una empresa DJ/events com Òrbita. Features que faltarien per ser "planificador avançat" (drag-drop entre dates, vista setmanal, bulk actions, multi-plataforma amb threading, calendari editorial per campanya) són overkill pel cas d'ús real. Reavaluar només quan `socialPerformanceService.generateRecommendations()` comenci a marcar "inactivitat sistèmica" o "baixa freqüència" de forma recurrent — és a dir, quan la feina volgui un ritme de posting que la UI actual no pugui sostenir. Aquesta decisió tanca explícitament el debat per evitar que un agent futur el reobri sense evidència operativa.
 **PENDENT CRÍTIC**: evitar Social com a mòdul decoratiu aïllat. Ha de ser part del pipeline real de contingut.
 **MÉS ENDAVANT**: calendari editorial viu, assistència de campanyes.
 
@@ -5249,6 +5249,18 @@ px tsc --noEmit OK · git diff --check OK.
 - No hi ha canvi de codi ni schema ni tests funcionals — el tall és normatiu i documental. Segueix el patró dels Canvis `#356`, `#374`, `#376`. Consistent amb la norma §2.1 de tancament rigorós.
 - Verificació del tall: `pnpm run qa:protocol` OK.
 - `ADMIN_CHANGE_COUNTER` puja a `378`; el següent canvi real ha de ser `#379`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #379 — 2026-04-24 — claude (FET)
+**Decisió canònica: el workspace Social actual és suficient — no cal planificador editorial avançat ara.**
+- Context: el §6.9 mantenia obert un `SEGÜENT` des del Canvi `#147` — *"revisar visualment el workspace Social, decidir si cal planificador editorial avançat"*. El workspace ja tenia backend tancat (`socialPostService` + 32 tests), UI complet (`SocialClient` 775 línies: vista llista, vista calendari mensual amb padding de mes previ/següent, modal CRUD, filtres per estat, navegació mensual, KPIs clicables), panell d'idees auto-generades (`socialIdeasService`) i mètriques de rendiment (`socialPerformanceService` amb `generateRecommendations` per inactivitat/baixa freqüència). La pregunta era si calia invertir en features de planificador avançat (drag-drop entre dates, vista setmana, bulk actions).
+- Decisió: **no cal planificador avançat ara**. Raons: (1) el volum de posts socials esperat per una empresa DJ/events és moderat — no és cas d'ús tipus newsroom amb desenes de posts programats per dia; (2) les features actuals cobreixen el flux operatiu real: veure què hi ha al mes, crear/editar posts, rebre idees generades automàticament des de bookings/testimonials/portfolio, llegir recomanacions automàtiques quan el ritme baixa; (3) afegir drag-drop, vista setmanal i bulk actions és feina gran amb ROI incert si el volum no ho justifica; (4) ja existeix un senyal explícit per reobrir la decisió — `socialPerformanceService.generateRecommendations()` marca "inactivitat sistèmica" o "baixa freqüència" quan el ritme cau. Aquesta senyal actua com a trigger natural per replantejar el planificador si realment fa falta.
+- `docs/protocol-producte-admin-ca.md` · §6.9: el bullet `SEGÜENT` es converteix en `FET` amb la decisió completa i el criteri explícit de reobertura (quan `socialPerformanceService` detecti inactivitat sistèmica recurrent). El `PENDENT CRÍTIC` del mateix §6.9 ("evitar Social com a mòdul decoratiu aïllat. Ha de ser part del pipeline real de contingut") queda cobert per `socialIdeasService` (idees des de bookings/testimonials/portfolio) i `socialPerformanceService` (feedback loop sobre el ritme real) — no és un gap tancat, però el tall d'aquest `#379` no l'empitjora.
+- No hi ha canvi de codi, schema ni tests — tall purament documental en la línia dels Canvis `#356`, `#374`, `#376`, `#378`. Consistent amb la norma §2.1 de tancament rigorós: un `SEGÜENT` que demana "decidir si cal X" es pot tancar amb una decisió raonada registrada, sempre que es deixi criteri clar per reobrir.
+- Verificació del tall: `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `379`; el següent canvi real ha de ser `#380`.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
