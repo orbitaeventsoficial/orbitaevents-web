@@ -5,7 +5,9 @@ import { CUSTOMER_ACTIVITY_ACTIONS } from '@/lib/constants';
 
 type CustomerActivityWriter = {
   customerActivity: {
-    create: (args: any) => Promise<unknown>;
+    create: (args: {
+      data: Prisma.CustomerActivityCreateInput | Prisma.CustomerActivityUncheckedCreateInput;
+    }) => Promise<unknown>;
   };
 };
 
@@ -21,7 +23,7 @@ export const EMAIL_ACTIVITY_ACTIONS = [
 ] as const;
 
 export type RecentEmailActivity = Prisma.CustomerActivityGetPayload<{ include: { customer: true } }>;
-export type CustomerActivityLogEntry = Prisma.CustomerActivityGetPayload<{}>;
+export type CustomerActivityLogEntry = Prisma.CustomerActivityGetPayload<Record<string, never>>;
 
 export function deriveCustomerHubActivitySummary(activityLog: CustomerActivityLogEntry[]): {
   customerNotes: MessageDTO[];

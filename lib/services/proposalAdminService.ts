@@ -185,3 +185,94 @@ export async function updateAdminProposal(id: string, data: ProposalUpdateInput)
 
   return { status: 200, body: { ok: true, proposal } };
 }
+
+type ReassignProposalInput = {
+  proposalId: string;
+  customerId?: string | null;
+  leadId?: string | null;
+  bookingId?: string | null;
+  actor?: string;
+};
+
+export type ReassignProposalResult =
+  | { ok: true; proposal: unknown; changed: { customerId: boolean; leadId: boolean; bookingId: boolean } }
+  | { ok: false; error: string; status: number };
+
+export async function reassignProposalOwner(
+  input: ReassignProposalInput,
+): Promise<ReassignProposalResult> {
+  const existing = await prisma.proposal.findUnique({
+    where: { id: input.proposalId },
+    select: { id: true, customerId: true, leadId: true, bookingId: true },
+  });
+  if (!existing) {
+    return { ok: false, error: 'Pressupost no trobat', status: 404 };
+  }
+
+  const customerIdProvided = input.customerId !== undefined;
+  const leadIdProvided = input.leadId !== undefined;
+  const bookingIdProvided = input.bookingId !== undefined;
+
+  if (!customerIdProvided && !leadIdProvided && !bookingIdProvided) {
+    return { ok: false, error: 'Cap canvi sol·licitat', status: 400 };
+  }
+
+  if (customerIdProvided && input.customerId) {
+    const exists = await prisma.customer.findUnique({
+      where: { id: input.customerId },
+      select: { id: true },
+    });
+    if (!exists) return { ok: false, error: 'Client no trobat', status: 404 };
+  }
+  if (leadIdProvided && input.leadId) {
+    const exists = await prisma.lead.findUnique({
+      where: { id: input.leadId },
+      select: { id: true },
+    });
+    if (!exists) return { ok: false, error: 'Lead no trobat', status: 404 };
+  }
+  if (bookingIdProvided && input.bookingId) {
+    const exists = await prisma.booking.findUnique({
+      where: { id: input.bookingId },
+      select: { id: true },
+    });
+    if (!exists) return { ok: false, error: 'Reserva no trobada', status: 404 };
+  }
+
+  const updateData: Prisma.ProposalUpdateInput = {};
+  if (customerIdProvided) {
+    updateData.customer = input.customerId
+      ? { connect: { id: input.customerId } }
+      : { disconnect: true };
+  }
+  if (leadIdProvided) {
+    updateData.lead = input.leadId
+      ? { connect: { id: input.leadId } }
+      : { disconnect: true };
+  }
+  if (bookingIdProvided) {
+    updateData.booking = input.bookingId
+      ? { connect: { id: input.bookingId } }
+      : { disconnect: true };
+  }
+
+  const proposal = await prisma.proposal.update({
+    where: { id: input.proposalId },
+    data: updateData,
+    include: {
+      customer: { select: { id: true, name: true, email: true } },
+      lead: { select: { id: true, name: true, email: true } },
+      booking: { select: { id: true, reference: true, status: true } },
+    },
+  });
+
+  return {
+    ok: true,
+    proposal,
+    changed: {
+      customerId: customerIdProvided && existing.customerId !== input.customerId,
+      leadId: leadIdProvided && existing.leadId !== input.leadId,
+      bookingId: bookingIdProvided && existing.bookingId !== input.bookingId,
+    },
+  };
+}

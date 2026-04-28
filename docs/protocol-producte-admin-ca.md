@@ -5614,6 +5614,33 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #439 — 2026-04-28 — claude (FET)
+**Hotfix lint Railway: `customerActivityService` esnetejat per ESLint estricte (any → tipus Prisma; `{}` → `Record<string, never>`).**
+- Context: Railway build fallava amb `customerActivityService.ts` línia 8 (`Unexpected any`) i 24 (`{}` empty object type) — ESLint estricte de Next.js 14 al `next lint` que corre dins `pnpm run build`. Aquests errors lint feien que el build de Railway abortés sense aplicar els canvis més recents (#433 endavant). Visible des de `https://orbitaevents.com/api/health` que retornava un timestamp del 20 d'abril (build congelat).
+- `lib/services/customerActivityService.ts`: el `CustomerActivityWriter` accepta ara `args: { data: Prisma.CustomerActivityCreateInput | Prisma.CustomerActivityUncheckedCreateInput }` en lloc de `(args: any)`. La unió amb `UncheckedCreateInput` és necessària perquè els callers escriuen `customerId: string` directe en lloc de `customer: { connect: { id } }`. `CustomerActivityLogEntry` passa de `Prisma.CustomerActivityGetPayload<{}>` a `<Record<string, never>>` — significat idèntic, ESLint content.
+- Aquest tall **NO** toca: cap caller del servei (els 13 helpers `recordCustomer*`/`recordLead*` continuen funcionant amb el mateix shape), ni el model Prisma. És pura neteja de tipus per fer el build verd.
+- Verificació del tall: `pnpm exec next lint --file lib/services/customerActivityService.ts` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `439`; el següent canvi real ha de ser `#440`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #438 — 2026-04-28 — claude (FET)
+**A.3 del §6.18: re-assignar pressupost entre entitats (client/lead/booking) sense haver d'esborrar i recrear.**
+- Context: després de `#437` (proposta orfe permesa), faltava la peça operativa que permet l'usuari moure un pressupost d'una entitat a una altra — el dolor real era "fer un pressupost al lead, després el lead es converteix en client, i ara el pressupost ha de migrar". A.3 del §6.18 (Camí 1, P1) tanca aquesta fricció amb un panell shared al detall del pressupost.
+- `lib/services/proposalAdminService.ts`: nou `reassignProposalOwner({proposalId, customerId?, leadId?, bookingId?, actor?})`. Tres camps independents — passar `null` desconnecta, `string` connecta, `undefined` no toca. Valida l'existència de cada entity target abans de fer connect (404 explícit per cada peça). Retorna `changed: { customerId, leadId, bookingId }` per permetre UI feedback granular. Usa `connect`/`disconnect` Prisma idiomàtic en lloc de scalar IDs nuls/strings.
+- `app/api/admin/proposals/[id]/owner/route.ts` (nou): PATCH amb auth + mutate permission + CSRF + Zod parse. Errors 400 per body invàlid, 404 per entitats inexistents, 500 per fallades inesperades.
+- `app/admin/presupuestos/ProposalOwnerPanel.tsx` (nou, client component): mostra les 3 files de vincles (client/lead/booking) amb estat actual, botó `Veure` (link a la fitxa) + `Canviar/Vincular` (obre modal d'autocomplete) + `Desvincular` (passa `null`). El modal cerca per `q` (customers) o `search` (leads/bookings) als endpoints existents amb debounce 250ms. Toast feedback + `router.refresh()` post-acció.
+- `app/admin/presupuestos/[id]/page.tsx` (nou): pàgina de detall mínima del pressupost amb header (referència, status badge, total, data) + link al editor (només si té client) + el `ProposalOwnerPanel` integrat. Sense aquesta pàgina, un pressupost orfe no tenia ruta visible — només aquí es pot accedir des de la llista.
+- `app/admin/presupuestos/ProposalsList.tsx`: nou helper `getProposalDetailHref` apuntant a `/admin/presupuestos/{id}`. Botó `🔗 Vincles` afegit al menu d'accions tant a card mòbil com a dropdown desktop, accessible per qualsevol pressupost (orfe o no).
+- `__tests__/lib/services/proposalAdminService.test.ts`: 6 tests nous a `reassignProposalOwner` — 404 sense pressupost, 400 sense canvis, 404 customer target, happy path connect+disconnect, validació lead/booking, disconnect-only no toca FKs no especificades. Suite: 16/16 verds.
+- Aquest tall **NO** toca: l'editor existent de pressupost (`/admin/presupuestos?customerId=X&proposalId=Y` segueix igual), ni el flow de creació nova, ni les FKs a `Booking`/`Lead` (ja eren nullable abans).
+- Verificació del tall: `npx prisma generate` OK · `pnpm exec vitest run __tests__/lib/services/proposalAdminService.test.ts` OK (16 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `438`; el següent canvi real ha de ser `#439`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #437 — 2026-04-28 — claude (FET)
 **A.2 del §6.18: pressupost lligat a entitat flexible — `Proposal.customerId` passa a nullable amb FK SET NULL. Un pressupost ja no obliga a tenir client assignat.**
 - Context: l'usuari portava demanant explícitament des del primer moment "que no m'obligui a assignar client a un pressupost, però que el pugui assignar després a client/lead/booking". Fins ara `Proposal.customerId String` (NOT NULL) + FK `Customer @relation(...onDelete: Cascade)` obligava a triar client al moment de crear pressupost. A.2 del §6.18 (Camí 1 P1) tanca aquesta fricció amb un canvi schema additiu i compatible.

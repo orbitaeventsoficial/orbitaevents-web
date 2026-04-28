@@ -11,6 +11,8 @@ const { mockPrisma } = vi.hoisted(() => ({
       update: vi.fn(),
     },
     customer: { findUnique: vi.fn() },
+    lead: { findUnique: vi.fn() },
+    booking: { findUnique: vi.fn() },
   },
 }));
 
@@ -21,6 +23,7 @@ import {
   createAdminProposal,
   getAdminProposalById,
   updateAdminProposal,
+  reassignProposalOwner,
 } from '@/lib/services/proposalAdminService';
 
 beforeEach(() => {
@@ -32,6 +35,8 @@ beforeEach(() => {
   mockPrisma.proposal.create.mockResolvedValue({ id: 'prop1', reference: 'PROP-2026-0001' });
   mockPrisma.proposal.update.mockResolvedValue({ id: 'prop1' });
   mockPrisma.customer.findUnique.mockResolvedValue(null);
+  mockPrisma.lead.findUnique.mockResolvedValue(null);
+  mockPrisma.booking.findUnique.mockResolvedValue(null);
 });
 
 describe('listAdminProposals', () => {
@@ -179,5 +184,111 @@ describe('updateAdminProposal', () => {
         }),
       })
     );
+  });
+});
+
+describe('reassignProposalOwner', () => {
+  it('404 si pressupost no existeix', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue(null);
+    const result = await reassignProposalOwner({
+      proposalId: 'inexistent',
+      customerId: 'c1',
+    });
+    expect(result).toEqual({ ok: false, error: 'Pressupost no trobat', status: 404 });
+  });
+
+  it('400 si no es passa cap canvi', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'p1',
+      customerId: 'c1',
+      leadId: null,
+      bookingId: null,
+    });
+    const result = await reassignProposalOwner({ proposalId: 'p1' });
+    expect(result).toEqual({ ok: false, error: 'Cap canvi sol·licitat', status: 400 });
+  });
+
+  it('404 si client target no existeix', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'p1',
+      customerId: null,
+      leadId: null,
+      bookingId: null,
+    });
+    mockPrisma.customer.findUnique.mockResolvedValue(null);
+    const result = await reassignProposalOwner({
+      proposalId: 'p1',
+      customerId: 'c-x',
+    });
+    expect(result).toEqual({ ok: false, error: 'Client no trobat', status: 404 });
+  });
+
+  it('happy path: connect customer + disconnect lead, retorna `changed`', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'p1',
+      customerId: null,
+      leadId: 'l1',
+      bookingId: null,
+    });
+    mockPrisma.customer.findUnique.mockResolvedValue({ id: 'c1' });
+    mockPrisma.proposal.update.mockResolvedValue({ id: 'p1' });
+
+    const result = await reassignProposalOwner({
+      proposalId: 'p1',
+      customerId: 'c1',
+      leadId: null,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.changed.customerId).toBe(true);
+    expect(result.changed.leadId).toBe(true);
+    expect(result.changed.bookingId).toBe(false);
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'p1' },
+        data: expect.objectContaining({
+          customer: { connect: { id: 'c1' } },
+          lead: { disconnect: true },
+        }),
+      })
+    );
+  });
+
+  it('valida lead i booking quan es passen', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'p1',
+      customerId: 'c1',
+      leadId: null,
+      bookingId: null,
+    });
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
+    const result = await reassignProposalOwner({
+      proposalId: 'p1',
+      leadId: 'lead-x',
+    });
+    expect(result).toEqual({ ok: false, error: 'Lead no trobat', status: 404 });
+  });
+
+  it('disconnect-only (passar null) no toca FKs no especificades', async () => {
+    mockPrisma.proposal.findUnique.mockResolvedValue({
+      id: 'p1',
+      customerId: 'c1',
+      leadId: 'l1',
+      bookingId: 'b1',
+    });
+    mockPrisma.proposal.update.mockResolvedValue({ id: 'p1' });
+
+    await reassignProposalOwner({
+      proposalId: 'p1',
+      customerId: null,
+    });
+
+    const callArgs = mockPrisma.proposal.update.mock.calls[0][0];
+    expect(callArgs.data).toEqual({
+      customer: { disconnect: true },
+    });
+    expect(callArgs.data.lead).toBeUndefined();
+    expect(callArgs.data.booking).toBeUndefined();
   });
 });

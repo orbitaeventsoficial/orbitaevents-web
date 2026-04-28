@@ -89,6 +89,7 @@ export default function ProposalsList({
     proposal.customerId
       ? buildCustomerProposalHref(proposal.customerId, proposal.id)
       : `/admin/presupuestos/${proposal.id}`;
+  const getProposalDetailHref = (proposal: ProposalItem) => `/admin/presupuestos/${proposal.id}`;
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -273,6 +274,12 @@ export default function ProposalsList({
                     👤 Client
                   </Link>
                 )}
+                <Link
+                  href={getProposalDetailHref(proposal)}
+                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
+                >
+                  🔗 Vincles
+                </Link>
                 {proposal.leadId && (
                   <Link
                     href={buildLeadWorkspaceHref(proposal.leadId)}
@@ -383,6 +390,12 @@ export default function ProposalsList({
                             👤 Fitxa client
                           </Link>
                         )}
+                        <Link
+                          href={getProposalDetailHref(proposal)}
+                          className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
+                        >
+                          🔗 Re-assignar vincles
+                        </Link>
                         {proposal.leadId && (
                           <Link
                             href={buildLeadWorkspaceHref(proposal.leadId)}

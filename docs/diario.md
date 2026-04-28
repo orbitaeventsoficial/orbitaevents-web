@@ -1,3 +1,20 @@
+## 2026-04-28 — Canvi #439: hotfix lint Railway — `customerActivityService` esnetejat per ESLint estricte (claude)
+- `next lint` a Railway tirava error per `(args: any)` (línia 8) i `Prisma.CustomerActivityGetPayload<{}>` (línia 24). Build congelat des del 20-abr fent que `/api/health` retornés timestamp vell.
+- `lib/services/customerActivityService.ts`: writer accepta ara `Prisma.CustomerActivityCreateInput | UncheckedCreateInput` (la unió permet els callers que escriuen `customerId` scalar). `<{}>` → `<Record<string, never>>` (semàntica idèntica, ESLint content).
+- 0 callers tocats — tots els helpers `recordCustomer*`/`recordLead*` segueixen funcionant.
+- Validació: `next lint` OK · `tsc` OK · `validate:core` 12/12 OK · `qa:protocol` OK (current #439).
+
+## 2026-04-28 — Canvi #438: A.3 — re-assignar pressupost entre client/lead/booking (claude)
+- Continuació natural del #437 (proposta orfe permesa). Faltava UI per moure pressupost entre entitats sense esborrar+recrear.
+- `proposalAdminService.ts`: nou `reassignProposalOwner({proposalId, customerId?, leadId?, bookingId?, actor?})`. `null`=desconnecta, `string`=connecta, `undefined`=no toca. Valida cada target abans de fer connect. Retorna `changed` granular.
+- `app/api/admin/proposals/[id]/owner/route.ts` (nou): PATCH amb auth+mutate+CSRF+Zod.
+- `app/admin/presupuestos/ProposalOwnerPanel.tsx` (nou, client): 3 files (client/lead/booking) amb estat actual + Veure/Canviar/Desvincular. Modal d'autocomplete amb debounce 250ms (param `q` per customers, `search` per leads/bookings als endpoints existents). Toast feedback + router.refresh.
+- `app/admin/presupuestos/[id]/page.tsx` (nou): pàgina detall mínima — header (ref + status + total + creat) + link a editor (només si té client) + ProposalOwnerPanel.
+- `ProposalsList.tsx`: nou helper `getProposalDetailHref` + botó `🔗 Vincles` accessible per qualsevol pressupost (orfe o no), tant a card mòbil com a dropdown desktop.
+- 6 tests nous a `proposalAdminService.test.ts` — suite 16/16 verds.
+- NO toca: editor existent (`?customerId=X&proposalId=Y`), creació nova, FKs Booking/Lead.
+- Validació: `validate:core` 12/12 OK · `qa:protocol` OK (current #438).
+
 ## 2026-04-28 — Canvi #437: A.2 — `Proposal.customerId` nullable, pressupost ja no obliga client (claude)
 - L'usuari portava demanant des del primer moment poder crear un pressupost sense haver d'assignar client immediatament i poder assignar-lo després a client/lead/booking. A.2 del §6.18 (Camí 1, P1) tanca aquesta fricció.
 - `prisma/schema.prisma`: `Proposal.customerId String` → `String?`; `customer Customer @relation(...onDelete: Cascade)` → `Customer? @relation(...onDelete: SetNull)`. Esborrar un client ja no esborra les seves propostes — passen a orfes.
