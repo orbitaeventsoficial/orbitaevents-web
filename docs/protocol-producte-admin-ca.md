@@ -5614,6 +5614,21 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #442 — 2026-04-28 — claude (FET)
+**A.5 del §6.18: wizard d'1 minut lead → pressupost → reserva amb pantalla única i 3 outcomes.**
+- Context: el flow tradicional de captura demana 3 pantalles separades (lead → presupost → reserva). Per casos típics on l'usuari ja sap el què (cas pas, lead amb pressupost ràpid, etc.) això és fricció pura. A.5 del §6.18 (Camí 1 P1) tanca-ho amb un wizard d'una sola pantalla.
+- `lib/services/leads/quickCreateFlow.ts` (nou): servei orquestrador `quickCreate({outcome, client, event, proposalSubtotal?, proposalSnapshot?})` amb 3 outcomes ('lead' | 'lead+proposal' | 'lead+proposal+booking'). Sempre crea lead via `createAdminLead`; encadena `createAdminProposal` amb leadId i `createBookingFromInput` amb leadId quan toca. Validació pre-flight per outcome 'lead+proposal+booking' (data, lloc, invitats, pack, telèfon obligatoris) abans de tocar res. Després del booking, lliga `proposal.bookingId` per coherència. Errors retornats amb `stage` ('lead' | 'proposal' | 'booking') per UI feedback granular.
+- `app/api/admin/quick-create/route.ts` (nou): POST amb auth + mutate permission + CSRF + Zod parse. Body amb `outcome`, `client`, `event`, `proposalSubtotal?`, `proposalSnapshot?`.
+- `app/admin/quick-create/page.tsx` (nou): server component que carrega packs actius i passa al form.
+- `app/admin/quick-create/QuickCreateForm.tsx` (nou, client component): un sol form amb dos fieldsets (Client, Esdeveniment) i un tercer ("Què vols crear?") amb 3 botons distintius — `Només lead` (gris), `Lead + pressupost` (ambre), `Tot d'un cop` (verd). Validació per outcome al client abans de fer fetch (data/lloc/invitats/pack/telèfon obligatoris només si l'usuari trie 'tot'). Toast feedback + redirect post-èxit: si crea booking → `/admin/bookings/{id}`, si crea proposal → `/admin/presupuestos/{id}`, si només lead → workspace canònic via `buildLeadWorkspaceHref`.
+- `__tests__/lib/services/leads/quickCreateFlow.test.ts`: 9 tests amb mocks de `prisma`/`createAdminLead`/`createAdminProposal`/`createBookingFromInput` hoisted: outcome=lead (happy + error), outcome=lead+proposal (happy amb VAT calculat, default subtotal=0, errors), outcome=lead+proposal+booking (validació data manca, telèfon manca, happy path encadenat amb update proposal.bookingId, propaga error de booking).
+- Aquest tall **NO** toca: els endpoints existents `/api/admin/leads`, `/api/admin/proposals`, `/api/admin/bookings` (continuen funcionant; el wizard només és una capa addicional). Tampoc `bookingCreationService` (ja accepta leadId per encadenar).
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/leads/quickCreateFlow.test.ts` OK (9 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `442`; el següent canvi real ha de ser `#443`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #441 — 2026-04-28 — claude (FET)
 **A.4 del §6.18: mode "client de pas" — panell de detecció + acció directa al detall del booking.**
 - Context: A.4 ja tenia el suport schema (`Booking.customerId String?` i `Booking.leadId String?` ja eren nullable); el flow de creació ja permetia bookings sense customerId. Faltava la **visibilitat** i **acció** al detall del booking — un booking orfe no mostrava cap pista que es podia vincular o promoure a customer real, igual que el #435 va fer per leads.

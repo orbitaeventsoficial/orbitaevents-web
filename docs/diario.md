@@ -1,3 +1,11 @@
+## 2026-04-28 — Canvi #442: A.5 — wizard d'1 minut lead/pressupost/reserva (claude)
+- A.5 del §6.18 (Camí 1, P1): pantalla única amb 3 outcomes (`lead` / `lead+proposal` / `lead+proposal+booking`) en lloc de 3 pantalles separades.
+- `quickCreateFlow.ts` (nou): servei orquestrador. Sempre crea lead. Encadena proposal amb leadId i booking amb leadId quan toca. Validació pre-flight (data/lloc/invitats/pack/telèfon) abans de tocar res. Update proposal.bookingId post-creació. Errors amb `stage` per feedback.
+- `POST /api/admin/quick-create` (nou): auth+mutate+CSRF+Zod.
+- `/admin/quick-create` + `QuickCreateForm.tsx` (nou): form únic amb fieldsets Client + Esdeveniment + 3 CTAs distintius (gris/ambre/verd). Validació client-side per outcome. Redirect post-èxit segons resultat (booking → fitxa booking, proposal → fitxa pressupost, lead → workspace lead).
+- 9 tests verds. NO toca endpoints existents; només capa orquestradora addicional.
+- Validació: `validate:core` 12/12 OK · `qa:protocol` OK (current #442).
+
 ## 2026-04-28 — Canvi #441: A.4 — mode "client de pas" amb panell al detall del booking (claude)
 - A.4 ja tenia suport schema (`Booking.customerId String?` ja era nullable). Faltava visibilitat al detall — booking orfe no mostrava cap pista de vinculació/promoció.
 - `bookingCustomerLinkService.ts` (nou): mirror del leadCustomerLinkService adaptat. Booking té només 3 claus (email/phone/name, sense DNI). `email` = `strong` confidence; `phone`/`name` = `medium`.
