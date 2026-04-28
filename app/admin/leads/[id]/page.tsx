@@ -14,7 +14,9 @@ import ScoreSnapshotButton from './ScoreSnapshotButton';
 import LeadInsightsBanner from './LeadInsightsBanner';
 import LeadScoreBreakdown from './LeadScoreBreakdown';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
+import LeadCustomerLinkPanel from './LeadCustomerLinkPanel';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
+import { previewLeadCustomerLink } from '@/lib/services/leads/leadCustomerLinkService';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import InfoTooltip from '@/app/admin/components/InfoTooltip';
 import { ADMIN_HELP } from '@/app/admin/components/adminHelpGlossary';
@@ -156,6 +158,7 @@ export default async function LeadDetailPage({ params }: Props) {
     interestedPackId: lead.interestedPackId,
     source: lead.source,
   });
+  const customerLinkPreview = lead.customerId ? null : await previewLeadCustomerLink(lead.id);
   const relatedLeads = await prisma.lead.findMany({
     where: {
       id: { not: lead.id },
@@ -737,6 +740,10 @@ export default async function LeadDetailPage({ params }: Props) {
               </div>
             </dl>
           </section>
+
+          {!lead.customer && customerLinkPreview && (
+            <LeadCustomerLinkPanel leadId={lead.id} preview={customerLinkPreview} />
+          )}
 
           {lead.customer && (
             <section className="rounded-xl border border-white/10 p-6 admin-card-glass" {...helpAttrs(ADMIN_LEAD_HELP.detail.customer)}>
