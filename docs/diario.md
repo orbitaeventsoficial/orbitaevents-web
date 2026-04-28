@@ -1,3 +1,12 @@
+## 2026-04-28 — Canvi #441: A.4 — mode "client de pas" amb panell al detall del booking (claude)
+- A.4 ja tenia suport schema (`Booking.customerId String?` ja era nullable). Faltava visibilitat al detall — booking orfe no mostrava cap pista de vinculació/promoció.
+- `bookingCustomerLinkService.ts` (nou): mirror del leadCustomerLinkService adaptat. Booking té només 3 claus (email/phone/name, sense DNI). `email` = `strong` confidence; `phone`/`name` = `medium`.
+- `/api/admin/bookings/[id]/customer-link` (nou): GET preview, POST link|create.
+- `BookingCustomerLinkPanel.tsx` (nou): "Reserva amb client de pas" badge groc + targetes amb match; "Sense client" + botó "Crear client nou".
+- Detail page: panell renderitzat sols quan `!booking.customerId`, just abans de `OwnerControlStrip`.
+- 11 tests verds. Validació: `validate:core` 12/12 OK · `qa:protocol` OK (current #441).
+- NO toca: bookingCreationService, snapshot clientName/Email/Phone.
+
 ## 2026-04-28 — Canvi #440: lead→client match per nom (4a clau, completant la petició del #435) (claude)
 - L'usuari al #435 deia explícitament "match per email, dni, telefon... tots els possibles". Email/DNI/telèfon ja eren al #435; aquest tall afegeix nom.
 - `previewLeadCustomerLink`: llegeix `lead.name`, normalitza amb `normalizeName`, only inclou al where si ≥3 chars (anti-soroll). Match per nom sol = `medium` confidence (com phone). `CustomerMatchKind` amplia a `'name'`.

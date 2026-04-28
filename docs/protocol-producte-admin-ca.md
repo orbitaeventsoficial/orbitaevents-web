@@ -5614,6 +5614,21 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #441 — 2026-04-28 — claude (FET)
+**A.4 del §6.18: mode "client de pas" — panell de detecció + acció directa al detall del booking.**
+- Context: A.4 ja tenia el suport schema (`Booking.customerId String?` i `Booking.leadId String?` ja eren nullable); el flow de creació ja permetia bookings sense customerId. Faltava la **visibilitat** i **acció** al detall del booking — un booking orfe no mostrava cap pista que es podia vincular o promoure a customer real, igual que el #435 va fer per leads.
+- `lib/services/bookings/bookingCustomerLinkService.ts` (nou): mirror del `leadCustomerLinkService` adaptat al schema del Booking. `previewBookingCustomerLink(bookingId)` busca matches per `emailNormalized` + `phoneNormalized` + `nameNormalized` (`Booking` no té DNI, només 3 claus en lloc de 4). `linkBookingToCustomer({bookingId, action, customerId?, actor?})` és idempotent (alreadyLinked sense escriptures), valida customer per `link`, rebutja amb 409 conflicte d'email per `create`. Mateix patró de confidence: `email` = `strong`, `phone`/`name` = `medium`.
+- `app/api/admin/bookings/[id]/customer-link/route.ts` (nou): GET preview (auth + read), POST acció (auth + mutate + CSRF). Patró idèntic al lead.
+- `app/admin/bookings/[id]/BookingCustomerLinkPanel.tsx` (nou, client component): mostra "Reserva amb client de pas" amb badge groc quan `matches-found`, "Reserva sense client al CRM" amb botó verd "Crear client nou" quan `no-match`. Toast feedback + `router.refresh()`.
+- `app/admin/bookings/[id]/page.tsx`: server component computa `customerLinkPreview = booking.customerId ? null : await previewBookingCustomerLink(booking.id)` i renderitza el panell just abans del `OwnerControlStrip`. Mai apareix si la booking ja té customer; sempre apareix amb missatge clar quan no.
+- `__tests__/lib/services/bookings/bookingCustomerLinkService.test.ts`: 11 tests amb mocks `prisma` hoisted: previewBookingCustomerLink (booking-not-found, already-linked, match per email+name strong, no-match per dades buides); linkBookingToCustomer link (404, alreadyLinked, 400 sense customerId, happy path); linkBookingToCustomer create (400 email buit, 409 conflicte email, happy path amb normalització email/phone/locale).
+- Aquest tall **NO** toca: el flow de creació de booking (continua acceptant `clientName`/`clientEmail`/`clientPhone` directes amb `customerId` opcional), ni `bookingCreationService.ts` (ja gestionava el customerId null amb `linkedCustomerId` resolution per email lookup). NO modifica `Booking.clientName/clientEmail/clientPhone` (snapshot) — només connecta al CRM real.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/bookings/bookingCustomerLinkService.test.ts` OK (11 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `441`; el següent canvi real ha de ser `#442`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #440 — 2026-04-28 — claude (FET)
 **Match per nom afegit al lead→client (4a clau): `previewLeadCustomerLink` ara busca també per `nameNormalized` quan tingui ≥3 chars.**
 - Context: l'usuari va dir explícitament al #435 "match per email, dni, telefon... tots els possibles". El #435 va cobrir email/DNI/telèfon però no nom (i no Instagram). Aquest tall afegeix el quart canal de match.

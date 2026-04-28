@@ -17,7 +17,9 @@ import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
+import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
+import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 
 import { getBookingStatusDisplay, getEventLabel, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
@@ -113,6 +115,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const ops = await getBookingOperationalSnapshot(booking);
   const { commStatuses, recentCommRows, reviewFlowStatus, internalPostEventStatus, timeline: bookingTimeline, customer, profitabilityConfig, targetMarginPct, inventoryCost } = ops;
   const activePortalAccess = ops.portalAccess as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
+
+  const customerLinkPreview = booking.customerId ? null : await previewBookingCustomerLink(booking.id);
 
   const googleCalendarUrl = buildGoogleCalendarUrl({
     reference: booking.reference,
@@ -239,6 +243,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
         />
       }
     >
+
+      {customerLinkPreview && (
+        <BookingCustomerLinkPanel bookingId={booking.id} preview={customerLinkPreview} />
+      )}
 
       <OwnerControlStrip
         system={{
