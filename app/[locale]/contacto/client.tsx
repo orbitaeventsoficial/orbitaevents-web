@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import ContactFormComplete from '@/app/components/forms/ContactFormComplete';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 function ContactContent() {
@@ -63,7 +63,7 @@ function ContactContent() {
               {/* WhatsApp + Email — auxiliary */}
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                 <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
+                  href={WHATSAPP_URL_WITH_MESSAGE(t('page.whatsappMessage'))}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-white/48 transition-all duration-300 hover:text-[#25D366] hover:drop-shadow-[0_0_8px_rgba(37,211,102,0.3)]"
                 >

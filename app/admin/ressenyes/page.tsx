@@ -9,6 +9,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateTime } from '@/lib/constants';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { log } from '@/lib/logger';
+import { pluralize } from '@/lib/utils/pluralize';
 
 type Testimonial = {
   id: string;
@@ -206,22 +207,22 @@ export default function AdminRessenyesPage() {
     const manualItems: string[] = [];
     if (pending.length > 0) {
       manualItems.push(
-        `${pending.length} ${pending.length === 1 ? 'ressenya pendent' : 'ressenyes pendents'} de moderació`,
+        `${pending.length} ${pluralize(pending.length, 'ressenya pendent', 'ressenyes pendents')} de moderació`,
       );
     }
     if (stalePending > 0) {
       manualItems.push(
-        `${stalePending} ${stalePending === 1 ? 'pendent' : 'pendents'} de fa >7 dies`,
+        `${stalePending} ${pluralize(stalePending, 'pendent', 'pendents')} de fa >7 dies`,
       );
     }
     if (lowRatingPending > 0) {
       manualItems.push(
-        `${lowRatingPending} ${lowRatingPending === 1 ? 'pendent amb <4★' : 'pendents amb <4★'}`,
+        `${lowRatingPending} ${pluralize(lowRatingPending, 'pendent amb <4★', 'pendents amb <4★')}`,
       );
     }
     if (lowRatingApproved > 0) {
       manualItems.push(
-        `${lowRatingApproved} ${lowRatingApproved === 1 ? 'aprovada amb <4★ visible' : 'aprovades amb <4★ visibles'} al web`,
+        `${lowRatingApproved} ${pluralize(lowRatingApproved, 'aprovada amb <4★ visible', 'aprovades amb <4★ visibles')} al web`,
       );
     }
 
@@ -248,10 +249,10 @@ export default function AdminRessenyesPage() {
         : pending.length > 0
           ? {
               eyebrow: 'Següent pas · Moderar',
-              title: `Moderar ${pending.length} ${pending.length === 1 ? 'ressenya pendent' : 'ressenyes pendents'}`,
+              title: `Moderar ${pending.length} ${pluralize(pending.length, 'ressenya pendent', 'ressenyes pendents')}`,
               detail:
                 stalePending > 0
-                  ? `${stalePending} ${stalePending === 1 ? 'porta' : 'porten'} >7 dies esperant. Aprova o amaga per no bloquejar el testimoniatge al web.`
+                  ? `${stalePending} ${pluralize(stalePending, 'porta', 'porten')} >7 dies esperant. Aprova o amaga per no bloquejar el testimoniatge al web.`
                   : 'Aprova o amaga cada testimoniatge per poder-lo fer servir com a canvas i social proof al web.',
               href: '#pendents',
               ctaLabel: 'Obrir pendents',
@@ -261,7 +262,7 @@ export default function AdminRessenyesPage() {
           : lowRatingApproved > 0
             ? {
                 eyebrow: 'Següent pas · Reviu',
-                title: `${lowRatingApproved} ${lowRatingApproved === 1 ? 'aprovada amb <4★' : 'aprovades amb <4★'} al web`,
+                title: `${lowRatingApproved} ${pluralize(lowRatingApproved, 'aprovada amb <4★', 'aprovades amb <4★')} al web`,
                 detail:
                   'Considera amagar ressenyes baixes per mantenir la mitjana pública. No elimina la ressenya — només la treu del canal públic.',
                 href: '#aprovades',
@@ -270,7 +271,7 @@ export default function AdminRessenyesPage() {
             : {
                 eyebrow: 'Següent pas',
                 title: 'Moderació al dia',
-                detail: `${approved.length} ${approved.length === 1 ? 'ressenya aprovada visible' : 'ressenyes aprovades visibles'}. Aprofita per generar canvas Story/Instagram i distribuir social proof.`,
+                detail: `${approved.length} ${pluralize(approved.length, 'ressenya aprovada visible', 'ressenyes aprovades visibles')}. Aprofita per generar canvas Story/Instagram i distribuir social proof.`,
                 href: '#aprovades',
                 ctaLabel: 'Veure aprovades',
               };
@@ -293,7 +294,7 @@ export default function AdminRessenyesPage() {
         title:
           manualItems.length === 0
             ? 'Cap senyal manual'
-            : `${manualItems.length} ${manualItems.length === 1 ? 'senyal per revisar' : 'senyals per revisar'}`,
+            : `${manualItems.length} ${pluralize(manualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
         tone: manualTone,
         items: manualItems,
         emptyText: 'Sense pendents ni ressenyes baixes visibles.',

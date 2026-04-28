@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import { fetchPublicStats } from '@/lib/api/publicStatsClient';
 
 // ─── Count-up hook ──────────────────────────────────────────────────────────
 
@@ -92,8 +93,7 @@ export default function StatsSection() {
   const [stats, setStats] = useState<StatConfig[]>(DEFAULT_STATS);
 
   useEffect(() => {
-    fetch(`/api/public/stats?locale=${locale}`)
-      .then((r) => r.json())
+    fetchPublicStats(locale)
       .then((data) => {
         if (!data.ok || !data.stats) return;
         const s = data.stats;

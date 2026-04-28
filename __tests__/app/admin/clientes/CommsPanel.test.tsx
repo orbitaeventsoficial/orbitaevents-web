@@ -91,6 +91,10 @@ describe('CommsPanel', () => {
     const cta = screen.getAllByRole('link', { name: 'Respondre per WhatsApp' })[0];
     expect(cta).toHaveAttribute('href');
     expect(cta.getAttribute('href')).toContain('https://wa.me/34600112233?text=');
+    expect(screen.getByRole('link', { name: 'Obrir Customer Hub' })).toHaveAttribute(
+      'href',
+      '/admin/clientes/cust-1?tab=comms'
+    );
   });
 
   it('neteja labels interns al llistat recent de comunicacions', () => {

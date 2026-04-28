@@ -6,6 +6,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { AdminHelpLegend } from '@/app/admin/components/AdminHelpLegend';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import { pluralize } from '@/lib/utils/pluralize';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_IMAGES } from '@/app/config/portfolio-images';
 import {
@@ -698,9 +699,9 @@ export default function AdminPortfolioPage() {
       `Categories actives: ${PORTFOLIO_CATEGORIES.length - emptyCategories.length}/${PORTFOLIO_CATEGORIES.length}`,
     ];
     const manualItems: string[] = [];
-    if (withoutCover > 0) manualItems.push(`${withoutCover} event${withoutCover === 1 ? '' : 's'} sense portada`);
-    if (withoutMedia > 0) manualItems.push(`${withoutMedia} event${withoutMedia === 1 ? '' : 's'} sense media vinculat`);
-    if (draftCount > 0) manualItems.push(`${draftCount} esborrany${draftCount === 1 ? '' : 's'} pendent${draftCount === 1 ? '' : 's'} de publicar`);
+    if (withoutCover > 0) manualItems.push(`${withoutCover} ${pluralize(withoutCover, 'event', 'events')} sense portada`);
+    if (withoutMedia > 0) manualItems.push(`${withoutMedia} ${pluralize(withoutMedia, 'event', 'events')} sense media vinculat`);
+    if (draftCount > 0) manualItems.push(`${draftCount} ${pluralize(draftCount, 'esborrany pendent', 'esborranys pendents')} de publicar`);
     if (emptyCategories.length > 0) manualItems.push(`Categories buides: ${emptyCategories.map((category) => category.name).join(', ')}`);
     let nextStep: {
       title: string;
@@ -718,7 +719,7 @@ export default function AdminPortfolioPage() {
       };
     } else if (withoutCover > 0) {
       nextStep = {
-        title: `Assigna portada a ${withoutCover} event${withoutCover === 1 ? '' : 's'}`,
+        title: `Assigna portada a ${withoutCover} ${pluralize(withoutCover, 'event', 'events')}`,
         detail: 'Els events sense portada es veuen buits a la web. Des de Media tria una peça i marca-la com a portada.',
         href: '#media',
         ctaLabel: 'Obrir Media',
@@ -726,21 +727,21 @@ export default function AdminPortfolioPage() {
       };
     } else if (withoutMedia > 0) {
       nextStep = {
-        title: `Vincula media a ${withoutMedia} event${withoutMedia === 1 ? '' : 's'}`,
+        title: `Vincula media a ${withoutMedia} ${pluralize(withoutMedia, 'event', 'events')}`,
         detail: 'Events sense media no tenen galeria pública. Des de Media selecciona peces i vincula-les a l\'event.',
         href: '#media',
         ctaLabel: 'Obrir Media',
       };
     } else if (draftCount > 0) {
       nextStep = {
-        title: `Publica ${draftCount} esborrany${draftCount === 1 ? '' : 's'}`,
+        title: `Publica ${draftCount} ${pluralize(draftCount, 'esborrany', 'esborranys')}`,
         detail: 'Els esborranys existeixen a l\'admin però no es veuen públicament. Revisa-los i publica els que estiguin a punt.',
         href: '#events',
         ctaLabel: 'Obrir Events',
       };
     } else if (emptyCategories.length > 0) {
       nextStep = {
-        title: `Afegeix events a ${emptyCategories.length} categoria${emptyCategories.length === 1 ? '' : 'es'} buida${emptyCategories.length === 1 ? '' : 'es'}`,
+        title: `Afegeix events a ${emptyCategories.length} ${pluralize(emptyCategories.length, 'categoria buida', 'categories buides')}`,
         detail: `Sense events, les categories es veuen desertes. Pendents: ${emptyCategories.map((category) => category.name).join(', ')}.`,
         href: '#events',
         ctaLabel: 'Obrir Events',

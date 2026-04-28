@@ -111,7 +111,10 @@ describe('SummaryPanel', () => {
     expect(screen.getByText('Conversió: sense reserva vinculada')).toBeInTheDocument();
     expect(screen.getByText('Canal suggerit: WhatsApp')).toBeInTheDocument();
     expect(screen.getByText('Prioritat del pas: Alta')).toBeInTheDocument();
-    expect(screen.getByText('Obrir fitxa de la lead')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Anar a Comunicacions' })).toHaveAttribute(
+      'href',
+      '/admin/clientes/cust-1?tab=comms'
+    );
     expect(screen.getAllByText('Desencallar per WhatsApp').length).toBeGreaterThan(0);
   });
 

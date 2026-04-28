@@ -43,6 +43,7 @@ type CalendarDay = {
   }[];
   followUps: {
     leadId: string;
+    customerId: string | null;
     name: string;
     urgency: 'URGENT' | 'NORMAL' | 'LOW';
     suggestedAction: string;
@@ -238,6 +239,7 @@ export async function getAdminCalendarMonth(from?: string | null, to?: string | 
     for (const item of followUps.items) {
       days[todayKey].followUps.push({
         leadId: item.leadId,
+        customerId: item.customerId,
         name: item.name,
         urgency: item.urgency,
         suggestedAction: item.suggestedAction,

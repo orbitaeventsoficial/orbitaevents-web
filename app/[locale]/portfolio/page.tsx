@@ -8,6 +8,7 @@ import { getTranslations } from 'next-intl/server';
 import { getSiteUrl } from '@/lib/site';
 import { listPortfolioEvents } from '@/lib/services/portfolioEventService';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -118,9 +119,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                       </h3>
                       <div className="mt-3 flex items-center gap-2 text-white/50 text-sm group-hover:text-white/70 transition-colors">
                         <span>{t('viewGallery')}</span>
-                        <svg className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
+                        <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
                       </div>
                     </div>
                   </Link>
@@ -153,9 +152,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                       <h3 className="text-2xl font-bold text-white group-hover:text-amber-50 transition-colors">{translatedName}</h3>
                       <p className="text-white/40 text-sm mt-1 flex items-center gap-1.5 group-hover:text-white/60 transition-colors">
                         {t('viewGallery')}
-                        <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
+                        <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </p>
                     </div>
                   </Link>

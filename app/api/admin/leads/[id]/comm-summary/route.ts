@@ -12,7 +12,8 @@ export async function GET(req: NextRequest, { params }: Params) {
   if (authError) return authError;
 
   try {
-    const summary = await loadCommTimeline(params.id);
+    const customerId = req.nextUrl.searchParams.get('customerId');
+    const summary = await loadCommTimeline(params.id, customerId);
     return NextResponse.json(summary);
   } catch (error) {
     log.error('Error obtenint resum de comunicacions', error);

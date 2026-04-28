@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerComposeHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import type { FollowUpSummary, PendingFollowUp } from '@/lib/services/responseTrackingService';
+import { resolveImportedLeadHref } from './importNavigation';
 
 const URGENCY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
   URGENT: { bg: 'bg-rose-500/10 border-rose-500/30', text: 'text-rose-300', label: 'Urgent' },
@@ -62,6 +64,13 @@ export default function PendingFollowUpsPanel() {
       <div className="mt-3 space-y-2">
         {visibleItems.map((item: PendingFollowUp) => {
           const style = URGENCY_STYLE[item.urgency] || URGENCY_STYLE.LOW;
+          const workspaceHref = resolveImportedLeadHref({
+            id: item.leadId,
+            customerId: item.customerId,
+          });
+          const composeHref = item.customerId
+            ? buildCustomerComposeHref(item.customerId, 'seguiment')
+            : buildLeadComposeHref(item.leadId, 'seguiment');
           return (
             <div
               key={item.leadId}
@@ -73,7 +82,7 @@ export default function PendingFollowUpsPanel() {
                     {style.label} · {item.daysSinceOutbound}d
                   </span>
                   <Link
-                    href={buildLeadWorkspaceHref(item.leadId)}
+                    href={workspaceHref}
                     className="text-sm font-medium hover:underline truncate"
                   >
                     {item.name}
@@ -84,7 +93,7 @@ export default function PendingFollowUpsPanel() {
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 <Link
-                  href={buildLeadComposeHref(item.leadId, 'seguiment')}
+                  href={composeHref}
                   className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
                 >
                   ✉️ Email
@@ -100,7 +109,7 @@ export default function PendingFollowUpsPanel() {
                   </a>
                 )}
                 <Link
-                  href={buildLeadWorkspaceHref(item.leadId)}
+                  href={workspaceHref}
                   className="rounded border border-white/10 px-2 py-1 text-[10px] hover:bg-white/5"
                 >
                   Obrir

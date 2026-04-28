@@ -50,7 +50,9 @@ export function ComposeModal({
           to,
           subject,
           body,
+          leadId: replyTo?.leadData?.id,
           replyToId: replyTo?.leadData?.id,
+          customerId: replyTo?.leadData?.customerId || undefined,
           locale,
           quote: attachQuote
             ? {
@@ -238,6 +240,7 @@ export function QuoteModal({
 
   const recipient = target.leadData?.email || target.imapData?.from.address || target.from;
   const leadId = target.leadData?.id;
+  const customerId = target.leadData?.customerId;
 
   async function handleSendQuote() {
     setSending(true);
@@ -248,6 +251,7 @@ export function QuoteModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           leadId,
+          customerId: customerId || undefined,
           to: recipient,
           packId,
           price: Number(price),
@@ -351,4 +355,3 @@ export function QuoteModal({
     </div>
   );
 }
-

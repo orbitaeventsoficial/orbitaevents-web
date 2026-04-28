@@ -54,11 +54,11 @@ const emptyFollowUps: FollowUpSummary = { generatedAt: now.toISOString(), total:
 const urgentFollowUps: FollowUpSummary = {
   generatedAt: now.toISOString(), total: 5, urgent: 2, normal: 2, low: 1,
   items: [
-    { leadId: 'l1', name: 'Anna', email: 'a@t.com', phone: '600', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 7, outboundCount: 3, hasInboundAfterOutbound: false, urgency: 'URGENT', suggestedAction: 'Trucar' },
-    { leadId: 'l2', name: 'Jordi', email: 'j@t.com', phone: '601', eventType: 'CORPORATE', status: 'QUOTE_SENT', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 6, outboundCount: 2, hasInboundAfterOutbound: false, urgency: 'URGENT', suggestedAction: 'WhatsApp' },
-    { leadId: 'l3', name: 'Maria', email: 'm@t.com', phone: '602', eventType: 'OTHER', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 3, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'NORMAL', suggestedAction: 'Email' },
-    { leadId: 'l4', name: 'Pere', email: 'p@t.com', phone: '603', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 2, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'NORMAL', suggestedAction: 'Esperar' },
-    { leadId: 'l5', name: 'Laia', email: 'l@t.com', phone: '604', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 1, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'LOW', suggestedAction: 'Esperar' },
+    { leadId: 'l1', customerId: null, name: 'Anna', email: 'a@t.com', phone: '600', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 7, outboundCount: 3, hasInboundAfterOutbound: false, urgency: 'URGENT', suggestedAction: 'Trucar' },
+    { leadId: 'l2', customerId: null, name: 'Jordi', email: 'j@t.com', phone: '601', eventType: 'CORPORATE', status: 'QUOTE_SENT', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 6, outboundCount: 2, hasInboundAfterOutbound: false, urgency: 'URGENT', suggestedAction: 'WhatsApp' },
+    { leadId: 'l3', customerId: null, name: 'Maria', email: 'm@t.com', phone: '602', eventType: 'OTHER', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 3, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'NORMAL', suggestedAction: 'Email' },
+    { leadId: 'l4', customerId: null, name: 'Pere', email: 'p@t.com', phone: '603', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 2, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'NORMAL', suggestedAction: 'Esperar' },
+    { leadId: 'l5', customerId: null, name: 'Laia', email: 'l@t.com', phone: '604', eventType: 'WEDDING', status: 'CONTACTED', preferredLocale: 'ca', contactedAt: new Date(), lastOutboundAt: new Date(), daysSinceOutbound: 1, outboundCount: 1, hasInboundAfterOutbound: false, urgency: 'LOW', suggestedAction: 'Esperar' },
   ],
 };
 
@@ -109,11 +109,20 @@ describe('assemblePriorityActions', () => {
   });
 
   it('inclou follow-ups urgents', () => {
-    const actions = assemblePriorityActions(makeInput({ followUps: urgentFollowUps }));
+    const actions = assemblePriorityActions(makeInput({
+      followUps: {
+        ...urgentFollowUps,
+        items: [
+          { ...urgentFollowUps.items[0], customerId: 'cust-1' },
+          ...urgentFollowUps.items.slice(1),
+        ],
+      },
+    }));
     const fuActions = actions.filter((a) => a.source === 'followUps');
     expect(fuActions).toHaveLength(2);
     expect(fuActions[0].urgency).toBe('CRITICAL');
     expect(fuActions[0].label).toContain('Anna');
+    expect(fuActions[0].href).toBe('/admin/clientes/cust-1?tab=comms');
   });
 
   it('inclou conflictes de capacitat', () => {

@@ -163,6 +163,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
       return {
         id: lead.id,
+        customerId: resolvedCustomerId,
         name: lead.name,
         email: lead.email,
         phone: lead.phone,
@@ -273,6 +274,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   const leadsDTO: LeadDTO[] = leads.map((lead) => ({
     id: lead.id,
+    customerId: resolvedCustomerId,
     name: lead.name,
     email: lead.email,
     phone: lead.phone,

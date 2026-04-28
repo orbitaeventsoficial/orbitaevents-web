@@ -135,4 +135,24 @@ describe('adminCommandPaletteService', () => {
       icon: '📖',
     });
   });
+
+  it('buildAdminCommandItems amb arrays buits retorna només els base commands', () => {
+    const items = buildAdminCommandItems([], [], ADMIN_COMMAND_PALETTE_BASE_COMMANDS);
+
+    expect(items).toHaveLength(ADMIN_COMMAND_PALETTE_BASE_COMMANDS.length);
+    expect(items.every((item) => item.type === 'Accio')).toBe(true);
+  });
+
+  it('filterAdminCommandItems amb limit 0 retorna array buit', () => {
+    const items = buildAdminCommandItems(PRIORITY_ITEMS, NAV_SECTIONS, ADMIN_COMMAND_PALETTE_BASE_COMMANDS);
+
+    expect(filterAdminCommandItems(items, '', 0)).toHaveLength(0);
+    expect(filterAdminCommandItems(items, 'entrades', 0)).toHaveLength(0);
+  });
+
+  it('buildAdminSearchEntries amb results totalment buits retorna array buit', () => {
+    const entries = buildAdminSearchEntries({ leads: [], bookings: [], customers: [] });
+
+    expect(entries).toEqual([]);
+  });
 });

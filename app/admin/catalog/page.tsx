@@ -5,6 +5,7 @@ import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
 import { CATALOG_TAB_META, formatCurrency } from '@/lib/constants';
+import { pluralize } from '@/lib/utils/pluralize';
 
 type CatalogTab = keyof typeof CATALOG_TAB_META;
 
@@ -191,22 +192,22 @@ export default async function CatalogPage({
   const stripManualItems: string[] = [];
   if (redCount > 0) {
     stripManualItems.push(
-      `${redCount} ${redCount === 1 ? 'pack crític' : 'packs crítics'} (marge < objectiu −8pp)`,
+      `${redCount} ${pluralize(redCount, 'pack crític', 'packs crítics')} (marge < objectiu −8pp)`,
     );
   }
   if (amberCount > 0) {
     stripManualItems.push(
-      `${amberCount} ${amberCount === 1 ? 'pack a vigilar' : 'packs a vigilar'} (marge proper al límit)`,
+      `${amberCount} ${pluralize(amberCount, 'pack a vigilar', 'packs a vigilar')} (marge proper al límit)`,
     );
   }
   if (packsWithoutInventory > 0) {
     stripManualItems.push(
-      `${packsWithoutInventory} ${packsWithoutInventory === 1 ? 'pack sense' : 'packs sense'} components d'inventari`,
+      `${packsWithoutInventory} ${pluralize(packsWithoutInventory, 'pack sense', 'packs sense')} components d'inventari`,
     );
   }
   if (highDivergenceCount > 0) {
     stripManualItems.push(
-      `${highDivergenceCount} ${highDivergenceCount === 1 ? 'pack amb desviació' : 'packs amb desviació'} ≥20% vs preu recomanat`,
+      `${highDivergenceCount} ${pluralize(highDivergenceCount, 'pack amb desviació', 'packs amb desviació')} ≥20% vs preu recomanat`,
     );
   }
 
@@ -247,7 +248,7 @@ export default async function CatalogPage({
       : redCount > 0
         ? {
             eyebrow: 'Següent pas · Crític',
-            title: `Resol ${redCount} ${redCount === 1 ? 'pack crític' : 'packs crítics'}`,
+            title: `Resol ${redCount} ${pluralize(redCount, 'pack crític', 'packs crítics')}`,
             detail: topCriticalPack
               ? `"${topCriticalPack.name}" té ${formatPct(topCriticalPack.marginPct)} marge (objectiu ${formatPct(targetMarginPct)}). Puja preu o redueix costos abans de vendre'l més.`
               : 'Hi ha packs amb marge sota llindar crític. Puja preu o redueix costos abans de vendre més.',
@@ -258,7 +259,7 @@ export default async function CatalogPage({
         : packsWithoutInventory > 0
           ? {
               eyebrow: 'Següent pas · Inventari',
-              title: `${packsWithoutInventory} ${packsWithoutInventory === 1 ? 'pack' : 'packs'} sense components`,
+              title: `${packsWithoutInventory} ${pluralize(packsWithoutInventory, 'pack', 'packs')} sense components`,
               detail:
                 'Sense inventari associat, el cost directe no inclou equipament real. Vincula elements d\'inventari per obtenir salut de preu fiable.',
               href: '/admin/packs?focus=without-inventory',
@@ -309,7 +310,7 @@ export default async function CatalogPage({
           title:
             stripManualItems.length === 0
               ? 'Cap senyal manual'
-              : `${stripManualItems.length} ${stripManualItems.length === 1 ? 'senyal per revisar' : 'senyals per revisar'}`,
+              : `${stripManualItems.length} ${pluralize(stripManualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
           tone: stripManualTone,
           items: stripManualItems,
           emptyText: 'Cap pack crític, sense inventari ni amb desviació alta.',

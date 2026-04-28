@@ -1,4 +1,6 @@
-import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerComposeHref, buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import type { LeadDTO } from './dto';
 
 export type LeadActionLink = {
@@ -28,20 +30,28 @@ export function buildLeadActionLink(lead: LeadDTO): LeadActionLink {
     lead.commercialBlocker?.label === 'Primera resposta pendent'
   ) {
     return {
-      href: buildLeadComposeHref(lead.id, 'recordatori'),
+      href: lead.customerId
+        ? buildCustomerComposeHref(lead.customerId, 'recordatori')
+        : buildLeadComposeHref(lead.id, 'recordatori'),
       label: lead.commercialBlocker.label === 'Pressupost pendent' ? 'Enviar recordatori' : 'Preparar seguiment',
     };
   }
 
   if (lead.commercialBlocker?.label === 'Passar a reserva') {
     return {
-      href: buildLeadWorkspaceHref(lead.id),
+      href: lead.customerId
+        ? buildCustomerWorkspaceTabHref(lead.customerId, 'bookings')
+        : buildLeadCustomerHref({ leadId: lead.id }),
       label: 'Tancar conversió',
     };
   }
 
   return {
-    href: buildLeadWorkspaceHref(lead.id),
+    href: buildLeadCustomerHref({
+      leadId: lead.id,
+      customerId: lead.customerId,
+      customerTab: 'leads',
+    }),
     label: 'Obrir lead',
   };
 }

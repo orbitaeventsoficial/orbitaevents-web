@@ -7,6 +7,7 @@ import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import LeadActions from './LeadActions';
+import LeadLostReasonBadge from './LeadLostReasonBadge';
 import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
 import LeadViewToggle from './LeadViewToggle';
@@ -179,6 +180,7 @@ async function getLeads(filters: {
             eventDate: true,
             createdAt: true,
             status: true,
+            lostReason: true,
             priority: true,
             source: true,
             customerId: true,
@@ -431,6 +433,11 @@ export default async function LeadsPage({
                     );
                   })()}
                 </div>
+                {lead.status === 'LOST' && (
+                  <div className="mt-2">
+                    <LeadLostReasonBadge lostReason={lead.lostReason} />
+                  </div>
+                )}
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Link
@@ -552,6 +559,11 @@ export default async function LeadsPage({
                         <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${statusConf.badgeClass}`}>
                           {statusConf.label}
                         </span>
+                        {lead.status === 'LOST' && (
+                          <div className="mt-1">
+                            <LeadLostReasonBadge lostReason={lead.lostReason} />
+                          </div>
+                        )}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${priorityConf.badgeClass}`}>
@@ -620,7 +632,6 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
-
 
 
 

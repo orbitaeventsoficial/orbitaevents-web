@@ -7,6 +7,7 @@ import { getLeadStatusDisplay } from '@/lib/constants';
 
 export interface LeadData {
   id: string;
+  customerId: string | null;
   name: string;
   email: string;
   phone: string | null;

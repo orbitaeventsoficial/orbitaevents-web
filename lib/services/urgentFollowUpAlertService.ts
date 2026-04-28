@@ -143,6 +143,7 @@ export async function runUrgentFollowUpAlerts(
     },
     select: {
       id: true,
+      customerId: true,
       name: true,
       email: true,
       phone: true,
@@ -165,6 +166,7 @@ export async function runUrgentFollowUpAlerts(
       const state = deriveLeadResponseState(lead.activities, lead.contactedAt);
       return {
         id: lead.id,
+        customerId: lead.customerId,
         name: lead.name,
         email: lead.email,
         phone: lead.phone,

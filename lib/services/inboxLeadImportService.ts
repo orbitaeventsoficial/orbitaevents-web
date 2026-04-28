@@ -119,6 +119,7 @@ export async function importLeadFromInboxMessage(uidNum: number, fallbackEmail: 
             name: existing.name,
             email: existing.email,
             status: existing.status,
+            customerId: existing.customerId ?? null,
           },
         },
       };
@@ -176,6 +177,7 @@ export async function importLeadFromInboxMessage(uidNum: number, fallbackEmail: 
           name: updated.name,
           email: updated.email,
           status: updated.status,
+          customerId: updated.customerId ?? existing.customerId ?? null,
         },
       },
     };
@@ -235,6 +237,7 @@ export async function importLeadFromInboxMessage(uidNum: number, fallbackEmail: 
         name: created.name,
         email: created.email,
         status: created.status,
+        customerId: created.customerId ?? null,
       },
     },
   };

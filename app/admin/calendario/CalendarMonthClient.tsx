@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -658,7 +659,10 @@ export default function CalendarMonthClient() {
                         <div className="truncate font-semibold">
                           {r.leadId ? (
                             <Link
-                              href={buildLeadWorkspaceHref(r.leadId)}
+                              href={buildLeadCustomerHref({
+                                leadId: r.leadId,
+                                customerId: r.customerId,
+                              })}
                               onClick={(event) => event.stopPropagation()}
                               className="hover:underline"
                             >
@@ -823,12 +827,23 @@ export default function CalendarMonthClient() {
                             Reserva →
                           </Link>
                           {r.leadId && (
-                            <Link href={buildLeadWorkspaceHref(r.leadId)} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
-                              Entrada →
+                            <Link
+                              href={buildLeadCustomerHref({
+                                leadId: r.leadId,
+                                customerId: r.customerId,
+                              })}
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[10px] font-medium hover:underline"
+                            >
+                              {r.customerId ? 'Workspace →' : 'Entrada →'}
                             </Link>
                           )}
                           {r.customerId && (
-                            <Link href={`/admin/clientes/${r.customerId}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                            <Link
+                              href={buildCustomerWorkspaceTabHref(r.customerId, 'bookings')}
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[10px] font-medium hover:underline"
+                            >
                               👤 Client →
                             </Link>
                           )}
@@ -884,7 +899,15 @@ export default function CalendarMonthClient() {
                     </Link>
                   ))}
                   {visibleLayers.followUps && selectedDayData.payload?.followUps?.map((item) => (
-                    <Link key={item.leadId} href={buildLeadWorkspaceHref(item.leadId)} className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all">
+                    <Link
+                      key={item.leadId}
+                      href={buildLeadCustomerHref({
+                        leadId: item.leadId,
+                        customerId: item.customerId,
+                        customerTab: 'comms',
+                      })}
+                      className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-3 py-2.5 transition-all"
+                    >
                       <div className="truncate text-sm font-medium">Follow-up · {item.name}</div>
                       <div className="mt-1 text-xs opacity-70">{item.urgency} · {item.suggestedAction}</div>
                     </Link>

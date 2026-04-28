@@ -14,17 +14,9 @@ import { getWeddingCoverageZones } from '@/lib/services/weddingCoverage';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import GuestRecommender from '@/app/components/ui/GuestRecommender';
 import { TRUST_POINTS } from '@/lib/constants/services';
-
-type AnalyticsValue = string | number | boolean | undefined;
-type AnalyticsParams = Record<string, AnalyticsValue>;
-type GtagWindow = Window & { gtag?: (command: 'event', action: string, params?: AnalyticsParams) => void };
-
-function trackServiceEvent(action: string, params: AnalyticsParams) {
-  if (typeof window === 'undefined') return;
-  const gtag = (window as GtagWindow).gtag;
-  if (!gtag) return;
-  gtag('event', action, params);
-}
+import PublicServiceMidCta from '@/app/components/public/PublicServiceMidCta';
+import PublicServiceZonesSection from '@/app/components/public/PublicServiceZonesSection';
+import { trackPublicServiceEvent } from '@/app/lib/analytics';
 
 export default function BodasClient({ heroImage }: { heroImage: string }) {
   const t = useTranslations('pages.weddings');
@@ -54,7 +46,7 @@ export default function BodasClient({ heroImage }: { heroImage: string }) {
   }, []);
 
   const handlePackCTA = (pack: PackDefinition) => {
-    trackServiceEvent('bodas_pack_cta', {
+    trackPublicServiceEvent('bodas_pack_cta', {
       pack_id: pack.id,
       pack_name: pack.name,
       price: pack.priceValue,
@@ -99,7 +91,7 @@ export default function BodasClient({ heroImage }: { heroImage: string }) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/configurador?service=bodas"
-                onClick={() => trackServiceEvent('bodas_hero_cta', { position: 'hero' })}
+                onClick={() => trackPublicServiceEvent('bodas_hero_cta', { position: 'hero' })}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25 text-lg"
               >
                 {t('configure')}
@@ -270,49 +262,31 @@ export default function BodasClient({ heroImage }: { heroImage: string }) {
       </section>
 
       {/* ═══ CTA INTERMEDI ═══ */}
-      <section className="max-w-3xl mx-auto px-4 py-12">
-        <div className="p-10 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
-          <h3 className="text-3xl font-bold text-white mb-3">
-            {t('heroTitle')}
-          </h3>
-          <p className="text-white/60 mb-8 max-w-md mx-auto">
-            {t('heroSubtitle')}
-          </p>
-          <Link
-            href="/configurador?service=bodas"
-            onClick={() => trackServiceEvent('bodas_mid_cta', { position: 'mid' })}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25"
-          >
-            {t('configure')}
-            <ChevronRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
+      <PublicServiceMidCta
+        title={t('heroTitle')}
+        subtitle={t('heroSubtitle')}
+        href="/configurador?service=bodas"
+        ctaLabel={t('configure')}
+        onClick={() => trackPublicServiceEvent('bodas_mid_cta', { position: 'mid' })}
+      />
 
       {/* ═══ ZONES DE COBERTURA ═══ */}
-      <section className="max-w-4xl mx-auto px-4 py-16">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-4">
-            <MapPin className="w-4 h-4 text-oe-gold" />
-            <span className="text-sm font-medium text-oe-gold">{t('coverage.badge')}</span>
-          </div>
-          <h3 className="text-2xl font-bold text-white">{t('coverage.title')}</h3>
-          <p className="text-white/50 mt-2">{t('coverage.subtitle')}</p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {coverageZones.map((zone) => (
-            <Link
-              key={zone.href}
-              href={zone.href}
-              className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-            >
-              <div className="text-2xl mb-2">{zone.icon}</div>
-              <div className="font-semibold text-white group-hover:text-oe-gold transition-colors">{zone.name}</div>
-              <div className="text-xs text-white/50">{zone.desc}</div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <PublicServiceZonesSection
+        title={t('coverage.title')}
+        subtitle={t('coverage.subtitle')}
+        badge={{
+          icon: <MapPin className="w-4 h-4 text-oe-gold" />,
+          label: t('coverage.badge'),
+        }}
+        headingLevel="h3"
+        zones={coverageZones.map((zone) => ({
+          id: zone.href,
+          href: zone.href,
+          icon: zone.icon,
+          label: zone.name,
+          description: zone.desc,
+        }))}
+      />
     </div>
   );
 }

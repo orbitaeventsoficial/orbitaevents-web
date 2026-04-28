@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import { pluralize } from '@/lib/utils/pluralize';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,7 +94,7 @@ export default async function MensajesPage() {
   const manualItems: string[] = [];
   if (data.stalePendingLeads > 0)
     manualItems.push(
-      `${data.stalePendingLeads} entrad${data.stalePendingLeads === 1 ? 'a' : 'es'} NEW de més de 24h sense gestió`,
+      `${data.stalePendingLeads} ${pluralize(data.stalePendingLeads, 'entrada', 'entrades')} NEW de més de 24h sense gestió`,
     );
   if (pendingNoNotesInSample > 0)
     manualItems.push(`${pendingNoNotesInSample} pendents sense cap nota (mostra recent)`);
@@ -110,7 +111,7 @@ export default async function MensajesPage() {
         }
       : data.stalePendingLeads > 0
         ? {
-            title: `Respon ${data.stalePendingLeads} entrad${data.stalePendingLeads === 1 ? 'a' : 'es'} NEW de més de 24h`,
+            title: `Respon ${data.stalePendingLeads} ${pluralize(data.stalePendingLeads, 'entrada', 'entrades')} NEW de més de 24h`,
             detail:
               'Superar les 24h sense resposta trenca la promesa comercial. Obre les entrades noves filtrades i tanca aquest backlog.',
             href: '/admin/leads?status=NEW',
@@ -118,7 +119,7 @@ export default async function MensajesPage() {
           }
         : data.pendingLeads > 0
           ? {
-              title: `Respon ${data.pendingLeads} entrad${data.pendingLeads === 1 ? 'a' : 'es'} nov${data.pendingLeads === 1 ? 'a' : 'es'}`,
+              title: `Respon ${data.pendingLeads} ${pluralize(data.pendingLeads, 'entrada nova', 'entrades noves')}`,
               detail:
                 'Encara no porten 24h però estan en estat NEW sense contacte. Obre-les i mou-les a la següent etapa.',
               href: '/admin/leads?status=NEW',

@@ -11,6 +11,7 @@ import BlogTracking from '@/app/components/blog/BlogTracking';
 import { PUBLIC_BLOG_CATEGORY_COLORS, toIntlLocale } from '@/lib/constants';
 import { getPublicBlogPosts, type PublicBlogPost } from '@/lib/blog-public';
 import { absoluteUrl } from '@/lib/site';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 
 export const revalidate = 3600;
@@ -109,9 +110,7 @@ function PostCard({
 
         <div className="mt-4 flex items-center gap-1.5 text-amber-400 text-sm font-semibold group-hover:gap-3 transition-all">
           <span>{readMoreLabel}</span>
-          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
         </div>
       </div>
     </Link>
@@ -220,9 +219,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
                   className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)]"
                 >
                   {t('ctaButton')}
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+                  <ArrowRightIcon className="w-5 h-5" />
                 </Link>
               </div>
             </>

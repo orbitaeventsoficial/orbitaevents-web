@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 import Link from 'next/link';
 import { DEFAULT_LOCALE, formatDateShort, formatDateSimple, formatDateTimeFull, getEventLabel } from '@/lib/constants';
-import type { UnifiedEmail } from './inbox-types';
+import type { LeadData, UnifiedEmail } from './inbox-types';
 import { getLeadStatusTone } from './inbox-types';
 import { ADMIN_INBOX_HELP, helpAttrs } from '../components/adminHelpContent';
 import InboxLeadContext from './InboxLeadContext';
@@ -255,7 +255,7 @@ export function InboxDetailPane({
   activeTab: 'all' | 'leads' | 'emails' | 'trash';
   handleReply: (email: UnifiedEmail) => void;
   handleOpenQuote: () => void;
-  handleOpenLead: (leadId: string) => void;
+  handleOpenLead: (lead: Pick<LeadData, 'id' | 'customerId'>) => void;
   handleImportLeadFromEmail: (email: UnifiedEmail) => void;
   handleMoveToTrash: (email: UnifiedEmail) => void;
   handleRestoreEmail: (email: UnifiedEmail) => void;
@@ -268,6 +268,7 @@ export function InboxDetailPane({
   const actionHint = activeTab === 'trash'
     ? { title: 'Acció recomanada', body: 'Decideix si aquest correu s\'ha de restaurar o eliminar definitivament.' }
     : { title: 'Acció recomanada', body: 'Converteix aquest correu en lead si és comercial; si no, respon o arxiva ràpid.' };
+  const selectedLead = selectedEmail.type === 'lead' ? selectedEmail.leadData ?? null : null;
 
   return (
     <div className="flex flex-1 flex-col" {...helpAttrs(ADMIN_INBOX_HELP.detail)}>
@@ -289,11 +290,11 @@ export function InboxDetailPane({
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
-        {selectedEmail.type === 'lead' && selectedEmail.leadData ? (
+        {selectedLead ? (
           <>
-            <InboxLeadContext lead={selectedEmail.leadData} />
+            <InboxLeadContext lead={selectedLead} />
             <div className="mb-4">
-              <CommSummaryPanel leadId={selectedEmail.leadData.id} />
+              <CommSummaryPanel leadId={selectedLead.id} customerId={selectedLead.customerId} />
             </div>
           </>
         ) : (
@@ -303,16 +304,16 @@ export function InboxDetailPane({
           </div>
         )}
 
-        {selectedEmail.leadData && (
+        {selectedLead && (
           <div className="mb-6 rounded-xl border p-6">
             <h3 className="mb-4 font-semibold">📋 Detalls de la sol·licitud</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><span>Tipus d&apos;event:</span><p className="font-medium">{getEventLabel(selectedEmail.leadData.eventType || '', 'No especificat')}</p></div>
-              {selectedEmail.leadData.eventDate && <div><span>Data:</span><p className="font-medium">{formatDateSimple(selectedEmail.leadData.eventDate)}</p></div>}
-              {selectedEmail.leadData.guestCount && <div><span>Convidats:</span><p className="font-medium">{selectedEmail.leadData.guestCount} persones</p></div>}
-              {selectedEmail.leadData.budget && <div><span>Pressupost:</span><p className="font-medium">{selectedEmail.leadData.budget}</p></div>}
-              {selectedEmail.leadData.eventLocation && <div><span>Ubicació:</span><p className="font-medium">{selectedEmail.leadData.eventLocation}</p></div>}
-              {selectedEmail.leadData.phone && <div><span>Telèfon:</span><p className="font-medium"><a href={`tel:${selectedEmail.leadData.phone}`} className="hover:underline">{selectedEmail.leadData.phone}</a></p></div>}
+              <div><span>Tipus d&apos;event:</span><p className="font-medium">{getEventLabel(selectedLead.eventType || '', 'No especificat')}</p></div>
+              {selectedLead.eventDate && <div><span>Data:</span><p className="font-medium">{formatDateSimple(selectedLead.eventDate)}</p></div>}
+              {selectedLead.guestCount && <div><span>Convidats:</span><p className="font-medium">{selectedLead.guestCount} persones</p></div>}
+              {selectedLead.budget && <div><span>Pressupost:</span><p className="font-medium">{selectedLead.budget}</p></div>}
+              {selectedLead.eventLocation && <div><span>Ubicació:</span><p className="font-medium">{selectedLead.eventLocation}</p></div>}
+              {selectedLead.phone && <div><span>Telèfon:</span><p className="font-medium"><a href={`tel:${selectedLead.phone}`} className="hover:underline">{selectedLead.phone}</a></p></div>}
             </div>
           </div>
         )}
@@ -323,7 +324,7 @@ export function InboxDetailPane({
           {selectedEmail.imapData?.bodyHtml ? (
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }} className="rounded-xl border p-4" />
           ) : (
-            <p className="whitespace-pre-wrap">{selectedEmail.leadData?.message || selectedEmail.imapData?.bodyText || selectedEmail.preview || 'Sense missatge'}</p>
+            <p className="whitespace-pre-wrap">{selectedLead?.message || selectedEmail.imapData?.bodyText || selectedEmail.preview || 'Sense missatge'}</p>
           )}
         </div>
       </div>
@@ -332,13 +333,21 @@ export function InboxDetailPane({
         <div className="flex flex-wrap items-center gap-2" {...helpAttrs(ADMIN_INBOX_HELP.messageActions)}>
           <button onClick={() => handleReply(selectedEmail)} type="button" className="ap-btn ap-btn--primary flex-1 px-4 py-2 font-medium">↩️ Respondre</button>
           <button onClick={handleOpenQuote} type="button" className="rounded-xl border px-4 py-2 transition-colors">📄 Pressupost</button>
-          {selectedEmail.leadData?.phone && (
+          {selectedLead?.phone && (
             <>
-              <a href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="rounded-xl border px-4 py-2 transition-colors">💬 WhatsApp</a>
-              <a href={`tel:${selectedEmail.leadData.phone}`} className="rounded-xl border px-4 py-2 transition-colors">📞 Trucar</a>
+              <a href={`https://wa.me/${selectedLead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="rounded-xl border px-4 py-2 transition-colors">💬 WhatsApp</a>
+              <a href={`tel:${selectedLead.phone}`} className="rounded-xl border px-4 py-2 transition-colors">📞 Trucar</a>
             </>
           )}
-          {selectedEmail.type === 'lead' && <button onClick={() => handleOpenLead(selectedEmail.id)} type="button" className="rounded-xl border px-4 py-2 transition-colors">📋 Veure lead</button>}
+          {selectedLead && (
+            <button
+              onClick={() => handleOpenLead(selectedLead)}
+              type="button"
+              className="rounded-xl border px-4 py-2 transition-colors"
+            >
+              {selectedLead.customerId ? '👤 Veure client' : '📋 Veure lead'}
+            </button>
+          )}
           {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
             <>
               <button onClick={() => handleImportLeadFromEmail(selectedEmail)} type="button" className="rounded-xl border px-4 py-2 transition-colors">➕ Crear/actualitzar lead</button>
@@ -356,4 +365,3 @@ export function InboxDetailPane({
     </div>
   );
 }
-

@@ -13,6 +13,7 @@ import { loadCapacityConflicts, type CapacityConflictReport, type CapacityConfli
 import { loadPipelineSuggestions, type PipelineSuggestion } from '@/lib/services/leadPipelineSuggestionsService';
 import { prisma } from '@/lib/prisma';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import type { LeadStatus } from '@prisma/client';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -406,9 +407,13 @@ function extractFollowUpActions(followUps: FollowUpSummary): NextBestAction[] {
       icon: '🚨',
       title: `Seguiment urgent — ${fu.name}`,
       subtitle: `${fu.daysSinceOutbound} dies sense resposta — ${fu.suggestedAction}`,
-      href: buildLeadWorkspaceHref(fu.leadId),
+      href: buildLeadCustomerHref({
+        leadId: fu.leadId,
+        customerId: fu.customerId,
+        customerTab: 'comms',
+      }),
       score: 0,
-      entity: { type: 'lead', id: fu.leadId, name: fu.name },
+      entity: { type: fu.customerId ? 'customer' : 'lead', id: fu.customerId || fu.leadId, name: fu.name },
       reasoning: `Lead contactat ${fu.outboundCount} vegades, ${fu.daysSinceOutbound} dies sense resposta — ${fu.suggestedAction}`,
       estimatedImpact: 'HIGH',
       timeWindow: 'Ara',
@@ -425,9 +430,13 @@ function extractFollowUpActions(followUps: FollowUpSummary): NextBestAction[] {
       icon: '📩',
       title: `Seguiment — ${fu.name}`,
       subtitle: `${fu.daysSinceOutbound} dies sense resposta`,
-      href: buildLeadWorkspaceHref(fu.leadId),
+      href: buildLeadCustomerHref({
+        leadId: fu.leadId,
+        customerId: fu.customerId,
+        customerTab: 'comms',
+      }),
       score: 0,
-      entity: { type: 'lead', id: fu.leadId, name: fu.name },
+      entity: { type: fu.customerId ? 'customer' : 'lead', id: fu.customerId || fu.leadId, name: fu.name },
       reasoning: `Lead sense resposta des de fa ${fu.daysSinceOutbound} dies`,
       estimatedImpact: 'MEDIUM',
       timeWindow: '48h',

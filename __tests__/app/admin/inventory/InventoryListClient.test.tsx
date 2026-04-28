@@ -127,7 +127,7 @@ describe('InventoryListClient health filters', () => {
 
     render(<InventoryListClient />);
 
-    expect(await screen.findByText('Mostrant equips que han superat el 95% de la vida útil')).toBeInTheDocument();
+    expect((await screen.findAllByText('Mostrant equips que han superat el 95% de la vida útil')).length).toBeGreaterThan(0);
     expect(screen.getByText('Inventari')).toBeInTheDocument();
     expect(screen.getByText('1 elements · 900€ invertits — equips, estat i amortització')).toBeInTheDocument();
     expect(screen.getAllByText('Cap mòbil gastat').length).toBeGreaterThan(0);
@@ -140,7 +140,7 @@ describe('InventoryListClient health filters', () => {
 
     render(<InventoryListClient />);
 
-    expect(await screen.findByText('Mostrant equips amb valor econòmic sense cap ús a packs ni reserves')).toBeInTheDocument();
+    expect((await screen.findAllByText('Mostrant equips amb valor econòmic sense cap ús a packs ni reserves')).length).toBeGreaterThan(0);
     expect(screen.getByText('1 elements · 450€ invertits — equips, estat i amortització')).toBeInTheDocument();
     expect(screen.getAllByText('Equip sense ús').length).toBeGreaterThan(0);
     expect(screen.queryByText('Cap mòbil gastat')).not.toBeInTheDocument();
@@ -152,7 +152,7 @@ describe('InventoryListClient health filters', () => {
 
     render(<InventoryListClient />);
 
-    expect(await screen.findByText('Mostrant equips entre el 80% i el 95% de la vida útil')).toBeInTheDocument();
+    expect((await screen.findAllByText('Mostrant equips entre el 80% i el 95% de la vida útil')).length).toBeGreaterThan(0);
     expect(screen.getByText('1 elements · 700€ invertits — equips, estat i amortització')).toBeInTheDocument();
     expect(screen.getAllByText('Barra LED envellint').length).toBeGreaterThan(0);
     expect(screen.queryByText('Cap mòbil gastat')).not.toBeInTheDocument();

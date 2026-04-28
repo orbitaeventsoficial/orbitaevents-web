@@ -10,6 +10,7 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { PUBLIC_PORTFOLIO_SHOWCASE_ITEMS, getPublicPortfolioShowcasePhotos, type PublicPortfolioShowcaseStory } from '@/lib/constants';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 type EventStory = PublicPortfolioShowcaseStory;
 
@@ -132,15 +133,10 @@ function StoryCard({
               <span className="text-white/20">·</span>
               <span className="inline-flex items-center gap-1.5 text-amber-400/80 font-medium group-hover:text-amber-400 transition-colors">
                 {t('viewStory')}
-                <svg
+                <ArrowRightIcon
                   className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
                   strokeWidth={2.5}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                />
               </span>
             </div>
           </div>
@@ -170,15 +166,9 @@ function ScrollButton({
         direction === 'left' ? 'mr-3' : 'ml-3'
       }`}
     >
-      <svg
+      <ArrowRightIcon
         className={`w-5 h-5 text-white ${direction === 'left' ? 'rotate-180' : ''}`}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-      </svg>
+      />
     </button>
   );
 }
@@ -364,9 +354,7 @@ export default function PortfolioShowcase({ stories = DEFAULT_EVENT_STORIES }: {
       {/* Scroll hint - mobile */}
       <div className="md:hidden flex justify-center mt-4">
         <div className="flex items-center gap-2 text-white/30 text-sm">
-          <svg className="w-4 h-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+          <ArrowRightIcon className="w-4 h-4 animate-pulse" strokeWidth={1.5} />
           {t('swipeHint')}
         </div>
       </div>
@@ -384,9 +372,7 @@ export default function PortfolioShowcase({ stories = DEFAULT_EVENT_STORIES }: {
             className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] group"
           >
             {t('viewAll')}
-            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
       </div>

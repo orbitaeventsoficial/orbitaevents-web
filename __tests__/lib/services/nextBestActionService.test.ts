@@ -86,8 +86,9 @@ function makeTask(overrides: Partial<NBATaskInput> = {}): NBATaskInput {
 }
 
 function makeFollowUp(overrides: Partial<PendingFollowUp> = {}): PendingFollowUp {
-  return {
+  const base: PendingFollowUp = {
     leadId: 'l10',
+    customerId: null,
     name: 'Follow-up Lead',
     email: 'fu@test.com',
     phone: '600222333',
@@ -101,8 +102,8 @@ function makeFollowUp(overrides: Partial<PendingFollowUp> = {}): PendingFollowUp
     hasInboundAfterOutbound: false,
     urgency: 'URGENT',
     suggestedAction: 'Trucar',
-    ...overrides,
   };
+  return { ...base, ...overrides, customerId: overrides.customerId ?? null };
 }
 
 // ── Lead Actions ──────────────────────────────────────────────────────────
@@ -327,7 +328,7 @@ describe('assembleNextBestActions — follow-ups', () => {
       generatedAt: now.toISOString(),
       total: 2, urgent: 1, normal: 1, low: 0,
       items: [
-        makeFollowUp({ leadId: 'l10', urgency: 'URGENT' }),
+        makeFollowUp({ leadId: 'l10', customerId: 'cust-10', urgency: 'URGENT' }),
         makeFollowUp({ leadId: 'l11', urgency: 'NORMAL', daysSinceOutbound: 3 }),
       ],
     };
@@ -337,6 +338,8 @@ describe('assembleNextBestActions — follow-ups', () => {
     const urgent = actions.find((a) => a.actionType === 'FOLLOW_UP' && a.urgency === 'CRITICAL');
     expect(urgent).toBeDefined();
     expect(urgent!.title).toContain('Follow-up Lead');
+    expect(urgent!.href).toBe('/admin/clientes/cust-10?tab=comms');
+    expect(urgent!.entity).toEqual({ type: 'customer', id: 'cust-10', name: 'Follow-up Lead' });
   });
 
   it('genera NORMAL_FOLLOWUP per items normals', () => {
@@ -353,6 +356,7 @@ describe('assembleNextBestActions — follow-ups', () => {
     const normal = actions.find((a) => a.domain === 'communication' && a.urgency === 'MEDIUM');
     expect(normal).toBeDefined();
     expect(normal!.title).toContain('Pere');
+    expect(normal!.href).toBe('/admin/leads/l12');
   });
 });
 

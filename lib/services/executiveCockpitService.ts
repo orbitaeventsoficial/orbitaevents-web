@@ -13,7 +13,7 @@ import { loadPendingFollowUps, type FollowUpSummary } from '@/lib/services/respo
 import { loadCapacityConflicts, type CapacityConflictReport } from '@/lib/services/capacityConflictService';
 import { loadPipelineSuggestions, type PipelineSuggestion } from '@/lib/services/leadPipelineSuggestionsService';
 import { loadAnomalyReport, type AnomalyReport } from '@/lib/services/dailyAnomalyService';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -102,7 +102,11 @@ export function assemblePriorityActions(input: CockpitAssemblyInput): CockpitPri
       icon: '🚨',
       label: `Follow-up urgent: ${item.name}`,
       detail: `${item.daysSinceOutbound} dies sense resposta — ${item.suggestedAction}`,
-      href: buildLeadWorkspaceHref(item.leadId),
+      href: buildLeadCustomerHref({
+        leadId: item.leadId,
+        customerId: item.customerId,
+        customerTab: 'comms',
+      }),
       source: 'followUps',
       urgency: 'CRITICAL',
     });

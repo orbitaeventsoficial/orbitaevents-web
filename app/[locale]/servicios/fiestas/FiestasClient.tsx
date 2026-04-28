@@ -13,17 +13,10 @@ import { usePacks } from '@/lib/hooks/usePacks';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import GuestRecommender from '@/app/components/ui/GuestRecommender';
 import { TRUST_POINTS } from '@/lib/constants/services';
-
-type AnalyticsValue = string | number | boolean | undefined;
-type AnalyticsParams = Record<string, AnalyticsValue>;
-type GtagWindow = Window & { gtag?: (command: 'event', action: string, params?: AnalyticsParams) => void };
-
-function trackServiceEvent(action: string, params: AnalyticsParams) {
-  if (typeof window === 'undefined') return;
-  const gtag = (window as GtagWindow).gtag;
-  if (!gtag) return;
-  gtag('event', action, params);
-}
+import { PUBLIC_SERVICE_ZONE_LINKS } from '@/lib/publicServiceZones';
+import PublicServiceZonesSection from '@/app/components/public/PublicServiceZonesSection';
+import PublicServiceMidCta from '@/app/components/public/PublicServiceMidCta';
+import { trackPublicServiceEvent } from '@/app/lib/analytics';
 
 export default function FiestasClient({ heroImage }: { heroImage: string }) {
   const t = useTranslations('pages.parties');
@@ -39,6 +32,16 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
     () => fiestaPacks.length ? Math.min(...fiestaPacks.map(p => p.priceValue ?? 0)) : 0,
     [fiestaPacks]
   );
+  const zoneCards = useMemo(
+    () => PUBLIC_SERVICE_ZONE_LINKS.fiestas.map((zone) => ({
+      id: zone.id,
+      href: zone.href,
+      icon: zone.icon,
+      label: t(`zones.${zone.labelKey}`),
+      description: t(`zones.${zone.descKey}`),
+    })),
+    [t]
+  );
 
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
   const packRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -51,7 +54,7 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
   }, []);
 
   const handlePackCTA = (pack: PackDefinition) => {
-    trackServiceEvent('fiestas_pack_cta', {
+    trackPublicServiceEvent('fiestas_pack_cta', {
       pack_id: pack.id,
       pack_name: pack.name,
       price: pack.priceValue,
@@ -96,7 +99,7 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/configurador?service=fiestas"
-                onClick={() => trackServiceEvent('fiestas_hero_cta', { position: 'hero' })}
+                onClick={() => trackPublicServiceEvent('fiestas_hero_cta', { position: 'hero' })}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25 text-lg"
               >
                 {t('configure')}
@@ -281,57 +284,20 @@ export default function FiestasClient({ heroImage }: { heroImage: string }) {
       </section>
 
       {/* ═══ CTA INTERMEDI ═══ */}
-      <section className="max-w-3xl mx-auto px-4 py-12">
-        <div className="p-10 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
-          <h3 className="text-3xl font-bold text-white mb-3">
-            {t('heroTitle')}
-          </h3>
-          <p className="text-white/60 mb-8 max-w-md mx-auto">
-            {t('heroSubtitle')}
-          </p>
-          <Link
-            href="/configurador?service=fiestas"
-            onClick={() => trackServiceEvent('fiestas_mid_cta', { position: 'mid' })}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-2xl hover:scale-105 transition-transform shadow-lg shadow-orange-500/25"
-          >
-            {t('configure')}
-            <ChevronRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
+      <PublicServiceMidCta
+        title={t('heroTitle')}
+        subtitle={t('heroSubtitle')}
+        href="/configurador?service=fiestas"
+        ctaLabel={t('configure')}
+        onClick={() => trackPublicServiceEvent('fiestas_mid_cta', { position: 'mid' })}
+      />
 
       {/* ═══ ZONES DE COBERTURA ═══ */}
-      <section className="max-w-5xl mx-auto px-4 pb-20">
-        <h2 className="text-2xl font-bold text-white text-center mb-8">
-          {t('zones.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            href="/servicios/dj-fiestas-barcelona"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🏙️</div>
-            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.barcelona.name')}</div>
-            <div className="text-xs text-white/50 mt-1">{t('zones.barcelona.desc')}</div>
-          </Link>
-          <Link
-            href="/servicios/dj-fiestas-maresme"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🏖️</div>
-            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.maresme.name')}</div>
-            <div className="text-xs text-white/50 mt-1">{t('zones.maresme.desc')}</div>
-          </Link>
-          <Link
-            href="/servicios/dj-fiestas-costa-brava"
-            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
-          >
-            <div className="text-2xl mb-2">🌊</div>
-            <div className="font-semibold text-white text-sm group-hover:text-oe-gold transition-colors">{t('zones.costaBrava.name')}</div>
-            <div className="text-xs text-white/50 mt-1">{t('zones.costaBrava.desc')}</div>
-          </Link>
-        </div>
-      </section>
+      <PublicServiceZonesSection
+        title={t('zones.title')}
+        zones={zoneCards}
+        columnsClassName="grid-cols-1 md:grid-cols-3"
+      />
     </div>
   );
 }

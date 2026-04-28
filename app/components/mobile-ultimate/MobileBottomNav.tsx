@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { PUBLIC_BOTTOM_NAV_ITEMS, type PublicBottomNavIcon, type PublicBottomNavItem } from '@/lib/constants';
 
 const HomeIcon = ({ active }: { active: boolean }) => (
   <svg className={`h-5 w-5 ${active ? 'text-amber-400' : 'text-white/60'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.3 : 1.8}>
@@ -38,6 +39,17 @@ type NavItem = {
   icon: ComponentType<{ active: boolean }>;
 };
 
+const ICONS: Record<Exclude<PublicBottomNavIcon, 'Calculator'>, ComponentType<{ active: boolean }>> = {
+  Home: HomeIcon,
+  Briefcase: ServicesIcon,
+  Image: PortfolioIcon,
+  MessageCircle: ContactIcon,
+};
+
+function isMobileBottomNavItem(item: PublicBottomNavItem): item is PublicBottomNavItem & { highlight?: false; icon: Exclude<PublicBottomNavIcon, 'Calculator'> } {
+  return !item.highlight;
+}
+
 function NavLink({ href, active, label, icon: Icon }: { href: string; active: boolean; label: string; icon: ComponentType<{ active: boolean }> }) {
   const reduceMotion = useReducedMotion();
 
@@ -65,12 +77,17 @@ export default function MobileBottomNav() {
   const t = useTranslations('mobileNav');
   const reduceMotion = useReducedMotion();
 
-  const items = useMemo<NavItem[]>(() => [
-    { id: 'home', href: `/${locale}`, labelKey: 'items.home', icon: HomeIcon },
-    { id: 'services', href: `/${locale}/servicios`, labelKey: 'items.services', icon: ServicesIcon },
-    { id: 'portfolio', href: `/${locale}/portfolio`, labelKey: 'items.portfolio', icon: PortfolioIcon },
-    { id: 'contact', href: `/${locale}/contacto`, labelKey: 'items.contact', icon: ContactIcon },
-  ], [locale]);
+  const items = useMemo<NavItem[]>(
+    () =>
+      PUBLIC_BOTTOM_NAV_ITEMS.filter(isMobileBottomNavItem).map((item) => ({
+        id: item.id,
+        href: item.href === '/' ? `/${locale}` : `/${locale}${item.href}`,
+        labelKey: `items.${item.labelKey}`,
+        icon: ICONS[item.icon],
+      })),
+    [locale]
+  );
+  const configuratorItem = PUBLIC_BOTTOM_NAV_ITEMS.find((item) => item.highlight);
 
   const normalizedPath = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
   const activeId = useMemo(() => {
@@ -93,7 +110,7 @@ export default function MobileBottomNav() {
         <NavLink href={items[0].href} active={activeId === items[0].id} label={t(items[0].labelKey)} icon={items[0].icon} />
         <NavLink href={items[1].href} active={activeId === items[1].id} label={t(items[1].labelKey)} icon={items[1].icon} />
         <Link
-          href={`/${locale}/configurador`}
+          href={configuratorItem ? `/${locale}${configuratorItem.href}` : `/${locale}/configurador`}
           aria-label={t('fab.configurator')}
           className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-400 text-black shadow-[0_8px_24px_rgba(251,191,36,0.35)] ring-[3px] ring-zinc-950/80 active:scale-90 transition-transform"
         >

@@ -45,6 +45,7 @@ export type CalendarApiDay = {
   }[];
   followUps: {
     leadId: string;
+    customerId?: string | null;
     name: string;
     urgency: 'URGENT' | 'NORMAL' | 'LOW';
     suggestedAction: string;

@@ -15,6 +15,7 @@ export type FollowUpUrgency = 'URGENT' | 'NORMAL' | 'LOW';
 
 export type PendingFollowUp = {
   leadId: string;
+  customerId: string | null;
   name: string;
   email: string;
   phone: string | null;
@@ -47,6 +48,7 @@ export type LeadResponseActivity = {
 export type ResponseTrackingInput = {
   leads: Array<{
     id: string;
+    customerId: string | null;
     name: string;
     email: string;
     phone: string | null;
@@ -127,6 +129,7 @@ export function detectPendingFollowUps(input: ResponseTrackingInput): FollowUpSu
 
     items.push({
       leadId: lead.id,
+      customerId: lead.customerId,
       name: lead.name,
       email: lead.email,
       phone: lead.phone,
@@ -177,6 +180,7 @@ export async function loadPendingFollowUps(
     },
     select: {
       id: true,
+      customerId: true,
       name: true,
       email: true,
       phone: true,
@@ -206,6 +210,7 @@ export async function loadPendingFollowUps(
 
       return {
         id: lead.id,
+        customerId: lead.customerId,
         name: lead.name,
         email: lead.email,
         phone: lead.phone,

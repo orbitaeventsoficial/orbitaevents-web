@@ -7,8 +7,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { trackCTAClick } from '@/app/lib/analytics';
 import { PUBLIC_HERO_KEN_BURNS_PRESETS, PUBLIC_HERO_MEDIA_FALLBACK } from '@/lib/constants';
-
-type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number];
+import { fetchHeroMedia, type HeroMediaItem } from '@/lib/api/heroMediaClient';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 
 const IMAGE_DURATION = 9000;
@@ -193,9 +193,8 @@ export default function HeroElegant() {
 
   // Fetch media from API + shuffle
   useEffect(() => {
-    fetch('/api/hero-media')
-      .then((r) => r.json())
-      .then((data: HeroMediaItem[]) => {
+    fetchHeroMedia()
+      .then((data) => {
         if (data.length > 0) setMediaItems(shuffle(data));
       })
       .catch(() => {});
@@ -483,9 +482,7 @@ export default function HeroElegant() {
                 <span className="relative z-10 text-zinc-900 font-black text-base md:text-lg">
                   {t('ctaPacks')}
                 </span>
-                <svg className="relative z-10 w-5 h-5 text-zinc-900 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <ArrowRightIcon className="relative z-10 w-5 h-5 text-zinc-900 group-hover:translate-x-1.5 transition-transform duration-300" strokeWidth={3} />
               </Link>
 
               {/* Secondary CTA — Configurador */}
@@ -497,9 +494,7 @@ export default function HeroElegant() {
                 <span className="text-white font-semibold text-base md:text-lg">
                   {t('ctaConfigurator')}
                 </span>
-                <svg className="w-4 h-4 text-white/60 group-hover:text-amber-400 group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <ArrowRightIcon className="w-4 h-4 text-white/60 group-hover:text-amber-400 group-hover:translate-x-1 transition-all duration-300" />
               </Link>
 
               {/* Tertiary CTA — Contact (text link with amber accent) */}
@@ -512,9 +507,7 @@ export default function HeroElegant() {
                 <span className="underline underline-offset-[6px] decoration-white/20 decoration-[1.5px] group-hover:decoration-amber-400/70 transition-colors">
                   {t('ctaContact')}
                 </span>
-                <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" strokeWidth={2.5} />
               </Link>
             </motion.div>
 

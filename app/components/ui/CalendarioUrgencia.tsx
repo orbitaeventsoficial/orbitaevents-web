@@ -22,7 +22,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { PUBLIC_CALENDAR_DAY_SHORT, PUBLIC_CALENDAR_MONTH_NAMES, PUBLIC_CALENDAR_MONTH_SHORT, PUBLIC_CALENDAR_SOCIAL_PROOF_INITIALS, WHATSAPP_NUMBER, toIntlLocale } from '@/lib/constants/index';
+import { PUBLIC_CALENDAR_DAY_SHORT, PUBLIC_CALENDAR_MONTH_NAMES, PUBLIC_CALENDAR_MONTH_SHORT, PUBLIC_CALENDAR_SOCIAL_PROOF_INITIALS, WHATSAPP_URL_WITH_MESSAGE, toIntlLocale } from '@/lib/constants/index';
 import { useAvailability } from '@/hooks/usePublicData';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
@@ -447,7 +447,7 @@ function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
               </Link>
 
               <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('modal.whatsappMsg', { date: formattedDate }))}`}
+                href={WHATSAPP_URL_WITH_MESSAGE(t('modal.whatsappMsg', { date: formattedDate }))}
                 target="_blank" rel="noopener noreferrer"
                 onClick={() => {
                   trackWhatsAppClick('calendar_modal');
@@ -683,7 +683,7 @@ export default function CalendarioUrgencia({
           {t('cta.subtitle')}
         </p>
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('modal.whatsappMsg', { date: '' }))}`}
+          href={WHATSAPP_URL_WITH_MESSAGE(t('modal.whatsappMsg', { date: '' }))}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {

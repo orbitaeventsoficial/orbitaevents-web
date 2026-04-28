@@ -31,6 +31,7 @@ async function getLeads() {
         },
         select: {
           id: true,
+          customerId: true,
           name: true,
           email: true,
           phone: true,
@@ -232,7 +233,6 @@ export default async function InboxPage() {
     </AdminPage>
   );
 }
-
 
 
 

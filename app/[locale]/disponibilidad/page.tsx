@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { AvailabilityCalendar } from '@/components/calendar/AvailabilityCalendar';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 export async function generateMetadata({
   params,
@@ -87,9 +88,7 @@ export default function AvailabilityPage({ params }: { params: { locale: string 
               className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-lg font-semibold transition-all"
             >
               {t('reserve.cta')}
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <ArrowRightIcon className="w-5 h-5" />
             </a>
           </div>
         </div>

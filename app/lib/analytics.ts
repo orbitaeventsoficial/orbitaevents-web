@@ -296,3 +296,22 @@ export const initAnalytics = (): void => {
   // Initialize analytics (empty for now - scripts are loaded in layout)
 };
 
+/**
+ * TRACKING DIRECTE D'EVENT GA4 SENSE CATEGORIES/LABELS
+ * Per al tracking de pàgines de servei públiques (bodas, discomovil, fiestas)
+ * que envien events com `bodas_pack_cta`, `discomovil_hero_cta`, etc. amb
+ * params arbitraris (pack_id, position, etc.) sense necessitat de
+ * la capa event_category/event_label/value que afegeix `trackEvent`.
+ */
+export type PublicServiceEventValue = string | number | boolean | undefined;
+export type PublicServiceEventParams = Record<string, PublicServiceEventValue>;
+
+export const trackPublicServiceEvent = (
+  action: string,
+  params: PublicServiceEventParams,
+): void => {
+  if (!isClientSide()) return;
+  if (!window.gtag) return;
+  window.gtag('event', action, params);
+};
+

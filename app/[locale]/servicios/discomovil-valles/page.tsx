@@ -9,6 +9,7 @@ import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 import { LOCAL_SERVICE_LANDING_COPY } from '@/lib/localServiceLandingCopy';
+import { buildPublicZoneBreadcrumbs } from '@/lib/publicZoneBreadcrumbs';
 
 const MIN_PRICE = getMinPriceByService('discomovil');
 const COPY = LOCAL_SERVICE_LANDING_COPY['discomovil-valles'];
@@ -84,14 +85,12 @@ export default async function DiscomovilVallesPage({ params }: PageProps) {
 
   return (
     <>
-      <Breadcrumbs
-        items={[
-          { name: tCommon('nav.home'), url: '/' },
-          { name: tCommon('nav.services'), url: '/servicios' },
-          { name: tCommon('nav.discomovil'), url: '/servicios/discomovil' },
-          { name: COPY.breadcrumbLabel, url: '/servicios/discomovil-valles' },
-        ]}
-      />
+      <Breadcrumbs items={buildPublicZoneBreadcrumbs({
+        service: 'discomovil',
+        zoneSlug: 'discomovil-valles',
+        breadcrumbLabel: COPY.breadcrumbLabel,
+        tCommon,
+      })} />
       <ServiceJsonLD
         name={COPY.serviceJsonLd.name}
         slugPath="/servicios/discomovil-valles"

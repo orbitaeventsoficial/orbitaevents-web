@@ -11,6 +11,7 @@ const DAYS = (n: number) => new Date(NOW.getTime() - n * 86400000);
 function makeLead(overrides: Partial<ResponseTrackingInput['leads'][number]> = {}): ResponseTrackingInput['leads'][number] {
   return {
     id: 'l1',
+    customerId: null,
     name: 'Maria Garcia',
     email: 'maria@test.com',
     phone: '+34600000000',
@@ -153,7 +154,16 @@ describe('detectPendingFollowUps', () => {
     expect(item.email).toBe('maria@test.com');
     expect(item.phone).toBe('+34600000000');
     expect(item.eventType).toBe('WEDDING');
+    expect(item.customerId).toBeNull();
     expect(item.outboundCount).toBe(1);
+  });
+
+  it('propaga customerId quan el lead ja està vinculat a client', () => {
+    const result = detectPendingFollowUps({
+      leads: [makeLead({ customerId: 'cust-1' })],
+      now: NOW,
+    });
+    expect(result.items[0].customerId).toBe('cust-1');
   });
 
   it('retorna llista buida si no hi ha leads', () => {

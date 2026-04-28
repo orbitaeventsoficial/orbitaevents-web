@@ -12,7 +12,7 @@ import {
   PUBLIC_HALLOWEEN_HERO_TAGS,
   PUBLIC_HALLOWEEN_HERO_IMAGE,
   PUBLIC_HALLOWEEN_GALLERY_SELECTION,
-  WHATSAPP_NUMBER,
+  WHATSAPP_URL_WITH_MESSAGE,
 } from '@/lib/constants';
 import { HALLOWEEN_HERO_LIGHTNING_EPISODES } from '@/lib/constants/halloween-atmosphere';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -339,7 +339,7 @@ export default function HalloweenClient({ initialGallery }: { initialGallery: Ha
                   <span>👻</span> {t('cta.reserve')}
                 </Link>
                 <Link
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
+                  href={WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('halloween'))}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-purple-500/30 bg-[#14091f] px-7 py-4 text-base font-medium text-white shadow-[0_14px_34px_rgba(0,0,0,0.28)] transition-all hover:border-purple-300/45 hover:bg-[#1a0d28]"
@@ -797,7 +797,7 @@ export default function HalloweenClient({ initialGallery }: { initialGallery: Ha
                 <span>👻</span> {t('cta.reserve2025', { year })}
               </Link>
               <Link
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
+                href={WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('halloween'))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-purple-500/30 bg-[#14091f] px-8 py-4 font-semibold text-white shadow-[0_14px_34px_rgba(0,0,0,0.28)] transition-all hover:border-purple-300/45 hover:bg-[#1a0d28]"

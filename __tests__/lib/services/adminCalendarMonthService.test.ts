@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
@@ -105,5 +106,47 @@ describe('getAdminCalendarMonth', () => {
     const result = await getAdminCalendarMonth('2026-03-01', '2026-03-31');
 
     expect(result.body.days!['2026-03-10'].reservas[0].packName).toBe('basic');
+  });
+
+  it('propaga customerId als follow-ups del dia', async () => {
+    const today = new Date();
+    const todayKey = today.toISOString().slice(0, 10);
+    const fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const from = fromDate.toISOString().slice(0, 10);
+    const to = toDate.toISOString().slice(0, 10);
+
+    vi.mocked(loadPendingFollowUps).mockResolvedValueOnce({
+      generatedAt: '2026-03-15T08:00:00.000Z',
+      total: 1,
+      urgent: 1,
+      normal: 0,
+      low: 0,
+      items: [
+        {
+          leadId: 'l1',
+          customerId: 'c1',
+          name: 'Maria',
+          email: 'maria@test.com',
+          phone: null,
+          eventType: 'WEDDING',
+          status: 'CONTACTED',
+          preferredLocale: 'ca',
+          contactedAt: new Date('2026-03-10T10:00:00Z'),
+          lastOutboundAt: new Date('2026-03-12T10:00:00Z'),
+          daysSinceOutbound: 3,
+          outboundCount: 1,
+          hasInboundAfterOutbound: false,
+          urgency: 'URGENT',
+          suggestedAction: 'Trucar',
+        },
+      ],
+    });
+
+    const result = await getAdminCalendarMonth(from, to);
+    const followUp = result.body.days?.[todayKey]?.followUps?.[0];
+
+    expect(followUp?.leadId).toBe('l1');
+    expect(followUp?.customerId).toBe('c1');
   });
 });

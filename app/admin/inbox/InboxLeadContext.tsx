@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { scoreLead } from '@/lib/services/commercialScoring';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import type { LeadData } from './inbox-types';
@@ -65,12 +66,22 @@ export default function InboxLeadContext({ lead }: { lead: LeadData }) {
       <div className={`rounded-xl border p-3 ${URGENCY_BG[hint.urgency]}`}>
         <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Acció recomanada</p>
         <p className="mt-1 text-sm font-semibold">{hint.label}</p>
-        <Link
-          href={buildLeadWorkspaceHref(lead.id)}
-          className="mt-2 inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
-        >
-          Obrir lead complet
-        </Link>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Link
+            href={buildLeadWorkspaceHref(lead.id)}
+            className="inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
+          >
+            Obrir lead complet
+          </Link>
+          {lead.customerId && (
+            <Link
+              href={buildCustomerWorkspaceTabHref(lead.customerId, 'comms')}
+              className="inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-semibold hover:bg-white/10 transition-colors"
+            >
+              Obrir Customer Hub
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Score + Context */}

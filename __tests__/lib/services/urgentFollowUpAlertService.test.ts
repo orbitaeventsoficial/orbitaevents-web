@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 // ── Hoisted mocks ──────────────────────────────────────────────────────────
-const { mockPrisma, mockSendEmail, mockSendWhatsApp, mockSaveCronRunStatus } = vi.hoisted(() => ({
+const { mockPrisma, mockSendEmail, mockSendWhatsApp, mockSaveCronRunStatus, mockGetRecipientsAsString } = vi.hoisted(() => ({
   mockPrisma: {
     lead: { findMany: vi.fn() },
     setting: { findMany: vi.fn(), upsert: vi.fn() },
@@ -10,6 +10,7 @@ const { mockPrisma, mockSendEmail, mockSendWhatsApp, mockSaveCronRunStatus } = v
   mockSendEmail: vi.fn(),
   mockSendWhatsApp: vi.fn(),
   mockSaveCronRunStatus: vi.fn(),
+  mockGetRecipientsAsString: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -19,6 +20,9 @@ vi.mock('@/lib/logger', () => ({
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
 vi.mock('@/lib/services/whatsappService', () => ({ sendWhatsAppText: mockSendWhatsApp }));
 vi.mock('@/lib/services/cronRunStatusService', () => ({ saveCronRunStatus: mockSaveCronRunStatus }));
+vi.mock('@/lib/services/notificationRecipientsService', () => ({
+  getRecipientsAsString: mockGetRecipientsAsString,
+}));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
     business: { email: 'admin@test.com', phone: '600000000' },
@@ -38,8 +42,9 @@ const now = new Date('2026-06-15T10:00:00Z');
 const daysAgo = (d: number) => new Date(now.getTime() - d * 86400000);
 
 function makePendingFollowUp(overrides: Partial<PendingFollowUp> = {}): PendingFollowUp {
-  return {
+  const base: PendingFollowUp = {
     leadId: 'l1',
+    customerId: null,
     name: 'Test Lead',
     email: 'lead@test.com',
     phone: '600111222',
@@ -53,8 +58,8 @@ function makePendingFollowUp(overrides: Partial<PendingFollowUp> = {}): PendingF
     hasInboundAfterOutbound: false,
     urgency: 'URGENT',
     suggestedAction: 'Trucar o enviar WhatsApp',
-    ...overrides,
   };
+  return { ...base, ...overrides, customerId: overrides.customerId ?? null };
 }
 
 beforeEach(() => {
@@ -63,6 +68,7 @@ beforeEach(() => {
   mockPrisma.setting.upsert.mockResolvedValue({});
   mockSendEmail.mockResolvedValue({});
   mockSendWhatsApp.mockResolvedValue({ ok: true });
+  mockGetRecipientsAsString.mockResolvedValue('admin@test.com');
   process.env.CONTACT_TO = 'admin@test.com';
   process.env.ADMIN_WHATSAPP = '600000000';
 });
@@ -213,6 +219,7 @@ describe('runUrgentFollowUpAlerts', () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       {
         id: 'l1',
+        customerId: null,
         name: 'Lead Urgent',
         email: 'lead@test.com',
         phone: '600111222',
@@ -243,6 +250,7 @@ describe('runUrgentFollowUpAlerts', () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       {
         id: 'l1',
+        customerId: null,
         name: 'Lead Urgent',
         email: 'lead@test.com',
         phone: '600111222',
@@ -276,6 +284,7 @@ describe('runUrgentFollowUpAlerts', () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       {
         id: 'l1',
+        customerId: null,
         name: 'Lead Urgent',
         email: 'lead@test.com',
         phone: '600111222',
@@ -306,6 +315,7 @@ describe('runUrgentFollowUpAlerts', () => {
     mockPrisma.lead.findMany.mockResolvedValue([
       {
         id: 'l1',
+        customerId: null,
         name: 'Lead Urgent',
         email: 'lead@test.com',
         phone: '600111222',

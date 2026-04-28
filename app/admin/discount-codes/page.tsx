@@ -13,6 +13,7 @@ import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../components/useAsyncForm';
+import { pluralize } from '@/lib/utils/pluralize';
 import { log } from '@/lib/logger';
 
 type DiscountCode = {
@@ -205,7 +206,7 @@ export default function DiscountCodesPage() {
       systemItems.push(`${stats.total} codis al catàleg · ${stats.active} actius · ${stats.expired} caducats`);
     }
     if (stats.totalUses > 0) {
-      systemItems.push(`${stats.totalUses} ${stats.totalUses === 1 ? 'ús acumulat' : 'usos acumulats'}`);
+      systemItems.push(`${stats.totalUses} ${pluralize(stats.totalUses, 'ús acumulat', 'usos acumulats')}`);
     }
     if (stats.total === 0) {
       systemItems.push('Cap codi creat encara');
@@ -214,27 +215,27 @@ export default function DiscountCodesPage() {
     const manualItems: string[] = [];
     if (expiredFlaggedActive > 0) {
       manualItems.push(
-        `${expiredFlaggedActive} ${expiredFlaggedActive === 1 ? 'codi caducat encara marcat' : 'codis caducats encara marcats'} actius`,
+        `${expiredFlaggedActive} ${pluralize(expiredFlaggedActive, 'codi caducat encara marcat', 'codis caducats encara marcats')} actius`,
       );
     }
     if (exhaustedFlaggedActive > 0) {
       manualItems.push(
-        `${exhaustedFlaggedActive} ${exhaustedFlaggedActive === 1 ? 'codi ha' : 'codis han'} esgotat els usos màxims`,
+        `${exhaustedFlaggedActive} ${pluralize(exhaustedFlaggedActive, 'codi ha', 'codis han')} esgotat els usos màxims`,
       );
     }
     if (aboutToExpire > 0) {
       manualItems.push(
-        `${aboutToExpire} ${aboutToExpire === 1 ? 'codi caduca' : 'codis caduquen'} en ≤7 dies`,
+        `${aboutToExpire} ${pluralize(aboutToExpire, 'codi caduca', 'codis caduquen')} en ≤7 dies`,
       );
     }
     if (nearMaxUses > 0) {
       manualItems.push(
-        `${nearMaxUses} ${nearMaxUses === 1 ? 'codi està' : 'codis estan'} a ≥80% d'usos`,
+        `${nearMaxUses} ${pluralize(nearMaxUses, 'codi està', 'codis estan')} a ≥80% d'usos`,
       );
     }
     if (unusedActive > 0) {
       manualItems.push(
-        `${unusedActive} ${unusedActive === 1 ? 'codi actiu sense ús' : 'codis actius sense cap ús'}`,
+        `${unusedActive} ${pluralize(unusedActive, 'codi actiu sense ús', 'codis actius sense cap ús')}`,
       );
     }
 
@@ -261,7 +262,7 @@ export default function DiscountCodesPage() {
         : expiredFlaggedActive > 0
           ? {
               eyebrow: 'Següent pas · Higiene',
-              title: `Desactivar ${expiredFlaggedActive} ${expiredFlaggedActive === 1 ? 'codi caducat' : 'codis caducats'}`,
+              title: `Desactivar ${expiredFlaggedActive} ${pluralize(expiredFlaggedActive, 'codi caducat', 'codis caducats')}`,
               detail: firstExpiredFlag
                 ? `"${firstExpiredFlag.code}" i ${expiredFlaggedActive - 1 >= 0 ? expiredFlaggedActive - 1 : 0} més tenen la bandera activa tot i haver caducat. Desactiva'ls per evitar errors d'aplicació.`
                 : 'Hi ha codis caducats amb la bandera activa. Desactiva\'ls per evitar errors d\'aplicació.',
@@ -272,14 +273,14 @@ export default function DiscountCodesPage() {
             ? {
                 eyebrow: 'Següent pas · Usos',
                 title: 'Tancar codis esgotats',
-                detail: `${exhaustedFlaggedActive} ${exhaustedFlaggedActive === 1 ? 'codi ha' : 'codis han'} arribat al màxim d'usos però continuen actius. Desactiva\'ls per mantenir el catàleg net.`,
+                detail: `${exhaustedFlaggedActive} ${pluralize(exhaustedFlaggedActive, 'codi ha', 'codis han')} arribat al màxim d'usos però continuen actius. Desactiva\'ls per mantenir el catàleg net.`,
                 href: '#codis-list',
                 ctaLabel: 'Revisar llista',
               }
             : aboutToExpire > 0
               ? {
                   eyebrow: 'Següent pas · Renovació',
-                  title: `${aboutToExpire} ${aboutToExpire === 1 ? 'codi caduca' : 'codis caduquen'} aviat`,
+                  title: `${aboutToExpire} ${pluralize(aboutToExpire, 'codi caduca', 'codis caduquen')} aviat`,
                   detail:
                     'Revisa si cal crear un codi de relleu abans que caduqui. Sense codi viu no pots aplicar promoció en aquest període.',
                   href: '#nou-codi',
@@ -299,7 +300,7 @@ export default function DiscountCodesPage() {
                 : {
                     eyebrow: 'Següent pas',
                     title: 'Catàleg de codis al dia',
-                    detail: `${stats.active} ${stats.active === 1 ? 'codi actiu disponible' : 'codis actius disponibles'}. Aprofita per crear codis dirigits (referits, campanyes, segona reserva).`,
+                    detail: `${stats.active} ${pluralize(stats.active, 'codi actiu disponible', 'codis actius disponibles')}. Aprofita per crear codis dirigits (referits, campanyes, segona reserva).`,
                     href: '#nou-codi',
                     ctaLabel: 'Nou codi',
                   };
@@ -322,7 +323,7 @@ export default function DiscountCodesPage() {
         title:
           manualItems.length === 0
             ? 'Cap senyal manual'
-            : `${manualItems.length} ${manualItems.length === 1 ? 'senyal per revisar' : 'senyals per revisar'}`,
+            : `${manualItems.length} ${pluralize(manualItems.length, 'senyal per revisar', 'senyals per revisar')}`,
         tone: manualTone,
         items: manualItems,
         emptyText: 'Sense codis caducats, esgotats ni propers a vèncer.',

@@ -25,7 +25,13 @@ const DIRECTION_ICON: Record<string, string> = {
   INTERNAL: '·',
 };
 
-export default function CommSummaryPanel({ leadId }: { leadId: string }) {
+export default function CommSummaryPanel({
+  leadId,
+  customerId = null,
+}: {
+  leadId: string;
+  customerId?: string | null;
+}) {
   const [timeline, setTimeline] = useState<CommTimelineSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +40,15 @@ export default function CommSummaryPanel({ leadId }: { leadId: string }) {
     setLoading(true);
     setTimeline(null);
 
-    fetch(`/api/admin/leads/${leadId}/comm-summary`)
+    const params = new URLSearchParams();
+    if (customerId) {
+      params.set('customerId', customerId);
+    }
+    const href = params.size > 0
+      ? `/api/admin/leads/${leadId}/comm-summary?${params.toString()}`
+      : `/api/admin/leads/${leadId}/comm-summary`;
+
+    fetch(href)
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
@@ -46,7 +60,7 @@ export default function CommSummaryPanel({ leadId }: { leadId: string }) {
       });
 
     return () => { cancelled = true; };
-  }, [leadId]);
+  }, [leadId, customerId]);
 
   if (loading) {
     return (

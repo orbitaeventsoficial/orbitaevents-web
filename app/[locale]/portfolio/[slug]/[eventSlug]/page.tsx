@@ -12,6 +12,7 @@ import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
 import { getSiteUrl } from '@/lib/site';
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 type PageProps = {
   params: Promise<{ slug: string; eventSlug: string; locale: string }>;
@@ -283,9 +284,7 @@ export default async function PortfolioEventPage({ params }: PageProps) {
               className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 text-zinc-900 font-black text-lg hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(251,191,36,0.3)]"
             >
               {tPortfolio('eventDetail.seePacks')}
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <ArrowRightIcon className="w-5 h-5" strokeWidth={3} />
             </Link>
             <Link
               href="/configurador"

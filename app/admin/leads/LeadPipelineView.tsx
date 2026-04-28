@@ -10,6 +10,7 @@ import { log } from '@/lib/logger';
 import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/PipelineBoard';
 import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import LeadLostStatusPrompt from './LeadLostStatusPrompt';
+import LeadLostReasonBadge from './LeadLostReasonBadge';
 import { patchLeadStatus } from './leadStatusClient';
 
 type PipelineFilters = {
@@ -31,6 +32,7 @@ type PipelineLead = {
   source: string;
   eventDate: string | null;
   status: string;
+  lostReason: string | null;
   priority: string;
   customerId: string | null;
   budget: string | null;
@@ -123,8 +125,10 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     return result;
   }, [allLeads, deferredLocalSearch, localPriority, localEventType, localSource]);
 
-  const setLeadStatusInState = useCallback((leadId: string, status: string) => {
-    setAllLeads((prev) => prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead)));
+  const setLeadStatusInState = useCallback((leadId: string, status: string, lostReasonValue: string | null = null) => {
+    setAllLeads((prev) => prev.map((lead) => (
+      lead.id === leadId ? { ...lead, status, lostReason: status === 'LOST' ? lostReasonValue : null } : lead
+    )));
   }, []);
 
   const moveLeadStatus = useCallback(async (leadId: string, newStatus: string) => {
@@ -136,14 +140,14 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     }
     const previousStatus = currentLead.status;
 
-    setLeadStatusInState(leadId, newStatus);
+    setLeadStatusInState(leadId, newStatus, null);
     setUpdatingId(leadId);
     try {
       await patchLeadStatus({ leadId, status: newStatus as 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' });
       const targetLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
       toast.success(`Entrada moguda a ${targetLabel}`);
     } catch {
-      setLeadStatusInState(leadId, previousStatus);
+      setLeadStatusInState(leadId, previousStatus, currentLead.lostReason);
       toast.error('Error de connexió movent l\'entrada');
     } finally {
       setUpdatingId(null);
@@ -161,7 +165,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         lostReason,
         note: lostNote,
       });
-      setLeadStatusInState(pendingLossLead.id, 'LOST');
+      setLeadStatusInState(pendingLossLead.id, 'LOST', lostReason);
       toast.success('Entrada moguda a Perdut');
       setPendingLossLead(null);
       setLostReason('');
@@ -434,6 +438,12 @@ function PipelineCard({
         <span>{EVENT_TYPE_ICONS[lead.eventType] || lead.eventType}</span>
         <span>{getSourceDisplay(lead.source).label}</span>
       </div>
+
+      {lead.status === 'LOST' && (
+        <div className="mt-1.5">
+          <LeadLostReasonBadge lostReason={lead.lostReason} />
+        </div>
+      )}
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {lead.customerId && (

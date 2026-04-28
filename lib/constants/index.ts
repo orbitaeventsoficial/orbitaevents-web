@@ -1438,12 +1438,23 @@ export const PUBLIC_MONTH_KEYS = [
   'july', 'august', 'september', 'october', 'november', 'december',
 ] as const;
 
-export const PUBLIC_BOTTOM_NAV_ITEMS = [
-  { href: '/', icon: 'Home', labelKey: 'home', exactMatch: true },
-  { href: '/servicios', icon: 'Briefcase', labelKey: 'services', exactMatch: false },
-  { href: '/configurador', icon: 'Calculator', labelKey: 'configure', exactMatch: true, highlight: true },
-  { href: '/portfolio', icon: 'Image', labelKey: 'portfolio', exactMatch: true },
-  { href: '/contacto', icon: 'MessageCircle', labelKey: 'contact', exactMatch: true },
+export type PublicBottomNavIcon = 'Home' | 'Briefcase' | 'Calculator' | 'Image' | 'MessageCircle';
+
+export type PublicBottomNavItem = {
+  id: 'home' | 'services' | 'configurator' | 'portfolio' | 'contact';
+  href: string;
+  icon: PublicBottomNavIcon;
+  labelKey: 'home' | 'services' | 'configure' | 'portfolio' | 'contact';
+  exactMatch: boolean;
+  highlight?: boolean;
+};
+
+export const PUBLIC_BOTTOM_NAV_ITEMS: readonly PublicBottomNavItem[] = [
+  { id: 'home', href: '/', icon: 'Home', labelKey: 'home', exactMatch: true },
+  { id: 'services', href: '/servicios', icon: 'Briefcase', labelKey: 'services', exactMatch: false },
+  { id: 'configurator', href: '/configurador', icon: 'Calculator', labelKey: 'configure', exactMatch: true, highlight: true },
+  { id: 'portfolio', href: '/portfolio', icon: 'Image', labelKey: 'portfolio', exactMatch: true },
+  { id: 'contact', href: '/contacto', icon: 'MessageCircle', labelKey: 'contact', exactMatch: true },
 ] as const;
 
 export const PUBLIC_FOOTER_DEFAULT_COVERAGE = ['Barcelona', 'Girona', 'Costa Brava', 'Maresme', 'Vallès'] as const;
@@ -1469,6 +1480,12 @@ export const PUBLIC_FOOTER_LEGAL_LINKS = [
   { nameKey: 'terms', href: '/legal/terminos' },
   { nameKey: 'cookies', href: '/legal/cookies' },
   { nameKey: 'legalNotice', href: '/legal/aviso-legal' },
+] as const;
+
+export const PUBLIC_MOBILE_FOOTER_LEGAL_LINKS = [
+  { tKey: 'legal.privacy', href: '/legal/privacidad' },
+  { tKey: 'legal.cookies', href: '/legal/cookies' },
+  { tKey: 'legal.legal', href: '/legal/aviso-legal' },
 ] as const;
 
 export const PUBLIC_PROCESS_STEP_STYLES = [

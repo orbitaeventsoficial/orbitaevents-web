@@ -11,6 +11,7 @@ type PipelineLead = {
   source: string;
   eventDate: Date | null;
   status: string;
+  lostReason: string | null;
   priority: string;
   customerId: string | null;
   budget: string | null;
@@ -39,6 +40,7 @@ export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereIn
       source: true,
       eventDate: true,
       status: true,
+      lostReason: true,
       priority: true,
       customerId: true,
       budget: true,
@@ -53,4 +55,3 @@ export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereIn
     },
   });
 }
-

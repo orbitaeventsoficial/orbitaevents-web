@@ -9,6 +9,7 @@ import { getMinPriceByService } from '@/config/packs-config';
 import { getSiteUrl } from '@/lib/site';
 import { getPublicServiceHeroImage, getPublicServiceGalleryImages } from '@/lib/services/publicServiceMediaService';
 import { LOCAL_PARTY_LANDING_COPY } from '@/lib/localPartyLandingCopy';
+import { buildPublicZoneBreadcrumbs } from '@/lib/publicZoneBreadcrumbs';
 
 const MIN_PRICE = getMinPriceByService('fiestas');
 const COPY = LOCAL_PARTY_LANDING_COPY['dj-fiestas-costa-brava'];
@@ -84,14 +85,12 @@ export default async function DJFiestasCostaBravaPage({ params }: PageProps) {
 
   return (
     <>
-      <Breadcrumbs
-        items={[
-          { name: tCommon('nav.home'), url: '/' },
-          { name: tCommon('nav.services'), url: '/servicios' },
-          { name: tCommon('nav.parties'), url: '/servicios/fiestas' },
-          { name: COPY.breadcrumbLabel, url: '/servicios/dj-fiestas-costa-brava' },
-        ]}
-      />
+      <Breadcrumbs items={buildPublicZoneBreadcrumbs({
+        service: 'fiestas',
+        zoneSlug: 'dj-fiestas-costa-brava',
+        breadcrumbLabel: COPY.breadcrumbLabel,
+        tCommon,
+      })} />
       <ServiceJsonLD
         name={COPY.serviceJsonLd.name}
         slugPath="/servicios/dj-fiestas-costa-brava"

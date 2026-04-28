@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -337,7 +337,11 @@ export default function CalendarWeekClient() {
                 {visibleLayers.followUps && dayData.followUps.map((item) => (
                   <Link
                     key={item.leadId}
-                    href={buildLeadWorkspaceHref(item.leadId)}
+                    href={buildLeadCustomerHref({
+                      leadId: item.leadId,
+                      customerId: item.customerId,
+                      customerTab: 'comms',
+                    })}
                     className="block rounded-xl border border-rose-500/20 bg-rose-500/[0.05] px-2.5 py-2 transition-all"
                   >
                     <div className="truncate text-xs font-semibold">☎ {item.name}</div>

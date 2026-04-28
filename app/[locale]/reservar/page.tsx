@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 import { BookingForm } from '@/components/booking/BookingForm';
+import StarIcon from '@/app/components/public/StarIcon';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -111,9 +112,7 @@ export default async function BookingPage({
 
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-center">
             <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-purple-500/20 flex items-center justify-center">
-              <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
+              <StarIcon className="w-6 h-6 text-purple-400" fill="currentColor" />
             </div>
             <h3 className="font-semibold text-white mb-2">{t('trust.items.3.title')}</h3>
             <p className="text-sm text-white/60">{t('trust.items.3.description')}</p>

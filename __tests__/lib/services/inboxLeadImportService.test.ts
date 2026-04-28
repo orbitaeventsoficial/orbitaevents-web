@@ -65,12 +65,14 @@ beforeEach(() => {
   mockPrisma.lead.findFirst.mockResolvedValue(null);
   mockPrisma.lead.create.mockResolvedValue({
     id: 'new-lead-1',
+    customerId: null,
     name: 'Maria López',
     email: 'client@example.com',
     status: 'NEW',
   });
   mockPrisma.lead.update.mockResolvedValue({
     id: 'existing-lead-1',
+    customerId: null,
     name: 'Maria López',
     email: 'client@example.com',
     status: 'NEW',
@@ -207,6 +209,7 @@ describe('actualització lead existent', () => {
     source: 'WEBSITE' as const,
     message: null,
     status: 'NEW',
+    customerId: null,
   };
 
   it('actualitza lead existent (merge)', async () => {
@@ -274,6 +277,25 @@ describe('actualització lead existent', () => {
     expect(result.status).toBe(200);
     expect(result.body.action).toBe('already_imported');
     expect(mockPrisma.lead.update).not.toHaveBeenCalled();
+  });
+
+  it('retorna customerId quan el lead existent ja esta vinculat a client', async () => {
+    mockPrisma.lead.findFirst.mockResolvedValue({
+      ...existingLead,
+      customerId: 'cust-1',
+    });
+    mockPrisma.lead.update.mockResolvedValue({
+      id: 'existing-lead-1',
+      customerId: 'cust-1',
+      name: 'Maria López',
+      email: 'client@example.com',
+      status: 'NEW',
+    });
+
+    const result = await importLeadFromInboxMessage(100);
+
+    expect(result.status).toBe(200);
+    expect(result.body.lead?.customerId).toBe('cust-1');
   });
 
   it('registra activitat shared quan actualitza lead existent', async () => {

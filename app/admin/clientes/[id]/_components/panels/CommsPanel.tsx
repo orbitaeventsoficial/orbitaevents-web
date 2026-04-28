@@ -8,8 +8,11 @@ import { useState } from 'react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildCustomerCommercialRiskLink, buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
-import { buildCustomerComposeHref, buildCustomerTaskCreateHref } from '@/lib/admin/customerWorkspaceHref';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import {
+  buildCustomerComposeHref,
+  buildCustomerTaskCreateHref,
+  buildCustomerWorkspaceTabHref,
+} from '@/lib/admin/customerWorkspaceHref';
 import { ADMIN_ACTIVITY_ACTION_META } from '@/lib/constants/admin';
 
 export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
@@ -187,8 +190,11 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
                 💬 WhatsApp
               </a>
             )}
-            <Link href={buildLeadWorkspaceHref(followUpSummary.topItem.leadId)} className="rounded border px-2 py-1">
-              Obrir lead
+            <Link
+              href={buildCustomerWorkspaceTabHref(data.customer.id, 'comms')}
+              className="rounded border px-2 py-1"
+            >
+              Obrir Customer Hub
             </Link>
           </div>
         </div>

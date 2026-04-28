@@ -1,3 +1,334 @@
+## 2026-04-28 — Canvi #433: el path canònic de fletxa CTA `M17 8l4 4m0 0l-4 4m4-4H3` duplicat a 23 ocurrències (14 fitxers públics) passa al component canònic `ArrowRightIcon` (claude)
+- Una passada `grep -rEo 'd="M[^"]+"' | sort | uniq -c | sort -rn` sobre la web pública mostra que la fletxa de CTA (`M17 8l4 4m0 0l-4 4m4-4H3` amb `strokeLinecap="round"` i `strokeLinejoin="round"`) viu replicada literal a **23 ocurrències a 14 fitxers** — la peça SVG **més duplicada** del frontend públic, amb diferència. Tots comparteixen `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`; les úniques diferències són `strokeWidth` (`1.5`/`2`/`2.5`/`3`) i la mida via className o `width`/`height`.
+- `app/components/public/ArrowRightIcon.tsx` (nou): component pur amb defaults `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `strokeWidth={2}` i path canònic amb `strokeLinecap`/`strokeLinejoin` `round`. `{...props}` spread last perquè el caller pugui sobreescriure especialment `strokeWidth` per a les variants `1.5`/`2.5`/`3`.
+- 23 substitucions a 14 fitxers — tots els punts de la web pública que renderitzaven el path inline ara consumeixen el component canònic. Inclou els 2 wrappers locals `Icons.Arrow` (a `CTAFinal.tsx` i `servicios/client.tsx`) que ara són one-liners cap al canònic. ~85 línies netes eliminades.
+- `__tests__/app/components/public/ArrowRightIcon.test.tsx` (nou): 4 tests amb `render` testing-library — viewBox + defaults + path canònic + `strokeLinecap`/`strokeLinejoin`, override de `strokeWidth`/`width`/`height`/`className`, render sense props, propagació d'`aria-hidden`/`data-testid`.
+- NO toca: territori admin (un grep ampliat retorna 0 ocurrències del path en `app/admin/...`). Aquest tall esgota la deute per a la web pública (§6.12).
+- Mateix patró editorial que la trilogia anterior d'icones de marca (`GoogleGIcon` #407, `StarIcon` #412/#432, `WhatsAppIcon` #422). La fletxa és la **quarta peça SVG canònica** publicada al catàleg `app/components/public/`.
+- Efecte: si demà cal substituir la fletxa per un chevron, refinar el grossor, animar-la diferent o canviar el path per una corba, es resol al component sense haver de tocar 14 fitxers ni arriscar regressions.
+- Validació: `pnpm exec vitest run --pool=threads __tests__/app/components/public/ArrowRightIcon.test.tsx` OK (4 tests); `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK (current #433).
+
+## 2026-04-27 — Canvi #432: drenades 3 ocurrències residuals del polygon star inline que van escapar al `#412` (claude)
+- `grep -rn "M12 2l3.09 6.26"` actual mostra 3 inline copies del polygon canònic d'estrella que el `#412` no havia tocat: `app/components/home/GoogleReviewsRotating.tsx:275-277` (loop fallback de 5 estrelles del títol), `app/components/marketing/CTAFinal.tsx:177` (estrella del strip 5.0/5) i `app/[locale]/reservar/page.tsx:115` (badge purple del panell trust de la pàgina pública de reserva).
+- 3 substitucions: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26..."/></svg>` → `<StarIcon className="..." fill="currentColor" />`. `GoogleReviewsRotating.tsx` ja tenia l'import (línia 22, des del #412); `CTAFinal.tsx` i `reservar/page.tsx` afegeixen l'import nou. `reservar/page.tsx` és server component — `StarIcon` no porta `'use client'`, no hi ha problema.
+- ~9 línies netes eliminades.
+- NO toca: `app/admin/google-reviews/page.tsx:189` (4a ocurrència restant) — territori admin, fora de §6.12 web pública.
+- Cap test nou: la cobertura del component `StarIcon` viu a `__tests__/app/components/public/StarIcon.test.tsx` (4 tests del #412). La substitució és literal entre dos shapes mathematicament equivalents (`M12 2l3.09 6.26...` ↔ polygon `12 2 15.09 8.26...`) sense canvi visual ni de runtime.
+- Efecte: la trilogia d'icones de marca (Google G #407, Star #412/#432, WhatsApp #422) queda totalment alineada — qualsevol canvi futur del path SVG toca un sol fitxer.
+- Validació: `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK (current #432).
+
+## 2026-04-27 — Canvi #431: client canònic `fetchHeroMedia` drena el patró `fetch '/api/hero-media'` duplicat als 2 heroes públics (claude)
+- `lib/api/heroMediaClient.ts` (nou): exposa `fetchHeroMedia(init?)` que crida l'endpoint i retorna `HeroMediaItem[]` parsejat. Llança `Error('hero-media fetch failed (<status>)')` si `!response.ok`. Re-exporta `type HeroMediaItem` (derivat de `typeof PUBLIC_HERO_MEDIA_FALLBACK`) perquè els consumidors no el redeclarin per separat.
+- 2 substitucions, sense canvi de comportament: `app/components/ui/HeroElegant.tsx` (desktop, shuffle de tot el catàleg) i `app/components/mobile-ultimate/MobileHeroUltimate.tsx` (mòbil, filtre `type === 'image'` + `url` no buit). Cada caller manté la seva post-processament específica sobre el resultat del client.
+- ~10 línies netes eliminades (2 declaracions de `type HeroMediaItem = (typeof PUBLIC_HERO_MEDIA_FALLBACK)[number]` + reescriptura del bloc `fetch().then(r=>r.json())`).
+- `__tests__/lib/api/heroMediaClient.test.ts` (nou): 3 tests amb mock de `globalThis.fetch` — URL canònica `/api/hero-media` + parse de slides amb shape complet, error amb status (`!ok` → `Error /503/`), propagació d'`init` arbitrari (`signal: AbortController.signal`, `cache: 'no-store'`).
+- NO toca: el contracte de `/api/hero-media/route.ts`, `imageFallbackItems`, `PUBLIC_HERO_MEDIA_FALLBACK` ni la lògica de shuffle/filtre. La canalització és purament de la capa de fetch.
+- Línia editorial consistent: després de `#427` (`fetchPublicGoogleReviews`) i `#430` (`type GoogleReview` re-export), aquesta segona dada pública crítica del frontend també té un sol punt d'entrada. Si demà cal afegir SWR cache, AbortController automàtic per `useEffect` cleanup o telemetria de latency, es resol al client sense tocar els 2 consumidors.
+- Validació: `pnpm exec vitest run __tests__/lib/api/heroMediaClient.test.ts` OK (3 tests); `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK (current #431).
+
+## 2026-04-26 — Canvi #429: regularitzat el `SEGÜENT` buit de `§6.12` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.12: el bloc encara conservava l'encapçalament `SEGÜENT`, però després de `#421`, `#423`, `#426` i `#427` ja no hi quedava cap bullet viu; només dues línies històriques marcades com a `FET`.
+- El tall elimina aquest `SEGÜENT` residual i deixa el front obert només als apartats canònics: `PENDENT CRÍTIC` per la coherència / i18n / contractes shared i `MÉS ENDAVANT` per la narrativa SEO i el replantejament global de la web.
+- Durant el tancament, `validate:core` va destapar un `TS2440` a [GoogleReviewsRotating.tsx](</D:/orbitaevents/app/components/home/GoogleReviewsRotating.tsx>) després de la canalització del client de reviews del `#427`. Ho he resolt fent servir l'àlies local `PublicGoogleReview` per al tipus importat, sense canvi funcional.
+- Efecte: `§6.12` continua `EN MARXA`, però el protocol deixa de fingir que queda un següent tall immediat quan el que resta és deute més transversal i estratègica.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #427: client canònic `fetchPublicGoogleReviews` drena el patró fetch '/api/google-reviews' duplicat a 7 ocurrències (claude)
+- `lib/api/googleReviewsClient.ts` (nou): exposa `fetchPublicGoogleReviews(init?)` que crida l'endpoint i retorna `GoogleReviewsResponse` parsejada (reusa el tipus canònic ja existent a `app/api/google-reviews/reviews-types.ts`). Llança `Error('google-reviews fetch failed (<status>)')` si `!response.ok`. Re-exporta `GoogleReviewsResponse` per als consumidors.
+- 7 substitucions a 5 fitxers, sense canvis de comportament: `GoogleReviewsRotating.tsx`, `MobileHomePage.tsx`, `opiniones/client.tsx` (try/catch substituint `if (res.ok)`), `ReviewsSection.tsx` (×3 — main + ReviewsBadge + ReviewsInline), `admin/google-reviews/page.tsx` (cast `as ReviewsData` per compatibilitat amb interface local). `Review` source local ampliat a `'json'` perquè coincideixi amb `GoogleReviewsResponse` (corregit per Codex al #426).
+- `__tests__/lib/api/googleReviewsClient.test.ts` (nou): 3 tests testing-library — crida amb URL canònica + parse, error amb status, propagació d'`init` (signal/cache).
+- NO toca: `/api/public/stats` (1 ocurrència), `/api/testimonials` (read vs write), APIs admin amb auth diferent.
+- Codex va prendre #423, #424, #426, #428 (regularitzacions §6.12 + §6.11) entre #422 i aquest tall, per la qual cosa la canalització del client de google-reviews es reassigna a #427. Cap col·lisió — peces diferents.
+- Trilogia d'icones (#407 Google G + #412 Star + #422 WhatsApp) + client canònic de dades públiques (#427) deixen el §6.12 amb la majoria de duplicacions estructurals canalitzades.
+- Validació: `pnpm exec vitest run __tests__/lib/api/googleReviewsClient.test.ts` OK (3 tests); `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK (current #428).
+
+## 2026-04-26 — Canvi #428: regularitzat el `SEGÜENT` residual de `§6.11` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.11: el bloc encara mantenia com a `SEGÜENT` una frase que ja no apuntava a cap tall executable ("saltar als pendents estructurals del cicle..."), sinó que simplement constatava que el front shared/responsive havia quedat drenat.
+- El tall elimina aquest `SEGÜENT` residual i deixa la deute viva només als llocs canònics: `PENDENT CRÍTIC` per la coherència visual transversal i `MÉS ENDAVANT` per la formalització del sistema visual.
+- `ADMIN_CHANGE_COUNTER` ja s'havia mogut a `427` per una reserva paral·lela no registrada encara al protocol; per això aquest tall queda renumerat directament a `#428`.
+- Efecte: `§6.11` deixa de fingir un següent pas immediat quan el que resta és una deute més àmplia de marca i sistema.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #426: regularitzat l'últim `SEGÜENT` de `§6.12` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.12: després de tancar els bullets obsolets de build, jerarquia shared i coherència duplicada (`#420`, `#421`, `#423`), l'únic punt viu sota `SEGÜENT` ja no descrivia un següent tall curt sinó una deute editorial/SEO de mig termini.
+- El tall retira aquest últim bullet de `SEGÜENT` i el mou a `MÉS ENDAVANT`, al costat del replantejament complet de `home`, `serveis`, `portfolio`, formularis i missatge de marca.
+- Durant el tancament, `validate:core` va destapar una deriva de tipus no relacionada directament amb el protocol: [ReviewsSection.tsx](</D:/orbitaevents/components/reviews/ReviewsSection.tsx>) tipava `source` massa estret i no acceptava `'json'`, tot i que `fetchPublicGoogleReviews()` ja el pot retornar. Ho he alineat afegint `'json'` a la unió local, sense canvi funcional de UI.
+- Mentre tancava el tall, un altre agent va reservar `#425` pujant `ADMIN_CHANGE_COUNTER` abans de registrar la seva entrada formal. Per no col·lidir, aquest tall queda renumerat a `#426`.
+- Efecte: la web pública continua `EN MARXA`, però el protocol ja no simula que quedi un "next step" immediat concret quan en realitat el que resta és feina estratègica i narrativa més llarga.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #422: SVG canònic del logo WhatsApp duplicat a 17 ocurrències passa al component canònic `WhatsAppIcon` (claude)
+- `app/components/public/WhatsAppIcon.tsx` (nou): component pur amb `SVGProps<SVGSVGElement>` que renderitza `<svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="..." /></svg>` amb el path canònic inline (~880 chars). Sense `const = '...'` exposat per evitar `arch:layer:check` flag.
+- 17 substitucions a 17 fitxers: header, footer, FloatingCTAs (×2), ExitIntentModal, CTAFinal, ProcessSection, mobile-ultimate (×4: Hero, CTAUrgency, Process, AppShell), WhatsAppSticky, BottomCTABar, faq, servicios, experiencias, gracias. ~187 línies netes eliminades.
+- Variants només a la presentació: width/height (3.5×3.5 a 24×24) i className (text-green-400, text-white, text-black) preservades via props arbitràries.
+- NO toca: `app/[locale]/contacto/client.tsx:70` perquè és una **variant visual diferent** — el seu svg conté el path canònic truncat + un segon path circle outline `M12 0C5.373 0 0 5.373 0 12...` independent. Si en el futur es decideix canalitzar també aquesta variant, requerirà una segona peça (`WhatsAppIconOutline`).
+- `__tests__/app/components/public/WhatsAppIcon.test.tsx` (nou): 3 tests testing-library — render canònic + fill default `currentColor`, override de fill (`#25D366`), propagació de aria-hidden/width/height.
+- Trilogia d'icones de marca canalitzades: Google G (#407), Star polygon (#412), WhatsApp (#422). Totes les superfícies que mostren un d'aquests tres SVG ara depenen d'un component shared únic.
+- Codex va prendre #413-#421 en paral·lel (regularitzacions documentals d'`EN MARXA` obsolets §6.2/6.5/6.6/6.7/6.8/6.11/6.12/6.14), per la qual cosa la meva extracció es registra com a #422. Cap col·lisió — peces diferents.
+- Validació: `pnpm exec vitest run __tests__/app/components/public/WhatsAppIcon.test.tsx` OK (3 tests); `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK.
+
+## 2026-04-26 — Canvi #412: polygon SVG d'estrella duplicat a 5 ocurrències passa al component canònic `StarIcon` + sub-export `StarPolygon` (claude)
+- `app/components/public/StarIcon.tsx` (nou): exposa `StarPolygon` (només `<polygon points="..." />` canònic) i `StarIcon` default (svg + polygon amb `SVGProps<SVGSVGElement>` arbitràries). Patró 2-peces necessari perquè el cas `motion.svg` animat de `GoogleReviewsRotating.tsx` no perdi la seva identitat (substituir per `motion(StarIcon)` complicaria sense valor).
+- 5 substitucions a 3 fitxers: `GoogleReviewsRotating.tsx` (×2 — `Icons.Star` 20×20 filled-outline + `motion.svg` animat amb scale, ara fa servir `<StarPolygon />` dins el `motion.svg`), `MobileHomePage.tsx` (×2 — 18×18 i 12×12 sòlids), `opiniones/client.tsx` (`Icons.Star` amb size variable). ~17 línies netes eliminades.
+- `__tests__/app/components/public/StarIcon.test.tsx` (nou): 4 tests amb `render` testing-library — `StarIcon` amb width/height + polygon canònic, propagació de fill/stroke/strokeWidth/className, render sense props, `StarPolygon` aïllat dins svg extern.
+- NO toca: el fallback de `GoogleReviewsRotating.tsx` que usa un `<path d="M12 2l3.09 6.26L22 9.27l-5 4.87..." />` — shape diferent del polygon canònic, no la mateixa dada SVG.
+- Codex va prendre #408, #409, #410, #411 i #413 (deploy migració + regularitzacions §6.2/§6.11) entre els meus #401/#407 i aquest tall, per la qual cosa la feina passa a #412. Buits canònics a #404 i #406 acumulats per la sessió compartida.
+- Validació: `pnpm exec vitest run __tests__/app/components/public/StarIcon.test.tsx` OK (4 tests); `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK (canvis: 403; current: #413).
+
+## 2026-04-26 — Canvi #423: regularitzat el segon bullet del `SEGÜENT` de `§6.12` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.12: el checklist mantenia com a `SEGÜENT` revisar coherència visual i narrativa entre `home`, `serveis`, `portfolio` i `admin`, però aquesta mateixa deute ja vivia com a `PENDENT CRÍTIC` transversal a `§6.11`.
+- El tall converteix aquest segon bullet a regularització `FET` i deixa la preocupació oberta només al lloc canònic on toca, en comptes de duplicar-la en dos blocs diferents del protocol.
+- Efecte: la web pública no es dona per visualment resolta; simplement el protocol deixa d'arrossegar la mateixa deute dues vegades.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #421: regularitzat el primer bullet del `SEGÜENT` de `§6.12` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.12: el checklist encara mantenia com a `SEGÜENT` revisar `header/footer/home` i entry points comercials per si quedava jerarquia pública duplicada fora del catàleg shared, però l’auditoria ràpida actual ja dona aquest perímetre per drenat via catàlegs, helpers i components shared.
+- El tall converteix aquest primer bullet a `FET` i manté oberts només els fronts reals del bloc: coherència visual/narrativa i refinament narratiu/SEO.
+- Efecte: la web pública continua oberta on toca, però el protocol deixa de retenir una revisió genèrica sobre un perímetre que ja ha quedat canonitzat.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #420: regularitzat un bullet obsolet del `SEGÜENT` de `§6.12` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.12: el `SEGÜENT` barrejava com a pendent una comprovació ja tancada ("build complet ja validat..." als Canvis `#57` i `#58`) amb la deute real de refinament narratiu/SEO.
+- El tall reescriu aquest punt perquè el checklist només deixi com a feina viva el refinament de pàgines singulars i hubs, i conservi la validació de build com a context històric.
+- Efecte: la web pública continua oberta en els fronts reals, però el protocol deixa de presentar el build com si seguís sent part del treball pendent.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #419: regularitzat el `SEGÜENT` obsolet de `§6.1` sobre backlog zenith (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.1: el bloc de `Fonaments de producte` mantenia al mateix `SEGÜENT` una llista de fronts que ja estan tancats al producte (`Executive Cockpit`, `next best action`, nurturing, attribution, forecast, command palette, QA visual, Google Calendar) barrejats amb la deute real de convertir manual + playbooks en un product operating system viu.
+- El tall reescriu aquest `SEGÜENT` perquè deixi com a `FET` explícit tot el que ja s’ha resolt i conservi només el següent real que continua obert.
+- Efecte: el front de fonaments conserva el seu `EN MARXA` legítim, però el checklist deixa de vendre com a pendents peces que el protocol mateix ja donava per fetes en altres seccions.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #418: regularitzat l’`EN MARXA` obsolet de `§6.14` sobre higiene de repo (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.14: el bloc d’`Infra / Dev / Operativa` mantenia un `EN MARXA` per a la consistència i neteja general del repo, però el mateix apartat ja recollia com a `FET` la capa base real: `validate:core`, pre-commit hook, guards obligatoris i norma de tancament rigorós.
+- El tall converteix aquest estat a `FET` i deixa com a deute viu explícit només el `PENDENT CRÍTIC` d’evitar regressions silencioses en un repo gran.
+- Efecte: el protocol deixa de presentar la higiene del repo com una neteja genèrica encara oberta quan la protecció efectiva ja viu al pipeline i als guards.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #417: regularitzat l’`EN MARXA` obsolet de `§6.8` sobre Inbox / comunicacions (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.8: el bloc de `Inbox / Comunicacions` mantenia un `EN MARXA` per una integració que el mateix apartat ja donava per funcional: resum canònic compartit amb `Customer Hub`, narrativa dins la timeline del client i follow-ups/risc comercial reutilitzats fora d’Inbox.
+- El tall converteix aquest estat a `FET` i deixa com a deute viu explícit només el `PENDENT CRÍTIC` d’evitar que comunicacions torni a viure com a capa paral·lela.
+- Efecte: el protocol deixa de vendre Inbox com un workspace encara a mig integrar quan la seva lectura estructural ja alimenta altres superfícies canòniques del producte.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #416: regularitzat l’`EN MARXA` obsolet de `§6.6` sobre Leads comercial (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.6: el bloc de `Leads / Pipeline comercial` mantenia un `EN MARXA` per a la conversió del workspace en cabina comercial real, però el mateix apartat ja recollia com a `FET` insights executables, banner comercial amb CTA, scoring explicable, suggeriments canònics de pipeline i la seva reutilització a brief i dashboard.
+- El tall converteix aquest estat a `FET` i deixa com a deute viu explícit només el `PENDENT CRÍTIC` d’evitar que Leads segueixi separat conceptualment del Customer Hub.
+- Efecte: el protocol deixa de vendre Leads com una cabina encara en transició quan la base comercial ja és operativa i compartida amb altres superfícies executives.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #415: regularitzat l’`EN MARXA` obsolet de `§6.5` sobre Customer Hub (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.5: el bloc de `CRM / Customer Hub` mantenia un `EN MARXA` per al pas de "fitxa" a "workspace d’acció", però el mateix apartat ja recollia com a `FET` la base operativa del hub: insights executables, comunicacions canòniques, prioritat comercial, reactivació assistida i navegació shared a workspaces externs.
+- El tall converteix aquest estat a `FET` i deixa com a deute viu explícit només el `PENDENT CRÍTIC` de fer del Customer Hub el cervell comercial únic i evitar el client fragmentat en pantalles paral·leles.
+- Efecte: el protocol deixa de vendre el Customer Hub com una fitxa encara en transició quan ja és un workspace operatiu transversal.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #414: regularitzat l’`EN MARXA` obsolet de `§6.7` sobre Bookings operatiu (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.7: el bloc de `Bookings / Operacions` mantenia un `EN MARXA` per a la conversió del detall en "cabina d’operacions", però el mateix apartat ja recollia com a `FET` el snapshot operacional unificat, la història canònica coherent i la consolidació final de comunicacions via timeline/shared services.
+- El tall converteix aquest estat a `FET` i deixa com a únic pendent explícit el `MÉS ENDAVANT` de planificació avançada.
+- Efecte: el protocol deixa de vendre Bookings com una cabina encara incompleta quan la base operativa ja està tancada i alineada amb la monocapa canònica.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #413: regularitzat l’`EN MARXA` obsolet de `§6.2` sobre l’arquitectura `LeadTask` (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.2: el bloc d’arquitectura de domini mantenia un `EN MARXA` per al desenganxament semàntic de `LeadTask`, però el mateix apartat ja recollia com a `FET` l’eliminació del model, els guards canònics i la migració `20260410140000_drop_lead_task_model` desplegada a Railway.
+- El tall converteix aquest estat a `FET` i deixa com a únic pendent explícit el `MÉS ENDAVANT` d’eliminar `legacyLeadTaskId` quan ja no hi hagi dades que el necessitin.
+- Efecte: la narrativa del protocol deixa d’obrir una migració de domini que, factualment, ja estava tancada a schema, serveis, timeline i base de dades remota.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #410: regularitzat l’`EN MARXA` obsolet de `§6.11` sobre auditoria visual (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.11: l’antic `EN MARXA` de l’auditoria visual/overflow global passa a `FET` amb referència explícita al tancament factual que `§6.13` ja documentava des dels Canvis `#385 + #388 + #389 + #391`.
+- Base factual: `§6.13` ja marcava aquesta barrera com a consolidada i protegida per pipeline automàtic (`qa:visual-overflow` dins `validate:core`, suite 100% verda), així que el tall és de sincronització documental, no de codi de producte.
+- Efecte: el checklist visual deixa de aparentar una feina viva quan el pipeline ja la tracta com a tancada.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #409: regularitzat l’últim pendent extern obsolet del `#358` al diari (codex)
+- `docs/diario.md`: el `Següent (codex)` del `Canvi #358` deixa de marcar com a pendent extern el deploy de `20260424120000_add_lead_lost_reason` i passa a citar-lo com a `FET` via el `Canvi #408`.
+- `docs/protocol-producte-admin-ca.md`: el `Canvi #409` ja havia deixat rastre formal al §9; aquest tall completa el parell protocol+diari que havia quedat desalineat.
+- Efecte: la seqüència `lead-loss` queda coherent també a la capçalera del diari i no només al protocol.
+- Validació: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+
+## 2026-04-26 — Canvi #408: migració `20260424120000_add_lead_lost_reason` desplegada a Railway (codex)
+- `npx prisma migrate status`: confirmava 21 migracions trobades i una pendent a Railway: `20260424120000_add_lead_lost_reason`.
+- `npx prisma migrate deploy`: aplicada correctament la migració pendent contra `DIRECT_DATABASE_URL` des de `D:\orbitaevents`.
+- `npx prisma migrate status` posterior: `Database schema is up to date!`.
+- `docs/protocol-producte-admin-ca.md`: el bloc `[LOW] Audit trail de decisions administratives — backend + analítica` deixa de marcar aquesta migració com a pendent i passa a citar el deploy efectiu al Canvi `#408`.
+- Efecte: la cadena `lead-loss` queda tancada també a nivell de base de dades de Railway, no només a nivell de codi i UI.
+- Validació: `npx prisma migrate status` OK; `npx prisma migrate deploy` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-26 — Canvi #405: regularitzats els `Següent (codex)` obsolets de la cadena `lead-loss` al diari (codex)
+- `docs/diario.md`: els blocs `### Següent (codex)` dels Canvis `#358`, `#360` i `#363` passen a reflectir l'estat real. Les peces de producte ja tancades queden marcades com a `FET` amb cita als Canvis `#363`, `#370`, `#372` i `#375`; només es manté com a pendent extern el deploy de la migració `20260424120000_add_lead_lost_reason` a Railway.
+- `docs/protocol-producte-admin-ca.md`: entrada formal `#405` perquè el rastre del §9 quedi alineat amb la neteja documental del diari.
+- Efecte: el rastre cronològic ja no manté com a "següent" feines de `lead-loss` que el producte fa dies que té resoltes.
+- Validació: `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-26 — Canvi #407: SVG complet del logo Google G duplicat a 8 ocurrències passa al component canònic `GoogleGIcon` (claude)
+- `app/components/public/GoogleGIcon.tsx` (nou): component pur amb `SVGProps<SVGSVGElement>` que renderitza el logo Google G amb els 4 paths inline (`#4285F4`/`#34A853`/`#FBBC05`/`#EA4335` en ordre canònic) i `viewBox="0 0 24 24"`. Sense catàleg `const = [...]` exposat (paths inline) per evitar `arch:layer:check` flag.
+- 8 substitucions a 6 fitxers: `GoogleReviewsRotating.tsx` (×2), `MobileHomePage.tsx` (×2), `opiniones/client.tsx`, `opiniones/page.tsx`, `admin/google-reviews/page.tsx`, `components/reviews/ReviewsSection.tsx`. ~56 línies netes eliminades.
+- Detectada i normalitzada la variant truncada del path groc `#FBBC05` (`...l3.66-2.84z`) a la canònica completa (`...l2.85-2.22.81-.62z`) — visualment indistingible, tècnicament dos paths SVG diferents que ara conviuen sota un únic source of truth.
+- `__tests__/app/components/public/GoogleGIcon.test.tsx` (nou): 3 tests amb `render` de testing-library — render dels 4 paths amb fills oficials en ordre + tot path comença amb `M`/`m` i ≥40 caràcters, propagació de className/aria-hidden/width/height, viewBox sense width/height passats.
+- NO toca: 3 ocurrències a `ReviewsSection.tsx` que són fragments parcials d'1 path (badges `Deixa la teva opinió`, `Verificat google source`, `Ressenyes verificades`) — variants visuals diferents, no representen el logo G complet.
+- Codex va prendre els #402 (BottomNav unificat), #403, #405 (regularitzacions documentals) i #408 (deploy migració Railway) entre el meu #401 i aquest tall, per la qual cosa la feina passa a registrar-se com a #407 aplicant la norma de no-col·lisió del §2.1. Cap col·lisió — peces diferents al mateix §6.12. Hi ha buits canònics a #404 i #406 per la concurrència de registres.
+- Validació: `pnpm exec vitest run __tests__/app/components/public/GoogleGIcon.test.tsx` OK (3 tests); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-26 — Canvi #401: hook canònic `useManagedImageSrc` drena el patró fetch /api/public/image-manager triplicat a 3 components UI (claude)
+- `lib/hooks/useManagedImageSrc.ts` (nou): hook `useManagedImageSrc(key, fallback)` que encapsula `useState(fallback)` + `useEffect` amb fetch a `/api/public/image-manager?key=<encodeURIComponent(key)>` (cache no-store), parse JSON segur, lectura `data?.data?.[key]?.item?.src`, validació `string` no buit/no-espais, patró `cancelled` per unmount. Silenci en `catch` alineat amb el comportament canònic de header/footer.
+- `app/components/ui/HeaderChampion.tsx`: `useState('/img/logoplanetatextdreta.svg')` + `useEffect` de 19 línies de `loadManagedLogo` → 1 línia: `useManagedImageSrc('layout.logo.header', '/img/logoplanetatextdreta.svg')`.
+- `app/components/ui/footer.tsx`: `useState` + branch `loadManagedLogo` del `useEffect` agrupat → 1 línia. `loadCoverage` segueix vivint al `useEffect` original (és un patró diferent, query a `/api/public/coverage`).
+- `app/components/mobile-ultimate/MobileHomePage.tsx`: `useState('/img/orbita-glyph.svg')` + `useEffect` de 22 línies de `loadManagedMobileLogo` → 1 línia. El `console.warn` previ queda absorbit pel comportament silent canònic d'assets de marca no crítics.
+- `__tests__/lib/hooks/useManagedImageSrc.test.tsx` (nou): 6 tests amb `renderHook` + mock `globalThis.fetch`. Cobreixen fallback inicial, substitució amb src gestionat, encoding de key, fallback si `!response.ok`, fallback si src només-espais, fallback si fetch llença.
+- ~50 línies netes eliminades. Si demà cal afegir caching, retry, telemetria o canviar el contracte HTTP, es resol al hook sense tocar els 3 consumidors.
+- Excloses: `TrustedByLogos.tsx` (consumeix `items` array, no `item` singular — patró diferent), `app/admin/layout.tsx` (multi-key paral·lel, lectura de 2 valors al mateix fetch), `ServiceJsonLD.tsx` (server-side via `getManagedImageOverride`, no fetch HTTP).
+- Validació: `pnpm exec vitest run __tests__/lib/hooks/useManagedImageSrc.test.tsx` OK (6 tests); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-26 — Canvi #403: regularitzat el `SEGÜENT` obsolet del `#363` sobre `LossBreakdownPanel` (codex)
+- `docs/protocol-producte-admin-ca.md`: el `SEGÜENT (codex)` del bloc `Canvi #363` passa a `FET` amb referència explícita al `Canvi #372`, que és on realment es va tancar el panell `LossBreakdownPanel` a `Sales Ops`.
+- El codi ja estava resolt abans d'aquest tall: [LossBreakdownPanel.tsx](/D:/orbitaevents/app/admin/sales-ops/LossBreakdownPanel.tsx), wiring a [page.tsx](/D:/orbitaevents/app/admin/sales-ops/page.tsx) i cobertura a [LossBreakdownPanel.test.tsx](/D:/orbitaevents/__tests__/app/admin/sales-ops/LossBreakdownPanel.test.tsx).
+- Efecte: es tanca un fals pendent documental i s'evita que un agent futur reobri una feina ja resolta al producte.
+- Validació: `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-26 — Canvi #402: `MobileBottomNav` deixa de duplicar el catàleg de `BottomNav` (codex)
+- `lib/constants/index.ts`: `PUBLIC_BOTTOM_NAV_ITEMS` passa a contracte tipat (`PublicBottomNavItem`, `PublicBottomNavIcon`) i guanya `id` estable per a cada entrada (`home`, `services`, `configurator`, `portfolio`, `contact`).
+- `app/components/mobile-ultimate/MobileBottomNav.tsx`: elimina el catàleg inline de `home/services/portfolio/contact`; ara deriva els 4 items navegables i el FAB central des de `PUBLIC_BOTTOM_NAV_ITEMS`, prefixant locale i mantenint la mateixa lectura d'actiu.
+- `app/components/ui/BottomNav.tsx`: el consumer clàssic conserva el mateix render però passa a preservar també l'`id` del contracte shared.
+- `__tests__/lib/publicBottomNavItems.test.ts` (nou): 2 tests purs per blindar ordre, shape i que només el configurador sigui l'item destacat.
+- Efecte: el `SEGÜENT` de `§6.12` continua drenat; la navegació inferior pública ja no pot divergir entre la barra clàssica i la variant `mobile-ultimate`.
+- Validació: `pnpm exec vitest run __tests__/lib/publicBottomNavItems.test.ts` OK (2 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-25 — Canvi #400: `trackServiceEvent` triplicat passa al canònic `trackPublicServiceEvent` shared (claude)
+- `app/lib/analytics.ts`: nou export `trackPublicServiceEvent(action, params)` amb tipus `PublicServiceEventValue` i `PublicServiceEventParams`. Mateix comportament que els 3 helpers locals (pass-through directe a `window.gtag('event', ...)` sense afegir categories GA4). Posicionat amb la resta de trackers (`trackEvent`, `trackLead`, `trackWhatsAppClick`, ...).
+- `app/[locale]/servicios/{bodas,discomovil,fiestas}/client.tsx`: eliminats els 3 blocs locals (~30 línies totals de tipus + funció duplicada). 16 crides renombrades a `trackPublicServiceEvent`.
+- `__tests__/app/lib/trackPublicServiceEvent.test.ts` (nou): 4 tests purs (forward correcte, no-op sense gtag, no-op SSR, qualsevol shape de params).
+- Efecte: el §6.12 elimina la triple duplicació del tracker. Si demà cal afegir consent guard o error handling, es resol al helper.
+- Validació: `pnpm exec vitest run __tests__/app/lib/trackPublicServiceEvent.test.ts` OK (4 tests); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #399: `bodas` delega la cobertura al `PublicServiceZonesSection` shared (claude)
+- `app/components/public/PublicServiceZonesSection.tsx`: amplia el contracte amb 3 props opcionals — `badge` (icon + label), `subtitle`, `headingLevel: 'h2' | 'h3'`. Defaults preserven `discomovil`/`fiestas` (#390); permeten absorbir el header més ric de bodas.
+- `app/[locale]/servicios/bodas/client.tsx`: el bloc inline de 24 línies (badge `MapPin` + h3 + subtitle + grid amb Link manual) se substitueix per una crida al component shared.
+- `__tests__/app/components/public/PublicServiceZonesSection.test.tsx`: test ampliat — cas default (h2 sense badge ni subtitle, igual que abans) + cas nou "bodas variant" (h3 + badge + subtitle).
+- Efecte: la secció de cobertura ja viu a un únic component per als tres entry points comercials principals.
+- Validació: `pnpm exec vitest run __tests__/app/components/public/PublicServiceZonesSection.test.tsx` OK (2 tests); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #398: links WhatsApp UI passen a `WHATSAPP_URL_WITH_MESSAGE` helper canònic (claude)
+- 11 substitucions a 8 fitxers UI: `contacto/client.tsx`, `tematica-halloween/client.tsx` (×2), `experiencias/page.tsx`, `faq/client.tsx`, `servicios/client.tsx`, `FAQSection.tsx`, `CTAFinal.tsx`, `CalendarioUrgencia.tsx` (×2). El template `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(X)}` passa a `WHATSAPP_URL_WITH_MESSAGE(X)`.
+- El helper ja existia a `lib/constants` però **cap UI el consumia**. Aquest tall el converteix en font canònica.
+- `__tests__/lib/whatsappUrlWithMessage.test.ts` (nou): 4 tests blindant URL canònica, encoding de caràcters perillosos (`& = ? #`), missatge buit, i que el número provingui de `WHATSAPP_NUMBER`.
+- Excloses les construccions amb `lead.phone` / `SITE_CONFIG.business.phone` perquè usen un número diferent — són casos legítims, no duplicació.
+- Validació: `pnpm exec vitest run __tests__/lib/whatsappUrlWithMessage.test.ts` OK (4 tests); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #397: `produccion` i `alquiler` deleguen al `StandaloneServicePage` shared (claude)
+- `app/components/public/StandaloneServicePage.tsx` (nou): server component async amb `slug`, `itemKey`, `locale`, `seo` i `faqItems`. Resol traduccions del namespace `pages.servicios` + `common` i renderitza l'estructura canònica `<h1> + tagline + desc + features + CTAs + ServiceJsonLD + FAQ`.
+- `app/[locale]/servicios/produccion/page.tsx` i `app/[locale]/servicios/alquiler/page.tsx`: redueixen de ~108 → 67-70 línies cada una. Conserven `MIN_PRICE`, `SEO`, `faqItems` i `generateMetadata`. El default export només crida el component shared.
+- `__tests__/app/components/public/StandaloneServicePage.test.tsx` (nou): 1 test que renderitza el server component amb mocks de `getTranslations`, `Link`, `ServiceJsonLD` i `FAQ`. Blinda títol, tagline, desc, features, hrefs CTA i count de FAQ.
+- Efecte: §6.12 drena un patró duplicat entre dues pàgines standalone. Si cal tocar la presentació, es resol al component shared.
+- Validació: `pnpm exec vitest run __tests__/app/components/public/StandaloneServicePage.test.tsx` OK (1 test); `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #396: enllaços legals del MobileFooter passen al catàleg `PUBLIC_MOBILE_FOOTER_LEGAL_LINKS` shared (claude)
+- `lib/constants/index.ts`: nou catàleg `PUBLIC_MOBILE_FOOTER_LEGAL_LINKS` amb 3 entrades `{ tKey, href }`. Subset paral·lel al `PUBLIC_FOOTER_LEGAL_LINKS` desktop, però amb claus de traducció del namespace mobile (`legal.privacy`/`legal.cookies`/`legal.legal`).
+- `app/components/mobile-ultimate/MobileHomePage.tsx`: el bloc inline de 6 línies (3 `<a>` + 2 separadors) se substitueix per un map del catàleg amb separador automàtic.
+- `__tests__/lib/publicMobileFooterLegalLinks.test.ts` (nou): 3 tests blindant entrades, claus i prefix de locale.
+- Efecte: §6.12 drena un altre punt del SEGÜENT — els enllaços legals públics ja no viuen duplicats entre footer desktop i mobile.
+- Validació: `pnpm exec vitest run __tests__/lib/publicMobileFooterLegalLinks.test.ts` OK (3 tests); `pnpm exec tsc --noEmit` OK; `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #395: helper canònic `buildPublicZoneBreadcrumbs` drena breadcrumbs zonals a 25 pàgines (claude)
+- `lib/publicZoneBreadcrumbs.ts` (nou): funció pura amb mapping intern `PUBLIC_ZONE_BREADCRUMB_SERVICE_META` que resol navKey + basePath per `bodas`/`discomovil`/`fiestas`. Retorna sempre 4 entrades en ordre canònic.
+- 25 pàgines zonals migrades: 11 `dj-bodas-X`, 7 `discomovil-X`, 7 `dj-fiestas-X`. Cada una substitueix l'array literal de breadcrumbs per una crida al helper amb `service`, `zoneSlug`, `breadcrumbLabel` (de `LOCAL_*_LANDING_COPY`) i `tCommon`.
+- `__tests__/lib/publicZoneBreadcrumbs.test.ts` (nou): 4 tests purs (estructura per cada servei + ordre canònic).
+- Efecte: §6.12 drena el darrer patró estructural duplicat als entry points comercials. Després de CTA mid (#393+#394), zonal section (#390), zones data shared (#384+#386), labels (#387) — ara també la jerarquia de breadcrumb és monocapa. Si demà calgués afegir un nivell tot es resol al helper.
+- Validació: `pnpm exec vitest run __tests__/lib/publicZoneBreadcrumbs.test.ts` OK (4 tests); `pnpm exec tsc --noEmit` OK; `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #394: `bodas` també delega la CTA intermèdia al `PublicServiceMidCta` shared (claude)
+- `app/[locale]/servicios/bodas/client.tsx`: import nou de `PublicServiceMidCta`; el bloc inline `CTA INTERMEDI` (~19 línies) se substitueix per una crida única al component amb `title`, `subtitle`, `href`, `ctaLabel` i `onClick` (tracking `bodas_mid_cta` íntegre).
+- Sense test nou: el `__tests__/app/components/public/PublicServiceMidCta.test.tsx` del Canvi #393 ja blinda el contracte (render + propagació del click). Mateix markup renderitzat, mateixes classes, mateix event analytics.
+- Efecte: els tres entry points core (`bodas`, `discomovil`, `fiestas`) comparteixen ja jerarquia zonal (#384, #386), secció visual de cobertura (#390) i CTA intermèdia (#393 + #394). El §6.12 drena el patró de duplicació de UI a entry points comercials principals.
+- Validació: `pnpm exec tsc --noEmit` OK; `pnpm run validate:core` OK amb 12 guards.
+
+## 2026-04-25 — Canvi #393: `discomovil` i `fiestas` comparteixen també la CTA intermèdia pública (codex)
+- `app/components/public/PublicServiceMidCta.tsx` (nou): component shared per al bloc CTA intermig amb títol, subtítol, enllaç i `onClick` injectable.
+- `app/[locale]/servicios/discomovil/client.tsx` i `app/[locale]/servicios/fiestas/FiestasClient.tsx`: deixen de duplicar aquest bloc i passen a delegar-lo al component shared mantenint el tracking específic de cada servei.
+- `__tests__/app/components/public/PublicServiceMidCta.test.tsx` (nou): prova de render i de propagació del click handler.
+- Efecte: `§6.12` continua drenat la UI repetida dels entry points comercials; després de la cobertura shared (`#390`), ara també la CTA intermèdia queda concentrada en una sola peça.
+- Validació: `pnpm vitest run __tests__/app/components/public/PublicServiceMidCta.test.tsx` OK; `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-25 — Canvi #392: §6.13 "EN MARXA" passa a `FET` — barrera verda consolidada i protegida (claude)
+- `docs/protocol-producte-admin-ca.md` · §6.13: el bullet "EN MARXA: review de regressions visuals..." es converteix en `FET` amb cita de Canvis #385 + #388 + #389 + #391.
+- Estat documentat: **3287/3287 tests passed** (288 fitxers), **12 guards** a `validate:core`, barrera automàtica contínua.
+- Sense canvi de codi — consolidació documental del tancament de la seqüència de fortificació del pipeline.
+- Validació: `pnpm run qa:protocol` OK.
+
+## 2026-04-25 — Canvi #391: `qa:visual-overflow` entra a `validate:core`, pipeline a 12 guards (claude)
+- `package.json` · `validate:core`: afegit `pnpm run qa:visual-overflow` entre `qa:patches` i `qa:message-imports`. Protegeix la feina del Canvi #77 (auditoria visual/overflow §6.11).
+- Mateix patró que #354 (`qa:language`) i #389 (`qa:patches`): guard existent, 0 findings actuals, llest per ser obligatori.
+- Des d'ara qualsevol classe Tailwind propensa a overflow (heurística del script) bloqueja `validate:core` i `build:ci`.
+- Validació: `pnpm run validate:core` OK amb 12 guards; `pnpm run qa:protocol` OK.
+
+## 2026-04-25 — Canvi #390: `discomovil` i `fiestas` comparteixen la mateixa secció visual de cobertura pública (codex)
+- `app/components/public/PublicServiceZonesSection.tsx` (nou): component shared per renderitzar títol + graella de targetes zonals a entry points comercials, amb `columnsClassName` com a única variació visual.
+- `app/[locale]/servicios/discomovil/client.tsx` i `app/[locale]/servicios/fiestas/FiestasClient.tsx`: deixen de duplicar el markup de la secció de cobertura i passen a mapar `PUBLIC_SERVICE_ZONE_LINKS` cap al component shared amb labels i descripcions traduïdes.
+- `__tests__/app/components/public/PublicServiceZonesSection.test.tsx` (nou): prova de render del component shared amb títol, labels, descripcions i `href`.
+- Efecte: `§6.12` drena no només la dada zonal hardcodejada (`#384`, `#386`), sinó també la capa de presentació repetida que la consumia a dues landings públiques.
+- Validació: `pnpm vitest run __tests__/app/components/public/PublicServiceZonesSection.test.tsx` OK; `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-25 — Canvi #389: `qa:patches` entra a `validate:core`, de 10 a 11 guards (claude)
+- `package.json` · `validate:core`: afegit `pnpm run qa:patches` entre `qa:language` i `qa:message-imports`. El pipeline passa a 11 guards seqüencials. El §2.1 deia "obligatori abans de tancar un canvi" però el pipeline no ho feia complir — fins al #388 es van poder acumular 40 ternaris sense detectar.
+- Des d'ara `[REPEATED_INLINE_PLURAL_TERNARY]` i `[DUPLICATE_PUSH_BLOCK]` bloquegen `validate:core` i `build:ci`.
+- Validació: `pnpm run validate:core` OK amb 11 guards (928 fitxers, 0 findings); `pnpm run qa:protocol` OK.
+
+## 2026-04-25 — Canvi #388: helper canònic `pluralize` extret, 40 ternaris inline eliminats, `check-patches.mjs` torna a net (claude)
+- `lib/utils/pluralize.ts` (nou): `pluralize(count, singular, plural)` + `pluralizeWithCount`. Helper monocapa canònic per tot l'admin.
+- `__tests__/lib/utils/pluralize.test.ts` (nou): 7 tests, 5ms.
+- `app/admin/catalog/page.tsx` (7), `discount-codes/page.tsx` (11), `mensajes/page.tsx` (4→3 amb consolidació), `portfolio/page.tsx` (9→6 amb consolidació), `ressenyes/page.tsx` (9): **40 ternaris inline eliminats**, substituïts per crides a `pluralize()`.
+- Consolidacions monocapa: `entrad + nov` (2 ternaris) → `entrada nova`/`entrades noves`; `esborrany + pendent` (2 ternaris) → `esborrany pendent`/`esborranys pendents`; `categoria + buida` (2 ternaris) → `categoria buida`/`categories buides`.
+- `check-patches.mjs` confirma: **0 findings** (abans 5 findings `[REPEATED_INLINE_PLURAL_TERNARY]`).
+- Validació: `pnpm vitest run __tests__/lib/utils/pluralize.test.ts` OK (7/7); `node scripts/check-patches.mjs` clean (928 fitxers); `npx tsc --noEmit` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-25 — Canvi #387: breadcrumbs zonals de `discomovil` alineats amb la traducció shared (codex)
+- `app/[locale]/servicios/discomovil-garraf/page.tsx`, `discomovil-costa-brava/page.tsx` i `discomovil-baix-llobregat/page.tsx`: el breadcrumb base deixa d'escriure el literal manual `'Discomóvil'` i passa a usar `tCommon('nav.discomovil')`.
+- Efecte: tres landings zonals més queden alineades amb la mateixa capa de narrativa pública shared que la resta de pàgines de serveis.
+- Validació: `npx tsc --noEmit --pretty false` OK; grep de `'Discomóvil', url: '/servicios/discomovil'` a `app/[locale]/servicios` sense resultats.
+
+## 2026-04-25 — Canvi #386: `fiestas` eleva també les zones de cobertura a helper shared (codex)
+- `lib/publicServiceZones.ts`: el contracte shared `PUBLIC_SERVICE_ZONE_LINKS` guanya ara també `fiestas` amb els entry points `dj-fiestas-barcelona`, `dj-fiestas-maresme` i `dj-fiestas-costa-brava`.
+- `app/[locale]/servicios/fiestas/FiestasClient.tsx`: la graella zonal deixa d’escriure tres `<Link>` hardcodejats i passa a renderitzar-se des del helper shared.
+- `__tests__/lib/publicServiceZones.test.ts`: el test pur s’amplia i ja blinda tant `discomovil` com `fiestas`.
+- Validació: `pnpm vitest run __tests__/lib/publicServiceZones.test.ts` OK; `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-25 — Canvi #385: fix dels 3 tests d'`InventoryListClient` documentats al #382 — suite 100% verda (claude)
+- `__tests__/app/admin/inventory/InventoryListClient.test.tsx`: les 3 assercions inicials (`findByText` per focus `end-of-life`, `unused`, `aging`) passen a `findAllByText(...).length).toBeGreaterThan(0)`. Causa real: l'`activeHealthLabel` apareix múltiples vegades al DOM (control strip + `InventoryHealthFocus` + resum filtre), duplicació legítima que els tests han de reflectir.
+- Sense canvi al component `InventoryListClient.tsx` ni a `OwnerControlStrip.tsx`. La fix inicialment documentada al #382 (mockejar `OwnerControlStrip`) era parcial — la via correcta és `findAllByText`.
+- Efecte: suite global passa de 3272/3 failing (estat al #382) a **3275/0 failing (100%)**.
+- Validació: `pnpm vitest run __tests__/app/admin/inventory/InventoryListClient.test.tsx` OK (3/3); `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #384: zones de cobertura de `discomovil` elevades a helper shared (codex)
+- `lib/publicServiceZones.ts`: nou contracte `PUBLIC_SERVICE_ZONE_LINKS.discomovil` amb els quatre entry points zonals (`barcelona`, `maresme`, `girona`, `valles`) i les seves metadades mínimes (`href`, icona, claus de copy).
+- `app/[locale]/servicios/discomovil/client.tsx`: la graella de cobertura deixa d’escriure quatre `<Link>` hardcodejats i passa a renderitzar-se des del helper shared.
+- `__tests__/lib/publicServiceZones.test.ts`: 1 test pur nou per blindar l’ordre i el contingut del contracte.
+- Validació: `pnpm vitest run __tests__/lib/publicServiceZones.test.ts` OK; `npx tsc --noEmit --pretty false` OK.
+
+## 2026-04-24 — Canvi #383: `Leads` mostra el `lostReason` a llista i kanban (codex)
+- `app/admin/leads/LeadLostReasonBadge.tsx`: badge shared per llegir el motiu de pèrdua amb labels canònics; diferencia `Motiu` manual d'`Auto` quan el cron marca `EVENT_PASSED`.
+- `app/admin/leads/page.tsx`: la llista SSR amplia el `select` amb `lostReason` i el badge apareix tant a la targeta mòbil com a la columna d'estat desktop quan el lead és `LOST`.
+- `lib/services/leads/pipeline.ts` + `app/admin/leads/LeadPipelineView.tsx`: el kanban incorpora `lostReason` al contracte de dades i les targetes perdudes el fan visible sense obrir la fitxa.
+- `__tests__/app/admin/leads/LeadLostReasonBadge.test.tsx`: 3 tests nous per motiu manual, motiu automàtic i no-render amb valors invàlids.
+- Validació: `pnpm vitest run __tests__/app/admin/leads/LeadLostReasonBadge.test.tsx` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #382: fix regressió tests `urgentFollowUpAlertService` + documentat 3 tests `InventoryListClient` pendents (claude)
+- `__tests__/lib/services/urgentFollowUpAlertService.test.ts`: mock nou per `notificationRecipientsService.getRecipientsAsString` (el #643 va canviar el servei a usar aquest helper però els tests no s'havien actualitzat). 16/16 tests verds.
+- 3 tests d'`InventoryListClient` (focus `end-of-life`/`unused`/`aging`) encara fallen per mock incompleta de `OwnerControlStrip`/`InventoryHealthFocus`. Documentat com a pendent explícit al §9 Canvi #382. Suite total passa de 3270/5 a 3272/3 failing.
+- Sense canvi al servei — la regressió era purament al mock del test.
+- Validació: `pnpm vitest run __tests__/lib/services/urgentFollowUpAlertService.test.ts` OK (16/16); `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #381: regularitzat `SEGÜENT` obsolet de §6.6; el dashboard ja mostrava els drivers de pipeline (codex)
+- `docs/protocol-producte-admin-ca.md` · §6.6: el `SEGÜENT` sobre "destacar quins senyals de pipeline degraden el pols" passa a `FET`.
+- Base factual: el Canvi `#327` ja havia fet visibles els `pipelineDrivers` al dashboard via `operationalPulseService` i el `#328` ja havia reconnectat el `Radar d'execució` a aquesta mateixa lectura canònica.
+- Sense canvis de codi/schema/tests — tall documental per alinear checklist i realitat del producte.
+- Validació: `pnpm run qa:protocol` OK.
+
+## 2026-04-24 — Canvi #380: Command palette del §6.15 tancat amb 3 tests edge case nous i protocol sincronitzat (claude)
+- `__tests__/lib/services/adminCommandPaletteService.test.ts`: 3 tests edge case nous — `buildAdminCommandItems` amb arrays buits, `filterAdminCommandItems` amb `limit = 0`, `buildAdminSearchEntries` amb results buits. Suite puja a 13 tests.
+- `docs/protocol-producte-admin-ca.md` · §6.15: bullet **[HIGH] Command palette global** passa de `SEGÜENT` a `FET` (strikethrough) amb la superfície real del servei pur i el comptador de tests actualitzat.
+- El servei `adminCommandPaletteService.ts` i `AdminSearchModal` no es toquen — el servei pur ja existia des del #102; aquest tall només amplia cobertura i sincronitza protocol amb codi real.
+- Validació: `pnpm vitest run __tests__/lib/services/adminCommandPaletteService.test.ts` OK (13 tests); `pnpm run qa:protocol` OK.
+
 ## 2026-04-24 — Canvi #379: decisió canònica — workspace Social actual és suficient, no cal planificador editorial avançat (claude)
 - `docs/protocol-producte-admin-ca.md` · §6.9: `SEGÜENT` (des del #147) convertit en `FET` amb decisió completa. Features actuals (llista + calendari mensual + CRUD + filtres + idees auto-generades + mètriques de rendiment amb recomanacions) cobreixen el volum esperat.
 - Criteri de reobertura explícit: quan `socialPerformanceService.generateRecommendations()` marqui "inactivitat sistèmica" o "baixa freqüència" de forma recurrent, replantejar drag-drop / vista setmanal / bulk actions.
@@ -9854,9 +10185,8 @@ El §6.15 llistava `[LOW] Audit trail de decisions administratives — Log de qu
 - `pnpm run qa:protocol` OK
 
 ### Següent (codex)
-- Ampliar `statusRouteHandler.ts` perquè accepti `{status, lostReason, note}` quan `status === 'LOST'` i delegui al servei nou.
-- Afegir form de pèrdua al Lead Hub amb select dels 8 motius + textarea de nota.
-- Desplegar migració `20260424120000_add_lead_lost_reason` a Railway (`prisma migrate deploy` contra `DIRECT_DATABASE_URL`).
+- **FET** *(Canvis #370 + #375)*: `statusRouteHandler.ts` accepta ja el path canònic de pèrdua i el Lead Hub demana `lostReason` + `note` abans de marcar un lead com a `LOST`.
+- **FET** *(Canvi #408)*: migració `20260424120000_add_lead_lost_reason` desplegada a Railway; `npx prisma migrate status` retorna ja `Database schema is up to date!`.
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 358. Següent canvi real ha de ser `#359`.
@@ -9884,8 +10214,8 @@ El Canvi #358 va afegir `Lead.lostReason` + `Lead.lostAt` + el servei `markLeadA
 - `pnpm run qa:protocol` OK — 354 canvis registrats, current #361
 
 ### Següent (codex)
-- Endpoint `GET /api/admin/reports/lead-losses?days=90` que cridi `loadLossReport()`.
-- Panell `LossBreakdownPanel` a `Sales Ops` o `Reporting executiu`: KPI `topReason` + donut `byReason` + bar `bySource` + line `byMonth`.
+- **FET** *(Canvi #363)*: endpoint `GET /api/admin/reports/lead-losses?days=90` exposat.
+- **FET** *(Canvi #372)*: `LossBreakdownPanel` integrat a `Sales Ops` amb KPI `topReason`, donut `byReason`, barres `bySource` i línia `byMonth`.
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 360 al tancament del meu tall; codex ha pujat a 361 amb el seu següent canvi paral·lel. El següent canvi real ha de ser `#362`.
@@ -9905,7 +10235,7 @@ El Canvi #360 va crear `leadLossAnalyticsService.loadLossReport()` però només 
 - `pnpm run qa:protocol` OK — 356 canvis registrats, current #363
 
 ### Següent (codex)
-- Panell `LossBreakdownPanel` a `Sales Ops` o `Reporting executiu` consumint l'endpoint: KPI `topReason` + donut `byReason` + bar `bySource` + line `byMonth`.
+- **FET** *(Canvi #372)*: `LossBreakdownPanel` a `Sales Ops` consumint l'endpoint amb KPI `topReason`, donut `byReason`, barres `bySource` i línia `byMonth`.
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 363. Següent canvi real ha de ser `#364`.

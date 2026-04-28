@@ -8,6 +8,7 @@ describe('buildLeadCommercialBlocker', () => {
       status: 'QUOTE_SENT',
       followUp: {
         leadId: 'lead-1',
+        customerId: null,
         name: 'Anna',
         email: 'anna@example.com',
         phone: null,

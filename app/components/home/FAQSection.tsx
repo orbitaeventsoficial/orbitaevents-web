@@ -8,8 +8,9 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { PUBLIC_FAQ_KEYS, WHATSAPP_NUMBER } from '@/lib/constants';
+import { PUBLIC_FAQ_KEYS, WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 export default function FAQSection() {
   const t = useTranslations('faq');
@@ -154,7 +155,7 @@ export default function FAQSection() {
         >
           <p className="text-white/50 text-sm mb-4">{t('cta.title')}</p>
           <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! Tinc un dubte sobre el vostre servei d'esdeveniments")}`}
+            href={WHATSAPP_URL_WITH_MESSAGE("Hola! Tinc un dubte sobre el vostre servei d'esdeveniments")}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => {
@@ -164,9 +165,7 @@ export default function FAQSection() {
             className="group relative inline-flex items-center gap-2 px-8 py-4 bg-bg-card border border-oe-gold/25 hover:bg-bg-elevated hover:border-oe-gold/40 hover:shadow-lg hover:shadow-oe-gold/10 rounded-full text-oe-gold text-base font-semibold transition-all duration-300"
           >
             {t('cta.button')}
-            <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
         </motion.div>
       </div>

@@ -33,6 +33,7 @@ interface Props {
   leads: Lead[];
   packs: Pack[];
   returnHref: string;
+  initialLeadId?: string;
   initialCustomer?: {
     id: string;
     name: string;
@@ -48,10 +49,17 @@ const ACTIVE_BUTTON = 'rounded-xl border px-4 py-2 text-sm font-medium admin-ton
 const CARD_SELECTED = 'rounded-xl border-2 p-4 text-left transition-colors admin-tone-soft-info admin-tone-border-info';
 const CARD_IDLE = 'ap-card rounded-xl border-2 p-4 text-left transition-colors hover:admin-tone-bg-neutral';
 
-export default function ComposeForm({ leads, packs, returnHref, initialCustomer, initialTemplate }: Props) {
+export default function ComposeForm({
+  leads,
+  packs,
+  returnHref,
+  initialLeadId,
+  initialCustomer,
+  initialTemplate,
+}: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<'email' | 'quote'>('email');
-  const [selectedLeadId, setSelectedLeadId] = useState('');
+  const [selectedLeadId, setSelectedLeadId] = useState(initialLeadId || '');
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -68,6 +76,12 @@ export default function ComposeForm({ leads, packs, returnHref, initialCustomer,
 
   const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
   const selectedPack = packs.find((pack) => pack.id === selectedPackId);
+
+  useEffect(() => {
+    if (initialLeadId) {
+      setSelectedLeadId(initialLeadId);
+    }
+  }, [initialLeadId]);
 
   const smartTemplates: SmartTemplate[] = useMemo(() => {
     if (selectedLead) {
@@ -490,5 +504,4 @@ export default function ComposeForm({ leads, packs, returnHref, initialCustomer,
     </div>
   );
 }
-
 

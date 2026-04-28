@@ -5,6 +5,7 @@ import { Link, useRouter } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, useCallback } from 'react';
 import { PUBLIC_HOME_SHOWCASE_PILLARS } from '@/lib/publicHomeShowcase';
+import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
 
 // ─── Pillar icons (inline SVG for zero deps) ────────────────────────────────
 
@@ -146,9 +147,7 @@ export default function ServicesGridElegant() {
                   {/* Link — always navigates directly */}
                   <Link href={href} onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 text-sm font-semibold ${accentLight} group-hover:gap-2.5 transition-all`}>
                     <span>{t('viewMore')}</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                    <ArrowRightIcon className="w-4 h-4" strokeWidth={2.5} />
                   </Link>
                 </div>
               </div>

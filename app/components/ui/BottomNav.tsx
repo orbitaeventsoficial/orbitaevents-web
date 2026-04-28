@@ -26,7 +26,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 
 const ICONS = { Home, Briefcase, Calculator, Image, MessageCircle } as const;
 
-const NAV_ITEMS: Array<{ href: string; labelKey: string; exactMatch: boolean; highlight?: boolean; icon: (typeof ICONS)[keyof typeof ICONS] }> = PUBLIC_BOTTOM_NAV_ITEMS.map((item) => ({
+const NAV_ITEMS: Array<{ id: string; href: string; labelKey: string; exactMatch: boolean; highlight?: boolean; icon: (typeof ICONS)[keyof typeof ICONS] }> = PUBLIC_BOTTOM_NAV_ITEMS.map((item) => ({
   ...item,
   icon: ICONS[item.icon],
 }));
