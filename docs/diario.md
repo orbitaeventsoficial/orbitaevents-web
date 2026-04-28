@@ -1,3 +1,11 @@
+## 2026-04-28 — Canvi #440: lead→client match per nom (4a clau, completant la petició del #435) (claude)
+- L'usuari al #435 deia explícitament "match per email, dni, telefon... tots els possibles". Email/DNI/telèfon ja eren al #435; aquest tall afegeix nom.
+- `previewLeadCustomerLink`: llegeix `lead.name`, normalitza amb `normalizeName`, only inclou al where si ≥3 chars (anti-soroll). Match per nom sol = `medium` confidence (com phone). `CustomerMatchKind` amplia a `'name'`.
+- `LeadCustomerLinkPanel.MATCH_LABELS`: nova entrada `name: 'mateix nom'`.
+- 2 tests nous (match per nom sol, skip <3 chars), 4 tests adaptats per fixtures. 15/15 verds.
+- NO afegeix Instagram — Lead schema no té el camp (Customer sí). Apuntat com a #441 futur (requereix migració).
+- Validació: `validate:core` 12/12 OK · `qa:protocol` OK (current #440).
+
 ## 2026-04-28 — Canvi #439: hotfix lint Railway — `customerActivityService` esnetejat per ESLint estricte (claude)
 - `next lint` a Railway tirava error per `(args: any)` (línia 8) i `Prisma.CustomerActivityGetPayload<{}>` (línia 24). Build congelat des del 20-abr fent que `/api/health` retornés timestamp vell.
 - `lib/services/customerActivityService.ts`: writer accepta ara `Prisma.CustomerActivityCreateInput | UncheckedCreateInput` (la unió permet els callers que escriuen `customerId` scalar). `<{}>` → `<Record<string, never>>` (semàntica idèntica, ESLint content).

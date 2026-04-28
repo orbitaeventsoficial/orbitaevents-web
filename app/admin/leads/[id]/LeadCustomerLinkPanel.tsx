@@ -10,10 +10,11 @@ import type {
   LeadCustomerPreview,
 } from '@/lib/services/leads/leadCustomerLinkService';
 
-const MATCH_LABELS: Record<'email' | 'dni' | 'phone', string> = {
+const MATCH_LABELS: Record<'email' | 'dni' | 'phone' | 'name', string> = {
   email: 'mateix email',
   dni: 'mateix DNI',
   phone: 'mateix telèfon',
+  name: 'mateix nom',
 };
 
 function formatMatchedBy(matchedBy: CustomerMatchSummary['matchedBy']): string {

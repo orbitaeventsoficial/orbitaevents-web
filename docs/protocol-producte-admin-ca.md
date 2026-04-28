@@ -5614,6 +5614,22 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #440 — 2026-04-28 — claude (FET)
+**Match per nom afegit al lead→client (4a clau): `previewLeadCustomerLink` ara busca també per `nameNormalized` quan tingui ≥3 chars.**
+- Context: l'usuari va dir explícitament al #435 "match per email, dni, telefon... tots els possibles". El #435 va cobrir email/DNI/telèfon però no nom (i no Instagram). Aquest tall afegeix el quart canal de match.
+- `lib/services/leads/leadCustomerLinkService.ts`:
+  - `CustomerMatchKind` amplia a `'email' | 'dni' | 'phone' | 'name'`.
+  - `previewLeadCustomerLink` ara llegeix `lead.name`, normalitza amb `normalizeName` i només l'usa al where si té ≥3 caràcters (anti-soroll: noms tipus "JJ", "Jo" donarien massa falsos positius). El where afegeix `{ nameNormalized: nameSearchable }` al `OR`.
+  - El `select` de `prisma.customer.findMany` afegeix `nameNormalized` al payload, i el ranking inclou `'name'` al `matchedBy`. Un match per nom sol és `confidence: 'medium'` (igual que phone) — només email/dni són `strong`.
+- `app/admin/leads/[id]/LeadCustomerLinkPanel.tsx`: `MATCH_LABELS` afegeix `name: 'mateix nom'`.
+- `__tests__/lib/services/leads/leadCustomerLinkService.test.ts`: 4 tests existents adaptats (afegint `lead.name` als fixtures + `nameNormalized` als customers); 2 tests nous (`matches by name alone medium confidence`, `skips name matching when normalized name <3 chars`). Suite: 15/15 verds.
+- Aquest tall **NO** afegeix match per Instagram. Lead schema **no té camp `instagram`** (Customer sí); per tant requereix migració schema. Apuntat com a feedback futur i documentat al §6.18 mancances transversals.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/leads/leadCustomerLinkService.test.ts` OK (15 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `440`; el següent canvi real ha de ser `#441`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #439 — 2026-04-28 — claude (FET)
 **Hotfix lint Railway: `customerActivityService` esnetejat per ESLint estricte (any → tipus Prisma; `{}` → `Record<string, never>`).**
 - Context: Railway build fallava amb `customerActivityService.ts` línia 8 (`Unexpected any`) i 24 (`{}` empty object type) — ESLint estricte de Next.js 14 al `next lint` que corre dins `pnpm run build`. Aquests errors lint feien que el build de Railway abortés sense aplicar els canvis més recents (#433 endavant). Visible des de `https://orbitaevents.com/api/health` que retornava un timestamp del 20 d'abril (build congelat).

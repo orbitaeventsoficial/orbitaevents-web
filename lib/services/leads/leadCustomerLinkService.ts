@@ -9,7 +9,7 @@ import {
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { recordLeadConverted } from '@/lib/services/customerActivityService';
 
-export type CustomerMatchKind = 'email' | 'dni' | 'phone';
+export type CustomerMatchKind = 'email' | 'dni' | 'phone' | 'name';
 
 export type CustomerMatchSummary = {
   customerId: string;
@@ -35,6 +35,7 @@ export async function previewLeadCustomerLink(
     select: {
       id: true,
       customerId: true,
+      name: true,
       email: true,
       phone: true,
       dni: true,
@@ -66,11 +67,15 @@ export async function previewLeadCustomerLink(
       : null;
   const phoneNorm = lead.phone ? normalizePhone(lead.phone) : null;
   const dniNorm = lead.dni ? normalizeDni(lead.dni) : null;
+  // Name match: only as last-resort signal (>=3 chars normalized to avoid noise like "Joan")
+  const nameNorm = lead.name ? normalizeName(lead.name) : null;
+  const nameSearchable = nameNorm && nameNorm.length >= 3 ? nameNorm : null;
 
   const orClauses: Prisma.CustomerWhereInput[] = [];
   if (emailNorm) orClauses.push({ emailNormalized: emailNorm });
   if (phoneNorm) orClauses.push({ phoneNormalized: phoneNorm });
   if (dniNorm) orClauses.push({ dniNormalized: dniNorm });
+  if (nameSearchable) orClauses.push({ nameNormalized: nameSearchable });
 
   if (orClauses.length === 0) return { kind: 'no-match' };
 
@@ -85,6 +90,7 @@ export async function previewLeadCustomerLink(
       emailNormalized: true,
       phoneNormalized: true,
       dniNormalized: true,
+      nameNormalized: true,
     },
     take: 10,
   });
@@ -96,6 +102,7 @@ export async function previewLeadCustomerLink(
     if (emailNorm && c.emailNormalized === emailNorm) matchedBy.push('email');
     if (dniNorm && c.dniNormalized === dniNorm) matchedBy.push('dni');
     if (phoneNorm && c.phoneNormalized === phoneNorm) matchedBy.push('phone');
+    if (nameSearchable && c.nameNormalized === nameSearchable) matchedBy.push('name');
     const confidence: 'strong' | 'medium' =
       matchedBy.includes('email') || matchedBy.includes('dni') ? 'strong' : 'medium';
     return {

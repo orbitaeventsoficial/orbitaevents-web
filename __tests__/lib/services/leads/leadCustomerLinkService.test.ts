@@ -48,6 +48,7 @@ describe('previewLeadCustomerLink', () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'lead-1',
       customerId: 'cust-1',
+      name: 'Joan',
       email: 'a@b.cat',
       phone: null,
       dni: null,
@@ -66,12 +67,14 @@ describe('previewLeadCustomerLink', () => {
     expect(result.customer.customerName).toBe('Joan');
   });
 
-  it('returns no-match when no normalized field is present (placeholder email and no dni/phone)', async () => {
+  it('returns no-match when no normalized field is present (placeholder email + 2-char name + no dni/phone)', async () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'lead-2',
       customerId: null,
+      name: 'JJ',
+      // ↑ name <3 chars (after normalize) → not searchable
       email: 'web-1234@leads.orbitaevents.local',
-      // ↑ placeholder domain triggers email-skip; with no phone/dni → no orClauses → early no-match
+      // ↑ placeholder domain triggers email-skip; with no phone/dni/name → no orClauses → early no-match
       phone: null,
       dni: null,
       customer: null,
@@ -85,6 +88,7 @@ describe('previewLeadCustomerLink', () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'lead-3',
       customerId: null,
+      name: 'Joan Garcia',
       email: 'a.b.c@gmail.com',
       phone: '612 345 678',
       dni: '12345678Z',
@@ -100,6 +104,7 @@ describe('previewLeadCustomerLink', () => {
         emailNormalized: 'other@x.com',
         phoneNormalized: '+34612345678',
         dniNormalized: null,
+        nameNormalized: 'telefon match',
       },
       {
         id: 'cust-email-strong',
@@ -110,6 +115,7 @@ describe('previewLeadCustomerLink', () => {
         emailNormalized: 'abc@gmail.com',
         phoneNormalized: null,
         dniNormalized: null,
+        nameNormalized: 'email match',
       },
     ]);
     const result = await previewLeadCustomerLink('lead-3');
@@ -128,6 +134,7 @@ describe('previewLeadCustomerLink', () => {
     mockPrisma.lead.findUnique.mockResolvedValue({
       id: 'lead-4',
       customerId: null,
+      name: 'Anonimitzat',
       email: 'fresh@nou.cat',
       phone: null,
       dni: null,
@@ -136,6 +143,51 @@ describe('previewLeadCustomerLink', () => {
     mockPrisma.customer.findMany.mockResolvedValue([]);
     const result = await previewLeadCustomerLink('lead-4');
     expect(result.kind).toBe('no-match');
+  });
+
+  it('matches by name alone (medium confidence) when no email/dni/phone match exists', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'lead-name',
+      customerId: null,
+      name: 'Joan Garcia López',
+      email: 'unique@x.cat',
+      phone: null,
+      dni: null,
+      customer: null,
+    });
+    mockPrisma.customer.findMany.mockResolvedValue([
+      {
+        id: 'cust-name',
+        name: 'Joan Garcia López',
+        email: 'jgl@old.com',
+        phone: null,
+        dni: null,
+        emailNormalized: 'jgl@old.com',
+        phoneNormalized: null,
+        dniNormalized: null,
+        nameNormalized: 'joan garcia lopez',
+      },
+    ]);
+    const result = await previewLeadCustomerLink('lead-name');
+    expect(result.kind).toBe('matches-found');
+    if (result.kind !== 'matches-found') return;
+    expect(result.matches[0].matchedBy).toEqual(['name']);
+    expect(result.matches[0].confidence).toBe('medium');
+  });
+
+  it('skips name matching when normalized name is shorter than 3 chars', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValue({
+      id: 'lead-shortname',
+      customerId: null,
+      name: 'Jo',
+      email: 'placeholder@leads.orbitaevents.local',
+      phone: null,
+      dni: null,
+      customer: null,
+    });
+    const result = await previewLeadCustomerLink('lead-shortname');
+    expect(result.kind).toBe('no-match');
+    expect(mockPrisma.customer.findMany).not.toHaveBeenCalled();
   });
 });
 
