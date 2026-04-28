@@ -34,6 +34,7 @@ function buildQuery(filters: {
   q: string;
   from: Date | null;
   to: Date | null;
+  includeLost?: boolean;
 }) {
   const params = new URLSearchParams();
   filters.status.forEach((value) => params.append('status', value));
@@ -43,6 +44,7 @@ function buildQuery(filters: {
   if (filters.q) params.set('q', filters.q);
   if (filters.from) params.set('from', filters.from.toISOString().slice(0, 10));
   if (filters.to) params.set('to', filters.to.toISOString().slice(0, 10));
+  if (filters.includeLost) params.set('includeLost', '1');
   return params.toString();
 }
 
@@ -82,6 +84,7 @@ type LeadFilters = {
   q: string;
   from: Date | null;
   to: Date | null;
+  includeLost: boolean;
 };
 
 type Pagination = {
@@ -114,6 +117,7 @@ async function getLeads(filters: {
   from?: string;
   to?: string;
   page?: string;
+  includeLost?: string;
 }) {
   try {
     const status = toArray(filters.status).filter(isLeadStatus);
@@ -125,9 +129,13 @@ async function getLeads(filters: {
     const pageRaw = Number.parseInt(filters.page || '1', 10);
     const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
     const pageSize = 25;
+    // Per defecte amaga els LOST per evitar soroll visual; si l'usuari filtra explícitament
+    // per status=LOST o demana includeLost=1, els mostrem.
+    const includeLost = filters.includeLost === '1' || status.includes('LOST');
 
     const where: Prisma.LeadWhereInput = {
       ...(status.length ? { status: { in: status } } : {}),
+      ...(!status.length && !includeLost ? { status: { not: 'LOST' } } : {}),
       ...(priority.length ? { priority: { in: priority } } : {}),
       ...(eventType.length ? { eventType: { in: eventType } } : {}),
       ...(source.length ? { source: { in: source } } : {}),
@@ -202,7 +210,7 @@ async function getLeads(filters: {
       CacheTTL.VERY_SHORT
     );
 
-    const normalizedFilters: LeadFilters = { status, priority, eventType, source, q: filters.q || '', from, to };
+    const normalizedFilters: LeadFilters = { status, priority, eventType, source, q: filters.q || '', from, to, includeLost };
     return {
       leads,
       filters: normalizedFilters,
@@ -216,7 +224,7 @@ async function getLeads(filters: {
     log.error('Error obtenint leads:', e);
     return {
       leads: [],
-      filters: { status: [], priority: [], eventType: [], source: [], q: '', from: null, to: null } as LeadFilters,
+      filters: { status: [], priority: [], eventType: [], source: [], q: '', from: null, to: null, includeLost: false } as LeadFilters,
       pagination: { page: 1, pageSize: 25, totalPages: 1 } as Pagination,
     };
   }
@@ -234,10 +242,11 @@ export default async function LeadsPage({
     from?: string;
     to?: string;
     page?: string;
+    includeLost?: string;
   };
 }) {
-  const { status, priority, eventType, source, q, from, to, page } = searchParams || {};
-  const data = await getLeads({ status, priority, eventType, source, q, from, to, page });
+  const { status, priority, eventType, source, q, from, to, page, includeLost } = searchParams || {};
+  const data = await getLeads({ status, priority, eventType, source, q, from, to, page, includeLost });
   const leads = data.leads;
   const currentQuery = buildQuery(data.filters);
   const newLeads = leads.filter((lead) => lead.status === 'NEW').length;
@@ -366,6 +375,42 @@ export default async function LeadsPage({
             Entrada ràpida
           </Link>
         </div>
+      </section>
+
+      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs">
+        <span className="text-white/60">Vista:</span>
+        {data.filters.includeLost ? (
+          <>
+            <span className="rounded-full bg-amber-500/20 border border-amber-400/30 px-2 py-0.5 text-amber-200">
+              Incloent perduts
+            </span>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams(currentQuery);
+                params.delete('includeLost');
+                const qs = params.toString();
+                return qs ? `/admin/leads?${qs}` : '/admin/leads';
+              })()}
+              className="text-white/70 hover:text-white underline"
+            >
+              Amagar perduts
+            </Link>
+          </>
+        ) : (
+          <>
+            <span className="text-white/70">Per defecte amaguem leads perduts.</span>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams(currentQuery);
+                params.set('includeLost', '1');
+                return `/admin/leads?${params.toString()}`;
+              })()}
+              className="text-amber-300 hover:text-amber-200 underline"
+            >
+              Mostrar també perduts
+            </Link>
+          </>
+        )}
       </section>
 
       <LeadViewToggle

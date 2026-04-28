@@ -5614,6 +5614,25 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #443 — 2026-04-28 — claude (FET)
+**Llistat de leads amaga `LOST` per defecte; toggle visible per mostrar-los quan calgui.**
+- Context: l'usuari es queixava que veure `/admin/leads` amb tots els leads perduts barrejats era soroll diari ("em dona toc veure-ho ple"). Esborrar-los no és bona idea — alimenten `LossSummary`, reactivació i reporting (#358-#367). La solució correcta és amagar-los visualment per defecte.
+- `app/admin/leads/page.tsx`:
+  - `getLeads` accepta `includeLost?: string`. Si NO és `'1'` i NO hi ha filtre explícit `status=LOST`, afegeix `status: { not: 'LOST' }` al where (ignorat quan l'usuari filtra LOST manualment des de la UI).
+  - `LeadFilters` guanya `includeLost: boolean` propagat a `buildQuery` per mantenir el toggle dins els links de paginació/filtres.
+  - Nou toggle UI just sobre el `LeadViewToggle`: pill "Incloent perduts" (ambre) + link "Amagar perduts" quan està actiu, o text "Per defecte amaguem leads perduts" + link "Mostrar també perduts" quan és la vista per defecte. Les dues vies preserven la query string actual via `URLSearchParams(currentQuery)`.
+- Comportament concret:
+  - `/admin/leads` → amaga LOST (vista neta per defecte)
+  - `/admin/leads?includeLost=1` → mostra tots
+  - `/admin/leads?status=LOST` → mostra només LOST (override manual: filtre explícit té prioritat)
+  - L'eliminació individual ja existent (botó 🗑️ a `LeadActions.tsx`) segueix funcionant per als casos d'error real.
+- Aquest tall **NO** elimina cap lead (cap dada perduda), NO toca els reports de pèrdues (`LossSummary` segueix llegint tot), NO afegeix bulk delete (decisió: no cal — el botó individual ja cobreix els casos d'error humà). NO modifica schema.
+- Verificació del tall: `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `443`; el següent canvi real ha de ser `#444`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #442 — 2026-04-28 — claude (FET)
 **A.5 del §6.18: wizard d'1 minut lead → pressupost → reserva amb pantalla única i 3 outcomes.**
 - Context: el flow tradicional de captura demana 3 pantalles separades (lead → presupost → reserva). Per casos típics on l'usuari ja sap el què (cas pas, lead amb pressupost ràpid, etc.) això és fricció pura. A.5 del §6.18 (Camí 1 P1) tanca-ho amb un wizard d'una sola pantalla.

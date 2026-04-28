@@ -1,3 +1,12 @@
+## 2026-04-28 — Canvi #443: amaga leads `LOST` per defecte al llistat (claude)
+- Petició usuari: "em dona toc veure-ho ple". Esborrar-los seria mala idea (LossSummary, reactivació, reports). Solució: amagar visualment per defecte.
+- `getLeads` afegeix `status: { not: 'LOST' }` al where quan no hi ha filtre explícit i `includeLost !== '1'`.
+- `LeadFilters` guanya `includeLost: boolean`. `buildQuery` inclou el flag perquè paginació/filtres preservin l'estat.
+- Toggle UI just sobre `LeadViewToggle`: pill "Incloent perduts" (ambre) o text "Per defecte amaguem perduts" segons mode. Links que preserven query string via `URLSearchParams(currentQuery)`.
+- Comportament: `/admin/leads` neta · `?includeLost=1` mostra tot · `?status=LOST` només LOST.
+- NO modifica reports (LossSummary continua llegint tot) ni schema. Botó 🗑️ individual ja existent segueix viu.
+- Validació: `validate:core` 12/12 OK · `qa:protocol` OK (current #443).
+
 ## 2026-04-28 — Canvi #442: A.5 — wizard d'1 minut lead/pressupost/reserva (claude)
 - A.5 del §6.18 (Camí 1, P1): pantalla única amb 3 outcomes (`lead` / `lead+proposal` / `lead+proposal+booking`) en lloc de 3 pantalles separades.
 - `quickCreateFlow.ts` (nou): servei orquestrador. Sempre crea lead. Encadena proposal amb leadId i booking amb leadId quan toca. Validació pre-flight (data/lloc/invitats/pack/telèfon) abans de tocar res. Update proposal.bookingId post-creació. Errors amb `stage` per feedback.
