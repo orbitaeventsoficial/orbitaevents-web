@@ -1,3 +1,12 @@
+## 2026-04-28 — Canvi #436: §6.18 nou — backlog d'auditoria CRMs top documentat (claude)
+- L'usuari ha demanat fer una auditoria contra els CRMs top i deixar-la documentada al checklist per atacar després. La feedback acumulada de setmanes (lead→client, auto-km, pressupost lligat opcional, etc.) queda ara formalitzada al protocol amb nomenclatura estable.
+- `docs/protocol-producte-admin-ca.md` · §6.18 (nou): "Auditoria CRMs top — backlog d'incorporacions" amb 27 ítems contra HubSpot/Pipedrive/Monday/Zoho/Salesforce + Tave/Honeybook (els dos referents per events). Agrupats en 7 àrees: A (lead→client→pressupost→reserva, ja FET A.1 al #435), B (auto-càlcul intel·ligent — USP), C (comunicació multi-canal), D (dashboards executius), E (mòbil i camp), F (integracions externes), G (portal client/onboarding).
+- Tags de criticitat: `[BLOC]` mai pot faltar; `[BÀSIC]` sentit comú a tots els tops; `[USP]` diferenciador d'Òrbita.
+- Tres camins acotats: Camí 1 "Eradicar fricció lead→pressupost→reserva" (~10-15h, prioritat 1); Camí 2 "Auto-càlcul brutal com a USP" (~8-12h, prioritat 2, amb B.6 fer estrella visible l'auto-km); Camí 3 "Portal client + signatura + pagament" (~25-40h, prioritat 3, reservat per quan hi hagi flux real).
+- Cada ítem cita el codi/servei existent que es pot aprofitar (`commercialSequenceService`, `customerInsightsService`, `costService`, `inboxTemplateService`, `LEAD_SCORING_STATUS_PROBABILITY`, `ClientPortalAccess`...).
+- Sense canvi de codi — pura documentació estratègica al §9 + §6.18 + diari.
+- Validació: `qa:protocol` OK (current #436).
+
 ## 2026-04-28 — Canvi #435: panell lead→client amb match per email/DNI/telèfon i feedback explícit (claude)
 - L'usuari portava demanant des del primer dia poder crear/vincular un client directament des del detall del lead — fins ara només es feia silencios via `statusRouteHandler.ts` quan canviaves estat a `WON`.
 - `lib/services/leads/leadCustomerLinkService.ts` (nou): `previewLeadCustomerLink(leadId)` busca matches per `emailNormalized` + `dniNormalized` + `phoneNormalized` reutilitzant `lib/utils/normalize.ts`, ranked per confidence (`strong`=email/dni, `medium`=phone-only) i nombre de matchedBy. `linkLeadToCustomer({leadId, action, customerId?, actor?})` és idempotent (alreadyLinked sense efectes), valida customer per `link`, rebutja amb 409 conflicte d'email/dni per `create`, i tota escriptura passa per `recordLeadConverted` amb `attribution.manualAction` per audit.

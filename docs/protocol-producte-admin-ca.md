@@ -916,6 +916,59 @@ Criteri pràctic:
 **CARACTERÍSTIQUES EXIGIDES**: relació bidireccional visible · zero contingut opac · bellesa funcional · zero overflow · TypeScript verd al perímetre.
 **SEGÜENT**: preparar una reunió de treball per definir Fase 0 (ICP + proposta de valor) — sense això no es pot començar res.
 
+## 6.18 Auditoria CRMs top — backlog d'incorporacions
+**CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**FET** *(2026-04-28 per `claude` — Canvi #436)*: backlog complet d'auditoria contra CRMs top documentat (HubSpot, Pipedrive, Monday CRM, Zoho, Salesforce + Tave/Honeybook per events). 27 ítems agrupats en 7 àrees (A-G) amb tag de criticitat (`[BLOC]` mai pot faltar · `[BÀSIC]` sentit comú · `[USP]` diferenciador d'Òrbita) i priorització en 3 camins paral·lels.
+**FET** *(2026-04-28 per `claude` — Canvi #435)*: A.1 — vinculació explícita lead→client amb match per email/DNI/telèfon i feedback explícit. Tancat amb `leadCustomerLinkService` + endpoint + panell + 13 tests.
+**LLEGENDA**: `[BLOC]` mai hauria de faltar a un CRM seriós · `[BÀSIC]` sentit comú a tots els tops · `[USP]` diferenciador d'Òrbita.
+
+### Camí 1 — Eradicar fricció lead → pressupost → reserva (~10-15h, prioritat 1)
+Resol el dolor que l'usuari té cada dia operant amb el sistema. Desbloca tot el flux comercial.
+
+### SEGÜENT (Camí 1)
+- **A.2 [BLOC] Pressupost lligat a entitat flexible** — el pressupost no ha d'obligar a tenir client assignat. Ha de poder viure orfe (`Tave Project`-style) o lligat a lead/client/booking. HubSpot Deal és el patró canònic: lligams opcionals a Contact/Company/Deal. Implica: schema (`Quote.leadId?`, `Quote.customerId?`, `Quote.bookingId?` tots nullable, FK SET NULL), formulari de creació amb selector multi-entitat opcional, validació "almenys un lligam o cap" sense bloquejar.
+- **A.3 [BLOC] Re-assignar pressupost a una altra entitat** — si avui és d'un lead i demà s'ha de moure a un client/booking, ha de ser drag&drop o canvi al detall. Pipedrive: drag entre Deals; HubSpot: change Deal owner. Implica: endpoint `PATCH /api/admin/proposals/[id]/owner` que canvia `leadId`/`customerId`/`bookingId` amb audit.
+- **A.4 [USP] Mode "client de pas"** — event sense crear customer permanent (cas one-shot, fira, banquet aïllat). Honeybook "Quick contact" pattern. Implica: flag `Booking.transientCustomer: boolean` + UI per crear booking sense Customer obligatori.
+- **A.5 [BÀSIC] Wizard d'1 minut** — pantalla única `lead → pressupost → reserva` amb steps inline, sense saltar entre 3 pàgines. Tave "Quick Project Wizard" és el referent. Implica: nou flow `/admin/quick-create` amb 3 pestanyes condicionals.
+
+### Camí 2 — Auto-càlcul brutal com a USP (~8-12h, prioritat 2)
+Amplifica el USP que l'usuari ja té (km + transport autocalculat) i el converteix en la marca diferenciadora.
+
+### SEGÜENT (Camí 2)
+- **B.6 [USP brutal] Fer estrella visible l'auto-càlcul km + transport** — la peça que més valora l'usuari ja existeix però viu com a feature secundària. Cap CRM general ho té. Convertir-la en hero del pressupost: badge visible "Transport calculat automàticament: X km · Y €" amb breakdown clicable, tooltip explicant la fórmula, CTA "veure ruta" amb Maps embed. Implica: refinement UI a `QuoteForm` + nou component `TransportBreakdownPanel` + tests visuals.
+- **B.7 [USP] Auto-pricing per data** — preu segons cap de setmana, alta temporada (juny-setembre + desembre), festius. Tave/Honeybook tenen `Pricing Rules` per data. Implica: nou model `PricingRule { startDate, endDate, multiplier, label }` + servei `applyDatePricing(basePrice, eventDate)` + UI a `/admin/packs` per gestionar regles.
+- **B.8 [BÀSIC] Auto-suggeriment de pack** — segons `eventType + guestCount + budget`, suggerir el pack que millor encaixa al moment de crear el lead/pressupost. Pipedrive Smart Suggestions, Honeybook templates. Implica: servei `suggestPackForLead(lead): { pack, confidence, reason }` que ja podem aprofitar `LEAD_SCORING_STATUS_PROBABILITY` + capacitat dels packs + budget bracket.
+- **B.9 [BÀSIC] Marge instantani per event visible al pressupost** — cost equip + transport + hores + extras → marge net visible al moment de cotitzar, no només a `/admin/economia`. Tave "Profit calculator" per project. Implica: component `LiveMarginIndicator` al detall de pressupost que reaprofita `costService` ja existent.
+
+### Camí 3 — Portal client + signatura + pagament (~25-40h, prioritat 3)
+Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb això. Reservar per quan hi hagi flux real que ho justifiqui.
+
+### SEGÜENT (Camí 3)
+- **F.22 [USP] Signatura digital de contractes inline** — DocuSign-like sense sortir d'Òrbita. Honeybook/Tave brutal en això. Implica: nou model `ContractSignature { contractId, signedAt, signatureBlob, ip, userAgent }` + portal públic `/contract/[token]/sign` + integració amb generació PDF firmat.
+- **F.23 [USP] Pagaments online (Stripe link) dins el pressupost** — Honeybook brutal. CTA "Paga el 30% per confirmar" amb Stripe Checkout. Implica: integració Stripe + nou flow `Booking.paymentLink` + webhook handler.
+- **G.25 [USP mig-llarg] Portal client** — timeline visible, contracte, factures, fotos post-event, qüestionaris. Honeybook Client Portal és el referent absolut. Implica: nou conjunt rutes `/portal/[token]/*` (`overview`, `contract`, `payments`, `gallery`, `questionnaire`) basades en `ClientPortalAccess` que ja existeix com a model.
+- **G.26 [USP] Qüestionari pre-event automàtic** — timing, cançons, contactes claus. Honeybook Questionnaires. Implica: nou model `Questionnaire { templateId, bookingId, responses }` + UI per propietari (templates) + UI portal client (responses).
+- **G.27 [USP] Galeria post-event privada amb codi compartible** — Tave Galleries. Implica: nou model `EventGallery { bookingId, shareToken, photos[] }` + ruta pública `/gallery/[token]` amb password opcional.
+
+### Mancances transversals (atacar quan toqui per àrea)
+- **C.10 [BÀSIC] Inbox unificada multi-canal real** (email + WhatsApp + IG DM + form) — HubSpot Inbox, Honeybook conversations. Òrbita ja té Inbox amb multi-canal parcial; falta unificar IG DM i form com a canal real al `commTimeline`.
+- **C.11 [BÀSIC] Enviament massiu segmentat** — "tots els clients de bodes 2025", "leads frescos sense resposta 7d". HubSpot Lists. Implica: servei `bulkComposeForSegment({segment, template})` reutilitzant `inboxTemplateService` existent.
+- **C.12 [BÀSIC parcialment FET]** Plantilles intel·ligents amb variables (`{{firstName}}`, `{{eventDate}}`) — `inboxTemplateService` ja té base, falta auto-emplenat al `ComposeForm`.
+- **C.13 [parcialment FET]** Sequencer manual des del lead — `commercialSequenceService` existeix però falta UI per disparar manualment a un lead concret amb passos custom.
+- **D.14 [parcial]** Forecast per mes amb confiança ponderada — `LEAD_SCORING_STATUS_PROBABILITY` ja existeix, falta agregació mensual amb confidence band a UI.
+- **D.15 [FET]** "Què faig avui" en 5 línies — `dailyBriefService` ja cobreix.
+- **D.16 [FET]** Customer Lifetime Value visible per client — `customerInsightsService.calculateLTV` ja existeix.
+- **D.17 [BLOC verificar UX]** Pipeline drag & drop entre estats — `LeadPipelineView` ja existeix, cal verificar fluïdesa drag&drop a mòbil i actualitzar si cal.
+- **E.18 [FET base]** App PWA admin — `app/manifest` ja existeix, refinar offline i Quick Actions.
+- **E.19 [BÀSIC]** Quick action mobile (1 tap → trucar/WhatsApp/marcar contactat) — falta a la fitxa de lead/customer/booking en vista mòbil.
+- **E.20 [USP]** Foto + nota ràpida des del bolo — Tave Field Notes. Component nou per pujar foto via càmera + nota a `Booking` directament.
+- **F.21 [FET]** Calendar bidireccional Google/iCal — Canvi #134 ja ho cobreix.
+- **F.24 [USP]** Integració Google Maps a la fitxa client — veure ubicació, distància real. Refinement del B.6 (auto-km).
+
+**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Atacar Camí 1 (10-15h) + verificar abans de saltar a Camí 2. Camí 3 reservat per quan hi hagi flux real que ho justifiqui (no abans de tenir clients estables i operatives diàries que ho demanin).
+
+**MÉS ENDAVANT**: tractar com a backlog viu — quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tag `[BLOC]/[BÀSIC]/[USP]`.
+
 ## Fase 1 — Consolidació del nucli (actual)
 - `Task` com a veritat canònica: pràcticament tancat, pendent de desplegar migració i netejar aliases legacy.
 - `timeline` canònica de lectura: avançada, pendent decidir Inbox/Comms i frontera timeline operativa vs log tècnic.
@@ -5557,6 +5610,19 @@ px tsc --noEmit OK · git diff --check OK.
 - Efecte: el §6.12 drena una altra capa de duplicació pública. ~56 línies netes eliminades. Si demà cal afegir variants del logo (mono, outline, icon-only), telemetria de visualització, o substituir-lo per la versió Material Symbols, es resol al component sense tocar els 6 fitxers consumidors.
 - Verificació del tall: `pnpm exec vitest run __tests__/app/components/public/GoogleGIcon.test.tsx` OK (3 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
 - `ADMIN_CHANGE_COUNTER` puja a `407`; el següent canvi real ha de ser `#408`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #436 — 2026-04-28 — claude (FET)
+**Documentat el backlog complet d'auditoria CRM al §6.18 — 27 ítems contra HubSpot/Pipedrive/Monday/Zoho/Salesforce + Tave/Honeybook, agrupats en 7 àrees (A-G) i 3 camins prioritzats.**
+- Context: l'usuari ha demanat explícitament fer una auditoria contra els CRMs top i deixar-la documentada al checklist per atacar després. La feedback que arriba al sistema porta setmanes acumulant-se sense quedar registrada al protocol — ara queda formalitzada al checklist amb nomenclatura estable (A-G) i tags de criticitat (`[BLOC]` mai pot faltar · `[BÀSIC]` sentit comú · `[USP]` diferenciador d'Òrbita) perquè qualsevol agent futur pugui reprendre-la sense context oral.
+- `docs/protocol-producte-admin-ca.md` · §6.18 (nou): "Auditoria CRMs top — backlog d'incorporacions". 27 ítems en 7 àrees: A. Conversió lead→client→pressupost→reserva (#1-#5, A.1 ja FET al #435); B. Auto-càlcul intel·ligent (#6-#9, on viu el USP brutal de l'auto-km); C. Comunicació multi-canal (#10-#13, parcialment fet); D. Dashboards executius (#14-#17, parcialment fet); E. Mòbil i camp (#18-#20); F. Integracions externes (#21-#24); G. Onboarding del client/portal (#25-#27, mig-llarg termini).
+- Tres camins prioritzats com a `SEGÜENT` ben acotats: Camí 1 "Eradicar fricció lead→pressupost→reserva" (~10-15h, prioritat 1, ítems A.2-A.5); Camí 2 "Auto-càlcul brutal com a USP" (~8-12h, prioritat 2, ítems B.6-B.9 amb B.6 com a estrella visible del producte); Camí 3 "Portal client + signatura + pagament" (~25-40h, prioritat 3, ítems F.22, F.23, G.25-G.27, reservat per quan hi hagi flux real).
+- La resta d'ítems queda registrada com a "Mancances transversals" amb estat actual (FET/parcial/pendent) i citacions als canvis corresponents quan s'aprofita codi ja existent (`commercialSequenceService`, `customerInsightsService`, `LEAD_SCORING_STATUS_PROBABILITY`, `dailyBriefService`, `inboxTemplateService`, `costService`, `LeadPipelineView`, `ClientPortalAccess`).
+- Aquest tall **NO** afegeix codi: és pura documentació estratègica al protocol perquè la feina pendent quedi traçada com a backlog viu. La regla del §6.18 explícita: quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tags.
+- Verificació del tall: `pnpm run qa:protocol` OK · `pnpm run validate:core` no cal (sense canvi de codi).
+- `ADMIN_CHANGE_COUNTER` puja a `436`; el següent canvi real ha de ser `#437`.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
