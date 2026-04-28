@@ -1,3 +1,10 @@
+## 2026-04-28 — Canvi #444: PDF del pressupost mostra ara línia explícita de Desplaçament (claude)
+- Bug detectat per l'usuari amb pressupost real (Silvia Sanchez): total 265€ quan l'esperat era 225€. Els 40€ extra eren 2 trams de transport (calculats automàticament) que se sumaven silencios al total sense aparèixer com a línia visible al PDF.
+- `pdf-utils.ts` · `QuoteData` afegeix camps opcionals: `travelCharge?`, `travelKm?`, `billableTravelKm?`, `travelBlocks?`. Lògica del summary card amplia 1 fila si `travelCharge > 0`, amb subtítol detall (km/trams) en text muted. Traduccions ca/es/en.
+- `PresupuestoPdfStudio.tsx` · `buildPdf` propaga els 4 valors al `generateQuotePDF` (abans només els consumia el `total` i la preview admin).
+- NO toca: càlcul, regles de transport, contracte, flux d'enviament. Només visibilitat al PDF. Proposals antigues regenerades reben ara la línia.
+- Validació: `tsc` OK · `validate:core` 12/12 OK · `qa:protocol` OK (current #444).
+
 ## 2026-04-28 — Canvi #443: amaga leads `LOST` per defecte al llistat (claude)
 - Petició usuari: "em dona toc veure-ho ple". Esborrar-los seria mala idea (LossSummary, reactivació, reports). Solució: amagar visualment per defecte.
 - `getLeads` afegeix `status: { not: 'LOST' }` al where quan no hi ha filtre explícit i `includeLost !== '1'`.

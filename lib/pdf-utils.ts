@@ -268,6 +268,14 @@ export interface QuoteData {
   extrasCatalog?: ExtraDefinition[];
   basePrice: number;
   extrasPrice: number;
+  /** Càrrec total de transport (en euros) — afegit com a línia separada al resumen si > 0. */
+  travelCharge?: number;
+  /** Km totals de la ruta (anada+tornada) — apareix com a context al PDF si transport > 0. */
+  travelKm?: number;
+  /** Km facturables (després de restar km inclosos). */
+  billableTravelKm?: number;
+  /** Nombre de trams de transport facturats. */
+  travelBlocks?: number;
   discount: number;
   discountReason: string;
   total: number;
@@ -306,6 +314,9 @@ export async function generateQuotePDF(
       priceSummary: 'Resum economic',
       basePack: 'Pack base',
       extrasTotal: 'Extres',
+      travel: 'Desplaçament',
+      travelDetail: (km: number, billable: number, blocks: number) =>
+        `${km.toFixed(1)} km totals · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tram' : 'trams'}`,
       discount: 'Descompte',
       total: 'Total',
       validUntilPrefix: 'Validesa:',
@@ -331,6 +342,9 @@ export async function generateQuotePDF(
       priceSummary: 'Resumen economico',
       basePack: 'Pack base',
       extrasTotal: 'Extras',
+      travel: 'Desplazamiento',
+      travelDetail: (km: number, billable: number, blocks: number) =>
+        `${km.toFixed(1)} km totales · ${billable.toFixed(1)} km facturables · ${blocks} ${blocks === 1 ? 'tramo' : 'tramos'}`,
       discount: 'Descuento',
       total: 'Total',
       validUntilPrefix: 'Validez:',
@@ -356,6 +370,9 @@ export async function generateQuotePDF(
       priceSummary: 'Price summary',
       basePack: 'Base package',
       extrasTotal: 'Extras',
+      travel: 'Travel',
+      travelDetail: (km: number, billable: number, blocks: number) =>
+        `${km.toFixed(1)} km total · ${billable.toFixed(1)} km billable · ${blocks} ${blocks === 1 ? 'block' : 'blocks'}`,
       discount: 'Discount',
       total: 'Total',
       validUntilPrefix: 'Validity:',
@@ -621,7 +638,13 @@ export async function generateQuotePDF(
     data.discount > 0 && data.discountReason?.trim()
       ? Math.min(2, doc.splitTextToSize(data.discountReason.trim(), 120).length)
       : 0;
-  const summaryRows = 2 + (data.discount > 0 ? 1 : 0);
+  const hasTravel = (data.travelCharge ?? 0) > 0;
+  const travelDetailVisible = hasTravel
+    && typeof data.travelKm === 'number'
+    && typeof data.billableTravelKm === 'number'
+    && typeof data.travelBlocks === 'number';
+  const summaryRows = 2 + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0);
+  const travelDetailGap = travelDetailVisible ? 4.2 : 0;
   const summaryTopPadding = 8;
   const summaryRowGap = 6;
   const summaryReasonGap = discountReasonLines > 0 ? 4.2 + discountReasonLines * 3.8 : 0;
@@ -631,6 +654,7 @@ export async function generateQuotePDF(
     summaryTopPadding +
     summaryRows * summaryRowGap +
     summaryReasonGap +
+    travelDetailGap +
     summaryTotalGap +
     summaryBottomPadding;
 
@@ -658,6 +682,23 @@ export async function generateQuotePDF(
   priceY += summaryRowGap;
   doc.text(t.extrasTotal, left + 4, priceY);
   doc.text(`${data.extrasPrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+  if (hasTravel) {
+    priceY += summaryRowGap;
+    doc.text(t.travel, left + 4, priceY);
+    doc.text(`${(data.travelCharge ?? 0).toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+    if (travelDetailVisible) {
+      priceY += 4.2;
+      doc.setTextColor(...muted);
+      doc.setFontSize(7.5);
+      doc.text(
+        t.travelDetail(data.travelKm!, data.billableTravelKm!, data.travelBlocks!),
+        left + 4,
+        priceY,
+      );
+      doc.setTextColor(...neutral);
+      doc.setFontSize(9);
+    }
+  }
   if (data.discount > 0) {
     priceY += summaryRowGap;
     doc.text(t.discount, left + 4, priceY);

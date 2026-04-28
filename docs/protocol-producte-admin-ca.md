@@ -5614,6 +5614,28 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #444 — 2026-04-28 — claude (FET)
+**Bug crític fixat: el PDF del pressupost no mostrava la línia de transport (els 40€ extra apareixien al total sense desglossament). Ara apareix com a línia explícita amb km/trams.**
+- Context: l'usuari va detectar al pressupost de Silvia Sanchez que el total era 265€ quan l'esperat era 225€ (preu sol·licitat + descompte). La diferència de 40€ corresponia a 2 trams de transport (TRAVEL_BLOCK_EUR=20€ × 2) que es **sumaven al total però no apareixien com a línia visible al PDF**. La preview admin (`StudioPreview.tsx`) sí els mostrava (línies 86-93), però la generació del PDF (`generateQuotePDF` a `lib/pdf-utils.ts`) no els rebia ni renderitzava.
+- `lib/pdf-utils.ts`:
+  - `QuoteData` afegeix 4 camps opcionals: `travelCharge?: number`, `travelKm?: number`, `billableTravelKm?: number`, `travelBlocks?: number`. Tots opcionals per retrocompatibilitat (proposals antigues continuen funcionant).
+  - Traduccions afegides als 3 locales (ca/es/en): `travel` (label) + `travelDetail(km, billable, blocks)` (línia secundària amb km/trams).
+  - Lògica del summary card amplia 1 fila quan `travelCharge > 0`, amb detall opcional `1.0 km totals · 5 km facturables · 1 tram` en text muted just sota la línia principal. Càlcul d'alçada (`summaryHeight`) actualitzat amb `travelDetailGap` perquè el card creixi correctament i la secció `Condicions` no se solapi.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx` · `buildPdf`: passa els 4 camps de transport al `generateQuotePDF`. Abans aquests valors només es feien servir al `total` (línia 279) i a la preview, però no es propagaven al PDF.
+- Comportament:
+  - Si la proposta té `travelCharge > 0` → apareix línia "Desplaçament: X€" amb detall km/trams al PDF.
+  - Si és 0 (lloc sense distància calculada o dins els 50 km inclosos) → no apareix la línia (com abans).
+  - El `total` no canvia: ja era correcte, només invisible el desglossament.
+- Aquest tall **NO** modifica:
+  - El càlcul del `total` ni les regles de transport (km inclosos, mida de bloc, preu per bloc) — només la **visibilitat**.
+  - El contracte ni la generació de proposta ni el flux d'enviament. Només el PDF.
+  - Els proposals desats abans d'aquest fix (els seus PDFs regenerats automàticament tindran ara la línia visible).
+- Verificació del tall: `npx tsc --noEmit` OK · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `444`; el següent canvi real ha de ser `#445`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #443 — 2026-04-28 — claude (FET)
 **Llistat de leads amaga `LOST` per defecte; toggle visible per mostrar-los quan calgui.**
 - Context: l'usuari es queixava que veure `/admin/leads` amb tots els leads perduts barrejats era soroll diari ("em dona toc veure-ho ple"). Esborrar-los no és bona idea — alimenten `LossSummary`, reactivació i reporting (#358-#367). La solució correcta és amagar-los visualment per defecte.
