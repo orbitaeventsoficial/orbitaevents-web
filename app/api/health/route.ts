@@ -2,6 +2,8 @@
 // Endpoint para monitorizar estado del sistema.
 
 import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import {
   applySentryHealth,
   checkDatabaseHealth,
