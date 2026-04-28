@@ -15,7 +15,7 @@ type ProposalItem = {
   total: number;
   createdAt: string;
   sentAt: string | null;
-  customerId: string;
+  customerId: string | null;
   leadId: string | null;
   customer: { name: string; email: string } | null;
 };
@@ -86,7 +86,9 @@ export default function ProposalsList({
     .reduce((sum, proposal) => sum + proposal.total, 0);
 
   const getProposalHref = (proposal: ProposalItem) =>
-    buildCustomerProposalHref(proposal.customerId, proposal.id);
+    proposal.customerId
+      ? buildCustomerProposalHref(proposal.customerId, proposal.id)
+      : `/admin/presupuestos/${proposal.id}`;
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -214,9 +216,13 @@ export default function ProposalsList({
                     {proposal.reference}
                   </Link>
                   <p className="truncate text-sm opacity-70">
-                    <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
-                      {proposal.customer?.name || 'Sense nom'}
-                    </Link>
+                    {proposal.customerId ? (
+                      <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                        {proposal.customer?.name || 'Sense nom'}
+                      </Link>
+                    ) : (
+                      <span className="opacity-60">Sense client assignat</span>
+                    )}
                   </p>
                 </div>
                 <StatusBadge status={proposal.status} />
@@ -259,7 +265,7 @@ export default function ProposalsList({
                     </button>
                   </>
                 )}
-                {proposal.customer && (
+                {proposal.customer && proposal.customerId && (
                   <Link
                     href={`/admin/clientes/${proposal.customerId}`}
                     className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
@@ -313,9 +319,13 @@ export default function ProposalsList({
                     <span className="ml-2 sm:hidden"><StatusBadge status={proposal.status} /></span>
                   </td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
-                      {proposal.customer?.name || 'Sense nom'}
-                    </Link>
+                    {proposal.customerId ? (
+                      <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                        {proposal.customer?.name || 'Sense nom'}
+                      </Link>
+                    ) : (
+                      <span className="opacity-60">Sense client assignat</span>
+                    )}
                     <p className="max-w-[200px] truncate text-xs opacity-50">{proposal.customer?.email}</p>
                   </td>
                   <td className="hidden px-4 py-3 sm:table-cell">
@@ -365,7 +375,7 @@ export default function ProposalsList({
                             </button>
                           </>
                         )}
-                        {proposal.customer && (
+                        {proposal.customer && proposal.customerId && (
                           <Link
                             href={`/admin/clientes/${proposal.customerId}`}
                             className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"

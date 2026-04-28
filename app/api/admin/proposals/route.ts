@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { createAdminProposal, listAdminProposals } from '@/lib/services/proposalAdminService';
 
 const createProposalSchema = z.object({
-  customerId: z.string().min(1),
+  customerId: z.string().min(1).optional(),
   leadId: z.string().optional(),
   bookingId: z.string().optional(),
   status: z.nativeEnum(ProposalStatus).optional(),

@@ -11,7 +11,7 @@ type ProposalListInput = {
 };
 
 type ProposalCreateInput = {
-  customerId: string;
+  customerId?: string;
   leadId?: string;
   bookingId?: string;
   status?: ProposalStatus;
@@ -107,10 +107,12 @@ export async function listAdminProposals(input: ProposalListInput) {
 
 export async function createAdminProposal(data: ProposalCreateInput) {
   const reference = await generateProposalReference();
-  const customer = await prisma.customer.findUnique({
-    where: { id: data.customerId },
-    select: { preferredLocale: true },
-  });
+  const customer = data.customerId
+    ? await prisma.customer.findUnique({
+        where: { id: data.customerId },
+        select: { preferredLocale: true },
+      })
+    : null;
   const resolvedLocale = (data.locale || customer?.preferredLocale || 'ca').toLowerCase();
 
   const proposal = await prisma.proposal.create({

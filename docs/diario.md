@@ -1,3 +1,15 @@
+## 2026-04-28 — Canvi #437: A.2 — `Proposal.customerId` nullable, pressupost ja no obliga client (claude)
+- L'usuari portava demanant des del primer moment poder crear un pressupost sense haver d'assignar client immediatament i poder assignar-lo després a client/lead/booking. A.2 del §6.18 (Camí 1, P1) tanca aquesta fricció.
+- `prisma/schema.prisma`: `Proposal.customerId String` → `String?`; `customer Customer @relation(...onDelete: Cascade)` → `Customer? @relation(...onDelete: SetNull)`. Esborrar un client ja no esborra les seves propostes — passen a orfes.
+- `prisma/migrations/20260508120000_proposal_customer_optional/migration.sql` (nou, additiu pur): drop FK → alter column drop NOT NULL → re-add FK ON DELETE SET NULL. 0 risc de pèrdua de dades. Aplicat a Railway via `railway run prisma migrate deploy`.
+- `lib/services/proposalAdminService.ts`: `ProposalCreateInput.customerId` esdevé opcional. `createAdminProposal` consulta `customer.findUnique` només si hi ha customerId; locale defaulteja a `'ca'` si no hi ha customer.
+- `app/api/admin/proposals/route.ts`: Zod customerId pasa a `.optional()`.
+- `lib/services/contractService.ts` + `lib/services/proposalDispatchService.ts`: guards explícits — pressupost orfe no pot generar/enviar contracte ni ser enviat per email; missatge clar "Vincula un client abans de generar/enviar".
+- `app/admin/presupuestos/ProposalsList.tsx`: `ProposalItem.customerId: string | null`; 4 Links a `/admin/clientes/${customerId}` ara protegits amb guard; quan no hi ha customer es mostra "Sense client assignat" i el botó pressupost porta a `/admin/presupuestos/{id}`.
+- 1 test nou a `proposalAdminService.test.ts` — suite 10/10 verda.
+- NO toca: FKs leadId/bookingId (ja nullable), generació PDF (funciona orfe), Booking.proposalId. UI per re-assignar pressupost orfe a una entitat queda per A.3 (tall separat).
+- Validació: `validate:core` OK 12 guards · `qa:protocol` OK (current #437).
+
 ## 2026-04-28 — Canvi #436: §6.18 nou — backlog d'auditoria CRMs top documentat (claude)
 - L'usuari ha demanat fer una auditoria contra els CRMs top i deixar-la documentada al checklist per atacar després. La feedback acumulada de setmanes (lead→client, auto-km, pressupost lligat opcional, etc.) queda ara formalitzada al protocol amb nomenclatura estable.
 - `docs/protocol-producte-admin-ca.md` · §6.18 (nou): "Auditoria CRMs top — backlog d'incorporacions" amb 27 ítems contra HubSpot/Pipedrive/Monday/Zoho/Salesforce + Tave/Honeybook (els dos referents per events). Agrupats en 7 àrees: A (lead→client→pressupost→reserva, ja FET A.1 al #435), B (auto-càlcul intel·ligent — USP), C (comunicació multi-canal), D (dashboards executius), E (mòbil i camp), F (integracions externes), G (portal client/onboarding).

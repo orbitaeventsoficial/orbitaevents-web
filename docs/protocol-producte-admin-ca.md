@@ -5614,6 +5614,24 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #437 — 2026-04-28 — claude (FET)
+**A.2 del §6.18: pressupost lligat a entitat flexible — `Proposal.customerId` passa a nullable amb FK SET NULL. Un pressupost ja no obliga a tenir client assignat.**
+- Context: l'usuari portava demanant explícitament des del primer moment "que no m'obligui a assignar client a un pressupost, però que el pugui assignar després a client/lead/booking". Fins ara `Proposal.customerId String` (NOT NULL) + FK `Customer @relation(...onDelete: Cascade)` obligava a triar client al moment de crear pressupost. A.2 del §6.18 (Camí 1 P1) tanca aquesta fricció amb un canvi schema additiu i compatible.
+- `prisma/schema.prisma`: `Proposal.customerId String` → `String?` i `customer Customer @relation(...onDelete: Cascade)` → `Customer? @relation(...onDelete: SetNull)`. Esborrar un client deixa de matar les seves propostes — passen a orfes en lloc de cascada.
+- `prisma/migrations/20260508120000_proposal_customer_optional/migration.sql` (nou, 8 línies, additiu pur): `DROP CONSTRAINT proposals_customerId_fkey` + `ALTER COLUMN customerId DROP NOT NULL` + `ADD CONSTRAINT ... ON DELETE SET NULL`. Sense pèrdua de dades — totes les propostes existents tenen customerId, només la columna deixa de ser obligatòria. Aplicat a Railway via `railway run prisma migrate deploy` ("All migrations have been successfully applied").
+- `lib/services/proposalAdminService.ts`: `ProposalCreateInput.customerId: string` → `customerId?: string`. `createAdminProposal` ara consulta `customer.findUnique` només si hi ha customerId; locale defaulteja a `'ca'` si no hi ha customer ni `data.locale` explícit.
+- `app/api/admin/proposals/route.ts`: Zod `customerId: z.string().min(1)` → `z.string().min(1).optional()`.
+- `lib/services/contractService.ts`: `renderContractPDF` i `sendContract` ara llencen error explícit ("Aquest pressupost no té client assignat. Vincula un client abans de generar/enviar el contracte.") si `proposal.customer` és null al moment de generar/enviar contracte. Pressupost orfe pot existir; contracte requereix customer.
+- `lib/services/proposalDispatchService.ts`: `sendAdminProposal` retorna `400` amb missatge clar si la proposta no té client; reescriu el flux intern per usar variables `customer`/`customerId` desestructurades després del guard, eliminant les referències a `existing.customer.email`/`.name`/`.customerId` que ara serien `string | null`.
+- `app/admin/presupuestos/ProposalsList.tsx`: `ProposalItem.customerId: string` → `string | null`. Els 4 punts on es construïa `<Link href={`/admin/clientes/${proposal.customerId}`}>` ara es protegeixen amb `proposal.customerId ? <Link>...</Link> : <span>Sense client assignat</span>`. `getProposalHref` defaulteja a `/admin/presupuestos/{id}` (workspace propi) quan no hi ha customerId.
+- `__tests__/lib/services/proposalAdminService.test.ts`: 1 test nou — `crea proposta sense customerId (orfe)` afirma `customer.findUnique` no es crida i `proposal.create` rep `customerId: undefined` + `locale: 'ca'`. Suite: 10/10 verds.
+- Aquest tall **NO** toca: les FKs de `Proposal.leadId`/`bookingId` (ja eren nullable de fa temps), ni el flux de `Booking.proposalId` (independent), ni la generació de PDF de pressupost (continua funcionant amb o sense customer al snapshot). Tampoc afegeix UI per re-assignar pressupost orfe a una entitat — això és A.3 del §6.18 i va com a tall separat.
+- Verificació del tall: `npx prisma generate` OK · `pnpm exec vitest run __tests__/lib/services/proposalAdminService.test.ts` OK (10 tests) · `pnpm run validate:core` OK amb 12 guards · `prisma migrate deploy` aplicat a Railway · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `437`; el següent canvi real ha de ser `#438`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #436 — 2026-04-28 — claude (FET)
 **Documentat el backlog complet d'auditoria CRM al §6.18 — 27 ítems contra HubSpot/Pipedrive/Monday/Zoho/Salesforce + Tave/Honeybook, agrupats en 7 àrees (A-G) i 3 camins prioritzats.**
 - Context: l'usuari ha demanat explícitament fer una auditoria contra els CRMs top i deixar-la documentada al checklist per atacar després. La feedback que arriba al sistema porta setmanes acumulant-se sense quedar registrada al protocol — ara queda formalitzada al checklist amb nomenclatura estable (A-G) i tags de criticitat (`[BLOC]` mai pot faltar · `[BÀSIC]` sentit comú · `[USP]` diferenciador d'Òrbita) perquè qualsevol agent futur pugui reprendre-la sense context oral.

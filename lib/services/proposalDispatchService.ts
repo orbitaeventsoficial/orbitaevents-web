@@ -23,6 +23,18 @@ export async function sendAdminProposal(id: string) {
     return { status: 404, body: { ok: false, error: 'Pressupost no trobat' } };
   }
 
+  const customer = existing.customer;
+  const customerId = existing.customerId;
+  if (!customer || !customerId) {
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: 'Aquest pressupost no té client assignat. Vincula un client abans d\'enviar-lo.',
+      },
+    };
+  }
+
   let ensuredLeadId = existing.leadId || null;
 
   if (!ensuredLeadId) {
@@ -32,7 +44,7 @@ export async function sendAdminProposal(id: string) {
 
     const reusableLead = await prisma.lead.findFirst({
       where: {
-        OR: [{ customerId: existing.customerId }, { email: existing.customer.email }],
+        OR: [{ customerId: customerId }, { email: customer.email }],
         status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'] },
       },
       orderBy: { updatedAt: 'desc' },
@@ -44,9 +56,9 @@ export async function sendAdminProposal(id: string) {
     } else {
       const createdLead = await prisma.lead.create({
         data: {
-          customerId: existing.customerId,
-          name: existing.customer.name || String(snapshotCustomer.name || 'Client'),
-          email: existing.customer.email,
+          customerId: customerId,
+          name: customer.name || String(snapshotCustomer.name || 'Client'),
+          email: customer.email,
           phone: snapshotCustomer.phone ? String(snapshotCustomer.phone) : null,
           eventType: mapLeadEventType(snapshot.eventType),
           eventDate: parseDateOrNull(snapshotEvent.date),
@@ -81,7 +93,7 @@ export async function sendAdminProposal(id: string) {
   });
 
   await recordCustomerProposalSent({
-    customerId: proposal.customerId,
+    customerId,
     proposalId: proposal.id,
     reference: proposal.reference,
     total: proposal.total,
@@ -91,7 +103,7 @@ export async function sendAdminProposal(id: string) {
     title: `Seguiment pressupost ${proposal.reference}`,
     description: 'Contactar client per confirmar resposta al pressupost enviat.',
     leadId: proposal.leadId || proposal.lead?.id || ensuredLeadId,
-    customerId: proposal.customerId,
+    customerId,
     bookingId: proposal.bookingId,
     proposalId: proposal.id,
   });

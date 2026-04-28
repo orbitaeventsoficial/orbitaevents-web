@@ -122,6 +122,9 @@ async function renderContractPDF(proposalId: string): Promise<{
       booking: { include: { pack: { include: { translations: true } }, extras: { include: { extra: { include: { translations: true } } } } } },
     },
   });
+  if (!proposal.customer) {
+    throw new Error('Aquest pressupost no té client assignat. Vincula un client abans de generar el contracte.');
+  }
 
   if (proposal.status !== 'ACCEPTED') {
     throw new Error('Només es pot generar un contracte d\'una proposta acceptada');
@@ -238,6 +241,9 @@ export async function sendContract(proposalId: string): Promise<void> {
     include: { customer: true },
   });
 
+  if (!proposal.customer) {
+    throw new Error('Aquest pressupost no té client assignat. Vincula un client abans d\'enviar el contracte.');
+  }
   if (!proposal.contractReference || !proposal.contractStatus) {
     throw new Error('Cal generar el contracte primer');
   }

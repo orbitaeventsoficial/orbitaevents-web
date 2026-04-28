@@ -113,6 +113,27 @@ describe('createAdminProposal', () => {
       })
     );
   });
+
+  it('crea proposta sense customerId (orfe) — defaulteja locale a "ca" sense consultar customer', async () => {
+    const result = await createAdminProposal({
+      currency: 'EUR',
+      validityDays: 30,
+      subtotal: 500,
+      discount: 0,
+      vatRate: 21,
+      vatAmount: 105,
+      total: 605,
+      snapshot: {},
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockPrisma.customer.findUnique).not.toHaveBeenCalled();
+    expect(mockPrisma.proposal.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ locale: 'ca', customerId: undefined }),
+      })
+    );
+  });
 });
 
 describe('getAdminProposalById', () => {
