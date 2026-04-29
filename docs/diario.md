@@ -1,3 +1,12 @@
+## 2026-04-29 — Canvi #446: B.7 — auto-pricing per data (cap setmana, temporada, Nadal, Nochevieja) (claude)
+- B.7 del §6.18 Camí 2 (P2). USP brutal: la data automàticament ajusta preu sense que l'usuari hagi de pensar-hi.
+- `lib/constants/pricingRules.ts` (nou): 4 regles canòniques amb i18n. weekend +10%, high-season +15%, christmas +25%, new-year-eve +50%. Tie-break per multiplicador més alt + priority.
+- `lib/services/pricing/datePricingService.ts` (nou): `applyDatePricing(basePrice, eventDate, locale, rules?)` purament funcional. Wrap-around correcte (Nadal Dec 15 → Jan 6). Sanititza dades invàlides.
+- 19 tests purs verds.
+- PdfStudio: total inclou recàrrec automàtic. Snapshot del draft. Propaga al PDF i Preview. StudioPreview renderitza línia amb badge "+15% sobre preu base". pdf-utils QuoteData rep 3 camps opcionals i renderitza línia entre extres i transport amb mateix patró.
+- NO toca: schema Prisma (regles canòniques al codi), transport ni descompte, emails/contracte.
+- Validació: 19 tests OK · `tsc` OK · `validate:core` 12/12 OK · `qa:protocol` OK (current #446).
+
 ## 2026-04-29 — Canvi #445: logo planeta visible sencer al PDF (header 26→32mm, logo 14→22mm) (claude)
 - Bug detectat per usuari: logo planeta tallat al PDF. Causa: caixa logo 52×14mm, els logos quadrats acabaven a 14×14mm — petits i sembla retallats.
 - `pdf-utils.ts` · `drawHeader` (pressupost): header non-compact 26→32mm; `fitWithin` 52×14→52×22 (logo quadrat passa de 14×14 a 22×22, +57% àrea). Text reposicionat (brandName y+13, quote y+22, ref y+10, issueDate y+16, validity y+22) sense solapaments.

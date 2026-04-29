@@ -5,6 +5,7 @@ import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import { log } from '@/lib/logger';
@@ -275,9 +276,15 @@ export default function PresupuestoPdfStudio({
     [travelKm]
   );
 
+  const datePricing = useMemo(
+    () => applyDatePricing(basePrice, eventDate || null, locale),
+    [basePrice, eventDate, locale],
+  );
+  const seasonSurcharge = datePricing.surchargeEur;
+
   const total = useMemo(() => {
-    return Math.max(0, basePrice + extrasPrice + travelCharge - Math.max(0, discount));
-  }, [basePrice, extrasPrice, travelCharge, discount]);
+    return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge - Math.max(0, discount));
+  }, [basePrice, seasonSurcharge, extrasPrice, travelCharge, discount]);
 
   useEffect(() => {
     const destination = eventLocation.trim();
@@ -690,6 +697,9 @@ export default function PresupuestoPdfStudio({
         extrasPrice,
         travelKm,
         travelCharge,
+        seasonSurcharge,
+        seasonLabel: datePricing.appliedRule?.label,
+        seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
         discount,
         discountReason: discountReason.trim(),
         total,
@@ -741,7 +751,7 @@ export default function PresupuestoPdfStudio({
   ): Promise<string | null> => {
     if (!customerId || !selectedPack) return null;
 
-    const subtotal = Math.max(0, Number(basePrice) || 0) + extrasPrice + travelCharge;
+    const subtotal = Math.max(0, Number(basePrice) || 0) + seasonSurcharge + extrasPrice + travelCharge;
     const discountSafe = Math.max(0, Number(discount) || 0);
     const vatRate = 21;
     const baseAfterDiscount = Math.max(0, subtotal - discountSafe);
@@ -886,6 +896,9 @@ export default function PresupuestoPdfStudio({
         travelKm,
         billableTravelKm,
         travelBlocks,
+        seasonSurcharge,
+        seasonLabel: datePricing.appliedRule?.label,
+        seasonPct: datePricing.appliedRule ? datePricing.surchargePct : undefined,
         discount: Math.max(0, Number(discount) || 0),
         discountReason: discountReason.trim(),
         total,
@@ -911,7 +924,7 @@ export default function PresupuestoPdfStudio({
 
   async function buildContract() {
     if (!selectedPack) return null;
-    const subtotal = Math.max(0, basePrice + extrasPrice + travelCharge);
+    const subtotal = Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge);
     const discountSafe = Math.max(0, discount);
     const vatRate = 21;
     const base = Math.max(0, subtotal - discountSafe);
@@ -1453,6 +1466,9 @@ export default function PresupuestoPdfStudio({
         travelKm={travelKm}
         billableTravelKm={billableTravelKm}
         travelBlocks={travelBlocks}
+        seasonSurcharge={seasonSurcharge}
+        seasonLabel={datePricing.appliedRule?.label}
+        seasonPct={datePricing.appliedRule ? datePricing.surchargePct : undefined}
         discount={discount}
         total={total}
         locale={locale}

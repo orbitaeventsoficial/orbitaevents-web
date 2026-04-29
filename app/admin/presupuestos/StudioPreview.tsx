@@ -25,6 +25,9 @@ export type StudioPreviewProps = {
   travelKm: number;
   billableTravelKm: number;
   travelBlocks: number;
+  seasonSurcharge?: number;
+  seasonLabel?: string;
+  seasonPct?: number;
   discount: number;
   total: number;
   locale: Locale;
@@ -78,6 +81,17 @@ export default function StudioPreview(props: StudioPreviewProps) {
             <span>Base</span>
             <span>{formatEUR(props.basePrice)}</span>
           </div>
+          {props.seasonSurcharge && props.seasonSurcharge > 0 && props.seasonLabel ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span>{props.seasonLabel}</span>
+                <span>+{formatEUR(props.seasonSurcharge)}</span>
+              </div>
+              {typeof props.seasonPct === 'number' && (
+                <div className="text-xs">+{props.seasonPct.toFixed(0)}% sobre el preu base</div>
+              )}
+            </>
+          ) : null}
           <div className="flex items-center justify-between">
             <span>Extres</span>
             <span>{formatEUR(props.extrasPrice)}</span>

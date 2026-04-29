@@ -276,6 +276,12 @@ export interface QuoteData {
   billableTravelKm?: number;
   /** Nombre de trams de transport facturats. */
   travelBlocks?: number;
+  /** Recàrrec aplicat per regla temporal (€) — alta temporada, festiu, cap setmana, etc. */
+  seasonSurcharge?: number;
+  /** Etiqueta visible del recàrrec temporal (ja localitzada). */
+  seasonLabel?: string;
+  /** Percentatge del recàrrec sobre el preu base. */
+  seasonPct?: number;
   discount: number;
   discountReason: string;
   total: number;
@@ -645,8 +651,11 @@ export async function generateQuotePDF(
     && typeof data.travelKm === 'number'
     && typeof data.billableTravelKm === 'number'
     && typeof data.travelBlocks === 'number';
-  const summaryRows = 2 + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0);
+  const hasSeason = (data.seasonSurcharge ?? 0) > 0 && typeof data.seasonLabel === 'string';
+  const seasonDetailVisible = hasSeason && typeof data.seasonPct === 'number';
+  const summaryRows = 2 + (hasSeason ? 1 : 0) + (hasTravel ? 1 : 0) + (data.discount > 0 ? 1 : 0);
   const travelDetailGap = travelDetailVisible ? 4.2 : 0;
+  const seasonDetailGap = seasonDetailVisible ? 4.2 : 0;
   const summaryTopPadding = 8;
   const summaryRowGap = 6;
   const summaryReasonGap = discountReasonLines > 0 ? 4.2 + discountReasonLines * 3.8 : 0;
@@ -657,6 +666,7 @@ export async function generateQuotePDF(
     summaryRows * summaryRowGap +
     summaryReasonGap +
     travelDetailGap +
+    seasonDetailGap +
     summaryTotalGap +
     summaryBottomPadding;
 
@@ -684,6 +694,19 @@ export async function generateQuotePDF(
   priceY += summaryRowGap;
   doc.text(t.extrasTotal, left + 4, priceY);
   doc.text(`${data.extrasPrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+  if (hasSeason) {
+    priceY += summaryRowGap;
+    doc.text(data.seasonLabel!, left + 4, priceY);
+    doc.text(`+${(data.seasonSurcharge ?? 0).toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+    if (seasonDetailVisible) {
+      priceY += 4.2;
+      doc.setTextColor(...muted);
+      doc.setFontSize(7.5);
+      doc.text(`+${data.seasonPct!.toFixed(0)}% sobre el preu base`, left + 4, priceY);
+      doc.setTextColor(...neutral);
+      doc.setFontSize(9);
+    }
+  }
   if (hasTravel) {
     priceY += summaryRowGap;
     doc.text(t.travel, left + 4, priceY);

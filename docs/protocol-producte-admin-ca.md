@@ -5614,6 +5614,35 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #446 — 2026-04-29 — claude (FET)
+**B.7 del §6.18: auto-pricing per data — caps de setmana, alta temporada, Nadal, Nochevieja amb regla canònica + servei pur + integració PDF/preview.**
+- Context: B.7 del §6.18 Camí 2 (P2). L'usuari valora el USP brutal del càlcul automàtic; B.6 (#444) va fer transport visible. Aquesta peça afegeix recàrrec automàtic per data: si l'event cau en cap de setmana, alta temporada o festiu, el preu base s'ajusta i apareix com a línia explícita al pressupost.
+- `lib/constants/pricingRules.ts` (nou): `DATE_PRICING_RULES` declaratives. 4 regles canòniques amb i18n (ca/es/en):
+  - `weekend` (divendres+dissabte): +10%
+  - `high-season` (1 juny → 30 setembre): +15%
+  - `christmas` (15 desembre → 6 gener, wrap-around): +25%
+  - `new-year-eve` (31 desembre fixed): +50%
+  Cada regla té `id`, `kind` ('recurring-weekday' | 'date-range' | 'fixed-date'), `multiplier`, `label.{ca,es,en}`, `priority` per tie-break.
+- `lib/services/pricing/datePricingService.ts` (nou): `applyDatePricing(basePrice, eventDate, locale, rules?)` retorna `{ basePrice, finalPrice, surchargeEur, surchargePct, appliedRule? }` purament funcional. `findApplicableRule` selecciona la regla amb multiplicador més alt, tie-break per priority. Sanititza preu negatiu, data invàlida i null. Wrap-around correcte per regles que travessen any (Nadal Dec 15 → Jan 6).
+- `__tests__/lib/services/pricing/datePricingService.test.ts` (nou): 19 tests purs. Cobertura: dates ordinàries (null), tots els kinds (weekday, range, fixed), wrap-around, priority tie-break (Nochevieja > Nadal), labels i18n, arrodoniment 2 decimals, sanitització base negativa, regles custom injectades.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: importa `applyDatePricing`. Computa `datePricing` + `seasonSurcharge` reactivament a `eventDate/basePrice/locale`. Total inclou ara `basePrice + seasonSurcharge + extrasPrice + travelCharge - discount`. Snapshot al draft (`pricing.seasonSurcharge`, `seasonLabel`, `seasonPct`) per persistència. Passa els 3 camps al `generateQuotePDF` i a `<StudioPreview>`.
+- `app/admin/presupuestos/StudioPreview.tsx`: 3 props opcionals (`seasonSurcharge`, `seasonLabel`, `seasonPct`). Renderitza línia "Recàrrec ..." amb badge "+10% sobre el preu base" només si `seasonSurcharge > 0`.
+- `lib/pdf-utils.ts` · `QuoteData` afegeix 3 camps opcionals (`seasonSurcharge`, `seasonLabel`, `seasonPct`). Summary card creix dinàmicament: `summaryRows` puja a +1 quan `hasSeason`, `seasonDetailGap` afegeix l'alçada del subtítol amb percentatge. Render entre `extrasTotal` i `travel`. Patró idèntic al de `travel` (línia + subtítol muted) per consistència.
+- Comportament:
+  - Event en dilluns ordinari → cap recàrrec, preu igual a abans.
+  - Event en dissabte de juliol → +15% (alta temporada guanya cap de setmana per multiplicador més alt).
+  - Event 31 desembre → +50% (Nochevieja específica guanya regla Nadal genèrica).
+  - PDF mostra la línia "Recàrrec alta temporada: +150€" amb subtítol "+15% sobre el preu base".
+- Aquest tall **NO** toca:
+  - Schema Prisma (les regles són canòniques al codi; si un dia cal CRUD per usuari, futures iteracions schema/CRUD).
+  - El càlcul de transport ni descompte.
+  - El flow d'enviament d'email ni contracte (les proposals existents continuen sense recàrrec; les noves o regenerades l'apliquen).
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/pricing/datePricingService.test.ts` OK (19 tests) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `446`; el següent canvi real ha de ser `#447`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #445 — 2026-04-29 — claude (FET)
 **Logo planeta es veu sencer: header del PDF (pressupost i contracte) ampliat de 26→32mm i caixa logo de 52×14→52×22mm.**
 - Context: l'usuari va detectar que el logo planeta apareixia tallat al PDF del pressupost. Inspecció: la caixa de logo era 52×14mm i `fitWithin` redueix proporcionalment per encabir-hi tot, així que un logo quadrat (planeta sol) només ocupava 14×14mm — molt petit i sembla retallat per la mida absoluta.
