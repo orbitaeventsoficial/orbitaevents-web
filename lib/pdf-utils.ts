@@ -450,7 +450,9 @@ export async function generateQuotePDF(
   };
 
   const drawHeader = (compact: boolean) => {
-    const headerHeight = compact ? 16 : 26;
+    // Header alt augmentat (26→32mm) perquè el logo càpiga sencer i visible.
+    // Caixa logo de 52×14mm passa a 52×22mm — un planeta quadrat es veu a 22×22 (abans 14×14).
+    const headerHeight = compact ? 16 : 32;
     drawCard(left, y, contentWidth, headerHeight, 3, true);
 
     const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
@@ -461,9 +463,9 @@ export async function generateQuotePDF(
       try {
         const fmt = getImageFormatFromDataUrl(logoSource);
         const props = doc.getImageProperties(logoSource);
-        const fitted = fitWithin(props.width, props.height, 52, 14);
+        const fitted = fitWithin(props.width, props.height, 52, 22);
         const logoX = left + 5;
-        const logoY = y + 5 + (14 - fitted.height) / 2;
+        const logoY = y + (headerHeight - fitted.height) / 2;
         doc.addImage(logoSource, fmt, logoX, logoY, fitted.width, fitted.height);
         logoBlockWidth = fitted.width + 8;
       } catch {
@@ -477,20 +479,20 @@ export async function generateQuotePDF(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(compact ? 10.5 : 15);
     const brandLine = doc.splitTextToSize(brandName, 78)[0] || brandName;
-    doc.text(brandLine, titleX, y + (compact ? 9 : 11));
+    doc.text(brandLine, titleX, y + (compact ? 9 : 13));
     if (!compact) {
       doc.setTextColor(...accent);
       doc.setFontSize(10);
-      doc.text(t.quote.toUpperCase(), titleX, y + 18.5);
+      doc.text(t.quote.toUpperCase(), titleX, y + 22);
     }
 
     doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 6, y + (compact ? 7 : 8.5), { align: 'right' });
-    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 6, y + (compact ? 11 : 13), { align: 'right' });
+    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 6, y + (compact ? 7 : 10), { align: 'right' });
+    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 6, y + (compact ? 11 : 16), { align: 'right' });
     if (!compact) {
-      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 6, y + 18.5, { align: 'right' });
+      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 6, y + 22, { align: 'right' });
     }
 
     y += headerHeight + 8;
@@ -1067,30 +1069,32 @@ export async function generateContractPDF(
   doc.rect(0, 0, 210, 297, 'F');
 
   // -- Header --
+  // Header alt augmentat (26→32mm) per encabir logo planeta sencer.
   const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
   const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
-  drawCard(left, y, contentWidth, 26, 3, true);
+  const contractHeaderHeight = 32;
+  drawCard(left, y, contentWidth, contractHeaderHeight, 3, true);
   if (hasLogo) {
     try {
       const fmt = getImageFormatFromDataUrl(logoSource);
       const props = doc.getImageProperties(logoSource);
-      const fitted = fitWithin(props.width, props.height, 52, 14);
-      doc.addImage(logoSource, fmt, left + 5, y + 5 + (14 - fitted.height) / 2, fitted.width, fitted.height);
+      const fitted = fitWithin(props.width, props.height, 52, 22);
+      doc.addImage(logoSource, fmt, left + 5, y + (contractHeaderHeight - fitted.height) / 2, fitted.width, fitted.height);
     } catch { /* fallback */ }
   }
   doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(brandName, hasLogo ? left + 62 : left + 6, y + 11);
+  doc.text(brandName, hasLogo ? left + 62 : left + 6, y + 13);
   doc.setTextColor(...accent);
   doc.setFontSize(10);
-  doc.text(t.title, hasLogo ? left + 62 : left + 6, y + 18.5);
+  doc.text(t.title, hasLogo ? left + 62 : left + 6, y + 22);
   doc.setTextColor(...muted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, y + 8.5, { align: 'right' });
-  doc.text(`${t.date}: ${fmtDate(data.contractDate)}`, left + contentWidth - 6, y + 13, { align: 'right' });
-  y += 34;
+  doc.text(`${t.ref}: ${data.contractReference}`, left + contentWidth - 6, y + 10, { align: 'right' });
+  doc.text(`${t.date}: ${fmtDate(data.contractDate)}`, left + contentWidth - 6, y + 16, { align: 'right' });
+  y += contractHeaderHeight + 8;
 
   // -- Parts --
   ensureSpace(55);

@@ -1,3 +1,10 @@
+## 2026-04-29 — Canvi #445: logo planeta visible sencer al PDF (header 26→32mm, logo 14→22mm) (claude)
+- Bug detectat per usuari: logo planeta tallat al PDF. Causa: caixa logo 52×14mm, els logos quadrats acabaven a 14×14mm — petits i sembla retallats.
+- `pdf-utils.ts` · `drawHeader` (pressupost): header non-compact 26→32mm; `fitWithin` 52×14→52×22 (logo quadrat passa de 14×14 a 22×22, +57% àrea). Text reposicionat (brandName y+13, quote y+22, ref y+10, issueDate y+16, validity y+22) sense solapaments.
+- `pdf-utils.ts` · contracte: mateix patró, constant `contractHeaderHeight=32`, caixa logo 52×22, text reposicionat. `y += 34` → `y += contractHeaderHeight + 8`.
+- NO toca: `addHeader` catàleg (ja gran, 50mm/38×38), assets base64.
+- Validació: `tsc` OK · `validate:core` 12/12 OK · `qa:protocol` OK (current #445).
+
 ## 2026-04-28 — Canvi #444: PDF del pressupost mostra ara línia explícita de Desplaçament (claude)
 - Bug detectat per l'usuari amb pressupost real (Silvia Sanchez): total 265€ quan l'esperat era 225€. Els 40€ extra eren 2 trams de transport (calculats automàticament) que se sumaven silencios al total sense aparèixer com a línia visible al PDF.
 - `pdf-utils.ts` · `QuoteData` afegeix camps opcionals: `travelCharge?`, `travelKm?`, `billableTravelKm?`, `travelBlocks?`. Lògica del summary card amplia 1 fila si `travelCharge > 0`, amb subtítol detall (km/trams) en text muted. Traduccions ca/es/en.

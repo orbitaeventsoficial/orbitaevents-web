@@ -5614,6 +5614,18 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #445 — 2026-04-29 — claude (FET)
+**Logo planeta es veu sencer: header del PDF (pressupost i contracte) ampliat de 26→32mm i caixa logo de 52×14→52×22mm.**
+- Context: l'usuari va detectar que el logo planeta apareixia tallat al PDF del pressupost. Inspecció: la caixa de logo era 52×14mm i `fitWithin` redueix proporcionalment per encabir-hi tot, així que un logo quadrat (planeta sol) només ocupava 14×14mm — molt petit i sembla retallat per la mida absoluta.
+- `lib/pdf-utils.ts` · `drawHeader` (pressupost): `headerHeight` non-compact passa de 26→32mm. `fitWithin` per al logo passa de 52×14 a 52×22 — un logo quadrat passa de 14×14 a 22×22 (+57% àrea visible). El text de marca (y+11→y+13), `quote` (y+18.5→y+22), `quoteRef` (y+8.5→y+10), `issueDate` (y+13→y+16) i `validity` (y+18.5→y+22) reposicionats per centrats verticalment al header més alt sense solapaments.
+- `lib/pdf-utils.ts` · contracte (línies ~1070-1100): mateix patró amb constant `contractHeaderHeight = 32` i caixa logo `52×22`. `brandName` (y+11→y+13), `title` (y+18.5→y+22), `ref` (y+8.5→y+10), `date` (y+13→y+16). `y += 34` passa a `y += contractHeaderHeight + 8` (= 40) per donar marge inferior consistent.
+- Aquest tall **NO** toca: `addHeader` (header gran de catàleg, ja és 50mm i logo 38×38mm — suficient), ni `ORBITA_LOGO_BASE64` ni `ORBITA_LOGO_TEXT_DRETA_BASE64` (els assets són correctes).
+- Verificació del tall: `npx tsc --noEmit` OK · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `445`; el següent canvi real ha de ser `#446`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #444 — 2026-04-28 — claude (FET)
 **Bug crític fixat: el PDF del pressupost no mostrava la línia de transport (els 40€ extra apareixien al total sense desglossament). Ara apareix com a línia explícita amb km/trams.**
 - Context: l'usuari va detectar al pressupost de Silvia Sanchez que el total era 265€ quan l'esperat era 225€ (preu sol·licitat + descompte). La diferència de 40€ corresponia a 2 trams de transport (TRAVEL_BLOCK_EUR=20€ × 2) que es **sumaven al total però no apareixien com a línia visible al PDF**. La preview admin (`StudioPreview.tsx`) sí els mostrava (línies 86-93), però la generació del PDF (`generateQuotePDF` a `lib/pdf-utils.ts`) no els rebia ni renderitzava.
