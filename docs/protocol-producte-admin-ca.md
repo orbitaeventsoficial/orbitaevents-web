@@ -800,6 +800,7 @@ Criteri pràctic:
 **FET** *(2026-04-26 per `claude` — Canvi #422)*: el SVG canònic del logo WhatsApp (path `M17.472 14.382c-.297-.149...3.48-8.413z` amb `viewBox="0 0 24 24"` i `fill="currentColor"`) deixa de viure duplicat a 17 ocurrències a 17 fitxers (header, footer, FloatingCTAs ×2, ExitIntentModal, CTAFinal, ProcessSection, MobileHero, MobileCTAUrgency, MobileProcess, MobileAppShell, WhatsAppSticky, BottomCTABar, faq, servicios, experiencias, gracias) i passa a un component canònic `app/components/public/WhatsAppIcon.tsx` que rep tots els `SVGProps<SVGSVGElement>` (className, width, height, fill override, etc.) i renderitza el path inline. ~187 línies netes eliminades. `__tests__/app/components/public/WhatsAppIcon.test.tsx` (3 tests) blinda viewBox + path canònic + fill default, override de fill, propagació de aria-hidden/width/height. NO toca: l'ocurrència de `app/[locale]/contacto/client.tsx` perquè conté **dos paths** (path canònic + un segon path circular outline `M12 0C5.373 0 0 5.373 0 12...`) — variant visual diferent, no la mateixa dada SVG.
 **FET** *(2026-04-26 per `claude` — Canvi #427)*: el patró `await fetch('/api/google-reviews') + await response.json()` deixa de viure replicat a 7 ocurrències a 5 fitxers (`GoogleReviewsRotating.tsx`, `MobileHomePage.tsx`, `opiniones/client.tsx`, `ReviewsSection.tsx` ×3 — `ReviewsSection` default + `ReviewsBadge` + `ReviewsInline`, `admin/google-reviews/page.tsx`) i passa a una funció canònica `lib/api/googleReviewsClient.ts` `fetchPublicGoogleReviews(init?)` que crida l'endpoint i retorna `GoogleReviewsResponse` parsejada (reusa el tipus canònic ja existent a `app/api/google-reviews/reviews-types.ts`). Llança error si `!response.ok` amb el status. Cada caller manté la seva mecànica de state (filter 5★, multi-source merge a opiniones, sync admin) però depèn d'un únic punt per la URL, el shape i el manegament de status. `__tests__/lib/api/googleReviewsClient.test.ts` (3 tests) blinda crida amb URL canònica + parse, error amb status quan no OK, propagació d'`init` (signal/cache).
 **FET** *(2026-04-26 per `claude` — Canvi #430)*: la interface local `GoogleReview` deixa de viure replicada a 4 fitxers consumidors (`GoogleReviewsRotating.tsx`, `MobileHomePage.tsx`, `opiniones/client.tsx`, `admin/google-reviews/page.tsx`) i passa a importar-se canònicament des de `lib/api/googleReviewsClient.ts` (re-exportada des de `app/api/google-reviews/reviews-types.ts`). Cada caller tenia una variant lleugerament diferent (uns sense `time`, altres sense `source`, alguns amb `language` opcional, etc.) — totes redundants perquè la dada que arribava per fetch era sempre la mateixa shape canònica. `lib/api/googleReviewsClient.ts` ara re-exposa `GoogleReview` junt amb `GoogleReviewsResponse` perquè els consumidors només importin un fitxer. ~22 línies netes eliminades. Cap test nou — la canalització és una refactorització pura de tipus sense canvi de shape de runtime; la cobertura existent del client (#427, 3 tests) i dels components SVG (#407 #412 #422) continua validant l'ús. `tsc --noEmit` verd, `validate:core` verd 12/12.
+**FET** *(2026-04-29 per `codex` — Canvi #448)*: els darrers enllaços públics de WhatsApp que encara fabricaven `wa.me` inline passen al helper canònic compartit. `app/[locale]/gracias/page.tsx`, `app/[locale]/boda-halloween/page.tsx` i `app/components/ui/ExitIntentModal.tsx` deixen de concatenar número + `encodeURIComponent(...)` al component i consumeixen `WHATSAPP_URL_WITH_MESSAGE(...)` des de `lib/constants`. El tall tanca l'última bossa visible del `PENDENT CRÍTIC` de §6.12 sobre literals públics compartits fora de `messages/*` + helper `lib/*`. Cobertura nova: `__tests__/app/gracias-page.test.tsx`, `__tests__/app/boda-halloween-page.test.tsx` i `__tests__/app/components/ui/ExitIntentModal.test.tsx` blinden els tres call sites.
 **PENDENT CRÍTIC**:
 - web i admin no poden semblar dos productes diferents
 - els literals públics compartits no poden tornar a `app/config` ni components: han de passar per `messages/*` + helper `lib/*`
@@ -918,25 +919,28 @@ Criteri pràctic:
 
 ## 6.18 Auditoria CRMs top — backlog d'incorporacions
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**FET** *(2026-04-29 per `claude` — Canvi #447)*: regularització documental del Camí 1 i meitat del Camí 2. Els ítems A.2 (#437), A.3 (#438), A.4 (#441), A.5 (#442), B.6 (#444) i B.7 (#446) ja estaven tancats al §9 però seguien llistats com a `SEGÜENT` aquí. Camí 1 ara 100% FET. Camí 2 redueix `SEGÜENT` a B.8 + B.9.
 **FET** *(2026-04-28 per `claude` — Canvi #436)*: backlog complet d'auditoria contra CRMs top documentat (HubSpot, Pipedrive, Monday CRM, Zoho, Salesforce + Tave/Honeybook per events). 27 ítems agrupats en 7 àrees (A-G) amb tag de criticitat (`[BLOC]` mai pot faltar · `[BÀSIC]` sentit comú · `[USP]` diferenciador d'Òrbita) i priorització en 3 camins paral·lels.
 **FET** *(2026-04-28 per `claude` — Canvi #435)*: A.1 — vinculació explícita lead→client amb match per email/DNI/telèfon i feedback explícit. Tancat amb `leadCustomerLinkService` + endpoint + panell + 13 tests.
 **LLEGENDA**: `[BLOC]` mai hauria de faltar a un CRM seriós · `[BÀSIC]` sentit comú a tots els tops · `[USP]` diferenciador d'Òrbita.
 
-### Camí 1 — Eradicar fricció lead → pressupost → reserva (~10-15h, prioritat 1)
-Resol el dolor que l'usuari té cada dia operant amb el sistema. Desbloca tot el flux comercial.
+### Camí 1 — Eradicar fricció lead → pressupost → reserva (~10-15h, prioritat 1) — TANCAT 2026-04-29
+Resol el dolor que l'usuari té cada dia operant amb el sistema. Desbloca tot el flux comercial. Tots els ítems A.1-A.5 tancats.
 
-### SEGÜENT (Camí 1)
-- **A.2 [BLOC] Pressupost lligat a entitat flexible** — el pressupost no ha d'obligar a tenir client assignat. Ha de poder viure orfe (`Tave Project`-style) o lligat a lead/client/booking. HubSpot Deal és el patró canònic: lligams opcionals a Contact/Company/Deal. Implica: schema (`Quote.leadId?`, `Quote.customerId?`, `Quote.bookingId?` tots nullable, FK SET NULL), formulari de creació amb selector multi-entitat opcional, validació "almenys un lligam o cap" sense bloquejar.
-- **A.3 [BLOC] Re-assignar pressupost a una altra entitat** — si avui és d'un lead i demà s'ha de moure a un client/booking, ha de ser drag&drop o canvi al detall. Pipedrive: drag entre Deals; HubSpot: change Deal owner. Implica: endpoint `PATCH /api/admin/proposals/[id]/owner` que canvia `leadId`/`customerId`/`bookingId` amb audit.
-- **A.4 [USP] Mode "client de pas"** — event sense crear customer permanent (cas one-shot, fira, banquet aïllat). Honeybook "Quick contact" pattern. Implica: flag `Booking.transientCustomer: boolean` + UI per crear booking sense Customer obligatori.
-- **A.5 [BÀSIC] Wizard d'1 minut** — pantalla única `lead → pressupost → reserva` amb steps inline, sense saltar entre 3 pàgines. Tave "Quick Project Wizard" és el referent. Implica: nou flow `/admin/quick-create` amb 3 pestanyes condicionals.
+### FET (Camí 1)
+- **A.2 [BLOC] Pressupost lligat a entitat flexible** — `FET` *(Canvi #437)*: `Proposal.customerId` nullable, FK SET NULL, formulari accepta pressupost orfe o lligat opcional a lead/customer/booking, validació "almenys un lligam o cap" sense bloquejar.
+- **A.3 [BLOC] Re-assignar pressupost a una altra entitat** — `FET` *(Canvi #438)*: endpoint `PATCH /api/admin/proposals/[id]/owner` que canvia `leadId`/`customerId`/`bookingId` amb audit; UI al detall del pressupost.
+- **A.4 [USP] Mode "client de pas"** — `FET` *(Canvi #441)*: panell de vinculació al detall del booking amb mode transitori per events one-shot sense customer permanent.
+- **A.5 [BÀSIC] Wizard d'1 minut** — `FET` *(Canvi #442)*: `/admin/quick-create` amb pantalla única + 3 outcomes (`lead`, `lead+proposal`, `lead+proposal+booking`) i servei orquestrador `quickCreateFlow`.
 
 ### Camí 2 — Auto-càlcul brutal com a USP (~8-12h, prioritat 2)
 Amplifica el USP que l'usuari ja té (km + transport autocalculat) i el converteix en la marca diferenciadora.
 
+### FET (Camí 2)
+- **B.6 [USP brutal] Fer estrella visible l'auto-càlcul km + transport** — `FET` *(Canvi #444)*: línia explícita "Desplaçament" al PDF del pressupost amb detall km totals · km facturables · trams. Abans els 40€/2 trams se sumaven al total invisibles.
+- **B.7 [USP] Auto-pricing per data** — `FET` *(Canvi #446)*: `lib/constants/pricingRules.ts` amb 4 regles canòniques (cap de setmana +10%, alta temporada juny-set +15%, Nadal 15dec-6gen +25%, Nochevieja 31dec +50%) + servei pur `applyDatePricing` + integració PDF/preview amb línia "Recàrrec ..." quan aplica.
+
 ### SEGÜENT (Camí 2)
-- **B.6 [USP brutal] Fer estrella visible l'auto-càlcul km + transport** — la peça que més valora l'usuari ja existeix però viu com a feature secundària. Cap CRM general ho té. Convertir-la en hero del pressupost: badge visible "Transport calculat automàticament: X km · Y €" amb breakdown clicable, tooltip explicant la fórmula, CTA "veure ruta" amb Maps embed. Implica: refinement UI a `QuoteForm` + nou component `TransportBreakdownPanel` + tests visuals.
-- **B.7 [USP] Auto-pricing per data** — preu segons cap de setmana, alta temporada (juny-setembre + desembre), festius. Tave/Honeybook tenen `Pricing Rules` per data. Implica: nou model `PricingRule { startDate, endDate, multiplier, label }` + servei `applyDatePricing(basePrice, eventDate)` + UI a `/admin/packs` per gestionar regles.
 - **B.8 [BÀSIC] Auto-suggeriment de pack** — segons `eventType + guestCount + budget`, suggerir el pack que millor encaixa al moment de crear el lead/pressupost. Pipedrive Smart Suggestions, Honeybook templates. Implica: servei `suggestPackForLead(lead): { pack, confidence, reason }` que ja podem aprofitar `LEAD_SCORING_STATUS_PROBABILITY` + capacitat dels packs + budget bracket.
 - **B.9 [BÀSIC] Marge instantani per event visible al pressupost** — cost equip + transport + hores + extras → marge net visible al moment de cotitzar, no només a `/admin/economia`. Tave "Profit calculator" per project. Implica: component `LiveMarginIndicator` al detall de pressupost que reaprofita `costService` ja existent.
 
@@ -965,7 +969,7 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 - **F.21 [FET]** Calendar bidireccional Google/iCal — Canvi #134 ja ho cobreix.
 - **F.24 [USP]** Integració Google Maps a la fitxa client — veure ubicació, distància real. Refinement del B.6 (auto-km).
 
-**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Atacar Camí 1 (10-15h) + verificar abans de saltar a Camí 2. Camí 3 reservat per quan hi hagi flux real que ho justifiqui (no abans de tenir clients estables i operatives diàries que ho demanin).
+**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Camí 1 tancat (#435-#442). Camí 2 a mig drenar — atacar B.8 i B.9 abans de saltar a Camí 3. Camí 3 reservat per quan hi hagi flux real que ho justifiqui (no abans de tenir clients estables i operatives diàries que ho demanin).
 
 **MÉS ENDAVANT**: tractar com a backlog viu — quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tag `[BLOC]/[BÀSIC]/[USP]`.
 
@@ -5610,6 +5614,34 @@ px tsc --noEmit OK · git diff --check OK.
 - Efecte: el §6.12 drena una altra capa de duplicació pública. ~56 línies netes eliminades. Si demà cal afegir variants del logo (mono, outline, icon-only), telemetria de visualització, o substituir-lo per la versió Material Symbols, es resol al component sense tocar els 6 fitxers consumidors.
 - Verificació del tall: `pnpm exec vitest run __tests__/app/components/public/GoogleGIcon.test.tsx` OK (3 tests) · `pnpm run validate:core` OK amb 12 guards · `pnpm run qa:protocol` OK.
 - `ADMIN_CHANGE_COUNTER` puja a `407`; el següent canvi real ha de ser `#408`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #448 — 2026-04-29 — codex (FET)
+**§6.12: els darrers links públics de WhatsApp deixen de construir `wa.me` inline i passen pel helper canònic compartit.**
+- Context: després dels Canvis `#398` (helper `WHATSAPP_URL_WITH_MESSAGE`) i `#422` (component `WhatsAppIcon`), encara quedaven tres call sites públics fora del contracte shared: `gracias/page.tsx`, `boda-halloween/page.tsx` i `ExitIntentModal.tsx`. Tots tres concatenaven número + `encodeURIComponent(...)` dins el component, exactament el patró que §6.12 vol evitar perquè els literals públics compartits no tornin a `app/config` ni a UI.
+- `app/[locale]/gracias/page.tsx`: deixa d'importar `WHATSAPP_NUMBER` i deriva l'CTA urgent des de `WHATSAPP_URL_WITH_MESSAGE('Hola, acabo de enviar el formulario')`.
+- `app/[locale]/boda-halloween/page.tsx`: el CTA hero de WhatsApp deixa de construir `wa.me` amb `SITE_CONFIG.business.phone.replace(...)` i consumeix `WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('bodas'))`.
+- `app/components/ui/ExitIntentModal.tsx`: elimina la construcció local `waPhone`/`waMessage`/`waUrl`; el botó obre directament `WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria rebre informació sobre els vostres serveis.")`.
+- `__tests__/app/gracias-page.test.tsx`, `__tests__/app/boda-halloween-page.test.tsx` i `__tests__/app/components/ui/ExitIntentModal.test.tsx`: cobertura nova per blindar que els tres punts obren exactament la URL canònica.
+- Verificació del tall: `npx vitest run __tests__/app/components/ui/ExitIntentModal.test.tsx __tests__/app/gracias-page.test.tsx __tests__/app/boda-halloween-page.test.tsx` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `448`; el següent canvi real ha de ser `#449`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #447 — 2026-04-29 — claude (FET)
+**Regularització documental del §6.18: 6 ítems FET (Camí 1 complet + B.6/B.7 del Camí 2) que ja estaven tancats al §9 però seguien llistats com a `SEGÜENT` al checklist del §6.18.**
+- Context: l'auditoria CRMs top (§6.18) tenia un deute documental clar — entre #437 i #446 s'havien tancat 6 ítems del backlog (A.2, A.3, A.4, A.5, B.6, B.7), però el bloc `SEGÜENT (Camí 1)` i `SEGÜENT (Camí 2)` continuaven llistant-los com a feina pendent. Qualsevol agent futur que llegís el §6.18 hauria reobert una feina ja feta. La norma §2.1 de tancament rigorós exigeix que cada Canvi #N actualitzi el §6 afectat, i aquí 6 canvis seguits no havien sincronitzat el checklist amb el §9. Aquest tall sana el deute.
+- `docs/protocol-producte-admin-ca.md` · §6.18:
+  - Camí 1 (Eradicar fricció lead → pressupost → reserva) marcat com `TANCAT 2026-04-29`. Subsecció `SEGÜENT (Camí 1)` reanomenada `FET (Camí 1)` amb 4 entrades (A.2 → #437, A.3 → #438, A.4 → #441, A.5 → #442) cadascuna amb cita explícita al canvi i descripció del lliurament real (no només la promesa original).
+  - Camí 2 dividit en dues subseccions: `FET (Camí 2)` amb B.6 (#444 — línia "Desplaçament" visible al PDF) i B.7 (#446 — `pricingRules.ts` + `applyDatePricing` + integració PDF/preview). `SEGÜENT (Camí 2)` redueix a B.8 (auto-suggeriment de pack) i B.9 (marge instantani al pressupost).
+  - `PENDENT CRÍTIC` actualitzat: "Camí 1 tancat (#435-#442). Camí 2 a mig drenar — atacar B.8 i B.9 abans de saltar a Camí 3."
+  - Capçalera del §6.18 guanya nou bullet `**FET** *(2026-04-29 per claude — Canvi #447)*` que documenta aquest tall de regularització, alineat amb el patró Codex va aplicar als Canvis `#410`, `#413`, `#414`, `#416`, `#417`, `#418` per altres seccions.
+- Aquest tall **NO** toca codi, schema, tests ni lògica de servei — és pur deute documental sanat. Tots els #437/#438/#441/#442/#444/#446 ja portaven validació pròpia (validate:core 12 guards + qa:protocol).
+- Verificació del tall: `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `447`; el següent canvi real ha de ser `#448`.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`

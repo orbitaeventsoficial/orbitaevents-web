@@ -8,8 +8,8 @@
 // - Delay mínim 3s a la pàgina abans d'activar
 
 import { useEffect, useRef, useState } from 'react';
-import { SITE_CONFIG } from '@/app/config/site-config';
 import WhatsAppIcon from '@/app/components/public/WhatsAppIcon';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 const SESSION_KEY = 'exit_intent_shown';
 const MIN_TIME_ON_PAGE_MS = 3000;
@@ -53,9 +53,7 @@ export default function ExitIntentModal() {
 
   if (!open) return null;
 
-  const waPhone = SITE_CONFIG.business.phone.replace(/\D/g, '');
-  const waMessage = encodeURIComponent('Hola! M\'agradaria rebre informació sobre els vostres serveis.');
-  const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
+  const waUrl = WHATSAPP_URL_WITH_MESSAGE('Hola! M\'agradaria rebre informació sobre els vostres serveis.');
 
   function handleClose() {
     setOpen(false);

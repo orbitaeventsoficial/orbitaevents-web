@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import { CheckCircle, Clock, MessageCircle } from 'lucide-react';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 import WhatsAppIcon from '@/app/components/public/WhatsAppIcon';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 
 export default async function GraciasPage() {
   const t = await getTranslations('gracias');
+  const urgentWhatsappUrl = WHATSAPP_URL_WITH_MESSAGE('Hola, acabo de enviar el formulario');
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-zinc-900 flex items-center justify-center px-4 py-20 relative">
@@ -61,7 +62,7 @@ export default async function GraciasPage() {
               <h3 className="text-lg font-bold text-white">{t('urgent.title')}</h3>
             </div>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hola,%20acabo%20de%20enviar%20el%20formulario`}
+              href={urgentWhatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-2"

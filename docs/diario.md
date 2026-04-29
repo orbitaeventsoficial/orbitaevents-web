@@ -1,3 +1,11 @@
+## 2026-04-29 — Canvi #448: §6.12 — els últims `wa.me` públics passen al helper canònic (codex)
+- Tancament net de l'última bossa pública fora del contracte shared de WhatsApp: `app/[locale]/gracias/page.tsx`, `app/[locale]/boda-halloween/page.tsx` i `app/components/ui/ExitIntentModal.tsx` deixen de construir `https://wa.me/...` inline.
+- `gracias/page.tsx`: l'CTA urgent passa de `WHATSAPP_NUMBER + text hardcoded` a `WHATSAPP_URL_WITH_MESSAGE('Hola, acabo de enviar el formulario')`.
+- `boda-halloween/page.tsx`: el CTA hero deixa de fer `SITE_CONFIG.business.phone.replace(...)` i passa a `WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('bodas'))`.
+- `ExitIntentModal.tsx`: desapareix la construcció local `waPhone` / `waMessage` / `waUrl`; el botó obre directament la URL canònica del helper.
+- Tests nous: `__tests__/app/gracias-page.test.tsx`, `__tests__/app/boda-halloween-page.test.tsx`, `__tests__/app/components/ui/ExitIntentModal.test.tsx` blinden els tres call sites.
+- Validació: `npx vitest run __tests__/app/components/ui/ExitIntentModal.test.tsx __tests__/app/gracias-page.test.tsx __tests__/app/boda-halloween-page.test.tsx` OK · `npx tsc --noEmit` OK · `validate:core` OK · `qa:protocol` OK.
+
 ## 2026-04-29 — Canvi #446: B.7 — auto-pricing per data (cap setmana, temporada, Nadal, Nochevieja) (claude)
 - B.7 del §6.18 Camí 2 (P2). USP brutal: la data automàticament ajusta preu sense que l'usuari hagi de pensar-hi.
 - `lib/constants/pricingRules.ts` (nou): 4 regles canòniques amb i18n. weekend +10%, high-season +15%, christmas +25%, new-year-eve +50%. Tie-break per multiplicador més alt + priority.
@@ -10393,3 +10401,27 @@ L'email executiu setmanal ara mostra pèrdues agregades. CSV i PDF les tenen aut
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 367. Codex ha tancat `#366` en paral·lel (quoteRouteHandler → leadActivity shared). Següent canvi real ha de ser `#368`.
+
+## 2026-04-29 — Regularització documental §6.18: 6 ítems FET no documentats al checklist (Canvi #447, claude)
+
+### Context
+Entre #437 i #446 vaig tancar 6 ítems del backlog d'auditoria CRMs (§6.18 — A.2, A.3, A.4, A.5, B.6, B.7) i els vaig registrar al §9, però el bloc `SEGÜENT (Camí 1)` i `SEGÜENT (Camí 2)` continuava llistant-los com a feina pendent. Era el deute documental clàssic que havia de sanejar abans d'atacar B.8: si no, qualsevol agent futur que llegís el §6.18 hauria reobert una feina ja feta. La norma §2.1 de tancament rigorós exigeix que cada Canvi #N actualitzi també el §6 afectat.
+
+### Canvi
+- `docs/protocol-producte-admin-ca.md` · §6.18:
+  - Camí 1 marcat com `TANCAT 2026-04-29`. Subsecció `SEGÜENT (Camí 1)` reanomenada `FET (Camí 1)` amb 4 entrades (A.2 → #437, A.3 → #438, A.4 → #441, A.5 → #442) — cada bullet ara cita el canvi corresponent i descriu el lliurament real, no la promesa original.
+  - Camí 2 dividit: `FET (Camí 2)` amb B.6 (#444 — línia "Desplaçament" visible al PDF) i B.7 (#446 — `pricingRules.ts` + `applyDatePricing` + integració PDF/preview). `SEGÜENT (Camí 2)` queda amb només B.8 (auto-suggeriment de pack) i B.9 (marge instantani al pressupost).
+  - `PENDENT CRÍTIC` actualitzat: "Camí 1 tancat (#435-#442). Camí 2 a mig drenar — atacar B.8 i B.9 abans de saltar a Camí 3."
+  - Capçalera del §6.18 guanya nou bullet `**FET** *(2026-04-29 per claude — Canvi #447)*` documentant aquest tall, alineat amb el patró Codex va aplicar als Canvis `#410`, `#413`, `#414`, `#416`, `#417`, `#418` per regularitzar altres seccions.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `446` a `447`.
+
+### Aquest tall NO toca
+- Codi de servei, schema, tests ni lògica de producte — és pur deute documental sanat.
+- Tots els #437/#438/#441/#442/#444/#446 ja portaven validació pròpia (validate:core 12 guards + qa:protocol al moment de cada tancament).
+
+### Validació
+- `pnpm run validate:core` OK — 12/12 guards
+- `pnpm run qa:protocol` OK
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 447. Següent canvi real ha de ser `#448` (atacar B.8 — auto-suggeriment de pack).

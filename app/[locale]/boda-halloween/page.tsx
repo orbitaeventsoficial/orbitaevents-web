@@ -1,5 +1,9 @@
 import { Metadata } from 'next';
-import { PUBLIC_HALLOWEEN_WEDDING_FAQ_KEYS, PUBLIC_HALLOWEEN_WEDDING_FEATURE_KEYS } from '@/lib/constants';
+import {
+  PUBLIC_HALLOWEEN_WEDDING_FAQ_KEYS,
+  PUBLIC_HALLOWEEN_WEDDING_FEATURE_KEYS,
+  WHATSAPP_URL_WITH_MESSAGE,
+} from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
@@ -56,7 +60,7 @@ export default async function BodaHalloweenPage({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'bodaHalloween' });
   const tMeta = await getTranslations({ locale, namespace: 'bodaHalloweenPage' });
   const tWhatsapp = await getTranslations({ locale, namespace: 'whatsappMessages' });
-  const whatsappUrl = `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}?text=${encodeURIComponent(tWhatsapp('bodas'))}`;
+  const whatsappUrl = WHATSAPP_URL_WITH_MESSAGE(tWhatsapp('bodas'));
 
   const FEATURE_ICONS = {
     theming: Ghost,
