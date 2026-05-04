@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EXTRAS, getPacksByService } from '@/app/config/packs-config';
 import { generateQuotePDF, generateContractPDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
+import { computeBookingFinancialSummary } from '@/lib/services/costEngine';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { applyDatePricing } from '@/lib/services/pricing/datePricingService';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -14,7 +15,7 @@ import StudioPreview from './StudioPreview';
 import {
   type DocMode, type SectionId, type Locale, type CustomExtra,
   type PricingCatalogState, type PricingCatalogPack, type PricingCatalogExtra,
-  type PricingCatalogResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
+  type PricingCatalogResponse, type ProfitabilityConfigResponse, type StudioProps, type ExtraDefinition, type ServiceSlug,
   SECTION_LABELS, DEFAULT_SECTION_ORDER, STUDIO_DRAFT_KEY, CUSTOM_PACK_ID,
   OPERATOR_PDF_EXTRA_ID, STUDIO_COPY, SERVICE_LABEL, ALL_SERVICES,
   quoteStudioSchema, normalizeStudioLocale, formatEUR, toFeatureLines,
@@ -112,6 +113,7 @@ export default function PresupuestoPdfStudio({
     extraNamesBySlug: {},
     extraDescriptionsBySlug: {},
   });
+  const [profitabilityConfig, setProfitabilityConfig] = useState<ProfitabilityConfigResponse['config'] | null>(null);
   const isCustomerScoped = Boolean(customerId);
 
   useEffect(() => {
@@ -196,6 +198,28 @@ export default function PresupuestoPdfStudio({
       cancelled = true;
     };
   }, [locale]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProfitabilityConfig = async () => {
+      try {
+        const res = await fetchWithCsrf('/api/admin/reports/profitability/config');
+        const data: ProfitabilityConfigResponse = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.ok || cancelled) return;
+        setProfitabilityConfig(data.config || data.defaults || null);
+      } catch (error) {
+        log.warn('Error loading profitability config', {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    };
+
+    void loadProfitabilityConfig();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const packs = useMemo(() => {
     return getPacksByService(eventType).map((pack) => ({
@@ -285,6 +309,22 @@ export default function PresupuestoPdfStudio({
   const total = useMemo(() => {
     return Math.max(0, basePrice + seasonSurcharge + extrasPrice + travelCharge - Math.max(0, discount));
   }, [basePrice, seasonSurcharge, extrasPrice, travelCharge, discount]);
+
+  const financialSummary = useMemo(() => {
+    if (!profitabilityConfig) return null;
+    return computeBookingFinancialSummary(
+      {
+        total,
+        packPrice: basePrice,
+        extrasTotal: extrasPrice,
+        extraHours: 0,
+        extraHourPrice: 0,
+        distanceKm: travelKm,
+        source: 'UNKNOWN',
+      },
+      profitabilityConfig,
+    );
+  }, [profitabilityConfig, total, basePrice, extrasPrice, travelKm]);
 
   useEffect(() => {
     const destination = eventLocation.trim();
@@ -1471,9 +1511,13 @@ export default function PresupuestoPdfStudio({
         seasonPct={datePricing.appliedRule ? datePricing.surchargePct : undefined}
         discount={discount}
         total={total}
+        directCost={financialSummary?.directCost}
+        netMargin={financialSummary?.netMargin}
+        marginPct={financialSummary?.marginPct}
+        marginTone={financialSummary?.marginTone.tone}
+        acquisitionCost={financialSummary?.acquisitionCost}
         locale={locale}
       />
     </section>
   );
 }
-

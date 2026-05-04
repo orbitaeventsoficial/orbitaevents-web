@@ -1,6 +1,36 @@
+import { promises as fs } from 'fs';
+import path from 'path';
 import Link from 'next/link';
 import { AdminPage, AdminSection } from '../components/AdminPage';
 import { ADMIN_GOOGLE_ADS_DECISION_RULES, ADMIN_MANUAL_AUDIT_CATEGORIES, ADMIN_MANUAL_AUTOMATION_FRONTIER, ADMIN_MANUAL_PRINCIPLES, ADMIN_MANUAL_REALITY_CHECKS, ADMIN_MANUAL_ROADMAP, ADMIN_MANUAL_SECTIONS, ADMIN_MANUAL_SNAPSHOT, ADMIN_MANUAL_VISUAL_GOVERNANCE, ADMIN_MARKETING_CHANNEL_PRIORITY_LABEL, ADMIN_MARKETING_CHANNELS, ADMIN_MARKETING_METRICS, ADMIN_MARKETING_PHASES, ADMIN_MARKETING_PHASE_LABEL, ADMIN_MARKETING_PHASE_SUMMARY, ADMIN_MARKETING_PLAYBOOK, type AdminManualRoadmapPriority, type AdminMarketingChannelPriority, type AdminMarketingPhase } from '@/lib/constants/adminManual';
+import {
+  indexProtocolCanvisByNumber,
+  parseProtocolCanvis,
+  type ProtocolCanviMeta,
+} from '@/lib/services/protocolCanvisService';
+
+export const dynamic = 'force-static';
+export const revalidate = 60;
+
+const ROADMAP_AREA_WORKSPACE: Record<string, { href: string; label: string }> = {
+  'Captació i vendes': { href: '/admin/leads', label: 'Anar a Leads' },
+  'Finances i decisió': { href: '/admin/reporting', label: 'Anar a Reporting' },
+  'UX transversal': { href: '/admin/manual', label: 'Manual' },
+  Comunicació: { href: '/admin/inbox', label: 'Anar a Inbox' },
+  'Executive cockpit': { href: '/admin', label: 'Anar al Dashboard' },
+  Operacions: { href: '/admin/calendario', label: 'Anar a Calendari' },
+  Reporting: { href: '/admin/reporting', label: 'Anar a Reporting' },
+};
+
+async function loadProtocolCanvisIndex(): Promise<Map<number, ProtocolCanviMeta>> {
+  try {
+    const filePath = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+    const raw = await fs.readFile(filePath, 'utf-8');
+    return indexProtocolCanvisByNumber(parseProtocolCanvis(raw));
+  } catch {
+    return new Map();
+  }
+}
 
 const MARKETING_PHASE_ORDER: AdminMarketingPhase[] = ['FASE_0', 'FASE_1', 'FASE_2', 'FASE_3'];
 
@@ -57,12 +87,20 @@ const toneClass = {
   neutral: 'ap-kpi--neutral',
 };
 
-export default function AdminManualPage() {
+const ROADMAP_STATUS_ORDER: Record<'PENDING' | 'DONE', number> = { PENDING: 0, DONE: 1 };
+
+export default async function AdminManualPage() {
   const totalCapabilities = ADMIN_MANUAL_SECTIONS.reduce((sum, section) => sum + section.capabilities.length, 0);
   const totalSnapshotItems = ADMIN_MANUAL_SNAPSHOT.reduce((sum, section) => sum + section.items.length, 0);
   const totalVisualAligned = ADMIN_MANUAL_VISUAL_GOVERNANCE
     .filter((section) => section.status === 'ALIGNED')
     .reduce((sum, section) => sum + section.items.length, 0);
+  const roadmapPendingCount = ADMIN_MANUAL_ROADMAP.filter((item) => item.status === 'PENDING').length;
+  const roadmapDoneCount = ADMIN_MANUAL_ROADMAP.length - roadmapPendingCount;
+  const roadmapItemsSorted = [...ADMIN_MANUAL_ROADMAP].sort(
+    (a, b) => ROADMAP_STATUS_ORDER[a.status] - ROADMAP_STATUS_ORDER[b.status],
+  );
+  const canvisIndex = await loadProtocolCanvisIndex();
 
   return (
     <AdminPage
@@ -87,8 +125,8 @@ export default function AdminManualPage() {
         </div>
         <div className="admin-card-glass rounded-2xl border border-white/10 p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wider opacity-50">Roadmap pendent</p>
-          <p className="mt-2 text-3xl font-black">{ADMIN_MANUAL_ROADMAP.length}</p>
-          <p className="mt-1 text-xs opacity-60">Millores identificades encara no construïdes.</p>
+          <p className="mt-2 text-3xl font-black">{roadmapPendingCount}</p>
+          <p className="mt-1 text-xs opacity-60">{roadmapDoneCount} ja construïdes · {roadmapPendingCount} per atacar.</p>
         </div>
       </section>
 
@@ -385,32 +423,86 @@ export default function AdminManualPage() {
         </div>
       </AdminSection>
 
-      <AdminSection title="Roadmap de millores pendents" description="Idees identificades que encara no s'han construït. Ordenades per impacte vs esforç. Cada ítem aquí és candidat a convertir-se en un Canvi del protocol.">
+      <AdminSection title="Roadmap de millores identificades" description="Backlog històric ordenat amb pendents primer. Els FET porten cita del Canvi #N que els va tancar — el §9 del protocol és l'origen canònic, i cada CTA porta directament al lloc on es treballa.">
         <div className="grid gap-3 lg:grid-cols-2">
-          {ADMIN_MANUAL_ROADMAP.map((item) => (
-            <article key={item.id} className="admin-card-glass flex flex-col gap-3 rounded-2xl border border-white/10 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-base font-black leading-snug">{item.title}</h3>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider opacity-50">{item.area}</p>
+          {roadmapItemsSorted.map((item) => {
+            const canvi = item.doneCanvi ? canvisIndex.get(item.doneCanvi) : undefined;
+            const workspace = ROADMAP_AREA_WORKSPACE[item.area];
+            return (
+              <article
+                key={item.id}
+                className={`admin-card-glass flex flex-col gap-3 rounded-2xl border p-4 ${
+                  item.status === 'DONE' ? 'border-emerald-500/20 bg-emerald-500/[0.02]' : 'border-white/10'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-black leading-snug">{item.title}</h3>
+                    <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider opacity-50">{item.area}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
+                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${priorityStyle[item.priority]}`}>
+                      {priorityLabel[item.priority]}
+                    </span>
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                        item.status === 'DONE'
+                          ? 'border-emerald-500/40 bg-emerald-500/[0.1] text-emerald-200'
+                          : 'border-white/15 bg-white/[0.04] text-white/70'
+                      }`}
+                    >
+                      {item.status === 'DONE'
+                        ? item.doneCanvi
+                          ? `Fet · #${item.doneCanvi}`
+                          : 'Fet'
+                        : 'Pendent'}
+                    </span>
+                  </div>
                 </div>
-                <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${priorityStyle[item.priority]}`}>
-                  {priorityLabel[item.priority]}
-                </span>
-              </div>
-              <p className="text-sm leading-relaxed opacity-75">{item.description}</p>
-              <div className="mt-auto grid gap-2 border-t border-white/10 pt-3 sm:grid-cols-2">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Impacte</p>
-                  <p className="mt-1 text-xs opacity-80">{item.impact}</p>
+                <p className="text-sm leading-relaxed opacity-75">{item.description}</p>
+                {item.status === 'DONE' && item.doneNote ? (
+                  <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-2.5 text-xs leading-relaxed text-emerald-100/80">
+                    {item.doneNote}
+                  </p>
+                ) : null}
+                {canvi ? (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 text-[11px] leading-relaxed opacity-80">
+                    <span className="font-semibold">Verificat al §9:</span> #{canvi.n} · {canvi.date} · {canvi.author} · {canvi.status}
+                  </div>
+                ) : null}
+                <div className="grid gap-2 border-t border-white/10 pt-3 sm:grid-cols-2">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Impacte</p>
+                    <p className="mt-1 text-xs opacity-80">{item.impact}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Esforç</p>
+                    <p className="mt-1 text-xs opacity-80">{item.effort}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50">Esforç</p>
-                  <p className="mt-1 text-xs opacity-80">{item.effort}</p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-1">
+                  {item.status === 'DONE' && item.doneCanvi ? (
+                    <Link
+                      href={`/admin/docs/protocol?canvi=${item.doneCanvi}#canvi-${item.doneCanvi}`}
+                      className="ap-btn-primary text-xs"
+                    >
+                      Obrir Canvi #{item.doneCanvi}
+                    </Link>
+                  ) : null}
+                  {item.status === 'PENDING' ? (
+                    <Link href="/admin/docs/protocol?seccio=6.15#seccio-6-15" className="ap-btn-primary text-xs">
+                      Obrir §6.15 al protocol
+                    </Link>
+                  ) : null}
+                  {workspace ? (
+                    <Link href={workspace.href} className="ap-btn-secondary text-xs">
+                      {workspace.label}
+                    </Link>
+                  ) : null}
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </AdminSection>
     </AdminPage>

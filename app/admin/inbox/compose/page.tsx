@@ -4,6 +4,7 @@ import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 import ComposeForm from './ComposeForm';
 import { resolveComposeReturnHref } from './composeNavigation';
+import { BULK_COMPOSE_SEGMENTS, loadBulkComposeAudience, type BulkComposeSegmentKey } from '@/lib/services/bulkComposeSegmentService';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,15 +86,24 @@ async function getLeadsAndPacks(customerId?: string, leadId?: string) {
   return { leads: mergedLeads, packs, customer };
 }
 
+async function getSegmentAudience(segmentKey?: string) {
+  if (!segmentKey) return null;
+  return loadBulkComposeAudience(segmentKey as BulkComposeSegmentKey);
+}
+
 export default async function ComposePage({
   searchParams,
 }: {
-  searchParams?: { customerId?: string; leadId?: string; template?: string };
+  searchParams?: { customerId?: string; leadId?: string; template?: string; segment?: string };
 }) {
   const customerId = searchParams?.customerId || '';
   const leadId = searchParams?.leadId || '';
   const template = searchParams?.template || '';
-  const { leads, packs, customer } = await getLeadsAndPacks(customerId || undefined, leadId || undefined);
+  const segmentKey = searchParams?.segment || '';
+  const [{ leads, packs, customer }, segmentAudience] = await Promise.all([
+    getLeadsAndPacks(customerId || undefined, leadId || undefined),
+    getSegmentAudience(segmentKey || undefined),
+  ]);
   const returnHref = resolveComposeReturnHref({
     customerId: customerId || null,
     leadId: leadId || null,
@@ -106,6 +116,26 @@ export default async function ComposePage({
       back={{ href: returnHref, label: customerId ? 'Client' : leadId ? 'Lead' : 'Inbox' }}
       className="max-w-4xl"
     >
+      <div className="mb-4 flex flex-wrap gap-2">
+        {BULK_COMPOSE_SEGMENTS.map((segment) => (
+          <a
+            key={segment.key}
+            href={`/admin/inbox/compose?segment=${segment.key}`}
+            className={`rounded-xl border px-3 py-2 text-xs ${
+              segmentAudience?.key === segment.key
+                ? 'admin-tone-soft-info admin-tone-border-info admin-tone-text-info'
+                : 'admin-tone-idle'
+            }`}
+          >
+            {segment.label}
+          </a>
+        ))}
+        {segmentAudience && (
+          <a href="/admin/inbox/compose" className="rounded-xl border px-3 py-2 text-xs admin-tone-idle">
+            Redactor individual
+          </a>
+        )}
+      </div>
 
       <ComposeForm
         leads={leads}
@@ -123,6 +153,7 @@ export default async function ComposePage({
             : undefined
         }
         initialTemplate={template}
+        initialSegmentAudience={segmentAudience || undefined}
       />
     </AdminPage>
   );

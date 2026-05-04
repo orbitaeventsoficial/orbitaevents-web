@@ -15,6 +15,7 @@ import LeadInsightsBanner from './LeadInsightsBanner';
 import LeadScoreBreakdown from './LeadScoreBreakdown';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
 import LeadCustomerLinkPanel from './LeadCustomerLinkPanel';
+import LeadMobileQuickActions from './LeadMobileQuickActions';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
 import { previewLeadCustomerLink } from '@/lib/services/leads/leadCustomerLinkService';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -79,6 +80,8 @@ export default async function LeadDetailPage({ params }: Props) {
       utmCampaign: true,
       status: true,
       priority: true,
+      nurturingStep: true,
+      lastNurturingAt: true,
       assignedTo: true,
       preferredLocale: true,
       createdAt: true,
@@ -380,6 +383,14 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       </section>
 
+      <LeadMobileQuickActions
+        leadId={lead.id}
+        leadName={lead.name}
+        leadEmail={lead.email}
+        leadPhone={lead.phone}
+        currentStatus={lead.status}
+      />
+
       <LeadInsightsBanner
         insights={leadInsights}
         leadId={lead.id}
@@ -640,6 +651,8 @@ export default async function LeadDetailPage({ params }: Props) {
             clientEmail={lead.email}
             clientPhone={lead.phone}
             eventType={eventType}
+            nurturingStep={lead.nurturingStep}
+            lastNurturingAt={lead.lastNurturingAt ? lead.lastNurturingAt.toISOString() : null}
           />
 
           {/* Metadades */}
@@ -846,8 +859,6 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
-
-
 
 
 

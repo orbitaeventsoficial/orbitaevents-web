@@ -36,7 +36,7 @@ const BASE_INSIGHTS: CustomerInsightsDTO = {
 
 const BASE_COMM_SUMMARY: CustomerCommSummaryDTO = {
   total: 1,
-  channels: { EMAIL: 0, WHATSAPP: 1, CALL: 0, NOTE: 0, SYSTEM: 0 },
+  channels: { EMAIL: 0, WHATSAPP: 1, INSTAGRAM: 0, FORM: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
   lastContactAt: '2026-04-17T09:00:00.000Z',
   lastContactChannel: 'WHATSAPP',
   lastContactDirection: 'INBOUND',

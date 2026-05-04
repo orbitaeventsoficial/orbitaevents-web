@@ -195,6 +195,81 @@ describe('fetchCustomerHub', () => {
     });
   });
 
+  it('propaga distanceKm des de bookings i reserva vinculada del lead', async () => {
+    mockFetchCustomerHubLeads.mockResolvedValue([
+      {
+        id: 'lead-1',
+        name: 'Lead Test',
+        email: 'lead@test.com',
+        eventType: 'WEDDING',
+        eventDate: null,
+        status: 'WON',
+        priority: 'HIGH',
+        createdAt: new Date('2026-04-02T09:00:00Z'),
+        contactedAt: new Date('2026-04-05T09:00:00Z'),
+        activities: [],
+        universalTasks: [],
+        booking: {
+          id: 'booking-lead-1',
+          reference: 'ORB-LEAD-1',
+          status: 'CONFIRMED',
+          total: 1250,
+          depositAmount: 300,
+          remainingAmount: 950,
+          discountCode: null,
+          eventType: 'WEDDING',
+          eventDate: new Date('2026-06-20T18:00:00Z'),
+          eventStartTime: '18:00',
+          eventEndTime: '02:00',
+          eventLocation: 'Girona',
+          eventVenue: 'Masia Can Riera',
+          distanceKm: 86.4,
+          guestCount: 120,
+          depositPaid: true,
+          remainingPaid: false,
+        },
+      },
+    ]);
+    mockFetchCustomerHubCollections.mockResolvedValue({
+      proposals: [],
+      bookingsRows: [
+        {
+          id: 'booking-row-1',
+          reference: 'ORB-ROW-1',
+          eventDate: new Date('2026-06-20T18:00:00Z'),
+          eventStartTime: '18:00',
+          eventEndTime: '02:00',
+          status: 'CONFIRMED',
+          eventLocation: 'Girona',
+          eventVenue: 'Masia Can Riera',
+          distanceKm: 86.4,
+          depositAmount: 300,
+          total: 1250,
+          eventType: 'WEDDING',
+          guestCount: 120,
+          depositPaid: true,
+          remainingPaid: false,
+          discountCode: null,
+          pack: null,
+        },
+      ],
+      customerTasks: [],
+      activityLog: [],
+      customerDiscountCodes: [],
+    });
+
+    const result = await fetchCustomerHub('cust-1');
+
+    expect(result.bookings[0]).toMatchObject({
+      id: 'booking-row-1',
+      distanceKm: 86.4,
+    });
+    expect(result.leads[0].booking).toMatchObject({
+      id: 'booking-lead-1',
+      distanceKm: 86.4,
+    });
+  });
+
   it('carrega també la timeline canònica del customer abans de construir la cronologia', async () => {
     mockFetchCustomerHubCollections.mockResolvedValue({
       proposals: [],

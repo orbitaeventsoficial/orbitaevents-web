@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockRecordLeadInboundChannelCaptured } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       count: vi.fn(),
@@ -10,10 +10,14 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     adminLog: { create: vi.fn() },
   },
+  mockRecordLeadInboundChannelCaptured: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/constants', () => ({ PLACEHOLDER_EMAIL_DOMAIN: '@placeholder.orbita' }));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadInboundChannelCaptured: mockRecordLeadInboundChannelCaptured,
+}));
 
 import {
   countNewAdminLeads,
@@ -28,6 +32,7 @@ beforeEach(() => {
   mockPrisma.lead.create.mockResolvedValue({ id: 'l1', name: 'Test', eventType: 'WEDDING' });
   mockPrisma.lead.groupBy.mockResolvedValue([]);
   mockPrisma.adminLog.create.mockResolvedValue({});
+  mockRecordLeadInboundChannelCaptured.mockResolvedValue(undefined);
 });
 
 describe('countNewAdminLeads', () => {
@@ -131,6 +136,32 @@ describe('createAdminLead', () => {
       data: expect.objectContaining({
         eventDate: expect.any(Date),
       }),
+    });
+  });
+
+  it('registra Instagram com a canal real quan el lead neix amb aquest source', async () => {
+    mockPrisma.lead.create.mockResolvedValue({
+      id: 'ig-1',
+      name: 'IG Lead',
+      eventType: 'WEDDING',
+      source: 'INSTAGRAM',
+      message: 'DM inbound',
+    });
+
+    await createAdminLead({
+      name: 'IG Lead',
+      email: 'ig@test.com',
+      eventType: 'WEDDING',
+      source: 'INSTAGRAM',
+      message: 'DM inbound',
+    });
+
+    expect(mockRecordLeadInboundChannelCaptured).toHaveBeenCalledWith({
+      leadId: 'ig-1',
+      channel: 'instagram',
+      title: 'Instagram DM registrat',
+      preview: 'DM inbound',
+      createdBy: 'Admin',
     });
   });
 });

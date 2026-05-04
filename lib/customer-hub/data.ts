@@ -34,7 +34,7 @@ export type CustomerHubLead = Prisma.LeadGetPayload<{
   include: {
     activities: true;
     universalTasks: true;
-    booking: { select: { id: true; reference: true; status: true; total: true; depositAmount: true; remainingAmount: true; discountCode: true; eventType: true; eventDate: true; eventStartTime: true; eventEndTime: true; eventLocation: true; eventVenue: true; guestCount: true; depositPaid: true; remainingPaid: true } };
+    booking: { select: { id: true; reference: true; status: true; total: true; depositAmount: true; remainingAmount: true; discountCode: true; eventType: true; eventDate: true; eventStartTime: true; eventEndTime: true; eventLocation: true; eventVenue: true; distanceKm: true; guestCount: true; depositPaid: true; remainingPaid: true } };
   };
 }>;
 
@@ -150,7 +150,7 @@ export async function fetchCustomerHubLeads(customerId: string): Promise<Custome
         include: {
           activities: { orderBy: { createdAt: 'desc' }, take: 60 },
           universalTasks: { orderBy: { createdAt: 'desc' }, take: 60 },
-          booking: { select: { id: true, reference: true, status: true, total: true, depositAmount: true, remainingAmount: true, discountCode: true, eventType: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true, eventVenue: true, guestCount: true, depositPaid: true, remainingPaid: true } },
+          booking: { select: { id: true, reference: true, status: true, total: true, depositAmount: true, remainingAmount: true, discountCode: true, eventType: true, eventDate: true, eventStartTime: true, eventEndTime: true, eventLocation: true, eventVenue: true, distanceKm: true, guestCount: true, depositPaid: true, remainingPaid: true } },
         },
       }),
     []

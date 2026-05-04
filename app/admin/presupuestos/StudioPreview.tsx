@@ -30,11 +30,26 @@ export type StudioPreviewProps = {
   seasonPct?: number;
   discount: number;
   total: number;
+  directCost?: number;
+  netMargin?: number;
+  marginPct?: number;
+  marginTone?: 'emerald' | 'amber' | 'orange' | 'rose';
+  acquisitionCost?: number;
   locale: Locale;
 };
 
 export default function StudioPreview(props: StudioPreviewProps) {
   const t = STUDIO_COPY[props.locale];
+  const marginToneClass =
+    props.marginTone === 'emerald'
+      ? 'text-emerald-300 border-emerald-400/30 bg-emerald-950/20'
+      : props.marginTone === 'amber'
+        ? 'text-amber-300 border-amber-400/30 bg-amber-950/20'
+        : props.marginTone === 'orange'
+          ? 'text-orange-300 border-orange-400/30 bg-orange-950/20'
+          : props.marginTone === 'rose'
+            ? 'text-rose-300 border-rose-400/30 bg-rose-950/20'
+            : 'text-white border-white/10 bg-white/[0.02]';
 
   return (
     <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">
@@ -114,6 +129,29 @@ export default function StudioPreview(props: StudioPreviewProps) {
             <span>{formatEUR(props.total)}</span>
           </div>
         </div>
+
+        {typeof props.directCost === 'number' &&
+        typeof props.netMargin === 'number' &&
+        typeof props.marginPct === 'number' ? (
+          <div className={`rounded-xl border p-3 ${marginToneClass}`}>
+            <p className="mb-2">Marge viu</p>
+            <div className="flex items-center justify-between">
+              <span>Cost directe</span>
+              <span>{formatEUR(props.directCost)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Marge net</span>
+              <span>{formatEUR(props.netMargin)}</span>
+            </div>
+            <div className="mt-2 border-t pt-2 flex items-center justify-between font-semibold">
+              <span>% marge</span>
+              <span>{props.marginPct.toFixed(1)}%</span>
+            </div>
+            {typeof props.acquisitionCost === 'number' ? (
+              <p className="mt-1 text-xs">Inclou CAC estimat de {formatEUR(props.acquisitionCost)}</p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </aside>
   );

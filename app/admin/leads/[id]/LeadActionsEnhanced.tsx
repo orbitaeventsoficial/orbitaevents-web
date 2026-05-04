@@ -4,7 +4,7 @@ import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_STATUS_ACTION_OPTIONS } from '@/lib/constants';
-import { getAdminLeadPackOptions } from '@/lib/constants/admin';
+import { ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS, getAdminLeadPackOptions } from '@/lib/constants/admin';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import LeadLostStatusPrompt from '../LeadLostStatusPrompt';
 import { patchLeadStatus } from '../leadStatusClient';
@@ -16,6 +16,8 @@ interface Props {
   clientEmail: string;
   clientPhone?: string | null;
   eventType: string;
+  nurturingStep: number;
+  lastNurturingAt?: string | null;
 }
 
 export default function LeadActionsEnhanced({ 
@@ -24,7 +26,9 @@ export default function LeadActionsEnhanced({
   clientName,
   clientEmail,
   clientPhone,
-  eventType 
+  eventType,
+  nurturingStep,
+  lastNurturingAt,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -45,9 +49,18 @@ export default function LeadActionsEnhanced({
   const [customPriceInput, setCustomPriceInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [quoteHtml, setQuoteHtml] = useState<string | null>(null);
+  const [manualSequenceStep, setManualSequenceStep] = useState(() => {
+    const nextStep = Math.min(nurturingStep + 1, ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS.length);
+    return String(nextStep);
+  });
+  const [manualSequenceRunning, setManualSequenceRunning] = useState(false);
 
   const selectedPackInfo = PACK_OPTIONS.find(p => p.value === selectedPack);
   const isManualMode = selectedPack === 'manual';
+  const selectedManualSequenceOption = ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS.find(
+    (option) => option.step === Number(manualSequenceStep),
+  );
+  const isLeadSequenceEligible = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'].includes(optimisticStatus);
 
   const parseCustomPrice = (): number | null => {
     const raw = customPriceInput.trim();
@@ -190,6 +203,36 @@ export default function LeadActionsEnhanced({
     }
   };
 
+  const handleRunManualSequence = async () => {
+    setManualSequenceRunning(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetchWithCsrf(`/api/admin/leads/${leadId}/sequence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: Number(manualSequenceStep) }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok || !data?.summary) {
+        throw new Error(data?.error || 'No s’ha pogut executar la seqüència manual');
+      }
+
+      const summary = data.summary as { channel: string; step: number; totalSteps: number; nurturingDone: boolean };
+      setSuccess(
+        `Seqüència enviada: pas ${summary.step}/${summary.totalSteps} per ${summary.channel === 'whatsapp' ? 'WhatsApp' : 'correu'}${summary.nurturingDone ? ' · cadència completada' : ''}`,
+      );
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setManualSequenceRunning(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Canviar Estat */}
@@ -250,6 +293,56 @@ export default function LeadActionsEnhanced({
           }}
           onConfirm={handleLostConfirm}
         />
+      </section>
+
+      <section className="ap-card p-6">
+        <h3 className="text-sm font-semibold mb-4">🔗 Seqüència manual</h3>
+        <div className="space-y-4 text-sm">
+          <div className="rounded-xl border border-white/10 p-3">
+            <p className="font-medium">Pas actual de nurturing</p>
+            <p className="mt-1 opacity-80">
+              {Math.min(nurturingStep, ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS.length)}/{ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS.length}
+              {lastNurturingAt ? ` · últim enviament registrat` : ' · encara sense enviaments'}
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium mb-2">Pas a enviar ara</label>
+            <select
+              value={manualSequenceStep}
+              onChange={(e) => setManualSequenceStep(e.target.value)}
+              disabled={!isLeadSequenceEligible || manualSequenceRunning}
+              className="ap-input w-full px-3 py-2 text-sm"
+            >
+              {ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS.map((option) => (
+                <option key={option.step} value={option.step}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {selectedManualSequenceOption && (
+              <p className="mt-2 text-xs opacity-70">
+                Envia el pas {selectedManualSequenceOption.step} ara mateix, sense esperar la cadència automàtica.
+              </p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleRunManualSequence}
+            disabled={!isLeadSequenceEligible || manualSequenceRunning}
+            aria-busy={manualSequenceRunning}
+            className="ap-btn ap-btn--secondary w-full disabled:opacity-50"
+          >
+            {manualSequenceRunning ? 'Executant seqüència...' : 'Executar seqüència manual'}
+          </button>
+
+          {!isLeadSequenceEligible && (
+            <p className="text-xs admin-tone-text-warning">
+              La seqüència manual només està disponible per leads actius (`NEW`, `CONTACTED`, `QUOTE_SENT`, `NEGOTIATING`).
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Generar Pressupost */}
@@ -397,7 +490,6 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
-
 
 
 

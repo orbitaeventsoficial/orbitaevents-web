@@ -25,6 +25,7 @@ import { PUBLIC_FOOTER_DEFAULT_COVERAGE, PUBLIC_FOOTER_EXPERIENCES_LINKS, PUBLIC
 import { PUBLIC_CORE_SERVICE_NAV } from '@/lib/publicServiceCatalog';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 import { useManagedImageSrc } from '@/lib/hooks/useManagedImageSrc';
+import { fetchPublicCoverage } from '@/lib/api/publicCoverageClient';
 import WhatsAppIcon from '@/app/components/public/WhatsAppIcon';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -65,11 +66,10 @@ export default function Footer() {
 
     const loadCoverage = async () => {
       try {
-        const res = await fetch('/api/public/coverage', { cache: 'no-store' });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data?.ok || !Array.isArray(data?.cities) || cancelled) return;
+        const data = await fetchPublicCoverage({ cache: 'no-store' });
+        if (cancelled || !data?.ok || !Array.isArray(data.cities)) return;
         if (data.cities.length > 0) {
-          setCoverageAreas(data.cities);
+          setCoverageAreas(data.cities as string[]);
         }
       } catch {
         // Silent fallback to localized static coverage.

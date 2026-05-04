@@ -10,7 +10,7 @@ export const metadata = {
 export default async function QuickCreatePage() {
   const packs = await prisma.pack.findMany({
     where: { isActive: true },
-    select: { id: true, code: true, price: true },
+    select: { id: true, slug: true, code: true, price: true },
     orderBy: { price: 'asc' },
   });
 
@@ -25,7 +25,9 @@ export default async function QuickCreatePage() {
           </p>
         </header>
 
-        <QuickCreateForm packs={packs.map((p) => ({ id: p.id, code: p.code ?? p.id, price: p.price }))} />
+        <QuickCreateForm
+          packs={packs.map((p) => ({ id: p.id, slug: p.slug, code: p.code ?? p.slug, price: p.price }))}
+        />
       </div>
     </div>
   );

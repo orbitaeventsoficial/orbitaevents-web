@@ -42,7 +42,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 448;
+export const ADMIN_CHANGE_COUNTER = 486;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -152,6 +152,11 @@ export const ADMIN_CRON_HEALTH_CONFIG = {
   warning: { dot: 'bg-amber-400', bg: 'border-amber-500/20 bg-amber-500/5', label: 'Retardat' },
   error: { dot: 'bg-rose-400', bg: 'border-rose-500/20 bg-rose-500/5', label: 'Error' },
   unknown: { dot: 'bg-white/30', bg: '', label: 'Mai executat' },
+} as const;
+
+export const ADMIN_PROTOCOL_VALIDATION_STYLE = {
+  validated: 'border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-200',
+  pending: 'border-amber-500/40 bg-amber-500/[0.08] text-amber-200',
 } as const;
 
 export const ADMIN_ACTIVITY_STATS_CARDS = [
@@ -538,6 +543,13 @@ export const ADMIN_CRON_PREFIXES = [
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
 export const ADMIN_HEALTH_ACTIVE_BOOKING_STATUSES = ['CONFIRMED', 'PREPARING'] as const;
+export const ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS = [
+  { step: 1, label: 'Pas 1 · primer seguiment', delayHours: 24 },
+  { step: 2, label: 'Pas 2 · recordatori pressupost', delayHours: 72 },
+  { step: 3, label: 'Pas 3 · urgència suau', delayHours: 168 },
+  { step: 4, label: 'Pas 4 · última disponibilitat', delayHours: 336 },
+  { step: 5, label: 'Pas 5 · tancament', delayHours: 720 },
+] as const;
 export const ADMIN_SALUT_STATUS_FILTER_OPTIONS = [
   { id: 'all', label: 'Tot' },
   { id: 'critical', label: 'Crítics' },

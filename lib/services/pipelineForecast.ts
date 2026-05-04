@@ -14,7 +14,11 @@ interface ForecastMonth {
   month: string;
   historicalAvg: number;
   pipeline: number;
+  pipelineLow: number;
+  pipelineHigh: number;
   combined: number;
+  combinedLow: number;
+  combinedHigh: number;
 }
 
 export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Date()): Promise<ForecastMonth[]> {
@@ -38,27 +42,35 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
     },
   });
 
-  // Agrupar pipeline per mes d'event
+  // Agrupar pipeline per mes d'event. Mantenim la suma del pipeline esperat
+  // (mean) i la suma de variances Bernoulli (a²·p·(1-p)) per construir banda
+  // de confiança ±1σ ("D.14 — Forecast amb confidence band").
   const pipelineByMonth = new Map<string, number>();
+  const varianceByMonth = new Map<string, number>();
   for (const lead of activeLeads) {
     const { probability } = scoreLead({ ...lead, now });
     const amount = estimateLeadAmount({ budget: lead.budget, eventType: lead.eventType });
     const weighted = amount * probability;
+    const variance = amount * amount * probability * (1 - probability);
 
     let monthKey: string;
     if (lead.eventDate) {
       const d = new Date(lead.eventDate);
       monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     } else {
-      // Si no té data, distribuir als pròxims 3 mesos
+      // Si no té data, distribuir als pròxims 3 mesos. La variància es
+      // divideix per 9 perquè cadascun dels 3 mesos rep `weighted/3` (les
+      // contribucions són independents).
       for (let i = 1; i <= 3; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         pipelineByMonth.set(k, (pipelineByMonth.get(k) || 0) + weighted / 3);
+        varianceByMonth.set(k, (varianceByMonth.get(k) || 0) + variance / 9);
       }
       continue;
     }
     pipelineByMonth.set(monthKey, (pipelineByMonth.get(monthKey) || 0) + weighted);
+    varianceByMonth.set(monthKey, (varianceByMonth.get(monthKey) || 0) + variance);
   }
 
   // 2. Històric — reserves completades/confirmades dels últims 24 mesos
@@ -112,17 +124,29 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
 
     const historicalAvg = monthlyAvg.get(calMonth) ?? globalMonthlyAvg;
     const pipeline = pipelineByMonth.get(monthKey) ?? 0;
+    const variance = varianceByMonth.get(monthKey) ?? 0;
+    // Banda ±1σ del pipeline (Bernoulli per lead, sumes assumides
+    // independents). Mai negativa.
+    const stdDev = Math.sqrt(variance);
+    const pipelineLow = Math.max(0, pipeline - stdDev);
+    const pipelineHigh = pipeline + stdDev;
 
     // Combinació: 60% pipeline (si n'hi ha) + 40% històric, o 100% històric si no hi ha pipeline
-    const combined = pipeline > 0
-      ? Math.round(pipeline * 0.6 + historicalAvg * 0.4)
-      : Math.round(historicalAvg);
+    const combine = (p: number) =>
+      pipeline > 0 ? Math.round(p * 0.6 + historicalAvg * 0.4) : Math.round(historicalAvg);
+    const combined = combine(pipeline);
+    const combinedLow = combine(pipelineLow);
+    const combinedHigh = combine(pipelineHigh);
 
     result.push({
       month: monthKey,
       historicalAvg: Math.round(historicalAvg),
       pipeline: Math.round(pipeline),
+      pipelineLow: Math.round(pipelineLow),
+      pipelineHigh: Math.round(pipelineHigh),
       combined,
+      combinedLow,
+      combinedHigh,
     });
   }
 

@@ -792,28 +792,43 @@ export default function EconomiaClient(props: EconomiaClientProps) {
             <>
               <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
                 <h2 className="text-lg font-semibold mb-1">Previsió de vendes</h2>
-                <p className="text-xs mb-4">Combinació de pipeline ponderat i tendència històrica amb estacionalitat.</p>
+                <p className="text-xs mb-4">
+                  Combinació de pipeline ponderat i tendència històrica amb estacionalitat. La columna
+                  <span className="font-semibold"> Rang ±1σ</span> reflecteix el ventall esperat segons la
+                  variància Bernoulli per lead (banda al ~68%).
+                </p>
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
                   <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[700px] w-full text-sm" aria-label="Previsió de vendes">
+                    <table className="min-w-[820px] w-full text-sm" aria-label="Previsió de vendes">
                       <thead>
                         <tr className="text-left text-[11px] uppercase tracking-wider">
                           <th scope="col" className="px-3 py-2">Mes</th>
                           <th scope="col" className="px-3 py-2 text-right">Mitjana històrica</th>
                           <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
                           <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
+                          <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
-                        {props.forecast_pipeline.map((row) => (
-                          <tr key={row.month} className="hover:bg-white/[0.03]">
-                            <td className="px-3 py-2 font-medium">{row.month}</td>
-                            <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
-                            <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
-                            <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
-                          </tr>
-                        ))}
+                        {props.forecast_pipeline.map((row) => {
+                          const hasBand = row.combinedHigh > row.combinedLow;
+                          return (
+                            <tr key={row.month} className="hover:bg-white/[0.03]">
+                              <td className="px-3 py-2 font-medium">{row.month}</td>
+                              <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
+                              <td className="px-3 py-2 text-right">{money(row.pipeline)}</td>
+                              <td className="px-3 py-2 text-right font-bold">{money(row.combined)}</td>
+                              <td className="px-3 py-2 text-right text-xs">
+                                {hasBand ? (
+                                  <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
+                                ) : (
+                                  <span className="opacity-50">—</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

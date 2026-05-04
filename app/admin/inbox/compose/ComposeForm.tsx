@@ -1,11 +1,12 @@
 // app/admin/inbox/compose/ComposeForm.tsx
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatDateSimple, formatCurrency, getEventLabel } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { generateSmartTemplates, generateAllTemplates, type SmartTemplate } from '@/lib/services/inboxTemplateService';
+import type { BulkComposeSegmentAudience } from '@/lib/services/bulkComposeSegmentService';
 
 interface Lead {
   id: string;
@@ -41,6 +42,7 @@ interface Props {
     preferredLocale: string | null;
   };
   initialTemplate?: string;
+  initialSegmentAudience?: BulkComposeSegmentAudience;
 }
 
 const INPUT_CLASSES = 'ap-input';
@@ -56,8 +58,10 @@ export default function ComposeForm({
   initialLeadId,
   initialCustomer,
   initialTemplate,
+  initialSegmentAudience,
 }: Props) {
   const router = useRouter();
+  const lastAppliedTemplateRef = useRef<{ key: string; subject: string; body: string } | null>(null);
   const [mode, setMode] = useState<'email' | 'quote'>('email');
   const [selectedLeadId, setSelectedLeadId] = useState(initialLeadId || '');
   const [to, setTo] = useState('');
@@ -73,6 +77,7 @@ export default function ComposeForm({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const isBulkSegmentMode = Boolean(initialSegmentAudience);
 
   const selectedLead = leads.find((lead) => lead.id === selectedLeadId);
   const selectedPack = packs.find((pack) => pack.id === selectedPackId);
@@ -107,6 +112,11 @@ export default function ComposeForm({
   }, [selectedLead, initialCustomer, locale]);
 
   function applyTemplate(template: SmartTemplate) {
+    lastAppliedTemplateRef.current = {
+      key: template.key,
+      subject: template.subject,
+      body: template.body,
+    };
     setSubject(template.subject);
     setBody(template.body);
     setActiveTemplateKey(template.key);
@@ -126,6 +136,38 @@ export default function ComposeForm({
       }
     }
   }, [selectedLeadId, selectedLead]);
+
+  useEffect(() => {
+    if (!activeTemplateKey) return;
+
+    const activeTemplate = smartTemplates.find((template) => template.key === activeTemplateKey);
+    if (!activeTemplate) return;
+
+    const lastAppliedTemplate = lastAppliedTemplateRef.current;
+    const canRefreshTemplate =
+      !lastAppliedTemplate ||
+      (lastAppliedTemplate.key === activeTemplateKey &&
+        subject === lastAppliedTemplate.subject &&
+        body === lastAppliedTemplate.body);
+
+    if (!canRefreshTemplate) return;
+
+    lastAppliedTemplateRef.current = {
+      key: activeTemplate.key,
+      subject: activeTemplate.subject,
+      body: activeTemplate.body,
+    };
+
+    if (subject !== activeTemplate.subject) {
+      setSubject(activeTemplate.subject);
+    }
+    if (body !== activeTemplate.body) {
+      setBody(activeTemplate.body);
+    }
+    if (mode !== activeTemplate.mode) {
+      setMode(activeTemplate.mode);
+    }
+  }, [activeTemplateKey, smartTemplates, subject, body, mode]);
 
   useEffect(() => {
     if (initialTemplate === 'enviament-pressupost') {
@@ -205,14 +247,15 @@ export default function ComposeForm({
       return;
     }
 
-    if (!to || !subject || !body) {
+    if ((!isBulkSegmentMode && !to) || !subject || !body) {
       setError('Omple tots els camps');
       return;
     }
 
     setSending(true);
     try {
-      const res = await fetchWithCsrf('/api/admin/emails/send', {
+      const endpoint = isBulkSegmentMode ? '/api/admin/emails/send-bulk' : '/api/admin/emails/send';
+      const res = await fetchWithCsrf(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -223,16 +266,17 @@ export default function ComposeForm({
           customerId: initialCustomer?.id || undefined,
           locale,
           templateKey: activeTemplateKey || undefined,
+          segmentKey: initialSegmentAudience?.key,
         }),
       });
 
       if (res.ok) {
         setSent(true);
         setTimeout(() => router.push(returnHref), 1500);
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Error enviant email');
-      }
+        } else {
+          const data = await res.json();
+          setError(data.error || (isBulkSegmentMode ? 'Error enviant campanya massiva' : 'Error enviant email'));
+        }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error de connexio');
     } finally {
@@ -280,24 +324,45 @@ export default function ComposeForm({
         </div>
       )}
 
+      {mode === 'email' && initialSegmentAudience && (
+        <div className="admin-card-glass rounded-xl border border-white/10 p-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider opacity-60">Audiència segmentada</p>
+          <p className="text-sm font-medium">{initialSegmentAudience.label}</p>
+          <p className="mt-1 text-xs opacity-70">{initialSegmentAudience.description}</p>
+          <p className="mt-2 text-sm">
+            {initialSegmentAudience.recipients.length} destinataris preparats per l’enviament massiu.
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {initialSegmentAudience.recipients.slice(0, 4).map((recipient) => (
+              <div key={recipient.id} className="rounded-lg border border-white/10 p-3 text-xs">
+                <p className="font-medium">{recipient.name}</p>
+                <p className="opacity-70">{recipient.email}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="overflow-hidden rounded-2xl border admin-card-glass">
         <div className="space-y-6 p-4 sm:p-6">
-          <div>
-            <label className="mb-2 block text-sm font-medium">Selecciona entrada (opcional)</label>
-            <select
-              value={selectedLeadId}
-              onChange={(e) => setSelectedLeadId(e.target.value)}
-              aria-label="Selecciona entrada"
-              className={INPUT_CLASSES}
-            >
-              <option value="">-- Escriu email manualment --</option>
-              {leads.map((lead) => (
-                <option key={lead.id} value={lead.id}>
-                  {lead.name} ({lead.email}) - {getEventLabel(lead.eventType || '', 'Event')}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!isBulkSegmentMode && (
+            <div>
+              <label className="mb-2 block text-sm font-medium">Selecciona entrada (opcional)</label>
+              <select
+                value={selectedLeadId}
+                onChange={(e) => setSelectedLeadId(e.target.value)}
+                aria-label="Selecciona entrada"
+                className={INPUT_CLASSES}
+              >
+                <option value="">-- Escriu email manualment --</option>
+                {leads.map((lead) => (
+                  <option key={lead.id} value={lead.id}>
+                    {lead.name} ({lead.email}) - {getEventLabel(lead.eventType || '', 'Event')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {selectedLead && (
             <div className="rounded-xl border p-4">
@@ -437,13 +502,20 @@ export default function ComposeForm({
             <>
               <div>
                 <label className="mb-2 block text-sm font-medium">Per a *</label>
-                <input
-                  type="email"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  className={INPUT_CLASSES}
-                  placeholder="email@exemple.com"
-                />
+                {isBulkSegmentMode ? (
+                  <div className={`${INPUT_CLASSES} flex items-center justify-between`}>
+                    <span>{initialSegmentAudience?.label}</span>
+                    <span className="text-xs opacity-70">{initialSegmentAudience?.recipients.length} contactes</span>
+                  </div>
+                ) : (
+                  <input
+                    type="email"
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                    className={INPUT_CLASSES}
+                    placeholder="email@exemple.com"
+                  />
+                )}
               </div>
 
               <div>
@@ -496,7 +568,15 @@ export default function ComposeForm({
                     : 'ap-btn ap-btn--primary'
               }`}
             >
-              {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Envia pressupost' : '📤 Envia correu'}
+              {sent
+                ? '✓ Enviat!'
+                : sending
+                  ? 'Enviant...'
+                  : mode === 'quote'
+                    ? '📤 Envia pressupost'
+                    : isBulkSegmentMode
+                      ? '📣 Envia campanya'
+                      : '📤 Envia correu'}
             </button>
           </div>
         </div>
@@ -504,4 +584,3 @@ export default function ComposeForm({
     </div>
   );
 }
-

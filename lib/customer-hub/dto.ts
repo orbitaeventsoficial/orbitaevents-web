@@ -34,6 +34,7 @@ export type BookingDTO = {
   status: string;
   location?: string;
   venue?: string;
+  distanceKm?: number;
   depositAmount?: number;
   totalAmount?: number;
   reference?: string;
@@ -85,10 +86,12 @@ export type CustomerCommSummaryDTO = {
     WHATSAPP: number;
     CALL: number;
     NOTE: number;
+    INSTAGRAM: number;
+    FORM: number;
     SYSTEM: number;
   };
   lastContactAt: string | null;
-  lastContactChannel: 'EMAIL' | 'WHATSAPP' | 'CALL' | 'NOTE' | 'SYSTEM' | null;
+  lastContactChannel: 'EMAIL' | 'WHATSAPP' | 'CALL' | 'NOTE' | 'INSTAGRAM' | 'FORM' | 'SYSTEM' | null;
   lastContactDirection: 'OUTBOUND' | 'INBOUND' | 'INTERNAL' | null;
   pendingResponseFrom: 'TEAM' | 'CLIENT' | 'NONE';
   daysSinceLastContact: number | null;
@@ -171,6 +174,7 @@ export type LeadDTO = {
     endTime?: string;
     location?: string;
     venue?: string;
+    distanceKm?: number;
     guestCount?: number;
     packName?: string;
     depositPaid?: boolean;

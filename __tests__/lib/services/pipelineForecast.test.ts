@@ -259,4 +259,105 @@ describe('buildPipelineForecast', () => {
     const b = await buildPipelineForecast(3, now);
     expect(a).toEqual(b);
   });
+
+  // ─── D.14 — Confidence band (1σ Bernoulli) ────────────────────────────────
+  describe('confidence band ±1σ', () => {
+    it('retorna pipelineLow=pipelineHigh=0 quan no hi ha leads', async () => {
+      mockPrisma.lead.findMany.mockResolvedValue([]);
+      mockPrisma.booking.findMany.mockResolvedValue([]);
+
+      const result = await buildPipelineForecast(3);
+
+      expect(result.every((m) => m.pipelineLow === 0 && m.pipelineHigh === 0)).toBe(true);
+      expect(result.every((m) => m.combinedLow === 0 && m.combinedHigh === 0)).toBe(true);
+    });
+
+    it('genera banda no negativa: pipelineLow ≤ pipeline ≤ pipelineHigh', async () => {
+      mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+      mockEstimateAmount.mockReturnValue(2000);
+      const eventDate = new Date('2026-08-15T00:00:00Z');
+      mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate })]);
+      mockPrisma.booking.findMany.mockResolvedValue([]);
+
+      const result = await buildPipelineForecast(6, new Date('2026-06-15T12:00:00Z'));
+      const target = result.find((m) => m.pipeline > 0);
+
+      expect(target).toBeDefined();
+      expect(target!.pipelineLow).toBeGreaterThanOrEqual(0);
+      expect(target!.pipelineLow).toBeLessThanOrEqual(target!.pipeline);
+      expect(target!.pipelineHigh).toBeGreaterThanOrEqual(target!.pipeline);
+    });
+
+    it('lead segur (p=1): banda col·lapsada perquè variància Bernoulli=0', async () => {
+      mockScoreLead.mockReturnValue({ probability: 1, score: 100 });
+      mockEstimateAmount.mockReturnValue(3000);
+      const eventDate = new Date('2026-08-15T00:00:00Z');
+      mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate })]);
+      mockPrisma.booking.findMany.mockResolvedValue([]);
+
+      const result = await buildPipelineForecast(6, new Date('2026-06-15T12:00:00Z'));
+      const target = result.find((m) => m.pipeline > 0);
+
+      expect(target).toBeDefined();
+      expect(target!.pipelineLow).toBe(target!.pipeline);
+      expect(target!.pipelineHigh).toBe(target!.pipeline);
+    });
+
+    it('amplada exacta: per p=0.5, σ = amount × 0.5 = amount/2', async () => {
+      mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+      mockEstimateAmount.mockReturnValue(4000);
+      const eventDate = new Date('2026-08-15T00:00:00Z');
+      mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate })]);
+      mockPrisma.booking.findMany.mockResolvedValue([]);
+
+      const result = await buildPipelineForecast(6, new Date('2026-06-15T12:00:00Z'));
+      const target = result.find((m) => m.pipeline > 0);
+
+      // Variància d'una Bernoulli sola: a²·p·(1-p) = 4000² × 0.25 = 4 000 000
+      // σ = sqrt(4 000 000) = 2000. Pipeline = 4000 × 0.5 = 2000.
+      // Banda: [max(0, 2000 - 2000), 2000 + 2000] = [0, 4000].
+      expect(target!.pipeline).toBe(2000);
+      expect(target!.pipelineLow).toBe(0);
+      expect(target!.pipelineHigh).toBe(4000);
+    });
+
+    it('combina la banda amb l\'històric igual que la previsió central (60/40)', async () => {
+      mockScoreLead.mockReturnValue({ probability: 0.5, score: 50 });
+      mockEstimateAmount.mockReturnValue(4000);
+      const eventDate = new Date('2026-08-15T00:00:00Z');
+      mockPrisma.lead.findMany.mockResolvedValue([makeLead({ eventDate })]);
+
+      // Construir històric per al mateix mes calendari (agost)
+      mockPrisma.booking.findMany.mockResolvedValue([
+        { eventDate: new Date('2025-08-15T00:00:00Z'), total: 1000 },
+      ]);
+
+      const result = await buildPipelineForecast(6, new Date('2026-06-15T12:00:00Z'));
+      const target = result.find((m) => m.pipeline > 0 && m.historicalAvg > 0);
+
+      expect(target).toBeDefined();
+      // pipeline = 2000, pipelineLow = 0, pipelineHigh = 4000, historicalAvg = 1000
+      // combined = round(2000·0.6 + 1000·0.4) = round(1600) = 1600
+      // combinedLow = round(0·0.6 + 1000·0.4) = 400
+      // combinedHigh = round(4000·0.6 + 1000·0.4) = 2800
+      expect(target!.combined).toBe(1600);
+      expect(target!.combinedLow).toBe(400);
+      expect(target!.combinedHigh).toBe(2800);
+    });
+
+    it('quan no hi ha pipeline, els 3 valors combinats igualen l\'històric', async () => {
+      mockPrisma.lead.findMany.mockResolvedValue([]);
+      mockPrisma.booking.findMany.mockResolvedValue([
+        { eventDate: new Date('2025-08-15T00:00:00Z'), total: 5000 },
+      ]);
+
+      const result = await buildPipelineForecast(6, new Date('2026-06-15T12:00:00Z'));
+      const target = result.find((m) => m.historicalAvg > 0);
+
+      expect(target).toBeDefined();
+      expect(target!.combined).toBe(target!.historicalAvg);
+      expect(target!.combinedLow).toBe(target!.historicalAvg);
+      expect(target!.combinedHigh).toBe(target!.historicalAvg);
+    });
+  });
 });

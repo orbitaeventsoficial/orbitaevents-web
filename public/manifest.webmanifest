@@ -24,5 +24,59 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Entrades",
+      "short_name": "Leads",
+      "description": "Anar al cockpit d'entrades",
+      "url": "/admin/leads",
+      "icons": [
+        {
+          "src": "/favicon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Creació ràpida",
+      "short_name": "Creació",
+      "description": "Crear lead, pressupost o reserva en un sol pas",
+      "url": "/admin/quick-create",
+      "icons": [
+        {
+          "src": "/favicon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Reserves",
+      "short_name": "Reserves",
+      "description": "Llista de reserves actives",
+      "url": "/admin/bookings",
+      "icons": [
+        {
+          "src": "/favicon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Inbox",
+      "short_name": "Inbox",
+      "description": "Safata de comunicacions amb clients",
+      "url": "/admin/inbox",
+      "icons": [
+        {
+          "src": "/favicon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

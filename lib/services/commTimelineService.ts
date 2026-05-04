@@ -8,7 +8,7 @@ import {
 // TYPES
 // ───────────────────────────────────────────────────────────────────────────
 
-export type CommChannel = 'EMAIL' | 'WHATSAPP' | 'CALL' | 'NOTE' | 'SYSTEM';
+export type CommChannel = 'EMAIL' | 'WHATSAPP' | 'CALL' | 'NOTE' | 'INSTAGRAM' | 'FORM' | 'SYSTEM';
 
 export type CommDirection = 'OUTBOUND' | 'INBOUND' | 'INTERNAL';
 
@@ -75,6 +75,19 @@ const TYPE_TO_CHANNEL: Record<string, CommChannel> = {
   SYSTEM: 'SYSTEM',
 };
 
+function normalizeCommChannel(value: unknown): CommChannel | null {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toUpperCase();
+  if (normalized === 'EMAIL') return 'EMAIL';
+  if (normalized === 'WHATSAPP') return 'WHATSAPP';
+  if (normalized === 'CALL') return 'CALL';
+  if (normalized === 'NOTE') return 'NOTE';
+  if (normalized === 'INSTAGRAM' || normalized === 'IG' || normalized === 'IG_DM') return 'INSTAGRAM';
+  if (normalized === 'FORM' || normalized === 'WEB_FORM' || normalized === 'CONTACT_FORM') return 'FORM';
+  if (normalized === 'SYSTEM') return 'SYSTEM';
+  return null;
+}
+
 function inferDirection(entry: CommTimelineRawEntry): CommDirection {
   if (entry.type === 'NOTE') return 'INTERNAL';
   if (entry.createdBy === 'system' || entry.createdBy === 'Scoring Bot' || entry.type === 'SYSTEM' || entry.type === 'STATUS_CHANGE') return 'INTERNAL';
@@ -106,6 +119,8 @@ function inferDirectionFromCanonicalEvent(event: CanonicalTimelineEvent): CommDi
 }
 
 function mapCanonicalEventToChannel(event: CanonicalTimelineEvent): CommChannel | null {
+  const metadataChannel = normalizeCommChannel(event.metadata?.channel);
+  if (metadataChannel) return metadataChannel;
   if (event.timelineType === 'MESSAGE_SENT' || event.timelineType === 'EMAIL_RECEIVED') return 'EMAIL';
   if (event.timelineType === 'WHATSAPP_SENT') return 'WHATSAPP';
   if (event.timelineType === 'PHONE_CALL') return 'CALL';
@@ -121,6 +136,8 @@ function summarizeEntries(entries: CommEntry[], now: Date): CommTimelineSummary 
     WHATSAPP: 0,
     CALL: 0,
     NOTE: 0,
+    INSTAGRAM: 0,
+    FORM: 0,
     SYSTEM: 0,
   };
   for (const entry of entries) {
@@ -175,7 +192,7 @@ export function buildCommTimeline(input: CommTimelineInput): CommTimelineSummary
     .filter((activity) => commTypes.has(activity.type))
     .map((a) => ({
     id: a.id,
-    channel: TYPE_TO_CHANNEL[a.type] ?? 'SYSTEM',
+    channel: normalizeCommChannel(a.metadata?.channel) ?? TYPE_TO_CHANNEL[a.type] ?? 'SYSTEM',
     direction: inferDirection(a),
     title: a.title ?? a.type,
     body: a.description,

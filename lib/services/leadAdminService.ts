@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
+import { recordLeadInboundChannelCaptured } from '@/lib/services/leadActivityService';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 type EventType = 'WEDDING' | 'BIRTHDAY' | 'CORPORATE' | 'COMMUNION' | 'BAPTISM' | 'GRADUATION' | 'ANNIVERSARY' | 'PRIVATE_PARTY' | 'OTHER';
@@ -110,6 +111,16 @@ export async function createAdminLead(data: LeadCreateInput) {
       details: { name: lead.name, eventType: lead.eventType },
     },
   });
+
+  if (lead.source === 'INSTAGRAM') {
+    await recordLeadInboundChannelCaptured({
+      leadId: lead.id,
+      channel: 'instagram',
+      title: 'Instagram DM registrat',
+      preview: lead.message || null,
+      createdBy: 'Admin',
+    });
+  }
 
   return { ok: true, lead };
 }

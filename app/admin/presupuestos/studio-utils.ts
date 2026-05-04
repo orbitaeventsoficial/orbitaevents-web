@@ -64,6 +64,24 @@ export type PricingCatalogResponse = {
   };
 };
 
+export type ProfitabilityConfigResponse = {
+  ok?: boolean;
+  config?: {
+    packCostRatio: number;
+    extraCostRatio: number;
+    extraHourCostRatio: number;
+    fixedOperationalCost: number;
+    channelCac: Record<string, number>;
+  } | null;
+  defaults?: {
+    packCostRatio: number;
+    extraCostRatio: number;
+    extraHourCostRatio: number;
+    fixedOperationalCost: number;
+    channelCac: Record<string, number>;
+  } | null;
+};
+
 export type StudioProps = {
   initialCustomerId?: string;
   initialCustomerName?: string;

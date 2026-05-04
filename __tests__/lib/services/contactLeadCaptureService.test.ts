@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Mocks (vi.hoisted per evitar TDZ amb vi.mock hoisting) ────────────────
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockRecordLeadInboundChannelCaptured } = vi.hoisted(() => ({
   mockPrisma: {
     lead: {
       findFirst: vi.fn(),
@@ -24,11 +24,15 @@ const { mockPrisma } = vi.hoisted(() => ({
       create: vi.fn(),
     },
   },
+  mockRecordLeadInboundChannelCaptured: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/logger', () => ({
   log: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() },
+}));
+vi.mock('@/lib/services/leadActivityService', () => ({
+  recordLeadInboundChannelCaptured: mockRecordLeadInboundChannelCaptured,
 }));
 
 import { persistContactLead } from '@/lib/services/contactLeadCaptureService';
@@ -55,6 +59,7 @@ const baseInput = {
 describe('persistContactLead', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRecordLeadInboundChannelCaptured.mockResolvedValue(undefined);
   });
 
   it('crea un lead nou si no existeix cap amb el mateix email', async () => {
@@ -221,5 +226,24 @@ describe('persistContactLead', () => {
         }),
       }),
     );
+  });
+
+  it('registra el formulari web com a canal real d’entrada', async () => {
+    mockPrisma.lead.findFirst.mockResolvedValue(null);
+    mockPrisma.lead.create.mockResolvedValue({ id: 'lead-form-1' });
+    mockPrisma.leadNote.create.mockResolvedValue({});
+    mockPrisma.customer.upsert.mockResolvedValue({ id: 'cust-form-1' });
+    mockPrisma.lead.update.mockResolvedValue({});
+    mockPrisma.customerActivity.create.mockResolvedValue({});
+
+    await persistContactLead(baseInput);
+
+    expect(mockRecordLeadInboundChannelCaptured).toHaveBeenCalledWith({
+      leadId: 'lead-form-1',
+      channel: 'form',
+      title: 'Formulari web rebut',
+      preview: 'Vull la millor festa!',
+      createdBy: 'Captura web',
+    });
   });
 });

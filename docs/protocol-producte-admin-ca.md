@@ -170,9 +170,16 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Norma canònica de lectures i escriptures**: si un domini ja té servei, helper o contracte shared per llegir o escriure, no es permet reobrir query crua o `create(...)` inline des d'una pàgina, route o servei adjacent. Primer s'ha de reutilitzar la capa canònica; si no arriba, s'amplia aquella capa i després es reconnecten els consumidors.
 - **Norma de tancament rigorós de tall**: cada `Canvi #N` registrat al §9 ha d'incloure, sense excepció: (1) tests nous o ampliats quan el codi canvia — shape, happy paths i regressions; (2) `pnpm run validate:core` verd 100% (tots els guards); (3) `pnpm run qa:protocol` OK al tancament; (4) entrada completa al §9 amb context, què s'ha fet en bullets concrets, verificació executada, `ADMIN_CHANGE_COUNTER` incrementat i autors (`Començat` / `Treballant` / `Tancat`); (5) entrada al `docs/diario.md` amb el mateix detall; (6) actualització del bloc §6 afectat (p.ex. `EN MARXA → FET` amb cita al canvi); (7) si el tall introdueix una regla operativa o arquitectònica, s'escriu explícitament a aquest document — no es deixa en context oral. Sense aquests punts, el tall no compta com a tancat. Aquesta norma aplica per igual a tots els agents (`claude`, `codex`) i al treball del `user` quan fa intervencions directes.
 - **Interfície de propietari obligatòria**: qualsevol pantalla que governi negoci, operativa o risc ha de poder-se llegir d'un cop d'ull. La UI ha de separar clarament què és `automàtic` i què és `manual`, fer visibles semàfors, prioritat i següent pas, i reduir dependència de memòria o lectura tècnica.
+- **Validació humana obligatòria**: una funció no es dona per bona només perquè el codi, els tests o la lògica interna semblin correctes. Si l'ús real depèn de botons, noms, estats, textos o d'un flux d'interfície, també s'ha de validar com ho faria una persona no tècnica. Si la UI indueix a error o fa passar per alt el comportament bo, el treball es considera incomplet.
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
 - **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
+- **Workflow mínim obligatori per cada tall**: abans de tocar res s'han de fer 4 comprovacions i deixar-les clares al cap: (1) `git status` per detectar worktree brut, (2) `ADMIN_CHANGE_COUNTER` actual, (3) `§6.N` afectat o `SEGÜENT` que justifica el tall, (4) classificació del tall: `codi`, `UI`, `documental`, `schema/migració` o `infra`. Sense aquestes 4 peces, no s'ha començat de veritat.
+- **Regla explícita de worktree brut**: si el repo ja té canvis locals aliens, no es permet "netejar", reordenar ni refactoritzar per comoditat. Només es toca l'àmbit mínim necessari pel tall actual. Si el fitxer ja està modificat i el nou tall hi entra, primer s'ha d'entendre què ja hi ha i adaptar-s'hi; no s'imposa un estat net fictici.
+- **Validació en 3 capes**: cada tall ha de deixar escrit què s'ha validat exactament entre aquestes tres capes: (1) `validació tècnica` — types, tests, guards, build; (2) `validació funcional` — el cas d'ús resolt produeix l'efecte correcte; (3) `validació humana/UX` — una persona no tècnica entén què passa i què ha de fer. Dir només "validat" és massa ambigu i ja no és acceptable.
+- **Ordre de prioritat operatiu**: quan hi ha dubte entre diversos fronts, l'ordre és aquest: (1) errors de compilació o contracte trencat, (2) regressions de runtime o dades, (3) tests/guards en vermell, (4) `PENDENT CRÍTIC` o `SEGÜENT` explícit del protocol, (5) millores documentals o UX no bloquejants. Això evita obrir fronts bonics mentre la base encara falla.
+- **Checklist de tancament canònic**: al final del tall s'ha de poder respondre sí/no, sense literatura, a aquesta llista: `tests tocats?`, `npx tsc --noEmit OK?`, `validate:core OK?`, `qa:protocol OK?`, `§6 afectat actualitzat?`, `§9 registrat?`, `docs/diario.md actualitzat?`, `ADMIN_CHANGE_COUNTER pujat?`, `tipus de validació explicitats?`. Si falta un sí en un tall que tocava aquell punt, el tall continua obert.
+- **Aplicació simètrica per actor**: aquestes normes operatives no són només per un agent concret. Apliquen igual a `claude`, `codex` i al `user` quan intervé directament al repo. Ningú no queda exempt del workflow mínim, la regla de worktree brut, la validació en 3 capes ni el checklist de tancament.
 - **Norma operativa de no-col·lisió entre agents**: `claude` i `codex` treballen concurrents sobre el mateix repo. Abans d'atacar un `SEGÜENT` cal mirar la darrera finestra de canvis `#N` al §9 i veure quin perímetre està ocupat ara mateix (el `ADMIN_CHANGE_COUNTER` pot pujar preemptivament per l'altre agent entre dues consultes). Dos indicadors: (1) si el counter està per sobre del darrer Canvi registrat al §9, és que l'altre agent ha reservat el número i està escrivint-ne el contingut — no es pren aquest número, el següent agent usa `counter + 1`; (2) abans de començar un tall, cal triar un **front diferent** al que ha tocat l'altre agent les darreres hores (si `codex` està al Lead Hub `LOST`, `claude` ataca bookings/tasks/social; i al revés). Si tot i així es detecta col·lisió (p.ex. edits paral·leles al mateix fitxer), el tall es replanteja o s'espera. Val la pena perdre una ronda abans que fer feina que es trepitgi.
 
 ## 2.1.0 Característiques exigides del repo
@@ -840,12 +847,27 @@ Criteri pràctic:
 **FET** *(2026-04-16 per `claude`)*: `build:ci` avaluat — CI ja executa `validate:core` (job lint-typecheck) + `next build` (job build) per separat; `build:ci` queda com a conveniència local, no cal al CI. `check-patches` avaluat: 0 findings a 885 fitxers, 5 detectors centrats en code smells (no lingüístics). No cal separar ara — si apareixen falsos positius lingüístics, crear `check-language-quality.mjs` apart. `docs/runbook.md` i `docs/estat-admin.md` actualitzats: crons 6→10, endpoints `/api/admin/crons/...`→`/api/cron/...`.
 **FET** *(2026-04-24 per `claude` — Canvi #354)*: `check-language-quality.mjs` integrat a `validate:core` amb test blindat. El guard lingüístic del repo (apòstrof català dins strings single-quoted, plurals incorrectes tipus `respostas`/`tascas`/`pressuposts`) ja existia com a script + entry `qa:language` a `package.json` però no entrava al pipeline. Afegit `pnpm run qa:language` dins `validate:core` entre `qa:encoding` i `qa:message-imports`. Nou test `__tests__/scripts/check-language-quality.test.ts` (7 tests: clean, apòstrof detectat en single-quote, no-flag en double-quote, plurals incorrectes detectats, skip `__tests__/`, skip `.test.` files). També queda escrita al §2.1 la **norma de tancament rigorós de tall** (aplica a `claude`, `codex` i `user`), documentant el que fins ara depenia de context oral: cada canvi requereix tests, validate:core verd, qa:protocol OK, §9 complet, diari, §6 actualitzat i regles noves al protocol.
 **FET** *(2026-04-26 per `codex` — Canvi #418)*: el vell `EN MARXA` de `§6.14` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava `validate:core` com a barrera obligatòria, pre-commit hook, guards de protocol/encoding/language/patches/overflow i disciplina de tancament rigorós escrita al §2.1; el pendent real que resta és exclusivament el `PENDENT CRÍTIC` d'evitar regressions silencioses en un repo gran.
+**FET** *(2026-05-01 per `codex` — Canvi #466)*: el nou perímetre HTTP de validacions del protocol ja queda alineat amb els contractes reals del repo i blindat amb test de route. `app/api/admin/protocol/validations/route.ts` deixa d'importar un helper inexistent (`@/lib/auth-utils`), substitueix el permís invàlid `write` pel permís canònic `mutate` i reutilitza `getAdminRole(req)` com a `validatedBy`. Test nou `__tests__/app/api/admin/protocol-validations-route.test.ts` cobreix `GET/POST/DELETE`, auth, permisos, body invàlid i la persistència del rol admin canònic. Efecte: `npx tsc --noEmit` i `validate:core` tornen a verd, i el mòdul de validacions del protocol deixa de ser una peça nova sense cobertura de contracte.
+**FET** *(2026-05-01 per `codex` — Canvi #467)*: la validació humana del protocol deixa de ser només servei+API i passa a ser una eina operativa real dins l'admin. `/admin/docs/protocol` deixa `force-static`, carrega `loadCanviValidations()` en temps real, mostra KPI de percentatge validat i cada `Canvi #N` incorpora un panell `Validació humana` amb estat, actor, data, nota curta i CTA per marcar/desfer via `fetchWithCsrf('/api/admin/protocol/validations')`. Test nou `__tests__/app/admin/docs/ProtocolValidationToggle.test.tsx` blinda `POST`, `DELETE`, refresh i error visible. Efecte: la norma §2.1 de validació humana ja no viu només al paper; queda accionable des del viewer del protocol.
+**FET** *(2026-05-01 per `codex` — Canvi #468)*: el viewer del protocol ja permet separar visualment el backlog humà pendent del que ja ha passat revisió. Nou helper pur `protocolValidationViewerService.ts` amb `normalizeProtocolValidationFilter()` + `filterProtocolCanvisByValidation()`, test propi (`__tests__/lib/services/protocolValidationViewerService.test.ts`) i wiring a `/admin/docs/protocol` via `?validation=all|validated|pending`, select al formulari i shortcuts ràpids `Tots / Validats / Pendents`. Efecte: el propietari pot veure només els canvis que encara requereixen validació humana, en lloc de recórrer manualment tota la llista.
+**FET** *(2026-05-01 per `codex` — Canvi #469)*: el viewer prioritza la feina humana pendent sense obligar a obrir cap detall. El helper `filterProtocolCanvisByValidation()` ara ordena `pending → validated` quan el filtre és `all`, i cada resum de `Canvi #N` mostra badge visible `Pendent validació` o `Validat humà` al costat de l'estat del canvi. Test del helper ampliat a 6 casos per blindar aquesta ordenació. Efecte: el propietari veu d'un cop d'ull què queda per revisar i què ja està validat, sense escaneig manual.
+**FET** *(2026-05-01 per `codex` — Canvi #471)*: els filtres del viewer ja mostren els comptadors reals de cada bucket humà. `protocolValidationViewerService.ts` guanya `summarizeProtocolValidationFilterCounts()` i el viewer pinta `Tots · N`, `Validats · N`, `Pendents · N` sobre el subconjunt ja filtrat per cerca `?q=`. Test del helper ampliat a 7 casos. Efecte: el propietari sap quants canvis queden pendents sense canviar de vista ni comptar manualment.
+**FET** *(2026-05-01 per `codex` — Canvi #473)*: la vista de backlog humà ja entra al detall correcte sense fricció. `protocolValidationViewerService.ts` afegeix `describeProtocolValidationFilter()` i `shouldAutoOpenProtocolCanvi()`; el KPI `Filtre actiu` deixa de ser genèric i ara explicita `Sense filtre / Cerca activa / Només validats / Només pendents`, i quan el filtre és `pending` els `<details>` dels canvis pendents s'obren automàticament. Test del helper ampliat a 13 casos per blindar copy, auto-open i focus explícit. Efecte: el propietari veu immediatament què està revisant i pot validar els pendents sense un clic addicional per canvi.
+**FET** *(2026-05-01 per `codex` — Canvi #475)*: el viewer ja porta l'usuari directament al primer canvi pendent del subconjunt actual. `protocolValidationViewerService.ts` afegeix `findFirstPendingProtocolCanvi()` i `/admin/docs/protocol` pinta el shortcut `Obrir primer pendent · #N` al costat dels filtres ràpids, preservant `?q=` i entrant directament a `?validation=pending&canvi=N#canvi-N`. Test del helper ampliat a 15 casos per blindar el càlcul del primer pendent i el cas `tot validat`. Efecte: la validació humana deixa de requerir escaneig inicial fins i tot quan hi ha molts canvis al bucket pendent.
+**FET** *(2026-05-01 per `codex` — Canvi #476)*: el viewer descriu millor els extrems de la cua humana i assenyala el següent pendent sense haver d'entrar al detall. `protocolValidationViewerService.ts` afegeix `describeProtocolValidationEmptyState()`; el card `Validats humans` mostra `Següent pendent: #N · author` quan n'hi ha cap, i l'empty state de resultats deixa de ser genèric per diferenciar `Tot validat`, `Cap pendent amb aquesta cerca`, `Cap canvi validat` o `Cap coincidència`. Test del helper ampliat a 19 casos. Efecte: el propietari sap si realment la cua està buida o si només la cerca l'ha deixat sense resultats, i sempre veu quin és el proper canvi humà a revisar.
+**FET** *(2026-05-01 per `codex` — Canvi #478)*: el viewer ja quantifica el progrés de validació dins la vista activa, no només al global. `protocolValidationViewerService.ts` afegeix `summarizeProtocolValidationProgress()` i el card `Validats humans` mostra `Vista actual: X/Y validats · Z%` sobre el subconjunt ja filtrat per `?q=` i `?validation=`. Test del helper ampliat a 21 casos, incloent subconjunt buit (`0/0`, `0%`). Efecte: el propietari entén d'un cop d'ull si la vista activa està a mig revisar o pràcticament tancada, sense haver de deduir-ho dels comptadors separats.
+**FET** *(2026-05-01 per `codex` — Canvi #480)*: el bloc `Resultats canvis` deixa de parlar en genèric i s'alinea amb la vista real. `protocolValidationViewerService.ts` afegeix `describeProtocolValidationResults()` i el viewer canvia el títol/descripció segons `all / validated / pending` i la cerca activa, p.ex. `Pendents de validació (N)` amb nota d'auto-open o `Validats humans (N)` quan només es miren els ja revisats. Test del helper ampliat a 24 casos. Efecte: el context del llistat queda explícit sense obligar l'usuari a deduir-lo dels filtres superiors.
+**FET** *(2026-05-01 per `codex` — Canvi #481)*: el bloc d'índex de seccions `§X.Y` també parla segons la vista real quan hi ha cerca activa. `protocolValidationViewerService.ts` afegeix `describeProtocolSectionResults()` i el viewer adapta títol/descripció del catàleg de seccions entre la vista base i `Seccions amb coincidències (N)`. Test del helper ampliat a 26 casos. Efecte: la cerca del protocol queda coherent tant al llistat de canvis com al llistat de seccions, sense copy genèric residual.
+**FET** *(2026-05-01 per `codex` — Canvi #483)*: la drecera de backlog humà ja explica també quan no queda res per revisar. `protocolValidationViewerService.ts` afegeix `describeProtocolPendingShortcut()` i el bloc de filtres deixa de desaparèixer en silenci quan no hi ha pendents: mostra `Obrir primer pendent · #N` quan existeix un pendent i un estat passiu `Sense pendents` o `Sense pendents en aquesta cerca` quan la cua ja està resolta. Test del helper ampliat a 28 casos. Efecte: el viewer evita silencis ambigus i deixa clar si la cua humana està realment tancada.
+**FET** *(2026-05-04 per `codex` — Canvi #486)*: el shortcut `Obrir primer pendent` del viewer deixa de filtrar un `href` brut. `protocolValidationViewerService.ts` extreu `querySuffix` i elimina el backtick residual que quedava enganxat al final de la URL `?validation=pending&canvi=N#canvi-N`. `__tests__/lib/services/protocolValidationViewerService.test.ts` guanya el cas explícit sense cerca activa, de manera que queden blindades tant la URL amb `?q=` com la versió base sense query. Efecte: el CTA del backlog humà torna a ser una drecera fiable i copiable, sense caràcters paràsits al final de l'àncora.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
 ## 6.15 Roadmap de millores identificades (backlog prioritzat)
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca.
 **FET** *(2026-04-10 per `claude` — Canvi #84)*: backlog exhaustiu documentat a `lib/constants/adminManual.ts` com a `ADMIN_MANUAL_ROADMAP` i visible a `/admin/manual`. Cada ítem porta prioritat, impacte, esforç i àrea.
+**FET** *(2026-04-30 per `claude` — Canvi #462)*: `ADMIN_MANUAL_ROADMAP` deixa de divergir d'aquesta secció. El contracte `AdminManualRoadmapItem` guanya `status: 'PENDING' | 'DONE'`, `doneCanvi?: number` i `doneNote?: string`; els 11 ítems CRITICAL/HIGH/MEDIUM/LOW que ja són FET aquí porten cita del Canvi #N corresponent (#115, #116, #126, #131, #133, #380, #408 + decisions sense Canvi únic), i només `marketing-analytics-hub` queda `PENDING`. La pàgina `/admin/manual` ordena pendents primer, pinta badge `Fet · Canvi #N` o `Pendent`, mostra `doneNote` als FET amb panell verd, i el KPI "Roadmap pendent" passa de `12` a `1`.
+**FET** *(2026-04-30 per `claude` — Canvi #463)*: el roadmap ja no és informatiu passiu. Cada card té CTAs reals: botó primari `Obrir Canvi #N` (DONE) o `Obrir §9 al protocol` (PENDING) que enllaça al nou viewer `/admin/docs/protocol?canvi=N#canvi-N`, i botó secundari `Anar a {workspace}` per `area`. La línia `Verificat al §9: #N · DATE · AUTHOR · STATUS` mostra metadades llegides en runtime des del protocol via `parseProtocolCanvis()`, sense duplicació al constant. Guard `qa:roadmap-canvis` afegit a `validate:core` (12 → 13 guards) blinda que cada `doneCanvi` del roadmap correspongui a un `### Canvi #N — ... (FET)` real al §9 — qualsevol divergència futura falla el pipeline.
 
 ### SEGÜENT (Crítiques — impacte directe a conversió)
 - **[CRITICAL] ~~Motor de nurturing automàtic de leads~~** — ✅ FET (anteriorment). `commercialSequenceService.ts` executa cadència 5 passos (1d/3d/7d/14d/30d) amb email/WA, integrat al cron `commercialDailyAutomation`.
@@ -915,10 +937,13 @@ Criteri pràctic:
 - FET: pestanya content del pack editor simplificada i elevada visualment, amb flux de treball, lots reutilitzables i lectura més clara de la composició.
 - FET: compositor automàtic explicat com a punt de partida, amb modes visibles i revisió explícita de quantitats i obligatorietat.
 **CARACTERÍSTIQUES EXIGIDES**: relació bidireccional visible · zero contingut opac · bellesa funcional · zero overflow · TypeScript verd al perímetre.
-**SEGÜENT**: preparar una reunió de treball per definir Fase 0 (ICP + proposta de valor) — sense això no es pot començar res.
+**FET** *(2026-05-04 per `claude` — Canvi #485)*: el `SEGÜENT` d'aquesta secció estava ocupat per un text desencaixat ("preparar una reunió de treball per definir Fase 0 (ICP + proposta de valor) — sense això no es pot començar res") que pertany conceptualment a `§6.16 Màrqueting i captació externa · Fase 0 — Fundació` (definir ICP, proposta de valor, optimitzar web, Google Business Profile), no a aquesta secció d'inventari+packs. La Fase 0 ja viu correctament documentada a `§6.16` amb les seves 4 sub-tasques. Aquí queda eliminat el residu sense duplicar — el bloc d'`ESTAT ACTUAL` ja deixa veure que la relació bidireccional inventari↔packs està drenada (badges clicables, preview de material, editor detall, pestanya content, compositor automàtic). No hi ha cap tall executable immediat pendent en aquesta zona. Mateix patró que el `#484` de codex (Camí 2 a §6.18) i el `#447` de claude (Camí 1 a §6.18).
+**MÉS ENDAVANT**: refinaments d'UI sobre la mateixa relació quan apareguin friccions reals d'ús.
 
 ## 6.18 Auditoria CRMs top — backlog d'incorporacions
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
+**FET** *(2026-04-29 per `codex` — Canvi #450)*: B.9 tancat amb marge viu al PDF Studio. `PresupuestoPdfStudio` carrega la `profitabilityConfig` canònica, calcula el resum via `costEngine` i `StudioPreview` mostra `cost directe`, `marge net`, `% marge` i CAC estimat amb to semàfor, sense crear un segon motor econòmic.
+**FET** *(2026-04-29 per `codex` — Canvi #449)*: B.8 tancat amb auto-suggeriment de pack integrat a `/admin/quick-create`. El formulari calcula suggeriment client-side a partir de `eventType + guestCount + budget`, mapeja el pack de config al pack real de Prisma per `slug`, mostra confiança + motius + alternatives i permet aplicar la recomanació sense sobreescriure la tria manual.
 **FET** *(2026-04-29 per `claude` — Canvi #447)*: regularització documental del Camí 1 i meitat del Camí 2. Els ítems A.2 (#437), A.3 (#438), A.4 (#441), A.5 (#442), B.6 (#444) i B.7 (#446) ja estaven tancats al §9 però seguien llistats com a `SEGÜENT` aquí. Camí 1 ara 100% FET. Camí 2 redueix `SEGÜENT` a B.8 + B.9.
 **FET** *(2026-04-28 per `claude` — Canvi #436)*: backlog complet d'auditoria contra CRMs top documentat (HubSpot, Pipedrive, Monday CRM, Zoho, Salesforce + Tave/Honeybook per events). 27 ítems agrupats en 7 àrees (A-G) amb tag de criticitat (`[BLOC]` mai pot faltar · `[BÀSIC]` sentit comú · `[USP]` diferenciador d'Òrbita) i priorització en 3 camins paral·lels.
 **FET** *(2026-04-28 per `claude` — Canvi #435)*: A.1 — vinculació explícita lead→client amb match per email/DNI/telèfon i feedback explícit. Tancat amb `leadCustomerLinkService` + endpoint + panell + 13 tests.
@@ -939,10 +964,11 @@ Amplifica el USP que l'usuari ja té (km + transport autocalculat) i el converte
 ### FET (Camí 2)
 - **B.6 [USP brutal] Fer estrella visible l'auto-càlcul km + transport** — `FET` *(Canvi #444)*: línia explícita "Desplaçament" al PDF del pressupost amb detall km totals · km facturables · trams. Abans els 40€/2 trams se sumaven al total invisibles.
 - **B.7 [USP] Auto-pricing per data** — `FET` *(Canvi #446)*: `lib/constants/pricingRules.ts` amb 4 regles canòniques (cap de setmana +10%, alta temporada juny-set +15%, Nadal 15dec-6gen +25%, Nochevieja 31dec +50%) + servei pur `applyDatePricing` + integració PDF/preview amb línia "Recàrrec ..." quan aplica.
+- **B.8 [BÀSIC] Auto-suggeriment de pack** — `FET` *(Canvi #449)*: `suggestPackForLead()` puntua packs per servei/capacitat/pressupost, parseja brackets de pressupost lliure (incloent accents com `més de` / `fins a`) i `/admin/quick-create` mostra la recomanació amb confiança, motius, alternatives i botó `Aplicar suggeriment` via mapping segur `config slug → Prisma pack`.
+- **B.9 [BÀSIC] Marge instantani per event visible al pressupost** — `FET` *(Canvi #450)*: el PDF Studio calcula marge viu reutilitzant `computeBookingFinancialSummary()` i la `profitabilityConfig` canònica. La preview ensenya cost directe, marge net, % marge, CAC estimat i to semàfor, sense motor paral·lel ni hardcodes econòmics locals.
 
-### SEGÜENT (Camí 2)
-- **B.8 [BÀSIC] Auto-suggeriment de pack** — segons `eventType + guestCount + budget`, suggerir el pack que millor encaixa al moment de crear el lead/pressupost. Pipedrive Smart Suggestions, Honeybook templates. Implica: servei `suggestPackForLead(lead): { pack, confidence, reason }` que ja podem aprofitar `LEAD_SCORING_STATUS_PROBABILITY` + capacitat dels packs + budget bracket.
-- **B.9 [BÀSIC] Marge instantani per event visible al pressupost** — cost equip + transport + hores + extras → marge net visible al moment de cotitzar, no només a `/admin/economia`. Tave "Profit calculator" per project. Implica: component `LiveMarginIndicator` al detall de pressupost que reaprofita `costService` ja existent.
+### FET (Camí 2)
+- **Regularització documental** — `FET` *(2026-05-03 per `codex` — Canvi #484)*: el `SEGÜENT` de Camí 2 queda tancat perquè els quatre ítems reals del bloc ja estaven completats (`B.6` → `#444`, `B.7` → `#446`, `B.8` → `#449`, `B.9` → `#450`). El checklist deixa de fingir un pas immediat obert quan l'únic estat honest és "Camí 2 drenat".
 
 ### Camí 3 — Portal client + signatura + pagament (~25-40h, prioritat 3)
 Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb això. Reservar per quan hi hagi flux real que ho justifiqui.
@@ -955,21 +981,21 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 - **G.27 [USP] Galeria post-event privada amb codi compartible** — Tave Galleries. Implica: nou model `EventGallery { bookingId, shareToken, photos[] }` + ruta pública `/gallery/[token]` amb password opcional.
 
 ### Mancances transversals (atacar quan toqui per àrea)
-- **C.10 [BÀSIC] Inbox unificada multi-canal real** (email + WhatsApp + IG DM + form) — HubSpot Inbox, Honeybook conversations. Òrbita ja té Inbox amb multi-canal parcial; falta unificar IG DM i form com a canal real al `commTimeline`.
-- **C.11 [BÀSIC] Enviament massiu segmentat** — "tots els clients de bodes 2025", "leads frescos sense resposta 7d". HubSpot Lists. Implica: servei `bulkComposeForSegment({segment, template})` reutilitzant `inboxTemplateService` existent.
-- **C.12 [BÀSIC parcialment FET]** Plantilles intel·ligents amb variables (`{{firstName}}`, `{{eventDate}}`) — `inboxTemplateService` ja té base, falta auto-emplenat al `ComposeForm`.
-- **C.13 [parcialment FET]** Sequencer manual des del lead — `commercialSequenceService` existeix però falta UI per disparar manualment a un lead concret amb passos custom.
-- **D.14 [parcial]** Forecast per mes amb confiança ponderada — `LEAD_SCORING_STATUS_PROBABILITY` ja existeix, falta agregació mensual amb confidence band a UI.
-- **D.15 [FET]** "Què faig avui" en 5 línies — `dailyBriefService` ja cobreix.
-- **D.16 [FET]** Customer Lifetime Value visible per client — `customerInsightsService.calculateLTV` ja existeix.
-- **D.17 [BLOC verificar UX]** Pipeline drag & drop entre estats — `LeadPipelineView` ja existeix, cal verificar fluïdesa drag&drop a mòbil i actualitzar si cal.
-- **E.18 [FET base]** App PWA admin — `app/manifest` ja existeix, refinar offline i Quick Actions.
-- **E.19 [BÀSIC]** Quick action mobile (1 tap → trucar/WhatsApp/marcar contactat) — falta a la fitxa de lead/customer/booking en vista mòbil.
-- **E.20 [USP]** Foto + nota ràpida des del bolo — Tave Field Notes. Component nou per pujar foto via càmera + nota a `Booking` directament.
+- **C.10 [BÀSIC] Inbox unificada multi-canal real** (email + WhatsApp + IG DM + form) — `FET` *(Canvi #461)*: `commTimeline` i el resum canònic de comunicacions ja tracten `INSTAGRAM` i `FORM` com a canals reals; la captura web (`contactLeadCaptureService`) i l'alta admin de leads `INSTAGRAM` escriuen activitat inbound canònica via `recordLeadInboundChannelCaptured()`, i `CommSummaryPanel` els mostra a la Inbox.
+- **C.11 [BÀSIC] Enviament massiu segmentat** — `FET` *(Canvi #457)*: `Inbox Compose` ja pot treballar en mode bulk sobre segments reals carregats pel servidor (`clients de bodes 2025` i `leads sense resposta 7d`) i enviar la campanya via `sendAdminEmail()` per destinatari a través del nou endpoint `POST /api/admin/emails/send-bulk`.
+- **C.12 [BÀSIC]** Plantilles intel·ligents amb variables (`{{firstName}}`, `{{eventDate}}`) — `FET` *(Canvi #452)*: `ComposeForm` reaplica la plantilla activa quan canvia el context (lead/idioma) mentre el text continua autoemplenat, i preserva les edicions manuals.
+- **C.13 [BÀSIC]** Sequencer manual des del lead — `FET` *(Canvi #455)*: la fitxa del lead exposa `Seqüència manual` amb selector de pas i trigger sobre el motor canònic `commercialSequenceService`, via endpoint dedicat `POST /api/admin/leads/[id]/sequence`.
+- **D.14 [FET]** Forecast per mes amb confiança ponderada — `FET` *(Canvi #454)*: `pipelineForecast.buildPipelineForecast()` ja sumava pipeline ponderat per mes amb `LEAD_SCORING_STATUS_PROBABILITY`; ara propaga també variància Bernoulli per lead i exposa `pipelineLow/High` + `combinedLow/High` (banda ±1σ). `EconomiaClient` mostra una nova columna `Rang ±1σ` a la previsió, amb 6 tests nous a `pipelineForecast.test.ts` que blinden la banda en casos límit (p=0, p=0.5, p=1, sense pipeline, combinat 60/40 amb històric).
+- **D.15 [FET]** "Què faig avui" en 5 línies — `FET` *(Canvi #44)*: `dailyBriefService` cobreix `greeting`, `summary`, KPIs, alertes per nivell i accions prioritàries; consumit per `DailyBriefPanel` a la home admin (regularitzat al Canvi #453).
+- **D.16 [FET]** Customer Lifetime Value visible per client — `FET` *(Canvi #16)*: `customerInsightsService.calculateLTV` integrat al `fetchCustomerHub` via `insights` i visible a `InsightsBanner` del Customer Hub (#35 ho mou de hardcode a aquest servei; regularitzat al Canvi #453).
+- **D.17 [FET]** Pipeline drag & drop entre estats — `FET` *(Canvi #456)*: `PipelineBoard` (compartit per `LeadPipelineView` i `BookingPipelineView`) exposa al renderCard un contracte complet `dragHandlers` amb `draggable + onDragStart/End` per desktop (HTML5 drag&drop) i `onPointerDown/Move/Up/Cancel` per mòbil (Pointer Events) amb heurística de scroll vertical vs drag horitzontal i `touchAction: pan-y/none` segons l'estat. Test nou `__tests__/app/admin/components/PipelineBoard.test.tsx` blinda el contracte (3 tests: handlers vius, deshabilitació quan `updatingId`, ignorar pointer down de ratolí).
+- **E.18 [FET]** App PWA admin — `FET` *(Canvi #458)*: `public/manifest.webmanifest` (consumit per `app/admin/layout.tsx`) afegeix `shortcuts` per a `Entrades`, `Creació ràpida`, `Reserves` i `Inbox` — Quick Actions de homescreen quan l'usuari instal·la l'admin com a PWA. La capa d'offline ja vivia al `public/sw.js` (precache + `offline.html`); el que faltava eren les Quick Actions admin. Test nou `__tests__/public/manifest-webmanifest.test.ts` blinda JSON vàlid + 4 shortcuts canònics + icona 96x96 per cadascuna.
+- **E.19 [BÀSIC]** Quick action mobile (1 tap → trucar/WhatsApp/marcar contactat) — `FET` *(Canvi #451)*: `MobileQuickActions` concentra el strip mòbil shared per `lead`, `customer` i `booking`, i `LeadMobileQuickActions` reaprofita `patchLeadStatus('CONTACTED')` per marcar contactat en un sol toc quan el lead és `NEW`.
+- **E.20 [USP]** Foto + nota ràpida des del bolo — `FET` *(Canvi #460)*: la fitxa de reserva incorpora `BookingFieldNotesComposer`, que obre càmera/fitxer al mòbil, puja la captura a la galeria del booking amb `caption` intern i deixa la nota editable des de `BookingGallery` sense tocar schema.
 - **F.21 [FET]** Calendar bidireccional Google/iCal — Canvi #134 ja ho cobreix.
-- **F.24 [USP]** Integració Google Maps a la fitxa client — veure ubicació, distància real. Refinement del B.6 (auto-km).
+- **F.24 [USP]** Integració Google Maps a la fitxa client — `FET` *(Canvi #459)*: la `SummaryPanel` del Customer Hub mostra una targeta `Ubicació i ruta` amb enllaç a Google Maps, distància guardada (`distanceKm`) si la reserva ja la té i càlcul viu via `POST /api/admin/maps/distance` quan encara falta persistència. Refinement directe del B.6 (auto-km) sense duplicar motor.
 
-**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Camí 1 tancat (#435-#442). Camí 2 a mig drenar — atacar B.8 i B.9 abans de saltar a Camí 3. Camí 3 reservat per quan hi hagi flux real que ho justifiqui (no abans de tenir clients estables i operatives diàries que ho demanin).
+**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Camí 1 tancat (#435-#442). Camí 2 tancat (#444, #446, #449, #450). El següent salt real és Camí 3 i només s'hauria d'obrir quan hi hagi prou flux i pressió operativa que el justifiqui.
 
 **MÉS ENDAVANT**: tractar com a backlog viu — quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tag `[BLOC]/[BÀSIC]/[USP]`.
 
@@ -5617,6 +5643,619 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #486 — 2026-05-04 — codex (FET)
+**El shortcut "Obrir primer pendent" del viewer del protocol deixa de generar una URL amb un backtick residual al final.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el Canvi `#483` havia introduït `describeProtocolPendingShortcut()` per convertir el backlog humà en una drecera explícita cap al primer `Canvi #N` pendent. Però al helper hi havia quedat un backtick literal enganxat al final de l'`href`, de manera que la URL resultant sortia com `/admin/docs/protocol?validation=pending&canvi=466#canvi-466``. Era un defecte petit però real en un CTA de navegació directa del viewer.
+- `lib/services/protocolValidationViewerService.ts`: la construcció de l'`href` deixa de compondre la query inline i passa a reutilitzar un `querySuffix` explícit. Això elimina el caràcter sobrant i deixa una URL canònica tant amb cerca (`?q=`) com sense cerca.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: nou cas `construeix una URL neta quan no hi ha cerca activa`, a més del cas existent amb `q=lead`. La suite del helper passa a 29 tests i blinda les dues variants del shortcut.
+- Efecte: el CTA `Obrir primer pendent · #N` torna a ser una drecera fiable, copiable i sense caràcters paràsits al final de l'àncora.
+- Verificació del tall:
+  - `npx vitest run __tests__/lib/services/protocolValidationViewerService.test.ts` OK (29 tests)
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `485` a `486`.
+- `ADMIN_CHANGE_COUNTER` puja a `486`; el següent canvi real ha de ser `#487`.
+
+### Canvi #485 — 2026-05-04 — claude (FET)
+**Regularització documental del `SEGÜENT` desencaixat de `§6.17`: el text d'ICP/Fase 0 que portava no pertanyia a inventari+packs sinó a `§6.16 Màrqueting`.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `§6.17 Front inventari + packs (estat operatiu)` ja documentava com a `FET` tots els punts del seu `ESTAT ACTUAL` — relació visible inventari→packs amb badges clicables, relació visible packs→equip amb preview de material, botó secundari `Equip` corregit, editor detall pujat a fitxa operativa, pestanya `content` del pack editor simplificada i compositor automàtic explicat com a punt de partida. Tot i això, l'última línia de la secció era `**SEGÜENT**: preparar una reunió de treball per definir Fase 0 (ICP + proposta de valor) — sense això no es pot començar res.` Aquest text parla d'`ICP` (Ideal Customer Profile) i `proposta de valor`, que són exactament les dues primeres sub-tasques de `§6.16 Màrqueting i captació externa · Fase 0 — Fundació` (`Definir 1 client ideal clar (ICP)` + `Proposta de valor en 1 frase`). El text estava conceptualment desencaixat: a `§6.17` (inventari+packs) no hi havia cap tall executable obert, només un residu documental que feia soroll al checklist com si encara hi hagués un pas immediat pendent.
+- `docs/protocol-producte-admin-ca.md` · `§6.17`: la línia `**SEGÜENT**: preparar una reunió de treball ...` queda substituïda per una entrada `**FET** *(2026-05-04 per `claude` — Canvi #485)*` que explica la regularització i remet a `§6.16 · Fase 0` per la documentació real de la feina d'ICP+proposta de valor. S'hi afegeix una línia `**MÉS ENDAVANT**` honesta (refinaments d'UI sobre la relació inventari↔packs quan apareguin friccions reals d'ús), de manera que la secció queda amb forma `OBJECTIU + ESTAT ACTUAL (FET) + CARACTERÍSTIQUES + FET (regularització) + MÉS ENDAVANT`, sense fingir un `SEGÜENT` que no era cap tall.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `484` a `485`.
+- Aquest tall **NO** toca codi d'aplicació, schema Prisma, serveis, tests, UI ni contractes HTTP. És sincronització documental pura — mateix patró ja aplicat al `#484` de codex (regularitza `SEGÜENT` buit de Camí 2 a §6.18) i al `#447` de claude (regularitza Camí 1 i meitat de Camí 2 a §6.18).
+- Verificació del tall:
+  - `pnpm run qa:protocol` OK
+  - `pnpm run validate:core` OK
+- `ADMIN_CHANGE_COUNTER` puja a `485`; el següent canvi real ha de ser `#486`.
+
+### Canvi #484 — 2026-05-03 — codex (FET)
+**Regularitzat el `SEGÜENT` buit de Camí 2 a `§6.18`: el bloc ja estava complet i només faltava sincronitzar el checklist.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: `§6.18 Auditoria CRMs top` ja documentava `B.6` `#444`, `B.7` `#446`, `B.8` `#449` i `B.9` `#450` com a `FET`, i el `PENDENT CRÍTIC` de la mateixa secció ja deia explícitament "Camí 2 tancat". Tot i això, entre aquests bullets i Camí 3 encara quedava un encapçalament `### SEGÜENT (Camí 2)` amb l'únic text "Camí 2 drenat. No hi ha més ítems oberts en aquest bloc." Això era un fals pendent formal: no hi havia cap tall executable, només una resta documental que feia soroll al checklist.
+- `docs/protocol-producte-admin-ca.md` · `§6.18`: el `SEGÜENT (Camí 2)` es converteix en `FET (Camí 2)` i explicita la regularització documental amb cites als quatre canvis reals que han drenat el bloc (`#444`, `#446`, `#449`, `#450`).
+- Aquest tall no toca codi d'aplicació, schema, serveis, tests ni UI. És sincronització documental pura perquè el checklist continuï sent font honesta de veritat.
+- Verificació del tall:
+- `pnpm run validate:core` OK
+- `pnpm run qa:protocol` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` es manté a `484`.
+- `ADMIN_CHANGE_COUNTER` queda a `484`; el següent canvi real ha de ser `#485`.
+
+### Canvi #483 — 2026-05-01 — codex (FET)
+**La drecera del primer pendent passa a tenir també un estat passiu explícit quan no queda backlog humà.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#481`, el viewer explicava millor la vista de seccions i de canvis, però la drecera `Obrir primer pendent` desapareixia completament quan el subconjunt no tenia cap pendent. Això deixava un buit silenciós just al mateix lloc on l'usuari espera entendre l'estat de la cua humana.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `describeProtocolPendingShortcut(firstPending, query)` per centralitzar tant el CTA accionable com el missatge passiu quan no hi ha pendents.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 26 a 28 tests amb cobertura del cas accionable i del cas `Sense pendents`.
+- `app/admin/docs/protocol/page.tsx`: el bloc de filtres mostra ara una pastilla passiva `Sense pendents` o `Sense pendents en aquesta cerca` quan no hi ha cap canvi humà pendent dins el subconjunt actual, en lloc d'amagar la drecera.
+- Aquest tall no toca persistència, API ni el toggle de validació. És refinament de feedback del viewer.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `482` a `483`.
+- `ADMIN_CHANGE_COUNTER` puja a `483`; el següent canvi real ha de ser `#484`.
+
+### Canvi #482 — 2026-05-01 — claude (FET)
+**Nou client canònic `lib/api/imageManagerClient.ts` (genèric, accepta una clau o llista de claus) + migrats els 3 consumers (`useManagedImageSrc`, `app/admin/layout.tsx`, `TrustedByLogos.tsx`) + `/api/public/image-manager` afegit al guard `qa:canonical-fetches`. 6è endpoint cobert.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: continuació de la cadena #470 → #472 → #474 → #477 → #479. L'endpoint `/api/public/image-manager` tenia un hook canonical pel cas simple (`useManagedImageSrc` del Canvi #401, retorna 1 src per 1 key) però NO cobria 2 patrons reals: (1) `app/admin/layout.tsx` fetcheja **múltiples claus alhora** (`?key=layout.logo.admin&key=layout.appleTouchIcon`) per carregar logo admin + apple-touch-icon en un sol RTT, (2) `app/components/marketing/TrustedByLogos.tsx` fetcheja una clau **amb collection** (`home.clientLogos.items[]`) per la galeria de logos client. El hook `useManagedImageSrc` no podia cobrir aquests dos casos. Solució: client genèric a la capa `lib/api/*` que abasta tots tres patrons.
+- `lib/api/imageManagerClient.ts` (nou): exporta `ImageManagerItem` (`{ src?, alt?, caption? }`), `ImageManagerEntry` (`{ item?, items? }` — el contracte real del response: cada clau pot tenir un `item` singular o `items[]` collection), `ImageManagerResponse` (`{ ok, data? }`). Funció `fetchImageManager(keys, init?)` accepta `string | string[]` i construeix `URLSearchParams` amb `params.append('key', k)` per cada clau (la API permet repetir el query param). Llança error si `!response.ok` (HTTP). Cap dependència de hook ni de React — funciona també des de codi server.
+- `lib/hooks/useManagedImageSrc.ts`: el hook deixa de fer `fetch(\`/api/public/image-manager?key=${encodeURIComponent(key)}\`)` + parse manual i passa a `fetchImageManager(key, { cache: 'no-store' })`. Comportament idèntic — el hook continua llegint `response.data?.[key]?.item?.src` i fent `setSrc(managed)` si és string vàlid; si l'API falla o no té managed src, manté el `fallback` estàtic.
+- `app/admin/layout.tsx`: el `useEffect` que carrega assets de marca admin (`layout.logo.admin` + `layout.appleTouchIcon`) deixa de fer fetch inline i passa a `fetchImageManager(['layout.logo.admin', 'layout.appleTouchIcon'], { cache: 'no-store' })`. Lectura idèntica de `response.data?.[key]?.item?.src`. Eliminada la doble guarda `if (!res.ok) return; data = await res.json().catch(...)` — el client ja llança si HTTP fail.
+- `app/components/marketing/TrustedByLogos.tsx`: el `useEffect` que carrega `home.clientLogos` deixa de fer fetch inline i passa a `fetchImageManager('home.clientLogos', { cache: 'no-store' })`. Lectura idèntica de `response.data?.['home.clientLogos']?.items`, filter per `src` no buit, fallback a `CLIENT_LOGOS` static. La doble guarda `!response.ok || !data?.ok` simplificada perquè el client ja llança si HTTP fail; només queda `!response.ok` (app-level json.ok) i `cancelled`.
+- `scripts/check-canonical-fetches.mjs`: nova entrada `{ id: 'image-manager', url: '/api/public/image-manager', client: 'lib/api/imageManagerClient.ts', helper: 'fetchImageManager()' }`. El guard ara cobreix **6 endpoints**.
+- `__tests__/scripts/check-canonical-fetches.test.ts`: 12è test afegit per blindar la nova entrada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `481` a `482`.
+- Aquest tall **NO** toca: la API `/api/public/image-manager/route.ts` ni la seva lògica de servei, el component `<Image>` consumidor del src retornat pel hook, ni cap altre fetch del repo.
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (12 tests) · `node scripts/check-canonical-fetches.mjs` OK (6 canonical fetches) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK 15/15 guards.
+- Amb aquest tall, els 6 endpoints públics canalitzats pel guard són: `/api/google-reviews`, `/api/hero-media`, `/api/public/stats`, `/api/public/availability`, `/api/public/packs`, `/api/public/image-manager`. Tots amb client a `lib/api/*Client.ts`, tots blindats contra fetches inline.
+- `ADMIN_CHANGE_COUNTER` puja a `482`; el següent canvi real ha de ser `#483`.
+
+### Canvi #481 — 2026-05-01 — codex (FET)
+**El bloc de seccions `§X.Y` adapta títol i descripció a la cerca activa.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#480`, el llistat principal de canvis ja explicava la vista activa, però el catàleg de seccions `§X.Y` encara mantenia un copy menys específic quan la cerca filtrava el conjunt.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `describeProtocolSectionResults(query, filteredCount)` per centralitzar títol i descripció del bloc de seccions.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 24 a 26 tests amb cobertura de la vista amb cerca i del copy base de totes les seccions.
+- `app/admin/docs/protocol/page.tsx`: el bloc del catàleg de seccions consumeix ara `sectionResultsMeta.title` i `sectionResultsMeta.description`.
+- Aquest tall no toca API, persistència ni validacions humanes. És refinament de lectura i coherència del viewer.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `480` a `481`.
+- `ADMIN_CHANGE_COUNTER` puja a `481`; el següent canvi real ha de ser `#482`.
+
+### Canvi #480 — 2026-05-01 — codex (FET)
+**El bloc `Resultats canvis` adapta títol i descripció a la vista humana real.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#478`, el viewer ja mostrava millor progrés, buit i següent pendent, però el bloc principal del llistat encara usava un copy base massa genèric. La UI ja sabia si estava mostrant `pending`, `validated` o `all`, però el text no ho feia explícit.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `describeProtocolValidationResults(filter, query, filteredCount)` per centralitzar títol i descripció del bloc principal.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 21 a 24 tests amb cobertura de la vista `pending`, `validated` amb cerca i la vista base `all`.
+- `app/admin/docs/protocol/page.tsx`: el `AdminSection` del llistat consumeix ara `resultsMeta.title` i `resultsMeta.description` en lloc del copy genèric fix.
+- Aquest tall no toca persistència, API ni el toggle de validació. És refinament de copy i lectura contextual del viewer.
+- Col·lisió de sessió: mentre validava aquest tall, `claude` ha tancat el `#479` en paral·lel. Seguint la norma de no-col·lisió del §2.1, aquest tall es registra directament al següent número lliure visible: `#480`.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `479` a `480`.
+- `ADMIN_CHANGE_COUNTER` puja a `480`; el següent canvi real ha de ser `#481`.
+
+### Canvi #479 — 2026-05-01 — claude (FET)
+**Nou client canònic `lib/api/publicPacksClient.ts` + migrats els 2 consumers (`usePrices` a `hooks/usePublicData.ts` + `usePacks` a `lib/hooks/usePacks.ts`) + `/api/public/packs` afegit al guard `qa:canonical-fetches`. Tanca el cercle de canonicalització de `usePublicData.ts` (3 hooks, 3 endpoints, 0 fetches inline).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: continuació natural dels Canvis #474 (stats) i #477 (availability). Aquest tall completa la canonicalització de tots els endpoints públics consumits per `hooks/usePublicData.ts`. Identifica també un segon consumer (`lib/hooks/usePacks.ts`, fitxer separat amb fallback localitzat per packs i `cache: 'no-store'`) que també llegia `/api/public/packs` directament — exemple d'una capa shared on un grep manual del consumer principal hauria deixat orfe.
+- `lib/api/publicPacksClient.ts` (nou): defineix `PublicPacksResponse = { ok: boolean; packs: unknown[] }` (alineat amb el contracte real de `app/api/public/packs/route.ts`) i `FetchPublicPacksOptions = { service?, locale? }`. La funció `fetchPublicPacks(options?, init?)` construeix el querystring amb `URLSearchParams`, propaga el `RequestInit` (per a `cache: 'no-store'` que `usePacks` necessita) i llança error si `!response.ok`. Els consumers interpreten `packs` segons les seves necessitats (cast a `PackDefinition[]` o partial shape).
+- `hooks/usePublicData.ts`: `usePrices()` deixa de fer `fetch('/api/public/packs')` + `await response.json()` i passa a `await fetchPublicPacks()`. La forma `(json as { ok: boolean; packs: ... }).packs` substituïda per `response.packs` ja tipat. Cap canvi semàntic — el hook continua interpretant cada element com `{ slug, price, originalPrice?, name }`.
+- `lib/hooks/usePacks.ts`: el hook que carrega packs amb fallback localitzat passa de construir el querystring amb `URLSearchParams` + `fetch(\`/api/public/packs?...\`, { cache: 'no-store' })` a `fetchPublicPacks({ service, locale }, { cache: 'no-store' })`. La gestió d'error (`!res.ok` → `throw`) ara és interna al client; el consumer captura amb `try/catch` el throw del client. La logica de `Array.isArray(data.packs)` + cast a `PackDefinition[]` es manté; el `localizedFallback` queda intacte.
+- `scripts/check-canonical-fetches.mjs`: nova entrada `{ id: 'public-packs', url: '/api/public/packs', client: 'lib/api/publicPacksClient.ts', helper: 'fetchPublicPacks()' }`. Allowlist deriva auto. El guard ara cobreix **5 endpoints**.
+- `__tests__/scripts/check-canonical-fetches.test.ts`: 11è test afegit per blindar la nova entrada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `478` a `479`.
+- Aquest tall **NO** toca: schema, dades, UI consumidora dels hooks, lògica de cache local, l'engine de packs (`getDbPacks`, `mapPack`, `fallbackPacks`), ni el route handler.
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (11 tests) · `node scripts/check-canonical-fetches.mjs` OK (5 canonical fetches) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK 15/15 guards.
+- Cadena tancada: `usePublicData.ts` ja no té cap fetch directe a un endpoint públic. Totes les rutes (`/api/public/stats`, `/api/public/availability`, `/api/public/packs`) passen per `lib/api/*Client.ts`. La capa shared d'hooks (`lib/hooks/{useBookedDates,usePacks}.ts`) també està alineada amb la mateixa monocapa.
+- `ADMIN_CHANGE_COUNTER` puja a `479`; el següent canvi real ha de ser `#480`.
+
+### Canvi #478 — 2026-05-01 — codex (FET)
+**El viewer del protocol mostra el progrés de validació de la vista activa.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#476`, el viewer ja diferenciava millor global vs buit i ja indicava el següent pendent, però encara faltava una lectura compacta del progrés de la vista activa. El propietari veia comptadors globals i buckets separats, però no un resum directe tipus `X/Y validats` sobre el subconjunt actual.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `summarizeProtocolValidationProgress(canvis, validations)` que deriva `validated`, `total`, `percent` i label `X/Y validats`.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 19 a 21 tests amb cobertura del progrés sobre subconjunt normal i buit (`0/0`, `0%`).
+- `app/admin/docs/protocol/page.tsx`: el card `Validats humans` mostra ara `Vista actual: X/Y validats · Z%` sobre la vista filtrada actual.
+- Aquest tall no toca persistència, API ni interaccions del toggle. És refinament de lectura del viewer.
+- Col·lisió de sessió: mentre validava aquest tall, `claude` ha tancat el `#477` en paral·lel. Seguint la norma de no-col·lisió del §2.1, aquest tall es registra directament al següent número lliure visible: `#478`.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `477` a `478`.
+- `ADMIN_CHANGE_COUNTER` puja a `478`; el següent canvi real ha de ser `#479`.
+
+### Canvi #477 — 2026-05-01 — claude (FET)
+**Nou client canònic `lib/api/publicAvailabilityClient.ts` + migrats els 2 consumers (`useAvailability` a `hooks/usePublicData.ts` + `useBookedDates` a `lib/hooks/useBookedDates.ts`) + `/api/public/availability` afegit al guard `qa:canonical-fetches`. El guard ha caçat un segon consumer (`useBookedDates`) que el grep manual hauria omès — exemple viu del seu valor.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: continuació natural del Canvi #474. Aquell tall va deixar identificat al §9 que `useAvailability` (a `hooks/usePublicData.ts`) encara llegia `/api/public/availability` directament. Aquest tall crea el client canònic que faltava i hi connecta tots els consumers reals — no només el documentat. La integració al guard `qa:canonical-fetches` (afegint l'entrada nova) ha caçat automàticament un consumidor extra (`lib/hooks/useBookedDates.ts`) que jo no havia vist al grep inicial: validació viva de la utilitat dels guards canònics introduïts als #470 i #472.
+- `lib/api/publicAvailabilityClient.ts` (nou): mateixa estructura que `publicStatsClient.ts`. Exporta `AvailabilityValues`, `AvailabilityMonth`, `AvailabilitySaturdayDate`, `AvailabilityUrgencyLevel`, `AvailabilitySaturdayStatus`, `PublicAvailabilityResponse` (`{ ok, data, generatedAt }` alineat amb el contracte real de `app/api/public/availability/route.ts`) i la funció `fetchPublicAvailability(locale?, init?)` que llença error si `!response.ok` (HTTP) i retorna el body parsejat. Cap dependència del servei `publicAvailabilityService` (les dades arriben tipades pel response, no per l'engine intern).
+- `hooks/usePublicData.ts`: `useAvailability()` deixa de fer `fetch('/api/public/availability?locale=...')` + `await response.json()` i passa a `await fetchPublicAvailability(locale)`. Interfaces locals duplicades `MonthAvailability` i `AvailabilityData` substituïdes per `type MonthAvailability = CanonicalAvailabilityMonth` i `type AvailabilityData = AvailabilityValues` (re-export tipat). El cast `as AvailabilityData` desapareix.
+- `lib/hooks/useBookedDates.ts`: el hook estàndard que extreu dates ocupades del payload de disponibilitat deixa també el `fetch(\`/api/public/availability?locale=${locale}\`).then(r => r.json())` directe i passa a `fetchPublicAvailability(locale)`. Eliminada la lectura `data?.ok` opcional (ara `response.ok` és typed). Cap canvi semàntic — el hook continua filtrant `saturday.status === 'booked' || 'blocked'`.
+- `scripts/check-canonical-fetches.mjs`: nova entrada `{ id: 'public-availability', url: '/api/public/availability', client: 'lib/api/publicAvailabilityClient.ts', helper: 'fetchPublicAvailability()' }`. Allowlist deriva auto.
+- `__tests__/scripts/check-canonical-fetches.test.ts`: 10è test afegit per blindar la nova entrada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `476` a `477`.
+- Aquest tall **NO** toca: schema, dades, UI consumidora dels hooks, lògica de cache local, els altres consumers de `usePublicData.ts` (`usePublicStats` ja al #474, `usePrices` queda per un futur Canvi com a deute identificat).
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (10 tests) · `node scripts/check-canonical-fetches.mjs` OK (4 canonical fetches) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK 15/15 guards.
+- Lliçó documentada al protocol: el guard `qa:canonical-fetches` introduït al #472 ha pagat el seu cost al primer ús. Sense ell, hauria fet l'extensió només al consumer documentat (`hooks/usePublicData.ts`) i hauria deixat `lib/hooks/useBookedDates.ts` orfe — falsa monocapa.
+- `ADMIN_CHANGE_COUNTER` puja a `477`; el següent canvi real ha de ser `#478`.
+
+### Canvi #476 — 2026-05-01 — codex (FET)
+**El viewer del protocol diferencia millor els estats buits i destaca el següent pendent a validar.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#475`, l'usuari ja podia saltar directament al primer pendent, però quan la llista quedava buida el missatge continuava sent massa genèric i no distingia si realment ja estava tot validat o si la cerca havia filtrat massa. També faltava un senyal persistent al resum superior per recordar quin és el següent pendent de la cua.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `describeProtocolValidationEmptyState(filter, query)` per centralitzar els missatges de buit segons filtre humà i cerca activa.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 15 a 19 tests amb cobertura de `Tot validat`, `Cap pendent amb aquesta cerca`, `Cap canvi validat` i `Cap coincidència`.
+- `app/admin/docs/protocol/page.tsx`: el card `Validats humans` mostra `Següent pendent: #N · author` quan n'hi ha, i l'empty state de resultats usa copy específica segons `all / validated / pending` i si hi ha `?q=`.
+- Aquest tall no toca API, persistència ni la interacció de `ProtocolValidationToggle`. És refinament de lectura i feedback del viewer.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `475` a `476`.
+- `ADMIN_CHANGE_COUNTER` puja a `476`; el següent canvi real ha de ser `#477`.
+
+### Canvi #475 — 2026-05-01 — codex (FET)
+**El viewer del protocol ja té drecera per obrir el primer canvi pendent del subconjunt actiu.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#473`, la vista `pending` ja autoobria els detalls pendents i el KPI superior explicava millor el filtre humà actiu. Tot i així, encara faltava una drecera perquè l'usuari no hagués ni de localitzar visualment quin és el primer canvi pendent quan hi ha cerca textual o una llista llarga.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `findFirstPendingProtocolCanvi(canvis, validations)` per derivar el primer pendent del subconjunt actual sense acoblar la regla al component.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 13 a 15 tests amb cobertura del primer pendent i del cas en què tots els canvis ja estan validats.
+- `app/admin/docs/protocol/page.tsx`: nou shortcut `Obrir primer pendent · #N` al costat de `Tots / Validats / Pendents`, preservant la cerca `?q=` i obrint directament `?validation=pending&canvi=N#canvi-N`.
+- Aquest tall no toca API, persistència ni el panell client de validació. És refinament de navegació del viewer.
+- Col·lisió de sessió: mentre preparava aquest registre, `claude` ha tancat el `#474` en paral·lel. Seguint la norma de no-col·lisió del §2.1, aquest tall es registra directament al següent número lliure visible: `#475`.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `474` a `475`.
+- `ADMIN_CHANGE_COUNTER` puja a `475`; el següent canvi real ha de ser `#476`.
+
+### Canvi #474 — 2026-05-01 — claude (FET)
+**Migrat `usePublicStats` (`hooks/usePublicData.ts`) cap al client canònic `fetchPublicStats()`, i `/api/public/stats` afegit al guard `qa:canonical-fetches`. Drena l'últim consumer directe identificat al deute del Canvi #472.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el Canvi #472 va instaurar el guard `qa:canonical-fetches` amb 2 entrades (`/api/google-reviews`, `/api/hero-media`) i va deixar documentat un deute explícit: `hooks/usePublicData.ts` encara llegia `/api/public/stats` directament malgrat existir el client `lib/api/publicStatsClient.ts`. Sense la migració, el guard no podia incloure el tercer endpoint (la inclusió hauria fallat el pipeline). Aquest tall tanca el deute i amplia el guard.
+- `hooks/usePublicData.ts`: el hook `usePublicStats()` deixa de fer `fetch('/api/public/stats?locale=...')` + `await response.json()` i passa a `await fetchPublicStats(locale)` del client canònic. Eliminada la interface local duplicada `StatsData` i substituïda per `type StatsData = PublicStatsValues` (del propi client). El cast `as StatsData` també desapareix perquè la resposta ja és tipada. Cap consumidor del hook s'altera (el contracte `useStatsReturn` continua igual).
+- `scripts/check-canonical-fetches.mjs`: nou bloc al config `CANONICAL_FETCHES`: `{ id: 'public-stats', url: '/api/public/stats', client: 'lib/api/publicStatsClient.ts', helper: 'fetchPublicStats()' }`. Sense canviar lògica del walker ni dels detectors. Allowlist deriva automàticament.
+- `__tests__/scripts/check-canonical-fetches.test.ts`: 9è test afegit (`fails when /api/public/stats is fetched outside the canonical client`) que blinda la nova entrada amb la mateixa mecànica `spawnSync` + fixture temp.
+- Aquest tall **NO** toca: schema, dades, UI consumidora del hook, lògica de cache local del hook (`getCachedData`/`setCachedData`), els altres dos hooks (`useAvailability`, `usePrices`), ni la resta del pipeline. Pur drenatge del deute identificat al §9 del Canvi #472.
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (9 tests) · `node scripts/check-canonical-fetches.mjs` OK (3 canonical fetches) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK 15/15 guards.
+- `ADMIN_CHANGE_COUNTER` puja a `474`; el següent canvi real ha de ser `#475`.
+
+### Canvi #473 — 2026-05-01 — codex (FET)
+**El viewer del protocol fa explícit el filtre humà actiu i autoobre els pendents quan entres a la vista de backlog.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#471`, els comptadors `Tots / Validats / Pendents` ja deien quants canvis hi havia a cada bucket, però la vista encara tenia dues friccions: el KPI `Filtre actiu` continuava sent massa genèric i, quan l'usuari entrava a `?validation=pending`, encara havia d'obrir manualment cada `Canvi #N` per veure el detall que havia de validar. El backlog humà era visible però no prou accionable.
+- `lib/services/protocolValidationViewerService.ts`: nous helpers purs `describeProtocolValidationFilter()` i `shouldAutoOpenProtocolCanvi()` per centralitzar la semàntica del filtre i la regla d'obertura automàtica.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 7 a 13 tests amb cobertura de copy del filtre, pluralització, auto-open de pendents, focus explícit i regressions fora del mode `pending`.
+- `app/admin/docs/protocol/page.tsx`: el KPI `Filtre actiu` mostra ara label + descripció real (`Sense filtre`, `Cerca activa`, `Només validats`, `Només pendents`) i els `<details>` dels canvis s'obren per defecte quan el filtre humà és `pending` o quan arribes amb `?canvi=N`.
+- Aquest tall no toca persistència, API, esquema ni el component client `ProtocolValidationToggle`. És refinament de lectura i navegació del viewer.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `472` a `473`.
+- `ADMIN_CHANGE_COUNTER` puja a `473`; el següent canvi real ha de ser `#474`.
+
+### Canvi #472 — 2026-05-01 — claude (FET)
+**Nou guard `qa:canonical-fetches` integrat a `validate:core`: blinda contra fetches directes als endpoints públics que ja tenen client canònic a `lib/api/*` (Google Reviews #427, Hero Media #431).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: continuïtat del Canvi #470 (`qa:canonical-svgs`) aplicant la mateixa idea als clients HTTP. Els Canvis #427 (`fetchPublicGoogleReviews` a `lib/api/googleReviewsClient.ts`) i #431 (`fetchHeroMedia` a `lib/api/heroMediaClient.ts`) van centralitzar fetches que vivien duplicats. Sense guard, una nova UI pot reescriure `fetch('/api/google-reviews')` inline i tornar a divergir el shape, l'error path i la URL. §6.14 PENDENT CRÍTIC torna a apuntar: "evitar regressions silencioses en repo gran". El tercer client `lib/api/publicStatsClient.ts` queda fora del guard ara perquè `hooks/usePublicData.ts` encara llegeix `/api/public/stats` directament — migrar-lo serà un canvi futur.
+- `scripts/check-canonical-fetches.mjs` (nou): walker recursiu sobre `app/`, `components/`, `lib/`, `hooks/` (skip `__tests__/`, `node_modules/`, `.next/`, `.git/`, `dist/`, `build/`). Configuració declarativa `CANONICAL_FETCHES = [{url, client, helper}]` amb 2 entrades canòniques. Detector regex `fetch\(\s*['"\`]URL(['"\`?])` que captura les 3 variants de quote i evita falsos positius per URLs amb prefix compartit (ex: `/api/google-reviews-stats` no dispara). Allowlist deriva automàticament dels `client` paths.
+- `__tests__/scripts/check-canonical-fetches.test.ts` (nou): 8 tests via `spawnSync` + fixtures temp. Cobertura: clean fixture, fail per `/api/google-reviews` inline, fail per `/api/hero-media` inline, fail per double-quoted, no flag a canonical clients (allowlist), no flag a URL amb prefix compartit, skip `__tests__/`, multiple violations report combinat.
+- `package.json`: nou script `qa:canonical-fetches` afegit a `validate:core` entre `qa:canonical-svgs` i `arch:layer:check`. `validate:core` passa de **14 → 15 guards**.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `471` a `472`.
+- Aquest tall **NO** toca: lògica de servei, schema, dades, UI, copy, cap workspace admin, els clients canònics existents, ni `usePublicData.ts`/publicStatsClient (deute futur). Pur guard nou + integració al pipeline.
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (8 tests) · `node scripts/check-canonical-fetches.mjs` OK contra repo real · `pnpm run validate:core` OK 15/15 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `472`; el següent canvi real ha de ser `#473`.
+
+### Canvi #471 — 2026-05-01 — codex (FET)
+**Els filtres `Tots / Validats / Pendents` del viewer del protocol mostren els comptadors reals.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#469`, el viewer ja distingia bé pendents i validats, però els filtres ràpids continuaven sent cecs: l'usuari havia de clicar cada bucket per saber-ne la mida. Faltava el mateix nivell de feedback que ja tenen molts panells operatius del repo.
+- `lib/services/protocolValidationViewerService.ts`: nou helper pur `summarizeProtocolValidationFilterCounts(canvis, validations)` que retorna `{ all, validated, pending }` sobre el subconjunt actual de canvis.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: ampliat de 6 a 7 tests amb cobertura del resum de comptadors.
+- `app/admin/docs/protocol/page.tsx`: els shortcuts ràpids passen a mostrar `Tots · N`, `Validats · N` i `Pendents · N`, calculats sobre els canvis que ja han passat el filtre textual `?q=...`.
+- Aquest tall no toca el contracte HTTP, la persistència ni el component `ProtocolValidationToggle`. És refinament informatiu de la capa de lectura del viewer.
+- Col·lisió de sessió: `claude` ja havia reservat i registrat el `#470` en paral·lel. Seguint la norma de no-col·lisió del §2.1, aquest tall es registra directament al següent número lliure visible: `#471`.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `ADMIN_CHANGE_COUNTER` puja a `471`; el següent canvi real ha de ser `#472`.
+
+### Canvi #470 — 2026-05-01 — claude (FET)
+**Nou guard `qa:canonical-svgs` integrat a `validate:core`: blinda contra regressions dels drenatges SVG canònics (Google G #407, Star polygon #412, WhatsApp #422, residuals #432) — qualsevol fitxer fora dels components shared que reintrodueixi aquests SVGs hardcoded falla el pipeline.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: durant els Canvis #407, #412, #422 i #432 es van drenar 17+ ocurrències del logo WhatsApp, 5 del polygon canònic d'estrella i 8 del logo Google G complet (4 paths colorejats `#4285F4`/`#34A853`/`#FBBC05`/`#EA4335`) cap a tres components canònics: `WhatsAppIcon.tsx`, `StarIcon.tsx`, `GoogleGIcon.tsx`. El §6.14 PENDENT CRÍTIC apunta explícitament a "evitar regressions silencioses en repo gran". Sense un guard, qualsevol PR futura que copïi una d'aquestes SVGs inline trencaria la monocapa sense que ningú se n'adoni fins al següent grep.
+- `scripts/check-canonical-svgs.mjs` (nou): walker recursiu sobre `app/`, `components/` i `lib/` (skip `__tests__/`, `node_modules/`, `.next/`, `.git/`, `dist/`, `build/`). Per cada fitxer `.{ts,tsx,js,jsx,mjs,cjs}` aplica 3 detectors: (1) substring `M17.472 14.382c-.297-.149` (path WhatsApp), (2) substring `12 2 15.09 8.26 22 9.27` (polygon estrella canònic), (3) presència simultània dels 4 hex colors del logo Google (només els 4 alhora compten — fragments parcials com `#4285F4` sol no disparen, alineat amb `ReviewsSection.tsx` que té badges parcials per Canvi #407). Allowlist canònica de 4 fitxers: els 3 components shared + `app/[locale]/contacto/client.tsx` (variant amb dual-path WhatsApp documentada al Canvi #422). Format de sortida coherent amb la resta de guards (`OK`/`FAIL` amb file:pattern).
+- `__tests__/scripts/check-canonical-svgs.test.ts` (nou): 8 tests via `spawnSync` sobre fixtures temp. (1) clean fixture passa. (2) WhatsApp path inline fora canonical → fail. (3) Star polygon inline → fail. (4) Tots 4 colors Google G alhora → fail. (5) Fragment parcial Google (només 1-2 colors) → no flag. (6) Components canonical mateixos no es flaguen. (7) Excepció documentada `app/[locale]/contacto/client.tsx` no es flaga. (8) Fitxers sota `__tests__/` ignorats. Aquest test entra automàticament a `qa:protocol:test` que ja escaneja `__tests__/scripts/`.
+- `package.json`: nou script `qa:canonical-svgs` afegit a `validate:core` entre `qa:roadmap-canvis` i `arch:layer:check`. `validate:core` passa de **13 → 14 guards**.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `469` a `470`.
+- Aquest tall **NO** toca: lògica de servei, schema, dades, UI, copy, cap workspace admin existent, cap component public canònic. Pur guard nou + integració a pipeline.
+- Verificació del tall: `pnpm exec vitest run __tests__/scripts/check-canonical-svgs.test.ts` OK (8 tests) · `node scripts/check-canonical-svgs.mjs` OK contra el repo real (cap regressió detectada) · `pnpm run validate:core` OK 14/14 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `470`; el següent canvi real ha de ser `#471`.
+
+### Canvi #469 — 2026-05-01 — codex (FET)
+**El viewer del protocol posa els pendents primer i fa visible l'estat de validació humana ja al resum de cada canvi.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el Canvi #468 ja permetia filtrar `all / validated / pending`, però en la vista per defecte (`all`) la llista seguia l'ordre cronològic pur del §9 i l'estat de validació humana només es veia dins del panell expandit. Això obligava a un segon nivell d'inspecció per detectar què faltava validar.
+- `lib/services/protocolValidationViewerService.ts`: `filterProtocolCanvisByValidation()` manté la semàntica del filtre però, quan el filtre és `all`, ordena els pendents abans que els validats mantenint la resta d'ordre estable.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts`: suite ampliada de 5 a 6 tests, afegint la regressió que blinda l'ordre `pending → validated` en vista `all`.
+- `app/admin/docs/protocol/page.tsx`: cada `<summary>` de `Canvi #N` guanya badge explícit `Pendent validació` o `Validat humà`; el `ProtocolValidationToggle` continua al detall, però la informació clau passa a ser visible sense expandir el bloc.
+- Aquest tall no toca el contracte HTTP ni la persistència de validacions. És refinament pur d'ordenació i lectura ràpida del viewer.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `ADMIN_CHANGE_COUNTER` puja a `469`; el següent canvi real ha de ser `#470`.
+
+### Canvi #468 — 2026-05-01 — codex (FET)
+**El viewer del protocol separa `validats` i `pendents` de validació humana amb filtre navegable.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del Canvi #467, la validació humana ja es podia marcar/desfer des de cada `Canvi #N`, però el viewer continuava mostrant tota la llista barrejada. Si el propietari vol saber "què queda pendent de revisar humanament", haver d'obrir-ho tot o escanejar targeta per targeta és fricció innecessària. Faltava una capa mínima de triatge.
+- `lib/services/protocolValidationViewerService.ts` (nou): helper pur amb `normalizeProtocolValidationFilter(raw)` i `filterProtocolCanvisByValidation(canvis, validations, filter)` per centralitzar la lògica `all / validated / pending` fora del component de pàgina.
+- `__tests__/lib/services/protocolValidationViewerService.test.ts` (nou): 5 tests blinden normalització del filtre, fallback a `all` i filtratge correcte de canvis validats vs pendents.
+- `app/admin/docs/protocol/page.tsx`: el viewer admet nou search param `?validation=all|validated|pending`, afegeix `<select>` al formulari de cerca i 3 shortcuts ràpids `Tots / Validats / Pendents`. El recompte de `Resultats canvis` i la llista renderitzada passen a sortir del filtre combinat `q + validation`.
+- Aquest tall no toca el contracte HTTP ni el component `ProtocolValidationToggle`. És consolidació d'ús sobre la capa de validacions ja tancada al #467.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/lib/services/protocolValidationViewerService.test.ts __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `ADMIN_CHANGE_COUNTER` puja a `468`; el següent canvi real ha de ser `#469`.
+
+### Canvi #467 — 2026-05-01 — codex (FET)
+**La validació humana del protocol es fa accionable al viewer admin: estat viu, KPI i CTA per marcar/desfer cada `Canvi #N`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el Canvi #466 ha deixat el servei i la route de validacions del protocol tècnicament correctes, però la funcionalitat continuava invisible per a l'usuari: no hi havia cap consumidor real al viewer i la norma nova de `Validació humana obligatòria` seguia sent més procedimental que operativa. Si ningú no pot marcar o veure la validació des del mateix lloc on llegeix el `Canvi #N`, la feature existeix a mitges.
+- `app/admin/docs/protocol/page.tsx`: el viewer passa de `force-static` a `force-dynamic` perquè reflecteixi estat viu de validacions. Carrega `loadCanviValidations()` i `summarizeValidations()` junt amb el markdown del protocol. El dashboard inicial guanya una KPI nova `Validats humans` amb `validatedCount / pendingCount / validatedPercent`.
+- `app/admin/docs/protocol/ProtocolValidationToggle.tsx` (nou): component client-side per cada `Canvi #N`. Mostra si consta validat o pendent, qui ho ha validat, quan i la nota registrada. Permet `Marcar validació humana` o `Desfer validació` via `fetchWithCsrf('/api/admin/protocol/validations')` amb `POST/DELETE`, textarea de nota opcional i `router.refresh()` després de persistir.
+- El component reaprofita el contracte del Canvi #466 sense inventar una segona capa: `validatedBy` surt del rol admin canònic, la persistència continua a `protocolValidationsService.ts` i el perímetre HTTP continua sent `/api/admin/protocol/validations`.
+- `__tests__/app/admin/docs/ProtocolValidationToggle.test.tsx` (nou): 3 tests cobreixen (1) marcar validació amb nota opcional, (2) desfer validació existent, (3) error visible quan l'API falla. Es mockegen `fetchWithCsrf` i `router.refresh()` com a contracte del component.
+- Aquest tall no toca la sintaxi del protocol, el parser `parseProtocolCanvis()` ni la capa de servei interna. La novetat és exclusivament convertir la validació humana en una superfície d'ús real dins l'admin.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `ADMIN_CHANGE_COUNTER` puja a `467`; el següent canvi real ha de ser `#468`.
+
+### Canvi #466 — 2026-05-01 — codex (FET)
+**El perímetre HTTP de validacions del protocol deixa de trencar compilació i queda blindat amb test de contracte.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: durant l'auditoria completa del repo ha aparegut un bloqueig objectiu: `npx tsc --noEmit` i `validate:core` fallaven a `app/api/admin/protocol/validations/route.ts`. La route nova importava `@/lib/auth-utils` (mòdul inexistent al repo) i demanava `requirePermission(req, 'write')` quan `AdminPermission` només admet `read | mutate | automation | integrations`. Això deixava el mòdul de validacions del protocol en estat aparentment construït però no tancable segons el mateix protocol.
+- `app/api/admin/protocol/validations/route.ts`: la route passa a reutilitzar només contractes canònics reals del repo. Import nou `getAdminRole` des de `@/lib/auth`; eliminat l'import inexistent `@/lib/auth-utils`; `POST` i `DELETE` passen de `write` a `mutate`; `validatedBy` es deriva via `getAdminRole(req)` (`OWNER`/`MANAGER`/`VIEWER`) en lloc d'inventar una superfície d'usuari no existent a l'auth actual.
+- `__tests__/app/api/admin/protocol-validations-route.test.ts` (nou): 7 tests de contracte per `GET/POST/DELETE`. Cobertura: auth 401, permission 403, `GET` retorna el `Map` serialitzat com a array, `POST` falla amb body invàlid, `POST` persisteix `validatedBy` amb el rol admin canònic, `DELETE` elimina correctament i `DELETE` retorna 400 amb body invàlid.
+- Aquest tall no canvia el servei `protocolValidationsService.ts` ni el model de persistència (`setting` JSON). El problema era al perímetre HTTP, no a la capa interna.
+- Verificació del tall:
+- `pnpm exec vitest run __tests__/app/api/admin/protocol-validations-route.test.ts __tests__/lib/services/protocolValidationsService.test.ts` OK
+- `npx tsc --noEmit` OK
+- `pnpm run validate:core` OK
+- `ADMIN_CHANGE_COUNTER` puja a `466`; el següent canvi real ha de ser `#467`.
+
+### Canvi #465 — 2026-05-01 — codex (FET)
+**El protocol de treball queda més executable: §2.1 guanya workflow mínim, regla explícita de worktree brut, validació separada en 3 capes, ordre de prioritat i checklist canònic de tancament.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el protocol ja exigia rigor i traçabilitat, però la part operativa encara depenia massa d'interpretació. Hi havia bones normes (`tancament rigorós`, `validació humana`, `go` del propietari), però faltava convertir-les en instruccions més mecàniques: què mirar abans de començar, què fer quan el worktree és brut, com dir clarament què s'ha validat i en quin ordre prioritzar fronts quan n'hi ha diversos.
+- `docs/protocol-producte-admin-ca.md` · §2.1: afegits 5 blocs nous dins dels principis invariables:
+- `Workflow mínim obligatori per cada tall` — força a comprovar `git status`, `ADMIN_CHANGE_COUNTER`, `§6.N/SEGÜENT` afectat i el tipus de tall abans de començar.
+- `Regla explícita de worktree brut` — prohibeix "netejar" o reordenar canvis aliens i obliga a treballar sobre l'àmbit mínim real.
+- `Validació en 3 capes` — separa `validació tècnica`, `funcional` i `humana/UX` perquè "validat" no sigui una paraula buida.
+- `Ordre de prioritat operatiu` — fixa l'escala compilació → runtime/dades → tests/guards → protocol crític → millores no bloquejants.
+- `Checklist de tancament canònic` — converteix el tancament en preguntes binàries (`tsc`, `validate:core`, `qa:protocol`, §6, §9, diari, comptador, tipus de validació).
+- Aclariment afegit al mateix §2.1: aquestes normes apliquen simètricament a `claude`, `codex` i al `user`; no és una disciplina reservada a un sol agent.
+- Efecte: el protocol continua sent rigorós, però ara és més fàcil d'executar per qualsevol agent sense dependre tant de context oral o d'interpretació del moment.
+- Verificació del tall: canvi documental; no s'han executat proves.
+- `ADMIN_CHANGE_COUNTER` puja a `465`; el següent canvi real ha de ser `#466`.
+
+### Canvi #464 — 2026-04-30 — claude (FET)
+**El viewer del protocol cobreix també les seccions §X.Y, no només els Canvis del §9: índex navegable amb 60+ links, vista per secció via `?seccio=X.Y`, i el CTA dels items PENDING del manual roadmap salta directament a §6.15 ressaltat.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el Canvi #463 va obrir el viewer `/admin/docs/protocol` amb el §9 sencer (Canvis #N llegits del fitxer Markdown). Però els items PENDING del manual roadmap ('marketing-analytics-hub') tenien CTA "Obrir §9 al protocol" — apuntant genèricament a la llista de Canvis enlloc d'on viuen com a SEGÜENT (§6.15 Roadmap). El protocol té ~60 seccions §X.Y (`§6.1 Fonaments`, `§6.6 Leads`, `§6.15 Roadmap`, `§6.18 Auditoria CRMs`, etc.) i cap d'elles era visible a l'admin sense obrir el `.md` al editor. Continuació natural del fil "botons clars + tot automatitzat" del #463.
+- `lib/services/protocolCanvisService.ts` · ampliació: nou type `ProtocolSectionMeta { id: string; title: string; body: string; anchorId: string }`. Funció pura `parseProtocolSections(rawMarkdown)` extreu cada `## X.Y Title` (regex `/^##\s+(\d+(?:\.\d+)*)(?:\s+|\.\s*)(.+)$/`) i el body fins al següent `## ` header. `id` preserva el `X.Y` original (`'6.15'`, `'2.1.0'`, etc.); `anchorId` substitueix `.` per `-` (`seccio-6-15`, `seccio-2-1-0`) per generar id HTML vàlids. `parseProtocolCanvis` (## headers de §9) i `parseProtocolSections` (## headers numerats) coexisteixen sense col·lisió perquè `### Canvi #N` té tres `#` i no entra al pattern de seccions.
+- `lib/services/protocolCanvisService.ts` · helper: `indexProtocolSectionsById()` per lookup O(1) per id (mateix patró que `indexProtocolCanvisByNumber`).
+- `__tests__/lib/services/protocolCanvisService.test.ts` · ampliat de 7 a 13 tests: 6 nous per `parseProtocolSections` (input buit, extracció amb anchorId derivat, body fins al següent ##, ignora `### Canvi`, ids multi-nivell `2.1.0`, lookup per Map). Tots verds.
+- `app/admin/docs/protocol/page.tsx` · ampliat:
+  - Nou search param `?seccio=X.Y`. Si present, mostra **només** la secció demanada (vista focus) com a primer block — `<pre>` amb body, ressaltat amb border-amber, més enllaços de tornada al protocol complet i al manual.
+  - Si no hi ha `?seccio=...`, mostra una nova `<AdminSection>` amb un grid de cards-link per cada `§X.Y` (id + title), cada una és un `<Link href="/admin/docs/protocol?seccio=X.Y#seccio-X-Y">`. Quan hi ha `?q=...`, filtra també les seccions per id+title (a més dels canvis).
+  - KPI grid passa de 3 a 4 columnes amb nou KPI "Seccions del protocol" mostrant el total parsejat.
+  - Search params type ara inclou `seccio?: string`.
+- `app/admin/manual/page.tsx`: el CTA primari dels items PENDING canvia de `/admin/docs/protocol` (genèric) a `/admin/docs/protocol?seccio=6.15#seccio-6-15` (apunta a §6.15 — el roadmap canònic on viuen els PENDING) i el text passa de "Obrir §9 al protocol" a "Obrir §6.15 al protocol". Els items DONE continuen apuntant al Canvi #N concret com al #463.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `463` a `464`.
+- Aquest tall **NO** toca: lògica de servei, schema, dades, cap altre workspace admin. Continuació pura del viewer del protocol amb una segona dimensió de navegació.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/protocolCanvisService.test.ts` OK (13 tests) · `pnpm run validate:core` OK 13/13 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `464`; el següent canvi real ha de ser `#465`.
+
+### Canvi #463 — 2026-04-30 — claude (FET)
+**Roadmap del manual passa de badges passius a CTAs reals i auto-verificats: viewer del §9 a `/admin/docs/protocol`, lectura enriquida del Canvi #N citat, botó "Anar al workspace" per àrea, i guard `qa:roadmap-canvis` que blinda la coherència entre `ADMIN_MANUAL_ROADMAP` i el §9.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el Canvi #462 va sincronitzar el roadmap amb la realitat (11 DONE + 1 PENDING), però l'usuari va detectar dos defectes oberts amb la frase "botons clars i entendibles i tot automatitzat joder": (1) el badge `Fet · Canvi #N` era passiu — no es podia clicar per anar al detall real al §9, (2) el manteniment del status/doneCanvi al constant continuava sent manual cada cop que es tancava un Canvi al §9 (doble entrada). El feedback és general però aquí toca tancar la peça concreta.
+- `lib/services/protocolCanvisService.ts` (nou): servei pur amb `parseProtocolCanvis(rawMarkdown)` que extreu cada `### Canvi #N — DATE — AUTHOR (STATUS)` com a `{ n, date, author, status, headline, body, anchorId }` i `indexProtocolCanvisByNumber()` que exposa lookup O(1) per Canvi #N. La regex canònica del header és `/^### Canvi #(\d+)\s+—\s+(\d{4}-\d{2}-\d{2})\s+—\s+([^\s(]+)\s*\(([^)]+)\)/` i el body s'agafa des del header fins al següent. `normalizeStatus()` retorna `'FET' | 'EN MARXA' | 'PENDENT' | 'UNKNOWN'`.
+- `__tests__/lib/services/protocolCanvisService.test.ts` (nou): 7 tests purs. (1) input buit/sense Canvis. (2) extracció de metadades canòniques amb headline preservada. (3) body capturat fins al següent header (no inclou el següent). (4) normalització dels 4 status. (5) ignora headers amb format trencat (sense `#`, sense numero, sense data, etc.). (6) ordre preservat (de més recent a més antic, com al §9). (7) `indexProtocolCanvisByNumber` lookup correcte i `undefined` per claus inexistents.
+- `app/admin/docs/protocol/page.tsx` (nou): pàgina admin server component (`force-static` + `revalidate: 60`) que llegeix `docs/protocol-producte-admin-ca.md` via `fs.readFile()`, parseja amb `parseProtocolCanvis()` i renderitza tots els Canvis com a `<details>` plegables amb `id="canvi-N"` per àncora directa. Suporta `?canvi=N` (obre el `<details>` corresponent + ressalta amb border-amber) i `?q=text` (filtra per número/data/autor/headline). KPIs: total canvis, # FET, darrer canvi (#N + data + autor), filtres actius. Cerca via `<form method="get">` simple. Cada `<summary>` mostra `#N`, data, autor (badge amb estil per `claude`/`codex`), status (badge amb estil per FET/EN MARXA/PENDENT/UNKNOWN) i headline. Body renderitzat com `<pre whitespace-pre-wrap>`.
+- `app/admin/manual/page.tsx`: la pàgina ara és `async` i llegeix el protocol via `loadProtocolCanvisIndex()` (un sol fetch + parse cacheat per `revalidate`). Cada card del roadmap rep: (a) sota la `doneNote` verda, una línia `Verificat al §9: #N · DATE · AUTHOR · STATUS` amb les metadades **reals** llegides del protocol (no només el número) — autoverificació que l'usuari demanava. (b) Una fila d'acció final amb dos CTAs: primari `Obrir Canvi #N` (DONE amb `doneCanvi`) o `Obrir §9 al protocol` (PENDING) enllaçant a `/admin/docs/protocol?canvi=N#canvi-N`; secundari `Anar a {workspace}` amb mappeig fix per `area`.
+- `scripts/check-roadmap-canvis.mjs` (nou): guard que parseja `lib/constants/adminManual.ts` (regex per blocs + `/doneCanvi:\s*(\d+)/`), parseja el §9 (regex de header amb status FET filtrat) i falla si una `doneCanvi: N` del roadmap no apareix com a `### Canvi #N — ... (FET)` al protocol. Si el fitxer del protocol no existeix, falla amb missatge clar.
+- `__tests__/scripts/check-roadmap-canvis.test.ts` (nou): 5 tests via `spawnSync` sobre fixtures temp. (1) passa quan tot doneCanvi té match FET. (2) passa quan no hi ha doneCanvi al roadmap. (3) falla amb un Canvi orfe. (4) falla quan el Canvi citat existeix però amb status `EN MARXA` (no FET). (5) falla quan el fitxer del protocol no existeix. Aquest test entra automàticament a `qa:protocol:test` que ja escaneja `__tests__/scripts/`.
+- `package.json`: nou script `qa:roadmap-canvis` afegit a `validate:core` entre `qa:message-imports` i `arch:layer:check`. `validate:core` passa de 12 guards a **13**.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `462` a `463`.
+- Ressonància amb el feedback general: aquesta línia editorial (botons clars + automatització) queda escrita com a regla durador a `feedback_botons_clars_automatitzat.md` a la memòria de Claude. Qualsevol UI futura amb badges passius o manteniment manual de doble entrada hauria d'aplicar el mateix patró (CTA real + lectura del source canònic + guard de coherència).
+- Aquest tall **NO** toca: lògica de servei comercial, schema, dades de leads/customers/bookings, copy públic, cap altre workspace admin. Pur drenatge UX + automatització de coherència.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/protocolCanvisService.test.ts __tests__/scripts/check-roadmap-canvis.test.ts __tests__/lib/constants/adminManualRoadmap.test.ts` OK (18 tests) · `pnpm run qa:roadmap-canvis` OK · `pnpm run validate:core` OK 13/13 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `463`; el següent canvi real ha de ser `#464`.
+
+### Canvi #462 — 2026-04-30 — claude (FET)
+**`ADMIN_MANUAL_ROADMAP` sincronitzat amb la realitat del §6.15: 11 ítems marcats `DONE` amb cita de Canvi #N + 1 ítem `PENDING` real, i el roadmap a `/admin/manual` deixa de mentir sobre l'estat del producte.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `lib/constants/adminManual.ts` exporta `ADMIN_MANUAL_ROADMAP` amb 12 ítems que es pinten a `/admin/manual` com a "Roadmap de millores pendents". El contracte original (`AdminManualRoadmapItem` amb `id/title/description/priority/impact/effort/area`) no portava camp `status` i tots els ítems es renderitzaven com si fossin pendents. La realitat al §6.15 del protocol és l'oposada: 11 dels 12 ítems ja són FET amb cita explícita de Canvi #N (alguns múltiples). Només `marketing-analytics-hub` és realment pendent. Resultat: l'usuari entrava a `/admin/manual` i veia 12 cards "pendents" quan només n'hi havia 1, i el KPI "Roadmap pendent" mostrava `12` en lloc de `1`. Trencava la confiança del manual com a font operativa.
+- `lib/constants/adminManual.ts` · contracte: nou type `AdminManualRoadmapStatus = 'PENDING' | 'DONE'` exportat. `AdminManualRoadmapItem` guanya `status: AdminManualRoadmapStatus`, `doneCanvi?: number` (referència al §9 quan és identificable amb un sol canvi) i `doneNote?: string` (descripció breu del lliurament real). Camps opcionals només es completen quan `status === 'DONE'`.
+- `lib/constants/adminManual.ts` · dades: 11 ítems marcats `DONE` amb mapeig contra el §6.15:
+  - `lead-nurturing-engine` → `commercialSequenceService.ts` (cadència 5 passos, sense Canvi únic).
+  - `forecast-per-status` → Canvi #115 (`LEAD_SCORING_STATUS_PROBABILITY` a `loadDailyBrief`, ampliat al #454 amb banda ±1σ).
+  - `command-palette` → Canvi #380 (capa pura `adminCommandPaletteService.ts` + 13 tests; base al #102).
+  - `ab-testing-templates` → Canvi #133 (`emailTrackingService.ts` click tracking + report best/worst).
+  - `attribution-multitouch` → Canvi #131 (`generateMultiTouchReport` + dashboard model multi-touch; #128).
+  - `lead-scoring-dynamic` → `commercialScoring.ts` (sense Canvi únic).
+  - `kpi-anomaly-detection` → Canvi #115 (`dailyAnomalyService.ts` + `AnomalyPanel`).
+  - `capacity-conflict-alerts` → Canvi #116 (`capacityConflictService.ts` + `CapacityConflictPanel`; alertes #129).
+  - `push-notifications-critical` → Canvi #115 (resum diari email/WA; #144 alertes urgents).
+  - `weekly-benchmark` → Canvi #126 (servei + ruta + GitHub Actions + 4 tests).
+  - `decision-audit-trail` → Canvi #408 (#358 backend + #360 analítica + #363 endpoint + #370/#372/#375/#377/#383 UI/wiring + #408 deploy Railway).
+- `lib/constants/adminManual.ts` · 1 ítem `PENDING`: `marketing-analytics-hub` (CRITICAL, OAuth + 4 APIs externes Google Ads/Meta Ads/GA4/Google Business Profile). Segueix sent l'únic candidat real a futur Canvi del protocol; no porta `doneCanvi` ni `doneNote`.
+- `app/admin/manual/page.tsx`: pàgina admin ajustada per llegir el nou contracte. (1) Nou record `ROOTMAP_STATUS_ORDER` amb `PENDING: 0, DONE: 1` per ordenar pendents primer. (2) Nous comptadors `roadmapPendingCount` i `roadmapDoneCount` calculats sobre `ADMIN_MANUAL_ROADMAP`. (3) `roadmapItemsSorted` aplica el sort sense mutar la constant. (4) KPI "Roadmap pendent" passa de mostrar `ADMIN_MANUAL_ROADMAP.length` (12) a `roadmapPendingCount` (1) i la descripció diu "X ja construïdes · Y per atacar". (5) Title de la secció passa de "Roadmap de millores pendents" a "Roadmap de millores identificades" amb description que reconeix el §9 com a origen canònic. (6) Cada card pinta dos badges apilats (prioritat com abans + estat nou amb classes verdes per `DONE` o neutres per `PENDING`); el text del badge `DONE` és `Fet · Canvi #N` quan hi ha `doneCanvi`, o simplement `Fet`. (7) Card amb `status === 'DONE'` guanya un border-emerald subtil i, si porta `doneNote`, un panell verd a sota de la descripció amb la cita textual del lliurament real.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts` (nou): 6 tests purs sobre el contracte. (1) tots els ítems tenen status canònic ∈ {PENDING, DONE}. (2) ids únics. (3) ítems DONE amb `doneCanvi` sempre numèric enter positiu i `doneNote` no buit quan apareix. (4) ítems PENDING no porten `doneCanvi` ni `doneNote`. (5) `marketing-analytics-hub` és l'únic PENDING amb prioritat CRITICAL. (6) els 11 ids canònics esperats al backlog DONE estan presents amb `status === 'DONE'`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `461` a `462`.
+- Aquest tall **NO** toca: lògica de servei, schema Prisma, rutes API, tests d'altres mòduls. Pur drenatge de deute documental + monocapa entre `/admin/manual` i el §6.15 del protocol.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (6 tests) · `pnpm run validate:core` OK 12/12 guards · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `462`; el següent canvi real ha de ser `#463`.
+
+### Canvi #461 — 2026-04-30 — codex (FET)
+**C.10 del §6.18: la Inbox canònica ja tracta Instagram DM i formulari web com a canals reals dins del resum compartit de comunicacions.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el backlog `C.10` no demanava una nova pantalla, sinó tancar el buit de model entre la Inbox existent i dos canals que encara no entraven bé al `commTimeline`: `IG DM` i `form`. El problema real era de font canònica, no d'UI: el resum de comunicacions i les activitats de lead només entenien bé `EMAIL` i `WHATSAPP`, així que els contactes entrants de formulari i Instagram quedaven com a soroll o semàntica parcial.
+- `lib/services/commTimelineService.ts`: el contracte `CommChannel` incorpora `INSTAGRAM` i `FORM`; el mapper canònic normalitza `metadata.channel` (`instagram`, `ig`, `ig_dm`, `form`, `web_form`, `contact_form`) abans de caure al tipus legacy, i el summary ja compta aquests dos canals al mateix nivell que email/WhatsApp/trucada/nota.
+- `app/admin/inbox/CommSummaryPanel.tsx`: el resum visual de la Inbox mostra també `Instagram` i `Formulari` com a canals actius, amb les seves icones i comptadors reals.
+- `lib/services/leadActivityService.ts`: nou helper `recordLeadInboundChannelCaptured()` per escriure una activitat inbound canònica a lead sense duplicar lògica ni inventar un segon model.
+- `lib/services/contactLeadCaptureService.ts`: la captura pública de contactes registra ara una activitat inbound de canal `FORM` o `INSTAGRAM` quan l'entrada arriba des de web/configurador/Instagram, mantenint `leadNote` i afegint traça canònica reutilitzable per Inbox/Hub.
+- `lib/services/leadAdminService.ts`: l'alta manual d'una lead amb `source='INSTAGRAM'` deixa també una activitat inbound canònica (`Instagram DM registrat`) perquè el resum compartit no depengui només d'integracions futures.
+- `lib/customer-hub/dto.ts` i `lib/customer-hub/fetchCustomerHub.ts`: el contracte del Customer Hub s'alinea amb els dos nous canals (`INSTAGRAM`, `FORM`) i els fallbacks locals deixen de trencar `tsc`.
+- Tests ampliats: `__tests__/lib/services/commTimelineService.test.ts`, `__tests__/app/admin/inbox/CommSummaryPanel.test.tsx`, `__tests__/lib/services/contactLeadCaptureService.test.ts`, `__tests__/lib/services/leadAdminService.test.ts`, més alineació de fixtures a `__tests__/app/admin/clientes/*`, `__tests__/lib/customer-hub/nextActionLink.test.ts` i `__tests__/lib/services/customerInsightsService.test.ts`.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/commTimelineService.test.ts __tests__/app/admin/inbox/CommSummaryPanel.test.tsx __tests__/lib/services/contactLeadCaptureService.test.ts __tests__/lib/services/leadAdminService.test.ts` OK (42 tests) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `461`; el següent canvi real ha de ser `#462`.
+
+### Canvi #460 — 2026-04-30 — codex (FET)
+**E.20 del §6.18 mancances transversals: la reserva ja té captura ràpida de bolo amb foto + nota sobre la galeria existent.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el punt `E.20` demanava un equivalent de "Field Notes" directament dins la fitxa de `Booking`. El model ja tenia `BookingGalleryPhoto.caption` i l'endpoint `POST /api/admin/bookings/[id]/gallery` ja acceptava `caption`, però la UI no exposava cap flux ràpid de mòbil per obrir càmera, pujar la foto i deixar context operatiu.
+- `app/admin/bookings/[id]/BookingFieldNotesComposer.tsx` (nou): composer compacte de captura ràpida. Permet escriure una nota curta, obre càmera o selector de foto amb `accept="image/*"` + `capture="environment"`, i puja la captura via `fetchWithCsrf` a la galeria de la reserva.
+- Contracte del composer:
+  - envia `caption` amb la nota escrita;
+  - força `isPortal=false` i `isPortfolio=false`, de manera que la captura queda interna per defecte;
+  - refresca la reserva després de guardar per veure la captura immediatament a la galeria.
+- `app/admin/bookings/[id]/BookingGallery.tsx`: la foto seleccionada guanya un camp `Nota / context` editable, reutilitzant el `PATCH` existent de galeria per desar `caption`. Això converteix `caption` en una nota de camp real i no només en metadada latent.
+- `app/admin/bookings/[id]/page.tsx`: el composer es col·loca a la secció `Galeria`, just abans de `BookingGallery`, perquè el flux sigui un sol pas des de la fitxa de reserva.
+- Tests:
+  - `__tests__/app/admin/bookings/BookingFieldNotesComposer.test.tsx` (nou): blinda enviament de `file + caption + flags interns` i `router.refresh()`, més el cas d'error.
+  - `__tests__/lib/services/galleryService.test.ts` ja cobria `caption` i segueix passant sense canvis de backend.
+- Verificació del tall: `pnpm exec vitest run __tests__/app/admin/bookings/BookingFieldNotesComposer.test.tsx __tests__/lib/services/galleryService.test.ts` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `460`; el següent canvi real ha de ser `#461`.
+
+### Canvi #459 — 2026-04-30 — codex (FET)
+**F.24 del §6.18 mancances transversals: la fitxa client ja ensenya ubicació i distància real reutilitzant el motor canònic de Google Maps.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el Customer Hub ja mostrava `eventVenue/eventLocation` en punts dispersos, però no hi havia cap superfície clara per consultar la ruta real des de la base Òrbita. El càlcul ja existia a `B.6` per reserves (`distanceKm` guardat + endpoint `POST /api/admin/maps/distance`), però `F.24` demanava aterrar-lo a la fitxa client sense crear un segon flux.
+- `lib/customer-hub/dto.ts`: `BookingDTO` i la reserva vinculada dins `LeadDTO` guanyen `distanceKm?: number` per transportar el km canònic fins a la UI.
+- `lib/customer-hub/data.ts` + `lib/customer-hub/fetchCustomerHub.ts`: el loader del Customer Hub selecciona i mapeja `booking.distanceKm` tant per a `bookingsRows` com per a la reserva vinculada del lead, de manera que la fitxa client pot consumir el valor persistent quan ja existeix.
+- `app/admin/clientes/[id]/_components/panels/SummaryPanel.tsx`: nova targeta `Ubicació i ruta` al bloc de següents passos. Prioritza la pròxima reserva del client, mostra `venue + location`, obre el destí a Google Maps i:
+  - si `distanceKm` ja existeix, ensenya la distància guardada (`km A/T`) com a dada canònica de la reserva;
+  - si no existeix però sí hi ha destí, calcula ruta viva via `fetchWithCsrf('/api/admin/maps/distance')` i mostra `km anada`, `km A/T`, durada i resolució de l'origen/destí sense modificar la reserva;
+  - si Google Maps falla o no està configurat, la targeta manté igualment la ubicació i un missatge de degradació net.
+- Tests:
+  - `__tests__/app/admin/clientes/SummaryPanel.test.tsx`: cobreix tant la variant amb `distanceKm` guardat com el fallback viu via Google Maps.
+  - `__tests__/lib/customer-hub/fetchCustomerHub.test.ts`: blinda que `distanceKm` es propagui des del loader cap a `bookings[]` i `leads[].booking`.
+- Verificació del tall: `pnpm exec vitest run __tests__/app/admin/clientes/SummaryPanel.test.tsx __tests__/lib/customer-hub/fetchCustomerHub.test.ts` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `459`; el següent canvi real ha de ser `#460`.
+
+### Canvi #458 — 2026-04-30 — claude (FET)
+**E.18 del §6.18 mancances transversals: l'admin PWA guanya Quick Actions de homescreen via `manifest.webmanifest`, completant el front que estava `[FET base]`.**
+- Context: el `E.18` deia "App PWA admin — `app/manifest` ja existeix, refinar offline i Quick Actions". L'auditoria ràpida mostra que la capa d'**offline** ja era robusta — `public/sw.js` té `OFFLINE_PAGE = '/offline.html'`, precache d'assets, estratègies fetch i activate cleanup; l'admin layout registra el SW. El que faltava eren les **Quick Actions** admin: `manifest.webmanifest` consumit per `app/admin/layout.tsx` només tenia `name`, `icons` i camps mínims, sense l'array `shortcuts` que defineix els accessos ràpids del homescreen quan l'usuari instal·la la PWA.
+- `public/manifest.webmanifest`: afegit l'array `shortcuts` amb 4 entrades canòniques alineades amb les superfícies més usades del cockpit:
+  - `Entrades` → `/admin/leads` (cockpit comercial)
+  - `Creació ràpida` → `/admin/quick-create` (wizard A.5 + B.8)
+  - `Reserves` → `/admin/bookings`
+  - `Inbox` → `/admin/inbox` (compose i bulk de C.11/C.12)
+  Cada shortcut porta `name`, `short_name`, `description`, `url` i icona `96x96` reaprofitant `/favicon-96.png` (no calen assets nous; el SO renderitza la mateixa icona arrodonida).
+- `__tests__/public/manifest-webmanifest.test.ts` (nou): 3 tests de contracte. (1) JSON vàlid amb camps mínims de PWA (`name`, `start_url`, `display: standalone`, ≥2 icones). (2) `shortcuts` inclou les 4 URLs admin canòniques (`/admin/leads`, `/admin/quick-create`, `/admin/bookings`, `/admin/inbox`). (3) Cada shortcut admin té `name`, `url` `/admin/*` i icona `96x96`.
+- Aquest tall **NO** toca:
+  - El SW (`public/sw.js`) ni l'`offline.html` — la capa d'offline ja era operativa i no requeria modificacions.
+  - El `manifest.json` públic (que viu separat amb shortcuts cap a `/contacto`, `/portfolio`, `/servicios/bodas` per al site web, no per a l'admin).
+  - `app/admin/layout.tsx` — el `<link rel="manifest" href="/manifest.webmanifest" />` ja apuntava al fitxer correcte.
+- Efecte: quan un propietari instal·la l'admin a un mòbil, el `long-press` sobre la icona ofereix saltar directament a Entrades, Creació ràpida, Reserves o Inbox sense passar per la home. És el patró estàndard de productivitat dels CRMs mòbil.
+- Verificació del tall: `pnpm exec vitest run __tests__/public/manifest-webmanifest.test.ts` OK (3 tests) · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `458`; el següent canvi real ha de ser `#459`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #457 — 2026-04-30 — codex (FET)
+**`C.11` queda tancat: `Inbox Compose` ja pot executar enviaments massius segmentats sobre audiències reals sense crear una capa paral·lela de redacció o d’enviament.**
+- Context: el backlog de `§6.18` marcava `C.11` com a pendent perquè el producte tenia segments CRM, campanyes suggerides i redactor d’Inbox, però l’últim pas continuava sent manual: copiar text i enviar-lo contacte per contacte. El tall bo no era inventar un mòdul nou, sinó connectar segmentació + compose + `sendAdminEmail()` sota el mateix flux.
+- `lib/services/bulkComposeSegmentService.ts` (nou): catàleg canònic `BULK_COMPOSE_SEGMENTS` amb dos segments executables de primer nivell: `customers-weddings-2025` i `leads-no-response-7d`. Carrega audiència real des de Prisma o des de `loadPendingFollowUps()`, personalitza placeholders simples `{nom}` / `{name}` i orquestra l’enviament bulk reutilitzant `sendAdminEmail()` per destinatari.
+- `app/api/admin/emails/send-bulk/route.ts` (nou): ruta autenticada per executar el bulk send sobre un segment, retornant `audienceSize`, `sent` i `failed`.
+- `app/admin/inbox/compose/page.tsx`: el redactor guanya accessos ràpids a segments i pot carregar l’audiència directament per `?segment=` sense crear una pantalla nova.
+- `app/admin/inbox/compose/ComposeForm.tsx`: nou mode segmentat. Mostra resum d’audiència, primers destinataris, bloqueja la selecció individual de lead quan s’està en bulk mode i envia el formulari a `/api/admin/emails/send-bulk`. El CTA passa a `📣 Envia campanya` per no semblar un correu individual.
+- `__tests__/lib/services/bulkComposeSegmentService.test.ts` (nou): blinda resolució de les dues audiències i personalització del missatge. `__tests__/app/api/admin/emails-send-bulk-route.test.ts` (nou): auth + happy path + propagació d’error funcional. `__tests__/app/admin/inbox/compose/ComposeForm.test.tsx`: ampliat amb regressió de mode segmentat.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/bulkComposeSegmentService.test.ts __tests__/app/api/admin/emails-send-bulk-route.test.ts __tests__/app/admin/inbox/compose/ComposeForm.test.tsx` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `457`; el següent canvi real ha de ser `#458`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #456 — 2026-04-30 — claude (FET)
+**D.17 del §6.18 mancances transversals: `PipelineBoard` ja porta drag & drop de mòbil via Pointer Events; queda blindada amb un test de contracte i marcat `[FET]` al checklist.**
+- Context: el `D.17` estava taggat `[BLOC verificar UX]` perquè la lectura ràpida del checklist suggeriria que `LeadPipelineView` només tenia drag HTML5 (que mobile browsers no suporten). La verificació real del codi mostra que `PipelineBoard` (component genèric extret del Lead i Booking pipeline) implementa una capa d'aliments dual: HTML5 drag&drop per desktop **i** Pointer Events per touch amb heurística pròpia de scroll vertical vs drag horitzontal (`Math.abs(deltaY) > 18 && Math.abs(deltaY) > Math.abs(deltaX) * 1.2 → cancel·la el drag`), `touchAction: 'pan-y'` per defecte i `'none'` mentre el drag és actiu, i `resolveDropStatusFromPoint(x, y)` per determinar la columna destí des de coordenades absolutes. Sense això es deixava la sensació que el front estava parcialment obert quan en realitat ja hi era; aquest tall el blinda i el converteix en `FET`.
+- `__tests__/app/admin/components/PipelineBoard.test.tsx` (nou): cobreix tres regressions del contracte exposat al `renderCard`: (1) tots els handlers desktop+mòbil són funcions vives i `style.touchAction` arrenca a `'pan-y'`; (2) `updatingId` desactiva `draggable` només per al lead afectat sense bloquejar la resta; (3) un `onPointerDown` d'origen `mouse` no llança cap moviment (els drags de ratolí passen per HTML5 drag&drop, no per Pointer Events).
+- Aquest tall **NO** toca codi del component, ni `LeadPipelineView`, ni `BookingPipelineView`, ni cap servei. La capa de Pointer Events ja existia (afegida prèviament al sync `81245d80 fix: ... mobile swipe`); el que faltava era una cita explícita al `Canvi #N` que ho tanqués. La regla és la mateixa que el `#447` i el `#453`: un `FET` viu al protocol ha de tenir cita de canvi.
+- Verificació del tall: `pnpm exec vitest run __tests__/app/admin/components/PipelineBoard.test.tsx` OK (3 tests) · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `456`; el següent canvi real ha de ser `#457`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #455 — 2026-04-29 — codex (FET)
+**`C.13` queda tancat: la fitxa del lead ja pot disparar manualment un pas de seqüència comercial sobre el motor canònic existent.**
+- Context: el backlog de `§6.18` marcava `C.13` com a parcialment fet perquè el nurturing comercial ja existia com a batch (`commercialSequenceService` + cron + botó massiu a `Sales Ops`), però faltava la superfície de propietari per executar-lo sobre un lead concret amb un pas triat. Sense això, el motor existia però no era accionable des de la fitxa comercial del dia a dia.
+- `lib/services/commercialSequenceService.ts`: refós perquè el batch i el trigger manual comparteixin la mateixa funció interna `executeSequenceStepForLead()`. El servei exporta ara `runCommercialSequenceForLead(leadId, { step })`, valida lead actiu, resol el pas demanat, reutilitza la mateixa lògica d’enviament (`WhatsApp` primer, fallback a correu), actualitza `nurturingStep/lastNurturingAt/nurturingDone`, registra `leadActivity` shared i marca `adminLog` amb `manual: true`.
+- `app/api/admin/leads/[id]/sequence/route.ts` (nou): endpoint autenticat + `permission('automation')` + CSRF per executar el pas manual i retornar `summary` tipat al client.
+- `app/admin/leads/[id]/LeadActionsEnhanced.tsx`: nou bloc `Seqüència manual` al sidebar del lead. Mostra progrés actual, permet triar pas 1-5 i executa el trigger manual sense sortir de la fitxa. Es desactiva automàticament fora dels estats actius (`NEW`, `CONTACTED`, `QUOTE_SENT`, `NEGOTIATING`).
+- `app/admin/leads/[id]/page.tsx` i `lib/constants/admin.ts`: la fitxa aporta `nurturingStep/lastNurturingAt` al panell i es centralitza el catàleg UI `ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS`.
+- `__tests__/lib/services/commercialSequenceService.test.ts`: 3 regressions noves per al trigger manual (`404`, execució de pas concret amb `manual: true`, i `409` si no hi ha canal). `__tests__/app/api/admin/leads-sequence-route.test.ts` (nou) blinda auth, permission, CSRF, happy path i propagació d’errors de domini.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/commercialSequenceService.test.ts __tests__/app/api/admin/leads-sequence-route.test.ts` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `455`; el següent canvi real ha de ser `#456`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #454 — 2026-04-29 — claude (FET)
+**D.14 del §6.18 mancances transversals: la previsió mensual deixa de ser un punt cec — `pipelineForecast` propaga ara una banda de confiança ±1σ derivada de la variància Bernoulli per lead i `EconomiaClient` la fa visible com a `Rang ±1σ`.**
+- Context: el §6.18 mantenia `D.14` com a `[parcial]` perquè `LEAD_SCORING_STATUS_PROBABILITY` i la combinació `60% pipeline + 40% històric` ja existien, però la UI a `/admin/economia` només mostrava el punt central (`historicalAvg`, `pipeline`, `combined`). Sense banda d'incertesa, un mes amb 1 lead "calent" valorat 8 000€ es presentava igual que un mes amb 4 leads molt insegurs sumant la mateixa esperança matemàtica — informació crítica perduda al cockpit financer.
+- `lib/services/pipelineForecast.ts`: el `ForecastMonth` afegeix `pipelineLow/High` i `combinedLow/High`. El loop de leads ara acumula també una variància Bernoulli per mes (`a²·p·(1-p)`), respectant la divisió per 9 quan un lead sense data es reparteix als 3 mesos següents (cada contribució és `weighted/3`, amb variància pròpia). Al final, `stdDev = sqrt(variance)` dóna `pipelineLow = max(0, pipeline - σ)` i `pipelineHigh = pipeline + σ`. La combinació amb l'històric reaprofita el helper local `combine(p)` per garantir que la banda final viu sota la mateixa regla 60/40 que el valor central.
+- `app/admin/economia/economia-types.ts`: `ForecastMonth` queda alineat amb el contracte nou del servei.
+- `app/admin/economia/EconomiaClient.tsx`: la taula `Previsió de vendes` afegeix la columna `Rang ±1σ`, mostrant `low – high` quan la banda té amplada (mai negativa) i `—` quan és col·lapsada (cap pipeline o p=0/p=1). El subtítol explica explícitament que la banda és la variància Bernoulli per lead — evita que un usuari ho llegeixi com un interval de confiança paramètric estricte.
+- Aquest tall **NO** toca:
+  - El motor de scoring (`commercialScoring.ts`) ni el càlcul d'amount estimat — la banda surt de la mateixa probabilitat que ja consumeix el centre.
+  - El cron `/api/admin/cron/forecast` ni cap endpoint — la signatura de `buildPipelineForecast` és estrictament additiva.
+  - La pestanya `Cash flow` (que viu en un altre servei `cashFlowForecast.ts`).
+- Tests nous (6): `confidence band ±1σ` cobreix banda zero sense leads, banda no negativa amb 1 lead, col·lapse a p=1, amplada exacta a p=0.5 (`σ = amount/2`), combinació 60/40 amb històric, i col·lapse total quan només hi ha històric.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/pipelineForecast.test.ts` OK (18 tests) · `pnpm run validate:core` OK (12 guards) · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `454`; el següent canvi real ha de ser `#455`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #453 — 2026-04-29 — claude (FET)
+**Regularització documental §6.18 mancances transversals: D.15 i D.16 estaven marcats `[FET]` però sense citar el `Canvi #N` que els resol, contràriament a la norma §2.1.**
+- Context: el bullet de `D.15 "Què faig avui"` deia només "`dailyBriefService` ja cobreix" i el de `D.16 "Customer Lifetime Value"` deia "`customerInsightsService.calculateLTV` ja existeix". Cap dels dos donava la cita explícita al canvi que els tancava, així que un agent futur que llegís el §6.18 hauria de fer una recerca a `git log` per saber on viu el codi tancat. Aquesta lectura és exactament la que la norma §2.1 vol evitar — un `FET` sense cita al `Canvi #N` és un drenatge documental incomplet.
+- Verificació del codi referenciat (lectura d'estat actual, sense modificar):
+  - D.15: `lib/services/dailyBriefService.ts` existeix amb `generateDailyBrief(input)` + wrapper `loadDailyBrief()`; consumit per `app/admin/components/DailyBriefPanel.tsx` integrat a `app/admin/page.tsx`. Tests `__tests__/lib/services/dailyBriefService.test.ts` cobreixen greeting, summary, KPIs, alertes i accions. Origen: `Canvi #44` (2026-04-10, claude). Re-foundat al `#109` (codex) per consumir `loadPipelineSuggestions` i `loadPendingFollowUps` com a fonts canòniques.
+  - D.16: `lib/services/customerInsightsService.ts` exposa `calculateLTV` i la integra a `fetchCustomerHub` via `insights`. UI: `InsightsBanner` al Customer Hub mostra LTV, salut relacional i next action. Origen: `Canvi #16` (2026-04-09, claude). El `#35` ho mou de hardcode a aquest servei al banner.
+- `docs/protocol-producte-admin-ca.md` · §6.18 mancances transversals: el bullet `D.15` passa a `FET *(Canvi #44)*` amb context complet del que cobreix realment el servei. El bullet `D.16` passa a `FET *(Canvi #16)*` amb cita addicional al `#35` que va portar la dada al banner. Tots dos esmenten que aquesta regularització és el `Canvi #453`.
+- Aquest tall **NO** toca codi, schema ni tests — és pur deute documental sanat. Els canvis #16, #35, #44 i #109 ja portaven la seva pròpia validació (validate:core + qa:protocol al moment del tancament).
+- Verificació del tall: `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `453`; el següent canvi real ha de ser `#454`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #452 — 2026-04-29 — codex (FET)
+**`ComposeForm` manté l’auto-emplenat de plantilles intel·ligents sincronitzat amb el lead actiu sense trepitjar edicions manuals.**
+- Context: `inboxTemplateService` ja generava plantilles contextuals amb `name`, `eventDate`, `eventType`, `guestCount` i idioma, però al `ComposeForm` el text només s’emplenava en el moment de fer click. Si després es canviava de lead o d’idioma, la UI recalculava `smartTemplates` però l’assumpte i el cos quedaven congelats amb el context antic, de manera que `C.12` continuava parcialment obert.
+- `app/admin/inbox/compose/ComposeForm.tsx`: nou `lastAppliedTemplateRef` per recordar l’últim auto-emplenat. Quan hi ha `activeTemplateKey`, el formulari reaplica la plantilla recalculada només si `subject` i `body` encara coincideixen amb l’últim valor generat; així el canvi de lead/idioma refresca variables com nom o dades d’event, però si l’usuari ja ha començat a editar a mà, el formulari no li sobrescriu el treball.
+- `__tests__/app/admin/inbox/compose/ComposeForm.test.tsx`: ampliada la suite amb dues regressions noves. La primera blinda que la plantilla activa es rehidrati amb el segon lead quan el text continua untouched; la segona garanteix que una edició manual de l’assumpte bloqueja la reaplicació automàtica i preserva el contingut escrit per l’usuari.
+- Efecte: les plantilles intel·ligents passen de ser només un “paste inicial” a comportar-se com un auto-emplenat real dins del redactor, que segueix el context mentre encara és segur fer-ho.
+- Verificació del tall: `pnpm exec vitest run __tests__/app/admin/inbox/compose/ComposeForm.test.tsx` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `452`; el següent canvi real ha de ser `#453`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #451 — 2026-04-29 — codex (FET)
+**E.19 del §6.18: quick actions mòbil unificades a lead, customer i booking amb una franja shared i l'acció canònica de "contactat" al lead.**
+- Context: el backlog transversal del §6.18 apuntava un gap molt concret de camp: des del mòbil, les fitxes de `lead`, `customer` i `booking` no oferien una capa consistent de primer contacte. Hi havia telèfons, correus i alguns links de WhatsApp dispersos, però no una affordance clara d'un sol toc; i al lead faltava exposar a mòbil l'acció operativa bàsica de marcar-lo com a `CONTACTED` reutilitzant la ruta canònica existent.
+- `app/admin/components/MobileQuickActions.tsx` (nou): component shared client-side per a vista mòbil (`md:hidden`) que centralitza `trucar`, `WhatsApp`, `correu` i una acció primària opcional. El helper intern `buildWhatsAppHref()` evita tornar a duplicar el format del link a cada fitxa.
+- `app/admin/leads/[id]/LeadMobileQuickActions.tsx` (nou): wrapper específic del lead que reaprofita `patchLeadStatus()` per fer `CONTACTED` amb un sol toc quan l'estat actual és `NEW`, i després refresca la fitxa.
+- `app/admin/leads/[id]/page.tsx`: injecta la franja mòbil shared just sota el bloc executiu principal del lead.
+- `app/admin/clientes/[id]/_components/CustomerHeader.tsx`: afegeix la mateixa franja al header del Customer Hub perquè el mòbil tingui `tel`, `WhatsApp` i `correu` sense navegar més.
+- `app/admin/bookings/[id]/page.tsx`: afegeix la franja shared dins la secció "Informació del Client" de la reserva.
+- Efecte operatiu: al telèfon, el propietari pot trucar, obrir WhatsApp, enviar correu o marcar el lead com a contactat en un sol toc, sense buscar aquestes accions dins la fitxa ni dependre del layout desktop.
+- Verificació del tall: `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `451`; el següent canvi real ha de ser `#452`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #450 — 2026-04-29 — codex (FET)
+**B.9 del §6.18: el marge instantani entra al PDF Studio reutilitzant `costEngine` i la configuració canònica de rendibilitat, sense cap motor econòmic paral·lel.**
+- Context: després de tancar B.8 al `quick-create`, l'últim punt obert del Camí 2 era B.9: fer visible el marge mentre es cotitza, no només a `/admin/economia` o al detall d'una reserva existent. El repo ja tenia la peça bona (`computeBookingFinancialSummary` a `lib/services/costEngine.ts`) i l'endpoint de lectura de `profitabilityConfig`, però el Studio de pressupost continuava ensenyant només ingressos i recàrrecs. Si volíem tancar B.9 bé, calia portar-hi exactament el mateix motor i no un resum local inventat.
+- `lib/services/costEngine.ts`: deixa de dependre runtime de `profitabilityService.ts` per al default i passa a usar `PROFITABILITY_MODEL_DEFAULTS` de constants. Això el fa segur per entorns client sense tocar la fórmula canònica ni els tests del motor.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: nou carregador de `profitabilityConfig` via `GET /api/admin/reports/profitability/config`. Amb aquesta config calcula un `financialSummary` amb `computeBookingFinancialSummary({ total, packPrice, extrasTotal, distanceKm, source:'UNKNOWN' })`. El Studio continua amb la mateixa veritat de preu, transport i extres; només afegeix la lectura de cost i marge.
+- `app/admin/presupuestos/StudioPreview.tsx`: nova targeta `Marge viu` amb `cost directe`, `marge net`, `% marge` i `CAC` estimat. El to visual surt del `marginTone` canònic (`emerald` / `amber` / `orange` / `rose`), així que el llenguatge és coherent amb bookings/economia.
+- `app/admin/presupuestos/studio-utils.ts`: tipus nou `ProfitabilityConfigResponse` per evitar payloads inline i mantenir la frontera tipada del Studio.
+- Efecte operatiu: mentre cotitza, el propietari veu al mateix moment si el pressupost respira o no, amb cost directe i marge net reals del motor compartit. B.9 queda tancat i el Camí 2 del §6.18 passa completament a FET.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/costEngine.test.ts` OK (53 tests) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `450`; el següent canvi real ha de ser `#451`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #449 — 2026-04-29 — codex (FET)
+**B.8 del §6.18: auto-suggeriment de pack aterra a `/admin/quick-create` amb parser de pressupost robust, score per capacitat/pressupost i mapping segur cap als packs reals de Prisma.**
+- Context: el backlog del §6.18 deixava B.8 com el següent tall natural després de B.6/B.7. El repo ja tenia un esquelet nou a `packSuggestionService`, però encara era una capa pura sense impacte operatiu i amb un forat real: `parseBudgetRange('més de 500€')` fallava per accents, així que el test nou ni tan sols passava. A més, el suggeridor treballava amb packs de `packs-config`, mentre que `/admin/quick-create` envia `packId` de Prisma; sense resoldre aquest mapping, la recomanació no podia aplicar-se al flux real.
+- `lib/services/packSuggestionService.ts`: `parseBudgetRange` normalitza accents via Unicode NFD abans de parsejar. Això fa robusts casos com `més de`, `mes de`, `fins a` i variants similars sense duplicar regexs. La resta del motor de score es manté: servei per `eventType`, capacitat, bracket de pressupost, bonus de popularitat, `confidence` i `alternatives`.
+- `app/admin/quick-create/page.tsx`: la query de packs actius passa també `slug`, no només `id/code/price`, perquè el formulari pugui resoldre el pack suggerit de config cap al registre real de Prisma sense heurístiques febles.
+- `app/admin/quick-create/QuickCreateForm.tsx`: integra `suggestPackForLead()` directament al formulari. Quan hi ha invitats o pressupost:
+  - calcula el millor pack i alternatives;
+  - mapeja `suggestion.best.pack.slug` al pack real carregat des de Prisma;
+  - mostra targeta `Suggeriment automàtic` amb confiança, motius, warning si toca i alternatives;
+  - afegeix CTA `Aplicar suggeriment` que posa `packId` al select però **no** sobreescriu mai una tria manual existent;
+  - si no hi ha encaix prou net (`unmatched`), mostra explícitament que no hi ha suggeriment clar.
+- Efecte operatiu: el wizard A.5 (#442) deixa de demanar al propietari que dedueixi mentalment quin pack encaixa millor. Ara rep una proposta accionable al mateix punt on crea lead/pressupost/reserva, tancant B.8 sense automatismes cecs.
+- Verificació del tall: `pnpm exec vitest run __tests__/lib/services/packSuggestionService.test.ts` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `449`; el següent canvi real ha de ser `#450`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ### Canvi #448 — 2026-04-29 — codex (FET)
 **§6.12: els darrers links públics de WhatsApp deixen de construir `wa.me` inline i passen pel helper canònic compartit.**

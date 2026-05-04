@@ -23,6 +23,7 @@ import { buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
 import { buildCustomerCommercialPriority } from '@/lib/customer-hub/commercialPriority';
 import InsightsBanner from './InsightsBanner';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
 
 type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads' | 'privacy';
 
@@ -404,6 +405,12 @@ export default function CustomerHeader({
             href: ownerNextStep.href,
             external: ownerNextStep.external,
           }}
+        />
+
+        <MobileQuickActions
+          phone={data.customer.phone}
+          email={data.customer.email}
+          whatsappMessage={data.customer.name ? `Hola ${data.customer.name}! Escric des d'Òrbita Events per seguir el teu expedient.` : null}
         />
 
         {/* Insights banner — motor intel·ligent */}

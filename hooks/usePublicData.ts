@@ -15,48 +15,22 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
+import { fetchPublicStats, type PublicStatsValues } from '@/lib/api/publicStatsClient';
+import {
+  fetchPublicAvailability,
+  type AvailabilityValues,
+  type AvailabilityMonth as CanonicalAvailabilityMonth,
+} from '@/lib/api/publicAvailabilityClient';
+import { fetchPublicPacks } from '@/lib/api/publicPacksClient';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface MonthAvailability {
-  month: string;
-  monthName: string;
-  year: number;
-  totalSaturdays: number;
-  availableSaturdays: number;
-  bookedSaturdays: number;
-  blockedSaturdays: number;
-  saturdayDates: {
-    date: string;
-    status: 'available' | 'booked' | 'blocked';
-  }[];
-}
+type MonthAvailability = CanonicalAvailabilityMonth;
+type AvailabilityData = AvailabilityValues;
 
-interface AvailabilityData {
-  nextAvailableDate: string | null;
-  nextAvailableSaturday: string | null;
-  monthlyAvailability: MonthAvailability[];
-  scarcityMessage: string;
-  urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
-}
-
-interface StatsData {
-  yearsExperience: string;
-  coverage: string;
-  responseTime: string;
-  yearStarted: number;
-  peopleEntertained: number;
-  technicalIncidents: number;
-  totalEvents: number;
-  totalWeddings: number;
-  totalCorporate: number;
-  totalParties: number;
-  averageRating: number;
-  googleRating: number | null;
-  googleReviewsCount: number | null;
-}
+type StatsData = PublicStatsValues;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CACHE SIMPLE
@@ -141,16 +115,14 @@ export function useAvailability(): UseAvailabilityReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/public/availability?locale=${locale}`);
-      const json = await response.json();
+      const response = await fetchPublicAvailability(locale);
 
-      if (json.ok) {
-        const availabilityData = json.data as AvailabilityData;
-        setData(availabilityData);
-        setCachedData(cacheKey, availabilityData);
+      if (response.ok) {
+        setData(response.data);
+        setCachedData(cacheKey, response.data);
         setError(null);
       } else {
-        setError(json.error || 'Error desconocido');
+        setError('Error desconocido');
       }
     } catch (err) {
       log.error('Error fetching availability', err);
@@ -254,16 +226,14 @@ export function usePublicStats(): UseStatsReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/public/stats?locale=${locale}`);
-      const json = await response.json();
+      const response = await fetchPublicStats(locale);
 
-      if (json.ok) {
-        const statsData = json.stats as StatsData;
-        setStats(statsData);
-        setCachedData(cacheKey, statsData);
+      if (response.ok) {
+        setStats(response.stats);
+        setCachedData(cacheKey, response.stats);
         setError(null);
       } else {
-        setError(json.error || 'Error desconocido');
+        setError('Error desconocido');
       }
     } catch (err) {
       log.error('Error fetching stats', err);
@@ -397,12 +367,11 @@ export function usePrices(): UsePricesReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/public/packs');
-      const json = await response.json();
+      const response = await fetchPublicPacks();
 
-      if (json.ok && json.packs && Array.isArray(json.packs)) {
+      if (response.ok && Array.isArray(response.packs)) {
         const pricesMap: Record<string, PackPrice> = {};
-        json.packs.forEach((pack: { slug: string; price: number; originalPrice?: number | null; name: string }) => {
+        (response.packs as { slug: string; price: number; originalPrice?: number | null; name: string }[]).forEach((pack) => {
           pricesMap[pack.slug] = {
             slug: pack.slug,
             price: pack.price,

@@ -61,6 +61,8 @@ export default function BookingGallery({ bookingId }: Props) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [captionDraft, setCaptionDraft] = useState('');
+  const [savingCaption, setSavingCaption] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const loadPhotos = useCallback(async () => {
@@ -78,6 +80,10 @@ export default function BookingGallery({ bookingId }: Props) {
   }, [bookingId]);
 
   useEffect(() => { loadPhotos(); }, [loadPhotos]);
+  useEffect(() => {
+    const selected = selectedId ? photos.find((photo) => photo.id === selectedId) : null;
+    setCaptionDraft(selected?.caption || '');
+  }, [photos, selectedId]);
 
   const handleUpload = async (files: FileList) => {
     setUploading(true);
@@ -150,6 +156,22 @@ export default function BookingGallery({ bookingId }: Props) {
     }
   };
 
+  const saveCaption = async (photo: GalleryPhoto) => {
+    try {
+      setSavingCaption(true);
+      const res = await fetchWithCsrf(`/api/admin/bookings/${bookingId}/gallery`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoId: photo.id, caption: captionDraft.trim() || null }),
+      });
+      if (res.ok) await loadPhotos();
+    } catch (err) {
+      log.error('Error actualitzant caption', err);
+    } finally {
+      setSavingCaption(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="animate-pulse space-y-3">
@@ -204,6 +226,27 @@ export default function BookingGallery({ bookingId }: Props) {
       {selected && (
         <div className="ap-card rounded-xl p-4 space-y-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.selected)}>
           <div className="flex items-center justify-between"><p className="text-sm font-medium">Configuració de la foto</p><button type="button" onClick={() => setSelectedId(null)} className="text-xs opacity-50 hover:opacity-100">Tancar</button></div>
+          <div>
+            <label htmlFor="gallery-caption" className="text-xs opacity-50 block mb-1">Nota / context</label>
+            <textarea
+              id="gallery-caption"
+              value={captionDraft}
+              onChange={(e) => setCaptionDraft(e.target.value)}
+              rows={3}
+              className="ap-input w-full px-3 py-2.5 text-sm"
+              placeholder="Afegeix context ràpid de la captura"
+            />
+            <div className="mt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => saveCaption(selected)}
+                disabled={savingCaption}
+                className="rounded-xl border px-3 py-1.5 text-xs disabled:opacity-50"
+              >
+                {savingCaption ? 'Desant...' : 'Desar nota'}
+              </button>
+            </div>
+          </div>
           <label className="flex items-center justify-between gap-3" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.portal)}>
             <span className="text-sm">Visible al portal client</span>
             <button type="button" role="switch" aria-checked={selected.isPortal} onClick={() => toggleFlag(selected, 'isPortal')} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${selected.isPortal ? 'admin-tone-bg-info' : 'admin-tone-bg-neutral'}`}>
@@ -229,4 +272,3 @@ export default function BookingGallery({ bookingId }: Props) {
     </div>
   );
 }
-

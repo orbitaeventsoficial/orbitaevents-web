@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { PackDefinition, ServiceSlug } from '@/config/packs-config';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
+import { fetchPublicPacks } from '@/lib/api/publicPacksClient';
 
 type PacksState = {
   packs: PackDefinition[];
@@ -40,21 +41,14 @@ export function usePacks(options: {
 
     const load = async () => {
       try {
-        const params = new URLSearchParams();
-        if (service) params.set('service', service);
-        if (locale) params.set('locale', locale);
-
-        const res = await fetch(`/api/public/packs?${params.toString()}`, {
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          throw new Error('No s\'han pogut carregar els packs');
-        }
-
-        const data = await res.json();
+        const response = await fetchPublicPacks(
+          { service, locale },
+          { cache: 'no-store' },
+        );
         if (!active) return;
-        const remotePacks = Array.isArray(data.packs) ? data.packs : [];
+        const remotePacks = Array.isArray(response.packs)
+          ? (response.packs as PackDefinition[])
+          : [];
 
         setState({
           packs: remotePacks.length > 0 ? remotePacks : localizedFallback,

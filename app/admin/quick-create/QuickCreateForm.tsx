@@ -6,8 +6,9 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { EVENT_TYPE_VALUES, getEventLabel } from '@/lib/constants';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { suggestPackForLead } from '@/lib/services/packSuggestionService';
 
-type Pack = { id: string; code: string; price: number };
+type Pack = { id: string; slug: string; code: string; price: number };
 
 type Outcome = 'lead' | 'lead+proposal' | 'lead+proposal+booking';
 
@@ -41,6 +42,12 @@ const INITIAL: FormState = {
   message: '',
 };
 
+function getConfidenceLabel(confidence: 'high' | 'medium' | 'low'): string {
+  if (confidence === 'high') return 'Alta';
+  if (confidence === 'medium') return 'Mitjana';
+  return 'Baixa';
+}
+
 export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
   const router = useRouter();
   const toast = useToast();
@@ -49,6 +56,24 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
 
   const update = (field: keyof FormState, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const canSuggest = Boolean(form.guestCount || form.budget.trim());
+  const suggestion = canSuggest
+    ? suggestPackForLead({
+        eventType: form.eventType,
+        guestCount: form.guestCount ? Number(form.guestCount) : null,
+        budget: form.budget.trim() || null,
+      })
+    : null;
+  const bestSuggestion = suggestion?.best ?? null;
+  const suggestedPack =
+    bestSuggestion ? packs.find((pack) => pack.slug === bestSuggestion.pack.slug) ?? null : null;
+  const suggestedAlternatives =
+    suggestion?.alternatives
+      .map((alternative) => packs.find((pack) => pack.slug === alternative.pack.slug) ?? null)
+      .filter((pack): pack is Pack => Boolean(pack))
+      .slice(0, 2) ?? [];
+  const selectedPack = packs.find((p) => p.id === form.packId) || null;
 
   const submit = async (outcome: Outcome) => {
     if (!form.name.trim() || !form.email.trim()) {
@@ -64,8 +89,6 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
       if (!form.packId) return toast.error('Pack necessari per crear reserva');
       if (!form.phone.trim()) return toast.error('Telèfon necessari per crear reserva');
     }
-
-    const selectedPack = packs.find((p) => p.id === form.packId) || null;
 
     setSubmitting(outcome);
     try {
@@ -251,6 +274,60 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
               ))}
             </select>
           </label>
+          {canSuggest && suggestion && (
+            <div className="sm:col-span-2 rounded-xl border border-cyan-400/20 bg-cyan-500/[0.06] p-4 text-sm">
+              {suggestedPack && !suggestion.unmatched ? (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-cyan-100 font-semibold">Suggeriment automàtic</span>
+                    <span className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-cyan-100">
+                      Confiança {bestSuggestion ? getConfidenceLabel(bestSuggestion.confidence) : ''}
+                    </span>
+                    {form.packId === suggestedPack.id ? (
+                      <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-emerald-100">
+                        Aplicat
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="text-white/85">
+                    <span className="font-semibold">{suggestedPack.code}</span> · {suggestedPack.price}€
+                  </p>
+                  {bestSuggestion && bestSuggestion.reasons.length > 0 ? (
+                    <p className="text-xs text-cyan-50/80">
+                      {bestSuggestion.reasons.slice(0, 2).join(' · ')}
+                    </p>
+                  ) : null}
+                  {bestSuggestion && bestSuggestion.warnings.length > 0 ? (
+                    <p className="text-xs text-amber-100/80">
+                      {bestSuggestion.warnings.slice(0, 1).join(' · ')}
+                    </p>
+                  ) : null}
+                  {suggestedAlternatives.length > 0 ? (
+                    <p className="text-xs text-white/55">
+                      Alternatives: {suggestedAlternatives.map((pack) => pack.code).join(' · ')}
+                    </p>
+                  ) : null}
+                  {form.packId !== suggestedPack.id ? (
+                    <button
+                      type="button"
+                      onClick={() => update('packId', suggestedPack.id)}
+                      className="rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-50 hover:bg-cyan-400/20"
+                    >
+                      Aplicar suggeriment
+                    </button>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="font-semibold text-cyan-100">Sense suggeriment clar</p>
+                  <p className="text-xs text-white/65">
+                    Amb les dades actuals no hi ha cap pack amb encaix prou net. Ajusta invitats,
+                    pressupost o tria el pack manualment.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
           <label className="block text-sm sm:col-span-2">
             <span className="text-xs text-white/60">Notes / missatge</span>
             <textarea
@@ -297,6 +374,12 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
         {submitting && (
           <p className="text-xs text-amber-200/80">Creant {submitting}…</p>
         )}
+        {!form.packId && suggestedPack ? (
+          <p className="text-xs text-white/55">
+            Tens un pack suggerit disponible. Si no l&apos;apliques, el lead es crearà sense pack
+            assignat.
+          </p>
+        ) : null}
       </fieldset>
     </form>
   );

@@ -9,6 +9,7 @@ const {
   mockPrisma: {
     lead: {
       findMany: vi.fn(),
+      findUnique: vi.fn(),
       update: vi.fn(),
     },
     adminLog: { create: vi.fn() },
@@ -26,7 +27,7 @@ vi.mock('@/lib/services/leadActivityService', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
-import { runCommercialSequences, DEFAULT_NURTURING_CADENCE } from '@/lib/services/commercialSequenceService';
+import { runCommercialSequences, runCommercialSequenceForLead, DEFAULT_NURTURING_CADENCE } from '@/lib/services/commercialSequenceService';
 
 function makeLead(overrides: Partial<Record<string, unknown>> = {}) {
   return {
@@ -48,6 +49,7 @@ describe('runCommercialSequences', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.lead.findUnique.mockResolvedValue(null);
     mockPrisma.lead.update.mockResolvedValue({});
     mockPrisma.adminLog.create.mockResolvedValue({});
     mockSendEmail.mockResolvedValue(undefined);
@@ -268,5 +270,67 @@ describe('DEFAULT_NURTURING_CADENCE', () => {
       expect(step.channel).toBe('EMAIL');
       expect(step.step).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('runCommercialSequenceForLead', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPrisma.lead.findUnique.mockResolvedValue(makeLead({ activities: [] }));
+    mockPrisma.lead.update.mockResolvedValue({});
+    mockPrisma.adminLog.create.mockResolvedValue({});
+    mockSendEmail.mockResolvedValue(undefined);
+    mockSendWhatsAppText.mockResolvedValue({ ok: false });
+    mockRecordLeadCommercialSequenceStepSent.mockResolvedValue({});
+  });
+
+  it('retorna 404 si el lead no existeix', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValueOnce(null);
+
+    const result = await runCommercialSequenceForLead('missing');
+
+    expect(result).toEqual({ ok: false, status: 404, error: 'Lead no trobat' });
+  });
+
+  it('executa un pas manual concret i marca adminLog com a manual', async () => {
+    const result = await runCommercialSequenceForLead('lead-1', { step: 3 });
+
+    expect(result).toEqual(expect.objectContaining({
+      ok: true,
+      leadId: 'lead-1',
+      step: 3,
+      channel: 'email',
+      nurturingStep: 3,
+    }));
+    expect(mockPrisma.lead.update).toHaveBeenCalledWith({
+      where: { id: 'lead-1' },
+      data: expect.objectContaining({
+        nurturingStep: 3,
+        nurturingDone: false,
+      }),
+    });
+    expect(mockPrisma.adminLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'COMM_SEQUENCE_EXEC',
+        entityId: 'lead-1',
+        details: expect.objectContaining({
+          step: 3,
+          manual: true,
+          templateSlug: 'follow-up-3',
+        }),
+      }),
+    });
+  });
+
+  it('retorna 409 si el lead no té cap canal disponible', async () => {
+    mockPrisma.lead.findUnique.mockResolvedValueOnce(makeLead({ email: null, phone: null, activities: [] }));
+
+    const result = await runCommercialSequenceForLead('lead-1', { step: 2 });
+
+    expect(result).toEqual({
+      ok: false,
+      status: 409,
+      error: 'El lead no té cap canal disponible per enviar la seqüència',
+    });
   });
 });

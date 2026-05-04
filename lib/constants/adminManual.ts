@@ -478,6 +478,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
 ];
 
 export type AdminManualRoadmapPriority = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type AdminManualRoadmapStatus = 'PENDING' | 'DONE';
 
 export interface AdminManualRoadmapItem {
   id: string;
@@ -487,6 +488,9 @@ export interface AdminManualRoadmapItem {
   impact: string;
   effort: string;
   area: string;
+  status: AdminManualRoadmapStatus;
+  doneCanvi?: number;
+  doneNote?: string;
 }
 
 export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
@@ -498,6 +502,8 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Recupera 15-25% de leads que no responen al primer contacte.',
     effort: 'Mitjà — servei + cron + UI de seqüències',
     area: 'Captació i vendes',
+    status: 'DONE',
+    doneNote: '`commercialSequenceService.ts` executa cadència 5 passos (1d/3d/7d/14d/30d) amb email/WA, integrat al cron `commercialDailyAutomation`.',
   },
   {
     id: 'forecast-per-status',
@@ -507,6 +513,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Previsió de facturació fiable per decisions de tresoreria i capacitat.',
     effort: 'Baix — actualitzar `dailyBriefService` i `reportingService`',
     area: 'Finances i decisió',
+    status: 'DONE',
+    doneCanvi: 115,
+    doneNote: '`loadDailyBrief` usa `LEAD_SCORING_STATUS_PROBABILITY` per estat en lloc de `budget × 0.3` fix. Ampliat al Canvi #454 amb banda ±1σ a `pipelineForecast`.',
   },
   {
     id: 'command-palette',
@@ -516,6 +525,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Redueix clics per tasca al 30-50%. Experiència premium.',
     effort: 'Mitjà — component + índex de cerca',
     area: 'UX transversal',
+    status: 'DONE',
+    doneCanvi: 380,
+    doneNote: 'Base funcional al Canvi #102; lògica extreta a capa pura `adminCommandPaletteService.ts` amb 13 tests al Canvi #380.',
   },
   {
     id: 'ab-testing-templates',
@@ -525,6 +537,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Optimització contínua del copy comercial basada en dades.',
     effort: 'Mitjà — tracking pixel + dashboard',
     area: 'Comunicació',
+    status: 'DONE',
+    doneCanvi: 133,
+    doneNote: '`emailTrackingService.ts` ampliat amb click tracking (clickedAt/clickCount), link wrapping, report amb best/worst performer. Ruta `/api/tracking/click/[token]`, API `/api/admin/email-tracking`. Migració schema. 33 tests.',
   },
   {
     id: 'attribution-multitouch',
@@ -534,6 +549,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Decisions d\'inversió en captació basades en ROI real per canal.',
     effort: 'Alt — schema + tracking + reporting',
     area: 'Captació i vendes',
+    status: 'DONE',
+    doneCanvi: 131,
+    doneNote: '`generateMultiTouchReport` + `loadMultiTouchReport` amb journeys, crèdits per canal (first/assist/last touch), insights i veredicte. Dashboard connectat al model multi-touch (Canvis #128 + #131). 12 tests nous.',
   },
   {
     id: 'lead-scoring-dynamic',
@@ -543,6 +561,8 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'L\'admin treballa sempre pel lead més prometedor sense pensar-hi.',
     effort: 'Baix — funció pura + columna',
     area: 'Captació i vendes',
+    status: 'DONE',
+    doneNote: '`commercialScoring.ts` calcula score 0-100 + probabilitat + band. Cron `commercialDailyAutomation` actualitza `cachedScore` diari en lots.',
   },
   {
     id: 'kpi-anomaly-detection',
@@ -552,6 +572,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Detecció precoç de problemes (tràfic caigut, conversió baixa).',
     effort: 'Baix — agregació + comparació',
     area: 'Executive cockpit',
+    status: 'DONE',
+    doneCanvi: 115,
+    doneNote: '`dailyAnomalyService.ts` compara 5 KPIs vs mitjana 30d, threshold 50%. Panel `AnomalyPanel` al dashboard quan hi ha desviacions.',
   },
   {
     id: 'capacity-conflict-alerts',
@@ -561,6 +584,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Evita incidències operatives el dia de l\'event.',
     effort: 'Mitjà — servei de detecció + UI',
     area: 'Operacions',
+    status: 'DONE',
+    doneCanvi: 116,
+    doneNote: '`capacityConflictService.ts` detecta col·lisions d\'inventari entre reserves. Panel `CapacityConflictPanel` al dashboard. Alertes integrades al `commercialDailyAutomationService` (Canvi #129).',
   },
   {
     id: 'push-notifications-critical',
@@ -570,6 +596,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Cap alerta crítica passa desapercebuda.',
     effort: 'Baix — cron + email template',
     area: 'Executive cockpit',
+    status: 'DONE',
+    doneCanvi: 115,
+    doneNote: '`commercialDailyAutomationService` envia alertes CRITICAL per email i WhatsApp al resum diari. Ampliat amb alertes urgents push pel Canvi #144 (`urgentFollowUpAlertService`).',
   },
   {
     id: 'weekly-benchmark',
@@ -579,6 +608,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Visibilitat regular de tendències sense entrar al reporting.',
     effort: 'Baix — agregació + email',
     area: 'Reporting',
+    status: 'DONE',
+    doneCanvi: 126,
+    doneNote: 'Servei + ruta + catàleg `ADMIN_CRON_PREFIXES` + job GitHub Actions `daily-crons.yml`. Test de route nou (4 tests) + fix `if:` del job que mai s\'executava.',
   },
   {
     id: 'decision-audit-trail',
@@ -588,6 +620,9 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Aprenentatge continu del pipeline perdut.',
     effort: 'Baix — afegir taula + UI',
     area: 'Captació i vendes',
+    status: 'DONE',
+    doneCanvi: 408,
+    doneNote: 'Backend (#358) + analítica agregada (#360) + endpoint HTTP (#363) + wiring `statusRouteHandler` (#370) + panell `Sales Ops` (#372) + formulari Lead Hub (#375) + bloqueig kanban/llistat (#377) + lectura visual (#383) + migració desplegada a Railway (#408).',
   },
   {
     id: 'marketing-analytics-hub',
@@ -597,6 +632,7 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     impact: 'Converteix el màrqueting de "disparar a cegues" a decisió basada en dades. Pots saber exactament quin euro et porta quin client.',
     effort: 'Alt — OAuth + 4 APIs externes + servei d\'anàlisi + UI dashboard + regles de diagnòstic',
     area: 'Captació i vendes',
+    status: 'PENDING',
   },
 ];
 

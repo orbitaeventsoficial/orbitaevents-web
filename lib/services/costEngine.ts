@@ -7,8 +7,8 @@
  * - Sempre suma: cost operacional fix + cost viatge + cost extres
  */
 
+import { PROFITABILITY_MODEL_DEFAULTS } from '@/lib/constants/admin';
 import type { ProfitabilityConfig } from './profitabilityService';
-import { DEFAULT_PROFITABILITY_CONFIG } from './profitabilityService';
 import { calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM } from './travelCost';
 import { getMarginTone, type MarginTone } from '@/lib/margin-utils';
 
@@ -112,7 +112,7 @@ export function computeBookingFinancialSummary(
  */
 export function computeSimpleMarginPct(
   input: BookingCostInput,
-  config: ProfitabilityConfig = DEFAULT_PROFITABILITY_CONFIG,
+  config: ProfitabilityConfig = PROFITABILITY_MODEL_DEFAULTS,
 ): number {
   const summary = computeBookingFinancialSummary(input, config);
   // Retornem el marge sense CAC per coherència amb la vista simplificada

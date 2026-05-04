@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
-import { formatDate, formatDateFull, formatDateShort, formatDateSimple, formatCurrency, getEventLabel, getLeadStatusDisplay } from '@/lib/constants';
+import { formatDate, formatDateFull, formatDateShort, formatDateSimple, formatCurrency, formatNumber, getEventLabel, getLeadStatusDisplay } from '@/lib/constants';
 import {
   CUSTOMER_LIFECYCLE_LABELS,
   CUSTOMER_LIFECYCLE_COLORS,
@@ -82,6 +82,9 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
     followUpSummary: data.followUpSummary,
   });
   const topLead = getTopCustomerHubLead(data.leads);
+  const routeBooking = nextEvent
+    || topLead?.booking
+    || data.bookings.find((booking) => Boolean(booking.location || booking.venue));
   const topLeadAction = topLead
     ? topLead.booking
       ? { href: `/admin/bookings/${topLead.booking.id}`, label: 'Obrir reserva', external: false as const }
@@ -498,6 +501,27 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.summary.nextSteps)}>
         <ActionCard
+          title="Ubicació i ruta"
+          isEmpty={!routeBooking}
+          emptyText="Sense ubicació d'esdeveniment registrada encara"
+          content={
+            routeBooking && (
+              <RouteSnapshotCard
+                bookingId={routeBooking.id}
+                location={routeBooking.location}
+                venue={routeBooking.venue}
+                distanceKm={routeBooking.distanceKm}
+              />
+            )
+          }
+          action={
+            routeBooking
+              ? <a href={`/admin/bookings/${routeBooking.id}`} className="text-xs">Obrir reserva</a>
+              : undefined
+          }
+        />
+
+        <ActionCard
           title="Oportunitat comercial"
           isEmpty={!topLead}
           emptyText="Sense leads actives visibles"
@@ -878,6 +902,115 @@ function QuickAction({ href, label, color, external }: { href: string; label: st
     >
       {label}
     </a>
+  );
+}
+
+function RouteSnapshotCard({
+  bookingId,
+  location,
+  venue,
+  distanceKm,
+}: {
+  bookingId: string;
+  location?: string;
+  venue?: string;
+  distanceKm?: number;
+}) {
+  const destination = [venue, location].filter(Boolean).join(', ').trim();
+  const [liveRoute, setLiveRoute] = useState<{
+    oneWayKm: number;
+    roundTripKm: number;
+    durationText: string | null;
+    originResolved?: string;
+    destinationResolved?: string;
+  } | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!destination || distanceKm != null) return;
+
+    let cancelled = false;
+
+    async function resolveRoute() {
+      setLoading(true);
+      setRouteError(null);
+
+      try {
+        const res = await fetchWithCsrf('/api/admin/maps/distance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destination }),
+        });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok || !payload?.ok) {
+          throw new Error(payload?.error || 'No s\'ha pogut calcular la ruta');
+        }
+        if (cancelled) return;
+
+        setLiveRoute({
+          oneWayKm: Number(payload.oneWayKm || 0),
+          roundTripKm: Number(payload.roundTripKm || 0),
+          durationText: typeof payload.durationText === 'string' ? payload.durationText : null,
+          originResolved: typeof payload.originResolved === 'string' ? payload.originResolved : undefined,
+          destinationResolved: typeof payload.destinationResolved === 'string' ? payload.destinationResolved : undefined,
+        });
+      } catch (error) {
+        if (!cancelled) {
+          setRouteError(error instanceof Error ? error.message : 'Ruta no disponible ara mateix');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void resolveRoute();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [destination, distanceKm]);
+
+  if (!destination) {
+    return <p className="text-sm">La reserva encara no té recinte ni població.</p>;
+  }
+
+  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+  const distanceLabel = distanceKm != null
+    ? `${formatNumber(distanceKm, { maximumFractionDigits: 1 })} km A/T`
+    : liveRoute
+      ? `${formatNumber(liveRoute.roundTripKm, { maximumFractionDigits: 1 })} km A/T`
+      : null;
+  const oneWayLabel = liveRoute
+    ? `${formatNumber(liveRoute.oneWayKm, { maximumFractionDigits: 1 })} km anada`
+    : null;
+  const sourceLabel = distanceKm != null ? 'Distància guardada a la reserva' : liveRoute ? 'Distància viva via Google Maps' : null;
+
+  return (
+    <>
+      <p className="text-sm font-medium">{venue || location}</p>
+      {venue && location && <p className="mt-1 text-xs">{location}</p>}
+      <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+        {distanceLabel && <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-cyan-200">🚗 {distanceLabel}</span>}
+        {oneWayLabel && <span className="rounded-full border border-white/10 px-2 py-0.5">{oneWayLabel}</span>}
+        {liveRoute?.durationText && <span className="rounded-full border border-white/10 px-2 py-0.5">⏱️ {liveRoute.durationText}</span>}
+      </div>
+      {sourceLabel && <p className="mt-2 text-[11px] opacity-70">{sourceLabel}</p>}
+      {liveRoute?.originResolved && <p className="mt-1 text-[11px] opacity-60">Base Òrbita: {liveRoute.originResolved}</p>}
+      {liveRoute?.destinationResolved && liveRoute.destinationResolved !== destination && (
+        <p className="mt-1 text-[11px] opacity-60">Destí resolt: {liveRoute.destinationResolved}</p>
+      )}
+      {loading && <p className="mt-2 text-[11px] opacity-70">Calculant ruta real...</p>}
+      {!loading && routeError && <p className="mt-2 text-[11px] text-amber-300">{routeError}</p>}
+      <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
+        <a href={mapsHref} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
+          Obrir a Google Maps
+        </a>
+        <a href={`/admin/bookings/${bookingId}`} className="underline-offset-2 hover:underline">
+          Veure fitxa completa
+        </a>
+      </div>
+    </>
   );
 }
 

@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
 import { PLACEHOLDER_EMAIL_DOMAIN } from '@/lib/constants';
 import { recordCustomerLeadCreated } from '@/lib/services/customerActivityService';
+import { recordLeadInboundChannelCaptured } from '@/lib/services/leadActivityService';
 
 type PersistContactLeadInput = {
   name: string;
@@ -70,6 +71,16 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           content: input.updateNote,
         },
       });
+
+      if (input.source === 'INSTAGRAM' || input.source === 'WEBSITE' || input.source === 'CONFIGURATOR') {
+        await recordLeadInboundChannelCaptured({
+          leadId: updatedLead.id,
+          channel: input.source === 'INSTAGRAM' ? 'instagram' : 'form',
+          title: input.source === 'INSTAGRAM' ? 'Instagram DM rebut' : 'Formulari web rebut',
+          preview: input.message || null,
+          createdBy: 'Captura web',
+        });
+      }
     } else {
       const emailForDb = input.clientEmail || `phone-${input.clientPhone}${PLACEHOLDER_EMAIL_DOMAIN}`;
 
@@ -103,6 +114,16 @@ export async function persistContactLead(input: PersistContactLeadInput): Promis
           content: input.createNote,
         },
       });
+
+      if (input.source === 'INSTAGRAM' || input.source === 'WEBSITE' || input.source === 'CONFIGURATOR') {
+        await recordLeadInboundChannelCaptured({
+          leadId: newLead.id,
+          channel: input.source === 'INSTAGRAM' ? 'instagram' : 'form',
+          title: input.source === 'INSTAGRAM' ? 'Instagram DM rebut' : 'Formulari web rebut',
+          preview: input.message || null,
+          createdBy: 'Captura web',
+        });
+      }
     }
 
     if (savedLeadId && input.clientEmail && !input.clientEmail.endsWith(PLACEHOLDER_EMAIL_DOMAIN)) {

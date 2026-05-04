@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { CLIENT_LOGOS } from '@/app/config/client-logos';
+import { fetchImageManager } from '@/lib/api/imageManagerClient';
 
 export default function TrustedByLogos() {
   const t = useTranslations('homePage.trustedBy');
@@ -21,14 +22,13 @@ export default function TrustedByLogos() {
 
     const loadManagedLogos = async () => {
       try {
-        const response = await fetch('/api/public/image-manager?key=home.clientLogos', { cache: 'no-store' });
-        const data = await response.json().catch(() => null);
-        if (!response.ok || !data?.ok || cancelled) return;
-        const items = data?.data?.['home.clientLogos']?.items;
+        const response = await fetchImageManager('home.clientLogos', { cache: 'no-store' });
+        if (cancelled || !response.ok) return;
+        const items = response.data?.['home.clientLogos']?.items;
         if (Array.isArray(items) && items.length > 0) {
           const next = items
-            .map((item: { src?: string }) => item?.src)
-            .filter((src: string | undefined): src is string => typeof src === 'string' && src.length > 0);
+            .map((item) => item?.src)
+            .filter((src): src is string => typeof src === 'string' && src.length > 0);
           if (next.length > 0) setLogos(next);
         }
       } catch {

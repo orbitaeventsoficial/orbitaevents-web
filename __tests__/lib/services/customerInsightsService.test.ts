@@ -24,7 +24,7 @@ function makeHub(overrides: Partial<CustomerHubDTO> = {}): CustomerHubDTO {
     messages: overrides.messages || [],
     commSummary: overrides.commSummary || {
       total: 0,
-      channels: { EMAIL: 0, WHATSAPP: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
+      channels: { EMAIL: 0, WHATSAPP: 0, INSTAGRAM: 0, FORM: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
       lastContactAt: null,
       lastContactChannel: null,
       lastContactDirection: null,
@@ -171,7 +171,7 @@ describe('computeCustomerInsights', () => {
     const hub = makeHub({
       commSummary: {
         total: 4,
-        channels: { EMAIL: 2, WHATSAPP: 1, CALL: 0, NOTE: 1, SYSTEM: 0 },
+        channels: { EMAIL: 2, WHATSAPP: 1, INSTAGRAM: 0, FORM: 0, CALL: 0, NOTE: 1, SYSTEM: 0 },
         lastContactAt: '2026-04-09T11:00:00Z',
         lastContactChannel: 'EMAIL',
         lastContactDirection: 'INBOUND',

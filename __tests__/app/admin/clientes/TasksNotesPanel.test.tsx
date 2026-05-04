@@ -45,7 +45,7 @@ const HUB: CustomerHubDTO = {
   messages: [],
   commSummary: {
     total: 0,
-    channels: { EMAIL: 0, WHATSAPP: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
+    channels: { EMAIL: 0, WHATSAPP: 0, INSTAGRAM: 0, FORM: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
     lastContactAt: null,
     lastContactChannel: null,
     lastContactDirection: null,

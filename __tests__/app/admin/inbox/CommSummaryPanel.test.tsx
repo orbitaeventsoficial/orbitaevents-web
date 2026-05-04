@@ -18,6 +18,8 @@ function makeSummary() {
       WHATSAPP: 0,
       CALL: 0,
       NOTE: 0,
+      INSTAGRAM: 0,
+      FORM: 0,
       SYSTEM: 0,
     },
     lastContactAt: '2026-04-25T10:00:00.000Z',
@@ -60,5 +62,28 @@ describe('CommSummaryPanel', () => {
         '/api/admin/leads/lead-1/comm-summary?customerId=cust-1'
       );
     });
+  });
+
+  it('mostra Instagram i Formulari quan el resum canònic els porta', async () => {
+    fetchMock.mockResolvedValue({
+      json: async () => ({
+        ...makeSummary(),
+        total: 3,
+        channels: {
+          EMAIL: 0,
+          WHATSAPP: 0,
+          CALL: 0,
+          NOTE: 0,
+          INSTAGRAM: 1,
+          FORM: 2,
+          SYSTEM: 0,
+        },
+      }),
+    });
+
+    render(<CommSummaryPanel leadId="lead-2" />);
+
+    expect(await screen.findByText('Instagram')).toBeInTheDocument();
+    expect(await screen.findByText('Formulari')).toBeInTheDocument();
   });
 });

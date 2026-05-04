@@ -17,6 +17,7 @@ import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
+import BookingFieldNotesComposer from './BookingFieldNotesComposer';
 import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
@@ -29,6 +30,7 @@ import type { BookingExtraRow, BookingProposalRow, BookingInvoiceRow, BookingNum
 import { buildGoogleCalendarUrl, getPackTranslation } from './booking-utils';
 import type { CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
+import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -329,6 +331,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Client Info */}
       <section id="sec-client" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.client)}>
         <h2 className="text-lg font-semibold mb-4">Informació del Client</h2>
+        <MobileQuickActions
+          phone={booking.clientPhone}
+          email={booking.clientEmail}
+          whatsappMessage={`Hola ${booking.clientName}! Et contactem des d'Òrbita Events per la reserva ${booking.reference}.`}
+        />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="text-xs font-medium uppercase">Nom</p>
@@ -714,6 +721,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Gallery Section */}
       <section id="sec-galeria" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.gallery)}>
+        <div className="mb-6">
+          <BookingFieldNotesComposer bookingId={booking.id} />
+        </div>
         <BookingGallery bookingId={booking.id} />
       </section>
 
@@ -769,8 +779,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
-
-
 
 
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { fetchImageManager } from '@/lib/api/imageManagerClient';
 
 export function useManagedImageSrc(key: string, fallback: string): string {
   const [src, setSrc] = useState(fallback);
@@ -10,14 +11,9 @@ export function useManagedImageSrc(key: string, fallback: string): string {
 
     const load = async () => {
       try {
-        const response = await fetch(
-          `/api/public/image-manager?key=${encodeURIComponent(key)}`,
-          { cache: 'no-store' },
-        );
-        if (!response.ok) return;
-        const data = await response.json().catch(() => null);
+        const response = await fetchImageManager(key, { cache: 'no-store' });
         if (cancelled) return;
-        const managed = data?.data?.[key]?.item?.src;
+        const managed = response.data?.[key]?.item?.src;
         if (typeof managed === 'string' && managed.trim().length > 0) {
           setSrc(managed);
         }

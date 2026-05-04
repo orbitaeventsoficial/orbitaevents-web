@@ -126,6 +126,20 @@ describe('buildCommTimeline', () => {
     expect(result.channels.NOTE).toBe(1);
   });
 
+  it('respecta metadata.channel=form a activitats de tipus EMAIL', () => {
+    const result = buildCommTimeline(makeInput([
+      makeEntry({
+        id: 'f1',
+        type: 'EMAIL',
+        metadata: { channel: 'form', direction: 'INBOUND' },
+        title: 'Formulari web rebut',
+      }),
+    ]));
+
+    expect(result.entries[0].channel).toBe('FORM');
+    expect(result.channels.FORM).toBe(1);
+  });
+
   it('lastContactAt exclou INTERNAL', () => {
     const activities = [
       makeEntry({ id: '1', type: 'NOTE', createdAt: new Date('2026-04-09T12:00:00Z') }), // INTERNAL
@@ -204,5 +218,31 @@ describe('buildCommTimeline', () => {
     expect(result.lastContactDirection).toBe('INBOUND');
     expect(result.pendingResponseFrom).toBe('TEAM');
     expect(result.entries[0].customerId).toBe('cust-1');
+  });
+
+  it('reconeix INSTAGRAM i FORM des de metadata.channel als events canònics', () => {
+    const result = buildCommTimelineFromCanonicalEvents({
+      events: [
+        makeCanonicalEvent({
+          id: 'ig-1',
+          title: 'Instagram DM rebut',
+          metadata: { channel: 'instagram', direction: 'INBOUND' },
+          occurredAt: '2026-04-10T09:00:00.000Z',
+        }),
+        makeCanonicalEvent({
+          id: 'form-1',
+          title: 'Formulari web rebut',
+          metadata: { channel: 'form', direction: 'INBOUND' },
+          occurredAt: '2026-04-10T08:00:00.000Z',
+        }),
+      ],
+      customerId: null,
+      now: NOW,
+    });
+
+    expect(result.channels.INSTAGRAM).toBe(1);
+    expect(result.channels.FORM).toBe(1);
+    expect(result.entries[0].channel).toBe('INSTAGRAM');
+    expect(result.entries[1].channel).toBe('FORM');
   });
 });

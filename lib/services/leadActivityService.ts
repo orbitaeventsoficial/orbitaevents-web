@@ -9,6 +9,28 @@ type LeadActivityInput = {
   createdBy?: string;
 };
 
+export async function recordLeadInboundChannelCaptured(input: {
+  leadId: string;
+  channel: 'instagram' | 'form';
+  title: string;
+  preview?: string | null;
+  createdBy?: string;
+}) {
+  return prisma.leadActivity.create({
+    data: {
+      leadId: input.leadId,
+      type: 'EMAIL',
+      title: input.title,
+      description: input.preview || undefined,
+      createdBy: input.createdBy || 'Sistema',
+      metadata: {
+        channel: input.channel,
+        direction: 'INBOUND',
+      },
+    },
+  });
+}
+
 export async function recordLeadEmailSent(input: {
   leadId: string;
   subject: string;

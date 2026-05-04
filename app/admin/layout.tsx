@@ -13,6 +13,7 @@ import { ADMIN_CHANGE_COUNTER, ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
+import { fetchImageManager } from '@/lib/api/imageManagerClient';
 import './admin-theme.css';
 import './control-room.css';
 
@@ -281,12 +282,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
     async function loadManagedBrandAssets() {
       try {
-        const res = await fetch('/api/public/image-manager?key=layout.logo.admin&key=layout.appleTouchIcon', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json().catch(() => ({}));
+        const response = await fetchImageManager(
+          ['layout.logo.admin', 'layout.appleTouchIcon'],
+          { cache: 'no-store' },
+        );
         if (cancelled) return;
-        const managedAdminLogo = data?.data?.['layout.logo.admin']?.item?.src;
-        const managedAppleTouchIcon = data?.data?.['layout.appleTouchIcon']?.item?.src;
+        const managedAdminLogo = response.data?.['layout.logo.admin']?.item?.src;
+        const managedAppleTouchIcon = response.data?.['layout.appleTouchIcon']?.item?.src;
         if (typeof managedAdminLogo === 'string' && managedAdminLogo.trim()) {
           setManagedAdminLogoSrc(managedAdminLogo);
         }

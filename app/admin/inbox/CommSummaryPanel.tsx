@@ -8,6 +8,8 @@ const CHANNEL_ICON: Record<CommChannel, string> = {
   WHATSAPP: '💬',
   CALL: '📞',
   NOTE: '📝',
+  INSTAGRAM: '📷',
+  FORM: '🧾',
   SYSTEM: '⚙️',
 };
 
@@ -16,6 +18,8 @@ const CHANNEL_LABEL: Record<CommChannel, string> = {
   WHATSAPP: 'WhatsApp',
   CALL: 'Trucada',
   NOTE: 'Nota',
+  INSTAGRAM: 'Instagram',
+  FORM: 'Formulari',
   SYSTEM: 'Sistema',
 };
 
@@ -80,7 +84,7 @@ export default function CommSummaryPanel({
     );
   }
 
-  const activeChannels = (['EMAIL', 'WHATSAPP', 'CALL', 'NOTE'] as CommChannel[])
+  const activeChannels = (['EMAIL', 'WHATSAPP', 'INSTAGRAM', 'FORM', 'CALL', 'NOTE'] as CommChannel[])
     .filter((ch) => timeline.channels[ch] > 0);
 
   return (

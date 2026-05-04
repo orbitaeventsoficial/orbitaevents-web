@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { render, screen, within, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SummaryPanel from '@/app/admin/clientes/[id]/_components/panels/SummaryPanel';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
@@ -22,6 +22,14 @@ vi.mock('@/lib/csrf', () => ({
   fetchWithCsrf: vi.fn(),
 }));
 
+import { fetchWithCsrf } from '@/lib/csrf';
+
+const mockFetchWithCsrf = vi.mocked(fetchWithCsrf);
+
+beforeEach(() => {
+  mockFetchWithCsrf.mockReset();
+});
+
 const HUB: CustomerHubDTO = {
   customer: {
     id: 'cust-1',
@@ -39,7 +47,7 @@ const HUB: CustomerHubDTO = {
   messages: [],
   commSummary: {
     total: 0,
-    channels: { EMAIL: 0, WHATSAPP: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
+    channels: { EMAIL: 0, WHATSAPP: 0, INSTAGRAM: 0, FORM: 0, CALL: 0, NOTE: 0, SYSTEM: 0 },
     lastContactAt: null,
     lastContactChannel: null,
     lastContactDirection: null,
@@ -98,6 +106,82 @@ const HUB: CustomerHubDTO = {
 };
 
 describe('SummaryPanel', () => {
+  it('mostra ubicació i distància guardada de la reserva al resum del client', () => {
+    const soonDate = new Date();
+    soonDate.setDate(soonDate.getDate() + 10);
+    const routedHub: CustomerHubDTO = {
+      ...HUB,
+      bookings: [
+        {
+          id: 'booking-map-1',
+          reference: 'ORB-2026-050',
+          status: 'CONFIRMED',
+          date: soonDate.toISOString(),
+          startTime: '19:00',
+          location: 'Girona',
+          venue: 'Masia Can Riera',
+          distanceKm: 86.4,
+        },
+      ],
+    };
+
+    render(<SummaryPanel data={routedHub} />);
+
+    expect(screen.getByText('Ubicació i ruta')).toBeInTheDocument();
+    expect(screen.getByText('Masia Can Riera')).toBeInTheDocument();
+    expect(screen.getAllByText('Girona').length).toBeGreaterThan(0);
+    expect(screen.getByText('🚗 86,4 km A/T')).toBeInTheDocument();
+    expect(screen.getByText('Distància guardada a la reserva')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Obrir a Google Maps' })).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/search/?api=1&query=Masia%20Can%20Riera%2C%20Girona'
+    );
+  });
+
+  it('calcula la ruta viva via Google Maps si la reserva encara no té km guardats', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        ok: true,
+        oneWayKm: 43.2,
+        roundTripKm: 86.4,
+        durationText: '48 min',
+        originResolved: 'Granollers, Barcelona',
+        destinationResolved: 'Masia Can Riera, Girona',
+      }),
+    } as Response);
+
+    const soonDate = new Date();
+    soonDate.setDate(soonDate.getDate() + 12);
+    const routedHub: CustomerHubDTO = {
+      ...HUB,
+      bookings: [
+        {
+          id: 'booking-map-2',
+          reference: 'ORB-2026-051',
+          status: 'CONFIRMED',
+          date: soonDate.toISOString(),
+          location: 'Girona',
+          venue: 'Masia Can Riera',
+        },
+      ],
+    };
+
+    render(<SummaryPanel data={routedHub} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('🚗 86,4 km A/T')).toBeInTheDocument();
+    });
+
+    expect(mockFetchWithCsrf).toHaveBeenCalledWith('/api/admin/maps/distance', expect.objectContaining({
+      method: 'POST',
+    }));
+    expect(screen.getByText('Distància viva via Google Maps')).toBeInTheDocument();
+    expect(screen.getByText('43,2 km anada')).toBeInTheDocument();
+    expect(screen.getByText('⏱️ 48 min')).toBeInTheDocument();
+    expect(screen.getByText('Base Òrbita: Granollers, Barcelona')).toBeInTheDocument();
+  });
+
   it('mostra l’oportunitat comercial principal i la seva CTA', () => {
     render(<SummaryPanel data={HUB} />);
 
@@ -177,6 +261,7 @@ describe('SummaryPanel', () => {
             endTime: '02:00',
             location: 'Masia Can Ribas',
             venue: 'Sala Gran',
+            distanceKm: 62,
             guestCount: 120,
             depositPaid: true,
             remainingPaid: false,

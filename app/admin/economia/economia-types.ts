@@ -93,7 +93,11 @@ export interface ForecastMonth {
   month: string;
   historicalAvg: number;
   pipeline: number;
+  pipelineLow: number;
+  pipelineHigh: number;
   combined: number;
+  combinedLow: number;
+  combinedHigh: number;
 }
 
 export interface CacChannelRow {
