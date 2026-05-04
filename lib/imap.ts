@@ -209,7 +209,13 @@ export async function fetchEmails(options: {
 }
 
 /**
- * Obtenir un email per UID
+ * Obtenir un email per UID.
+ *
+ * IMPORTANT: descarrega només `HEADER` + `TEXT` via `bodyParts`, NO `source: true`.
+ * `source: true` baixaria el RFC822 sencer incloent attachments en base64
+ * (ex: PDF de 2MB = 2.7MB de base64 transferit), provocant timeouts >25s i 502
+ * a Railway quan els missatges porten attachments grans. `bodyParts` salta
+ * attachments i descarrega només el text/HTML del missatge.
  */
 export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Promise<EmailMessage | null> {
   const client = await connectIMAP();
@@ -223,23 +229,32 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
         envelope: true,
         bodyStructure: true,
         flags: true,
-        source: true,
+        bodyParts: ['HEADER', 'TEXT'],
       }, { uid: true })) {
         const envelope = message.envelope;
-        
+
         let bodyText = '';
         let bodyHtml = '';
-        
-        if (message.source) {
+
+        const headerPart = message.bodyParts?.get('HEADER');
+        const textPart = message.bodyParts?.get('TEXT');
+
+        if (headerPart && textPart) {
           try {
-            const parsed = await simpleParser(message.source);
+            const fullSource = Buffer.concat([headerPart, textPart]);
+            const parsed = await simpleParser(fullSource);
             bodyText = parsed.text || '';
             bodyHtml = typeof parsed.html === 'string' ? parsed.html : '';
           } catch {
-            const source = message.source.toString();
-            bodyText = source.split('\r\n\r\n').slice(1).join('\r\n\r\n');
+            bodyText = textPart.toString('utf8');
           }
+        } else if (textPart) {
+          bodyText = textPart.toString('utf8');
         }
+
+        const hasAttachments = message.bodyStructure?.childNodes?.some(
+          (node: { disposition?: string }) => node.disposition === 'attachment'
+        ) || false;
 
         return {
           id: `imap-${message.uid}`,
@@ -258,7 +273,7 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
           bodyText,
           bodyHtml,
           isRead: message.flags?.has('\\Seen') || false,
-          hasAttachments: false,
+          hasAttachments,
           attachments: [],
         };
       }

@@ -865,6 +865,7 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #490)*: la mateixa barrera d'integració ara cobreix també la vista `validated` amb cerca i el buit de seccions del viewer real. `__tests__/app/admin/docs/ProtocolPage.test.tsx` guanya un quart cas que obre `?validation=validated&q=codex`, comprova el títol `Validats humans (1)`, la descripció contextualitzada amb la cerca, el link `Validats · 1`, el text passiu `Sense pendents en aquesta cerca` i l'empty state `Cap secció amb aquesta cerca`. Efecte: el wiring visible entre filtre `validated`, copy dinàmic, shortcuts passius i índex de seccions queda cobert també a nivell de pàgina, no només als helpers purs.
 **FET** *(2026-05-04 per `codex` — Canvi #491)*: el toggle `ProtocolValidationToggle` deixa de dependre només de proves de happy path. `__tests__/app/admin/docs/ProtocolValidationToggle.test.tsx` cobreix ara també l'estat renderitzat quan un canvi ja està validat (`Validat per ...`, `Nota registrada: ...`, CTA `Desfer validació`) i el camí d'error quan el `DELETE /api/admin/protocol/validations` falla (`cannot-delete` visible, sense `router.refresh()`). Efecte: una regressió del component client en la lectura del registre humà o en el rollback de validació ja no passarà en silenci.
 **FET** *(2026-05-04 per `codex` — Canvi #493)*: el parser del protocol deixa de degradar a `UNKNOWN` els canvis reclassificats o reservats amb context extra al header. `lib/services/protocolCanvisService.ts` ara normalitza també capçaleres com `(FET; reclassificat des de #487 ...)`, `(EN MARXA; reservat ...)` o `(PENDENT temporal ...)` a l'estat canònic correcte, en lloc d'exigir coincidència exacta. `__tests__/lib/services/protocolCanvisService.test.ts` guanya un cas amb els tres formats reals/adjacents. Efecte: el viewer i qualsevol consumidor de `parseProtocolCanvis()` deixa d'ensenyar `UNKNOWN` en canvis vàlids quan el protocol documenta col·lisions o context de sessió dins del mateix parèntesi.
+**FET** *(2026-05-04 per `codex` — Canvi #495)*: el resum global de validacions humanes deixa de comptar validacions stale o futures que no corresponen a cap `Canvi #N` present al protocol parsejat. `summarizeValidations()` accepta ara la llista canònica de números existents, `/admin/docs/protocol` li passa `allCanvis.map((canvi) => canvi.n)` i els tests blinden tant el servei com el render real amb una validació `#999` que no ha d'inflar el KPI. Efecte: el card `Validats humans` no pot mostrar un 100% fals si el setting conserva entrades antigues o escrites fora del viewer.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5648,6 +5649,37 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #496 — 2026-05-04 — claude (FET)
+**Fix crític d'inbox: obrir un mail trigava 27s i acabava en 502 perquè `fetchEmailByUid` baixava el RFC822 sencer (`source: true`) incloent attachments base64. Substituït per `bodyParts: ['HEADER', 'TEXT']` + test estructural anti-regressió.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: usuari reporta lentitud d'obrir mail. Verificat amb curl real contra `https://orbitaevents.com/api/admin/inbox/messages/16578`: HTTP 502 a 27.5s. Diagnòstic a `lib/imap.ts:fetchEmailByUid`: `source: true` baixa RFC822 sencer (attachments base64 inclosos). Mail amb PDF de 2MB → 2.7MB base64 + parse MIME → timeout >25s a Railway.
+- `lib/imap.ts`: `fetchEmailByUid` substitueix `source: true` per `bodyParts: ['HEADER', 'TEXT']`. Reconstrueix RFC822 mínim concatenant `bodyParts.get('HEADER')` + `bodyParts.get('TEXT')` per `simpleParser`, fallback a `textPart.toString('utf8')` si parse falla. `hasAttachments` segueix detectat via `bodyStructure.childNodes`.
+- `__tests__/lib/imap-fetch-bodyparts.test.ts` (nou, 3 tests): guard estructural que llegeix `lib/imap.ts` real (cap mock) i verifica: (1) NO conté `source: true`, (2) usa `bodyParts: [...]` amb `'HEADER'` i `'TEXT'`, (3) llegeix `bodyParts?.get('HEADER')` i `bodyParts?.get('TEXT')`. Patró contrari als tests existents (`inbox-messages-route.test.ts`) que mocken `@/lib/imap` per complet i no van detectar mai el problema.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 495 → 496.
+- Aquest tall **NO** toca: `fetchEmails`, `markAsRead`, `markAsUnread`, `deleteEmail`, `moveToFolder`, `restoreFromTrash`, `listFolders`, `countUnread`, `countTotal`, `testConnection` (no afectats), ni cap component d'UI.
+- Verificació: `pnpm exec vitest run __tests__/lib/imap-fetch-bodyparts.test.ts` OK 3/3, `pnpm run validate:core` OK, verificació real post-deploy contra Railway pendent.
+- Honestedat: el test és estructural (parse de codi font), no funcional contra IMAP real. No mesura temps. La verificació definitiva només es pot fer post-deploy. Aquest test no resol el problema general de mocks-massa-profunds; blinda específicament aquest antipattern.
+- `ADMIN_CHANGE_COUNTER` puja a `496`; el següent canvi real ha de ser `#497`.
+
+### Canvi #495 — 2026-05-04 — codex (FET)
+**El KPI global de validacions humanes del protocol ignora validacions stale/futures que no existeixen al §9 parsejat.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: `summarizeValidations(totalCanvis, validations)` comptava `validations.size` i només el capava al total. Si el setting `protocol.canviValidations` conservava una validació antiga, futura o escrita manualment per un `canviN` que no apareix al protocol parsejat, el card global `Validats humans` podia inflar el percentatge i fins i tot mostrar 100% amb pendents reals. Els comptadors de filtre ja eren precisos perquè iteraven sobre `canvis`; faltava alinear el resum global amb la mateixa font canònica.
+- `lib/services/protocolValidationsService.ts`: `summarizeValidations()` accepta un tercer paràmetre opcional `knownCanviNumbers` i compta només validacions presents en aquest conjunt; si no es passa, conserva el comportament anterior per compatibilitat.
+- `app/admin/docs/protocol/page.tsx`: el resum global passa `allCanvis.map((canvi) => canvi.n)`, de manera que només els `Canvi #N` realment parsejats poden sumar al KPI.
+- `__tests__/lib/services/protocolValidationsService.test.ts`: nou cas que blinda que una validació `#999` no compti quan els canvis coneguts són `[1, 2]`.
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: el test principal injecta una validació stale `#999` i comprova que el card global continua mostrant `50% · 1 pendents.` sobre dos canvis reals.
+- Validació tècnica: `npx vitest run __tests__/lib/services/protocolValidationsService.test.ts` OK (14 tests) · `npx vitest run __tests__/app/admin/docs/ProtocolPage.test.tsx` OK (4 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK (15 guards).
+- Validació funcional: el percentatge global queda derivat de la intersecció `validacions persistides ∩ canvis parsejats`, no de la mida bruta del setting.
+- Validació humana/UX: el propietari deixa de veure una cua aparentment tancada quan encara hi ha canvis reals pendents i només existeix soroll stale al registre humà.
+- Aquest tall **NO** toca: API de crear/esborrar validacions, persistència del setting, parser de canvis, filtres de `validated/pending`, ni els canvis de cache del `#494`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `494` a `495`.
+- `ADMIN_CHANGE_COUNTER` puja a `495`; el següent canvi real ha de ser `#496`.
 
 ### Canvi #494 — 2026-05-04 — claude (FET)
 **Cache acumulat: HTML d'admin sempre fresc + Service Worker amb versió nova + JS/CSS network-first per evitar servir codi vell als deploys.**

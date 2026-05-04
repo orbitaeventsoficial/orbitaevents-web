@@ -27,6 +27,24 @@ export interface RecordCanviValidationInput {
 
 export type CanviValidationsMap = Map<number, CanviValidation>;
 
+function countKnownValidations(
+  validations: CanviValidationsMap,
+  knownCanviNumbers?: Iterable<number>,
+): number {
+  if (!knownCanviNumbers) return validations.size;
+
+  const known = new Set<number>();
+  for (const canviN of knownCanviNumbers) {
+    if (Number.isInteger(canviN) && canviN > 0) known.add(canviN);
+  }
+
+  let count = 0;
+  for (const canviN of known) {
+    if (validations.has(canviN)) count += 1;
+  }
+  return count;
+}
+
 function isValidCanviValidation(input: unknown): input is CanviValidation {
   if (!input || typeof input !== 'object') return false;
   const record = input as Record<string, unknown>;
@@ -56,9 +74,10 @@ function parseValidationsPayload(raw: string): CanviValidation[] {
 export function summarizeValidations(
   totalCanvis: number,
   validations: CanviValidationsMap,
+  knownCanviNumbers?: Iterable<number>,
 ): CanviValidationsSummary {
   const safeTotal = Math.max(0, totalCanvis);
-  const validatedCount = Math.min(safeTotal, validations.size);
+  const validatedCount = Math.min(safeTotal, countKnownValidations(validations, knownCanviNumbers));
   const pendingCount = Math.max(0, safeTotal - validatedCount);
   const validatedPercent = safeTotal === 0 ? 0 : Math.round((validatedCount / safeTotal) * 1000) / 10;
   return { totalCanvis: safeTotal, validatedCount, pendingCount, validatedPercent };

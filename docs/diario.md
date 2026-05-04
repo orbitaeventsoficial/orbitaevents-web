@@ -1,3 +1,24 @@
+## 2026-05-04 — Canvi #495: KPI de validacions humanes ignora entrades stale/futures (codex)
+
+### Context
+El card global `Validats humans` de `/admin/docs/protocol` comptava `validations.size` i només el capava al total de canvis. Si el setting `protocol.canviValidations` conservava una validació antiga, futura o escrita fora del viewer per un `canviN` que no existeix al protocol parsejat, podia mostrar un percentatge inflat o un 100% fals.
+
+### Canvi
+- `lib/services/protocolValidationsService.ts`: `summarizeValidations()` accepta `knownCanviNumbers` i compta només la intersecció entre validacions persistides i canvis reals.
+- `app/admin/docs/protocol/page.tsx`: passa `allCanvis.map((canvi) => canvi.n)` al resum global.
+- `__tests__/lib/services/protocolValidationsService.test.ts`: cas nou amb validació stale `#999`.
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: el render real injecta `#999` i comprova que el KPI segueix sent `50% · 1 pendents.`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 494 → 495.
+
+### Validació
+- `npx vitest run __tests__/lib/services/protocolValidationsService.test.ts` OK (14 tests)
+- `npx vitest run __tests__/app/admin/docs/ProtocolPage.test.tsx` OK (4 tests)
+- `pnpm run qa:protocol` OK
+- `pnpm run validate:core` OK (15 guards)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 495. Següent canvi real `#496`.
+
 ## 2026-05-04 — Canvi #494: cache acumulat — HTML admin sense cache + SW v2 + JS/CSS network-first (claude)
 
 ### Context

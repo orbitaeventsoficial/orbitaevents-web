@@ -70,6 +70,7 @@ describe('AdminProtocolPage', () => {
     mockLoadCanviValidations.mockResolvedValue(
       new Map([
         [487, { canviN: 487, validatedAt: '2026-05-04T10:00:00.000Z', validatedBy: 'OWNER' }],
+        [999, { canviN: 999, validatedAt: '2026-05-04T12:00:00.000Z', validatedBy: 'OWNER' }],
       ]),
     );
 
@@ -84,6 +85,7 @@ describe('AdminProtocolPage', () => {
       '/admin/docs/protocol?validation=pending&canvi=486#canvi-486',
     );
     expect(screen.getByText('Pendents · 1')).toBeInTheDocument();
+    expect(screen.getByText('50% · 1 pendents.')).toBeInTheDocument();
     expect(screen.getByText('Vista actual: 1/2 validats · 50%.')).toBeInTheDocument();
     expect(screen.getByText('Següent pendent: #486 · codex')).toBeInTheDocument();
   });

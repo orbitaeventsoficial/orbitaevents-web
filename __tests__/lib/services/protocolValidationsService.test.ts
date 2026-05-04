@@ -61,6 +61,19 @@ describe('summarizeValidations', () => {
     expect(summary.validatedPercent).toBe(100);
   });
 
+  it('ignora validacions que no corresponen a cap canvi present al protocol', () => {
+    const map = new Map<number, CanviValidation>();
+    map.set(1, { canviN: 1, validatedAt: 'x', validatedBy: 'jordi' });
+    map.set(999, { canviN: 999, validatedAt: 'x', validatedBy: 'jordi' });
+    const summary = summarizeValidations(2, map, [1, 2]);
+    expect(summary).toEqual({
+      totalCanvis: 2,
+      validatedCount: 1,
+      pendingCount: 1,
+      validatedPercent: 50,
+    });
+  });
+
   it('100% quan tots els canvis tenen validació', () => {
     const map = new Map<number, CanviValidation>();
     map.set(1, { canviN: 1, validatedAt: 'x', validatedBy: 'jordi' });

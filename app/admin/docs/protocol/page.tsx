@@ -64,7 +64,7 @@ export default async function AdminProtocolPage({
   const allCanvis = parseProtocolCanvis(markdown);
   const allSections = parseProtocolSections(markdown);
   const validations = await loadCanviValidations();
-  const validationSummary = summarizeValidations(allCanvis.length, validations);
+  const validationSummary = summarizeValidations(allCanvis.length, validations, allCanvis.map((canvi) => canvi.n));
 
   const queryFiltered: ProtocolCanviMeta[] = query
     ? allCanvis.filter((canvi) => {
