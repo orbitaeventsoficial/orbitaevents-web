@@ -1,3 +1,27 @@
+## 2026-05-04 — Canvi #494: cache acumulat — HTML admin sense cache + SW v2 + JS/CSS network-first (claude)
+
+### Context
+Usuari reporta hard-refresh constant per veure canvis post-deploy. Tres causes acumulatives: (1) HTML admin sense regla `Cache-Control` específica; (2) `CACHE_NAME='orbita-v1'` fix al SW mai canviava → caches obsolets infinits; (3) `staleWhileRevalidate` per JS/CSS sempre servia codi vell al primer load.
+
+### Canvi
+- `next.config.mjs`: regla `/admin/:path*` amb `Cache-Control: no-store, max-age=0, must-revalidate`. `/_next/static/*` segueix amb cache 1y (Next hashejja bundles).
+- `public/sw.js`: `CACHE_NAME` `orbita-v1` → `orbita-v2-2026-05-04` → activa la purga de caches obsolets.
+- `public/sw.js`: CSS/JS passa de `staleWhileRevalidate` a `networkFirst`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 493 → 494.
+
+### Aquest tall NO toca
+Lògica install SW, altres estratègies (cacheFirst imatges/fonts, networkFirst HTML existent), headers `/api/*`, headers `/_next/static/*`, sync, push.
+
+### Validació
+- `pnpm run validate:core` OK 13/13
+- Verificació real post-deploy: SW v1→v2 fa primer load fresc, després `networkFirst` per HTML+CSS+JS.
+
+### Efecte operatiu
+Deixa de calar Ctrl+Shift+R. `CACHE_NAME` amb data manual: cal recordar bumpar-lo a futures deploys grans (millora futura: injectar git short SHA al build).
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 494. Següent canvi real `#495`.
+
 ## 2026-05-04 — Canvi #492: fix crític redirect `www.orbitaevents.com` → port `:8080` (claude)
 
 ### Context
