@@ -1,3 +1,61 @@
+## 2026-05-04 — Canvi #501: render real del CTA pendent del Manual (codex)
+
+### Context
+El `#500` va moure el CTA pendent del roadmap cap a un helper pur i va apuntar `marketing-analytics-hub` a `§6.16`. Faltava cobrir que la pàgina server real `/admin/manual` renderitza aquest CTA, perquè una regressió de wiring entre constant, helper i component no quedaria coberta només amb el test del helper.
+
+### Canvi
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: test de render del server component real.
+- El test mockeja `fs` i `next/link`, renderitza `AdminManualPage()` i comprova el botó `Obrir §6.16 al protocol`.
+- També comprova que no aparegui el CTA antic `Obrir §6.15 al protocol`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 500 → 501.
+
+### Validació
+- `npx vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (1 test)
+- `pnpm run qa:protocol` OK
+- `pnpm run validate:core` OK (15 guards)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 501. Següent canvi real `#502`.
+
+## 2026-05-04 — Canvi #500: CTA del roadmap pendent cap a §6.16 (codex)
+
+### Context
+El manual tenia un únic roadmap `PENDING`, `marketing-analytics-hub`, però la UI construïa el CTA pendent amb una ruta fixa a `§6.15`. Això feia que una millora de captació/màrqueting no obrís directament el bloc operatiu de captació externa `§6.16`.
+
+### Canvi
+- `lib/constants/adminManual.ts`: `AdminManualRoadmapItem` guanya `protocolSection?: string`; `marketing-analytics-hub` declara `protocolSection: '6.16'`.
+- `lib/services/adminManualRoadmapService.ts`: helper pur que construeix el CTA del protocol per ítems `DONE` i `PENDING`.
+- `app/admin/manual/page.tsx`: deixa d'hardcodejar `§6.15` i usa el helper.
+- Tests nous/ampliats per blindar el CTA i la secció del pendent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 499 → 500.
+
+### Validació
+- `npx vitest run __tests__/lib/services/adminManualRoadmapService.test.ts __tests__/lib/constants/adminManualRoadmap.test.ts` OK (10 tests)
+- `npx tsc --noEmit` OK
+- `pnpm run qa:protocol` OK
+- `pnpm run validate:core` OK (15 guards)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 500. Següent canvi real `#501`.
+
+## 2026-05-04 — Canvi #499: detall IMAP sense timeout de logout (claude)
+
+### Context
+Després del `#496`, obrir un mail encara trigava 35s constants. El diagnòstic del tall concurrent va detectar que `fetchEmailByUid()` retornava dins un `for await`, deixant el stream IMAP suspès, i després `client.logout()` esperava resposta del servidor fins al timeout.
+
+### Canvi
+- `lib/imap.ts`: `fetchEmailByUid()` desa el resultat, fa `break` del loop i retorna després de tancar.
+- `client.logout()` passa a `client.close()` per evitar bloqueig cooperatiu del servidor IMAP.
+- Cache LRU en memòria per UID/folder amb helpers `clearFetchEmailCache()` i `invalidateFetchEmailCache()`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 498 → 499.
+
+### Validació
+- Mesura documentada al §9: 35s → 1.58s primer cop i 0.43s en cache hit.
+- Validació final queda lligada al tall posterior `#500`, que executa `qa:protocol` i `validate:core` amb aquest canvi dins el worktree.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 499. Següent canvi real `#500`.
+
 ## 2026-05-04 — Canvi #498: smoke test automàtic de producció (claude)
 
 ### Context

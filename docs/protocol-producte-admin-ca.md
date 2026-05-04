@@ -869,6 +869,7 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #495)*: el resum global de validacions humanes deixa de comptar validacions stale o futures que no corresponen a cap `Canvi #N` present al protocol parsejat. `summarizeValidations()` accepta ara la llista canònica de números existents, `/admin/docs/protocol` li passa `allCanvis.map((canvi) => canvi.n)` i els tests blinden tant el servei com el render real amb una validació `#999` que no ha d'inflar el KPI. Efecte: el card `Validats humans` no pot mostrar un 100% fals si el setting conserva entrades antigues o escrites fora del viewer.
 **FET** *(2026-05-04 per `codex` — Canvi #497)*: `qa:protocol` deixa de validar només protocol + comptador i passa a exigir també l'entrada corresponent a `docs/diario.md` pel `ADMIN_CHANGE_COUNTER` actual. `scripts/check-admin-change-log.mjs` llegeix el diari i falla si no hi ha cap header `## ... Canvi #N`; `__tests__/scripts/check-admin-change-log.test.ts` guanya el cas negatiu que reprodueix el forat detectat al `#496`. Efecte: cap canvi futur podrà quedar formalment verd si el diari no acompanya el §9.
 **FET** *(2026-05-04 per `claude` — Canvi #498)*: producció guanya smoke test automàtic post-deploy i heartbeat. `scripts/smoke-prod.mjs` comprova health, home pública, challenge d'auth admin i endpoints admin amb auth opcional; `.github/workflows/smoke-prod.yml` l'executa a `main`, cada 15 minuts i manualment. Efecte: regressions com redirects trencats, 502 o endpoints crítics lents deixen de dependre només d'una comprovació manual.
+**FET** *(2026-05-04 per `codex` — Canvi #501)*: el CTA pendent del Manual queda cobert també a nivell de render real. `__tests__/app/admin/manual/AdminManualPage.test.tsx` renderitza el server component `/admin/manual` amb `fs` i `next/link` mockejats, comprova `Obrir §6.16 al protocol` amb `href=/admin/docs/protocol?seccio=6.16#seccio-6-16` i verifica que el CTA antic `§6.15` no aparegui. Efecte: una regressió de wiring entre constant, helper i UI ja no passa en silenci.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -877,6 +878,8 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `claude` — Canvi #84)*: backlog exhaustiu documentat a `lib/constants/adminManual.ts` com a `ADMIN_MANUAL_ROADMAP` i visible a `/admin/manual`. Cada ítem porta prioritat, impacte, esforç i àrea.
 **FET** *(2026-04-30 per `claude` — Canvi #462)*: `ADMIN_MANUAL_ROADMAP` deixa de divergir d'aquesta secció. El contracte `AdminManualRoadmapItem` guanya `status: 'PENDING' | 'DONE'`, `doneCanvi?: number` i `doneNote?: string`; els 11 ítems CRITICAL/HIGH/MEDIUM/LOW que ja són FET aquí porten cita del Canvi #N corresponent (#115, #116, #126, #131, #133, #380, #408 + decisions sense Canvi únic), i només `marketing-analytics-hub` queda `PENDING`. La pàgina `/admin/manual` ordena pendents primer, pinta badge `Fet · Canvi #N` o `Pendent`, mostra `doneNote` als FET amb panell verd, i el KPI "Roadmap pendent" passa de `12` a `1`.
 **FET** *(2026-04-30 per `claude` — Canvi #463)*: el roadmap ja no és informatiu passiu. Cada card té CTAs reals: botó primari `Obrir Canvi #N` (DONE) o `Obrir §9 al protocol` (PENDING) que enllaça al nou viewer `/admin/docs/protocol?canvi=N#canvi-N`, i botó secundari `Anar a {workspace}` per `area`. La línia `Verificat al §9: #N · DATE · AUTHOR · STATUS` mostra metadades llegides en runtime des del protocol via `parseProtocolCanvis()`, sense duplicació al constant. Guard `qa:roadmap-canvis` afegit a `validate:core` (12 → 13 guards) blinda que cada `doneCanvi` del roadmap correspongui a un `### Canvi #N — ... (FET)` real al §9 — qualsevol divergència futura falla el pipeline.
+**FET** *(2026-05-04 per `codex` — Canvi #500)*: el CTA del roadmap pendent deixa de tenir la secció del protocol hardcoded. `AdminManualRoadmapItem` guanya `protocolSection?: string`, `marketing-analytics-hub` apunta explícitament a `§6.16` i `/admin/manual` construeix el CTA via `buildAdminManualRoadmapProtocolTarget()`. Efecte: l'únic pendent real de màrqueting obre directament el bloc de captació externa, no un `§6.15` genèric.
+**FET** *(2026-05-04 per `codex` — Canvi #501)*: el wiring visible del `#500` queda blindat amb test de pàgina. El Manual renderitzat ja ha de mostrar `Obrir §6.16 al protocol` per l'ítem pendent `marketing-analytics-hub` i no pot tornar a mostrar `Obrir §6.15 al protocol` sense trencar `AdminManualPage.test.tsx`.
 
 ### SEGÜENT (Crítiques — impacte directe a conversió)
 - **[CRITICAL] ~~Motor de nurturing automàtic de leads~~** — ✅ FET (anteriorment). `commercialSequenceService.ts` executa cadència 5 passos (1d/3d/7d/14d/30d) amb email/WA, integrat al cron `commercialDailyAutomation`.
@@ -900,6 +903,7 @@ Criteri pràctic:
 ## 6.16 Màrqueting i captació externa (del zero)
 **CONTEXT**: L'usuari reconeix que no té experiència en màrqueting i els clients no arriben. L'admin està preparat per gestionar leads, però fa falta un embut de captació real. Aquesta secció és el pla d'acció pas a pas.
 **FET** *(2026-04-10 per `claude` — Canvi #84)*: pla d'acció màrqueting documentat (veure baix). Cal executar-lo per fases.
+**FET** *(2026-05-04 per `codex` — Canvi #500)*: el manual de possibilitats ja envia el roadmap pendent `marketing-analytics-hub` cap a aquest bloc (`/admin/docs/protocol?seccio=6.16#seccio-6-16`). Això reforça la regla d'aquesta secció: abans d'obrir integracions cares d'ads/GA4/GBP, cal treballar la captació per fases.
 
 ### Fase 0 — Fundació (abans de gastar res)
 - **Definir 1 client ideal clar** (ICP): tipus d'event (bodes? corporatius? festes privades?), ubicació, pressupost mig, què busquen.
@@ -5652,6 +5656,42 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #501 — 2026-05-04 — codex (FET)
+**El CTA pendent del Manual queda blindat amb un test de render real de `/admin/manual`: la UI ha de mostrar `Obrir §6.16 al protocol` i no pot tornar al link antic `§6.15`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `#500` va arreglar el contracte de navegació del roadmap amb `protocolSection` + `buildAdminManualRoadmapProtocolTarget()`, però la cobertura nova vivia sobretot en helper/constant. Faltava una prova del wiring visible: constant → helper → server component `/admin/manual` → `<Link>`.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx` (nou): renderitza `AdminManualPage()` com a server component real, mockeja `fs.readFile()` perquè el lookup del protocol no depengui del fitxer complet i mockeja `next/link` a `<a>`.
+- El test comprova tres contractes:
+  1. el card pendent `Marketing Analytics Hub amb integracions externes` existeix;
+  2. el link `Obrir §6.16 al protocol` té `href="/admin/docs/protocol?seccio=6.16#seccio-6-16"`;
+  3. el link antic `Obrir §6.15 al protocol` no es renderitza.
+- Aquest tall **NO** toca: el helper del `#500`, els constants del roadmap, integracions externes, IMAP, schema, auth ni UI productiva. Només afegeix cobertura de render i puja el comptador.
+- Validació tècnica: `npx vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (1 test) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK (15 guards).
+- Validació funcional: el test cobreix el comportament visible que veurà el propietari al Manual.
+- Validació humana/UX: el botó del pendent de màrqueting queda verificat com a entrada directa al pla de captació per fases.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `500` a `501`.
+- `ADMIN_CHANGE_COUNTER` puja a `501`; el següent canvi real ha de ser `#502`.
+
+### Canvi #500 — 2026-05-04 — codex (FET)
+**El CTA del roadmap pendent del Manual deixa de ser hardcoded a `§6.15`: els ítems `PENDING` poden declarar `protocolSection`, i `marketing-analytics-hub` obre directament `§6.16` de captació externa.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#499` concurrent, el següent tall havia de ser `#500`. En revisar el `SEGÜENT` viu del roadmap, el Manual només conserva un ítem `PENDING` (`marketing-analytics-hub`), però `/admin/manual` generava el CTA dels pendents amb una URL fixa a `/admin/docs/protocol?seccio=6.15#seccio-6-15`. Per una peça de màrqueting/captació, això obligava a entrar al backlog genèric en comptes del pla operatiu `§6.16`.
+- `lib/constants/adminManual.ts`: `AdminManualRoadmapItem` guanya `protocolSection?: string`; `marketing-analytics-hub` declara `protocolSection: '6.16'`.
+- `lib/services/adminManualRoadmapService.ts` (nou): helper pur `buildAdminManualRoadmapProtocolTarget(item)` que retorna el CTA canònic. `DONE + doneCanvi` apunta a `?canvi=N#canvi-N`; `PENDING` apunta a `?seccio=X#seccio-X`, amb fallback `§6.15` per compatibilitat amb pendents antics sense secció.
+- `app/admin/manual/page.tsx`: elimina el `Link` hardcoded a `§6.15` i renderitza el botó primari des del helper. El text del botó queda derivat (`Obrir §6.16 al protocol`) en lloc de duplicat a UI.
+- `__tests__/lib/services/adminManualRoadmapService.test.ts` (nou): cobreix CTA per `DONE`, `DONE` sense `doneCanvi`, `PENDING` amb secció explícita i fallback `§6.15`.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: blinda que els `PENDING` no tinguin `doneCanvi`/`doneNote`, que `protocolSection` tingui format de secció i que `marketing-analytics-hub` apunti a `6.16`.
+- Aquest tall **NO** toca: `lib/imap.ts` del `#499`, integracions externes de Google/Meta/GA4, schema, auth, crons ni tracking real d'ads. Només millora el contracte de navegació del roadmap.
+- Validació tècnica: `npx vitest run __tests__/lib/services/adminManualRoadmapService.test.ts __tests__/lib/constants/adminManualRoadmap.test.ts` OK (10 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK (15 guards).
+- Validació funcional: el CTA de l'únic roadmap pendent obre `/admin/docs/protocol?seccio=6.16#seccio-6-16`.
+- Validació humana/UX: el propietari passa del backlog genèric al pla de captació per fases quan prem l'únic pendent de màrqueting.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `499` a `500`.
+- `ADMIN_CHANGE_COUNTER` puja a `500`; el següent canvi real ha de ser `#501`.
 
 ### Canvi #499 — 2026-05-04 — claude (FET)
 **Obrir mail trigava 35s constants tot i el #496. Causa real: `return` dins `for await` deixa IMAP stream suspès + `client.logout()` espera resposta que mai arriba. Fix: `break + client.close()` + cache LRU en memòria. Mesurat: 35s → 1.58s primer cop, 0.43s cache hit.**
