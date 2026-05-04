@@ -130,6 +130,34 @@ export async function connectIMAP(): Promise<ImapFlow> {
 }
 
 /**
+ * Obtenir llista canònica d'adreces destinatàries que volem mostrar.
+ *
+ * Per defecte: si l'env var `INBOX_TO_FILTER` està definida, només es retornen
+ * emails on alguna `to[].address` coincideix amb una de les adreces de la
+ * llista (case-insensitive). Si no està definida, retorna tots els emails
+ * (comportament històric).
+ *
+ * Format de l'env: `INBOX_TO_FILTER=info@orbitaevents.com,reservas@orbitaevents.com`
+ *
+ * Útil quan la mateixa bústia IMAP rep mails forwardejats des d'adreces
+ * antigues o alies que ja no volem veure operativament (ex: ctreball20@gmail).
+ */
+export function getInboxToFilter(): string[] {
+  const raw = (process.env.INBOX_TO_FILTER || '').trim();
+  if (!raw) return [];
+  return raw.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+}
+
+function emailMatchesToFilter(email: EmailMessage, allowed: string[]): boolean {
+  if (allowed.length === 0) return true;
+  for (const t of email.to) {
+    const addr = (t.address || '').trim().toLowerCase();
+    if (addr && allowed.includes(addr)) return true;
+  }
+  return false;
+}
+
+/**
  * Obtenir llista d'emails de l'inbox
  */
 export async function fetchEmails(options: {
@@ -139,32 +167,34 @@ export async function fetchEmails(options: {
   onlyUnread?: boolean;
 }): Promise<EmailMessage[]> {
   const { folder = 'INBOX', limit = 50, offset = 0, onlyUnread = false } = options;
-  
+
+  const allowed = getInboxToFilter();
+
+  // Si hi ha filtre actiu, sobrebusquem (3×) i retallem post-filtre per
+  // garantir que retornem ~limit emails que coincideixen.
+  const fetchLimit = allowed.length > 0 ? Math.min(limit * 3, 200) : limit;
+  const fetchOffset = allowed.length > 0 ? 0 : offset;
+
   const client = await connectIMAP();
   const emails: EmailMessage[] = [];
 
   try {
-    // Obrir carpeta
     const mailbox = await client.getMailboxLock(folder);
 
     try {
-      // Query per obtenir UIDs
       const searchCriteria = onlyUnread ? { seen: false } : { all: true };
       const uids = await client.search(searchCriteria, { uid: true });
 
-      // Si no hi ha resultats, retornar buit
       if (!Array.isArray(uids) || uids.length === 0) {
         return emails;
       }
 
-      // Ordenar per més recent primer i aplicar paginació
-      const sortedUids = uids.sort((a, b) => b - a).slice(offset, offset + limit);
+      const sortedUids = uids.sort((a, b) => b - a).slice(fetchOffset, fetchOffset + fetchLimit);
 
       if (sortedUids.length === 0) {
         return emails;
       }
 
-      // Fetch emails (llistat ràpid): sense body complet per millor rendiment.
       for await (const message of client.fetch(sortedUids, {
         uid: true,
         envelope: true,
@@ -202,10 +232,20 @@ export async function fetchEmails(options: {
       mailbox.release();
     }
   } finally {
-    await client.logout();
+    try {
+      client.close();
+    } catch {
+      /* swallow */
+    }
   }
 
-  return emails;
+  if (allowed.length === 0) {
+    return emails;
+  }
+
+  // Aplicar filtre per `to` i retallar a `limit` reals
+  const filtered = emails.filter((e) => emailMatchesToFilter(e, allowed));
+  return filtered.slice(offset, offset + limit);
 }
 
 /**

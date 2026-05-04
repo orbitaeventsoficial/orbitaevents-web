@@ -1,3 +1,21 @@
+## 2026-05-04 — Canvi #502: autoregulació de model/effort i consum (codex)
+
+### Context
+El propietari demana deixar per escrit que no cal treballar sempre amb model top + effort màxim. La regla correcta és esforç proporcional al risc: rigor alt quan hi ha producció, dades, schema, auth o errors opacs; eficiència quan el tall és rutinari o documental.
+
+### Canvi
+- `docs/protocol-producte-admin-ca.md`: nova norma operativa d'autoregulació de model/effort i consum dins el §2.1.
+- La norma fixa que `go` normal, docs, guards, tests focalitzats i refactors petits han d'anar amb context mínim suficient, eines agrupades i raonament proporcional.
+- També fixa quan pujar a `high`/màxim: producció, schema/migracions, auth, dades, concurrència, errors opacs, arquitectura o refactors grans.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 501 → 502.
+
+### Validació
+- `pnpm run qa:protocol` OK
+- `validate:core` no s'executa perquè el tall és documental + comptador; `qa:protocol` cobreix la coherència del registre.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 502. Següent canvi real `#503`.
+
 ## 2026-05-04 — Canvi #501: render real del CTA pendent del Manual (codex)
 
 ### Context

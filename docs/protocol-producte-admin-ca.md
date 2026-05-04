@@ -178,6 +178,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Regla explícita de worktree brut**: si el repo ja té canvis locals aliens, no es permet "netejar", reordenar ni refactoritzar per comoditat. Només es toca l'àmbit mínim necessari pel tall actual. Si el fitxer ja està modificat i el nou tall hi entra, primer s'ha d'entendre què ja hi ha i adaptar-s'hi; no s'imposa un estat net fictici.
 - **Validació en 3 capes**: cada tall ha de deixar escrit què s'ha validat exactament entre aquestes tres capes: (1) `validació tècnica` — types, tests, guards, build; (2) `validació funcional` — el cas d'ús resolt produeix l'efecte correcte; (3) `validació humana/UX` — una persona no tècnica entén què passa i què ha de fer. Dir només "validat" és massa ambigu i ja no és acceptable.
 - **Ordre de prioritat operatiu**: quan hi ha dubte entre diversos fronts, l'ordre és aquest: (1) errors de compilació o contracte trencat, (2) regressions de runtime o dades, (3) tests/guards en vermell, (4) `PENDENT CRÍTIC` o `SEGÜENT` explícit del protocol, (5) millores documentals o UX no bloquejants. Això evita obrir fronts bonics mentre la base encara falla.
+- **Autoregulació de model/effort i consum**: no es treballa en mode “màxim del màxim” per defecte. Per `go` normal, docs, guards, tests focalitzats, refactors petits i canvis mecànics, l'agent ha de ser eficient: context mínim suficient, eines agrupades, respostes curtes i raonament proporcional. S'eleva a `high`/màxim només quan hi ha risc real: producció, schema/migracions, auth, dades, concurrència entre agents, errors opacs de build/runtime, decisions arquitectòniques o refactors grans. Si cal pujar el nivell, s'ha d'explicar breument el motiu. Objectiu: pagar per rigor quan aporta valor, no per inèrcia.
 - **Checklist de tancament canònic**: al final del tall s'ha de poder respondre sí/no, sense literatura, a aquesta llista: `tests tocats?`, `npx tsc --noEmit OK?`, `validate:core OK?`, `qa:protocol OK?`, `§6 afectat actualitzat?`, `§9 registrat?`, `docs/diario.md actualitzat?`, `ADMIN_CHANGE_COUNTER pujat?`, `tipus de validació explicitats?`. Si falta un sí en un tall que tocava aquell punt, el tall continua obert.
 - **Aplicació simètrica per actor**: aquestes normes operatives no són només per un agent concret. Apliquen igual a `claude`, `codex` i al `user` quan intervé directament al repo. Ningú no queda exempt del workflow mínim, la regla de worktree brut, la validació en 3 capes ni el checklist de tancament.
 - **Norma operativa de no-col·lisió entre agents**: `claude` i `codex` treballen concurrents sobre el mateix repo. Abans d'atacar un `SEGÜENT` cal mirar la darrera finestra de canvis `#N` al §9 i veure quin perímetre està ocupat ara mateix (el `ADMIN_CHANGE_COUNTER` pot pujar preemptivament per l'altre agent entre dues consultes). Dos indicadors: (1) si el counter està per sobre del darrer Canvi registrat al §9, és que l'altre agent ha reservat el número i està escrivint-ne el contingut — no es pren aquest número, el següent agent usa `counter + 1`; (2) abans de començar un tall, cal triar un **front diferent** al que ha tocat l'altre agent les darreres hores (si `codex` està al Lead Hub `LOST`, `claude` ataca bookings/tasks/social; i al revés). Si tot i així es detecta col·lisió (p.ex. edits paral·leles al mateix fitxer), el tall es replanteja o s'espera. Val la pena perdre una ronda abans que fer feina que es trepitgi.
@@ -870,6 +871,7 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #497)*: `qa:protocol` deixa de validar només protocol + comptador i passa a exigir també l'entrada corresponent a `docs/diario.md` pel `ADMIN_CHANGE_COUNTER` actual. `scripts/check-admin-change-log.mjs` llegeix el diari i falla si no hi ha cap header `## ... Canvi #N`; `__tests__/scripts/check-admin-change-log.test.ts` guanya el cas negatiu que reprodueix el forat detectat al `#496`. Efecte: cap canvi futur podrà quedar formalment verd si el diari no acompanya el §9.
 **FET** *(2026-05-04 per `claude` — Canvi #498)*: producció guanya smoke test automàtic post-deploy i heartbeat. `scripts/smoke-prod.mjs` comprova health, home pública, challenge d'auth admin i endpoints admin amb auth opcional; `.github/workflows/smoke-prod.yml` l'executa a `main`, cada 15 minuts i manualment. Efecte: regressions com redirects trencats, 502 o endpoints crítics lents deixen de dependre només d'una comprovació manual.
 **FET** *(2026-05-04 per `codex` — Canvi #501)*: el CTA pendent del Manual queda cobert també a nivell de render real. `__tests__/app/admin/manual/AdminManualPage.test.tsx` renderitza el server component `/admin/manual` amb `fs` i `next/link` mockejats, comprova `Obrir §6.16 al protocol` amb `href=/admin/docs/protocol?seccio=6.16#seccio-6-16` i verifica que el CTA antic `§6.15` no aparegui. Efecte: una regressió de wiring entre constant, helper i UI ja no passa en silenci.
+**FET** *(2026-05-04 per `codex` — Canvi #502)*: el protocol incorpora la norma d'autoregulació de model/effort i consum. Per defecte, `go` normal i canvis petits han d'usar context mínim suficient i raonament proporcional; només s'eleva a `high`/màxim quan hi ha risc real (producció, schema, auth, dades, concurrència, errors opacs, arquitectura o refactors grans).
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5656,6 +5658,38 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #503 — 2026-05-04 — claude (FET)
+**Filtre opcional `INBOX_TO_FILTER` per amagar mails que vénen d'adreces velles forwardejades a la mateixa bústia. Resol el cas reportat per l'usuari: "rebo ctreball20 i info, només vull info@orbitaevents.com".**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: l'usuari reporta que la safata d'entrada barreja mails de dues adreces: `info@orbitaevents.com` (la canònica del negoci) i `ctreball20@gmail.com` (alies/forwarding antic). Verificat al llistat real: alguns mails IMAP tenen `to:[{address:"ctreball20@gmail.com"}]` i altres `to:[{address:"info@orbitaevents.com"}]`. Vénen tots a la mateixa bústia perquè el servidor IMAP té forwarding actiu. L'opció correcta a llarg termini és tancar el forwarding al servidor; mentre, una opció software ràpida que no perd informació.
+- `lib/imap.ts`: nova funció exportada `getInboxToFilter()` que parseja `process.env.INBOX_TO_FILTER` (llista d'adreces separades per comes, case-insensitive). Si la env està buida o no definida, retorna llista buida i el filtre no s'aplica (comportament històric). `fetchEmails()` ara crida `getInboxToFilter()` i, si hi ha llista, sobrebusca emails (3× el `limit` requerit, max 200) i filtra post-fetch per `email.to[].address`. Per defecte (sense env), comportament idèntic a abans.
+- `lib/imap.ts:fetchEmails`: també substituït `await client.logout()` per `client.close()` síncron amb try/catch defensiu, alineat amb el patró del `#499` per `fetchEmailByUid`. Evita timeouts de logout cooperatiu.
+- `__tests__/lib/imap-inbox-filter.test.ts` (nou, 5 tests): blinda els 5 casos del parsing: env no definida, env buida, una sola adreça (case-insensitive), múltiples separades per comes, espais i entrades buides. 5/5 verds.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `502` a `503`.
+- Aquest tall **NO** toca: `fetchEmailByUid` (continua sense filtre — si l'usuari ja té el UID, ja saps que el vol obrir), `markAsRead`, `markAsUnread`, `deleteEmail`, `moveToFolder`, `restoreFromTrash`, `listFolders`, `countUnread`, `countTotal`, `testConnection`, ni cap UI.
+- Configuració per a producció: cal afegir a Railway env vars `INBOX_TO_FILTER=info@orbitaevents.com` i redesplegar. Sense aquesta env, comportament idèntic al d'avui.
+- Col·lisió de comptador: havia de ser `#502`, però codex va tancar `#502` mentre escrivia. Reassignat a `#503` segons norma §2.1.
+- Honestedat: aquesta solució és pragmàtica però no perfecta. Si la safata té MOLTS mails de `ctreball20` (>200 entre el `limit*3` sobrebuscat), els que arribin al final podrien no aparèixer al llistat ni quedar amagats. Per safates molt actives, la solució correcta és cancel·lar el forwarding al servidor IMAP. Documentat com a `MÉS ENDAVANT` al `§6.19` per si calgui millorar la implementació.
+- `ADMIN_CHANGE_COUNTER` puja a `503`; el següent canvi real ha de ser `#504`.
+
+### Canvi #502 — 2026-05-04 — codex (FET)
+**Norma d'autoregulació de model/effort i consum: no treballar en mode màxim per defecte; pujar effort només quan el risc tècnic ho justifica.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el propietari pregunta si cal mantenir model top + effort màxim i si això impacta consum. La decisió operativa queda escrita: el rigor s'ha d'aplicar quan aporta valor, no per inèrcia. En tasques rutinàries, l'agent ha de reduir exploració, sortida i raonament innecessari.
+- `docs/protocol-producte-admin-ca.md` · §2.1: nova regla **Autoregulació de model/effort i consum**.
+- Regla per defecte: `go` normal, docs, guards, tests focalitzats, refactors petits i canvis mecànics → context mínim suficient, eines agrupades, respostes curtes i raonament proporcional.
+- Regla d'escalada: només pujar a `high`/màxim quan hi ha risc real: producció, schema/migracions, auth, dades, concurrència entre agents, errors opacs de build/runtime, decisions arquitectòniques o refactors grans. Si cal pujar, s'explica breument el motiu.
+- Aquest tall **NO** toca: codi d'aplicació, tests, UI, schema, auth, IMAP ni pipelines. És una norma documental de treball.
+- Validació tècnica: `pnpm run qa:protocol` OK. `validate:core` no s'executa perquè és un tall documental + comptador; `qa:protocol` cobreix la coherència del registre.
+- Validació funcional: el protocol ja dona instrucció explícita sobre quan gastar raonament alt i quan no.
+- Validació humana/UX: el propietari pot demanar `go` sense assumir que cada ronda anirà en mode màxim.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `501` a `502`.
+- `ADMIN_CHANGE_COUNTER` puja a `502`; el següent canvi real ha de ser `#503`.
 
 ### Canvi #501 — 2026-05-04 — codex (FET)
 **El CTA pendent del Manual queda blindat amb un test de render real de `/admin/manual`: la UI ha de mostrar `Obrir §6.16 al protocol` i no pot tornar al link antic `§6.15`.**
