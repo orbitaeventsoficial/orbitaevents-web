@@ -7,11 +7,16 @@ import { describe, expect, it } from 'vitest';
 
 const scriptPath = path.resolve('scripts/check-admin-change-log.mjs');
 
-function writeFixture(protocol: string, counter: number) {
+function writeFixture(protocol: string, counter: number, diario?: string) {
   const root = mkdtempSync(path.join(tmpdir(), 'oe-protocol-'));
   mkdirSync(path.join(root, 'docs'), { recursive: true });
   mkdirSync(path.join(root, 'lib', 'constants'), { recursive: true });
   writeFileSync(path.join(root, 'docs', 'protocol-producte-admin-ca.md'), protocol, 'utf8');
+  writeFileSync(
+    path.join(root, 'docs', 'diario.md'),
+    diario ?? `## 2026-04-10 — Canvi #${counter}: canvi de prova\n`,
+    'utf8',
+  );
   writeFileSync(
     path.join(root, 'lib', 'constants', 'admin.ts'),
     `export const ADMIN_CHANGE_COUNTER = ${counter};\n`,
@@ -20,8 +25,8 @@ function writeFixture(protocol: string, counter: number) {
   return root;
 }
 
-function runGuard(protocol: string, counter: number) {
-  const cwd = writeFixture(protocol, counter);
+function runGuard(protocol: string, counter: number, diario?: string) {
+  const cwd = writeFixture(protocol, counter, diario);
   return spawnSync(process.execPath, [scriptPath], { cwd, encoding: 'utf8' });
 }
 
@@ -53,6 +58,16 @@ describe('check-admin-change-log', () => {
     const result = runGuard(`${change(57)}\n${change(58)}\n`, 57);
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('ADMIN_CHANGE_COUNTER=57 but protocol max is #58');
+  });
+
+  it('rejects missing diario entry for the current counter', () => {
+    const result = runGuard(
+      `${change(57)}\n${change(58)}\n`,
+      58,
+      '## 2026-04-10 — Canvi #57: canvi anterior\n',
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('docs/diario.md missing entry for current change #58');
   });
 
   it('rejects new changes without ownership fields', () => {

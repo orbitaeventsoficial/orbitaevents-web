@@ -1,3 +1,41 @@
+## 2026-05-04 — Canvi #498: smoke test automàtic de producció (claude)
+
+### Context
+Els incidents recents de producció (`www` amb port intern, cache acumulat i 502 en detall IMAP) demostren que faltava un heartbeat extern post-deploy. El repo tenia guards locals, però cap comprovació recurrent contra `https://orbitaevents.com`.
+
+### Canvi
+- `scripts/smoke-prod.mjs`: script Node que comprova `/api/health`, home pública, challenge `401` d'admin, leads amb auth i inbox count amb auth.
+- `.github/workflows/smoke-prod.yml`: workflow a `main`, cada 15 minuts i manual.
+- Config via `SMOKE_BASE_URL`, `SMOKE_AUTH` i `SMOKE_MAX_MS`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 497 → 498.
+
+### Validació
+- `node --check scripts/smoke-prod.mjs` OK
+- `pnpm run qa:protocol` i `pnpm run validate:core` finals pendents d'executar després del registre.
+- Verificació real post-deploy pendent: configurar `SMOKE_AUTH` a GitHub Secrets si es vol cobrir endpoints autenticats.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 498. Següent canvi real `#499`.
+
+## 2026-05-04 — Canvi #497: `qa:protocol` exigeix entrada actual al diari (codex)
+
+### Context
+La norma de tancament rigorós obliga a actualitzar `docs/diario.md`, però el guard `qa:protocol` només validava el §9 del protocol i `ADMIN_CHANGE_COUNTER`. Això permetia que un canvi quedés verd amb protocol + comptador sincronitzats però sense entrada cronològica al diari.
+
+### Canvi
+- `scripts/check-admin-change-log.mjs`: llegeix també `docs/diario.md`.
+- El guard falla si no troba cap header `## ... Canvi #N` pel `ADMIN_CHANGE_COUNTER` actual.
+- `__tests__/scripts/check-admin-change-log.test.ts`: els fixtures creen diari i s'afegeix el cas negatiu amb protocol/counter a `#58` però diari només amb `#57`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 496 → 497.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-admin-change-log.test.ts` OK (6 tests)
+- `pnpm run qa:protocol` OK abans del registre final
+- `pnpm run qa:protocol` i `pnpm run validate:core` finals pendents d'executar després del registre.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 497. Següent canvi real `#498`.
+
 ## 2026-05-04 — Canvi #496: detall IMAP sense descarregar attachments complets (claude)
 
 ### Context

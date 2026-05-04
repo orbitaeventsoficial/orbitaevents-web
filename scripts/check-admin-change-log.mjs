@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const PROTOCOL_PATH = path.join(process.cwd(), 'docs', 'protocol-producte-admin-ca.md');
+const DIARIO_PATH = path.join(process.cwd(), 'docs', 'diario.md');
 const ADMIN_CONSTANTS_PATH = path.join(process.cwd(), 'lib', 'constants', 'admin.ts');
 
 function fail(message) {
@@ -18,6 +19,7 @@ function readFile(filePath) {
 }
 
 const protocol = readFile(PROTOCOL_PATH);
+const diario = readFile(DIARIO_PATH);
 const adminConstants = readFile(ADMIN_CONSTANTS_PATH);
 
 
@@ -87,6 +89,11 @@ if (!counterMatch) {
   const maxChange = Math.max(...changeNumbers);
   if (counter !== maxChange) {
     fail(`ADMIN_CHANGE_COUNTER=${counter} but protocol max is #${maxChange}`);
+  }
+
+  const diarioCurrentChangeRegex = new RegExp(`^## [^\\n]*Canvi #${counter}\\b`, 'm');
+  if (!diarioCurrentChangeRegex.test(diario)) {
+    fail(`docs/diario.md missing entry for current change #${counter}`);
   }
 }
 

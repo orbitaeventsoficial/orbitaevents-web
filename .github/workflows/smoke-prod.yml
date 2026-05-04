@@ -1,0 +1,47 @@
+name: Smoke test — producció
+
+# Es dispara:
+#  - Després de cada push a main (és a dir, després de cada deploy de Railway)
+#  - Cada 15 min com a heartbeat
+#  - Manualment des de la UI de GitHub
+#
+# Verifica que els endpoints crítics de producció responen amb HTTP correcte
+# i sota un temps màxim. Si falla, l'usuari rep notificació per email
+# (configuració per defecte de GitHub).
+#
+# La verificació real, sense mocks. Cobreix:
+#  - L'API està viva (no 502, no timeout)
+#  - L'auth basic funciona
+#  - Els endpoints admin responen sota un temps raonable
+#  - La home pública carrega
+#  - El health endpoint reporta BD i API com a pass
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Cada 15 minuts. Suficient per detectar caigudes en hores laborals
+    # sense saturar la quota de minuts gratuïts de GitHub Actions.
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Smoke test contra producció
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run smoke test
+        env:
+          SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL || 'https://orbitaevents.com' }}
+          SMOKE_AUTH: ${{ secrets.SMOKE_AUTH }}
+          SMOKE_MAX_MS: ${{ vars.SMOKE_MAX_MS || '5000' }}
+        run: node scripts/smoke-prod.mjs

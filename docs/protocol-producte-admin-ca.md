@@ -717,6 +717,7 @@ Criteri pràctic:
 **FET** *(2026-04-17 per `codex` — Canvi #151)*: el `TimelinePanel` mostra un resum d'estat comercial actual abans de la cronologia, connectant risc, següent pas i CTA dins del mateix espai on es llegeix la seqüència de comunicació.
 **FET** *(2026-04-22 per `codex` — Canvi #329)*: el resum de comunicacions deixa de viure com a reconstrucció local a Inbox. `CommSummaryPanel` consumeix ara `/api/admin/leads/[id]/comm-summary`, que delega a `loadCommTimeline()` basat en timeline canònica; el mateix servei continua alimentant `commSummary` del Customer Hub. Es redueix una capa paral·lela sense tocar schema ni fluxos de redacció.
 **FET** *(2026-04-26 per `codex` — Canvi #417)*: el vell `EN MARXA` de `§6.8` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava resum canònic compartit entre Inbox i Customer Hub (`#136`, `#329`), narrativa de comunicació integrada a la timeline del client (`#137`, `#138`) i follow-ups/risc comercial reutilitzats fora d'Inbox (`#139`-`#151`); el pendent real que resta és exclusivament el `PENDENT CRÍTIC` d'evitar noves capes paral·leles de comunicacions.
+**FET** *(2026-05-04 per `claude` — Canvi #496)*: el detall IMAP deixa de descarregar el RFC822 sencer amb attachments quan s'obre un mail. `fetchEmailByUid()` passa de `source: true` a `bodyParts: ['HEADER', 'TEXT']`, parseja només header+text i manté la detecció d'adjunts via `bodyStructure`; `__tests__/lib/imap-fetch-bodyparts.test.ts` blinda que no es torni a baixar el missatge complet. Efecte: el detall de mail evita timeouts/502 a Railway provocats per attachments grans.
 **PENDENT CRÍTIC**: evitar que comunicacions visquin com a capa paral·lela.
 **MÉS ENDAVANT**: inbox unificada multi-canal.
 
@@ -866,6 +867,8 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #491)*: el toggle `ProtocolValidationToggle` deixa de dependre només de proves de happy path. `__tests__/app/admin/docs/ProtocolValidationToggle.test.tsx` cobreix ara també l'estat renderitzat quan un canvi ja està validat (`Validat per ...`, `Nota registrada: ...`, CTA `Desfer validació`) i el camí d'error quan el `DELETE /api/admin/protocol/validations` falla (`cannot-delete` visible, sense `router.refresh()`). Efecte: una regressió del component client en la lectura del registre humà o en el rollback de validació ja no passarà en silenci.
 **FET** *(2026-05-04 per `codex` — Canvi #493)*: el parser del protocol deixa de degradar a `UNKNOWN` els canvis reclassificats o reservats amb context extra al header. `lib/services/protocolCanvisService.ts` ara normalitza també capçaleres com `(FET; reclassificat des de #487 ...)`, `(EN MARXA; reservat ...)` o `(PENDENT temporal ...)` a l'estat canònic correcte, en lloc d'exigir coincidència exacta. `__tests__/lib/services/protocolCanvisService.test.ts` guanya un cas amb els tres formats reals/adjacents. Efecte: el viewer i qualsevol consumidor de `parseProtocolCanvis()` deixa d'ensenyar `UNKNOWN` en canvis vàlids quan el protocol documenta col·lisions o context de sessió dins del mateix parèntesi.
 **FET** *(2026-05-04 per `codex` — Canvi #495)*: el resum global de validacions humanes deixa de comptar validacions stale o futures que no corresponen a cap `Canvi #N` present al protocol parsejat. `summarizeValidations()` accepta ara la llista canònica de números existents, `/admin/docs/protocol` li passa `allCanvis.map((canvi) => canvi.n)` i els tests blinden tant el servei com el render real amb una validació `#999` que no ha d'inflar el KPI. Efecte: el card `Validats humans` no pot mostrar un 100% fals si el setting conserva entrades antigues o escrites fora del viewer.
+**FET** *(2026-05-04 per `codex` — Canvi #497)*: `qa:protocol` deixa de validar només protocol + comptador i passa a exigir també l'entrada corresponent a `docs/diario.md` pel `ADMIN_CHANGE_COUNTER` actual. `scripts/check-admin-change-log.mjs` llegeix el diari i falla si no hi ha cap header `## ... Canvi #N`; `__tests__/scripts/check-admin-change-log.test.ts` guanya el cas negatiu que reprodueix el forat detectat al `#496`. Efecte: cap canvi futur podrà quedar formalment verd si el diari no acompanya el §9.
+**FET** *(2026-05-04 per `claude` — Canvi #498)*: producció guanya smoke test automàtic post-deploy i heartbeat. `scripts/smoke-prod.mjs` comprova health, home pública, challenge d'auth admin i endpoints admin amb auth opcional; `.github/workflows/smoke-prod.yml` l'executa a `main`, cada 15 minuts i manualment. Efecte: regressions com redirects trencats, 502 o endpoints crítics lents deixen de dependre només d'una comprovació manual.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5649,6 +5652,38 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #498 — 2026-05-04 — claude (FET)
+**Smoke test real de producció: GitHub Actions comprova health, home pública i endpoints admin crítics després de deploy i cada 15 minuts.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: els últims incidents de producció (`#492` redirect `www` → `:8080`, `#494` cache acumulat, `#496` detall IMAP amb 502 per timeout) mostren que el repo tenia bones barreres locals però cap heartbeat extern que detectés ràpidament regressions reals post-deploy. Si una API cau, un redirect es trenca o un endpoint admin torna a fer timeout, calia descobrir-ho manualment.
+- `scripts/smoke-prod.mjs` (nou): script Node sense mocks que llegeix `SMOKE_BASE_URL`, `SMOKE_AUTH` i `SMOKE_MAX_MS`; comprova `/api/health`, home pública, challenge `401` d'admin sense auth, `/api/admin/leads?limit=1` amb auth i `/api/admin/inbox/messages?action=count` amb auth. Valida status HTTP, JSON quan toca, cos mínim i temps màxim per check.
+- `.github/workflows/smoke-prod.yml` (nou): workflow `Smoke test — producció` amb `push` a `main`, `schedule` cada 15 minuts i `workflow_dispatch`; fa checkout, setup Node 20 i executa `node scripts/smoke-prod.mjs` amb secrets/vars de GitHub.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `497` a `498`.
+- Aquest tall **NO** toca: codi d'aplicació, endpoints, auth, IMAP, middleware, cache, schema ni UI. Només afegeix observabilitat externa.
+- Validació tècnica: `node --check scripts/smoke-prod.mjs` OK. `qa:protocol` i `validate:core` finals pendents d'executar després d'aquest registre.
+- Validació funcional: el smoke cobreix explícitament els patrons que han fallat recentment en producció: health, home, auth admin, leads i inbox count.
+- Validació humana/UX: el propietari passa de detectar caigudes manualment a rebre feedback de GitHub Actions quan un endpoint crític no respon o supera el límit.
+- Verificació real post-deploy: pendent configurar `SMOKE_AUTH` a secrets de GitHub si es vol cobrir també els checks autenticats; sense secret, el script salta aquests checks i manté els públics.
+- `ADMIN_CHANGE_COUNTER` puja a `498`; el següent canvi real ha de ser `#499`.
+
+### Canvi #497 — 2026-05-04 — codex (FET)
+**`qa:protocol` valida també que `docs/diario.md` tingui entrada pel canvi actual; el guard ja no pot deixar verd un tall amb §9 i comptador sincronitzats però sense diari.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: en la ronda del `#496`, el protocol i el comptador van quedar sincronitzats mentre el diari podia anar per separat. La norma §2.1 ja obliga a registrar cada tall també a `docs/diario.md`, però `scripts/check-admin-change-log.mjs` només comprovava `docs/protocol-producte-admin-ca.md` + `ADMIN_CHANGE_COUNTER`. Això deixava un forat real: `pnpm run qa:protocol` podia passar encara que el diari no tingués l'entrada del canvi actual.
+- `scripts/check-admin-change-log.mjs`: afegeix `DIARIO_PATH`, llegeix `docs/diario.md` i, quan el counter coincideix amb el màxim del protocol, exigeix un header `## ... Canvi #N` pel mateix número actual. Si falta, falla amb `docs/diario.md missing entry for current change #N`.
+- `__tests__/scripts/check-admin-change-log.test.ts`: els fixtures temporals creen ara també `docs/diario.md`; s'afegeix un test que deixa protocol `#58` + counter `58` correctes però diari només amb `#57`, i comprova que el guard falla pel motiu nou.
+- Efecte: la disciplina de tancament rigorós deixa de dependre només d'autocontrol. Qualsevol canvi futur que oblidi el diari trencarà `qa:protocol` i, per extensió, `validate:core`.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-change-log.test.ts` OK (6 tests) · `pnpm run qa:protocol` OK abans del registre. `validate:core` i `qa:protocol` finals pendents d'executar després d'aquesta entrada.
+- Validació funcional: el guard cobreix el cas exacte de desalineació `protocol + counter OK` però `diari absent`.
+- Validació humana/UX: el propietari pot llegir el diari com a registre cronològic fiable sense haver de comparar-lo manualment amb el §9.
+- Aquest tall **NO** toca: parser del viewer, validacions humanes del protocol, codi IMAP del `#496`, ni cap flux d'admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `496` a `497`.
+- `ADMIN_CHANGE_COUNTER` puja a `497`; el següent canvi real ha de ser `#498`.
 
 ### Canvi #496 — 2026-05-04 — claude (FET)
 **Fix crític d'inbox: obrir un mail trigava 27s i acabava en 502 perquè `fetchEmailByUid` baixava el RFC822 sencer (`source: true`) incloent attachments base64. Substituït per `bodyParts: ['HEADER', 'TEXT']` + test estructural anti-regressió.**
