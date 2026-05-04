@@ -1,3 +1,20 @@
+## 2026-05-04 — Canvi #503: filtre INBOX_TO_FILTER (claude)
+
+### Context
+Safata barreja info@orbitaevents.com (canònica) i ctreball20@gmail.com (forwarding antic). L'usuari vol només info@.
+
+### Canvi
+- lib/imap.ts: getInboxToFilter() llegeix INBOX_TO_FILTER (CSV). fetchEmails() filtra per email.to[].address post-fetch.
+- fetchEmails: client.logout() → client.close() (alineat amb #499).
+- __tests__/lib/imap-inbox-filter.test.ts: 5/5 verds.
+- counter 502 → 503.
+
+### Producció
+Afegir a Railway: INBOX_TO_FILTER=info@orbitaevents.com + redesplegar.
+
+### Tancament
+ADMIN_CHANGE_COUNTER = 503. Següent #504.
+
 ## 2026-05-04 — Canvi #502: autoregulació de model/effort i consum (codex)
 
 ### Context
