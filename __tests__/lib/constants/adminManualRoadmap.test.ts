@@ -35,6 +35,9 @@ describe('ADMIN_MANUAL_ROADMAP', () => {
     for (const item of pending) {
       expect(item.doneCanvi).toBeUndefined();
       expect(item.doneNote).toBeUndefined();
+      if (item.protocolSection !== undefined) {
+        expect(item.protocolSection).toMatch(/^\d+(?:\.\d+)*$/);
+      }
     }
   });
 
@@ -43,6 +46,7 @@ describe('ADMIN_MANUAL_ROADMAP', () => {
     expect(pending).toHaveLength(1);
     expect(pending[0]?.id).toBe('marketing-analytics-hub');
     expect(pending[0]?.priority).toBe('CRITICAL');
+    expect(pending[0]?.protocolSection).toBe('6.16');
   });
 
   it('inclou els ids canònics dels ítems FET coberts pel §6.15 del protocol', () => {

@@ -211,18 +211,49 @@ export async function fetchEmails(options: {
 /**
  * Obtenir un email per UID.
  *
- * IMPORTANT: descarrega només `HEADER` + `TEXT` via `bodyParts`, NO `source: true`.
- * `source: true` baixaria el RFC822 sencer incloent attachments en base64
- * (ex: PDF de 2MB = 2.7MB de base64 transferit), provocant timeouts >25s i 502
- * a Railway quan els missatges porten attachments grans. `bodyParts` salta
- * attachments i descarrega només el text/HTML del missatge.
+ * Notes operatives clau:
+ *  1. Descarrega només `HEADER` + `TEXT` via `bodyParts`, MAI `source: true`.
+ *     `source: true` baixaria el RFC822 sencer incloent attachments en base64,
+ *     provocant timeouts >25s i 502 a Railway. Guard estructural a
+ *     `__tests__/lib/imap-fetch-bodyparts.test.ts`.
+ *  2. Cache LRU en memòria de procés. Cada `fetchEmailByUid(uid)` posterior
+ *     a la primera vegada retorna instant. La cache es perd al redeploy
+ *     (acceptable: el primer load post-deploy paga el cost real).
+ *  3. NO fa `return` dins el `for await` del fetch IMAP — això deixava el
+ *     stream en estat suspès i feia que `client.logout()` esperés el timeout
+ *     (35s constants observats). Recollir el missatge en variable local i
+ *     retornar després de tancar tot net.
+ *  4. `client.logout()` substituït per `client.close()` que tanca local sense
+ *     esperar resposta del servidor IMAP. Si el servidor és lent o no respon
+ *     al `LOGOUT`, cap més bloqueig.
  */
+const FETCH_EMAIL_CACHE = new Map<string, EmailMessage>();
+const FETCH_EMAIL_CACHE_MAX = 200;
+
+function cacheKey(uid: number, folder: string) {
+  return `${folder}:${uid}`;
+}
+
+export function clearFetchEmailCache(): void {
+  FETCH_EMAIL_CACHE.clear();
+}
+
+export function invalidateFetchEmailCache(uid: number, folder: string = 'INBOX'): void {
+  FETCH_EMAIL_CACHE.delete(cacheKey(uid, folder));
+}
+
 export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Promise<EmailMessage | null> {
+  const key = cacheKey(uid, folder);
+  const cached = FETCH_EMAIL_CACHE.get(key);
+  if (cached) {
+    return cached;
+  }
+
   const client = await connectIMAP();
+  let result: EmailMessage | null = null;
 
   try {
     const mailbox = await client.getMailboxLock(folder);
-
     try {
       for await (const message of client.fetch([uid], {
         uid: true,
@@ -256,7 +287,7 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
           (node: { disposition?: string }) => node.disposition === 'attachment'
         ) || false;
 
-        return {
+        result = {
           id: `imap-${message.uid}`,
           uid: message.uid,
           messageId: envelope?.messageId || '',
@@ -276,15 +307,28 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
           hasAttachments,
           attachments: [],
         };
+        break;
       }
     } finally {
       mailbox.release();
     }
   } finally {
-    await client.logout();
+    try {
+      client.close();
+    } catch {
+      /* swallow — close() és síncron i no hauria de fallar, però per si de cas */
+    }
   }
 
-  return null;
+  if (result) {
+    if (FETCH_EMAIL_CACHE.size >= FETCH_EMAIL_CACHE_MAX) {
+      const firstKey = FETCH_EMAIL_CACHE.keys().next().value;
+      if (firstKey) FETCH_EMAIL_CACHE.delete(firstKey);
+    }
+    FETCH_EMAIL_CACHE.set(key, result);
+  }
+
+  return result;
 }
 
 /**

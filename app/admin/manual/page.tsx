@@ -8,6 +8,7 @@ import {
   parseProtocolCanvis,
   type ProtocolCanviMeta,
 } from '@/lib/services/protocolCanvisService';
+import { buildAdminManualRoadmapProtocolTarget } from '@/lib/services/adminManualRoadmapService';
 
 export const dynamic = 'force-static';
 export const revalidate = 60;
@@ -428,6 +429,7 @@ export default async function AdminManualPage() {
           {roadmapItemsSorted.map((item) => {
             const canvi = item.doneCanvi ? canvisIndex.get(item.doneCanvi) : undefined;
             const workspace = ROADMAP_AREA_WORKSPACE[item.area];
+            const protocolTarget = buildAdminManualRoadmapProtocolTarget(item);
             return (
               <article
                 key={item.id}
@@ -481,17 +483,9 @@ export default async function AdminManualPage() {
                   </div>
                 </div>
                 <div className="mt-auto flex flex-wrap gap-2 pt-1">
-                  {item.status === 'DONE' && item.doneCanvi ? (
-                    <Link
-                      href={`/admin/docs/protocol?canvi=${item.doneCanvi}#canvi-${item.doneCanvi}`}
-                      className="ap-btn-primary text-xs"
-                    >
-                      Obrir Canvi #{item.doneCanvi}
-                    </Link>
-                  ) : null}
-                  {item.status === 'PENDING' ? (
-                    <Link href="/admin/docs/protocol?seccio=6.15#seccio-6-15" className="ap-btn-primary text-xs">
-                      Obrir §6.15 al protocol
+                  {protocolTarget ? (
+                    <Link href={protocolTarget.href} className="ap-btn-primary text-xs">
+                      {protocolTarget.label}
                     </Link>
                   ) : null}
                   {workspace ? (

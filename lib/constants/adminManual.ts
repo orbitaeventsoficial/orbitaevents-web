@@ -491,6 +491,7 @@ export interface AdminManualRoadmapItem {
   status: AdminManualRoadmapStatus;
   doneCanvi?: number;
   doneNote?: string;
+  protocolSection?: string;
 }
 
 export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
@@ -633,6 +634,7 @@ export const ADMIN_MANUAL_ROADMAP: AdminManualRoadmapItem[] = [
     effort: 'Alt — OAuth + 4 APIs externes + servei d\'anàlisi + UI dashboard + regles de diagnòstic',
     area: 'Captació i vendes',
     status: 'PENDING',
+    protocolSection: '6.16',
   },
 ];
 

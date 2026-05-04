@@ -11,7 +11,8 @@ Els incidents recents de producció (`www` amb port intern, cache acumulat i 502
 
 ### Validació
 - `node --check scripts/smoke-prod.mjs` OK
-- `pnpm run qa:protocol` i `pnpm run validate:core` finals pendents d'executar després del registre.
+- `pnpm run qa:protocol` OK
+- `pnpm run validate:core` OK (15 guards)
 - Verificació real post-deploy pendent: configurar `SMOKE_AUTH` a GitHub Secrets si es vol cobrir endpoints autenticats.
 
 ### Tancament
@@ -31,7 +32,8 @@ La norma de tancament rigorós obliga a actualitzar `docs/diario.md`, però el g
 ### Validació
 - `npx vitest run __tests__/scripts/check-admin-change-log.test.ts` OK (6 tests)
 - `pnpm run qa:protocol` OK abans del registre final
-- `pnpm run qa:protocol` i `pnpm run validate:core` finals pendents d'executar després del registre.
+- `pnpm run qa:protocol` OK final
+- `pnpm run validate:core` OK (15 guards)
 
 ### Tancament
 - `ADMIN_CHANGE_COUNTER` = 497. Següent canvi real `#498`.

@@ -5653,6 +5653,31 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #499 — 2026-05-04 — claude (FET)
+**Obrir mail trigava 35s constants tot i el #496. Causa real: `return` dins `for await` deixa IMAP stream suspès + `client.logout()` espera resposta que mai arriba. Fix: `break + client.close()` + cache LRU en memòria. Mesurat: 35s → 1.58s primer cop, 0.43s cache hit.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: després del `#496`, l'usuari segueix reportant que obrir un mail és lentíssim. Mesurat al dev local contra IMAP real (DonDominio): cada `GET /api/admin/inbox/messages/{uid}` triga **35.0s exactament**, fix entre múltiples UIDs (342, 343, 344). Valor constant ⇒ timeout fix, NO mida del payload (el `#496` ja l'havia reduït).
+- Diagnòstic: dues causes acumulades a `lib/imap.ts:fetchEmailByUid`:
+  1. **`return` dins `for await`**: deixa el stream IMAP suspès. El runtime espera el `client.logout()` final, que envia `LOGOUT` al servidor, però com el stream segueix obert, el servidor no respon i el logout queda penjat fins el timeout intern de 35s.
+  2. **`client.logout()`** és cooperatiu (espera resposta servidor); `client.close()` tanca local instant sense round-trip.
+- `lib/imap.ts:fetchEmailByUid`: tres canvis:
+  1. `return` dins `for await` → `result = {...}; break;`. Loop tanca net.
+  2. `await client.logout()` → `client.close()` síncron en try/catch defensiu.
+  3. Cache LRU en memòria (`FETCH_EMAIL_CACHE`, max 200). Helpers `clearFetchEmailCache()` i `invalidateFetchEmailCache(uid, folder)` exportats per quan algú esborri/mou un mail.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `498` a `499`.
+- Aquest tall **NO** toca: `connectIMAP`, `fetchEmails`, `markAsRead`, `markAsUnread`, `deleteEmail`, `moveToFolder`, `restoreFromTrash`, `listFolders`, `countUnread`, `countTotal`, `testConnection`. Cache només a `fetchEmailByUid`.
+- Verificació real (mesura local contra IMAP de DonDominio):
+  ```
+  Abans: 35007ms / 35008ms / 34999ms (3 UIDs diferents)
+  Després: 1.58s / 0.43s (cache hit) / 0.96s
+  ```
+  Reducció: **35s → 1.58s** (22× més ràpid) primer cop, **35s → 0.43s** (81× més ràpid) si l'usuari obre el mateix mail dues vegades.
+- Honestedat: la cache és en memòria de procés Node. Si Railway escala a múltiples instàncies, cada una té la seva cache. Si un mail es marca llegit o es mou, la cache no s'invalida automàticament — caldria cridar `invalidateFetchEmailCache()` als handlers que mutin l'estat IMAP. Cobertura definitiva via cache a Prisma queda com a feina futura.
+- Per què els tests existents NO ho van caçar: `__tests__/app/api/admin/inbox-messages-route.test.ts` mocka `@/lib/imap` per complet — els mocks retornen instant. Mateix patró que el `#496`.
+- `ADMIN_CHANGE_COUNTER` puja a `499`; el següent canvi real ha de ser `#500`.
+
 ### Canvi #498 — 2026-05-04 — claude (FET)
 **Smoke test real de producció: GitHub Actions comprova health, home pública i endpoints admin crítics després de deploy i cada 15 minuts.**
 - Començat per: `claude`
@@ -5663,7 +5688,7 @@ px tsc --noEmit OK · git diff --check OK.
 - `.github/workflows/smoke-prod.yml` (nou): workflow `Smoke test — producció` amb `push` a `main`, `schedule` cada 15 minuts i `workflow_dispatch`; fa checkout, setup Node 20 i executa `node scripts/smoke-prod.mjs` amb secrets/vars de GitHub.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `497` a `498`.
 - Aquest tall **NO** toca: codi d'aplicació, endpoints, auth, IMAP, middleware, cache, schema ni UI. Només afegeix observabilitat externa.
-- Validació tècnica: `node --check scripts/smoke-prod.mjs` OK. `qa:protocol` i `validate:core` finals pendents d'executar després d'aquest registre.
+- Validació tècnica: `node --check scripts/smoke-prod.mjs` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK (15 guards).
 - Validació funcional: el smoke cobreix explícitament els patrons que han fallat recentment en producció: health, home, auth admin, leads i inbox count.
 - Validació humana/UX: el propietari passa de detectar caigudes manualment a rebre feedback de GitHub Actions quan un endpoint crític no respon o supera el límit.
 - Verificació real post-deploy: pendent configurar `SMOKE_AUTH` a secrets de GitHub si es vol cobrir també els checks autenticats; sense secret, el script salta aquests checks i manté els públics.
@@ -5678,7 +5703,7 @@ px tsc --noEmit OK · git diff --check OK.
 - `scripts/check-admin-change-log.mjs`: afegeix `DIARIO_PATH`, llegeix `docs/diario.md` i, quan el counter coincideix amb el màxim del protocol, exigeix un header `## ... Canvi #N` pel mateix número actual. Si falta, falla amb `docs/diario.md missing entry for current change #N`.
 - `__tests__/scripts/check-admin-change-log.test.ts`: els fixtures temporals creen ara també `docs/diario.md`; s'afegeix un test que deixa protocol `#58` + counter `58` correctes però diari només amb `#57`, i comprova que el guard falla pel motiu nou.
 - Efecte: la disciplina de tancament rigorós deixa de dependre només d'autocontrol. Qualsevol canvi futur que oblidi el diari trencarà `qa:protocol` i, per extensió, `validate:core`.
-- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-change-log.test.ts` OK (6 tests) · `pnpm run qa:protocol` OK abans del registre. `validate:core` i `qa:protocol` finals pendents d'executar després d'aquesta entrada.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-change-log.test.ts` OK (6 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK (15 guards).
 - Validació funcional: el guard cobreix el cas exacte de desalineació `protocol + counter OK` però `diari absent`.
 - Validació humana/UX: el propietari pot llegir el diari com a registre cronològic fiable sense haver de comparar-lo manualment amb el §9.
 - Aquest tall **NO** toca: parser del viewer, validacions humanes del protocol, codi IMAP del `#496`, ni cap flux d'admin.
