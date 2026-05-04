@@ -1,3 +1,24 @@
+## 2026-05-04 — Canvi #496: detall IMAP sense descarregar attachments complets (claude)
+
+### Context
+Obrir un mail concret a producció acabava en `502` després d'uns 27s. La causa era `fetchEmailByUid()` a `lib/imap.ts`: usava `source: true`, que baixa l'RFC822 complet incloent attachments en base64. Un PDF de 2MB pot convertir-se en ~2.7MB de transferència i parse MIME pesat abans de respondre a Railway.
+
+### Canvi
+- `lib/imap.ts`: `fetchEmailByUid()` substitueix `source: true` per `bodyParts: ['HEADER', 'TEXT']`.
+- El parser reconstrueix un RFC822 mínim amb `HEADER + TEXT` per `simpleParser`; si falla, fa fallback a `textPart.toString('utf8')`.
+- `hasAttachments` continua sortint de `bodyStructure.childNodes`.
+- `__tests__/lib/imap-fetch-bodyparts.test.ts`: guard estructural nou que prohibeix `source: true` i exigeix `bodyParts` amb `HEADER` i `TEXT`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 495 → 496.
+
+### Validació
+- `npx vitest run __tests__/lib/imap-fetch-bodyparts.test.ts` OK (3 tests)
+- `npx tsc --noEmit` OK
+- `pnpm run qa:protocol` OK
+- `validate:core` consta com OK al §9 del canvi; verificació real post-deploy contra Railway pendent.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 496. Següent canvi real `#497`.
+
 ## 2026-05-04 — Canvi #495: KPI de validacions humanes ignora entrades stale/futures (codex)
 
 ### Context
