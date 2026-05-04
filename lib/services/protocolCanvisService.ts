@@ -14,9 +14,9 @@ const HEADER_PATTERN = /^### Canvi #(\d+)\s+—\s+(\d{4}-\d{2}-\d{2})\s+—\s+([
 
 function normalizeStatus(raw: string): ProtocolCanviStatus {
   const upper = raw.trim().toUpperCase();
-  if (upper === 'FET' || upper === 'EN MARXA' || upper === 'PENDENT') {
-    return upper;
-  }
+  if (upper === 'FET' || upper.startsWith('FET;') || upper.startsWith('FET ')) return 'FET';
+  if (upper === 'EN MARXA' || upper.startsWith('EN MARXA;') || upper.startsWith('EN MARXA ')) return 'EN MARXA';
+  if (upper === 'PENDENT' || upper.startsWith('PENDENT;') || upper.startsWith('PENDENT ')) return 'PENDENT';
   return 'UNKNOWN';
 }
 

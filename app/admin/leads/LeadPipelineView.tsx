@@ -146,9 +146,10 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       await patchLeadStatus({ leadId, status: newStatus as 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' });
       const targetLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
       toast.success(`Entrada moguda a ${targetLabel}`);
-    } catch {
+    } catch (error) {
       setLeadStatusInState(leadId, previousStatus, currentLead.lostReason);
-      toast.error('Error de connexió movent l\'entrada');
+      log.error('[LeadPipelineView] Error movent entrada', error);
+      toast.error(error instanceof Error ? error.message : 'Error movent l\'entrada');
     } finally {
       setUpdatingId(null);
     }
@@ -170,8 +171,9 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       setPendingLossLead(null);
       setLostReason('');
       setLostNote('');
-    } catch {
-      toast.error('Error de connexió movent l\'entrada');
+    } catch (error) {
+      log.error('[LeadPipelineView] Error marcant entrada com a perduda', error);
+      toast.error(error instanceof Error ? error.message : 'Error marcant l\'entrada com a perduda');
     } finally {
       setUpdatingId(null);
     }

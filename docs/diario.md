@@ -1,3 +1,140 @@
+## 2026-05-04 — Canvi #492: fix crític redirect `www.orbitaevents.com` → port `:8080` (claude)
+
+### Context
+Usuari reporta "tot mort": múltiples funcionalitats que existeixen al codi (respondre mails, convertir a lead, canviar estat de leads) no funcionen a producció. Verificat amb curl: `https://www.orbitaevents.com/api/health` retorna `301 Location: https://orbitaevents.com:8080/api/health` (port `8080` no exposat públicament). `https://orbitaevents.com/api/health` (sense `www.`) → `200 OK`. Diagnòstic: `middleware.ts:26-31` clonava `req.nextUrl` i canviava `hostname`, però preservava el `port` intern de Railway (`process.env.PORT=8080`); el `Location` header sortia amb port.
+
+### Canvi
+- `middleware.ts`: dins del strip-www, afegit `url.port = ''` i `url.protocol = 'https:'` abans del redirect 301.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 491 → 492.
+
+### Col·lisió de comptador
+Reassignat de `#491` a `#492` perquè codex va tancar `#491` (cobertura ProtocolValidationToggle) en paral·lel.
+
+### Validació
+- `pnpm run validate:core` OK 13/13
+- Test e2e contra Railway pendent del redeploy
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 492. Següent canvi real `#493`.
+
+## 2026-05-04 — Canvi #493: normalització d’estat per headers reclassificats del protocol (codex)
+
+### Context
+El protocol viu ja conté canvis reclassificats amb headers del tipus `(FET; reclassificat des de #487 ...)`. El parser `parseProtocolCanvis()` els llegia com a `UNKNOWN` perquè `normalizeStatus()` només acceptava coincidència exacta amb `FET`, `EN MARXA` o `PENDENT`.
+
+### Canvi
+- `lib/services/protocolCanvisService.ts`: `normalizeStatus()` accepta ara els tres estats canònics també quan són prefix d’un text més llarg (`FET; ...`, `EN MARXA; ...`, `PENDENT temporal ...`).
+- `__tests__/lib/services/protocolCanvisService.test.ts`: cas nou que blinda tres headers amb context extra realista.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 492 → 493.
+
+### Col·lisió de comptador
+Aquest tall havia de ser `#492`, però mentre preparava el registre Claude ha tancat el seu propi `#492` sobre el redirect `www` → apex a Railway. Reassignat a `#493` seguint la norma de no-col·lisió del protocol.
+
+### Validació
+- `npx vitest run __tests__/lib/services/protocolCanvisService.test.ts` OK (14 tests)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 493. Següent canvi real ha de ser `#494`.
+
+## 2026-05-04 — Canvi #491: cobertura del toggle de validació humana en estat validat i error de DELETE (codex)
+
+### Context
+El front del protocol ja tenia barreres d’integració de pàgina fins al `#490`, però el component client `ProtocolValidationToggle` encara depenia sobretot de happy paths. Faltava cobrir l’estat inicial quan la validació ja existeix i el cas d’error quan desfer la validació falla.
+
+### Canvi
+- `__tests__/app/admin/docs/ProtocolValidationToggle.test.tsx`: dos tests nous.
+- Un cas blinda el render de metadata (`Validat per OWNER`), la nota registrada i el botó `Desfer validació`.
+- L’altre cas simula `DELETE` fallit amb error `cannot-delete` i comprova error visible + absència de `router.refresh()`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 490 → 491.
+
+### Validació
+- `npx vitest run __tests__/app/admin/docs/ProtocolValidationToggle.test.tsx` OK (5 tests)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 491. Següent canvi real ha de ser `#492`.
+
+## 2026-05-04 — Canvi #490: cobertura d’integració per la vista `validated` amb cerca al viewer del protocol (codex)
+
+### Context
+El viewer del protocol ja tenia cobertura d’integració pel wiring principal (`#487`) i per la secció enfocada + estat “sense pendents” (`#488`). Faltava encara una combinació visible a la pàgina real: `validation=validated&q=...`, amb el copy contextualitzat i l’empty state de seccions.
+
+### Canvi
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: quart test nou.
+- El cas renderitza la pàgina amb `validation=validated` i `q=codex`, mockejant els dos canvis com a validats.
+- Queden blindats el títol `Validats humans (1)`, la descripció amb la cerca activa, el link `Validats · 1`, el text passiu `Sense pendents en aquesta cerca` i l’empty state `Cap secció amb aquesta cerca`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 489 → 490.
+
+### Col·lisió de comptador
+Aquest tall havia de ser `#489`, però mentre preparava el registre Claude ha tancat el seu propi `#489` sobre errors reals al canvi d’estat de lead. Reassignat a `#490` seguint la norma de no-col·lisió del protocol.
+
+### Validació
+- `npx vitest run __tests__/app/admin/docs/ProtocolPage.test.tsx` OK (4 tests)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 490. Següent canvi real ha de ser `#491`.
+
+## 2026-05-04 — Canvi #489: instrumentació real d'errors al canvi d'estat de lead (claude; reclassificat des de #487 per col·lisió de comptador)
+
+### Context
+L'usuari reporta que no pot passar un lead concret (Silvia Sanchez) de `NEW` a `CONTACTED`. Verificat directament contra la BD de Railway via dev local: el `PATCH /api/admin/leads/[id]/status` retorna `200 OK` en ~2s amb el lead correctament transicionat (he provat real, no mock). El problema reportat no era backend trencat sinó **error d'UX al frontend** que tapava la causa real quan alguna petició fallava (timeout, FK orphan, latència Railway, etc.). Dels 7 punts que criden `patchLeadStatus()`, només 2 mostraven el missatge real; els altres 5 descartaven l'objecte `error` o el substituïen per text fix com `'Error de connexió'` (literalment misleading — la causa pot ser qualsevol cosa).
+
+### Canvi
+- `app/admin/leads/LeadQuickStatus.tsx`: els 2 catch del select d'estat propaguen `error.message` al toast.
+- `app/admin/leads/LeadPipelineView.tsx`: els 2 `catch {}` del kanban deixen de descartar l'objecte error i passen a `catch (error)` amb `log.error()` + `toast.error(error.message)`. Eliminat el text fix `'Error de connexió movent l'entrada'` (misleading).
+- `app/admin/leads/[id]/LeadMobileQuickActions.tsx`: afegit `catch (error)` + toast al botó mòbil `Marcar contactat` (abans silent fail).
+- `__tests__/app/admin/leads/LeadQuickStatus.test.tsx`: nou test que blinda que el missatge real de l'API arribi al toast en lloc del genèric.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 488 → 489.
+
+### Aquest tall NO toca
+Backend (`statusRouteHandler.ts` ja era correcte), client `leadStatusClient.ts` (ja propagava bé `payload.error`), ni tests d'altres fitxers. Només els 5 punts d'UI que descartaven la informació.
+
+### Col·lisió de comptador
+Aquest tall havia de ser `#487`, però mentre validava codex va tancar `#487` (test integració viewer) i `#488` (focusedSection). Reassignat a `#489` segons norma §2.1.
+
+### Validació
+- `pnpm exec vitest run __tests__/app/admin/leads/LeadQuickStatus.test.tsx` OK 3/3
+- `pnpm run validate:core` OK
+
+### Efecte operatiu
+La propera vegada que un canvi d'estat falli per qualsevol motiu (timeout, FK, validació, infra), l'usuari veurà la causa concreta al toast i podrà reportar-la directament en lloc de viure un toast genèric/misleading.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 489. Següent canvi real ha de ser `#490`.
+
+## 2026-05-04 — Canvi #488: cobertura d’integració per `focusedSection` i “sense pendents” al viewer del protocol (codex)
+
+### Context
+Després del `#487`, `/admin/docs/protocol` ja tenia un test d’integració per al wiring principal del backlog humà. Però encara faltaven dues branques visibles de la pàgina real: la secció enfocada quan s’entra amb `?seccio=` des del manual i l’estat passiu quan el subconjunt filtrat ja no té cap pendent.
+
+### Canvi
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx`: tercer test nou.
+- El cas renderitza la pàgina amb `seccio=6.14`, `q=infra` i `validation=pending`, mockejant tots els canvis com a validats.
+- Queden blindats el header de secció, els links de retorn, el text `Sense pendents en aquesta cerca`, l’absència del shortcut accionable i l’empty state `Cap pendent amb aquesta cerca`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 487 → 488.
+
+### Validació
+- `npx vitest run __tests__/app/admin/docs/ProtocolPage.test.tsx` OK (3 tests)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 488. Següent canvi real ha de ser `#489`.
+
+## 2026-05-04 — Canvi #487: test d'integració de `/admin/docs/protocol` (codex)
+
+### Context
+El front de validacions humanes del protocol ja tenia proves de helper i del toggle client, però cap test de la pàgina real. Això deixava un forat: una regressió de wiring entre parser, validacions carregades, comptadors visibles i shortcut `Obrir primer pendent · #N` podia escapar amb tots els tests unitaris verds.
+
+### Canvi
+- `__tests__/app/admin/docs/ProtocolPage.test.tsx` (nou): prova d'integració del server component real `app/admin/docs/protocol/page.tsx`.
+- El primer test blinda el shortcut pendent, els comptadors humans i el resum de progrés de la vista.
+- El segon test blinda l'auto-open del `<details>` pendent quan el filtre és `pending`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 486 → 487.
+
+### Validació
+- `npx vitest run __tests__/app/admin/docs/ProtocolPage.test.tsx` OK (2 tests)
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 487. Següent canvi real ha de ser `#488`.
+
 ## 2026-05-04 — Canvi #486: shortcut net del primer pendent al viewer del protocol (codex)
 
 ### Context

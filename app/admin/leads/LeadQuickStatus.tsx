@@ -34,7 +34,7 @@ export default function LeadQuickStatus({
       router.refresh();
     } catch (error) {
       log.error('[LeadQuickStatus] Error canviant estat', error);
-      toast.error('Error canviant l\'estat');
+      toast.error(error instanceof Error ? error.message : 'Error canviant l\'estat');
     } finally {
       setSaving(false);
     }
@@ -56,7 +56,7 @@ export default function LeadQuickStatus({
       router.refresh();
     } catch (error) {
       log.error('[LeadQuickStatus] Error marcant lead com a perdut', error);
-      toast.error('Error canviant l\'estat');
+      toast.error(error instanceof Error ? error.message : 'Error canviant l\'estat');
     } finally {
       setSaving(false);
     }

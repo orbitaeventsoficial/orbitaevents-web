@@ -27,6 +27,8 @@ export async function middleware(req: NextRequest) {
   if (req.headers.get('host') === 'www.orbitaevents.com') {
     const url = req.nextUrl.clone();
     url.hostname = 'orbitaevents.com';
+    url.port = '';
+    url.protocol = 'https:';
     return NextResponse.redirect(url, 301);
   }
 

@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
+import { useToast } from '@/app/admin/components/ToastProvider';
+import { log } from '@/lib/logger';
 import { patchLeadStatus } from '../leadStatusClient';
 
 type LeadMobileQuickActionsProps = {
@@ -21,6 +23,7 @@ export default function LeadMobileQuickActions({
   currentStatus,
 }: LeadMobileQuickActionsProps) {
   const router = useRouter();
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -43,6 +46,9 @@ export default function LeadMobileQuickActions({
                 try {
                   await patchLeadStatus({ leadId, status: 'CONTACTED' });
                   startTransition(() => router.refresh());
+                } catch (error) {
+                  log.error('[LeadMobileQuickActions] Error marcant contactat', error);
+                  toast.error(error instanceof Error ? error.message : 'Error marcant contactat');
                 } finally {
                   setBusy(false);
                 }

@@ -22,6 +22,24 @@ describe('ProtocolValidationToggle', () => {
     vi.clearAllMocks();
   });
 
+  it('renderitza l’estat validat amb metadata i nota registrada', () => {
+    render(
+      <ProtocolValidationToggle
+        canviN={466}
+        validation={{
+          canviN: 466,
+          validatedAt: '2026-05-01T10:00:00.000Z',
+          validatedBy: 'OWNER',
+          notes: 'OK',
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/validat per owner/i)).toBeInTheDocument();
+    expect(screen.getByText('Nota registrada: OK')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /desfer validació/i })).toBeInTheDocument();
+  });
+
   it('marca una validació humana amb nota opcional', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true, validation: { canviN: 467 } }), { status: 200 }),
@@ -87,6 +105,29 @@ describe('ProtocolValidationToggle', () => {
     fireEvent.click(screen.getByRole('button', { name: /marcar validació humana/i }));
 
     expect(await screen.findByText('forbidden')).toBeInTheDocument();
+    expect(mockRefresh).not.toHaveBeenCalled();
+  });
+
+  it('mostra error si desfer la validació falla', async () => {
+    mockFetchWithCsrf.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: false, error: 'cannot-delete' }), { status: 500 }),
+    );
+
+    render(
+      <ProtocolValidationToggle
+        canviN={466}
+        validation={{
+          canviN: 466,
+          validatedAt: '2026-05-01T10:00:00.000Z',
+          validatedBy: 'OWNER',
+          notes: 'OK',
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /desfer validació/i }));
+
+    expect(await screen.findByText('cannot-delete')).toBeInTheDocument();
     expect(mockRefresh).not.toHaveBeenCalled();
   });
 });

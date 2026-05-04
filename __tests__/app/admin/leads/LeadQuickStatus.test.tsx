@@ -62,6 +62,23 @@ describe('LeadQuickStatus', () => {
     expect(screen.queryByText('Motiu canònic')).not.toBeInTheDocument();
   });
 
+  it("mostra el missatge d'error real de l'API al toast en lloc d'un text genèric", async () => {
+    mockFetchWithCsrf.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: vi.fn().mockResolvedValue({ error: 'Lead orfe — customer eliminat' }),
+    });
+
+    render(<LeadQuickStatus leadId="lead-1" currentStatus="NEW" />);
+
+    fireEvent.change(screen.getByLabelText('Canviar estat'), {
+      target: { value: 'CONTACTED' },
+    });
+
+    await waitFor(() => expect(toastError).toHaveBeenCalledTimes(1));
+    expect(toastError).toHaveBeenCalledWith('Lead orfe — customer eliminat');
+  });
+
   it('demana motiu i nota abans de marcar el lead com a perdut', async () => {
     mockFetchWithCsrf.mockResolvedValue({
       ok: true,

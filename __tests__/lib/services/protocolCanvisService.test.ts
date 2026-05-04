@@ -74,6 +74,20 @@ describe('parseProtocolCanvis', () => {
     expect(canvis.map((c) => c.status)).toEqual(['FET', 'EN MARXA', 'PENDENT', 'UNKNOWN']);
   });
 
+  it('normalitza estats canònics encara que el header porti context extra de col·lisió o reclassificació', () => {
+    const md = [
+      '### Canvi #489 — 2026-05-04 — claude (FET; reclassificat des de #487 per col·lisió de comptador)',
+      '**A.**',
+      '### Canvi #490 — 2026-05-04 — codex (EN MARXA; reservat mentre valida)',
+      '**B.**',
+      '### Canvi #491 — 2026-05-04 — codex (PENDENT temporal fins al registre final)',
+      '**C.**',
+    ].join('\n');
+
+    const canvis = parseProtocolCanvis(md);
+    expect(canvis.map((c) => c.status)).toEqual(['FET', 'EN MARXA', 'PENDENT']);
+  });
+
   it('ignora headers que no siguin "### Canvi #N — DATE — AUTHOR (STATUS)"', () => {
     const md = [
       '### Canvi 462 — 2026-04-30 — claude (FET)',
