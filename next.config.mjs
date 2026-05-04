@@ -149,6 +149,14 @@ const nextConfig = {
           { key: 'Access-Control-Max-Age', value: '86400' },
         ],
       },
+      // Admin HTML: sempre fresc (assets de _next/static segueixen amb cache llarg)
+      {
+        source: '/admin/:path*',
+        headers: [
+          ...securityHeaders,
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+        ],
+      },
     ];
   },
 

@@ -5649,6 +5649,21 @@ px tsc --noEmit OK · git diff --check OK.
 - Treballant per: `claude`
 - Tancat per: `claude`
 
+### Canvi #494 — 2026-05-04 — claude (FET)
+**Cache acumulat: HTML d'admin sempre fresc + Service Worker amb versió nova + JS/CSS network-first per evitar servir codi vell als deploys.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: l'usuari reporta que ha de fer hard-refresh constantment per veure canvis nous a producció. Tres causes acumulatives: (1) `next.config.mjs` no tenia regla per HTML d'admin (default cachejejable); (2) `public/sw.js` tenia `CACHE_NAME = 'orbita-v1'` fix que mai canviava entre deploys, fent que la lògica d'`activate` (línies 52-67) que elimina caches obsolets no s'activés mai; (3) `staleWhileRevalidate` per CSS/JS servia sempre la versió cachejada al primer load i només actualitzava al següent navegació, fent invisibles els canvis fins el segon load.
+- `next.config.mjs`: afegida regla `source: '/admin/:path*'` amb `Cache-Control: no-store, max-age=0, must-revalidate` + securityHeaders. Els assets `/_next/static/*` mantenen `max-age=31536000, immutable` (no afectats) — Next hashejja els bundles, així el cache de JS/CSS encara funciona per recursos no canviats.
+- `public/sw.js`: `CACHE_NAME` puja de `'orbita-v1'` a `'orbita-v2-2026-05-04'`. La transició dispara la lògica d'`activate` que elimina caches amb nom != `CACHE_NAME`, purgant els residus.
+- `public/sw.js`: la branca de CSS/JS (línies 117-119) passa de `staleWhileRevalidate` a `networkFirst`. JS/CSS frescos al primer load post-deploy; cau a cache només offline.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `493` a `494`.
+- Aquest tall **NO** toca: lògica d'install del SW, altres estratègies (cacheFirst per imatges/fonts, networkFirst per HTML), headers `/api/*` (ja eren no-store), headers `/_next/static/*` (segueixen max-age 1y), background sync, push notifications.
+- Verificació del tall: `pnpm run validate:core` OK 13/13. La verificació real només es pot fer post-deploy: la transició SW v1→v2 fa primer load amb xarxa pura (cache buit), i a partir d'aleshores `networkFirst` per HTML+CSS+JS.
+- Efecte operatiu: deixa de necessitar Ctrl+Shift+R per veure canvis post-deploy. `CACHE_NAME` versionat amb data manual obliga a recordar bumpar-lo a deploys grans; millora futura possible: injectar `git rev-parse --short HEAD` al build.
+- `ADMIN_CHANGE_COUNTER` puja a `494`; el següent canvi real ha de ser `#495`.
+
 ### Canvi #493 — 2026-05-04 — codex (FET)
 **`parseProtocolCanvis()` reconeix ja estats canònics encara que el header porti context extra de reclassificació o reserva.**
 - Començat per: `codex`

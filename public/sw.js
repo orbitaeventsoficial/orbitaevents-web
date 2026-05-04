@@ -8,7 +8,7 @@
  * - Background sync para formularios
  */
 
-const CACHE_NAME = 'orbita-v1';
+const CACHE_NAME = 'orbita-v2-2026-05-04';
 const OFFLINE_PAGE = '/offline.html';
 
 // Assets para cachear inmediatamente
@@ -113,9 +113,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // CSS/JS - Stale while revalidate
+  // CSS/JS - Network first (evita servir versions velles als deploys; cau a cache només offline)
   if (CACHE_PATTERNS.styles.test(url.pathname) || CACHE_PATTERNS.scripts.test(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(networkFirst(request));
     return;
   }
 
