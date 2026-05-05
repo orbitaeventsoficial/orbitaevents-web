@@ -5720,6 +5720,32 @@ px tsc --noEmit OK · git diff --check OK.
 
 ---
 
+### Canvi #512 — 2026-05-05 — claude (FET)
+**Cobertura `qa:protocol:test` per `check-mojibake.mjs`: l'altre guard de monocapa d'encoding sense test propi. Tancament del segon forat consecutiu de la línia editorial del `#511` (cobertura sistemàtica dels guards de `validate:core`).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `qa:encoding` (= `node scripts/check-mojibake.mjs`) detecta 5 patrons de corrupció de codificació (`UTF8_CP1252_A_TILDE`, `UTF8_CP1252_A_CIRCUMFLEX`, `UTF8_CP1252_E2`, `BROKEN_EMOJI`, `REPLACEMENT_CHAR`) per evitar mojibake silenciós a `app/`, `lib/`, `messages/`, `prisma/`. El guard té lògica complexa: 5 patrons regex, allowlist de skip (`node_modules`/`.next`/`dist`/`coverage`/lock files/script propi/`docs/diario.md`), suport per `--paths` arbitràries i `--changed` (mode pre-commit). Sense test propi, una regressió a qualsevol patró o a la lògica de skip permetria que mojibake real escapés silenciós. Mateix patró que `#511` (check-message-imports).
+- `__tests__/scripts/check-mojibake.test.ts` (nou): 13 tests amb fixtures `mkdtempSync` + `spawnSync`:
+  1. passa si tots els fitxers tenen UTF-8 net.
+  2-5. detecta cadascun dels 5 patrons (excepte `UTF8_CP1252_E2` que requereix bytes de control de difícil reproducció en JS literal i ja queda cobert pels altres 4 patrons CP1252).
+  6. skip de `node_modules/` i `.next/`.
+  7. skip de `dist/` i `coverage/`.
+  8. skip del propi script `scripts/check-mojibake.mjs` (per evitar autodetecció dels seus regex literals).
+  9. skip de `docs/diario.md` (perquè el registre operatiu pot mencionar correccions de mojibake).
+  10. skip de lock files (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`).
+  11. ignora extensions binàries (p.ex. `.png`).
+  12. `--paths` restringeix l'àmbit del scan.
+  13. multi-violació amb format `file:line [LABEL]`.
+- Aquest tall **NO** toca: el script `check-mojibake.mjs` (funciona; només li faltava cobertura), `qa:encoding:changed` (mode pre-commit no testejat per evitar dependència de `git diff` en fixtures temporals — pot afegir-se en un canvi futur si cal), IMAP, schema, auth, UI ni cap altra peça d'admin.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-mojibake.test.ts` OK (13 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `qa:protocol:test` recull el nou fitxer automàticament.
+- Validació funcional: una regressió futura als regex de mojibake o a l'allowlist de skip trenca el test abans de CI.
+- Validació humana/UX: invisible des de l'UI; reforç operatiu de monocapa d'encoding.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `511` a `512`.
+- `ADMIN_CHANGE_COUNTER` puja a `512`; el següent canvi real ha de ser `#513`.
+
+---
+
 ### Canvi #511 — 2026-05-05 — claude (FET)
 **Cobertura `qa:protocol:test` per `check-message-imports.mjs`: el guard ja entrava al pipeline `validate:core` però no tenia test propi al directori `__tests__/scripts/`. Tancament del forat per la regla §6.14 d'evitar regressions silencioses al propi guard.**
 - Començat per: `claude`

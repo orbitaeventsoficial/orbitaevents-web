@@ -1,3 +1,21 @@
+## 2026-05-05 — Canvi #512: cobertura `qa:protocol:test` per `check-mojibake` (claude)
+
+### Context
+Continuació de la línia editorial del `#511`: cobrir sistemàticament els guards de `validate:core` que encara no tenien test propi. `check-mojibake.mjs` detecta 5 patrons de corrupció CP1252→UTF-8 i té lògica de skip complexa (`node_modules/`/`.next/`/`dist/`/`coverage/`/lock files/script propi/`docs/diario.md`). Sense test propi, una regressió silent als regex permetria que mojibake real escapés.
+
+### Canvi
+- `__tests__/scripts/check-mojibake.test.ts` (nou): 13 tests amb fixtures `mkdtempSync` + `spawnSync`.
+- Cobreix: scan net, detecció de 4 dels 5 patrons (`A_TILDE`, `A_CIRCUMFLEX`, `BROKEN_EMOJI`, `REPLACEMENT_CHAR`), skip de `node_modules`/`.next`/`dist`/`coverage`, skip del propi script, skip de `docs/diario.md`, skip de lock files, ignora extensions binàries, `--paths` arg, multi-violació format.
+- `lib/constants/admin.ts`: counter `511 → 512`.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-mojibake.test.ts` OK (13 tests).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 512. Següent canvi `#513`.
+
 ## 2026-05-05 — Canvi #511: cobertura `qa:protocol:test` per `check-message-imports` (claude)
 
 ### Context
