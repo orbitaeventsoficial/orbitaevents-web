@@ -59,6 +59,17 @@ describe('check-canonical-fetches', () => {
     expect(result.stderr).toContain('google-reviews');
   });
 
+  it('fails when canonical endpoints are fetched through window.fetch or globalThis.fetch', () => {
+    const result = runGuard({
+      'app/leak-window.tsx': "await window.fetch('/api/google-reviews')",
+      'hooks/leak-global.ts': 'await globalThis.fetch("/api/public/stats?locale=ca")',
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toMatch(/2 direct fetch\(es\)/);
+    expect(result.stderr).toContain('fetchPublicGoogleReviews');
+    expect(result.stderr).toContain('fetchPublicStats');
+  });
+
   it('does not flag canonical client files (allowlist)', () => {
     const result = runGuard({
       'lib/api/googleReviewsClient.ts': "fetch('/api/google-reviews')",

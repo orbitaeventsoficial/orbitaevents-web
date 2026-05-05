@@ -872,6 +872,7 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `claude` — Canvi #498)*: producció guanya smoke test automàtic post-deploy i heartbeat. `scripts/smoke-prod.mjs` comprova health, home pública, challenge d'auth admin i endpoints admin amb auth opcional; `.github/workflows/smoke-prod.yml` l'executa a `main`, cada 15 minuts i manualment. Efecte: regressions com redirects trencats, 502 o endpoints crítics lents deixen de dependre només d'una comprovació manual.
 **FET** *(2026-05-04 per `codex` — Canvi #501)*: el CTA pendent del Manual queda cobert també a nivell de render real. `__tests__/app/admin/manual/AdminManualPage.test.tsx` renderitza el server component `/admin/manual` amb `fs` i `next/link` mockejats, comprova `Obrir §6.16 al protocol` amb `href=/admin/docs/protocol?seccio=6.16#seccio-6-16` i verifica que el CTA antic `§6.15` no aparegui. Efecte: una regressió de wiring entre constant, helper i UI ja no passa en silenci.
 **FET** *(2026-05-04 per `codex` — Canvi #502)*: el protocol incorpora la norma d'autoregulació de model/effort i consum. Per defecte, `go` normal i canvis petits han d'usar context mínim suficient i raonament proporcional; només s'eleva a `high`/màxim quan hi ha risc real (producció, schema, auth, dades, concurrència, errors opacs, arquitectura o refactors grans).
+**FET** *(2026-05-05 per `codex` — Canvi #505)*: el guard `qa:canonical-fetches` queda blindat explícitament contra crides qualificades a endpoints canònics (`window.fetch(...)` i `globalThis.fetch(...)`). `__tests__/scripts/check-canonical-fetches.test.ts` guanya un cas amb `/api/google-reviews` i `/api/public/stats` fora dels seus clients `lib/api/*`, verificant que el guard reporta dues violacions i recomana `fetchPublicGoogleReviews()` / `fetchPublicStats()`. Efecte: el `PENDENT CRÍTIC` de regressions silencioses queda una mica més tancat també davant variants habituals de fetch directe.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5658,6 +5659,39 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #505 — 2026-05-05 — codex (FET)
+**El guard de fetches canònics queda cobert explícitament contra variants `window.fetch(...)` i `globalThis.fetch(...)` sobre endpoints que han de passar per `lib/api/*`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: l'ordre `go` activa la continuïtat del protocol. El front recent de Claude era IMAP/inbox (#503), així que aquest tall entra a `§6.14 Infra / Dev / Operativa`, concretament al `PENDENT CRÍTIC` d'evitar regressions silencioses en repo gran. En revisar `qa:canonical-fetches`, el forat històric de `/api/public/stats` ja estava resolt al worktree actual: `hooks/usePublicData.ts` consumeix `fetchPublicStats()`, el guard inclou `public-stats` i els tests ja cobreixen el cas bàsic. Durant el registre, Claude ha aterrat `#504`; aquest tall queda renumerat a `#505` segons norma de no-col·lisió.
+- `__tests__/scripts/check-canonical-fetches.test.ts`: nou cas que crea dues fuites en fixture temporal, `window.fetch('/api/google-reviews')` i `globalThis.fetch('/api/public/stats?locale=ca')`.
+- El test comprova que el guard reporta `2 direct fetch(es)` i recomana els helpers canònics `fetchPublicGoogleReviews()` i `fetchPublicStats()`.
+- No cal tocar `scripts/check-canonical-fetches.mjs`: el detector actual ja capturava aquestes formes perquè el patró troba el substring `fetch(`; el canvi fa que aquest comportament quedi blindat i no sigui accidental.
+- Aquest tall **NO** toca: IMAP/inbox, schema, clients `lib/api/*`, UI pública, auth, ni cap endpoint HTTP.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (14 tests).
+- Validació funcional: una regressió futura que intenti saltar-se els clients canònics amb `window.fetch` o `globalThis.fetch` queda coberta pel test del guard.
+- Validació humana/UX: no hi ha canvi visible; el valor és operatiu, mantenir una sola font de veritat per URL, shape i error path dels endpoints públics.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `504` a `505`.
+- `ADMIN_CHANGE_COUNTER` puja a `505`; el següent canvi real ha de ser `#506`.
+
+### Canvi #504 — 2026-05-05 — claude (FET)
+**Cobertura unitària de `emailMatchesToFilter`: el `#503` només testejava el parsing de `INBOX_TO_FILTER`; la lògica real de match contra `to[]` quedava sense cap test directe. Tancament del forat per la regla §6.14 d'evitar regressions silencioses.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el `#503` va introduir dues peces a `lib/imap.ts` — `getInboxToFilter()` (parsing CSV de la env) i `emailMatchesToFilter(email, allowed)` (decideix si una `EmailMessage` passa el filtre per `to[].address`). El test que va acompanyar el tall (`__tests__/lib/imap-inbox-filter.test.ts`, 5 casos) blindava només el parsing. La funció `emailMatchesToFilter` era privada al mòdul i sense cobertura: si algú canvia el `for` per un `find` mal escrit, perd el `trim()` o trenca el case-insensitive, els tests existents no ho detectarien. Forat directe del `PENDENT CRÍTIC §6.14`.
+- `lib/imap.ts`: `emailMatchesToFilter` passa de funció privada a `export`. Cap canvi de comportament — la signatura i la lògica són idèntiques.
+- `__tests__/lib/imap-inbox-filter.test.ts`: nou bloc `describe('emailMatchesToFilter()')` amb 9 tests pure: llista buida (no filtre), match exacte, no-match, case-insensitive sobre `to[].address`, una de diverses `to[]` coincideix, `to[]` buit, ignora addresses buides/només-espai, multi-allowed, trim de `to[].address`. Helper `makeEmail()` local per construir `EmailMessage` mínim.
+- Aquest tall **NO** toca: `getInboxToFilter` (ja cobert), `fetchEmails` (només consumidor del helper, sense canvi de contracte), `fetchEmailByUid`, IMAP client, env vars, schema, auth, UI ni cap altra peça d'admin.
+- Validació tècnica: `npx vitest run __tests__/lib/imap-inbox-filter.test.ts` OK (14 tests = 5 originals + 9 nous) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: el filtre real (`to[]` match) queda blindat contra regressions silencioses del comportament canònic.
+- Validació humana/UX: el propietari pot confiar que un canvi futur a `emailMatchesToFilter` no podrà silenciosament excloure mails legítims o deixar passar mails forwardejats antics.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `503` a `504`.
+- `ADMIN_CHANGE_COUNTER` puja a `504`; el següent canvi real ha de ser `#505`.
+
+---
 
 ### Canvi #503 — 2026-05-04 — claude (FET)
 **Filtre opcional `INBOX_TO_FILTER` per amagar mails que vénen d'adreces velles forwardejades a la mateixa bústia. Resol el cas reportat per l'usuari: "rebo ctreball20 i info, només vull info@orbitaevents.com".**

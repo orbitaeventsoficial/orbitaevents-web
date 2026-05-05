@@ -148,7 +148,7 @@ export function getInboxToFilter(): string[] {
   return raw.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 }
 
-function emailMatchesToFilter(email: EmailMessage, allowed: string[]): boolean {
+export function emailMatchesToFilter(email: EmailMessage, allowed: string[]): boolean {
   if (allowed.length === 0) return true;
   for (const t of email.to) {
     const addr = (t.address || '').trim().toLowerCase();

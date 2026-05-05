@@ -1,3 +1,43 @@
+## 2026-05-05 — Canvi #505: cobertura window/globalThis fetch al guard canònic (codex)
+
+### Context
+`go` executat segons protocol. Worktree net a l'inici, `ADMIN_CHANGE_COUNTER=503`, següent canvi previst `#504`. Front triat: `§6.14 Infra / Dev / Operativa`, diferent d'IMAP/inbox del `#503`. Durant el registre, Claude ha aterrat `#504` sobre IMAP; aquest tall queda renumerat a `#505` segons la norma de no-col·lisió. El forat històric de `/api/public/stats` ja estava resolt; el tall reforça el guard perquè quedi explícitament cobert que `window.fetch(...)` i `globalThis.fetch(...)` tampoc poden saltar-se els clients canònics `lib/api/*`.
+
+### Canvi
+- `__tests__/scripts/check-canonical-fetches.test.ts`: nou cas amb `window.fetch('/api/google-reviews')` i `globalThis.fetch('/api/public/stats?locale=ca')`.
+- El test exigeix `2 direct fetch(es)` i els helpers recomanats `fetchPublicGoogleReviews()` / `fetchPublicStats()`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `504 → 505` després del `#504` paral·lel.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-canonical-fetches.test.ts` OK (14 tests).
+- Validació funcional: el guard queda blindat contra dues formes habituals de fetch directe.
+- Validació humana/UX: sense canvi visible; reforç operatiu de monocapa.
+
+### Tancament
+ADMIN_CHANGE_COUNTER = 505. Següent #506.
+
+## 2026-05-05 — Canvi #504: cobertura unitària `emailMatchesToFilter` (claude)
+
+### Context
+El `#503` va afegir `INBOX_TO_FILTER` amb dues peces a `lib/imap.ts`: parsing (`getInboxToFilter`) i match real (`emailMatchesToFilter`). El test que acompanyava cobria només el parsing — la funció de match estava privada al mòdul i sense cap test directe. Forat directe del `PENDENT CRÍTIC §6.14` (evitar regressions silencioses).
+
+### Canvi
+- `lib/imap.ts`: `emailMatchesToFilter` passa de funció privada a `export`. Cap canvi de lògica.
+- `__tests__/lib/imap-inbox-filter.test.ts`: 9 tests nous per `emailMatchesToFilter` (llista buida, match exacte, no-match, case-insensitive sobre `to[].address`, multi-`to[]`, `to[]` buit, addresses buides/només-espai, multi-allowed, trim de l'address).
+- Helper local `makeEmail()` al test per construir `EmailMessage` mínim.
+
+### Col·lisió de comptador
+Codex va prendre el `#504` paral·lelament (guard canonical-fetches). Quan jo havia escrit ja `#504` al §9, codex va renumerar el seu tall a `#505` segons norma §2.1. El meu canvi conserva `#504`.
+
+### Validació
+- `npx vitest run __tests__/lib/imap-inbox-filter.test.ts` OK (14 tests = 5 originals + 9 nous).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+### Tancament
+- Comptador final = 505 (després del `#505` de codex). Següent canvi `#506`.
+
 ## 2026-05-04 — Canvi #503: filtre INBOX_TO_FILTER (claude)
 
 ### Context

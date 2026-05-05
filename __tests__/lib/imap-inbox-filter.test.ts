@@ -1,5 +1,22 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { getInboxToFilter } from '@/lib/imap';
+import { emailMatchesToFilter, getInboxToFilter, type EmailMessage } from '@/lib/imap';
+
+function makeEmail(to: { name?: string; address: string }[]): EmailMessage {
+  return {
+    id: 'imap-1',
+    uid: 1,
+    messageId: '<test@local>',
+    from: { name: '', address: 'sender@example.com' },
+    to: to.map((t) => ({ name: t.name ?? '', address: t.address })),
+    subject: '(Sense assumpte)',
+    date: new Date('2026-05-04T00:00:00Z'),
+    bodyText: '',
+    bodyHtml: '',
+    isRead: false,
+    hasAttachments: false,
+    attachments: [],
+  };
+}
 
 /**
  * Filtre `INBOX_TO_FILTER` per la safata d'entrada.
@@ -51,5 +68,57 @@ describe('lib/imap.ts — getInboxToFilter()', () => {
       'info@orbitaevents.com',
       'reservas@orbitaevents.com',
     ]);
+  });
+});
+
+describe('lib/imap.ts — emailMatchesToFilter()', () => {
+  it('accepta qualsevol email quan la llista de permesos és buida (sense filtre)', () => {
+    const email = makeEmail([{ address: 'qualsevol@example.com' }]);
+    expect(emailMatchesToFilter(email, [])).toBe(true);
+  });
+
+  it('accepta email quan una `to[]` coincideix exactament amb la llista', () => {
+    const email = makeEmail([{ address: 'info@orbitaevents.com' }]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(true);
+  });
+
+  it('rebutja email quan cap `to[]` coincideix', () => {
+    const email = makeEmail([{ address: 'ctreball20@gmail.com' }]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(false);
+  });
+
+  it('és case-insensitive sobre el camp `to[].address`', () => {
+    const email = makeEmail([{ address: 'INFO@OrbitaEvents.COM' }]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(true);
+  });
+
+  it('accepta email quan una de diverses `to[]` coincideix amb la llista', () => {
+    const email = makeEmail([
+      { address: 'cc@example.com' },
+      { address: 'info@orbitaevents.com' },
+    ]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(true);
+  });
+
+  it('rebutja email amb `to[]` buit', () => {
+    const email = makeEmail([]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(false);
+  });
+
+  it('ignora entrades amb `address` buida o només espais', () => {
+    const email = makeEmail([{ address: '   ' }, { address: '' }]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(false);
+  });
+
+  it('accepta email quan coincideix amb qualsevol de les adreces permeses', () => {
+    const email = makeEmail([{ address: 'reservas@orbitaevents.com' }]);
+    expect(
+      emailMatchesToFilter(email, ['info@orbitaevents.com', 'reservas@orbitaevents.com']),
+    ).toBe(true);
+  });
+
+  it('respecta espais residuals al camp `to[].address` retallant-los', () => {
+    const email = makeEmail([{ address: '  info@orbitaevents.com  ' }]);
+    expect(emailMatchesToFilter(email, ['info@orbitaevents.com'])).toBe(true);
   });
 });
