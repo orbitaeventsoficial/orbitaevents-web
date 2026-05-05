@@ -512,4 +512,35 @@ describe('recalculateAllCustomers', () => {
     const result = await recalculateAllCustomers();
     expect(result).toEqual({ processed: 0, lifecycleChanges: 0, healthUpdates: 0 });
   });
+
+  it('pagina amb cursor quan el batch arriba al límit', async () => {
+    const makeCustomer = (id: string) => ({
+      id,
+      totalEvents: 0,
+      totalSpent: 0,
+      lastEventDate: null,
+      createdAt: new Date('2024-01-01'),
+      lifecycleStage: 'NEW',
+      healthScore: 0,
+      _count: { testimonials: 0, referrals: 0 },
+      leads: [],
+      bookings: [],
+    });
+
+    const firstBatch = Array.from({ length: 100 }, (_, index) => makeCustomer(`c${index + 1}`));
+    mockPrisma.customer.findMany
+      .mockResolvedValueOnce(firstBatch)
+      .mockResolvedValueOnce([makeCustomer('c101')]);
+
+    const result = await recalculateAllCustomers(new Date('2026-05-05T10:00:00Z'));
+
+    expect(result.processed).toBe(101);
+    expect(mockPrisma.customer.findMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        skip: 1,
+        cursor: { id: 'c100' },
+      }),
+    );
+  });
 });

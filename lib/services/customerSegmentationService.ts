@@ -146,9 +146,9 @@ export async function recalculateAllCustomers(now: Date = new Date()): Promise<U
   let processed = 0;
   let lifecycleChanges = 0;
   let healthUpdates = 0;
+  let hasMoreCustomers = true;
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (hasMoreCustomers) {
     const customers = await prisma.customer.findMany({
       take: batchSize,
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
@@ -230,7 +230,7 @@ export async function recalculateAllCustomers(now: Date = new Date()): Promise<U
     }
 
     cursor = customers[customers.length - 1].id;
-    if (customers.length < batchSize) break;
+    hasMoreCustomers = customers.length === batchSize;
   }
 
   return { processed, lifecycleChanges, healthUpdates };

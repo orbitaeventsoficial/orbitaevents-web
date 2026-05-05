@@ -877,6 +877,7 @@ Criteri pràctic:
 **FET** *(2026-05-05 per `codex` — Canvi #508)*: el guard `qa:patches` ja detecta marcadors `TODO`/`FIXME`/`HACK`/`XXX` també dins comentaris de bloc i JSDoc, no només com a `// TODO`. `scripts/check-patches.mjs` amplia `detectTodoMarkers()` i `__tests__/scripts/check-patches.test.ts` blinda fitxers nets, línia, bloc i exclusions de tests. Efecte: els deutes explícits no poden esquivar el guard canviant el format del comentari.
 **FET** *(2026-05-05 per `codex` — Canvi #509)*: `hooks/useScrollTracking.ts` deixa d'usar `(window as any).dataLayer` i passa a consumir el global tipat `window.dataLayer` ja declarat a `types/window.d.ts`. `__tests__/hooks/useScrollTracking.test.ts` blinda que el hook mantingui `Array.isArray(window.dataLayer)` + `window.dataLayer.push` i que no torni el cast `window as any`. Efecte: menys escapes de tipus en analítica pública i regressió coberta.
 **FET** *(2026-05-05 per `codex` — Canvi #510)*: `lib/hooks/useAnalytics.ts` també deixa de crear un alias manual `window as unknown as { dataLayer... }` i passa a usar `window.dataLayer` directament. `__tests__/lib/hooks/useAnalytics.test.ts` blinda que el hook mantingui el global tipat i que no torni `window as unknown`/`win.dataLayer`. Efecte: la capa d'analítica pública queda alineada amb el contracte global declarat, sense casts locals innecessaris.
+**FET** *(2026-05-05 per `codex` — Canvi #515)*: `recalculateAllCustomers()` deixa d'usar `while (true)` amb suppressió ESLint i passa a una condició explícita `hasMoreCustomers` basada en la mida del batch. `__tests__/lib/services/customerSegmentationService.test.ts` blinda la paginació amb un batch complet de 100 clients i cursor `c100`. Efecte: mateixa paginació, menys suppressions locals i més cobertura del cursor.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5717,6 +5718,52 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació humana/UX: sense canvi visible; reforç de mantenibilitat i de contracte TypeScript.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `508` a `509`.
 - `ADMIN_CHANGE_COUNTER` puja a `509`; el següent canvi real ha de ser `#510`.
+
+---
+
+### Canvi #514 — 2026-05-05 — claude (FET)
+**Cobertura `qa:protocol:test` per `check-layer-catalogs.mjs` + 2 millores menors al guard: (a) `repoRoot = process.cwd()` consistent amb la resta dels guards i (b) `fs.existsSync()` defensiu abans del `walk()` per no crashar quan falta un target dir. Quart forat consecutiu de la línia editorial #511/#512/#513.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `arch:layer:check` (= `node scripts/check-layer-catalogs.mjs`) detecta catàlegs declaratius locals (`const NAME_UPPER = [`/`{`/`new Set(`/`Object.freeze(`) fora de `lib/constants/*` i de l'allowlist amb 28 entrades documentades. La filosofia (escrita als Canvis #124, #125, #128, #353, #354): un catàleg compartit ha de viure a `lib/constants/`, no incrustat en components/serveis. Sense test propi, una regressió al regex (`suspiciousConst`) o a `shouldIgnore()` o a l'allowlist passaria silenciosa.
+- Dues observacions menors descobertes mentre escrivia el test:
+  1. El script tenia `const repoRoot = path.resolve(import.meta.dirname, '..')` — únic guard del directori `scripts/` que NO usa `process.cwd()`. Inconsistent amb `check-canonical-fetches`, `check-canonical-svgs`, `check-mojibake`, `check-message-imports`, `check-visual-overflow`. Substituït per `process.cwd()` per consistència i testabilitat (els tests usen fixtures amb `cwd` controlat).
+  2. El script feia `walk(path.join(repoRoot, target))` directe; `walk()` crida `fs.readdirSync()` que llança `ENOENT` si el dir no existeix. Afegit `if (fs.existsSync(resolved)) walk(resolved)` igual que `check-message-imports` i `check-mojibake`. Cap canvi de comportament a producció (al repo real `app/` i `lib/` sempre existeixen), però el guard ja no crashea en tests amb fixtures parcials ni en checkouts incomplets.
+- `__tests__/scripts/check-layer-catalogs.test.ts` (nou): 10 tests amb fixtures `mkdtempSync` + `spawnSync`:
+  1. passa amb OK quan no hi ha catàlegs sospitosos.
+  2. detecta `export const NAME = [` (array catalog).
+  3. detecta `const NAME = {` (object catalog).
+  4. detecta `const NAME = new Set(...)`.
+  5. detecta `const NAME = Object.freeze(...)`.
+  6. NO marca lowercase ni PascalCase (només UPPER_SNAKE_CASE).
+  7. ignora `app/config`, `app/api`, `app/admin/components`, `lib/constants` (paths exempts).
+  8. ignora extensions no candidates (`.json`, `.md`).
+  9. multi-violació amb missatge de redirecció (`Move declarative catalogs to lib/constants`).
+  10. només escaneja `app/` i `lib/` (no `docs/`, `scripts/`, etc.).
+- Aquest tall **NO** toca: la lògica de detecció (`suspiciousConst`, `shouldIgnore`, `allowedCatalogs`), les 28 entrades de l'allowlist, IMAP, schema, auth, UI ni cap altra peça d'admin.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-layer-catalogs.test.ts` OK (10 tests) · `pnpm run arch:layer:check` OK contra el repo real (cap regressió funcional) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `qa:protocol:test` recull el nou fitxer automàticament.
+- Validació funcional: una regressió al regex o a la lògica de skip trenca el test específic.
+- Validació humana/UX: invisible des de l'UI; reforç operatiu de la monocapa de constants.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `513` a `514`.
+- `ADMIN_CHANGE_COUNTER` puja a `514`; el següent canvi real ha de ser `#515`.
+
+---
+
+### Canvi #515 — 2026-05-05 — codex (FET)
+**`recalculateAllCustomers()` elimina el `while (true)` amb suppressió ESLint i manté la paginació per cursor amb una condició explícita i testada.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go` amb worktree brut per canvis paral·lels de Claude. El `#514` queda ocupat per la cobertura de `check-layer-catalogs`, així que aquest tall es registra com a `#515` segons la norma de no-col·lisió. Front triat: `§6.14 Infra / Dev / Operativa`, però fora de la línia de guards de scripts que Claude estava drenat. `lib/services/customerSegmentationService.ts` tenia un bucle de paginació funcional però escrit com `while (true)` amb `eslint-disable-next-line no-constant-condition`.
+- `lib/services/customerSegmentationService.ts`: afegit `hasMoreCustomers` i canviat el bucle a `while (hasMoreCustomers)`. La condició queda determinada per `customers.length === batchSize`; batch buit continua sortint immediatament.
+- `__tests__/lib/services/customerSegmentationService.test.ts`: nou cas `pagina amb cursor quan el batch arriba al límit`, amb 100 clients al primer batch i un client al segon. El test comprova `processed = 101` i que la segona consulta usa `skip: 1` + `cursor: { id: 'c100' }`.
+- Aquest tall **NO** toca: guards de scripts, `check-layer-catalogs`, IMAP/inbox, SVGs canònics, fetches canònics, schema, auth, endpoints ni UI.
+- Validació tècnica: `npx vitest run __tests__/lib/services/customerSegmentationService.test.ts` OK (37 tests) · `npx tsc --noEmit` OK.
+- Validació funcional: la recalculació segueix processant tots els clients per lots i conserva la paginació per cursor quan un batch arriba al límit.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat i cobertura de cron intern.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `514` a `515`.
+- `ADMIN_CHANGE_COUNTER` puja a `515`; el següent canvi real ha de ser `#516`.
 
 ---
 

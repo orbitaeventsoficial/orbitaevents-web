@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const repoRoot = path.resolve(import.meta.dirname, '..');
+const repoRoot = process.cwd();
 const targets = ['app', 'lib'];
 const ignoredDirs = new Set([
   'app/config',
@@ -75,7 +75,8 @@ function walk(dirPath) {
 }
 
 for (const target of targets) {
-  walk(path.join(repoRoot, target));
+  const resolved = path.join(repoRoot, target);
+  if (fs.existsSync(resolved)) walk(resolved);
 }
 
 if (findings.length === 0) {

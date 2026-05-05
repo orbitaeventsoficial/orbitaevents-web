@@ -1,3 +1,42 @@
+## 2026-05-05 — Canvi #515: paginació explícita a `recalculateAllCustomers` (codex)
+
+### Context
+Continuació de `go` segons protocol. Durant la validació, Claude ha ocupat `#514` amb cobertura de `check-layer-catalogs`; aquest tall queda renumerat a `#515` segons la norma de no-col·lisió. Front triat: `§6.14 Infra / Dev / Operativa`, però fora de la línia de guards de scripts que Claude està drenat. `recalculateAllCustomers()` funcionava, però el bucle de paginació usava `while (true)` amb suppressió `eslint-disable-next-line no-constant-condition`.
+
+### Canvi
+- `lib/services/customerSegmentationService.ts`: el bucle infinit passa a `while (hasMoreCustomers)` amb condició explícita basada en si el batch arriba al límit.
+- `__tests__/lib/services/customerSegmentationService.test.ts`: nou cas que força un batch complet de 100 clients i comprova que la segona lectura usa `skip: 1` + `cursor: { id: 'c100' }`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `514 → 515`.
+
+### Validació
+- `npx vitest run __tests__/lib/services/customerSegmentationService.test.ts` OK (37 tests).
+- `npx tsc --noEmit` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 515. Següent canvi `#516`.
+
+## 2026-05-05 — Canvi #514: cobertura `qa:protocol:test` per `check-layer-catalogs` + millores menors (claude)
+
+### Context
+Quart forat consecutiu (línia editorial #511/#512/#513). El guard `arch:layer:check` detecta catàlegs declaratius locals fora de `lib/constants/*`. Mentre escrivia el test van aparèixer dues inconsistències menors al guard que calia resoldre per testabilitat i robustesa.
+
+### Canvi
+- `scripts/check-layer-catalogs.mjs`: 2 millores menors (cap canvi funcional a producció):
+  - `path.resolve(import.meta.dirname, '..')` → `process.cwd()`. Consistent amb la resta dels guards.
+  - `walk(...)` directe → guard `fs.existsSync()` defensiu, igual que `check-message-imports` i `check-mojibake`.
+- `__tests__/scripts/check-layer-catalogs.test.ts` (nou): 10 tests amb fixtures `mkdtempSync` + `spawnSync`. Cobreix array/object/Set/Object.freeze, lowercase/PascalCase no marcats, paths exempts (app/config, app/api, app/admin/components, lib/constants), extensions no candidates, multi-violació, scope app/+lib/.
+- `lib/constants/admin.ts`: counter `513 → 514`.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-layer-catalogs.test.ts` OK (10 tests).
+- `pnpm run arch:layer:check` OK (cap regressió contra el repo real).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 514. Següent canvi `#515`.
+
 ## 2026-05-05 — Canvi #513: cobertura `qa:protocol:test` per `check-visual-overflow` (claude)
 
 ### Context
