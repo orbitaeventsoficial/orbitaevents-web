@@ -873,6 +873,8 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #501)*: el CTA pendent del Manual queda cobert també a nivell de render real. `__tests__/app/admin/manual/AdminManualPage.test.tsx` renderitza el server component `/admin/manual` amb `fs` i `next/link` mockejats, comprova `Obrir §6.16 al protocol` amb `href=/admin/docs/protocol?seccio=6.16#seccio-6-16` i verifica que el CTA antic `§6.15` no aparegui. Efecte: una regressió de wiring entre constant, helper i UI ja no passa en silenci.
 **FET** *(2026-05-04 per `codex` — Canvi #502)*: el protocol incorpora la norma d'autoregulació de model/effort i consum. Per defecte, `go` normal i canvis petits han d'usar context mínim suficient i raonament proporcional; només s'eleva a `high`/màxim quan hi ha risc real (producció, schema, auth, dades, concurrència, errors opacs, arquitectura o refactors grans).
 **FET** *(2026-05-05 per `codex` — Canvi #505)*: el guard `qa:canonical-fetches` queda blindat explícitament contra crides qualificades a endpoints canònics (`window.fetch(...)` i `globalThis.fetch(...)`). `__tests__/scripts/check-canonical-fetches.test.ts` guanya un cas amb `/api/google-reviews` i `/api/public/stats` fora dels seus clients `lib/api/*`, verificant que el guard reporta dues violacions i recomana `fetchPublicGoogleReviews()` / `fetchPublicStats()`. Efecte: el `PENDENT CRÍTIC` de regressions silencioses queda una mica més tancat també davant variants habituals de fetch directe.
+**FET** *(2026-05-05 per `codex` — Canvi #506)*: el guard `qa:canonical-svgs` ja cobreix també còpies parcials del Google G, no només el cas complet amb quatre colors. `components/reviews/ReviewsSection.tsx` deixa de tenir tres SVG inline amb el path de Google i passa a `GoogleGIcon`; `scripts/check-canonical-svgs.mjs` detecta el path blau canònic, i el test del guard blinda el cas. Efecte: una còpia parcial del logo ja no pot tornar a escapar perquè no porti tots els colors.
+**FET** *(2026-05-05 per `codex` — Canvi #508)*: el guard `qa:patches` ja detecta marcadors `TODO`/`FIXME`/`HACK`/`XXX` també dins comentaris de bloc i JSDoc, no només com a `// TODO`. `scripts/check-patches.mjs` amplia `detectTodoMarkers()` i `__tests__/scripts/check-patches.test.ts` blinda fitxers nets, línia, bloc i exclusions de tests. Efecte: els deutes explícits no poden esquivar el guard canviant el format del comentari.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5659,6 +5661,61 @@ px tsc --noEmit OK · git diff --check OK.
 - Començat per: `claude`
 - Treballant per: `claude`
 - Tancat per: `claude`
+
+### Canvi #507 — 2026-05-05 — claude (FET)
+**Les mutacions IMAP (`markAsRead`, `markAsUnread`, `deleteEmail`, `moveToFolder`) no invalidaven `FETCH_EMAIL_CACHE` del `#499` — un mail marcat llegit es tornava a servir des del cache amb `isRead: false`. Tancament del deute documentat al tancament del `#499`.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el `#499` va introduir `FETCH_EMAIL_CACHE` (Map LRU, max 200) per accelerar `fetchEmailByUid`. Va exportar dos helpers (`clearFetchEmailCache`, `invalidateFetchEmailCache`) i va deixar escrita la honestedat: *"Si un mail es marca llegit o es mou, la cache no s'invalida automàticament — caldria cridar `invalidateFetchEmailCache()` als handlers que mutin l'estat IMAP."* Forat real: usuari obre mail → cached. Marca llegit → IMAP canvia. Reobre → cache torna l'entrada vella amb `isRead: false`. Mateix risc per `deleteEmail` (cache serveix mail esborrat) i `moveToFolder` (cache té UID a la carpeta origen però el mail real ja no hi és).
+- `lib/imap.ts` · 4 mutacions: afegida crida `invalidateFetchEmailCache(uid, folder)` immediatament després de la mutació IMAP exitosa.
+  - `markAsRead`: després de `messageFlagsAdd([uid], ['\\Seen'], ...)`.
+  - `markAsUnread`: després de `messageFlagsRemove([uid], ['\\Seen'], ...)`.
+  - `deleteEmail`: tant al `messageDelete` directe com al fallback `messageMove` cap a paperera.
+  - `moveToFolder`: després de `messageMove([uid], targetFolder, ...)` invalida el cache de `sourceFolder` (no del destí — el cache no tenia entrada al destí).
+- `restoreFromTrash` no necessita canvi: delega a `moveToFolder`, que ja invalida.
+- `__tests__/lib/imap-cache-invalidation.test.ts` (nou): guard estructural que llegeix `lib/imap.ts` i verifica per cada funció que conté la crida canònica `invalidateFetchEmailCache(uid, folder)` (o `sourceFolder` per `moveToFolder`). Mateix patró que `imap-fetch-bodyparts.test.ts` (#496): sense mocks IMAP, sense fragilitat. 5 tests: markAsRead, markAsUnread, deleteEmail (≥2 crides per cobrir delete + fallback move-to-trash), moveToFolder (per `sourceFolder`), i export-en-vida d'`invalidateFetchEmailCache`.
+- Aquest tall **NO** toca: `fetchEmails` (lectura, no mutació), `fetchEmailByUid` (consumidor del cache), `markAsRead`/etc d'altres canvis no relacionats, IMAP client, env vars, schema, auth ni UI.
+- Validació tècnica: `npx vitest run __tests__/lib/imap-cache-invalidation.test.ts` OK (5 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: l'usuari pot marcar un mail llegit o esborrar-lo i l'següent open NO retornarà l'estat stale del cache.
+- Validació humana/UX: comportament invisible des de l'UI (és exactament el que l'usuari ja esperava intuïtivament) — el bug només era detectable en escenaris on `fetchEmailByUid` es cridava just després d'una mutació.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `506` a `507`.
+- `ADMIN_CHANGE_COUNTER` puja a `507`; el següent canvi real ha de ser `#508`.
+
+---
+
+### Canvi #508 — 2026-05-05 — codex (FET)
+**El guard anti-parxes detecta també marcadors de deute dins comentaris de bloc/JSDoc (`/* TODO`, `/** TODO`, `* TODO`), no només variants `// TODO`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go` amb worktree brut per canvis paral·lels. El `#507` queda ocupat per Claude amb IMAP; aquest tall es registra com a `#508` segons la norma de no-col·lisió. Front triat: `§6.14 Infra / Dev / Operativa`, `PENDENT CRÍTIC` d'evitar regressions silencioses en repo gran. `scripts/check-patches.mjs` ja fallava davant `// TODO`, `// FIXME`, `// HACK` i `// XXX`, però una línia de bloc o JSDoc amb el mateix deute podia passar perquè el patró exigia `//`.
+- `scripts/check-patches.mjs`: `detectTodoMarkers()` amplia el patró a `//`, `/*`, `/**` i línies prefixades amb `*`.
+- `__tests__/scripts/check-patches.test.ts` (nou): prova el cas net, el marcador de línia, el marcador de bloc i que els fitxers `.test.` / `__tests__` continuen exclosos com abans.
+- Aquest tall **NO** toca: IMAP/inbox, SVGs canònics, fetches canònics, schema, auth, endpoints ni UI.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-patches.test.ts` OK (4 tests) · `pnpm run qa:patches` OK.
+- Validació funcional: un deute explícit ja no pot saltar-se el guard només canviant `// TODO` per un comentari de bloc o JSDoc.
+- Validació humana/UX: sense canvi visible; reforç operatiu del pipeline.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `507` a `508`.
+- `ADMIN_CHANGE_COUNTER` puja a `508`; el següent canvi real ha de ser `#509`.
+
+---
+
+### Canvi #506 — 2026-05-05 — codex (FET)
+**El Google G deixa de tenir còpies parcials inline a `ReviewsSection` i el guard `qa:canonical-svgs` aprèn a detectar també el path blau parcial, no només el logo complet de quatre colors.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go` amb worktree brut per `#504/#505`, sense tocar IMAP ni el guard de fetches. El front és `§6.14 Infra / Dev / Operativa`: evitar regressions silencioses en repo gran. El guard de SVGs canònics només detectava Google G quan un fitxer contenia els quatre colors (`#4285F4`, `#34A853`, `#FBBC05`, `#EA4335`). Això deixava passar còpies parcials del path blau del logo, i `components/reviews/ReviewsSection.tsx` encara en tenia tres còpies inline.
+- `components/reviews/ReviewsSection.tsx`: els tres SVG inline de Google passen a `GoogleGIcon`, que ja era importat pel component. Cap canvi de contracte de dades ni de fetch.
+- `scripts/check-canonical-svgs.mjs`: el detector `google-g-icon` conserva la detecció de quatre colors i afegeix detecció del path blau canònic `M22.56 12.25...`.
+- `__tests__/scripts/check-canonical-svgs.test.ts`: nou cas que crea una còpia parcial del Google G fora del component canònic i exigeix error amb recomanació de `GoogleGIcon`.
+- Aquest tall **NO** toca: IMAP/inbox, fetches canònics, schema, auth, endpoints, ni la lògica de ressenyes.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-canonical-svgs.test.ts` OK (9 tests) · `pnpm run qa:canonical-svgs` OK.
+- Validació funcional: el guard ja no deixa passar còpies parcials del Google G com les que quedaven a `ReviewsSection`.
+- Validació humana/UX: el senyal visual de Google es manté, però ara surt del component shared i no de fragments SVG locals.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `505` a `506`.
+- `ADMIN_CHANGE_COUNTER` puja a `506`; el següent canvi real ha de ser `#507`.
 
 ### Canvi #505 — 2026-05-05 — codex (FET)
 **El guard de fetches canònics queda cobert explícitament contra variants `window.fetch(...)` i `globalThis.fetch(...)` sobre endpoints que han de passar per `lib/api/*`.**

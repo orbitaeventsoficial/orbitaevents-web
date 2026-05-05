@@ -382,6 +382,7 @@ export async function markAsRead(uid: number, folder: string = 'INBOX'): Promise
 
     try {
       await client.messageFlagsAdd([uid], ['\\Seen'], { uid: true });
+      invalidateFetchEmailCache(uid, folder);
       return true;
     } finally {
       mailbox.release();
@@ -407,6 +408,7 @@ export async function markAsUnread(uid: number, folder: string = 'INBOX'): Promi
 
     try {
       await client.messageFlagsRemove([uid], ['\\Seen'], { uid: true });
+      invalidateFetchEmailCache(uid, folder);
       return true;
     } finally {
       mailbox.release();
@@ -433,6 +435,7 @@ export async function deleteEmail(uid: number, folder: string = 'INBOX'): Promis
     try {
       try {
         await client.messageDelete([uid], { uid: true });
+        invalidateFetchEmailCache(uid, folder);
         return true;
       } catch {
         // Fallback for servers that block direct delete: move to trash.
@@ -446,6 +449,7 @@ export async function deleteEmail(uid: number, folder: string = 'INBOX'): Promis
           return false;
         }
         await client.messageMove([uid], trash.path, { uid: true });
+        invalidateFetchEmailCache(uid, folder);
         return true;
       }
     } finally {
@@ -491,6 +495,7 @@ export async function moveToFolder(uid: number, targetFolder: string, sourceFold
 
     try {
       await client.messageMove([uid], targetFolder, { uid: true });
+      invalidateFetchEmailCache(uid, sourceFolder);
       return true;
     } finally {
       mailbox.release();

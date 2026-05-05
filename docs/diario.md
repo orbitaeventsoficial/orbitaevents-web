@@ -1,3 +1,63 @@
+## 2026-05-05 — Canvi #508: TODO de bloc al guard anti-parxes (codex)
+
+### Context
+Continuació de `go` segons protocol. Durant el tancament, el `#507` ha quedat ocupat per Claude amb la invalidació de cache IMAP; aquest tall es renumera a `#508` segons la norma de no-col·lisió. Front triat: `§6.14 Infra / Dev / Operativa`, `PENDENT CRÍTIC` d'evitar regressions silencioses. El guard `qa:patches` detectava `// TODO`, `// FIXME`, `// HACK` i `// XXX`, però no els mateixos marcadors quan entraven en comentaris de bloc o JSDoc (`/* TODO`, `/** TODO`, `* TODO`).
+
+### Canvi
+- `scripts/check-patches.mjs`: `detectTodoMarkers()` reconeix ara marcadors en comentaris de línia, bloc i línies JSDoc.
+- `__tests__/scripts/check-patches.test.ts`: nou test suite estructural per validar fitxers nets, `// TODO`, `/* TODO`, i l'exclusió de `.test.` / `__tests__`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `507 → 508`.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-patches.test.ts` OK (4 tests).
+- `pnpm run qa:patches` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 508. Següent canvi `#509`.
+
+## 2026-05-05 — Canvi #507: invalidació `FETCH_EMAIL_CACHE` a mutacions IMAP (claude)
+
+### Context
+El `#499` va deixar escrit que les mutacions IMAP (`markAsRead`, `markAsUnread`, `deleteEmail`, `moveToFolder`) no invalidaven el cache LRU. Forat real: marcar un mail llegit a l'UI deixava el cache amb `isRead: false`; al següent open, la lectura cached tornava l'estat antic.
+
+### Canvi
+- `lib/imap.ts`: 4 mutacions afegeixen `invalidateFetchEmailCache(uid, folder)` immediatament després de la crida IMAP exitosa.
+- `deleteEmail`: invalida tant al `messageDelete` directe com al fallback `messageMove` a paperera (≥2 crides).
+- `moveToFolder`: invalida el cache de `sourceFolder` (no destí).
+- `restoreFromTrash`: cap canvi (delega a `moveToFolder`).
+- `__tests__/lib/imap-cache-invalidation.test.ts`: 5 tests estructurals (mateix patró que `imap-fetch-bodyparts.test.ts`).
+- `lib/constants/admin.ts`: counter `506 → 507`.
+
+### Validació
+- `npx vitest run __tests__/lib/imap-cache-invalidation.test.ts` OK (5 tests).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 507. Següent canvi `#508`.
+
+## 2026-05-05 — Canvi #506: Google G parcial fora de monocapa (codex)
+
+### Context
+Continuació de `go` segons protocol. Worktree brut amb `#504/#505` ja oberts, però el nou tall evita IMAP i fetches canònics. Front triat: `§6.14 Infra / Dev / Operativa`, `PENDENT CRÍTIC` d'evitar regressions silencioses. El guard `qa:canonical-svgs` només detectava Google G quan apareixien els quatre colors al mateix fitxer; això deixava passar còpies parcials del path blau. `components/reviews/ReviewsSection.tsx` encara tenia tres SVG inline amb el path del Google G.
+
+### Canvi
+- `components/reviews/ReviewsSection.tsx`: els tres SVG inline de Google passen a `GoogleGIcon`.
+- `scripts/check-canonical-svgs.mjs`: el detector `google-g-icon` també reconeix el path blau canònic del Google G, encara que no hi siguin els quatre colors.
+- `__tests__/scripts/check-canonical-svgs.test.ts`: nou cas que falla amb un Google G parcial inline fora del component canònic.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `505 → 506`.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-canonical-svgs.test.ts` OK (9 tests).
+- `pnpm run qa:canonical-svgs` OK.
+- Validació funcional: el guard ja no deixa passar còpies parcials del Google G com les que quedaven a `ReviewsSection`.
+- Validació humana/UX: el component conserva el mateix senyal visual de Google, ara des de la peça shared.
+
+### Tancament
+ADMIN_CHANGE_COUNTER = 506. Següent #507.
+
 ## 2026-05-05 — Canvi #505: cobertura window/globalThis fetch al guard canònic (codex)
 
 ### Context

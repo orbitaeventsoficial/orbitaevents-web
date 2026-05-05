@@ -24,6 +24,7 @@ function runGuard(files: Record<string, string>) {
 
 const WHATSAPP_PATH = 'M17.472 14.382c-.297-.149-1.758-.867';
 const STAR_POLYGON = '12 2 15.09 8.26 22 9.27 17 14.14';
+const GOOGLE_G_BLUE_PATH = 'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z';
 const GOOGLE_G_FULL = `
   fill="#4285F4"
   fill="#34A853"
@@ -64,6 +65,15 @@ describe('check-canonical-svgs', () => {
     });
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('google-g-icon');
+  });
+
+  it('fails when a partial Google G path is inlined outside the canonical component', () => {
+    const result = runGuard({
+      'components/reviews/ReviewsSection.tsx': `<svg><path d="${GOOGLE_G_BLUE_PATH}" /></svg>`,
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('google-g-icon');
+    expect(result.stderr).toContain('GoogleGIcon');
   });
 
   it('does not flag partial Google G fragments (single or partial colors)', () => {

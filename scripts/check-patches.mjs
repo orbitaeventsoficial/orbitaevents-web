@@ -146,7 +146,7 @@ function detectEmptyCatch(lines) {
 
 function detectTodoMarkers(lines) {
   const findings = [];
-  const pattern = /\/\/\s*(TODO|FIXME|HACK|XXX)\b[^\n]*/i;
+  const pattern = /(?:\/\/|\/\*+|\*)\s*(TODO|FIXME|HACK|XXX)\b[^\n]*/i;
   lines.forEach((line, idx) => {
     const match = line.match(pattern);
     if (!match) return;
