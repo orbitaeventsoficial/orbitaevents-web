@@ -73,7 +73,7 @@ export const trackEvent = ({
     return;
   }
 
-  if (window.dataLayer) {
+  if (Array.isArray(window.dataLayer)) {
     window.dataLayer.push({
       event: eventName,
       event_category: eventCategory,
@@ -280,7 +280,7 @@ export const trackPageView = (pagePath: string, pageTitle: string): void => {
     return;
   }
 
-  if (window.dataLayer) {
+  if (Array.isArray(window.dataLayer)) {
     window.dataLayer.push({
       event: 'page_view',
       page_path: pagePath,
@@ -314,4 +314,3 @@ export const trackPublicServiceEvent = (
   if (!window.gtag) return;
   window.gtag('event', action, params);
 };
-

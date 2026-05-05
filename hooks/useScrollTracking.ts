@@ -24,8 +24,8 @@ export function useScrollTracking(selector = '[data-section-id]') {
           seen.add(sectionId);
 
           // GTM dataLayer
-          if (Array.isArray((window as any).dataLayer)) {
-            (window as any).dataLayer.push({
+          if (Array.isArray(window.dataLayer)) {
+            window.dataLayer.push({
               event: 'section_view',
               section_id: sectionId,
             });

@@ -875,6 +875,8 @@ Criteri pràctic:
 **FET** *(2026-05-05 per `codex` — Canvi #505)*: el guard `qa:canonical-fetches` queda blindat explícitament contra crides qualificades a endpoints canònics (`window.fetch(...)` i `globalThis.fetch(...)`). `__tests__/scripts/check-canonical-fetches.test.ts` guanya un cas amb `/api/google-reviews` i `/api/public/stats` fora dels seus clients `lib/api/*`, verificant que el guard reporta dues violacions i recomana `fetchPublicGoogleReviews()` / `fetchPublicStats()`. Efecte: el `PENDENT CRÍTIC` de regressions silencioses queda una mica més tancat també davant variants habituals de fetch directe.
 **FET** *(2026-05-05 per `codex` — Canvi #506)*: el guard `qa:canonical-svgs` ja cobreix també còpies parcials del Google G, no només el cas complet amb quatre colors. `components/reviews/ReviewsSection.tsx` deixa de tenir tres SVG inline amb el path de Google i passa a `GoogleGIcon`; `scripts/check-canonical-svgs.mjs` detecta el path blau canònic, i el test del guard blinda el cas. Efecte: una còpia parcial del logo ja no pot tornar a escapar perquè no porti tots els colors.
 **FET** *(2026-05-05 per `codex` — Canvi #508)*: el guard `qa:patches` ja detecta marcadors `TODO`/`FIXME`/`HACK`/`XXX` també dins comentaris de bloc i JSDoc, no només com a `// TODO`. `scripts/check-patches.mjs` amplia `detectTodoMarkers()` i `__tests__/scripts/check-patches.test.ts` blinda fitxers nets, línia, bloc i exclusions de tests. Efecte: els deutes explícits no poden esquivar el guard canviant el format del comentari.
+**FET** *(2026-05-05 per `codex` — Canvi #509)*: `hooks/useScrollTracking.ts` deixa d'usar `(window as any).dataLayer` i passa a consumir el global tipat `window.dataLayer` ja declarat a `types/window.d.ts`. `__tests__/hooks/useScrollTracking.test.ts` blinda que el hook mantingui `Array.isArray(window.dataLayer)` + `window.dataLayer.push` i que no torni el cast `window as any`. Efecte: menys escapes de tipus en analítica pública i regressió coberta.
+**FET** *(2026-05-05 per `codex` — Canvi #510)*: `lib/hooks/useAnalytics.ts` també deixa de crear un alias manual `window as unknown as { dataLayer... }` i passa a usar `window.dataLayer` directament. `__tests__/lib/hooks/useAnalytics.test.ts` blinda que el hook mantingui el global tipat i que no torni `window as unknown`/`win.dataLayer`. Efecte: la capa d'analítica pública queda alineada amb el contracte global declarat, sense casts locals innecessaris.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
 
@@ -5698,6 +5700,66 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació humana/UX: sense canvi visible; reforç operatiu del pipeline.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `507` a `508`.
 - `ADMIN_CHANGE_COUNTER` puja a `508`; el següent canvi real ha de ser `#509`.
+
+---
+
+### Canvi #509 — 2026-05-05 — codex (FET)
+**El tracking de scroll deixa d'accedir a GTM amb `(window as any).dataLayer` i usa el global tipat `window.dataLayer` declarat al projecte.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go` amb worktree brut per canvis recents `#506`-`#508`. Front triat: `§6.14 Infra / Dev / Operativa`, `PENDENT CRÍTIC` d'evitar regressions silencioses en repo gran. El fitxer `types/window.d.ts` ja declara `Window.dataLayer`, i altres peces (`app/lib/analytics.ts`, `WebVitalsReporter`, `ExitIntentModal`) consumeixen `window.dataLayer` directament. `hooks/useScrollTracking.ts` era una excepció amb `(window as any).dataLayer`, que saltava el contracte tipat global sense necessitat.
+- `hooks/useScrollTracking.ts`: substituït `Array.isArray((window as any).dataLayer)` per `Array.isArray(window.dataLayer)` i el `push` equivalent per `window.dataLayer.push(...)`.
+- `__tests__/hooks/useScrollTracking.test.ts` (nou): guard estructural que comprova l'ús del global tipat i falla si torna el text `window as any`.
+- Aquest tall **NO** toca: IMAP/inbox, SVGs canònics, fetches canònics, `check-patches`, schema, auth, endpoints ni UI.
+- Validació tècnica: `npx vitest run __tests__/hooks/useScrollTracking.test.ts` OK (1 test) · `npx tsc --noEmit` OK.
+- Validació funcional: el tracking continua enviant `section_view` al mateix `dataLayer`, però ara passa pel tipus global compartit.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat i de contracte TypeScript.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `508` a `509`.
+- `ADMIN_CHANGE_COUNTER` puja a `509`; el següent canvi real ha de ser `#510`.
+
+---
+
+### Canvi #511 — 2026-05-05 — claude (FET)
+**Cobertura `qa:protocol:test` per `check-message-imports.mjs`: el guard ja entrava al pipeline `validate:core` però no tenia test propi al directori `__tests__/scripts/`. Tancament del forat per la regla §6.14 d'evitar regressions silencioses al propi guard.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `qa:message-imports` (= `node scripts/check-message-imports.mjs`) detecta imports directes de `messages/*` fora dels 5 adapters i18n autoritzats (`pack-i18n`, `equipment-i18n`, `home-meta`, `site-public-copy`, `public-error-copy`). El guard ja era obligatori al `validate:core` i corre cada commit, però no tenia test propi: si algú toca el regex (`messageImportRegex`), l'allowlist o la lògica de skip (`node_modules`/`.next`/...) i la ruptura no tomba `validate:core` perquè el guard segueix retornant `0` per casualitat, ningú s'enteraria fins que un import real escapa silenciós a producció. Mateix patró que els altres tests de scripts: `check-canonical-fetches.test.ts`, `check-canonical-svgs.test.ts`, `check-task-canonical.test.ts`, `check-roadmap-canvis.test.ts`, `check-language-quality.test.ts`, `check-admin-change-log.test.ts` i el nou `check-patches.test.ts` (#508). Aquest era l'últim guard de monocapa de l'i18n d'app/lib sense cobertura pròpia.
+- `__tests__/scripts/check-message-imports.test.ts` (nou): 9 tests amb fixtures temporals via `mkdtempSync` + `spawnSync(process.execPath, [scriptPath], { cwd })`:
+  1. passa si cap fitxer importa de `messages`.
+  2. falla amb `from '@/messages/ca.json'` a `app/`.
+  3. falla amb `'../messages/...'` i `'../../messages/...'` (relatius parent).
+  4. falla amb path qualsevol que acabi en `messages/<locale>.json`.
+  5. permet tots 5 adapters de l'allowlist (`lib/pack-i18n.ts`, `lib/equipment-i18n.ts`, `lib/home-meta.ts`, `lib/site-public-copy.ts`, `lib/public-error-copy.ts`).
+  6. ignora `node_modules/` i `.next/`.
+  7. només escaneja `app/` i `lib/` (no `scripts/`, `docs/`, etc.).
+  8. multi-violació amb missatge d'ajuda (`i18n/copy helper` o `allowlist entry`).
+  9. accepta extensions `.tsx`/`.ts`/`.jsx`/`.mjs` netes sense fals positiu.
+- Aquest tall **NO** toca: el script `check-message-imports.mjs` en si (el guard funciona correctament, només li faltava cobertura), els 5 adapters allowlistats, IMAP, schema, auth, UI ni cap altra peça d'admin.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-message-imports.test.ts` OK (9 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `qa:protocol:test` recull automàticament el nou fitxer perquè és `vitest run __tests__/scripts/`.
+- Validació funcional: una regressió futura al regex (p.ex. canviar `messages/(?:ca|es|en)\.json` a una expressió diferent) o a l'allowlist (afegir/treure adapters) trenca el test abans d'arribar a CI.
+- Validació humana/UX: invisible des de l'UI; reforç operatiu de monocapa.
+- Col·lisió de comptador: havia de ser `#509`, però codex va tancar `#509`/`#510` mentre treballava (canvis d'analítica pública). Reassignat a `#511` segons norma §2.1 + `project_admin_counter.md`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `510` a `511`.
+- `ADMIN_CHANGE_COUNTER` puja a `511`; el següent canvi real ha de ser `#512`.
+
+---
+
+### Canvi #510 — 2026-05-05 — codex (FET)
+**`useAnalytics` elimina l'alias manual de `dataLayer` i consumeix el global tipat `window.dataLayer`, igual que la resta de la capa d'analítica pública.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go`. No és un error funcional detectat, sinó cleanup tipat dins `§6.14 Infra / Dev / Operativa`: després del `#509`, quedava un segon accés a GTM amb cast local a `lib/hooks/useAnalytics.ts`. El projecte ja té `Window.dataLayer` declarat a `types/window.d.ts`, i altres peces d'analítica pública consumeixen aquest contracte directament.
+- `lib/hooks/useAnalytics.ts`: substituït `const win = window as unknown as { dataLayer: Record<string, unknown>[] }` per ús directe de `window.dataLayer`.
+- `__tests__/lib/hooks/useAnalytics.test.ts` (nou): guard estructural que exigeix `window.dataLayer = window.dataLayer || []` i `window.dataLayer.push`, i falla si tornen `window as unknown` o `win.dataLayer`.
+- Aquest tall **NO** toca: IMAP/inbox, SVGs canònics, fetches canònics, `check-patches`, schema, auth, endpoints ni UI.
+- Validació tècnica: `npx vitest run __tests__/hooks/useScrollTracking.test.ts __tests__/lib/hooks/useAnalytics.test.ts` OK (2 tests) · `npx tsc --noEmit` OK.
+- Validació funcional: `trackEvent()` i `useAnalytics().track()` continuen fent push del mateix payload al `dataLayer`.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat TypeScript.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `509` a `510`.
+- `ADMIN_CHANGE_COUNTER` puja a `510`; el següent canvi real ha de ser `#511`.
 
 ---
 

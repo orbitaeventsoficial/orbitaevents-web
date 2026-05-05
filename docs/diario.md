@@ -1,3 +1,61 @@
+## 2026-05-05 — Canvi #511: cobertura `qa:protocol:test` per `check-message-imports` (claude)
+
+### Context
+El guard `check-message-imports.mjs` corre dins `validate:core` (`qa:message-imports`) i bloqueja imports directes de `messages/*` fora dels 5 adapters i18n. Era l'últim guard de monocapa d'i18n sense test propi a `__tests__/scripts/`. Sense test, una regressió al regex o a l'allowlist passaria silenciosa fins que un import real escapés a producció.
+
+### Canvi
+- `__tests__/scripts/check-message-imports.test.ts` (nou): 9 tests amb fixtures `mkdtempSync` + `spawnSync` (mateix patró que `check-canonical-fetches.test.ts`, `check-canonical-svgs.test.ts`, `check-patches.test.ts`).
+- Cobreix: passa net, alies `@/messages`, relatius parent (`../messages`, `../../messages`), path arbitrari acabant en `messages/<locale>.json`, allowlist dels 5 adapters, skip de `node_modules/`/`.next/`, scope només `app/` + `lib/`, multi-violació amb missatge d'ajuda, extensions `.tsx`/`.ts`/`.jsx`/`.mjs` netes.
+- `lib/constants/admin.ts`: counter `510 → 511`.
+
+### Col·lisió de comptador
+Havia de ser `#509`, però codex va tancar `#509` (analítica pública `dataLayer`) i `#510` (alias `useAnalytics`) mentre treballava. Reassignat a `#511` segons norma §2.1.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-message-imports.test.ts` OK (9 tests).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+- `qa:protocol:test` recull automàticament el nou fitxer (`vitest run __tests__/scripts/`).
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 511. Següent canvi `#512`.
+
+## 2026-05-05 — Canvi #510: `useAnalytics` consumeix `dataLayer` global tipat (codex)
+
+### Context
+Continuació de `go` segons protocol. No és un bug funcional: és un cleanup de contracte tipat dins el mateix perímetre d'analítica pública del `#509`. `lib/hooks/useAnalytics.ts` encara creava un alias `window as unknown as { dataLayer... }` tot i que `types/window.d.ts` ja declara `window.dataLayer` com a global compartit.
+
+### Canvi
+- `lib/hooks/useAnalytics.ts`: elimina l'alias `win` amb cast manual i usa `window.dataLayer = window.dataLayer || []` + `window.dataLayer.push(...)`.
+- `__tests__/lib/hooks/useAnalytics.test.ts`: nou guard estructural que exigeix el global tipat i blinda que no torni `window as unknown` ni `win.dataLayer`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `509 → 510`.
+
+### Validació
+- `npx vitest run __tests__/hooks/useScrollTracking.test.ts __tests__/lib/hooks/useAnalytics.test.ts` OK (2 tests).
+- `npx tsc --noEmit` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 510. Següent canvi `#511`.
+
+## 2026-05-05 — Canvi #509: `dataLayer` tipat al tracking de scroll (codex)
+
+### Context
+Continuació de `go` segons protocol. Worktree brut per canvis recents `#506`-`#508`, però aquest tall toca un perímetre diferent: tracking públic de scroll. `types/window.d.ts` ja declara `window.dataLayer`, però `hooks/useScrollTracking.ts` encara feia servir `(window as any).dataLayer`, un escape de tipus innecessari en una peça d'analítica compartida.
+
+### Canvi
+- `hooks/useScrollTracking.ts`: elimina el cast `(window as any)` i consumeix directament `window.dataLayer`.
+- `__tests__/hooks/useScrollTracking.test.ts`: nou guard estructural que exigeix `Array.isArray(window.dataLayer)`, `window.dataLayer.push` i blinda que no torni `window as any`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 i §9 actualitzats.
+- `lib/constants/admin.ts`: counter `508 → 509`.
+
+### Validació
+- `npx vitest run __tests__/hooks/useScrollTracking.test.ts` OK (1 test).
+- `npx tsc --noEmit` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 509. Següent canvi `#510`.
+
 ## 2026-05-05 — Canvi #508: TODO de bloc al guard anti-parxes (codex)
 
 ### Context

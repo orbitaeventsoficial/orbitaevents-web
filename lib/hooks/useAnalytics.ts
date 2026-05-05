@@ -13,9 +13,8 @@ type TrackingData = Record<string, string | number | boolean>;
 function pushToDataLayer(event: string, data?: TrackingData): void {
   if (typeof window === 'undefined') return;
 
-  const win = window as unknown as { dataLayer: Record<string, unknown>[] };
-  win.dataLayer = win.dataLayer || [];
-  win.dataLayer.push({
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
     event,
     ...data,
   });
