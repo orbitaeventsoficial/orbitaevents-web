@@ -1,3 +1,22 @@
+## 2026-05-05 — Canvi #513: cobertura `qa:protocol:test` per `check-visual-overflow` (claude)
+
+### Context
+Tercer forat consecutiu de la línia editorial #511/#512: cobrir guards de `validate:core` sense test propi. `check-visual-overflow.mjs` detecta 3 famílies de risc (`nowrap-no-guard`, `wide-min-no-scroll`, `fixed-grid-mobile`) amb heurístiques d'overlay/icones/scroll proper. Té dos modes: per defecte warning + exit 0; `--strict` exit 2.
+
+### Canvi
+- `__tests__/scripts/check-visual-overflow.test.ts` (nou): 14 tests amb fixtures `mkdtempSync` + `spawnSync`.
+- Cobreix les 3 deteccions, els 4 falsos positius (truncate/min-w-0/max-w, overlay, icona, scroll proper), el filtre de scope (`app/` + `components/` només), `${...}` dinàmic, `--strict` exit 2, sense `--strict` exit 0.
+- Detall: el primer test fallava a Windows per `path.relative()` natiu; substituït per `[/\\]` regex.
+- `lib/constants/admin.ts`: counter `512 → 513`.
+
+### Validació
+- `npx vitest run __tests__/scripts/check-visual-overflow.test.ts` OK (14 tests).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+### Tancament
+- `ADMIN_CHANGE_COUNTER` = 513. Següent canvi `#514`.
+
 ## 2026-05-05 — Canvi #512: cobertura `qa:protocol:test` per `check-mojibake` (claude)
 
 ### Context

@@ -5720,6 +5720,38 @@ px tsc --noEmit OK · git diff --check OK.
 
 ---
 
+### Canvi #513 — 2026-05-05 — claude (FET)
+**Cobertura `qa:protocol:test` per `check-visual-overflow.mjs`: tercer forat consecutiu de la línia editorial #511/#512 (cobertura sistemàtica dels guards de `validate:core`). Inclou test del mode `--strict` que sí trenca CI.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `qa:visual-overflow` (= `node scripts/check-visual-overflow.mjs`) detecta 3 famílies de risc tipogràfic/layout que poden generar overflow horitzontal silenciós: `nowrap-no-guard` (`whitespace-nowrap` sense `truncate`/`min-w-0`/`max-w-`/`overflow-*`/`break-*`/`text-ellipsis`/`whitespace-normal`/`shrink-0`), `wide-min-no-scroll` (`min-w-[500+px]` custom sense `overflow-x-auto`/`snap-x` propi o adjacent), i `fixed-grid-mobile` (`grid-cols-4..9` sense breakpoint `sm:`/`md:`/`lg:`/`xl:`/`2xl:` ni scroll). El guard té heurístiques fines: ignora `whitespace-nowrap` dins overlays (`absolute`/`fixed`), ignora primitives icòniques (tokens `h-`/`w-`/`size-` amb ≤12 tokens), ignora `${...}` (template strings dinàmiques) i busca scroll a 360 caràcters anteriors a l'element. Sense test, qualsevol regressió silenciosa a aquestes heurístiques deixa passar overflow real.
+- Modes del guard: per defecte logs informatius i exit 0 (warning); amb `--strict` exit 2 i error a `stderr`. `validate:core` el corre sense `--strict`, així que les warnings actuals no trenquen CI però queden visibles al log.
+- `__tests__/scripts/check-visual-overflow.test.ts` (nou): 14 tests amb fixtures `mkdtempSync` + `spawnSync`:
+  1. passa amb `OK: no obvious static overflow risks` quan els fitxers són nets.
+  2. detecta `nowrap-no-guard` literal.
+  3. NO marca `whitespace-nowrap` quan acompanyat de `truncate`/`min-w-0`/`max-w-[..]`.
+  4. NO marca `whitespace-nowrap` dins overlay (`absolute`/`fixed`).
+  5. NO marca `whitespace-nowrap` en primitives icòniques (`h-4 w-4 ...`).
+  6. detecta `wide-min-no-scroll` per `min-w-[640px]`.
+  7. NO marca `min-w-[640px]` si va amb `overflow-x-auto` mateix element.
+  8. NO marca si `overflow-x-auto` és a un avantpassat proper (≤360 chars).
+  9. detecta `fixed-grid-mobile` per `grid-cols-6` sense responsive.
+  10. NO marca grid responsive (`sm:grid-cols-6`).
+  11. només escaneja `app/` i `components/` (no `lib/`, `docs/`, etc.).
+  12. ignora `className={\`${...}\`}` dinàmic.
+  13. **`--strict` mode trenca amb exit 2** quan hi ha riscos.
+  14. sense `--strict` exit 0 encara amb riscos (warning only).
+- Aquest tall **NO** toca: el script `check-visual-overflow.mjs` (funciona; només li faltava cobertura), les heurístiques de detecció (`OVERFLOW_GUARDS`, `isOverlay`, `isLikelyIconOrPrimitive`, `hasNearbyHorizontalScroll`), IMAP, schema, auth, UI ni cap altra peça d'admin.
+- Detall tècnic: la primera versió del test feia `expect(stdout).toContain('app/risk.tsx')` i fallava a Windows perquè `path.relative()` retorna `\` natiu. Substituït per `expect(stdout).toMatch(/app[/\\]risk\.tsx/)` per platform-agnostic.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-visual-overflow.test.ts` OK (14 tests) · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK · `qa:protocol:test` recull el nou fitxer automàticament.
+- Validació funcional: una regressió a qualsevol heurística de detecció trenca el test específic.
+- Validació humana/UX: invisible des de l'UI; reforç operatiu del guard que vigila el responsive del producte.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `512` a `513`.
+- `ADMIN_CHANGE_COUNTER` puja a `513`; el següent canvi real ha de ser `#514`.
+
+---
+
 ### Canvi #512 — 2026-05-05 — claude (FET)
 **Cobertura `qa:protocol:test` per `check-mojibake.mjs`: l'altre guard de monocapa d'encoding sense test propi. Tancament del segon forat consecutiu de la línia editorial del `#511` (cobertura sistemàtica dels guards de `validate:core`).**
 - Començat per: `claude`
