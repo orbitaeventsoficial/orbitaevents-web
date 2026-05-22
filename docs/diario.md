@@ -1,3 +1,42 @@
+## 2026-05-22 — Canvi #755: Botó eliminar configuració IMAP a la safata (claude)
+
+### Context
+La pantalla `/admin/inbox/settings` no tenia manera d'esborrar un compte IMAP configurat des de la BD — només es podia sobreescriure. L'usuari volia poder eliminar el compte `ctreball` i deixar la safata buida per configurar `info@orbitaevents.com` des de zero.
+
+### Canvi
+1. **`lib/services/imapSettingsService.ts`**: nova funció `deleteImapSettings()` que elimina totes les claus `imap.*` de la taula `Setting`.
+2. **`app/api/admin/inbox/settings/route.ts`**: nou handler `DELETE` protegit amb `requireAuth` + `verifyCsrf`.
+3. **`app/admin/inbox/settings/ImapSettingsClient.tsx`**: botó "Eliminar configuració" (vermell, visible només quan `source === 'db'`) amb confirmació via `useConfirmDialog`. Després d'eliminar, reseteja l'estat local.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK.
+- Validació funcional: el botó apareix únicament quan la configuració prové de la BD (no de variables d'entorn Railway). La confirmació prevé eliminació accidental.
+- Validació humana/UX: l'usuari pot eliminar el compte `ctreball` i configurar `info@orbitaevents.com` sense haver de sobreescriure credencials a mà.
+
+### Tancament
+- Tancat per: claude, 2026-05-22.
+
+---
+
+## 2026-05-22 — Canvi #754: Fix vitest — `@vitest-environment node` als 14 fitxers de scripts restants (claude)
+
+### Context
+El commit anterior (`bbef8c45`) havia afegit `environmentMatchGlobs` a `vitest.config.ts` per forçar entorn `node` als tests de scripts. Però `environmentMatchGlobs` no existeix als tipus de Vitest 4.x → error `TS2769` → CI Lint fallava → Railway no desplegava. Els 45 fitxers que ja tenien `// @vitest-environment node` funcionaven bé; en mancaven 14.
+
+### Canvi
+1. **`vitest.config.ts`**: eliminat `environmentMatchGlobs` (no tipat a Vitest 4.x).
+2. **14 fitxers `__tests__/scripts/`**: afegit `// @vitest-environment node` a la primera línia: `check-inline-hex`, `check-inline-rgba`, `check-inline-intl`, `check-inline-to-locale-date-time`, `check-inline-to-locale-string`, `check-admin-slate-gray`, `check-customer-inline-href`, `check-admin-inline-font-styles`, `check-admin-static-css-var-styles`, `check-admin-inline-font-size`, `check-admin-toFixed-currency`, `check-admin-mode-prefix`, `check-packs-i18n`, `check-equipment-i18n`.
+
+### Validació
+- Validació tècnica: `pnpm test:run` — 4547 tests, 0 fallades. `npx tsc --noEmit` OK.
+- Validació funcional: tots 59 fitxers de `__tests__/scripts/` corren en entorn node. CI Lint+Typecheck torna a passar.
+- Validació humana/UX: Railway pot tornar a desplegar. El fix del i18n `ctaWhatsappButton` (comit anterior) també es desplega en aquest push.
+
+### Tancament
+- Tancat per: claude, 2026-05-22.
+
+---
+
 ## 2026-05-22 — Canvi #753: `qa:protocol` exigeix validació en 3 capes també al §9 actual (codex)
 
 ### Context
