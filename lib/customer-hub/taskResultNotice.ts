@@ -1,4 +1,4 @@
-import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerHubHref, buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 
 export type TaskRedirectResult = 'created' | 'deduped' | 'reopened';
 
@@ -31,6 +31,6 @@ export function buildCustomerHubTaskHref(
   }
 
   return taskSource
-    ? `/admin/clientes/${customerId}?${params.toString()}`
+    ? `${buildCustomerHubHref(customerId)}?${params.toString()}`
     : buildCustomerWorkspaceTabHref(customerId, 'tasks');
 }

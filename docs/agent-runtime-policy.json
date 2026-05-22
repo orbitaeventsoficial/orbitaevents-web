@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "repository": "orbitaevents",
+  "defaultWorkspacePath": "D:\\orbitaevents",
+  "defaultCommand": "go",
+  "mode": "nonstop_until_end",
+  "finalResponsePolicy": {
+    "afterGreenCutWithActionableBacklog": "forbidden",
+    "allowedWhen": [
+      "no_actionable_backlog",
+      "real_blocker_requires_human_decision",
+      "owner_explicitly_requests_stop_or_report_only"
+    ]
+  },
+  "requiredLoopAfterGreenCut": [
+    "rereread_section_6",
+    "select_next_seguent_or_pendent_critic",
+    "continue_automatically_with_short_update"
+  ],
+  "requiredValidationBeforeCutClose": [
+    "qa_protocol",
+    "validate_core",
+    "diario_entry",
+    "protocol_section_6_update",
+    "protocol_section_9_entry",
+    "admin_change_counter_increment"
+  ],
+  "canonicalGuard": "pnpm run qa:nonstop-protocol"
+}

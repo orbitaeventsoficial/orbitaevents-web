@@ -13,6 +13,7 @@ const { mockPrisma, mockUploadFile, mockDeleteFile } = vi.hoisted(() => ({
     },
     booking: {
       findUnique: vi.fn(),
+      update: vi.fn(),
     },
   },
   mockUploadFile: vi.fn(),
@@ -40,11 +41,16 @@ import {
   updateGalleryPhoto,
   deleteGalleryPhoto,
   getGallerySummary,
+  createGalleryShareToken,
+  revokeGalleryShareToken,
+  getGalleryByShareToken,
+  getGalleryShareInfo,
 } from '@/lib/services/galleryService';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockPrisma.booking.findUnique.mockResolvedValue(null);
+  mockPrisma.booking.update.mockResolvedValue({});
   mockPrisma.bookingGalleryPhoto.findMany.mockResolvedValue([]);
   mockPrisma.bookingGalleryPhoto.findUnique.mockResolvedValue(null);
   mockPrisma.bookingGalleryPhoto.create.mockResolvedValue({ id: 'photo-1' });
@@ -473,5 +479,185 @@ describe('getGallerySummary', () => {
     expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1' } });
     expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1', isPortfolio: true } });
     expect(mockPrisma.bookingGalleryPhoto.count).toHaveBeenCalledWith({ where: { bookingId: 'bk-1', isPortal: true } });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// createGalleryShareToken
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('createGalleryShareToken', () => {
+  it('crea token sense contrasenya', async () => {
+    mockPrisma.booking.update.mockResolvedValue({});
+
+    const result = await createGalleryShareToken('bk-1');
+
+    expect(result.token).toMatch(/^[a-z0-9]{24}$/);
+    expect(result.passwordProtected).toBe(false);
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'bk-1' },
+      data: expect.objectContaining({
+        gallerySharePassword: null,
+      }),
+    });
+  });
+
+  it('crea token amb contrasenya', async () => {
+    mockPrisma.booking.update.mockResolvedValue({});
+
+    const result = await createGalleryShareToken('bk-1', 'secret123');
+
+    expect(result.passwordProtected).toBe(true);
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'bk-1' },
+      data: expect.objectContaining({
+        gallerySharePassword: 'secret123',
+      }),
+    });
+  });
+
+  it('ignora contrasenya buida (espais)', async () => {
+    mockPrisma.booking.update.mockResolvedValue({});
+
+    const result = await createGalleryShareToken('bk-1', '   ');
+
+    expect(result.passwordProtected).toBe(false);
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'bk-1' },
+      data: expect.objectContaining({ gallerySharePassword: null }),
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// revokeGalleryShareToken
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('revokeGalleryShareToken', () => {
+  it('esborra token i contrasenya', async () => {
+    mockPrisma.booking.update.mockResolvedValue({});
+
+    await revokeGalleryShareToken('bk-1');
+
+    expect(mockPrisma.booking.update).toHaveBeenCalledWith({
+      where: { id: 'bk-1' },
+      data: { galleryShareToken: null, gallerySharePassword: null },
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// getGalleryByShareToken
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('getGalleryByShareToken', () => {
+  const baseBooking = {
+    id: 'bk-1',
+    reference: 'ORB-001',
+    eventDate: new Date('2026-06-15'),
+    gallerySharePassword: null,
+    galleryPhotos: [
+      { id: 'p1', photoUrl: '/img1.jpg', caption: 'Foto 1' },
+    ],
+  };
+
+  it('retorna OK per galeria pública', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue(baseBooking);
+
+    const result = await getGalleryByShareToken('abc123');
+
+    expect(result.status).toBe('OK');
+    if (result.status === 'OK') {
+      expect(result.bookingReference).toBe('ORB-001');
+      expect(result.photos).toHaveLength(1);
+    }
+  });
+
+  it('retorna NOT_FOUND si token no existeix', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue(null);
+
+    const result = await getGalleryByShareToken('inexistent');
+
+    expect(result.status).toBe('NOT_FOUND');
+  });
+
+  it('retorna PASSWORD_REQUIRED si galeria protegida i no hi ha password', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...baseBooking,
+      gallerySharePassword: 'secret',
+    });
+
+    const result = await getGalleryByShareToken('abc123');
+
+    expect(result.status).toBe('PASSWORD_REQUIRED');
+  });
+
+  it('retorna WRONG_PASSWORD si la contrasenya no coincideix', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...baseBooking,
+      gallerySharePassword: 'secret',
+    });
+
+    const result = await getGalleryByShareToken('abc123', 'wrongpass');
+
+    expect(result.status).toBe('WRONG_PASSWORD');
+  });
+
+  it('retorna OK amb password correcte', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      ...baseBooking,
+      gallerySharePassword: 'secret',
+    });
+
+    const result = await getGalleryByShareToken('abc123', 'secret');
+
+    expect(result.status).toBe('OK');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// getGalleryShareInfo
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('getGalleryShareInfo', () => {
+  it('retorna token i passwordProtected=true', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      galleryShareToken: 'tok123',
+      gallerySharePassword: 'secret',
+    });
+
+    const result = await getGalleryShareInfo('bk-1');
+
+    expect(result).toEqual({ token: 'tok123', passwordProtected: true });
+  });
+
+  it('retorna token i passwordProtected=false sense contrasenya', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      galleryShareToken: 'tok123',
+      gallerySharePassword: null,
+    });
+
+    const result = await getGalleryShareInfo('bk-1');
+
+    expect(result).toEqual({ token: 'tok123', passwordProtected: false });
+  });
+
+  it('retorna token=null si booking no té share token', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue({
+      galleryShareToken: null,
+      gallerySharePassword: null,
+    });
+
+    const result = await getGalleryShareInfo('bk-1');
+
+    expect(result).toEqual({ token: null, passwordProtected: false });
+  });
+
+  it('retorna token=null si booking no existeix', async () => {
+    mockPrisma.booking.findUnique.mockResolvedValue(null);
+
+    const result = await getGalleryShareInfo('bk-1');
+
+    expect(result).toEqual({ token: null, passwordProtected: false });
   });
 });

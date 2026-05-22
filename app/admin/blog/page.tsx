@@ -6,6 +6,7 @@ import { Pencil, Trash2, Plus } from 'lucide-react';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { formatDateSimple } from '@/lib/constants';
 import { log } from '@/lib/logger';
+import { buildBlogEditHref } from '@/lib/admin/blogWorkspaceHref';
 import { EditorControlStrip } from '../components/EditorControlStrip';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
@@ -286,7 +287,7 @@ export default function BlogAdminPage() {
                     </div>
                     <div className="flex gap-1">
                       <button
-                        onClick={() => router.push(`/admin/blog/edit/${post.id}`)}
+                        onClick={() => router.push(buildBlogEditHref(post.id))}
                         type="button"
                         className="ap-btn ap-btn--secondary flex min-h-[44px] min-w-[44px] items-center justify-center p-2.5"
                         title="Editar"
@@ -343,7 +344,7 @@ export default function BlogAdminPage() {
                       <td className="px-6 py-4 admin-tone-text-slate">{formatDateSimple(post.createdAt)}</td>
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => router.push(`/admin/blog/edit/${post.id}`)} type="button" className="ap-btn ap-btn--secondary p-2" title="Editar">
+                          <button onClick={() => router.push(buildBlogEditHref(post.id))} type="button" className="ap-btn ap-btn--secondary p-2" title="Editar">
                             <Pencil className="h-5 w-5" />
                           </button>
                           <button onClick={() => handleDelete(post.id)} type="button" className="ap-btn ap-btn--danger p-2" title="Eliminar">

@@ -237,8 +237,11 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
   const discount = data.discount || 0;
   const vatRate = 21;
   const baseAfterDiscount = subtotal - discount;
-  const vatAmount = baseAfterDiscount * (vatRate / 100);
-  const total = baseAfterDiscount + vatAmount;
+  // Money es desa com a Float al schema: arrodonir a cèntims evita soroll de
+  // coma flotant a BD i desquadres amb Stripe (cobra en cèntims sencers).
+  // Mateix patró canònic que publicBookingService.ts.
+  const vatAmount = Math.round(baseAfterDiscount * (vatRate / 100) * 100) / 100;
+  const total = Math.round((baseAfterDiscount + vatAmount) * 100) / 100;
   const depositAmount = Math.round(total * 0.3);
   const reference = await generateReference();
 
@@ -283,7 +286,7 @@ export async function createBookingFromInput(data: BookingCreateInput): Promise<
       vatAmount,
       total,
       depositAmount,
-      remainingAmount: total - depositAmount,
+      remainingAmount: Math.round((total - depositAmount) * 100) / 100,
       notes: data.notes,
       extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
     },

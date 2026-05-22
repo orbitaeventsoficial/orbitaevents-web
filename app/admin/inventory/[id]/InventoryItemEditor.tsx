@@ -9,6 +9,7 @@ import {
   INVENTORY_CATEGORY_OPTIONS,
   INVENTORY_CONDITION_OPTIONS,
   INVENTORY_STATUS_OPTIONS,
+  formatCurrencyExact,
 } from '@/lib/constants';
 
 interface ItemData {
@@ -51,9 +52,7 @@ const CONDITION_TONE: Record<string, string> = {
 const inputClass =
   'mt-1 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/90 placeholder:text-white/35 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50';
 
-function formatEuro(value: number) {
-  return `${value.toFixed(2)}€`;
-}
+const formatEuro = formatCurrencyExact;
 
 export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryItemEditorProps) {
   const router = useRouter();
@@ -522,7 +521,7 @@ export default function InventoryItemEditor({ item, mode = 'edit' }: InventoryIt
         </aside>
       </div>
 
-      <div className="sticky bottom-2 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-[#0f1218]/85 p-3 backdrop-blur">
+      <div className="sticky bottom-2 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 admin-sticky-bar-bg p-3 backdrop-blur">
         <button
           type="button"
           onClick={handleSave}

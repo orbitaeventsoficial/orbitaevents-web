@@ -6,7 +6,7 @@
 // Part pura — no toca la base de dades.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { getEventLabel } from '@/lib/constants';
+import { getEventLabel, toIntlLocale } from '@/lib/constants';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -56,7 +56,7 @@ function formatEventDate(iso: string | null | undefined, locale: string): string
   try {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+    return d.toLocaleDateString(toIntlLocale(locale), {
       day: 'numeric',
       month: 'long',
       year: 'numeric',

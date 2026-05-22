@@ -241,7 +241,8 @@ export default function ContactFormComplete({
       } else {
         throw new Error('Error en enviar');
       }
-    } catch {
+    } catch (err) {
+      console.error('Error enviant formulari de contacte', err);
       setSubmitStatus('error');
     } finally {
       if (timeoutId) clearTimeout(timeoutId);

@@ -8,6 +8,8 @@ import ConfirmDialog, { useConfirmDialog } from '@/app/admin/components/ConfirmD
 import { ADMIN_ACTIONS_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { BOOKING_STATUS_OPTIONS, DELETABLE_BOOKING_STATUSES } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export default function BookingActions({
   id,
@@ -50,6 +52,7 @@ export default function BookingActions({
       toast.success('Reserva eliminada');
       router.refresh();
     } catch (error) {
+      console.error('Error eliminant reserva', error);
       toast.error(error instanceof Error ? error.message : 'Error eliminant reserva');
     } finally {
       setIsDeleting(false);
@@ -72,6 +75,7 @@ export default function BookingActions({
       toast.success(`Estat canviat a ${nextStatus}`);
       router.refresh();
     } catch (error) {
+      console.error("Error actualitzant estat reserva", error);
       toast.error(error instanceof Error ? error.message : "Error actualitzant l'estat");
     } finally {
       setIsUpdatingStatus(false);
@@ -97,11 +101,11 @@ export default function BookingActions({
         Calendari
       </Link>
       {customerId && (
-        <Link href={`/admin/clientes/${customerId}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.customer)}>
+        <Link href={buildCustomerHubHref(customerId)} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.customer)}>
           Client
         </Link>
       )}
-      <Link href={`/admin/bookings/${id}`} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
+      <Link href={buildBookingHref(id)} className="ap-btn ap-btn--secondary px-3 py-1.5 text-xs" {...helpAttrs(ADMIN_ACTIONS_HELP.booking.view)}>
         Veure
       </Link>
       {canDelete && (

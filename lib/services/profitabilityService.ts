@@ -132,20 +132,21 @@ async function fetchProfitabilityBookings() {
   const readAll = async (include: typeof includeWithLead | typeof includeWithoutLead) => {
     const bookings: Array<Record<string, unknown>> = [];
     let cursorId: string | undefined;
+    let hasMoreBookings = true;
 
-    while (true) {
+    while (hasMoreBookings) {
       const batch = await prisma.booking.findMany({
         where,
         orderBy: { id: 'asc' },
         take: PROFITABILITY_BATCH_SIZE,
         ...(cursorId ? { cursor: { id: cursorId }, skip: 1 } : {}),
         include,
-      }) as unknown as Array<Record<string, unknown>>;
+      });
 
       if (batch.length === 0) break;
-      bookings.push(...batch);
-      cursorId = String(batch[batch.length - 1]?.id || '');
-      if (!cursorId) break;
+      bookings.push(...(JSON.parse(JSON.stringify(batch)) as Array<Record<string, unknown>>));
+      cursorId = batch[batch.length - 1]?.id ?? '';
+      hasMoreBookings = Boolean(cursorId) && batch.length === PROFITABILITY_BATCH_SIZE;
     }
 
     return bookings;

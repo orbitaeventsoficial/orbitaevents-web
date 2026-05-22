@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const {
   mockPrisma,
@@ -112,5 +114,18 @@ describe('runAllAdminAutomations', () => {
         data: expect.objectContaining({ action: 'AUTOMATION_RUN_ALL' }),
       })
     );
+  });
+});
+
+describe('admin automation log details shape', () => {
+  it('normalitza JSON abans de passar details a Prisma sense cast unknown opac', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'lib', 'services', 'adminAutomationService.ts'),
+      'utf8',
+    );
+
+    expect(source).toContain('function normalizeAdminLogDetails(details: unknown): Prisma.InputJsonValue');
+    expect(source).toContain('JSON.parse(JSON.stringify(details)) as Prisma.InputJsonValue');
+    expect(source).not.toContain('as unknown as Prisma.InputJsonValue');
   });
 });

@@ -11,6 +11,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_PDF_STUDIO_DEFAULTS } from '@/lib/constants/admin';
 import { log } from '@/lib/logger';
 import SortableList from '@/app/admin/components/SortableList';
+import AiCopySuggestionsInline from '@/app/admin/components/AiCopySuggestionsInline';
 import StudioPreview from './StudioPreview';
 import {
   type DocMode, type SectionId, type Locale, type CustomExtra,
@@ -502,7 +503,7 @@ export default function PresupuestoPdfStudio({
 
     void loadProposal();
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- proposal loader must run only for initial id and draft hydration
   }, [initialProposalId, draftLoaded]);
 
   useEffect(() => {
@@ -784,6 +785,9 @@ export default function PresupuestoPdfStudio({
     brandEmail,
     brandPhone,
     brandTagline,
+    seasonSurcharge,
+    datePricing.appliedRule,
+    datePricing.surchargePct,
   ]);
 
   const saveProposalDraft = useCallback(async (
@@ -841,6 +845,7 @@ export default function PresupuestoPdfStudio({
     buildProposalSnapshot,
     proposalId,
     leadId,
+    seasonSurcharge,
   ]);
 
   useEffect(() => {
@@ -1064,7 +1069,7 @@ export default function PresupuestoPdfStudio({
       if (!doc) throw new Error('No s\'ha pogut generar el PDF');
       doc.autoPrint();
       const url = doc.output('bloburl');
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
       setMessage('PDF preparat per imprimir.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No s\'ha pogut preparar la impressió');
@@ -1312,7 +1317,17 @@ export default function PresupuestoPdfStudio({
               <label className="text-sm">Motiu del descompte<input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} /></label>
               <label className="text-sm md:col-span-3">Característiques del pack (una per línia)<textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} /></label>
               <label className="text-sm md:col-span-3">Condicions (una per línia)<textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} /></label>
-              <label className="text-sm md:col-span-3">Explicació comercial: per què triar-nos<textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} /></label>
+              <div className="md:col-span-3">
+                <label className="text-sm">Explicació comercial: per què triar-nos
+                  <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
+                </label>
+                <AiCopySuggestionsInline
+                  type="quote-why-us"
+                  context={`Tipus d'event: ${eventType}, Client: ${clientName}`}
+                  onApply={(text) => setWhyChooseUs(text)}
+                  label="Genera text IA"
+                />
+              </div>
             </div>
           </>
         );

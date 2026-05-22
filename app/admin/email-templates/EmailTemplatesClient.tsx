@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '../components/ToastProvider';
 import { EditorControlStrip } from '../components/EditorControlStrip';
+import { buildEmailTemplateHref } from '@/lib/admin/emailTemplateWorkspaceHref';
 import { SUPPORTED_LOCALES, SUPPORTED_LOCALE_LABELS } from '@/lib/constants';
 import { ADMIN_EMAIL_TEMPLATE_SOURCE_BADGE } from '@/lib/constants/admin';
 
@@ -27,6 +28,7 @@ export default function EmailTemplatesClient() {
       const data = await res.json();
       setTemplates(data.templates || []);
     } catch (err) {
+      console.error('Error carregant llista de plantilles email', err);
       toast.error(err instanceof Error ? err.message : 'Error carregant');
     } finally {
       setLoading(false);
@@ -110,7 +112,7 @@ export default function EmailTemplatesClient() {
           tone: defaultOnly > 0 || templates.length === 0 ? 'warning' : 'success',
           primaryAction: templates[0]
             ? {
-                href: `/admin/email-templates/${templates[0].slug}?locale=${SUPPORTED_LOCALES[0]}`,
+                href: buildEmailTemplateHref(templates[0].slug, SUPPORTED_LOCALES[0]),
                 label: 'Obrir primera plantilla',
               }
             : undefined,
@@ -155,7 +157,7 @@ export default function EmailTemplatesClient() {
                 return (
                   <Link
                     key={l.locale}
-                    href={`/admin/email-templates/${t.slug}?locale=${l.locale}`}
+                    href={buildEmailTemplateHref(t.slug, l.locale)}
                     className="ap-btn ap-btn--secondary"
                   >
                     <span className="font-semibold">{SUPPORTED_LOCALE_LABELS[l.locale] || l.locale}</span>

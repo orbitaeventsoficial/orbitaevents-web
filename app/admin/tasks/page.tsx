@@ -14,6 +14,7 @@ import { loadTaskQueue, type TaskQueue } from '@/lib/services/tasks/taskQueueSer
 import TaskQueueBanner from './TaskQueueBanner';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref, buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ function parsePage(value?: string) {
 }
 
 function resolveDestination(task: TaskListItem) {
-  if (task.customer) return `/admin/clientes/${task.customer.id}`;
+  if (task.customer) return buildCustomerHubHref(task.customer.id);
   if (task.lead) return buildLeadWorkspaceHref(task.lead.id);
 
   const title = task.title.toLowerCase();
@@ -116,7 +117,7 @@ export default async function TasksPage({
         ? buildTaskListHref(customerId, false, status, 'BLOQUEJAT')
         : '/admin/tasks?view=list&queue=BLOQUEJAT'
       : customerId
-        ? `/admin/clientes/${customerId}?tab=tasks`
+        ? buildCustomerWorkspaceTabHref(customerId!, 'tasks')
         : '/admin/tasks/new';
   const nextStepLabel = overdueTasks > 0
     ? 'Desbloquejar tasques vençudes'
@@ -148,7 +149,7 @@ export default async function TasksPage({
     <AdminPage
       title="Tasques"
       subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
-      back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
+      back={customerId ? { href: buildCustomerWorkspaceTabHref(customerId!, 'tasks'), label: 'Client' } : undefined}
       actions={<TaskPageToolbar isKanban={isKanban} status={status} customerId={customerId} />}
     >
       {!isKanban && (

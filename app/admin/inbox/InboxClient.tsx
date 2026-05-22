@@ -41,6 +41,7 @@ export default function InboxClient({
   const [showCompose, setShowCompose] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
+  const [suggestedBody, setSuggestedBody] = useState('');
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loadingSelected, setLoadingSelected] = useState(false);
   const { confirm, dialogProps } = useConfirmDialog();
@@ -92,6 +93,7 @@ export default function InboxClient({
       setImapUnread(data.unread || 0);
       setFlashMessage(null);
     } catch (error) {
+      console.error('Error carregant correus IMAP a Inbox', error);
       const msg = error instanceof Error ? `Error de connexió: ${error.message}` : 'Error de connexió';
       setImapError(msg);
       setFlashMessage({ type: 'error', text: msg });
@@ -327,9 +329,18 @@ export default function InboxClient({
         handleMoveToTrash={handleMoveToTrash}
         handleRestoreEmail={handleRestoreEmail}
         handleDeletePermanently={handleDeletePermanently}
+        onApplySuggestion={(text) => {
+          setSuggestedBody(text);
+          if (selectedEmail) handleReply(selectedEmail);
+        }}
       />
       {showCompose && (
-        <ComposeModal replyTo={replyTo} packOptions={quotePacks} onClose={() => { setShowCompose(false); setReplyTo(null); }} />
+        <ComposeModal
+          replyTo={replyTo}
+          packOptions={quotePacks}
+          initialBody={suggestedBody}
+          onClose={() => { setShowCompose(false); setReplyTo(null); setSuggestedBody(''); }}
+        />
       )}
       <ConfirmDialog {...dialogProps} />
       {showQuote && selectedEmail && (

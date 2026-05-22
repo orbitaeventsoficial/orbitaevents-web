@@ -3,7 +3,9 @@ import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadCustomerContinuityTarget } from '@/lib/admin/leadCustomerHref';
+import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import LeadActions from './LeadActions';
@@ -16,6 +18,7 @@ import { getLeadPriorityColorDisplay, getLeadStatusColorDisplay, LEAD_COLOR_DEFA
 import ExportCsvButton from '../components/ExportCsvButton';
 import PipelineSuggestionsPanel from './PipelineSuggestionsPanel';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import { buildLeadOwnerControlSummary } from '@/lib/services/leadOwnerControlSummaryService';
 
 export const dynamic = 'force-dynamic';
 
@@ -249,46 +252,7 @@ export default async function LeadsPage({
   const data = await getLeads({ status, priority, eventType, source, q, from, to, page, includeLost });
   const leads = data.leads;
   const currentQuery = buildQuery(data.filters);
-  const newLeads = leads.filter((lead) => lead.status === 'NEW').length;
-  const hotLeads = leads.filter((lead) => lead.priority === 'HIGH' || lead.priority === 'URGENT').length;
-  const wonLeads = leads.filter((lead) => lead.status === 'WON').length;
-  const pipelineLinkedBookings = leads.filter((lead) => !!lead.booking).length;
-  const staleLeads = leads.filter((lead) => {
-    if (lead.status === 'WON' || lead.status === 'LOST') return false;
-    const hours = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / (1000 * 60 * 60));
-    return hours >= 24;
-  }).length;
-  const automaticSignals = [
-    newLeads > 0 ? `${newLeads} entrada${newLeads > 1 ? 'es' : ''} nova${newLeads > 1 ? 'es' : ''}` : null,
-    hotLeads > 0 ? `${hotLeads} entrada${hotLeads > 1 ? 'es' : ''} d’alta prioritat` : null,
-    pipelineLinkedBookings > 0 ? `${pipelineLinkedBookings} entrada${pipelineLinkedBookings > 1 ? 'es' : ''} ja vinculada${pipelineLinkedBookings > 1 ? 'es' : ''} a reserva` : null,
-  ].filter(Boolean) as string[];
-  const manualSignals = [
-    staleLeads > 0 ? `${staleLeads} entrada${staleLeads > 1 ? 'es' : ''} fa més de 24h sense tancar` : null,
-    newLeads > 0 ? `${newLeads} entrada${newLeads > 1 ? 'es' : ''} pendent${newLeads > 1 ? 's' : ''} de primera resposta` : null,
-    wonLeads === 0 && leads.length > 0 ? 'Cap entrada guanyada a la vista actual' : null,
-  ].filter(Boolean) as string[];
-  const nextStepHref = staleLeads > 0
-    ? '/admin/leads?status=NEW'
-    : newLeads > 0
-      ? '/admin/leads?status=NEW'
-      : hotLeads > 0
-        ? '/admin/leads?priority=HIGH&priority=URGENT'
-        : '/admin/intake';
-  const nextStepLabel = staleLeads > 0
-    ? 'Respondre entrades fredes'
-    : newLeads > 0
-      ? 'Atacar entrades noves'
-      : hotLeads > 0
-        ? 'Revisar prioritats altes'
-        : 'Crear entrada ràpida';
-  const nextStepDetail = staleLeads > 0
-    ? 'El risc principal és deixar refredar oportunitats que ja passen del llindar saludable.'
-    : newLeads > 0
-      ? 'La prioritat és fer la primera resposta comercial.'
-      : hotLeads > 0
-        ? 'Queden oportunitats calentes que mereixen atenció abans del detall.'
-        : 'No hi ha tensió crítica a la vista actual.';
+  const ownerSummary = buildLeadOwnerControlSummary(leads);
 
   return (
     <AdminPage
@@ -323,20 +287,20 @@ export default async function LeadsPage({
           eyebrow: 'Automàtic',
           title: 'Què vigila el sistema',
           tone: 'info',
-          items: automaticSignals,
+          items: ownerSummary.automaticSignals,
           emptyText: 'Sense senyals automàtiques destacades a la vista actual.',
         }}
         manual={{
           eyebrow: 'Manual',
           title: 'Què et reclama decisió',
-          tone: manualSignals.length > 0 ? 'warning' : 'success',
-          items: manualSignals,
+          tone: ownerSummary.manualSignals.length > 0 ? 'warning' : 'success',
+          items: ownerSummary.manualSignals,
           emptyText: 'No hi ha cap front manual calent a les entrades visibles.',
         }}
         nextStep={{
-          title: nextStepLabel,
-          detail: nextStepDetail,
-          href: nextStepHref,
+          title: ownerSummary.nextStep.label,
+          detail: ownerSummary.nextStep.detail,
+          href: ownerSummary.nextStep.href,
         }}
       />
 
@@ -437,6 +401,10 @@ export default async function LeadsPage({
           leads.map((lead) => {
             const statusConf = getLeadStatusColorDisplay(lead.status);
             const eventType = getEventLabel(lead.eventType);
+            const continuityTarget = buildLeadCustomerContinuityTarget({
+              leadId: lead.id,
+              customerId: lead.customerId,
+            });
 
             return (
               <article
@@ -493,10 +461,11 @@ export default async function LeadsPage({
                     </Link>
                     {lead.customerId && (
                       <Link
-                        href={`/admin/clientes/${lead.customerId}`}
+                        href={continuityTarget.href}
+                        title={continuityTarget.title}
                         className="rounded-xl border px-2 py-1 text-[11px] font-medium"
                       >
-                        Client
+                        {continuityTarget.label}
                       </Link>
                     )}
                   </div>
@@ -510,7 +479,7 @@ export default async function LeadsPage({
                 </div>
                 {lead.booking && (
                   <Link
-                    href={`/admin/bookings/${lead.booking.id}`}
+                    href={buildBookingHref(lead.booking.id)}
                     className="mt-2 block text-xs font-medium hover:underline"
                   >
                     ✓ Reserva: {lead.booking.reference}
@@ -555,6 +524,10 @@ export default async function LeadsPage({
                   const statusConf = getLeadStatusColorDisplay(lead.status);
                   const eventType = getEventLabel(lead.eventType);
                   const priorityConf = getLeadPriorityColorDisplay(lead.priority);
+                  const continuityTarget = buildLeadCustomerContinuityTarget({
+                    leadId: lead.id,
+                    customerId: lead.customerId,
+                  });
 
                   return (
                     <tr key={lead.id} className="transition-colors hover:bg-white/[0.03]">
@@ -564,21 +537,21 @@ export default async function LeadsPage({
                             {lead.name}
                           </Link>
                           {lead.customerId && (
-                            <Link href={`/admin/clientes/${lead.customerId}`} className="" title="Fitxa client">
-                              👤
+                            <Link href={continuityTarget.href} className="text-[11px] font-semibold hover:underline" title={continuityTarget.title}>
+                              360
                             </Link>
                           )}
                         </div>
                         {lead.booking && (
-                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs hover:underline block text-center">
+                          <Link href={buildBookingHref(lead.booking.id)} className="text-xs hover:underline block text-center">
                             ✓ {lead.booking.reference}
                           </Link>
                         )}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">
-                        <a href={`mailto:${lead.email}`} className="hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
+                        <Link href={buildLeadComposeHref(lead.id)} className="hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
                           {lead.email}
-                        </a>
+                        </Link>
                         {lead.phone && (
                           <a href={`tel:${lead.phone}`} className="text-xs whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[220px]">📱 {lead.phone}</a>
                         )}
@@ -677,7 +650,4 @@ export default async function LeadsPage({
     </AdminPage>
   );
 }
-
-
-
 

@@ -3,6 +3,9 @@ import { formatDateSimple } from '@/lib/constants';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
+import { buildCustomerComposeHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,13 +91,17 @@ export default async function FeedbackPage() {
                   </div>
                   <div className="flex gap-2">
                     <Link
-                      href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${formatDateSimple(booking.eventDate)}!`}
+                      href={booking.customerId
+                        ? buildCustomerComposeHref(booking.customerId, 'post-event')
+                        : booking.leadId
+                          ? buildLeadComposeHref(booking.leadId, 'post-event')
+                          : '/admin/inbox/compose'}
                       className="ap-btn ap-btn--primary px-4 py-2 text-sm"
                     >
                       ✉️ Envia correu
                     </Link>
                     <Link
-                      href={`/admin/bookings/${booking.id}`}
+                      href={buildBookingHref(booking.id)}
                       className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                     >
                       Veure

@@ -15,6 +15,7 @@ import type { GalleryItem } from '@/app/components/GalleryPro';
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
+import { toIntlLocale } from '@/lib/constants';
 
 function isVideoAsset(src: string): boolean {
   const normalized = src.split('?')[0]?.toLowerCase() || '';
@@ -325,7 +326,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
                       {ev.venue && <span>{ev.venue}</span>}
                       {ev.eventDate && (
                         <span className="capitalize">
-                          {new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(new Date(ev.eventDate))}
+                          {new Intl.DateTimeFormat(toIntlLocale(locale), { year: 'numeric', month: 'long' }).format(new Date(ev.eventDate))}
                         </span>
                       )}
                       {ev._count.media > 0 && <span>{ev._count.media} {tPortfolio('eventDetail.photosVideos')}</span>}

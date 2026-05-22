@@ -65,7 +65,7 @@ export async function updateAdminSettings(settings: SettingPayload[]) {
     data: {
       action: 'UPDATE',
       entity: 'setting',
-      details: { keys: settings.map((setting) => setting.key) } as unknown as Prisma.InputJsonValue,
+      details: JSON.parse(JSON.stringify({ keys: settings.map((setting) => setting.key) })) as Prisma.InputJsonValue,
     },
   });
 

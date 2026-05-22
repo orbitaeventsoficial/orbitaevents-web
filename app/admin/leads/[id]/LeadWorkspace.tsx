@@ -262,17 +262,20 @@ export default function LeadWorkspace({
             <input
               className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-5"
               placeholder="Ex: Trucar per tancar pressupost"
+              aria-label="Títol de la tasca"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
             />
             <input
               type="date"
+              aria-label="Data límit de la tasca"
               className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-3"
               value={taskDueDate}
               onChange={(e) => setTaskDueDate(e.target.value)}
             />
             <select
               className="ap-input min-w-0 px-3 py-2 text-sm md:col-span-2"
+              aria-label="Prioritat de la tasca"
               value={taskPriority}
               onChange={(e) => setTaskPriority(e.target.value)}
             >

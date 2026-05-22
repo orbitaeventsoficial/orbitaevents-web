@@ -1,8 +1,9 @@
 import type { ChannelCredit, LeadJourney, MultiTouchReport } from '@/lib/services/attributionService';
+import { formatCurrency, formatDateShort } from '@/lib/constants';
 
 function formatEuro(v: number): string {
   if (v === 0) return '—';
-  return `${Math.round(v).toLocaleString('ca-ES')}€`;
+  return formatCurrency(Math.round(v));
 }
 
 function formatPct(value: number, total: number): string {
@@ -11,10 +12,7 @@ function formatPct(value: number, total: number): string {
 }
 
 function formatMoment(iso: string): string {
-  return new Date(iso).toLocaleDateString('ca-ES', {
-    day: '2-digit',
-    month: 'short',
-  });
+  return formatDateShort(iso);
 }
 
 function StageStat({

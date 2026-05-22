@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { AdminEmptyState } from '../components/AdminPage';
+import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { ADMIN_CUSTOMERS_LIST_HELP, helpAttrs } from '../components/adminHelpContent';
 import { getCustomerSourceLabel } from '@/lib/constants';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { PRIORITY_FILTER_STYLES, getNextStep } from './customer-utils';
+import { PRIORITY_FILTER_STYLES, buildCustomerHubOperatingSummary, getNextStep } from './customer-utils';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 export function CustomersHelpPanel() {
   return (
@@ -41,6 +43,41 @@ function CustomerStatCard({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+export function CustomerHubOperatingStrip({
+  customers,
+  stats,
+}: {
+  customers: Customer[];
+  stats: CustomerStats | null;
+}) {
+  const summary = buildCustomerHubOperatingSummary(customers, stats);
+
+  return (
+    <OwnerControlStrip
+      system={{
+        eyebrow: 'Customer Hub',
+        title: 'Què concentra el CRM ara',
+        items: summary.systemItems,
+        tone: summary.tone,
+        emptyText: 'Encara no hi ha lectura útil de clients.',
+      }}
+      manual={{
+        eyebrow: 'Manual',
+        title: 'On intervenir primer',
+        items: summary.manualItems,
+        tone: summary.tone,
+        emptyText: 'Sense clients visibles no hi ha intervenció prioritzable.',
+      }}
+      nextStep={{
+        title: summary.nextStep.title,
+        detail: summary.nextStep.detail,
+        href: summary.nextStep.href,
+        ctaLabel: summary.nextStep.ctaLabel,
+      }}
+    />
+  );
+}
+
 
 export function CustomersToolbar({
   searchInput,
@@ -206,7 +243,7 @@ export function CustomersMobileList({
                 <button onClick={() => onStartProcess(customer)} type="button" className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" title="Iniciar procés" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
-                <Link href={`/admin/clientes/${customer.id}`} className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
+                <Link href={buildCustomerHubHref(customer.id)} className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                 </Link>
               </div>
@@ -273,7 +310,7 @@ export function CustomersDesktopTable({
                       <button onClick={() => onStartProcess(customer)} type="button" className="p-2 rounded-xl transition-all" title="Iniciar procés" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </button>
-                      <Link href={`/admin/clientes/${customer.id}`} className="p-2 rounded-xl transition-all" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
+                      <Link href={buildCustomerHubHref(customer.id)} className="p-2 rounded-xl transition-all" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </Link>
                     </div>

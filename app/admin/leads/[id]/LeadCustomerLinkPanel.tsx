@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { buildCustomerWorkspaceTabHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import type {
   CustomerMatchSummary,
   LeadCustomerPreview,
@@ -73,7 +74,46 @@ export default function LeadCustomerLinkPanel({
   };
 
   if (preview.kind === 'lead-not-found') return null;
-  if (preview.kind === 'already-linked') return null;
+
+  if (preview.kind === 'already-linked') {
+    return (
+      <section
+        className="rounded-xl border border-emerald-400/30 bg-emerald-500/[0.06] p-6"
+        aria-label="Lead vinculat al Customer Hub"
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">
+          Customer Hub
+        </p>
+        <h3 className="mt-2 text-sm font-semibold text-emerald-100">
+          Aquest lead ja forma part del client
+        </h3>
+        <p className="mt-2 text-xs text-emerald-50/75">
+          Continua el flux comercial des del Customer Hub per veure entrades, tasques, comunicacions i reserves en una sola fitxa.
+        </p>
+        <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-sm">
+          <div className="font-semibold">{preview.customer.customerName}</div>
+          <div className="text-xs text-white/60 break-all">{preview.customer.customerEmail}</div>
+          {preview.customer.customerPhone && (
+            <div className="text-xs text-white/50">Tel: {preview.customer.customerPhone}</div>
+          )}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={buildCustomerWorkspaceTabHref(preview.customer.customerId, 'summary')}
+            className="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/90 text-zinc-950 font-semibold hover:bg-emerald-400"
+          >
+            Obrir Customer Hub
+          </Link>
+          <Link
+            href={buildCustomerWorkspaceTabHref(preview.customer.customerId, 'leads')}
+            className="text-xs px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/10"
+          >
+            Veure entrades del client
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   if (preview.kind === 'matches-found') {
     return (
@@ -112,7 +152,7 @@ export default function LeadCustomerLinkPanel({
                 </div>
                 <div className="flex items-center gap-2">
                   <Link
-                    href={`/admin/clientes/${match.customerId}`}
+                    href={buildCustomerHubHref(match.customerId)}
                     className="text-xs px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/10"
                   >
                     Veure fitxa

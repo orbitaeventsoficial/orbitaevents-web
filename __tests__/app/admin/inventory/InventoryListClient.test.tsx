@@ -158,4 +158,32 @@ describe('InventoryListClient health filters', () => {
     expect(screen.queryByText('Cap mòbil gastat')).not.toBeInTheDocument();
     expect(screen.queryByText('Equip sense ús')).not.toBeInTheDocument();
   });
+
+  it('fa emergir friccions operatives del parc abans de filtrar manualment', async () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams(''));
+    mockFetchWithCsrf.mockImplementation((url: string) => {
+      if (url.startsWith('/api/admin/inventory/bundles')) {
+        return Promise.resolve(response({ bundles: [{ id: 'bundle-1', name: 'Lot principal', itemIds: ['linked'] }] }));
+      }
+
+      return Promise.resolve(
+        response({
+          items: [
+            makeItem({ id: 'linked', code: 'LIN-1', name: 'Equip connectat', value: 500 }),
+            makeItem({ id: 'missing', code: 'MIS-1', name: 'Equip sense cost', purchasePrice: null, expectedLifeHours: null, value: 250 }),
+            makeItem({ id: 'unused', code: 'UNU-1', name: 'Equip sense ús', packItems: [], _count: { bookingItems: 0, usageHistory: 0 }, value: 450 }),
+          ],
+          stats: {},
+        })
+      );
+    });
+
+    render(<InventoryListClient />);
+
+    expect(await screen.findByText('Completar cost i vida útil abans de llegir marge')).toBeInTheDocument();
+    expect(screen.getByText('1 equips sense cost o vida útil completa.')).toBeInTheDocument();
+    expect(screen.getByText('1 equips amb valor econòmic sense ús a packs ni reserves.')).toBeInTheDocument();
+    expect(screen.getByText('2 equips ja estan connectats a almenys un pack.')).toBeInTheDocument();
+    expect(screen.getByText('Obrir cost pendent').closest('a')).toHaveAttribute('href', '/admin/inventory?health=missing-cost');
+  });
 });

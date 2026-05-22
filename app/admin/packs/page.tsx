@@ -9,8 +9,9 @@ import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
-import { PACK_SERVICE_OPTIONS } from '@/lib/constants';
+import { PACK_SERVICE_OPTIONS, formatCurrencyExact } from '@/lib/constants';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -461,7 +462,7 @@ export default async function PacksPage({
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-xl border p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{health.recommendedPrice.toFixed(2)}€</p>
+                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -473,7 +474,7 @@ export default async function PacksPage({
                         />
                         <div className="rounded-xl border p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
+                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
                           <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
@@ -538,13 +539,13 @@ export default async function PacksPage({
 
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
-                      href={`/admin/packs/${pack.id}`}
+                      href={buildPackHref(pack.id)}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}?tab=content`}
+                      href={buildPackHref(pack.id, 'content')}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Equip
@@ -625,7 +626,7 @@ export default async function PacksPage({
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-xl border p-2">
                           <p className="">Pack recomanat</p>
-                          <p className="text-sm font-semibold">{health.recommendedPrice.toFixed(2)}€</p>
+                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedPrice)}</p>
                         </div>
                         <PackPriceQuickEditor
                           packId={pack.id}
@@ -637,7 +638,7 @@ export default async function PacksPage({
                         />
                         <div className="rounded-xl border p-2">
                           <p className="">Hora extra recomanada</p>
-                          <p className="text-sm font-semibold">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
+                          <p className="text-sm font-semibold">{formatCurrencyExact(health.recommendedExtraHourPrice)}</p>
                         </div>
                         <div className={`col-span-2 rounded-xl border p-2 ${divergenceColor}`}>
                           <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
@@ -702,13 +703,13 @@ export default async function PacksPage({
 
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
-                      href={`/admin/packs/${pack.id}`}
+                      href={buildPackHref(pack.id)}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
-                      href={`/admin/packs/${pack.id}?tab=content`}
+                      href={buildPackHref(pack.id, 'content')}
                       className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       📦 Equip

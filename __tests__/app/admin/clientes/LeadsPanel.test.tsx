@@ -94,5 +94,14 @@ describe('LeadsPanel', () => {
     expect(screen.getByText('Pressupost pendent')).toBeInTheDocument();
     expect(screen.getAllByText('Desencallar per WhatsApp').length).toBeGreaterThan(0);
     expect(screen.getByText('Enviar recordatori')).toBeInTheDocument();
+    expect(screen.getAllByText('Entrada nova · Lead -> negociació -> reserva -> client recurrent').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /Lead calenta/ })[0]).toHaveAttribute(
+      'href',
+      '/admin/clientes/cust-1?tab=leads'
+    );
+    expect(screen.getAllByRole('link', { name: 'Fitxa tècnica del lead' })[0]).toHaveAttribute(
+      'href',
+      '/admin/leads/lead-2'
+    );
   });
 });

@@ -1,3 +1,0 @@
-viewport=1440x900
-category=/portfolio/bodas
-event=none

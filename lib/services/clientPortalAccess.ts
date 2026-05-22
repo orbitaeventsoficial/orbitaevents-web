@@ -36,13 +36,17 @@ function buildClientPortalUrl(token: string, locale: string): string {
   return `${baseUrl}/${normalizePortalLocale(locale)}/portal/${token}`;
 }
 
+function isPortalAccessCurrentlyValid(access: { revokedAt: Date | null; expiresAt: Date | null }, now = new Date()): boolean {
+  return !access.revokedAt && Boolean(access.expiresAt) && access.expiresAt! > now;
+}
+
 export async function getActivePortalAccessForBooking(bookingId: string) {
   const now = new Date();
   return portalAccessRepo.findFirst({
     where: {
       bookingId,
       revokedAt: null,
-      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+      expiresAt: { gt: now },
     },
     orderBy: { createdAt: 'desc' },
     select: {
@@ -161,6 +165,11 @@ export async function findPortalAccessByRawToken(token: string) {
               reference: true,
               pdfUrl: true,
               createdAt: true,
+              contractReference: true,
+              contractStatus: true,
+              contractPdfUrl: true,
+              contractSignedAt: true,
+              contractSignatureBlob: true,
             },
           },
           postEventReport: true,
@@ -173,8 +182,7 @@ export async function findPortalAccessByRawToken(token: string) {
   });
 
   if (!access) return null;
-  if (access.revokedAt) return null;
-  if (access.expiresAt && access.expiresAt <= now) return null;
+  if (!isPortalAccessCurrentlyValid(access, now)) return null;
 
   return access;
 }

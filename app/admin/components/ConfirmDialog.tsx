@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ADMIN_SHARED_HELP, helpAttrs } from './adminHelpContent';
 
 type ConfirmVariant = 'danger' | 'warning' | 'info';
@@ -102,8 +103,12 @@ export default function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const [busy, setBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const confirmRef = useRef<HTMLButtonElement>(null);
+  const shouldReduceMotion = useReducedMotion();
   const styles = VARIANT_STYLES[variant];
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (open) {
@@ -139,61 +144,82 @@ export default function ConfirmDialog({
     }
   };
 
-  if (!open) return null;
+  const dur = shouldReduceMotion ? 0 : 0.15;
+  const scaleTo = shouldReduceMotion ? 1 : 0.95;
+
+  if (!mounted) return null;
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-dialog-title"
-      {...helpAttrs(ADMIN_SHARED_HELP.confirmDialog)}
-    >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150" onClick={onCancel} />
-
-      <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-2xl animate-in zoom-in-95 fade-in duration-200">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 text-xl">{styles.icon}</span>
-          <div className="flex-1 min-w-0">
-            <h3 id="confirm-dialog-title" className="text-base font-semibold text-white">
-              {title}
-            </h3>
-            <p className="mt-1.5 text-sm text-white/60 leading-relaxed whitespace-pre-line">
-              {message}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
+    <AnimatePresence>
+      {open && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          {...helpAttrs(ADMIN_SHARED_HELP.confirmDialog)}
+        >
+          <motion.div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onCancel}
-            disabled={busy}
-            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
-            {...helpAttrs(ADMIN_SHARED_HELP.confirmCancel)}
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: dur }}
+          />
+
+          <motion.div
+            className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-2xl"
+            initial={{ opacity: 0, scale: scaleTo }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: scaleTo }}
+            transition={{ duration: dur, ease: 'easeOut' }}
           >
-            Cancel·lar
-          </button>
-          <button
-            ref={confirmRef}
-            type="button"
-            onClick={handleConfirm}
-            disabled={busy}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 ${styles.button}`}
-            {...helpAttrs(ADMIN_SHARED_HELP.confirmAccept)}
-          >
-            {busy ? (
-              <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Processant...
-              </span>
-            ) : (
-              confirmLabel
-            )}
-          </button>
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 text-xl">{styles.icon}</span>
+              <div className="flex-1 min-w-0">
+                <h3 id="confirm-dialog-title" className="text-base font-semibold text-white">
+                  {title}
+                </h3>
+                <p className="mt-1.5 text-sm text-white/60 leading-relaxed whitespace-pre-line">
+                  {message}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={busy}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+                {...helpAttrs(ADMIN_SHARED_HELP.confirmCancel)}
+              >
+                Cancel·lar
+              </button>
+              <button
+                ref={confirmRef}
+                type="button"
+                onClick={handleConfirm}
+                disabled={busy}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 ${styles.button}`}
+                {...helpAttrs(ADMIN_SHARED_HELP.confirmAccept)}
+              >
+                {busy ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Processant...
+                  </span>
+                ) : (
+                  confirmLabel
+                )}
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>,
+      )}
+    </AnimatePresence>,
     document.body,
   );
 }

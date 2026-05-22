@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { LossBreakdownEntry, LossSummary, MonthlyLossPoint } from '@/lib/services/leadLossAnalyticsService';
+import { ADMIN_CHART_COLORS, ADMIN_CHART_SERIES_COLORS, ADMIN_SVG_COLORS } from '@/lib/constants/admin';
+import { formatMonthYearCompact } from '@/lib/constants';
 
 type LossBreakdownPanelProps = {
   initialSummary: LossSummary;
@@ -16,17 +18,10 @@ type LossApiResponse = {
 
 function buildDonutGradient(entries: LossBreakdownEntry[]): string {
   if (entries.length === 0) {
-    return 'conic-gradient(rgba(255,255,255,0.08) 0deg 360deg)';
+    return `conic-gradient(${ADMIN_SVG_COLORS.emptyGradient} 0deg 360deg)`;
   }
 
-  const palette = [
-    '#22d3ee',
-    '#f59e0b',
-    '#34d399',
-    '#f472b6',
-    '#818cf8',
-    '#fb7185',
-  ];
+  const palette = ADMIN_CHART_COLORS;
 
   let current = 0;
   const stops = entries.map((entry, index) => {
@@ -56,11 +51,7 @@ function buildTrendPolyline(points: MonthlyLossPoint[]): string {
 }
 
 function formatMonth(monthIso: string): string {
-  const [year, month] = monthIso.split('-').map(Number);
-  if (!year || !month) return monthIso;
-  return new Intl.DateTimeFormat('ca-ES', { month: 'short', year: '2-digit', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(year, month - 1, 1))
-  );
+  return formatMonthYearCompact(monthIso);
 }
 
 export default function LossBreakdownPanel({
@@ -190,7 +181,7 @@ export default function LossBreakdownPanel({
                 className="mx-auto h-40 w-40 rounded-full border border-white/10"
                 style={{ backgroundImage: donutGradient }}
               >
-                <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-[#04131c]/95 text-center">
+                <div className="m-auto mt-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 admin-donut-hole text-center">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.18em] text-white/45">Leads</p>
                     <p className="mt-1 text-2xl font-semibold text-white">{summary.total}</p>
@@ -205,7 +196,7 @@ export default function LossBreakdownPanel({
                       <span
                         aria-hidden="true"
                         className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: ['#22d3ee', '#f59e0b', '#34d399', '#f472b6', '#818cf8'][index % 5] }}
+                        style={{ backgroundColor: ADMIN_CHART_COLORS[index % ADMIN_CHART_COLORS.length] }}
                       />
                       <span className="text-white/85">{entry.label}</span>
                     </div>
@@ -253,10 +244,10 @@ export default function LossBreakdownPanel({
             <>
               <div className="mt-4 rounded-xl border border-white/8 bg-black/10 p-3">
                 <svg viewBox="0 0 160 72" className="h-28 w-full" role="img" aria-label="Tendència mensual de pèrdues">
-                  <path d="M8 64 H152" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                  <path d="M8 64 H152" stroke={ADMIN_SVG_COLORS.baselineLine} strokeWidth="1" />
                   <polyline
                     fill="none"
-                    stroke="rgba(34,211,238,0.95)"
+                    stroke={ADMIN_CHART_SERIES_COLORS.trendLine}
                     strokeWidth="3"
                     strokeLinejoin="round"
                     strokeLinecap="round"
@@ -266,7 +257,7 @@ export default function LossBreakdownPanel({
                     const max = Math.max(...summary.byMonth.map((item) => item.count), 1);
                     const x = summary.byMonth.length === 1 ? 80 : 8 + (index / (summary.byMonth.length - 1)) * 144;
                     const y = 64 - ((point.count / max) * 48);
-                    return <circle key={point.monthIso} cx={x} cy={y} r="3.5" fill="#67e8f9" />;
+                    return <circle key={point.monthIso} cx={x} cy={y} r="3.5" fill={ADMIN_CHART_SERIES_COLORS.trendDots} />;
                   })}
                 </svg>
               </div>

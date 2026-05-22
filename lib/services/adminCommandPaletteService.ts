@@ -1,4 +1,6 @@
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 export type AdminPaletteNavItem = {
   icon: string;
@@ -179,7 +181,7 @@ export function buildAdminSearchEntries(results: AdminPaletteSearchResults): Adm
     })),
     ...results.bookings.map((booking) => ({
       key: `booking-${booking.id}`,
-      href: `/admin/bookings/${booking.id}`,
+      href: buildBookingHref(booking.id),
       label: `${booking.reference} · ${booking.clientName}`,
       meta: booking.statusLabel,
       type: 'Reserva',
@@ -187,7 +189,7 @@ export function buildAdminSearchEntries(results: AdminPaletteSearchResults): Adm
     })),
     ...results.customers.map((customer) => ({
       key: `customer-${customer.id}`,
-      href: `/admin/clientes/${customer.id}`,
+      href: buildCustomerHubHref(customer.id),
       label: customer.name,
       meta: `${customer.totalEvents} esdeveniments`,
       type: 'Client',

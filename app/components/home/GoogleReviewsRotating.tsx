@@ -21,6 +21,7 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import GoogleGIcon from '@/app/components/public/GoogleGIcon';
 import StarIcon, { StarPolygon } from '@/app/components/public/StarIcon';
 import { fetchPublicGoogleReviews, type GoogleReview as PublicGoogleReview } from '@/lib/api/googleReviewsClient';
+import { toIntlLocale } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -248,7 +249,7 @@ export default function GoogleReviewsRotating({ showFooterCta = true, showHeader
     if (!lastUpdated) return null;
     const parsed = new Date(lastUpdated);
     if (Number.isNaN(parsed.getTime())) return null;
-    return new Intl.DateTimeFormat(locale, {
+    return new Intl.DateTimeFormat(toIntlLocale(locale), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

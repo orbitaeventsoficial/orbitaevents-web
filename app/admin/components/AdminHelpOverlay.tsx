@@ -261,11 +261,11 @@ export default function AdminHelpOverlay() {
       onDoubleClick={blockAction}
       onMouseDown={blockAction}
     >
-      <div className="pointer-events-none absolute inset-0 bg-slate-950/12" />
+      <div className="pointer-events-none absolute inset-0 bg-black/[0.12]" />
       <button
         type="button"
         data-help-toggle="true"
-        className="absolute right-4 top-4 z-[69] rounded-full border border-white/20 bg-slate-950/90 px-4 py-2 text-xs font-semibold text-white shadow-xl"
+        className="absolute right-4 top-4 z-[69] rounded-full border border-white/20 bg-black/90 px-4 py-2 text-xs font-semibold text-white shadow-xl"
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();

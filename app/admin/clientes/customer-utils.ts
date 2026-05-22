@@ -36,8 +36,29 @@ export interface CustomerStats {
 
 export type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
+export interface CustomerHubOperatingSummary {
+  totalVisible: number;
+  totalKnown: number;
+  withEventHistory: number;
+  activeOpportunities: number;
+  highPriority: number;
+  atRisk: number;
+  dormant: number;
+  missingContactChannel: number;
+  tone: 'info' | 'warning' | 'success';
+  systemItems: string[];
+  manualItems: string[];
+  nextStep: {
+    title: string;
+    detail: string;
+    href: string;
+    ctaLabel: string;
+  };
+}
+
 export { PRIORITY_FILTER_STYLES } from '@/lib/constants';
 import { EXECUTION_PRIORITY_HINTS, CUSTOMER_NEXT_STEPS } from '@/lib/constants';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -75,5 +96,68 @@ export function getExecutionPriority(customer: Customer): { level: ExecutionPrio
     return { level: 'MITJANA', score: 50, hint: EXECUTION_PRIORITY_HINTS.RECURRING_POTENTIAL };
   }
   return { level: 'BAIXA', score: 20, hint: EXECUTION_PRIORITY_HINTS.LOW_URGENCY };
+}
+
+export function buildCustomerHubOperatingSummary(
+  customers: Customer[],
+  stats: CustomerStats | null,
+): CustomerHubOperatingSummary {
+  const prioritized = customers
+    .map((customer) => ({ customer, priority: getExecutionPriority(customer) }))
+    .sort((a, b) => b.priority.score - a.priority.score);
+  const totalVisible = customers.length;
+  const totalKnown = stats?.total ?? totalVisible;
+  const withEventHistory = stats?.withEvents ?? customers.filter((customer) => (customer.total_events || 0) > 0).length;
+  const activeOpportunities = customers.filter((customer) => (customer.total_events || 0) === 0 && Boolean(customer.email || customer.phone)).length;
+  const highPriority = prioritized.filter((item) => item.priority.level === 'ALTA').length;
+  const atRisk = stats?.atRisk ?? customers.filter((customer) => typeof customer.healthScore === 'number' && customer.healthScore <= 45).length;
+  const dormant = stats?.dormant ?? customers.filter((customer) => customer.lifecycleStage === 'DORMANT').length;
+  const missingContactChannel = customers.filter((customer) => !customer.email && !customer.phone).length;
+  const focus = prioritized[0]?.customer ?? null;
+  const focusPriority = prioritized[0]?.priority ?? null;
+  const hasRisk = highPriority > 0 || atRisk > 0 || missingContactChannel > 0;
+  const tone: CustomerHubOperatingSummary['tone'] = hasRisk ? 'warning' : totalVisible > 0 ? 'success' : 'info';
+
+  return {
+    totalVisible,
+    totalKnown,
+    withEventHistory,
+    activeOpportunities,
+    highPriority,
+    atRisk,
+    dormant,
+    missingContactChannel,
+    tone,
+    systemItems: [
+      `${totalVisible} clients visibles de ${totalKnown} totals al CRM.`,
+      `${withEventHistory} clients amb historial d'esdeveniments i ${activeOpportunities} oportunitats sense esdeveniment encara.`,
+      `${dormant} dormits i ${atRisk} en risc dins la lectura actual.`,
+      `${missingContactChannel} clients no tenen canal directe complet per contactar.`,
+    ],
+    manualItems: [
+      highPriority > 0
+        ? `${highPriority} clients demanen prioritat alta abans de seguir filtrant.`
+        : 'No hi ha cap client visible amb prioritat alta ara mateix.',
+      focus
+        ? `Primer focus: ${focus.name} (${focusPriority?.level.toLowerCase() ?? 'baixa'}).`
+        : 'Encara no hi ha cap client visible per prioritzar.',
+      activeOpportunities > 0
+        ? 'Les oportunitats sense esdeveniment han de convertir-se en pressupost, reserva o descart.'
+        : 'La llista visible no té oportunitats obertes sense esdeveniment.',
+    ],
+    nextStep: focus
+      ? {
+          title: `Obrir Fitxa 360 de ${focus.name}`,
+          detail: focusPriority?.hint ?? 'Revisa la relació completa abans de decidir el següent moviment.',
+          href: buildCustomerHubHref(focus.id),
+          ctaLabel: 'Obrir Fitxa 360',
+        }
+      : {
+          title: 'Crear o importar el primer client útil',
+          detail: 'Sense clients visibles, el Customer Hub no pot actuar com a centre de relació.',
+          href: '/admin/clientes?add=1',
+          ctaLabel: 'Afegir client',
+        },
+  };
 }
 

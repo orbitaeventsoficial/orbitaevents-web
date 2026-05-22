@@ -27,6 +27,10 @@ export function parseCustomerWorkspaceTab(value: string | null | undefined): Cus
     : null;
 }
 
+export function buildCustomerHubHref(customerId: string): string {
+  return `/admin/clientes/${customerId}`;
+}
+
 export function buildCustomerWorkspaceTabHref(
   customerId: string,
   tab: CustomerWorkspaceTab

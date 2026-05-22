@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useToast } from '../components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_CUSTOMER_START_PROCESSES } from '@/lib/constants/admin';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import type { Customer } from './customer-utils';
 
 interface DuplicateWarning {
@@ -127,6 +128,7 @@ export function AddCustomerModal({
 
       onCreated(result.data, createdDuplicateWarnings);
     } catch (err) {
+      console.error('Error en acció ClientesModals', err);
       setError(err instanceof Error ? err.message : 'Error');
     } finally {
       setActionLoading(false);
@@ -163,7 +165,7 @@ export function AddCustomerModal({
             {duplicateWarnings.map((dup) => (
               <Link
                 key={dup.id}
-                href={`/admin/clientes/${dup.id}`}
+                href={buildCustomerHubHref(dup.id)}
                 className="flex items-center justify-between rounded-xl border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
               >
                 <div>
@@ -363,6 +365,7 @@ export function StartProcessModal({
       toast.success(`Procés "${processType}" iniciat per ${customer.name}`);
       onClose();
     } catch (err) {
+      console.error('Error iniciant procés client', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setActionLoading(false);

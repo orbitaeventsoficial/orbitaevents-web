@@ -88,6 +88,7 @@ export default function CollaboratorsClient() {
       setCollaborators(data.collaborators || []);
       setKpis(data.kpis || null);
     } catch (error) {
+      console.error('Error carregant col·laboradors', error);
       const message = error instanceof Error ? error.message : "No s'han pogut carregar els col·laboradors";
       setLoadError(message);
       toast.error(message);
@@ -121,7 +122,8 @@ export default function CollaboratorsClient() {
       setEditingId(null);
       setForm(ADMIN_COLLABORATOR_EMPTY_FORM);
       load();
-    } catch {
+    } catch (err) {
+      console.error('Error desant col·laborador', err);
       toast.error('Error desant');
     }
   };
@@ -149,6 +151,7 @@ export default function CollaboratorsClient() {
       toast.success('Col·laborador eliminat');
       await load();
     } catch (error) {
+      console.error('Error eliminant col·laborador', error);
       toast.error(error instanceof Error ? error.message : "No s'ha pogut eliminar el col·laborador");
     }
   };
@@ -164,6 +167,7 @@ export default function CollaboratorsClient() {
       toast.success(c.isActive ? 'Desactivat' : 'Activat');
       await load();
     } catch (error) {
+      console.error("Error actualitzant estat col·laborador", error);
       toast.error(error instanceof Error ? error.message : "No s'ha pogut actualitzar l'estat del col·laborador");
     }
   };

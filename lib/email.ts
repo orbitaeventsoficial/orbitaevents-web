@@ -5,6 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { absoluteUrl, getAppBaseUrl } from '@/lib/site';
 import { getManagedImageOverride } from '@/lib/services/imageManagerService';
@@ -1128,7 +1129,7 @@ export async function sendBookingNotificationToAdmin(booking: BookingEmailModel)
 
           <hr>
           <p style="color: #666; font-size: 12px;">
-            Ver en admin: ${SITE_CONFIG.web.url}/admin/bookings/${booking.id}
+            Ver en admin: ${SITE_CONFIG.web.url}${buildBookingHref(booking.id)}
           </p>
         </div>
       </body>

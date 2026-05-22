@@ -11,6 +11,7 @@ import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog'
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 import { INVENTORY_CONDITION_OPTIONS } from '@/lib/constants';
+import { buildInventoryHref } from '@/lib/admin/inventoryWorkspaceHref';
 import { getInventoryCategoryDisplay } from '@/lib/inventory-utils';
 import { ADMIN_BOOKING_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 
@@ -343,7 +344,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 </code>
                 <div className="min-w-0">
                   <Link
-                    href={`/admin/inventory/${a.item.id}`}
+                    href={buildInventoryHref(a.item.id)}
                     className="text-sm font-medium transition-colors truncate block"
                   >
                     {a.item.name}
@@ -414,6 +415,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cercar per nom o codi..."
+            aria-label="Cercar equipament"
             className="w-full rounded-xl border px-3 py-2.5 text-sm "
             autoFocus
           />
@@ -453,7 +455,6 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     </section>
   );
 }
-
 
 
 

@@ -3,7 +3,9 @@ import { log } from '@/lib/logger';
 // Detall de reserva amb canvi d'estat
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerComposeHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import { notFound } from 'next/navigation';
 import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
@@ -15,10 +17,12 @@ import InvoiceSection from './InvoiceSection';
 import DocumentFlowSection from './DocumentFlowSection';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
+import StripePaymentPanel from './StripePaymentPanel';
 import BookingSectionNav from './BookingSectionNav';
 import BookingGallery from './BookingGallery';
 import BookingFieldNotesComposer from './BookingFieldNotesComposer';
 import BookingCustomerLinkPanel from './BookingCustomerLinkPanel';
+import BookingQuestionnaireSection from './BookingQuestionnaireSection';
 import { getBookingOperationalSnapshot } from '@/lib/services/bookingOperationalService';
 import { previewBookingCustomerLink } from '@/lib/services/bookings/bookingCustomerLinkService';
 
@@ -77,6 +81,7 @@ async function getBooking(id: string) {
           select: {
             id: true, reference: true, status: true, pdfUrl: true,
             contractStatus: true, contractReference: true, contractPdfUrl: true, contractSignedAt: true,
+            contractSignedBy: true, contractSignatureIp: true, contractSignatureUa: true, contractSignatureBlob: true,
           },
           orderBy: { createdAt: 'desc' },
         },
@@ -119,6 +124,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const activePortalAccess = ops.portalAccess as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
 
   const customerLinkPreview = booking.customerId ? null : await previewBookingCustomerLink(booking.id);
+  const bookingComposeHref = customer
+    ? buildCustomerComposeHref(customer.id)
+    : booking.lead
+      ? buildLeadComposeHref(booking.lead.id)
+      : '/admin/inbox/compose';
 
   const googleCalendarUrl = buildGoogleCalendarUrl({
     reference: booking.reference,
@@ -219,7 +229,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               )}
               {customer && (
                 <Link
-                  href={`/admin/clientes/${customer.id}`}
+                  href={buildCustomerHubHref(customer.id)}
                   className="ap-btn ap-btn--secondary"
                 >
                   Fitxa Client
@@ -334,13 +344,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <MobileQuickActions
           phone={booking.clientPhone}
           email={booking.clientEmail}
+          emailHref={bookingComposeHref}
           whatsappMessage={`Hola ${booking.clientName}! Et contactem des d'Òrbita Events per la reserva ${booking.reference}.`}
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="text-xs font-medium uppercase">Nom</p>
             {customer ? (
-              <Link href={`/admin/clientes/${customer.id}`} className="mt-1 font-medium transition-colors block">
+              <Link href={buildCustomerHubHref(customer.id)} className="mt-1 font-medium transition-colors block">
                 {booking.clientName}
               </Link>
             ) : (
@@ -349,9 +360,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
           <div>
             <p className="text-xs font-medium uppercase">Email</p>
-            <a href={`mailto:${booking.clientEmail}`} className="mt-1 hover:underline block">
+            <Link href={bookingComposeHref} className="mt-1 hover:underline block">
               {booking.clientEmail}
-            </a>
+            </Link>
           </div>
           <div>
             <p className="text-xs font-medium uppercase">Telèfon</p>
@@ -374,7 +385,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <PostEventEmailButton bookingId={booking.id} />
           {customer && (
             <Link
-              href={`/admin/clientes/${customer.id}`}
+              href={buildCustomerHubHref(customer.id)}
               className="ap-btn ap-btn--secondary text-xs"
             >
               Fitxa client 360
@@ -461,7 +472,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="flex items-start justify-between">
             <div>
               <span className="text-xs font-medium uppercase">Pack</span>
-              <Link href={`/admin/packs/${booking.pack.id}`} className="text-lg font-semibold underline decoration-white/20 hover:decoration-white/60 transition-colors">
+              <Link href={buildPackHref(booking.pack.id)} className="text-lg font-semibold underline decoration-white/20 hover:decoration-white/60 transition-colors">
                 {packTranslation?.name || booking.pack.slug}
               </Link>
               {packTranslation?.tagline && (
@@ -526,6 +537,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
         />
       </div>
 
+      <div id="sec-questionnaire" className="scroll-mt-28">
+        <BookingQuestionnaireSection bookingId={booking.id} />
+      </div>
+
       {/* Pricing */}
       <section id="sec-finances" className="admin-booking-panel scroll-mt-28 ap-card rounded-xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP.detail.finances)}>
         <h2 className="text-lg font-semibold mb-4">Resum Econòmic</h2>
@@ -566,6 +581,17 @@ export default async function BookingDetailPage({ params }: PageProps) {
               {booking.remainingPaid ? 'Pagat' : 'Pendent'}
             </span>
           </div>
+        </div>
+        <div className="mt-6">
+          <StripePaymentPanel
+            bookingId={booking.id}
+            depositPaid={booking.depositPaid}
+            depositPaymentUrl={booking.depositPaymentUrl}
+            remainingPaid={booking.remainingPaid}
+            remainingPaymentUrl={booking.remainingPaymentUrl}
+            depositAmount={booking.depositAmount}
+            remainingAmount={booking.remainingAmount}
+          />
         </div>
       </section>
 
@@ -611,6 +637,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
           contractReference: p.contractReference,
           contractPdfUrl: p.contractPdfUrl,
           contractSignedAt: p.contractSignedAt?.toISOString() || null,
+          contractSignedBy: p.contractSignedBy,
+          contractSignatureIp: p.contractSignatureIp,
+          contractSignatureUa: p.contractSignatureUa,
+          contractSignatureBlob: p.contractSignatureBlob,
         }))}
         invoices={(booking.invoices as BookingInvoiceRow[]).map((inv) => ({
           id: inv.id,
@@ -779,11 +809,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </AdminPage>
   );
 }
-
-
-
-
-
 
 
 

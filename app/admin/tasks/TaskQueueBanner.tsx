@@ -15,7 +15,7 @@ const QUEUE_CONFIG: Array<{
   { key: 'VENÇUT', label: 'Vençudes', icon: '🔴', color: 'border-rose-500/30 bg-rose-500/[0.06] text-rose-200', activeColor: 'border-rose-500/60 bg-rose-500/[0.15] text-rose-100 ring-1 ring-rose-500/40' },
   { key: 'AVUI', label: 'Avui', icon: '🟡', color: 'border-amber-500/30 bg-amber-500/[0.06] text-amber-200', activeColor: 'border-amber-500/60 bg-amber-500/[0.15] text-amber-100 ring-1 ring-amber-500/40' },
   { key: 'VIP', label: 'VIP', icon: '⭐', color: 'border-purple-500/30 bg-purple-500/[0.06] text-purple-200', activeColor: 'border-purple-500/60 bg-purple-500/[0.15] text-purple-100 ring-1 ring-purple-500/40' },
-  { key: 'BLOQUEJAT', label: 'Bloquejades', icon: '🧊', color: 'border-slate-500/30 bg-slate-500/[0.06] text-slate-300', activeColor: 'border-slate-500/60 bg-slate-500/[0.15] text-slate-200 ring-1 ring-slate-500/40' },
+  { key: 'BLOQUEJAT', label: 'Bloquejades', icon: '🧊', color: 'border-white/15 bg-white/[0.06] text-white/60', activeColor: 'border-white/30 bg-white/[0.08] text-white/70 ring-1 ring-white/20' },
 ];
 
 export default function TaskQueueBanner({

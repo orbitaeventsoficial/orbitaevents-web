@@ -7,6 +7,7 @@
 // Part pura (assemblatge + scoring) + wrapper (fetch paral·lel).
 // ═══════════════════════════════════════════════════════════════════════════
 
+import { formatCurrencyExact } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import { loadPendingFollowUps, type FollowUpSummary, type PendingFollowUp } from '@/lib/services/responseTrackingService';
 import { loadCapacityConflicts, type CapacityConflictReport, type CapacityConflict } from '@/lib/services/capacityConflictService';
@@ -14,6 +15,8 @@ import { loadPipelineSuggestions, type PipelineSuggestion } from '@/lib/services
 import { prisma } from '@/lib/prisma';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import type { LeadStatus } from '@prisma/client';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -290,11 +293,11 @@ function extractCustomerActions(customers: NBACustomerInput[], now: Date): NextB
         urgency: urgent ? 'HIGH' : 'MEDIUM',
         icon: '💰',
         title: `Cobrament pendent — ${cust.name}`,
-        subtitle: `${cust.pendingPayment.toLocaleString('ca-ES')}€ pendents`,
-        href: `/admin/clientes/${cust.id}`,
+        subtitle: `${formatCurrencyExact(cust.pendingPayment)} pendents`,
+        href: buildCustomerHubHref(cust.id),
         score: 0,
         entity: { type: 'customer', id: cust.id, name: cust.name },
-        reasoning: `El client té ${cust.pendingPayment.toLocaleString('ca-ES')}€ pendents de cobrar`,
+        reasoning: `El client té ${formatCurrencyExact(cust.pendingPayment)} pendents de cobrar`,
         estimatedImpact: urgent ? 'HIGH' : 'MEDIUM',
         timeWindow: 'Aquesta setmana',
       });
@@ -311,7 +314,7 @@ function extractCustomerActions(customers: NBACustomerInput[], now: Date): NextB
         icon: '⚠️',
         title: `Client en risc — ${cust.name}`,
         subtitle: `Salut: ${cust.healthScore}/100`,
-        href: `/admin/clientes/${cust.id}`,
+        href: buildCustomerHubHref(cust.id),
         score: 0,
         entity: { type: 'customer', id: cust.id, name: cust.name },
         reasoning: `Score de salut molt baix (${cust.healthScore}/100) — risc de pèrdua`,
@@ -331,7 +334,7 @@ function extractCustomerActions(customers: NBACustomerInput[], now: Date): NextB
         icon: '📭',
         title: `Sense contacte — ${cust.name}`,
         subtitle: `${dSinceContact} dies sense comunicació`,
-        href: `/admin/clientes/${cust.id}`,
+        href: buildCustomerHubHref(cust.id),
         score: 0,
         entity: { type: 'customer', id: cust.id, name: cust.name },
         reasoning: `Fa ${dSinceContact} dies sense cap comunicació — relació es refreda`,
@@ -360,8 +363,8 @@ function extractTaskActions(tasks: NBATaskInput[], now: Date): NextBestAction[] 
 
     const entityType = task.bookingId ? 'booking' : task.customerId ? 'customer' : task.leadId ? 'lead' : 'task';
     const entityId = task.bookingId || task.customerId || task.leadId || task.id;
-    const href = task.bookingId ? `/admin/bookings/${task.bookingId}`
-      : task.customerId ? `/admin/clientes/${task.customerId}`
+    const href = task.bookingId ? buildBookingHref(task.bookingId)
+      : task.customerId ? buildCustomerHubHref(task.customerId)
       : task.leadId ? buildLeadWorkspaceHref(task.leadId)
       : '/admin/tasks';
 

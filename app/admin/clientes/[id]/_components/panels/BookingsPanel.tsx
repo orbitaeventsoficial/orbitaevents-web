@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { BOOKING_STATUS_CONFIG, formatDateFull, formatNumber, getEventLabel } from '@/lib/constants';
 import { ADMIN_CUSTOMER_PANEL_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { buildCustomerBookingCreateHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 function getBookingStatusBadgeClass(status: string) {
   const tone = BOOKING_STATUS_CONFIG[status];
@@ -86,7 +87,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                   {(booking.depositAmount || booking.totalAmount) && <PaymentIndicator booking={booking} />}
 
                   <div className="mt-3 border-t pt-2">
-                    <Link href={`/admin/bookings/${booking.id}`} className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                    <Link href={buildBookingHref(booking.id)} className="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa d&apos;esdeveniment →
                     </Link>
                   </div>
@@ -104,7 +105,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                   </div>
                   <p className="mt-1 text-xs">{booking.date ? formatDateFull(booking.date) : 'Sense data'}</p>
                   <div className="mt-2 border-t border-white/5 pt-2">
-                    <Link href={`/admin/bookings/${booking.id}`} className="text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
+                    <Link href={buildBookingHref(booking.id)} className="text-xs" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP.bookings.openBooking)}>
                       Obrir fitxa →
                     </Link>
                   </div>

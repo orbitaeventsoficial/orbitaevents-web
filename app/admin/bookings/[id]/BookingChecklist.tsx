@@ -58,6 +58,7 @@ export default function BookingChecklist({ bookingId }: { bookingId: string }) {
       });
       if (!response.ok) throw new Error('Error desant checklist');
     } catch (error) {
+      console.error('Error desant checklist', error);
       toast.error(error instanceof Error ? error.message : 'Error desant checklist');
     }
   }

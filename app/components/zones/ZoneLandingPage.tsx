@@ -57,6 +57,8 @@ export default function ZoneLandingPage({ config }: Props) {
               src={heroImage}
               alt={t(`galleryAltByService.${service}`, { zone, index: 1 })}
               fill
+              sizes="100vw"
+              quality={70}
               className="object-cover"
               priority
             />
@@ -176,6 +178,8 @@ export default function ZoneLandingPage({ config }: Props) {
                     src={img}
                     alt={t(`galleryAltByService.${service}`, { zone, index: index + 1 })}
                     fill
+                    sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
+                    quality={70}
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -11,6 +11,10 @@ interface ProposalDoc {
   contractReference: string | null;
   contractPdfUrl: string | null;
   contractSignedAt: string | null;
+  contractSignedBy: string | null;
+  contractSignatureIp: string | null;
+  contractSignatureUa: string | null;
+  contractSignatureBlob: string | null;
 }
 
 interface InvoiceDoc {
@@ -18,6 +22,13 @@ interface InvoiceDoc {
   reference: string;
   status: string;
   holdedInvoiceUrl: string | null;
+}
+
+function formatSignedAt(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
 }
 
 export default function DocumentFlowSection({ proposals, invoices }: { proposals: ProposalDoc[]; invoices: InvoiceDoc[] }) {
@@ -40,6 +51,7 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
   ];
 
   const progressWidth = invoicePaid ? 'calc(100% - 3rem)' : hasInvoice ? 'calc(83% - 2.5rem)' : contractSigned ? 'calc(67% - 2rem)' : hasContract ? 'calc(50% - 1.5rem)' : proposalAccepted ? 'calc(33% - 1rem)' : hasProposal ? 'calc(16% - 0.5rem)' : '0%';
+  const contractSignedAt = formatSignedAt(activeProposal?.contractSignedAt ?? null);
 
   return (
     <section className="ap-card rounded-2xl p-6" {...helpAttrs(ADMIN_BOOKING_HELP_2.documentFlow.root)}>
@@ -71,11 +83,25 @@ export default function DocumentFlowSection({ proposals, invoices }: { proposals
             {step.status && <span className={`mt-1.5 inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${step.style.badge}`}>{step.status}</span>}
             {step.empty && <p className="mt-1 text-xs admin-tone-text-slate">{step.empty}</p>}
             {step.link && <a href={step.link.href} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium transition-colors admin-tone-text-info">{step.link.label}</a>}
+            {i === 1 && contractSigned && (
+              <div className="mt-3 space-y-1 rounded-lg border border-emerald-400/30 bg-emerald-500/10 p-2 text-[10px] leading-snug admin-tone-text-success">
+                {activeProposal?.contractSignedBy && <p>Signat per {activeProposal.contractSignedBy}</p>}
+                {contractSignedAt && <p>{contractSignedAt}</p>}
+                {activeProposal?.contractSignatureIp && <p>IP {activeProposal.contractSignatureIp}</p>}
+                {activeProposal?.contractSignatureUa && <p className="break-words">UA {activeProposal.contractSignatureUa}</p>}
+                {activeProposal?.contractSignatureBlob && (
+                  // eslint-disable-next-line @next/next/no-img-element -- data:image URL de signatura manuscrita; next/image no suporta data URIs sense remote patterns
+                  <img
+                    src={activeProposal.contractSignatureBlob}
+                    alt="Signatura manuscrita capturada"
+                    className="mt-2 max-h-16 rounded border border-emerald-300/30 bg-black/20 object-contain"
+                  />
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
     </section>
   );
 }
-
-

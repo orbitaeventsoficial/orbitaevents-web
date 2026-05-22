@@ -38,6 +38,12 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-links {
   gap: 0.625rem;
 }
 
+@media (min-width: 640px) {
+  html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-links {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link {
   border: 1px solid var(--at-border);
   background: var(--at-panel);
@@ -49,8 +55,11 @@ html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link {
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-quick-link:hover {
-  border-color: var(--at-info);
-  color: var(--at-text);
+  border-color: color-mix(in oklab, var(--at-gold) 40%, var(--at-border) 60%);
+  color: var(--at-gold-text);
+  background: color-mix(in oklab, var(--at-gold) 6%, var(--at-panel) 94%);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--at-gold) 12%, transparent 88%);
+  transform: translateY(-1px);
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel {

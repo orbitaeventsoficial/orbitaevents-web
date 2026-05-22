@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback, useDeferredValue, useMemo } from 'react';
 import Link from 'next/link';
+import { buildLeadCustomerContinuityTarget } from '@/lib/admin/leadCustomerHref';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, PRIORITY_DOT_CLASS, PRIORITY_LABELS, LEAD_PIPELINE_COLUMNS, formatDateShort, getSourceDisplay } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -337,6 +339,10 @@ function PipelineCard({
   const nextStatus = canMoveForward ? COLUMNS[statusIndex + 1].status : null;
   const prevStatus = canMoveBack ? COLUMNS[statusIndex - 1].status : null;
   const cardHelp = ADMIN_PIPELINE_HELP.lead.card(lead.name, col.label);
+  const continuityTarget = buildLeadCustomerContinuityTarget({
+    leadId: lead.id,
+    customerId: lead.customerId,
+  });
 
   return (
     <div
@@ -449,13 +455,13 @@ function PipelineCard({
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {lead.customerId && (
-          <Link href={`/admin/clientes/${lead.customerId}`} className="text-[10px] hover:underline">
-            👤 Client
+          <Link href={continuityTarget.href} className="text-[10px] hover:underline" title={continuityTarget.title}>
+            {continuityTarget.label}
           </Link>
         )}
         {lead.booking && (
           <Link
-            href={`/admin/bookings/${lead.booking.id}`}
+            href={buildBookingHref(lead.booking.id)}
             className="inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
           >
             📋 {lead.booking.reference}

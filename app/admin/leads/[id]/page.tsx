@@ -1,7 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { AdminPage } from '../../components/AdminPage';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
@@ -161,7 +163,7 @@ export default async function LeadDetailPage({ params }: Props) {
     interestedPackId: lead.interestedPackId,
     source: lead.source,
   });
-  const customerLinkPreview = lead.customerId ? null : await previewLeadCustomerLink(lead.id);
+  const customerLinkPreview = await previewLeadCustomerLink(lead.id);
   const relatedLeads = await prisma.lead.findMany({
     where: {
       id: { not: lead.id },
@@ -300,7 +302,7 @@ export default async function LeadDetailPage({ params }: Props) {
         <div className="flex flex-wrap gap-2">
           {lead.customerId && (
             <Link
-              href={`/admin/clientes/${lead.customerId}`}
+              href={buildCustomerHubHref(lead.customerId)}
               className="ap-btn ap-btn--secondary w-full sm:w-auto"
             >
               👤 Fitxa Client
@@ -325,12 +327,12 @@ export default async function LeadDetailPage({ params }: Props) {
               </a>
             </>
           )}
-          <a
-            href={`mailto:${lead.email}`}
+          <Link
+            href={buildLeadComposeHref(lead.id)}
             className="ap-btn ap-btn--secondary w-full sm:w-auto"
           >
             ✉️ Email
-          </a>
+          </Link>
         </div>
       }
     >
@@ -616,7 +618,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         Obrir formulari client
                       </a>
                     )}
-                    <Link href={`/admin/bookings/${lead.booking.id}`} className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
+                    <Link href={buildBookingHref(lead.booking.id)} className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
                       Veure reserva completa
                     </Link>
                     <Link href="/admin/post-event/reports" className="ap-btn ap-btn--secondary inline-flex w-full items-center justify-center px-3 py-1.5 text-xs sm:w-auto">
@@ -675,7 +677,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 <div>
                   <dt className="text-xs">ID client</dt>
                   <dd className="font-mono text-xs break-all">
-                    <Link href={`/admin/clientes/${lead.customerId}`} className="hover:underline">
+                    <Link href={buildCustomerHubHref(lead.customerId!)} className="hover:underline">
                       {lead.customerId}
                     </Link>
                   </dd>
@@ -754,7 +756,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </dl>
           </section>
 
-          {!lead.customer && customerLinkPreview && (
+          {customerLinkPreview && (
             <LeadCustomerLinkPanel leadId={lead.id} preview={customerLinkPreview} />
           )}
 
@@ -800,7 +802,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 </div>
               </dl>
               <Link
-                href={`/admin/clientes/${lead.customer.id}`}
+                href={buildCustomerHubHref(lead.customer.id)}
                 className="mt-4 inline-flex rounded-xl px-3 py-1.5 text-xs font-semibold text-white"
               >
                 Obrir fitxa client
@@ -832,7 +834,7 @@ export default async function LeadDetailPage({ params }: Props) {
                     {item.booking ? (
                       <p className="text-xs">
                         <Link
-                          href={`/admin/bookings/${item.booking.id}`}
+                          href={buildBookingHref(item.booking.id)}
                           className="hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -859,8 +861,6 @@ export default async function LeadDetailPage({ params }: Props) {
     </AdminPage>
   );
 }
-
-
 
 
 

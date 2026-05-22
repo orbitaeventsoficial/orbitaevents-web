@@ -643,9 +643,11 @@ model Booking {
   depositAmount   Float
   depositPaid     Boolean   @default(false)
   depositPaidAt   DateTime?
+  depositPaymentUrl String?
   remainingAmount Float
   remainingPaid   Boolean   @default(false)
   remainingPaidAt DateTime?
+  remainingPaymentUrl String?
 
   // Travel / distance tracking
   distanceKm    Float? // km anada i tornada
@@ -676,6 +678,13 @@ model Booking {
   reviewToken          String?
   reviewSubmittedAt    DateTime?
 
+  // Questionnaire
+  questionnaireResponses QuestionnaireResponse[]
+
+  // Gallery share
+  galleryShareToken    String?  @unique
+  gallerySharePassword String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -689,6 +698,36 @@ model Booking {
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
   @@index([depositPaid, eventDate]) // Per filtres de cobrament i agenda
   @@map("bookings")
+}
+
+model QuestionnaireTemplate {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  questions   Json
+  isActive    Boolean   @default(true)
+  responses   QuestionnaireResponse[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("questionnaire_templates")
+}
+
+model QuestionnaireResponse {
+  id         String                @id @default(cuid())
+  bookingId  String
+  booking    Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  templateId String
+  template   QuestionnaireTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  answers    Json
+  submittedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([bookingId, templateId])
+  @@index([bookingId])
+  @@index([templateId])
+  @@map("questionnaire_responses")
 }
 
 model ClientPortalAccess {
@@ -777,9 +816,12 @@ model Proposal {
   contractPdfUrl     String?
   contractPdfKey     String?
   contractSentAt     DateTime?
-  contractSignedAt   DateTime?
-  contractSignedBy   String?
-  depositAmount      Float?
+  contractSignedAt     DateTime?
+  contractSignedBy     String?
+  contractSignatureIp   String?
+  contractSignatureUa   String?       @db.Text
+  contractSignatureBlob String?       @db.Text
+  depositAmount         Float?
   depositDueDate     DateTime?
   finalPaymentDue    DateTime?
   cancellationPolicy String?         @db.Text
@@ -1228,6 +1270,20 @@ model AdminLog {
   @@index([entity])
   @@index([createdAt])
   @@map("admin_logs")
+}
+
+model StripeWebhookEvent {
+  id              String   @id @default(cuid())
+  eventId         String   @unique
+  type            String
+  bookingId       String?
+  paymentType     String?
+  stripeSessionId String?
+  processedAt     DateTime @default(now())
+
+  @@index([processedAt])
+  @@index([bookingId])
+  @@map("stripe_webhook_events")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

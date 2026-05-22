@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       create: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
+      findUnique: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
       count: vi.fn(),
@@ -29,6 +30,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       create: vi.fn(),
       findMany: vi.fn(),
       groupBy: vi.fn(),
+      count: vi.fn(),
     },
     legalDocument: { findFirst: vi.fn() },
     dataRetentionPolicy: { findMany: vi.fn(), update: vi.fn() },
@@ -59,6 +61,9 @@ import {
   executeRetentionPolicies,
   getPrivacyStats,
   checkGdprCompliance,
+  fetchCustomerPrivacyData,
+  listPrivacyAuditLogs,
+  findConsentById,
 } from '@/lib/services/privacyService';
 
 beforeEach(() => {
@@ -751,5 +756,100 @@ describe('checkGdprCompliance', () => {
     mockPrisma.customer.findUnique.mockResolvedValue(null);
 
     await expect(checkGdprCompliance('nonexist')).rejects.toThrow('Client no trobat');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FUNCIONS AUXILIARS (noves)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('fetchCustomerPrivacyData', () => {
+  it('retorna consentiments i sol·licituds del client en paral·lel', async () => {
+    const consents = [{ id: 'c1', consentType: 'GDPR_BASIC' }];
+    const requests = [{ id: 'r1', requestType: 'ACCESS' }];
+    mockPrisma.consentRecord.findMany.mockResolvedValue(consents);
+    mockPrisma.dataRequest.findMany.mockResolvedValue(requests);
+
+    const result = await fetchCustomerPrivacyData('cust1');
+
+    expect(result).toEqual({ consents, requests });
+    expect(mockPrisma.consentRecord.findMany).toHaveBeenCalledWith({
+      where: { customerId: 'cust1' },
+      orderBy: { createdAt: 'desc' },
+    });
+    expect(mockPrisma.dataRequest.findMany).toHaveBeenCalledWith({
+      where: { customerId: 'cust1' },
+      orderBy: { createdAt: 'desc' },
+    });
+  });
+
+  it('retorna arrays buits si el client no té dades', async () => {
+    mockPrisma.consentRecord.findMany.mockResolvedValue([]);
+    mockPrisma.dataRequest.findMany.mockResolvedValue([]);
+
+    const result = await fetchCustomerPrivacyData('cust-nou');
+
+    expect(result).toEqual({ consents: [], requests: [] });
+  });
+});
+
+describe('listPrivacyAuditLogs', () => {
+  it('retorna logs paginats sense filtre', async () => {
+    const logs = [{ id: 'l1', action: 'DATA_ACCESSED' }];
+    mockPrisma.privacyAuditLog.findMany.mockResolvedValue(logs);
+    mockPrisma.privacyAuditLog.count.mockResolvedValue(1);
+
+    const result = await listPrivacyAuditLogs({ limit: 10, offset: 0 });
+
+    expect(result).toEqual({ logs, total: 1 });
+    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenCalledWith({
+      where: {},
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      skip: 0,
+    });
+    expect(mockPrisma.privacyAuditLog.count).toHaveBeenCalledWith({ where: {} });
+  });
+
+  it('filtra per acció concreta', async () => {
+    mockPrisma.privacyAuditLog.findMany.mockResolvedValue([]);
+    mockPrisma.privacyAuditLog.count.mockResolvedValue(0);
+
+    await listPrivacyAuditLogs({ limit: 20, offset: 0, action: 'CONSENT_GRANTED' });
+
+    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { action: 'CONSENT_GRANTED' } }),
+    );
+  });
+
+  it('ignora el filtre quan action és "all"', async () => {
+    mockPrisma.privacyAuditLog.findMany.mockResolvedValue([]);
+    mockPrisma.privacyAuditLog.count.mockResolvedValue(0);
+
+    await listPrivacyAuditLogs({ limit: 10, offset: 0, action: 'all' });
+
+    expect(mockPrisma.privacyAuditLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: {} }),
+    );
+  });
+});
+
+describe('findConsentById', () => {
+  it('retorna el consentiment pel seu id', async () => {
+    const consent = { id: 'c1', consentType: 'GDPR_BASIC', granted: true };
+    mockPrisma.consentRecord.findUnique.mockResolvedValue(consent);
+
+    const result = await findConsentById('c1');
+
+    expect(result).toEqual(consent);
+    expect(mockPrisma.consentRecord.findUnique).toHaveBeenCalledWith({ where: { id: 'c1' } });
+  });
+
+  it('retorna null si no existeix', async () => {
+    mockPrisma.consentRecord.findUnique.mockResolvedValue(null);
+
+    const result = await findConsentById('nonexist');
+
+    expect(result).toBeNull();
   });
 });

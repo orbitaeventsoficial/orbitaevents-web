@@ -849,6 +849,12 @@ export interface ContractPdfData {
   // Clàusules
   cancellationPolicy: string;
   additionalClauses?: string;
+
+  // Signatura digital
+  signedBy?: string;
+  signedAt?: Date | null;
+  signatureBlob?: string;
+  signatureIp?: string | null;
 }
 
 export async function generateContractPDF(
@@ -904,6 +910,7 @@ export async function generateContractPDF(
       signDate: 'Data de signatura',
       signName: 'Nom i cognoms',
       sign: 'Signatura',
+      signedInline: 'Signat digitalment',
     },
     es: {
       title: 'CONTRATO DE PRESTACIÓN DE SERVICIOS',
@@ -949,6 +956,7 @@ export async function generateContractPDF(
       signDate: 'Fecha de firma',
       signName: 'Nom i cognoms',
       sign: 'Firma',
+      signedInline: 'Firmado digitalmente',
     },
     en: {
       title: 'SERVICE AGREEMENT',
@@ -994,6 +1002,7 @@ export async function generateContractPDF(
       signDate: 'Signature date',
       signName: 'Full name',
       sign: 'Signature',
+      signedInline: 'Digitally signed',
     },
   }[locale];
 
@@ -1250,42 +1259,64 @@ export async function generateContractPDF(
   y = legalY + 6;
 
   // -- Signatures --
-  ensureSpace(55);
-  drawCard(left, y - 4, contentWidth, 48, 2, true);
+  const hasClientSignature = Boolean(data.signedBy || data.signedAt || data.signatureBlob);
+  const signatureBoxHeight = hasClientSignature ? 58 : 48;
+  ensureSpace(signatureBoxHeight + 7);
+  drawCard(left, y - 4, contentWidth, signatureBoxHeight, 2, true);
   drawSectionTitle(t.signatures);
 
   const sigColWidth = (contentWidth - 20) / 2;
+  const providerX = left + 6;
+  const clientX = left + 6 + sigColWidth + 8;
 
   // Provider signature
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
-  doc.text(t.signProvider, left + 6, y);
+  doc.text(t.signProvider, providerX, y);
   y += 5;
   doc.setTextColor(...muted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`${t.signName}: ${data.companyLegalName}`, left + 6, y);
-  doc.text(`${t.signName}: ____________________`, left + 6 + sigColWidth + 8, y);
+  doc.text(`${t.signName}: ${data.companyLegalName}`, providerX, y);
+  doc.text(`${t.signName}: ${data.signedBy || '____________________'}`, clientX, y);
 
   // Client signature labels
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.signClient, left + 6 + sigColWidth + 8, y - 5);
+  doc.text(t.signClient, clientX, y - 5);
 
   y += 8;
   doc.setTextColor(...muted);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${t.signDate}: ____________________`, left + 6, y);
-  doc.text(`${t.signDate}: ____________________`, left + 6 + sigColWidth + 8, y);
-  y += 10;
+  doc.text(`${t.signDate}: ____________________`, providerX, y);
+  doc.text(`${t.signDate}: ${data.signedAt ? fmtDate(data.signedAt) : '____________________'}`, clientX, y);
+  const signatureLineY = y + (hasClientSignature ? 18 : 10);
+  if (data.signatureBlob && isDataUrl(data.signatureBlob)) {
+    try {
+      const fmt = getImageFormatFromDataUrl(data.signatureBlob);
+      const props = doc.getImageProperties(data.signatureBlob);
+      const fitted = fitWithin(props.width, props.height, sigColWidth - 12, 12);
+      doc.addImage(data.signatureBlob, fmt, clientX + 4, y + 3, fitted.width, fitted.height);
+    } catch {
+      doc.setTextColor(...muted);
+      doc.setFont('helvetica', 'italic');
+      doc.text(t.signedInline, clientX, y + 9);
+    }
+  } else if (hasClientSignature) {
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'italic');
+    doc.text(t.signedInline, clientX, y + 9);
+  }
+  y = signatureLineY;
   doc.setDrawColor(...border);
-  doc.line(left + 6, y, left + 6 + sigColWidth - 4, y);
-  doc.line(left + 6 + sigColWidth + 8, y, left + 6 + sigColWidth * 2 + 4, y);
+  doc.line(providerX, y, providerX + sigColWidth - 4, y);
+  doc.line(clientX, y, clientX + sigColWidth - 4, y);
   doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.text(t.sign, left + 6 + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
-  doc.text(t.sign, left + 6 + sigColWidth + 8 + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
+  doc.text(t.sign, providerX + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
+  doc.text(t.sign, clientX + (sigColWidth - 4) / 2, y + 4, { align: 'center' });
 
   // -- Footer on all pages --
   const totalPages = doc.internal.pages.length - 1;
@@ -1327,6 +1358,5 @@ export async function downloadImages(
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }
-
 
 

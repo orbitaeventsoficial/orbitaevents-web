@@ -4,7 +4,7 @@ import { formatDate, formatDateSimple, formatNumber, getEventLabel, getLeadStatu
 import { ADMIN_CUSTOMER_PANEL_HELP_2, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
 import { buildLeadActionLink } from '@/lib/customer-hub/leadActionLink';
-import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildLeadContinuity } from '@/lib/customer-hub/leadContinuity';
 import { getTopCustomerHubLead, sortCustomerHubLeads } from '@/lib/customer-hub/topLead';
 
 const BLOCKER_TONE_CLASS: Record<'DANGER' | 'WARNING' | 'INFO', string> = {
@@ -17,6 +17,7 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   const leads = sortCustomerHubLeads(data.leads);
   const topLead = getTopCustomerHubLead(data.leads);
   const topLeadAction = topLead ? buildLeadActionLink(topLead) : null;
+  const topLeadContinuity = topLead ? buildLeadContinuity(topLead, data.customer.id) : null;
 
   return (
     <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.root)}>
@@ -44,6 +45,11 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
               {topLead.commercialBlocker.context ? ` · ${topLead.commercialBlocker.context}` : ''}
             </p>
           )}
+          {topLeadContinuity && (
+            <p className="mt-2 text-xs opacity-75">
+              {topLeadContinuity.stageLabel} · {topLeadContinuity.narrative}
+            </p>
+          )}
           {topLeadAction && (
             <Link
               href={topLeadAction.href}
@@ -63,9 +69,10 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
           const statusConf = getLeadStatusDisplay(lead.status);
           const priorityConf = getLeadPriorityColorDisplay(lead.priority);
           const actionLink = buildLeadActionLink(lead);
+          const continuity = buildLeadContinuity(lead, data.customer.id);
           return (
             <article key={lead.id} className="rounded-xl border p-4 transition-colors" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.leads.card(lead.name))}>
-              <Link href={buildLeadWorkspaceHref(lead.id)} className="block">
+              <Link href={continuity.hubHref} className="block">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold">{lead.name}</p>
                   <div className="flex flex-wrap items-center gap-2">
@@ -84,18 +91,29 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
                   </div>
                 )}
                 {lead.booking && <p className="mt-2 text-xs">Reserva {lead.booking.reference} · {formatNumber(lead.booking.total)}€</p>}
+                <p className="mt-2 text-xs opacity-75">
+                  {continuity.stageLabel} · {continuity.narrative}
+                </p>
                 <p className="mt-1 text-[11px]">Creada {formatDateSimple(lead.createdAt)}</p>
               </Link>
-              {actionLink && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {actionLink && (
+                  <Link
+                    href={actionLink.href}
+                    target={actionLink.external ? '_blank' : undefined}
+                    rel={actionLink.external ? 'noreferrer' : undefined}
+                    className="inline-flex rounded-lg border px-3 py-1 text-xs font-medium"
+                  >
+                    {actionLink.label}
+                  </Link>
+                )}
                 <Link
-                  href={actionLink.href}
-                  target={actionLink.external ? '_blank' : undefined}
-                  rel={actionLink.external ? 'noreferrer' : undefined}
-                  className="mt-3 inline-flex rounded-lg border px-3 py-1 text-xs font-medium"
+                  href={continuity.technicalHref}
+                  className="inline-flex rounded-lg border px-3 py-1 text-xs font-medium opacity-80"
                 >
-                  {actionLink.label}
+                  Fitxa tècnica del lead
                 </Link>
-              )}
+              </div>
             </article>
           );
         })}

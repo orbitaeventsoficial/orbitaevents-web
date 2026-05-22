@@ -494,6 +494,24 @@ export function formatDateShort(date: Date | string | null | undefined, locale =
   return new Date(date).toLocaleDateString(toIntlLocale(locale), { day: '2-digit', month: 'short' });
 }
 
+/** Short weekday: "dl." */
+export function formatWeekdayShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { weekday: 'short' });
+}
+
+/** Long weekday: "dilluns" */
+export function formatWeekdayLong(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { weekday: 'long' });
+}
+
+/** Compact weekday date: "dl. 24 feb" */
+export function formatWeekdayDateShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
 /** Full date with weekday: "dl. 24 feb 2026" */
 export function formatDateFull(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
@@ -512,6 +530,12 @@ export function formatDateTimeFull(date: Date | string | null | undefined, local
   return new Date(date).toLocaleString(toIntlLocale(locale));
 }
 
+/** Short time: "14:30" */
+export function formatTimeShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleTimeString(toIntlLocale(locale), { hour: '2-digit', minute: '2-digit' });
+}
+
 /** Number with locale formatting */
 export function formatNumber(value: number | null | undefined, opts?: Intl.NumberFormatOptions, locale = 'ca-ES'): string {
   if (value === null || value === undefined) return '-';
@@ -526,6 +550,32 @@ export function formatCurrency(amount: number | null | undefined, locale = 'ca-E
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/** Like formatCurrency but preserves 2 decimal places. Use when exact cents matter (e.g. pricing breakdowns). */
+export function formatCurrencyExact(amount: number | null | undefined, locale = 'ca-ES'): string {
+  if (amount === null || amount === undefined) return '-';
+  return new Intl.NumberFormat(toIntlLocale(locale), {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+/** Chart axis month label from ISO "YYYY-MM": "feb '26" — UTC-safe */
+export function formatMonthYearCompact(monthIso: string, locale = 'ca-ES'): string {
+  const [year, month] = monthIso.split('-').map(Number);
+  if (!year || !month) return monthIso;
+  return new Intl.DateTimeFormat(toIntlLocale(locale), { month: 'short', year: '2-digit', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(year, month - 1, 1))
+  );
+}
+
+/** Long month + year: "febrer de 2026" */
+export function formatMonthYearLong(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { month: 'long', year: 'numeric' });
 }
 
 /** Case-insensitive event type label lookup (DB uses UPPER, forms may use lower) */
@@ -724,6 +774,7 @@ export const BOOKING_DETAIL_SECTIONS = [
   { id: 'sec-serveis', label: 'Serveis' },
   { id: 'sec-equipament', label: 'Equipament' },
   { id: 'sec-portal', label: 'Portal' },
+  { id: 'sec-questionnaire', label: 'Qüestionari' },
   { id: 'sec-finances', label: 'Finances' },
   { id: 'sec-marge', label: 'Marge' },
   { id: 'sec-documents', label: 'Documents' },
@@ -1048,6 +1099,7 @@ export const TASK_DEDUPE_KEY = {
   atRisk: (customerId: string) => `atrisk:${customerId}`,
   quote: (entityId: string) => `quote:${entityId}`,
   reactivation: (customerId: string) => `reactivation:${customerId}`,
+  reengagement: (leadId: string) => `reengagement:${leadId}`,
 } as const;
 
 export const CANVAS_COLOR_OPTIONS = ['#ffffff', '#06b6d4', '#f97316', '#eab308', '#22c55e', '#ec4899', '#a855f7', '#ef4444', '#000000', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)'] as const;

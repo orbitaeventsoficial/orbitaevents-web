@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { PRIVACY_CONSENT_STATUS_VALUES, type PrivacyConsentStatus } from '@/lib/constants/privacy';
-import { listConsents, revokeConsent, logPrivacyAction } from '@/lib/services/privacyService';
+import { listConsents, revokeConsent, logPrivacyAction, findConsentById } from '@/lib/services/privacyService';
 import type { ConsentType } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -60,9 +60,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (consentId) {
-      // Revocar per ID directe
-      const { prisma } = await import('@/lib/prisma');
-      const consent = await prisma.consentRecord.findUnique({ where: { id: consentId } });
+      const consent = await findConsentById(consentId);
       if (!consent) {
         return NextResponse.json({ ok: false, error: 'Consentiment no trobat' }, { status: 404 });
       }

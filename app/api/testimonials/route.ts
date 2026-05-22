@@ -30,7 +30,14 @@ export async function POST(request: NextRequest) {
   const t = PUBLIC_TESTIMONIAL_API_MESSAGES[resolveLocale(request)];
   try {
     const body = await request.json();
-    const data = testimonialSchema.parse(body);
+    const parsed = testimonialSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: t.invalid, details: parsed.error.errors },
+        { status: 400 }
+      );
+    }
+    const data = parsed.data;
 
     const result = await submitPublicTestimonial({
       rating: data.rating,
@@ -52,13 +59,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     log.error('Error submitting testimonial', error);
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: t.invalid, details: error.errors },
-        { status: 400 }
-      );
-    }
 
     return NextResponse.json(
       { error: t.processing },

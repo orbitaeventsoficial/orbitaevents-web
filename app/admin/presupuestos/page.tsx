@@ -5,6 +5,7 @@ import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { formatCurrency } from '@/lib/constants';
 import ProposalsList from './ProposalsList';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
@@ -291,7 +292,7 @@ export default async function PresupuestosPage({
         <>
           {customer ? (
             <span>
-              Client: <Link href={`/admin/clientes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+              Client: <Link href={buildCustomerHubHref(customer.id)} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
             </span>
           ) : (
             'Selecciona un client per començar'
@@ -302,7 +303,7 @@ export default async function PresupuestosPage({
       actions={
         <div className="flex gap-2">
           {customer && (
-            <Link href={`/admin/clientes/${customer.id}`} className="ap-btn ap-btn--secondary">
+            <Link href={buildCustomerHubHref(customer.id)} className="ap-btn ap-btn--secondary">
               👤 Fitxa Client
             </Link>
           )}

@@ -88,6 +88,7 @@ export default function BookingFilters() {
         <input
           type="search"
           placeholder="Cercar per nom, referència, ubicació..."
+          aria-label="Cercar reserves"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm focus:ring-1 transition-all"

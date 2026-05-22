@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ADMIN_WEATHER_DEFAULT_EMOJI, ADMIN_WEATHER_EMOJI, ADMIN_WEATHER_EMOJI_CA } from '@/lib/constants/admin';
+import { formatWeekdayDateShort } from '@/lib/constants';
 import { log } from '@/lib/logger';
 import type { WeatherForecast } from '@/lib/services/weatherService';
 
@@ -30,7 +31,7 @@ function formatShortDate(isoString: string): string {
   if (diffDays <= 0) return 'Avui';
   if (diffDays === 1) return 'Demà';
 
-  return d.toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+  return formatWeekdayDateShort(d);
 }
 
 export default function WeatherWidget() {
@@ -79,7 +80,7 @@ export default function WeatherWidget() {
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl leading-none">{getWeatherEmoji(f.description)}</span>
-              <span className="text-xl font-bold" style={{ fontFamily: 'var(--font-mono, monospace)' }}>
+              <span className="text-xl font-bold font-mono">
                 {f.temp}°
               </span>
             </div>

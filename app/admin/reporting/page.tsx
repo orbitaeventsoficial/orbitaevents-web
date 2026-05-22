@@ -3,6 +3,7 @@ import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { AdminPage } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { buildExecutiveReport } from '@/lib/services/executiveReportService';
+import { generateReportingInsights, type InsightPriority } from '@/lib/services/reportingInsightsService';
 import { formatNumber } from '@/lib/constants';
 import { loadEmailTrackingReport } from '@/lib/services/emailTrackingService';
 
@@ -59,38 +60,23 @@ export default async function ReportingPage() {
       ? `El tracking d'email encara és fluix (${emailTracking.globalOpenRate}% opens, ${emailTracking.globalReplyRate}% replies)`
       : '',
   ].filter(Boolean);
-  const nextStep =
-    report.headline.slaBroken > 0
-      ? {
-          title: 'Tallar el soroll operatiu abans de llegir conclusions',
-          detail: `Hi ha ${report.headline.slaBroken} SLA trencats. Si la base comercial està arribant tard, el reporting explica símptomes però no arregla la causa.`,
-          href: '/admin/leads',
-          ctaLabel: 'Obrir entrades',
-          secondaryAction: { href: '/admin/sales-ops', label: 'Veure Sales Ops' },
-        }
-      : marginRate < 0.55
-        ? {
-            title: 'Revisar marge i pricing abans d’escalar',
-            detail: `La taxa de marge brut és del ${pct(marginRate)}. El següent pas no és mirar més volum sinó protegir rendibilitat i estructura de preu.`,
-            href: '/admin/pricing',
-            ctaLabel: 'Revisar preus',
-            secondaryAction: { href: '/admin/economia', label: 'Mirar finances' },
-          }
-        : recurrenceRate < 0.3
-          ? {
-              title: 'Treballar recurrència i recuperació, no només captació',
-              detail: `Només ${pct(recurrenceRate)} dels clients són recurrents. El retorn ara és reforçar Customer Hub, post-event i referrals.`,
-              href: '/admin/clientes',
-              ctaLabel: 'Obrir clients',
-              secondaryAction: { href: '/admin/clientes/referrals', label: 'Veure referrals' },
-            }
-          : {
-              title: 'Optimitzar missatges i conversió dels canals forts',
-              detail: `La base financera no mostra un incendi immediat. El millor següent pas és llegir millor què converteix i empènyer els canals amb millor qualitat.`,
-              href: '/admin/sales-ops',
-              ctaLabel: 'Anar a Sales Ops',
-              secondaryAction: { href: '/admin/analytics', label: 'Obrir analítica' },
-            };
+  const insights = generateReportingInsights(report, { emailOpenRate: openRate, emailReplyRate: replyRate });
+  const topInsight = insights[0];
+  const nextStep = topInsight
+    ? {
+        title: topInsight.headline,
+        detail: topInsight.detail,
+        href: topInsight.href,
+        ctaLabel: topInsight.ctaLabel,
+        secondaryAction: topInsight.secondaryAction,
+      }
+    : {
+        title: "Optimitzar missatges i conversió dels canals forts",
+        detail: "La base financera no mostra un incendi immediat. El millor seguent pas és analitzar canals i empènyer conversió.",
+        href: "/admin/sales-ops",
+        ctaLabel: "Anar a Sales Ops",
+        secondaryAction: { href: "/admin/analytics", label: "Obrir analítica" },
+      };
 
   const funnelMax = Math.max(
     report.funnel.NEW,
@@ -142,6 +128,45 @@ export default async function ReportingPage() {
             ...nextStep,
           }}
         />
+
+        {insights.length > 1 && (
+          <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wider opacity-60">
+              Alertes i oportunitats ({insights.length - 1} addicional{insights.length - 1 !== 1 ? 's' : ''})
+            </h2>
+            <div className="mt-3 space-y-2">
+              {insights.slice(1).map((insight, i) => {
+                const badgeClass: Record<InsightPriority, string> = {
+                  critical: 'bg-rose-500/20 text-rose-300',
+                  warning: 'bg-amber-500/20 text-amber-300',
+                  positive: 'bg-emerald-500/20 text-emerald-300',
+                };
+                return (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 rounded-lg border border-white/5 bg-white/[0.015] p-3"
+                  >
+                    <span
+                      className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${badgeClass[insight.priority]}`}
+                    >
+                      {insight.area}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold">{insight.headline}</p>
+                      <p className="mt-0.5 text-[11px] opacity-60">{insight.detail}</p>
+                    </div>
+                    <a
+                      href={insight.href}
+                      className="shrink-0 rounded border border-white/10 px-2 py-0.5 text-[10px] hover:bg-white/10"
+                    >
+                      {insight.ctaLabel}
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Headline KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
@@ -240,11 +265,11 @@ export default async function ReportingPage() {
             <table className="w-full text-sm" aria-label="Conversió per origen">
               <thead>
                 <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
-                  <th className="py-2 pr-4">Origen</th>
-                  <th className="py-2 pr-4">Total leads</th>
-                  <th className="py-2 pr-4">Tancats</th>
-                  <th className="py-2 pr-4">Win rate</th>
-                  <th className="py-2">Ingrés mig/client</th>
+                  <th scope="col" className="py-2 pr-4">Origen</th>
+                  <th scope="col" className="py-2 pr-4">Total leads</th>
+                  <th scope="col" className="py-2 pr-4">Tancats</th>
+                  <th scope="col" className="py-2 pr-4">Win rate</th>
+                  <th scope="col" className="py-2">Ingrés mig/client</th>
                 </tr>
               </thead>
               <tbody>
@@ -321,14 +346,14 @@ export default async function ReportingPage() {
             <table className="w-full text-sm" aria-label="Tracking email per plantilla">
               <thead>
                 <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
-                  <th className="py-2 pr-4">Plantilla</th>
-                  <th className="py-2 pr-4">Enviats</th>
-                  <th className="py-2 pr-4">Oberts</th>
-                  <th className="py-2 pr-4">Clics</th>
-                  <th className="py-2 pr-4">Respostes</th>
-                  <th className="py-2 pr-4">Open rate</th>
-                  <th className="py-2 pr-4">Click rate</th>
-                  <th className="py-2">Reply rate</th>
+                  <th scope="col" className="py-2 pr-4">Plantilla</th>
+                  <th scope="col" className="py-2 pr-4">Enviats</th>
+                  <th scope="col" className="py-2 pr-4">Oberts</th>
+                  <th scope="col" className="py-2 pr-4">Clics</th>
+                  <th scope="col" className="py-2 pr-4">Respostes</th>
+                  <th scope="col" className="py-2 pr-4">Open rate</th>
+                  <th scope="col" className="py-2 pr-4">Click rate</th>
+                  <th scope="col" className="py-2">Reply rate</th>
                 </tr>
               </thead>
               <tbody>
@@ -361,10 +386,10 @@ export default async function ReportingPage() {
             <table className="w-full text-sm" aria-label="Tendència mensual">
               <thead>
                 <tr className="border-b border-white/10 text-left text-[10px] font-semibold uppercase tracking-wider opacity-60">
-                  <th className="py-2 pr-4">Mes</th>
-                  <th className="py-2 pr-4">Leads</th>
-                  <th className="py-2 pr-4">Reserves</th>
-                  <th className="py-2">Ingressos</th>
+                  <th scope="col" className="py-2 pr-4">Mes</th>
+                  <th scope="col" className="py-2 pr-4">Leads</th>
+                  <th scope="col" className="py-2 pr-4">Reserves</th>
+                  <th scope="col" className="py-2">Ingressos</th>
                 </tr>
               </thead>
               <tbody>

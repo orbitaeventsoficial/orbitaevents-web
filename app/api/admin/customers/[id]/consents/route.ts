@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { fetchCustomerPrivacyData } from '@/lib/services/privacyService';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,16 +13,7 @@ export async function GET(
 
   try {
     const { id } = await params;
-    const [consents, requests] = await Promise.all([
-      prisma.consentRecord.findMany({
-        where: { customerId: id },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.dataRequest.findMany({
-        where: { customerId: id },
-        orderBy: { createdAt: 'desc' },
-      }),
-    ]);
+    const { consents, requests } = await fetchCustomerPrivacyData(id);
     return NextResponse.json({ ok: true, body: { consents, requests } });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error desconegut';

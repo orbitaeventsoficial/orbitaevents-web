@@ -152,6 +152,33 @@ export default function InventoryListClient() {
       ),
     [items]
   );
+  const missingCostItems = useMemo(
+    () => items.filter((item) => item.purchasePrice == null || item.expectedLifeHours == null),
+    [items]
+  );
+  const unusedValuableItems = useMemo(
+    () => items.filter((item) => item.purchasePrice != null && item.purchasePrice > 0 && item.packItems.length === 0 && item._count.bookingItems === 0),
+    [items]
+  );
+  const endOfLifeItems = useMemo(
+    () => items.filter((item) => {
+      const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
+      return life > 0 && item.totalHoursUsed / life >= 0.95;
+    }),
+    [items]
+  );
+  const agingItems = useMemo(
+    () => items.filter((item) => {
+      const life = item.expectedLifeHours || DEFAULT_EXPECTED_LIFE_HOURS;
+      const ratio = life > 0 ? item.totalHoursUsed / life : 0;
+      return ratio >= 0.8 && ratio < 0.95;
+    }),
+    [items]
+  );
+  const packLinkedItems = useMemo(
+    () => items.filter((item) => item.packItems.length > 0),
+    [items]
+  );
 
   const displayedItems = useMemo(() => {
     return items.filter((item) => {
@@ -231,9 +258,15 @@ export default function InventoryListClient() {
     ? 'Recuperar la lectura d’inventari abans d’actuar'
     : lowStockItems.length > 0
       ? 'Atacar primer el stock crític'
+      : missingCostItems.length > 0
+        ? 'Completar cost i vida útil abans de llegir marge'
+        : unusedValuableItems.length > 0
+          ? 'Decidir què fer amb equip valuós sense ús'
+          : endOfLifeItems.length > 0 || agingItems.length > 0
+            ? 'Revisar equips tensats abans del pròxim bolo'
       : healthFilter === 'missing-cost'
         ? 'Omplir cost i vida útil dels equips incomplets'
-        : healthFilter === 'end-of-life' || healthFilter === 'aging'
+      : healthFilter === 'end-of-life' || healthFilter === 'aging'
           ? 'Revisar els equips més tensats abans d’ampliar catàleg'
           : selectedBundleCoverage === 0
             ? 'Definir un lot útil abans de seguir afinant'
@@ -242,6 +275,12 @@ export default function InventoryListClient() {
     ? 'Sense lectura estable no toca canviar lots, estat ni decisions de manteniment.'
     : lowStockItems.length > 0
       ? 'Ja tens detectats els consumibles o ítems que han arribat al mínim i són el coll més immediat.'
+      : missingCostItems.length > 0
+        ? `${missingCostItems.length} equips no tenen cost o vida útil completa. Sense això packs i pressupostos arrosseguen marge parcial.`
+        : unusedValuableItems.length > 0
+          ? `${unusedValuableItems.length} equips tenen valor econòmic però no apareixen a packs ni reserves. Decideix si entren en un pack, lot o retirada.`
+          : endOfLifeItems.length > 0 || agingItems.length > 0
+            ? `${endOfLifeItems.length} equips estan al final de vida i ${agingItems.length} ja s'acosten al límit. Revisa estat abans de seguir venent-los.`
       : healthFilter === 'missing-cost'
         ? 'Aquest focus ja t’aïlla els equips que no permeten llegir bé amortització ni valor real.'
         : healthFilter === 'end-of-life' || healthFilter === 'aging'
@@ -253,6 +292,14 @@ export default function InventoryListClient() {
     ? '/admin/inventory'
     : lowStockItems.length > 0
       ? '/admin/inventory?health=low-stock'
+      : missingCostItems.length > 0
+        ? '/admin/inventory?health=missing-cost'
+        : unusedValuableItems.length > 0
+          ? '/admin/inventory?health=unused'
+          : endOfLifeItems.length > 0
+            ? '/admin/inventory?health=end-of-life'
+            : agingItems.length > 0
+              ? '/admin/inventory?health=aging'
       : healthFilter === 'missing-cost'
         ? '/admin/inventory?health=missing-cost'
         : healthFilter === 'end-of-life' || healthFilter === 'aging'
@@ -262,6 +309,14 @@ export default function InventoryListClient() {
     ? 'Recarregar inventari'
     : lowStockItems.length > 0
       ? 'Obrir stock crític'
+      : missingCostItems.length > 0
+        ? 'Obrir cost pendent'
+        : unusedValuableItems.length > 0
+          ? 'Obrir sense ús'
+          : endOfLifeItems.length > 0
+            ? 'Obrir final de vida'
+            : agingItems.length > 0
+              ? 'Obrir envelliment'
       : healthFilter
         ? 'Mantenir aquest focus'
         : 'Revisar inventari';
@@ -415,6 +470,9 @@ export default function InventoryListClient() {
             selectedBundleCoverage > 0
               ? `El lot seleccionat cobreix ${selectedBundleCoverage} equips.`
               : 'Cap lot seleccionat amb cobertura útil ara mateix.',
+            packLinkedItems.length > 0
+              ? `${packLinkedItems.length} equips ja estan connectats a almenys un pack.`
+              : 'Cap equip visible està connectat a packs ara mateix.',
           ],
           emptyText: 'Sense lectura d’inventari no hi ha resum automàtic del canal.',
         }}
@@ -429,6 +487,15 @@ export default function InventoryListClient() {
             hasActiveFilters
               ? 'Hi ha filtres o cerca actius sobre la lectura actual.'
               : 'Sense filtres manuals: veus l’inventari complet.',
+            missingCostItems.length > 0
+              ? `${missingCostItems.length} equips sense cost o vida útil completa.`
+              : 'Cost i vida útil complets a primer nivell.',
+            unusedValuableItems.length > 0
+              ? `${unusedValuableItems.length} equips amb valor econòmic sense ús a packs ni reserves.`
+              : 'No hi ha equips valuosos completament desconnectats.',
+            endOfLifeItems.length > 0 || agingItems.length > 0
+              ? `${endOfLifeItems.length} equips al final de vida i ${agingItems.length} envellint.`
+              : 'Cap tensió de vida útil destacada.',
             savingBundles
               ? 'Hi ha canvis de lots desant-se ara mateix.'
               : bundleMessage

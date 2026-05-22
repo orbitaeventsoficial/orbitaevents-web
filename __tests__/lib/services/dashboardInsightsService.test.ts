@@ -283,7 +283,10 @@ describe('dashboardInsightsService', () => {
       expect(insight).toBeDefined();
       expect(insight!.type).toBe('warning');
       expect(insight!.priority).toBe(2);
-      expect(insight!.text).toContain('1200');
+      // El servei usa formatCurrency (helper canònic) → '1.200 €' amb NBSP i milers.
+      // Comprovem que el text inclou el dígit i la unitat, no la representació plana.
+      expect(insight!.text).toContain('1.200');
+      expect(insight!.text).toContain('pendents de cobrar');
     });
 
     it('pendingPayments ≤ 500 → cap insight', () => {

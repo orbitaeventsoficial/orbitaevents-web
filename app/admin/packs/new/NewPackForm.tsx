@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useAsyncForm } from '../../components/useAsyncForm';
@@ -41,7 +42,7 @@ export default function NewPackForm() {
         if (!res.ok || !data?.pack?.id) {
           throw new Error(data?.error || "No s'ha pogut crear el pack");
         }
-        router.push(`/admin/packs/${data.pack.id}`);
+        router.push(buildPackHref(data.pack.id));
       });
     } catch {
       // L'error queda centralitzat al hook.

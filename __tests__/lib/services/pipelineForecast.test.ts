@@ -215,6 +215,67 @@ describe('buildPipelineForecast', () => {
     expect(result).toHaveLength(12);
   });
 
+  it('exposa previousYearActual quan hi ha històric del mateix mes l\'any anterior', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+
+    // Booking l'any anterior, mateix mes que el primer mes del forecast
+    const firstForecastMonth = new Date();
+    firstForecastMonth.setMonth(firstForecastMonth.getMonth() + 1);
+    const prevYearSameMonth = new Date(
+      firstForecastMonth.getFullYear() - 1,
+      firstForecastMonth.getMonth(),
+      15,
+    );
+
+    mockPrisma.booking.findMany
+      // historicBookings (1a crida)
+      .mockResolvedValueOnce([{ eventDate: prevYearSameMonth, total: 4500 }])
+      // confirmedFuture (2a crida)
+      .mockResolvedValueOnce([]);
+
+    const result = await buildPipelineForecast(3);
+
+    expect(result[0].previousYearActual).toBe(4500);
+  });
+
+  it('compta reserves ja confirmades amb event futur com a forecast operatiu', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+
+    const futureMonth = new Date();
+    futureMonth.setMonth(futureMonth.getMonth() + 2);
+    futureMonth.setDate(10);
+
+    mockPrisma.booking.findMany
+      // historicBookings
+      .mockResolvedValueOnce([])
+      // confirmedFuture — 2 reserves confirmades al mateix mes futur
+      .mockResolvedValueOnce([
+        { eventDate: futureMonth, total: 3000 },
+        { eventDate: futureMonth, total: 2500 },
+      ]);
+
+    const result = await buildPipelineForecast(3);
+
+    const targetKey = `${futureMonth.getFullYear()}-${String(futureMonth.getMonth() + 1).padStart(2, '0')}`;
+    const targetMonth = result.find((m) => m.month === targetKey);
+    expect(targetMonth).toBeDefined();
+    expect(targetMonth!.confirmedBookings).toBe(2);
+    expect(targetMonth!.confirmedRevenue).toBe(5500);
+  });
+
+  it('previousYearActual i confirmedBookings a 0 quan no hi ha dades', async () => {
+    mockPrisma.lead.findMany.mockResolvedValue([]);
+    mockPrisma.booking.findMany.mockResolvedValue([]);
+
+    const result = await buildPipelineForecast(3);
+
+    for (const month of result) {
+      expect(month.previousYearActual).toBe(0);
+      expect(month.confirmedBookings).toBe(0);
+      expect(month.confirmedRevenue).toBe(0);
+    }
+  });
+
   // Regressió: `buildPipelineForecast` ha de propagar `now` a `scoreLead` i
   // acceptar un `now?` extern per fer-lo testable deterministament. Abans, la
   // funció cridava `new Date()` internament i `scoreLead(lead)` sense `now`,

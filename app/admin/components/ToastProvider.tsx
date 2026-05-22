@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 // ── Toast inline (before: imported from AdminUI.tsx) ──
 
@@ -45,6 +46,7 @@ let nextId = 0;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const shouldReduceMotion = useReducedMotion();
 
   const addToast = useCallback((type: ToastItem['type'], message: string) => {
     const id = nextId++;
@@ -70,11 +72,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {/* Toast stack — bottom-right, stacked */}
       <div role="status" aria-live="polite" className="fixed bottom-20 sm:bottom-4 right-4 z-[101] flex flex-col gap-2 pointer-events-none">
-        {toasts.map((t) => (
-          <div key={t.id} className="pointer-events-auto animate-in slide-in-from-right">
-            <Toast type={t.type} message={t.message} onClose={() => remove(t.id)} />
-          </div>
-        ))}
+        <AnimatePresence initial={false}>
+          {toasts.map((t) => (
+            <motion.div
+              key={t.id}
+              className="pointer-events-auto"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 40 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.2, ease: 'easeOut' }}
+            >
+              <Toast type={t.type} message={t.message} onClose={() => remove(t.id)} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );

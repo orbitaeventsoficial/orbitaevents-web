@@ -159,7 +159,8 @@ export default function CostCalculatorClient() {
       setQuoteName('');
       setClientName('');
       setComponents([]);
-    } catch {
+    } catch (err) {
+      console.error('Error desant pressupost', err);
       toast.error('Error desant');
     } finally {
       setSaving(false);

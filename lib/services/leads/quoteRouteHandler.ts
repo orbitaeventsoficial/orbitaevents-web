@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { formatCurrencyExact } from '@/lib/constants';
 import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from '@/lib/services/documentService';
 import { resolveQuotePack } from '@/lib/services/quotes/quotePack';
 import { requireAuth } from '@/lib/auth';
@@ -143,7 +144,7 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string) {
     await prisma.leadNote.create({
       data: {
         leadId,
-        content: `📄 Pressupost generat: ${quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
+        content: `📄 Pressupost generat: ${quoteNumber}\n💰 Total: ${formatCurrencyExact(quoteData.total)}\n📦 Pack: ${packData.name}`,
       },
     });
 

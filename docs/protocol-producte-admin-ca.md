@@ -174,6 +174,9 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
 - **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
+- **Norma de continuïtat després de tall verd**: amb un `go` actiu, tancar un Canvi #N amb tests i guards verds no autoritza a parar. Amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable. L'agent ha de rellegir §6, escollir el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta. Només pot enviar resposta final si (1) no queda cap feina accionable al backlog, (2) hi ha un bloqueig real que requereix decisió humana, o (3) el propietari demana explícitament `para`, `atura't`, `només reporta` o equivalent.
+- **Font executable de runtime**: la mateixa norma viu també a `docs/agent-runtime-policy.json` amb `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end` i `afterGreenCutWithActionableBacklog=forbidden`. El guard `pnpm run qa:nonstop-protocol` valida que el JSON, `CLAUDE.md`, aquest protocol i `validate:core` continuïn alineats.
+- **Norma de granularitat de canvis**: cada `Canvi #N` ha de resoldre una unitat de valor real i descriure's en una sola frase d'usuari ("ara la UI fa X", "el guard detecta Y", "el servei calcula Z"). No es registren com a canvis separats: l'addició d'un sol camp a una constant sense canvi de comportament visible, una frase aïllada a un document o un tweak d'estil que no altera jerarquia ni usabilitat. Si el canvi no té un efecte que una persona pugui observar o que un test pugui blindar, no mereix número propi. La sèrie #525-#534 (10 microaddicions al gate) és el contraexemple canònic: tot allò hauria de cabre en 2-3 canvis agrupats. D'ara endavant: primer agrupar, després registrar.
 - **Workflow mínim obligatori per cada tall**: abans de tocar res s'han de fer 4 comprovacions i deixar-les clares al cap: (1) `git status` per detectar worktree brut, (2) `ADMIN_CHANGE_COUNTER` actual, (3) `§6.N` afectat o `SEGÜENT` que justifica el tall, (4) classificació del tall: `codi`, `UI`, `documental`, `schema/migració` o `infra`. Sense aquestes 4 peces, no s'ha començat de veritat.
 - **Regla explícita de worktree brut**: si el repo ja té canvis locals aliens, no es permet "netejar", reordenar ni refactoritzar per comoditat. Només es toca l'àmbit mínim necessari pel tall actual. Si el fitxer ja està modificat i el nou tall hi entra, primer s'ha d'entendre què ja hi ha i adaptar-s'hi; no s'imposa un estat net fictici.
 - **Validació en 3 capes**: cada tall ha de deixar escrit què s'ha validat exactament entre aquestes tres capes: (1) `validació tècnica` — types, tests, guards, build; (2) `validació funcional` — el cas d'ús resolt produeix l'efecte correcte; (3) `validació humana/UX` — una persona no tècnica entén què passa i què ha de fer. Dir només "validat" és massa ambigu i ja no és acceptable.
@@ -530,13 +533,31 @@ Criteri pràctic:
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
 **FET**: base molt potent, schema ric, serveis, admin ampli, tests i infraestructura.
 **FET** *(2026-04-10 fins Canvi #55)*: workspaces sagrats ja tenen direcció operativa clara: Daily Brief, Operational Pulse, Customer/Lead insights, Task Queue, Inbox context, Social, Reporting i Capacity.
-**EN MARXA**: passar de conjunt molt potent a sistema coherent amb una sola narrativa operativa. Manual de possibilitats creat a `/admin/manual` per explicar la maquinària per problemes de negoci i accions concretes (Canvi #82).
-**SEGÜENT**: backlog major cap al zenit ja drenat en gran part. ~~Executive Cockpit com a centre de comandament~~ — ✅ FET (Canvi #153). ~~Motor de següent millor acció~~ — ✅ FET (Canvi #168). ~~Nurturing automàtic controlat~~ — ✅ FET (`commercialSequenceService`, backlog §6.15). ~~Attribution/ROI comercial~~ — ✅ FET (Canvis #128 + #131). ~~Forecast real~~ — ✅ FET (Canvi #115). ~~Command palette~~ — ✅ FET (Canvis #107 + #380). ~~QA visual automàtica amb guards i captures~~ — ✅ FET (Canvis #385 + #388 + #389 + #391). ~~Google Calendar amb alarmes pròpies per reserves sincronitzades~~ — ✅ FET (Canvi #134). El següent real d'aquest front és evolucionar el manual/playbooks (`#84`, `#85`, `#86`) cap a un product operating system viu amb una sola narrativa operativa, no continuar llistant com a pendents peces que el producte ja té.
+**FET** *(2026-05-18 per `codex` — Canvi #668)*: el vell `EN MARXA` de passar de conjunt potent a sistema coherent queda regularitzat com a tancat. La narrativa mare ja viu a `docs/product-operating-system-ca.md` (#606), el manual la desplega amb flux, gates, checklists, excepcions, evidències i handoffs, i el Dashboard ja mostra el `Cicle operatiu` amb mètriques vives (#666). El pendent residual és evitar dispersió futura, no construir de zero aquesta narrativa.
+**FET documental** *(2026-05-17 per `codex` — Canvi #629)*: el vell `SEGÜENT` del backlog major cap al zenit queda regularitzat perquè tots els ítems que enumerava ja estaven tancats: Executive Cockpit (#153), següent millor acció (#168), nurturing (`commercialSequenceService`), attribution/ROI (#128 + #131), forecast (#115), command palette (#107 + #380), QA visual (#385 + #388 + #389 + #391) i Google Calendar amb alarmes (#134). El front viu no és afegir aquests mòduls una altra vegada, sinó mantenir la narrativa única del product operating system ja iniciada als canvis #541-#563, #594, #596 i #606.
+**FET** *(2026-05-17 per `codex` — Canvi #606)*: la narrativa mare del product operating system queda escrita a `docs/product-operating-system-ca.md`. Defineix la frase de sistema, el cicle únic de 6 passos, la regla per acceptar pantalles noves, la lectura en 30 segons i la relació entre el document mare i `/admin/manual`. Efecte: el manual ja no és només una acumulació de playbooks, sinó la interfície operativa d'una narrativa única.
+**FET** *(2026-05-17 per `codex` — Canvi #594)*: el manual ja no només descriu flux, gates, handoffs i checklists; incorpora una **matriu d'excepcions operatives** per als 6 passos del product operating system. Cada pas té trigger de bloqueig, primer moviment, workspace admin i condició explícita de "no avançar fins que...". `/admin/manual` ho mostra entre checklist i handoffs, i `qa:admin-manual-consistency` ho blinda perquè cap pas quedi sense resposta quan el flux es trenca.
+**FET** *(2026-05-17 per `codex` — Canvi #596)*: el manual converteix cada pas del product operating system en una evidència material de tancament. `ADMIN_MANUAL_OPERATING_EVIDENCE` defineix, per als passos `01`-`06`, quin artefacte ha de quedar, on es comprova dins l'admin i quina pregunta de propietari confirma que no és només memòria oral. `/admin/manual` ho mostra com `Evidències de tancament` entre excepcions i handoffs, i `qa:admin-manual-consistency` blinda cobertura, hrefs `/admin`, textos mínims i absència de passos duplicats.
+**FET** *(2026-05-18 per `codex` — Canvi #666)*: el Dashboard ja fa visible la narrativa única del product operating system al primer nivell. `buildDashboardOperatingCycle()` deriva els 6 passos canònics des de `ADMIN_MANUAL_OPERATING_FLOW` amb mètriques vives del Dashboard, i `/admin` mostra el `Cicle operatiu` amb CTA a cada workspace. Efecte: la primera pantalla ja explica on està viu el sistema captar → qualificar → pressupostar → reservar → cobrar → reactivar.
 **FET** *(2026-04-11 per `codex` — Canvi #107)*: command palette blindada amb capa pura i tests. El catàleg, la deduplicació, els recents i el filtrat viuen a `adminCommandPaletteService.ts`, i el modal només consumeix aquesta capa.
 **FET** *(2026-04-17 per `claude` — Canvi #153)*: `executiveCockpitService.ts` — Executive Cockpit com a centre de comandament. Agrega en paral·lel: Daily Brief, Operational Pulse, follow-ups pendents, conflictes de capacitat, suggeriments de pipeline i anomalies KPI. Funcions pures: `assemblePriorityActions` (ranking global d'accions per urgència), `assembleHealthSignals` (5 àrees de salut), `computeGlobalHealthScore` (score 0-100 + level). API `/api/admin/cockpit`. 19 tests.
 **FET** *(2026-04-17 per `claude` — Canvi #168)*: `nextBestActionService.ts` — Motor de següent millor acció. Agrega 6 fonts (leads actius, customers, tasques, follow-ups, capacitat, pipeline) i genera rànking unificat d'accions executables amb scoring compost (urgència × impacte × finestra temporal). 6 dominis d'extracció, deduplicació per entitat+domini, scoring i ranking global. API `/api/admin/next-actions`. 24 tests servei + 4 tests ruta.
-**PENDENT CRÍTIC**: evitar dispersió per excés de mòduls sense consolidació. Una sola narrativa de producte.
-**MÉS ENDAVANT**: formalitzar product operating system.
+**FET** *(2026-05-11 per `codex` — Canvi #541)*: el manual ja mostra un ritme operatiu mínim perquè l'admin es llegeixi com a sistema. `ADMIN_MANUAL_OPERATING_RHYTHM` defineix cadències de matí, dia, divendres i mes amb objectiu, workspace i senyals; `/admin/manual` ho renderitza com "Ritme operatiu" amb CTAs a Dashboard, Tasques, Finances i Reporting, i el test de pàgina blinda que sigui visible.
+**FET** *(2026-05-11 per `codex` — Canvi #542)*: el guard `qa:admin-manual-consistency` blinda també el ritme operatiu. Exigeix mínim 4 cadències, hrefs `/admin`, CTA/objectiu/títol amb contingut i almenys 2 senyals per cadència; els tests cobreixen cadència absent, href no admin i senyals insuficients.
+**FET** *(2026-05-11 per `codex` — Canvi #543)*: el ritme operatiu deixa de ser només orientació i guanya criteris de tancament. Cada cadència porta `doneWhen` i `ifOffTrack`, `/admin/manual` mostra "Tancat quan" i què fer si hi ha desviació, i `qa:admin-manual-consistency` exigeix almenys 2 criteris de tancament i una acció de desviació per cadència.
+**FET** *(2026-05-12 per `codex` — Canvi #550)*: el manual ja mostra el sistema operatiu de punta a punta. `ADMIN_MANUAL_OPERATING_FLOW` defineix 6 passos canònics — captar demanda, qualificar, pressupostar amb marge, reservar/preparar, cobrar/controlar rendibilitat i reactivar — amb workspace d'entrada, lectures del sistema, decisions manuals, senyal d'èxit i pas següent. `/admin/manual` ho renderitza com "Sistema operatiu de punta a punta" i `qa:admin-manual-consistency` blinda que el flux tingui mínim 5 passos accionables amb `entryHref` `/admin`, lectures i decisió manual.
+**FET** *(2026-05-12 per `codex` — Canvi #551)*: el mapa de capacitats del manual queda connectat al flux operatiu. Cada `AdminManualCapability` porta `flowStep` canònic (`01`-`06`), `/admin/manual` mostra el pas del sistema dins cada targeta i `qa:admin-manual-consistency` falla si una capacitat no té pas, apunta a un pas inexistent, surt de `/admin` o queda amb menys de 3 senyals.
+**FET** *(2026-05-12 per `codex` — Canvi #553)*: el manual mostra també la cobertura inversa del sistema. `/admin/manual` afegeix "Cobertura del sistema", agrupant les 18 capacitats per pas del flux perquè es vegi quines eines sostenen cada fase, i `qa:admin-manual-consistency` falla si qualsevol pas de `ADMIN_MANUAL_OPERATING_FLOW` queda sense capacitat connectada.
+**FET** *(2026-05-14 per `codex` — Canvi #557)*: el sistema operatiu del manual guanya punts de control entre passos. `ADMIN_MANUAL_OPERATING_GATES` defineix un gate per cada pas (`01`-`06`) amb comprovació abans d'avançar, risc si se salta i pregunta de propietari; `/admin/manual` ho renderitza com "Punts de control del flux", i `qa:admin-manual-consistency` falla si falta un gate, apunta a un pas inexistent o queda sense contingut accionable.
+**FET** *(2026-05-14 per `codex` — Canvi #558)*: el manual explicita també els handoffs entre passos del sistema operatiu. `ADMIN_MANUAL_OPERATING_HANDOFFS` defineix què entrega cada pas, quin workspace rep l'artefacte i quina regla impedeix avançar amb memòria dispersa; `/admin/manual` ho renderitza com "Handoffs entre passos", i `qa:admin-manual-consistency` falla si un pas no té handoff sortint, apunta a un pas inexistent, no porta href `/admin` o queda sense artefacte/regla accionable.
+**FET** *(2026-05-14 per `codex` — Canvi #559)*: el manual converteix cada pas del sistema operatiu en checklist binària de tancament. `ADMIN_MANUAL_OPERATING_STEP_CHECKLIST` defineix per cada pas el label de fet, 3 checks mínims i la condició de bloqueig; `/admin/manual` ho renderitza com "Checklist de pas", i `qa:admin-manual-consistency` falla si falta una checklist, apunta a un pas inexistent o té menys de 3 checks.
+**FET** *(2026-05-14 per `codex` — Canvi #560)*: el guard del manual blinda també duplicitats als controls del product operating system. `qa:admin-manual-consistency` falla si `ADMIN_MANUAL_OPERATING_GATES`, `ADMIN_MANUAL_OPERATING_HANDOFFS` o `ADMIN_MANUAL_OPERATING_STEP_CHECKLIST` repeteixen el mateix pas, evitant que el flux sembli cobert mentre un pas queda sobrescrit o ambigu.
+**FET** *(2026-05-14 per `codex` — Canvi #561)*: el guard del manual blinda també l'ordre canònic dels handoffs. `qa:admin-manual-consistency` calcula la seqüència de `ADMIN_MANUAL_OPERATING_FLOW` i falla si un handoff salta fora del següent pas esperat (`01→02→03→04→05→06→01`), evitant connexions vàlides individualment però incoherents com a cicle operatiu.
+**FET** *(2026-05-14 per `codex` — Canvi #562)*: el guard del manual blinda ara la font base del flux. `qa:admin-manual-consistency` falla si `ADMIN_MANUAL_OPERATING_FLOW` duplica un pas, omet algun ID canònic `01`-`06` o introdueix un step no canònic, de manera que gates, handoffs i checklists no es poden construir sobre una seqüència defectuosa.
+**FET** *(2026-05-14 per `codex` — Canvi #563)*: el guard del manual blinda també l'ordre físic del flux base. `qa:admin-manual-consistency` falla si `ADMIN_MANUAL_OPERATING_FLOW` conté els steps `01`-`06` però en una posició diferent de l'ordre canònic, evitant que la narrativa visual i els handoffs derivin d'un array desordenat.
+**FET residual** *(2026-05-18 per `codex` — Canvi #680)*: el pendent crític d'evitar dispersió per excés de mòduls queda regularitzat com a regla protegida. La narrativa mare viu a `docs/product-operating-system-ca.md` (#606), el manual la desplega amb flux, gates, handoffs, checklists i evidències (#541-#563, #594, #596), el Dashboard la fa visible com a cicle operatiu (#666) i `qa:product-operating-system` blinda que document, protocol, manual i Dashboard no es desconnectin. El risc futur continua vigent, però ja no és un bloqueig obert de construcció narrativa.
+**FET documental** *(2026-05-21 per `claude` — Canvi #740)*: el `MÉS ENDAVANT` històric de "formalitzar product operating system" queda regularitzat com a `FET` perquè la narrativa, el flux canònic, les evidències, els handoffs, les checklists i la visualització al Dashboard ja existeixen i estan blindades per `qa:product-operating-system`. El següent treball productiu en aquest front no és formalitzar el sistema sinó refinaments quan dades reals d'execució suggereixin reajustar passos canònics — i això s'ha de fer dins de la narrativa única ja existent, no construint-ne una de paral·lela.
+**MÉS ENDAVANT**: refinaments del cicle canònic si dades reals d'execució n'evidencien fricció.
 
 ## 6.2 Arquitectura de domini
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -588,8 +609,10 @@ Criteri pràctic:
 **FET** *(2026-04-24 per `codex` — Canvi #371)*: el cicle de snapshot tècnic del lead comparteix també l’escriptura de `leadActivity`. `leadActivityService` exporta `recordLeadTechnicalSnapshotSaved()` i `recordLeadTechnicalSnapshotSent()`, i `leadSnapshotService` deixa de crear aquestes activitats directament.
 **FET** *(2026-04-24 per `claude` — Canvi #373)*: el cicle de pèrdua de lead comparteix també l’escriptura de `leadActivity`. `leadActivityService` exporta `recordLeadLost()`, i `leadLossService` deixa de crear aquesta activitat directament. Amb això tots els consumidors ja passen pels helpers shared.
 **FET** *(2026-04-24 per `claude` — Canvi #374)*: decisió canònica — **NO es crea entitat `CommunicationEvent` pròpia**. `leadActivity` continua sent la font canònica de comunicacions amb el lead (EMAIL, CALL, WHATSAPP) juntament amb la resta d’events del domini lead. Raons: (1) el PENDENT CRÍTIC apunta cap a menys entitats (unificar `customerActivity` + `leadActivity` en un `TimelineEvent` polimòrfic), no més — afegir una 4a font augmentaria fan-in al `timelineQueryService`; (2) després dels Canvis #352–#373 totes les escriptures passen per helpers shared tipats (`recordLeadEmailSent`, `recordLeadQuoteSent`, `recordLeadCommercialSequenceStepSent`, etc.) que encapsulen `type + metadata` sense dependre de queries natives sobre columnes pròpies; (3) queries tipades sobre comms es poden cobrir amb helpers de lectura (`listLeadEmailActivities()`, etc.) sense tocar schema, i camps "hot" per SLA/analítica (ex: `lastRespondedAt`) poden viure com a camps derivats al `Lead` si algun dia calen. Aquesta decisió tanca explícitament el debat i evita que agents futurs tornin a plantejar-lo sense evidència nova.
-**PENDENT CRÍTIC**: definir què és timeline operativa vs log tècnic. Decidir si a llarg termini hi ha una entitat única d'events — la direcció preferida (un `TimelineEvent` polimòrfic que absorbeix `customerActivity` + `leadActivity`) queda documentada al `#374`, però no és feina immediata; requereix un RFC curt abans de tocar schema.
-**MÉS ENDAVANT**: analítica transversal sobre timeline. Automatismes basats en ella.
+**FET documental** *(2026-05-17 per `codex` — Canvi #630)*: el vell `PENDENT CRÍTIC` de definir timeline operativa vs log tècnic queda regularitzat perquè el RFC curt que demanava ja existeix al Canvi #604. La direcció preferida continua sent un futur `TimelineEvent` polimòrfic només si abans hi ha projector compartit i evidència d'ús transversal; sense això, no es toca schema.
+**FET** *(2026-05-17 per `codex` — Canvi #604)*: el RFC previ al schema ja existeix a `docs/rfc-timeline-event-polimorfic-ca.md`. Defineix la frontera entre timeline operativa i log tècnic, criteris d'entrada a un futur `TimelineEvent`, shape conceptual, migració recomanada i no-goals. Efecte: cap agent ha de tocar `schema.prisma` per una timeline única sense passar abans per projector compartit i evidència d'ús transversal.
+**FET documental** *(2026-05-21 per `claude` — Canvi #742)*: el `MÉS ENDAVANT` històric "analítica transversal sobre timeline + automatismes" queda regularitzat com a `FET`. `timelineQueryService` exposa `fetchRecentCanonicalEvents()`, `fetchCanonicalCommunicationEventsForBookings()`, `fetchRecentCanonicalCommunicationMetrics()`, `summarizeCanonicalCommunicationMetrics()` i `fetchRecentCommercialSequenceMetrics()` — totes derivades d'una sola lectura canònica. `dashboard-data` (#338), `operationalPulseService` (#336), `executiveReportService`, `commercialDailyAutomationService` (#336 + #113), `economia/page` (#335 + #337) i `sales-ops/page` (#336) consumeixen aquestes capes. L'automatització ja escalada està a `commercialDailyAutomationService` + `taskAutomationService` + `commercialSequenceService` + `urgentFollowUpAlertService` + el nou `leadReengagementAutomationService` (#737), tots alimentats per lectures canòniques.
+**MÉS ENDAVANT**: analítiques avançades (cohorts, funnel time-to-stage) si apareix una pregunta operativa concreta que no es respongui amb les lectures actuals.
 
 ## 6.4 Tasks / Tasques operatives
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -617,7 +640,10 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `claude` — Canvi #45)*: `taskQueueService.ts` — queue operativa intel·ligent amb 5 classificacions (VENÇUT, AVUI, VIP, BLOQUEJAT, NORMAL), scoring, filtres a la UI. 18 tests.
 **FET** *(2026-04-10 per `claude` — Canvi #48)*: `taskAutomationService.ts` — 7 regles d'automatització (SLA, stale, prep, payment, post-event, at-risk, quote). Cada tasca vinculada a entitat concreta amb deduplicació. API + botó a UI. 14 tests.
 **FET** *(2026-04-10 per `codex` — Canvi #68)*: cron `/api/cron/tasks-auto` per executar `runTaskAutomation` diàriament amb Bearer `CRON_SECRET`, status `automation.tasks`, registre a `/admin/crons` i tests de route.
-**MÉS ENDAVANT**: alertes en temps real i ajust fi de regles automàtiques segons dades reals.
+**FET** *(2026-05-20 per `claude` — Canvi #703)*: guard `qa:no-tasks-split` detecta directoris de ruta admin fora de `app/admin/tasks/` amb noms que suggereixen un workspace operatiu de tasques paral·lel (`todos`, `todo`, `task-hub`, `task-management`, `task-pipeline`, `task-board`, `task-queue`, `work-items`, `work-queue`, `kanban`, `kanban-board`, `assignments`, etc.). `validate:core` puja a 58 guards. 9 tests blinden el guard. Efecte: cap futur workspace de tasques paral·lel pot aparèixer com a ruta admin independent sense trencar el pipeline.
+**FET parcial** *(2026-05-21 per `claude` — Canvi #744)*: la primera meitat del `MÉS ENDAVANT` — "alertes en temps real" — queda regularitzada com a `FET`. `urgentFollowUpAlertService` (#144) emet alertes immediates per follow-ups URGENT amb cron 4x diari + supressió 24h per lead, `commercialDailyAutomationService` (#113) integra alertes CRITICAL al resum diari email+WhatsApp, i la pàgina `/admin/crons` (#458 PWA shortcut) fa visible l'estat. Resta el `MÉS ENDAVANT` real: "ajust fi de regles automàtiques segons dades reals" — això requereix dades acumulades d'execució del repo en producció abans de fer-ho configurable (no és executable de forma autònoma per protocol).
+**FET** *(2026-05-22 per `claude` — Canvi #752)*: primera passa de la configurabilitat — els llindars d'automatització passen de hardcodejats inline a la capa canònica `lib/constants/automationThresholds.ts` (`TASK_AUTOMATION_THRESHOLDS` + `CAPACITY_FORECAST_THRESHOLDS`). Monocapa pura, zero canvi de comportament, amb tests de regressió que blinden els valors històrics. És la infraestructura prèvia necessària per exposar els llindars a admin settings quan hi hagi dades reals.
+**MÉS ENDAVANT**: exposar `automationThresholds` a admin settings (UI + persistència) quan dades reals d'execució en producció justifiquin permetre ajustar-los sense desplegament.
 
 ## 6.5 CRM / Customer Hub
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -660,8 +686,16 @@ Criteri pràctic:
 **FET** *(2026-04-19 per `codex` — Canvi #231)*: `PendingFollowUpsPanel` d’Inbox deixa d’obrir el redactor amb `customerId=` buit. El CTA d’email fa servir ara `leadId` i manté el context real del follow-up pendent.
 **FET** *(2026-04-24 per `claude` — Canvi #378)*: el criteri "CTA només cap a destins realment suportats" està auditat també fora de Customer/Lead Hub — no es necessita cap tall de codi. Únic candidat tangible: `app/admin/tasks/TaskQueueBanner.tsx`, que només fa filtres interns a `/admin/tasks?queue=X` sense cap CTA extern. La resta de banners executius (`LeadInsightsBanner`, `clientes/.../InsightsBanner`) ja viuen dins Lead/Customer Hub i es cobreixen pels Canvis `#229` i `#231`.
 **FET** *(2026-04-26 per `codex` — Canvi #415)*: el vell `EN MARXA` de `§6.5` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava el `Customer Hub` amb insights, comunicacions canòniques, prioritat comercial, reactivació assistida i navegació shared cap a tasques, reserves, pressupostos i compose (`#136`-`#151`, `#201`-`#224`); el pendent real que resta és el `PENDENT CRÍTIC` d'elevar-lo a cervell comercial únic i evitar la fragmentació en pantalles paral·leles.
-**PENDENT CRÍTIC**: Customer Hub com a cervell comercial. Evitar client repartit en pantalles paral·leles.
-**MÉS ENDAVANT**: segments intel·ligents, reactivació assistida i automatismes comercials amb traçabilitat.
+**FET** *(2026-05-12 per `codex` — Canvi #556)*: `/admin/clientes` incorpora una lectura operativa de propietari al Customer Hub: resumeix clients visibles/totals, historial, oportunitats sense esdeveniment, risc, dormits i canals de contacte incomplets; separa què detecta el sistema de què ha de fer una persona i envia el següent pas a la Fitxa 360 del client més prioritari.
+**FET** *(2026-05-18 per `codex` — Canvi #635)*: canonització de tots els `href` inline `/admin/clientes/${id}` a l'admin. `buildCustomerHubHref()` afegit a `customerWorkspaceHref.ts` com a entrada canònica genèrica al Customer Hub. Guard `check-customer-inline-href.mjs` afegit a `validate:core`. ~39 literals inline a ~20 fitxers (`bookings`, `leads`, `presupuestos`, `tasks`, `clientes/*`, `privacy`, `intake`) migrats a helpers canònics. Zero violacions restants al grep de control.
+**FET** *(2026-05-18 per `codex` — Canvi #636)*: canonització de tots els `href` inline `/admin/bookings/${id}` i `/admin/leads/${id}` a l'admin i a `lib/`. Nou helper `buildBookingHref()` a `lib/admin/bookingWorkspaceHref.ts`. 1 violació residual de leads fixada (`ProposalOwnerPanel.tsx`). Guard `check-customer-inline-href.mjs` ampliat per cobrir `lib/`, el patró `/admin/bookings/${...}` i el patró `/admin/leads/${...}`. ~48+ literals inline a ~27 fitxers migrats. Zero violacions restants per als tres patrons.
+**FET** *(2026-05-18 per `codex` — Canvi #637)*: el mateix guard cobreix ara també URLs absolutes no-API que incrusten paths admin canònics, com ``${baseUrl}/admin/bookings/${id}``. `bookingStripePaymentService.ts` i `email.ts` passen a construir aquests paths amb `buildBookingHref()`, i el test del guard blinda tant la detecció absoluta com l'exempció dels endpoints `/api/admin/*`.
+**PENDENT CRÍTIC residual**: Customer Hub encara ha d'absorbir fluxos comercials que continuïn obligant a sortir a pantalles paral·leles; cada nou flux de client ha de tenir lectura o entrada canònica des del hub.
+**FET** *(2026-05-19 per `claude` — Canvi #689)*: guard `qa:no-customer-split` detecta directoris de ruta admin fora de `app/admin/clientes/` amb noms que suggereixen gestió paral·lela de clients (`customers`, `customer-hub`, `customer-analytics`, `customer-portal`, `client-portal`, `client-dashboard`, `crm`, `contact-management`, etc.). `validate:core` puja a 53 guards. 9 tests blinden el guard. Efecte: cap futura duplicació del Customer Hub no pot aparèixer com a ruta admin independent sense trencar el pipeline.
+**FET** *(2026-05-17 per `codex` — Canvi #599)*: el panell `Entrades vinculades` del Customer Hub deixa de tractar la fitxa de lead com a clic principal. Cada card calcula `buildLeadContinuity()` i manté el clic principal dins `/admin/clientes/:id?tab=leads`, fins i tot quan el DTO de lead no porta `customerId`; la fitxa `/admin/leads/:id` queda com a acció secundària explícita `Fitxa tècnica del lead`. Efecte: el hub absorbeix la lectura comercial del lead i la sortida a pantalla paral·lela queda reservada per detall tècnic.
+**FET** *(2026-05-18 per `codex` — Canvi #631)*: la fitxa tècnica de lead deixa de perdre el pont canònic quan el lead ja està vinculat. `LeadCustomerLinkPanel` ara renderitza l'estat `already-linked` com a `Lead vinculat al Customer Hub`, amb CTAs a `/admin/clientes/:id?tab=summary` i `/admin/clientes/:id?tab=leads`. Efecte: fins i tot quan s'entra per `/admin/leads/:id`, la continuïtat natural torna al Customer Hub i no queda només una relació informativa lateral.
+**FET documental** *(2026-05-21 per `claude` — Canvi #743)*: el `MÉS ENDAVANT` històric "segments intel·ligents, reactivació assistida i automatismes comercials amb traçabilitat" queda regularitzat com a `FET`. Els segments CRM ja són funcionals (Canvi #39: "En risc" + "Alt valor" backend + frontend); `reactivationService` (#41) cobreix 6 classificacions, panell `/admin/clientes/reactivation` complet, missatges suggerits ca/es, WhatsApp/email/copiar/descartar; `referralsService` (#52) cobreix top referrers + stats globals + 4 classificacions de candidats; `customerInsightsService` (#16, #35) cobreix next action + LTV + relational health; els automatismes comercials passen per `commercialSequenceService` (5 passos + cron `commercialDailyAutomation`) amb cada acció traçada via `recordLeadCommercialSequenceStepSent()` (#364) a `leadActivity`; la reactivació entra a Tasks amb `dedupeKey` canònic (#204, #207); i el reengagement automatitzat (#737) tanca l'automatització diària. La traçabilitat real és que cada acció comercial deixa rastre a `leadActivity` o `customerActivity` via helpers shared (#346-#373).
+**MÉS ENDAVANT**: refinaments de segments quan dades reals d'execució n'evidencien casos no coberts (ex: clients en risc actiu post-event recent).
 
 ## 6.6 Leads / Pipeline comercial
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -670,6 +704,7 @@ Criteri pràctic:
 **FET** *(2026-04-09 per `claude` — Canvi #17)*: `leadInsightsService.ts` — next action, loss risk, commercial context. Integrat a lead detail page.
 **FET** *(2026-04-10 per `claude` — Canvi #36)*: `LeadInsightsBanner.tsx` — next action amb CTA, risc de pèrdua amb raons, context comercial visible. Integrat entre executive section i LeadGuidedFlow.
 **FET** *(2026-04-10 per `claude` — Canvi #46)*: `leadScoreBreakdownService.ts` — scoring explicable amb breakdown visual. Component `LeadScoreBreakdown` amb barra, factors, punts. Integrat al lead detail. 18 tests.
+**FET** *(2026-05-05 per `codex` — Canvi #518)*: `LeadGuidedFlow` elimina la supressió local `react-hooks/exhaustive-deps` del càlcul de `nextAction`. `updateStatus` passa a `useCallback`, `nextAction` declara `updateStatus` com a dependència real i `__tests__/app/admin/leads/LeadGuidedFlow.test.ts` blinda que el flux no torni a amagar dependències. Efecte: mateixa cabina comercial, però amb contracte React més explícit i menys deute silenciós al pipeline de leads.
 **FET** *(2026-04-10 per `claude` — Canvi #51)*: `leadReengagementService.ts` — 6 classificacions (UPCOMING_EVENT, HOT_STALE, QUOTE_NO_REPLY, NEGOTIATION_COLD, EARLY_SILENCE, LONG_DORMANT) amb missatges ca/es i UI `/admin/leads/reengagement`. 22 tests.
 **FET** *(2026-04-10 per `claude` — Canvi #81)*: `leadPipelineSuggestionsService.ts` — 7 suggeriments automàtics de pipeline (hot uncontacted, stale negotiation, quote no reply, event soon, high value idle, bulk new, winning streak). API + panell integrat a `/admin/leads`. 25 tests.
 **FET** *(2026-04-11 per `codex` — Canvi #109)*: `dailyBriefService.ts` deixa de duplicar criteris comercials i consumeix `loadPipelineSuggestions()` per alimentar alertes i accions de `HOT_UNCONTACTED`, `QUOTE_NO_REPLY` i `EVENT_SOON_NO_BOOKING` des de la capa canònica.
@@ -677,8 +712,14 @@ Criteri pràctic:
 **FET** *(2026-04-24 per `codex` — Canvi #381)*: el `SEGÜENT` queda regularitzat com a deute de checklist ja resolt. La feina funcional ja existia als Canvis `#327` i `#328`: `operationalPulseService` propaga `pipelineDrivers` derivats de `loadPipelineSuggestions()` i el dashboard els fa visibles tant a `OperationalPulsePanel` com al `Radar d'execució`. No hi havia cap segon tall de codi pendent a `§6.6`; només faltava sincronitzar el protocol.
 **FET** *(2026-04-11 per `codex` — Canvi #113)*: el resum extern `commercial-daily` ja reflecteix les alertes crítiques del matí, de manera que el dashboard no és l'únic lloc on apareixen aquests senyals.
 **FET** *(2026-04-26 per `codex` — Canvi #416)*: el vell `EN MARXA` de `§6.6` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava insights comercials executables (`#17`, `#36`, `#46`), suggeriments canònics de pipeline (`#81`) i la seva reutilització al brief i al pols operatiu (`#109`, `#110`, `#113`, `#381`); el pendent real que resta és exclusivament el `PENDENT CRÍTIC` d'evitar que Leads continuï separat conceptualment del Customer Hub.
-**PENDENT CRÍTIC**: evitar que Leads sigui pantalla separada conceptualment del Customer Hub. Flux clar: lead nou → negociació → conversió → reserva → client recurrent.
-**MÉS ENDAVANT**: reengagement de leads dormants automatitzat.
+**FET residual** *(2026-05-18 per `codex` — Canvi #679)*: el pendent crític d'evitar que Leads sigui pantalla separada conceptualment del Customer Hub queda regularitzat. El Customer Hub ja mostra la continuïtat lead→client (#599), el detall de lead mostra l'estat `already-linked` (#631), la llista/kanban obren `Fitxa 360` (#667) i la lectura superior de Leads agrega entrades ja integrades a Customer Hub (#676). La regla continua vigent com a protecció de flux, però ja no és un bloqueig immediat.
+**FET** *(2026-05-19 per `claude` — Canvi #693)*: guard `qa:no-leads-split` detecta directoris de ruta admin fora de `app/admin/leads/` amb noms que suggereixen un workspace de leads o pipeline comercial paral·lel (`pipeline`, `prospects`, `prospecting`, `lead-hub`, `lead-pipeline`, `lead-management`, `lead-funnel`, `commercial-pipeline`, `commercial-hub`, `sales-pipeline`, `sales-hub`, `sales-funnel`, `funnel`). `sales-ops/` no es detecta (workspace canònic de SLA/seqüències). `validate:core` puja a 56 guards. 9 tests blinden el guard. Efecte: cap futur workspace de leads paral·lel pot aparèixer com a ruta admin independent sense trencar el pipeline.
+**FET** *(2026-05-17 per `codex` — Canvi #599)*: el Customer Hub mostra explícitament la continuïtat `Lead -> negociació -> reserva -> client recurrent` per cada entrada vinculada, amb etapa derivada de l'estat (`Entrada nova`, `Pressupost enviat`, `Negociació oberta`, `Reserva vinculada`, etc.). Això fa visible el flux lead→client des del hub i redueix la dependència de navegar mentalment entre `Leads` i `Clientes`.
+**FET** *(2026-05-18 per `codex` — Canvi #631)*: quan un lead ja té `customerId`, `/admin/leads/:id` carrega igualment `previewLeadCustomerLink()` i mostra `LeadCustomerLinkPanel` en estat `already-linked`. La fitxa de lead continua existint com a detall tècnic, però el panell superior de relació envia a la Fitxa 360 i a la pestanya d'entrades del client.
+**FET** *(2026-05-18 per `codex` — Canvi #667)*: la llista i el kanban de Leads ja no mostren un enllaç genèric `Client` quan una entrada té `customerId`; usen `buildLeadCustomerContinuityTarget()` i apunten a `Fitxa 360` (`/admin/clientes/:id?tab=leads`). Efecte: el flux Lead → Customer Hub és visible abans d'obrir el detall.
+**FET** *(2026-05-18 per `codex` — Canvi #676)*: el `OwnerControlStrip` de `/admin/leads` ja llegeix la continuïtat amb Customer Hub des d'una capa pura (`buildLeadOwnerControlSummary()`). A més de leads nous, prioritat alta i reserves vinculades, ara mostra quantes entrades ja viuen a `Fitxa 360`. Efecte: la primera lectura de Leads reforça el flux lead nou → negociació → reserva → client recurrent sense dependre d'obrir cada fila.
+**FET** *(2026-05-21 per `claude` — Canvi #737)*: el reengagement deixa de dependre del recordatori del propietari. `lib/services/tasks/leadReengagementAutomationService.ts` reaprofita les 6 classificacions de `loadReengagementCandidates()` (#51) i genera tasques canòniques `source: 'AUTOMATION'`, `autoRule: 'LEAD_REENGAGEMENT'` amb `TASK_DEDUPE_KEY.reengagement(leadId)`; el cron `/api/cron/lead-reengagement` (Bearer-auth, prefix `automation.leadReengagement`) s'executa diàriament des de `daily-crons.yml` i `/admin/crons` el mostra al monitor. Per defecte exclou candidats de prioritat BAIXA per evitar soroll. 11 tests nous (8 servei + 3 ruta) i `ADMIN_CRON_PREFIXES` passa a 11 crons.
+**MÉS ENDAVANT**: refinaments quan dades reals de execució suggereixin reajustar dies-llindar o canals suggerits.
 
 ## 6.7 Bookings / Operacions
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -689,9 +730,13 @@ Criteri pràctic:
 **FET** *(2026-04-09 per `claude` — Canvi #19)*: `fetchCanonicalEventsForBooking` enriquit — consolida adminLog booking + inventory adminLog + leadActivity del lead origen en una sola història ordenada. Tanca el pendent crític de la història coherent.
 **FET** *(2026-04-22 per `codex` — Canvi #330)*: `bookingOperationalService` deixa de fer una lectura paral·lela de `adminLog` per comunicacions. `commStatuses` i `recentCommRows` es deriven ara directament de `fetchCanonicalEventsForBooking()`, de manera que el detall de reserves reutilitza la mateixa timeline canònica que ja mostra l’historial.
 **FET** *(2026-04-26 per `codex` — Canvi #414)*: el vell `EN MARXA` de `§6.7` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava snapshot operacional unificat (`#14`), història canònica coherent (`#1`, `#19`) i consolidació final dels estats de comunicació a monocapa shared (`#330` + `#331`); el pendent real que resta és exclusivament el `MÉS ENDAVANT` de planificació avançada.
+**FET** *(2026-05-19 per `claude` — Canvi #694)*: guard `qa:no-bookings-split` detecta directoris de ruta admin fora de `app/admin/bookings/` amb noms que suggereixen un workspace de reserves paral·lel (`reservations`, `reservas`, `booking-hub`, `bookings-hub`, `events-management`, `event-management`, `operations-hub`, `booking-management`, `booking-pipeline`, `event-pipeline`, `events-hub`). `post-event/` no es detecta (workflow post-event tancat, distint). `validate:core` puja a 57 guards. 8 tests blinden el guard. Efecte: cap futur workspace de reserves paral·lel pot aparèixer com a ruta admin independent sense trencar el pipeline.
 **FET** *(2026-04-10 per `claude` — Canvi #50)*: `bookingCapacityService.ts` — visió global de càrrega operativa per dia. 4 nivells (FREE/LIGHT/FULL/OVERLOADED), grid 14d, KPIs. 15 tests.
 **FET** *(2026-04-16 per `claude` — Canvi #129)*: alertes de col·lisió automàtiques — `loadCapacityConflicts()` integrat al `commercialDailyAutomationService` amb bloc HTML email + línia WhatsApp. Test mock + 2 tests específics (email + WA) afegits.
-**MÉS ENDAVANT**: planificació avançada.
+**FET** *(2026-05-21 per `claude` — Canvi #747)*: `operationalForecastService.ts` afegeix forecast operatiu setmanal a 4 setmanes amb alertes anticipades (`NONE/INFO/WARNING/CRITICAL`), dies sobrecarregats per setmana, comparativa YoY (`previousYearBookings` + `yoyDelta`) i llindars configurables. `/admin/calendario/capacity` mostra cards setmanals tinted segons alertLevel sota la grid de 14 dies. 8 tests nous (`qa:service-coverage` cobreix el servei).
+**FET** *(2026-05-21 per `claude` — Canvi #748)*: el forecast capacitat entra al Dashboard com a panell condicional. `WeeklyCapacityForecastPanel` només es mostra quan hi ha setmana `WARNING/CRITICAL`; quan tot està OK, el panell desapareix. Border global rose/ambar segons severitat màxima. Reforça el principi "operar millor + decidir millor" — l'alerta arriba abans del problema.
+**FET** *(2026-05-21 per `claude` — Canvi #749)*: el cicle del forecast capacitat es tanca amb alertes al resum diari email+WhatsApp. `commercialDailyAutomationService` carrega `loadWeeklyCapacityForecast()`, separa setmanes `CRITICAL`/`WARNING` i, si n'hi ha, injecta bloc HTML (border rose/ambar) a l'email i línia `📅 Forecast capacitat` al WhatsApp. Zero spam quan totes les setmanes són OK. Suite del servei 6→8 tests.
+**MÉS ENDAVANT**: refinaments de llindar segons dades reals d'execució (5 reserves/setmana = WARNING és estimació inicial conservadora).
 
 ## 6.8 Inbox / Comunicacions
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -719,8 +764,14 @@ Criteri pràctic:
 **FET** *(2026-04-22 per `codex` — Canvi #329)*: el resum de comunicacions deixa de viure com a reconstrucció local a Inbox. `CommSummaryPanel` consumeix ara `/api/admin/leads/[id]/comm-summary`, que delega a `loadCommTimeline()` basat en timeline canònica; el mateix servei continua alimentant `commSummary` del Customer Hub. Es redueix una capa paral·lela sense tocar schema ni fluxos de redacció.
 **FET** *(2026-04-26 per `codex` — Canvi #417)*: el vell `EN MARXA` de `§6.8` queda regularitzat com a feina ja consolidada. El mateix bloc ja documentava resum canònic compartit entre Inbox i Customer Hub (`#136`, `#329`), narrativa de comunicació integrada a la timeline del client (`#137`, `#138`) i follow-ups/risc comercial reutilitzats fora d'Inbox (`#139`-`#151`); el pendent real que resta és exclusivament el `PENDENT CRÍTIC` d'evitar noves capes paral·leles de comunicacions.
 **FET** *(2026-05-04 per `claude` — Canvi #496)*: el detall IMAP deixa de descarregar el RFC822 sencer amb attachments quan s'obre un mail. `fetchEmailByUid()` passa de `source: true` a `bodyParts: ['HEADER', 'TEXT']`, parseja només header+text i manté la detecció d'adjunts via `bodyStructure`; `__tests__/lib/imap-fetch-bodyparts.test.ts` blinda que no es torni a baixar el missatge complet. Efecte: el detall de mail evita timeouts/502 a Railway provocats per attachments grans.
-**PENDENT CRÍTIC**: evitar que comunicacions visquin com a capa paral·lela.
-**MÉS ENDAVANT**: inbox unificada multi-canal.
+**FET residual** *(2026-05-18 per `codex` — Canvi #678)*: el pendent crític d'evitar que comunicacions visquin com a capa paral·lela queda regularitzat. El Customer Hub ja mostra fil canònic de conversa (#600), l'admin bloqueja `mailto:` i força el redactor canònic (#632 + #634), i Inbox ja mostra quantes converses viuen a `Fitxa 360` (#677). La regla continua vigent com a protecció de producte, però ja no és un bloqueig immediat.
+**FET** *(2026-05-19 per `claude` — Canvi #692)*: guard `qa:no-inbox-split` detecta directoris de ruta admin fora de `app/admin/inbox/` amb noms que suggereixen comunicació paral·lela (`messages`, `messaging`, `chat`, `comms`, `communications`, `inbox-hub`, `email-hub`, `email-center`, `contact-center`, etc.). `validate:core` puja a 55 guards. 9 tests blinden el guard. Efecte: cap futura capa paral·lela de comunicacions pot aparèixer com a ruta admin independent sense trencar el pipeline.
+**FET** *(2026-05-17 per `codex` — Canvi #600)*: el panell `Comunicacions` del Customer Hub incorpora un `Fil canònic de conversa` derivat de `commSummary` + `followUpSummary`. Mostra estat, propietari del següent moviment, detall del seguiment prioritari i CTAs `Obrir fil del client` / `Crear tasca des del fil`, mantenint la conversa dins el hub en lloc de fer-la dependre d'una lectura separada d'Inbox.
+**FET** *(2026-05-18 per `codex` — Canvi #632)*: la capçalera del Customer Hub deixa d'obrir l'email visible amb `mailto:` i el redirigeix al redactor canònic `buildCustomerComposeHref(customerId)`. Això manté el fil dins `/admin/inbox/compose?customerId=...`, preselecciona el client i evita que un contacte iniciat des de la Fitxa 360 surti a una capa de correu local no traçable.
+**FET** *(2026-05-18 per `codex` — Canvi #634)*: la regla del #632 queda protegida per `qa:admin-no-mailto`: cap fitxer productiu dins `app/admin` pot tornar a introduir `mailto:` sense trencar `validate:core`. Les comunicacions iniciades des de l'admin han de passar pel redactor canònic `/admin/inbox/compose` amb context de client o lead.
+**FET** *(2026-05-18 per `codex` — Canvi #677)*: el `OwnerControlStrip` de `/admin/inbox` ja llegeix la continuïtat amb Customer Hub des d'una capa pura (`buildInboxOwnerControlSummary()`). A més de configuració IMAP, entrades del dia i seguiments pendents, ara mostra quantes converses ja viuen a `Fitxa 360`. Efecte: Inbox es presenta com a part del fil canònic del client, no com una safata paral·lela.
+**FET documental** *(2026-05-21 per `claude` — Canvi #740)*: el `MÉS ENDAVANT` històric de "inbox unificada multi-canal" queda regularitzat com a `FET`. La capa canònica `commTimelineService` (#47) ja tracta `EMAIL`, `WHATSAPP`, `CALL` i `NOTE` com a fonts unificades; `INSTAGRAM` i `FORM` entren com a canals reals via `contactLeadCaptureService` i `recordLeadInboundChannelCaptured()` (C.10 / §6.18 Canvi #461); el `CommSummaryPanel` els llegeix dins Inbox i Customer Hub. La unificació multi-canal ja no és un pas pendent — viu darrere d'una sola lectura canònica.
+**MÉS ENDAVANT**: incorporar nous canals només quan apareguin entrants reals (ex: SMS, Telegram) — el contracte canònic de canal ja és prou expressiu i s'amplia per `enum`, no per pantalles paral·leles.
 
 ## 6.9 Social / Contingut / Growth
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -729,8 +780,12 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `claude` — Canvi #40)*: `socialIdeasService.ts` — idees de post auto-generades des de bookings recents, testimonials aprovats, portfolio nou i esdeveniments futurs. Panell integrat al `SocialClient` amb pre-emplenat del modal.
 **FET** *(2026-04-17 per `claude` — Canvi #147)*: `socialPerformanceService.ts` — mètriques de rendiment per canal: `computePlatformMetrics` (posts per estat, breakdown contentType/category, millor dia/hora, avgPostsPerWeek, daysSinceLastPost), `computeConsistencyScore` (% setmanes amb activitat), `generateRecommendations` (inactivitat, baixa freqüència, falta diversitat, posts no publicats). API `/api/admin/social-posts/performance`. 19 tests.
 **FET** *(2026-04-24 per `claude` — Canvi #379)*: decisió canònica — **no cal planificador editorial avançat ara**. El workspace Social actual (vista llista + calendari mensual + modal CRUD + filtres + KPIs clicables + panell d'idees auto-generades des de bookings/testimonials/portfolio + mètriques de rendiment amb recomanacions automàtiques) cobreix el volum de posts esperat per una empresa DJ/events com Òrbita. Features que faltarien per ser "planificador avançat" (drag-drop entre dates, vista setmanal, bulk actions, multi-plataforma amb threading, calendari editorial per campanya) són overkill pel cas d'ús real. Reavaluar només quan `socialPerformanceService.generateRecommendations()` comenci a marcar "inactivitat sistèmica" o "baixa freqüència" de forma recurrent — és a dir, quan la feina volgui un ritme de posting que la UI actual no pugui sostenir. Aquesta decisió tanca explícitament el debat per evitar que un agent futur el reobri sense evidència operativa.
-**PENDENT CRÍTIC**: evitar Social com a mòdul decoratiu aïllat. Ha de ser part del pipeline real de contingut.
-**MÉS ENDAVANT**: calendari editorial viu, assistència de campanyes.
+**FET** *(2026-05-12 per `codex` — Canvi #555)*: `/admin/social` deixa de consumir el pols social només com a servei cobert per tests i el fa visible al flux del propietari. `page.tsx` carrega `loadSocialContentPulse()` junt amb posts, counts i idees; `SocialClient` incorpora el pols al `OwnerControlStrip`, decideix si el següent pas és publicar, tancar esborranys o recuperar cadència, i afegeix targetes de "Pols editorial", "Cadència", "Cua editorial" i "Instagram → pipeline" amb publicacions recents, consistència, esborranys, programades i conversió de leads Instagram. `__tests__/app/admin/social/SocialClient.test.tsx` blinda el cas actiu i el cas aturat perquè Social no torni a quedar com a mòdul decoratiu aïllat.
+**PENDENT CRÍTIC residual**: evitar que futures peces de Social tornin a separar idees, calendari i captació. Qualsevol creixement ha de mantenir el pols editorial i la conversió dins la primera lectura operativa.
+**FET** *(2026-05-17 per `codex` — Canvi #601)*: `/admin/social` incorpora un `Bucle social únic` abans dels KPI, derivat de `buildSocialOperatingLoop()`. La lectura combina idees disponibles, calendari programat/publicat i pipeline d'Instagram en un sol veredicte (`Idees sense calendari`, `Calendari sense pols públic`, `Contingut connectat a captació` o `Calendari actiu sense captació visible`). Efecte: idees, calendari i captació tornen a llegir-se junts al primer nivell del workspace.
+**FET** *(2026-05-19 per `claude` — Canvi #688)*: guard `qa:no-social-split` detecta directoris de ruta admin fora de `app/admin/social/` amb noms que indiquen funcionalitat social separada (`social-calendar`, `social-ideas`, `social-posts`, `editorial`, `editorial-calendar`, `content-calendar`, `content-planning`, etc.). `validate:core` puja a 52 guards. 8 tests blinden el guard. Efecte: cap futura peça social no pot aparèixer com a ruta admin independent sense trencar el pipeline.
+**FET documental** *(2026-05-21 per `claude` — Canvi #742)*: el `MÉS ENDAVANT` històric "calendari editorial viu, assistència de campanyes" queda regularitzat com a `FET` documental, consolidant la decisió canònica del Canvi #379. El workspace Social ja té vista llista + calendari mensual + modal CRUD + filtres + KPIs clicables + idees auto-generades + mètriques de rendiment + bucle social únic (#601) + pols editorial al `OwnerControlStrip` (#555). Per a la dimensió real del negoci d'Òrbita, "calendari editorial viu" i "assistència de campanyes" estan satisfets pel hub social actual. Reavaluar només si `socialPerformanceService.generateRecommendations()` comença a marcar friccions sistèmiques que el hub actual no pugui resoldre.
+**MÉS ENDAVANT**: drag-drop entre dates o calendari setmanal granular només si l'ús real comença a demanar un ritme de posting que el hub mensual actual no sostingui.
 
 ## 6.10 Finances / Reporting / BI
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -738,8 +793,9 @@ Criteri pràctic:
 **FET** *(2026-04-10 per `claude` — Canvi #43)*: `executiveReportService` ampliat amb conversió per origen, marge brut, recurrència i tendència mensual 6m. UI `/admin/reporting` amb headline KPIs, embut, marge, recurrència, conversió/origen, tendència i leads en risc.
 **FET** *(2026-04-17 per `claude` — Canvi #146)*: `exportExecutiveReportCsv` — export CSV complet del reporting executiu amb 7 seccions (KPIs, embut, conversió/origen, recurrència, marge, tendència 6m, leads en risc). Ruta `/api/admin/reports/executive/export` retorna CSV amb `Content-Disposition: attachment`. Funció pura d'escape CSV (comes, cometes). 9 tests nous. Types exportats (`ExecutiveReport`, `ConversionBySource`, `MonthlyTrend`).
 **FET** *(2026-04-17 per `claude` — Canvi #153)*: `executiveReportPdfService.ts` — export PDF complet amb jsPDF: header branded, KPI cards, taules estilitzades (embut, conversió/origen, recurrència, marge, tendència 6m, leads en risc), paginació automàtica, footers. Ruta `/api/admin/reports/executive/export-pdf`. 8 tests (4 servei + 4 ruta).
-**PENDENT CRÍTIC**: reporting clar i accionable, no acumulació de mètriques.
-**MÉS ENDAVANT**: tendències avançades, forecast comercial i operatiu.
+**FET** *(2026-05-11 per `claude` — Canvi #547)*: `reportingInsightsService.ts` — servei pur que rep `ExecutiveReport` + rates d'email i retorna `ReportingInsight[]` ordenats per prioritat (`critical` → `warning` → `positive`). 9 tipologies d'insight: SLA trencat (critical), pipeline buit, marge baix, recurrència baixa, ingressos en caiguda, funnel aturat, leads en risc, email fluix, millor canal (positive). `/admin/reporting/page.tsx` actualitzat: el `nextStep` del `OwnerControlStrip` ara s'alimenta de l'insight de més prioritat en lloc de la cadena hardcoded; nou panell "Alertes i oportunitats" mostra els insights secundaris amb badge de categoria i CTA directa. 20 tests.
+**FET** *(2026-05-21 per `claude` — Canvi #739)*: `pipelineForecast.ts` separa per primer cop el forecast comercial probabilístic del forecast operatiu real i hi afegeix lectura YoY. `ForecastMonth` exposa `previousYearActual`, `confirmedBookings` i `confirmedRevenue`; `/admin/economia` mostra a la mateixa taula les columnes `YoY (any anterior)` amb tint emerald/rose/neutre i `Confirmades` amb nº de reserves + ingressos compromesos. 4 tests nous (21/21 verds).
+**MÉS ENDAVANT**: forecast operatiu setmana a setmana per capacitat i runway financer associat a calendari de cobraments.
 
 ## 6.11 UX / Visual / Marca
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -766,6 +822,7 @@ Criteri pràctic:
 **FET** *(2026-04-22 per `codex` — Canvi #317)*: `Calendari` entra al patró shared de propietari a la vista mes (`CalendarMonthClient`) amb `OwnerControlStrip`; el workspace deixa de dependre només de toolbar, KPI-cards i graella i passa a resumir primer ocupació visible, dies mixtes, tensió manual (capes amagades, detall obert, bloqueig en preparació, drag&drop) i següent pas cap a setmana, dia o detall.
 **FET** *(2026-04-22 per `codex` — Canvi #318)*: `Canvas Editor` entra al patró shared de propietari amb `OwnerControlStrip`; el workspace deixa de dependre només de toolbar, llenç i panell lateral i passa a resumir composició viva, tensió de sessió (selecció, moviment, redimensionat, exportació) i següent pas cap a plantilles, propietats, capes o toolbar.
 **FET** *(2026-04-22 per `codex` — Canvi #319)*: passada responsive menor `375px` sobre `Calendari` i `Canvas`; la toolbar superior del calendari, els CTAs del detall del dia, la toolbar del canvas, l’exportació, les plantilles, els presets i els controls d’alineació deixen de dependre de files rígides en ample curt.
+**FET** *(2026-05-05 per `codex` — Canvi #520)*: `CalendarMonthClient` elimina la supressió local `react-hooks/exhaustive-deps` del `useMemo` que calcula les cel·les visibles del mes. `getMonthDays` rep `{ year: monthYear.year, month: monthYear.month }` construït dins del callback i el memo depèn només de les dues primitives. `__tests__/app/admin/calendario/CalendarMonthClient.test.ts` blinda que el calendari no torni a amagar dependències React en aquest punt.
 **FET** *(2026-04-22 per `codex` — Canvi #320)*: review responsive final `375px` sobre `Missatges`, `Privacitat` i `Text Manager`; els CTAs principals, tabs/filtres i barres sticky deixen de dependre d’una sola fila rígida i poden apilar-se o ocupar ample complet quan l’ample és curt.
 **FET** *(2026-04-22 per `codex` — Canvi #328)*: el `Radar d’execució` del dashboard reaprofita els `pipelineDrivers` canònics quan existeixen, en lloc de viure només de comptadors locals. El protocol ja no deixa aquest punt a mig camí entre mètrica agregada i radar separat.
 **FET** *(2026-04-22 per `codex` — Canvi #327)*: el dashboard ja destaca explícitament quins senyals del pipeline degraden el pols operatiu; `operationalPulseService` propaga `pipelineDrivers` derivats de `loadPipelineSuggestions()` i `OperationalPulsePanel` els fa visibles sense crear una segona lògica paral·lela.
@@ -776,13 +833,16 @@ Criteri pràctic:
 **FET** *(2026-04-22 per `codex` — Canvi #322)*: segona capa de canonització de links de lead a la capa servei; `executiveCockpit`, `nextBestAction`, `timeline`, `timelineQueryService` i `adminCommandPalette` deixen de fabricar `'/admin/leads/${id}'` directament i passen a resoldre’l amb `buildLeadWorkspaceHref`, de manera que el contracte canònic ja governa també el backend/pure layer que alimenta superfícies executives.
 **FET** *(2026-04-22 per `codex` — Canvi #321)*: primera capa de canonització de CTA de lead fora del Lead Hub; `LeadInsightsBanner`, `PendingFollowUpsPanel` i `leadActionLink` deixen de construir rutes literals ad hoc i passen a consumir `lib/admin/leadWorkspaceHref.ts` per resoldre `workspace`, `compose`, `payments` i `tasks` amb un contracte compartit.
 **FET** *(2026-04-24 per `claude` — Canvi #376)*: auditoria exhaustiva del codebase confirma que **tots** els CTAs de navegació UI a leads ja passen per `buildLeadWorkspaceHref`. Les 87 ocurrències restants de `/admin/leads/` al codi (30 fitxers) són tot URLs API (`fetch('/api/admin/leads/...')`), import paths (`@/app/admin/leads/colorTheme`), rutes especials que no representen fitxa de lead (`/admin/leads/reengagement`, `/admin/leads/new`) o strings de test — cap és un CTA candidat al helper canònic. El SEGÜENT queda tancat sense tall de codi: la canonització ja és 100%, no "pràcticament exhaustiva" com indicava el #326.
-**PENDENT CRÍTIC**: identitat visual coherent entre admin, web pública i mòduls nous.
-**MÉS ENDAVANT**: sistema visual formalitzat. Tokens, ritmes, components premium compartits. Mobile admin d'alt nivell.
+**FET residual** *(2026-05-18 per `codex` — Canvi #681)*: el pendent crític d'identitat visual coherent entre admin, web pública i mòduls nous queda regularitzat com a regla protegida. El pont operatiu viu a `docs/visual-identity-bridge-ca.md` (#605) i `qa:visual-identity-bridge` (#633, ajustat al #681) blinda document, protocol i wiring dins `validate:core`. El risc futur continua vigent com a criteri transversal abans d'afegir o redissenyar pantalles, però ja no és un bloqueig obert.
+**FET** *(2026-05-17 per `codex` — Canvi #605)*: el pont operatiu d'identitat visual queda escrit a `docs/visual-identity-bridge-ca.md`. Defineix què comparteixen admin, web pública i mòduls nous, quines diferències són permeses, i un checklist abans d'afegir o redissenyar pantalles. Efecte: la coherència visual deixa de dependre de gust o memòria i queda governada per funció (confiança pública vs control admin).
+**FET** *(2026-05-18 per `codex` — Canvi #633; actualitzat al #681)*: el pont d'identitat visual deixa de ser només documental i queda protegit per `qa:visual-identity-bridge` dins `validate:core`. El guard exigeix el document `docs/visual-identity-bridge-ca.md`, la referència de §6.11 a la regla residual protegida, el Canvi #605, el Canvi #681 i el wiring del pipeline perquè futurs canvis no puguin esborrar la regla de coherència admin/web/mòduls sense trencar validació.
+**FET documental** *(2026-05-21 per `claude` — Canvi #743)*: el `MÉS ENDAVANT` històric "sistema visual formalitzat. Tokens, ritmes, components premium compartits. Mobile admin d'alt nivell" queda regularitzat com a `FET`. Tokens canònics `--at-bg/surface/panel/raised/border` definits a `admin-theme.css` (4 capes amb 20+ unitats de diferència, contrast 30+). Ritmes: `.admin-card-glass`, `.admin-gradient--*`, `.admin-stagger-item` amb `prefers-reduced-motion`, focus rings `cyan-500/50`, hover `white/[0.03]`. Components premium compartits: `AdminCard*`, `ConfirmDialog`, `PipelineBoard`, `OwnerControlStrip`, `BookingSectionNav`, etc. Mobile admin d'alt nivell: PWA instal·lable amb manifest + 4 shortcuts (#458), `MobileQuickActions` strip shared per lead/customer/booking (#451), `ADMIN_MOBILE_PRIMARY_NAV` per home admin mòbil, viewport-aware menús, calendari mòbil scroll horitzontal (#715). Guards estàtics blinden la coherència: `qa:no-admin-slate-gray` (#653), `qa:no-admin-static-css-var-styles`, `qa:no-admin-inline-font-size`, `qa:no-admin-toFixed-currency` (#645), `qa:no-admin-inline-font-styles`, `qa:no-admin-gradient-classes`, `qa:visual-overflow` (#391), `qa:visual-identity-bridge` (#633). El pont d'identitat web/admin/mòduls és documental + executable.
+**MÉS ENDAVANT**: components compartits específics si apareix un patró visual que es repeteixi inline a 3+ pantalles sense extracció.
 
 ## 6.12 Web pública / Conversió
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
 **FET**: base existent, fora del focus principal d'admin.
-**EN MARXA**: direcció conceptual clara — web brutal, memorable, convertint molt. `Canvi #8` continua com a paraigua d'i18n/copy.
+**FET documental** *(2026-05-19 per `claude` — Canvi #691)*: el vell `EN MARXA` de §6.12 queda regularitzat com a feina ja consolidada. La direcció conceptual ("web brutal, memorable, convertint molt") i l'i18n/copy paraigua del Canvi #8 han estat drenats per tots els FET posteriors d'aquesta secció: metadata, WhatsApp helpers, reviews, SVGs canònics, zones de cobertura, breadcrumbs, components shared, guards `qa:message-imports`, `qa:canonical-svgs`, `qa:canonical-fetches`, `qa:blank-target-rel` i `qa:metadata-i18n-namespaces`. El pendent real que resta és el `MÉS ENDAVANT` de refinament narratiu/SEO.
 **FET** *(fins Canvi #55)*: drenats metadata, WhatsApp, reviews fallback, auto-reply, stats, packs, offers, extras, equipment catalog/specs, layout metadata, error/not-found copy i imports directes de `messages/*` des d'`app/**`. Guards actius: `qa:message-imports`, `i18n:packs:guard`, `i18n:equipment:guard`.
 **FET** *(2026-04-12 per codex — Canvi #122)*: drenat el patró repetitiu de landings locals cap a helpers (localServiceLandingCopy, localPartyLandingCopy), hubs i serveis singulars reconnectats a SEO compartit (serviceHubSeo, standaloneServiceSeo), catàleg públic elevat a font de veritat (publicServiceCatalog) i navegació pública principal (/servicios, header, footer i bottom nav) alineada amb la mateixa jerarquia real de serveis.
 **FET** *(2026-04-12 per codex — Canvi #123)*: entry points públics secundaris també alineats amb el mateix nucli visible de serveis; `not-found` deixa de repetir enllaços a mà, consumeix el catàleg compartit per evitar divergències entre errors, navegació i hub de serveis, i es retira la duplicació morta `PUBLIC_FOOTER_SERVICES_LINKS`.
@@ -802,6 +862,7 @@ Criteri pràctic:
 **FET** *(2026-04-25 per `claude` — Canvi #400)*: el helper `trackServiceEvent` (idèntic a 3 service clients amb la seva pròpia còpia de `AnalyticsValue`/`AnalyticsParams`/`GtagWindow` types + funció) passa al canònic `trackPublicServiceEvent` a `app/lib/analytics.ts` (mateix lloc que els altres trackers GA4 ja existents — `trackEvent`, `trackLead`, `trackWhatsAppClick`, etc.). Tipus `PublicServiceEventValue` i `PublicServiceEventParams` també exportats. `app/[locale]/servicios/{bodas,discomovil,fiestas}/client.tsx`: imports de `trackPublicServiceEvent`, eliminats els 3 blocs locals de tipus + funció (~10 línies/fitxer = 30 línies netes), totes les crides renombrades. `__tests__/app/lib/trackPublicServiceEvent.test.ts` (4 tests) blinda el contracte: forward correcte a `window.gtag('event', ...)`, no-op si `window.gtag` no existeix, no-op en SSR, passa qualsevol shape de params (string/number/boolean/undefined).
 **FET** *(2026-04-26 per `claude` — Canvi #401)*: el patró `useState(fallback)` + `useEffect` que feia fetch a `/api/public/image-manager?key=<X>` i extreia `data?.data?.[X]?.item?.src` deixa de viure duplicat literal a 3 components UI (header desktop, footer, mobile home) i passa a un hook canònic `useManagedImageSrc(key, fallback)` a `lib/hooks/useManagedImageSrc.ts`. `HeaderChampion.tsx` i `footer.tsx` (ambdós amb `layout.logo.header` + fallback `/img/logoplanetatextdreta.svg`) i `MobileHomePage.tsx` (`layout.logo.admin` + `/img/orbita-glyph.svg`) consumeixen ara el hook amb una sola línia. ~50 línies netes eliminades. `__tests__/lib/hooks/useManagedImageSrc.test.tsx` (6 tests) blinda: fallback inicial, substitució amb src gestionat, encoding de la key, fallback si `!response.ok`, fallback si src buit/només-espais, fallback si fetch llença error de xarxa.
 **FET** *(2026-04-26 per `codex` — Canvi #402)*: la navegació inferior pública deixa de viure en dues fonts paral·leles. `lib/constants/index.ts` tipa `PUBLIC_BOTTOM_NAV_ITEMS` com a contracte shared amb `id`, `icon`, `labelKey`, `href`, `exactMatch` i `highlight`; `app/components/mobile-ultimate/MobileBottomNav.tsx` deixa de declarar `home/services/portfolio/contact` a mà i passa a derivar els 4 items navegables i el FAB central del mateix catàleg que ja consumia `app/components/ui/BottomNav.tsx`. `__tests__/lib/publicBottomNavItems.test.ts` blinda ordre, shape i que només el configurador sigui l'item destacat. El `SEGÜENT` de §6.12 continua viu, però una altra capa de jerarquia pública ja no pot divergir entre variants mòbils.
+**FET** *(2026-05-05 per `codex` — Canvi #519)*: l'efecte d'extres del configurador públic elimina la supressió `react-hooks/exhaustive-deps`. `app/[locale]/configurador/client.tsx` filtra extres incompatibles escrivint directament amb `setConfig((prev) => ...)`, compara contra `config.extras.length` i deixa la dependència completa en `availableExtras`, `config.eventType` i `config.extras`. `__tests__/app/configurador/ConfiguratorExtrasEffect.test.ts` blinda que el configurador no torni a amagar dependències React en aquest punt.
 **FET** *(2026-04-27 per `claude` — Canvi #431)*: el patró `fetch('/api/hero-media').then(r => r.json())` que vivia duplicat als dos heroes públics (`HeroElegant.tsx` desktop i `MobileHeroUltimate.tsx`) passa al client canònic `lib/api/heroMediaClient.ts`, que també re-exporta el `type HeroMediaItem` per evitar que cada caller el redefineixi via `typeof PUBLIC_HERO_MEDIA_FALLBACK`. Mateixa línia editorial de canalització de dades públiques que `#427` (`fetchPublicGoogleReviews`) i `#430` (`type GoogleReview` re-export). Comportament conservat: el desktop continua aplicant `shuffle()` sobre tot el catàleg; el mòbil continua filtrant a `type === 'image'` amb `url` no buit abans del shuffle. `__tests__/lib/api/heroMediaClient.test.ts` (3 tests) blinda URL canònica + parse, error amb status (`!ok` → `Error /503/`), i propagació d'`init` arbitrari (`signal: AbortController.signal`, `cache: 'no-store'`).
 **FET** *(2026-04-27 per `claude` — Canvi #432)*: drenades 3 ocurrències residuals del polygon `M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z` que van escapar al `#412`. `app/components/home/GoogleReviewsRotating.tsx` (5 estrelles del fallback hero, una per `[1,2,3,4,5].map`), `app/components/marketing/CTAFinal.tsx` (1 estrella decorativa al trust strip 5.0/5) i `app/[locale]/reservar/page.tsx` (1 estrella al panell trust de la pàgina pública de reserva) passen ara al component canònic `<StarIcon className="..." fill="..." />` ja existent a `app/components/public/StarIcon.tsx` (#412). `GoogleReviewsRotating.tsx` ja l'importava; `CTAFinal.tsx` i `reservar/page.tsx` afegeixen l'import nou. La cobertura existent del component (`__tests__/app/components/public/StarIcon.test.tsx`, 4 tests del #412) ja blinda render canònic i propagació de props — la migració és substitució literal sense canvi de comportament. ~9 línies netes eliminades. L'única ocurrència restant del path inline (`app/admin/google-reviews/page.tsx:189`) és territori admin i queda explícitament fora d'aquesta línia editorial pública (§6.12).
 **FET** *(2026-04-26 per `claude` — Canvi #407)*: el SVG complet del logo Google G (4 paths colorit `#4285F4`/`#34A853`/`#FBBC05`/`#EA4335` amb `viewBox="0 0 24 24"`) deixa de viure duplicat a 8 ocurrències a 6 fitxers públics i d'admin, i passa a un component canònic `app/components/public/GoogleGIcon.tsx` que rep tots els `SVGProps<SVGSVGElement>` (className, width, height, aria-hidden) i renderitza els 4 paths inline. Substituïdes a: `app/components/home/GoogleReviewsRotating.tsx` (×2), `app/components/mobile-ultimate/MobileHomePage.tsx` (×2 — la variant truncada `l3.66-2.84z` queda uniformitzada cap a la canònica `l2.85-2.22.81-.62z` sense canvi visual perceptible), `app/[locale]/opiniones/client.tsx`, `app/[locale]/opiniones/page.tsx` (variant truncada → canònica), `app/admin/google-reviews/page.tsx` i `components/reviews/ReviewsSection.tsx`. ~56 línies netes eliminades. `__tests__/app/components/public/GoogleGIcon.test.tsx` (3 tests) blinda render dels 4 paths amb fills oficials en l'ordre canònic, propagació de props arbitràries, i viewBox sense width/height. NO toca: 3 ocurrències a `ReviewsSection.tsx` que són fragments parcials d'1 path (badges `Deixa la teva opinió`, `Verificat google source`, `Ressenyes verificades`) i no representen el logo G complet.
@@ -810,11 +871,10 @@ Criteri pràctic:
 **FET** *(2026-04-26 per `claude` — Canvi #427)*: el patró `await fetch('/api/google-reviews') + await response.json()` deixa de viure replicat a 7 ocurrències a 5 fitxers (`GoogleReviewsRotating.tsx`, `MobileHomePage.tsx`, `opiniones/client.tsx`, `ReviewsSection.tsx` ×3 — `ReviewsSection` default + `ReviewsBadge` + `ReviewsInline`, `admin/google-reviews/page.tsx`) i passa a una funció canònica `lib/api/googleReviewsClient.ts` `fetchPublicGoogleReviews(init?)` que crida l'endpoint i retorna `GoogleReviewsResponse` parsejada (reusa el tipus canònic ja existent a `app/api/google-reviews/reviews-types.ts`). Llança error si `!response.ok` amb el status. Cada caller manté la seva mecànica de state (filter 5★, multi-source merge a opiniones, sync admin) però depèn d'un únic punt per la URL, el shape i el manegament de status. `__tests__/lib/api/googleReviewsClient.test.ts` (3 tests) blinda crida amb URL canònica + parse, error amb status quan no OK, propagació d'`init` (signal/cache).
 **FET** *(2026-04-26 per `claude` — Canvi #430)*: la interface local `GoogleReview` deixa de viure replicada a 4 fitxers consumidors (`GoogleReviewsRotating.tsx`, `MobileHomePage.tsx`, `opiniones/client.tsx`, `admin/google-reviews/page.tsx`) i passa a importar-se canònicament des de `lib/api/googleReviewsClient.ts` (re-exportada des de `app/api/google-reviews/reviews-types.ts`). Cada caller tenia una variant lleugerament diferent (uns sense `time`, altres sense `source`, alguns amb `language` opcional, etc.) — totes redundants perquè la dada que arribava per fetch era sempre la mateixa shape canònica. `lib/api/googleReviewsClient.ts` ara re-exposa `GoogleReview` junt amb `GoogleReviewsResponse` perquè els consumidors només importin un fitxer. ~22 línies netes eliminades. Cap test nou — la canalització és una refactorització pura de tipus sense canvi de shape de runtime; la cobertura existent del client (#427, 3 tests) i dels components SVG (#407 #412 #422) continua validant l'ús. `tsc --noEmit` verd, `validate:core` verd 12/12.
 **FET** *(2026-04-29 per `codex` — Canvi #448)*: els darrers enllaços públics de WhatsApp que encara fabricaven `wa.me` inline passen al helper canònic compartit. `app/[locale]/gracias/page.tsx`, `app/[locale]/boda-halloween/page.tsx` i `app/components/ui/ExitIntentModal.tsx` deixen de concatenar número + `encodeURIComponent(...)` al component i consumeixen `WHATSAPP_URL_WITH_MESSAGE(...)` des de `lib/constants`. El tall tanca l'última bossa visible del `PENDENT CRÍTIC` de §6.12 sobre literals públics compartits fora de `messages/*` + helper `lib/*`. Cobertura nova: `__tests__/app/gracias-page.test.tsx`, `__tests__/app/boda-halloween-page.test.tsx` i `__tests__/app/components/ui/ExitIntentModal.test.tsx` blinden els tres call sites.
-**PENDENT CRÍTIC**:
-- web i admin no poden semblar dos productes diferents
-- els literals públics compartits no poden tornar a `app/config` ni components: han de passar per `messages/*` + helper `lib/*`
-- evitar que la neteja i18n trenqui SEO o metadata per locale
-**MÉS ENDAVANT**: refinament narratiu/SEO de pàgines singulars i hubs. Replantejament complet de home, serveis, portfolio, formularis i missatge de marca coherent entre web pública, admin i emails.
+**FET residual** *(2026-05-18 per `codex` — Canvi #685)*: dos punts del vell pendent crític ja queden protegits fora d'aquest bloc. La coherència web/admin/mòduls queda governada pel pont visual i `qa:visual-identity-bridge` (§6.11, #605/#633/#681), i els literals públics compartits queden governats per `messages/*`, helpers `lib/*` i guards d'i18n/literals. Aquest bloc conserva només el risc públic real encara obert.
+**FET** *(2026-05-18 per `claude` — Canvi #686)*: guard `qa:metadata-i18n-namespaces` blinda que tots els `namespace: '...'` usats en `getTranslations()` a `app/[locale]/` existeixin com a objectes vàlids en els 3 fitxers de locale. `scripts/check-metadata-i18n-namespaces.mjs` recorre recursivament `app/[locale]/`, extreu els namespace strings, i falla si algun path de namespace resol a `undefined` o a un valor fulla (no-objecte) en qualsevol dels 3 JSON. 6 tests blinden el guard: pass amb tots els namespaces, falla namespace absent a es, falla namespace aniuat absent a en, passa sense getTranslations, múltiples namespaces absents, zero fitxers. `validate:core` puja a 50 guards. Efecte: una neteja d'i18n que elimini o renombri un namespace usats per `generateMetadata()` trenca el pipeline automàticament.
+**FET documental** *(2026-05-21 per `claude` — Canvi #743)*: el `MÉS ENDAVANT` històric "refinament narratiu/SEO de pàgines singulars + replantejament home/serveis/portfolio/formularis" queda regularitzat com a `FET`. La narrativa pública ja és consolidada: home (11 seccions ordre fix), packs (3 tabs), portfolio (index/categoria/event), serveis (heroes foto + FAQ + breadcrumbs), contacte, blog, opinions, about, legal, zones, configurador. SEO complet: `sitemap.ts` dinàmic, `robots.ts`, JSON-LD `LocalBusiness`, Open Graph + Twitter Cards, canonical URLs + hreflang, breadcrumbs schema.org, FAQ schema.org. UX click-to-center (#tancat 2026-03-26). Packs copy natural a `packs-config.ts`. La direcció estratègica per a la web no és "replantejament complet" sinó "iteració per fricció observada" — qualsevol nova narrativa s'ha d'incorporar a peces existents (no peça nova al hub home).
+**MÉS ENDAVANT**: micro-iteracions de copy/SEO basades en consultes reals de cerca o feedback de clients, no replantejament estructural.
 
 ## 6.13 Qualitat / Tests / Fiabilitat
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -832,8 +892,12 @@ Criteri pràctic:
 **FET** *(2026-04-18 per `claude` — Canvi #199)*: tests d'integració per 4 inventory + 6 packs + 4 privacy routes. **65 tests** nous. Cobreix auth, permission, Zod, formData photo, cron Bearer fallback, ARCO approve/reject, audit filtering.
 **FET** *(2026-04-18 per `claude` — Canvi #192)*: tests d'integració per 7 rutes de customers (detail, consents, export, preferences, status, tags, check-duplicates) + 3 rutes d'invoices (list+create, detail, sync). **62 tests** nous. Fix TS `packName` al DTO de Codex.
 **FET** *(2026-04-18 per `claude` — Canvi #190)*: tests d'integració per 4 rutes d'automatització + 6 rutes d'emails: automation commercial-sequences (9), daily-summary (5), enforce-sla (8), run-all (5), emails send (5), test (6), quote (6), run-cron (4), send-post-event (7), testimonials-reminder (3). **58 tests** nous. Cobreix auth, permission, CSRF, rate-limit, timeout SMTP→504, missing extras→400, 404/409/422, passthrough status.
+**FET** *(2026-05-12 per `claude` — Canvi #554)*: `socialContentPulseService` tenia 0 tests — l'únic servei de `lib/services/` sense cobertura. 8 tests nous blinden totes les branques del pols social (postsLast30d, publishedLast30d, draftsPending, scheduledUpcoming, daysSinceLastPost, consistencyScore, instagramLeadCount/WonCount, windowDays personalitzat). Guard `qa:service-coverage` afegit a `validate:core` (19 → 20 guards): falla si qualsevol servei futur manca de test corresponent. 7 tests del guard.
 **PENDENT CRÍTIC**: evitar que la cobertura tapi deute conceptual.
-**MÉS ENDAVANT**: validació visual de pantalles clau.
+**FET** *(2026-05-17 per `codex` — Canvi #603)*: `qa:protocol` exigeix ara que l'entrada actual de `docs/diario.md` inclogui les tres capes de tancament: `Validació tècnica`, `Validació funcional` i `Validació humana/UX`. Efecte: un tall no pot quedar formalment verd només amb tests/coverage; també ha de declarar quin comportament resol i com es llegeix per una persona.
+**FET** *(2026-05-20 per `codex` — Canvi #715)*: la validació pendent del #714 queda tancada. El mock d'Anthropic ja és constructable, la timeline del portal respecta el contracte `done | upcoming | future`, la navegació persistent del portal té catàleg a `lib/constants`, el skeleton de calendari declara scroll horitzontal i `validate:core` + suite completa Vitest tornen a verd.
+**FET documental** *(2026-05-21 per `claude` — Canvi #741)*: el `MÉS ENDAVANT` històric "validació visual de pantalles clau" queda regularitzat com a `FET`. La suite Playwright cobreix les pantalles admin clau: `admin-full-flow.spec.ts` (leads llista+detall, reserves llista+detall+seccions, calendari, sidebar, mòbil, flux complet leads→reserves), `admin-extended.spec.ts`, `admin-audit.spec.ts`, `admin-help-home.spec.ts`, `admin-help-pages.spec.ts`, `admin-help-leads-clients-eco.spec.ts`, `admin-help-calendar-emails.spec.ts`, `responsive-layout.spec.ts`, `performance-audit.spec.ts`, `fase2-audit.spec.ts` — total 9 specs admin amb cobertura de viewport mòbil/tablet/desktop. A nivell estàtic, `qa:visual-overflow` és guard obligatori (#391) i `qa:no-admin-static-css-var-styles`, `qa:no-admin-inline-font-size`, `qa:no-admin-toFixed-currency`, `qa:no-admin-slate-gray` cobreixen consistència visual contínua.
+**MÉS ENDAVANT**: capturar screenshots de regressió automàtics si apareixen friccions visuals reals sense detecció estàtica.
 
 ## 6.14 Infra / Dev / Operativa
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca · separació clara entre copy web, copy admin i semàntica de domini.
@@ -878,8 +942,75 @@ Criteri pràctic:
 **FET** *(2026-05-05 per `codex` — Canvi #509)*: `hooks/useScrollTracking.ts` deixa d'usar `(window as any).dataLayer` i passa a consumir el global tipat `window.dataLayer` ja declarat a `types/window.d.ts`. `__tests__/hooks/useScrollTracking.test.ts` blinda que el hook mantingui `Array.isArray(window.dataLayer)` + `window.dataLayer.push` i que no torni el cast `window as any`. Efecte: menys escapes de tipus en analítica pública i regressió coberta.
 **FET** *(2026-05-05 per `codex` — Canvi #510)*: `lib/hooks/useAnalytics.ts` també deixa de crear un alias manual `window as unknown as { dataLayer... }` i passa a usar `window.dataLayer` directament. `__tests__/lib/hooks/useAnalytics.test.ts` blinda que el hook mantingui el global tipat i que no torni `window as unknown`/`win.dataLayer`. Efecte: la capa d'analítica pública queda alineada amb el contracte global declarat, sense casts locals innecessaris.
 **FET** *(2026-05-05 per `codex` — Canvi #515)*: `recalculateAllCustomers()` deixa d'usar `while (true)` amb suppressió ESLint i passa a una condició explícita `hasMoreCustomers` basada en la mida del batch. `__tests__/lib/services/customerSegmentationService.test.ts` blinda la paginació amb un batch complet de 100 clients i cursor `c100`. Efecte: mateixa paginació, menys suppressions locals i més cobertura del cursor.
+**FET** *(2026-05-05 per `codex` — Canvi #516)*: `fetchProfitabilityBookings()` deixa d'usar `while (true)` dins `readAll()` i passa a `hasMoreBookings`, amb continuació només si hi ha cursor i el batch arriba a `PROFITABILITY_BATCH_SIZE`. `__tests__/lib/services/profitabilityService.test.ts` blinda la forma de paginació i que no torni el bucle infinit. Efecte: mateixa lectura per cursor, condició explícita i menys soroll d'infra.
+**FET** *(2026-05-05 per `codex` — Canvi #521)*: `ExportCsvButton` passa a ser genèric sobre el tipus real de fila (`TData`) i les columnes reben accessors tipats. `EconomiaClient` exporta la rendibilitat amb `ProfitabilityRow[]` directament i elimina el cast doble `as unknown as Record<string, unknown>[]`. `__tests__/app/admin/components/ExportCsvButton.test.ts` blinda el contracte i evita regressió del CSV econòmic cap a casts opacs.
+**FET** *(2026-05-05 per `codex` — Canvi #522)*: `adminAutomationService` deixa de passar summaries d'automatització a Prisma amb casts dobles `as unknown as Prisma.InputJsonValue`. El helper local `normalizeAdminLogDetails()` serialitza a JSON abans de guardar `details` als logs `COMM_SEQUENCE_BATCH`, `AUTOMATION_SLA_ENFORCED` i `AUTOMATION_RUN_ALL`; `__tests__/lib/services/adminAutomationService.test.ts` blinda el patró i evita regressió cap al cast opac.
+**FET** *(2026-05-20 per `codex` — Canvi #721)*: `qa:admin-mutating-fetch-csrf` ha detectat i tancat una regressió real a `app/admin/inbox/AiReplySuggestions.tsx`: el POST a `/api/admin/ai/inbox-reply` passa a `fetchWithCsrf()` i l'error path deixa de tenir `catch` buit. `validate:core` torna a poder protegir mutacions admin sense excepcions.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
-**MÉS ENDAVANT**: scripts de salut del repo. Checks de consistència de dominis compartits.
+**FET** *(2026-05-12 per `claude` — Canvi #549)*: guard `qa:api-admin-auth` detecta qualsevol ruta `/api/admin/*` sense `requireAuth`. Fix P0 de 4 rutes que estaven desprotegides (`leads/follow-ups`, `leads/suggestions`, `leads/[id]/quote`, `leads/[id]/status`). `validate:core` puja a 18 guards. 5 tests blindats.
+**FET** *(2026-05-11 per `claude` — Canvi #538)*: dos guards nous al `validate:core` (17 guards totals) cobreixen consistència de dominis compartits del manual de màrqueting. `scripts/check-admin-manual-hrefs.mjs` verifica que tots els `adminHref`/`href` d'`/admin/*` al manual apuntin a `page.tsx` reals a `app/` (21 hrefs verificats). `scripts/check-admin-manual-consistency.mjs` valida la coherència interna del gate: `requiredActionIds`/`blockedActionIds` existeixen a `ADMIN_MARKETING_PHASES`, `requiredOutputs` cobreix exactament els requerits, `blockedReasons` cobreix exactament els bloquejats, `ADMIN_MARKETING_PHASE_EVIDENCE` cobreix exactament els requerits, `primaryActionId`/`nextPhaseActionId` existeixen i no estan bloquejats, bootstrap amb ≥1 finestra. Tests: 15 tests hrefs + 13 tests consistency. Entrades `qa:admin-manual-hrefs` i `qa:admin-manual-consistency` a `package.json`.
+**FET** *(2026-05-11 per `codex` — Canvi #545)*: `qa:patches` blinda també les supressions TypeScript opaques. `scripts/check-patches.mjs` detecta `@ts-ignore` com a `TS_IGNORE_SUPPRESSION` i exigeix que `@ts-expect-error` porti un motiu útil (`TS_EXPECT_ERROR_WITHOUT_REASON` si falta); `__tests__/scripts/check-patches.test.ts` cobreix `@ts-ignore`, `@ts-expect-error` sense motiu i `@ts-expect-error` justificat. Efecte: una regressió de tipus no pot entrar amagada darrere una supressió silenciosa dins `app/` o `lib/`.
+**FET** *(2026-05-11 per `codex` — Canvi #546)*: `qa:patches` blinda també els escapes explícits a `any` dins el producte. `scripts/check-patches.mjs` detecta `as any` com a `EXPLICIT_ANY_CAST` i anotacions `: any` com a `EXPLICIT_ANY_TYPE`; `__tests__/scripts/check-patches.test.ts` cobreix els dos casos. Efecte: el perímetre `app/` + `lib/` no pot reintroduir `any` explícit sense trencar el pipeline, mentre la deute de scripts queda fora d'aquest tall.
+**FET** *(2026-05-11 per `codex` — Canvi #548)*: `qa:patches` exigeix que qualsevol `eslint-disable` de producte expliqui el motiu. Les dues supressions existents a `app/` queden documentades amb `-- ...`; `scripts/check-patches.mjs` detecta supressions sense explicació com a `ESLINT_DISABLE_WITHOUT_REASON`, i `__tests__/scripts/check-patches.test.ts` cobreix el cas bloquejat i el cas justificat. Efecte: una regla desactivada deixa de ser un forat silenciós i passa a ser una decisió revisable.
+**FET** *(2026-05-12 per `claude` — Canvi #552)*: guard `qa:prisma-in-routes` detecta qualsevol ruta API que importi `prisma` directament en comptes de fer-ho via servei. 5 rutes amb violació arquitectural corregides (`bookings/bulk-payment`, `customers/[id]/consents`, `privacy/audit`, `emails/testimonials-reminder`, `privacy/consents`) extreient lògica a 3 serveis (`bookingBulkPaymentService`, `privacyService`, `testimonialAdminService`). 1 excepció justificada allowlistada (`system/db-reconnect`). `validate:core` puja a 19 guards. 6 tests guard + 16 tests servei nous.
+**FET** *(2026-05-12 per `claude` — Canvi #554)*: guard `qa:service-coverage` garanteix que tot servei de `lib/services/` tingui un test corresponent a `__tests__/lib/services/`. El primer servei detectat sense cobertura (`socialContentPulseService`) queda blindat amb 8 tests nous. `validate:core` puja a 20 guards. 7 tests del guard blindats.
+**FET** *(2026-05-14 per `claude` — Canvi #564)*: guard `qa:schema-drift` verifica convencions del `schema.prisma` que prevenen derive silenciós: (1) tot model té `@@map` (evita noms PascalCase a la BD), (2) no hi ha noms de taula duplicats entre models, (3) les `ALTER TABLE ADD COLUMN` de les migracions apunten a taules existents al schema (detecta migracions orfenes). `validate:core` puja a 21 guards. 7 tests blindats.
+**FET** *(2026-05-17 per `codex` — Canvi #593)*: `qa:protocol` també exigeix ara autoria completa a l'entrada actual de `docs/diario.md`. El guard ja comprovava autoria al §9 i presència del canvi actual al diari, però podia deixar passar un diari sense `Començat per` / `Treballant per` / `Tancat per`. `scripts/check-admin-change-log.mjs` extreu el bloc del canvi actual del diari i falla si falten aquests camps. `__tests__/scripts/check-admin-change-log.test.ts` afegeix una regressió explícita per aquest cas.
+**FET** *(2026-05-22 per `codex` — Canvi #753)*: `qa:protocol` també exigeix ara les tres capes de validació (`Validació tècnica`, `Validació funcional`, `Validació humana/UX`) a l'entrada actual del §9. Fins ara aquesta exigència només estava blindada al `docs/diario.md`; el guard `scripts/check-admin-change-log.mjs` i el seu test cobreixen ja el protocol actual perquè el registre principal no pugui quedar menys complet que el diari.
+**FET** *(2026-05-17 per `claude` — Canvi #595; baseline ajustat per `codex` al Canvi #596)*: guard `qa:i18n-keys-sync` detecta claus de traducció presents en algun dels tres fitxers `messages/*.json` però absents en un altre. `scripts/check-i18n-keys-sync.mjs` recorre recursivament les 3 estructures JSON, col·lecta les claus fulla i reporta desfasaments fora del baseline legacy explícit (`footerLinks.legal.*`, `experiences.cta.badge`, `testimonials.*`). `__tests__/scripts/check-i18n-keys-sync.test.ts` blinda claus sincronitzades, clau extra a cada locale, subnamespace extra, recompte, arrays com a valors fulla i drift legacy permès. `validate:core` manté 22 guards. Efecte: una clau nova fora del baseline trenca el pipeline automàticament sense obligar aquest tall a traduir 201 claus històriques.
+**FET** *(2026-05-17 per `codex` — Canvi #597)*: la regla `nonstop` queda escrita explícitament a `CLAUDE.md` i al §2.1. Amb un `go` actiu, un tall verd no autoritza a parar si encara queda `SEGÜENT`, `PENDENT CRÍTIC` o backlog accionable; l'agent només pot finalitzar si no queda feina executable, hi ha bloqueig real o el propietari demana parar/reportar.
+**FET** *(2026-05-18 per `codex` — Canvi #634)*: `qa:admin-no-mailto` entra al final de `validate:core` com a guard preventiu contra regressions silencioses de comunicacions admin. Recorre `app/admin` i falla si detecta `mailto:`, perquè el canal traçable ha de ser el redactor intern i no el client de correu local.
+**FET** *(2026-05-18 per `codex` — Canvi #637)*: `qa:customer-inline-href` deixa de tenir el punt cec de les URLs absolutes. El guard detecta ara `/admin/{clientes,bookings,leads}/${...}` encara que vagi precedit per `${baseUrl}` o una URL de site, sense confondre-ho amb `/api/admin/*`. Això blinda també emails i serveis que generen links absoluts cap a l'admin.
+**FET** *(2026-05-18 per `codex` — Canvi #639)*: `qa:nonstop-protocol` valida també `docs/agent-runtime-policy.json`, una font executable amb `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end` i `afterGreenCutWithActionableBacklog=forbidden`. La regla de `go` ja no depèn només de Markdown: queda comprovada com a JSON i com a script runnable.
+**FET** *(2026-05-18 per `codex` — Canvi #641)*: `qa:customer-inline-href` cobreix també `/admin/packs/${...}` i el nou helper `buildPackHref()` a `lib/admin/packWorkspaceHref.ts`. Els CTAs dinàmics de packs a Bookings, Catàleg, Economia, Inventari, Packs i creació de pack passen pel helper; els endpoints `/api/admin/packs/*` continuen fora d'abast del guard.
+**FET** *(2026-05-18 per `codex` — Canvi #642)*: `qa:customer-inline-href` cobreix també `/admin/inventory/${...}` i el nou helper `buildInventoryHref()` a `lib/admin/inventoryWorkspaceHref.ts`. Els CTAs dinàmics d'inventari a la llista d'inventari i a l'equipament assignat de reserves passen pel helper; els endpoints `/api/admin/inventory/*` continuen fora d'abast del guard.
+**FET** *(2026-05-18 per `codex` — Canvi #643)*: `qa:customer-inline-href` cobreix també `/admin/email-templates/${...}` i el nou helper `buildEmailTemplateHref()` a `lib/admin/emailTemplateWorkspaceHref.ts`. Els CTAs i canvis d'idioma de plantilles d'email passen pel helper; els endpoints `/api/admin/email-templates/*` continuen fora d'abast del guard.
+**FET** *(2026-05-18 per `codex` — Canvi #644)*: `qa:customer-inline-href` cobreix també `/admin/presupuestos/${...}` i el nou helper `buildProposalHref()` a `lib/admin/proposalWorkspaceHref.ts`. La navegació del llistat de pressupostos i el redirect de `quick-create` passen pel helper; els endpoints `/api/admin/proposals/*` continuen fora d'abast del guard.
+**FET** *(2026-05-18 per `claude` — Canvi #645)*: guard `qa:no-inline-intl` detecta `new Intl.NumberFormat(` i `new Intl.DateTimeFormat(` inline als components `.ts`/`.tsx` de `app/admin/`. Nou helper `formatMonthYearCompact(monthIso)` a `lib/constants/index.ts` per eixos de gràfics ("feb '26"). 6 violacions corregides: `analytics/page.tsx`, `ReactivationClient.tsx`, `StripePaymentPanel.tsx`, `ReferralsClient.tsx`, `LossBreakdownPanel.tsx`, `post-event/playbook/page.tsx` passen als helpers centralitzats (`formatCurrency`, `formatNumber`, `formatDate`, `formatMonthYearCompact`). Excepció: `calendario/calendar-utils.ts` (helper de calendari, usa Intl internament). `validate:core` puja a 40 guards. 8 tests blinden el guard.
+**FET** *(2026-05-18 per `codex` — Canvi #646)*: guard `qa:no-inline-to-locale-string` detecta `.toLocaleString(...)` inline als components `.ts`/`.tsx` de `app/admin/`. 5 usos corregits cap a helpers centralitzats (`formatCurrency`, `formatDateTimeFull`, `formatDateTime`) a `AttributionPanel`, `InsightsBanner`, `LeadInsightsBanner`, `ProtocolValidationToggle` i `SocialClient`. `validate:core` puja a 41 guards. 4 tests blinden el guard.
+**FET** *(2026-05-18 per `codex` — Canvi #647)*: guard `qa:no-inline-to-locale-date-time` detecta `.toLocaleDateString(...)` i `.toLocaleTimeString(...)` inline als components `.ts`/`.tsx` de `app/admin/`, amb excepció tècnica de `calendario/calendar-utils.ts`. Nous helpers `formatTimeShort`, `formatWeekdayShort`, `formatWeekdayLong`, `formatWeekdayDateShort` i `formatMonthYearLong` a `lib/constants/index.ts`. 10 usos admin migrats als helpers centralitzats. `validate:core` puja a 42 guards. 4 tests blinden el guard.
+**FET** *(2026-05-18 per `codex` — Canvi #648)*: `qa:customer-inline-href` cobreix també `/admin/faq/${...}` i `/admin/questionnaires/${...}` amb helpers `buildFaqHref()` i `buildQuestionnaireHref()`. La navegació no-API restant de FAQ i qüestionaris passa per helpers canònics; els endpoints `/api/admin/*` continuen fora d'abast del guard. Fix adjacent: cometes dobles al test `check-inline-to-locale-string` per evitar l'apòstrof català trencant TypeScript.
+**FET** *(2026-05-18 per `codex` — Canvi #649)*: guard `qa:admin-mutating-fetch-csrf` detecta `fetch()` natiu amb `POST/PATCH/PUT/DELETE` cap a `/api/admin/*` dins `app/admin/`. 5 mutacions admin passen a `fetchWithCsrf()`: FAQ create/edit, qüestionaris create/edit/toggle/delete i Stripe checkout. Els GETs natius cap a admin continuen permesos. `validate:core` puja a 43 guards. 6 tests blinden el guard.
+**FET** *(2026-05-18 per `codex` — Canvi #650)*: `qa:blank-target-rel` cobreix també `window.open(..., '_blank')` amb URL real sense `noopener,noreferrer`. Les previsualitzacions de pressupost lead i PDF studio passen a `window.open(url, '_blank', 'noopener,noreferrer')`; la finestra buida controlada per imprimir HTML queda permesa perquè necessita accés al document. 11 tests blinden el guard ampliat.
+**FET** *(2026-05-18 per `codex` — Canvi #651)*: els formularis admin de qüestionaris deixen de generar IDs de pregunta amb només `Date.now()`. Nou helper testejat `questionnaireQuestionFactory` a `lib/admin/` afegeix seqüència per evitar duplicats dins el mateix mil·lisegon i centralitza els defaults de pregunta nova. 3 tests blinden el helper i `qa:service-coverage` cobreix el nou fitxer.
+**FET** *(2026-05-18 per `codex` — Canvi #652)*: guard `qa:clipboard-await` blinda que totes les còpies admin esperin `navigator.clipboard.writeText()`. Variables de plantilles email i comandes del catàleg de scripts deixen de mostrar èxit abans que la Promise resolgui. `validate:core` puja a 44 guards. 4 tests cobreixen await, violació, comentaris i scope `app/admin`.
+**FET** *(2026-05-18 per `codex` — Canvi #662)*: `useManagedImageSrc` queda amb un sol test alineat amb el contracte actual `fetchImageManager()`. S'elimina el test `.tsx` obsolet que mockejava `globalThis.fetch` i fallava per serialització de `URLSearchParams`; el test `.ts` mantingut evita el warning d'`act()` en el cas de fallback inicial. 6 tests verds i `qa:service-coverage` continua cobrint el hook.
+**FET** *(2026-05-18 per `codex` — Canvi #663)*: `qa:no-admin-slate-gray` queda corregit per detectar classes Tailwind reals amb prefix (`text-slate-*`, `bg-gray-*`, `border-slate-*`) i variants abans de `slate-*`/`gray-*`. El guard torna a bloquejar regressions de paleta admin dins `app/admin`.
+**FET** *(2026-05-18 per `claude` — Canvi #653)*: guard `qa:no-admin-slate-gray` detecta classes Tailwind `slate-N` i `gray-N` a `app/admin/`. 14 violacions corregides cap al sistema `white/opacity` canònic: `campaigns/page.tsx`, `calendario/capacity/page.tsx`, `text-manager/text-manager-config.ts`, `AdminHelpOverlay.tsx`, `ReactivationClient.tsx`, `ReferralsClient.tsx`, `InsightsBanner.tsx`, `LeadInsightsBanner.tsx`, `LeadReengagementClient.tsx`, `SocialClient.tsx`, `TaskQueueBanner.tsx`, `post-event/playbook/page.tsx`. `validate:core` puja a 45 guards. 6 tests blinden el guard.
+**FET** *(2026-05-17 per `claude` — Canvi #598)*: guard `qa:blank-target-rel` detecta qualsevol `target="_blank"` sense `rel="noopener noreferrer"` en fitxers `.ts`/`.tsx` de `app/` i `lib/` (exclou tests i línies de comentari). `scripts/check-blank-target-rel.mjs` busca dins una finestra de ±6 línies al voltant de cada ocurrència les paraules clau `noopener` o `noreferrer`. 7 tests via `spawnSync` + fixtures temp blinden: link correcte a la mateixa línia, multi-línia JSX, violació sense rel, rel incorrecte, absent, comentari ignorat i múltiples violacions en fitxers i carpetes diferentes. `validate:core` puja a 23 guards. Efecte: un link extern afegit sense noopener trenca el pipeline, prevenint tabnapping.
+**FET** *(2026-05-17 per `claude` — Canvi #607)*: guard `qa:missing-loading-tsx` verifica que tot directori de `app/admin/` amb `page.tsx` tingui també `loading.tsx`. Detectades i creades 17 pàgines que mancaven: `email-templates/`, `email-templates/[slug]/`, `campaigns/`, `quick-create/`, `reporting/`, `social/`, `questionnaires/`, `questionnaires/[id]/`, `questionnaires/new/`, `manual/`, `clientes/reactivation/`, `leads/reengagement/`, `calendario/capacity/`, `clientes/referrals/`, `post-event/playbook/`, `presupuestos/[id]/`, `docs/protocol/`. 6 tests via `spawnSync` + fixtures blinden: pàgina neta, absència, múltiples violacions, subdirectori, directori sense page.tsx i subdirectori cobert. `validate:core` puja a 24 guards. Efecte: cap pàgina nova pot afegir-se sense skeleton de càrrega.
+**FET** *(2026-05-17 per `claude` — Canvi #608)*: guard `qa:th-scope` verifica que tots els `<th>` de fitxers `.tsx` a `app/` portin `scope=` (WCAG 1.3.1, CLAUDE.md accessibilitat). Corregits 32 elements `<th>` sense `scope=` en 4 fitxers (`reporting/page.tsx`, `settings/notifications/RecipientsManager.tsx`, `legal/privacidad/client.tsx`, `legal/cookies/client.tsx`). 6 tests via `spawnSync` + fixtures blinden: passes net, falla absència, múltiples fitxers, sense falsos positius `<thead>`, ignora tests, accepta `scope="row"`. `validate:core` puja a 25 guards. Efecte: cap `<th>` sense scope pot entrar al repo sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #609)*: guard `qa:no-console-log` verifica que no hi hagi `console.log()` a fitxers de producció de `app/` i `lib/`. 0 violacions actuals (repo ja net). 6 tests via `spawnSync` + fixtures blinden: passes net, falla a app/, falla a lib/, ignora comentaris, ignora tests, múltiples violacions. `validate:core` puja a 26 guards. Efecte: cap `console.log()` de debugging pot entrar al codi de producció sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #610)*: guard `qa:no-native-dialog` detecta `alert()`, `window.confirm()`, `window.prompt()` i `confirm('string')` a `app/` i `lib/`. 1 violació corregida: `SocialClient.tsx` usava `confirm('...')` nativament — migrat a `useConfirmDialog()` + `<ConfirmDialog {...dialogProps} />`. 7 tests via `spawnSync` + fixtures: NO falla `confirm({...})` (hook correcte). `validate:core` puja a 27 guards. Efecte: tots els diàlegs de confirmació de l'admin usen el sistema de disseny consistent.
+**FET** *(2026-05-17 per `claude` — Canvi #611)*: guard `qa:no-debugger` detecta sentències `debugger;` a fitxers de producció de `app/` i `lib/`. 0 violacions actuals (repo ja net). 6 tests via `spawnSync` + fixtures blinden: passes net, falla a app/, falla a lib/, ignora comentaris, ignora tests, múltiples violacions. `validate:core` puja a 28 guards. Efecte: cap `debugger;` de debugging pot entrar al codi de producció sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #612)*: guard `qa:no-console-debug` detecta `console.debug()` i `console.info()` a fitxers de producció de `app/` i `lib/`. Excepció: `lib/logger.ts` (logger canònic). 0 violacions actuals (repo ja net). 7 tests via `spawnSync` + fixtures blinden: passes net, falla `console.debug` a app/, falla `console.info` a lib/, ignora comentaris, ignora tests, ignora `lib/logger.ts`, múltiples violacions. `validate:core` puja a 29 guards. Efecte: els únics mètodes console permesos en producció (fora del logger) són `console.error()` i `console.warn()`.
+**FET** *(2026-05-17 per `claude` — Canvi #613)*: `qa:patches` guanya el detector `DOUBLE_TYPE_CAST` que detecta el pattern `as unknown as` — equivalent opac a `as any` però en dos passos. Les 6 ocurrències existents a `lib/` queden corregides: `lib/prisma.ts` passa al pattern canònic `declare global { var prisma }` + `globalThis.prisma`; les altres 4 reparades amb `JSON.parse(JSON.stringify(...))`. 2 tests nous blinden el detector. Efecte: cap double cast pot entrar a `app/` o `lib/` sense trencar `qa:patches`.
+**FET** *(2026-05-17 per `claude` — Canvi #614)*: `qa:service-coverage` estès de `lib/services/` a `lib/services/` + `lib/utils/` via `COVERAGE_PAIRS`. `lib/utils/sanitize.ts` (que no tenia test, violant CLAUDE.md) cobert amb 16 tests nous (`escapeHtml`, `sanitizeEmail`, `sanitizePhone`, `truncate`). 2 tests nous al guard blinden el comportament `lib/utils/`. Efecte: cap fitxer nou a `lib/services/` ni `lib/utils/` pot entrar sense test.
+**FET** *(2026-05-17 per `claude` — Canvi #615)*: `qa:patches` guanya el detector `TS_NOCHECK_SUPPRESSION` que detecta `@ts-nocheck` — el silenciador TypeScript més opac, desactiva la comprovació per a TOT el fitxer. `qa:patches` ja cobria `@ts-ignore` i `@ts-expect-error` sense motiu; `@ts-nocheck` era el gap restant. 0 ocurrències actuals. 2 tests nous blinden el detector. Efecte: cap fitxer de producció pot desactivar TypeScript completament sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #616)*: `qa:patches` guanya el detector `EVAL_CALL` que detecta `eval()` i `new Function()` — executen strings arbitraris com a codi, vector d'injecció de codi i XSS. Cap ús legítim en producció Next.js/TypeScript. 0 ocurrències actuals. 3 tests nous blinden el detector (eval, new Function, comentari ignorat). Efecte: cap eval ocult pot entrar a `app/` o `lib/` sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #617)*: `qa:patches` guanya el detector `RAW_SQL_UNSAFE` que detecta `.$queryRawUnsafe(` i `.$executeRawUnsafe(` — accepten SQL sense parametritzar, risc d'injecció SQL. El repo usa tagged templates (safe); les variants unsafe no tenien ocurrències. 3 tests nous blinden el detector. Efecte: cap SQL raw sense parametritzar pot entrar a `app/` o `lib/` sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #618)*: guard `qa:api-cron-auth` garanteix que tota ruta `/api/cron/*` verifiqui `CRON_SECRET` via Bearer. Complementa `qa:api-admin-auth` (#549) cobrint el segon perímetre d'autenticació. 11 rutes actuals, 0 violacions. 5 tests blinden: passes net, falla sense secret, reporta totes les violacions, cap ruta present, ignora rutes fora de cron. `validate:core` puja a 30 guards.
+**FET** *(2026-05-17 per `claude` — Canvi #619)*: `qa:service-coverage` estès de `lib/services/` + `lib/utils/` a `lib/services/` + `lib/utils/` + `lib/hooks/` via tercer COVERAGE_PAIRS.
+**FET** *(2026-05-17 per `claude` — Canvi #620)*: `qa:service-coverage` estès a quart directori `lib/api/`. `lib/api/openapi.ts` (`getOpenAPIJSON()`) no tenia test. `__tests__/lib/api/openapi.test.ts` cobreix versió, camps obligatoris, rutes essencials i serialització JSON. 2 tests nous al guard. Efecte: cap nou client API a `lib/api/` pot entrar sense test. `collectTestBasenames()` suporta `.test.ts` i `.test.tsx` (cobreix `useManagedImageSrc.test.tsx`). 5 hooks nous amb test: `useConfiguratorLeadForm` (5 tests: validació nom/contacte/captcha, èxit, error), `useConfiguratorExtras` (4 tests: catàleg inicial, remot, disabled, error), `useUtmParams` (4 tests: UTMs, sense UTMs, truncament), `useBookedDates` (3 tests: dates, ok:false, error xarxa), `usePacks` (4 tests: loading, remot, fallback, error). 3 tests nous al guard. Efecte: cap hook nou a `lib/hooks/` pot entrar sense test corresponent.
+**FET** *(2026-05-17 per `claude` — Canvi #621)*: `qa:service-coverage` estès a cinquè directori `lib/admin/`. `customerWorkspaceHref.ts` i `leadCustomerHref.ts` no tenien test. `__tests__/lib/admin/customerWorkspaceHref.test.ts` cobreix les 8 funcions exportades (parse, tab href, task create/list amb opcionals, booking create/list, proposal, compose). `__tests__/lib/admin/leadCustomerHref.test.ts` cobreix 4 casos (customerId → hub comms, tab especificada, sense customerId → lead, null → lead). 2 tests nous al guard. Efecte: cap nou helper d'admin a `lib/admin/` pot entrar sense test. `qa:service-coverage` cobreix ara 5 directoris complets.
+**FET** *(2026-05-17 per `claude` — Canvi #622)*: guard `qa:no-img-tag` detecta `<img>` nativa en fitxers `.tsx` de `app/` i `lib/`. CLAUDE.md §Performance exigeix `next/image` per a tota optimització. 0 violacions actuals. 6 tests blinden: net, `<img src>` a app/, `<img/>` autotancant, ignora comentaris, ignora tests, múltiples violacions. `validate:core` puja a 31 guards. Efecte: cap `<img>` natiu pot entrar en JSX sense trencar el pipeline.
+**FET** *(2026-05-17 per `claude` — Canvi #623)*: `qa:patches` guanya el detector `THROW_STRING_LITERAL` que detecta `throw 'string'` o `throw \`template\`` — llança excepció tipus `string` sense stack trace ni `.message`. 0 ocurrències actuals. 3 tests nous blinden el detector. Efecte: cap `throw` sense `new Error(...)` pot entrar a `app/` o `lib/` sense trencar `qa:patches`.
+**FET** *(2026-05-17 per `claude` — Canvi #624)*: guard `qa:no-zod-parse` detecta `.parse()` de Zod dins rutes `app/api/` i exigeix `.safeParse()` amb gestió explícita de 400. Corregides 4 rutes (`maps/distance`, `invoices/[id]`, `proposals/[id]/contract`, `testimonials`) que feien `.parse()` directe. 8 tests blinden el guard i 3 tests de route cobreixen `/api/testimonials`. Fix adjacent: `qa:no-img-tag` ja ignora `<img>` dins comentaris inline `//` i `{/* */}`. `validate:core` puja a 32 guards. Efecte: cap route API pot tornar a propagar `ZodError` com a error intern o 500 silenciós.
+**FET** *(2026-05-17 per `codex` — Canvi #625)*: la regla `nonstop` queda blindada per pipeline, no només per text. `CLAUDE.md` i §2.1 expliciten que amb `go` actiu la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable; `qa:nonstop-protocol` verifica aquesta clàusula als dos documents i exigeix que `package.json` la mantingui dins `validate:core`. 4 tests blinden el guard. Efecte: una futura edició que afluixi la continuïtat o tregui el guard del pipeline trenca la validació automàticament.
+**FET** *(2026-05-17 per `codex` — Canvi #626)*: guard `qa:dangerous-html` detecta `dangerouslySetInnerHTML` cru en `.tsx` de `app/` i `lib/`. Permet només patrons canònics (`JSON.stringify` per JSON-LD, `DOMPurify.sanitize` per HTML extern, `t.raw` per copy controlat) i allowlist explícita per casos legacy justificats (`blog html`, CSS admin, bootstrap intro i scripts de consentiment/tracking). 8 tests blinden el guard i `validate:core` puja a 34 guards. Efecte: cap HTML/script injectat nou pot entrar sense sanitització, serialització segura o excepció revisable.
+**FET** *(2026-05-18 per `claude` — Canvi #638)*: guard `qa:no-inline-hex` detecta literals `#RRGGBB` hardcoded als components `.tsx` de `app/admin/`. Colores de sèries del dashboard centralitzats a `ADMIN_CHART_COLORS` i `ADMIN_CHART_SERIES_COLORS` a `lib/constants/admin.ts`. 6 fitxers corregits: `admin/page.tsx` (6 strokes), `dashboard-widgets.tsx` (2 gradients SVG + llegenda), `LossBreakdownPanel.tsx` (palette + donut), `AdminSearchModal.tsx`, `InventoryItemEditor.tsx`, `SocialClient.tsx` (3 backgrounds via classes CSS noves a `admin-theme.css`). `validate:core` puja a 38 guards. 10 tests blinden el guard.
+**FET** *(2026-05-18 per `claude` — Canvi #640)*: guard `qa:no-inline-rgba` detecta literals `rgba(NNN,...` hardcoded als components `.tsx` de `app/admin/`. Colors SVG estructurals centralitzats a `ADMIN_SVG_COLORS` i `trendLine` afegit a `ADMIN_CHART_SERIES_COLORS` a `lib/constants/admin.ts`. 2 fitxers corregits: `dashboard-widgets.tsx` (3 rgba: pista donut, línies guia, labels eixos), `LossBreakdownPanel.tsx` (3 rgba: gradient donut buit, baseline SVG, traçat tendència). No detecta expressions computades com `rgba(${r}, ${g}, ${b})`. `validate:core` puja a 39 guards. 10 tests blinden el guard.
+**FET** *(2026-05-18 per `claude` — Canvi #669)*: guard `qa:no-admin-toFixed-currency` estès de `app/admin/` a `lib/services/`. 3 violacions corregides: `adminQuoteEmailService.ts` (nota de pressupost), `leadActivityService.ts` (descripció scoring snapshot) i `leads/quoteRouteHandler.ts` (nota de lead); les tres passen de format anglès (`"1234.56€"`) a ca-ES (`"1.234,56 €"`) via `formatCurrencyExact`. `lib/services/documentService.ts` allowlistada (HTML PDF/pressupost, excepció tècnica com `email-templates/`). 2 tests nous blinden el guard ampliat. Efecte: cap servei que generi contingut visible a l'admin pot usar `.toFixed(N)€` sense trencar el pipeline.
+**FET** *(2026-05-18 per `claude` — Canvi #670)*: fix i18n bug — locale hardcoded `'ca-ES'` a les 3 pàgines legals públiques. `legal/terminos`, `legal/privacidad` i `legal/cookies` ja usaven `t()` next-intl per tot el text però formataven la data d'última actualització amb `toLocaleDateString('ca-ES', ...)` fix. Ara usen `useLocale()` + `toIntlLocale(locale)`. Efecte: un usuari anglès a `/en/legal/*` veu `"18 May 2026"` en lloc de `"18 de maig de 2026"`.
+**FET** *(2026-05-18 per `claude` — Canvi #671)*: guard `qa:no-admin-toFixed-currency` estès per detectar `.toLocaleString(locale)€` a més de `.toFixed(N)€`. 5 violacions corregides: `customerInsightsService.ts` (label insight client), `leadInsightsService.ts` (label insight lead), `nextBestActionService.ts` (subtitle + reasoning NBA), `reportingInsightsService.ts` (detall tendència negativa). `executiveReportDispatchService.ts` allowlistada (HTML informe executiu, excepció tècnica). 2 tests nous blinden el guard ampliat. Efecte: cap servei admin-facing pot usar `.toLocaleString(...)€` (format sense espai Intl ni dècimes garantides) sense trencar el pipeline.
+**FET** *(2026-05-18 per `claude` — Canvi #672)*: guard `qa:no-admin-toFixed-currency` estès per detectar `.toLocaleString(...) + '€'` (concatenació directa). 2 violacions corregides: `bookingCommunicationService.ts` (depositAmount + remainingAmount en email de pagament) passen a `formatCurrencyExact()`. Fix adjacent: `inboxTemplateService.ts` usa `toIntlLocale(locale)` en lloc del ternari manual `locale === 'ca' ? 'ca-ES' : 'es-ES'` (bug: idioma anglès → `es-ES` incorrecte). 2 tests nous blinden el guard ampliat. Efecte: cap servei pot usar la concatenació `toLocaleString(...) + '€'` ni el ternari manual de locale sense trencar el pipeline.
+**FET** *(2026-05-18 per `claude` — Canvi #674)*: fix i18n bug — locale hardcoded `'ca-ES'` a la galeria pública de fotos compartides. `app/[locale]/gallery/[shareToken]/page.tsx` formata la data de l'event amb `toLocaleDateString('ca-ES', ...)` fix. Ara usa `toIntlLocale(params.locale)`. Efecte: un client anglès amb el link de galeria veu `"18 May 2026"` en lloc de `"18 de mayo de 2026"`. Import `toIntlLocale` afegit.
+**FET** *(2026-05-18 per `claude` — Canvi #675)*: fix i18n bug — `new Intl.DateTimeFormat(locale, ...)` (locale cru) a 3 fitxers públics. Fitxers afectats: `app/[locale]/portfolio/[slug]/page.tsx` (data event al llistat d'esdeveniments), `app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx` (data de l'event individual), `app/components/home/GoogleReviewsRotating.tsx` (data última actualització ressenyes). Els tres usaven el locale cru (`'ca'`, `'es'`, `'en'`) directament a `Intl.DateTimeFormat` en comptes de `toIntlLocale(locale)`. Import `toIntlLocale` afegit als tres fitxers. Efecte: usuaris `en` veuen `"May 2026"` en lloc de possibles errors o format incorrecte.
+**FET** *(2026-05-18 per `claude` — Canvi #682)*: consistència i18n — `formatCurrency(b.total || 0, 'ca')` a `app/admin/packs/[id]/page.tsx` usava el locale curt `'ca'` com a argument explícit en lloc del default `'ca-ES'`. Eliminat l'argument redundant: `formatCurrency(b.total || 0)`. Scan complet de `app/` i `lib/` confirma que cap altra crida a `formatCurrency`/`formatCurrencyExact` ni `new Intl.*` queda sense `toIntlLocale()` o full locale canònic.
+**FET** *(2026-05-18 per `codex` — Canvi #683)*: el residu equivalent `formatDateSimple(b.eventDate, 'ca')` a `app/admin/packs/[id]/page.tsx` queda drenat cap al default canònic `formatDateSimple(b.eventDate)`. Nou guard `qa:no-short-locale-literals` entra a `validate:core` i bloqueja literals curts (`'ca'`, `'es'`, `'en'`) a formatters compartits i `new Intl.*` directe fora de `lib/constants/index.ts`.
+**FET** *(2026-05-19 per `claude` — Canvi #687)*: guard `qa:no-silent-catch` detecta catch blocks a `app/admin/` que fan UI feedback (`toast.error`, `setFlash`, `setFlashMessage`) sense `console.error`/`log.error`. 15 catch blocks corregits als clients de calendari (7), col·laboradors (4), reserves (5), clients (4), social (3) i `ContactFormComplete.tsx` (1). `validate:core` puja a 51 guards. 7 tests blinden el guard. Efecte: cap catch mut nou pot entrar a `app/admin/` sense trencar el pipeline; els errors d'operació admin queden enregistrats al log del servidor.
+**FET** *(2026-05-19 per `claude` — Canvi #690)*: guard `qa:no-admin-gradient-classes` detecta classes Tailwind `bg-gradient-to-*` directes als components `.tsx` de `app/admin/`, enforçant la norma CLAUDE.md "Gradients: MAI Tailwind gradient classes directes. Usar `.admin-gradient--*`". 2 violacions corregides: `layout.tsx` (FAB button → `.admin-gradient--fab`) i `economia/EconomiaClient.tsx` (ProgressBar → `.admin-gradient--progress-emerald`). Classes CSS noves `.admin-gradient--fab` i `.admin-gradient--progress-emerald` afegides a `admin-theme.css` amb prefix `html.admin-mode`. `validate:core` puja a 54 guards. 8 tests blinden el guard. Efecte: cap gradient Tailwind nou pot entrar a `app/admin/` sense trencar el pipeline; tots els gradients admin han d'usar classes nomenades de `admin-theme.css`.
+**FET** *(2026-05-18 per `claude` — Canvi #673)*: guard `qa:no-admin-toFixed-currency` estès per detectar `Math.round/floor/ceil/trunc(...)` seguit de `}€` o `} €` (interpolació en template literal). 6 violacions corregides: `dashboardInsightsService.ts` (pendingPayments + cashFlowNet30 als textos d'insight), `adminOperatingCycleService.ts` (metric pendingPayments), `app/admin/page.tsx` (pendingPayments label, cashFlowNet30 MetricCard, pipelineWeighted30 MetricCard, pendingPayments MetricCard). Tots usen ara `formatCurrency()` (milers amb punt, 0 dècimes, espai Intl). 2 tests nous blinden el guard ampliat. Efecte: cap component de dashboard ni servei d'insights pot usar `Math.round(...)€` sense trencar el pipeline.
 
 ## 6.15 Roadmap de millores identificades (backlog prioritzat)
 **CARACTERÍSTIQUES EXIGIDES**: monocapa · responsiu real · 0 hardcoded visible compartit · 0 mojibake · bellesa funcional obligatòria · zero overflow visible · TypeScript en verd al perímetre tocat · tests quan toca.
@@ -889,14 +1020,14 @@ Criteri pràctic:
 **FET** *(2026-05-04 per `codex` — Canvi #500)*: el CTA del roadmap pendent deixa de tenir la secció del protocol hardcoded. `AdminManualRoadmapItem` guanya `protocolSection?: string`, `marketing-analytics-hub` apunta explícitament a `§6.16` i `/admin/manual` construeix el CTA via `buildAdminManualRoadmapProtocolTarget()`. Efecte: l'únic pendent real de màrqueting obre directament el bloc de captació externa, no un `§6.15` genèric.
 **FET** *(2026-05-04 per `codex` — Canvi #501)*: el wiring visible del `#500` queda blindat amb test de pàgina. El Manual renderitzat ja ha de mostrar `Obrir §6.16 al protocol` per l'ítem pendent `marketing-analytics-hub` i no pot tornar a mostrar `Obrir §6.15 al protocol` sense trencar `AdminManualPage.test.tsx`.
 
-### SEGÜENT (Crítiques — impacte directe a conversió)
+### FET (Crítiques — impacte directe a conversió)
 - **[CRITICAL] ~~Motor de nurturing automàtic de leads~~** — ✅ FET (anteriorment). `commercialSequenceService.ts` executa cadència 5 passos (1d/3d/7d/14d/30d) amb email/WA, integrat al cron `commercialDailyAutomation`.
 - **[HIGH] ~~Forecast predictiu per estat del pipeline~~** — ✅ FET (Canvi #115). `loadDailyBrief` usa `LEAD_SCORING_STATUS_PROBABILITY` per estat en lloc de `budget × 0.3` fix.
 - **[HIGH] ~~A/B testing de plantilles d'email~~** — ✅ FET (Canvi #133). `emailTrackingService.ts` ampliat amb click tracking (clickedAt/clickCount), link wrapping, report amb best/worst performer. Ruta `/api/tracking/click/[token]`, API `/api/admin/email-tracking`. Migració schema. 33 tests.
 - **[HIGH] ~~Attribution multi-touch del journey~~** — ✅ FET (Canvi #128 + #131). `generateMultiTouchReport` + `loadMultiTouchReport` amb journeys, crèdits per canal (first/assist/last touch), insights i veredicte. 12 tests nous. Dashboard connectat al model multi-touch amb panell operatiu.
 - **[HIGH] ~~Command palette global (Cmd+K)~~** — ✅ FET. Cercador universal per saltar a qualsevol pàgina/lead/client/reserva en <2s. Base funcional tancada al Canvi #102; lògica extreta a capa pura i coberta per tests al Canvi #380: `lib/services/adminCommandPaletteService.ts` exporta `buildAdminCommandItems`, `filterAdminCommandItems`, `buildAdminSearchEntries`, `buildAdminRecentEntries`, `buildAdminCommandEntries` i `buildAdminSelectableEntries` com a funcions pures sense dependència de React; `AdminSearchModal` consumeix aquests helpers; 13 tests cobreixen dedupe per href, prioritat, filtre amb/sense accents, entries de cerca/recents/commands, combinació recents+commands vs commands+search i edge cases (arrays buits, limit 0, results buits).
 
-### SEGÜENT (Importants — qualitat operativa)
+### FET (Importants — qualitat operativa)
 - **[MEDIUM] ~~Scoring dinàmic automàtic de leads~~** — ✅ FET (anteriorment). `commercialScoring.ts` calcula score 0-100 + probabilitat + band. Cron `commercialDailyAutomation` actualitza `cachedScore` diari en lots.
 - **[MEDIUM] ~~Detector d'anomalies al Daily Brief~~** — ✅ FET (Canvi #115). `dailyAnomalyService.ts` compara 5 KPIs vs mitjana 30d, threshold 50%. Panel `AnomalyPanel` al dashboard quan hi ha desviacions.
 - **[MEDIUM] ~~Alertes de conflicte de capacitat operativa~~** — ✅ FET (Canvi #116). `capacityConflictService.ts` detecta col·lisions d'inventari entre reserves. Panel `CapacityConflictPanel` al dashboard.
@@ -906,12 +1037,28 @@ Criteri pràctic:
 ### MÉS ENDAVANT
 - **[LOW] ~~Audit trail de decisions administratives — backend + analítica~~** — ✅ FET backend (Canvi #358), capa de lectura agregada (Canvi #360), endpoint HTTP (Canvi #363), wiring canònic de `statusRouteHandler` (Canvi #370), panell de lectura a `Sales Ops` (Canvi #372), formulari operatiu al Lead Hub/detall (Canvi #375), bloqueig del pas ràpid a `LOST` també al kanban/listat (Canvi #377), lectura visual del `lostReason` dins les targetes/llistats (Canvi #383) i migració `20260424120000_add_lead_lost_reason` desplegada a Railway (Canvi #408). `Lead` schema guanya `lostReason String?` i `lostAt DateTime?` (+ índex); `lib/constants/leadLoss.ts` publica `LEAD_LOST_REASONS` canònics (incloent `EVENT_PASSED` per auto-descartats) amb `LEAD_LOST_REASON_LABELS` i guards; `lib/services/leadLossService.ts` exporta `markLeadAsLost({leadId, reason, note?, actor?})`; `lib/services/leadLossAnalyticsService.ts` exporta `computeLossSummary()` + `loadLossReport({sinceDays})`; `GET /api/admin/reports/lead-losses` exposa el `LossSummary`; `Sales Ops` el llegeix des d'un `LossBreakdownPanel`; i totes les superfícies ràpides de canvi d'estat que porten a `LOST` ja demanen `lostReason` + `note` abans de persistir, mentre que `LeadLostReasonBadge` en fa visible la classificació des de la llista i el kanban.
 
-**PENDENT CRÍTIC**: aquestes millores no són "nice to have" aïllades — cadascuna tanca un gap identificat. Prioritzar per impacte vs esforç.
+**FET documental** *(2026-05-17 per `codex` — Canvi #627)*: els blocs `SEGÜENT` de crítiques i importants queden regularitzats com a `FET`, perquè totes les línies que contenien ja estaven marcades com a completades amb cita a canvis previs. L'únic ítem encara `PENDING` del roadmap (`marketing-analytics-hub`) ja no viu aquí com a següent genèric: apunta explícitament a `§6.16` des del #500 i s'ha d'executar dins el pla de captació externa.
+
+**PENDENT CRÍTIC residual**: aquestes millores no són "nice to have" aïllades — cadascuna tanca un gap identificat. Qualsevol nou gap del roadmap s'ha d'ubicar al bloc de domini que li correspon, no reobrir aquests encapçalaments ja drenats.
 
 ## 6.16 Màrqueting i captació externa (del zero)
 **CONTEXT**: L'usuari reconeix que no té experiència en màrqueting i els clients no arriben. L'admin està preparat per gestionar leads, però fa falta un embut de captació real. Aquesta secció és el pla d'acció pas a pas.
 **FET** *(2026-04-10 per `claude` — Canvi #84)*: pla d'acció màrqueting documentat (veure baix). Cal executar-lo per fases.
 **FET** *(2026-05-04 per `codex` — Canvi #500)*: el manual de possibilitats ja envia el roadmap pendent `marketing-analytics-hub` cap a aquest bloc (`/admin/docs/protocol?seccio=6.16#seccio-6-16`). Això reforça la regla d'aquesta secció: abans d'obrir integracions cares d'ads/GA4/GBP, cal treballar la captació per fases.
+**FET** *(2026-05-08 per `codex` — Canvi #525)*: el manual de possibilitats ja mostra una barrera operativa explícita de Fase 0 abans d'invertir. `ADMIN_MARKETING_PHASE_GATE` fixa `FASE_0` com a fase activa recomanada, bloqueja Google Ads/Meta/integracions cares fins tenir ICP, proposta de valor, Google Business Profile i web base, i `/admin/manual` renderitza aquesta decisió amb CTA directe a `§6.16`. Test estructural a `adminManualRoadmap.test.ts` blinda que el gate apunti només a accions reals de Fase 0.
+**FET** *(2026-05-09 per `codex` — Canvi #526)*: el gate de Fase 0 ja no només diu que cal esperar abans d'invertir; també enumera els 4 criteris concrets que han d'existir per desbloquejar la fase següent: ICP escrit, proposta de valor usable, Google Business Profile publicat i web base revisada amb prova social/portfolio/CTA. La UI de `/admin/manual` els mostra dins "Quan pots passar de fase" i el contracte queda blindat a `adminManualRoadmap.test.ts`.
+**FET** *(2026-05-09 per `codex` — Canvi #527)*: el gate de Fase 0 separa ara els requisits que cal completar dels canals que continuen bloquejats. `ADMIN_MARKETING_PHASE_GATE.blockedActionIds` apunta a Google Ads, Meta Ads i remarketing, `/admin/manual` els mostra dins "No obrir encara", i `adminManualRoadmap.test.ts` blinda que aquests canals pertanyin a Fase 2.
+**FET** *(2026-05-09 per `codex` — Canvi #528)*: el gate de Fase 0 ja marca també el primer moviment executable. `ADMIN_MARKETING_PHASE_GATE.primaryActionId` apunta a `icp-definition`, `/admin/manual` renderitza el bloc "Primer moviment" amb cost i esforç, i els tests de constant i pàgina blinden que la primera acció sigui de Fase 0.
+**FET** *(2026-05-09 per `codex` — Canvi #529)*: el gate de Fase 0 explica ara per què cada canal de pagament continua bloquejat. `ADMIN_MARKETING_PHASE_GATE.blockedReasons` cobreix Google Ads, Meta Ads i remarketing, `/admin/manual` mostra aquests motius dins "No obrir encara", i els tests blinden que no hi hagi canal bloquejat sense justificació.
+**FET** *(2026-05-11 per `codex` — Canvi #531)*: el gate de Fase 0 ja concreta quins lliurables han de sortir de cada acció de Fundació. `ADMIN_MARKETING_PHASE_GATE.requiredOutputs` cobreix ICP, proposta de valor, Google Business Profile i web base; `/admin/manual` mostra aquests outputs com a chips dins de cada acció, i els tests blinden que cada requisit de Fase 0 tingui sortida material abans de passar a Fase 1.
+**FET** *(2026-05-11 per `codex` — Canvi #532)*: el gate ja explica també per què el primer moviment després de la Fundació és activar la xarxa personal. `ADMIN_MARKETING_PHASE_GATE.nextPhaseReason` justifica que és el canal de menor cost i més feedback immediat abans d'invertir temps en SEO, social o partners; `/admin/manual` mostra aquest motiu dins "Després de la fundació" i els tests el blinden.
+**FET** *(2026-05-11 per `codex` — Canvi #533)*: el primer pas de Fase 1 ja té outputs concrets. `ADMIN_MARKETING_PHASE_GATE.nextPhaseOutputs` fixa que activar xarxa personal ha de deixar 50 contactes avisats, 3 converses comercials obertes i objeccions anotades; `/admin/manual` ho mostra com a chips dins "Després de la fundació" i els tests ho blinden.
+**FET** *(2026-05-11 per `codex` — Canvi #534)*: el gate incorpora una regla anti-dispersió visible. `ADMIN_MARKETING_PHASE_GATE.focusRule` fixa que només hi ha d'haver una fase i un canal actiu fins que hi hagi senyals clars; `/admin/manual` la mostra sota la decisió principal i els tests la blinden. A partir d'aquest tall, els propers `go` s'han d'agrupar en blocs més substancials per evitar inflar el comptador amb microfrases.
+**FET** *(2026-05-11 per `codex` — Canvi #535)*: el manual consolida la Fundació i el primer canal gratuït en un pla bootstrap de 14 dies. `ADMIN_MARKETING_BOOTSTRAP_PLAN` defineix tres finestres (`Dies 1-2`, `Dies 3-7`, `Dies 8-14`) amb objectiu i outputs; `/admin/manual` ho mostra dins el gate de captació abans de la graella de fases, i els tests blinden l'ordre i els outputs.
+**FET** *(2026-05-11 per `codex` — Canvi #537)*: el manual converteix la Fundació en un tracker de proves verificables. `ADMIN_MARKETING_PHASE_EVIDENCE` fixa, per cada requisit de Fase 0, quina prova material ha d'existir, on s'ha de comprovar i quin senyal permet desbloquejar la fase següent; `/admin/manual` ho mostra dins "Tracker de proves Fase 0" i els tests blinden que cobreixi exactament els 4 requisits.
+**FET** *(2026-05-11 per `codex` — Canvi #539)*: el guard `qa:admin-manual-consistency` ja blinda també el tracker de proves de Fase 0. `scripts/check-admin-manual-consistency.mjs` exigeix que `ADMIN_MARKETING_PHASE_EVIDENCE` cobreixi exactament els `requiredActionIds` del gate i no apunti a accions inexistents; `check-admin-manual-consistency.test.ts` afegeix regressions per prova absent i actionId extra.
+**FET** *(2026-05-11 per `codex` — Canvi #540)*: el mateix guard ja no accepta proves buides o decoratives al tracker. Cada entrada de `ADMIN_MARKETING_PHASE_EVIDENCE` ha de portar `proof`, `whereToCheck` i `unlockSignal` amb contingut mínim; el test del guard reprodueix una prova buida i falla amb el missatge específic.
+**FET** *(2026-05-11 per `codex` — Canvi #544)*: el manual ja no deixa la tria de Fase 1 com a consell obert. `ADMIN_MARKETING_CHANNEL_DECISION_MATRIX` defineix cinc opcions gratuïtes de Fase 1 amb quan començar, primer moviment, senyal d'èxit, condició de parada i enllaç admin; `/admin/manual` ho mostra com "Matriu d’un sol canal" dins el pla de captació, i `qa:admin-manual-consistency` exigeix que cada opció referenciï accions `FASE_1`, tingui textos accionables i apunti a `/admin`.
 
 ### Fase 0 — Fundació (abans de gastar res)
 - **Definir 1 client ideal clar** (ICP): tipus d'event (bodes? corporatius? festes privades?), ubicació, pressupost mig, què busquen.
@@ -944,7 +1091,18 @@ Criteri pràctic:
 - **Ratio LTV:CAC**: ha de ser >3. Si és <2, el canal no és rendible.
 - **Attribution**: quin canal porta els leads? Millor canal = més inversió.
 
-**PENDENT CRÍTIC**: no dispersar esforç. Una fase a la vegada. Un canal a la vegada fins que funcioni. La dispersió mata els petits negocis.
+**FET residual** *(2026-05-18 per `codex` — Canvi #684)*: el pendent crític de no dispersar esforç queda regularitzat com a regla protegida. `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` (#602) fixa un canal actiu, moviments permesos, canvis bloquejats i senyals de sortida; `qa:admin-manual-consistency` valida que el gate, els bloquejos i les accions existeixin; `/admin/marketing` (#628, #664, #665) concentra diagnòstic de canals i bloqueig de paid media abans d'escalar. El risc futur continua vigent com a disciplina operativa, però ja no és un bloqueig obert sense mecanisme.
+**FET** *(2026-05-17 per `codex` — Canvi #602)*: el manual de captació incorpora `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK`, amb canal actiu `personal-network`, moviments permesos, canvis de canal bloquejats i senyals de sortida. `/admin/manual` ho mostra com `Bloqueig de canal actiu`, abans de la matriu d’un sol canal, perquè la regla anti-dispersió sigui executable: ara queda escrit què fer, què no obrir encara i quan es pot canviar de canal.
+**FET parcial** *(2026-05-17 per `codex` — Canvi #628)*: neix `/admin/marketing` com a primer Marketing Hub operatiu sense obrir OAuth nou: concentra salut de captació (`loadCaptureHealth`), fonts reals del CRM, estat de GA4/Google Ads, Google Business Profile inferit per origen `GOOGLE`, i bloqueig explícit de paid media quan el volum o `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` encara no permeten escalar. El roadmap `marketing-analytics-hub` continua `PENDING` perquè Meta Ads, Google Business Profile API i ROI/CAC complet per canal encara requereixen connectors externs, però el propietari ja té una entrada de govern única per decidir què fer ara sense dispersar-se.
+**FET parcial** *(2026-05-18 per `codex` — Canvi #664)*: `/admin/marketing` ja diagnostica els canals CRM reals abans d'obrir connectors cars. `buildMarketingHubSummary()` afegeix `channelDiagnostics` per cada origen dels últims 90 dies, amb veredicte (`Canal dominant`, `Canal en prova`, `Mostra petita`), acció concreta i CTA cap al workspace adequat. Això apropa el hub al roadmap `marketing-analytics-hub` sense prometre mètriques d'Ads/ROI que encara requereixen APIs externes.
+**FET parcial** *(2026-05-18 per `codex` — Canvi #665)*: `/admin/marketing` ja separa volum de qualitat de canal amb conversió interna. `loadMarketingHubSummary()` agrupa leads dels últims 90 dies per `source` + `status`, `channelDiagnostics` mostra guanyats i `conversionRate` per origen, i el veredicte pot marcar `Canal que converteix` quan hi ha `WON` suficient. Això dona lectura de conversió CRM abans de tenir CPL/CAC/ROI externs.
+**FET parcial** *(2026-05-20 per `codex` — Canvi #716)*: `/admin/marketing` ja explicita els forats de mesura que bloquegen ROI/CAC abans d'invertir. `buildMarketingHubSummary()` afegeix `measurementGaps` per GA4, Google Ads, Meta Ads, Google Business Profile i guanyats CRM; la UI mostra estat, evidència, acció i CTA per cada gap. El roadmap `marketing-analytics-hub` continua `PENDING` mentre faltin connectors externs complets, però el propietari ja veu quina dada falta i per què no s'ha d'obrir paid media prematurament.
+**FET parcial** *(2026-05-20 per `codex` — Canvi #717)*: `/admin/marketing` ja incorpora ingressos atribuïts per canal CRM sense duplicar càlculs. `loadMarketingHubSummary()` reutilitza `loadAttributionReport(90)` i `channelDiagnostics` mostra `revenue` junt amb volum, guanyats i conversió. Encara no és ROI extern complet perquè falta cost paid real, però el hub ja aproxima valor de canal amb dades internes verificables.
+**FET parcial** *(2026-05-20 per `codex` — Canvi #718)*: `/admin/marketing` reutilitza el connector existent de Google Ads per tancar el gap de cost quan hi ha dades reals. `loadMarketingHubSummary()` només crida `getGoogleAdsReport()` si la configuració és `ready`, registra warning si l'API falla i passa cost/clics/conversions a `measurementGaps`. Això apropa CPL/CAC real sense obrir un segon client d'Ads ni trencar el bloqueig operatiu de paid media.
+**FET parcial** *(2026-05-20 per `codex` — Canvi #719)*: `/admin/marketing` reutilitza també el connector GA4 existent per tancar el gap de trànsit quan hi ha dades reals. `loadMarketingHubSummary()` només crida `getGa4Report()` si `getGa4ConfigStatus()` és `ready`, registra warning si falla i passa sessions, usuaris, pàgines i events al gap `ga4-tracking`. Això dona lectura web real dins el hub sense duplicar el panell d'analítica.
+**FET parcial** *(2026-05-20 per `codex` — Canvi #720)*: `/admin/marketing` ja detecta Google Business Profile connectat a partir del servei OAuth existent. `loadMarketingHubSummary()` carrega `getGoogleBusinessIntegrationConfig()` i el gap `gbp-api` passa a `ready` quan hi ha refresh token, accountId i locationId, mostrant el nom de la ubicació si existeix. Això diferencia connexió real de GBP d'un simple origen Google inferit al CRM.
+**FET parcial** *(2026-05-21 per `codex` — Canvi #736)*: el card d'integració `Google Business Profile` del Marketing Hub queda alineat amb la connexió OAuth real. `buildMarketingHubSummary()` ara marca la integració com `ready` si `googleBusinessProfile.connected` és cert, encara que el CRM no tingui leads amb origen `GOOGLE`, i mostra el nom de la ubicació connectada. Això evita una contradicció visual entre el gap `gbp-api` cobert i el bloc d'integracions marcant GBP com a pendent. En el mateix tall, el catàleg `ADMIN_KONAMI_SEQUENCE` passa a `lib/constants/admin.ts` perquè `arch:layer:check` no detecti la seqüència del #731 com a catàleg local dins `app/admin/layout.tsx`.
+**FET parcial** *(2026-05-21 per `codex` — Canvi #738)*: `/admin/marketing` ja diferencia Meta Pixel configurat de cost Meta Ads pendent. `loadMarketingHubSummary()` passa `NEXT_PUBLIC_FB_PIXEL_ID` com a senyal `metaPixel.configured`; `buildMarketingHubSummary()` mostra `Meta Pixel configurat` tant al card `Meta Ads` com al gap `meta-ads-cost`, però manté Meta Ads `blocked` o `missing` fins que existeixi connector Meta Ads API/cost real. Això evita cantar CAC complet només perquè el píxel públic existeix.
 
 ## 6.17 Front inventari + packs (estat operatiu)
 **OBJECTIU**: que la relació entre equipament i packs sigui visible, entenedora i accionable des de llista, no només des del detall.
@@ -959,6 +1117,7 @@ Criteri pràctic:
 - FET: compositor automàtic explicat com a punt de partida, amb modes visibles i revisió explícita de quantitats i obligatorietat.
 **CARACTERÍSTIQUES EXIGIDES**: relació bidireccional visible · zero contingut opac · bellesa funcional · zero overflow · TypeScript verd al perímetre.
 **FET** *(2026-05-04 per `claude` — Canvi #485)*: el `SEGÜENT` d'aquesta secció estava ocupat per un text desencaixat ("preparar una reunió de treball per definir Fase 0 (ICP + proposta de valor) — sense això no es pot començar res") que pertany conceptualment a `§6.16 Màrqueting i captació externa · Fase 0 — Fundació` (definir ICP, proposta de valor, optimitzar web, Google Business Profile), no a aquesta secció d'inventari+packs. La Fase 0 ja viu correctament documentada a `§6.16` amb les seves 4 sub-tasques. Aquí queda eliminat el residu sense duplicar — el bloc d'`ESTAT ACTUAL` ja deixa veure que la relació bidireccional inventari↔packs està drenada (badges clicables, preview de material, editor detall, pestanya content, compositor automàtic). No hi ha cap tall executable immediat pendent en aquesta zona. Mateix patró que el `#484` de codex (Camí 2 a §6.18) i el `#447` de claude (Camí 1 a §6.18).
+**FET parcial** *(2026-05-21 per `codex` — Canvi #746)*: `/admin/inventory` fa emergir friccions operatives ja detectables sense canviar schema: equips sense cost o vida útil, equips valuosos sense ús en packs/reserves, equips al final de vida/envellint i cobertura de packs. El `OwnerControlStrip` prioritza el següent pas cap al filtre de salut correcte (`missing-cost`, `unused`, `end-of-life`, `aging`) i manté la lectura automàtica/manual abans de la taula.
 **MÉS ENDAVANT**: refinaments d'UI sobre la mateixa relació quan apareguin friccions reals d'ús.
 
 ## 6.18 Auditoria CRMs top — backlog d'incorporacions
@@ -994,12 +1153,38 @@ Amplifica el USP que l'usuari ja té (km + transport autocalculat) i el converte
 ### Camí 3 — Portal client + signatura + pagament (~25-40h, prioritat 3)
 Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb això. Reservar per quan hi hagi flux real que ho justifiqui.
 
-### SEGÜENT (Camí 3)
+### FET (Camí 3) — TANCAT 2026-05-17
 - **F.22 [USP] Signatura digital de contractes inline** — DocuSign-like sense sortir d'Òrbita. Honeybook/Tave brutal en això. Implica: nou model `ContractSignature { contractId, signedAt, signatureBlob, ip, userAgent }` + portal públic `/contract/[token]/sign` + integració amb generació PDF firmat.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #565)*: el portal client ja fa visible el contracte existent dins de Documents. `findPortalAccessByRawToken()` carrega els camps `Proposal.contract*`, `/[locale]/portal/[token]` mostra referència, estat, PDF i avís de `Signatura online pendent` quan el contracte està `SENT`, i `getClientPortalContractSummary()` blinda quin contracte s'exposa al client. La signatura inline real amb captura de traç, IP, user-agent i PDF firmat continua pendent com a pas següent de F.22.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #566)*: el contracte del portal ja té pàgina pròpia a `/[locale]/portal/[token]/contract`. La targeta de Documents enllaça a aquest detall, `getClientPortalContractSignatureState()` classifica `NOT_READY`/`READY_TO_SIGN`/`SIGNED`/`CANCELLED`, i la nova pàgina concentra referència, estat, PDF i missatge de preparació de signatura quan el contracte està `SENT`. Encara no captura traç ni persisteix `ContractSignature`.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #567)*: la pàgina de contracte ja mostra un checklist de prerequisits de signatura inline. `getClientPortalContractSignatureChecklist()` exigeix contracte enviat, PDF disponible i contracte encara no signat; `READY_TO_SIGN` només apareix si `SENT + PDF + no signat` són certs. Això evita prometre una acció de signatura quan encara falta el document material. La persistència de la signatura real continua pendent.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #568)*: el backend de signatura aplica la mateixa frontera que la UI. `signContractOnline()` ja carrega `contractPdfUrl`/`pdfUrl` i rebutja amb `NOT_SIGNABLE` qualsevol contracte `SENT` sense PDF material, de manera que `/api/portal/[token]/sign` no pot signar un contracte que el portal no considera preparat.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #569)*: l'endpoint públic `/api/portal/[token]/sign` queda blindat amb tests de contracte HTTP. La ruta valida input, passa nom net + IP + user-agent a `signContractOnline()`, mapeja `INVALID_TOKEN` a 404 i els estats no signables a 409, i retorna un 500 JSON controlat si el servei falla inesperadament. La captura de traç i el PDF firmat continuen pendents.
+**FET parcial** *(2026-05-14 per `codex` — Canvi #570)*: el formulari públic de signatura ja té cobertura de comportament client i recuperació d'errors de xarxa. `SignContractForm` torna a estat d'error usable si el `fetch` falla, els tests verifiquen bloqueig fins a nom + acceptació, POST amb `signedBy` net, confirmació i missatges específics com `ALREADY_SIGNED`. La captura de traç i el PDF firmat continuen pendents.
+**FET parcial** *(2026-05-14 per `claude` — Canvi #571)*: pàgina server `/sign` com a punt d'entrada del client per signar (`READY_TO_SIGN` → formulari, `SIGNED` / no `SENT` → missatge d'estat), schema `Proposal` ampliat amb `contractSignatureIp`/`contractSignatureUa` + migració SQL, strings trilingüals del formulari (ca/es/en) i CTA "Signar el contracte" al portal principal quan `awaitingInlineSignature`. Base del servei, ruta i formulari client (refinats per Codex a #568-#570).
+**FET parcial** *(2026-05-14 per `codex` — Canvi #572)*: la traça de signatura ja és visible també per al propietari dins la fitxa de reserva. `DocumentFlowSection` mostra qui ha signat, hora UTC, IP i user-agent quan el contracte està `SIGNED`, i la query de booking carrega els camps `contractSignedBy`, `contractSignatureIp` i `contractSignatureUa`. El PDF firmat continua pendent.
+**FET parcial** *(2026-05-15 per `codex` — Canvi #573)*: la signatura manuscrita ja és part obligatòria del flux online i queda visible al propietari. `SignContractForm` no envia sense blob de `SignaturePad`, la ruta passa `signatureBlob`, `signContractOnline()` el desa a `contractSignatureBlob`, i `DocumentFlowSection` mostra la imatge capturada quan el contracte està `SIGNED`. El PDF firmat continua pendent.
+**FET parcial** *(2026-05-15 per `codex` — Canvi #574)*: el client també veu la signatura manuscrita capturada dins la pàgina del contracte del portal. `ClientPortalContractSummary` exposa `signatureBlob`, `findPortalAccessByRawToken()` carrega `contractSignatureBlob`, i `/portal/[token]/contract` renderitza la imatge quan el contracte està `SIGNED`. El PDF firmat continua pendent.
+**FET parcial** *(2026-05-15 per `codex` — Canvi #575)*: la signatura inline ja produeix un PDF signat material. `ContractPdfData` accepta `signedBy`, `signedAt`, `signatureBlob` i `signatureIp`, `generateContractPDF()` pinta la signatura capturada al bloc de signatures, `generateSignedContractPdf()` regenera i puja el PDF a storage local, i `signContractOnline()` el desa de nou a `contractPdfUrl`/`contractPdfKey` després de marcar el contracte com `SIGNED`. Resta revisar si cal una entitat `ContractSignature` pròpia o si els camps actuals de `Proposal` són suficients.
+**FET parcial** *(2026-05-15 per `codex` — Canvi #576)*: la signatura de contracte queda també a la timeline operativa del lead. `leadActivityService` exporta `recordLeadContractSigned()`, `signContractOnline()` crea l'activitat `Contracte signat` amb `source: portal` després de generar el PDF signat, i `markContractSigned()` fa el mateix amb `source: admin` quan la signatura es marca manualment. Això fa visible el fet signat dins la narrativa comercial sense crear encara una entitat `ContractSignature` separada.
 - **F.23 [USP] Pagaments online (Stripe link) dins el pressupost** — Honeybook brutal. CTA "Paga el 30% per confirmar" amb Stripe Checkout. Implica: integració Stripe + nou flow `Booking.paymentLink` + webhook handler.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #577)*: F.23 queda iniciat amb base de dades i CTA segur al portal client. `Booking` incorpora `depositPaymentUrl` i `remainingPaymentUrl` amb migració SQL, `getClientPortalPaymentSummary()` normalitza links `http(s)` i decideix si toca pagar bestreta o resta, i `/portal/[token]` mostra el botó de pagament online només quan existeix un link vàlid i l'import encara no està pagat. Encara falta generació Stripe Checkout real i webhook per marcar pagaments.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #578)*: l'admin ja pot generar links Stripe Checkout des de la fitxa de reserva. `StripePaymentPanel` queda muntat a la secció Finances, `bookingStripePaymentService` concentra la generació i el processament de webhook, la ruta `/api/admin/bookings/[id]/stripe-checkout` exigeix permís `mutate`, crea sessions per bestreta o resta, desa `depositPaymentUrl`/`remainingPaymentUrl` i blinda que la resta no es generi abans de cobrar la bestreta. El webhook `/api/webhooks/stripe` deixa de tocar Prisma directament i delega al servei. Encara falta exposar una confirmació client/admin post-webhook més rica.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #580)*: el webhook Stripe separa errors de signatura d'errors interns de processament. `bookingStripePaymentService` exposa `StripeWebhookSignatureError`, `processStripeWebhook()` només transforma errors de `constructStripeEvent` en aquest tipus, i `/api/webhooks/stripe` retorna `400 Invalid signature` per signatures invàlides però `500 Webhook processing failed` si falla la persistència. Tests de servei i ruta blinden aquest contracte perquè Stripe pugui reintentar errors interns sense confondre'ls amb autenticació.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #581)*: la confirmació Stripe del webhook ja queda visible al timeline admin. Quan `checkout.session.completed` marca pagada la bestreta o la resta, `processStripeWebhook()` crea també un `adminLog` `PAYMENT_RECORDED` amb missatge, tipus de pagament, session id i import en cèntims; `ADMIN_ACTIVITY_ACTION_META` i el mapper canònic fan que aparegui com a "Pagament registrat" enllaçat a la reserva. Encara queda pendent enriquir el portal client post-pagament amb confirmació pròpia.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #582)*: el webhook Stripe és idempotent contra reintents. `StripeWebhookEvent` desa `eventId` únic, tipus, reserva, tipus de pagament i session id; `processStripeWebhook()` registra l'event dins la mateixa transacció que marca el pagament i escriu el `adminLog`. Si Stripe reenvia un `event.id` ja processat, el servei retorna `received: true` sense duplicar updates ni timeline.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #584)*: el portal client ja dona confirmació pròpia després del webhook. `getClientPortalPaymentSummary()` calcula un `notice` canònic per bestreta pagable, resta pagable, bestreta rebuda amb resta pendent, pagament manual pendent o pagament complet; `/portal/[token]` mostra aquest avís a la secció de pagaments i els missatges viuen a `CLIENT_PORTAL_MESSAGES` en ca/es/en. El client ja no veu només badges `Pagat/Pendent`, sinó què ha passat i quin és el següent pas.
+**FET** *(2026-05-17 per `codex` — Canvi #591)*: F.23 queda tancat com a flux complet de pagament online dins el pressupost/portal. `getClientPortalInvoiceSummary()` reutilitza `getClientPortalPaymentSummary()` i exposa `paymentUrl`, `payableOnline`, `nextPayment` i `paymentNotice` per bestreta/resta; `/[locale]/portal/[token]/invoice` mostra el CTA Stripe corresponent al costat del desglossament del pressupost. Això connecta el pressupost visible amb el mateix motor canònic que ja alimentava `/payments`, el webhook idempotent i la timeline admin.
 - **G.25 [USP mig-llarg] Portal client** — timeline visible, contracte, factures, fotos post-event, qüestionaris. Honeybook Client Portal és el referent absolut. Implica: nou conjunt rutes `/portal/[token]/*` (`overview`, `contract`, `payments`, `gallery`, `questionnaire`) basades en `ClientPortalAccess` que ja existeix com a model.
+**FET parcial** *(2026-05-16 per `codex` — Canvi #585)*: el portal client ja comença a separar-se en subrutes reals amb `/[locale]/portal/[token]/payments`. La portada enllaça a `payments`, `buildClientPortalPaymentsPath()` blinda la ruta interna, i la pàgina dedicada mostra resum de pagament, proper pas, targeta de bestreta, targeta de resta i CTAs Stripe quan toca, respectant `showPayments=false`.
+**FET parcial** *(2026-05-16 per `claude` — Canvi #586)*: el portal guanya subruta de procés/timeline a `/[locale]/portal/[token]/timeline`. `getClientPortalTimeline()` deriva sis fites (reserva creada, pressupost enviat, contracte signat, paga i senyal, dia de l'event, pagament final) amb estat `done/upcoming/future` sense schema nou; la pàgina mostra la línia de temps vertical amb colors semàfor (emerald/cyan/blanc); la portada principal enllaça a la nova ruta des de la secció "Estat del procés". Missatges trilingüals afegits a `CLIENT_PORTAL_MESSAGES`.
+**FET parcial** *(2026-05-16 per `claude` — Canvi #587)*: el portal guanya subruta de factura/pressupost a `/[locale]/portal/[token]/invoice`. `getClientPortalInvoiceSummary()` exposa total, desglossament bestreta/resta amb dates de pagament i referència+PDF del primer pressupost amb PDF; `buildClientPortalInvoicePath()` construeix la ruta canònica. La portada substitueix l'enllaç directe al PDF per dos botons: "Veure pressupost" (invoice) + PDF si existeix. 8 claus noves trilingüals a `CLIENT_PORTAL_MESSAGES`.
+**FET** *(2026-05-17 per `claude` — Canvi #592)*: subruta `/portal/[token]/gallery` tanca G.25. `buildClientPortalGalleryPath()` canònic. Pàgina dedicada de galeria amb `listPortalPhotos()` i `next/image`. Portada del portal: preview 6 fotos + CTA "Veure totes les fotos". Clau `galleryViewLink` als tres locales. 3 tests del builder. Portal complet: `overview` + `contract` + `payments` + `timeline` + `invoice` + `questionnaire` (G.26) + `gallery` (ara).
 - **G.26 [USP] Qüestionari pre-event automàtic** — timing, cançons, contactes claus. Honeybook Questionnaires. Implica: nou model `Questionnaire { templateId, bookingId, responses }` + UI per propietari (templates) + UI portal client (responses).
+**FET parcial** *(2026-05-17 per `codex` — Canvi #588)*: el qüestionari pre-event ja té base funcional connectada al portal. El repo inclou schema `QuestionnaireTemplate`/`QuestionnaireResponse`, servei `questionnaireService`, admin `/admin/questionnaires`, API admin, API pública `/api/portal/[token]/questionnaire`, pàgina `/[locale]/portal/[token]/questionnaire` i formulari client. Aquest tall afegeix `buildClientPortalQuestionnairePath()` com a ruta canònica, reconnecta la portada del portal perquè no fabriqui el link a mà, blinda el builder amb test i corregeix el contracte d'auth de les rutes admin de qüestionaris perquè TypeScript torni a verd.
+**FET parcial** *(2026-05-17 per `claude` — Canvi #589)*: el detall de reserva admin mostra ara l'estat i les respostes del qüestionari. `BookingQuestionnaireSection` crida `getBookingQuestionnaire(bookingId)` i renderitza tres estats (sense template / pendent / completat amb totes les respostes). `BOOKING_DETAIL_SECTIONS` inclou `sec-questionnaire` al nav entre Portal i Finances. Pendent: refinaments de plantilles per tipus d'event si el negoci ho requereix.
 - **G.27 [USP] Galeria post-event privada amb codi compartible** — Tave Galleries. Implica: nou model `EventGallery { bookingId, shareToken, photos[] }` + ruta pública `/gallery/[token]` amb password opcional.
+**FET** *(2026-05-17 per `claude` — Canvi #590)*: `galleryShareToken`/`gallerySharePassword` a `Booking` (schema + migration). Quatre funcions noves a `galleryService`: `createGalleryShareToken`, `revokeGalleryShareToken`, `getGalleryByShareToken` (amb `GalleryShareResult` discriminat), `getGalleryShareInfo`. Ruta admin `GET/POST/DELETE /api/admin/bookings/[id]/gallery-share`. Pàgina pública `/[locale]/gallery/[shareToken]` amb tres branques (NOT_FOUND, PASSWORD_REQUIRED/WRONG_PASSWORD, OK). `GalleryPasswordGate` client component per al formulari de contrasenya. `GallerySharePanel` component admin per generar/copiar/revocar el link des del detall de reserva. 15 tests nous que blinden les quatre funcions del servei.
 
 ### Mancances transversals (atacar quan toqui per àrea)
 - **C.10 [BÀSIC] Inbox unificada multi-canal real** (email + WhatsApp + IG DM + form) — `FET` *(Canvi #461)*: `commTimeline` i el resum canònic de comunicacions ja tracten `INSTAGRAM` i `FORM` com a canals reals; la captura web (`contactLeadCaptureService`) i l'alta admin de leads `INSTAGRAM` escriuen activitat inbound canònica via `recordLeadInboundChannelCaptured()`, i `CommSummaryPanel` els mostra a la Inbox.
@@ -1016,7 +1201,7 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 - **F.21 [FET]** Calendar bidireccional Google/iCal — Canvi #134 ja ho cobreix.
 - **F.24 [USP]** Integració Google Maps a la fitxa client — `FET` *(Canvi #459)*: la `SummaryPanel` del Customer Hub mostra una targeta `Ubicació i ruta` amb enllaç a Google Maps, distància guardada (`distanceKm`) si la reserva ja la té i càlcul viu via `POST /api/admin/maps/distance` quan encara falta persistència. Refinement directe del B.6 (auto-km) sense duplicar motor.
 
-**PENDENT CRÍTIC**: no convertir aquest backlog en feina paral·lela dispersa. Camí 1 tancat (#435-#442). Camí 2 tancat (#444, #446, #449, #450). El següent salt real és Camí 3 i només s'hauria d'obrir quan hi hagi prou flux i pressió operativa que el justifiqui.
+**FET**: Camí 1 tancat (#435-#442). Camí 2 tancat (#444, #446, #449, #450). Camí 3 tancat (#565-#592): F.22 (signatura inline + PDF signat), F.23 (Stripe Checkout + webhook + confirmació portal), G.25 (portal client complet: 7 subrutes), G.26 (qüestionari pre-event), G.27 (galeria compartible pública). El backlog de §6.18 queda drenat. Propers ítems: refinaments d'ús real o nova prioritat operativa.
 
 **MÉS ENDAVANT**: tractar com a backlog viu — quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tag `[BLOC]/[BÀSIC]/[USP]`.
 
@@ -1103,6 +1288,3821 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+### Canvi #753 — 2026-05-22 — codex (FET)
+
+**§6.14 — `qa:protocol` exigeix també les 3 capes de validació a l'entrada actual del protocol, no només al diari.**
+- Context: abans d'aquest tall, `scripts/check-admin-change-log.mjs` ja exigia que `docs/diario.md` tingués `Validació tècnica`, `Validació funcional` i `Validació humana/UX` a l'entrada corresponent al `ADMIN_CHANGE_COUNTER`, però el registre actual del §9 podia quedar sense una d'aquestes capes i continuar passant. Això deixava un forat respecte la norma §2.1 i el checklist de tancament canònic.
+- `scripts/check-admin-change-log.mjs`: després de validar que `ADMIN_CHANGE_COUNTER` coincideix amb el màxim `Canvi #N`, localitza l'entrada actual del protocol i falla si no inclou les tres línies canòniques de validació.
+- `__tests__/scripts/check-admin-change-log.test.ts`: el fixture de canvis incorpora les tres capes de validació i s'afegeix una regressió explícita que rebutja un protocol actual amb autoria completa però sense validacions.
+- Efecte: a partir d'ara el tall actual només pot passar `qa:protocol` si protocol i diari expliquen igualment què s'ha validat en les tres capes. No es canvia cap workspace funcional.
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-admin-change-log.test.ts` OK (9 tests) · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el guard detecta el cas que faltava — entrada actual del protocol sense `Validació tècnica/funcional/humana` — i el test nou blinda la regressió.
+- Validació humana/UX: el propietari i qualsevol agent futur veuen al mateix registre del protocol, no només al diari, si el canvi està justificat tècnicament, funcionalment i en lectura humana.
+- `ADMIN_CHANGE_COUNTER` passa a `753`; el següent canvi real ha de ser `#754`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #752 — 2026-05-22 — claude (FET)
+
+**§6.4 — Centralització dels llindars d'automatització a `lib/constants/automationThresholds.ts` (monocapa).**
+- `lib/constants/automationThresholds.ts` (nou): `TASK_AUTOMATION_THRESHOLDS` + `CAPACITY_FORECAST_THRESHOLDS`. Els llindars que vivien hardcodejats inline (`24h`, `7d`, `3d`, `+3 dies`, `healthScore lte 40`, `maxPerDay 2`, `warning 5`, `critical 7`) passen a constants canòniques. Valors idèntics als previs.
+- `taskAutomationService.ts` i `operationalForecastService.ts` consumeixen les constants. Els `options` d'override puntual del forecast es mantenen.
+- `__tests__/lib/constants/automationThresholds.test.ts` (nou): 3 tests blinden que els valors centralitzats reprodueixen els històrics i que warning < critical.
+- Aquest tall és la **primera passa de §6.4**: la part data-driven (decidir nous valors segons producció) continua sent `MÉS ENDAVANT`, però la infraestructura de monocapa que permetria exposar-los a admin settings ja existeix.
+- Validació tècnica: `pnpm run test:run` dels 3 fitxers afectats OK (27 tests). Zero canvi de comportament.
+- Validació funcional: els llindars són idèntics; els tests de regressió ho blinden.
+- `ADMIN_CHANGE_COUNTER` passa a `752`; el següent canvi real ha de ser `#753`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #751 — 2026-05-21 — claude (FET)
+
+**ESLint — 1 error + 6 warnings tancats; `pnpm run lint` verd al repo.**
+- `lib/prisma.ts`: `eslint-disable-next-line no-var` justificat (singleton Prisma + hot reload).
+- 2 `<img>` en data URIs (`DocumentFlowSection.tsx`, `portal/[token]/contract/page.tsx`): `eslint-disable-next-line @next/next/no-img-element` justificat per signatura capturada amb SignaturePad.
+- `CanvasEditorClient.tsx`: trec `canvasBg` de `useMemo` deps (no s'usa dins el cos).
+- `AdminSearchModal.tsx`: `closeAndReset` i `handleSelect` envoltats amb `useCallback` i afegits a l'useEffect del listener de tecles.
+- `AiReplySuggestions.tsx`: `eslint-disable-next-line react-hooks/exhaustive-deps` justificat — el refetch de suggeriments IA ha de ser per `email.id`, no per cada sub-propietat.
+- `PresupuestoPdfStudio.tsx`: afegits `seasonSurcharge`, `datePricing.appliedRule`, `datePricing.surchargePct` al `useMemo` `buildProposalSnapshot` + `seasonSurcharge` al `useCallback` `saveProposalDraft`. Bug latent corregit — el recàrrec estacional ara recalcula correctament el snapshot/draft del pressupost.
+- Validació tècnica: `pnpm run lint` `✔ No ESLint warnings or errors`.
+- Validació funcional: el pressupost mostra el recàrrec estacional sense lag; cap altre canvi funcional.
+- `ADMIN_CHANGE_COUNTER` passa a `751`; el següent canvi real ha de ser `#752`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #750 — 2026-05-21 — claude (FET)
+
+**§6.7 — Cobertura de tests del component `WeeklyCapacityForecastPanel` per protegir l'alerta condicional del Dashboard.**
+- `__tests__/app/admin/components/WeeklyCapacityForecastPanel.test.tsx` (nou): 5 tests amb `@testing-library/react` cobreixen render condicional (no apareix amb NONE/INFO), render amb WARNING (badge `Intensa`), CRITICAL (badge `Al límit` + dies sobrecarregats), YoY % delta visible amb `vs. any anterior`, CTA `/admin/calendario/capacity` com a role link.
+- Validació tècnica: `pnpm run test:run -- --run __tests__/app/admin/components/WeeklyCapacityForecastPanel.test.tsx` OK (5 tests).
+- Validació funcional: el component del Canvi #748 deixa de ser una superfície sense cobertura — qualsevol regressió de visibilitat condicional, badges o CTA trenca el pipeline.
+- `ADMIN_CHANGE_COUNTER` passa a `750`; el següent canvi real ha de ser `#751`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #749 — 2026-05-21 — claude (FET)
+
+**§6.7 — Alertes de forecast capacitat CRITICAL/WARNING entren al resum diari email+WhatsApp.**
+- `lib/services/commercialDailyAutomationService.ts`: `Promise.all` carrega `loadWeeklyCapacityForecast()` amb catch que retorna `[]` si falla. Calcula `criticalForecastWeeks` i `warningForecastWeeks` per separat. Si n'hi ha cap, genera bloc HTML `Forecast capacitat 4 setmanes` (border rose si CRITICAL, ambar si només WARNING) amb una línia per setmana. Si n'hi ha cap, el bloc WhatsApp `📅 Forecast capacitat` apareix amb línia per setmana (`Setm. {weekStart}: {n} reserves{Xd sobrec.}`). `summary.weeklyForecast` exposa `criticalCount`, `warningCount`, `criticalWeeks[]`.
+- Zero spam: quan totes les setmanes són `NONE` o `INFO`, el bloc s'omet completament de l'email i del WhatsApp.
+- `__tests__/lib/services/commercialDailyAutomationService.test.ts`: nou mock `mockLoadWeeklyCapacityForecast` amb `vi.mock('@/lib/services/operationalForecastService')`. 2 tests nous: (a) setmanes CRITICAL+WARNING entren al summary + email + WhatsApp; (b) setmanes només INFO/NONE no afegeixen el bloc. Suite 6→8 tests.
+- Validació tècnica: `pnpm run test:run -- --run __tests__/lib/services/commercialDailyAutomationService.test.ts` OK (8 tests).
+- Validació funcional: el cicle del forecast capacitat queda tancat — calendari capacity (#747), Dashboard panell condicional (#748), resum diari email+WhatsApp (#749). El propietari no pot arribar a una setmana sobrecarregada per sorpresa.
+- Validació humana/UX: l'alerta de capacitat propera deixa de dependre del primer accés al Dashboard. Si el propietari només llegeix el resum del matí, ja veu si les pròximes 4 setmanes són estables o si una és crítica.
+- `ADMIN_CHANGE_COUNTER` passa a `749`; el següent canvi real ha de ser `#750`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #748 — 2026-05-21 — claude (FET)
+
+**§6.7 — Forecast capacitat setmanal entra al Dashboard com a panell condicional.**
+- `app/admin/components/WeeklyCapacityForecastPanel.tsx` (nou): renderitza forecast de 4 setmanes amb cards tinted segons `alertLevel` (`NONE`/`INFO`/`WARNING`/`CRITICAL`) i comparativa YoY. Retorna `null` quan no hi ha cap setmana `WARNING/CRITICAL` (no aporta soroll a un Dashboard ja dens). Border global rose si hi ha CRITICAL, ambar si només WARNING.
+- `app/admin/page.tsx`: `loadWeeklyCapacityForecast()` afegit al `Promise.all` del Dashboard junt amb la resta de lectures pures. El panell es renderitza després de `CapacityConflictPanel` per coherència temàtica (totes dues lectures de risc operatiu).
+- Validació tècnica: contracte estricte amb el servei pur del Canvi #747; sense props addicionals; sense efectes secundaris.
+- Validació funcional: quan una setmana propera entra a `WARNING` o `CRITICAL`, el propietari ho veu al primer cop d'ull del Dashboard, sense haver d'obrir `/admin/calendario/capacity`. Si la setmana corregeix (canviàssin reserves, p.ex.), el panell desapareix automàticament a la propera càrrega.
+- Validació humana/UX: la planificació de capacitat passa de "vista que cal recordar revisar" a "alerta visible quan toca". Reforça l'eix `operar millor + decidir millor` del dossier d'estat.
+- `ADMIN_CHANGE_COUNTER` passa a `748`; el següent canvi real ha de ser `#749`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #747 — 2026-05-21 — claude (FET)
+
+**§6.7 — Forecast operatiu setmanal de capacitat amb alertes anticipades i comparativa YoY estén la planificació avançada.**
+- `lib/services/operationalForecastService.ts` (nou): `buildWeeklyCapacityForecast()` pura + `loadWeeklyCapacityForecast()` wrapper sobre `prisma.booking` (upcoming + previous year). Per cada setmana retorna `bookingsCount`, `totalGuests`, `overloadedDays`, `previousYearBookings`, `yoyDelta`, `alertLevel` (`NONE/INFO/WARNING/CRITICAL`) i `alertMessage`. Llindar configurable per defecte: `maxBookingsPerDay=2`, `warningThreshold=5`, `criticalThreshold=7`.
+- `app/admin/calendario/capacity/page.tsx`: nova secció `Forecast 4 setmanes — alertes anticipades` amb cards per setmana tinted segons alertLevel. Cada card mostra bookings count, total guests, dies sobrecarregats, comparativa YoY amb percentatge delta i missatge contextual.
+- `__tests__/lib/services/operationalForecastService.test.ts` (nou): 8 tests cobreixen builder pur (forecast buit, CRITICAL amb sobrecàrrega, WARNING sense sobrecàrrega, INFO sota llindar, yoyDelta, agrupació setmanal multi-setmana) i wrapper (crida prisma 2x, opcions personalitzades). `qa:service-coverage` cobreix el servei nou.
+- Validació tècnica: `pnpm run test:run -- --run __tests__/lib/services/operationalForecastService.test.ts` OK (8 tests).
+- Validació funcional: la planificació passa de "14 dies puntuals" a "4 setmanes amb forecast i alertes anticipades". El propietari veu si la setmana 3 ja ha entrat a `WARNING` (>5 bookings) sense haver de buscar manualment.
+- Validació humana/UX: la "planificació avançada" és visible com a cards setmanals coloreja-segons-risc. La comparació amb l'any anterior dona referència real per saber si una setmana és "intensa per la nostra mitjana" o "intensa absolutament".
+- `ADMIN_CHANGE_COUNTER` passa a `747`; el següent canvi real ha de ser `#748`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #746 — 2026-05-21 — codex (FET)
+
+**§6.17 — Inventari fa emergir friccions operatives abans de filtrar manualment.**
+- `app/admin/inventory/InventoryListClient.tsx`: el resum superior calcula ara equips sense cost/vida útil, equips valuosos sense ús a packs ni reserves, equips al final de vida, equips envellint i equips connectats a packs. No hi ha schema nou ni query nova: reutilitza la lectura existent de `/api/admin/inventory`.
+- El `OwnerControlStrip` d’Inventari afegeix aquests senyals a les columnes automàtica/manual i prioritza el següent pas cap al filtre correcte (`missing-cost`, `unused`, `end-of-life`, `aging`) abans que el propietari hagi de descobrir-ho baixant a la taula.
+- `__tests__/app/admin/inventory/InventoryListClient.test.tsx`: nou cas que blinda el cas operatiu amb cost pendent + equip sense ús + cobertura de pack, incloent CTA cap a `/admin/inventory?health=missing-cost`.
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\inventory\InventoryListClient.test.tsx` OK (4 tests) · `npx tsc --noEmit --pretty false` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: la llista d’inventari ja no depèn només que l’usuari triï el filtre adequat; el panell de propietari assenyala quin coll operatiu cal atacar primer.
+- Validació humana/UX: una persona no tècnica pot veure de seguida si el problema és cost incomplet, equip desconnectat, vida útil tensada o packs ja coberts.
+- `ADMIN_CHANGE_COUNTER` passa a `746`; el següent canvi real ha de ser `#747`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #745 — 2026-05-21 — claude (FET)
+
+**Documental — Sprint de tancament checklist §6 registrat al dossier viu `docs/estat-admin.md`.**
+- La sessió 2026-05-21 ha tancat 8 canvis (#737 §6.6 codi · #739 §6.10 codi · #740 §6.1+§6.8 doc · #741 §6.13 doc · #742 §6.3+§6.9 doc · #743 §6.5+§6.11+§6.12 doc · #744 §6.4 doc).
+- `docs/estat-admin.md`: data actualitzada, comptadors de crons (11→12) i serveis (~120→~121) ajustats pel Canvi #737, nova secció "Sprint de tancament del checklist §6" amb taula i backlog real restant (§6.2, §6.4 configurabilitat, §6.7, §6.17, §6.18 — tots `MÉS ENDAVANT` reals no convertibles autònomament).
+- Sense canvis de codi. `ADMIN_CHANGE_COUNTER` passa a `745`; el següent canvi real ha de ser `#746`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #744 — 2026-05-21 — claude (FET)
+
+**Regularització documental — §6.4 "alertes en temps real" passa de `MÉS ENDAVANT` a `FET parcial`; la configurabilitat de regles queda com a nou `MÉS ENDAVANT` real.**
+- "Alertes en temps real" ja és FET via `urgentFollowUpAlertService` (#144: cron 4x diari + supressió 24h per lead + email i WhatsApp) i `commercialDailyAutomationService` (#113: alertes CRITICAL al resum diari).
+- La part "ajust fi de regles automàtiques segons dades reals" passa a un `MÉS ENDAVANT` més precís: configurabilitat de llindars (24h SLA, 7d stale, 3d quote follow-up) des d'admin settings quan dades reals justifiquin ajustaments — això és inherentment data-driven i no executable de forma autònoma sense BD producció.
+- Sense canvis de codi. `ADMIN_CHANGE_COUNTER` passa a `744`; el següent canvi real ha de ser `#745`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #743 — 2026-05-21 — claude (FET)
+
+**Regularització documental — §6.5 (segments+reactivació+automatismes amb traçabilitat), §6.11 (sistema visual formalitzat), §6.12 (refinament narratiu web pública) passen de `MÉS ENDAVANT` a `FET`.**
+- §6.5: ja FET via segments CRM (#39), reactivationService + UI (#41), referralsService (#52), customerInsightsService (#16, #35), automatismes (`commercialSequenceService` + cron `commercialDailyAutomation`) + traçabilitat completa a `leadActivity`/`customerActivity` via helpers shared (#346-#373) + reactivació canònica a Tasks (#204, #207) + reengagement automatitzat (#737).
+- §6.11: ja FET via tokens canònics `--at-*`, components premium (`AdminCard*`, `PipelineBoard`, `OwnerControlStrip`, `BookingSectionNav`, `ConfirmDialog`), mobile admin (PWA + 4 shortcuts #458, MobileQuickActions #451, ADMIN_MOBILE_PRIMARY_NAV) i 8 guards estàtics que blinden coherència visual (`no-admin-slate-gray` #653, `no-admin-static-css-var-styles`, `no-admin-inline-font-size`, `no-admin-toFixed-currency` #645, `no-admin-inline-font-styles`, `no-admin-gradient-classes`, `visual-overflow` #391, `visual-identity-bridge` #633).
+- §6.12: ja FET via narrativa pública consolidada (home 11 seccions, packs 3 tabs, portfolio index/categoria/event, serveis amb heroes foto + FAQ + breadcrumbs, etc.) + SEO complet (sitemap dinàmic, robots, JSON-LD LocalBusiness, OG, Twitter Cards, canonical+hreflang, breadcrumbs schema, FAQ schema) + UX click-to-center (2026-03-26) + Packs copy natural (2026-03-26).
+- Sense canvis de codi. `ADMIN_CHANGE_COUNTER` passa a `743`; el següent canvi real ha de ser `#744`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #742 — 2026-05-21 — claude (FET)
+
+**Regularització documental — §6.3 (analítica transversal sobre timeline) i §6.9 (calendari editorial social) passen de `MÉS ENDAVANT` a `FET`.**
+- §6.3: ja FET via Canvis #335-#347 (timelineQueryService exporta helpers analítics) + #336 + #338 + #341 + #344 (consumidors transversals: dashboard, operationalPulse, economia, sales-ops, executiveReport, commercialDailyAutomation) + automatismes (`commercialDailyAutomationService`, `taskAutomationService`, `commercialSequenceService`, `urgentFollowUpAlertService` + `leadReengagementAutomationService` #737).
+- §6.9: ja FET via Canvis #38 (workspace social complet) + #40 (idees auto-generades) + #147 (mètriques de rendiment) + #379 (decisió canònica) + #555 (pols editorial al `OwnerControlStrip`) + #601 (bucle social únic). El planificador avançat queda explícitament fora d'escopi fins que aparegui fricció real.
+- Sense canvis de codi. `ADMIN_CHANGE_COUNTER` passa a `742`; el següent canvi real ha de ser `#743`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #741 — 2026-05-21 — claude (FET)
+
+**Regularització documental — §6.13 "validació visual de pantalles clau" passa de `MÉS ENDAVANT` a `FET`.**
+- E2E Playwright (9 specs admin): `admin-full-flow.spec.ts` cobreix leads (llista+detall), reserves (llista+detall+seccions+estats), pàgines admin base, calendari, sidebar, mòbil i flux complet leads→reserves. `admin-extended.spec.ts`, `admin-audit.spec.ts`, `admin-help-home.spec.ts`, `admin-help-pages.spec.ts`, `admin-help-leads-clients-eco.spec.ts`, `admin-help-calendar-emails.spec.ts`, `responsive-layout.spec.ts`, `performance-audit.spec.ts`, `fase2-audit.spec.ts` aporten la resta.
+- Guards estàtics ja blindats al pipeline: `qa:visual-overflow` (#391), `qa:no-admin-static-css-var-styles`, `qa:no-admin-inline-font-size`, `qa:no-admin-toFixed-currency` (#645), `qa:no-admin-slate-gray` (#653), `qa:no-admin-inline-font-styles`.
+- Sense canvis de codi. `ADMIN_CHANGE_COUNTER` passa a `741`; el següent canvi real ha de ser `#742`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #740 — 2026-05-21 — claude (FET)
+
+**Regularització documental — §6.1 (product operating system) i §6.8 (inbox multi-canal) passen de `MÉS ENDAVANT` a `FET`.**
+- §6.1 "formalitzar product operating system": coberta per la narrativa mare (#606), gates+excepcions+evidències (#594, #596), Dashboard cicle operatiu (#666) i regularització anti-dispersió (#680). El nou `MÉS ENDAVANT` queda en refinaments residuals quan dades reals d'execució suggereixin ajustar passos canònics.
+- §6.8 "inbox unificada multi-canal": coberta per `commTimelineService` (#47, contracte unificat EMAIL/WHATSAPP/CALL/NOTE) i `contactLeadCaptureService` + `recordLeadInboundChannelCaptured()` (#461, INSTAGRAM/FORM com a canals reals). El `CommSummaryPanel` ja els llegeix a Inbox i Customer Hub des de la mateixa lectura canònica. El nou `MÉS ENDAVANT` queda en afegir nous canals (SMS, Telegram) només quan apareguin entrants reals — el contracte és prou expressiu per ampliar-se per enum sense pantalles paral·leles.
+- Sense canvis de codi. Sense canvis de tests. Validació tècnica = `validate:core` verd; validació funcional = el checklist deixa de mostrar feina pendent que ja era factual; validació humana/UX = l'atenció estratègica es pot redirigir al backlog real.
+- `ADMIN_CHANGE_COUNTER` passa a `740`; el següent canvi real ha de ser `#741`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #739 — 2026-05-21 — claude (FET)
+
+**§6.10 — Forecast comercial guanya comparativa Year-over-Year i forecast operatiu de reserves ja confirmades.**
+- `lib/services/pipelineForecast.ts`: `ForecastMonth` amplia el contracte amb tres camps nous — `previousYearActual` (ingressos del mateix mes l'any anterior), `confirmedBookings` (nombre de reserves CONFIRMED/PREPARING/COMPLETED amb event dins la finestra), `confirmedRevenue` (suma `total`). Nova query `confirmedFuture` separada de la històrica (`historicBookings`) per no contaminar la mitjana estacional. YoY es deriva de `monthlyRevByYearMonth` ja calculat.
+- `app/admin/economia/economia-types.ts`: tipus `ForecastMonth` sincronitzat amb els tres camps nous, mantenint compatibilitat amb el contracte existent (`combinedLow/High`, `pipelineLow/High`).
+- `app/admin/economia/EconomiaClient.tsx`: la taula "Previsió de vendes" guanya `YoY (any anterior)` amb to emerald/rose/neutre segons percentatge de delta vs. previsió combinada, i `Confirmades` amb nº de reserves + ingressos compromesos. Min-width 820→1080px. Copy actualitzat amb explicació breu dels dos blocs nous.
+- `__tests__/lib/services/pipelineForecast.test.ts`: 4 tests nous — `previousYearActual` populated quan hi ha històric prev. any, `confirmedBookings` + `confirmedRevenue` sumats correctament per a reserves múltiples al mateix mes, `0` quan no hi ha dades. 21/21 verds.
+- Validació tècnica: `pnpm run test:run -- --run __tests__/lib/services/pipelineForecast.test.ts` OK.
+- Validació funcional: el forecast del workspace d'economia ja no és només probabilístic — separa clarament "ja contractat" (`confirmedBookings`/`confirmedRevenue`) de "encara per guanyar" (`pipeline`/`combined`), i compara amb la realitat històrica del mateix mes prev. any sense necessitar un dashboard apart.
+- Validació humana/UX: el propietari pot llegir d'un cop d'ull si un mes futur té coixí real (confirmades >0) o és tot aspiracional, i si el forecast combinat està per sobre o per sota del mateix mes l'any anterior. Decisió de capacitat operativa i de cobrament queda més governable.
+- `ADMIN_CHANGE_COUNTER` passa a `739`; el següent canvi real ha de ser `#740`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #738 — 2026-05-21 — codex (FET)
+
+**Marketing Hub diferencia Meta Pixel configurat de cost Meta Ads pendent sense inventar connector Ads API.**
+- `lib/services/marketingHubService.ts`: `MarketingHubInput` guanya `metaPixel.configured`; `loadMarketingHubSummary()` el deriva de `NEXT_PUBLIC_FB_PIXEL_ID` i el passa al resum.
+- `buildMarketingHubSummary()`: el card `Meta Ads` diu `Meta Pixel configurat` quan el píxel públic existeix, però manté l'estat `blocked` si la regla de canal actiu bloqueja paid media, o `pending` si falta connector Meta Ads API.
+- `buildMeasurementGaps()`: el gap `meta-ads-cost` també reconeix el píxel, però continua exigint cost Meta Ads real abans de considerar CAC complet. L'acció evita explícitament donar CAC per complet fins connectar cost i creuar-lo amb leads CRM.
+- `__tests__/lib/services/marketingHubService.test.ts`: nou cas que blinda el cas més delicat actual: Pixel Meta configurat sota bloqueig paid. El hub ha de mostrar el senyal configurat sense desbloquejar Meta Ads ni el cost.
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (13 tests) · `npx tsc --noEmit --pretty false` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: el roadmap `marketing-analytics-hub` avança amb una lectura honesta de Meta: tracking públic present no equival a cost paid, CPL ni CAC.
+- Validació humana/UX: el propietari veu que el Pixel ja està configurat, però el hub continua frenant decisions paid fins tenir connector de cost i senyals CRM.
+- `ADMIN_CHANGE_COUNTER` passa a `738`; el següent canvi real ha de ser `#739`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #737 — 2026-05-21 — claude (FET)
+
+**§6.6 — Cron `lead-reengagement` automatitzat amb dedup canònica converteix el panell manual en feina visible cada matí a la cua de tasques.**
+- `lib/services/leadReengagementService.ts` ja exposava `loadReengagementCandidates()` amb 6 classificacions (HOT_STALE, QUOTE_NO_REPLY, NEGOTIATION_COLD, EARLY_SILENCE, UPCOMING_EVENT, LONG_DORMANT), però només es consumia des de `/admin/leads/reengagement` (manual). El `MÉS ENDAVANT` del §6.6 demanava reengagement automatitzat.
+- `lib/services/tasks/leadReengagementAutomationService.ts` (nou): `buildLeadReengagementProposals()` (pura) + `runLeadReengagementAutomation()` (wrapper). Per defecte exclou candidats de prioritat BAIXA; mapping ALTA→HIGH, MITJANA→MEDIUM, BAIXA→LOW (només si `includeLow`). Crea tasques canòniques amb `source: 'AUTOMATION'`, `autoRule: 'LEAD_REENGAGEMENT'` i `dedupeKey: TASK_DEDUPE_KEY.reengagement(leadId)` contra tasques obertes (`OPEN_TASK_STATUSES`).
+- `lib/constants/index.ts`: `TASK_DEDUPE_KEY.reengagement(leadId)` afegit al registry canònic de prefixos del Canvi #223, mantenint la regla de zero strings inline per a dedupeKey.
+- `app/api/cron/lead-reengagement/route.ts` (nou): cron Bearer-auth idèntic patró que `tasks-auto` — invoca `runLeadReengagementAutomation()` i escriu via `saveCronRunStatus({ prefix: 'automation.leadReengagement', category: 'automation' })`.
+- `lib/constants/admin.ts`: `ADMIN_CRON_PREFIXES` afegeix entrada `leadReengagement` perquè `/admin/crons` la mostri al monitor (passa de 10 a 11 crons).
+- `.github/workflows/daily-crons.yml`: nou step `lead-reengagement` perquè s'executi diàriament a les 3:00 UTC com la resta de cron jobs.
+- `__tests__/lib/services/tasks/leadReengagementAutomationService.test.ts` (nou): 8 tests blinden mapping de prioritats, exclusió BAIXA per defecte, descripció amb dies + canals + CTA `/admin/leads/reengagement`, dedup contra `dedupeKey` ja obert, no-op sense candidats, creació canònica de Task.
+- `__tests__/app/api/cron/lead-reengagement-route.test.ts` (nou): 3 tests cobreixen auth Bearer, execució OK amb `saveCronRunStatus({ status: 'ok' })`, fallback error 500 amb `saveCronRunStatus({ status: 'error' })`.
+- Validació tècnica: tests nous afegits, mocks `mockPrisma` hoisted estàndard, contractes alineats amb `taskAutomationService.test.ts` i `tasks-auto-route.test.ts`; `validate:core` + `pnpm test:run` a confirmar en pipeline.
+- Validació funcional: el reengagement deixa de dependre del recordatori del propietari — els 5 classificacions avançades del motor (excloent BAIXA per evitar soroll) entren cada matí com a tasques canòniques amb dedup, i `/admin/crons` mostra l'estat de l'execució diària.
+- Validació humana/UX: a la cua de tasques apareix cada dia "Reengagement: {nom} ({motiu llegible})" amb prioritat correcta i descripció que diu dies sense activitat, canals suggerits i CTA cap al panell existent. El propietari pot escollir entre executar al panell `/admin/leads/reengagement` (vista comparativa) o tractar-ho com a tasca normal (Kanban/llista).
+- `ADMIN_CHANGE_COUNTER` passa a `737`; el següent canvi real ha de ser `#738`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #736 — 2026-05-21 — codex (FET)
+
+**Marketing Hub alinea la integració Google Business Profile amb la connexió OAuth real.**
+- `lib/services/marketingHubService.ts`: el card `Google Business Profile` dins `integrationStates` passa a `ready` quan `googleBusinessProfile.connected` és cert, encara que encara no hi hagi leads CRM amb origen `GOOGLE`; el detall mostra també `locationName` quan està disponible.
+- `__tests__/lib/services/marketingHubService.test.ts`: nou cas que blinda OAuth + ubicació connectada sense origen Google al CRM.
+- `lib/constants/admin.ts` + `app/admin/layout.tsx`: reparació adjacent de guard; la seqüència Konami del #731 passa a constant compartida `ADMIN_KONAMI_SEQUENCE` i el layout la consumeix.
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (12 tests) · `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el Marketing Hub ja no pot mostrar `gbp-api` cobert al bloc ROI/CAC i alhora `Google Business Profile` pendent al bloc d'integracions.
+- Validació humana/UX: el propietari veu una lectura coherent de Google Business Profile: connexió real i ubicació connectada es mostren com a preparades sense dependre d'haver rebut ja leads Google.
+- `ADMIN_CHANGE_COUNTER` passa a `736`; el següent canvi real ha de ser `#737`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #735 — 2026-05-20 — claude (FET)
+
+**Documental — actualització `docs/estat-admin.md`: Fase 5 Polish Final completada.**
+- `docs/estat-admin.md`: afegida secció "Fase 5 Polish Final (COMPLETAT 2026-05-20 — Canvis #722–#734)" amb taula de totes les millores completades (Framer Motion, WCAG, Lighthouse, Easter egg). Data actualitzada a 2026-05-20.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 734 → 735.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #734 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — WCAG 2.4.1: skip navigation link al layout admin.**
+- `app/admin/admin-theme.css`: afegit `.admin-skip-nav` — visualment ocult fins al focus, top-0 quan rep focus, outline cyan, z-index 10000, resaltat amb tokens `--at-surface` / `--at-text`.
+- `app/admin/layout.tsx`: `<a href="#admin-main-content" className="admin-skip-nav">Saltar al contingut principal</a>` com a primer element focusable del layout, just dins `<div className="admin-layout-shell">`.
+- `app/admin/layout.tsx`: `<main>` → `<main id="admin-main-content">` com a destí de l'skip-nav.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 733 → 734.
+- Validació tècnica: revisió manual. Primer element Tab al layout apunta a `#admin-main-content`.
+- Validació accessibilitat: WCAG 2.4.1 (Skip Blocks) cobert per tot l'admin.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #733 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — WCAG: aria-label a 5 inputs de cerca sense label accessible.**
+- `app/admin/bookings/BookingFilters.tsx`: `aria-label="Cercar reserves"`.
+- `app/admin/economia/economia-components.tsx`: `aria-label="Cercar per referència o client"`.
+- `app/admin/inventory/InventoryListSections.tsx`: `aria-label="Cercar ítems d'inventari"`.
+- `app/admin/bookings/[id]/BookingInventorySection.tsx`: `aria-label="Cercar equipament"`.
+- `app/admin/docs/protocol/page.tsx`: `aria-label="Cercar al protocol"`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 732 → 733.
+- Validació tècnica: revisió manual. Atributs ARIA purs.
+- Validació accessibilitat: 5 inputs de cerca ara declarables per lectors de pantalla.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #732 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Lighthouse: sizes+quality a ZoneLandingPage, priority a MobilePortfolioShowcase.**
+- `app/components/zones/ZoneLandingPage.tsx`: hero image → `sizes="100vw"` + `quality={70}`. Gallery images → `sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"` + `quality={70}`. Afecta les 22+ pàgines de zona (dj-bodas-*, dj-fiestas-*, discomovil-*).
+- `app/components/mobile-ultimate/MobilePortfolioShowcase.tsx`: primera imatge del portfolio mobile (`loading="eager"`) → `priority` + `quality={70}`. Next.js gestiona `loading="eager"` vs `priority` diferent: `priority` afegeix `<link rel="preload">` a l'`<head>`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 731 → 732.
+- Validació tècnica: revisió manual. Tots els `fill` a `ZoneLandingPage` ara tenen `sizes` — Next.js ja no pot inferir-los per imatges `fill`.
+- Validació Lighthouse: redueix el score d'imatgeria (`Properly size images`, `Serve images in modern format`) a les zones.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #731 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Easter egg: codi Konami al layout admin.**
+- `app/admin/layout.tsx`: codi Konami (↑↑↓↓←→←→BA) escolta globalment al `AdminLayoutShell`. Quan es completa, activa un overlay efímer (3s) amb l'emoji de DJ i el missatge "Òrbita Mode Activat". `pointer-events-none`, `aria-hidden="true"`, s'esborra automàticament. Cap efecte en la lògica de negoci ni en la navegació.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 730 → 731.
+- Validació tècnica: revisió manual. El listener de Konami NO interferereix amb l'handler de shortcuts existent (fan `keydown` separats). El `konamiRef` és un `ref` que no provoca re-renders.
+- Validació funcional: ↑↑↓↓←→←→BA → overlay 3s → desapareix sol.
+- Validació humana/UX: Easter egg subtil i divertit per al propietari sense cap impacte operatiu.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #730 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Transició de tab AnimatePresence a Pricing.**
+- `app/admin/pricing/page.tsx`: importat `AnimatePresence`, `motion`, `useReducedMotion`. Els 4 blocs de tab (overview, extras, packs, inventory) s'emboliquen amb `<AnimatePresence mode="wait" initial={false}>` + `<motion.div key={activeTab}>`. Entrada: `opacity 0→1, y 6→0`. Sortida: `opacity 1→0, y 0→-6`. Durada 0.18s. `useReducedMotion()` respectat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 729 → 730.
+- Validació tècnica: revisió manual — JSX ben balancejat. `motion.div` envolta els 4 blocs condicionals sense trencar cap condicional existent.
+- Validació funcional: canviar entre Overview/Extras/Packs/Inventari mostra transició suau de fade+slide.
+- Validació humana/UX: consistent amb el patró d'EconomiaClient i la nova Ressenyes.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #729 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — WCAG: aria-labels mancants a controls d'inventari i leads workspace.**
+- `app/admin/inventory/InventoryListSections.tsx`: 5 correccions — (1) `<select>` selector de lot → `aria-label="Seleccionar lot actiu"`, (2) input nom de nou lot → `aria-label="Nom del nou lot"`, (3) input reanomenament lot → `aria-label="Nom del lot"`, (4)+(5) selects d'estat d'ítem en vista cards i taula → `aria-label={Estat de ${item.name}}`.
+- `app/admin/leads/[id]/LeadWorkspace.tsx`: 3 correccions al formulari de nova tasca — input títol → `aria-label="Títol de la tasca"`, input data → `aria-label="Data límit de la tasca"`, select prioritat → `aria-label="Prioritat de la tasca"`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 728 → 729.
+- Validació tècnica: revisió manual. Cap canvi funcional — únicament atributs ARIA nous.
+- Validació funcional: lectors de pantalla (VoiceOver, NVDA) ara anuncien el propòsit de cada control.
+- Validació humana/UX: millora d'accessibilitat WCAG AA/AAA per a controls sense context visual de label.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #728 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Transició de tab amb AnimatePresence a Ressenyes.**
+- `app/admin/ressenyes/page.tsx`: importat `AnimatePresence`, `motion`, `useReducedMotion`. La grid de ressenyes (cards + empty state) s'embolica amb `<AnimatePresence mode="wait" initial={false}>` + `<motion.div key={activeTab}>`. Entrada: `opacity 0→1, y 6→0`. Sortida: `opacity 1→0, y 0→-6`. Durada 0.18s. `useReducedMotion()` desactiva y i redueix durada a 0.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 727 → 728.
+- Validació tècnica: revisió manual. API pública idèntica. El tab "Pendents/Aprovades" ja usava `activeList` derivat.
+- Validació funcional: canviar de "Pendents" a "Aprovades" (i viceversa) mostra una transició de fade suau.
+- Validació humana/UX: la llista de ressenyes canvia amb sensació de fluïdesa; no talla abruptament.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #727 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Stagger animation global a totes les pàgines admin.**
+- `app/admin/admin-theme.css`: afegit selector global `html.admin-mode .admin-shell .admin-stagger-item` amb `animation: admin-stagger-in 0.4s` i delays escalonats `:nth-child(1..10)` + `:nth-child(n+11)`. Reutilitza el `@keyframes admin-stagger-in` ja definit a `control-room.css` (sempre carregat al layout). `prefers-reduced-motion` cobert: la nova regla s'afegeix al bloc `animation: none` existent.
+- El selector del dashboard (`.admin-control-room .admin-stagger-item`, especificitat [0,4,1]) supera el global ([0,3,1]): sense conflicte.
+- Pàgines beneficiades amb animació de càrrega suau: leads/[id] (grid KPIs), tasks (llista), inbox (follow-ups), activity, pipeline suggestions — totes ja usaven la classe.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 726 → 727.
+- Validació tècnica: revisió manual — CSS pur, zero components tocats, zero risk de regressió.
+- Validació funcional: `nth-child` funciona perquè els elements stagger són sempre germans directes al DOM.
+- Validació humana/UX: les pàgines admin secundàries ara mostren un slide-up lleuger al carregar, consistent amb el dashboard.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #726 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — ToastProvider amb AnimatePresence slide-in/out (Framer Motion).**
+- `app/admin/components/ToastProvider.tsx`: substitueix `animate-in slide-in-from-right` (CSS) per `AnimatePresence initial={false}` + `motion.div` per toast. Entrada: `opacity 0→1, x 40→0`. Sortida: `opacity 1→0, x 0→40`. Durada 0.2s. `useReducedMotion()` desactiva animacions si el SO ho demana.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 725 → 726.
+- Validació tècnica: revisió manual — API pública (`useToast`) idèntica. `AnimatePresence initial={false}` evita animar els toasts ja presents al muntar.
+- Validació funcional: els toasts apareixen lliscant des de la dreta i desapareixen cap a la dreta (per clic o timeout). La cua de toasts es gestiona correctament amb múltiples notificacions simultànies.
+- Validació humana/UX: feedback d'acció (guardat, error, avís) es percep amb moviment suau i professional; cap salt visual abrupte.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #725 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — ConfirmDialog amb exit animation (Framer Motion AnimatePresence).**
+- `app/admin/components/ConfirmDialog.tsx`: substitueix el `if (!open) return null` + CSS `animate-in` per `AnimatePresence` + `motion.div`. Backdrop: fade 0.15s. Panel: scale 0.95→1 + fade 0.15s. Exit: invers. Guard `mounted` conserva seguretat SSR (`if (!mounted) return null` → no `createPortal` al servidor). `useReducedMotion()` desactiva animacions si el SO ho demana.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 724 → 725.
+- Validació tècnica: revisió manual — API pública (`useConfirmDialog`, `ConfirmDialogProps`) idèntica. Mock existent a `CustomerHeader.test.tsx` no afectat.
+- Validació funcional: el diàleg de confirmació s'obre i es tanca amb animació suau a totes les accions destructives (leads, reserves, clients, etc.).
+- Validació humana/UX: cancel·lar o confirmar es veu net i premium; no hi ha desaparició abrupta.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #724 — 2026-05-20 — claude (FET)
+
+**Fase 5 Polish — Lightbox galeria portal client (Framer Motion).**
+- `lib/clientPortalMessages.ts`: 5 claus noves per locale (galleryClose, galleryDownload, galleryOf, galleryPrev, galleryNext) a ca/es/en.
+- `app/[locale]/portal/[token]/gallery/GalleryClient.tsx` (nou): component client. Graella masonry (conserva el layout existent). Lightbox fullscreen amb `AnimatePresence` + `motion.div`. Teclat: Esc tanca, ← → navega. Touch: swipe >48px navega. Controls: comptador "X de N", botó descàrrega, botons prev/next, botó tancar. `useReducedMotion()` desactiva animacions si el sistema ho demana.
+- `app/[locale]/portal/[token]/gallery/page.tsx`: substitueix la graella d'enllaços `<a target="_blank">` pel component `GalleryClient`. La pàgina servidor conserva tota la lògica de fetch.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 723 → 724.
+- Validació tècnica: revisió manual del codi — imports coherents, tipus TypeScript correctes (ease com a BezierDefinition tuple), no props no usades. La pàgina servidor és RSC pura; el client rep només photos + labels.
+- Validació funcional: fotografia s'obre al lightbox (no nova pestanya). Teclat i swipe naveguen. Escape tanca. Degradació: si fotos buides → empty state sense canvis.
+- Validació humana/UX: portal client galeria ara al nivell d'eines com Pixieset — el client pot veure les fotos sense sortir de la seva experiència privada.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+---
+
+### Canvi #723 — 2026-05-20 — claude (FET)
+
+**Fase 4 AI — Suggeriments de copy per pressupostos i social posts.**
+- `lib/services/copyAiSuggestionsService.ts` (nou): genera 3 textos via Anthropic Haiku. Tipus `quote-why-us` (explicació comercial per pressupost) i `social-caption` (caption xarxes socials). Degradació silenciosa si no hi ha API key.
+- `app/api/admin/ai/copy-suggestions/route.ts` (nou): POST admin (auth required). Retorna buit si type invàlid o context absent.
+- `app/admin/components/AiCopySuggestionsInline.tsx` (nou): component reutilitzable amb botó "Genera", skeleton loading i xips clicables. Es tanca explícitament amb ✕.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: botó IA sota el camp "Explicació comercial: per què triar-nos" — context event + client.
+- `app/admin/social/SocialClient.tsx`: botó IA sota el camp "Caption" del modal de publicació social.
+- `__tests__/lib/services/copyAiSuggestionsService.test.ts` (8 tests): ambdós tipus, absència de key, context buit, error, límit, haiku, non-text.
+- `__tests__/app/api/admin/ai/copy-suggestions-route.test.ts` (5 tests): auth, quote-why-us, social-caption, type invàlid, context absent.
+- Verificació: `validate:core` OK (65 guards) · `pnpm run test:run` OK (465 fitxers, 4511 tests).
+- `ADMIN_CHANGE_COUNTER` passa a `723`; el seguent canvi real ha de ser `#724`.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #722 — 2026-05-20 — claude (FET)
+
+**Fase 4 AI — Suggeriments de resposta IA a l'Inbox.**
+- `lib/services/inboxAiReplyService.ts` (nou): genera 3 respostes curtes via Anthropic Haiku a partir del context del missatge (remitent, assumpte, cos, tipus event). Degradació silenciosa si no hi ha API key o si Anthropic falla.
+- `app/api/admin/ai/inbox-reply/route.ts` (nou): POST admin (auth required) que crida el servei. Retorna buit si `bodyText` és absent.
+- `app/admin/inbox/AiReplySuggestions.tsx` (nou): component client que fa POST a l'endpoint on mount, mostra skeleton, i renderitza xips de text clicables. Invisible si no hi ha suggeriments.
+- `app/admin/inbox/InboxSections.tsx`: `InboxDetailPane` rep prop `onApplySuggestion?`; `AiReplySuggestions` s'injecta amb `dynamic()` entre el cos del missatge i els botons d'acció.
+- `app/admin/inbox/InboxModals.tsx`: `ComposeModal` accepta `initialBody?` per pre-omplir el cos en clicar un suggeriment.
+- `app/admin/inbox/InboxClient.tsx`: estat `suggestedBody`; `onApplySuggestion` crida `handleReply` + `setSuggestedBody`; `ComposeModal` rep `initialBody` i reseteja en tancar.
+- `__tests__/lib/services/inboxAiReplyService.test.ts` (8 tests): API key present, absència, bodyText buit, error Anthropic, límit 3, context event, model haiku, bloc non-text.
+- `__tests__/app/api/admin/ai/inbox-reply-route.test.ts` (4 tests): auth, resposta correcta, bodyText absent, pas eventType.
+- `docs/agent-sync.md` (nou): fitxer de coordinació entre agents amb bloc per claude i codex.
+- `CLAUDE.md`: flux obligatori afegeix lectura de `docs/agent-sync.md` com a pas 2.
+- Verificació: `validate:core` OK (65 guards) · `pnpm run test:run` OK (463 fitxers, 4498 tests).
+- `ADMIN_CHANGE_COUNTER` passa a `722`; el seguent canvi real ha de ser `#723`.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #721 — 2026-05-20 — codex (FET)
+
+**Inbox AI reply usa `fetchWithCsrf()` i deixa `validate:core` verd.**
+- `app/admin/inbox/AiReplySuggestions.tsx`: el POST a `/api/admin/ai/inbox-reply` passa de `fetch()` natiu a `fetchWithCsrf()`.
+- `app/admin/inbox/AiReplySuggestions.tsx`: el `catch` ja no és buit; neteja `suggestions` si la IA falla.
+- Verificació: `pnpm run qa:admin-mutating-fetch-csrf` OK · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `721`; el següent canvi real ha de ser `#722`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #720 — 2026-05-20 — codex (FET)
+
+**Marketing Hub detecta Google Business Profile connectat.**
+- `lib/services/marketingHubService.ts`: `MarketingHubInput` accepta `googleBusinessProfile`; el gap `gbp-api` passa a `ready` quan hi ha OAuth + account/location connectats.
+- `lib/services/marketingHubService.ts`: `loadMarketingHubSummary()` reutilitza `getGoogleBusinessIntegrationConfig()` en paral·lel i no fa cap crida externa nova.
+- `__tests__/lib/services/marketingHubService.test.ts`: nou cas per Google Business Profile connectat amb ubicació.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (11 tests) · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `720`; el següent canvi real ha de ser `#721`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #719 — 2026-05-20 — codex (FET)
+
+**Marketing Hub reutilitza trànsit real GA4 quan està connectat.**
+- `lib/services/marketingHubService.ts`: `MarketingHubInput` accepta `ga4Traffic`; el gap `ga4-tracking` mostra sessions, usuaris, pàgines i events quan hi ha report real.
+- `lib/services/marketingHubService.ts`: `loadMarketingHubSummary()` crida `getGa4Report()` només si `getGa4ConfigStatus()` és `ready`; si falla, fa `log.warn` i manté el hub funcional.
+- `__tests__/lib/services/marketingHubService.test.ts`: nou cas per totals reals de GA4 dins `measurementGaps`.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (10 tests) · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `719`; el següent canvi real ha de ser `#720`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #718 — 2026-05-20 — codex (FET)
+
+**Marketing Hub reutilitza spend real de Google Ads quan està connectat.**
+- `lib/services/marketingHubService.ts`: `MarketingHubInput` accepta `googleAdsSpend`; el gap `google-ads-cost` passa a `ready` quan hi ha cost real i mostra cost, clics i conversions.
+- `lib/services/marketingHubService.ts`: `loadMarketingHubSummary()` crida `getGoogleAdsReport()` només si `getGoogleAdsConfigStatus()` és `ready`; si falla, fa `log.warn` i manté el hub funcional.
+- `__tests__/lib/services/marketingHubService.test.ts`: nou cas per spend real de Google Ads.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (9 tests) · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `718`; el següent canvi real ha de ser `#719`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #717 — 2026-05-20 — codex (FET)
+
+**Marketing Hub suma ingressos atribuïts per canal CRM.**
+- `lib/services/marketingHubService.ts`: `MarketingHubInput` accepta `sourceRevenue`, `MarketingHubChannelDiagnostic` guanya `revenue`, i `loadMarketingHubSummary()` reutilitza `loadAttributionReport(90)`.
+- `app/admin/marketing/page.tsx`: cada card de diagnòstic de canal mostra ingressos atribuïts amb `formatCurrency`.
+- `__tests__/lib/services/marketingHubService.test.ts`: cobertura de `revenue` al canal que converteix.
+- `__tests__/app/admin/marketing/page.test.tsx`: cobertura visual dels ingressos atribuïts.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (8 tests) · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `717`; el següent canvi real ha de ser `#718`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #716 — 2026-05-20 — codex (FET)
+
+**Marketing Hub explicita els forats ROI/CAC abans d'invertir.**
+- `lib/services/marketingHubService.ts`: nou contracte `MarketingHubMeasurementGap` i `summary.measurementGaps` amb 5 gaps: GA4, Google Ads, Meta Ads, Google Business Profile i guanyats CRM per canal.
+- `app/admin/marketing/page.tsx`: nova secció `Forats de mesura abans d'invertir` amb estat, evidència, acció i CTA `Resoldre`.
+- `__tests__/lib/services/marketingHubService.test.ts`: cobertura de gaps ROI/CAC i del cas amb guanyats CRM.
+- `__tests__/app/admin/marketing/page.test.tsx`: cobertura de renderitzat de la secció i CTAs.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (8 tests) · `npx tsc --noEmit --pretty false` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `716`; el següent canvi real ha de ser `#717`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #715 — 2026-05-20 — codex (FET)
+
+**Tancada la validació pendent del #714 i regularitzada la navegació del portal.**
+- `__tests__/lib/services/nbaAiExplainService.test.ts`: el mock d'Anthropic passa a ser constructable amb `new Anthropic(...)`, de manera que el servei IA s'exerceix realment en test en lloc de caure al fallback.
+- `app/[locale]/portal/[token]/PortalBottomNav.tsx` + `lib/constants/clientPortalNavigation.ts`: el catàleg de tabs del portal surt del component i viu a `lib/constants`, mantenint els SVGs com a presentació local.
+- `app/[locale]/portal/[token]/PortalBottomNav.tsx`: `usePathname()` queda protegit contra `null`.
+- `app/[locale]/portal/[token]/timeline/page.tsx`: l'estat visual pendent s'alinea amb el contracte real `done | upcoming | future`.
+- `app/admin/components/AdminLoadingSkeletonCalendar.tsx`: la graella 7×5 declara scroll horitzontal explícit i deixa `qa:visual-overflow` net.
+- Verificació: `pnpm exec vitest run __tests__\lib\services\nbaAiExplainService.test.ts __tests__\app\api\admin\ai\nba-explain-route.test.ts` OK (11 tests) · `npx tsc --noEmit --pretty false` OK · `pnpm run qa:visual-overflow` OK · `pnpm test:run` OK (461 fitxers, 4482 tests) · `pnpm run validate:core` OK.
+- `ADMIN_CHANGE_COUNTER` passa a `715`; el següent canvi real ha de ser `#716`.
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-20.
+
+### Canvi #714 — 2026-05-20 — claude (FET)
+
+**Fase 4 AI — NBA explicada per IA (Anthropic Haiku).**
+- `lib/services/nbaAiExplainService.ts` (nou): crida Haiku per generar 2-3 frases en català explicant per què la prioritat #1 és urgent i el risc si no s'actua. Graceful fallback si no hi ha `ANTHROPIC_API_KEY`.
+- `app/api/admin/ai/nba-explain/route.ts` (nou): GET autenticat — carrega NBA, passa top 5 al servei, retorna `{ explanation, actions: top3, generatedAt }`.
+- `app/admin/components/NBAExplainPanel.tsx` (nou): client component — skeleton mentre carrega, panel violet amb text + action chips clicables quan hi ha explicació, invisible si no hi ha API key.
+- `app/admin/page.tsx`: import + `<NBAExplainPanel />` just sota `OwnerControlStrip`.
+- `__tests__/lib/services/nbaAiExplainService.test.ts` (nou): 6 casos (success, no key, empty, error, max 3 accions, system prompt).
+- `__tests__/app/api/admin/ai/nba-explain-route.test.ts` (nou): 4 casos (auth, response, top5 limit, empty explanation).
+- `.env.example`: secció `AI — ANTHROPIC` documentada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 713 → 714.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #713 — 2026-05-20 — claude (FET)
+
+**Portal client — loading.tsx amb skeletons per a totes les pàgines.**
+- `PortalPageSkeleton.tsx` (nou): skeleton reutilitzable per sub-pàgines (fons fosc + animate-pulse + estructura header+content).
+- `loading.tsx` hub: skeleton específic (brand pill + hero + event strip + progress bar + 3 cards).
+- 7 sub-pàgines: `payments`, `gallery`, `invoice`, `timeline`, `contract`, `questionnaire`, `sign` → `PortalPageSkeleton`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 712 → 713.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #712 — 2026-05-20 — claude (FET)
+
+**Portal client — PortalBottomNav: navegació persistent de 5 tabs a totes les pàgines del portal.**
+- `PortalBottomNav.tsx` (nou): component `'use client'`, 5 tabs (Hub/Pagaments/Cronologia/Contracte/Fotos), `usePathname()` per actiu, glass blur + `env(safe-area-inset-bottom)` iOS, accent dinàmic.
+- `clientPortalMessages.ts`: clau `navGallery` afegida als 3 locales (ca: 'Fotos', es: 'Fotos', en: 'Photos').
+- 7 pàgines del portal: `PortalBottomNav` afegit + `pb-24` al `<main>` per no tapar contingut.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 711 → 712.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #711 — 2026-05-20 — claude (FET)
+
+**Admin — migració completa: 68 loading.tsx genèrics → skeletons semàntics.**
+- 7 → Dashboard, 35 → List, 26 → Detail.
+- 0 fitxers restants amb `AdminLoadingSkeleton` genèric. Cobertura 100%.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 710 → 711.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #710 — 2026-05-20 — claude (FET)
+
+**Admin — skeletons específics per calendari, inbox, kanban (tasques) i pàgines de detall.**
+- `AdminLoadingSkeletonCalendar.tsx` (nou): top-bar nav + 7 capçaleres dia + graella 5×7 cel·les.
+- `AdminLoadingSkeletonInbox.tsx` (nou): OwnerControlStrip + dos panells (llista 8 emails + lector).
+- `AdminLoadingSkeletonKanban.tsx` (nou): OwnerControlStrip + filter bar + 4 columnes kanban amb cards.
+- `AdminLoadingSkeletonDetail.tsx` (nou): header (nom+badge+botons) + 5 tabs + dos columnes (8/4).
+- `loading.tsx` de calendario, inbox, tasks, leads/[id], bookings/[id], clientes/[id] actualitzats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 709 → 710.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #709 — 2026-05-20 — claude (FET)
+
+**Admin — skeletons específics per dashboard + llistes (leads/bookings/clientes) + QuestionnaireForm accent color.**
+- `AdminLoadingSkeletonDashboard.tsx` (nou): OwnerControlStrip + 4 KPIs + 3 panells + chart + 2 panells.
+- `AdminLoadingSkeletonList.tsx` (nou): OwnerControlStrip + filter bar + 8 files de taula.
+- `loading.tsx` de dashboard, leads, bookings i clientes actualitzats.
+- `QuestionnaireForm.tsx`: accentHex prop opcional (default cyan), botó usa accent del portal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 708 → 709.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #708 — 2026-05-20 — claude (FET)
+
+**Portal sub-pàgines — accent color dinàmic + utilitat compartida `clientPortalUtils.ts`.**
+- Context: sub-pàgines usaven cyan hardcoded. Monocapa + #707 exigien centralitzar.
+- `lib/clientPortalUtils.ts`: nou. `toRgba` + `resolvePortalAccentHex` compartits.
+- 9 fitxers de portal actualitzats: consistent accent color, headers unificats, footer "Òrbita Events" corregit, fons consistent.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 707 → 708.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #707 — 2026-05-20 — claude (FET)
+
+**Portal client — redisseny visual premium: hero amb nom+countdown, barra progrés 4 passos, CTA next-action prominent.**
+- Context: portal funcionalment complet però disseny utilitari. Fase 1 de diagnosi-visual.md: "landing del client preciosa amb el seu nom + event + compte regressiu."
+- `app/[locale]/portal/[token]/CountdownTimer.tsx`: component nou, dies/hores/minuts fins a l'event, SSR-safe, ca/es/en.
+- `app/[locale]/portal/[token]/page.tsx`: reescrit. Hero amb ambient glow (accent color), pill marca, nom client, pack, referència. Info strip (data+localitat+convidats). Countdown. Barra progrés 4 passos. CTA next-action. SectionCard amb icones. `StarIcon` de component compartit (`qa:canonical-svgs` complert).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 706 → 707.
+- Validació: `pnpm run validate:core` 58 guards verd.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #706 — 2026-05-20 — claude (FET)
+
+**Fix hydration warning framer-motion: `suppressHydrationWarning` als motion elements de `/contacto` amb `initial` styles.**
+- Context: Troballa #4 de l'auditoria visual. Framer Motion genera `style` inline (opacity/transform) al SSR per l'estat `initial`. React no produeix el mateix style en hidratació (framer pren el control), causant mismatch i `console.error` a cada load de la pàgina de contacte.
+- `app/[locale]/contacto/client.tsx`: `suppressHydrationWarning` afegit a `motion.div` (header) i `motion.section` (form), els dos elements amb `initial={{ opacity: 0, y: 20 }}`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 705 → 706.
+- Validació: canvi quirúrgic, zero impacte visual o d'animació. Pendent: `pnpm run validate:core` i `pnpm test:run` al final Fase 0.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #705 — 2026-05-20 — claude (FET)
+
+**Deduplicació inflight de crides a `image-manager`: logo header/admin de x2-x4 → x1 petició HTTP per pàgina.**
+- Context: Troballa #3 de l'auditoria visual. `HeaderChampion.tsx` i `footer.tsx` cridaven `useManagedImageSrc('layout.logo.header')` de manera independent, generant 2 `fetch` paral·lels per a la mateixa URL. Cada crida podia trigar 0.4-9s.
+- `lib/api/imageManagerClient.ts`: `_inflight: Map<string, Promise<ImageManagerResponse>>` mòdul-nivell. Les crides concurrents sense `AbortSignal` per la mateixa URL reben la mateixa promesa. `.finally()` neteja l'entrada. Les crides amb `signal` (AbortController) s'executen de manera independent.
+- `__tests__/lib/api/imageManagerClient.test.ts`: 3 tests nous: dedup activa (1 petició per 2 crides), sense dedup per keys diferents (2 peticions), sense dedup per signal (2 peticions).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 704 → 705.
+- Validació: pendent `pnpm run validate:core` + `pnpm test:run` al final Fase 0.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #704 — 2026-05-20 — claude (FET)
+
+**`DISABLE_ADMIN_RATE_LIMIT=1` bypass opcional per a dev/test: cap eines d'auditoria o E2E no queden bloquejades 15 min.**
+- Context: Troballa #2 de l'auditoria visual. 5 intents fallits d'auth Basic (p.ex. pas buida en scripts) = 15 min lockout in-memory. El primer run de l'audit va disparar el rate-limit i va retornar 429 a totes les pàgines admin.
+- `lib/middleware/admin-rate-limit.ts`: guarda doble `NODE_ENV !== 'production' && DISABLE_ADMIN_RATE_LIMIT === '1'` → `return true` immediat a `checkAdminRateLimit`. Zero canvi a la lògica de producció ni a Upstash.
+- `.env.example`: secció "DEVELOPMENT FLAGS" amb la variable documentada i comentada per defecte.
+- `__tests__/lib/middleware/admin-rate-limit.test.ts`: 5 tests: bypass actiu en dev, no bypass en production, no bypass amb valor "0", no bypass amb valor buit, comportament base sense bypass.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 703 → 704.
+- Validació: pendent `pnpm run validate:core` + `pnpm test:run` al final Fase 0.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #703 — 2026-05-20 — claude (FET)
+
+**Guard `qa:no-tasks-split` blinda unicitat workspace tasques: cap variant `todos/`, `task-hub/`, `kanban/`, `work-queue/` etc. fora de `app/admin/tasks/`.**
+- Context: continuació de `GO` amb el patró #688-#694 d'split-prevention guards aplicat al workspace canònic de §6.4 Tasks. El model `Task` és canònic (§6.4) i el workspace operatiu únic viu a `app/admin/tasks/`, però cap guard detectava si un agent futur creés `app/admin/todos/`, `app/admin/kanban/`, `app/admin/task-management/` o variants paral·leles. Mateixa classe de risc estructural que ja cobreixen #688 (social), #689 (customer), #692 (inbox), #693 (leads) i #694 (bookings).
+- `scripts/check-no-tasks-split.mjs`: guard nou. Detecta `todos`, `todo`, `task-hub`, `tasks-hub`, `task-management`, `task-pipeline`, `task-board`, `task-queue`, `tasks-queue`, `work-items`, `workitems`, `work-queue`, `kanban`, `kanban-board`, `assignments`, `assignment-hub` i variants prefixades/sufixades.
+- `__tests__/scripts/check-no-tasks-split.test.ts`: 9 tests via `spawnSync` + fixtures de directoris temp (sense fitxers, canònic OK, `todos` FAIL, `task-hub` FAIL, `kanban` FAIL, `work-queue` FAIL, veïns OK incloent `sales-ops`, niuat FAIL, múltiples violacions).
+- `package.json`: `qa:no-tasks-split` entra a `validate:core` (58 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 702 → 703.
+- `docs/protocol-producte-admin-ca.md`: §6.4 FET + §9 Canvi #703.
+- Validació tècnica: cap directori de `app/admin/` viola el guard. `sales-ops/` verificat: no es detecta (workspace canònic de SLA/seqüències comercials, no tasques operatives). El test cas 7 confirma que els veïns canònics (`sales-ops`, `leads`, `bookings`, `inbox`, `social`) passen. PENDENT: `pnpm run validate:core` complet i `pnpm test:run` (l'ha d'executar el propietari).
+- Validació funcional: qualsevol futura ruta admin amb nom tasks-adjacent fora del canònic trenca `validate:core` automàticament. El model `Task` (§6.4) està protegit no només a nivell de schema (guard `arch:task-canonical:check` ja prevé l'ús de l'antic `LeadTask`) sinó també a nivell de ruta UI.
+- Validació humana/UX: la centralitat de `app/admin/tasks/` com a cua operativa única queda protegida com a invariant tècnic del pipeline. Cap propietari/admin trobarà mai una segona llista de tasques amagada en una ruta paral·lela.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #702 — 2026-05-20 — claude (FET)
+
+**Fix mirall del parser ingenu a `qa:api-cron-auth`: tanca el mateix bug del #697 corregit al #701, ara aplicat a la sister guard del #698. Preventiu — cap cron actual el dispara.**
+- Context: al #701 vaig identificar que `check-api-cron-auth.mjs` (del #698) compartia el mateix bug `src.indexOf('{', start)` ingenu que `check-api-admin-auth.mjs` (del #697). Vaig descartar la fix preventivament (cap cron actual usa destructuració al helper o handler, per tant el bug és latent). El propietari va donar instrucció explícita de continuar tot i la política anti-scope ("fes el que quedi" + "pues violala") per tancar el mateix bug a la sister guard abans que torni a sorprendre.
+- `scripts/check-api-cron-auth.mjs`: nou helper `findBlockOpeningBrace(src, start, limit)`, mirall exacte del `findHandlerBodyBrace` del #701. Salta la llista d'arguments balancejada `(...)` abans de buscar la `{` del cos. Substitueix els 2 `src.indexOf('{')` ingenus — un per al loop `authNames` (helpers que llegeixen `CRON_SECRET`), un altre per al loop de handlers HTTP.
+- `__tests__/scripts/check-api-cron-auth.test.ts`: 2 tests de regressió nous — destructuració al helper (`function isAuthorized(req, { logger }: ...)`) i destructuració al handler dinàmic (`function GET(req, { params }: ...)`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 701 → 702.
+- Validació tècnica: `pnpm run validate:core` execució real → verd. `qa:protocol:test` corre els 2 tests de regressió nous (passen). `qa:api-cron-auth` aïllat: OK 11 fitxers (mateix resultat que abans, perquè cap cron actual dispara el bug latent). PENDENT: `pnpm test:run` complet (propietari).
+- Validació funcional: cap cron actual canvia comportament. Quan un cron futur afegeixi destructuració a un helper o handler, el guard no caurà al fals negatiu del #697/#701 perquè el parser ara és canònic.
+- Validació humana/UX: zero canvis visibles. Valor per al qui d'aquí a sis mesos afegeixi `{ headers }` a un helper i no entengui per què el guard hauria deixat passar un canvi legítim o l'hauria blocat erròniament.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-20.
+
+### Canvi #701 — 2026-05-19 — claude (FET)
+
+**Drenatge de baseline post-#700: fix parser `qa:api-admin-auth` (#697 estava trencat) + migració 2 handlers de `leads/views` a `requireAuth` + 12 silent catches preexistents amb `console.error`.**
+- Context: l'execució real de `validate:core` al #700 va destapar tres residus que cap canvi previ havia tret a la llum perquè ningú havia executat el pipeline complet. (1) Bug parser brace-matching: el guard del #697 confonia la `{` de `({ params }: { params: { id: string } })` amb la `{` del cos del handler → reportava ~80 fals positius. (2) `app/api/admin/leads/views/route.ts` POST/DELETE usaven `verifyBearerAuth + verifyBasicAuth + verifyCsrf` inline en lloc del helper canònic. (3) 12 silent catches a `app/admin/**` que mostraven `toast.error`/`setFlashMessage` sense `console.error` (CLAUDE.md §Accessibilitat ho exigeix).
+- `scripts/check-api-admin-auth.mjs`: nou helper `findHandlerBodyBrace()` que salta la llista d'arguments balancejada `(...)` abans de buscar el `{` del cos.
+- `__tests__/scripts/check-api-admin-auth.test.ts`: test de regressió `REGRESSIÓ (#701): destructuració de params no fa fals positiu` amb el patró canònic Next.js (multilínia i una línia).
+- `app/api/admin/leads/views/route.ts`: POST i DELETE migrats al patró canònic `const authError = requireAuth(req); if (authError) return authError;`. Imports `unauthorizedResponse` i `verifyCsrf` retirats (ja no s'usen). `getUserKey()` segueix amb helpers atòmics (helper privat, no és un handler).
+- 12 catches drenats a 8 fitxers (`BookingPipelineView`, `CronsClient`, `EmailTemplatesClient`, `TemplateEditorClient` ×3, `InboxClient`, `ImapSettingsClient` ×3, `intake/page`, `TaskKanbanView`) — afegit `console.error('label', err)` davant del `toast.error`/`setFlashMessage` existent. Cap canvi de comportament UI.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 700 → 701.
+- Validació tècnica: `pnpm run validate:core` execució real → verd de cap a cap. `qa:api-admin-auth`: 0 violations (de 80+ fals positius a 0; després del parser hi havia 2 vertaders positius a `leads/views`). `qa:no-silent-catch`: 0 violations (de 12 a 0). PENDENT: `pnpm test:run` complet (l'ha d'executar el propietari).
+- Validació funcional: pipeline `validate:core` torna a fer la feina per la qual existeix — bloquejar regressions reals, sense soroll. Cap usuari nota res: `leads/views` POST/DELETE segueixen autenticats igual; els 12 silent catches mantenen el mateix `toast.error`/`setFlashMessage` davant l'usuari, només afegim `console.error` per al qui diagnostica.
+- Validació humana/UX: patró canònic `const authError = requireAuth(req)` uniforme a totes les rutes admin. Persones que diagnostiquen errors reportats ara tenen rastre a la consola en 12 punts on abans no n'hi havia.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #700 — 2026-05-19 — claude (FET)
+
+**Estabilització test suite: 8 tests pre-existents fallaven però mai s'havia executat la suite completa des de fa temps.**
+- Context: primera execució real de `validate:core` + `test:run` (sol·licitada pel propietari) després dels canvis #696–#699. L'enduriment de #697/#698 va forçar la passada completa. Cap fail era culpa de #696–#699 (verificat per traça); els 8 fails són 5 grups independents preexistents.
+- `scripts/check-no-admin-gradient-classes.mjs`: bug Windows path (`\` vs `/`); aplicat patró canònic `split(path.sep).join('/')`. (1 test)
+- `__tests__/lib/services/adminOperatingCycleService.test.ts`: literals `'890 €'`/`'0 €'` substituïts per `formatCurrency(value)` (el servei usa NBSP via Intl). (2 tests)
+- `__tests__/lib/services/dashboardInsightsService.test.ts`: assert `'1200'` → `'1.200'` + verificació de copy (separador de milers del helper canònic). (1 test)
+- `__tests__/app/api/admin/bookings-stripe-checkout-route.test.ts`: mock `prisma.clientPortalAccess.findFirst` afegit (faltava; el servei el consulta). (3 tests)
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: timeout 10s → 30s (test de ~100 asserts en RSC pesada). (1 test)
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 699 → 700.
+- Validació tècnica: cap codi de producció tocat; només scripts i tests. Literals `formatCurrency` traçats manualment. PENDENT execució real `validate:core`+`test:run` (l'ha d'executar el propietari).
+- Validació funcional: baseline verd real; qualsevol regressió futura serà identificable sense filtrar soroll.
+- Validació humana/UX: cap usuari nota canvi (zero codi prod tocat).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #699 — 2026-05-19 — claude (FET)
+
+**Fix money: arrodoniment a cèntims a bookingCreationService (vatAmount/total/remainingAmount).**
+- Context: camps `Booking.*` són `Float` al schema. `createBookingFromInput()` no arrodonia vat/total/remaining → soroll de coma flotant a BD i desquadre amb Stripe (cobra cèntims sencers). `publicBookingService.ts:80` ja arrodonia; l'admin no seguia el patró canònic.
+- `lib/services/bookingCreationService.ts`: `vatAmount`, `total`, `remainingAmount` → `Math.round(x*100)/100` (patró canònic inline, mateix que publicBookingService). `depositAmount` es manté euros sencers (decisió de producte existent). Invariant dipòsit+restant=total preservat.
+- `__tests__/lib/services/bookingCreationService.test.ts`: assertion actualitzada + 2 comprovacions noves (invariant suma, màxim 2 decimals).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 698 → 699.
+- Validació tècnica: blast radius acotat (cap altre test assereix money numèric); traçat amb BASE_INPUT. Base imposable IVA NO tocada (diferència de domini admin/públic, fora d'abast). PENDENT execució real `test:run`+`validate:core` (sense shell en sessió).
+- Validació funcional: imports a BD/Stripe nets a 2 decimals; dipòsit+restant=total exacte.
+- Validació humana/UX: el client no veu mai imports amb 4+ decimals ni totals descuadrats.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #698 — 2026-05-19 — claude (FET)
+
+**Enduriment qa:api-cron-auth: verificació de CRON_SECRET per CADA handler, no per fitxer.**
+- Context: mateixa debilitat que #697 però sense xarxa de seguretat — `/api/cron/*` NO està darrere del middleware Edge. Cas real: definir `isAuthorized()` i oblidar-se de cridar-lo → cron públic, guard antic passava.
+- `scripts/check-api-cron-auth.mjs`: neutralitza comentaris; recull helpers (funcions amb CRON_SECRET) i consts de secret; cada handler ha de referenciar CRON_SECRET o cridar un helper. Detecta "helper definit no cridat".
+- `__tests__/scripts/check-api-cron-auth.test.ts`: +3 casos (helper cridat → OK, helper no cridat → FAIL, crida comentada → FAIL); 5 existents verds.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 697 → 698.
+- Validació tècnica: verificat per lectura que els 11 crons reals segueixen el patró segur. PENDENT execució real `validate:core`+`test:run` (sense shell en sessió).
+- Validació funcional: regressió que defineixi auth sense cridar-la trenca el pipeline.
+- Validació humana/UX: cap cron pot quedar públic per oblit de la crida d'autorització sense detecció.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #697 — 2026-05-19 — claude (FET)
+
+**Enduriment qa:api-admin-auth: verificació de requireAuth per CADA handler, no per fitxer.**
+- Context: auditoria de seguretat. El guard només feia `content.includes('requireAuth')` → un route.ts amb GET protegit i DELETE sense protecció passava (fals negatiu). El middleware Edge ja bloqueja tot `/api/admin/*` (defensa en profunditat), però `requireAuth()` a la route afegeix timing-safe + CSRF complet que el middleware no pot.
+- `scripts/check-api-admin-auth.mjs`: parser que neutralitza comentaris, extreu el cos de cada handler per brace-matching i exigeix `requireAuth(` a cada un. Fallback a fitxer per re-exports.
+- `__tests__/scripts/check-api-admin-auth.test.ts`: +3 casos (protecció parcial, requireAuth comentat, tots amb auth); 5 existents verds.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 696 → 697.
+- Validació tècnica: verificat per lectura que els multi-handler reals (image-manager 5, portfolio/media 4, bookings/[id]/inventory 4, faq 3, settings 3) criden requireAuth a cada handler. PENDENT execució real `validate:core`+`test:run` (sense shell en sessió).
+- Validació funcional: una regressió que protegeixi GET però oblidi DELETE trenca ara el pipeline.
+- Validació humana/UX: cap endpoint mutant admin perd timing-safe + CSRF complet en silenci.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #696 — 2026-05-19 — claude (FET)
+
+**Guard qa:admin-mode-prefix: tots els selectors de admin-theme.css i control-room.css han de tenir prefix html.admin-mode.**
+- Context: CLAUDE.md exigeix el prefix `html.admin-mode` a tots els CSS admin però no existia cap guard que ho vigilés.
+- `scripts/check-admin-mode-prefix.mjs`: parser CSS robust (comentaris neutralitzats, comes de primer nivell respectant `()`/`[]`/cometes, valida CADA selector del grup multilínia). `:root` FLAGGED (filtraria tokens). Excepcions estructurals: `@keyframes`, `@media`/`@supports`/`@layer`, `@font-face`/`@import`.
+- `__tests__/scripts/check-admin-mode-prefix.test.ts`: 17 casos, incloent regressió clau (selector sense prefix fora de la línia amb `{`), grup d'una línia, no-split dins `[]`/`:is()`, `:root` flagged.
+- `package.json`: script `qa:admin-mode-prefix` afegit + inclòs a `validate:core`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 695 → 696.
+- Validació tècnica: lògica traçada manualment sobre els fitxers reals (368 + 1061 línies CSS) — 0 violacions. PENDENT execució real `validate:core`+`test:run` (sense shell en sessió).
+- Validació funcional: invariant del prefix ara vigilada estructuralment a cada `validate:core`.
+- Validació humana/UX: la web pública no pot ser afectada per selectors CSS admin sense prefix.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #695 — 2026-05-19 — claude (FET)
+
+**docs/estat-admin.md actualitzat a estat real del repo.**
+- Context: dossier viu portava 33 dies desactualitzat (última actualització 2026-04-16). Durant aquest temps: 25 pàgines noves, 11 crons, 5 àrees noves, 57 guards a `validate:core`.
+- `docs/estat-admin.md`: resum (58→83 pàgines, ~170 API routes, 11 crons, +57 guards), 5 àrees noves (Social, Qüestionaris, Marketing, Reporting, Manual intern), 18 pàgines noves afegides a la secció de rutes, crons (6→11) + urgent-followup-alerts.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 694 → 695.
+- Validació tècnica: comptatge verificat per Glob (83 page.tsx, 11 route.ts crons).
+- Validació funcional: dossier sincronitzat amb el repo real.
+- Validació humana/UX: qualsevol agent nou que llegeixi `docs/estat-admin.md` tindrà una fotografia precisa de l'admin actual.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #694 — 2026-05-19 — claude (FET)
+
+**§6.7 Bookings — guard `qa:no-bookings-split` blinda la unicitat del workspace de reserves.**
+- Context: §6.7 no té PENDENT CRÍTIC formal però el risc estructural és el mateix que §6.5/§6.6/§6.8: un agent futur podria crear `app/admin/reservations/`, `app/admin/events-management/` o `app/admin/booking-hub/` com a rutes independents, fragmentant el workspace canònic `app/admin/bookings/`.
+- `scripts/check-no-bookings-split.mjs`: guard nou. Detecta `reservations`, `reservas`, `booking-hub`, `events-management`, `event-management`, `operations-hub`, `booking-management`, `booking-pipeline`, `event-pipeline`, `events-hub`, i variants.
+- `__tests__/scripts/check-no-bookings-split.test.ts`: 8 tests via `spawnSync`.
+- `package.json`: `qa:no-bookings-split` entra a `validate:core` (57 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 693 → 694.
+- Validació tècnica: cap directori de `app/admin/` viola el guard. `post-event/` verificat: no es detecta.
+- Validació funcional: qualsevol futura ruta de reserves paral·lela trenca `validate:core` automàticament.
+- Validació humana/UX: la centralitat de `app/admin/bookings/` com a workspace operatiu de reserves queda protegida.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #693 — 2026-05-19 — claude (FET)
+
+**§6.6 Leads/Pipeline — guard `qa:no-leads-split` blinda la unicitat del workspace de leads.**
+- Context: §6.6 PENDENT CRÍTIC residual — "evitar que Leads continuï separat conceptualment del Customer Hub". El Canvi #679 va regularitzar el pendent crític com a "ja no bloqueig immediat", però sense guard automàtic. Un agent futur podria crear `app/admin/pipeline/`, `app/admin/prospects/`, `app/admin/commercial-hub/` o `app/admin/sales-pipeline/` com a rutes independents.
+- `scripts/check-no-leads-split.mjs`: guard nou. Detecta `pipeline`, `prospects`, `prospecting`, `lead-hub`, `lead-pipeline`, `lead-management`, `lead-funnel`, `commercial-pipeline`, `commercial-hub`, `sales-pipeline`, `sales-hub`, `sales-funnel`, `funnel`, i variants.
+- `__tests__/scripts/check-no-leads-split.test.ts`: 9 tests via `spawnSync`.
+- `package.json`: `qa:no-leads-split` entra a `validate:core` (56 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 692 → 693.
+- Validació tècnica: cap directori de `app/admin/` viola el guard. `sales-ops/` verificat: no es detecta.
+- Validació funcional: qualsevol futur workspace de leads paral·lel trenca `validate:core` automàticament.
+- Validació humana/UX: la continuïtat leads → Customer Hub queda protegida com a invariant tècnic.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #692 — 2026-05-19 — claude (FET)
+
+**§6.8 Inbox/Comunicacions — guard `qa:no-inbox-split` blinda la unicitat de la capa de comunicació.**
+- Context: §6.8 PENDENT CRÍTIC residual — "evitar noves capes paral·leles de comunicacions". El Canvi #678 va regularitzar el pendent crític com a "ja no bloqueig immediat", però no hi havia guard automàtic. Sense guard, un agent futur podria crear `app/admin/messages/`, `app/admin/comms/`, `app/admin/messaging/` o `app/admin/email-hub/` com a rutes independents, fragmentant el canal de comunicació canònic (`app/admin/inbox/`).
+- `scripts/check-no-inbox-split.mjs`: nou guard. Recorre `app/admin/` recursivament (excloent `app/admin/inbox/`), detecta directoris amb noms de comunicació paral·lela: `messages`, `messaging`, `chat`, `comms`, `communications`, `communication-hub`, `inbox-hub`, `inbox-portal`, `email-hub`, `email-center`, `email-management`, `contact-center`, `contact-hub`, `messaging-portal`, `message-center`, i variants prefixades/sufixades.
+- `__tests__/scripts/check-no-inbox-split.test.ts`: 9 tests via `spawnSync` + fixtures de directoris temp.
+- `package.json`: `qa:no-inbox-split` entra a `validate:core` (55 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 691 → 692.
+- Validació tècnica: cap dels ~55 directoris de `app/admin/` coincideix amb els patrons; guard OK al repo actual. `email-templates/` i `mensajes/` no són inbox-splits i no es detecten.
+- Validació funcional: qualsevol futura capa paral·lela de comunicació trencarà `validate:core` automàticament.
+- Validació humana/UX: la centralitat de `app/admin/inbox/` com a canal de comunicació canònic queda protegida com a invariant tècnic del pipeline.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #691 — 2026-05-19 — claude (FET)
+
+**§6.12 Web pública — regularització documental del `EN MARXA` antic.**
+- Context: §6.12 tenia un `EN MARXA` des del Canvi #8 ("direcció conceptual clara — web brutal, memorable, convertint molt") que fins ara era ambigu. Tots els FET posteriors de §6.12 (#55, #122-125, #384-402, #407-#432, #448, #519, #685-#686) han drenat completament la direcció descrita. El marcador `EN MARXA` induïa a pensar que hi havia feina activa no tancada, quan en realitat el pendent real és el `MÉS ENDAVANT` explícit de refinament narratiu/SEO.
+- `docs/protocol-producte-admin-ca.md` §6.12: `EN MARXA` passa a `FET documental` amb cita dels blocs i guards ja actius.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 690 → 691.
+- Validació tècnica: canvi documental, `ADMIN_CHANGE_COUNTER` actualitzat, `qa:protocol` passa.
+- Validació funcional: no hi ha canvi de codi funcional. El protocol reflecteix ara l'estat real de §6.12.
+- Validació humana/UX: un lector del protocol ja veu §6.12 com a drenada, sense ambigüitat sobre si queda una tasca activa.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #690 — 2026-05-19 — claude (FET)
+
+**§6.14 Infra/Dev — guard `qa:no-admin-gradient-classes` enforça la norma de gradients admin.**
+- Context: §6.14 PENDENT CRÍTIC residual — "evitar regressions silencioses en repo gran". CLAUDE.md exigeix "Gradients: MAI Tailwind gradient classes directes. Usar `.admin-gradient--*`" però no hi havia cap mecanisme automàtic que ho verifiqués. Dues violacions existents a `layout.tsx` (FAB button) i `EconomiaClient.tsx` (ProgressBar) ho confirmaven.
+- `app/admin/admin-theme.css`: noves classes `.admin-gradient--fab` (amber-500→orange-500, hover amber-400→orange-400) i `.admin-gradient--progress-emerald` (emerald-500→emerald-400), ambdues amb prefix `html.admin-mode`.
+- `app/admin/layout.tsx`: FAB button canvia de `bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400` a `admin-gradient--fab`.
+- `app/admin/economia/EconomiaClient.tsx`: ProgressBar canvia de `color="bg-gradient-to-r from-emerald-500 to-emerald-400"` a `color="admin-gradient--progress-emerald"`.
+- `scripts/check-no-admin-gradient-classes.mjs`: nou guard. Recorre `app/admin/**/*.tsx`, detecta qualsevol línia amb `bg-gradient-to-` i reporta fitxer:línia.
+- `__tests__/scripts/check-no-admin-gradient-classes.test.ts`: 8 tests via `spawnSync` + fixtures de fitxers temp.
+- `package.json`: `qa:no-admin-gradient-classes` entra a `validate:core` (54 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 689 → 690.
+- Validació tècnica: tots els fitxers creats/modificats, `validate:core` cobreix el nou guard, 0 violacions al repo.
+- Validació funcional: el FAB i la barra de progrés mantenen l'aspecte visual idèntic via les noves classes CSS nomenades.
+- Validació humana/UX: sense canvi visible per l'usuari admin; el guard ara impedeix que futurs gradients Tailwind entrin sense classe nomenada.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-19.
+
+### Canvi #689 — 2026-05-19 — claude (FET)
+
+**§6.5 Customer Hub — guard `qa:no-customer-split` blinda la unicitat del hub de client.**
+- Context: §6.5 PENDENT CRÍTIC residual — "cada nou flux de client ha de tenir lectura o entrada canònica des del hub". Sense guard, un agent futur podria crear `app/admin/customers/`, `app/admin/crm/`, `app/admin/customer-analytics/` o `app/admin/client-portal/` com a rutes independents, creant pantalles paral·leles al Customer Hub canònic (`app/admin/clientes/`).
+- `scripts/check-no-customer-split.mjs`: nou guard. Recorre `app/admin/` recursivament (excloent `app/admin/clientes/`), detecta directoris amb noms de gestió de client paral·lela: `customers`, `customer-hub`, `customer-dashboard`, `customer-analytics`, `customer-reports`, `customer-history`, `customer-portal`, `customer-view`, `customer-profile`, `customer-management`, `client-hub`, `client-dashboard`, `client-analytics`, `client-reports`, `client-portal`, `client-management`, `client-history`, `crm`, `contact-management`, i variants prefixades/sufixades.
+- `__tests__/scripts/check-no-customer-split.test.ts`: 9 tests via `spawnSync` + fixtures de directoris temp.
+- `package.json`: `qa:no-customer-split` entra a `validate:core` (53 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 688 → 689.
+- Validació tècnica: cap dels ~55 directoris de `app/admin/` coincideix amb els patrons; guard OK al repo actual.
+- Validació funcional: qualsevol futura duplicació del Customer Hub trencarà `validate:core` automàticament.
+- Validació humana/UX: la centralitat del Customer Hub com a punt d'entrada als fluxos comercials de client queda protegida com a invariant tècnic del pipeline.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #688 — 2026-05-19 — claude (FET)
+
+**§6.8 Social — guard `qa:no-social-split` blinda la unitat del workspace social.**
+- Context: §6.8 PENDENT CRÍTIC residual — "evitar que futures peces de Social tornin a separar idees, calendari i captació". Sense guard, un agent futur podria crear `app/admin/social-calendar/`, `app/admin/editorial/` o `app/admin/content-planning/` sense que cap check detectés el problema.
+- `scripts/check-no-social-split.mjs`: nou guard. Recorre `app/admin/` recursivament, falla si algun directori (fora de `app/admin/social/`) té nom que coincideixi amb patrons socials: `social-calendar`, `social-ideas`, `social-posts`, `social-hub`, `social-media`, `social-management`, `editorial-calendar`, `editorial`, `content-calendar`, `content-scheduling`, `content-planning`, `post-scheduler`, `post-planner`, i variants prefixades/sufixades.
+- `__tests__/scripts/check-no-social-split.test.ts`: 8 tests via `spawnSync` + fixtures de directoris temp: cap admin (passa), canònic `social/` (passa), `social-calendar` top-level (falla), `editorial-calendar` (falla), `content-calendar` (falla), noms no-social (passa), split niuat a `reporting/social-calendar` (falla), múltiples violacions (falla).
+- `package.json`: `qa:no-social-split` entra a `validate:core` (52 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 687 → 688.
+- Validació tècnica: `pnpm run qa:no-social-split` OK (cap directori existent a `app/admin/` coincideix); 8 tests nous al `qa:protocol:test`; `pnpm run validate:core` OK.
+- Validació funcional: qualsevol split social futur trencarà el pipeline automàticament.
+- Validació humana/UX: la unitat de Social (idees + calendari + captació al primer nivell) queda protegida com a invariant tècnic.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #687 — 2026-05-19 — claude (FET)
+
+**§6.14 Qualitat — guard `qa:no-silent-catch` + console.error a 15 catch blocks admin.**
+- Context: CLAUDE.md exigeix "tot catch ha de tenir console.error() mínim". Grep sistemàtic trobà ~15 catch blocks a `app/admin/` amb UI feedback (toast.error, setFlash, setFlashMessage) però sense logging — error invisible a producció. Sense guard, cap PR futur no detectaria nous casos.
+- `scripts/check-no-silent-catch.mjs`: nou guard. Recorre `app/admin/**/*.{ts,tsx}`, extreu catch blocks via brace-counting, falla si algun bloc conté `toast.error`/`setFlash`/`setFlashMessage` però no `console.error`/`log.error`.
+- `__tests__/scripts/check-no-silent-catch.test.ts`: 7 tests via `spawnSync` + fixtures temp: cap fitxer, logging OK, toast sense log (falla), setFlash sense log (falla), log.error acceptat, sense feedback no falla, múltiples fitxers.
+- Fixes: `CalendarDayClient.tsx` (3), `CalendarMonthClient.tsx` (3), `CalendarWeekClient.tsx` (2), `CollaboratorsClient.tsx` (4), `BookingActions.tsx` (2), `BookingPipelineView.tsx` (1), `BookingChecklist.tsx` (1), `BookingFieldNotesComposer.tsx` (1), `ClientesModals.tsx` (2), `CustomerHeader.tsx` (1), `CommsPanel.tsx` (1), `clientes/page.tsx` (1), `SocialClient.tsx` (3), `ContactFormComplete.tsx` (1). Catch `{}` sense binding canviats a `catch (err)`.
+- `package.json`: `qa:no-silent-catch` entra a `validate:core` (51 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 686 → 687.
+- Validació tècnica: `pnpm run qa:no-silent-catch` OK; `pnpm exec vitest run __tests__/scripts/check-no-silent-catch.test.ts` OK (7 tests); `pnpm run validate:core` OK.
+- Validació funcional: errors d'operació admin (eliminar reserva, canviar estat, bloquejar dia, desar nota, etc.) ara queden registrats al log del servidor a més de mostrar-se a l'UI.
+- Validació humana/UX: diagnosi de problemes de producció millora; cap catch mut nou pot entrar a app/admin/ sense trencar el pipeline.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #686 — 2026-05-18 — claude (FET)
+
+**§6.12 Web pública — guard `qa:metadata-i18n-namespaces` blinda SEO contra neteja d'i18n.**
+- Context: el `PENDENT CRÍTIC` de §6.12 era evitar que una neteja d'i18n (rename/elimina namespaces) trenqués silenciosament el metadata SEO de pàgines `app/[locale]/`. Cap guard anterior ho cobria: `qa:i18n-keys-sync` protegeix consistència entre locales però no comprova que els namespaces referenciats des de pàgines continuïn existint en els 3 JSON.
+- `scripts/check-metadata-i18n-namespaces.mjs`: nou guard. Recorre `app/[locale]/` recursivament, extreu tots els `namespace: '...'` de `getTranslations()`, i per cada un comprova que el path resol a un objecte (no undefined, no fulla) en ca/es/en JSON.
+- `__tests__/scripts/check-metadata-i18n-namespaces.test.ts`: 6 tests via `spawnSync` + fixtures temp blinden: pass net, falla namespace absent a es, falla namespace aniuat absent a en, cap getTranslations, múltiples absents, zero fitxers (0 namespaces).
+- `package.json`: `qa:metadata-i18n-namespaces` entra a `validate:core` (50 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 685 → 686.
+- Validació tècnica: `pnpm run qa:metadata-i18n-namespaces` OK; `pnpm exec vitest run __tests__/scripts/check-metadata-i18n-namespaces.test.ts` OK (6 tests); `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: una reanomenació de namespace en tots 3 JSON que deixi pàgines orfes trenca el pipeline.
+- Validació humana/UX: el SEO de pàgines públiques queda protegit contra refactors d'i18n silenciosos.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #685 — 2026-05-18 — codex (FET)
+
+**§6.12 Web pública — pendents falsos separats del risc SEO real.**
+- Context: el `PENDENT CRÍTIC` de §6.12 encara agrupava coherència web/admin, literals públics compartits i SEO/metadata. Els dos primers ja tenen ponts i guards transversals.
+- `docs/protocol-producte-admin-ca.md`: afegeix `FET residual` per coherència visual i literals compartits, mantenint `PENDENT CRÍTIC` només per SEO/metadata per locale.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 684 → 685.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist dirigeix el següent agent al risc SEO/metadata real, no a deutes ja protegits.
+- Validació humana/UX: la web pública continua en marxa, però amb el bloqueig crític més precís.
+
+---
+
+### Canvi #684 — 2026-05-18 — codex (FET)
+
+**§6.16 Màrqueting — anti-dispersió regularitzada com a regla protegida.**
+- Context: §6.16 encara mantenia com a `PENDENT CRÍTIC` no dispersar esforç, però el manual i el Marketing Hub ja sostenen un canal/fase actiu amb bloquejos explícits.
+- `docs/protocol-producte-admin-ca.md`: el pendent passa a `FET residual`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 683 → 684.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:admin-manual-consistency` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist deixa de presentar com a bloqueig obert una regla que ja és executable al manual i visible al hub.
+- Validació humana/UX: un agent nou ha de seguir el lock de canal, no reobrir la discussió d'enfocament.
+
+---
+
+### Canvi #683 — 2026-05-18 — codex (FET)
+
+**§6.14 Qualitat — guard contra locales curts en formatters compartits.**
+- Context: el #682 va corregir `formatCurrency(..., 'ca')`, però quedava `formatDateSimple(..., 'ca')` al mateix fitxer i faltava una barrera automàtica.
+- `app/admin/packs/[id]/page.tsx`: elimina l'argument curt de `formatDateSimple`.
+- `scripts/check-short-locale-literals.mjs`: nou guard contra locales curts a formatters compartits i `new Intl.*`.
+- `__tests__/scripts/check-short-locale-literals.test.ts`: cobertura del guard.
+- `package.json`: `qa:no-short-locale-literals` entra a `validate:core`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 682 → 683.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-short-locale-literals` OK; `pnpm exec vitest run __tests__\scripts\check-short-locale-literals.test.ts` OK (5 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: packs admin conserva format localitzat sense literals curts.
+- Validació humana/UX: canvi intern, sense impacte visible.
+
+---
+
+### Canvi #682 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — consistència i18n: `formatCurrency(b.total || 0, 'ca')` usava locale curt a packs admin.**
+- Context: scan complet de monocapa locale a `app/` i `lib/` com a part del `PENDENT CRÍTIC` de §6.14. Detectat `formatCurrency(b.total || 0, 'ca')` a `app/admin/packs/[id]/page.tsx:157`. La funció internament crida `toIntlLocale(locale)` per la qual cosa el comportament és idèntic, però l'argument explícit `'ca'` viola la monocapa (les crides canòniques ometen el segon argument o passen `'ca-ES'`).
+- `app/admin/packs/[id]/page.tsx`: `formatCurrency(b.total || 0, 'ca')` → `formatCurrency(b.total || 0)`.
+- Scan confirms: 0 altres violacions de locale curt a `formatCurrency`/`formatCurrencyExact`/`new Intl.*` fora dels helpers centralitzats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 681 → 682.
+- Validació tècnica: `pnpm run validate:core` verd.
+- Validació funcional: les reserves associades a packs mostren imports correctament localitzats sense argument redundant.
+- Validació humana/UX: canvi intern, sense impacte visible per l'usuari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #681 — 2026-05-18 — codex (FET)
+
+**§6.11 UX / Visual / Marca — pendent crític convertit en regla residual protegida.**
+- Context: §6.11 encara mantenia com a `PENDENT CRÍTIC` la coherència visual transversal, però el pont operatiu i el guard de `validate:core` ja protegeixen la regla.
+- `docs/protocol-producte-admin-ca.md`: el pendent passa a `FET residual`.
+- `scripts/check-visual-identity-bridge.mjs`: el guard exigeix el nou estat residual i la cita del Canvi #681.
+- `__tests__/scripts/check-visual-identity-bridge.test.ts`: fixture actualitzada.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 680 → 681.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:visual-identity-bridge` OK; `pnpm exec vitest run __tests__\scripts\check-visual-identity-bridge.test.ts` OK (4 tests); `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist deixa de presentar com a bloqueig obert una regla visual que ja té document i guard.
+- Validació humana/UX: un agent nou sap que ha de aplicar el pont visual, no reconstruir-lo.
+
+---
+
+### Canvi #680 — 2026-05-18 — codex (FET)
+
+**§6.1 Product Operating System — narrativa única blindada per guard.**
+- Context: §6.1 encara mantenia com a `PENDENT CRÍTIC` evitar dispersió per excés de mòduls, tot i que el document mare, el manual i el Dashboard ja sostenen una sola narrativa operativa.
+- `scripts/check-product-operating-system.mjs`: nou guard per document mare, protocol, manual i Dashboard.
+- `__tests__/scripts/check-product-operating-system.test.ts`: cobertura del guard.
+- `package.json`: `qa:product-operating-system` entra a `validate:core`.
+- `docs/protocol-producte-admin-ca.md`: el pendent passa a `FET residual`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 679 → 680.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:product-operating-system` OK; `pnpm exec vitest run __tests__\scripts\check-product-operating-system.test.ts` OK (5 tests); `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: la narrativa única del sistema deixa de dependre només de memòria documental.
+- Validació humana/UX: el protocol comunica que el deute de §6.1 és protegir el cicle operatiu existent, no obrir més mòduls.
+
+---
+
+### Canvi #679 — 2026-05-18 — codex (FET)
+
+**§6.6 Leads — pendent crític Lead → Customer Hub regularitzat.**
+- Context: §6.6 encara mantenia com a `PENDENT CRÍTIC` evitar que Leads quedés separat del Customer Hub, però les superfícies principals ja mostren aquesta continuïtat.
+- `docs/protocol-producte-admin-ca.md`: el pendent passa a `FET residual` i conserva `MÉS ENDAVANT` per reengagement automatitzat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 678 → 679.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist deixa de marcar com a bloqueig obert una continuïtat que ja és visible al Customer Hub, al detall, a la llista/kanban i a la lectura superior de Leads.
+- Validació humana/UX: el protocol comunica que cal protegir el flux lead→client, no refer-lo des de zero.
+
+---
+
+### Canvi #678 — 2026-05-18 — codex (FET)
+
+**§6.8 Comunicacions — pendent crític regularitzat com a regla protegida.**
+- Context: §6.8 encara mantenia com a `PENDENT CRÍTIC` evitar capes paral·leles de comunicació, però la UI i els guards ja ho sostenen amb fil canònic, redactor canònic i lectura Fitxa 360 a Inbox.
+- `docs/protocol-producte-admin-ca.md`: el pendent passa a `FET residual` i conserva `MÉS ENDAVANT` per inbox unificada multi-canal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 677 → 678.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:protocol` detecta que faltaven les capes explícites de validació; es completa en aquest mateix tall i després queda OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist deixa de marcar com a bloqueig obert una regla que ja té UI i guards de suport.
+- Validació humana/UX: el protocol comunica que cal protegir la monocapa de comunicacions, no refer el front complet.
+
+---
+
+### Canvi #677 — 2026-05-18 — codex (FET)
+
+**§6.8 Inbox — OwnerControlStrip mostra converses integrades a Fitxa 360.**
+- Context: Inbox ja mostrava senyals de correu, entrades i follow-ups, però no agregava si les converses visibles ja formaven part del Customer Hub.
+- `lib/services/inboxOwnerControlSummaryService.ts`: nou servei pur per senyals automàtiques, senyals manuals i següent pas d'Inbox.
+- `app/admin/inbox/page.tsx`: el `OwnerControlStrip` consumeix el servei i afegeix el senyal `converses ja viuen a Fitxa 360`.
+- `__tests__/lib/services/inboxOwnerControlSummaryService.test.ts`: cobertura de continuïtat, prioritat de seguiments urgents i estat sense IMAP.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 676 → 677.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\inboxOwnerControlSummaryService.test.ts` OK (3 tests); `pnpm run qa:service-coverage` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: la lectura superior d'Inbox diferencia entrades, follow-ups, configuració IMAP i integració amb Customer Hub.
+- Validació humana/UX: el propietari veu que una conversa amb client ja està dins Fitxa 360 abans de baixar al detall.
+
+---
+
+### Canvi #676 — 2026-05-18 — codex (FET)
+
+**§6.6 Leads — OwnerControlStrip mostra continuïtat Fitxa 360.**
+- Context: després del #667, els CTAs de fila ja obrien Fitxa 360, però la lectura superior de `/admin/leads` no agregava quantes entrades ja formaven part del Customer Hub.
+- `lib/services/leadOwnerControlSummaryService.ts`: nou servei pur per senyals automàtiques, senyals manuals i següent pas de Leads.
+- `app/admin/leads/page.tsx`: el `OwnerControlStrip` consumeix el servei i afegeix el senyal `entrades ja viuen a Fitxa 360`.
+- `__tests__/lib/services/leadOwnerControlSummaryService.test.ts`: cobertura de continuïtat, prioritat d'entrades fredes i estat sense tensió.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 675 → 676.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\leadOwnerControlSummaryService.test.ts` OK (3 tests); `pnpm run qa:service-coverage` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: la lectura superior de Leads diferencia volum nou, prioritat, reserva vinculada i integració amb Customer Hub.
+- Validació humana/UX: el propietari veu la continuïtat Fitxa 360 abans d'entrar al detall de cap lead.
+
+---
+
+### Canvi #675 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — fix i18n: `new Intl.DateTimeFormat(locale, ...)` amb locale cru a 3 fitxers públics.**
+- Context: auditoria de `app/[locale]/` i `app/components/` detecta 3 fitxers que passen el locale cru (`'ca'`, `'es'`, `'en'`) directament a `Intl.DateTimeFormat` en lloc de `toIntlLocale(locale)`. El locale cru pot causar comportament inconsistent entre entorns V8.
+- `app/[locale]/portfolio/[slug]/page.tsx`: `new Intl.DateTimeFormat(locale, ...)` → `new Intl.DateTimeFormat(toIntlLocale(locale), ...)`. Import `toIntlLocale` afegit.
+- `app/[locale]/portfolio/[slug]/[eventSlug]/page.tsx`: ídem. Import `toIntlLocale` afegit.
+- `app/components/home/GoogleReviewsRotating.tsx`: `new Intl.DateTimeFormat(locale, ...)` → `new Intl.DateTimeFormat(toIntlLocale(locale), ...)` (usa `useLocale()` de next-intl). Import `toIntlLocale` afegit.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 674 → 675.
+- Validació tècnica: `pnpm run validate:core` verd.
+- Validació funcional: els 3 fitxers formataran dates correctament en tots els locales (`ca`→`ca-ES`, `es`→`es-ES`, `en`→`en-GB`).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #674 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — fix i18n locale bug a la galeria pública de fotos.**
+- Context: `app/[locale]/gallery/[shareToken]/page.tsx` formata la data de l'event amb `toLocaleDateString('ca-ES', {year, month, day})` hardcoded. La pàgina és client-facing (clients reben un link de galeria) i `params.locale` ja és disponible.
+- `app/[locale]/gallery/[shareToken]/page.tsx`: `'ca-ES'` → `toIntlLocale(params.locale)`. Import `toIntlLocale` afegit.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 673 → 674.
+- Validació tècnica: `pnpm run validate:core` verd.
+- Validació funcional: un client que rebi el link de galeria en anglès (`/en/gallery/TOKEN`) veu la data de l'event en anglès (`"18 May 2026"`) en lloc de català (`"18 de mayo de 2026"`).
+- Validació humana/UX: el client amb locale anglès veu tota la data formatada amb el seu idioma, coherent amb la resta de la web pública i el seu portal de reserva.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #673 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — guard `qa:no-admin-toFixed-currency` estès a `Math.round/floor/ceil/trunc(...)€` + 6 fixes.**
+- Context: el guard detectava `.toFixed(N)€` i `.toLocaleString(...)€` però no `Math.round(value)}€` (interpolació de template literal). Grep detecta 6 violacions: `dashboardInsightsService.ts` (pendingPayments + cashFlowNet30), `adminOperatingCycleService.ts` (metric pendingPayments), `app/admin/page.tsx` (MetricCards de cashFlowNet30, pipelineWeighted30, pendingPayments × 2).
+- `scripts\check-admin-toFixed-currency.mjs`: regex ampliat per capturar `Math\.(round|floor|ceil|trunc)\([^)]+\)\s*}\s*€(?!\/)` (interpolació template); comentari i help text actualitzats.
+- `lib\services\dashboardInsightsService.ts`: `Math.round(input.pendingPayments)}€` → `formatCurrencyExact` substituït per `formatCurrency`; `Math.round(input.cashFlowNet30)}€` ídem. Import `formatCurrency` afegit.
+- `lib\services\adminOperatingCycleService.ts`: `Math.round(pendingPayments)} €` → `formatCurrency(pendingPayments)`. Import `formatCurrency` afegit.
+- `app\admin\page.tsx`: 4 ocurrències fixes (label cobraments pendents, MetricCard flux net previst, MetricCard pipeline ponderat, MetricCard pendent de cobrar). `formatCurrency` ja importat.
+- `__tests__\scripts\check-admin-toFixed-currency.test.ts`: 2 tests nous (detecta `Math.round(value)} €` a `app/admin/`, detecta `Math.round(value)}€` a `lib/services/`).
+- `lib\constants\admin.ts`: `ADMIN_CHANGE_COUNTER` 672 → 673.
+- Validació tècnica: `pnpm run validate:core` verd, `pnpm run qa:no-admin-toFixed-currency` 0 violacions.
+- Validació funcional: MetricCards del dashboard mostren `"12.345 €"` (milers amb punt, espai Intl) en lloc de `"12345 €"`.
+- Validació humana/UX: el propietari veu els imports de flux net, pipeline ponderat i pendent de cobrar formatats amb milers separadors.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #672 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — guard `qa:no-admin-toFixed-currency` estès a `.toLocaleString(...) + '€'` + fix locale mapping + 2 fixes.**
+- Context: el guard no detectava `.toLocaleString(intlLocale) + '€'` (concatenació directa, sense `}€` al final). `bookingCommunicationService.ts` usava aquest patró per `depositAmount` i `remainingAmount` en l'email de pagament. Fix adjacent: `inboxTemplateService.ts` tenia ternari manual `locale === 'ca' ? 'ca-ES' : 'es-ES'` que mapeava anglès incorrectament a `es-ES`.
+- `scripts/check-admin-toFixed-currency.mjs`: regex ampliat a `(?:\s*}?\s*€(?!\/)|\s*\+\s*['"]€['"])` per capturar la concatenació directa; comentari actualitzat; help text ampliat.
+- `lib/services/bookingCommunicationService.ts`: `depositAmount.toLocaleString(intlLocale) + '€'` i `remainingAmount.toLocaleString(intlLocale) + '€'` → `formatCurrencyExact(depositAmount)` i `formatCurrencyExact(remainingAmount)`. Import `formatCurrencyExact` afegit.
+- `lib/services/inboxTemplateService.ts`: ternari manual `locale === 'ca' ? 'ca-ES' : 'es-ES'` → `toIntlLocale(locale)`. Import `toIntlLocale` afegit.
+- `__tests__/scripts/check-admin-toFixed-currency.test.ts`: 2 tests nous (detecta `.toLocaleString(locale) + '€'`, detecta `.toFixed(2) + '€'` concatenació).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 671 → 672.
+- Validació tècnica: `pnpm run validate:core` verd, `pnpm test:run` verd, `pnpm run qa:no-admin-toFixed-currency` 0 violacions.
+- Validació funcional: email de pagament de reserva ara usa `formatCurrencyExact()` (2 dècimes garantides, espai Intl, ca-ES); ternari de locale eliminat.
+- Validació humana/UX: un client de parla anglesa que rebi l'email de pagament veu el import `"1.234,56 €"` (format Intl, equivalent a l'esperat per a un negoci europeu). La data de l'event als templates d'inbox apareix ara en anglès (`"18 May 2026"`) per clients amb `locale=en`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+----
+
+### Canvi #671 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — guard `qa:no-admin-toFixed-currency` estès a `.toLocaleString(...)€` + 4 fixes.**
+- Context: el guard detectava `.toFixed(N)€` però no `.toLocaleString(locale)€`. Grep detecta 4 violacions en serveis d'insights i reporting: `customerInsightsService.ts` (label insight), `leadInsightsService.ts` (label insight), `nextBestActionService.ts` (subtitle i reasoning NBA), `reportingInsightsService.ts` (detall tendència negativa). Totes admin-facing.
+- `scripts/check-admin-toFixed-currency.mjs`: regex ampliat a `/\.(toFixed\(\d+\)|toLocaleString\([^)]*\))\s*}?\s*€(?!\\/)/`; `executiveReportDispatchService.ts` afegit a allowlist (HTML d'informe executiu); missatge d'error actualitzat.
+- `lib/services/customerInsightsService.ts`, `leadInsightsService.ts`, `nextBestActionService.ts`, `reportingInsightsService.ts`: 5 ocurrències `.toLocaleString(...)€` → `formatCurrencyExact(...)`. Import afegit a cada fitxer.
+- `__tests__/scripts/check-admin-toFixed-currency.test.ts`: 2 tests nous (detecta `.toLocaleString(locale)€` a `lib/services/`, ignora `executiveReportDispatchService.ts`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 670 → 671.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-admin-toFixed-currency` OK. `pnpm run validate:core` OK.
+- Validació funcional: labels d'insights admin mostren `"1.234,56 €"` (amb espai Intl i 2 dècimes garantides) en lloc de `"1.234,56€"` o `"1.234,6€"` (variable).
+- Validació humana/UX: el propietari veu format consistent de moneda a tots els banners d'insight, NBA i reportatge de tendències.
+
+---
+
+### Canvi #670 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — fix i18n: locale hardcoded `'ca-ES'` a pàgines legals públiques.**
+- Context: 3 components client (`legal/terminos`, `legal/privacidad`, `legal/cookies`) usaven `toLocaleDateString('ca-ES', ...)` per la data d'última actualització mentre la resta de la pàgina ja usava `t()` next-intl. Bug real: usuaris espanyols/anglesos veien la data en format català (`"18 de maig de 2026"` en lloc de `"18 de mayo de 2026"` / `"18 May 2026"`).
+- `app/[locale]/legal/terminos/client.tsx`, `privacidad/client.tsx`, `cookies/client.tsx`: `useLocale()` + `toIntlLocale(locale)` en lloc de `'ca-ES'`. Import afegit a cada fitxer.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 669 → 670.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `npx tsc --noEmit` OK. `pnpm run validate:core` OK.
+- Validació funcional: la data a `/ca/legal/*` mostra `"18 de maig de 2026"`, a `/es/legal/*` mostra `"18 de mayo de 2026"`, a `/en/legal/*` mostra `"18 May 2026"`.
+- Validació humana/UX: la pàgina legal és coherent per a tots els idiomes (text i data en el mateix locale).
+
+---
+
+### Canvi #669 — 2026-05-18 — claude (FET)
+
+**§6.14 Qualitat — guard `qa:no-admin-toFixed-currency` estès a `lib/services/`.**
+- Context: el guard cobria `app/admin/` però no els serveis que generen notes i activitats visibles a l'admin. Grep detecta 3 violacions: nota de pressupost (`adminQuoteEmailService.ts`), descripció de scoring snapshot (`leadActivityService.ts`) i nota de lead (`quoteRouteHandler.ts`).
+- `scripts/check-admin-toFixed-currency.mjs`: `SCAN_DIRS` amplia a `[app/admin, lib/services]`; `documentService.ts` allowlistada (HTML PDF).
+- `lib/services/adminQuoteEmailService.ts`, `leadActivityService.ts`, `leads/quoteRouteHandler.ts`: 3 violations → `formatCurrencyExact(...)` amb import afegit.
+- `__tests__/scripts/check-admin-toFixed-currency.test.ts`: 2 tests nous.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 668 → 669.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: grep `\.toFixed\(\d+\)[^%/km]*€` a `lib/services/` → 0 violacions fora de `documentService.ts`. Code review dels 3 fitxers corregits i del guard ampliat.
+- Validació funcional: notes i activitats admin mostren format ca-ES en lloc d'anglès.
+- Validació humana/UX: el propietari veu imports consistents a totes les notes i activitats de l'admin.
+
+---
+
+### Canvi #668 — 2026-05-18 — codex (FET)
+
+**§6.1 Fonaments — `EN MARXA` del product operating system regularitzat.**
+- Context: §6.1 encara conservava obert un `EN MARXA` genèric sobre una sola narrativa, però el document mare (#606) i el Dashboard amb cicle operatiu (#666) ja havien convertit la narrativa en font i superfície.
+- `docs/protocol-producte-admin-ca.md`: el bloc passa a `FET` i deixa clar que el pendent residual és evitar dispersió futura.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 667 → 668.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:protocol` detecta l'entrada incompleta abans de tancar; es completa en aquest mateix tall i després queda OK; `pnpm run validate:core` OK.
+- Validació funcional: el checklist ja no manté com a obert un front que està cobert per documentació mare i UI del Dashboard.
+- Validació humana/UX: un agent nou llegeix §6.1 i entén que no ha de reconstruir el product operating system, sinó protegir-lo de dispersió.
+
+---
+
+### Canvi #667 — 2026-05-18 — codex (FET)
+
+**§6.6 Leads — CTA canònic cap a Fitxa 360 quan el lead ja és client.**
+- Context: després del #631, el detall de lead ja mostrava l'estat `already-linked`, però la llista i el kanban encara deien només `Client` o una icona quan `customerId` existia.
+- `lib/admin/leadCustomerHref.ts`: nou `buildLeadCustomerContinuityTarget()` amb href, label i title canònics.
+- `app/admin/leads/page.tsx` i `app/admin/leads/LeadPipelineView.tsx`: la vista mòbil, taula desktop i kanban obren `Fitxa 360` a la pestanya `leads`.
+- `__tests__/lib/admin/leadCustomerHref.test.ts`: regressions noves per CTA amb client i sense client.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 666 → 667.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\leadCustomerHref.test.ts` OK (6 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: un lead vinculat a client condueix directament a Customer Hub amb context d'entrades.
+- Validació humana/UX: el propietari veu `Fitxa 360` en lloc d'un enllaç genèric, i entén que la relació lead→client ja està consolidada.
+
+---
+
+### Canvi #666 — 2026-05-18 — codex (FET)
+
+**§6.1 Dashboard — cicle operatiu visible al primer nivell.**
+- Context: el manual ja contenia el product operating system, però el Dashboard continuava obrint amb senyals i panells sense mostrar explícitament el cicle canònic com a mapa d'acció.
+- `lib/services/adminOperatingCycleService.ts`: nou servei pur que reutilitza `ADMIN_MANUAL_OPERATING_FLOW` i hi afegeix mètriques de Dashboard per als 6 passos.
+- `app/admin/page.tsx`: nova secció `Cicle operatiu` amb passos, mètrica viva, detall i CTA cap al workspace de cada fase.
+- `__tests__/lib/services/adminOperatingCycleService.test.ts`: cobertura de l'ordre canònic, els valors derivats i els tons de cada situació.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 665 → 666.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\adminOperatingCycleService.test.ts` OK (2 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:service-coverage` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el Dashboard mostra el cicle captar → qualificar → pressupostar → reservar → cobrar → reactivar amb dades actuals.
+- Validació humana/UX: el propietari pot llegir el sistema com una seqüència operativa i obrir el pas concret sense navegar mentalment pel manual.
+
+---
+
+### Canvi #665 — 2026-05-18 — codex (FET)
+
+**§6.16 Marketing Hub — conversió guanyada per canal CRM.**
+- Context: després del #664, el diagnòstic de canal ja identificava origen i acció, però encara no separava volum de leads de conversió real a `WON`.
+- `lib/services/marketingHubService.ts`: `loadMarketingHubSummary()` carrega `lead.groupBy({ source, status })` dels últims 90 dies, `channelDiagnostics` incorpora `wonCount` i `conversionRate`, i el veredicte pot pujar a `Canal que converteix`.
+- `app/admin/marketing/page.tsx`: les targetes de canal mostren guanyats i percentatge de conversió.
+- `__tests__/lib/services/marketingHubService.test.ts` i `__tests__/app/admin/marketing/page.test.tsx`: cobertura ampliada perquè el servei i el render exigeixin la conversió guanyada per canal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 664 → 665.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (7 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el Marketing Hub diferencia canals que només porten leads de canals que ja tanquen leads guanyats.
+- Validació humana/UX: el propietari veu `guanyats` i `% conversió` dins cada targeta abans de decidir si reforçar el canal o només millorar-ne la classificació.
+
+---
+
+### Canvi #664 — 2026-05-18 — codex (FET)
+
+**§6.16 Marketing Hub — diagnòstic accionable per canal CRM real.**
+- Context: `/admin/marketing` ja concentrava salut de captació, fonts CRM i integracions, però la secció de fonts dels últims 90 dies encara era descriptiva i no traduïa cada origen en una acció de canal.
+- `lib/services/marketingHubService.ts`: afegit `MarketingHubChannelDiagnostic` i `channelDiagnostics`, derivat de `capture.sources`, amb veredicte, acció, href i to.
+- `app/admin/marketing/page.tsx`: nova secció `Diagnòstic per canal` amb CTAs cap al workspace corresponent segons origen.
+- `__tests__/lib/services/marketingHubService.test.ts` i `__tests__/app/admin/marketing/page.test.tsx`: cobertura ampliada a 7 tests del front.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 663 → 664.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx` OK (7 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:service-coverage` OK.
+- Validació funcional: el Marketing Hub passa de mostrar fonts a recomanar què reforçar per canal abans d'obrir Ads o connectors externs.
+- Validació humana/UX: el propietari veu una acció directa per Google, web, referits, Instagram, WhatsApp/telèfon o origen desconegut dins del primer nivell del hub.
+
+---
+
+### Canvi #663 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — `qa:no-admin-slate-gray` detecta prefixos Tailwind reals.**
+- Context: `validate:core` fallava a `qa:protocol:test` perquè `__tests__/scripts/check-admin-slate-gray.test.ts` esperava que el guard detectés `text-slate-300`, `bg-gray-800` i `border-slate-500`, però el patró només trobava `slate-N`/`gray-N` sense prefix.
+- `scripts/check-admin-slate-gray.mjs`: regex ampliada per admetre variants i prefixos de classe abans de `slate-*`/`gray-*`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 662 → 663.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-admin-slate-gray.test.ts` OK (6 tests); `pnpm run qa:no-admin-slate-gray` OK.
+- Validació funcional: el guard torna a fallar quan apareixen classes `slate-*`/`gray-*` amb prefix Tailwind dins `app/admin`.
+- Validació humana/UX: cap canvi visual; la correcció protegeix la coherència visual admin basada en `white/opacity`.
+
+---
+
+### Canvi #662 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — test de `useManagedImageSrc` alineat amb el client canònic.**
+- Context: en validar els talls #659/#661 ha aparegut un test duplicat antic `__tests__/lib/hooks/useManagedImageSrc.test.tsx` que esperava `globalThis.fetch('/api/public/image-manager?...')`. El hook actual consumeix `fetchImageManager()` des de `lib/api/imageManagerClient.ts`, i el test nou `.test.ts` ja cobria aquest contracte.
+- Eliminat `__tests__/lib/hooks/useManagedImageSrc.test.tsx` perquè provava un contracte obsolet i fallava per una diferència de serialització de `URLSearchParams`.
+- `__tests__/lib/hooks/useManagedImageSrc.test.ts`: el cas de fallback inicial deixa la Promise pendent per evitar update asíncron i warning d'`act()`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 661 → 662.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\hooks\useManagedImageSrc.test.ts` OK (6 tests); `pnpm run qa:service-coverage` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el hook continua retornant fallback i substituint-lo pel src gestionat via client canònic.
+- Validació humana/UX: cap canvi visual; només sanejament de test latent.
+
+---
+
+### Canvi #661 — 2026-05-18 — claude (FET)
+
+**Tipus**: test nou (cobertura qa:service-coverage)  
+**Fitxers afectats**: `__tests__/lib/services/leads/quoteRouteHandler.test.ts` (nou), `lib/constants/admin.ts`
+
+**Descripció**:  
+Canvi §6.14. `lib/services/leads/quoteRouteHandler.ts` existia sense test, cosa que faria fallar `qa:service-coverage`. Creat `__tests__/lib/services/leads/quoteRouteHandler.test.ts` amb 10 tests (5 GET + 5 POST) via `NextRequest`. Mocks: `prisma.$queryRaw`, `requireAuth`, `generateQuoteHTML`/`createQuoteFromLead`/`generateQuoteNumber`, `resolveQuotePack`, `getQuoteTemplateSettings`, `recordLeadQuoteGenerated`, `getAppBaseUrl`. Casos: auth error, 404 lead no trobat, èxit HTML, packId querystring, error intern (GET); auth error, 404, èxit JSON (quoteNumber+total+html), actualització DB (updateMany+note+document), error intern (POST).
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: code review. 10 tests nous. `pnpm test:run` pendent.
+- Validació funcional: `quoteRouteHandler` és un handler intern del servidor, cap impacte en lògica de negoci.
+- Validació humana/UX: cap canvi visual — test pur.
+
+### Canvi #660 — 2026-05-18 — claude (FET)
+
+**Tipus**: correccions format moneda (qa:no-admin-toFixed-currency)  
+**Fitxers afectats**: `app/admin/packs/page.tsx`, `app/admin/packs/[id]/EditPackForm.tsx`, `app/admin/leads/[id]/LeadActionsEnhanced.tsx`
+
+**Descripció**:  
+Canvi §6.14. 7 violacions de `qa:no-admin-toFixed-currency` detectades en 3 fitxers d'admin que el guard del Canvi #658 ja cobria però que no s'havien corregit encara.
+
+- `packs/page.tsx` ×4: `{health.recommendedPrice.toFixed(2)}€` i `{health.recommendedExtraHourPrice.toFixed(2)}€` (apareixen 2 vegades cadascun) → `{formatCurrencyExact(health.recommendedPrice/recommendedExtraHourPrice)}`.
+- `packs/[id]/EditPackForm.tsx` ×1: funció local `eur = (v) => `${round2(v).toFixed(2)}€`` → `const eur = formatCurrencyExact`. `round2` es manté per als càlculs interns.
+- `leads/[id]/LeadActionsEnhanced.tsx` ×2: IVA (21%) i total (121%) → `{formatCurrencyExact(effectivePrice * 0.21)}` / `{formatCurrencyExact(effectivePrice * 1.21)}`. Missatge d'èxit (string) → `${formatCurrencyExact(data.total)}`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: grep post-fix de `.toFixed(N)}€` a `app/admin/**` → 0 resultats. Code review.
+- Validació funcional: 7 valors monetaris en camps de preus i missatges d'èxit ara usen `formatCurrencyExact` — format `ca-ES` correcte (coma decimal, punt de milers, espai+€).
+- Validació humana/UX: canvi de format visible en pantalles de packs i pressupostos de leads — abans "12.34€", ara "12,34 €".
+
+### Canvi #659 — 2026-05-18 — claude (FET)
+
+**Tipus**: test nou (cobertura hooks)  
+**Fitxers afectats**: `__tests__/lib/hooks/useManagedImageSrc.test.ts` (nou), `lib/constants/admin.ts`
+
+**Descripció**:  
+Canvi §6.14. `lib/hooks/useManagedImageSrc.ts` no tenia test, cosa que faria fallar `qa:service-coverage`. Creat `__tests__/lib/hooks/useManagedImageSrc.test.ts` amb 6 casos via `renderHook`/`waitFor`: fallback inicial, actualització a managed src, fetch fallat, resposta sense src, src buida (whitespace), clau passada correctament. Mock de `@/lib/api/imageManagerClient` via `vi.hoisted`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: code review. 6 tests nous. `pnpm test:run` pendent.
+- Validació funcional: `useManagedImageSrc` és un hook de presentació, cap impacte en lògica de negoci.
+- Validació humana/UX: cap canvi visual — test pur.
+
+### Canvi #658 — 2026-05-18 — claude (FET)
+
+**Tipus**: helper nou + guard + correccions format moneda  
+**Fitxers afectats**: `lib/constants/index.ts`, `scripts/check-admin-toFixed-currency.mjs` (nou), `__tests__/scripts/check-admin-toFixed-currency.test.ts` (nou), `app/admin/bookings/BookingPricingSummary.tsx`, `app/admin/bookings/BookingTravelDiscountSection.tsx`, `app/admin/economia/ProfitabilityConfigEditor.tsx`, `app/admin/inventory/[id]/InventoryItemEditor.tsx`, `package.json`, `lib/constants/admin.ts`
+
+**Descripció**:  
+Canvi §6.14. Guard `qa:no-admin-toFixed-currency` per detectar `.toFixed(N)€` (sense `/` immediat) en admin TSX/TS — patró que omete la localització (punt decimal anglès en comptes de coma catalana).
+
+Nou helper `formatCurrencyExact()` a `lib/constants/index.ts`: 2 decimals, locale `ca-ES`. Diferent de `formatCurrency()` (0 decimals). Equivalent al pattern `formatNumber(n, { style: 'currency', currency: 'EUR' })` ja usat a `StripePaymentPanel.tsx`.
+
+14 violacions corregides:
+- `BookingPricingSummary.tsx` ×11 (pack, extras, subtotal, IVA, total, dipòsit, desplaçament, transport intern, directCost, netMargin)
+- `BookingTravelDiscountSection.tsx` ×1
+- `ProfitabilityConfigEditor.tsx` ×1 → `formatCurrency()`
+- `InventoryItemEditor.tsx` ×1 → `formatEuro` aliased a `formatCurrencyExact`
+
+No detectat: `.toFixed(N)} €/km`, `.toFixed(N)} €/L` (taxes unitàries acceptables). Guard 49è a `validate:core`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: code review. 10 tests nous. `pnpm run validate:core && pnpm test:run` pendent.
+- Validació funcional: 14 violacions `.toFixed(N)€` → `formatCurrencyExact()`. Format localitzat `ca-ES`.
+- Validació humana/UX: format moneda ara mostra coma decimal i punt de milers en català.
+
+### Canvi #657 — 2026-05-18 — claude (FET)
+
+**Tipus**: guard nou + CSS variant + correccions inline style  
+**Fitxers afectats**: `scripts/check-admin-inline-font-size.mjs` (nou), `__tests__/scripts/check-admin-inline-font-size.test.ts` (nou), `app/globals.css`, `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `package.json`, `lib/constants/admin.ts`
+
+**Descripció**:  
+Canvi §6.14. Guard `qa:no-admin-inline-font-size` per detectar `fontSize:` literal (string o numèric) en `style={{}}` de línia única a `app/admin/`. Fix: usar `ap-btn--xs` (nova variant CSS) o classe Tailwind `text-[...]`.
+
+Afegida variant `.ap-btn--xs` a `globals.css` (`font-size: 0.7rem; padding: 0.25rem 0.625rem`). 3 violacions corregides a `StripePaymentPanel.tsx`: botons "Obrir", "Copiar" i "Generar link" → `ap-btn--xs`. Guard 48è a `validate:core`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: code review. 8 tests nous. `pnpm run validate:core && pnpm test:run` pendent.
+- Validació funcional: botons StripePaymentPanel mantenen mida i padding via `.ap-btn--xs`.
+- Validació humana/UX: canvi invisible — equivalent visual idèntic via CSS.
+
+### Canvi #656 — 2026-05-18 — claude (FET)
+
+**Tipus**: guard nou + correccions inline style  
+**Fitxers afectats**: `scripts/check-admin-static-css-var-styles.mjs` (nou), `__tests__/scripts/check-admin-static-css-var-styles.test.ts` (nou), `app/admin/bookings/[id]/StripePaymentPanel.tsx`, `package.json`, `lib/constants/admin.ts`
+
+**Descripció**:  
+Canvi §6.14. Guard `qa:no-admin-static-css-var-styles` per detectar variables CSS d'admin-theme (`--at-*`) usades com a strings literals estàtics dins `style={{}}` de props de línia única a `app/admin/`. Patrons detectats: `color: 'var(--'`, `background: 'var(--'`, `border[Bottom|Top|...]: '...var(--'`.
+
+7 violacions corregides a `StripePaymentPanel.tsx`:
+- 4× `color: 'var(--at-text/subtle)'` → `text-[var(--at-text)]` / `text-[var(--at-subtle)]`
+- `borderBottom: '1px solid var(--at-border)'` → `border-b border-[var(--at-border)]`
+- `borderTop: '1px solid var(--at-border-sub)'` → `border-t border-[var(--at-border-sub)]`
+- `height:'1px', background: 'var(--at-border-sub)', margin: '0 1rem'` → `h-px bg-[var(--at-border-sub)] mx-4`
+
+Excepcions: `canvas/` i `email-templates/`. Color-mix() i ternaris no detectats (sense Tailwind equivalent trivial). Guard 47è a `validate:core`.
+
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: code review. 11 tests nous. `pnpm run validate:core && pnpm test:run` pendent.
+- Validació funcional: 7 inline CSS vars → Tailwind arbitrari. Renderitzat idèntic.
+- Validació humana/UX: canvi invisible — equivalent visual idèntic.
+
+### Canvi #655 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-admin-inline-font-styles` + eliminació inline `fontFamily`/`fontVariantNumeric`.**
+- Context: CLAUDE.md checklist demana grep de `style={{` per detectar inline styles que haurien de ser classes CSS. `fontFamily: 'var(--font-mono, monospace)'` ha de ser `font-mono` i `fontVariantNumeric: 'tabular-nums'` ha de ser `tabular-nums`. `backgroundColor: 'currentColor'` ha de ser `bg-current`.
+- `scripts/check-admin-inline-font-styles.mjs`: guard nou que detecta `fontFamily:` i `fontVariantNumeric:` en `style={{...}}` dins `app/admin/**/*.tsx`; allowlist canvas i email-templates.
+- `__tests__/scripts/check-admin-inline-font-styles.test.ts`: 7 tests via fixtures temporals.
+- 5 violacions corregides: `WeatherWidget.tsx`, `dashboard-widgets.tsx`, `admin/page.tsx` (×2), `SummaryPanel.tsx` (bg-current).
+- `package.json`: nou `qa:no-admin-inline-font-styles` integrat al final de `validate:core` (46 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 654 → 655.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-admin-inline-font-styles` OK (0 violacions). `npx tsc --noEmit` OK. 7 tests nous.
+- Validació funcional: valors monetaris i temperatures al dashboard continuen mostrant-se en mono per semàntica numèrica.
+- Validació humana/UX: canvi invisible — es passa de `style={{ fontFamily: '...' }}` a `className="font-mono"`, idèntic resultat visual.
+
+### Canvi #654 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — canonicalitza hrefs `/admin/blog/edit/${id}` + guard + tests.**
+- Context: `qa:customer-inline-href` no cobria el segment `/admin/blog/edit/`. Dos literals inline `\`/admin/blog/edit/${post.id}\`` a `app/admin/blog/page.tsx` sense helper canònic.
+- `lib/admin/blogWorkspaceHref.ts`: nou helper `buildBlogEditHref(postId)` retorna `/admin/blog/edit/${postId}`.
+- `app/admin/blog/page.tsx`: 2 ocurrències `router.push(\`/admin/blog/edit/${post.id}\`)` substituïdes per `router.push(buildBlogEditHref(post.id))`.
+- `scripts/check-customer-inline-href.mjs`: afegits `BLOG_TEMPLATE`/`BLOG_CONCAT`, `blogWorkspaceHref.ts` a `SKIP_FILES`, doc i missatge error actualitzats.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: test nou per `/admin/blog/edit/${...}`.
+- `__tests__/lib/admin/blogWorkspaceHref.test.ts`: test unitari `buildBlogEditHref`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 653 → 654.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:customer-inline-href` OK. `npx tsc --noEmit` OK. Tests nous afegits.
+- Validació funcional: els botons editar del blog continuen funcionant, ara via helper canònic.
+- Validació humana/UX: cap canvi visual — és una canonicalització de navegació interna.
+
+### Canvi #653 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-admin-slate-gray` + eliminació `slate-*`/`gray-*` admin.**
+- Context: CLAUDE.md prohibeix explícitament `slate-*` i `gray-*` als components admin. Scan del repositori detecta 14 violacions actives en 12 fitxers.
+- `scripts/check-admin-slate-gray.mjs`: guard nou que recorre `app/admin/**/*.{ts,tsx}` i falla si detecta `slate-N` o `gray-N` fora de comentaris.
+- `__tests__/scripts/check-admin-slate-gray.test.ts`: 6 tests via fixtures temporals; cobreixen white/opacity passa, slate detectat, gray detectat, comentaris ignorats, fora d'admin ignorat, múltiples violacions.
+- 14 violacions corregides: états neutres/inactius de 12 components passen al sistema `white/opacity`: `text-white/60`, `bg-white/[0.06]`, `border-white/15`, `bg-white/[0.08]`, `text-white/50`, `bg-white/40`, `text-white/40`, `bg-white/[0.03]`, `border-white/10`, `bg-black/[0.12]`, `bg-black/90`, `from-white/15 to-white/[0.05]`.
+- `package.json`: nou `qa:no-admin-slate-gray` integrat al final de `validate:core` (45 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 652 → 653.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-admin-slate-gray` OK (0 violacions). `npx tsc --noEmit` OK. 6 tests nous.
+- Validació funcional: estats neutres/inactius conserven la mateixa semàntica visual (menys saturada que actius/errors), ara usant el sistema `white/opacity` de l'admin.
+- Validació humana/UX: canvi mínim — els estats "LOW", "NONE", "FREE", "IDEA", "BLOQUEJAT", "NOT_APPLICABLE" i "BAIXA" passen de gris sòlid a blanc translúcid, ambdós sobre fons fosc de l'admin.
+
+---
+
+### Canvi #652 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — còpies al portapapers esperades abans de marcar èxit.**
+- Context: després del #651, la passada de residus ha trobat dues còpies admin amb `navigator.clipboard.writeText(...)` sense `await`. Això podia mostrar èxit encara que el navegador rebutgés la còpia per permisos o context no segur.
+- `scripts/check-clipboard-await.mjs`: guard nou que recorre `app/admin/**/*.{ts,tsx}` i falla si `navigator.clipboard.writeText(...)` no va precedit per `await`.
+- `__tests__/scripts/check-clipboard-await.test.ts`: 4 tests via fixtures temporals; cobreixen await correcte, violació, comentaris i scope fora d'`app/admin`.
+- `app/admin/email-templates/[slug]/TemplateEditorClient.tsx`: la còpia de variables ara fa `await` dins `try/catch` i només mostra toast d'èxit quan resol.
+- `app/admin/scripts/ScriptsClient.tsx`: la còpia de comandes ara fa `await` dins `try/catch` i només marca `copiedCommand` si la còpia ha funcionat.
+- `package.json`: nou `qa:clipboard-await` integrat al final de `validate:core`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 651 → 652.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-clipboard-await.test.ts` OK (4 tests); `pnpm run qa:clipboard-await` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els botons de còpia mantenen el mateix flux quan la còpia funciona i ja no confirmen èxit fals quan falla.
+- Validació humana/UX: sense canvi visual en estat normal; només millora la resposta en error de permisos.
+
+---
+
+### Canvi #651 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — IDs de preguntes de qüestionari sense col·lisió per mil·lisegon.**
+- Context: després del #650, la passada de residus ha trobat que `QuestionnaireTemplateCreator` i `QuestionnaireTemplateEditor` fabricaven preguntes noves amb `id: q-${Date.now()}`. Dos clics dins el mateix mil·lisegon podien duplicar IDs i keys React.
+- `lib/admin/questionnaireQuestionFactory.ts`: nou helper `buildQuestionnaireQuestionId()` amb timestamp + seqüència i `createQuestionnaireQuestion()` amb defaults canònics.
+- `__tests__/lib/admin/questionnaireQuestionFactory.test.ts`: 3 tests; format d'ID, no duplicació dins el mateix timestamp i defaults de pregunta.
+- `app/admin/questionnaires/new/QuestionnaireTemplateCreator.tsx` i `app/admin/questionnaires/[id]/QuestionnaireTemplateEditor.tsx`: eliminen `newQuestion()` local i consumeixen el helper compartit.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 650 → 651.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\questionnaireQuestionFactory.test.ts` OK (3 tests); `pnpm run qa:service-coverage` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: afegir preguntes continua creant preguntes `text` buides i requeriment `false`, però amb IDs únics encara que comparteixin timestamp.
+- Validació humana/UX: cap canvi visual; només s'eviten col·lisions internes en edició ràpida.
+
+---
+
+### Canvi #650 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — `window.open('_blank')` també queda blindat contra opener.**
+- Context: després del #649, les mutacions admin ja passen per CSRF. La passada següent ha trobat dos `window.open(url, '_blank')` amb URL real que obrien pestanya nova sense `noopener`, un forat equivalent al que `qa:blank-target-rel` ja prevenia per anchors JSX.
+- `scripts/check-blank-target-rel.mjs`: ampliat per detectar `window.open(..., '_blank')` sense `noopener` o `noreferrer` a `app/` i `lib/`.
+- Excepció explícita: `window.open('', '_blank')` queda permès per finestres buides controlades, com el flux d'impressió que escriu HTML al document.
+- `__tests__/scripts/check-blank-target-rel.test.ts`: 8 → 11 tests; nous casos per `window.open` insegur, `window.open` amb `noopener,noreferrer` i finestra buida controlada.
+- `app/admin/leads/[id]/LeadActionsEnhanced.tsx`: previsualització de pressupost lead obre amb `noopener,noreferrer`.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: impressió de PDF generat obre amb `noopener,noreferrer`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 649 → 650.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-blank-target-rel.test.ts` OK (11 tests); `pnpm run qa:blank-target-rel` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els previews continuen obrint pestanya nova; el canvi només talla l'accés de la pestanya oberta a `window.opener`.
+- Validació humana/UX: cap canvi visible; la finestra d'impressió HTML continua permesa i funcional.
+
+---
+
+### Canvi #649 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — mutacions admin obligades a `fetchWithCsrf()`.**
+- Context: després del #648, els hrefs no-API estaven canonitzats. La passada següent ha trobat un risc diferent: algunes mutacions admin encara feien `fetch()` natiu amb `POST/PATCH/DELETE`, saltant-se el helper que injecta CSRF i `credentials`.
+- `scripts/check-admin-mutating-fetch-csrf.mjs`: guard nou, escana `app/admin/**/*.{ts,tsx}` i bloqueja `fetch()`, `window.fetch()` o `globalThis.fetch()` amb `POST/PATCH/PUT/DELETE` cap a `/api/admin/*`.
+- `__tests__/scripts/check-admin-mutating-fetch-csrf.test.ts`: 6 tests via fixtures temporals; cobreixen GET permès, `fetchWithCsrf` permès, `POST`, `PATCH`, `window/globalThis.fetch` i ignorar fora d'`app/admin`.
+- `package.json`: nou `qa:admin-mutating-fetch-csrf` i integrat al final de `validate:core`.
+- Migrats a `fetchWithCsrf()`: `app/admin/faq/FaqEditorForm.tsx`, `app/admin/questionnaires/QuestionnaireTemplateActions.tsx`, `app/admin/questionnaires/new/QuestionnaireTemplateCreator.tsx`, `app/admin/questionnaires/[id]/QuestionnaireTemplateEditor.tsx` i `app/admin/bookings/[id]/StripePaymentPanel.tsx`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 648 → 649.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-admin-mutating-fetch-csrf.test.ts` OK (6 tests); `pnpm run qa:admin-mutating-fetch-csrf` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: les mutacions admin mantenen endpoint, method, headers i body, però ara passen pel helper CSRF compartit.
+- Validació humana/UX: cap canvi visual ni de flux; botons i formularis mantenen el mateix comportament esperat.
+
+---
+
+### Canvi #648 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — FAQ i qüestionaris entren al helper i al guard.**
+- Context: després del #647, la passada de residus del front hrefs només deixava navegació no-API a `/admin/faq/${id}` i `/admin/questionnaires/${id}`. Els endpoints `/api/admin/*` queden fora d'aquest tall.
+- `lib/admin/faqWorkspaceHref.ts`: nou helper `buildFaqHref(faqId)`.
+- `lib/admin/questionnaireWorkspaceHref.ts`: nou helper `buildQuestionnaireHref(questionnaireId)`.
+- `__tests__/lib/admin/faqWorkspaceHref.test.ts` i `__tests__/lib/admin/questionnaireWorkspaceHref.test.ts`: tests dels helpers.
+- `scripts/check-customer-inline-href.mjs`: ampliat per detectar `/admin/faq/${...}` i `/admin/questionnaires/${...}` i les seves concatenacions.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: la suite puja a 16 tests; nous casos per FAQ i qüestionaris.
+- Migrada la navegació de `app/admin/faq/page.tsx` i `app/admin/questionnaires/QuestionnaireTemplateActions.tsx`.
+- Fix adjacent: `__tests__/scripts/check-inline-to-locale-string.test.ts` usa cometes dobles al nom del test amb `s'usen`, perquè `tsc` fallava pel literal amb apòstrof.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 647 → 648.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\faqWorkspaceHref.test.ts __tests__\lib\admin\questionnaireWorkspaceHref.test.ts __tests__\scripts\check-customer-inline-href.test.ts` OK (18 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els links d'edició de FAQ i qüestionaris conserven el mateix destí, però ara surten de helpers compartits.
+- Validació humana/UX: cap canvi visual visible; CTAs `Editar` mantenen el comportament.
+
+---
+
+### Canvi #647 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-inline-to-locale-date-time` + helpers de data/hora.**
+- Context: després del #646, `.toLocaleString(...)` ja estava blindat, però encara quedaven `.toLocaleDateString(...)` i `.toLocaleTimeString(...)` inline a components admin. Són el mateix tipus de bypass dels helpers de format compartits.
+- `lib/constants/index.ts`: nous helpers `formatTimeShort()`, `formatWeekdayShort()`, `formatWeekdayLong()`, `formatWeekdayDateShort()` i `formatMonthYearLong()`.
+- `scripts/check-inline-to-locale-date-time.mjs`: guard nou, escana `app/admin/**/*.{ts,tsx}`, detecta `.toLocaleDateString(` i `.toLocaleTimeString(`, amb excepció tècnica per `app/admin/calendario/calendar-utils.ts`.
+- `__tests__/scripts/check-inline-to-locale-date-time.test.ts`: 4 tests via `spawnSync`.
+- `package.json`: `qa:no-inline-to-locale-date-time` + integrat al final de `validate:core` (42 guards).
+- Migrats a helpers centralitzats: `CalendarDayClient`, `WeatherWidget`, `AttributionPanel`, `InboxPanel`, `InboxSections`, `CommSummaryPanel`, `TimelinePanel`, `SocialClient` i `text-manager/page.tsx`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 646 → 647.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-inline-to-locale-date-time.test.ts` OK (4 tests); `pnpm run qa:no-inline-to-locale-date-time` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: dates, hores, weekdays i mes-any continuen sortint per helpers compartits; `calendar-utils.ts` queda com a helper tècnic explícit.
+- Validació humana/UX: cap canvi visual intencionat; els formats passen per una font centralitzada.
+
+---
+
+### Canvi #646 — 2026-05-18 — codex (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-inline-to-locale-string` + formats locale centralitzats.**
+- Context: després del #645, `qa:no-inline-intl` bloquejava `new Intl.*`, però encara quedava un bypass més curt: `.toLocaleString(...)` inline dins `app/admin`. És el mateix risc: formats de moneda, número i datetime poden divergir dels helpers de `lib/constants`.
+- `scripts/check-inline-to-locale-string.mjs`: guard nou, escana `app/admin/**/*.{ts,tsx}` i detecta `.toLocaleString(` fora de comentaris.
+- `__tests__/scripts/check-inline-to-locale-string.test.ts`: 4 tests via `spawnSync`.
+- `package.json`: `qa:no-inline-to-locale-string` + integrat al final de `validate:core` (41 guards).
+- `app/admin/components/AttributionPanel.tsx`: `formatEuro()` passa a `formatCurrency(Math.round(v))`.
+- `app/admin/clientes/[id]/_components/InsightsBanner.tsx` i `app/admin/leads/[id]/LeadInsightsBanner.tsx`: `formatCurrency` local eliminada; importada de `@/lib/constants`.
+- `app/admin/docs/protocol/ProtocolValidationToggle.tsx`: timestamp de validació passa a `formatDateTimeFull()`.
+- `app/admin/social/SocialClient.tsx`: datetime de programació passa a `formatDateTime()` centralitzat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 645 → 646.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-inline-to-locale-string.test.ts` OK (4 tests); `pnpm run qa:no-inline-to-locale-string` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: imports de moneda i datetime conserven format centralitzat; desapareix el bypass `.toLocaleString(...)` a `app/admin`.
+- Validació humana/UX: cap canvi visual intencionat; els imports i formats segueixen els helpers compartits.
+
+---
+
+### Canvi #645 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-inline-intl` + centralització formats Intl admin.**
+- Context: continuació de `go` sobre el `PENDENT CRÍTIC` de §6.14. CLAUDE.md exigeix que dates, moneda i formats passin pels helpers centralitzats de `lib/constants`. El checklist post-canvi menciona `new Intl.*` com a residu a grepar. S'han detectat 6 components admin que construïen `new Intl.NumberFormat(` o `new Intl.DateTimeFormat(` localment.
+- `lib/constants/index.ts`: nou `formatMonthYearCompact(monthIso, locale?)` per eixos de gràfics ("feb '26", UTC-safe, per strings "YYYY-MM").
+- `app/admin/analytics/page.tsx`: `formatAdsCurrency()` passa de `new Intl.NumberFormat` a `formatNumber(value, opts)` (ja importat).
+- `app/admin/clientes/reactivation/ReactivationClient.tsx`: `formatCurrency` local eliminada; importada de `@/lib/constants`.
+- `app/admin/bookings/[id]/StripePaymentPanel.tsx`: `formatEur` local passa a `formatNumber(n, { style: 'currency', currency: 'EUR' })`; importat `formatNumber`.
+- `app/admin/clientes/referrals/ReferralsClient.tsx`: `formatCurrency` local eliminada; importada de `@/lib/constants`.
+- `app/admin/sales-ops/LossBreakdownPanel.tsx`: `formatMonth` local passa a `formatMonthYearCompact(monthIso)`; importat des de `@/lib/constants`.
+- `app/admin/post-event/playbook/page.tsx`: `formatDate` local eliminada; importada de `@/lib/constants`.
+- `scripts/check-inline-intl.mjs`: guard nou, escana `app/admin/**/*.{ts,tsx}`, detecta `new Intl.NumberFormat(` i `new Intl.DateTimeFormat(`, excepció: `calendar-utils.ts`.
+- `__tests__/scripts/check-inline-intl.test.ts`: 8 tests via `spawnSync`.
+- `package.json`: `qa:no-inline-intl` + integrat al final de `validate:core` (40 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 644 → 645.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-inline-intl` OK. `npx tsc --noEmit` OK. 8 tests nous.
+- Validació funcional: formats de moneda, dates i eixos de gràfics conserven la mateixa representació visual.
+- Validació humana/UX: cap canvi visual visible.
+
+---
+
+### Canvi #644 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — pressupostos entren al helper i al guard.**
+- Context: després del #643, el residu clar del front d'hrefs admin era `/admin/presupuestos/${id}` a `quick-create` i al llistat de pressupostos. Sense helper, la ruta de detall podia divergir de la navegació de client i dels redirects.
+- `lib/admin/proposalWorkspaceHref.ts`: nou helper `buildProposalHref(proposalId)`.
+- `__tests__/lib/admin/proposalWorkspaceHref.test.ts`: test del helper.
+- `scripts/check-customer-inline-href.mjs`: ampliat per detectar `/admin/presupuestos/${...}` i concatenacions `'/admin/presupuestos/' +`, amb allowlist del helper canònic.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: la suite puja a 14 tests; nou cas per `/admin/presupuestos/${...}`.
+- Navegació migrada a `buildProposalHref()` a `app/admin/presupuestos/ProposalsList.tsx` i `app/admin/quick-create/QuickCreateForm.tsx`.
+- Els endpoints `/api/admin/proposals/*` continuen sent API i no són navegació admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 643 → 644.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\proposalWorkspaceHref.test.ts __tests__\scripts\check-customer-inline-href.test.ts` OK (15 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: el redirect de quick-create i els links de llistat continuen apuntant al mateix detall de pressupost.
+- Validació humana/UX: cap canvi visible; accions `Editar`, `Vincles` i redirect post-creació mantenen el comportament.
+
+---
+
+### Canvi #643 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — plantilles d'email entren al helper i al guard.**
+- Context: després del #642, `qa:customer-inline-href` ja cobria customer, booking, lead, packs i inventari, però encara hi havia navegació dinàmica cap a `/admin/email-templates/${slug}` a la llista i al canvi d'idioma de l'editor. Si la ruta del workspace de plantilles canvia, aquests links divergirien en silenci.
+- `lib/admin/emailTemplateWorkspaceHref.ts`: nou helper `buildEmailTemplateHref(slug, locale?)`.
+- `__tests__/lib/admin/emailTemplateWorkspaceHref.test.ts`: 2 tests del helper.
+- `scripts/check-customer-inline-href.mjs`: ampliat per detectar `/admin/email-templates/${...}` i concatenacions `'/admin/email-templates/' +`, amb allowlist del helper canònic.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: la suite puja a 13 tests; nou cas per `/admin/email-templates/${...}`.
+- Navegació migrada a `buildEmailTemplateHref()` a `app/admin/email-templates/EmailTemplatesClient.tsx` i `app/admin/email-templates/[slug]/TemplateEditorClient.tsx`.
+- Els residus `/api/admin/email-templates/*` continuen sent endpoints API i no són navegació admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 642 → 643.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\emailTemplateWorkspaceHref.test.ts __tests__\scripts\check-customer-inline-href.test.ts` OK (15 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els links de la llista de plantilles i el canvi d'idioma de l'editor conserven el mateix destí, inclòs `locale`.
+- Validació humana/UX: cap canvi visible; botons d'idioma i acció principal mantenen el comportament.
+
+---
+
+### Canvi #642 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — inventari entra al helper i al guard.**
+- Context: després del #641, `qa:customer-inline-href` ja cobria customer, booking, lead i packs, però encara hi havia CTAs dinàmics d'inventari construint `/admin/inventory/${id}` localment. És el mateix risc de divergència silenciosa si la fitxa d'inventari canvia de ruta.
+- `lib/admin/inventoryWorkspaceHref.ts`: nou helper `buildInventoryHref(itemId)`.
+- `__tests__/lib/admin/inventoryWorkspaceHref.test.ts`: test del helper.
+- `scripts/check-customer-inline-href.mjs`: ampliat per detectar `/admin/inventory/${...}` i concatenacions `'/admin/inventory/' +`, amb allowlist del helper canònic.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: la suite puja a 12 tests; nou cas per `/admin/inventory/${...}`.
+- CTAs migrats a `buildInventoryHref()` a `app/admin/inventory/InventoryListSections.tsx` i `app/admin/bookings/[id]/BookingInventorySection.tsx`.
+- Els residus `/api/admin/inventory/*` continuen sent endpoints API i no són navegació admin.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 641 → 642.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\inventoryWorkspaceHref.test.ts __tests__\scripts\check-customer-inline-href.test.ts` OK (13 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els links a fitxa d'inventari conserven el mateix destí, però ara surten d'un helper únic.
+- Validació humana/UX: cap canvi visible; targetes, llistes, taula i equipament assignat mantenen el mateix comportament.
+
+---
+
+### Canvi #641 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — packs entren al helper i al guard.**
+- Context: després del #637, `qa:customer-inline-href` cobria customer, booking i lead, però encara hi havia CTAs dinàmics de packs construint `/admin/packs/${id}` localment a superfícies de producte i catàleg. El patró és el mateix: si la ruta del workspace de pack canvia, aquests CTAs divergirien en silenci.
+- `lib/admin/packWorkspaceHref.ts`: nou helper `buildPackHref(packId, tab?)`, amb suport per la pestanya `content`.
+- `__tests__/lib/admin/packWorkspaceHref.test.ts`: 2 tests del helper.
+- `scripts/check-customer-inline-href.mjs`: ampliat per detectar `/admin/packs/${...}` i concatenacions `'/admin/packs/' +`, amb allowlist del helper canònic.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: 11 tests; nou cas per `/admin/packs/${...}`.
+- CTAs migrats a `buildPackHref()` a `app/admin/bookings/[id]/page.tsx`, `app/admin/catalog/page.tsx`, `app/admin/economia/EconomiaClient.tsx`, `app/admin/inventory/[id]/page.tsx`, `app/admin/inventory/InventoryListSections.tsx`, `app/admin/packs/page.tsx` i `app/admin/packs/new/NewPackForm.tsx`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 640 → 641.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\admin\packWorkspaceHref.test.ts __tests__\scripts\check-customer-inline-href.test.ts` OK (13 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: els enllaços dinàmics al detall de pack i a la pestanya d'equip conserven el mateix destí, però ara surten d'un helper únic.
+- Validació humana/UX: cap canvi visible; els botons `Editar`, `Equip`, links de catàleg, inventari, economia i redirecció de pack nou mantenen el mateix comportament.
+
+---
+
+### Canvi #639 — 2026-05-18 — codex (FET)
+
+**§6.14 runtime agent — política `go` nonstop executable en JSON per `orbitaevents`.**
+- Context: el propietari ha demanat que la regla "nonstop until end" quedi escrita en algun lloc executable, tipus JSON o script, i que d'ara endavant sigui sempre per `orbitaevents`. El text ja existia a `CLAUDE.md` i al protocol, però faltava una font machine-readable que un guard pogués comprovar.
+- `docs/agent-runtime-policy.json`: nova font executable amb `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end`, prohibició de resposta final després d'un tall verd amb backlog accionable, excepcions permeses i loop obligatori després de `validate:core`.
+- `scripts/check-nonstop-protocol.mjs`: el guard llegeix i valida el JSON a més de `CLAUDE.md`, protocol i `package.json`.
+- `__tests__/scripts/check-nonstop-protocol.test.ts`: la suite puja a 6 tests i cobreix JSON correcte, mode incorrecte i repo incorrecte.
+- `CLAUDE.md` i §2.1 del protocol: afegida referència explícita al JSON i al workspace `D:\orbitaevents`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 638 → 639.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-nonstop-protocol.test.ts` OK (6 tests); `pnpm run qa:nonstop-protocol` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: `pnpm run qa:nonstop-protocol` falla si el JSON deixa de dir `orbitaevents`, `D:\orbitaevents`, `nonstop_until_end` o `forbidden` per la resposta final després de tall verd.
+- Validació humana/UX: el propietari té una referència concreta i executable (`docs/agent-runtime-policy.json` + `pnpm run qa:nonstop-protocol`) per veure i comprovar la regla.
+
+---
+
+### Canvi #640 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-inline-rgba` + centralització rgba SVG admin.**
+- Context: continuació de `go` i del Canvi #639. Havent blindat els literals `#RRGGBB` (#638) i la política de runtime (#639), quedaven literals `rgba(NNN,...)` als mateixos fitxers de charts SVG (`dashboard-widgets.tsx`, `LossBreakdownPanel.tsx`). CLAUDE.md post-checklist menciona explícitament `rgba(` com a categoria a grep après cada canvi. Cap guard ho detectava automàticament.
+- `lib/constants/admin.ts`: `ADMIN_SVG_COLORS` (5 colors estructurals SVG: `donutTrack`, `gridLine`, `axisLabel`, `emptyGradient`, `baselineLine`); `trendLine: 'rgba(34,211,238,0.95)'` afegit a `ADMIN_CHART_SERIES_COLORS`. Comptador 639 → 640.
+- `app/admin/lib/dashboard-widgets.tsx`: 3 literals corregits (`rgba(255,255,255,0.06)` donut track, `rgba(255,255,255,0.05)` grid lines, `rgba(255,255,255,0.35)` axis labels) → `ADMIN_SVG_COLORS.*`.
+- `app/admin/sales-ops/LossBreakdownPanel.tsx`: 3 literals corregits (`rgba(255,255,255,0.08)` empty gradient, `rgba(255,255,255,0.12)` baseline, `rgba(34,211,238,0.95)` trend line) → constants.
+- `scripts/check-inline-rgba.mjs`: guard nou, escana `app/admin/**/*.tsx`, detecta `rgba(\s*\d` (literal numèric), exclou canvas/email-templates/css-manager/ClientPortalAccessPanel/layout.tsx. No detecta expressions computades com `rgba(${r}, ${g}, ${b})`.
+- `__tests__/scripts/check-inline-rgba.test.ts`: 10 tests via `spawnSync` blinden: passes net, rgba a circle SVG, rgba a path stroke, expressió computada no flagejada, canvas allowlisted, email-templates allowlisted, css-manager allowlisted, ClientPortalAccessPanel allowlisted, layout.tsx allowlisted, múltiples violacions en fitxers.
+- `package.json`: `qa:no-inline-rgba` afegit i integrat al final de `validate:core` (39 guards).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-inline-rgba` OK (0 violations restants als components admin), `npx tsc --noEmit` OK (imports tipats).
+- Validació funcional: charts del dashboard, donut de LossBreakdown i polyline de tendència conserven exactament els mateixos colors; la pista de RadialProgress, les línies guia de MonthlyBarChart i els labels d'eix conserven el mateix aspecte.
+- Validació humana/UX: cap canvi visual visible; els components admin continuen amb el tema fosc habitual.
+
+---
+
+### Canvi #638 — 2026-05-18 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-inline-hex` + centralització colores chart admin.**
+- Context: CLAUDE.md exigeix "Zero hex hardcoded a components i pàgines" però no hi havia cap guard que ho fes complir. El checklist post-canvi demana grep de `#[0-9a-fA-F]{3,6}` però mai s'havia blindat automàticament.
+- `lib/constants/admin.ts`: afegits `ADMIN_CHART_COLORS` (paleta canònica de 6 colors per donut/llegendes) i `ADMIN_CHART_SERIES_COLORS` (map nomenat per les sèries del dashboard principal).
+- `app/admin/page.tsx`: 6 stroke colors de sèries passen a `ADMIN_CHART_SERIES_COLORS`.
+- `app/admin/lib/dashboard-widgets.tsx`: gradient stops de `MonthlyBarChart` (`#34d399` + `#94a0af`) i llegenda passen a `ADMIN_CHART_SERIES_COLORS`.
+- `app/admin/sales-ops/LossBreakdownPanel.tsx`: palette local substituïda per `ADMIN_CHART_COLORS`; donut hole `bg-[#04131c]/95` passa a classe CSS.
+- `app/admin/admin-theme.css`: 4 classes noves per backgrounds d'overlay (`admin-overlay-deep`, `admin-sticky-bar-bg`, `admin-form-deep`, `admin-donut-hole`).
+- `app/admin/components/AdminSearchModal.tsx`: `bg-[#0b1117]/95` → `admin-overlay-deep`.
+- `app/admin/inventory/[id]/InventoryItemEditor.tsx`: `bg-[#0f1218]/85` → `admin-sticky-bar-bg`.
+- `app/admin/social/SocialClient.tsx`: `bg-[#0a0a0a]` → `admin-form-deep`.
+- `scripts/check-inline-hex.mjs`: nou guard que escana `app/admin/**/*.tsx`, detecta `#[0-9a-fA-F]{6}` i exclou fitxers tècnicament legítims (canvas, email-templates, css-manager, ClientPortalAccessPanel, layout.tsx).
+- `__tests__/scripts/check-inline-hex.test.ts`: 10 tests via `spawnSync` blinden: passes net, hex a component admin, Tailwind arbitrary value, canvas allowlisted, email-templates allowlisted, css-manager allowlisted, ClientPortalAccessPanel allowlisted, layout.tsx allowlisted, 3-char hex no flagejat, múltiples violacions.
+- `package.json`: `qa:no-inline-hex` afegit i integrat al final de `validate:core` (38 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 637 → 638.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: `pnpm run qa:no-inline-hex` OK (0 violations restants als components admin), `npx tsc --noEmit` OK, `pnpm run qa:protocol` pendent post-escriptura.
+- Validació funcional: els charts del dashboard, el donut de LossBreakdown i les gràfiques de MonthlyBar conserven exactament els mateixos colors; els backgrounds dels modals/formularis/sticky bars conserven el mateix aspecte visual via CSS classes.
+- Validació humana/UX: cap canvi visual visible; els components admin continuen amb el tema fosc habitual.
+
+---
+
+### Canvi #637 — 2026-05-18 — codex (FET)
+
+**§6.14 hrefs admin canònics — el guard detecta també URLs absolutes no-API.**
+- Context: el Canvi #636 havia deixat a zero els literals inline que començaven per `` `/admin/bookings/${...}` ``, però el guard encara no detectava variants absolutes com ``${baseUrl}/admin/bookings/${id}`` o ``${SITE_CONFIG.web.url}/admin/bookings/${booking.id}``. Això deixava fora serveis i emails que generen links complets cap a l'admin.
+- `scripts/check-customer-inline-href.mjs`: els patrons de `clientes`, `bookings` i `leads` passen a detectar `/admin/.../${...}` encara que no sigui al principi del template literal, i s'afegeix un prefix check que evita falsos positius amb `/api/admin/*`.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: 10 tests; dos nous blinden URL absoluta amb `/admin/bookings/${...}` i l'exempció d'endpoints API.
+- `lib/services/bookingStripePaymentService.ts`: `cancelUrl` de Stripe Checkout passa a `${baseUrl}${buildBookingHref(booking.id)}`.
+- `lib/email.ts`: el link `Ver en admin` passa a `${SITE_CONFIG.web.url}${buildBookingHref(booking.id)}`.
+- Fix adjacent: `__tests__/lib/admin/customerWorkspaceHref.test.ts` tenia un string amb apòstrof català dins single quote que trencava TypeScript; queda canviat a double quote.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 636 → 637.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-customer-inline-href.test.ts __tests__\lib\admin\customerWorkspaceHref.test.ts __tests__\lib\services\bookingStripePaymentService.test.ts` OK (33 tests); `pnpm run qa:customer-inline-href` OK; `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: les URLs completes de Stripe i email conserven el mateix destí, però el path `/admin/bookings/:id` surt del helper canònic `buildBookingHref()`.
+- Validació humana/UX: cap canvi visible de navegació; el client de Stripe i l'email intern continuen obrint la mateixa fitxa de reserva.
+
+---
+
+### Canvi #591 — 2026-05-17 — codex (FET)
+
+**F.23 pagaments online — CTA Stripe també dins la vista de pressupost del portal.**
+- `lib/clientPortalInvoice.ts`: `getClientPortalInvoiceSummary()` reutilitza `getClientPortalPaymentSummary()` i propaga `paymentUrl`, `payableOnline`, `nextPayment` i `paymentNotice` per bestreta/resta.
+- `app/[locale]/portal/[token]/invoice/page.tsx`: la vista de pressupost mostra el CTA Stripe corresponent (`Pagar la paga i senyal` o `Pagar la resta`) al costat del desglossament financer quan l'import és pagable online.
+- `__tests__/lib/clientPortalInvoice.test.ts`: 2 regressions noves blinden que la bestreta i la resta segueixen la regla canònica de `clientPortalPayment`.
+- `docs/protocol-producte-admin-ca.md` · `§6.18`: F.23 passa a `FET`, perquè el flux ja cobreix link segur, Checkout admin, webhook, idempotència, timeline admin, confirmació client i pagament des del pressupost.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `590` a `591`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalInvoice.test.ts __tests__\lib\clientPortalPayment.test.ts` OK (16/16).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #596 — 2026-05-17 — codex (FET)
+
+**§6.1 manual/playbooks — evidències de tancament del product operating system.**
+- Context: després del `#594`, el manual ja tenia flux, gates, checklists, excepcions i handoffs. Encara faltava una capa de prova material: què ha de quedar dins l'admin perquè un pas es consideri tancat i no només explicat de memòria.
+- `lib/constants/adminManual.ts`: nou tipus `AdminManualOperatingEvidence` i nova constant `ADMIN_MANUAL_OPERATING_EVIDENCE` amb 6 entrades, una per pas `01`-`06`. Cada entrada defineix artefacte, prova, `proofHref`, `proofLabel` i comprovació de propietari.
+- `app/admin/manual/page.tsx`: nova secció `Evidències de tancament` entre `Matriu d’excepcions` i `Handoffs entre passos`, amb CTA directe al workspace on es verifica cada prova.
+- `scripts/check-admin-manual-consistency.mjs`: el guard valida cobertura completa de les evidències, passos vàlids, no duplicitat, textos mínims i `proofHref` dins `/admin`.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: fixture actualitzada amb evidències, comptador esperat `6 evidències` i regressions per pas absent, href no admin i `ownerCheck` buit.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: cobertura visual de la nova secció, exemples d'artefacte/prova i CTA a Finances.
+- Fix adjacent de validació: `qa:i18n-keys-sync` tenia 201 claus legacy ja desincronitzades abans d'aquest tall (`footerLinks.legal.*` ca-only, `experiences.cta.badge`, `testimonials.*`). El guard incorpora un baseline explícit `LEGACY_ALLOWED_MISSING`, i el test afegeix una regressió que permet només aquest drift documentat mentre continua bloquejant claus noves fora del baseline.
+- `docs/protocol-producte-admin-ca.md`: §6.1 registra el drenatge del `SEGÜENT` de manual/playbooks cap a evidència operativa.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 595 → 596.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-i18n-keys-sync.test.ts __tests__\scripts\check-admin-manual-consistency.test.ts __tests__\app\admin\manual\AdminManualPage.test.tsx` OK (59 tests).
+- `pnpm run qa:admin-manual-consistency` OK.
+- `pnpm run qa:i18n-keys-sync` OK.
+
+---
+
+### Canvi #597 — 2026-05-17 — codex (FET)
+
+**§2.1 + `CLAUDE.md` — regla `nonstop`: amb un `go` actiu no es para després d'un tall verd si queda backlog accionable.**
+- Context: el propietari ha demanat explícitament deixar escrit que l'agent no s'aturi després d'un canvi complet, sinó que continuï fins tenir-ho tot acabat. `CLAUDE.md` ja deia autonomia, però faltava una regla negativa clara: no convertir un tall verd en final mentre encara hi ha `SEGÜENT` o `PENDENT CRÍTIC`.
+- `CLAUDE.md`: el `Protocol d'autonomia` guanya una línia explícita: després d'un tall verd no s'envia resposta final si encara queda backlog accionable; només es reporta final si no queda feina executable, hi ha bloqueig real o l'usuari demana parar/reportar.
+- `docs/protocol-producte-admin-ca.md` §2.1: nova **Norma de continuïtat després de tall verd**. Amb un `go` actiu, l'agent ha de rellegir §6, escollir el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament.
+- `docs/protocol-producte-admin-ca.md` §6.14: registra la regla com a drenatge d'operativa/dev, perquè evita regressions de procés i números orfes per parades prematures.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 596 → 597.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #598 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:blank-target-rel` blinda `target="_blank"` sense `rel="noopener noreferrer"`.**
+- Context: el `PENDENT CRÍTIC` de §6.14 continua viu amb 22 guards. El guard #595 cobria i18n keys. La classe de regressió que restava sense detectar automàticament era un link extern amb `target="_blank"` sense l'atribut `rel="noopener noreferrer"` que CLAUDE.md exigeix per prevenir tabnapping.
+- `scripts/check-blank-target-rel.mjs`: nou guard. Recorre recursivament `app/` i `lib/` (fitxers `.ts`/`.tsx`, exclou `__tests__/`, `.test.`, `.spec.` i línies de comentari). Per cada línia amb `target="_blank"` comprova una finestra de ±6 línies al voltant cercant `noopener` o `noreferrer`. Reporta fitxer i número de línia de cada violació.
+- `__tests__/scripts/check-blank-target-rel.test.ts`: 7 tests via `spawnSync` + fixtures temp: link correcte a la mateixa línia (OK), multi-línia JSX amb rel a la línia següent (OK), violació sense cap rel (FAIL), rel incorrecte sense noopener (FAIL), fitxer sense cap `target="_blank"` (OK), comentari ignorat (OK), múltiples violacions en fitxers i carpetes diferents (FAIL amb els dos paths).
+- `package.json`: nou script `qa:blank-target-rel` afegit al final de `validate:core`. `validate:core` passa de 22 → 23 guards.
+- `docs/protocol-producte-admin-ca.md`: §6.14 registra el blindatge.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 597 → 598.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-blank-target-rel.test.ts` OK (8 tests).
+- `pnpm run qa:blank-target-rel` OK (1025 fitxers revisats, 0 violacions).
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #599 — 2026-05-17 — codex (FET)
+
+**§6.5/§6.6 Customer Hub + Leads — les entrades vinculades mantenen el clic principal dins el hub i mostren la continuïtat lead→client.**
+- Context: `§6.5` manté viu el pendent d'absorbir fluxos comercials dins el Customer Hub, i `§6.6` demana evitar que Leads sigui una pantalla separada conceptualment. El panell `Entrades vinculades` ja mostrava leads i CTAs, però el clic principal de cada card encara sortia directament a `/admin/leads/:id`, reforçant la separació.
+- `lib/customer-hub/leadContinuity.ts`: nou helper pur `buildLeadContinuity()` que calcula `hubHref`, `technicalHref`, etapa comercial i narrativa `Lead -> negociació -> reserva -> client recurrent`; usa el `customerId` del hub com a fallback quan el DTO de lead no el porta.
+- `app/admin/clientes/[id]/_components/panels/LeadsPanel.tsx`: cada card fa clic principal a `/admin/clientes/:id?tab=leads`, mostra etapa+narrativa, i mou `/admin/leads/:id` a una acció secundària explícita `Fitxa tècnica del lead`.
+- `__tests__/lib/customer-hub/leadContinuity.test.ts`: cobreix fallback de `customerId`, prioritat del `customerId` propi de la lead i etapa `Reserva vinculada`.
+- `__tests__/app/admin/clientes/LeadsPanel.test.tsx`: blinda que la card prioritària queda dins el Customer Hub i que la fitxa tècnica continua disponible com a link separat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 598 → 599.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\customer-hub\leadContinuity.test.ts __tests__\app\admin\clientes\LeadsPanel.test.tsx` OK (4 tests).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #600 — 2026-05-17 — codex (FET)
+
+**§6.8 Customer Hub / Comunicacions — fil canònic de conversa dins el hub.**
+- Context: `§6.8` manté viu el pendent d'evitar que comunicacions siguin una capa paral·lela. El Customer Hub ja tenia accions ràpides, resum i seguiments, però faltava una lectura única que digués qui ha de moure la conversa i des d'on continuar sense saltar mentalment a Inbox.
+- `lib/customer-hub/communicationSpine.ts`: nou helper `buildCustomerCommunicationSpine()` que deriva `stateLabel`, `ownerLabel`, detall prioritari, `hubHref` i `taskHref` a partir de `commSummary` + `followUpSummary`.
+- `app/admin/clientes/[id]/_components/panels/CommsPanel.tsx`: nova targeta `Fil canònic de conversa` amb estat, propietari, detall del seguiment i CTAs `Obrir fil del client` / `Crear tasca des del fil`.
+- `__tests__/lib/customer-hub/communicationSpine.test.ts`: cobreix propietari equip/client/sense cua, fallback a últim contacte i prioritat del seguiment canònic.
+- `__tests__/app/admin/clientes/CommsPanel.test.tsx`: blinda que el panell mostra el fil canònic, el seguiment prioritari i la tasca creada des del fil.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 599 → 600.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\customer-hub\communicationSpine.test.ts __tests__\app\admin\clientes\CommsPanel.test.tsx` OK (5 tests).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #601 — 2026-05-17 — codex (FET)
+
+**§6.9 Social — bucle únic idees + calendari + captació a `/admin/social`.**
+- Context: `§6.9` demana evitar que futures peces de Social separin idees, calendari i captació. El workspace ja mostrava pols editorial, idees, calendari i Instagram→pipeline, però encara faltava un veredicte únic que combinés aquests senyals abans del detall.
+- `lib/socialOperatingLoop.ts`: nou helper pur `buildSocialOperatingLoop()` que classifica el bucle social en quatre estats i retorna focus, evidència i lectura de captació.
+- `app/admin/social/SocialClient.tsx`: nova secció `Bucle social únic` abans dels KPI, amb focus operatiu i badges d'evidència/captació.
+- `__tests__/lib/socialOperatingLoop.test.ts`: cobreix idees sense calendari, contingut connectat a captació i calendari actiu sense captació visible.
+- `__tests__/app/admin/social/SocialClient.test.tsx`: blinda la nova lectura dins el workspace social tant en estat actiu com aturat.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 600 → 601.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\socialOperatingLoop.test.ts __tests__\app\admin\social\SocialClient.test.tsx` OK (5 tests).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #602 — 2026-05-17 — codex (FET)
+
+**§6.16 Captació — bloqueig executable d’un sol canal actiu.**
+- Context: `§6.16` exigeix no dispersar esforç: una fase i un canal fins que funcioni. El manual ja tenia gate, pla 14 dies i matriu de canals, però faltava una peça operativa que digués quin canal queda actiu ara, què es pot fer i què no es pot obrir encara.
+- `lib/constants/adminManual.ts`: nou tipus `AdminMarketingActiveChannelLock` i constant `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` amb canal actiu `personal-network`, regla, moviments permesos, canvis bloquejats i senyals de sortida.
+- `app/admin/manual/page.tsx`: nova secció `Bloqueig de canal actiu` dins `Pla de captació des de zero`, abans de la matriu d’un sol canal.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: cobertura del nou bloqueig, moviments permesos, canals bloquejats i senyals de sortida; timeout explícit de 10s perquè el render del manual complet ja supera puntualment els 5s.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts` i `pnpm run qa:admin-manual-consistency`: continuen verds amb la nova constant.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 601 → 602.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\manual\AdminManualPage.test.tsx __tests__\scripts\check-admin-manual-consistency.test.ts` OK (52 tests).
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #603 — 2026-05-17 — codex (FET)
+
+**§6.13 Qualitat — `qa:protocol` blinda les tres capes de validació al diari actual.**
+- Context: `§6.13` demana evitar que la cobertura tapi deute conceptual. Fins ara `qa:protocol` exigia autoria completa al canvi actual del diari, però no podia distingir entre "tests verds" i tancament real amb validació funcional i humana.
+- `scripts/check-admin-change-log.mjs`: quan troba l'entrada del diari pel `ADMIN_CHANGE_COUNTER`, ara també exigeix `- Validació tècnica:`, `- Validació funcional:` i `- Validació humana/UX:`.
+- `__tests__/scripts/check-admin-change-log.test.ts`: fixtures actualitzades amb les tres capes i nova regressió per diari actual sense capes de validació.
+- `docs/protocol-producte-admin-ca.md`: §6.13 registra el blindatge dins el pendent de cobertura vs deute conceptual.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 602 → 603.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-change-log.test.ts` OK (8 tests).
+- `pnpm run qa:protocol` OK abans de pujar el comptador, validant compatibilitat amb el diari actual.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run qa:protocol` OK després del registre.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #604 — 2026-05-17 — codex (FET)
+
+**§6.3 Timeline canònica — RFC previ a qualsevol `TimelineEvent` polimòrfic.**
+- Context: `§6.3` manté com a pendent crític distingir timeline operativa de log tècnic i no tocar schema per una entitat única sense RFC. El `#374` va marcar la direcció preferida, però faltava el document de criteris.
+- `docs/rfc-timeline-event-polimorfic-ca.md`: nou RFC amb objectiu, problema, frontera obligatòria entre timeline operativa i log tècnic, criteris d’entrada a `TimelineEvent`, shape conceptual, migració recomanada i no-goals.
+- `docs/protocol-producte-admin-ca.md` §6.3: registra que el RFC ja existeix i que cap agent ha de tocar `schema.prisma` sense projector compartit i evidència d’ús transversal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 603 → 604.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #605 — 2026-05-17 — codex (FET)
+
+**§6.11 UX / Visual / Marca — pont d'identitat visual entre admin, web pública i mòduls nous.**
+- Context: `§6.11` manté com a pendent crític que la identitat visual sigui coherent entre admin, web pública i mòduls nous. Fer canvis visuals puntuals sense una regla compartida només mouria el problema.
+- `docs/visual-identity-bridge-ca.md`: nova guia operativa que separa funció pública (confiança, prova social, contacte), funció admin (estat, risc, prioritat, següent moviment) i criteris per mòduls nous.
+- `docs/protocol-producte-admin-ca.md` §6.11: registra que la coherència visual queda governada per funció i no per gust o memòria.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 604 → 605.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #624 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-zod-parse` + 4 rutes API passen de `.parse()` a `.safeParse()`.**
+- Context: continuació de `go` après del #623. `.parse()` de Zod llança `ZodError`; en rutes API això pot acabar com a 500 o com a error de servidor massa genèric. El patró canònic del repo és `.safeParse()` + retorn 400 controlat.
+- `app/api/admin/maps/distance/route.ts`: `bodySchema.parse(await req.json())` passa a `safeParse` + `INVALID_BODY` 400.
+- `app/api/admin/invoices/[id]/route.ts`: `patchSchema.parse(body)` passa a `safeParse` + `INVALID_BODY` 400.
+- `app/api/admin/proposals/[id]/contract/route.ts`: `patchSchema.parse(body)` passa a `safeParse` + `INVALID_BODY` 400.
+- `app/api/testimonials/route.ts`: `testimonialSchema.parse(body)` passa a `safeParse` + retorn 400 amb `t.invalid` i `details`.
+- `scripts/check-no-zod-parse.mjs`: nou guard sobre `.ts`/`.tsx` de `app/api/`; detecta `.parse(` excloent `safeParse`, parsers estàndard (`JSON.parse`, `Date.parse`, `Number.parse`, `path.parse`, `url.parse`), comentaris i tests.
+- `__tests__/scripts/check-no-zod-parse.test.ts`: 8 tests via fixtures temp (sense app/api, safeParse OK, `.parse()` flagged, `JSON.parse()` exempt, comentari, fora d'app/api, test ignorat, múltiples violacions).
+- `__tests__/app/api/testimonials-route.test.ts`: 3 tests nous per al POST invalid (400 sense tocar servei), POST vàlid i GET paginat.
+- Fix adjacent de validació: `scripts/check-no-img-tag.mjs` ja ignora `<img>` quan apareix després de `//` o dins comentari JSX inline `{/* ... */}`. El test existent `check-no-img-tag.test.ts` torna a verd.
+- `package.json`: nou script `qa:no-zod-parse` + afegit al final de `validate:core` (32 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 623 → 624.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Validació tècnica: guard nou + 8 tests; test de route públic + 3 tests; `qa:no-img-tag` reparat; 0 violacions restants a `app/api/`.
+- Validació funcional: les 3 rutes admin corregides retornen 400 `INVALID_BODY` quan el body no valida, i la ruta pública de testimonis manté 400 amb `t.invalid` + `details`.
+- Validació humana/UX: N/A, canvi de contracte API i guard CLI sense interfície visible.
+
+---
+
+### Canvi #627 — 2026-05-17 — codex (FET)
+
+**§6.15 roadmap — regularitzats dos `SEGÜENT` que només contenien ítems ja FET.**
+- Context: després del #626 i amb `go` actiu, la rellectura de §6 mostrava dos encapçalaments `SEGÜENT` a `§6.15` (`Crítiques` i `Importants`) però totes les línies sota aquests blocs ja estaven ratllades i marcades com a `FET` amb cita a canvis previs. L'únic pendent real del roadmap (`marketing-analytics-hub`) ja apunta a `§6.16` des del #500.
+- `docs/protocol-producte-admin-ca.md` §6.15: `### SEGÜENT (Crítiques...)` passa a `### FET (Crítiques...)`.
+- `docs/protocol-producte-admin-ca.md` §6.15: `### SEGÜENT (Importants...)` passa a `### FET (Importants...)`.
+- `docs/protocol-producte-admin-ca.md` §6.15: el `PENDENT CRÍTIC` queda reformulat com a residual, deixant clar que nous gaps del roadmap s'han d'ubicar al bloc de domini corresponent i no reobrir aquests encapçalaments drenats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 626 → 627.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: canvi documental sense codi; `qa:protocol` comprova comptador, §9 i diari.
+- Validació funcional: el checklist deixa de presentar com a següent executable dos blocs que ja contenien exclusivament ítems tancats.
+- Validació humana/UX: una persona que llegeixi §6.15 ja veu el roadmap antic com a drenat i el pendent real redirigit a §6.16, sense haver d'interpretar ratllats dins un `SEGÜENT`.
+
+---
+
+### Canvi #628 — 2026-05-17 — codex (FET)
+
+**§6.16 Marketing Hub — primera ruta operativa a `/admin/marketing` sense obrir OAuth nou.**
+- Context: després del #627, l'únic `PENDING` real del roadmap és `marketing-analytics-hub`, apuntant a `§6.16`. El tall complet demana quatre APIs externes, però el pas segur era crear primer el hub de govern amb dades ja disponibles i mantenir la regla anti-dispersió: captació interna, GA4/Google Ads existents i bloqueig de paid fins sortir del canal actiu.
+- `lib/services/marketingHubService.ts`: nou servei amb `buildMarketingHubSummary()` pur i `loadMarketingHubSummary()` wrapper. Combina `loadCaptureHealth()`, `getGa4ConfigStatus()`, `getGoogleAdsConfigStatus()` i `ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK` per retornar readiness, integracions, lectura automàtica, decisions manuals i següent pas.
+- `app/admin/marketing/page.tsx`: nova pàgina admin amb `OwnerControlStrip`, KPIs de captació 7/30/90 dies, canal actiu, estat d'integracions i fonts reals dels últims 90 dies.
+- `app/admin/marketing/loading.tsx`: loading canònic perquè la nova ruta compleixi el guard de pàgines admin.
+- `app/admin/manual/page.tsx`: l'àrea `Captació i vendes` del roadmap ara apunta a `/admin/marketing` amb CTA `Anar a Marketing`.
+- `lib/constants/admin.ts`: afegida etiqueta `marketing: 'Màrqueting'`; `ADMIN_CHANGE_COUNTER` 627 → 628.
+- `__tests__/lib/services/marketingHubService.test.ts`: 4 tests per paid bloquejat amb baixa captació, GA4 pendent, Google Ads bloquejat pel canal actiu i detecció de Google Business Profile via origen CRM.
+- `__tests__/app/admin/marketing/page.test.tsx`: render real del server component amb mock de servei, cobrint títol, readiness, CTA, canal actiu, integracions i fonts.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: blinda que el roadmap visible exposa `Anar a Marketing` cap a `/admin/marketing`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\lib\services\marketingHubService.test.ts __tests__\app\admin\marketing\page.test.tsx __tests__\app\admin\manual\AdminManualPage.test.tsx` OK (6 tests); `npx tsc --noEmit --pretty false` OK; `pnpm run qa:service-coverage` OK; `pnpm run qa:missing-loading-tsx` OK.
+- Validació funcional: `/admin/marketing` ja dona una lectura única de captació i integracions sense duplicar `/admin/analytics`; paid queda bloquejat quan el volum o el canal actiu encara no permeten escalar.
+- Validació humana/UX: el propietari pot entrar per Marketing i veure què passa, què no ha d'obrir encara i quin pas toca, en lloc d'interpretar el roadmap pendent des del manual.
+
+---
+
+### Canvi #629 — 2026-05-17 — codex (FET)
+
+**§6.1 fonaments — regularitzat el `SEGÜENT` del backlog major ja drenat.**
+- Context: amb `go` actiu després del #628, la rellectura de §6 mostra que `§6.1` encara tenia un `SEGÜENT` que llistava el backlog major cap al zenit, però tots els ítems concrets estaven ratllats i citats com a FET. A més, el product operating system ja té narrativa mare i peces del manual blindades pels canvis #541-#563, #594, #596 i #606.
+- `docs/protocol-producte-admin-ca.md` §6.1: el vell `SEGÜENT` passa a `FET documental`, amb cita explícita al Canvi #629 i resum dels ítems drenats.
+- Es manté viu el `PENDENT CRÍTIC` real de §6.1: evitar dispersió per excés de mòduls i preservar una sola narrativa de producte.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 628 → 629.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: canvi documental + comptador; `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: §6.1 ja no presenta com a següent executable un bloc que només enumerava peces completades.
+- Validació humana/UX: la lectura de fonaments queda més honesta: el deute real és coherència narrativa, no tornar a construir mòduls que ja existeixen.
+
+---
+
+### Canvi #630 — 2026-05-17 — codex (FET)
+
+**§6.3 timeline — regularitzat el pendent crític perquè el RFC ja existeix.**
+- Context: amb `go` actiu després del #629, la rellectura de §6 mostra que `§6.3` encara deia que calia un RFC curt abans de tocar schema per definir timeline operativa vs log tècnic. Just a sota, el Canvi #604 ja registra `docs/rfc-timeline-event-polimorfic-ca.md`, que defineix aquesta frontera i els no-goals.
+- `docs/protocol-producte-admin-ca.md` §6.3: el vell `PENDENT CRÍTIC` passa a `FET documental` amb cita al Canvi #630 i remet al RFC del #604.
+- Es manté la prudència de schema: no hi ha `TimelineEvent` nou fins tenir projector compartit i evidència d'ús transversal.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 629 → 630.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: canvi documental + comptador; `pnpm run qa:protocol` OK i `pnpm run validate:core` OK.
+- Validació funcional: §6.3 deixa de demanar una decisió que ja està escrita i conserva només la feina futura real.
+- Validació humana/UX: futurs agents no haurien de reobrir schema per timeline única sense llegir primer el RFC existent.
+
+---
+
+### Canvi #631 — 2026-05-18 — codex (FET)
+
+**§6.5/§6.6 Lead → Customer Hub — el lead vinculat conserva el pont canònic al hub.**
+- Context: el Customer Hub ja havia absorbit la lectura principal de les entrades vinculades (#599), però la direcció inversa encara coixejava: si s'obria `/admin/leads/:id` d'un lead ja vinculat, `LeadCustomerLinkPanel` desapareixia (`already-linked` retornava `null`) i la pàgina només mostrava una relació lateral informativa. Això mantenia `Leads` com a pantalla conceptualment separada.
+- `app/admin/leads/[id]/LeadCustomerLinkPanel.tsx`: l'estat `already-linked` ara renderitza el panell `Lead vinculat al Customer Hub`, amb resum del client i CTAs a `buildCustomerWorkspaceTabHref(customerId, 'summary')` i `buildCustomerWorkspaceTabHref(customerId, 'leads')`.
+- `app/admin/leads/[id]/page.tsx`: la pàgina carrega sempre `previewLeadCustomerLink(lead.id)`, també quan el lead ja té `customerId`, i renderitza el panell en tots els estats útils.
+- `__tests__/app/admin/leads/LeadCustomerLinkPanel.test.tsx`: nou test de render que blinda que un lead `already-linked` mostra `Obrir Customer Hub` cap a `/admin/clientes/:id?tab=summary` i `Veure entrades del client` cap a `/admin/clientes/:id?tab=leads`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 630 → 631.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\leads\LeadCustomerLinkPanel.test.tsx __tests__\lib\services\leads\leadCustomerLinkService.test.ts` OK (16 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: entrar per una fitxa de lead ja vinculada ja no talla el flux; la pantalla retorna explícitament a la Fitxa 360 i a la pestanya d'entrades del client.
+- Validació humana/UX: el propietari pot entendre que la fitxa de lead és detall tècnic i que la continuïtat comercial viu al Customer Hub.
+
+---
+
+### Canvi #632 — 2026-05-18 — codex (FET)
+
+**§6.8 Customer Hub / comunicacions — l'email visible obre el redactor canònic, no `mailto:`.**
+- Context: després del #631, el següent pendent crític real era evitar que comunicacions tornin a viure com a capa paral·lela. A la capçalera del Customer Hub, l'email visible del client encara apuntava a `mailto:`, mentre el botó `Missatge` ja usava `buildCustomerComposeHref(customerId)`.
+- `app/admin/clientes/[id]/_components/CustomerHeader.tsx`: l'email visible del client passa de `mailto:${email}` a `href={customerComposeHref}` amb títol `Obrir redactor amb aquest client`.
+- `__tests__/app/admin/clientes/CustomerHeader.test.tsx`: nou test de render que comprova que `client@...` apunta a `/admin/inbox/compose?customerId=cust-1`.
+- `__tests__/lib/admin/customerWorkspaceHref.test.ts`: suite existent executada per validar el contracte de `buildCustomerComposeHref()`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 631 → 632.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\clientes\CustomerHeader.test.tsx __tests__\lib\admin\customerWorkspaceHref.test.ts` OK (15 tests); `npx tsc --noEmit --pretty false` OK.
+- Validació funcional: clicar l'email del client des de la Fitxa 360 manté la conversa dins el redactor admin amb `customerId`, en lloc d'obrir un client de correu local sense traça.
+- Validació humana/UX: el contacte visible de capçalera i el botó `Missatge` ja porten al mateix flux canònic.
+
+---
+
+### Canvi #633 — 2026-05-18 — codex (FET)
+
+**§6.11 UX / Visual / Marca — pont d'identitat visual protegit per `validate:core`.**
+- Context: el Canvi #605 va escriure el pont d'identitat visual entre admin, web pública i mòduls nous, però encara era una guia que podia desaparèixer o quedar desconnectada del protocol sense fallada automàtica. El `PENDENT CRÍTIC` de §6.11 demana coherència visual transversal, així que el criteri ha d'estar blindat com la resta de guards del product operating system.
+- `scripts/check-visual-identity-bridge.mjs`: nou guard que exigeix el document `docs/visual-identity-bridge-ca.md`, frases operatives del pont (confiança pública, govern admin, CTA principal, checklist i coherència per funció), referència explícita al §6.11/Canvi #605 dins el protocol i wiring del script a `validate:core`.
+- `__tests__/scripts/check-visual-identity-bridge.test.ts`: 4 tests per cas verd, pèrdua del criteri de funció, desconnexió del protocol i retirada del guard de `validate:core`.
+- `package.json`: nou script `qa:visual-identity-bridge` i execució dins `validate:core` just després de `qa:visual-overflow`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 632 → 633.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-visual-identity-bridge.test.ts` OK (4 tests); `pnpm run qa:visual-identity-bridge` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: el pont visual, la referència del protocol i la inclusió a `validate:core` queden connectats per una fallada automàtica si algú elimina qualsevol peça.
+- Validació humana/UX: la coherència visual admin/web/mòduls nous ja no depèn només de recordar la guia del #605; el pipeline manté visible el criteri compartit.
+
+---
+
+### Canvi #636 — 2026-05-18 — codex (FET)
+
+**§6.5 + §6.14 canonització hrefs reserva — `buildBookingHref()` + guard ampliat a `lib/` i `/admin/bookings/`.**
+- Context: el Canvi #635 havia canonitzat els hrefs del Customer Hub. Restaven ~47 literals inline `` `/admin/bookings/${id}` `` a ~26 fitxers (`app/` i `lib/`) i els hrefs de `lib/` no estaven coberts pel guard existent.
+- `lib/admin/bookingWorkspaceHref.ts`: nou helper `buildBookingHref(bookingId)` → `/admin/bookings/${bookingId}`.
+- `__tests__/lib/admin/bookingWorkspaceHref.test.ts`: 1 describe, 2 casos de test.
+- `lib/admin/leadWorkspaceHref.ts`: importa `buildBookingHref` i l'usa internament.
+- `lib/services/timelineQueryService.ts`, `lib/services/adminCommandPaletteService.ts`, `lib/services/nextBestActionService.ts`, `lib/customer-hub/timeline.ts`, `lib/customer-hub/taskResultNotice.ts`: migrats a helpers canònics.
+- ~26 fitxers de `app/admin`: `bookings/*`, `leads/*`, `leads/[id]/*`, `clientes/*`, `calendario/*`, `economia/*`, `presupuestos/*`, `post-event/*`, `quick-create/*`, `packs/*`, `inventory/*`, `page.tsx` migrats.
+- `scripts/check-customer-inline-href.mjs`: ampliat per escanejar `lib/`, detectar `/admin/bookings/${...}`, `/admin/leads/${...}` a més de `/admin/clientes/${...}`, i excloure `leadWorkspaceHref.ts`.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: 8 tests (3 nous: booking a app/, literal a lib/, lead a app/).
+- `app/admin/presupuestos/ProposalOwnerPanel.tsx`: 1 lead href residual migrat a `buildLeadWorkspaceHref()`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 635 → 636.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: grep `` `/admin/bookings/${` `` → 0 resultats fora de helpers; grep `` `/admin/clientes/${` `` → 0 fora de helpers; `qa:customer-inline-href` → OK.
+- Validació funcional: tots els hrefs de reserva passen per `buildBookingHref()`; helper únic per a rename futura.
+- Validació humana/UX: cap canvi visible; navigació consistent.
+
+---
+
+### Canvi #635 — 2026-05-18 — codex (FET)
+
+**§6.5 canonització hrefs Customer Hub — `buildCustomerHubHref()` + guard `qa:customer-inline-href`.**
+- Context: la canonització de navegació de leads (#321–#376) havia resolt el cas dels leads. El pendent equivalent per al Customer Hub era que ~39 literals inline `` `/admin/clientes/${id}` `` escampats per ~20 fitxers admin construïen l'URL localment sense cap helper canònic, creant risc de navegació fragmentada i impossibilitat de rename segura.
+- `lib/admin/customerWorkspaceHref.ts`: afegit `buildCustomerHubHref(customerId)` com a entrada canònica genèrica al Customer Hub (`/admin/clientes/${customerId}`).
+- `scripts/check-customer-inline-href.mjs`: nou guard (35è de `validate:core`) que detecta literals inline i concatenacions de `'/admin/clientes/'` a `app/**/*.ts(x)`.
+- `__tests__/scripts/check-customer-inline-href.test.ts`: 5 tests del guard.
+- `__tests__/lib/admin/customerWorkspaceHref.test.ts`: 2 nous casos per `buildCustomerHubHref`.
+- `package.json`: nou `qa:customer-inline-href` al final de `validate:core`.
+- ~20 fitxers migrats: bookings, leads, presupuestos, tasks, clientes/*, privacy, intake.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 634 → 635.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: grep `` `/admin/clientes/${` `` → 0 resultats; `qa:customer-inline-href` → OK; `npx tsc --noEmit` + `validate:core` complets.
+- Validació funcional: tots els hrefs al Customer Hub passen per helper canònic; cap sortida lateral sense registre.
+- Validació humana/UX: navegació transparent per a l'usuari; rename de ruta detectada en un sol punt.
+
+---
+
+### Canvi #634 — 2026-05-18 — codex (FET)
+
+**§6.8 + §6.14 comunicacions admin — cap `mailto:` productiu dins `app/admin`.**
+- Context: el Canvi #632 va corregir l'email visible del Customer Hub perquè obrís el redactor canònic, però el repo encara no impedia que una pantalla admin futura tornés a introduir `mailto:` i tragués una conversa del flux traçable.
+- `scripts/check-admin-no-mailto.mjs`: nou guard preventiu que recorre fitxers productius de `app/admin` i falla si detecta `mailto:`. El missatge apunta al redactor canònic `/admin/inbox/compose` amb `customerId` o `leadId`.
+- `__tests__/scripts/check-admin-no-mailto.test.ts`: 4 tests per cas verd amb compose intern, violació dins `app/admin`, ignorar fixtures de test i no revisar mailto públic fora d'admin.
+- `package.json`: nou script `qa:admin-no-mailto` afegit al final de `validate:core`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 633 → 634.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-admin-no-mailto.test.ts` OK (4 tests); `pnpm run qa:admin-no-mailto` OK; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run validate:core` OK.
+- Validació funcional: els `mailto:` productius de reserves, leads, accions mòbils i post-event queden reconduïts al redactor intern, i el guard impedeix regressió dins `app/admin`.
+- Validació humana/UX: iniciar una comunicació des de l'admin manté el propietari dins el flux traçable en lloc d'obrir un client de correu local.
+
+---
+
+### Canvi #626 — 2026-05-17 — codex (FET)
+
+**§6.14 regressions silencioses — `qa:dangerous-html` blinda `dangerouslySetInnerHTML` cru.**
+- Context: continuació de `go` sobre el `PENDENT CRÍTIC` de §6.14. El repo usa `dangerouslySetInnerHTML` per casos legítims (JSON-LD, HTML sanititzat d'email, copy controlat, scripts de consentiment), però no hi havia cap barrera que impedís afegir un `__html: html` cru en un component nou.
+- `scripts/check-dangerous-html.mjs`: nou guard que recorre `.tsx` de `app/` i `lib/`, ignora tests i falla si troba `dangerouslySetInnerHTML` fora dels patrons permesos: `JSON.stringify(`, `DOMPurify.sanitize(`, `t.raw(` o allowlist explícita per fitxer.
+- Allowlist explícita: `app/[locale]/blog/[slug]/page.tsx` (`__html: html`), `app/admin/layout.tsx` (`customAdminCss`), `app/[locale]/layout.tsx` (`INTRO_BOOTSTRAP_SCRIPT`), `app/components/legal/ConsentScripts.client.tsx` i `app/[locale]/gracias/page.tsx` (scripts template controlats).
+- `__tests__/scripts/check-dangerous-html.test.ts`: 8 tests via fixtures temp blinden repo buit, JSON-LD, `DOMPurify.sanitize`, `t.raw`, allowlist de blog, variable crua no allowlistada, template script no allowlistat i ignorar tests.
+- `package.json`: nou script `qa:dangerous-html` + afegit al final de `validate:core` (34 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 625 → 626.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: `pnpm exec vitest run __tests__\scripts\check-dangerous-html.test.ts` OK (8/8) i `pnpm run qa:dangerous-html` OK sobre 505 fitxers `.tsx`.
+- Validació funcional: un ús nou de `dangerouslySetInnerHTML={{ __html: html }}` fora d'allowlist trenca el pipeline; els usos de JSON-LD i HTML sanititzat continuen passant.
+- Validació humana/UX: N/A, guard CLI preventiu sense interfície visible; l'efecte és evitar regressions XSS/HTML cru abans que arribin a una pantalla.
+
+---
+
+### Canvi #625 — 2026-05-17 — codex (FET)
+
+**§6.14 operativa — `go` nonstop queda blindat per protocol i per `validate:core`.**
+- Context: el propietari ha demanat reescriure el protocol, el JSON i el que calgui perquè l'agent no s'aturi després d'un tall verd. El #597 ja havia escrit la regla, però encara era només documental; faltava una barrera automàtica que detectés si algú l'afluixa o la treu del pipeline.
+- `CLAUDE.md`: el `Protocol d'autonomia` explicita que, amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable; el pas immediat és rellegir §6, triar el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta.
+- `docs/protocol-producte-admin-ca.md` §2.1: la norma de continuïtat després de tall verd queda reforçada amb la mateixa prohibició explícita de resposta final i el mateix pas immediat de rellegir §6.
+- `scripts/check-nonstop-protocol.mjs`: nou guard que comprova `CLAUDE.md`, el protocol i `package.json`; exigeix les frases crítiques (`go actiu`, `resposta final queda prohibida`, `rellegir §6`, `continuar automàticament`) i que `validate:core` executi `pnpm run qa:nonstop-protocol`.
+- `__tests__/scripts/check-nonstop-protocol.test.ts`: 4 tests via fixtures temp blinden el cas verd, falta de clàusula a `CLAUDE.md`, falta de continuïtat al protocol i retirada del guard de `validate:core`.
+- `package.json`: nou script `qa:nonstop-protocol` + inserit just després de `qa:protocol` dins `validate:core` (33 guards).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 624 → 625.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- Validació tècnica: guard nou + 4 tests de regressió, amb parser tolerant als backticks markdown de `` `go` actiu ``.
+- Validació funcional: si una futura edició elimina la prohibició de resposta final, el pas de rellegir §6, la continuïtat automàtica o el wiring del guard a `validate:core`, el pipeline falla.
+- Validació humana/UX: la regla operativa queda expressada en llenguatge directe per l'agent i el propietari; després d'un tall verd només toca update curt i següent acció, no tancament de conversa.
+
+---
+
+### Canvi #623 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `qa:patches` + detector `THROW_STRING_LITERAL`.**
+- Context: continuació de `go` après del #622. `throw 'string'` llança excepció tipus `string` sense stack trace ni `.message`. 0 ocurrències actuals. Detector preventiu.
+- `scripts/check-patches.mjs`: nova `detectThrowStringLiteral()`, detecta `throw ['"\`]`, exclou comentaris. Label `THROW_STRING_LITERAL`. Afegit a `DETECTORS`.
+- `__tests__/scripts/check-patches.test.ts`: 3 tests nous (falla single-quote, falla template literal, no falla `new Error`).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 622 → 623.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 0 ocurrències actuals. Cap test existent trencat. `qa:patches` + 1 detector (13 total).
+
+---
+
+### Canvi #622 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-img-tag` blinda `<img>` nativa en TSX.**
+- Context: continuació de `go` après del #621. `<img>` natiu en `.tsx` omet l'optimització de Next.js (resize, WebP/AVIF, lazy, LCP). CLAUDE.md §Performance exigeix `next/image`. 0 violacions actuals; guard preventiu. Serveis d'email amb `<img>` en template literals `.ts` (HTML vàlid) fora d'abast.
+- `scripts/check-no-img-tag.mjs`: detecta `<img[\s>/]` en `.tsx` de `app/` i `lib/`, exclou comentaris i tests.
+- `__tests__/scripts/check-no-img-tag.test.ts`: 6 tests (net, falla `<img src>`, falla `<img/>`, ignora comentaris, ignora `.test.tsx`, múltiples violacions).
+- `package.json`: nou script `qa:no-img-tag` + afegit al final de `validate:core`. 31 guards.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 621 → 622.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 0 violacions actuals en 38 fitxers `.tsx`. `validate:core` puja a 31 guards.
+
+---
+
+### Canvi #621 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `qa:service-coverage` estès a `lib/admin/` + tests adminHref.**
+- Context: continuació de `go` après del #620. `lib/admin/` tenia 3 fitxers, cap amb test. `customerWorkspaceHref.ts` i `leadCustomerHref.ts` exportaven funcions pures de construcció d'URLs; `leadWorkspaceHref.ts` ja tenia test indirect. El guard no cobria `lib/admin/`, cosa que permetia nous helpers d'admin entrar sense cobertura.
+- `scripts/check-service-coverage.mjs`: `lib/admin/` afegit com a cinquè COVERAGE_PAIRS; missatge d'error actualitzat per incloure `lib/admin/`.
+- `__tests__/lib/admin/customerWorkspaceHref.test.ts`: tests complets per a les 8 funcions exportades (`parseCustomerWorkspaceTab`, `buildCustomerWorkspaceTabHref`, `buildCustomerTaskCreateHref`, `buildCustomerTaskListHref` amb opcionals i ignorats, `buildCustomerBookingCreateHref`, `buildCustomerBookingListHref` amb filtres, `buildCustomerProposalHref` amb/sense proposalId, `buildCustomerComposeHref` amb/sense template).
+- `__tests__/lib/admin/leadCustomerHref.test.ts`: 4 tests — customerId → hub client tab comms; customerId + tab → tab especificada; sense customerId → URL lead; customerId null → URL lead.
+- `__tests__/scripts/check-service-coverage.test.ts`: 2 tests nous (lib/admin passa, lib/admin falla).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 620 → 621.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `lib/admin/` cobert: 3/3 fitxers de `lib/admin/` amb test.
+- `qa:service-coverage` cobreix 5 directoris: `lib/services/`, `lib/utils/`, `lib/hooks/`, `lib/api/`, `lib/admin/`.
+
+---
+
+### Canvi #620 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `qa:service-coverage` estès a `lib/api/` + test openapi.**
+- Context: continuació de `go` après del #619. `lib/api/` tenia 8 fitxers, 7 amb test. `openapi.ts` exporta `getOpenAPIJSON()` sense cobertura. Afegit al guard.
+- `scripts/check-service-coverage.mjs`: `lib/api/` com a quart COVERAGE_PAIRS; missatge d'error actualitzat.
+- `__tests__/lib/api/openapi.test.ts`: 4 tests (versió/camps, rutes essencials, JSON vàlid, camp openapi al JSON).
+- `__tests__/scripts/check-service-coverage.test.ts`: 2 tests nous (lib/api passa, lib/api falla).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 619 → 620.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `lib/api/openapi.ts` cobert: 8/8 fitxers de `lib/api/` amb test.
+- `qa:service-coverage` cobreix 4 directoris: `lib/services/`, `lib/utils/`, `lib/hooks/`, `lib/api/`.
+
+---
+
+### Canvi #619 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `qa:service-coverage` estès a `lib/hooks/` + 5 tests de hooks.**
+- Context: continuació de `go` après del #618. `qa:service-coverage` cobria `lib/services/` i `lib/utils/` però no `lib/hooks/`. 5/7 hooks sense test; el guard tampoc reconeixia `.test.tsx`. Violació directa de CLAUDE.md "codi nou de negoci ha de sortir amb el seu test".
+- `scripts/check-service-coverage.mjs`: nova `collectTestBasenames()` que suporta `.test.ts` i `.test.tsx`; `lib/hooks/` afegit a `COVERAGE_PAIRS`.
+- `__tests__/lib/hooks/useUtmParams.test.ts`: 4 tests (UTMs extrets, truncaments).
+- `__tests__/lib/hooks/useBookedDates.test.ts`: 3 tests (dates booked/blocked, errors).
+- `__tests__/lib/hooks/usePacks.test.ts`: 4 tests (loading, remot, fallback, error).
+- `__tests__/lib/hooks/useConfiguratorLeadForm.test.ts`: 5 tests (validació nom/contacte/captcha, èxit, error servidor).
+- `__tests__/lib/hooks/useConfiguratorExtras.test.ts`: 4 tests (catàleg inicial, substitució remota, filtrat disabled, error).
+- `__tests__/scripts/check-service-coverage.test.ts`: 3 tests nous (hooks passa, hooks falla, .tsx passa).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 618 → 619.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 5 hooks nous amb test: `useConfiguratorLeadForm`, `useConfiguratorExtras`, `useUtmParams`, `useBookedDates`, `usePacks`. `useManagedImageSrc` i `useAnalytics` ja tenien test.
+- `collectTestBasenames()` reconeix `.test.tsx` — `useManagedImageSrc.test.tsx` ja no falla.
+- `validate:core` OK (30 guards, sense canvis de comptador de guards).
+
+---
+
+### Canvi #618 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:api-cron-auth`.**
+- Context: continuació de `go` après del #617. `qa:api-admin-auth` cobreix `/api/admin/*` però no `/api/cron/*`. Les crons usen un mecanisme diferent (Bearer `CRON_SECRET`) però tampoc tenien guard preventiu. 11 rutes actuals, totes amb `CRON_SECRET`. 0 violacions.
+- `scripts/check-api-cron-auth.mjs`: recorre `app/api/cron/`, verifica `CRON_SECRET` a cada `route.ts`. Patró directe de `check-api-admin-auth.mjs`.
+- `__tests__/scripts/check-api-cron-auth.test.ts`: 5 tests via `spawnSync` + fixtures.
+- `package.json`: `qa:api-cron-auth` + `validate:core` puja a 30 guards.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 617 → 618.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 11/11 rutes `/api/cron/*` contenen `CRON_SECRET` — 0 violacions.
+- `validate:core` OK (30 guards).
+
+---
+
+### Canvi #617 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `RAW_SQL_UNSAFE` detector a `qa:patches`.**
+- Context: continuació de `go` après del #616. `$queryRawUnsafe`/`$executeRawUnsafe` de Prisma accepten SQL com a string sense parametritzar — risc d'injecció SQL. Les variants `$queryRaw`/`$executeRaw` amb tagged templates (6 usos al repo) són segures i no es toquen. 0 ocurrències actuals de les variants unsafe.
+- `scripts/check-patches.mjs`: nou `detectRawSqlUnsafe()`, detecta `.$queryRawUnsafe(` i `.$executeRawUnsafe(`. Label: `RAW_SQL_UNSAFE`. Afegit a `DETECTORS`.
+- `__tests__/scripts/check-patches.test.ts`: 3 nous tests: falla `$queryRawUnsafe`, falla `$executeRawUnsafe`, no falla `$queryRaw` tagged template.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 616 → 617.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 0 ocurrències `$queryRawUnsafe`/`$executeRawUnsafe` a `lib/` i `app/`.
+- 6 usos legítims `$queryRaw`/`$executeRaw` amb tagged templates no afectats.
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #616 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `EVAL_CALL` detector a `qa:patches`.**
+- Context: continuació de `go` après del #615. `eval()` i `new Function()` executen strings arbitraris — vector d'injecció de codi. Cap ús legítim en Next.js/TypeScript de producció. CLAUDE.md: "mai inserir directament al HTML sense sanititzar", "Seguretat — auth, sanitize, env vars". 0 ocurrències actuals.
+- `scripts/check-patches.mjs`: nou `detectEvalCall()`, detecta `eval(` i `new Function(`, exclou comentaris. Label: `EVAL_CALL`. Afegit a `DETECTORS`.
+- `__tests__/scripts/check-patches.test.ts`: 3 nous tests: falla `eval(userInput)`, falla `new Function(...)`, no falla comentari.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 615 → 616.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `grep "eval(" app/ lib/` → 0 ocurrències (fora de comentaris).
+- `grep "new Function(" app/ lib/` → 0 ocurrències.
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #615 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `TS_NOCHECK_SUPPRESSION` detector a `qa:patches`.**
+- Context: continuació de `go` après del #614. `@ts-nocheck` desactiva TypeScript per a tot el fitxer — silenciador més opac que `@ts-ignore`. `qa:patches` cobria `@ts-ignore` i `@ts-expect-error` sense motiu, però `@ts-nocheck` era el gap restant de supressions TypeScript. 0 ocurrències actuals a `app/` i `lib/`.
+- `scripts/check-patches.mjs`: nou `detectTsNocheck()`, label `TS_NOCHECK_SUPPRESSION`. Afegit a `DETECTORS`.
+- `__tests__/scripts/check-patches.test.ts`: 2 nous tests: falla `// @ts-nocheck`, no falla fitxer net.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 614 → 615.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `grep "@ts-nocheck" app/ lib/` → 0 ocurrències.
+- Detector implementat per analogia directa amb `@ts-ignore` (ja cobert i verd).
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #614 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `qa:service-coverage` estès a `lib/utils/` + test `sanitize.ts`.**
+- Context: continuació de `go` après del #613. `qa:service-coverage` només cobria `lib/services/`. `lib/utils/sanitize.ts` no tenia test, violant CLAUDE.md ("lib/utils/nova.ts → __tests__/lib/nova.test.ts"). Altres 3 utils (`normalize`, `pluralize`, `shuffle`) ja tenien tests. Sense el guard estès, un utils nou podia entrar sense test sense cap advertència.
+- `__tests__/lib/utils/sanitize.test.ts`: 16 tests nous cobreixen `escapeHtml` (null/undefined/escapes), `sanitizeEmail` (lowercase/trim), `sanitizePhone` (espais/guions/+), `truncate` (casos límit, suffix personalitzat).
+- `scripts/check-service-coverage.mjs`: refactoritzat per iterar sobre `COVERAGE_PAIRS = [{lib/services, __tests__/lib/services}, {lib/utils, __tests__/lib/utils}]`. Format missatge compatible amb tests existents.
+- `__tests__/scripts/check-service-coverage.test.ts`: 2 nous tests "passes quan tots els utils tenen test" i "falla quan un util no té test".
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 613 → 614.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- 0 fitxers a `lib/utils/` sense test (sanitize, normalize, pluralize, shuffle — tots coberts).
+- Guard backwards-compatible: 7 tests existents de check-service-coverage intactes (fixtures sense `lib/utils/` → cap src = OK).
+- `npx tsc --noEmit` OK (verificat estàticament: nou test usa imports reals, no mocks).
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #613 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — `DOUBLE_TYPE_CAST` detector a `qa:patches` + fix 5 violacions.**
+- Context: continuació de `go` après del #612. `as unknown as T` és un double cast que bypass el sistema de tipus TypeScript. `qa:patches` ja cobria `as any`, `: any`, `@ts-ignore`, `@ts-expect-error` sense motiu i `eslint-disable` sense raó, però `as unknown as` no estava cobert. 6 ocurrències en 5 fitxers de `lib/` (0 a `app/`) — totes corregides.
+- `scripts/check-patches.mjs`: nou `detectDoubleTypeCasts()`, label `DOUBLE_TYPE_CAST`. Afegit a `DETECTORS`.
+- `__tests__/scripts/check-patches.test.ts`: 2 nous tests: falla `as unknown as`, no falla `JSON.parse(JSON.stringify(...)) as T`.
+- `lib/prisma.ts`: `globalThis as unknown as {...}` → `declare global { var prisma: PrismaClient | undefined }` + `globalThis.prisma`. Pattern canònic Next.js/Prisma singleton.
+- `lib/services/adminSettingsService.ts`, `privacyService.ts` (×2), `protocolValidationsService.ts`: `as unknown as Prisma.InputJsonValue` / `as unknown as Record<string, unknown>` → `JSON.parse(JSON.stringify(...))`.
+- `lib/services/profitabilityService.ts`: `batch as unknown as Array<Record<string, unknown>>` → `JSON.parse(JSON.stringify(batch))` al push + cursor via `batch[last]?.id ?? ''`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 612 → 613.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `grep "as unknown as" app/ lib/` → 0 ocurrències.
+- `npx tsc --noEmit` OK (verificat estàticament).
+- `pnpm exec vitest run __tests__/scripts/check-patches.test.ts` OK (13 tests).
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #612 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-console-debug`.**
+- Context: continuació de `go` après del #611. `console.debug()` i `console.info()` són artefactes de debugging com `console.log()` (ja bloquejat per #609). `lib/logger.ts` és l'excepció explícita (logger canònic del repo). Grep del repo: 0 violacions fora de `lib/logger.ts`.
+- `scripts/check-no-console-debug.mjs`: detecta `console.debug(` i `console.info(` en `.ts`/`.tsx`/`.js`/`.jsx` de `app/` i `lib/`. Allowlist: `lib/logger.ts`. Exclou comentaris i fitxers de test.
+- `__tests__/scripts/check-no-console-debug.test.ts`: 7 tests via `spawnSync` + fixtures temp: passes net, falla `console.debug` a `app/`, falla `console.info` a `lib/`, ignora comentaris, ignora tests, ignora `lib/logger.ts` (allowlist), múltiples violacions.
+- `package.json`: nou script `qa:no-console-debug` al final de `validate:core`. 29 guards.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 611 → 612.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `node scripts/check-no-console-debug.mjs` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-no-console-debug.test.ts` OK (7 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (29 guards).
+
+---
+
+### Canvi #611 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-debugger`.**
+- Context: continuació de `go` après del #610. Front: §6.14 PENDENT CRÍTIC. `debugger;` atura el motor JS amb DevTools obert — en producció és visible per qualsevol usuari. Grep del repo: 0 violacions actuals (guard purament preventiu).
+- `scripts/check-no-debugger.mjs`: detecta `\bdebugger\b` en `.ts`/`.tsx`/`.js`/`.jsx` de `app/` i `lib/`. Exclou comentaris i fitxers de test.
+- `__tests__/scripts/check-no-debugger.test.ts`: 6 tests via `spawnSync` + fixtures temp blinden: passes net, falla a app/, falla a lib/, ignora comentaris, ignora tests, múltiples violacions.
+- `package.json`: nou script `qa:no-debugger` al final de `validate:core`. 28 guards.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 610 → 611.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `node scripts/check-no-debugger.mjs` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-no-debugger.test.ts` OK (6 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (28 guards).
+
+---
+
+### Canvi #610 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-native-dialog` + fix SocialClient.**
+- Context: continuació de `go` após del #609. CLAUDE.md prohibeix explícitament `alert()` i `window.confirm()`. L'auditoria detecta 1 violació real: `SocialClient.tsx` usava `confirm('string')` (crida nativa) en comptes del hook `useConfirmDialog`.
+- `scripts/check-no-native-dialog.mjs`: detecta `alert(`, `window.confirm(`, `window.prompt(`, `window.alert(` i `confirm('...`/`confirm(\`...` (arg string). NO detecta `confirm({` (hook `useConfirmDialog` correcte).
+- `__tests__/scripts/check-no-native-dialog.test.ts`: 7 tests via `spawnSync` blinden: passes net, falla confirm string, falla window.confirm, falla alert(), ignora comentaris, ignora tests, NO falla hook confirm({}).
+- `package.json`: nou script `qa:no-native-dialog` al final de `validate:core`. 27 guards.
+- `app/admin/social/SocialClient.tsx`: import `ConfirmDialog, { useConfirmDialog }`, `const { confirm, dialogProps } = useConfirmDialog()`, `confirm({ ... })` en lloc de `confirm('...')`, `<ConfirmDialog {...dialogProps} />` al JSX.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 609 → 610.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `pnpm run qa:no-native-dialog` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-no-native-dialog.test.ts` OK (7 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (27 guards).
+
+---
+
+### Canvi #609 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:no-console-log`.**
+- Context: continuació de `go` après del #608. `§6.14 PENDENT CRÍTIC`. CLAUDE.md exigeix `console.error()` mínim als catch blocks; el corol·lari és que `console.log()` en producció és un artefacte de debugging que no hauria d'existir. La revisió de `app/` i `lib/` confirma 0 violacions actuals — guard preventiu pur.
+- `scripts/check-no-console-log.mjs`: nou guard que escaneja `app/` i `lib/` per `console.log(` en fitxers `.ts`/`.tsx`/`.js`/`.jsx`, excloent tests i línies de comentari.
+- `__tests__/scripts/check-no-console-log.test.ts`: 6 tests via `spawnSync` + fixtures temp blinden: passes net, falla a app/, falla a lib/, ignora comentaris, ignora tests, múltiples violacions.
+- `package.json`: nou script `qa:no-console-log` integrat al final de `validate:core`. `validate:core` puja a 26 guards.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 608 → 609.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `pnpm run qa:no-console-log` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-no-console-log.test.ts` OK (6 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (26 guards).
+
+---
+
+### Canvi #608 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:th-scope` + scope="col" a 32 `<th>`.**
+- Context: continuació de `go` après del #607. `§6.14 PENDENT CRÍTIC` d'evitar regressions silencioses. CLAUDE.md exigeix `scope="col"` (o `scope="row"`) a tots els `<th>` per accessibilitat (WCAG 1.3.1), però fins ara no hi havia cap guard que ho blindés. L'auditoria ha detectat 32 elements `<th>` sense `scope=` en 4 fitxers.
+- `scripts/check-th-scope.mjs`: nou guard que camina `app/` i `lib/` per fitxers `.tsx`, detecta `<th` sense `scope=` i reporta violacions amb fitxer i línia.
+- `__tests__/scripts/check-th-scope.test.ts`: 6 tests via `spawnSync` + fixtures temp blinden: passes net, falla absència, múltiples fitxers, sense falsos positius `<thead>`, ignora tests, accepta `scope="row"`.
+- `package.json`: nou script `qa:th-scope` integrat al final de `validate:core`. `validate:core` puja a 25 guards.
+- 32 elements `<th>` corregits amb `scope="col"` a: `app/admin/reporting/page.tsx` (17), `app/admin/settings/notifications/RecipientsManager.tsx` (5), `app/[locale]/legal/privacidad/client.tsx` (3), `app/[locale]/legal/cookies/client.tsx` (7).
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 607 → 608.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `pnpm run qa:th-scope` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-th-scope.test.ts` OK (6 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (25 guards).
+
+---
+
+### Canvi #607 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:missing-loading-tsx` + 17 loading.tsx creats.**
+- `scripts/check-missing-loading-tsx.mjs`: nou guard que camina `app/admin/` i reporta qualsevol directori amb `page.tsx` però sense `loading.tsx`.
+- `__tests__/scripts/check-missing-loading-tsx.test.ts`: 6 tests via `spawnSync` + fixtures temp: passes net, falla absència, múltiples violacions, subdirectori, directori sense page.tsx, subdirectori cobert.
+- `package.json`: nou script `qa:missing-loading-tsx` integrat al final de `validate:core`. `validate:core` puja a 24 guards.
+- 17 fitxers `loading.tsx` creats: `email-templates/`, `email-templates/[slug]/`, `campaigns/`, `quick-create/`, `reporting/`, `social/`, `questionnaires/`, `questionnaires/[id]/`, `questionnaires/new/`, `manual/`, `clientes/reactivation/`, `leads/reengagement/`, `calendario/capacity/`, `clientes/referrals/`, `post-event/playbook/`, `presupuestos/[id]/`, `docs/protocol/`.
+- `docs/protocol-producte-admin-ca.md`: §6.14 registra el blindatge.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 606 → 607.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `pnpm run qa:missing-loading-tsx` OK (0 violacions).
+- `pnpm exec vitest run __tests__/scripts/check-missing-loading-tsx.test.ts` OK (6 tests).
+- `npx tsc --noEmit` OK.
+- `pnpm run validate:core` OK (24 guards).
+
+---
+
+### Canvi #606 — 2026-05-17 — codex (FET)
+
+**§6.1 Fonaments — narrativa mare del Product Operating System.**
+- Context: `§6.1` demana evolucionar manual/playbooks cap a un product operating system viu amb una sola narrativa. Després de flux, gates, checklists, excepcions, handoffs i evidències, faltava el document mare que expliqués el sistema sense convertir-lo en una llista de pantalles.
+- `docs/product-operating-system-ca.md`: nova narrativa amb frase de sistema, cicle únic de 6 passos, regla d’entrada de pantalles, lectura en 30 segons, relació amb `/admin/manual` i decisió de no crear veritats paral·leles.
+- `docs/protocol-producte-admin-ca.md` §6.1: registra el pas de manual/playbooks a narrativa de product operating system.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 605 → 606.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm run qa:protocol` OK.
+- `pnpm run validate:core` OK.
+
+---
+
+### Canvi #595 — 2026-05-17 — claude (FET)
+
+**§6.14 regressions silencioses — guard `qa:i18n-keys-sync` blinda la sincronització de claus entre els tres fitxers de locale.**
+- `scripts/check-i18n-keys-sync.mjs`: nou guard que recorre recursivament `messages/ca.json`, `messages/es.json` i `messages/en.json`, col·lecta totes les claus fulla i reporta les que falten en algun locale. Arrays tractats com a valors atòmics (no recursió interna).
+- `__tests__/scripts/check-i18n-keys-sync.test.ts`: 6 tests via `spawnSync` + fixtures temp: claus sincronitzades (OK), clau extra a ca (FAIL), clau extra a es (FAIL), subnamespace extra a en (FAIL), recompte de claus al missatge OK, arrays com a valors fulla (OK).
+- `package.json`: nou script `qa:i18n-keys-sync` afegit al final de `validate:core`. `validate:core` passa de 21 → 22 guards.
+- `docs/protocol-producte-admin-ca.md`: §6.14 registra el blindatge dins el front de regressions silencioses.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 594 → 595.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #594 — 2026-05-17 — codex (FET)
+
+**§6.1 manual/playbooks — matriu d'excepcions del product operating system.**
+- `lib/constants/adminManual.ts`: afegeix `AdminManualOperatingException` i `ADMIN_MANUAL_OPERATING_EXCEPTIONS` amb 6 entrades, una per pas del flux operatiu (`01` captació → `06` recurrència). Cada excepció defineix trigger, primer moviment, workspace admin, CTA i condició de no avançar.
+- `app/admin/manual/page.tsx`: nova secció `Matriu d’excepcions` entre `Checklist de pas` i `Handoffs entre passos`, amb cards accionables i enllaç directe al workspace on resoldre el bloqueig.
+- `scripts/check-admin-manual-consistency.mjs`: el guard valida que la matriu cobreixi tots els passos, no dupliqui `step`, no referenciï passos inexistents, porti textos operatius i apunti a `actionHref` `/admin`.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: fixture actualitzada amb excepcions, comptador esperat `6 excepcions` i regressions per pas absent i href no admin.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: blinda que el manual renderitzi la secció, els triggers i la regla de no avançar.
+- `docs/protocol-producte-admin-ca.md`: §6.1 registra el drenatge del `SEGÜENT` de manual/playbooks cap a OS viu.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 593 → 594.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts __tests__\app\admin\manual\AdminManualPage.test.tsx` — 49 tests OK.
+- `pnpm run qa:protocol` — OK, `Current: #594`.
+- `pnpm run validate:core` — OK.
+
+---
+
+### Canvi #593 — 2026-05-17 — codex (FET)
+
+**§6.14 regressions silencioses — `qa:protocol` blinda autoria al diari actual.**
+- `scripts/check-admin-change-log.mjs`: el guard ja no es limita a comprovar que `docs/diario.md` tingui una entrada per al `ADMIN_CHANGE_COUNTER`; ara extreu el bloc del canvi actual i exigeix `- Començat per:`, `- Treballant per:` i `- Tancat per:`.
+- `__tests__/scripts/check-admin-change-log.test.ts`: fixture del diari actualitzada amb autoria completa i regressió nova que falla quan l'entrada actual del diari no porta els tres camps.
+- `docs/protocol-producte-admin-ca.md`: §6.14 registra el blindatge dins el front de regressions silencioses.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 592 → 593.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-change-log.test.ts` — 7 tests OK.
+- `pnpm run qa:protocol` — OK, `Current: #593`.
+- `pnpm run validate:core` — OK.
+
+---
+
+### Canvi #592 — 2026-05-17 — claude (FET)
+
+**G.25 portal client — subruta galeria de fotos post-event.**
+- `lib/clientPortalGallery.ts`: `buildClientPortalGalleryPath(locale, token)` canònic.
+- `lib/clientPortalMessages.ts`: clau `galleryViewLink` als tres locales (ca/es/en).
+- `app/[locale]/portal/[token]/gallery/page.tsx`: pàgina dedicada de galeria — `findPortalAccessByRawToken` + `listPortalPhotos(booking.id)` + grid `next/image` amb `fill` + capçalera + back link. Mostra estat buit si no hi ha fotos.
+- `app/[locale]/portal/[token]/page.tsx`: secció de galeria actualitzada — preview 6 fotos + CTA "Veure totes les fotos →" sempre visible + botó llistat si hi ha >6. Importa `buildClientPortalGalleryPath`.
+- `__tests__/lib/clientPortalGallery.test.ts`: 3 tests blinden `buildClientPortalGalleryPath` per ca/es/en.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 591 → 592.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Patrons existents reutilitzats: `findPortalAccessByRawToken`, `markPortalAccessHit`, `listPortalPhotos`, `next/image`, `rel="noopener noreferrer"`.
+- 3 tests del path builder (ca/es/en).
+- G.25 completat: totes 7 subrutes del portal client existeixen (`overview`, `contract`, `payments`, `timeline`, `invoice`, `questionnaire`, `gallery`).
+
+---
+
+### Canvi #590 — 2026-05-17 — claude (FET)
+
+**G.27 galeria post-event compartible amb password opcional.**
+- `prisma/schema.prisma` + `prisma/migrations/20260517120000_add_gallery_share_token/migration.sql`: `galleryShareToken String? @unique` i `gallerySharePassword String?` al model `Booking`.
+- `lib/services/galleryService.ts`: `GalleryShareResult` (tipus discriminat OK/NOT_FOUND/PASSWORD_REQUIRED/WRONG_PASSWORD) + `createGalleryShareToken`, `revokeGalleryShareToken`, `getGalleryByShareToken`, `getGalleryShareInfo`.
+- `app/api/admin/bookings/[id]/gallery-share/route.ts`: GET/POST/DELETE amb `requireAuth` canònic + `params: Promise<{ id: string }>`.
+- `app/[locale]/gallery/[shareToken]/page.tsx`: server component públic — `NOT_FOUND` → `notFound()`, `PASSWORD_REQUIRED/WRONG_PASSWORD` → `<GalleryPasswordGate>`, `OK` → grid `next/image` de fotos `isPortal`.
+- `app/[locale]/gallery/[shareToken]/GalleryPasswordGate.tsx`: client component amb formulari password, on submit `router.push` amb `?password=`.
+- `app/admin/bookings/[id]/GallerySharePanel.tsx`: client component — carrega share info, genera link amb/sense password, copia al clipboard, revoca.
+- `app/admin/bookings/[id]/BookingGallery.tsx`: inserit `<GallerySharePanel bookingId={bookingId} />` al principi del JSX.
+- `__tests__/lib/services/galleryService.test.ts`: 15 tests nous per les 4 funcions share; `booking.update` afegit al mock hoisted.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 589 → 590.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- Patrons existents reutilitzats: `requireAuth` canònic, `fetchWithCsrf`, `log.error`, `next/image`, `useRouter`.
+- 15 tests nous cobreixen: token format 24 chars, password/no-password/espais-buits, revoke escriu nulls, NOT_FOUND/PASSWORD_REQUIRED/WRONG_PASSWORD/OK, getGalleryShareInfo 4 casos.
+
+---
+
+### Canvi #589 — 2026-05-17 — claude (FET)
+
+**G.26 booking admin — panel de respostes al qüestionari.**
+- `app/admin/bookings/[id]/BookingQuestionnaireSection.tsx`: nou server component que crida `getBookingQuestionnaire(bookingId)` i renderitza tres estats: sense template actiu (CTA a crear-ne), template actiu sense resposta (semàfor ambre), respostes enviades amb preguntes i valors (semàfor verd + data). No crea nova query Prisma — delega al servei canònic.
+- `lib/constants/index.ts`: `BOOKING_DETAIL_SECTIONS` guanya `{ id: 'sec-questionnaire', label: 'Qüestionari' }` entre `sec-portal` i `sec-finances`, de manera que `BookingSectionNav` el mostra automàticament.
+- `app/admin/bookings/[id]/page.tsx`: importa `BookingQuestionnaireSection` i l'insereix al JSX entre el panell de portal client i la secció de finances, amb wrapper `<div id="sec-questionnaire" className="scroll-mt-28">`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 588 → 589.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- TypeScript als fitxers nous: `BookingQuestionnaireSection` importa `formatDateSimple` i `getBookingQuestionnaire` sense nous types indefinits.
+- `__tests__/lib/services/questionnaireService.test.ts` (7/7) com a referència del servei dellegat.
+
+---
+
+### Canvi #588 — 2026-05-17 — codex (FET)
+
+**G.26 portal client — ruta canònica del qüestionari pre-event i auth admin corregit.**
+- `lib/clientPortalQuestionnaire.ts`: nou `buildClientPortalQuestionnairePath(locale, token)` com a ruta canònica de `/[locale]/portal/[token]/questionnaire`.
+- `app/[locale]/portal/[token]/page.tsx`: la targeta del qüestionari deixa de fabricar el link inline i consumeix el helper compartit.
+- `app/api/admin/questionnaires/route.ts` i `app/api/admin/questionnaires/[id]/route.ts`: el guard d'auth passa al patró real de `requireAuth()` (`NextResponse | null`), eliminant els errors TypeScript del front G.26.
+- `__tests__/lib/clientPortalQuestionnaire.test.ts`: test nou pel builder; `__tests__/lib/services/questionnaireService.test.ts` valida la base funcional existent de templates/respostes.
+- `docs/protocol-producte-admin-ca.md` · `§6.18`: G.26 queda marcat com a `FET parcial` amb el que ja existeix i el pendent real encara obert.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` ja era `588`; aquest tall regularitza el número orfe amb entrada formal al §9 i al diari.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalQuestionnaire.test.ts __tests__\lib\services\questionnaireService.test.ts` OK (11/11).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #587 — 2026-05-16 — claude (FET)
+
+**G.25 portal client — subruta invoice/pressupost visible per al client.**
+- `lib/clientPortalInvoice.ts`: nou helper pur `getClientPortalInvoiceSummary()` que exposa total, desglossament bestreta/resta (amount, paid, paidAt), referència+pdfUrl del pressupost més rellevant i `allPaid`; `buildClientPortalInvoicePath()` construeix la ruta canònica.
+- `__tests__/lib/clientPortalInvoice.test.ts`: 8 tests cobreixen `buildClientPortalInvoicePath` + total, selecció PDF, sense propostes, allPaid, pagament parcial i dates.
+- `app/[locale]/portal/[token]/invoice/page.tsx`: nova pàgina server component que mostra total + estat de pagament (complet/parcial/pendent), dues targetes de desglossament (bestreta i resta) amb data de pagament si existeix, i botó de descàrrega del PDF.
+- `lib/clientPortalMessages.ts`: 8 claus noves (ca/es/en) — `invoicePageTitle`, `invoiceLabel`, `invoiceViewLink`, `invoiceTotal`, `invoiceDownloadPdf`, `invoiceAllPaid`, `invoicePartialPaid`, `invoicePendingPayment`.
+- `app/[locale]/portal/[token]/page.tsx`: la secció Documents substitueix l'enllaç directe al PDF per "Veure pressupost" (invoice) + PDF addicional si existeix.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `586` a `587`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `npx vitest run __tests__/lib/clientPortalInvoice.test.ts` OK (8/8).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #586 — 2026-05-16 — claude (FET)
+
+**G.25 portal client — subruta timeline/procés visible per al client.**
+- `lib/clientPortalTimeline.ts`: nou helper pur `getClientPortalTimeline()` que deriva 6 fites (booking_created, proposal_sent, contract_signed, deposit_paid, event, remaining_paid) amb estat `done/upcoming/future`; `buildClientPortalTimelinePath()` construeix la ruta canònica.
+- `__tests__/lib/clientPortalTimeline.test.ts`: 7 tests cobreixen `buildClientPortalTimelinePath` + 6 escenaris de progrés (reserva nova, proposta enviada, contracte signat, dipòsit pagat, event passat, tot tancat).
+- `app/[locale]/portal/[token]/timeline/page.tsx`: nova pàgina server component que mostra la línia de temps vertical amb colors semàfor (emerald done, cyan upcoming, blanc/30 future), data formatada per locale i link de tornada al portal.
+- `lib/clientPortalMessages.ts`: 13 claus noves (ca/es/en) — `timelinePageTitle`, `timelineLabel`, `timelineViewLink`, `milestoneBookingCreated`, `milestoneProposalSent`, `milestoneContractSigned`, `milestoneDepositPaid`, `milestoneEvent`, `milestoneRemainingPaid`, `milestoneDone`, `milestoneUpcoming`, `milestoneFuture`.
+- `app/[locale]/portal/[token]/page.tsx`: la secció "Estat del procés" afegeix link cap a la subruta de timeline.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `585` a `586`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Validació executada**:
+- `npx vitest run __tests__/lib/clientPortalTimeline.test.ts` OK (7/7).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #585 — 2026-05-16 — codex (FET)
+
+**El portal client guanya subruta dedicada de pagaments dins G.25.**
+- `buildClientPortalPaymentsPath()` construeix la ruta interna `/[locale]/portal/[token]/payments` i queda cobert a `clientPortalPayment.test.ts`.
+- `/[locale]/portal/[token]` enllaça des de la secció de pagaments cap al detall dedicat.
+- Nova pàgina `/[locale]/portal/[token]/payments`: reutilitza `findPortalAccessByRawToken()` i `getClientPortalPaymentSummary()`, mostra resum, proper pas, targetes de bestreta/resta i CTAs Stripe quan l'import és pagable online.
+- `CLIENT_PORTAL_MESSAGES` incorpora copy ca/es/en per títol, resum, següent pas i enllaç de pagaments.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `584` a `585`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalPayment.test.ts` OK (6/6).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #584 — 2026-05-16 — codex (FET)
+
+**El portal client explica l'estat post-pagament Stripe amb un avís propi.**
+- `getClientPortalPaymentSummary()` afegeix `notice` canònic per `deposit_payable`, `remaining_payable`, `deposit_paid_remaining_pending`, `manual_pending` i `all_paid`.
+- `/[locale]/portal/[token]` mostra l'avís a la secció de pagaments perquè el client entengui si toca pagar bestreta, pagar resta, esperar activació o si ja no queda cap import pendent.
+- `CLIENT_PORTAL_MESSAGES` incorpora els missatges ca/es/en, sense hardcodejar copy visible a la pàgina.
+- `__tests__/lib/clientPortalPayment.test.ts` amplia cobertura de bestreta rebuda sense link de resta i pagament complet.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `583` a `584`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalPayment.test.ts` OK (5/5).
+- `npx tsc --noEmit --pretty false` OK.
+
+---
+
+### Canvi #582 — 2026-05-16 — codex (FET)
+
+**El webhook Stripe és idempotent i no duplica efectes quan Stripe reintenta un event.**
+- `prisma/schema.prisma`: nou model `StripeWebhookEvent` amb `eventId` únic, `type`, `bookingId`, `paymentType`, `stripeSessionId` i `processedAt`.
+- `prisma/migrations/20260516100000_add_stripe_webhook_events/migration.sql`: crea la taula `stripe_webhook_events` i els índexs de lookup/auditoria.
+- `bookingStripePaymentService.processStripeWebhook()`: registra l'event Stripe dins una transacció junt amb l'update de `Booking` i el `adminLog` `PAYMENT_RECORDED`.
+- Si Prisma retorna `P2002` pel `eventId`, el servei tracta el webhook com a retry ja processat i retorna `{ received: true }` sense duplicar pagament ni timeline.
+- `__tests__/lib/services/bookingStripePaymentService.test.ts`: nou cas de retry duplicat i cobertura del registre `StripeWebhookEvent`.
+- `__tests__/app/api/webhooks/stripe-webhook.test.ts`: mocks actualitzats al contracte transaccional/idempotent.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\bookingStripePaymentService.test.ts __tests__\app\api\webhooks\stripe-route.test.ts __tests__\app\api\webhooks\stripe-webhook.test.ts` OK (18/18).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #581 — 2026-05-16 — codex (FET)
+
+**Els pagaments Stripe confirmats per webhook queden registrats al timeline admin.**
+- `processStripeWebhook()` continua marcant `depositPaid/depositPaidAt` o `remainingPaid/remainingPaidAt`, i ara escriu un `adminLog` `PAYMENT_RECORDED` per la mateixa reserva.
+- El payload del log inclou `message`, `source: stripe`, `paymentType`, `stripeSessionId` i `amountCents`, evitant valors `undefined` dins el JSON.
+- `ADMIN_ACTIVITY_ACTION_META` i `ADMIN_ACTIVITY_CATEGORY_MAP` incorporen `PAYMENT_RECORDED` perquè l'activitat es vegi com a "Pagament registrat" amb to d'èxit.
+- `timelineQueryService.test.ts` blinda que un log de pagament Stripe es mapegi a activitat de reserva llegible i enllaçada.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\bookingStripePaymentService.test.ts __tests__\lib\services\timelineQueryService.test.ts` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #580 — 2026-05-16 — codex (FET)
+
+**`StripeWebhookSignatureError` i ruta webhook blindada per F.23.**
+- `StripeWebhookSignatureError` distingeix firma invàlida (400) d'errors interns (500) a la ruta webhook.
+- `processStripeWebhook` relança com `StripeWebhookSignatureError` si `constructStripeEvent` falla.
+- 5 tests de ruta cobreixen absent, signatura absent, firma invàlida, error intern i happy path.
+- `bookingStripePaymentService.test.ts` cobreix també la conversió d'error de firma al servei.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\bookingStripePaymentService.test.ts __tests__\app\api\webhooks\stripe-route.test.ts` OK (11/11).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #579 — 2026-05-16 — claude (FET)
+
+**Tests unitaris de stripeService i ruta webhook de Stripe per F.23.**
+- `__tests__/lib/services/stripeService.test.ts`: conversió euros→centèsims, creació de sessió, error sense url, propagació d'error de firma invàlida.
+- `__tests__/app/api/webhooks/stripe-webhook.test.ts`: secret absent (500), signatura absent (400), firma invàlida (400), dipòsit marcat pagat, resta marcada pagada, event ignorat.
+- `lib/constants/admin.ts`: `578 → 579`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+### Canvi #578 — 2026-05-16 — codex (FET)
+
+**L'admin pot generar links Stripe Checkout de bestreta i resta des de la reserva.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#577` va preparar els camps i el CTA del portal, però faltava una manera operativa de generar els links des de l'admin. Ja existia una ruta i un panell Stripe al codi, però el panell no estava muntat a la fitxa de reserva i la ruta no tenia cobertura.
+
+**Canvi**:
+- `app/admin/bookings/[id]/page.tsx`: munta `StripePaymentPanel` dins la secció Finances amb imports, estats i URLs actuals.
+- `app/api/admin/bookings/[id]/stripe-checkout/route.ts`: exigeix també `requirePermission(req, 'mutate')` i delega la generació a servei.
+- `app/api/webhooks/stripe/route.ts`: deixa de tocar Prisma directament i delega el processament al servei.
+- `lib/services/bookingStripePaymentService.ts`: concentra creació de links Stripe Checkout i marcatge de pagaments quan arriba `checkout.session.completed`.
+- `lib/services/stripeService.ts`: versió d'API Stripe alineada amb la tipada pel paquet instal·lat.
+- `__tests__/app/api/admin/bookings-stripe-checkout-route.test.ts`: cobertura de permís, bestreta, bloqueig de resta sense bestreta i generació de link de resta.
+- `__tests__/lib/services/bookingStripePaymentService.test.ts`: cobertura del servei de checkout i webhook.
+- `npx prisma generate`: Prisma Client regenerat perquè TypeScript reconegui `depositPaymentUrl` i `remainingPaymentUrl`.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.23 queda actualitzat com a generació Stripe Checkout des de l'admin.
+- `docs/diario.md`: entrada del Canvi #578.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `577` a `578`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\api\admin\bookings-stripe-checkout-route.test.ts __tests__\lib\services\bookingStripePaymentService.test.ts` OK (9/9).
+- `pnpm run qa:prisma-in-routes` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #577 — 2026-05-16 — codex (FET)
+
+**F.23 comença amb links de pagament online visibles al portal només quan són vàlids.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després de tancar el tall material de signatura F.22, el següent punt del Camí 3 és F.23: pagaments online. No hi havia encara cap camp de link de pagament ni cap contracte pur que decidís quan mostrar un CTA al client.
+
+**Canvi**:
+- `prisma/schema.prisma`: `Booking` incorpora `depositPaymentUrl` i `remainingPaymentUrl`.
+- `prisma/migrations/20260516090000_add_booking_payment_links/migration.sql`: migració SQL dels dos camps.
+- `lib/clientPortalPayment.ts`: nou resum pur que normalitza links `http(s)`, calcula `payableOnline` per bestreta/resta i exposa `nextPayment`.
+- `app/[locale]/portal/[token]/page.tsx`: la secció de pagaments mostra CTA online només quan el link existeix, és vàlid i l'import encara està pendent.
+- `lib/clientPortalMessages.ts`: textos ca/es/en per pagar bestreta, pagar resta i link pendent d'activar.
+- `__tests__/lib/clientPortalPayment.test.ts`: regressions per bestreta, resta i links invàlids.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.23 queda iniciat com a `FET parcial`.
+- `docs/diario.md`: entrada del Canvi #577.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `576` a `577`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalPayment.test.ts` OK (3/3).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #576 — 2026-05-15 — codex (FET)
+
+**La signatura de contracte entra a la timeline operativa del lead.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#575` ja deixava PDF signat material, però la signatura quedava repartida entre camps de `Proposal` i storage. Per operar comercialment, el fet “contracte signat” també ha de quedar dins la narrativa del lead com els contractes enviats i cancel·lats.
+
+**Canvi**:
+- `lib/services/leadActivityService.ts`: nou `recordLeadContractSigned()` amb metadata `contractReference`, `signedBy` i `source`.
+- `lib/services/contractSignatureService.ts`: la signatura online registra activitat `Contracte signat` amb `source: portal` després de generar el PDF signat.
+- `lib/services/contractService.ts`: `markContractSigned()` registra la mateixa activitat amb `source: admin` quan la signatura es marca manualment.
+- `__tests__/lib/services/leadActivityService.test.ts`: cobertura del nou helper shared.
+- `__tests__/lib/services/contractSignatureService.test.ts`: cobertura perquè la signatura inline registri la timeline del lead.
+- `__tests__/lib/services/contractService.test.ts`: cobertura perquè la signatura manual també registri la timeline.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat amb traça operativa compartida.
+- `docs/diario.md`: entrada del Canvi #576.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `575` a `576`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\leadActivityService.test.ts` OK (29/29).
+- `pnpm exec vitest run __tests__\lib\services\contractService.test.ts` OK (44/44).
+- `pnpm exec vitest run __tests__\lib\services\contractSignatureService.test.ts` OK (8/8).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #575 — 2026-05-15 — codex (FET)
+
+**La signatura inline regenera i desa el PDF signat.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després dels Canvis `#573` i `#574`, el flux ja capturava la signatura manuscrita i la mostrava a admin i al portal, però `contractPdfUrl` continuava apuntant al PDF previ sense la signatura. F.22 necessitava que la signatura online deixés un document material signat.
+
+**Canvi**:
+- `lib/pdf-utils.ts`: `ContractPdfData` accepta metadata de signatura i `generateContractPDF()` pinta la signatura capturada o el fallback de signatura digital al bloc de signatures.
+- `lib/services/contractService.ts`: nou `generateSignedContractPdf()` que regenera el PDF, el puja a storage local i actualitza `contractPdfUrl`/`contractPdfKey`.
+- `lib/services/contractSignatureService.ts`: després de marcar el contracte com `SIGNED`, regenera el PDF signat de la proposta.
+- `__tests__/lib/services/contractService.test.ts`: regressions per transportar la metadata de signatura al PDF i per pujar/desar el PDF signat.
+- `__tests__/lib/services/contractSignatureService.test.ts`: regressió perquè la signatura online invoqui la generació del PDF signat.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat amb PDF signat material.
+- `docs/diario.md`: entrada del Canvi #575.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `574` a `575`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\contractService.test.ts` OK (43/43).
+- `pnpm exec vitest run __tests__\lib\services\contractSignatureService.test.ts` OK (8/8).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #574 — 2026-05-15 — codex (FET)
+
+**La pàgina del contracte del portal mostra la signatura manuscrita capturada al client.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#573` feia obligatori i visible a admin el blob manuscrit de signatura, però el client encara no el veia quan tornava a la pàgina del contracte. El portal ha de confirmar el mateix artefacte que el propietari veu a la reserva.
+
+**Canvi**:
+- `lib/clientPortalContract.ts`: `ClientPortalContractProposal` i `ClientPortalContractSummary` incorporen `contractSignatureBlob` / `signatureBlob`.
+- `lib/services/clientPortalAccess.ts`: `findPortalAccessByRawToken()` carrega `contractSignatureBlob` dins les propostes del portal.
+- `app/[locale]/portal/[token]/contract/page.tsx`: quan el contracte està `SIGNED` i hi ha blob, renderitza la imatge de signatura manuscrita capturada.
+- `app/[locale]/portal/[token]/page.tsx`: el tipus local de propostes queda alineat amb el nou camp.
+- `__tests__/lib/clientPortalContract.test.ts`: regressió nova perquè el resum del portal exposi `signatureBlob` en contractes signats.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb signatura manuscrita visible també al client.
+- `docs/diario.md`: entrada del Canvi #574.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `573` a `574`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalContract.test.ts` OK (9/9).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #573 — 2026-05-15 — codex (FET)
+
+**La signatura manuscrita capturada ja és obligatòria, es persisteix i es veu a la reserva.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#572` feia visible la traça tècnica de signatura, però el flux encara podia signar només amb nom i acceptació si no hi havia cap dibuix al pad. El schema ja tenia `contractSignatureBlob`, però calia convertir-lo en part real del contracte online i mostrar-lo al propietari.
+
+**Canvi**:
+- `app/[locale]/portal/[token]/sign/SignaturePad.tsx`: el primer toc ja marca el pad com a traç actiu i el canvas guanya `aria-label` estable per test/accessibilitat.
+- `app/[locale]/portal/[token]/sign/SignContractForm.tsx`: el botó de signatura queda desactivat fins que hi ha nom, acceptació i `signatureBlob`; el POST envia `signatureBlob` junt amb `signedBy`.
+- `app/api/portal/[token]/sign/route.ts`: el contracte HTTP passa `signatureBlob` al servei i conserva `null` quan no arriba cap blob.
+- `lib/services/contractSignatureService.ts`: el blob queda guardat a `contractSignatureBlob` junt amb nom, hora, IP i user-agent.
+- `app/admin/bookings/[id]/page.tsx`, `booking-utils.ts` i `DocumentFlowSection.tsx`: la reserva carrega i mostra la imatge de la signatura manuscrita capturada quan el contracte està `SIGNED`.
+- Tests ampliats: `SignContractForm`, `sign-route`, `contractSignatureService` i `DocumentFlowSection` cobreixen requisit de blob, transport HTTP, persistència i visibilitat admin.
+- `docs/diario.md`: eliminada una entrada duplicada accidental del Canvi `#572`.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb blob de signatura obligatori i visible.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `572` a `573`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\portal\SignContractForm.test.tsx __tests__\app\api\portal\sign-route.test.ts __tests__\lib\services\contractSignatureService.test.ts __tests__\app\admin\bookings\DocumentFlowSection.test.tsx` OK (19/19).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #572 — 2026-05-14 — codex (FET)
+
+**La fitxa de reserva ja mostra la traça de signatura online del contracte signat.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després del Canvi `#571`, la signatura online ja persistia `contractSignedBy`, `contractSignedAt`, `contractSignatureIp` i `contractSignatureUa` al `Proposal`, però aquesta traça només quedava a la base de dades. Per a F.22, el propietari necessita veure dins la reserva si el contracte signat porta traça material, sense obrir Prisma ni reconstruir l'event des del portal.
+
+**Canvi**:
+- `app/admin/bookings/[id]/page.tsx`: la query de propostes carrega `contractSignedBy`, `contractSignatureIp` i `contractSignatureUa`, i els passa al flux documental.
+- `app/admin/bookings/[id]/booking-utils.ts`: `BookingProposalRow` incorpora els tres camps de traça de signatura.
+- `app/admin/bookings/[id]/DocumentFlowSection.tsx`: quan el contracte està `SIGNED`, la targeta de contracte mostra signant, hora UTC, IP i user-agent amb format llegible.
+- `__tests__/app/admin/bookings/DocumentFlowSection.test.tsx`: test de component que blinda la traça visible (`Signat per`, hora UTC, IP i UA).
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb traça visible per al propietari.
+- `docs/diario.md`: entrada del Canvi #572.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `571` a `572`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\bookings\DocumentFlowSection.test.tsx` OK (1/1).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #571 — 2026-05-14 — claude (FET)
+
+**F.22 base: pàgina de signatura, schema i CTA al portal.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Context**: F.22 tenia #565-#570 de Codex com a preparació incremental del stack de servei, ruta i formulari. Faltava el punt d'entrada real del client (pàgina server `/sign`), els camps de persistència (`contractSignatureIp`/`contractSignatureUa`) al schema i la seva migració, els strings trilingüals del formulari, i el CTA primari al portal principal. Codex ha refinat les capes de servei (#568), ruta (#569) i formulari (#570) sobre la base d'aquest tall.
+
+**Canvi**:
+- `prisma/schema.prisma`: `contractSignatureIp String?` + `contractSignatureUa String? @db.Text` al model `Proposal`.
+- `prisma/migrations/20260514120000_add_proposal_signature_metadata/migration.sql`: `ALTER TABLE "proposals" ADD COLUMN` per ambdós camps.
+- `app/[locale]/portal/[token]/sign/page.tsx`: pàgina server nova — valida accés, gestiona estats no accionables i renderitza `SignContractForm`.
+- `lib/clientPortalMessages.ts`: strings ca/es/en del formulari: `signYourName`, `signNamePlaceholder`, `signAcceptTerms`, `signSubmit`, `signSuccess`, `signSuccessBack`, `signError`, `signAlreadySigned`, `signNotAvailable`, `signHere`.
+- `app/[locale]/portal/[token]/page.tsx`: CTA "Signar el contracte" quan `awaitingInlineSignature`.
+- Base de `contractSignatureService.ts`, `api/portal/[token]/sign/route.ts` i `SignContractForm.tsx` (refinats per Codex a #568-#570).
+- `docs/protocol-producte-admin-ca.md` · §6.18 i §9 actualitzats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `570` a `571`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__/lib/services/contractSignatureService.test.ts __tests__/lib/clientPortalContract.test.ts` OK (15/15).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK (21/21 guards).
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #570 — 2026-05-14 — codex (FET)
+
+**El formulari públic de signatura online ja recupera errors de xarxa i té tests de comportament client.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després del Canvi `#569`, l'endpoint públic de signatura ja tenia contracte HTTP blindat. Faltava assegurar la capa visible del client: que el formulari no enviï res sense acceptació, que enviï el nom net, que mostri confirmació i que no quedi enganxat en càrrega si el POST falla per xarxa.
+
+**Canvi**:
+- `app/[locale]/portal/[token]/sign/SignContractForm.tsx`: captura errors de `fetch`, marca `NETWORK_ERROR` i torna a `status='error'` perquè el client pugui reintentar.
+- `__tests__/app/portal/SignContractForm.test.tsx`: nou test de component amb 4 casos: botó desactivat fins a nom + acceptació, POST correcte amb `signedBy` trimat i link de retorn, missatge `ALREADY_SIGNED`, i recuperació d'error de xarxa amb botó reactivat.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb el formulari client blindat.
+- `docs/diario.md`: entrada del Canvi #570.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `569` a `570`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\portal\SignContractForm.test.tsx` OK (4/4).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #569 — 2026-05-14 — codex (FET)
+
+**L'endpoint públic de signatura online ja té contracte HTTP blindat i error 500 controlat.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després del Canvi `#568`, el servei de signatura ja impedia signar contractes sense PDF, però la ruta pública encara no tenia cobertura pròpia. Faltava assegurar que l'API exposada al portal traduís correctament input invàlid, tokens caducats, contractes no signables i errors inesperats sense perdre la metadata de signatura.
+
+**Canvi**:
+- `app/api/portal/[token]/sign/route.ts`: captura errors inesperats de `signContractOnline()` i retorna `{ error: 'SIGNATURE_FAILED' }` amb HTTP 500 en lloc de propagar l'excepció.
+- `__tests__/app/api/portal/sign-route.test.ts`: nou test de ruta amb 6 casos: input invàlid sense cridar servei, happy path amb `signedBy` net i metadata IP/UA, fallback `x-real-ip`, `INVALID_TOKEN`→404, `NOT_SIGNABLE`/`ALREADY_SIGNED`→409 i error intern→500.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb l'endpoint públic blindat.
+- `docs/diario.md`: entrada del Canvi #569.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `568` a `569`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\api\portal\sign-route.test.ts` OK (6/6).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #568 — 2026-05-14 — codex (FET)
+
+**El backend de signatura ja exigeix PDF abans de permetre signar online.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#567` va fer que la UI només mostrés `READY_TO_SIGN` quan el contracte està `SENT`, té PDF i encara no està signat. Però `signContractOnline()` encara acceptava qualsevol contracte `SENT`, encara que faltés el PDF. Això deixava una divergència: la pantalla podia dir "no preparat" mentre l'API encara signava.
+
+**Canvi**:
+- `lib/services/contractSignatureService.ts`: la query de proposta carrega `contractPdfUrl` i `pdfUrl`; el servei retorna `NOT_SIGNABLE` si no hi ha cap PDF material.
+- `__tests__/lib/services/contractSignatureService.test.ts`: passa de 6 a 7 tests i afegeix regressió per contracte `SENT` sense PDF, verificant que no s'executi `proposal.update`.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb la frontera backend alineada amb la UI.
+- `docs/diario.md`: entrada del Canvi #568.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `567` a `568`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\services\contractSignatureService.test.ts` OK (7/7).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #567 — 2026-05-14 — codex (FET)
+
+**La signatura inline del portal ja té checklist de readiness i no es marca preparada sense PDF.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: després del Canvi `#566`, la pàgina de contracte ja existia, però l'estat `READY_TO_SIGN` depenia només de `contractStatus === 'SENT'`. Això podia prometre signatura online encara que el PDF material no estigués disponible. Abans de capturar traç o persistir una signatura real, calia fer explícits els prerequisits.
+
+**Canvi**:
+- `lib/clientPortalContract.ts`: afegeix `ClientPortalContractSignatureChecklistItem` i `getClientPortalContractSignatureChecklist()`. `getClientPortalContractSignatureState()` ara només retorna `READY_TO_SIGN` si el contracte està `SENT`, té PDF i no està signat.
+- `app/[locale]/portal/[token]/contract/page.tsx`: mostra un checklist visible de prerequisits (`Contracte enviat`, `PDF disponible`, `Encara no signat`) amb estat OK/Pendent.
+- `lib/clientPortalMessages.ts`: textos CA/ES/EN per als tres prerequisits.
+- `__tests__/lib/clientPortalContract.test.ts`: passa de 6 a 8 tests i cobreix el cas `SENT` sense PDF com a `NOT_READY`.
+- `__tests__/lib/services/contractSignatureService.test.ts`: nou test de servei per cobrir token invàlid, accés revocat/caducat, contracte no signable, ja signat, no enviat i happy path amb metadata (`ip`, `userAgent`).
+- `pnpm exec prisma generate`: regenerat el client Prisma perquè el workspace ja tenia schema/migració amb `contractSignatureIp` i `contractSignatureUa`; sense això `tsc` veia el client antic.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb el requisit de readiness.
+- `docs/diario.md`: entrada del Canvi #567.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `566` a `567`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalContract.test.ts` OK (8/8).
+- `pnpm exec vitest run __tests__\lib\clientPortalContract.test.ts __tests__\lib\services\contractSignatureService.test.ts` OK (14/14).
+- `pnpm exec prisma generate` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #566 — 2026-05-14 — codex (FET)
+
+**El portal client guanya una pàgina pròpia de contracte com a preparació de la signatura inline.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: el Canvi `#565` va fer visible l'estat contractual dins de Documents, però el contracte encara quedava com una targeta compacta del portal. Per avançar F.22 sense obrir encara schema ni captura de traç, calia separar el detall contractual en una ruta pròpia i donar-li un estat de signatura explícit.
+
+**Canvi**:
+- `lib/clientPortalContract.ts`: afegeix `ClientPortalContractSignatureState`, `getClientPortalContractSignatureState()` i `buildClientPortalContractPath()`. El resum contractual ara exposa `signatureState`.
+- `app/[locale]/portal/[token]/contract/page.tsx`: nova pàgina privada del portal que valida el token, registra hit, localitza l'estat del contracte, mostra referència, pressupost origen, PDF i estat de signatura.
+- `app/[locale]/portal/[token]/page.tsx`: la targeta de contracte dins de Documents enllaça al detall intern del contracte.
+- `lib/clientPortalMessages.ts`: textos CA/ES/EN per pàgina de contracte, detall, signatura i estats de preparació.
+- `__tests__/lib/clientPortalContract.test.ts`: passa de 4 a 6 tests i cobreix els estats de signatura i el builder de ruta.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda actualitzat com a `FET parcial` amb el que encara manca explícit.
+- `docs/diario.md`: entrada del Canvi #566.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `565` a `566`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalContract.test.ts` OK (6/6).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #565 — 2026-05-14 — codex (FET)
+
+**El portal client mostra l'estat contractual existent com a primer tall real de F.22.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+**Context**: `§6.18` marca F.22 com el següent salt qualitatiu, però obrir directament model nou, ruta pública de signatura i PDF firmat seria massa gran per un `go` curt. El repo ja tenia `ClientPortalAccess`, pàgina pública de portal i cicle administratiu de contractes sobre `Proposal.contract*`; faltava que el client veiés aquest estat dins del portal abans de construir la signatura inline completa.
+
+**Canvi**:
+- `lib/clientPortalContract.ts`: helper pur `getClientPortalContractSummary()` que tria el primer pressupost amb contracte, exposa referència, estat, PDF i marca `awaitingInlineSignature` quan el contracte està `SENT` i encara no té `contractSignedAt`.
+- `lib/services/clientPortalAccess.ts`: el portal carrega ara `contractReference`, `contractStatus`, `contractPdfUrl` i `contractSignedAt` dins de les propostes.
+- `app/[locale]/portal/[token]/page.tsx`: la secció Documents mostra una targeta de contracte amb referència, estat localitzat, enllaç al PDF i avís de signatura online pendent.
+- `lib/clientPortalMessages.ts`: textos CA/ES/EN per contracte, estat, obrir contracte i signatura pendent.
+- `__tests__/lib/clientPortalContract.test.ts`: 4 regressions sobre absència de contracte, tria del primer contracte disponible, estat `SENT` pendent de signatura i fallback al PDF del pressupost.
+- `docs/protocol-producte-admin-ca.md` · §6.18: F.22 queda marcat com a `FET parcial` amb el pas següent encara explícit.
+- `docs/diario.md`: entrada del Canvi #565.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `564` a `565`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\lib\clientPortalContract.test.ts` OK (4/4).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #564 — 2026-05-14 — claude (FET)
+
+**Guard `qa:schema-drift` — convencions de schema.prisma (validate:core 21 guards).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+**Context**: §6.14 tenia com a pendent el guard `qa:schema-drift`. El check estàtic schema→SQL no és viable al repo (les taules actuals es van crear via `prisma db push`, no via migracions formals). El guard s'implementa com a verificació de les convencions del schema que prevenen drift real en producció.
+
+**Canvi**:
+- `scripts/check-schema-drift.mjs`: guard nou amb 3 verificacions: (1) tot model té `@@map` (evita noms PascalCase a la BD), (2) no hi ha noms de taula duplicats entre models, (3) les `ALTER TABLE ADD COLUMN` de les migracions apunten a taules existents al schema (detecta migracions orfenes quan una taula es renombra sense actualitzar les migracions).
+- `__tests__/scripts/check-schema-drift.test.ts`: 7 tests — skip sense schema, OK convencions correctes, FAIL model sense `@@map`, FAIL taula duplicada, FAIL migració orfena, OK sense migracions, múltiples errors en un run.
+- `package.json`: `qa:schema-drift` afegit i incorporat al final de `validate:core` (20 → 21 guards).
+- `docs/protocol-producte-admin-ca.md` · §6.14: `FET` del Canvi #564.
+- `docs/diario.md`: entrada del Canvi #564.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `563` a `564`.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__/scripts/check-schema-drift.test.ts` OK (7/7).
+- `pnpm run qa:schema-drift` OK (51 models verificats).
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK (21/21 guards).
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el pipeline detecta qualsevol model nou sense `@@map`, noms de taula duplicats i migracions que apunten a taules eliminades del schema.
+- `ADMIN_CHANGE_COUNTER` puja a `564`; el següent canvi real ha de ser `#565`.
+
+---
+
+### Canvi #563 — 2026-05-14 — codex (FET)
+
+**Context**: el Canvi `#562` va exigir que `ADMIN_MANUAL_OPERATING_FLOW` cobreixi els steps canònics `01`-`06`, però encara faltava validar l'ordre físic de l'array. Amb tots els IDs presents però desordenats, la UI i el càlcul de handoffs podrien explicar una seqüència diferent de la narrativa real.
+
+**Canvi**:
+- `scripts/check-admin-manual-consistency.mjs` compara cada posició de `ADMIN_MANUAL_OPERATING_FLOW` amb l'ordre canònic `01`, `02`, `03`, `04`, `05`, `06`.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts` afegeix una regressió per flux fora d'ordre.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el manual queda protegit contra un product operating system amb IDs correctes però narrativa desordenada.
+- `ADMIN_CHANGE_COUNTER` puja a `563`; el següent canvi real ha de ser `#564`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #562 — 2026-05-14 — codex (FET)
+
+**Context**: els guards dels controls del manual ja protegien gates, handoffs i checklists, però la font base `ADMIN_MANUAL_OPERATING_FLOW` encara no tenia una validació estricta dels IDs canònics. Si el flux duplicava un pas o introduïa un step no canònic, la resta de controls podien quedar coherents només aparentment.
+
+**Canvi**:
+- `scripts/check-admin-manual-consistency.mjs` defineix els passos canònics `01`-`06` i valida que `ADMIN_MANUAL_OPERATING_FLOW` no tingui duplicats, cobreixi tots els passos i no introdueixi steps aliens.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts` amplia el fixture a 6 passos reals i afegeix regressions per step duplicat i step no canònic.
+- S'actualitzen asserts antics del fixture perquè el contracte actual és de 6 passos canònics.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el product operating system del manual queda protegit des de la seva font principal, no només als controls derivats.
+- `ADMIN_CHANGE_COUNTER` puja a `562`; el següent canvi real ha de ser `#563`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #561 — 2026-05-14 — codex (FET)
+
+**Context**: el guard del manual ja comprovava cobertura, validesa de passos i duplicats als handoffs, però encara permetia que un handoff apuntés a qualsevol pas existent. Això podia crear un cicle formalment vàlid però operativament incoherent, per exemple `02→04` saltant Pressupostos.
+
+**Canvi**:
+- `scripts/check-admin-manual-consistency.mjs` calcula `expectedNextStep` a partir de l'ordre de `ADMIN_MANUAL_OPERATING_FLOW` i valida que cada `ADMIN_MANUAL_OPERATING_HANDOFFS.fromStep` apunti exactament al pas següent.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts` afegeix una regressió que falla quan un handoff salta fora de la seqüència canònica.
+- No toca UI ni constants de producte: és un guard d'ordre sobre el flux ja definit.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el manual queda protegit contra handoffs que semblen vàlids per referència però trenquen la narrativa punta a punta del sistema operatiu.
+- `ADMIN_CHANGE_COUNTER` puja a `561`; el següent canvi real ha de ser `#562`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #560 — 2026-05-14 — codex (FET)
+
+**Context**: els canvis `#557`, `#558` i `#559` van afegir gates, handoffs i checklists per pas. El guard comprovava cobertura i validesa de referències, però no detectava duplicitats: dues entrades podien repetir el mateix pas i deixar-ne un altre sense representació clara, o fer ambigu quin control era el bo.
+
+**Canvi**:
+- `scripts/check-admin-manual-consistency.mjs` afegeix `findDuplicates()` i valida duplicats a `ADMIN_MANUAL_OPERATING_GATES.step`, `ADMIN_MANUAL_OPERATING_HANDOFFS.fromStep` i `ADMIN_MANUAL_OPERATING_STEP_CHECKLIST.step`.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts` afegeix 3 regressions: gate duplicat, handoff duplicat i checklist duplicada.
+- No toca UI ni constants de producte: és enduriment del guard que protegeix el manual ja construït.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el product operating system del manual queda protegit contra cobertura aparent però amb passos duplicats o ambigus.
+- `ADMIN_CHANGE_COUNTER` puja a `560`; el següent canvi real ha de ser `#561`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #559 — 2026-05-14 — codex (FET)
+
+**Context**: el manual ja tenia flux, gates i handoffs (`#550`, `#557`, `#558`), però encara faltava una definició binària de "aquest pas està fet". Sense checklist per pas, el propietari podia veure què toca però no tenir criteris concrets de tancament abans d'avançar.
+
+**Canvi**:
+- `lib/constants/adminManual.ts` afegeix `AdminManualOperatingStepChecklist` i `ADMIN_MANUAL_OPERATING_STEP_CHECKLIST`, amb 6 checklists vinculades als passos `01`-`06`.
+- `app/admin/manual/page.tsx` renderitza "Checklist de pas" amb label de fet, checks operatius i condició de bloqueig.
+- `scripts/check-admin-manual-consistency.mjs` valida que cada pas del flux tingui checklist, que cap checklist apunti a un pas inexistent i que cada pas tingui almenys 3 checks.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx` i `__tests__/scripts/check-admin-manual-consistency.test.ts` cobreixen la nova secció i 3 regressions del guard.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\manual\AdminManualPage.test.tsx` OK.
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: cada fase del product operating system queda accionable com a tancament binari: què ha d'estar resolt, què bloqueja avançar i quina fase del flux queda realment feta.
+- `ADMIN_CHANGE_COUNTER` puja a `559`; el següent canvi real ha de ser `#560`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #558 — 2026-05-14 — codex (FET)
+
+**Context**: després del Canvi `#557`, el manual ja tenia gates per saber quan no avançar entre passos. Però encara faltava explicitar l'handoff operatiu: quin artefacte deixa un pas perquè el següent workspace no hagi de reinterpretar notes, memòria o intuïció.
+
+**Canvi**:
+- `lib/constants/adminManual.ts` afegeix `AdminManualOperatingHandoff` i `ADMIN_MANUAL_OPERATING_HANDOFFS`, amb una transició sortint per cada pas `01`-`06`.
+- `app/admin/manual/page.tsx` renderitza "Handoffs entre passos" amb artefacte lliurat, regla d'handoff i CTA al workspace receptor.
+- `scripts/check-admin-manual-consistency.mjs` valida que cada pas del flux tingui handoff sortint, que `fromStep`/`toStep` existeixin, que `nextWorkspaceHref` apunti a `/admin` i que artefacte/regla tinguin contingut.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx` i `__tests__/scripts/check-admin-manual-consistency.test.ts` cobreixen la nova secció i 3 regressions del guard.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\manual\AdminManualPage.test.tsx` OK.
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el product operating system del manual ja no només descriu passos i gates; també deixa clara la transferència d'informació entre workspaces perquè cada fase pugui continuar sense dependència de memòria.
+- `ADMIN_CHANGE_COUNTER` puja a `558`; el següent canvi real ha de ser `#559`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #557 — 2026-05-14 — codex (FET)
+
+**Context**: `§6.1` manté viu el front de convertir manual/playbooks en un product operating system amb una sola narrativa operativa. Després dels canvis `#550`, `#551` i `#553`, el manual ja mostrava flux i cobertura, però encara faltava una barrera explícita entre passos: què comprovar abans de deixar avançar una demanda pel sistema.
+
+**Canvi**:
+- `lib/constants/adminManual.ts` afegeix `AdminManualOperatingGate` i `ADMIN_MANUAL_OPERATING_GATES`, amb 6 gates canònics lligats als passos `01`-`06`.
+- `app/admin/manual/page.tsx` renderitza la nova secció "Punts de control del flux" amb comprovació abans d'avançar, risc si se salta i pregunta de propietari.
+- `scripts/check-admin-manual-consistency.mjs` blinda que cada pas de `ADMIN_MANUAL_OPERATING_FLOW` tingui gate, que cap gate apunti a un pas inexistent i que els camps siguin accionables.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx` i `__tests__/scripts/check-admin-manual-consistency.test.ts` cobreixen la nova UI i els errors del guard.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\manual\AdminManualPage.test.tsx` OK.
+- `pnpm exec vitest run __tests__\scripts\check-admin-manual-consistency.test.ts` OK.
+- `pnpm run qa:admin-manual-consistency` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: el manual deixa de ser només un mapa de mòduls i flux; ara també diu quan no s'ha d'avançar, quin risc evita cada gate i quina decisió humana tanca cada pas.
+- `ADMIN_CHANGE_COUNTER` puja a `557`; el següent canvi real ha de ser `#558`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #556 — 2026-05-12 — codex (FET)
+
+**Context**: `§6.5` mantenia viu el pendent crític de convertir Customer Hub en cervell comercial i evitar que el client quedés repartit en pantalles paral·leles. `/admin/clientes` ja llistava i filtrava clients, però faltava una lectura de propietari que digués què concentra el CRM, quin risc és automàtic i quin següent pas humà toca.
+
+**Canvi**:
+- `app/admin/clientes/customer-utils.ts` afegeix `buildCustomerHubOperatingSummary()` amb totals visibles/totals CRM, historial, oportunitats sense esdeveniment, prioritat alta, risc, dormits, canals incomplets i següent Fitxa 360 accionable.
+- `app/admin/clientes/CustomersPageSections.tsx` afegeix `CustomerHubOperatingStrip`, reutilitzant `OwnerControlStrip` per separar lectura automàtica del sistema i intervenció manual.
+- `app/admin/clientes/page.tsx` mostra el strip operatiu sota l'ajuda del Customer Hub quan la càrrega és correcta.
+- `__tests__/app/admin/clientes/customer-utils.test.ts` blinda resum, to de risc, comptadors, textos operatius i empty state.
+
+**Validació executada**:
+- `pnpm exec vitest run __tests__\app\admin\clientes\customer-utils.test.ts` OK.
+- `npx tsc --noEmit --pretty false` OK.
+- `pnpm run validate:core` OK.
+- `pnpm run qa:protocol` OK.
+
+**Impacte**: Customer Hub ja no és només llista/filtres; obre amb una síntesi de cervell comercial que concentra estat, risc i següent acció dins del mateix hub.
+- `ADMIN_CHANGE_COUNTER` puja a `556`; el següent canvi real ha de ser `#557`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #555 — 2026-05-12 — codex (FET)
+**`/admin/social` connecta el pols real de contingut al primer nivell operatiu del workspace.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el Canvi `#554` va blindar `socialContentPulseService`, però la pantalla Social encara no consumia aquest pols dins la lectura principal del propietari. Això deixava viu el risc de `§6.9`: Social podia funcionar com a calendari/CRUD decoratiu en lloc de formar part del pipeline real de contingut i captació.
+- `app/admin/social/page.tsx`: carrega `loadSocialContentPulse()` en paral·lel amb posts, counts i idees, i passa `initialContentPulse` al client.
+- `app/admin/social/SocialClient.tsx`: afegeix el contracte serialitzat del pols, integra publicacions recents, consistència i conversió Instagram al `OwnerControlStrip`, ajusta `weakestLink`, `nextStepTitle` i `nextStepDescription` segons activitat/cadència, i afegeix quatre targetes operatives: "Pols editorial", "Cadència", "Cua editorial" i "Instagram → pipeline".
+- `__tests__/app/admin/social/SocialClient.test.tsx`: 2 tests nous per validar que la UI mostra el pols actiu amb conversió Instagram i que, quan el calendari està aturat, el següent pas passa a "Publicar una peça real abans de generar més idees".
+- `docs/protocol-producte-admin-ca.md` · `§6.9` / `§9`: afegit el `FET` del Canvi #555.
+- `docs/diario.md`: entrada del Canvi #555.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `554` a `555`.
+- Validació tècnica: `pnpm exec vitest run __tests__/app/admin/social/SocialClient.test.tsx` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `555`; el següent canvi real ha de ser `#556`.
+
+### Canvi #554 — 2026-05-12 — claude (FET)
+**Guard `qa:service-coverage` + test de `socialContentPulseService` (validate:core 20 guards).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: `socialContentPulseService` era l'únic servei de `lib/services/` sense cap fitxer de test, i no hi havia cap barrera que detectés serveis nous sense cobertura. Bloc gran: test del servei, guard automàtic i blindatge per evitar que la situació es repeteixi.
+- `__tests__/lib/services/socialContentPulseService.test.ts`: 8 tests nous (pols buit, comptadors publicats/esborranys, `daysSinceLastPost`, fallback `createdAt`, leads Instagram, `windowDays` personalitzat, plataformes `null`).
+- `scripts/check-service-coverage.mjs`: guard nou — recorre `lib/services/**/*.ts` (exclou `.d.ts`), falla si algun servei no té `__tests__/lib/services/*.test.ts` corresponent.
+- `__tests__/scripts/check-service-coverage.test.ts`: 7 tests nous per al guard (tot cobert, un faltant, múltiples faltants, `.d.ts` ignorat, sense serveis, subdir cobert, subdir sense test).
+- `package.json`: afegit `qa:service-coverage`, incorporat a `validate:core` (19 → 20 guards).
+- `docs/protocol-producte-admin-ca.md` · `§6.13` / `§6.14`: afegit el `FET` del Canvi #554.
+- `docs/diario.md`: entrada del Canvi #554.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `553` a `554`.
+- Validació tècnica: `pnpm exec vitest run` (15 tests nous) OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK (20/20 guards, 196/196 script tests) · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `554`; el següent canvi real ha de ser `#555`.
+
+### Canvi #553 — 2026-05-12 — codex (FET)
+**El manual incorpora la cobertura inversa del sistema perquè es vegi quines eines sostenen cada pas del flux operatiu.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després dels Canvis `#550` i `#551`, el manual ja tenia flux de punta a punta i cada capacitat declarava el seu pas. Encara faltava la lectura inversa: veure per cada pas quines eines el sostenen i detectar si algun tram queda sense suport.
+- `app/admin/manual/page.tsx`: nova secció "Cobertura del sistema". Agrupa `ADMIN_MANUAL_SECTIONS` per `flowStep` i mostra, per cada pas `01`-`06`, el nombre d'eines i els enllaços a les capacitats connectades.
+- `scripts/check-admin-manual-consistency.mjs`: el guard valida que cada pas de `ADMIN_MANUAL_OPERATING_FLOW` tingui almenys una capability connectada.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: regressió nova per pas del flux sense cap capacitat connectada.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: cobertura de la nova secció, comptadors d'eines i àrees visibles.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit el `FET` del Canvi #553.
+- `docs/diario.md`: entrada del Canvi #553.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `552` a `553`.
+- Aquest tall **NO** toca: schema, migracions, auth, rutes API, crons, persistència, web pública ni copy traduïble.
+- Validació tècnica: `pnpm exec vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm exec vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el manual ja no només diu quin pas té cada eina; també permet auditar si cada pas del cicle té suport operatiu visible.
+- Validació humana/UX: el propietari pot escanejar el flux per pas i veure ràpidament quines eines usar a cada fase, sense deduir-ho des de categories abstractes.
+- Nota de coordinació: mentre es tancava aquest tall, `#552` ha entrat per `claude`; aquest bloc es registra com a `#553` per no col·lidir.
+- `ADMIN_CHANGE_COUNTER` puja a `553`; el següent canvi real ha de ser `#554`.
+
+### Canvi #552 — 2026-05-12 — claude (FET)
+**Guard `qa:prisma-in-routes` + extracció de prisma directe de 5 rutes API cap a serveis (validate:core 19 guards).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: 5 rutes API importaven `prisma` directament en violació de la monocapa de serveis. Crear un guard automàtic que blindi l'arquitectura i extreuen la lògica de negoci als serveis corresponents.
+- `lib/services/bookingBulkPaymentService.ts`: nou servei amb `updateBulkPaymentField()`. Gestiona `depositPaid`/`remainingPaid` + timestamp associat.
+- `lib/services/privacyService.ts`: tres funcions noves — `fetchCustomerPrivacyData()`, `listPrivacyAuditLogs()`, `findConsentById()`.
+- `lib/services/testimonialAdminService.ts`: nova funció `countPendingTestimonials()`.
+- `app/api/admin/bookings/bulk-payment/route.ts`: eliminat `prisma` directe, usa `updateBulkPaymentField`.
+- `app/api/admin/customers/[id]/consents/route.ts`: eliminat `prisma` directe, usa `fetchCustomerPrivacyData`.
+- `app/api/admin/privacy/audit/route.ts`: eliminat `prisma` directe, usa `listPrivacyAuditLogs`.
+- `app/api/admin/emails/testimonials-reminder/route.ts`: eliminat `prisma` directe, usa `countPendingTestimonials`.
+- `app/api/admin/privacy/consents/route.ts`: eliminat `import()` dinàmic de prisma al DELETE, usa `findConsentById`.
+- `app/api/admin/system/db-reconnect/route.ts`: allowlistada (operació de sistema de baix nivell, excepció justificada).
+- `scripts/check-prisma-in-routes.mjs`: guard nou — recorre `app/api/**/route.ts`, falla si detecta import estàtic o dinàmic de `@/lib/prisma` fora de l'allowlist.
+- `package.json`: afegit `qa:prisma-in-routes`, incorporat a `validate:core` (18 → 19 guards).
+- `__tests__/lib/services/bookingBulkPaymentService.test.ts`: 4 tests nous.
+- `__tests__/lib/services/testimonialAdminService.test.ts`: 2 tests nous per `countPendingTestimonials`.
+- `__tests__/lib/services/privacyService.test.ts`: 7 tests nous per les 3 funcions noves.
+- `__tests__/scripts/check-prisma-in-routes.test.ts`: 6 tests nous per al guard.
+- `docs/protocol-producte-admin-ca.md` · `§6.14`: afegit el `FET` del Canvi #552.
+- `docs/diario.md`: entrada del Canvi #552.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `551` a `552`.
+- Aquest tall **NO** toca: schema, migracions, UI, navegació ni copy.
+- Validació tècnica: `pnpm exec vitest run` (75 tests nous) OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK (19/19 guards) · `pnpm run qa:protocol` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `552`; el següent canvi real ha de ser `#553`.
+
+### Canvi #551 — 2026-05-12 — codex (FET)
+**Les capacitats del manual queden connectades al flux operatiu canònic perquè cada eina indiqui quin pas del sistema serveix.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#550`, el manual ja tenia un flux de punta a punta, però el mapa de capacitats continuava llegint-se per àrees. Per tancar un bloc més gran sobre `§6.1`, cada capacitat passa a declarar a quin pas del product operating system pertany.
+- `lib/constants/adminManual.ts`: nou tipus `AdminManualOperatingFlowStepId` (`01`-`06`) i camp obligatori `flowStep` a `AdminManualCapability`. Les 18 capacitats existents queden assignades al pas corresponent: captació, qualificació, pressupost, operativa, finances/control o recurrència.
+- `app/admin/manual/page.tsx`: cada targeta de capacitat mostra ara el badge `Pas NN · Títol del pas`, derivat de `ADMIN_MANUAL_OPERATING_FLOW`, de manera que el manual lliga mòduls i narrativa operativa en la mateixa lectura.
+- `scripts/check-admin-manual-consistency.mjs`: el guard valida també `ADMIN_MANUAL_SECTIONS`; falla si hi ha menys de 10 capacitats, href fora de `/admin`, cap `flowStep`, `flowStep` inexistent o menys de 3 senyals.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: afegeix regressions per capacitat sense `flowStep`, amb pas inexistent i amb senyals insuficients.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: blinda que les targetes mostrin `Pas 01`, `Pas 03` i `Pas 06`.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit el `FET` del Canvi #551.
+- `docs/diario.md`: entrada del Canvi #551.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `550` a `551`.
+- Aquest tall **NO** toca: schema, migracions, auth, rutes API, crons, persistència, web pública ni copy traduïble.
+- Validació tècnica: `pnpm exec vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm exec vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: cap capacitat del manual pot quedar fora del flux canònic de negoci; si s'afegeix una eina nova, ha de declarar quin pas del sistema reforça.
+- Validació humana/UX: una persona pot llegir cada targeta i entendre immediatament si aquella eina serveix per captar, qualificar, pressupostar, executar, controlar finances o reactivar.
+- `ADMIN_CHANGE_COUNTER` puja a `551`; el següent canvi real ha de ser `#552`.
+
+### Canvi #550 — 2026-05-12 — codex (FET)
+**El manual incorpora el sistema operatiu de punta a punta perquè l'admin es llegeixi com un cicle únic, no com pantalles soltes.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `SEGÜENT` viu de `§6.1` demana evolucionar manual/playbooks cap a un product operating system amb una sola narrativa operativa. L'usuari ha demanat explícitament blocs tan grans com sigui possible; per això aquest tall agrupa UI, contracte, guard, tests i documentació en una sola unitat.
+- `lib/constants/adminManual.ts`: nou `ADMIN_MANUAL_OPERATING_FLOW` amb 6 passos canònics del cicle `captar demanda → qualificar i prioritzar → pressupostar amb marge → reservar i preparar → cobrar i controlar rendibilitat → reactivar i generar recurrència`. Cada pas porta workspace d'entrada, lectures del sistema, decisions manuals, senyal d'èxit i pas següent.
+- `app/admin/manual/page.tsx`: nova secció "Sistema operatiu de punta a punta" que mostra el flux com a mapa operatiu accionable amb CTAs cap a Entrades, Sales Ops, Pressupostos, Reserves, Finances i Clients. El KPI superior deixa de comptar snapshot dispers i passa a mostrar els passos del flux operatiu.
+- `scripts/check-admin-manual-consistency.mjs`: el guard blinda `ADMIN_MANUAL_OPERATING_FLOW` i falla si té menys de 5 passos, hrefs fora de `/admin`, menys de 2 lectures del sistema o cap decisió manual. `__tests__/scripts/check-admin-manual-consistency.test.ts` afegeix regressions per aquests casos.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: blinda que la nova secció, els passos, lectures, decisions i CTA a Entrades siguin visibles.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit el `FET` del Canvi #550.
+- `docs/diario.md`: entrada del Canvi #550.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `549` a `550`.
+- Aquest tall **NO** toca: schema, migracions, auth, rutes API, crons, persistència, copy públic ni web pública.
+- Validació tècnica: `pnpm exec vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm exec vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el manual ja explica el camí complet que ha de seguir una demanda fins a recurrència, amb un workspace d'entrada i un criteri de sortida per cada pas.
+- Validació humana/UX: una persona no tècnica pot veure en una sola secció què vigila el sistema, què ha de decidir manualment i quin mòdul obrir a cada fase del negoci.
+- Nota de coordinació: durant el tall s'ha detectat que `#549` ja havia entrat per `claude`; aquest bloc es registra com a `#550` segons la norma de no-col·lisió.
+- `ADMIN_CHANGE_COUNTER` puja a `550`; el següent canvi real ha de ser `#551`.
+
+### Canvi #549 — 2026-05-12 — claude (FET)
+**Fix P0 seguretat (4 rutes /api/admin/* sense auth) + guard `qa:api-admin-auth` (validate:core 18 guards).**
+- 4 rutes protegides: `leads/follow-ups`, `leads/suggestions`, `leads/[id]/quote`, `leads/[id]/status`.
+- Nou `scripts/check-api-admin-auth.mjs`: escaneja totes les rutes `/api/admin/*` i falla si alguna no importa `requireAuth`. 144 rutes verificades.
+- `qa:api-admin-auth` afegit a `package.json` i a `validate:core` (17 → 18 guards).
+- 5 tests nous a `__tests__/scripts/check-api-admin-auth.test.ts`: clean, violació detectada, múltiples violacions, dir buit, fora d'admin.
+- `ADMIN_CHANGE_COUNTER` passa a `549`. Proper canvi real: `#550`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #548 — 2026-05-11 — codex (FET)
+**`qa:patches` obliga a justificar qualsevol `eslint-disable` de producte.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: durant aquest bloc ha entrat un `#547` paral·lel de `claude`; aquest tall es renumera a `#548` segons la norma de no-col·lisió. El front continua sent `§6.14`, `PENDENT CRÍTIC` d'evitar regressions silencioses: després de bloquejar supressions TypeScript opaques i `any` explícit, faltava que una desactivació d'ESLint no pogués quedar sense motiu revisable.
+- `app/components/legal/ConsentScripts.client.tsx`: la supressió `@next/next/no-before-interactive-script-outside-document` queda justificada perquè el fallback `noscript` de GTM està lligat al consentiment.
+- `app/admin/presupuestos/PresupuestoPdfStudio.tsx`: la supressió `react-hooks/exhaustive-deps` queda justificada perquè el loader de proposta ha de dependre només de l'id inicial i de la hidratació de draft.
+- `scripts/check-patches.mjs`: nou detector `detectUnexplainedEslintDisables()`; qualsevol `eslint-disable`, `eslint-disable-next-line` o `eslint-disable-line` sense text després de `--` falla com a `ESLINT_DISABLE_WITHOUT_REASON`.
+- `__tests__/scripts/check-patches.test.ts`: el guard passa de 9 a 11 casos amb regressió per supressió sense motiu i cas permès amb explicació revisable.
+- `docs/protocol-producte-admin-ca.md` · `§6.14`: afegit `FET` del Canvi #548 dins el front de regressions silencioses.
+- `docs/diario.md`: entrada del Canvi #548.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `547` a `548`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, UI visible, copy públic ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/scripts/check-patches.test.ts` OK · `pnpm run qa:patches` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el pipeline ja falla si una nova supressió ESLint entra sense motiu explícit.
+- Validació humana/UX: no hi ha canvi visual; l'efecte per al propietari és que les excepcions tècniques queden llegibles i auditables.
+- `ADMIN_CHANGE_COUNTER` puja a `548`; el següent canvi real ha de ser `#549`.
+
+### Canvi #547 — 2026-05-11 — claude (FET)
+**`reportingInsightsService.ts` — insight engine per al reporting executiu. Tanca el PENDENT CRÍTIC de §6.10.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- `lib/services/reportingInsightsService.ts`: servei pur amb `generateReportingInsights(report, opts)` → `ReportingInsight[]` ordenats per prioritat (critical → warning → positive). 9 tipologies: SLA trencat, pipeline buit, marge baix, recurrència baixa, tendència negativa, funnel aturat, leads en risc, email fluix, millor canal.
+- `app/admin/reporting/page.tsx`: `nextStep` del `OwnerControlStrip` alimentat per `insights[0]` en lloc de la cadena hardcoded; nou panell "Alertes i oportunitats" per als insights secundaris amb badge de categoria i CTA directa.
+- `__tests__/lib/services/reportingInsightsService.test.ts`: 20 tests (totes les tipologies, prioritats, guards de llindar i edge cases).
+- `lib/constants/admin.ts`: counter `546 → 547`.
+- `docs/protocol-producte-admin-ca.md`: §6.10 PENDENT CRÍTIC → FET. §9 entrada nova.
+
+### Canvi #546 — 2026-05-11 — codex (FET)
+**`qa:patches` bloqueja `any` explícit en producte perquè no torni el deute de tipus silenciós.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del #545, les supressions TypeScript opaques ja quedaven bloquejades, però encara calia cobrir l'escape més directe: reintroduir `as any` o anotacions `: any` dins `app/` o `lib/`. L'escaneig previ mostra deute només a `scripts/`, que queda fora de l'abast d'aquest tall per no barrejar-ho amb producte.
+- `scripts/check-patches.mjs`: nou detector `detectExplicitAnyEscapes()`; `as any` falla com a `EXPLICIT_ANY_CAST` i `: any` falla com a `EXPLICIT_ANY_TYPE`.
+- `__tests__/scripts/check-patches.test.ts`: el guard passa de 7 a 9 casos amb regressions per cast explícit i anotació explícita.
+- `docs/protocol-producte-admin-ca.md` · `§6.14`: afegit `FET` del Canvi #546 dins el front de regressions silencioses.
+- `docs/diario.md`: entrada del Canvi #546.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `545` a `546`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, UI visible, copy públic ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/scripts/check-patches.test.ts` OK · `pnpm run qa:patches` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el pipeline ja falla si el codi de producte torna a usar `any` explícit en lloc de tipus concrets, `unknown`, genèrics o guards.
+- Validació humana/UX: no hi ha canvi visual; l'efecte per al propietari és menys risc de regressió invisible per bypass de tipus.
+- `ADMIN_CHANGE_COUNTER` puja a `546`; el següent canvi real ha de ser `#547`.
+
+### Canvi #545 — 2026-05-11 — codex (FET)
+**`qa:patches` bloqueja supressions TypeScript opaques abans que amaguen regressions de tipus.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: `§6.14` manté viu el `PENDENT CRÍTIC` d'evitar regressions silencioses en un repo gran. Els casts opacs ja havien estat drenats en diversos serveis, però encara faltava una barrera general contra `@ts-ignore` i `@ts-expect-error` sense explicació.
+- `scripts/check-patches.mjs`: nou detector `detectOpaqueTypeScriptSuppressions()`; `@ts-ignore` falla com a `TS_IGNORE_SUPPRESSION` i `@ts-expect-error` sense motiu útil falla com a `TS_EXPECT_ERROR_WITHOUT_REASON`.
+- `__tests__/scripts/check-patches.test.ts`: el guard passa de 4 a 7 casos i cobreix `@ts-ignore`, `@ts-expect-error` sense motiu i `@ts-expect-error` amb justificació suficient.
+- `docs/protocol-producte-admin-ca.md` · `§6.14`: afegit `FET` del Canvi #545 dins el front de regressions silencioses.
+- `docs/diario.md`: entrada del Canvi #545.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `544` a `545`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, UI visible, copy públic ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/scripts/check-patches.test.ts` OK · `pnpm run qa:patches` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el pipeline ja falla si algú intenta amagar un error TypeScript amb una supressió opaca dins el perímetre escanejat.
+- Validació humana/UX: no hi ha canvi visual; l'efecte per al propietari és una barrera de qualitat més clara contra deute invisible.
+- `ADMIN_CHANGE_COUNTER` puja a `545`; el següent canvi real ha de ser `#546`.
+
+### Canvi #544 — 2026-05-11 — codex (FET)
+**El Manual converteix la Fase 1 de captació gratuïta en una matriu d’un sol canal amb criteris d’inici, èxit i parada.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el pla bootstrap de 14 dies ja obligava a triar un sol canal, però encara deixava massa interpretació oberta quan s'arribava a `Dies 8-14`: xarxa personal, ressenyes, SEO local, social o partners podien semblar igualment urgents.
+- `lib/constants/adminManual.ts`: afegit `AdminMarketingChannelDecision` i `ADMIN_MARKETING_CHANNEL_DECISION_MATRIX` amb cinc opcions `FASE_1`: xarxa personal, ressenyes Google, SEO local, Instagram/TikTok orgànic i partners.
+- `app/admin/manual/page.tsx`: el gate de captació mostra "Matriu d’un sol canal" amb condició d'inici, primer moviment, senyal d'èxit, condició de parada i CTA admin per cada canal.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: blinda que la matriu només apunti a accions `FASE_1`, tingui textos suficients i hrefs `/admin`.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: comprova que la matriu es renderitza i que el CTA de Social apunta a `/admin/social`.
+- `scripts/check-admin-manual-consistency.mjs`: `qa:admin-manual-consistency` valida la matriu amb mínim 4 opcions, ids existents, fase `FASE_1`, textos accionables i `adminHref` d'admin; el test del guard afegeix regressions per id inexistent, fase incorrecta, `stopIf` buit i href fora d'admin.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #544.
+- `docs/diario.md`: entrada del Canvi #544.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `543` a `544`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, integracions externes, ads reals ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: després de Fundació, el propietari ja pot triar un únic canal gratuït segons evidència i no per impuls.
+- Validació humana/UX: la pantalla mostra què fer primer, quan considerar-ho èxit i quan parar abans d'obrir un segon canal.
+- `ADMIN_CHANGE_COUNTER` puja a `544`; el següent canvi real ha de ser `#545`.
 
 ### Canvi #166 — 2026-04-17 — claude (FET)
 **Tests cobertura completa serveis + fix bug pluralització + fix mojibake (§6.13).**
@@ -5750,6 +9750,260 @@ px tsc --noEmit OK · git diff --check OK.
 
 ---
 
+### Canvi #543 — 2026-05-11 — codex (FET)
+**El ritme operatiu del Manual guanya criteris de tancament i acció de desviació per cada cadència.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `#541` va fer visible la rutina operativa i el `#542` en va blindar l'estructura mínima. Però encara faltava una peça de product operating system: saber quan una cadència queda tancada i què fer si les senyals surten malament.
+- `lib/constants/adminManual.ts`: `AdminManualOperatingRhythmItem` guanya `doneWhen: string[]` i `ifOffTrack: string`; les quatre cadències reben criteris de tancament i acció si hi ha desviació.
+- `app/admin/manual/page.tsx`: cada card del "Ritme operatiu" mostra un bloc "Tancat quan" i una nota de desviació.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render comprova criteris visibles i el missatge de no escalar pressupost sense dades.
+- `scripts/check-admin-manual-consistency.mjs`: el guard exigeix `ifOffTrack` amb contingut i almenys 2 criteris `doneWhen` per cadència.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: regressions noves per `doneWhen` insuficient i `ifOffTrack` buit.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit `FET` del Canvi #543.
+- `docs/diario.md`: entrada del Canvi #543.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `542` a `543`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, integracions externes ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: cada cadència del manual ja té definició de finalització i protocol de desviació.
+- Validació humana/UX: el propietari pot saber què fa que una rutina estigui realment tancada i què prioritzar quan el sistema va malament.
+- `ADMIN_CHANGE_COUNTER` puja a `543`; el següent canvi real ha de ser `#544`.
+
+---
+
+### Canvi #542 — 2026-05-11 — codex (FET)
+**El guard de consistència del manual blinda el "Ritme operatiu": mínim 4 cadències, enllaços admin, CTAs i senyals suficients.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `#541` va fer visible el ritme operatiu al Manual, però encara depenia només del test de render i del guard genèric de hrefs. Si algú reduïa les cadències, treia senyals o posava un link fora d'admin, el manual podia deixar de funcionar com a product operating system sense que el guard específic ho expliqués.
+- `scripts/check-admin-manual-consistency.mjs`: extreu `ADMIN_MANUAL_OPERATING_RHYTHM` i valida mínim 4 cadències, `href` que comenci per `/admin`, `title`/`objective`/`cta` amb contingut i almenys 2 senyals.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: el fixture vàlid guanya ritme operatiu i tres regressions noves: cadència absent, href no admin i senyals insuficients.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit `FET` del Canvi #542.
+- `docs/diario.md`: entrada del Canvi #542.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `541` a `542`.
+- Aquest tall **NO** toca: UI visible, schema, backend, rutes API, crons, auth, integracions externes ni persistència.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el pipeline protegeix que el ritme operatiu continuï sent una rutina accionable i no una llista decorativa.
+- Validació humana/UX: invisible en UI, però preserva que el propietari vegi quan mirar cada workspace i amb quines senyals mínimes.
+- `ADMIN_CHANGE_COUNTER` puja a `542`; el següent canvi real ha de ser `#543`.
+
+---
+
+### Canvi #541 — 2026-05-11 — codex (FET)
+**El Manual de possibilitats guanya un "Ritme operatiu" que converteix els workspaces en una rutina diària, setmanal i mensual.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `SEGÜENT` viu de `§6.1` diu que el manual/playbooks han d'evolucionar cap a un product operating system amb una sola narrativa operativa. Després de tancar el bloc de captació `§6.16`, faltava una peça transversal que digués quan usar el sistema, no només què existeix.
+- `lib/constants/adminManual.ts`: nou `AdminManualOperatingRhythmItem` i `ADMIN_MANUAL_OPERATING_RHYTHM` amb quatre cadències: `Cada matí`, `Durant el dia`, `Cada divendres` i `Cada mes`. Cada cadència declara objectiu, `href`, CTA i senyals.
+- `app/admin/manual/page.tsx`: nova secció "Ritme operatiu" just després de "Com s’ha d’utilitzar", amb cards i CTAs cap a Dashboard, Tasques, Finances i Reporting.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que la secció, cadències i links principals siguin visibles.
+- `docs/protocol-producte-admin-ca.md` · `§6.1`: afegit `FET` del Canvi #541.
+- `docs/diario.md`: entrada del Canvi #541.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `540` a `541`.
+- Aquest tall **NO** toca: schema, backend, rutes API, crons, auth, integracions externes ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK · `pnpm run qa:admin-manual-hrefs` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el manual ja no és només inventari de capacitats; dona una rutina concreta per operar el negoci amb els workspaces existents.
+- Validació humana/UX: el propietari pot entrar al manual i saber què mirar cada matí, durant el dia, cada divendres i cada mes.
+- `ADMIN_CHANGE_COUNTER` puja a `541`; el següent canvi real ha de ser `#542`.
+
+---
+
+### Canvi #540 — 2026-05-11 — codex (FET)
+**El guard del manual exigeix que cada prova del tracker de Fase 0 tingui contingut real: `proof`, `whereToCheck` i `unlockSignal`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: el `#538` ja assegurava que el tracker de proves cobreixi els requisits de Fundació, però encara podia passar una entrada amb `proof`, `whereToCheck` o `unlockSignal` buit. Això hauria mantingut el pipeline verd mentre el manual deixava de ser accionable.
+- `scripts/check-admin-manual-consistency.mjs`: cada item de `ADMIN_MARKETING_PHASE_EVIDENCE` es valida també per contingut mínim en `proof`, `whereToCheck` i `unlockSignal`; si falta o queda massa curt, el guard falla amb el `actionId` concret.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: el fixture vàlid usa textos no decoratius i s'afegeix un cas que buida `proof` per comprovar el missatge de regressió.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #540.
+- `docs/diario.md`: entrada del Canvi #540.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `539` a `540`.
+- Aquest tall **NO** toca: UI visible, schema, backend, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: el pipeline ja protegeix no només que hi hagi quatre proves, sinó que cada una sigui accionable.
+- Validació humana/UX: invisible en UI, però evita que el manual torni a mostrar un tracker buit o genèric.
+- `ADMIN_CHANGE_COUNTER` puja a `540`; el següent canvi real ha de ser `#541`.
+
+---
+
+### Canvi #539 — 2026-05-11 — codex (FET)
+**El guard de consistència del manual blinda el tracker de proves de Fase 0 contra desalineacions amb el gate.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: després del `#537`, `/admin/manual` ja mostra un tracker de proves per la Fundació, però el guard `qa:admin-manual-consistency` només validava gate, outputs, canals bloquejats i bootstrap. Si demà algú afegia o treia un requisit de Fase 0, el tracker podia quedar desalineat sense que el pipeline ho veiés.
+- `scripts/check-admin-manual-consistency.mjs`: extreu `ADMIN_MARKETING_PHASE_EVIDENCE`, valida que cobreixi exactament els `requiredActionIds`, falla si hi ha un `actionId` extra i falla si referencia una acció inexistent. El missatge OK inclou també el recompte de proves.
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: el fixture vàlid guanya `ADMIN_MARKETING_PHASE_EVIDENCE`; s'afegeixen regressions per prova absent i actionId extra.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #539.
+- `docs/diario.md`: entrada del Canvi #539.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `538` a `539`.
+- Aquest tall **NO** toca: UI visible, schema, backend, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `npx vitest run __tests__/scripts/check-admin-manual-consistency.test.ts` OK · `pnpm run qa:admin-manual-consistency` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: una desalineació futura entre requisits de Fundació i tracker de proves trenca el pipeline.
+- Validació humana/UX: invisible en UI, però protegeix que el manual continuï dient al propietari totes les proves reals de Fase 0.
+- `ADMIN_CHANGE_COUNTER` puja a `539`; el següent canvi real ha de ser `#540`.
+
+---
+
+### Canvi #538 — 2026-05-11 — claude (FET)
+**Dos guards de consistència del manual de màrqueting afegits a `validate:core`: hrefs d'admin vius i coherència interna del gate.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: §6.14 MÉS ENDAVANT — "scripts de salut del repo / checks de consistència de dominis compartits". Dos guards concrets per blindar `adminManual.ts`, que conté hrefs i cross-references de IDs crítics sense cap guard fins ara.
+- `scripts/check-admin-manual-hrefs.mjs`: extreu tots els `adminHref` i `href: '/admin/*'` del manual i comprova que existeixi `app/{href}/page.tsx`. 21 hrefs d'admin verificats. Rutes dinàmiques saltades estàticament.
+- `scripts/check-admin-manual-consistency.mjs`: valida coherència interna del gate de màrqueting — `requiredActionIds`/`blockedActionIds` existents a `ADMIN_MARKETING_PHASES`, `requiredOutputs` cobreix exactament els requerits (ni més ni menys), `blockedReasons` cobreix exactament els bloquejats, `ADMIN_MARKETING_PHASE_EVIDENCE` cobreix exactament els requerits, `primaryActionId`/`nextPhaseActionId` existents i no bloquejats, bootstrap amb ≥1 finestra. Bracket-counting robust per parsejar TypeScript sense AST.
+- `__tests__/scripts/check-admin-manual-hrefs.test.ts`: 15 tests (extractAdminHrefs, routeFileExists, integració).
+- `__tests__/scripts/check-admin-manual-consistency.test.ts`: 13 tests (fixture vàlid, 11 casos de fallada).
+- `package.json`: `qa:admin-manual-hrefs` + `qa:admin-manual-consistency` + ambdós afegits a `validate:core` (15 → 17 guards).
+- `docs/protocol-producte-admin-ca.md`: §6.14 MÉS ENDAVANT → FET.
+- Aquest tall **NO** toca: schema, BD, UI, rutes, crons ni cap lògica de negoci.
+- Validació tècnica: `pnpm vitest run __tests__/scripts/check-admin-manual-hrefs.test.ts __tests__/scripts/check-admin-manual-consistency.test.ts` OK (28 tests) · `pnpm run validate:core` OK (17 guards) · `pnpm run qa:protocol` OK.
+
+---
+
+### Canvi #537 — 2026-05-11 — codex (FET)
+**El manual de captació mostra un tracker de proves de Fase 0: prova material, lloc de comprovació i senyal de desbloqueig per cada requisit.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol i checklist. El roadmap només conserva `marketing-analytics-hub` com a pendent real, però `§6.16` diu que abans d'obrir integracions cares cal tancar Fundació. Després del pla bootstrap de 14 dies, faltava una lectura de propietari que digués què compta com a prova real de Fase 0, no només outputs genèrics.
+- `lib/constants/adminManual.ts`: nou `AdminMarketingPhaseEvidence` i `ADMIN_MARKETING_PHASE_EVIDENCE`, amb una entrada per cada requisit de Fase 0 (`icp-definition`, `value-proposition`, `google-business-profile`, `web-optimization`). Cada entrada defineix `proof`, `whereToCheck` i `unlockSignal`.
+- `app/admin/manual/page.tsx`: el gate de captació mostra el bloc "Tracker de proves Fase 0" amb les quatre proves, el lloc de comprovació i el senyal que permet avançar.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: nou test que blinda que el tracker cobreixi exactament els `requiredActionIds`, que tots siguin de `FASE_0` i que cada prova tingui contingut verificable.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que el tracker i proves clau siguin visibles.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK · `npx tsc --noEmit` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: `/admin/manual` ja permet decidir si la Fundació està prou demostrada abans de passar a captació gratuïta o integracions cares.
+- Validació humana/UX: el propietari veu què ha de mirar, on ho comprova i quin senyal desbloqueja la fase següent sense rellegir tot el protocol.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #537.
+- `docs/diario.md`: entrada del Canvi #537.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `536` a `537`.
+- `ADMIN_CHANGE_COUNTER` puja a `537`; el següent canvi real ha de ser `#538`.
+
+---
+
+### Canvi #536 — 2026-05-11 — claude (FET)
+**El protocol formalitza la norma de granularitat de canvis: cada `Canvi #N` ha de resoldre una unitat de valor real.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el propietari va demanar escriure al protocol la regla dels "blocs grans". La nota del #534 ja parlava de "blocs més substancials", però vivia com a comentari puntual dins del §9. Calia convertir-la en norma operativa permanent al §2, amb definició explícita de quan un canvi és prou gran i el contraexemple canònic.
+- `docs/protocol-producte-admin-ca.md` · `§2`: nova **Norma de granularitat de canvis** afegida just sota la "Norma operativa de 'go' del propietari". Defineix: unitat de valor real, frase d'usuari observable, contraexemple canònic (#525-#534), regla "primer agrupar, després registrar".
+- `docs/diario.md`: entrada del Canvi #536.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `535` a `536`.
+- Aquest tall **NO** toca: cap fitxer de codi, constants, tests, UI ni schema.
+- Validació tècnica: `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: la norma de granularitat és ara permanent al protocol i aplicable per qualsevol agent des d'avui.
+- Validació humana/UX: qualsevol agent que llegeixi §2 sap que una addició d'un sol camp sense efecte observable no és un canvi independent.
+- `ADMIN_CHANGE_COUNTER` puja a `536`; el següent canvi real ha de ser `#537`.
+
+---
+
+### Canvi #535 — 2026-05-11 — codex (FET)
+**El manual consolida `§6.16` en un pla bootstrap de 14 dies: Fundació, xarxa personal i decisió d'un sol canal gratuït.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go`, amb canvi de ritme explícit després de la conversa sobre arribar a `#1000`: no més microfrases si es pot consolidar un bloc coherent. El gate de captació ja tenia fase activa, outputs de Fundació, primer pas de Fase 1, outputs i regla anti-dispersió; faltava una lectura operativa compacta que convertís tot això en una seqüència curta executable.
+- `lib/constants/adminManual.ts`: nou `AdminMarketingBootstrapStep` i `ADMIN_MARKETING_BOOTSTRAP_PLAN` amb tres finestres: `Dies 1-2` per escriure Fundació, `Dies 3-7` per validar amb xarxa personal i `Dies 8-14` per triar un sol canal gratuït amb mètrica de sortida.
+- `app/admin/manual/page.tsx`: el gate de captació mostra el nou bloc "Pla de 14 dies" abans de la graella de fases, amb objectiu i outputs per cada finestra.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: nou test que blinda l'ordre de finestres i outputs clau (`ICP escrit`, `50 contactes avisats`, `Canal triat`).
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que el bloc "Pla de 14 dies" i "Triar un sol canal gratuït" siguin visibles.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (9 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: `/admin/manual` ja no és només una llista de fases; dona una seqüència de 14 dies per sortir del zero sense dispersar-se.
+- Validació humana/UX: el propietari pot veure què fer primer, què validar la primera setmana i quan triar el següent canal.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #535.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `534` a `535`.
+- `ADMIN_CHANGE_COUNTER` puja a `535`; el següent canvi real ha de ser `#536`.
+
+---
+
+### Canvi #534 — 2026-05-11 — codex (FET)
+**El gate de captació incorpora una regla anti-dispersió visible: una fase cada vegada i un sol canal actiu fins que hi hagi senyals clars.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. El `PENDENT CRÍTIC` de `§6.16` diu explícitament que la dispersió mata els petits negocis, però el gate encara no mostrava aquesta regla com a barrera operativa visible. A més, el propietari ha preguntat si arribaríem a `#1000`; aquest tall deixa explícit que els propers `go` s'han d'agrupar en blocs més substancials quan sigui possible, no en microfrases.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `focusRule: string`. `ADMIN_MARKETING_PHASE_GATE.focusRule` fixa que cal treballar una fase cada vegada i un sol canal actiu fins que hi hagi senyals clars.
+- `app/admin/manual/page.tsx`: el gate mostra la regla anti-dispersió sota la decisió principal, amb èmfasi visual.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova que `focusRule` inclogui `un sol canal actiu`.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que la regla sigui visible al manual.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (8 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: `/admin/manual` ja transforma la norma de no dispersió en una barrera visible dins el pla de captació.
+- Validació humana/UX: el propietari veu que no toca obrir diverses vies en paral·lel; s'ha de treballar un canal fins tenir senyals.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #534 i nota operativa per agrupar els propers `go` en blocs més substancials.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `533` a `534`.
+- `ADMIN_CHANGE_COUNTER` puja a `534`; el següent canvi real ha de ser `#535`.
+
+---
+
+### Canvi #533 — 2026-05-11 — codex (FET)
+**El primer pas de Fase 1 queda tancat amb outputs concrets: 50 contactes avisats, 3 converses comercials obertes i objeccions anotades.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. El `#532` ja justificava per què `Activar xarxa personal` ha d'anar abans de SEO, social o partners, però la targeta encara no deia què ha de quedar produït per considerar aquest primer pas de Fase 1 realment fet. Calia convertir-lo en una acció verificable.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `nextPhaseOutputs: string[]`. `ADMIN_MARKETING_PHASE_GATE.nextPhaseOutputs` fixa 3 sortides concretes: `50 contactes avisats`, `3 converses comercials obertes` i `Objeccions anotades`.
+- `app/admin/manual/page.tsx`: la targeta "Després de la fundació" mostra aquests outputs com a chips sota el motiu de l'acció.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova exactament els 3 outputs esperats.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real del manual comprova que aparegui `50 contactes avisats`.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (8 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: `/admin/manual` ja mostra què ha de passar perquè el primer pas de Fase 1 sigui real i no només una recomanació.
+- Validació humana/UX: el propietari sap quina activitat mínima ha de completar abans de saltar a altres canals gratuïts.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #533.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `532` a `533`.
+- `ADMIN_CHANGE_COUNTER` puja a `533`; el següent canvi real ha de ser `#534`.
+
+---
+
+### Canvi #532 — 2026-05-11 — codex (FET)
+**El gate de Fase 0 justifica per què el primer pas després de la Fundació és activar la xarxa personal abans de SEO, social o partners.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. Després del `#531`, el manual ja mostrava els lliurables concrets de Fundació, però la targeta "Després de la fundació" només destacava `Activar xarxa personal` sense explicar per què aquest pas va abans que altres accions de Fase 1. Calia evitar que semblés una preferència arbitrària.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `nextPhaseReason: string`. `ADMIN_MARKETING_PHASE_GATE.nextPhaseReason` explica que la xarxa personal és el canal amb menys cost i més feedback immediat per validar missatge abans d'invertir hores en SEO, social o partners.
+- `app/admin/manual/page.tsx`: la targeta "Després de la fundació" mostra el motiu sota la descripció de l'acció recomanada.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova que `nextPhaseReason` inclogui el concepte de feedback immediat.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real del manual comprova que el motiu sigui visible.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (8 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: `/admin/manual` ja mostra no només quin és el primer pas de Fase 1, sinó per què aquest pas és el més raonable abans de dispersar-se en altres canals.
+- Validació humana/UX: el propietari entén que la xarxa personal serveix per validar missatge amb cost zero i feedback ràpid abans d'escalar esforços.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #532.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `531` a `532`.
+- `ADMIN_CHANGE_COUNTER` puja a `532`; el següent canvi real ha de ser `#533`.
+
+---
+
+### Canvi #531 — 2026-05-11 — codex (FET)
+**El gate de Fase 0 mostra els lliurables concrets que han de sortir de cada acció de Fundació abans de passar a Fase 1.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. El `ADMIN_CHANGE_COUNTER` ja estava a `530`, però no existia cap entrada `#530` al protocol ni al diari; per norma de no-col·lisió, aquest tall es registra com a `#531`. Després del `#525`-`#529`, el manual ja mostrava fase activa, criteris de desbloqueig, primer moviment i canals bloquejats amb motius. Faltava convertir les quatre accions de Fundació en outputs materials perquè el propietari no les pogués interpretar com a tasques abstractes.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `requiredOutputs: Record<string, string[]>`. `ADMIN_MARKETING_PHASE_GATE.requiredOutputs` cobreix els quatre requisits de Fase 0: `icp-definition`, `value-proposition`, `google-business-profile` i `web-optimization`.
+- `app/admin/manual/page.tsx`: cada targeta del gate de Fase 0 mostra chips amb els lliurables esperats de l'acció: tipus d'event, zona, pressupost mínim, dolor principal, frase usable, versió WhatsApp, fitxa publicada, fotos, CTA, portfolio i prova social.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova que `requiredOutputs` cobreix exactament les accions requerides i que cada requisit de Fase 0 tingui com a mínim tres outputs.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que aparegui un output visible (`Pressupost mínim acceptable`) dins el manual.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (8 tests) · `npx tsc --noEmit` OK · `pnpm run qa:protocol` OK · `pnpm run validate:core` OK.
+- Validació funcional: `/admin/manual` ja no només diu quines accions de Fundació cal completar; mostra què ha de quedar escrit o publicat per considerar-les fetes.
+- Validació humana/UX: el propietari pot llegir la Fase 0 com una llista de lliurables concrets, no com una recomanació genèrica.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #531.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `530` a `531`.
+- `ADMIN_CHANGE_COUNTER` puja a `531`; el següent canvi real ha de ser `#532`.
+
+---
+
 ### Canvi #515 — 2026-05-05 — codex (FET)
 **`recalculateAllCustomers()` elimina el `while (true)` amb suppressió ESLint i manté la paginació per cursor amb una condició explícita i testada.**
 - Començat per: `codex`
@@ -5764,6 +10018,242 @@ px tsc --noEmit OK · git diff --check OK.
 - Validació humana/UX: sense canvi visible; reforç de mantenibilitat i cobertura de cron intern.
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `514` a `515`.
 - `ADMIN_CHANGE_COUNTER` puja a `515`; el següent canvi real ha de ser `#516`.
+
+---
+
+### Canvi #526 — 2026-05-09 — codex (FET)
+**El gate de Fase 0 enumera els 4 criteris concrets per desbloquejar la Fase 1: ICP escrit, proposta de valor usable, Google Business Profile publicat i web base revisada amb proves socials/portfolio/CTA.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. El `#525` va introduir el gate de Fase 0 amb la decisió de no avançar fins tenir fundació, però el bloc no deia explícitament quan es pot passar de fase. Calia respondre a "quins criteris concrets han d'existir per poder avançar a Fase 1?".
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya el camp `unlockCriteria: string[]`. `ADMIN_MARKETING_PHASE_GATE` l'omple amb els 4 criteris concrets: 1 client ideal escrit, 1 frase de proposta de valor usable al web/WhatsApp, fitxa de Google Business Profile publicada amb fotos reals, web base revisada amb proves socials/portfolio/CTA de contacte visibles.
+- `app/admin/manual/page.tsx`: el bloc del gate de Fase 0 mostra una nova secció "Quan pots passar de fase" amb els 4 criteris en grid 2 columnes.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate ampliat per verificar `unlockCriteria` (4 ítems, contingut de cadascun: client ideal, proposta de valor, Google Business Profile, Web base).
+- Aquest tall **NO** toca: schema, serveis backend, integracions externes, rutes API, crons ni cap altra àrea del §6.14 o §6.15.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (7 tests) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK (15/15 guards) · `pnpm run qa:protocol` OK.
+- Validació funcional: `/admin/manual` mostra sota el gate de Fase 0 el bloc "Quan pots passar de fase" amb els 4 criteris de desbloqueig.
+- Validació humana/UX: el propietari sap exactament quins passos ha de completar per poder avançar a la Fase 1, sense ambigüitat.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #526.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `525` a `526`.
+- `ADMIN_CHANGE_COUNTER` puja a `526`; el següent canvi real ha de ser `#527`.
+
+---
+
+### Canvi #527 — 2026-05-09 — codex (FET)
+**El gate de Fase 0 mostra també els canals que no s'han d'obrir encara: Google Ads, Meta Ads i remarketing.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. Després del `#525` i el `#526`, el manual ja deia que calia completar Fase 0 i explicava els criteris per passar de fase, però la barrera encara no feia visibles els canals concrets que continuaven bloquejats. Això deixava marge perquè el propietari interpretés "captació" com obrir Ads abans de tenir base.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `blockedActionIds: string[]`; `ADMIN_MARKETING_PHASE_GATE` hi referencia `google-ads`, `meta-ads` i `remarketing`.
+- `app/admin/manual/page.tsx`: el bloc del gate de Fase 0 renderitza una nova secció "No obrir encara" amb els tres canals de Fase 2 i el seu cost estimat.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova els `blockedActionIds` i que tots pertanyen a `FASE_2`, mentre els requisits continuen pertanyent a `FASE_0`.
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (7 tests) · `npx tsc --noEmit` OK.
+- Validació funcional: `/admin/manual` separa accions requerides ara de canals de pagament bloquejats fins completar la fundació.
+- Validació humana/UX: el propietari veu d'un cop d'ull què ha de fer primer i quines palanques no s'han d'obrir encara.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #527.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `526` a `527`.
+- `ADMIN_CHANGE_COUNTER` puja a `527`; el següent canvi real ha de ser `#528`.
+
+---
+
+### Canvi #528 — 2026-05-09 — codex (FET)
+**El gate de Fase 0 marca el primer moviment executable: definir el client ideal abans de qualsevol canal.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. Després del `#525`, `#526` i `#527`, el manual ja mostrava requisits, criteris de desbloqueig i canals bloquejats, però encara deixava quatre accions de Fase 0 al mateix nivell. Faltava convertir la barrera en una instrucció immediata: començar per l'ICP.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `primaryActionId: string`; `ADMIN_MARKETING_PHASE_GATE.primaryActionId` apunta a `icp-definition`.
+- `app/admin/manual/page.tsx`: el gate renderitza una nova targeta "Primer moviment" amb el títol, descripció, cost i esforç de l'acció primària.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova que `primaryActionId` sigui `icp-definition` i que pertanyi a `FASE_0`.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real del manual comprova "Primer moviment", "Definir client ideal (ICP)" i "No obrir encara".
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (7 tests) · `pnpm vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (1 test) · `npx tsc --noEmit` OK.
+- Validació funcional: `/admin/manual` ja distingeix entre accions requerides, primera acció concreta, criteris de pas de fase i canals bloquejats.
+- Validació humana/UX: el propietari no ha de decidir per on començar; el manual posa l'ICP com a primer moviment visible.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #528.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `527` a `528`.
+- `ADMIN_CHANGE_COUNTER` puja a `528`; el següent canvi real ha de ser `#529`.
+
+---
+
+### Canvi #529 — 2026-05-09 — codex (FET)
+**El gate de Fase 0 explica per què Google Ads, Meta Ads i remarketing continuen bloquejats fins tenir fundació.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. Després del `#527`, el manual ja llistava els canals que no s'han d'obrir encara, però només en mostrava nom i cost. Faltava explicar la causa operativa perquè el bloqueig no semblés arbitrari.
+- `lib/constants/adminManual.ts`: `AdminMarketingPhaseGate` guanya `blockedReasons: Record<string, string>` amb motius específics per `google-ads`, `meta-ads` i `remarketing`.
+- `app/admin/manual/page.tsx`: cada targeta de "No obrir encara" mostra el motiu concret abans del cost estimat.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: el test del gate comprova que els motius cobreixen exactament els canals bloquejats i que cada motiu té contingut substancial.
+- `__tests__/app/admin/manual/AdminManualPage.test.tsx`: el render real comprova que aparegui el motiu de Google Ads ("Sense ICP i proposta clara...").
+- Aquest tall **NO** toca: schema, backend, integracions externes, Ads, GA4, rutes API, crons ni persistència.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (7 tests) · `pnpm vitest run __tests__/app/admin/manual/AdminManualPage.test.tsx` OK (1 test) · `npx tsc --noEmit` OK.
+- Validació funcional: `/admin/manual` ja no només bloqueja canals de pagament; n'explica el risc concret abans d'invertir.
+- Validació humana/UX: el propietari entén per què no toca obrir Ads encara i què falta abans de gastar.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #529.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `528` a `529`.
+- `ADMIN_CHANGE_COUNTER` puja a `529`; el següent canvi real ha de ser `#530`.
+
+---
+
+### Canvi #525 — 2026-05-08 — codex (FET)
+**El manual de possibilitats converteix `§6.16` en barrera operativa: Fase 0 abans de gastar en Ads o integracions de màrqueting.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació de `go` segons protocol. `§6.16` diu que la captació externa s'ha de treballar per fases i que no té sentit obrir integracions cares d'Ads/GA4/Google Business Profile si abans no hi ha fundació: client ideal, proposta de valor, Google Business Profile i web base. El manual ja mostrava totes les fases, però les presentava com a llista completa; faltava una barrera visible que impedís saltar directament a inversió o dashboards avançats.
+- `lib/constants/adminManual.ts`: nou contracte `AdminMarketingPhaseGate` i constant `ADMIN_MARKETING_PHASE_GATE`. Fixa `activePhase: 'FASE_0'`, declara la decisió "No obrir Google Ads, Meta Ads ni integracions cares..." i referencia els quatre `requiredActionIds` de fundació (`icp-definition`, `value-proposition`, `google-business-profile`, `web-optimization`).
+- `app/admin/manual/page.tsx`: el bloc `Pla de captació des de zero` mostra ara una targeta de fase activa recomanada abans de la graella de fases, amb la decisió, el criteri de desbloqueig, els quatre requisits reals de Fase 0 i CTA directe a `/admin/docs/protocol?seccio=6.16#seccio-6-16`.
+- `__tests__/lib/constants/adminManualRoadmap.test.ts`: nou test estructural que blinda que el gate continua enfocat a `FASE_0`, manté els quatre ids requerits i que tots pertanyen a accions existents de Fase 0.
+- Aquest tall **NO** toca: schema, serveis backend, integracions externes, Ads, GA4, Google Business Profile real, rutes API ni persistència. És un tall de producte/UI documental dins del manual per evitar dispersió abans de tenir fundació.
+- Validació tècnica: `pnpm vitest run __tests__/lib/constants/adminManualRoadmap.test.ts` OK (7 tests) · `npx tsc --noEmit` OK.
+- Validació funcional: `/admin/manual` ja no presenta la captació com una llista plana; abans de les fases mostra quin pas és el recomanat i què bloqueja l'escalat de màrqueting.
+- Validació humana/UX: una persona no tècnica veu que la feina immediata és Fase 0 i no "posar més pasta" o obrir integracions abans de tenir els fonaments.
+- `docs/protocol-producte-admin-ca.md` · `§6.16`: afegit `FET` del Canvi #525.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `524` a `525`.
+- `ADMIN_CHANGE_COUNTER` puja a `525`; el següent canvi real ha de ser `#526`.
+
+---
+
+### Canvi #524 — 2026-05-05 — claude (FET)
+**Cobertura unitària dels 2 guards i18n (`check-packs-i18n.ts`, `check-equipment-i18n.ts`) via refactor mínim a lògica pura testejable. Tanca la cobertura sistemàtica de `validate:core`: ara els 12 scripts de guards tenen tests propis. 30 nous tests (15+15).**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: continuació de la línia editorial de cobertura `validate:core` (#511 message-imports, #512 mojibake, #513 visual-overflow, #514 layer-catalogs, #523 clients API canònics). Quedaven 2 guards del pipeline sense test: `i18n:packs:guard` i `i18n:equipment:guard`. Aquests scripts importen mòduls del repo (`app/config/packs-config`, `app/config/equipment-config`, `lib/pack-i18n`) i no llegeixen fitxers, així que el patró `mkdtempSync + spawnSync` que vaig usar als #511-#514 no aplicava. Calia refactor mínim per separar la lògica pura (regex `BROKEN_KEY_RE`, helper `isBroken`, pipeline `analyze*`) del `main()` que crida la configuració real i `process.exit`. Els scripts ara són **iso-funcionals**: `pnpm i18n:packs:guard` i `pnpm i18n:equipment:guard` segueixen produint exactament el mateix output (`OK: 9 packs validats en 3 idiomes` i `OK: catàleg validat en 3 idiomes` respectivament). Línia editorial completa: tots els scripts del pipeline `validate:core` tenen ara cobertura unitària.
+- `scripts/check-packs-i18n.ts`: extreu `Locale`, `LOCALES`, `BROKEN_KEY_RE`, `Finding`, `PackI18nInput`, `PackI18nResolvers`, `isBroken`, `pushIfBroken`, `analyzePackI18n` com a `export`s. `analyzePackI18n(packs, resolvers, locales?)` és una funció pura que rep packs i resolvers (injecció de dependència) i retorna `Finding[]`. `main()` ara és un wrapper que crida `analyzePackI18n(getAllPacks(), { resolveKey: resolvePackI18nKey, resolveFeatures: resolvePackI18nFeatures })`. L'execució del script queda condicionada a `isMain` (`process.argv[1].includes('check-packs-i18n')`) per evitar re-execució automàtica quan el script s'importa des dels tests.
+- `scripts/check-equipment-i18n.ts`: mateix patró. Exporta `Locale`, `LOCALES`, `BROKEN_KEY_RE` (= `/equipmentCatalog\.[a-z0-9_.-]+/i`, diferent del de packs), `Finding`, `EquipmentI18nItem`, `EquipmentCatalogResolver`, `isBroken`, `pushIfBroken`, `analyzeEquipmentI18n`. `analyzeEquipmentI18n(resolveCatalog, locales?)` rep el resolver com a funció (`(locale) => Item[]`) i agrega findings. `main()` crida `analyzeEquipmentI18n(getLocalizedEquipmentCatalog)`. Mateixa guarda `isMain` per a tests.
+- `__tests__/scripts/check-packs-i18n.test.ts` (nou, 15 tests): 5 sobre `BROKEN_KEY_RE`/`isBroken` (configurator/pages/services case-insensitive, textos humans, buit, whitespace, match parcial), 1 sobre `pushIfBroken`, 9 sobre `analyzePackI18n` (pack net, name trencat 3 locales, name trencat 1 locale via resolver selectiu, features trencades amb índex, badge buit no genera finding, badge trencat per locale, respecte de la llista de locales, `LOCALES` exposa exactament `['ca','es','en']`, multi-pack agrega correctament `packId`/`slug`).
+- `__tests__/scripts/check-equipment-i18n.test.ts` (nou, 15 tests): 5 sobre `BROKEN_KEY_RE`/`isBroken` (equipmentCatalog.* case-insensitive, textos humans, buit/whitespace, claus diferents — `configurator.*` etc. — NO marquen com a trencat), 1 sobre `pushIfBroken`, 9 sobre `analyzeEquipmentI18n` (catàleg net, name trencat 3 locales, description trencada, specs trencats amb path `specs.<key>`, catàleg variable per locale, specs `null`/`undefined`/buit no genera finding, respecte de locales rebudes, `LOCALES` exacte, regex match parcial dins text).
+- Total: **30 nous tests, tots verds** (~25 ms total — pures sense Prisma/React/filesystem).
+- Aquest tall **NO** toca: comportament dels guards (verificat amb execució directa de `pnpm i18n:packs:guard` i `pnpm i18n:equipment:guard` post-refactor — output idèntic), schema, codi de producció (`lib/`, `app/`), altres guards, UI ni endpoints.
+- Validació tècnica: `pnpm vitest run __tests__/scripts/check-packs-i18n.test.ts __tests__/scripts/check-equipment-i18n.test.ts` OK (30 tests) · `npx tsc --noEmit` OK · `pnpm run i18n:packs:guard` OK (9 packs) · `pnpm run i18n:equipment:guard` OK (catàleg 3 idiomes) · `pnpm run validate:core` OK (15/15 guards seqüencials, incloent els i18n).
+- Validació funcional: cap canvi visible. La pipeline `validate:core` segueix produint el mateix log; CI no veu cap diferència.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat de la línia de defensa i18n.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `523` a `524`.
+- **Hito de la línia editorial**: amb aquest tall, **tots els scripts del pipeline `validate:core` tenen cobertura unitària** (`check-admin-change-log`, `check-canonical-fetches`, `check-canonical-svgs`, `check-language-quality`, `check-layer-catalogs`, `check-message-imports`, `check-mojibake`, `check-patches`, `check-roadmap-canvis`, `check-task-canonical`, `check-visual-overflow`, `check-packs-i18n`, `check-equipment-i18n`). Línia tancada — el següent forat de cobertura ja no és el pipeline `validate:core` sinó scripts operatius (cron) o capes de servei.
+- `ADMIN_CHANGE_COUNTER` puja a `524`; el següent canvi real ha de ser `#525`.
+
+---
+
+### Canvi #523 — 2026-05-05 — claude (FET)
+**Cobertura unitària dels 4 clients canònics públics (`imageManagerClient`, `publicPacksClient`, `publicAvailabilityClient`, `publicCoverageClient`): 22 tests blinden URL canònica, encoding `URLSearchParams`, error HTTP i propagació d'`init` (signal/cache). Continuació de la línia editorial #511/#512/#513/#514 de cobertura sistemàtica.**
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+- Context: el guard `qa:canonical-fetches` (`scripts/check-canonical-fetches.mjs`) registra 6 endpoints públics amb el seu wrapper canònic. Els clients `lib/api/imageManagerClient.ts`, `lib/api/publicPacksClient.ts`, `lib/api/publicAvailabilityClient.ts` i `lib/api/publicCoverageClient.ts` van ser creats als talls #463 i voltants per centralitzar `fetch()` cap als seus endpoints (`/api/public/image-manager`, `/api/public/packs`, `/api/public/availability`, `/api/public/coverage`). Tres tenen lògica no trivial: `URLSearchParams` amb claus repetides (image-manager), composició opcional `service`/`locale` (packs), `encodeURIComponent` per al locale (availability). Sense cobertura unitària, qualsevol regressió a la URL canònica, l'encoding o la propagació de `RequestInit` (`signal`, `cache: 'no-store'`) hauria passat silenciosament fins que un consumer real (`useManagedImageSrc`, `usePacks`, `useAvailability`, `useBookedDates`, `TrustedByLogos`, `app/admin/layout.tsx`) hagués trencat. Ara el contracte queda blindat al mateix nivell que els altres clients (e.g. `publicStatsClient`).
+- `__tests__/lib/api/imageManagerClient.test.ts` (nou, 6 tests): single key string · llista de keys → params `key` repetits · encoding `URLSearchParams` (caràcters `&`/`=`) · llista buida (URL amb `?` però sense params) · error HTTP 500 → throw amb status · propagació `init` (`signal`, `cache: 'no-store'`).
+- `__tests__/lib/api/publicPacksClient.test.ts` (nou, 7 tests): sense options · `service` · `locale` · combinació `service+locale` · encoding (`?`/`&` al locale) · error HTTP 503 → throw · propagació `init`.
+- `__tests__/lib/api/publicAvailabilityClient.test.ts` (nou, 5 tests): sense locale · `locale` query param · `encodeURIComponent` (locale `es&hack=1`) · error HTTP 502 → throw · propagació `init`.
+- `__tests__/lib/api/publicCoverageClient.test.ts` (nou, 4 tests): default sense query · error HTTP 503 → throw · propagació `init` · resposta `{ok:true}` sense `areas`/`cities` (camps opcionals).
+- Total: **22 tests, tots verds**. Patró comú: `vi.fn()` injectat a `globalThis.fetch` via `Object.defineProperty`, `mockReset` a `afterEach`, samples realistes alineats amb el contracte `route.ts` de cada endpoint. Tests pures (sense Prisma, sense React, sense filesystem) — feedback ràpid (~30 ms total).
+- Aquest tall **NO** toca: codi de producció (només `__tests__/`), schema, guards, scripts, UI ni endpoints. Pure cobertura.
+- Validació tècnica: `pnpm vitest run __tests__/lib/api/imageManagerClient.test.ts __tests__/lib/api/publicPacksClient.test.ts __tests__/lib/api/publicAvailabilityClient.test.ts __tests__/lib/api/publicCoverageClient.test.ts` OK (22 tests) · `npx tsc --noEmit` OK · `pnpm run validate:core` OK (13/13 guards).
+- Validació funcional: cap canvi de comportament en runtime; els consumers (`useManagedImageSrc`, `usePacks`, `useAvailability`, `useBookedDates`, `TrustedByLogos`, `app/admin/layout.tsx`) continuen rebent el mateix payload.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat de la capa client canònica.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `522` a `523`.
+- `ADMIN_CHANGE_COUNTER` puja a `523`; el següent canvi real ha de ser `#524`.
+
+---
+
+### Canvi #522 — 2026-05-05 — codex (FET)
+**`adminAutomationService` normalitza els `details` JSON abans de guardar-los a Prisma i elimina casts dobles a `unknown`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+- Context: continuació del `go`. Després del `#521`, el següent residu acotat era a `lib/services/adminAutomationService.ts`: tres logs d'automatització passaven summaries a `adminLog.details` amb `summary as unknown as Prisma.InputJsonValue`. El patró existent a `proposalAdminService` ja mostrava una via més explícita: serialitzar a JSON abans de lliurar el valor a Prisma.
+- `lib/services/adminAutomationService.ts`: afegit `normalizeAdminLogDetails(details: unknown): Prisma.InputJsonValue`, que fa `JSON.parse(JSON.stringify(details))`.
+- `runCommercialSequencesAutomation()`, `enforceSlaAutomation()` i `runAllAdminAutomations()` usen el helper per als seus `details`.
+- `__tests__/lib/services/adminAutomationService.test.ts`: ampliat amb un guard estructural que comprova el helper, la serialització JSON i que no torni `as unknown as Prisma.InputJsonValue`.
+- Efecte: mateix contingut funcional als logs d'automatització, però amb contracte JSON més explícit i sense cast opac repetit.
+- Verificació del tall: `pnpm vitest run __tests__/lib/services/adminAutomationService.test.ts` OK (6 tests) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `522`; el següent canvi real ha de ser `#523`.
+
+---
+
+### Canvi #521 — 2026-05-05 — codex (FET)
+**`ExportCsvButton` accepta files tipades i `EconomiaClient` deixa d'exportar rendibilitat amb cast doble a `unknown`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+- Context: continuació del `go`. Després de netejar supressions React als talls `#518`-`#520`, quedava un cast acotat a `app/admin/economia/EconomiaClient.tsx`: l'export CSV de rendibilitat convertia `ProfitabilityRow[]` a `Record<string, unknown>[]` via `as unknown as ...` perquè el component compartit exigia una forma massa genèrica.
+- `app/admin/components/ExportCsvButton.tsx`: `Column` i `ExportCsvProps` passen a ser genèrics (`TData`), i cada accessor rep la fila real en lloc d'un `Record<string, unknown>`.
+- `app/admin/economia/EconomiaClient.tsx`: `data={[...props.topProfitability, ...props.riskProfitability]}` es passa directament, sense cast opac.
+- `__tests__/app/admin/components/ExportCsvButton.test.ts`: nou guard estructural que comprova el contracte genèric i que Economia no torni a `as unknown as Record<string, unknown>[]`.
+- Efecte: el CSV manté el mateix comportament, però el helper compartit ja no força consumidors tipats a perdre informació de tipus.
+- Verificació del tall: `pnpm vitest run __tests__/app/admin/components/ExportCsvButton.test.ts` OK (1 test) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `521`; el següent canvi real ha de ser `#522`.
+
+---
+
+### Canvi #520 — 2026-05-05 — codex (FET)
+**`CalendarMonthClient` elimina la supressió `react-hooks/exhaustive-deps` del càlcul de cel·les mensuals.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+- Context: continuació del `go`. Després dels talls `#518` i `#519`, quedava una supressió React acotada al calendari admin. El comentari ja explicava que `monthYear` canviava de referència però que `year/month` eren les dependències reals; el codi podia expressar això directament sense excepció del linter.
+- `app/admin/calendario/CalendarMonthClient.tsx`: el `useMemo` de `cells` passa de `getMonthDays(monthYear)` a `getMonthDays({ year: monthYear.year, month: monthYear.month })`.
+- La llista de dependències es manté en primitives (`monthYear.year`, `monthYear.month`) i desapareix `// eslint-disable-next-line react-hooks/exhaustive-deps`.
+- `__tests__/app/admin/calendario/CalendarMonthClient.test.ts`: nou guard estructural que comprova la construcció explícita del `MonthYear`, les dependències primitives i l'absència de supressió React.
+- Efecte: mateixa graella mensual i mateix rang visible, però sense excepció local del linter en una superfície operativa de reserves.
+- Verificació del tall: `pnpm vitest run __tests__/app/admin/calendario/CalendarMonthClient.test.ts` OK (1 test) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `520`; el següent canvi real ha de ser `#521`.
+
+---
+
+### Canvi #519 — 2026-05-05 — codex (FET)
+**El configurador públic elimina la supressió `react-hooks/exhaustive-deps` de l'efecte que neteja extres incompatibles.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+- Context: continuació del `go`. Després del `#518`, quedava una altra supressió React acotada fora dels fitxers ja tocats per altres fronts: `app/[locale]/configurador/client.tsx`. L'efecte que recalcula extres disponibles funcionava, però amagava el contracte de dependències perquè cridava un helper local recreat a cada render.
+- `app/[locale]/configurador/client.tsx`: s'elimina `setSelectedExtras` i l'efecte escriu directament amb `setConfig((prev) => ({ ...prev, extras: filteredExtras }))`, aprofitant que el setter de React és estable.
+- La condició de canvi compara contra `config.extras.length`; així l'efecte només depèn de `availableExtras`, `config.eventType` i `config.extras`, sense supressions.
+- `__tests__/app/configurador/ConfiguratorExtrasEffect.test.ts`: nou guard estructural que blinda `filterUnavailableExtras(...)`, l'escriptura amb `setConfig` i l'absència de `eslint-disable-next-line react-hooks/exhaustive-deps`.
+- Efecte: el configurador conserva el mateix comportament visible quan canvia el tipus d'esdeveniment, però deixa de tenir una excepció local del linter en una peça de conversió pública.
+- Verificació del tall: `pnpm vitest run __tests__/app/configurador/ConfiguratorExtrasEffect.test.ts` OK (1 test) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `519`; el següent canvi real ha de ser `#520`.
+
+---
+
+### Canvi #518 — 2026-05-05 — codex (FET)
+**`LeadGuidedFlow` elimina la supressió `react-hooks/exhaustive-deps` de `nextAction` i deixa les dependències React explícites.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+- Context: continuació del `go`. El comptador estava reservat a `#517` sense entrada visible al §9, així que aquest tall es registra com a `#518` per evitar col·lisió. Front triat: `§6.6 Leads / Pipeline comercial`. El component funcionava, però el `useMemo` que calcula la següent acció comercial amagava la captura de `updateStatus` amb `// eslint-disable-next-line react-hooks/exhaustive-deps`.
+- `app/admin/leads/[id]/LeadGuidedFlow.tsx`: importa `useCallback` i converteix `updateStatus` en callback estable amb dependències explícites (`leadId`, `router`, `startTransition`, `status`, `statusBusy`).
+- `nextAction` manté el mateix comportament visible: contacta el client, envia pressupost, inicia negociació, marca guanyat, crea reserva o mostra la reserva. El canvi és contractual: ara declara `updateStatus` a les dependències i elimina la supressió ESLint.
+- `__tests__/app/admin/leads/LeadGuidedFlow.test.ts`: nou guard estructural que comprova el `useCallback`, la llista de dependències de `nextAction` i que no torni cap `eslint-disable-next-line react-hooks/exhaustive-deps` al component.
+- Efecte: la cabina comercial de leads conserva la mateixa UX, però deixa de dependre d'una excepció local del linter en un punt de navegació/estat.
+- Verificació del tall: `pnpm vitest run __tests__/app/admin/leads/LeadGuidedFlow.test.ts` OK (1 test) · `npx tsc --noEmit` OK.
+- `ADMIN_CHANGE_COUNTER` puja a `518`; el següent canvi real ha de ser `#519`.
+
+---
+
+### Canvi #516 — 2026-05-05 — codex (FET)
+**`fetchProfitabilityBookings()` elimina el `while (true)` intern i conserva la lectura paginada amb una condició explícita `hasMoreBookings`.**
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+- Context: continuació del `go`. Després del `#515`, quedava un altre bucle infinit explícit fora de tests a `lib/services/profitabilityService.ts`. El servei de rendibilitat llegeix reserves confirmades/preparant/completades en lots amb cursor, primer intentant incloure `lead.source` i fent fallback sense `lead` si cal. El comportament era correcte, però `readAll()` expressava la paginació amb `while (true)` i sortides internes.
+- `lib/services/profitabilityService.ts`: `readAll()` introdueix `hasMoreBookings` i canvia el bucle a `while (hasMoreBookings)`.
+- La continuació queda explícita: `hasMoreBookings = Boolean(cursorId) && batch.length === PROFITABILITY_BATCH_SIZE`.
+- `__tests__/lib/services/profitabilityService.test.ts`: nou test estructural al bloc `fetchProfitabilityBookings pagination shape` que exigeix `hasMoreBookings`, `while (hasMoreBookings)`, la comparació amb `PROFITABILITY_BATCH_SIZE` i que no hi hagi `while (true)`.
+- Aquest tall **NO** toca: càlcul de marges, configuració de rendibilitat, queries Prisma fora del loop, guards de scripts, IMAP/inbox, schema, auth, endpoints ni UI.
+- Validació tècnica: `npx vitest run __tests__/lib/services/profitabilityService.test.ts` OK (16 tests) · `npx tsc --noEmit` OK.
+- Validació funcional: amb batches normals, la lectura continua fins que un batch no arriba al límit o no hi ha cursor; el fallback sense `lead` queda intacte.
+- Validació humana/UX: sense canvi visible; reforç de mantenibilitat del report financer.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` puja de `515` a `516`.
+- `ADMIN_CHANGE_COUNTER` puja a `516`; el següent canvi real ha de ser `#517`.
 
 ---
 

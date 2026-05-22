@@ -12,7 +12,7 @@ type Props = { initialCandidates: SerializedCandidate[] };
 const PRIORITY_TONE: Record<ReengagementPriority, string> = {
   ALTA: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
   MITJANA: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-  BAIXA: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+  BAIXA: 'border-white/15 bg-white/[0.06] text-white/60',
 };
 
 const CHANNEL_ICON: Record<string, string> = {

@@ -8,8 +8,22 @@ export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
   c: '/admin/calendario',
 };
 
+export const ADMIN_KONAMI_SEQUENCE = [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'b',
+  'a',
+] as const;
+
 export const ADMIN_PAGE_LABELS: Record<string, string> = {
   leads: 'Entrades',
+  marketing: 'Màrqueting',
   bookings: 'Reserves',
   tasks: 'Tasques',
   packs: 'Packs',
@@ -42,7 +56,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 515;
+export const ADMIN_CHANGE_COUNTER = 753;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',
@@ -75,6 +89,7 @@ export const ADMIN_ACTIVITY_ACTION_META: Record<string, { label: string; icon: s
   COMM_SEQUENCE_BATCH: { label: 'Batch sequencies', icon: '📦', tone: 'admin-tone-text-info' },
   SEND_POST_EVENT_EMAIL: { label: 'Email post-event', icon: '🎉', tone: 'admin-tone-text-violet' },
   PAYMENT_REMINDER_SENT: { label: 'Recordatori pagament', icon: '💰', tone: 'admin-tone-text-warning' },
+  PAYMENT_RECORDED: { label: 'Pagament registrat', icon: '💰', tone: 'admin-tone-text-success' },
   AUTOMATION_DAILY_SUMMARY_SENT: { label: 'Resum diari', icon: '📋', tone: 'admin-tone-text-info' },
   AUTOMATION_SLA_ENFORCED: { label: 'SLA aplicat', icon: '⏱️', tone: 'admin-tone-text-danger' },
   AUTOMATION_RUN_ALL: { label: 'Automatitzacio completa', icon: '🤖', tone: 'admin-tone-text-info' },
@@ -204,6 +219,7 @@ export const ADMIN_ACTIVITY_CATEGORY_MAP: Record<string, string> = {
   COMM_SEQUENCE_BATCH: 'comms',
   SEND_POST_EVENT_EMAIL: 'comms',
   PAYMENT_REMINDER_SENT: 'comms',
+  PAYMENT_RECORDED: 'system',
   AUTOMATION_DAILY_SUMMARY_SENT: 'automation',
   AUTOMATION_SLA_ENFORCED: 'automation',
   AUTOMATION_RUN_ALL: 'automation',
@@ -539,6 +555,7 @@ export const ADMIN_CRON_PREFIXES = [
   { id: 'reviewsSync', label: 'Ressenyes Google', prefix: 'automation.reviewsSync', frequency: 'Diari' },
   { id: 'weeklyBenchmark', label: 'Benchmark setmanal', prefix: 'benchmark.weekly', frequency: 'Setmanal (dl)' },
   { id: 'urgentFollowUpAlerts', label: 'Alertes follow-up urgents', prefix: 'alerts.urgentFollowUp', frequency: '4x diari' },
+  { id: 'leadReengagement', label: 'Reengagement leads dormants', prefix: 'automation.leadReengagement', frequency: 'Diari' },
 ] as const;
 
 export const ADMIN_HEALTH_ACTIVE_LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] as const;
@@ -653,3 +670,37 @@ export const ADMIN_HEALTH_STATUS_ORDER: Record<HealthStatus, number> = {
   ok: 2,
 };
 export const ADMIN_WEEKDAY_SHORT_LABELS = ['Dg', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds'] as const;
+
+// ─── Chart & dataviz colors (fonts de veritat per admin) ─────────────────────
+
+// Paleta canònica de la seqüència de colors per charts (donut, bars, llegendes)
+export const ADMIN_CHART_COLORS = [
+  '#22d3ee', // 0: cyan
+  '#f59e0b', // 1: amber
+  '#34d399', // 2: emerald
+  '#f472b6', // 3: pink
+  '#818cf8', // 4: indigo
+  '#fb7185', // 5: rose
+] as const;
+
+// Colors nomenats per les sèries del dashboard principal
+export const ADMIN_CHART_SERIES_COLORS = {
+  ga4Sessions: '#22d3ee',
+  ga4Users:    '#60a5fa',
+  leads:       '#34d399',
+  leadsWon:    '#fbbf24',
+  bookings:    '#f472b6',
+  revenue:     '#a78bfa',
+  prevBar:     '#94a0af',
+  trendDots:   '#67e8f9',
+  trendLine:   'rgba(34,211,238,0.95)',
+} as const;
+
+// Colors estructurals SVG (eixos, graelles, pistes de donut, línies base)
+export const ADMIN_SVG_COLORS = {
+  donutTrack:    'rgba(255,255,255,0.06)',
+  gridLine:      'rgba(255,255,255,0.05)',
+  axisLabel:     'rgba(255,255,255,0.35)',
+  emptyGradient: 'rgba(255,255,255,0.08)',
+  baselineLine:  'rgba(255,255,255,0.12)',
+} as const;

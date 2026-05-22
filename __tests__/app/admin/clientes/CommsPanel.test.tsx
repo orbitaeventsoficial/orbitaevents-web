@@ -91,6 +91,14 @@ describe('CommsPanel', () => {
     const cta = screen.getAllByRole('link', { name: 'Respondre per WhatsApp' })[0];
     expect(cta).toHaveAttribute('href');
     expect(cta.getAttribute('href')).toContain('https://wa.me/34600112233?text=');
+    expect(screen.getByText('Fil canònic de conversa')).toBeInTheDocument();
+    expect(screen.getAllByText('Client esperant resposta').length).toBeGreaterThan(0);
+    expect(screen.getByText('Moure ara: equip')).toBeInTheDocument();
+    expect(screen.getByText('Anna · 6d sense resposta · Trucar o enviar WhatsApp')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Crear tasca des del fil' })).toHaveAttribute(
+      'href',
+      '/admin/tasks/new?customerId=cust-1'
+    );
     expect(screen.getByRole('link', { name: 'Obrir Customer Hub' })).toHaveAttribute(
       'href',
       '/admin/clientes/cust-1?tab=comms'

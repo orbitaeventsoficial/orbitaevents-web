@@ -83,3 +83,7 @@ export async function moderateTestimonial(id?: string, action?: string) {
 
   return { status: 400, body: { ok: false, error: 'Unknown action' } };
 }
+
+export async function countPendingTestimonials(): Promise<number> {
+  return prisma.customerTestimonial.count({ where: { isApproved: false } });
+}

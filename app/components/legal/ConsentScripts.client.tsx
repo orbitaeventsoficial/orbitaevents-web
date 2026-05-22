@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-before-interactive-script-outside-document */
+/* eslint-disable @next/next/no-before-interactive-script-outside-document -- consent-gated GTM noscript fallback must stay colocated with consent scripts */
 'use client';
 
 import { useEffect, useState } from 'react';

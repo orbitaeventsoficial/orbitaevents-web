@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter } from 'next/navigation';
-import { formatDateFull, DEFAULT_LOCALE, getBookingStatusBadgeDisplay } from '@/lib/constants';
+import { formatDateFull, formatWeekdayLong, getBookingStatusBadgeDisplay } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { ADMIN_CALENDAR_HELP, helpAttrs } from '../components/adminHelpContent';
 import { useToast } from '../components/ToastProvider';
@@ -57,6 +58,7 @@ export default function CalendarDayClient() {
         const json = (await res.json()) as CalendarApiResponse;
         if (!cancelled) setData(json);
       } catch (e) {
+        console.error('Error carregant dia del calendari', e);
         if (!cancelled) setError(e instanceof Error ? e.message : 'Error carregant');
       } finally {
         if (!cancelled) setLoading(false);
@@ -88,7 +90,8 @@ export default function CalendarDayClient() {
       setRefreshKey((k) => k + 1);
       setShowBlockForm(false);
       setBlockNote('');
-    } catch {
+    } catch (err) {
+      console.error('Error bloquejant dia', err);
       toast.error('Error bloquejant dia');
     }
   }, [dateKey, toast]);
@@ -101,13 +104,14 @@ export default function CalendarDayClient() {
       if (!res.ok) throw new Error('Error desbloquejant dia');
       toast.success('Dia desbloquejat');
       setRefreshKey((k) => k + 1);
-    } catch {
+    } catch (err) {
+      console.error('Error desbloquejant dia', err);
       toast.error('Error desbloquejant dia');
     }
   }, [dateKey, toast]);
 
   const dayLabel = formatDateFull(currentDate).replace(/^\w/, (c) => c.toUpperCase());
-  const weekdayLabel = currentDate.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'long' }).replace(/^\w/, (c) => c.toUpperCase());
+  const weekdayLabel = formatWeekdayLong(currentDate).replace(/^\w/, (c) => c.toUpperCase());
 
   // Build timeline data
   const timelineBookings = useMemo(() => {
@@ -285,7 +289,7 @@ export default function CalendarDayClient() {
                           return (
                             <Link
                               key={`${b.id}-${hour}`}
-                              href={`/admin/bookings/${b.id}`}
+                              href={buildBookingHref(b.id)}
                               className={`flex-1 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                                 b.startH === hour ? 'border admin-tone-soft-info admin-tone-border-info' : 'border admin-tone-idle'
                               }`}
@@ -311,7 +315,7 @@ export default function CalendarDayClient() {
                     {visibleTimelineBookings.filter((b) => b.startH === null).map((b) => (
                       <Link
                         key={b.id}
-                        href={`/admin/bookings/${b.id}`}
+                        href={buildBookingHref(b.id)}
                         className="mb-1 block rounded-xl border px-3 py-2 transition-colors admin-tone-idle"
                       >
                         <span className="text-sm font-medium">{resolveServiceLabel(b)}</span>
@@ -403,7 +407,7 @@ export default function CalendarDayClient() {
               return (
                 <Link
                   key={b.id}
-                  href={`/admin/bookings/${b.id}`}
+                  href={buildBookingHref(b.id)}
                   className="block rounded-2xl border p-5 transition-colors admin-card-glass"
                 >
                   <div className="flex items-center justify-between mb-2">

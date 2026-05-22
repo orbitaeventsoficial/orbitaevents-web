@@ -12,6 +12,7 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { AdminPage } from '../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS, INTAKE_SOURCE_SELECTED_STYLES } from '@/lib/constants';
 
 type DuplicateWarning = {
@@ -172,6 +173,7 @@ export default function IntakePage() {
       setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
       setDuplicates([]);
     } catch (err) {
+      console.error('Error enviant intake manual de lead', err);
       const msg = err instanceof Error ? err.message : 'Error desconegut';
       setError(msg);
       toast.error(msg);
@@ -247,7 +249,7 @@ export default function IntakePage() {
             {duplicates.map((dup) => (
               <Link
                 key={dup.id}
-                href={`/admin/clientes/${dup.id}`}
+                href={buildCustomerHubHref(dup.id)}
                 className="flex items-center justify-between rounded-xl border p-3 transition-colors"
               >
                 <div>

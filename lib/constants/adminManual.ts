@@ -1,4 +1,5 @@
 export type AdminManualTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+export type AdminManualOperatingFlowStepId = '01' | '02' | '03' | '04' | '05' | '06';
 
 export interface AdminManualCapability {
   title: string;
@@ -6,6 +7,7 @@ export interface AdminManualCapability {
   href: string;
   cta: string;
   tone: AdminManualTone;
+  flowStep: AdminManualOperatingFlowStepId;
   signals: string[];
 }
 
@@ -19,6 +21,71 @@ export interface AdminManualSection {
 export interface AdminManualPrinciple {
   title: string;
   description: string;
+}
+
+export interface AdminManualOperatingRhythmItem {
+  cadence: string;
+  title: string;
+  objective: string;
+  href: string;
+  cta: string;
+  signals: string[];
+  doneWhen: string[];
+  ifOffTrack: string;
+}
+
+export interface AdminManualOperatingFlowStep {
+  step: AdminManualOperatingFlowStepId;
+  title: string;
+  objective: string;
+  entryHref: string;
+  entryLabel: string;
+  systemReads: string[];
+  manualDecisions: string[];
+  successSignal: string;
+  nextStep: string;
+}
+
+export interface AdminManualOperatingGate {
+  step: AdminManualOperatingFlowStepId;
+  title: string;
+  checkBeforeMoving: string;
+  riskIfSkipped: string;
+  ownerQuestion: string;
+}
+
+export interface AdminManualOperatingHandoff {
+  fromStep: AdminManualOperatingFlowStepId;
+  toStep: AdminManualOperatingFlowStepId;
+  artifact: string;
+  nextWorkspace: string;
+  nextWorkspaceHref: string;
+  handoffRule: string;
+}
+
+export interface AdminManualOperatingStepChecklist {
+  step: AdminManualOperatingFlowStepId;
+  doneLabel: string;
+  checks: string[];
+  blockedIf: string;
+}
+
+export interface AdminManualOperatingException {
+  step: AdminManualOperatingFlowStepId;
+  trigger: string;
+  firstMove: string;
+  actionHref: string;
+  actionLabel: string;
+  doNotAdvanceUntil: string;
+}
+
+export interface AdminManualOperatingEvidence {
+  step: AdminManualOperatingFlowStepId;
+  artifact: string;
+  proof: string;
+  proofHref: string;
+  proofLabel: string;
+  ownerCheck: string;
 }
 
 export interface AdminManualSnapshotSection {
@@ -67,6 +134,379 @@ export const ADMIN_MANUAL_PRINCIPLES: AdminManualPrinciple[] = [
   {
     title: 'El zenit és coherència',
     description: 'CRM, reserves, finances, social, inbox i reporting han de parlar el mateix llenguatge i no duplicar fonts de veritat.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_RHYTHM: AdminManualOperatingRhythmItem[] = [
+  {
+    cadence: 'Cada matí',
+    title: 'Obrir comandament del dia',
+    objective: 'Entrar pel Dashboard, llegir salut, alertes, tasques i següent millor acció abans de tocar cap mòdul solt.',
+    href: '/admin',
+    cta: 'Obrir Dashboard',
+    signals: ['salut global', 'alertes', 'tasques', 'següent acció'],
+    doneWhen: ['alertes crítiques llegides', 'primer bloc de feina triat', 'tasques urgents identificades'],
+    ifOffTrack: 'Si hi ha salut vermella o alerta crítica, no obrir cap front nou fins entendre causa i responsable.',
+  },
+  {
+    cadence: 'Durant el dia',
+    title: 'Treballar cues, no memòria',
+    objective: 'Atacar Leads, Inbox i Tasques fins deixar sense resposta urgent, sense follow-up vençut i sense acció comercial crítica.',
+    href: '/admin/tasks',
+    cta: 'Obrir Tasques',
+    signals: ['SLA', 'follow-up', 'inbox', 'prioritat'],
+    doneWhen: ['cap follow-up vençut sense decisió', 'inbox urgent revisada', 'tasques del dia reordenades'],
+    ifOffTrack: 'Si la cua creix, parar treball creatiu i tancar respostes, cobraments o bloquejos abans de seguir.',
+  },
+  {
+    cadence: 'Cada divendres',
+    title: 'Tancar setmana comercial i operativa',
+    objective: 'Revisar cobraments, pipeline, reserves properes i accions post-event per començar la setmana següent sense deute invisible.',
+    href: '/admin/economia',
+    cta: 'Obrir Finances',
+    signals: ['cobraments', 'pipeline', 'reserves', 'post-event'],
+    doneWhen: ['cobraments pendents revisats', 'reserves properes sense bloqueig', 'post-event pendent assignat'],
+    ifOffTrack: 'Si hi ha deute de cobrament o preparació, convertir-lo en tasca abans de donar la setmana per tancada.',
+  },
+  {
+    cadence: 'Cada mes',
+    title: 'Decidir amb dades, no intuïció',
+    objective: 'Mirar reporting, canals, pèrdues i rendibilitat per decidir què reforçar, què pausar i quin experiment obrir.',
+    href: '/admin/reporting',
+    cta: 'Obrir Reporting',
+    signals: ['conversió', 'origen', 'marge', 'experiments'],
+    doneWhen: ['canal guanyador identificat', 'canal feble pausat o corregit', 'experiment següent triat'],
+    ifOffTrack: 'Si no hi ha dades suficients, no escalar pressupost: definir tracking o volum mínim abans de decidir.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_FLOW: AdminManualOperatingFlowStep[] = [
+  {
+    step: '01',
+    title: 'Captar demanda',
+    objective: 'Convertir visites, WhatsApp, formularis, ressenyes i accions de màrqueting en entrades treballables.',
+    entryHref: '/admin/leads',
+    entryLabel: 'Obrir Entrades',
+    systemReads: ['origen del lead', 'captura inbound', 'proves socials', 'fase de captació'],
+    manualDecisions: ['validar si és oportunitat real', 'triar primer contacte'],
+    successSignal: 'Lead amb origen clar, necessitat entesa i proper pas comercial assignat.',
+    nextStep: 'Qualificar i prioritzar sense deixar-lo refredar.',
+  },
+  {
+    step: '02',
+    title: 'Qualificar i prioritzar',
+    objective: 'Separar soroll de negoci real amb scoring, SLA, pipeline i lectura de risc abans de pressupostar.',
+    entryHref: '/admin/sales-ops',
+    entryLabel: 'Obrir Sales Ops',
+    systemReads: ['score comercial', 'SLA', 'estat pipeline', 'dormants'],
+    manualDecisions: ['decidir si avança', 'escollir canal de seguiment'],
+    successSignal: 'Oportunitat situada al pipeline amb prioritat, risc i acció següent visibles.',
+    nextStep: 'Preparar proposta només quan la demanda ja té sentit.',
+  },
+  {
+    step: '03',
+    title: 'Pressupostar amb marge',
+    objective: 'Transformar l’oportunitat en proposta clara amb pack, transport, data, marge i condicions visibles.',
+    entryHref: '/admin/presupuestos',
+    entryLabel: 'Obrir Pressupostos',
+    systemReads: ['pack suggerit', 'auto-km', 'recàrrecs per data', 'marge estimat'],
+    manualDecisions: ['ajustar oferta', 'validar marge mínim'],
+    successSignal: 'Proposta enviada amb valor, cost, marge i següent acció de seguiment controlats.',
+    nextStep: 'Convertir acceptació en reserva operativa.',
+  },
+  {
+    step: '04',
+    title: 'Reservar i preparar',
+    objective: 'Passar de venda a execució amb calendari, checklist, inventari, documents i responsabilitats clares.',
+    entryHref: '/admin/bookings',
+    entryLabel: 'Obrir Reserves',
+    systemReads: ['estat reserva', 'calendari', 'checklist', 'inventari assignat'],
+    manualDecisions: ['confirmar preparació', 'resoldre bloquejos'],
+    successSignal: 'Reserva sense bloquejos crítics, material preparat i data governada al calendari.',
+    nextStep: 'Cobrar i executar sense perdre traça.',
+  },
+  {
+    step: '05',
+    title: 'Cobrar i controlar rendibilitat',
+    objective: 'Vigilar cobraments, marge, desviacions i reporting perquè l’operativa no amagui pèrdues.',
+    entryHref: '/admin/economia',
+    entryLabel: 'Obrir Finances',
+    systemReads: ['pagaments pendents', 'marge net', 'forecast', 'pèrdues comercials'],
+    manualDecisions: ['prioritzar cobrament', 'pausar canal feble'],
+    successSignal: 'Event amb cobrament i marge sota control, sense deute financer invisible.',
+    nextStep: 'Tancar post-event i alimentar recurrència.',
+  },
+  {
+    step: '06',
+    title: 'Reactivar i generar recurrència',
+    objective: 'Fer que clients, ressenyes, referrals i post-event tornin al sistema com a nova demanda qualificada.',
+    entryHref: '/admin/clientes',
+    entryLabel: 'Obrir Clients',
+    systemReads: ['LTV', 'dormants', 'post-event', 'referrals'],
+    manualDecisions: ['aprovar reactivació', 'demanar ressenya o referral'],
+    successSignal: 'Client amb valor aprofitat: ressenya, referral, retorn o aprenentatge registrat.',
+    nextStep: 'Reiniciar el cicle des de captació amb dades més bones.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_GATES: AdminManualOperatingGate[] = [
+  {
+    step: '01',
+    title: 'No entra res sense context',
+    checkBeforeMoving: 'Abans de qualificar, el lead ha de tenir origen, tipus d’esdeveniment i primer contacte assignat.',
+    riskIfSkipped: 'Si passa endavant sense context, Sales Ops prioritza soroll i el seguiment queda a memòria.',
+    ownerQuestion: 'Sé d’on ve aquesta demanda i quin primer moviment comercial toca?',
+  },
+  {
+    step: '02',
+    title: 'No es pressuposta soroll',
+    checkBeforeMoving: 'Abans de preparar proposta, ha d’existir prioritat, necessitat real i canal de seguiment definit.',
+    riskIfSkipped: 'Si es pressuposta massa aviat, el sistema crea feina documental sense probabilitat ni criteri de marge.',
+    ownerQuestion: 'Aquesta oportunitat mereix proposta ara o encara necessita qualificació?',
+  },
+  {
+    step: '03',
+    title: 'No surt proposta sense marge',
+    checkBeforeMoving: 'Abans d’enviar, el pressupost ha de tenir pack, transport, data i marge mínim revisats.',
+    riskIfSkipped: 'Si surt sense marge llegible, la venda pot semblar bona i convertir-se en pèrdua operativa.',
+    ownerQuestion: 'Acceptaria aquesta venda sabent cost real, desplaçament i condicions?',
+  },
+  {
+    step: '04',
+    title: 'No es reserva sense operativa clara',
+    checkBeforeMoving: 'Abans de donar per preparada la reserva, calendari, checklist, inventari i bloquejos han d’estar visibles.',
+    riskIfSkipped: 'Si la reserva avança sense preparació, el problema apareix tard: material, staff, document o cobrament.',
+    ownerQuestion: 'Podria executar aquest esdeveniment demà sense dependre de memòria?',
+  },
+  {
+    step: '05',
+    title: 'No es tanca sense caixa i marge',
+    checkBeforeMoving: 'Abans de tancar l’event, cobraments, desviacions i rendibilitat han de quedar revisats.',
+    riskIfSkipped: 'Si no es mira caixa i marge, el negoci acumula feina feta però aprèn massa tard què no compensa.',
+    ownerQuestion: 'Aquest event ha deixat diners, aprenentatge i cap deute financer invisible?',
+  },
+  {
+    step: '06',
+    title: 'No es perd client content',
+    checkBeforeMoving: 'Abans de deixar refredar el client, post-event, ressenya, referral o reactivació han de tenir decisió.',
+    riskIfSkipped: 'Si no torna al sistema, el cost de captació es malbarata i la recurrència queda a l’atzar.',
+    ownerQuestion: 'Aquest client pot donar ressenya, referral, retorn o aprenentatge útil?',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_HANDOFFS: AdminManualOperatingHandoff[] = [
+  {
+    fromStep: '01',
+    toStep: '02',
+    artifact: 'Lead amb origen, necessitat i primer contacte assignat.',
+    nextWorkspace: 'Sales Ops',
+    nextWorkspaceHref: '/admin/sales-ops',
+    handoffRule: 'No passa a qualificació si falta origen, tipus d’esdeveniment o canal de resposta.',
+  },
+  {
+    fromStep: '02',
+    toStep: '03',
+    artifact: 'Oportunitat prioritzada amb risc, canal de seguiment i criteri de proposta.',
+    nextWorkspace: 'Pressupostos',
+    nextWorkspaceHref: '/admin/presupuestos',
+    handoffRule: 'No passa a proposta si encara no hi ha demanda real, timing i prioritat comercial.',
+  },
+  {
+    fromStep: '03',
+    toStep: '04',
+    artifact: 'Pressupost amb pack, preu, transport, data i marge revisat.',
+    nextWorkspace: 'Reserves',
+    nextWorkspaceHref: '/admin/bookings',
+    handoffRule: 'No passa a reserva si la proposta no deixa clara la rendibilitat i les condicions.',
+  },
+  {
+    fromStep: '04',
+    toStep: '05',
+    artifact: 'Reserva preparada amb calendari, checklist, inventari i bloquejos visibles.',
+    nextWorkspace: 'Finances',
+    nextWorkspaceHref: '/admin/economia',
+    handoffRule: 'No passa a control financer si l’operativa encara depèn de memòria o notes disperses.',
+  },
+  {
+    fromStep: '05',
+    toStep: '06',
+    artifact: 'Event amb cobraments, marge i desviacions revisades.',
+    nextWorkspace: 'Clients',
+    nextWorkspaceHref: '/admin/clientes',
+    handoffRule: 'No passa a recurrència si queda deute de cobrament o no s’ha entès el resultat econòmic.',
+  },
+  {
+    fromStep: '06',
+    toStep: '01',
+    artifact: 'Client convertit en ressenya, referral, retorn o aprenentatge per captar millor.',
+    nextWorkspace: 'Entrades',
+    nextWorkspaceHref: '/admin/leads',
+    handoffRule: 'No torna a captació si no hi ha decisió post-event o aprenentatge registrat.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_STEP_CHECKLIST: AdminManualOperatingStepChecklist[] = [
+  {
+    step: '01',
+    doneLabel: 'Demanda capturada i preparada per qualificar',
+    checks: [
+      'origen del lead identificat',
+      'necessitat i tipus d’esdeveniment entesos',
+      'primer contacte o canal de resposta assignat',
+    ],
+    blockedIf: 'encara no queda clar d’on ve la demanda o quin primer moviment comercial toca.',
+  },
+  {
+    step: '02',
+    doneLabel: 'Oportunitat qualificada amb prioritat real',
+    checks: [
+      'score o prioritat comercial visible',
+      'risc o bloqueig principal identificat',
+      'canal de seguiment triat',
+    ],
+    blockedIf: 'la demanda continua sent soroll, no té timing o no hi ha acció següent clara.',
+  },
+  {
+    step: '03',
+    doneLabel: 'Proposta preparada amb marge defensable',
+    checks: [
+      'pack i extres alineats amb la necessitat',
+      'transport, data i recàrrecs revisats',
+      'marge mínim validat abans d’enviar',
+    ],
+    blockedIf: 'el preu encara no explica cost real, condicions o rendibilitat mínima.',
+  },
+  {
+    step: '04',
+    doneLabel: 'Reserva preparada sense bloquejos crítics',
+    checks: [
+      'calendari i data governats',
+      'checklist i responsabilitats visibles',
+      'inventari o material crític revisat',
+    ],
+    blockedIf: 'la preparació encara depèn de notes disperses, memòria o confirmacions pendents.',
+  },
+  {
+    step: '05',
+    doneLabel: 'Event controlat econòmicament',
+    checks: [
+      'cobraments pendents revisats',
+      'marge i desviacions entesos',
+      'deute financer convertit en acció si existeix',
+    ],
+    blockedIf: 'queda cobrament, marge o desviació sense decisió explícita.',
+  },
+  {
+    step: '06',
+    doneLabel: 'Client retornat al sistema de recurrència',
+    checks: [
+      'post-event o aprenentatge registrat',
+      'ressenya, referral o reactivació decidida',
+      'valor del client visible per futures accions',
+    ],
+    blockedIf: 'el client queda refredat sense decisió sobre ressenya, retorn o aprenentatge.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_EXCEPTIONS: AdminManualOperatingException[] = [
+  {
+    step: '01',
+    trigger: 'Lead sense origen, tipus d’esdeveniment o canal de resposta clar.',
+    firstMove: 'Aturar qualificació i completar context mínim a Entrades abans de moure pipeline.',
+    actionHref: '/admin/leads',
+    actionLabel: 'Obrir Entrades',
+    doNotAdvanceUntil: 'el lead tingui origen, necessitat i primer contacte assignat.',
+  },
+  {
+    step: '02',
+    trigger: 'Oportunitat amb score, timing o necessitat massa ambigua per pressupostar.',
+    firstMove: 'Revisar Sales Ops i decidir seguiment, descart, reactivació o canal de resposta.',
+    actionHref: '/admin/sales-ops',
+    actionLabel: 'Obrir Sales Ops',
+    doNotAdvanceUntil: 'la prioritat i el següent moviment comercial siguin explícits.',
+  },
+  {
+    step: '03',
+    trigger: 'Pressupost sense marge, transport, data o condicions prou defensables.',
+    firstMove: 'Reobrir Pressupostos i ajustar pack, extres, desplaçament o condicions abans d’enviar.',
+    actionHref: '/admin/presupuestos',
+    actionLabel: 'Obrir Pressupostos',
+    doNotAdvanceUntil: 'el preu expliqui cost real, marge mínim i condicions de venda.',
+  },
+  {
+    step: '04',
+    trigger: 'Reserva amb calendari, checklist, inventari o responsabilitat encara dispersa.',
+    firstMove: 'Obrir Reserves i convertir cada bloqueig en checklist, tasca o decisió operativa.',
+    actionHref: '/admin/bookings',
+    actionLabel: 'Obrir Reserves',
+    doNotAdvanceUntil: 'la reserva sigui executable sense memòria externa.',
+  },
+  {
+    step: '05',
+    trigger: 'Cobrament, marge o desviació econòmica sense decisió visible.',
+    firstMove: 'Entrar a Finances i convertir deute, risc o desviació en acció amb responsable.',
+    actionHref: '/admin/economia',
+    actionLabel: 'Obrir Finances',
+    doNotAdvanceUntil: 'el resultat econòmic i el cobrament pendent quedin governats.',
+  },
+  {
+    step: '06',
+    trigger: 'Client post-event sense decisió de ressenya, referral, retorn o aprenentatge.',
+    firstMove: 'Obrir Clients i decidir acció post-event abans que el valor comercial es refredi.',
+    actionHref: '/admin/clientes',
+    actionLabel: 'Obrir Clients',
+    doNotAdvanceUntil: 'hi hagi aprenentatge, ressenya, referral o reactivació decidida.',
+  },
+];
+
+export const ADMIN_MANUAL_OPERATING_EVIDENCE: AdminManualOperatingEvidence[] = [
+  {
+    step: '01',
+    artifact: 'Fitxa de lead amb origen, necessitat i primer contacte assignat.',
+    proof: 'La llista d’Entrades permet veure estat, origen i següent moviment comercial abans de qualificar.',
+    proofHref: '/admin/leads',
+    proofLabel: 'Comprovar Entrades',
+    ownerCheck: 'Puc explicar d’on ve la demanda i què faré primer sense obrir cap nota externa.',
+  },
+  {
+    step: '02',
+    artifact: 'Oportunitat prioritzada amb risc, SLA i canal de seguiment decidits.',
+    proof: 'Sales Ops mostra prioritat comercial, pèrdues, seqüències i senyals que justifiquen avançar o aturar.',
+    proofHref: '/admin/sales-ops',
+    proofLabel: 'Comprovar Sales Ops',
+    ownerCheck: 'Sé per què aquest lead mereix proposta ara i quin canal sosté el seguiment.',
+  },
+  {
+    step: '03',
+    artifact: 'Pressupost amb pack, preu, transport, condicions i marge revisats.',
+    proof: 'El PDF Studio i la preview de pressupost ensenyen import, desplaçament, recàrrecs i marge abans d’enviar.',
+    proofHref: '/admin/presupuestos',
+    proofLabel: 'Comprovar Pressupost',
+    ownerCheck: 'El preu es pot defensar davant client i negoci sense recalcular res fora del sistema.',
+  },
+  {
+    step: '04',
+    artifact: 'Reserva governada amb calendari, checklist, inventari, portal i documents visibles.',
+    proof: 'La fitxa de reserva concentra preparació, contracte, portal, qüestionari, galeria i finances de l’event.',
+    proofHref: '/admin/bookings',
+    proofLabel: 'Comprovar Reserves',
+    ownerCheck: 'Si l’event fos demà, sabria què falta i qui ho ha de resoldre.',
+  },
+  {
+    step: '05',
+    artifact: 'Resultat econòmic amb cobraments, marge, desviacions i següent acció financera.',
+    proof: 'Finances i Reporting permeten contrastar cobrament, forecast, marge i canal abans de tancar el cicle.',
+    proofHref: '/admin/economia',
+    proofLabel: 'Comprovar Finances',
+    ownerCheck: 'No queda cap deute de caixa o marge sense decisió operativa.',
+  },
+  {
+    step: '06',
+    artifact: 'Client retornat al sistema amb ressenya, referral, post-event, retorn o aprenentatge.',
+    proof: 'Customer Hub mostra historial, LTV, comunicacions, post-event i opcions de reactivació en una lectura única.',
+    proofHref: '/admin/clientes',
+    proofLabel: 'Comprovar Clients',
+    ownerCheck: 'El client ja no queda com a feina acabada: deixa valor aprofitable per captar millor.',
   },
 ];
 
@@ -300,6 +740,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/leads',
         cta: 'Obrir Entrades',
         tone: 'warning',
+        flowStep: '01',
         signals: ['estat del lead', 'prioritat', 'temps pendent', 'origen'],
       },
       {
@@ -308,6 +749,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/sales-ops',
         cta: 'Obrir Sales Ops',
         tone: 'info',
+        flowStep: '02',
         signals: ['SLA', 'seguiment', 'dormants', 'negociació'],
       },
       {
@@ -316,6 +758,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/presupuestos',
         cta: 'Obrir Pressupostos',
         tone: 'success',
+        flowStep: '03',
         signals: ['proposta', 'import', 'estat', 'client'],
       },
     ],
@@ -331,6 +774,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/clientes',
         cta: 'Obrir Clients',
         tone: 'info',
+        flowStep: '06',
         signals: ['historial', 'valor', 'timeline', 'proper pas'],
       },
       {
@@ -339,6 +783,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/clientes/reactivation',
         cta: 'Obrir Reactivació',
         tone: 'warning',
+        flowStep: '06',
         signals: ['dormant', 'VIP', 'últim contacte', 'missatge suggerit'],
       },
       {
@@ -347,6 +792,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/clientes/referrals',
         cta: 'Obrir Referrals',
         tone: 'success',
+        flowStep: '06',
         signals: ['referidor', 'valor generat', 'candidats', 'xarxa'],
       },
     ],
@@ -362,6 +808,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/bookings',
         cta: 'Obrir Reserves',
         tone: 'success',
+        flowStep: '04',
         signals: ['data', 'estat', 'pack', 'marge'],
       },
       {
@@ -370,6 +817,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/calendario/capacity',
         cta: 'Obrir Capacitat',
         tone: 'danger',
+        flowStep: '04',
         signals: ['col·lisions', 'càrrega', 'disponibilitat', 'dies crítics'],
       },
       {
@@ -378,6 +826,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/tasks',
         cta: 'Obrir Tasques',
         tone: 'warning',
+        flowStep: '04',
         signals: ['vençut', 'avui', 'bloquejat', 'VIP'],
       },
     ],
@@ -393,6 +842,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/inbox',
         cta: 'Obrir Inbox',
         tone: 'info',
+        flowStep: '02',
         signals: ['correu', 'context lead', 'plantilla', 'resposta'],
       },
       {
@@ -401,6 +851,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/social',
         cta: 'Obrir Social',
         tone: 'success',
+        flowStep: '01',
         signals: ['post', 'plataforma', 'estat', 'calendari'],
       },
       {
@@ -409,6 +860,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/portfolio',
         cta: 'Obrir Portfolio',
         tone: 'warning',
+        flowStep: '01',
         signals: ['casos', 'prova social', 'imatges', 'SEO'],
       },
     ],
@@ -424,6 +876,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/economia',
         cta: 'Obrir Finances',
         tone: 'danger',
+        flowStep: '05',
         signals: ['cobraments', 'marge', 'tresoreria', 'risc'],
       },
       {
@@ -432,6 +885,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/reporting',
         cta: 'Obrir Reporting',
         tone: 'info',
+        flowStep: '05',
         signals: ['facturació', 'conversió', 'origen', 'tendència'],
       },
       {
@@ -440,6 +894,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/pricing',
         cta: 'Obrir Preus',
         tone: 'success',
+        flowStep: '03',
         signals: ['pack', 'preu', 'descompte', 'marge'],
       },
     ],
@@ -455,6 +910,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/crons',
         cta: 'Obrir Crons',
         tone: 'warning',
+        flowStep: '05',
         signals: ['cron', 'última execució', 'estat', 'error'],
       },
       {
@@ -463,6 +919,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/salut',
         cta: 'Obrir Salut',
         tone: 'danger',
+        flowStep: '05',
         signals: ['incidència', 'alerta', 'check', 'prioritat'],
       },
       {
@@ -471,6 +928,7 @@ export const ADMIN_MANUAL_SECTIONS: AdminManualSection[] = [
         href: '/admin/settings',
         cta: 'Obrir Configuració',
         tone: 'neutral',
+        flowStep: '05',
         signals: ['settings', 'RGPD', 'features', 'copy'],
       },
     ],
@@ -718,6 +1176,59 @@ export interface AdminMarketingPhaseAction {
   effort: string;
 }
 
+export interface AdminMarketingPhaseGate {
+  activePhase: AdminMarketingPhase;
+  title: string;
+  decision: string;
+  focusRule: string;
+  blockedUntil: string;
+  requiredActionIds: string[];
+  requiredOutputs: Record<string, string[]>;
+  blockedActionIds: string[];
+  blockedReasons: Record<string, string>;
+  primaryActionId: string;
+  nextPhaseActionId: string;
+  nextPhaseReason: string;
+  nextPhaseOutputs: string[];
+  unlockCriteria: string[];
+}
+
+export interface AdminMarketingBootstrapStep {
+  window: string;
+  title: string;
+  objective: string;
+  outputs: string[];
+}
+
+export interface AdminMarketingPhaseEvidence {
+  actionId: string;
+  proof: string;
+  whereToCheck: string;
+  unlockSignal: string;
+}
+
+export interface AdminMarketingChannelDecision {
+  actionId: string;
+  startWhen: string;
+  firstMove: string;
+  successSignal: string;
+  stopIf: string;
+  adminHref: string;
+  adminLabel: string;
+}
+
+export interface AdminMarketingActiveChannelLock {
+  activeActionId: string;
+  title: string;
+  rule: string;
+  allowedMoves: string[];
+  blockedSwitches: Array<{
+    actionId: string;
+    reason: string;
+  }>;
+  exitSignals: string[];
+}
+
 export const ADMIN_MARKETING_PHASE_LABEL: Record<AdminMarketingPhase, string> = {
   FASE_0: 'Fase 0 · Fundació',
   FASE_1: 'Fase 1 · Captació gratuïta',
@@ -731,6 +1242,193 @@ export const ADMIN_MARKETING_PHASE_SUMMARY: Record<AdminMarketingPhase, string> 
   FASE_2: 'Escalar amb publicitat quan els orgànics ja funcionin.',
   FASE_3: 'Convertir el negoci en una màquina de captació sostenible.',
 };
+
+export const ADMIN_MARKETING_PHASE_GATE: AdminMarketingPhaseGate = {
+  activePhase: 'FASE_0',
+  title: 'Fase activa recomanada: fundació abans d\'invertir',
+  decision: 'No obrir Google Ads, Meta Ads ni integracions cares fins que el client ideal, la proposta de valor, la fitxa de Google i el web base estiguin clars.',
+  focusRule: 'Una fase cada vegada i un sol canal actiu fins que hi hagi senyals clars. La dispersió crema temps i pressupost.',
+  blockedUntil: 'Quan aquestes quatre peces existeixin, el següent pas natural és activar captació gratuïta i mesurar canals abans d\'escalar pressupost.',
+  requiredActionIds: [
+    'icp-definition',
+    'value-proposition',
+    'google-business-profile',
+    'web-optimization',
+  ],
+  requiredOutputs: {
+    'icp-definition': [
+      'Tipus d\'event prioritari',
+      'Zona principal',
+      'Pressupost mínim acceptable',
+      'Dolor principal del client',
+    ],
+    'value-proposition': [
+      'Frase usable al web',
+      'Versió curta per WhatsApp',
+      'Dolor que elimina',
+    ],
+    'google-business-profile': [
+      'Fitxa publicada',
+      'Fotos reals pujades',
+      'Horaris i contacte revisats',
+    ],
+    'web-optimization': [
+      'CTA visible',
+      'Portfolio destacat',
+      'Prova social visible',
+    ],
+  },
+  blockedActionIds: [
+    'google-ads',
+    'meta-ads',
+    'remarketing',
+  ],
+  blockedReasons: {
+    'google-ads': 'Sense ICP i proposta clara, les keywords locals compren trànsit però no converteixen.',
+    'meta-ads': 'Sense portfolio i prova social visibles, el creatiu pot generar clics però no confiança.',
+    remarketing: 'Sense volum inicial de visites i CTA revisat, el remarketing crema pressupost massa aviat.',
+  },
+  primaryActionId: 'icp-definition',
+  nextPhaseActionId: 'personal-network',
+  nextPhaseReason: 'És el canal amb menys cost i més feedback immediat: valida el missatge amb gent propera abans de dedicar hores a SEO, social o partners.',
+  nextPhaseOutputs: [
+    '50 contactes avisats',
+    '3 converses comercials obertes',
+    'Objeccions anotades',
+  ],
+  unlockCriteria: [
+    '1 client ideal escrit amb tipus d\'event, zona, pressupost i dolor principal.',
+    '1 frase de proposta de valor que es pugui posar literalment al web o a WhatsApp.',
+    'Fitxa de Google Business Profile publicada amb fotos reals i dades correctes.',
+    'Web base revisada amb proves socials, portfolio i CTA de contacte visibles.',
+  ],
+};
+
+export const ADMIN_MARKETING_BOOTSTRAP_PLAN: AdminMarketingBootstrapStep[] = [
+  {
+    window: 'Dies 1-2',
+    title: 'Escriure Fundació',
+    objective: 'Tancar ICP, proposta de valor i criteris mínims abans de moure cap canal.',
+    outputs: ['ICP escrit', 'Frase de valor usable', 'Checklist web/GBP revisat'],
+  },
+  {
+    window: 'Dies 3-7',
+    title: 'Validar amb xarxa personal',
+    objective: 'Enviar el missatge a contactes reals i recollir feedback abans de fer SEO o social.',
+    outputs: ['50 contactes avisats', '3 converses obertes', 'Objeccions anotades'],
+  },
+  {
+    window: 'Dies 8-14',
+    title: 'Triar un sol canal gratuït',
+    objective: 'Decidir el següent canal amb evidència, no per impuls: ressenyes, SEO local, social o partners.',
+    outputs: ['Canal triat', 'Primer experiment definit', 'Mètrica de sortida fixada'],
+  },
+];
+
+export const ADMIN_MARKETING_CHANNEL_DECISION_MATRIX: AdminMarketingChannelDecision[] = [
+  {
+    actionId: 'personal-network',
+    startWhen: 'La Fundació ja està escrita i el missatge es pot enviar sense explicar-lo de nou.',
+    firstMove: 'Enviar el missatge a 50 contactes reals i marcar cada resposta com a lead, objecció o silenci.',
+    successSignal: '3 converses comercials obertes o 1 oportunitat concreta abans de 7 dies.',
+    stopIf: 'Si ningú respon, reescriure proposta de valor abans d’obrir un segon canal.',
+    adminHref: '/admin/leads',
+    adminLabel: 'Registrar leads',
+  },
+  {
+    actionId: 'google-reviews',
+    startWhen: 'Ja hi ha clients contents o events recents que poden validar confiança pública.',
+    firstMove: 'Demanar 10 ressenyes amb text curt i revisar que la fitxa pública les mostra bé.',
+    successSignal: '5 ressenyes noves o una millora visible de prova social abans de 14 dies.',
+    stopIf: 'Si no hi ha clients recents, prioritzar xarxa personal o portfolio abans de forçar ressenyes.',
+    adminHref: '/admin/google-reviews',
+    adminLabel: 'Mirar ressenyes',
+  },
+  {
+    actionId: 'seo-local-pages',
+    startWhen: 'Ja està clar quin tipus d’event i quina zona tenen prioritat comercial.',
+    firstMove: 'Crear o revisar una pàgina ciutat + servei amb prova social, portfolio i CTA directe.',
+    successSignal: 'La pàgina queda publicada i entra al tracking de visites o leads del canal orgànic.',
+    stopIf: 'Si no hi ha proposta clara o proves visuals, no crear més pàgines: tornar a Fundació.',
+    adminHref: '/admin/text-manager',
+    adminLabel: 'Editar textos',
+  },
+  {
+    actionId: 'instagram-organic',
+    startWhen: 'Ja hi ha material real d’events o muntatges que pot demostrar qualitat sense inventar campanya.',
+    firstMove: 'Programar 3 peces reals en una setmana: muntatge, resultat i testimoni o moment clau.',
+    successSignal: '3 converses, clics qualificats o respostes guardades com a objeccions comercials.',
+    stopIf: 'Si només genera likes sense converses, canviar angle o pausar abans de gastar en Meta Ads.',
+    adminHref: '/admin/social',
+    adminLabel: 'Obrir Social',
+  },
+  {
+    actionId: 'partner-network',
+    startWhen: 'Ja pots explicar en una frase quin partner et pot enviar quin tipus de client.',
+    firstMove: 'Contactar 10 restaurants, fotògrafs, DJs o planners amb proposta concreta de col·laboració.',
+    successSignal: '2 partners interessats o 1 lead referit amb origen identificat.',
+    stopIf: 'Si no hi ha resposta, ajustar incentiu i ICP abans de multiplicar contactes.',
+    adminHref: '/admin/clientes/referrals',
+    adminLabel: 'Obrir referrals',
+  },
+];
+
+export const ADMIN_MARKETING_ACTIVE_CHANNEL_LOCK: AdminMarketingActiveChannelLock = {
+  activeActionId: 'personal-network',
+  title: 'Canal actiu ara: xarxa personal',
+  rule: 'No obrir SEO, Social, Partners ni Ads fins haver provat el missatge amb persones reals i haver registrat el resultat al CRM.',
+  allowedMoves: [
+    'Enviar el missatge a 50 contactes reals.',
+    'Registrar cada resposta com a lead, objecció o silenci.',
+    'Reescriure la proposta de valor si no hi ha resposta clara.',
+  ],
+  blockedSwitches: [
+    {
+      actionId: 'seo-local-pages',
+      reason: 'Sense feedback real del missatge, una pàgina SEO només escala un posicionament encara no validat.',
+    },
+    {
+      actionId: 'instagram-organic',
+      reason: 'Sense saber quina objecció mou la conversa, Social pot generar activitat però no demanda qualificada.',
+    },
+    {
+      actionId: 'partner-network',
+      reason: 'Sense proposta provada, els partners reben un pitch massa verd i costa recuperar la primera impressió.',
+    },
+  ],
+  exitSignals: [
+    '50 contactes avisats amb resultat registrat.',
+    '3 converses comercials obertes o 1 oportunitat concreta.',
+    'Objeccions principals anotades i proposta de valor ajustada.',
+  ],
+};
+
+export const ADMIN_MARKETING_PHASE_EVIDENCE: AdminMarketingPhaseEvidence[] = [
+  {
+    actionId: 'icp-definition',
+    proof: 'Fitxa escrita amb event prioritari, zona, pressupost mínim i dolor principal.',
+    whereToCheck: 'Manual intern o brief comercial abans de tocar cap canal.',
+    unlockSignal: 'Qualsevol missatge nou pot dir clarament a qui parla.',
+  },
+  {
+    actionId: 'value-proposition',
+    proof: 'Frase curta reutilitzable al web, WhatsApp i primer email.',
+    whereToCheck: 'Home pública, CTA de contacte, WhatsApp i plantilla de primer contacte.',
+    unlockSignal: 'El client entén en una frase per què Òrbita és l’opció correcta.',
+  },
+  {
+    actionId: 'google-business-profile',
+    proof: 'Fitxa publicada amb fotos reals, horari, telèfon, web i categoria correctes.',
+    whereToCheck: 'Google Maps i Google Business Profile.',
+    unlockSignal: 'Una cerca local pot trobar el negoci i contactar sense fricció.',
+  },
+  {
+    actionId: 'web-optimization',
+    proof: 'Portfolio, prova social i CTA visibles sense haver de pensar.',
+    whereToCheck: 'Home, portfolio, serveis i formulari/WhatsApp públics.',
+    unlockSignal: 'El trànsit orgànic o referit té una ruta clara cap al lead.',
+  },
+];
 
 export const ADMIN_MARKETING_PHASES: AdminMarketingPhaseAction[] = [
   // ── FASE 0 ────────────────────────────────────────────────────────────

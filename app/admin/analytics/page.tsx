@@ -115,7 +115,7 @@ function pctDelta(current: number, previous: number): number | null {
 }
 
 function formatAdsCurrency(value: number, currency: string) {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: currency || 'EUR', maximumFractionDigits: 0 }).format(value);
+  return formatNumber(value, { style: 'currency', currency: currency || 'EUR', maximumFractionDigits: 0 });
 }
 
 function deltaTone(value: number, inverse = false) {

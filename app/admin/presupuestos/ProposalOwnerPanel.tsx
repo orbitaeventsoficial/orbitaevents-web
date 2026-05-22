@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 type OwnerRefs = {
   customerId: string | null;
@@ -134,7 +137,7 @@ export default function ProposalOwnerPanel({
         currentId: initial.customerId,
         currentLabel: initial.customer?.name || null,
         currentSecondary: initial.customer?.email || null,
-        href: initial.customer ? `/admin/clientes/${initial.customer.id}` : null,
+        href: initial.customer ? buildCustomerHubHref(initial.customer.id) : null,
       },
       {
         kind: 'lead' as const,
@@ -142,7 +145,7 @@ export default function ProposalOwnerPanel({
         currentId: initial.leadId,
         currentLabel: initial.lead?.name || null,
         currentSecondary: initial.lead?.email || null,
-        href: initial.lead ? `/admin/leads/${initial.lead.id}` : null,
+        href: initial.lead ? buildLeadWorkspaceHref(initial.lead.id) : null,
       },
       {
         kind: 'booking' as const,
@@ -150,7 +153,7 @@ export default function ProposalOwnerPanel({
         currentId: initial.bookingId,
         currentLabel: initial.booking?.reference || null,
         currentSecondary: initial.booking?.status || null,
-        href: initial.booking ? `/admin/bookings/${initial.booking.id}` : null,
+        href: initial.booking ? buildBookingHref(initial.booking.id) : null,
       },
     ],
     [initial],

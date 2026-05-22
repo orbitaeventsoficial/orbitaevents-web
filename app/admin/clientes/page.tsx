@@ -28,6 +28,7 @@ import { AddCustomerModal, StartProcessModal } from './ClientesModals';
 import {
   CustomersDesktopTable,
   CustomersEmpty,
+  CustomerHubOperatingStrip,
   CustomersError,
   CustomersHelpPanel,
   CustomersLoading,
@@ -128,6 +129,7 @@ export default function AdminContactesPage() {
       if (err instanceof DOMException && err.name === 'AbortError') {
         setError('La connexió ha trigat massa. Reintenta.');
       } else {
+        console.error('Error carregant clients', err);
         setError(err instanceof Error ? err.message : 'Error desconegut');
       }
     } finally {
@@ -184,6 +186,7 @@ export default function AdminContactesPage() {
       actions={<CustomersStatsActions stats={stats} />}
     >
       <CustomersHelpPanel />
+      {!loading && !error && (<CustomerHubOperatingStrip customers={customers} stats={stats} />)}
       <CustomersToolbar
         searchInput={searchInput}
         setSearchInput={setSearchInput}

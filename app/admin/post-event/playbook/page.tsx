@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 import { loadPostEventPlaybook, type PlaybookActionStatus, type PlaybookPriority } from '@/lib/services/postEventPlaybookService';
-import { getEventLabel } from '@/lib/constants';
+import { formatDate, getEventLabel } from '@/lib/constants';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,7 @@ const STATUS_TONE: Record<PlaybookActionStatus, string> = {
   DONE: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
   PENDING: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
   OVERDUE: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
-  NOT_APPLICABLE: 'border-slate-500/20 bg-slate-500/5 text-slate-500',
+  NOT_APPLICABLE: 'border-white/10 bg-white/[0.03] text-white/40',
 };
 
 const STATUS_ICON: Record<PlaybookActionStatus, string> = {
@@ -29,10 +30,6 @@ const PRIORITY_TONE: Record<PlaybookPriority, string> = {
   BAIXA: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300',
   DONE: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
 };
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
-}
 
 export default async function PlaybookPage() {
   const summary = await loadPostEventPlaybook();
@@ -98,7 +95,7 @@ export default async function PlaybookPage() {
                     </div>
                     <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                       <Link
-                        href={`/admin/bookings/${item.bookingId}`}
+                        href={buildBookingHref(item.bookingId)}
                         className="text-sm font-semibold hover:text-cyan-300 transition-colors"
                       >
                         {item.clientName}
@@ -164,7 +161,7 @@ export default async function PlaybookPage() {
                     </span>
                     <span className="text-[11px]">{item.nextAction.label}</span>
                     <Link
-                      href={`/admin/bookings/${item.bookingId}`}
+                      href={buildBookingHref(item.bookingId)}
                       className="ml-auto text-[11px] text-cyan-300 hover:text-cyan-200"
                     >
                       Gestionar →

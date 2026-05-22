@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { formatDateShort } from '@/lib/constants';
 import type { CommChannel, CommTimelineSummary } from '@/lib/services/commTimelineService';
 
 const CHANNEL_ICON: Record<CommChannel, string> = {
@@ -129,7 +130,7 @@ export default function CommSummaryPanel({
             <span className="shrink-0 opacity-50">{DIRECTION_ICON[entry.direction]}</span>
             <span className="truncate">{entry.title}</span>
             <span className="ml-auto shrink-0 opacity-40">
-              {new Date(entry.occurredAt).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
+              {formatDateShort(entry.occurredAt)}
             </span>
           </div>
         ))}

@@ -9,7 +9,7 @@ import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpM
 import { ADMIN_LAYOUT_HELP, helpAttrs } from './components/adminHelpContent';
 import { ToastProvider } from './components/ToastProvider';
 import { getPriorityItems, NAV_SECTIONS, type NavSection } from './components/nav-items';
-import { ADMIN_CHANGE_COUNTER, ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
+import { ADMIN_CHANGE_COUNTER, ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_KONAMI_SEQUENCE, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
@@ -82,7 +82,7 @@ function FloatingAddButton() {
         onClick={toggle}
         aria-label="Accions rapides"
         aria-expanded={open}
-        className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${open ? 'bg-white/20 rotate-45' : 'bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400'}`}
+        className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${open ? 'bg-white/20 rotate-45' : 'admin-gradient--fab'}`}
         {...helpAttrs(ADMIN_LAYOUT_HELP.quickActionsFab)}
       >
         <span className="text-2xl font-bold text-white transition-transform">+</span>
@@ -247,6 +247,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [konamiActive, setKonamiActive] = useState(false);
+  const konamiRef = useRef<number>(0);
   const [customAdminCss, setCustomAdminCss] = useState('');
   const [managedAdminLogoSrc, setManagedAdminLogoSrc] = useState('/img/logosoloplaneta.svg');
   const [managedAppleTouchIconSrc, setManagedAppleTouchIconSrc] = useState('/apple-touch-icon.png');
@@ -404,6 +406,23 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleShortcut, true);
   }, [helpModeEnabled, router]);
 
+  useEffect(() => {
+    const handleKonami = (e: KeyboardEvent) => {
+      if (e.key === ADMIN_KONAMI_SEQUENCE[konamiRef.current]) {
+        konamiRef.current += 1;
+        if (konamiRef.current === ADMIN_KONAMI_SEQUENCE.length) {
+          konamiRef.current = 0;
+          setKonamiActive(true);
+          setTimeout(() => setKonamiActive(false), 3000);
+        }
+      } else {
+        konamiRef.current = e.key === ADMIN_KONAMI_SEQUENCE[0] ? 1 : 0;
+      }
+    };
+    window.addEventListener('keydown', handleKonami);
+    return () => window.removeEventListener('keydown', handleKonami);
+  }, []);
+
   const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
   const navSections = useMemo<NavSection[]>(() => NAV_SECTIONS.map((section) => ({
     ...section,
@@ -503,6 +522,20 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
       <link rel="apple-touch-icon" href={managedAppleTouchIconSrc} />
+      {/* Easter egg: codi Konami ↑↑↓↓←→←→BA */}
+      {konamiActive && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-[9998] flex items-center justify-center"
+          style={{ animation: 'admin-stagger-in 0.3s ease forwards' }}
+        >
+          <div className="rounded-3xl border border-white/10 bg-black/80 px-10 py-8 text-center backdrop-blur-sm shadow-2xl">
+            <p className="text-5xl mb-3">🎧</p>
+            <p className="text-xl font-bold text-white">Òrbita Mode Activat</p>
+            <p className="mt-1 text-sm text-white/50">Ara sona millor</p>
+          </div>
+        </div>
+      )}
       <div
         className="admin-layout-shell"
         onClickCapture={blockInteractionInHelpMode}
@@ -510,6 +543,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         onSubmitCapture={blockInteractionInHelpMode}
         onPointerDownCapture={blockInteractionInHelpMode}
       >
+          <a href="#admin-main-content" className="admin-skip-nav">Saltar al contingut principal</a>
           {customAdminCss && (
             <style id="admin-custom-css" dangerouslySetInnerHTML={{ __html: customAdminCss }} />
           )}
@@ -859,7 +893,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main Content */}
-      <main className="admin-main">
+      <main id="admin-main-content" className="admin-main">
         <div className="admin-shell admin-main-shell">
           <ToastProvider>
             {children}
@@ -898,5 +932,4 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </>
   );
 }
-
 

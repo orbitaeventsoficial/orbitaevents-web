@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import type { CanviValidation } from '@/lib/services/protocolValidationsService';
+import { formatDateTimeFull } from '@/lib/constants';
 
 interface ProtocolValidationToggleProps {
   canviN: number;
@@ -67,7 +68,7 @@ export default function ProtocolValidationToggle({
           <p className="text-[11px] font-semibold uppercase tracking-wider opacity-60">Validació humana</p>
           {validation ? (
             <p className="text-sm text-emerald-200">
-              Validat per {validation.validatedBy} · {new Date(validation.validatedAt).toLocaleString('ca-ES')}
+              Validat per {validation.validatedBy} · {formatDateTimeFull(validation.validatedAt)}
             </p>
           ) : (
             <p className="text-sm opacity-70">Encara no consta com a validat per una persona.</p>

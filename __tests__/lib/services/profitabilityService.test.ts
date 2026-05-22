@@ -31,6 +31,8 @@
  *    Si no existeix o està corrupta, s'usen els valors per defecte.
  */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
   normalizeProfitabilityConfig,
@@ -136,6 +138,17 @@ describe('profitabilityService', () => {
       });
       expect(result.channelCac.REFERRAL).toBe(5);
       expect(result.channelCac.INSTAGRAM).toBe(DEFAULT_PROFITABILITY_CONFIG.channelCac.INSTAGRAM);
+    });
+  });
+
+  describe('fetchProfitabilityBookings pagination shape', () => {
+    const source = readFileSync(join(process.cwd(), 'lib', 'services', 'profitabilityService.ts'), 'utf8');
+
+    it('usa una condició explícita per paginar, no un while infinit', () => {
+      expect(source).toContain('let hasMoreBookings = true');
+      expect(source).toContain('while (hasMoreBookings)');
+      expect(source).toContain('batch.length === PROFITABILITY_BATCH_SIZE');
+      expect(source).not.toContain('while (true)');
     });
   });
 });

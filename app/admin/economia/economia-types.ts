@@ -98,6 +98,9 @@ export interface ForecastMonth {
   combined: number;
   combinedLow: number;
   combinedHigh: number;
+  previousYearActual: number;
+  confirmedBookings: number;
+  confirmedRevenue: number;
 }
 
 export interface CacChannelRow {

@@ -18,7 +18,11 @@ export async function POST(req: NextRequest) {
   if (permissionError) return permissionError;
 
   try {
-    const body = bodySchema.parse(await req.json());
+    const parsed = bodySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'INVALID_BODY' }, { status: 400 });
+    }
+    const body = parsed.data;
     const result = await calculateGoogleMapsDistance({
       destination: body.destination,
       origin: body.origin,

@@ -12,7 +12,7 @@ export const metadata = {
 const URGENCY_TONE: Record<string, string> = {
   HIGH: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
   MEDIUM: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-  LOW: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+  LOW: 'border-white/15 bg-white/[0.06] text-white/60',
 };
 
 const URGENCY_LABEL: Record<string, string> = {

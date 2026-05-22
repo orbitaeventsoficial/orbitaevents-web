@@ -1,11 +1,14 @@
 import DOMPurify from 'dompurify';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { DEFAULT_LOCALE, formatDateShort, formatDateSimple, formatDateTimeFull, getEventLabel } from '@/lib/constants';
+import { formatDateShort, formatDateSimple, formatDateTimeFull, formatTimeShort, formatWeekdayShort, getEventLabel } from '@/lib/constants';
 import type { LeadData, UnifiedEmail } from './inbox-types';
 import { getLeadStatusTone } from './inbox-types';
 import { ADMIN_INBOX_HELP, helpAttrs } from '../components/adminHelpContent';
 import InboxLeadContext from './InboxLeadContext';
 import CommSummaryPanel from './CommSummaryPanel';
+
+const AiReplySuggestions = dynamic(() => import('./AiReplySuggestions'), { ssr: false });
 
 function getInboxScopeLabel(activeTab: 'all' | 'leads' | 'emails' | 'trash') {
   switch (activeTab) {
@@ -30,13 +33,13 @@ export function formatInboxEmailDate(date: Date) {
   const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return d.toLocaleTimeString(DEFAULT_LOCALE, { hour: '2-digit', minute: '2-digit' });
+    return formatTimeShort(d);
   }
   if (diffDays === 1) {
     return 'Ahir';
   }
   if (diffDays < 7) {
-    return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short' });
+    return formatWeekdayShort(d);
   }
   return formatDateShort(d);
 }
@@ -249,6 +252,7 @@ export function InboxDetailPane({
   handleMoveToTrash,
   handleRestoreEmail,
   handleDeletePermanently,
+  onApplySuggestion,
 }: {
   selectedEmail: UnifiedEmail | null;
   loadingSelected: boolean;
@@ -260,6 +264,7 @@ export function InboxDetailPane({
   handleMoveToTrash: (email: UnifiedEmail) => void;
   handleRestoreEmail: (email: UnifiedEmail) => void;
   handleDeletePermanently: (email: UnifiedEmail) => void;
+  onApplySuggestion?: (text: string) => void;
 }) {
   if (!selectedEmail) {
     return <div className="flex flex-1 items-center justify-center"><div className="text-center"><span className="text-6xl">📬</span><p className="mt-4 text-sm font-semibold text-white/85">Selecciona un missatge per veure&apos;l</p><p className="mt-2 text-xs text-white/50">La columna dreta s&apos;activa quan tries una conversa o una entrada web.</p></div></div>;
@@ -327,6 +332,12 @@ export function InboxDetailPane({
             <p className="whitespace-pre-wrap">{selectedLead?.message || selectedEmail.imapData?.bodyText || selectedEmail.preview || 'Sense missatge'}</p>
           )}
         </div>
+
+        {onApplySuggestion && activeTab !== 'trash' && (
+          <div className="mt-4">
+            <AiReplySuggestions email={selectedEmail} onApply={onApplySuggestion} />
+          </div>
+        )}
       </div>
 
       <div className="border-t p-4">

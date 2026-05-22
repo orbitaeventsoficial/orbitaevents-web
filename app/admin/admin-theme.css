@@ -6,11 +6,11 @@
 
 html.admin-mode {
   /* ── Backgrounds ── */
-  --at-bg: #0f1218;
-  --at-surface: #1a1f2b;
-  --at-panel: #222938;
-  --at-raised: #2d3548;
-  --at-input: #151a24;
+  --at-bg: #0b0f16;
+  --at-surface: #141b28;
+  --at-panel: #1c2334;
+  --at-raised: #283045;
+  --at-input: #111827;
 
   /* ── Borders ── */
   --at-border: #3a4560;
@@ -24,10 +24,10 @@ html.admin-mode {
   --at-subtle: #7889a0;
 
   /* ── Gold (brand accent) ── */
-  --at-gold: #e0a832;
-  --at-gold-glow: rgba(224, 168, 50, 0.25);
-  --at-gold-dim: rgba(224, 168, 50, 0.15);
-  --at-gold-text: #f0c050;
+  --at-gold: #e8b040;
+  --at-gold-glow: rgba(232, 176, 64, 0.32);
+  --at-gold-dim: rgba(232, 176, 64, 0.18);
+  --at-gold-text: #f5c958;
 
   /* ── Functional accents ── */
   --at-blue: #5a9ee0;
@@ -50,10 +50,10 @@ html.admin-mode {
   --at-border-strong: var(--at-border-s);
 
   /* ── Glass + Shadows ── */
-  --at-glass-bg: rgba(22, 28, 40, 0.85);
-  --at-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
-  --at-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --at-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --at-glass-bg: rgba(18, 24, 38, 0.88);
+  --at-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --at-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --at-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.07);
 
   /* ── Control Room palette ── */
   --at-cr-rose: #c15f79;
@@ -329,13 +329,80 @@ html.admin-mode .admin-shimmer {
   animation: admin-shimmer 1.8s ease infinite;
 }
 
+/* ── Overlay & surface backgrounds (eviten hex inline als components) ── */
+html.admin-mode .admin-overlay-deep {
+  background-color: rgba(11, 17, 23, 0.95);
+}
+html.admin-mode .admin-sticky-bar-bg {
+  background-color: rgba(15, 18, 24, 0.85);
+}
+html.admin-mode .admin-form-deep {
+  background-color: #0a0a0a;
+}
+html.admin-mode .admin-donut-hole {
+  background-color: rgba(4, 19, 28, 0.95);
+}
+
+/* ── Named gradient utilities (replace bg-gradient-to-* classes in components) ── */
+html.admin-mode .admin-gradient--fab {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+html.admin-mode .admin-gradient--fab:hover {
+  background: linear-gradient(135deg, #fbbf24, #fb923c);
+}
+html.admin-mode .admin-gradient--progress-emerald {
+  background: linear-gradient(to right, #10b981, #34d399);
+}
+
+/* ── Stagger animation global (totes les pàgines admin, no només dashboard) ──
+   admin-control-room té el seu propi selector més específic a control-room.css.
+   Aquí cobrim: leads, tasques, inbox, salut i qualsevol altra pàgina que
+   ja faci servir .admin-stagger-item. ── */
+html.admin-mode .admin-shell .admin-stagger-item {
+  animation: admin-stagger-in 0.4s var(--at-ease-out, cubic-bezier(0,0,0.2,1)) both;
+}
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(1)  { animation-delay: 0ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(2)  { animation-delay: 40ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(3)  { animation-delay: 80ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(4)  { animation-delay: 120ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(5)  { animation-delay: 160ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(6)  { animation-delay: 200ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(7)  { animation-delay: 240ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(8)  { animation-delay: 280ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(9)  { animation-delay: 320ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(10) { animation-delay: 360ms; }
+html.admin-mode .admin-shell .admin-stagger-item:nth-child(n+11) { animation-delay: 400ms; }
+
+/* Skip navigation link — WCAG 2.4.1 */
+html.admin-mode .admin-skip-nav {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--at-surface, #141b28);
+  color: var(--at-text, #f0f4f8);
+  border: 1px solid var(--at-border-s, #506080);
+  border-radius: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+html.admin-mode .admin-skip-nav:focus {
+  top: 0;
+  outline: 2px solid rgb(6 182 212 / 0.6);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.admin-mode .admin-drag-placeholder,
   html.admin-mode [data-dragging='true'],
   html.admin-mode .admin-drop-active,
   html.admin-mode .admin-drag-item,
   html.admin-mode .admin-drag-inserted,
-  html.admin-mode .admin-shimmer {
+  html.admin-mode .admin-shimmer,
+  html.admin-mode .admin-shell .admin-stagger-item {
     transition: none;
     animation: none;
   }

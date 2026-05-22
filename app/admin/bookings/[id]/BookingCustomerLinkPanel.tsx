@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import type {
   BookingCustomerMatchSummary,
   BookingCustomerPreview,
@@ -108,7 +109,7 @@ export default function BookingCustomerLinkPanel({
                 </div>
                 <div className="flex items-center gap-2">
                   <Link
-                    href={`/admin/clientes/${match.customerId}`}
+                    href={buildCustomerHubHref(match.customerId)}
                     className="text-xs px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/10"
                   >
                     Veure fitxa

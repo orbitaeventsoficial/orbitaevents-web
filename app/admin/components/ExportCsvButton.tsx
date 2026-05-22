@@ -3,9 +3,9 @@
 import { useCallback } from 'react';
 import { useToast } from './ToastProvider';
 
-type Column = {
+type Column<TData> = {
   header: string;
-  accessor: (row: Record<string, unknown>) => string | number;
+  accessor: (row: TData) => string | number;
 };
 
 function escapeCsvCell(val: string | number): string {
@@ -16,14 +16,14 @@ function escapeCsvCell(val: string | number): string {
   return str;
 }
 
-type ExportCsvProps = {
+type ExportCsvProps<TData> = {
   filename?: string;
 } & (
-  | { data: Record<string, unknown>[]; columns: Column[]; headers?: never; rows?: never }
+  | { data: TData[]; columns: Column<TData>[]; headers?: never; rows?: never }
   | { headers: string[]; rows: string[][]; data?: never; columns?: never }
 );
 
-export default function ExportCsvButton(props: ExportCsvProps) {
+export default function ExportCsvButton<TData>(props: ExportCsvProps<TData>) {
   const { filename = 'export' } = props;
   const toast = useToast();
 

@@ -114,7 +114,7 @@ async function persistValidations(validations: CanviValidation[]): Promise<void>
     data: {
       action: 'UPDATE',
       entity: 'setting',
-      details: { key: PROTOCOL_VALIDATION_SETTING_KEY, count: validations.length } as unknown as Prisma.InputJsonValue,
+      details: JSON.parse(JSON.stringify({ key: PROTOCOL_VALIDATION_SETTING_KEY, count: validations.length })) as Prisma.InputJsonValue,
     },
   });
 }

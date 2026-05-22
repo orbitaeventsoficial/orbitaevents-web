@@ -1,6 +1,7 @@
 import Tooltip from './components/Tooltip';
 import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import QuickActions from './components/QuickActions';
 import StatusQuickSelect from './components/StatusQuickSelect';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
@@ -10,7 +11,7 @@ import WeatherWidget from './components/WeatherWidget';
 import { ADMIN_DASHBOARD_HELP, helpAttrs } from './components/adminHelpContent';
 import { getGreeting, RadialProgress, MetricCard, Card, Button, MonthlyBarChart, DonutChart, MiniLineChart } from './lib/dashboard-widgets';
 import { LEAD_STATUS_OPTIONS, BOOKING_STATUS_OPTIONS } from '@/lib/constants';
-import { ADMIN_DASHBOARD_PILOT_STEPS, ADMIN_DASHBOARD_INSIGHT_COLORS } from '@/lib/constants/admin';
+import { ADMIN_DASHBOARD_PILOT_STEPS, ADMIN_DASHBOARD_INSIGHT_COLORS, ADMIN_CHART_SERIES_COLORS } from '@/lib/constants/admin';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import DailyBriefPanel from './components/DailyBriefPanel';
 import { loadOperationalPulse } from '@/lib/services/operationalPulseService';
@@ -23,13 +24,17 @@ import { loadAnomalyReport } from '@/lib/services/dailyAnomalyService';
 import AnomalyPanel from './components/AnomalyPanel';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
 import CapacityConflictPanel from './components/CapacityConflictPanel';
+import { loadWeeklyCapacityForecast } from '@/lib/services/operationalForecastService';
+import WeeklyCapacityForecastPanel from './components/WeeklyCapacityForecastPanel';
 import { OwnerControlStrip } from './components/OwnerControlStrip';
+import { buildDashboardOperatingCycle, type AdminOperatingCycleTone } from '@/lib/services/adminOperatingCycleService';
+import NBAExplainPanel from './components/NBAExplainPanel';
 
 // Removed: all widget components now in lib/dashboard-widgets.tsx
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  const [d, dailyBrief, pulse, captureHealth, attribution, anomalies, capacityConflicts] = await Promise.all([
+  const [d, dailyBrief, pulse, captureHealth, attribution, anomalies, capacityConflicts, weeklyCapacityForecast] = await Promise.all([
     fetchDashboardData(),
     loadDailyBrief(),
     loadOperationalPulse(),
@@ -37,6 +42,7 @@ export default async function AdminDashboard() {
     loadMultiTouchReport(90),
     loadAnomalyReport(),
     loadCapacityConflicts(),
+    loadWeeklyCapacityForecast(),
   ]);
 
   const insights = generateDashboardInsights({
@@ -112,15 +118,28 @@ export default async function AdminDashboard() {
     },
     {
       label: 'Cobraments pendents',
-      value: d.pendingPayments > 0 ? `${Math.round(d.pendingPayments)} € per cobrar` : 'Cap import pendent',
+      value: d.pendingPayments > 0 ? `${formatCurrency(d.pendingPayments)} per cobrar` : 'Cap import pendent',
     },
   ];
   const ownerAutomaticSignals = autoSignals.map((item) => `${item.label}: ${item.value}`);
   const ownerManualSignals = ownerDecisions.map((item) => `${item.label}: ${item.value}`);
+  const operatingCycle = buildDashboardOperatingCycle({
+    leadsThisMonth: d.leadsThisMonth,
+    staleLeadsCount: d.staleLeadsCount,
+    quotesInFlightCount: d.quotesInFlightCount,
+    bookingsConfirmed: d.bookingsConfirmed,
+    pendingPayments: d.pendingPayments,
+    postEventPending: d.postEventPending,
+  });
+  const operatingCycleTone: Record<AdminOperatingCycleTone, string> = {
+    success: 'border-emerald-500/25 bg-emerald-500/[0.04] text-emerald-100',
+    warning: 'border-amber-500/25 bg-amber-500/[0.05] text-amber-100',
+    info: 'border-cyan-500/25 bg-cyan-500/[0.05] text-cyan-100',
+  };
   const nextPriorityHref = d.alerts[0]?.href || '/admin/tasks';
   const nextPriorityTitle = d.alerts[0]?.title || (d.upcomingTasks[0]?.title ? d.upcomingTasks[0].title : 'Revisar la cua de tasques');
   const nextPriorityDetail = d.alerts[0]?.description || (d.upcomingTasks[0]?.lead?.name ? `Relacionat amb ${d.upcomingTasks[0].lead.name}` : 'Obre el workspace que concentra la feina pendent.');
-  const operationHref = d.nextEvent ? `/admin/bookings/${d.nextEvent.id}` : '/admin/bookings';
+  const operationHref = d.nextEvent ? buildBookingHref(d.nextEvent.id) : '/admin/bookings';
   const operationLabel = d.nextEvent ? `${d.nextEvent.clientName} · ${d.nextEvent.daysUntil === 0 ? 'avui' : d.nextEvent.daysUntil === 1 ? 'demà' : `d'aquí ${d.nextEvent.daysUntil} dies`}` : 'Sense bolo imminent';
   const pipelineRadarItems = pulse.pipelineDrivers.length > 0
     ? pulse.pipelineDrivers.slice(0, 3).map((driver) => {
@@ -240,17 +259,53 @@ export default async function AdminDashboard() {
         }}
       />
 
+      <NBAExplainPanel />
+
+      <section className="rounded-2xl border border-white/10 p-4 admin-card-glass">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">Cicle operatiu</p>
+            <h2 className="mt-1 text-lg font-semibold text-white">On està viu el sistema ara</h2>
+          </div>
+          <Link href="/admin/manual" className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-white/70 transition-colors hover:bg-white/5">
+            Obrir manual
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {operatingCycle.map((item) => (
+            <Link
+              key={item.step}
+              href={item.href}
+              className={`rounded-2xl border p-3 transition-colors hover:bg-white/[0.04] ${operatingCycleTone[item.tone]}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Pas {item.step}</p>
+                  <h3 className="mt-1 text-sm font-black text-white">{item.title}</h3>
+                </div>
+                <span className="shrink-0 rounded-full border border-white/10 bg-black/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide">
+                  {item.metric}
+                </span>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-white/70">{item.detail}</p>
+              <p className="mt-3 text-[11px] font-semibold text-white/55">{item.cta}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ═══ DAILY BRIEF ═══ */}
       <DailyBriefPanel brief={dailyBrief} />
       {anomalies.anomalies.length > 0 && <AnomalyPanel report={anomalies} />}
       {capacityConflicts.conflicts.length > 0 && <CapacityConflictPanel report={capacityConflicts} />}
+      <WeeklyCapacityForecastPanel forecast={weeklyCapacityForecast} />
       <CaptureHealthPanel report={captureHealth} />
       <AttributionPanel report={attribution} />
       <OperationalPulsePanel pulse={pulse} />
 
       {/* ═══ PRÒXIM BOLO ═══ */}
       {d.nextEvent && (
-        <Link href={`/admin/bookings/${d.nextEvent.id}`} className="block">
+        <Link href={buildBookingHref(d.nextEvent.id)} className="block">
           <section className={`rounded-2xl border-2 p-5 sm:p-6 transition-all admin-card-glass ${
             d.nextEvent.daysUntil <= 1
               ? 'border-amber-500/50 admin-glow-pulse'
@@ -281,7 +336,7 @@ export default async function AdminDashboard() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-2xl font-bold" style={{ fontFamily: 'var(--font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(d.nextEvent.total)}</p>
+                <p className="text-2xl font-bold font-mono tabular-nums">{formatCurrency(d.nextEvent.total)}</p>
                 <p className="text-xs opacity-70 mt-0.5">{d.nextEvent.packName}</p>
                 <div className="flex items-center justify-end gap-1.5 mt-2">
                   <Tooltip text={d.nextEvent.depositPaid && d.nextEvent.remainingPaid ? 'Tot pagat' : d.nextEvent.depositPaid ? 'Falta pagament final' : 'Sense cap pagament'}>
@@ -322,7 +377,7 @@ export default async function AdminDashboard() {
             <Tooltip text="Objectiu mensual configurable a Configuració">
               <p className="text-xs font-medium uppercase tracking-wide opacity-60">Ingressos del mes</p>
             </Tooltip>
-            <p className="text-xl font-bold mt-1" style={{ fontFamily: 'var(--font-mono, monospace)', fontVariantNumeric: 'tabular-nums' }}>
+            <p className="text-xl font-bold mt-1 font-mono tabular-nums">
               {formatCurrency(d.revenueThisMonth)}
             </p>
             <p className="text-sm opacity-50">
@@ -447,7 +502,7 @@ export default async function AdminDashboard() {
                 d.commandBookings.map((booking) => (
                   <div key={booking.id} className="admin-cr-list-row">
                     <div className="admin-cr-list-content">
-                      <Link href={`/admin/bookings/${booking.id}`} className="admin-cr-list-link">
+                      <Link href={buildBookingHref(booking.id)} className="admin-cr-list-link">
                         {booking.reference} · {booking.clientName}
                       </Link>
                       <p className="admin-cr-meta">{formatEventDate(new Date(booking.eventDate))}</p>
@@ -676,17 +731,17 @@ export default async function AdminDashboard() {
         <div className="admin-stagger-item"><Tooltip text="Visites a la web els últims 30 dies. Si baixa, pot ser que el màrqueting perdi empenta."><MetricCard icon="🌐" label="Sessions web (30d)" value={d.ga4Sessions || '-'} change={d.ga4Users ? `${d.ga4Users} usuaris` : 'GA4 pendent'} changeType="neutral" accent="cyan" /></Tooltip></div>
         <div className="admin-stagger-item"><Tooltip text="Quant de temps passen els visitants a la web. Més temps = més interès real en el que ofereixes."><MetricCard icon="⏱️" label="Temps mitjà web" value={d.ga4AvgSessionMin ? `${d.ga4AvgSessionMin} min` : '-'} change={d.ga4PageViews ? `${d.ga4PageViews} pàgines` : 'GA4 pendent'} changeType="neutral" accent="rose" /></Tooltip></div>
         <div className="admin-stagger-item"><Tooltip text="Percentatge que et queda net de cada reserva després de descomptar costos. Per sobre del 50% és excel·lent."><MetricCard icon="📊" label="Marge mitjà" value={`${d.avgMarginPct}%`} change={d.avgMarginPct >= 50 ? 'Excel·lent' : d.avgMarginPct >= 30 ? 'Acceptable' : d.avgMarginPct >= 15 ? 'Vigilar' : 'Crític'} changeType={d.avgMarginPct >= 30 ? 'up' : 'down'} accent={d.avgMarginPct >= 50 ? 'emerald' : d.avgMarginPct >= 30 ? 'amber' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Quants diners entraran o sortiran els pròxims 30 dies, segons reserves confirmades i costos previstos."><MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${Math.round(d.cashFlowNet30)} €`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Valor estimat de les vendes en curs, ponderat per la probabilitat de tancar cada una."><MetricCard icon="🔮" label="Pipeline ponderat" value={`${Math.round(d.pipelineWeighted30)} €`} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
-        <div className="admin-stagger-item"><Tooltip text="Total que encara no has cobrat de reserves actives. Inclou bestretes i saldos pendents."><MetricCard icon="💶" label="Pendent de cobrar" value={`${Math.round(d.pendingPayments)} €`} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Quants diners entraran o sortiran els pròxims 30 dies, segons reserves confirmades i costos previstos."><MetricCard icon="💰" label="Flux net previst" value={`${d.cashFlowNet30 >= 0 ? '+' : ''}${formatCurrency(Math.abs(d.cashFlowNet30))}`} change="Pròxims 30 dies" changeType={d.cashFlowNet30 >= 0 ? 'up' : 'down'} accent={d.cashFlowNet30 >= 0 ? 'emerald' : 'rose'} /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Valor estimat de les vendes en curs, ponderat per la probabilitat de tancar cada una."><MetricCard icon="🔮" label="Pipeline ponderat" value={formatCurrency(d.pipelineWeighted30)} change="Vendes probables" changeType="neutral" accent="amber" /></Tooltip></div>
+        <div className="admin-stagger-item"><Tooltip text="Total que encara no has cobrat de reserves actives. Inclou bestretes i saldos pendents."><MetricCard icon="💶" label="Pendent de cobrar" value={formatCurrency(d.pendingPayments)} change="Reserves actives" changeType={d.pendingPayments > 0 ? 'down' : 'up'} accent={d.pendingPayments > 5000 ? 'rose' : 'sky'} /></Tooltip></div>
       </div>
 
       <div className="admin-cr-chart-grid">
         <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.traffic30d}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
-              { data: d.ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: d.ga4Sessions || '-' },
-              { data: d.ga4UsersSeries, stroke: '#60a5fa', label: 'Usuaris', value: d.ga4Users || '-' },
+              { data: d.ga4SessionsSeries, stroke: ADMIN_CHART_SERIES_COLORS.ga4Sessions, label: 'Sessions', value: d.ga4Sessions || '-' },
+              { data: d.ga4UsersSeries, stroke: ADMIN_CHART_SERIES_COLORS.ga4Users, label: 'Usuaris', value: d.ga4Users || '-' },
             ]} />
             {!d.ga4Available && <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>}
           </div>
@@ -694,16 +749,16 @@ export default async function AdminDashboard() {
         <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.leadsConversion}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
-              { data: d.leadsSeries, stroke: '#34d399', label: 'Entrades', value: d.leadsThisMonth },
-              { data: d.leadsWonSeries, stroke: '#fbbf24', label: 'Guanyats', value: d.wonLeads },
+              { data: d.leadsSeries, stroke: ADMIN_CHART_SERIES_COLORS.leads, label: 'Entrades', value: d.leadsThisMonth },
+              { data: d.leadsWonSeries, stroke: ADMIN_CHART_SERIES_COLORS.leadsWon, label: 'Guanyats', value: d.wonLeads },
             ]} />
           </div>
         </Card>
         <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding helpText={ADMIN_DASHBOARD_HELP.cards.bookingsRevenue}>
           <div className="admin-cr-card-pad">
             <MiniLineChart series={[
-              { data: d.bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: d.bookingsConfirmed },
-              { data: d.revenueSeries, stroke: '#a78bfa', label: '€', value: d.revenueTotal30 },
+              { data: d.bookingsSeries, stroke: ADMIN_CHART_SERIES_COLORS.bookings, label: 'Reserves', value: d.bookingsConfirmed },
+              { data: d.revenueSeries, stroke: ADMIN_CHART_SERIES_COLORS.revenue, label: '€', value: d.revenueTotal30 },
             ]} />
           </div>
         </Card>
@@ -729,7 +784,7 @@ export default async function AdminDashboard() {
             {d.upcomingBookings.length > 0 ? (
               <div className="admin-cr-divide-list">
                 {d.upcomingBookings.map((booking) => (
-                  <Link key={booking.id} href={`/admin/bookings/${booking.id}`} className="admin-cr-row-link">
+                  <Link key={booking.id} href={buildBookingHref(booking.id)} className="admin-cr-row-link">
                     <div className="admin-cr-avatar-box">
                       <span className="admin-cr-avatar-text">{new Date(booking.eventDate).getDate()}</span>
                     </div>
@@ -852,7 +907,6 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-
 
 
 

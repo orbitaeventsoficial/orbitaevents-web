@@ -55,7 +55,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   try {
     const body = await req.json();
-    const { status, signedBy } = patchSchema.parse(body);
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'INVALID_BODY' }, { status: 400 });
+    }
+    const { status, signedBy } = parsed.data;
 
     if (status === 'SIGNED') {
       await markContractSigned(params.id, signedBy || 'Admin');

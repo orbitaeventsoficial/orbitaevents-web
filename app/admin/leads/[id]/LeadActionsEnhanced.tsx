@@ -3,9 +3,11 @@
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { LEAD_STATUS_ACTION_OPTIONS } from '@/lib/constants';
+import { LEAD_STATUS_ACTION_OPTIONS, formatCurrencyExact } from '@/lib/constants';
 import { ADMIN_MANUAL_SEQUENCE_STEP_OPTIONS, getAdminLeadPackOptions } from '@/lib/constants/admin';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import LeadLostStatusPrompt from '../LeadLostStatusPrompt';
 import { patchLeadStatus } from '../leadStatusClient';
 
@@ -98,7 +100,7 @@ export default function LeadActionsEnhanced({
       setSuccess('Estat actualitzat!');
       startTransition(() => {
         if (newStatus === 'WON' && customerId) {
-          router.push(`/admin/clientes/${customerId}`);
+          router.push(buildCustomerHubHref(customerId));
           return;
         }
         router.refresh();
@@ -169,7 +171,7 @@ export default function LeadActionsEnhanced({
       }
 
       setQuoteHtml(data.html);
-      setSuccess(`Pressupost ${data.quoteNumber} generat! Total: ${data.total.toFixed(2)}€`);
+      setSuccess(`Pressupost ${data.quoteNumber} generat! Total: ${formatCurrencyExact(data.total)}`);
       setOptimisticStatus('QUOTE_SENT');
       
       startTransition(() => {
@@ -189,7 +191,7 @@ export default function LeadActionsEnhanced({
     if (typeof customPrice === 'number' && Number.isFinite(customPrice) && customPrice > 0) {
       params.set('customPrice', String(customPrice));
     }
-    window.open(`/api/admin/leads/${leadId}/quote?${params.toString()}`, '_blank');
+    window.open(`/api/admin/leads/${leadId}/quote?${params.toString()}`, '_blank', 'noopener,noreferrer');
   };
 
   const handlePrintQuote = () => {
@@ -398,11 +400,11 @@ export default function LeadActionsEnhanced({
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="">IVA (21%):</span>
-              <span className="font-medium">{(effectivePrice * 0.21).toFixed(2)}€</span>
+              <span className="font-medium">{formatCurrencyExact(effectivePrice * 0.21)}</span>
             </div>
             <div className="admin-tone-border-neutral mt-2 flex justify-between border-t pt-2 text-sm">
               <span className="font-semibold">Total:</span>
-              <span className="font-bold">{(effectivePrice * 1.21).toFixed(2)}€</span>
+              <span className="font-bold">{formatCurrencyExact(effectivePrice * 1.21)}</span>
             </div>
           </div>
 
@@ -461,9 +463,7 @@ export default function LeadActionsEnhanced({
           )}
           
           <a
-            href={`mailto:${clientEmail}?subject=${encodeURIComponent(`Pressupost Òrbita Events - ${eventType}`)}&body=${encodeURIComponent(
-              `Hola ${clientName},\n\nGràcies pel teu interès en Òrbita Events! Adjunto el pressupost per al teu event.\n\nQualsevol dubte, estic a la teva disposició.\n\nSalutacions,\nÒrbita Events\n${clientPhone ? `📱 ${clientPhone}` : ''}`
-            )}`}
+            href={buildLeadComposeHref(leadId, 'quote')}
             className="ap-btn ap-btn--primary flex w-full items-center gap-3 px-4 py-3"
           >
             <span className="text-xl">✉️</span>
@@ -490,8 +490,6 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
-
-
 
 
 

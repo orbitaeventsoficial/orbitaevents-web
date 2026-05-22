@@ -176,12 +176,176 @@ function detectNarrowFixComments(lines) {
   return findings;
 }
 
+function detectOpaqueTypeScriptSuppressions(lines) {
+  const findings = [];
+  lines.forEach((line, idx) => {
+    if (/@ts-ignore\b/.test(line)) {
+      findings.push({
+        line: idx + 1,
+        label: 'TS_IGNORE_SUPPRESSION',
+        sample: line.trim().slice(0, 180),
+        hint: '@ts-ignore oculta errors sense contracte — tipa el cas o usa @ts-expect-error amb motiu verificable',
+      });
+      return;
+    }
+
+    const expectError = line.match(/@ts-expect-error\b(?::|-)?\s*(.*)$/);
+    if (!expectError) return;
+    const reason = expectError[1].trim();
+    if (reason.length >= 12) return;
+    findings.push({
+      line: idx + 1,
+      label: 'TS_EXPECT_ERROR_WITHOUT_REASON',
+      sample: line.trim().slice(0, 180),
+      hint: '@ts-expect-error necessita un motiu curt i útil per revisar la supressió',
+    });
+  });
+  return findings;
+}
+
+function detectExplicitAnyEscapes(lines) {
+  const findings = [];
+  const patterns = [
+    {
+      pattern: /\bas\s+any\b/,
+      label: 'EXPLICIT_ANY_CAST',
+      hint: 'cast a any — defineix un tipus mínim, un guard o Record<string, unknown>',
+    },
+    {
+      pattern: /:\s*any\b/,
+      label: 'EXPLICIT_ANY_TYPE',
+      hint: 'tipus any explícit — substitueix-lo per unknown, un genèric o una interfície concreta',
+    },
+  ];
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) return;
+    for (const item of patterns) {
+      if (!item.pattern.test(line)) continue;
+      findings.push({
+        line: idx + 1,
+        label: item.label,
+        sample: trimmed.slice(0, 180),
+        hint: item.hint,
+      });
+      return;
+    }
+  });
+  return findings;
+}
+
+function detectUnexplainedEslintDisables(lines) {
+  const findings = [];
+  lines.forEach((line, idx) => {
+    if (!/eslint-disable(?:-next-line|-line)?\b/.test(line)) return;
+    const reason = line.split('--').slice(1).join('--').trim();
+    if (reason.length >= 12) return;
+    findings.push({
+      line: idx + 1,
+      label: 'ESLINT_DISABLE_WITHOUT_REASON',
+      sample: line.trim().slice(0, 180),
+      hint: 'eslint-disable necessita un motiu curt després de "--" per fer revisable la supressió',
+    });
+  });
+  return findings;
+}
+
+function detectDoubleTypeCasts(lines) {
+  const findings = [];
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) return;
+    if (!/\bas\s+unknown\s+as\b/.test(line)) return;
+    findings.push({
+      line: idx + 1,
+      label: 'DOUBLE_TYPE_CAST',
+      sample: trimmed.slice(0, 180),
+      hint: 'Double cast through unknown — senyala un desajust de tipus. Usa tipat propi, JSON.parse(JSON.stringify(...)) o un helper tipat',
+    });
+  });
+  return findings;
+}
+
+function detectTsNocheck(lines) {
+  const findings = [];
+  lines.forEach((line, idx) => {
+    if (!/@ts-nocheck\b/.test(line)) return;
+    findings.push({
+      line: idx + 1,
+      label: 'TS_NOCHECK_SUPPRESSION',
+      sample: line.trim().slice(0, 180),
+      hint: '@ts-nocheck desactiva TypeScript per tot el fitxer — és el silenciador més opac que existeix. Tipa el cas concret o migra a @ts-expect-error amb motiu',
+    });
+  });
+  return findings;
+}
+
+function detectEvalCall(lines) {
+  const findings = [];
+  const pattern = /\beval\s*\(|new\s+Function\s*\(/;
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) return;
+    if (!pattern.test(line)) return;
+    findings.push({
+      line: idx + 1,
+      label: 'EVAL_CALL',
+      sample: trimmed.slice(0, 180),
+      hint: 'eval() i new Function() executen strings arbitraris — vector d\'injecció de codi. Substitueix per lògica tipada explícita',
+    });
+  });
+  return findings;
+}
+
+function detectRawSqlUnsafe(lines) {
+  const findings = [];
+  const pattern = /\.\$(?:queryRawUnsafe|executeRawUnsafe)\s*\(/;
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) return;
+    if (!pattern.test(line)) return;
+    findings.push({
+      line: idx + 1,
+      label: 'RAW_SQL_UNSAFE',
+      sample: trimmed.slice(0, 180),
+      hint: '$queryRawUnsafe/$executeRawUnsafe accepten SQL sense parametritzar — risc d\'injecció SQL. Usa $queryRaw o $executeRaw amb tagged template literals',
+    });
+  });
+  return findings;
+}
+
+function detectThrowStringLiteral(lines) {
+  const findings = [];
+  const pattern = /\bthrow\s+(['"`])/;
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return;
+    if (!pattern.test(line)) return;
+    findings.push({
+      line: idx + 1,
+      label: 'THROW_STRING_LITERAL',
+      sample: trimmed.slice(0, 180),
+      hint: 'throw amb string literal no genera stack trace ni missatge .message. Usa throw new Error(\'missatge\') per tenir traçabilitat en producció',
+    });
+  });
+  return findings;
+}
+
 const DETECTORS = [
   detectRepeatedPluralTernary,
   detectDuplicatePushBlocks,
   detectEmptyCatch,
   detectTodoMarkers,
   detectNarrowFixComments,
+  detectOpaqueTypeScriptSuppressions,
+  detectExplicitAnyEscapes,
+  detectUnexplainedEslintDisables,
+  detectDoubleTypeCasts,
+  detectTsNocheck,
+  detectEvalCall,
+  detectRawSqlUnsafe,
+  detectThrowStringLiteral,
 ];
 
 function scanFile(filePath) {

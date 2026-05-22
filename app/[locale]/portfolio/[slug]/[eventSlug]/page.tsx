@@ -13,6 +13,7 @@ import { getSiteUrl } from '@/lib/site';
 import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import ArrowRightIcon from '@/app/components/public/ArrowRightIcon';
+import { toIntlLocale } from '@/lib/constants';
 
 type PageProps = {
   params: Promise<{ slug: string; eventSlug: string; locale: string }>;
@@ -108,7 +109,7 @@ export default async function PortfolioEventPage({ params }: PageProps) {
   const heroMedia = resolveEventHeroMedia(event);
 
   const dateFormatted = event.eventDate
-    ? new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(new Date(event.eventDate))
+    ? new Intl.DateTimeFormat(toIntlLocale(locale), { year: 'numeric', month: 'long' }).format(new Date(event.eventDate))
     : null;
 
   return (

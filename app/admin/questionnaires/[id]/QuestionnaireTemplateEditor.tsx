@@ -1,0 +1,198 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { QuestionnaireTemplateDTO, QuestionnaireQuestion, QuestionType } from '@/lib/services/questionnaireService';
+import { fetchWithCsrf } from '@/lib/csrf';
+import { createQuestionnaireQuestion } from '@/lib/admin/questionnaireQuestionFactory';
+
+const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
+  { value: 'text', label: 'Text curt' },
+  { value: 'textarea', label: 'Text llarg' },
+  { value: 'select', label: 'Selecció única' },
+  { value: 'multiselect', label: 'Selecció múltiple' },
+];
+
+export default function QuestionnaireTemplateEditor({
+  template,
+}: {
+  template: QuestionnaireTemplateDTO;
+}) {
+  const router = useRouter();
+  const [title, setTitle] = useState(template.title);
+  const [description, setDescription] = useState(template.description ?? '');
+  const [isActive, setIsActive] = useState(template.isActive);
+  const [questions, setQuestions] = useState<QuestionnaireQuestion[]>(
+    template.questions.length > 0 ? template.questions : [createQuestionnaireQuestion()],
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function updateQuestion(idx: number, patch: Partial<QuestionnaireQuestion>) {
+    setQuestions((prev) => prev.map((q, i) => (i === idx ? { ...q, ...patch } : q)));
+  }
+
+  function removeQuestion(idx: number) {
+    setQuestions((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function addQuestion() {
+    setQuestions((prev) => [...prev, createQuestionnaireQuestion()]);
+  }
+
+  async function handleSave() {
+    if (!title.trim()) { setError('El títol és obligatori.'); return; }
+    if (questions.length === 0) { setError("Cal almenys una pregunta."); return; }
+    const emptyLabel = questions.some((q) => !q.label.trim());
+    if (emptyLabel) { setError('Totes les preguntes han de tenir un label.'); return; }
+
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetchWithCsrf(`/api/admin/questionnaires/${template.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), description: description.trim() || null, questions, isActive }),
+      });
+      if (!res.ok) throw new Error('Error desant la plantilla.');
+      router.push('/admin/questionnaires');
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : 'Error desant la plantilla.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      {error && (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p>
+      )}
+
+      <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div>
+          <label htmlFor="tpl-title" className="block text-xs text-white/50 mb-1">Títol</label>
+          <input
+            id="tpl-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+          />
+        </div>
+        <div>
+          <label htmlFor="tpl-desc" className="block text-xs text-white/50 mb-1">Descripció (opcional)</label>
+          <input
+            id="tpl-desc"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+          />
+        </div>
+        <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+            className="rounded"
+            role="switch"
+            aria-checked={isActive}
+          />
+          Plantilla activa (visible al portal del client)
+        </label>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-white/70">Preguntes</h2>
+        {questions.map((q, idx) => (
+          <div key={q.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs text-white/40">Pregunta {idx + 1}</p>
+              {questions.length > 1 && (
+                <button
+                  onClick={() => removeQuestion(idx)}
+                  className="text-xs text-red-300 hover:underline"
+                  type="button"
+                >
+                  Eliminar
+                </button>
+              )}
+            </div>
+            <div>
+              <label htmlFor={`q-label-${idx}`} className="block text-xs text-white/50 mb-1">Enunciat</label>
+              <input
+                id={`q-label-${idx}`}
+                value={q.label}
+                onChange={(e) => updateQuestion(idx, { label: e.target.value })}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+              />
+            </div>
+            <div>
+              <label htmlFor={`q-type-${idx}`} className="block text-xs text-white/50 mb-1">Tipus</label>
+              <select
+                id={`q-type-${idx}`}
+                value={q.type}
+                onChange={(e) => updateQuestion(idx, { type: e.target.value as QuestionType })}
+                aria-label="Tipus de pregunta"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+              >
+                {QUESTION_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+            {(q.type === 'select' || q.type === 'multiselect') && (
+              <div>
+                <label htmlFor={`q-opts-${idx}`} className="block text-xs text-white/50 mb-1">Opcions (una per línia)</label>
+                <textarea
+                  id={`q-opts-${idx}`}
+                  rows={3}
+                  value={(q.options ?? []).join('\n')}
+                  onChange={(e) => updateQuestion(idx, { options: e.target.value.split('\n').filter(Boolean) })}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                />
+              </div>
+            )}
+            <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={q.required}
+                onChange={(e) => updateQuestion(idx, { required: e.target.checked })}
+                className="rounded"
+                role="switch"
+                aria-checked={q.required}
+              />
+              Obligatòria
+            </label>
+          </div>
+        ))}
+        <button
+          onClick={addQuestion}
+          type="button"
+          className="inline-flex rounded-lg border border-white/15 px-4 py-2 text-sm text-white/70 hover:bg-white/5"
+        >
+          + Afegir pregunta
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          type="button"
+          className="inline-flex rounded-lg bg-cyan-500 px-5 py-2 text-sm font-semibold text-black hover:bg-cyan-400 disabled:opacity-50"
+        >
+          {saving ? 'Desant...' : 'Desar canvis'}
+        </button>
+        <button
+          onClick={() => router.back()}
+          type="button"
+          className="inline-flex rounded-lg border border-white/15 px-5 py-2 text-sm text-white/70 hover:bg-white/5"
+        >
+          Cancel·lar
+        </button>
+      </div>
+    </div>
+  );
+}

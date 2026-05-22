@@ -19,6 +19,12 @@ interface ForecastMonth {
   combined: number;
   combinedLow: number;
   combinedHigh: number;
+  /** Ingressos reals del mateix mes calendari l'any anterior (YoY). 0 si no hi ha dades. */
+  previousYearActual: number;
+  /** Reserves ja confirmades amb event en aquest mes futur (forecast operatiu). */
+  confirmedBookings: number;
+  /** Ingressos compromesos per les reserves ja confirmades en aquest mes futur. */
+  confirmedRevenue: number;
 }
 
 export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Date()): Promise<ForecastMonth[]> {
@@ -86,6 +92,29 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
     },
   });
 
+  // 2b. Reserves ja confirmades amb event futur (forecast operatiu)
+  const forecastEnd = new Date(now.getFullYear(), now.getMonth() + monthsAhead + 1, 1);
+  const confirmedFuture = await prisma.booking.findMany({
+    where: {
+      status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] },
+      eventDate: { gte: now, lt: forecastEnd },
+    },
+    select: {
+      eventDate: true,
+      total: true,
+    },
+  });
+
+  const confirmedByMonth = new Map<string, { count: number; revenue: number }>();
+  for (const b of confirmedFuture) {
+    const d = new Date(b.eventDate);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const current = confirmedByMonth.get(key) ?? { count: 0, revenue: 0 };
+    current.count += 1;
+    current.revenue += Number(b.total) || 0;
+    confirmedByMonth.set(key, current);
+  }
+
   // Agrupar per (any, mes) per calcular total mensual real
   const monthlyRevByYearMonth = new Map<string, number>(); // "2024-06" → total revenue
   for (const b of historicBookings) {
@@ -138,6 +167,13 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
     const combinedLow = combine(pipelineLow);
     const combinedHigh = combine(pipelineHigh);
 
+    // YoY — ingressos reals del mateix mes calendari l'any anterior
+    const prevYearKey = `${d.getFullYear() - 1}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const previousYearActual = monthlyRevByYearMonth.get(prevYearKey) ?? 0;
+
+    // Forecast operatiu — reserves ja confirmades amb event en aquest mes
+    const confirmedSlot = confirmedByMonth.get(monthKey) ?? { count: 0, revenue: 0 };
+
     result.push({
       month: monthKey,
       historicalAvg: Math.round(historicalAvg),
@@ -147,6 +183,9 @@ export async function buildPipelineForecast(monthsAhead = 6, now: Date = new Dat
       combined,
       combinedLow,
       combinedHigh,
+      previousYearActual: Math.round(previousYearActual),
+      confirmedBookings: confirmedSlot.count,
+      confirmedRevenue: Math.round(confirmedSlot.revenue),
     });
   }
 

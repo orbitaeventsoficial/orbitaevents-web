@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { Prisma } from '@prisma/client';
 import { AdminPage } from '../components/AdminPage';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
@@ -19,7 +20,7 @@ import { getTranslatedPackName } from '@/lib/pack-name';
 import ExportCsvButton from '../components/ExportCsvButton';
 import dynamicImport from 'next/dynamic';
 import { ADMIN_BOOKING_PAYMENT_FILTER_OPTIONS } from '@/lib/constants/admin';
-import { buildCustomerBookingListHref, buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerBookingListHref, buildCustomerWorkspaceTabHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 
 const BookingPipelineViewWrapper = dynamicImport(
@@ -425,7 +426,7 @@ export default async function BookingsPage({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <Link href={`/admin/bookings/${booking.id}`}>
+                      <Link href={buildBookingHref(booking.id)}>
                         <code className="text-[10px] font-mono px-1.5 py-0.5 rounded">{booking.reference}</code>
                       </Link>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
@@ -434,7 +435,7 @@ export default async function BookingsPage({
                     </div>
                     {booking.customerId ? (
                       <Link
-                        href={`/admin/clientes/${booking.customerId}`}
+                        href={buildCustomerHubHref(booking.customerId)}
                         className="font-medium mt-2 truncate block"
                       >
                         {booking.clientName} 👤
@@ -549,13 +550,13 @@ export default async function BookingsPage({
                       }`}
                     >
                       <td className="px-4 py-3 text-center">
-                        <Link href={`/admin/bookings/${booking.id}`} className="hover:opacity-80 transition-opacity">
+                        <Link href={buildBookingHref(booking.id)} className="hover:opacity-80 transition-opacity">
                           <code className="text-xs font-mono px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-center">
                         {booking.customerId ? (
-                          <Link href={`/admin/clientes/${booking.customerId}`} className="font-medium">
+                          <Link href={buildCustomerHubHref(booking.customerId!)} className="font-medium">
                             {booking.clientName}
                           </Link>
                         ) : (

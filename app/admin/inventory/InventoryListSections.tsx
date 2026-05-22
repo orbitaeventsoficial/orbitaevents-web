@@ -10,6 +10,8 @@ import {
   getInventoryStatusDisplay,
 } from '@/lib/inventory-utils';
 import { ADMIN_INVENTORY_HELP, helpAttrs } from '../components/adminHelpContent';
+import { buildInventoryHref } from '@/lib/admin/inventoryWorkspaceHref';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import type {
   InventoryBundlesSectionProps,
   InventoryItem,
@@ -103,7 +105,7 @@ function InventoryPackLinks({ item, compact = false }: { item: InventoryItem; co
       {item.packItems.slice(0, 4).map((packItem) => (
         <Link
           key={packItem.id}
-          href={`/admin/packs/${packItem.pack.id}?tab=content`}
+          href={buildPackHref(packItem.pack.id, 'content')}
           className="inline-flex max-w-full items-center rounded-full border border-cyan-400/25 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-100 transition-colors hover:bg-cyan-500/20"
         >
           <span className="truncate">{packItem.pack.slug}</span>
@@ -155,6 +157,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
           value={selectedBundleId}
           onChange={(e) => setSelectedBundleId(e.target.value)}
           className="rounded-xl border px-3 py-2 text-xs"
+          aria-label="Seleccionar lot actiu"
         >
           {bundles.map((bundle) => (
             <option key={bundle.id} value={bundle.id}>
@@ -166,6 +169,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
           value={bundleNameDraft}
           onChange={(e) => setBundleNameDraft(e.target.value)}
           placeholder="Nou lot"
+          aria-label="Nom del nou lot"
           className="rounded-xl border px-3 py-2 text-xs"
         />
         <button type="button" onClick={createBundle} className="rounded-xl border px-3 py-2 text-xs">
@@ -179,6 +183,7 @@ export function InventoryBundlesSection(props: InventoryBundlesSectionProps) {
               value={selectedBundle.name}
               onChange={(e) => renameSelectedBundle(e.target.value)}
               onBlur={persistRenameSelectedBundle}
+              aria-label="Nom del lot"
               className="w-full rounded-xl border px-3 py-2 text-sm"
             />
             <button
@@ -242,7 +247,7 @@ export function InventoryLowStockAlert({ lowStockItems }: { lowStockItems: Inven
         {lowStockItems.map((item) => (
           <Link
             key={item.id}
-            href={`/admin/inventory/${item.id}`}
+            href={buildInventoryHref(item.id)}
             className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs"
           >
             <code className="font-mono">{item.code}</code>
@@ -306,6 +311,7 @@ export function InventoryFiltersSection({
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Cercar per nom o codi..."
+        aria-label="Cercar ítems d'inventari"
         className="w-full rounded-xl border px-4 py-3 text-sm "
       />
       <div className="grid gap-2 sm:grid-cols-3">
@@ -370,7 +376,7 @@ export function InventoryGridSection({ displayedItems }: { displayedItems: Inven
         return (
           <Link
             key={item.id}
-            href={`/admin/inventory/${item.id}`}
+            href={buildInventoryHref(item.id)}
             className="group rounded-2xl border p-0 overflow-hidden transition-all"
           >
             <div className="aspect-video relative overflow-hidden">
@@ -439,7 +445,7 @@ export function InventoryMobileListSection({
           <article key={item.id} className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <Link href={`/admin/inventory/${item.id}`} className="font-medium text-sm leading-tight transition-colors block truncate">
+                <Link href={buildInventoryHref(item.id)} className="font-medium text-sm leading-tight transition-colors block truncate">
                   {item.name}
                 </Link>
                 <code className="text-[11px] font-mono mt-0.5 inline-block opacity-60">{item.code}</code>
@@ -459,12 +465,12 @@ export function InventoryMobileListSection({
               </div>
               <div className="mt-2"><InventoryPackLinks item={item} compact /></div>
               <div className="flex items-center gap-1 shrink-0">
-                <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-[11px] font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
+                <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} aria-label={`Estat de ${item.name}`} className={`min-h-[44px] min-w-[44px] rounded-xl px-2 py-1 text-[11px] font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
                   {statuses.map((st) => (
                     <option key={st} value={st}>{STATUS_CONFIG[st].label}</option>
                   ))}
                 </select>
-                <Link href={`/admin/inventory/${item.id}`} className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-white/5 hover:bg-white/10">
+                <Link href={buildInventoryHref(item.id)} className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-xl px-3 text-xs font-medium transition-colors bg-white/5 hover:bg-white/10">
                   Fitxa
                 </Link>
               </div>
@@ -511,7 +517,7 @@ export function InventoryDesktopTableSection({
                 <tr key={item.id} className="transition-colors hover:bg-white/[0.03]">
                   <td className="px-4 py-3"><code className="text-xs font-mono px-2 py-1 rounded">{item.code}</code></td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/inventory/${item.id}`} className="font-medium transition-colors">{item.name}</Link>
+                    <Link href={buildInventoryHref(item.id)} className="font-medium transition-colors">{item.name}</Link>
                     {item.description && <p className="text-xs truncate max-w-[200px]">{item.description}</p>}
                     <InventoryPackLinks item={item} compact />
                   </td>
@@ -528,12 +534,12 @@ export function InventoryDesktopTableSection({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} className={`rounded-full px-2.5 py-0.5 text-xs font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
+                    <select value={item.status} onChange={(e) => handleStatusChange(item.id, e.target.value)} aria-label={`Estat de ${item.name}`} className={`rounded-full px-2.5 py-0.5 text-xs font-medium border-0 cursor-pointer ${statusConf.bg} ${statusConf.text}`}>
                       {statuses.map((st) => (<option key={st} value={st}>{STATUS_CONFIG[st].label}</option>))}
                     </select>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/admin/inventory/${item.id}`} className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors">Fitxa</Link>
+                    <Link href={buildInventoryHref(item.id)} className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors">Fitxa</Link>
                   </td>
                 </tr>
               );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { AdminPage, AdminKpiRow, AdminKpi } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
@@ -52,6 +53,7 @@ export default function AdminRessenyesPage() {
   const [approved, setApproved] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<StatusTab>('pending');
+  const shouldReduceMotion = useReducedMotion();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [canvasPreview, setCanvasPreview] = useState<{ id: string; url: string } | null>(null);
   const toast = useToast();
@@ -148,7 +150,8 @@ export default function AdminRessenyesPage() {
         toast.error("No s'ha pogut actualitzar la ressenya");
         await load(); // Revert on error
       }
-    } catch {
+    } catch (err) {
+      console.error('Error actualitzant ressenya', err);
       toast.error("Error de connexio");
       await load(); // Revert on error
     } finally {
@@ -364,7 +367,15 @@ export default function AdminRessenyesPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeTab}
+          className="grid grid-cols-1 gap-4"
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
+        >
         {activeList.length === 0 && (
           <div className="rounded-2xl border admin-card-glass p-6 text-center text-white/40">
             {activeTab === 'pending'
@@ -494,7 +505,8 @@ export default function AdminRessenyesPage() {
             )}
           </div>
         ))}
-      </div>
+        </motion.div>
+      </AnimatePresence>
       <ConfirmDialog {...dialogProps} />
     </AdminPage>
   );

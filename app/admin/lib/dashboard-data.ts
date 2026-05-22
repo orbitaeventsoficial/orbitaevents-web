@@ -13,6 +13,7 @@ import { isBuildPrerenderPhase } from '@/lib/build-phase';
 import { getAdminHealthSnapshot, type AdminHealthSnapshot } from '@/lib/services/adminHealthService';
 import { fetchRecentCanonicalEvents, type CanonicalTimelineEvent } from '@/lib/services/timelineQueryService';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -437,7 +438,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   const timeline = [
     ...recentLeadsTimeline.map((lead) => ({ id: `lead-${lead.id}`, icon: '👥', text: `Nou lead: ${lead.name}`, time: timeAgo(new Date(lead.createdAt)), ts: new Date(lead.createdAt).getTime(), href: buildLeadWorkspaceHref(lead.id) })),
-    ...recentBookingsTimeline.map((booking) => ({ id: `booking-${booking.id}`, icon: '📋', text: `Reserva ${booking.reference} · ${booking.clientName}`, time: timeAgo(new Date(booking.createdAt)), ts: new Date(booking.createdAt).getTime(), href: `/admin/bookings/${booking.id}` })),
+    ...recentBookingsTimeline.map((booking) => ({ id: `booking-${booking.id}`, icon: '📋', text: `Reserva ${booking.reference} · ${booking.clientName}`, time: timeAgo(new Date(booking.createdAt)), ts: new Date(booking.createdAt).getTime(), href: buildBookingHref(booking.id) })),
     ...recentCanonicalTimeline.map((event) => mapCanonicalEventToDashboardTimelineItem(event)),
   ].sort((a, b) => b.ts - a.ts).slice(0, 10);
 
@@ -523,7 +524,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
         type: 'error',
         title: 'Checklist massa baix!',
         description: `El bolo de ${nextEvent.clientName} és ${nextEvent.daysUntil === 0 ? 'AVUI' : 'DEMÀ'} i la checklist està al ${checklistPct}%.`,
-        href: `/admin/bookings/${nextEvent.id}`,
+        href: buildBookingHref(nextEvent.id),
         action: 'Completar checklist',
       });
     }
@@ -534,7 +535,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
       type: 'warning',
       title: 'Pagament pendent imminent',
       description: `${nextEvent.clientName} no ha pagat la paga i senyal i el bolo és ${nextEvent.daysUntil === 0 ? 'avui' : `d'aquí ${nextEvent.daysUntil} dies`}.`,
-      href: `/admin/bookings/${nextEvent.id}`,
+      href: buildBookingHref(nextEvent.id),
       action: 'Gestionar pagament',
     });
   }

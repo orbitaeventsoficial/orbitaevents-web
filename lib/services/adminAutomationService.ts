@@ -7,6 +7,10 @@ import {
   fetchRecentCommercialSequenceMetrics,
 } from '@/lib/services/timelineQueryService';
 
+function normalizeAdminLogDetails(details: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(details)) as Prisma.InputJsonValue;
+}
+
 export async function readCommercialSequenceMetrics() {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const [commMetrics, sequenceExec] = await Promise.all([
@@ -29,7 +33,7 @@ export async function runCommercialSequencesAutomation() {
       action: 'COMM_SEQUENCE_BATCH',
       entity: 'automation',
       entityId: 'commercial-sequences',
-      details: summary as unknown as Prisma.InputJsonValue,
+      details: normalizeAdminLogDetails(summary),
     },
   });
   return summary;
@@ -42,7 +46,7 @@ export async function enforceSlaAutomation() {
       action: 'AUTOMATION_SLA_ENFORCED',
       entity: 'lead',
       entityId: 'bulk',
-      details: summary as unknown as Prisma.InputJsonValue,
+      details: normalizeAdminLogDetails(summary),
     },
   });
   return summary;
@@ -65,7 +69,7 @@ export async function runAllAdminAutomations() {
       action: 'AUTOMATION_RUN_ALL',
       entity: 'automation',
       entityId: 'run-all',
-      details: summary as unknown as Prisma.InputJsonValue,
+      details: normalizeAdminLogDetails(summary),
     },
   });
 

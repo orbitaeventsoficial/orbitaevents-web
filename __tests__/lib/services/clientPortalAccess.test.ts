@@ -21,6 +21,7 @@ vi.mock('@/lib/site', () => ({ getAppBaseUrl: () => 'https://orbitaevents.com' }
 
 import {
   normalizePortalLocale,
+  getActivePortalAccessForBooking,
   issueClientPortalAccess,
   revokeActiveClientPortalAccess,
   findPortalAccessByRawToken,
@@ -94,6 +95,20 @@ describe('issueClientPortalAccess', () => {
       expect.objectContaining({
         where: expect.objectContaining({ bookingId: 'booking-1', revokedAt: null }),
         data: expect.objectContaining({ revokedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('només considera actius els accessos amb caducitat futura', async () => {
+    await getActivePortalAccessForBooking('booking-1');
+
+    expect(mockPrisma.clientPortalAccess.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          bookingId: 'booking-1',
+          revokedAt: null,
+          expiresAt: { gt: expect.any(Date) },
+        },
       })
     );
   });
@@ -179,6 +194,16 @@ describe('findPortalAccessByRawToken', () => {
     mockPrisma.clientPortalAccess.findUnique.mockResolvedValue({
       revokedAt: null,
       expiresAt: new Date('2020-01-01'),
+    });
+
+    const result = await findPortalAccessByRawToken('a'.repeat(30));
+    expect(result).toBeNull();
+  });
+
+  it('retorna null si el token legacy no té caducitat', async () => {
+    mockPrisma.clientPortalAccess.findUnique.mockResolvedValue({
+      revokedAt: null,
+      expiresAt: null,
     });
 
     const result = await findPortalAccessByRawToken('a'.repeat(30));

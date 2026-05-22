@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
@@ -130,6 +131,7 @@ export default function PricingAdminPage() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<PricingTab>(() => resolvePricingTab(searchParams?.get('tab')));
+  const shouldReduceMotion = useReducedMotion();
   const [extras, setExtras] = useState<ExtraData[]>([]);
   const [packs, setPacks] = useState<PackData[]>([]);
   const [inventory, setInventory] = useState<InventoryData[]>([]);
@@ -420,6 +422,14 @@ export default function PricingAdminPage() {
         </div>
       )}
 
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
+        >
       {activeTab === 'overview' && stats && (
         <div className="space-y-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -842,6 +852,8 @@ export default function PricingAdminPage() {
           </div>
         </div>
       )}
+        </motion.div>
+      </AnimatePresence>
     </AdminPage>
   );
 }

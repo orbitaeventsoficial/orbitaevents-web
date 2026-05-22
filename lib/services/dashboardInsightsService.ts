@@ -3,6 +3,7 @@
  *
  * Analitza les dades del dashboard i genera missatges intel·ligents en català.
  */
+import { formatCurrency } from '@/lib/constants';
 
 export interface DashboardInsight {
   id: string;
@@ -104,7 +105,7 @@ export function generateDashboardInsights(input: InsightInput, now: Date = new D
     insights.push({
       id: 'pending-payments',
       icon: '💰',
-      text: `${Math.round(input.pendingPayments)}€ pendents de cobrar. Envia recordatoris!`,
+      text: `${formatCurrency(input.pendingPayments)} pendents de cobrar. Envia recordatoris!`,
       type: 'warning',
       priority: 2,
     });
@@ -184,7 +185,7 @@ export function generateDashboardInsights(input: InsightInput, now: Date = new D
     insights.push({
       id: 'cash-flow-negative',
       icon: '💸',
-      text: `Flux de caixa projectat negatiu (${Math.round(input.cashFlowNet30)}€). Revisa despeses.`,
+      text: `Flux de caixa projectat negatiu (${formatCurrency(input.cashFlowNet30)}). Revisa despeses.`,
       type: 'danger',
       priority: 1,
     });

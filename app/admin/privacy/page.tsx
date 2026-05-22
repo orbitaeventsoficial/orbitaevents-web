@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 type PrivacyStats = {
   consents: { total: number; active: number };
@@ -583,7 +584,7 @@ export default function AdminPrivacyPage() {
                   </div>
                   {r.customer && (
                     <div className="mt-1">
-                      <Link href={`/admin/clientes/${r.customer.id}`} className="text-sm hover:underline">
+                      <Link href={buildCustomerHubHref(r.customer.id)} className="text-sm hover:underline">
                         {r.customer.name}
                       </Link>
                       <span className="text-sm opacity-50 ml-2">{r.customer.email}</span>
@@ -771,7 +772,7 @@ export default function AdminPrivacyPage() {
                         <tr key={c.id} className="transition-colors hover:bg-white/[0.03]">
                           <td className="px-4 py-3">
                             {c.customer ? (
-                              <Link href={`/admin/clientes/${c.customer.id}`} className="hover:underline">
+                              <Link href={buildCustomerHubHref(c.customer.id)} className="hover:underline">
                                 <p className="font-medium">{c.customer.name}</p>
                                 <p className="text-xs opacity-50">{c.customer.email}</p>
                               </Link>

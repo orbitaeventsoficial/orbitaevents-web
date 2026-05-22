@@ -124,7 +124,8 @@ export default function CustomerHeader({
         const body = await res.json().catch(() => ({}));
         toast.error(body.error || 'Error eliminant client');
       }
-    } catch {
+    } catch (err) {
+      console.error('Error en acció de capçalera client', err);
       toast.error('Error de connexió');
     } finally {
       setActionLoading(null);
@@ -281,12 +282,13 @@ export default function CustomerHeader({
 
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 {data.customer.email && (
-                  <a
-                    href={`mailto:${data.customer.email}`}
+                  <Link
+                    href={customerComposeHref}
                     className="transition-colors"
+                    title="Obrir redactor amb aquest client"
                   >
                     {data.customer.email}
-                  </a>
+                  </Link>
                 )}
                 {data.customer.phone && (
                   <>
@@ -410,6 +412,7 @@ export default function CustomerHeader({
         <MobileQuickActions
           phone={data.customer.phone}
           email={data.customer.email}
+          emailHref={customerComposeHref}
           whatsappMessage={data.customer.name ? `Hola ${data.customer.name}! Escric des d'Òrbita Events per seguir el teu expedient.` : null}
         />
 

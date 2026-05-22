@@ -8,6 +8,8 @@ import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
 import PipelineBoard, { type PipelineCardContext } from '@/app/admin/components/PipelineBoard';
 import { ADMIN_PIPELINE_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 type PipelineBooking = {
   id: string;
@@ -67,6 +69,7 @@ export default function BookingPipelineView() {
       }));
       setBookings(mapped);
     } catch (error) {
+      console.error('Error carregant reserves pipeline', error);
       toast.error(error instanceof Error ? error.message : 'Error carregant reserves');
     } finally {
       setLoading(false);
@@ -133,6 +136,7 @@ export default function BookingPipelineView() {
         toast.success(`Reserva moguda a ${targetLabel}`);
       }
     } catch (error) {
+      console.error('Error canviant estat de reserva al pipeline', error);
       setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: prevStatus } : b)));
       toast.error(error instanceof Error ? error.message : 'Error de connexió');
     } finally {
@@ -247,7 +251,7 @@ function BookingCard({
     >
       <div className="flex items-start justify-between gap-2">
         <Link
-          href={`/admin/bookings/${booking.id}`}
+          href={buildBookingHref(booking.id)}
           className="text-sm font-semibold transition-colors line-clamp-1"
         >
           {booking.reference}
@@ -290,7 +294,7 @@ function BookingCard({
 
       <p className="text-xs mt-1 truncate">
         {booking.customerId ? (
-          <Link href={`/admin/clientes/${booking.customerId}`} className="hover:underline">
+          <Link href={buildCustomerHubHref(booking.customerId!)} className="hover:underline">
             {booking.clientName}
           </Link>
         ) : booking.clientName}

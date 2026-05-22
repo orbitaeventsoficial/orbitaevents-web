@@ -11,12 +11,12 @@
 import { getAllPacks } from '../app/config/packs-config';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '../lib/pack-i18n';
 
-type Locale = 'ca' | 'es' | 'en';
+export type Locale = 'ca' | 'es' | 'en';
 
-const LOCALES: Locale[] = ['ca', 'es', 'en'];
-const BROKEN_KEY_RE = /(configurator\.|pages\.|services\.)/i;
+export const LOCALES: Locale[] = ['ca', 'es', 'en'];
+export const BROKEN_KEY_RE = /(configurator\.|pages\.|services\.)/i;
 
-type Finding = {
+export type Finding = {
   packId: string;
   slug: string;
   locale: Locale;
@@ -24,48 +24,47 @@ type Finding = {
   value: string;
 };
 
-function isBroken(value: string): boolean {
+export type PackI18nInput = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string;
+  badge?: string | null;
+  features?: string[];
+};
+
+export type PackI18nResolvers = {
+  resolveKey: (raw: string, locale: Locale) => string;
+  resolveFeatures: (raws: string[], locale: Locale) => string[];
+};
+
+export function isBroken(value: string): boolean {
   const normalized = String(value || '').trim();
   if (!normalized) return false;
   return BROKEN_KEY_RE.test(normalized);
 }
 
-function pushIfBroken(findings: Finding[], candidate: Finding) {
+export function pushIfBroken(findings: Finding[], candidate: Finding) {
   if (isBroken(candidate.value)) findings.push(candidate);
 }
 
-async function main() {
-  const packs = getAllPacks();
+export function analyzePackI18n(
+  packs: PackI18nInput[],
+  resolvers: PackI18nResolvers,
+  locales: Locale[] = LOCALES,
+): Finding[] {
   const findings: Finding[] = [];
 
   for (const pack of packs) {
-    for (const locale of LOCALES) {
-      const name = resolvePackI18nKey(pack.name, locale);
-      const tagline = resolvePackI18nKey(pack.tagline, locale);
-      const badge = resolvePackI18nKey(pack.badge || '', locale);
-      const features = resolvePackI18nFeatures(pack.features || [], locale);
+    for (const locale of locales) {
+      const name = resolvers.resolveKey(pack.name, locale);
+      const tagline = resolvers.resolveKey(pack.tagline, locale);
+      const badge = resolvers.resolveKey(pack.badge || '', locale);
+      const features = resolvers.resolveFeatures(pack.features || [], locale);
 
-      pushIfBroken(findings, {
-        packId: pack.id,
-        slug: pack.slug,
-        locale,
-        field: 'name',
-        value: name,
-      });
-      pushIfBroken(findings, {
-        packId: pack.id,
-        slug: pack.slug,
-        locale,
-        field: 'tagline',
-        value: tagline,
-      });
-      pushIfBroken(findings, {
-        packId: pack.id,
-        slug: pack.slug,
-        locale,
-        field: 'badge',
-        value: badge,
-      });
+      pushIfBroken(findings, { packId: pack.id, slug: pack.slug, locale, field: 'name', value: name });
+      pushIfBroken(findings, { packId: pack.id, slug: pack.slug, locale, field: 'tagline', value: tagline });
+      pushIfBroken(findings, { packId: pack.id, slug: pack.slug, locale, field: 'badge', value: badge });
 
       features.forEach((feature, index) => {
         pushIfBroken(findings, {
@@ -78,6 +77,16 @@ async function main() {
       });
     }
   }
+
+  return findings;
+}
+
+async function main() {
+  const packs = getAllPacks();
+  const findings = analyzePackI18n(packs, {
+    resolveKey: resolvePackI18nKey,
+    resolveFeatures: resolvePackI18nFeatures,
+  });
 
   if (findings.length > 0) {
     console.error('\n[PACKS I18N GUARD] S\'han detectat textos trencats:\n');
@@ -93,8 +102,14 @@ async function main() {
   console.log(`[PACKS I18N GUARD] OK: ${packs.length} packs validats en ${LOCALES.length} idiomes.`);
 }
 
-main().catch((error) => {
-  console.error('[PACKS I18N GUARD] Error executant validació:', error);
-  process.exit(1);
-});
+const isMain =
+  typeof process !== 'undefined' &&
+  process.argv[1] &&
+  process.argv[1].includes('check-packs-i18n');
 
+if (isMain) {
+  main().catch((error) => {
+    console.error('[PACKS I18N GUARD] Error executant validació:', error);
+    process.exit(1);
+  });
+}

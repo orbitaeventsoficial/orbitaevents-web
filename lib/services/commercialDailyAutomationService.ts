@@ -11,13 +11,22 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { saveCronRunStatus } from '@/lib/services/cronRunStatusService';
 import { loadDailyBrief } from '@/lib/services/dailyBriefService';
 import { loadCapacityConflicts } from '@/lib/services/capacityConflictService';
+import { loadWeeklyCapacityForecast } from '@/lib/services/operationalForecastService';
 import { getRecipientsAsString } from '@/lib/services/notificationRecipientsService';
 import { fetchRecentCanonicalCommunicationMetrics } from '@/lib/services/timelineQueryService';
 
 const COMMERCIAL_SCORING_BATCH_SIZE = 50;
 
+function normalizeDailyAutomationDetails(details: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(details)) as Prisma.InputJsonValue;
+}
+
+function pluralize(count: number, singular: string, plural: string): string {
+  return count === 1 ? singular : plural;
+}
+
 export async function runCommercialDailyAutomation() {
-  const [sequences, sla, paymentReminders, dailyBrief, capacityReport] = await Promise.all([
+  const [sequences, sla, paymentReminders, dailyBrief, capacityReport, weeklyForecast] = await Promise.all([
     runCommercialSequences(),
     enforceLeadSla(),
     sendPaymentReminders().catch((err) => {
@@ -29,7 +38,14 @@ export async function runCommercialDailyAutomation() {
       log.error('Capacity conflict check failed in commercial-daily', err);
       return { generatedAt: new Date().toISOString(), windowDays: 14, conflicts: [] as Array<{ date: string; itemName: string; itemCode: string; deficit: number; bookings: Array<{ clientName: string }> }>, verdict: '' };
     }),
+    loadWeeklyCapacityForecast().catch((err) => {
+      log.error('Weekly capacity forecast failed in commercial-daily', err);
+      return [];
+    }),
   ]);
+
+  const criticalForecastWeeks = weeklyForecast.filter((w) => w.alertLevel === 'CRITICAL');
+  const warningForecastWeeks = weeklyForecast.filter((w) => w.alertLevel === 'WARNING');
 
   let scoringUpdated = 0;
   try {
@@ -119,6 +135,16 @@ export async function runCommercialDailyAutomation() {
         bookingCount: c.bookings.length,
       })),
     },
+    weeklyForecast: {
+      criticalCount: criticalForecastWeeks.length,
+      warningCount: warningForecastWeeks.length,
+      criticalWeeks: criticalForecastWeeks.map((w) => ({
+        weekStart: w.weekStart,
+        bookingsCount: w.bookingsCount,
+        overloadedDays: w.overloadedDays,
+        message: w.alertMessage,
+      })),
+    },
   };
 
   const subject = `Resum diari comercial · ${new Date().toLocaleDateString('ca-ES')}`;
@@ -145,11 +171,29 @@ export async function runCommercialDailyAutomation() {
     `
     : '';
 
+  const forecastHasAny = criticalForecastWeeks.length + warningForecastWeeks.length > 0;
+  const forecastIsCritical = criticalForecastWeeks.length > 0;
+  const forecastBorderRgb = forecastIsCritical ? '244,63,94' : '251,191,36';
+  const forecastTextColor = forecastIsCritical ? '#fecdd3' : '#fde68a';
+  const criticalLabel = `${criticalForecastWeeks.length} ${pluralize(criticalForecastWeeks.length, 'crítica', 'crítiques')}`;
+  const warningLabel = `${warningForecastWeeks.length} ${pluralize(warningForecastWeeks.length, 'intensa', 'intenses')}`;
+  const forecastAlertsHtml = forecastHasAny
+    ? `
+      <div style="margin:0 0 18px 0;padding:16px;border-radius:14px;border:1px solid rgba(${forecastBorderRgb},0.35);background:rgba(${forecastBorderRgb},0.08)">
+        <h3 style="margin:0 0 10px 0;color:${forecastTextColor}">Forecast capacitat 4 setmanes — ${criticalLabel}, ${warningLabel}</h3>
+        <ul style="margin:0;padding-left:18px;line-height:1.7;color:${forecastTextColor}">
+          ${[...criticalForecastWeeks, ...warningForecastWeeks].map((w) => `<li><strong>Setmana ${w.weekStart}</strong> — ${w.bookingsCount} reserves${w.overloadedDays > 0 ? ` · ${w.overloadedDays} dies sobrecarregats` : ''}${w.alertMessage ? ` <span style="color:#e2e8f0">(${w.alertMessage})</span>` : ''}</li>`).join('')}
+        </ul>
+      </div>
+    `
+    : '';
+
   const html = `
     <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">
       <h2 style="margin:0 0 12px 0;color:#f8fafc">Resum diari comercial</h2>
       ${criticalAlertsHtml}
       ${capacityConflictsHtml}
+      ${forecastAlertsHtml}
       <ul style="line-height:1.8;margin:0 0 18px 0;padding-left:18px">
         <li>Seqüències executades: <strong>${sequences.executed}</strong></li>
         <li>Enviaments email: <strong>${sequences.sentEmail}</strong></li>
@@ -192,6 +236,12 @@ export async function runCommercialDailyAutomation() {
         waLines.push(`• ${c.itemName} (${c.date}): falten ${c.deficit} ud.`);
       }
     }
+    if (forecastHasAny) {
+      waLines.push(`📅 Forecast capacitat: ${criticalLabel}, ${warningLabel}`);
+      for (const w of [...criticalForecastWeeks, ...warningForecastWeeks]) {
+        waLines.push(`• Setm. ${w.weekStart}: ${w.bookingsCount} reserves${w.overloadedDays > 0 ? ` (${w.overloadedDays}d sobrec.)` : ''}`);
+      }
+    }
     const waText = waLines.join('\n');
     await sendWhatsAppText({ to: waTo, text: waText });
   }
@@ -201,7 +251,7 @@ export async function runCommercialDailyAutomation() {
       action: 'AUTOMATION_DAILY_SUMMARY_SENT',
       entity: 'automation',
       entityId: 'commercial-daily',
-      details: summary as unknown as Prisma.InputJsonValue,
+      details: normalizeDailyAutomationDetails(summary),
     },
   });
 

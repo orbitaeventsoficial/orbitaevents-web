@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Hoisted mocks ───────────────────────────────────────────────────────
-const { mockPrisma, mockGenerateContractPDF, mockSendEmail } = vi.hoisted(() => ({
+const { mockPrisma, mockGenerateContractPDF, mockSendEmail, mockUploadFile } = vi.hoisted(() => ({
   mockPrisma: {
     proposal: {
       findUniqueOrThrow: vi.fn(),
@@ -12,6 +12,7 @@ const { mockPrisma, mockGenerateContractPDF, mockSendEmail } = vi.hoisted(() => 
   },
   mockGenerateContractPDF: vi.fn(),
   mockSendEmail: vi.fn(),
+  mockUploadFile: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
@@ -19,6 +20,7 @@ vi.mock('@/lib/pdf-utils', () => ({
   generateContractPDF: mockGenerateContractPDF,
 }));
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }));
+vi.mock('@/lib/storage', () => ({ uploadFile: mockUploadFile }));
 vi.mock('@/lib/logger', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/app/config/site-config', () => ({
   SITE_CONFIG: {
@@ -30,17 +32,19 @@ vi.mock('@/lib/services/travelCost', () => ({ INCLUDED_TRAVEL_KM: 100 }));
 vi.mock('@/lib/services/leadActivityService', () => ({
   recordLeadContractSent: vi.fn(),
   recordLeadContractCancelled: vi.fn(),
+  recordLeadContractSigned: vi.fn(),
 }));
 
 import {
   generateContractFromProposal,
+  generateSignedContractPdf,
   sendContract,
   markContractSigned,
   cancelContract,
   getDefaultCancellationPolicy,
   getDefaultTermsAndConditions,
 } from '@/lib/services/contractService';
-import { recordLeadContractCancelled, recordLeadContractSent } from '@/lib/services/leadActivityService';
+import { recordLeadContractCancelled, recordLeadContractSent, recordLeadContractSigned } from '@/lib/services/leadActivityService';
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 const COMPANY_SETTINGS = [
@@ -115,6 +119,10 @@ beforeEach(() => {
   mockPrisma.leadDocument.create.mockResolvedValue({});
   mockGenerateContractPDF.mockResolvedValue(fakePdfDoc);
   mockSendEmail.mockResolvedValue(undefined);
+  mockUploadFile.mockResolvedValue({
+    path: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
+    publicUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -196,6 +204,27 @@ describe('generateContractFromProposal', () => {
         total: 968,
         eventType: 'WEDDING',
         companyName: 'Òrbita Events',
+      }),
+      'ca'
+    );
+  });
+
+  it('passa la signatura digital al PDF si la proposta ja està signada', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal({
+      contractSignedBy: 'Maria Garcia',
+      contractSignedAt: new Date('2026-05-15T10:00:00Z'),
+      contractSignatureBlob: 'data:image/png;base64,abc123',
+      contractSignatureIp: '127.0.0.1',
+    }));
+
+    await generateContractFromProposal('prop-1');
+
+    expect(mockGenerateContractPDF).toHaveBeenCalledWith(
+      expect.objectContaining({
+        signedBy: 'Maria Garcia',
+        signedAt: new Date('2026-05-15T10:00:00Z'),
+        signatureBlob: 'data:image/png;base64,abc123',
+        signatureIp: '127.0.0.1',
       }),
       'ca'
     );
@@ -362,6 +391,21 @@ describe('markContractSigned', () => {
     );
   });
 
+  it('registra leadActivity shared quan es marca signat manualment', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(
+      makeProposal({ contractReference: 'CTR-2026-TEST', contractStatus: 'SENT', leadId: 'lead-1' })
+    );
+
+    await markContractSigned('prop-1', 'Joan Garcia');
+
+    expect(recordLeadContractSigned).toHaveBeenCalledWith({
+      leadId: 'lead-1',
+      contractReference: 'CTR-2026-TEST',
+      signedBy: 'Joan Garcia',
+      source: 'admin',
+    });
+  });
+
   it('error si no hi ha contracte', async () => {
     mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(
       makeProposal({ contractReference: null })
@@ -384,6 +428,39 @@ describe('markContractSigned', () => {
     );
 
     await expect(markContractSigned('prop-1', 'Joan')).rejects.toThrow('cancel·lat');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// generateSignedContractPdf
+// ─────────────────────────────────────────────────────────────────────────
+describe('generateSignedContractPdf', () => {
+  it('regenera el PDF signat, el puja a storage i actualitza la proposta', async () => {
+    mockPrisma.proposal.findUniqueOrThrow.mockResolvedValue(makeProposal({
+      contractReference: 'CTR-2026-AB12',
+      contractStatus: 'SIGNED',
+      contractSignedBy: 'Maria Garcia',
+      contractSignedAt: new Date('2026-05-15T10:00:00Z'),
+      contractSignatureBlob: 'data:image/png;base64,abc123',
+    }));
+
+    const result = await generateSignedContractPdf('prop-1');
+
+    expect(mockUploadFile).toHaveBeenCalledWith(
+      'contracts/prop-1/CTR-2026-AB12-signed.pdf',
+      expect.any(Buffer),
+    );
+    expect(mockPrisma.proposal.update).toHaveBeenCalledWith({
+      where: { id: 'prop-1' },
+      data: {
+        contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
+        contractPdfKey: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
+      },
+    });
+    expect(result).toEqual({
+      contractPdfUrl: '/api/uploads/contracts/prop-1/CTR-2026-AB12-signed.pdf',
+      contractPdfKey: 'contracts/prop-1/CTR-2026-AB12-signed.pdf',
+    });
   });
 });
 

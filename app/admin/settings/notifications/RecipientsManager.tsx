@@ -176,15 +176,15 @@ export function RecipientsManager() {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-white/10 text-left">
-              <th className="px-2 py-2 font-medium">Email</th>
-              <th className="px-2 py-2 font-medium">Etiqueta</th>
+              <th scope="col" className="px-2 py-2 font-medium">Email</th>
+              <th scope="col" className="px-2 py-2 font-medium">Etiqueta</th>
               {ALL_CATEGORIES.map((c) => (
-                <th key={c} className="px-2 py-2 text-center font-medium" title={CATEGORY_LABELS[c].hint}>
+                <th key={c} scope="col" className="px-2 py-2 text-center font-medium" title={CATEGORY_LABELS[c].hint}>
                   {CATEGORY_LABELS[c].title}
                 </th>
               ))}
-              <th className="px-2 py-2 text-center font-medium">Actiu</th>
-              <th className="px-2 py-2 text-center font-medium" aria-label="Accions" />
+              <th scope="col" className="px-2 py-2 text-center font-medium">Actiu</th>
+              <th scope="col" className="px-2 py-2 text-center font-medium" aria-label="Accions" />
             </tr>
           </thead>
           <tbody>

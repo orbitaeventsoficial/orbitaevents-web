@@ -7,41 +7,48 @@
 
 import { getLocalizedEquipmentCatalog } from '../app/config/equipment-config';
 
-type Locale = 'ca' | 'es' | 'en';
+export type Locale = 'ca' | 'es' | 'en';
 
-const LOCALES: Locale[] = ['ca', 'es', 'en'];
-const BROKEN_KEY_RE = /equipmentCatalog\.[a-z0-9_.-]+/i;
+export const LOCALES: Locale[] = ['ca', 'es', 'en'];
+export const BROKEN_KEY_RE = /equipmentCatalog\.[a-z0-9_.-]+/i;
 
-type Finding = {
+export type Finding = {
   itemId: string;
   locale: Locale;
   field: string;
   value: string;
 };
 
-function isBroken(value: string): boolean {
+export type EquipmentI18nItem = {
+  id: string;
+  name: string;
+  description: string;
+  specs?: Record<string, unknown>;
+};
+
+export type EquipmentCatalogResolver = (locale: Locale) => EquipmentI18nItem[];
+
+export function isBroken(value: string): boolean {
   const normalized = String(value || '').trim();
   if (!normalized) return false;
   return BROKEN_KEY_RE.test(normalized);
 }
 
-function pushIfBroken(findings: Finding[], candidate: Finding) {
+export function pushIfBroken(findings: Finding[], candidate: Finding) {
   if (isBroken(candidate.value)) findings.push(candidate);
 }
 
-async function main() {
+export function analyzeEquipmentI18n(
+  resolveCatalog: EquipmentCatalogResolver,
+  locales: Locale[] = LOCALES,
+): Finding[] {
   const findings: Finding[] = [];
 
-  for (const locale of LOCALES) {
-    const catalog = getLocalizedEquipmentCatalog(locale);
+  for (const locale of locales) {
+    const catalog = resolveCatalog(locale);
 
     for (const item of catalog) {
-      pushIfBroken(findings, {
-        itemId: item.id,
-        locale,
-        field: 'name',
-        value: item.name,
-      });
+      pushIfBroken(findings, { itemId: item.id, locale, field: 'name', value: item.name });
       pushIfBroken(findings, {
         itemId: item.id,
         locale,
@@ -60,6 +67,12 @@ async function main() {
     }
   }
 
+  return findings;
+}
+
+async function main() {
+  const findings = analyzeEquipmentI18n(getLocalizedEquipmentCatalog);
+
   if (findings.length > 0) {
     console.error('\n[EQUIPMENT I18N GUARD] S\'han detectat textos trencats:\n');
     findings.forEach((finding) => {
@@ -74,7 +87,14 @@ async function main() {
   console.log(`[EQUIPMENT I18N GUARD] OK: catàleg validat en ${LOCALES.length} idiomes.`);
 }
 
-main().catch((error) => {
-  console.error('[EQUIPMENT I18N GUARD] Error executant validació:', error);
-  process.exit(1);
-});
+const isMain =
+  typeof process !== 'undefined' &&
+  process.argv[1] &&
+  process.argv[1].includes('check-equipment-i18n');
+
+if (isMain) {
+  main().catch((error) => {
+    console.error('[EQUIPMENT I18N GUARD] Error executant validació:', error);
+    process.exit(1);
+  });
+}

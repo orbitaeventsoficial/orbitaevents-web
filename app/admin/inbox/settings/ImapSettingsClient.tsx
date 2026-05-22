@@ -49,6 +49,7 @@ export default function ImapSettingsClient() {
         setUser(data.config.user || '');
       }
     } catch (err) {
+      console.error('Error carregant configuració IMAP', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setLoading(false);
@@ -80,6 +81,7 @@ export default function ImapSettingsClient() {
         setConnection({ ok: false, error: data.error });
       }
     } catch (err) {
+      console.error('Error provant connexió IMAP', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setTesting(false);
@@ -112,6 +114,7 @@ export default function ImapSettingsClient() {
         toast.error(data.error || 'Error desant');
       }
     } catch (err) {
+      console.error('Error desant configuració IMAP', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setSaving(false);

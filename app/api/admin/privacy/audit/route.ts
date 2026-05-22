@@ -1,6 +1,6 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { listPrivacyAuditLogs } from '@/lib/services/privacyService';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,21 +14,7 @@ export async function GET(req: NextRequest) {
     const offset = Number(searchParams.get('offset') || 0);
     const action = searchParams.get('action');
 
-    const where: Record<string, unknown> = {};
-    if (action && action !== 'all') {
-      where.action = action;
-    }
-
-    const [logs, total] = await Promise.all([
-      prisma.privacyAuditLog.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset,
-      }),
-      prisma.privacyAuditLog.count({ where }),
-    ]);
-
+    const { logs, total } = await listPrivacyAuditLogs({ limit, offset, action });
     return NextResponse.json({ ok: true, body: { logs, total } });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error desconegut';

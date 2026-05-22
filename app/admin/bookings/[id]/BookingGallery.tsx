@@ -6,6 +6,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { BOOKING_GALLERY_PORTFOLIO_CATEGORIES } from '@/lib/constants';
 import { ADMIN_BOOKING_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { log } from '@/lib/logger';
+import GallerySharePanel from './GallerySharePanel';
 
 const MAX_DIMENSION = 1200;
 const WEBP_QUALITY = 0.85;
@@ -187,6 +188,8 @@ export default function BookingGallery({ bookingId }: Props) {
 
   return (
     <div className="space-y-4" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.root)}>
+      <GallerySharePanel bookingId={bookingId} />
+
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Galeria de fotos ({photos.length})</h2>
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 min-h-[44px]" {...helpAttrs(ADMIN_BOOKING_HELP.gallery.upload)}>

@@ -1,1 +1,1 @@
-export { default } from '../components/AdminLoadingSkeleton';
+export { default } from '../components/AdminLoadingSkeletonDashboard';

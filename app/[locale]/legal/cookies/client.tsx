@@ -1,10 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { toIntlLocale } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function CookiesClient() {
   const t = useTranslations('legal.cookies');
+  const locale = useLocale();
   const { business } = SITE_CONFIG;
 
   return (
@@ -14,7 +16,7 @@ export default function CookiesClient() {
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>
-            {t('lastUpdate')} {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {t('lastUpdate')} {new Date().toLocaleDateString(toIntlLocale(locale), { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
 
           <section>
@@ -31,9 +33,9 @@ export default function CookiesClient() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/20">
-                    <th className="text-left py-2 text-white">{t('section2.technical.table.nombre')}</th>
-                    <th className="text-left py-2 text-white">{t('section2.technical.table.finalidad')}</th>
-                    <th className="text-left py-2 text-white">{t('section2.technical.table.duracion')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.technical.table.nombre')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.technical.table.finalidad')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.technical.table.duracion')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -57,10 +59,10 @@ export default function CookiesClient() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/20">
-                    <th className="text-left py-2 text-white">{t('section2.analytical.table.nombre')}</th>
-                    <th className="text-left py-2 text-white">{t('section2.analytical.table.proveedor')}</th>
-                    <th className="text-left py-2 text-white">{t('section2.analytical.table.finalidad')}</th>
-                    <th className="text-left py-2 text-white">{t('section2.analytical.table.duracion')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.analytical.table.nombre')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.analytical.table.proveedor')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.analytical.table.finalidad')}</th>
+                    <th scope="col" className="text-left py-2 text-white">{t('section2.analytical.table.duracion')}</th>
                   </tr>
                 </thead>
                 <tbody>

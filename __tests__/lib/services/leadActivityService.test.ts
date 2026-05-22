@@ -21,6 +21,7 @@ import {
   deleteLeadActivity,
   recordLeadContractCancelled,
   recordLeadContractSent,
+  recordLeadContractSigned,
   recordLeadCommercialSequenceStepSent,
   recordLeadDocumentAdded,
   recordLeadDocumentDeleted,
@@ -177,11 +178,11 @@ describe('recordLeadScoreSnapshot', () => {
     });
 
     expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
-      data: {
+      data: expect.objectContaining({
         leadId: 'lead-1',
         type: 'SYSTEM',
         title: 'Scoring snapshot',
-        description: 'Score 75 (HOT) · Prob 65.0% · Weighted 1300.00€',
+        description: expect.stringMatching(/Score 75 \(HOT\) · Prob 65\.0% · Weighted.*1\.300.*€/),
         createdBy: 'Scoring Bot',
         metadata: {
           score: 75,
@@ -191,7 +192,7 @@ describe('recordLeadScoreSnapshot', () => {
           reasons: ['Event proper', 'Pressupost alt'],
           riskFlags: [],
         },
-      },
+      }),
     });
   });
 });
@@ -337,6 +338,32 @@ describe('recordLeadContractCancelled', () => {
         type: 'SYSTEM',
         title: 'Contracte cancel·lat',
         description: 'Contracte CTR-2026-AB12 cancel·lat',
+      },
+    });
+  });
+});
+
+describe('recordLeadContractSigned', () => {
+  it('crea activitat shared per contracte signat des del portal', async () => {
+    await recordLeadContractSigned({
+      leadId: 'lead-1',
+      contractReference: 'CTR-2026-AB12',
+      signedBy: 'Maria Garcia',
+      source: 'portal',
+    });
+
+    expect(mockPrisma.leadActivity.create).toHaveBeenCalledWith({
+      data: {
+        leadId: 'lead-1',
+        type: 'DOCUMENT',
+        title: 'Contracte signat',
+        description: 'Contracte CTR-2026-AB12 signat per Maria Garcia',
+        metadata: {
+          contractReference: 'CTR-2026-AB12',
+          signedBy: 'Maria Garcia',
+          source: 'portal',
+        },
+        createdBy: 'Portal client',
       },
     });
   });

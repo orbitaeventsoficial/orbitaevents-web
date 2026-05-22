@@ -1,0 +1,72 @@
+import Link from 'next/link';
+import { formatDateSimple } from '@/lib/constants';
+import { getBookingQuestionnaire } from '@/lib/services/questionnaireService';
+
+export default async function BookingQuestionnaireSection({ bookingId }: { bookingId: string }) {
+  const data = await getBookingQuestionnaire(bookingId);
+
+  return (
+    <section className="admin-booking-panel ap-card rounded-xl p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 className="text-lg font-semibold">Qüestionari pre-event</h2>
+        <Link
+          href="/admin/questionnaires"
+          className="text-xs text-white/40 hover:text-white/70 transition-colors"
+        >
+          Gestionar plantilles →
+        </Link>
+      </div>
+
+      {!data ? (
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <p className="text-sm text-white/50">Cap plantilla de qüestionari activa.</p>
+          <Link
+            href="/admin/questionnaires/new"
+            className="mt-2 inline-block text-cyan-400 hover:underline text-xs"
+          >
+            Crear primera plantilla
+          </Link>
+        </div>
+      ) : !data.response ? (
+        <div className="rounded-xl border border-amber-400/20 bg-amber-950/10 p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+            <p className="text-sm font-medium">Pendent de resposta</p>
+          </div>
+          <p className="text-xs text-white/50">
+            Plantilla activa: <span className="text-white/70">{data.template.title}</span>
+          </p>
+          <p className="text-xs text-white/40 mt-1">
+            El client veurà el qüestionari al seu portal però encara no ha enviat respostes.
+          </p>
+        </div>
+      ) : (
+        <div>
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+            <p className="text-sm font-medium text-emerald-300">Qüestionari completat</p>
+            {data.response.submittedAt && (
+              <span className="text-xs text-white/40">
+                {formatDateSimple(data.response.submittedAt)}
+              </span>
+            )}
+          </div>
+          <dl className="space-y-3">
+            {data.template.questions.map((q) => {
+              const answer = data.response!.answers[q.id];
+              const displayAnswer = Array.isArray(answer)
+                ? answer.join(', ') || '—'
+                : (answer as string) || '—';
+              return (
+                <div key={q.id} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                  <dt className="text-xs text-white/40 uppercase tracking-wide">{q.label}</dt>
+                  <dd className="mt-1 text-sm text-white/85">{displayAnswer}</dd>
+                </div>
+              );
+            })}
+          </dl>
+        </div>
+      )}
+    </section>
+  );
+}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildCustomerWorkspaceTabHref } from '@/lib/admin/customerWorkspaceHref';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -83,6 +84,7 @@ export default function CalendarMonthClient() {
       setShowBlockForm(false);
       setBlockNote('');
     } catch (err) {
+      console.error('Error bloquejant dia del calendari', err);
       toast.error(err instanceof Error ? err.message : 'Error bloquejant dia');
     } finally {
       setBlockingDate(false);
@@ -98,6 +100,7 @@ export default function CalendarMonthClient() {
       toast.success(`Dia ${formatDateShort(dateKey)} desbloquejat`);
       setRefreshKey((k) => k + 1);
     } catch (err) {
+      console.error('Error desbloquejant dia del calendari', err);
       toast.error(err instanceof Error ? err.message : 'Error desbloquejant dia');
     }
   }, [toast]);
@@ -116,13 +119,13 @@ export default function CalendarMonthClient() {
       toast.success(`Reserva moguda al ${formatDateShort(newDateKey)}`);
       setRefreshKey((k) => k + 1);
     } catch (err) {
+      console.error('Error movent reserva al calendari', err);
       toast.error(err instanceof Error ? err.message : 'Error movent reserva');
     }
   }, [toast]);
 
   const cells = useMemo(
-    () => getMonthDays(monthYear),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- monthYear object reference changes, but year/month are the actual deps
+    () => getMonthDays({ year: monthYear.year, month: monthYear.month }),
     [monthYear.year, monthYear.month],
   );
 
@@ -823,7 +826,7 @@ export default function CalendarMonthClient() {
                           {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                         </div>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
-                          <Link href={`/admin/bookings/${r.id}`} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
+                          <Link href={buildBookingHref(r.id)} onClick={(e) => e.stopPropagation()} className="text-[10px] font-medium hover:underline">
                             Reserva →
                           </Link>
                           {r.leadId && (

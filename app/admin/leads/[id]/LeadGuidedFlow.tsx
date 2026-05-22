@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState, useTransition } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { LEAD_GUIDED_STEPS, LEAD_GUIDED_STATUS_ORDER } from '@/lib/constants';
 import { ADMIN_LEAD_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import LeadLostStatusPrompt from '../LeadLostStatusPrompt';
 import { patchLeadStatus } from '../leadStatusClient';
 
@@ -60,7 +62,7 @@ export default function LeadGuidedFlow({
     return { stepsDone, total: 5, pct: Math.round((stepsDone / 5) * 100) };
   }, [currentIndex, hasCustomer, hasBooking]);
 
-  const updateStatus = async (nextStatus: LeadStatus) => {
+  const updateStatus = useCallback(async (nextStatus: LeadStatus) => {
     if (statusBusy) return;
     if (nextStatus === 'LOST') {
       setShowLostPrompt(true);
@@ -76,7 +78,7 @@ export default function LeadGuidedFlow({
       const customerId = payload?.lead?.customerId as string | undefined;
       startTransition(() => {
         if (nextStatus === 'WON' && customerId) {
-          router.push(`/admin/clientes/${customerId}`);
+          router.push(buildCustomerHubHref(customerId));
           return;
         }
         router.refresh();
@@ -87,7 +89,7 @@ export default function LeadGuidedFlow({
     } finally {
       setStatusBusy(false);
     }
-  };
+  }, [leadId, router, startTransition, status, statusBusy]);
 
   const confirmLostStatus = async () => {
     if (!lostReason || statusBusy) return;
@@ -151,10 +153,9 @@ export default function LeadGuidedFlow({
     if (currentIndex === 2) return { label: 'Iniciar negociaci\u00f3', action: () => updateStatus('NEGOTIATING') };
     if (currentIndex === 3) return { label: 'Marcar com a guanyat', action: () => updateStatus('WON') };
     if (currentIndex === 4 && !hasBooking) return { label: 'Crear reserva', href: `/admin/bookings/new?leadId=${leadId}` };
-    if (hasBooking && bookingId) return { label: 'Veure reserva', href: `/admin/bookings/${bookingId}` };
+    if (hasBooking && bookingId) return { label: 'Veure reserva', href: buildBookingHref(bookingId) };
     return null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
+  }, [currentIndex, isLost, hasBooking, bookingId, leadId, updateStatus]);
 
   return (
     <section className="ap-card p-5" {...helpAttrs(ADMIN_LEAD_HELP.guided.root)}>
@@ -307,7 +308,6 @@ export default function LeadGuidedFlow({
     </section>
   );
 }
-
 
 
 

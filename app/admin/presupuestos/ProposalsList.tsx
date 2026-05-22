@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getProposalStatusDisplay, PROPOSAL_FILTERABLE_STATUSES, formatDate, formatCurrency } from '@/lib/constants';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { buildCustomerProposalHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildCustomerProposalHref, buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 
 type ProposalItem = {
   id: string;
@@ -88,8 +89,8 @@ export default function ProposalsList({
   const getProposalHref = (proposal: ProposalItem) =>
     proposal.customerId
       ? buildCustomerProposalHref(proposal.customerId, proposal.id)
-      : `/admin/presupuestos/${proposal.id}`;
-  const getProposalDetailHref = (proposal: ProposalItem) => `/admin/presupuestos/${proposal.id}`;
+      : buildProposalHref(proposal.id);
+  const getProposalDetailHref = (proposal: ProposalItem) => buildProposalHref(proposal.id);
 
   async function handleSend(proposalId: string) {
     setSendingId(proposalId);
@@ -218,7 +219,7 @@ export default function ProposalsList({
                   </Link>
                   <p className="truncate text-sm opacity-70">
                     {proposal.customerId ? (
-                      <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                      <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
                       </Link>
                     ) : (
@@ -268,7 +269,7 @@ export default function ProposalsList({
                 )}
                 {proposal.customer && proposal.customerId && (
                   <Link
-                    href={`/admin/clientes/${proposal.customerId}`}
+                    href={buildCustomerHubHref(proposal.customerId)}
                     className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/10"
                   >
                     👤 Client
@@ -327,7 +328,7 @@ export default function ProposalsList({
                   </td>
                   <td className="px-4 py-3">
                     {proposal.customerId ? (
-                      <Link href={`/admin/clientes/${proposal.customerId}`} className="hover:underline">
+                      <Link href={buildCustomerHubHref(proposal.customerId)} className="hover:underline">
                         {proposal.customer?.name || 'Sense nom'}
                       </Link>
                     ) : (
@@ -384,7 +385,7 @@ export default function ProposalsList({
                         )}
                         {proposal.customer && proposal.customerId && (
                           <Link
-                            href={`/admin/clientes/${proposal.customerId}`}
+                            href={buildCustomerHubHref(proposal.customerId)}
                             className="block rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-white/10"
                           >
                             👤 Fitxa client

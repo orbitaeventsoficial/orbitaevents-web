@@ -148,6 +148,35 @@ describe('mapAdminLogToCanonicalEvent', () => {
     expect(event.timelineType).toBe('PROPOSAL_SENT');
     expect(event.title).toBe('Pressupost enviat');
   });
+
+  it('mapeja PAYMENT_RECORDED de Stripe com a activitat de reserva llegible', () => {
+    const event = mapAdminLogToCanonicalEvent({
+      id: 'al-3',
+      action: 'PAYMENT_RECORDED',
+      entity: 'booking',
+      entityId: 'b-1',
+      details: {
+        message: 'Pagament Stripe registrat: paga i senyal',
+        source: 'stripe',
+        paymentType: 'deposit',
+        stripeSessionId: 'cs_deposit',
+        amountCents: 30000,
+      },
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      userId: null,
+    });
+
+    expect(event.title).toBe('Pagament registrat');
+    expect(event.body).toBe('Pagament Stripe registrat: paga i senyal');
+    expect(event.timelineType).toBe('BOOKING_CREATED');
+    expect(event.link?.href).toBe('/admin/bookings/b-1');
+    expect(event.metadata).toMatchObject({
+      source: 'stripe',
+      paymentType: 'deposit',
+      stripeSessionId: 'cs_deposit',
+      amountCents: 30000,
+    });
+  });
 });
 
 // ───────────────────────────────────────────────────────────────────────────

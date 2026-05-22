@@ -482,10 +482,6 @@ export default function ConfiguradorClient() {
     updateConfig({ guests });
   };
 
-  const setSelectedExtras = (extras: string[]) => {
-    updateConfig({ extras });
-  };
-
   const toggleExtra = (extraId: string, checked: boolean) => {
     setConfig((prev) => ({
       ...prev,
@@ -618,10 +614,9 @@ export default function ConfiguradorClient() {
     if (!config.eventType) return;
 
     const filteredExtras = filterUnavailableExtras(config.extras, availableExtras);
-    if (filteredExtras.length !== extrasCount) {
-      setSelectedExtras(filteredExtras);
+    if (filteredExtras.length !== config.extras.length) {
+      setConfig((prev) => ({ ...prev, extras: filteredExtras }));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableExtras, config.eventType, config.extras]);
 
   // PAS 1: Tipus d'esdeveniment
@@ -1248,7 +1243,6 @@ export default function ConfiguradorClient() {
     </div>
   );
 }
-
 
 
 

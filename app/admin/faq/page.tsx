@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { EditorControlStrip } from '../components/EditorControlStrip';
 import { AdminEmptyState, AdminPage } from '../components/AdminPage';
+import { buildFaqHref } from '@/lib/admin/faqWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,7 +80,7 @@ export default async function FAQPage() {
           description: inactiveFaqs.length > 0
             ? 'Abans de crear més contingut, comprova si les preguntes inactives s’han de recuperar, reescriure o eliminar.'
             : 'Si no hi ha incidències evidents, el millor retorn és reforçar categories clau i mantenir coherència entre idiomes.',
-          primaryAction: { href: inactiveFaqs[0] ? `/admin/faq/${inactiveFaqs[0].id}` : '/admin/faq/new', label: inactiveFaqs[0] ? 'Editar una inactiva' : 'Crear nova pregunta' },
+          primaryAction: { href: inactiveFaqs[0] ? buildFaqHref(inactiveFaqs[0].id) : '/admin/faq/new', label: inactiveFaqs[0] ? 'Editar una inactiva' : 'Crear nova pregunta' },
           secondaryPills: topCategory ? [`Focus actual: ${topCategoryConfig?.label}`] : undefined,
         }}
       />
@@ -160,7 +161,7 @@ export default async function FAQPage() {
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <Link
-                          href={`/admin/faq/${faq.id}`}
+                          href={buildFaqHref(faq.id)}
                           className="inline-flex items-center rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors"
                         >
                           Editar

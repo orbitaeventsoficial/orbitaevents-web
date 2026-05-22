@@ -135,7 +135,7 @@ export const SECTIONS: Section[] = [
     name: 'Panell admin',
     icon: '⚙️',
     description: 'Dashboard, bookings, leads, CRM',
-    color: 'from-gray-600 to-gray-800',
+    color: 'from-white/15 to-white/[0.05]',
     paths: ['admin.']
   },
   {

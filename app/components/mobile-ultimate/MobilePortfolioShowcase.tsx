@@ -102,8 +102,9 @@ export default function MobilePortfolioShowcase({ stories = DEFAULT_CATEGORIES }
                 alt={`${t(`categories.${active.id}`)} 1`}
                 fill
                 sizes="100vw"
+                quality={70}
                 className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-active:scale-[1.03]"
-                loading="eager"
+                priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5">

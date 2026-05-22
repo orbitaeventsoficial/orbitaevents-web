@@ -45,6 +45,7 @@ export default function BookingFieldNotesComposer({ bookingId }: { bookingId: st
       setSuccess('Captura guardada al bolo');
       router.refresh();
     } catch (uploadError) {
+      console.error('Error pujant captura de camp', uploadError);
       setError(uploadError instanceof Error ? uploadError.message : 'Error pujant la captura');
     } finally {
       setSending(false);

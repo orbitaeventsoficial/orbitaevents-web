@@ -21,6 +21,9 @@ export function getClientIp(req: NextRequest): string {
 }
 
 export async function checkAdminRateLimit(req: NextRequest): Promise<boolean> {
+  if (process.env.NODE_ENV !== 'production' && process.env.DISABLE_ADMIN_RATE_LIMIT === '1') {
+    return true;
+  }
   const clientIp = getClientIp(req);
   const key = `admin-auth:${clientIp}`;
 

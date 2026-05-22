@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 import { TASK_KANBAN_COLUMNS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { fetchWithCsrf } from '@/lib/csrf';
@@ -113,6 +114,7 @@ export default function TaskKanbanView() {
         toast.success(`Tasca moguda a ${targetLabel}`);
       }
     } catch (error) {
+      console.error('Error movent tasca al kanban', error);
       setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: prevStatus } : t)));
       toast.error(error instanceof Error ? error.message : 'Error de connexió');
     }
@@ -217,7 +219,7 @@ export default function TaskKanbanView() {
 
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
                     {task.customerId && (
-                      <Link href={`/admin/clientes/${task.customerId}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                      <Link href={buildCustomerHubHref(task.customerId)} className="hover:underline" onClick={(e) => e.stopPropagation()}>
                         👤 {task.customerName || 'Client'}
                       </Link>
                     )}

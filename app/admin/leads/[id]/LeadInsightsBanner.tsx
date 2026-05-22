@@ -8,6 +8,7 @@ import {
   buildLeadTaskHref,
   buildLeadWorkspaceHref,
 } from '@/lib/admin/leadWorkspaceHref';
+import { formatCurrency } from '@/lib/constants';
 
 const URGENCY_COLOR: Record<string, string> = {
   HIGH: 'border-rose-500/40 bg-rose-500/10',
@@ -19,7 +20,7 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
   HIGH: { label: 'Alt', color: 'text-rose-300', bg: 'bg-rose-500/15 border-rose-500/30' },
   MEDIUM: { label: 'Mitjà', color: 'text-amber-300', bg: 'bg-amber-500/15 border-amber-500/30' },
   LOW: { label: 'Baix', color: 'text-emerald-300', bg: 'bg-emerald-500/15 border-emerald-500/30' },
-  NONE: { label: 'Cap', color: 'text-slate-300', bg: 'bg-slate-500/15 border-slate-500/30' },
+  NONE: { label: 'Cap', color: 'text-white/60', bg: 'bg-white/[0.08] border-white/15' },
 };
 
 const ACTION_CTA: Record<string, { href: (input: { leadId: string; customerId?: string | null; bookingId?: string | null }) => string; label: string }> = {
@@ -31,10 +32,6 @@ const ACTION_CTA: Record<string, { href: (input: { leadId: string; customerId?: 
   COMPLETE_TASK: { href: ({ leadId, customerId }) => buildLeadTaskHref({ leadId, customerId }), label: 'Veure tasques' },
   RE_ENGAGE: { href: ({ leadId }) => buildLeadComposeHref(leadId), label: 'Reactivar' },
 };
-
-function formatCurrency(val: number): string {
-  return val.toLocaleString('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-}
 
 export default function LeadInsightsBanner({
   insights,

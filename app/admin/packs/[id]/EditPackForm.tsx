@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
-import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES } from '@/lib/constants';
+import { DEFAULT_EXPECTED_LIFE_HOURS, SUPPORTED_LOCALES, formatCurrencyExact } from '@/lib/constants';
 import { ADMIN_PACK_EDITOR_TABS, type PackEditorTab } from '@/lib/constants/admin';
 import type { InventoryBundle } from '@/lib/inventory-bundles-contract';
 import { AdminHelpPanel } from '../../components/AdminHelpPanel';
@@ -88,7 +88,7 @@ const calcCostHour = (price: number | null, life: number | null) =>
   !price || price <= 0 ? 0 : round2(price / (life && life > 0 ? life : DEFAULT_EXPECTED_LIFE_HOURS));
 const divPct = (pub: number, rec: number) => (rec > 0 ? ((pub - rec) / rec) * 100 : 0);
 const semClass = (d: number, t: number) => Math.abs(d) >= t ? 'border-rose-500/40 bg-rose-500/15 text-rose-200' : Math.abs(d) >= t * 0.5 ? 'border-amber-500/40 bg-amber-500/15 text-amber-200' : 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200';
-const eur = (v: number) => `${round2(v).toFixed(2)}€`;
+const eur = formatCurrencyExact;
 
 function getMarginSignal(currentPrice: number, recommendedPrice: number, thresholdPct: number) {
   const diffPct = divPct(currentPrice, recommendedPrice);

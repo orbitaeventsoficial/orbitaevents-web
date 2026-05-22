@@ -1,6 +1,6 @@
 'use client';
 import { log } from '@/lib/logger';
-import { formatDateShort, formatDateTimeFull, DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateShort, formatDateTimeFull, formatTimeShort } from '@/lib/constants';
 
 import { useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
@@ -154,7 +154,7 @@ export default function InboxPanel() {
     const isToday = date.toDateString() === now.toDateString();
 
     if (isToday) {
-      return date.toLocaleTimeString(DEFAULT_LOCALE, { hour: '2-digit', minute: '2-digit' });
+      return formatTimeShort(date);
     }
     return formatDateShort(date);
   };

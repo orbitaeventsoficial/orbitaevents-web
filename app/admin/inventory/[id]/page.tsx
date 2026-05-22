@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 import {
   calculateCurrentValue,
   calculateCostPerHour,
@@ -188,7 +190,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
               return (
                 <Link
                   key={pi.id}
-                  href={`/admin/packs/${pi.pack.id}`}
+                  href={buildPackHref(pi.pack.id)}
                   className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors hover:bg-white/5"
                 >
                   <span className="font-medium underline decoration-white/20">{packName}</span>
@@ -235,7 +237,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
                   <tr key={bi.id} className="transition-colors hover:bg-white/[0.03]">
                     <td className="px-4 py-3">
                       <Link
-                        href={`/admin/bookings/${bi.booking.id}`}
+                        href={buildBookingHref(bi.booking.id)}
                         className="font-mono hover:underline"
                       >
                         {bi.booking.reference}

@@ -27,10 +27,12 @@ import { dedupeCustomerHubQuickActions } from '@/lib/customer-hub/quickActions';
 import {
   buildCustomerBookingCreateHref,
   buildCustomerComposeHref,
+  buildCustomerHubHref,
   buildCustomerProposalHref,
   buildCustomerTaskCreateHref,
   buildCustomerWorkspaceTabHref,
 } from '@/lib/admin/customerWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { getLeadPriorityColorDisplay } from '@/app/admin/leads/colorTheme';
 import { OwnerControlStrip } from '@/app/admin/components/OwnerControlStrip';
 
@@ -87,7 +89,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
     || data.bookings.find((booking) => Boolean(booking.location || booking.venue));
   const topLeadAction = topLead
     ? topLead.booking
-      ? { href: `/admin/bookings/${topLead.booking.id}`, label: 'Obrir reserva', external: false as const }
+      ? { href: buildBookingHref(topLead.booking.id), label: 'Obrir reserva', external: false as const }
       : buildLeadActionLink(topLead)
     : null;
   const topLeadActionChannel = topLeadAction
@@ -252,7 +254,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
               detail: nextEvent.date
                 ? `Pròxim esdeveniment · ${formatDateFull(nextEvent.date)}`
                 : 'Reserva vinculada al client',
-              href: `/admin/bookings/${nextEvent.id}`,
+              href: buildBookingHref(nextEvent.id),
               external: false,
             }
           : {
@@ -516,7 +518,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           }
           action={
             routeBooking
-              ? <a href={`/admin/bookings/${routeBooking.id}`} className="text-xs">Obrir reserva</a>
+              ? <a href={buildBookingHref(routeBooking.id)} className="text-xs">Obrir reserva</a>
               : undefined
           }
         />
@@ -644,7 +646,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   Anar a Comunicacions
                 </a>
                 {topLead.booking && (
-                  <a href={`/admin/bookings/${topLead.booking.id}`} className="mt-2 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
+                  <a href={buildBookingHref(topLead.booking.id)} className="mt-2 inline-flex text-[11px] opacity-70 underline-offset-2 hover:underline">
                     Obrir reserva vinculada
                   </a>
                 )}
@@ -784,7 +786,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                   <div key={ev.id} className="rounded-xl border p-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium">{ev.reference || 'Reserva'}</p>
-                      <a href={`/admin/bookings/${ev.id}`} className="text-[11px]">Obrir →</a>
+                      <a href={buildBookingHref(ev.id)} className="text-[11px]">Obrir →</a>
                     </div>
                     <p className="mt-0.5 text-xs">{ev.date && formatDateFull(ev.date)}{ev.startTime && ` · ${ev.startTime}`}</p>
                     {ev.location && <p className="text-[11px]">📍 {ev.location}</p>}
@@ -1006,7 +1008,7 @@ function RouteSnapshotCard({
         <a href={mapsHref} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
           Obrir a Google Maps
         </a>
-        <a href={`/admin/bookings/${bookingId}`} className="underline-offset-2 hover:underline">
+        <a href={buildBookingHref(bookingId)} className="underline-offset-2 hover:underline">
           Veure fitxa completa
         </a>
       </div>
@@ -1121,7 +1123,7 @@ function CrmStatusBar({
         {/* Health score */}
         {healthScore != null && (
           <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${getHealthColor(healthScore)}`}>
-            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: 'currentColor' }} />
+            <span className="inline-block h-2 w-2 rounded-full bg-current" />
             {healthScore}/100 — {getHealthLabel(healthScore)}
           </span>
         )}
@@ -1129,7 +1131,7 @@ function CrmStatusBar({
         {/* Referit per */}
         {customer.referredBy && (
           <a
-            href={`/admin/clientes/${customer.referredBy.id}`}
+            href={buildCustomerHubHref(customer.referredBy.id)}
             className="inline-flex items-center gap-1 text-xs text-white/50 hover:text-white/70 transition-colors"
           >
             Referit per: <span className="font-medium text-white/70">{customer.referredBy.name}</span>

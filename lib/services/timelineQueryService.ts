@@ -3,6 +3,8 @@ import { log } from '@/lib/logger';
 import { ADMIN_ACTIVITY_ACTION_META, ADMIN_ACTIVITY_CATEGORY_MAP } from '@/lib/constants/admin';
 import type { TimelineEventDTO } from '@/lib/customer-hub/dto';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
 
 export type CanonicalTimelineEvent = {
   id: string;
@@ -219,9 +221,9 @@ function mapAdminLogToTimelineType(log: AdminLogLike): TimelineEventDTO['type'] 
 
 function buildAdminLogLink(log: AdminLogLike): CanonicalTimelineEvent['link'] {
   if (!log.entityId) return undefined;
-  if (log.entity === 'booking') return { label: 'Veure reserva', href: `/admin/bookings/${log.entityId}` };
+  if (log.entity === 'booking') return { label: 'Veure reserva', href: buildBookingHref(log.entityId) };
   if (log.entity === 'lead') return { label: 'Veure entrada', href: buildLeadWorkspaceHref(log.entityId) };
-  if (log.entity === 'customer') return { label: 'Veure client', href: `/admin/clientes/${log.entityId}` };
+  if (log.entity === 'customer') return { label: 'Veure client', href: buildCustomerHubHref(log.entityId) };
   if (log.entity === 'proposal') return { label: 'Obrir', href: `/admin/presupuestos?proposalId=${log.entityId}` };
   return undefined;
 }

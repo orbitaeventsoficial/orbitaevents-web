@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { formatCurrency } from '@/lib/constants';
 
 export default function ProfitabilityConfigEditor({ initial }: { initial: ProfitabilityConfig }) {
   const [form, setForm] = useState<ProfitabilityConfig>(initial);
@@ -187,7 +188,7 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${extraHourState.cls}`}>{extraHourState.label}</span>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <p className="font-semibold">Cost operatiu fix: {form.fixedOperationalCost.toFixed(0)}€</p>
+              <p className="font-semibold">Cost operatiu fix: {formatCurrency(form.fixedOperationalCost)}</p>
               <p className="">Cost fix per servei (temps, gestió, logística).</p>
               <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${fixedState.cls}`}>{fixedState.label}</span>
             </div>

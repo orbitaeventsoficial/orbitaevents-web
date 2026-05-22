@@ -91,6 +91,14 @@ jobs:
           echo "urgent-followup-alerts: $status"
           [ "$status" = "200" ] || exit 1
 
+      - name: lead-reengagement
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://orbitaevents.com/api/cron/lead-reengagement")
+          echo "lead-reengagement: $status"
+          [ "$status" = "200" ] || exit 1
+
   # Benchmark setmanal — només dilluns
   # El job s'executa cada dia però el step-level "Check if Monday" el bloqueja
   # excepte els dilluns (o via workflow_dispatch manual).

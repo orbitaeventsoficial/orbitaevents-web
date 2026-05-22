@@ -3,6 +3,7 @@
 type MobileQuickActionsProps = {
   phone?: string | null;
   email?: string | null;
+  emailHref?: string | null;
   whatsappMessage?: string | null;
   primaryAction?: {
     label: string;
@@ -21,6 +22,7 @@ function buildWhatsAppHref(phone: string, message?: string | null): string {
 export default function MobileQuickActions({
   phone,
   email,
+  emailHref,
   whatsappMessage,
   primaryAction,
 }: MobileQuickActionsProps) {
@@ -55,7 +57,7 @@ export default function MobileQuickActions({
         ) : null}
         {email ? (
           <a
-            href={`mailto:${email}`}
+            href={emailHref || '/admin/inbox/compose'}
             className="ap-btn ap-btn--secondary flex items-center justify-center gap-2 px-3 py-2 text-xs"
           >
             <span>✉️</span>

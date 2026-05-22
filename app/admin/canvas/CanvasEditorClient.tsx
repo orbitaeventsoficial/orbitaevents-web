@@ -194,7 +194,6 @@ export default function CanvasEditorClient() {
     };
   }, [
     activePreset,
-    canvasBg,
     canvasSize.height,
     canvasSize.width,
     dragging,

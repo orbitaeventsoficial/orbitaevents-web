@@ -36,7 +36,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   try {
     const body = await req.json();
-    const { status } = patchSchema.parse(body);
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: 'INVALID_BODY' }, { status: 400 });
+    }
+    const { status } = parsed.data;
     const result = await updateAdminInvoiceStatus(params.id, status);
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {

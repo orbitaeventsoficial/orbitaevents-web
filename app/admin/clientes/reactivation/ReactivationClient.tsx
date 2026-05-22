@@ -3,13 +3,15 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { ReactivationCandidate, ReactivationPriority } from '@/lib/services/reactivationService';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { formatCurrency } from '@/lib/constants';
 
 type Props = { initialCandidates: ReactivationCandidate[] };
 
 const PRIORITY_TONE: Record<ReactivationPriority, string> = {
   ALTA: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
   MITJANA: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-  BAIXA: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+  BAIXA: 'border-white/15 bg-white/[0.06] text-white/60',
 };
 
 const CHANNEL_ICON: Record<string, string> = {
@@ -17,10 +19,6 @@ const CHANNEL_ICON: Record<string, string> = {
   email: '✉️',
   instagram: '📷',
 };
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
-}
 
 export default function ReactivationClient({ initialCandidates }: Props) {
   const [filter, setFilter] = useState<'ALL' | ReactivationPriority>('ALL');
@@ -126,7 +124,7 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                   </div>
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                     <Link
-                      href={`/admin/clientes/${c.customerId}`}
+                      href={buildCustomerHubHref(c.customerId)}
                       className="text-sm font-semibold hover:text-cyan-300 transition-colors"
                     >
                       {c.name}
@@ -210,7 +208,7 @@ export default function ReactivationClient({ initialCandidates }: Props) {
                   {copied === c.customerId ? '✓ Copiat' : 'Copiar missatge'}
                 </button>
                 <Link
-                  href={`/admin/clientes/${c.customerId}`}
+                  href={buildCustomerHubHref(c.customerId)}
                   className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] hover:bg-white/10"
                 >
                   Veure fitxa →

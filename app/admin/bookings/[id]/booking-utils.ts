@@ -24,6 +24,10 @@ export type BookingProposalRow = {
   contractReference: string | null;
   contractPdfUrl: string | null;
   contractSignedAt: Date | null;
+  contractSignedBy: string | null;
+  contractSignatureIp: string | null;
+  contractSignatureUa: string | null;
+  contractSignatureBlob: string | null;
 };
 
 export type BookingInvoiceRow = {

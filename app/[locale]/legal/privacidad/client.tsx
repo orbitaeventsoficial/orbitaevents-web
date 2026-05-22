@@ -1,11 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { toIntlLocale } from '@/lib/constants';
 import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function PrivacidadClient() {
   const t = useTranslations('legal.privacidad');
+  const locale = useLocale();
   const { business } = SITE_CONFIG;
 
   return (
@@ -15,7 +17,7 @@ export default function PrivacidadClient() {
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>
-            {t('lastUpdate')} {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {t('lastUpdate')} {new Date().toLocaleDateString(toIntlLocale(locale), { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
 
           {/* Banner Portal de Privacitat */}
@@ -81,9 +83,9 @@ export default function PrivacidadClient() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/20">
-                    <th className="text-left py-2 px-3 text-white">{t('section3.table.finalidad')}</th>
-                    <th className="text-left py-2 px-3 text-white">{t('section3.table.baseLegal')}</th>
-                    <th className="text-left py-2 px-3 text-white">{t('section3.table.conservacion')}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-white">{t('section3.table.finalidad')}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-white">{t('section3.table.baseLegal')}</th>
+                    <th scope="col" className="text-left py-2 px-3 text-white">{t('section3.table.conservacion')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-white/70">

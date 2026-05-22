@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import type { BookingFormData, BookingLeadData, BookingSelectedExtras } from './booking-form.types';
 
 interface UseNewBookingSubmitOptions {
@@ -84,7 +85,7 @@ export function useNewBookingSubmit({
       }
 
       const data = await res.json();
-      router.push(`/admin/bookings/${data.booking.id}`);
+      router.push(buildBookingHref(data.booking.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {

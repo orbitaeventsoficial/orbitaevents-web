@@ -21,6 +21,8 @@ import {
 import {
   KpiCard, ProgressBar, HealthScore, PaymentTimelineBar, CobramentFiltersSection,
 } from './economia-components';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
 
 
@@ -72,7 +74,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
         <div className="flex flex-wrap gap-2">
           <ExportCsvButton
             filename="rendibilitat"
-            data={[...props.topProfitability, ...props.riskProfitability] as unknown as Record<string, unknown>[]}
+            data={[...props.topProfitability, ...props.riskProfitability]}
             columns={[
               { header: 'Referència', accessor: (r) => String(r.reference || '') },
               { header: 'Client', accessor: (r) => String(r.clientName || '') },
@@ -298,7 +300,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <ProgressBar
                     value={props.monthCollected}
                     max={props.monthCollected + props.outstandingTotal}
-                    color="bg-gradient-to-r from-emerald-500 to-emerald-400"
+                    color="admin-gradient--progress-emerald"
                   />
                 </motion.section>
               )}
@@ -406,7 +408,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     {props.topProfitability.slice(0, 5).map((row, i) => (
                       <Link
                         key={row.id}
-                        href={`/admin/bookings/${row.id}`}
+                        href={buildBookingHref(row.id)}
                         className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                       >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm font-black">
@@ -514,7 +516,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         <div className="mt-3 border-t border-white/10 pt-3">
                           <div className="mb-3 flex items-center justify-between gap-2">
                             <p className="text-[11px]">Codi reserva: {row.reference}</p>
-                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors">
+                            <Link href={buildBookingHref(row.id)} className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors">
                               Obrir reserva
                             </Link>
                           </div>
@@ -585,7 +587,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositAmount)}</p>}
                           {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingAmount)}</p>}
                         </div>
-                        <Link href={`/admin/bookings/${row.id}`} className="shrink-0 text-xs">
+                        <Link href={buildBookingHref(row.id)} className="shrink-0 text-xs">
                           &rarr;
                         </Link>
                       </div>
@@ -633,7 +635,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           props.topProfitability.slice(0, 12).map((row, i) => (
                             <Link
                               key={row.id}
-                              href={`/admin/bookings/${row.id}`}
+                              href={buildBookingHref(row.id)}
                               className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                             >
                               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-black">
@@ -680,7 +682,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           props.riskProfitability.slice(0, 12).map((row) => (
                             <Link
                               key={row.id}
-                              href={`/admin/bookings/${row.id}`}
+                              href={buildBookingHref(row.id)}
                               className="flex items-center gap-3 rounded-xl border p-3 transition-colors group"
                             >
                               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs">📉</span>
@@ -795,12 +797,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <p className="text-xs mb-4">
                   Combinació de pipeline ponderat i tendència històrica amb estacionalitat. La columna
                   <span className="font-semibold"> Rang ±1σ</span> reflecteix el ventall esperat segons la
-                  variància Bernoulli per lead (banda al ~68%).
+                  variància Bernoulli per lead (banda al ~68%). <span className="font-semibold">YoY</span> compara
+                  amb el mateix mes l'any anterior; <span className="font-semibold">Confirmades</span> mostra reserves ja en agenda.
                 </p>
 
                 {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
                   <div className="overflow-x-auto rounded-xl border border-white/10">
-                    <table className="min-w-[820px] w-full text-sm" aria-label="Previsió de vendes">
+                    <table className="min-w-[1080px] w-full text-sm" aria-label="Previsió de vendes">
                       <thead>
                         <tr className="text-left text-[11px] uppercase tracking-wider">
                           <th scope="col" className="px-3 py-2">Mes</th>
@@ -808,11 +811,23 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                           <th scope="col" className="px-3 py-2 text-right">Pipeline ponderat</th>
                           <th scope="col" className="px-3 py-2 text-right">Previsió combinada</th>
                           <th scope="col" className="px-3 py-2 text-right">Rang ±1σ</th>
+                          <th scope="col" className="px-3 py-2 text-right">YoY (any anterior)</th>
+                          <th scope="col" className="px-3 py-2 text-right">Confirmades</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/10">
                         {props.forecast_pipeline.map((row) => {
                           const hasBand = row.combinedHigh > row.combinedLow;
+                          const yoyDelta = row.previousYearActual > 0
+                            ? (row.combined - row.previousYearActual) / row.previousYearActual
+                            : null;
+                          const yoyToneClass = yoyDelta == null
+                            ? 'opacity-50'
+                            : yoyDelta >= 0.1
+                              ? 'text-emerald-300'
+                              : yoyDelta <= -0.1
+                                ? 'text-rose-300'
+                                : 'opacity-70';
                           return (
                             <tr key={row.month} className="hover:bg-white/[0.03]">
                               <td className="px-3 py-2 font-medium">{row.month}</td>
@@ -822,6 +837,29 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <td className="px-3 py-2 text-right text-xs">
                                 {hasBand ? (
                                   <span className="font-mono">{money(row.combinedLow)} – {money(row.combinedHigh)}</span>
+                                ) : (
+                                  <span className="opacity-50">—</span>
+                                )}
+                              </td>
+                              <td className={`px-3 py-2 text-right text-xs ${yoyToneClass}`}>
+                                {row.previousYearActual > 0 ? (
+                                  <span className="font-mono">
+                                    {money(row.previousYearActual)}
+                                    {yoyDelta != null && (
+                                      <span className="ml-1">
+                                        ({yoyDelta >= 0 ? '+' : ''}{Math.round(yoyDelta * 100)}%)
+                                      </span>
+                                    )}
+                                  </span>
+                                ) : (
+                                  <span>—</span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2 text-right text-xs">
+                                {row.confirmedBookings > 0 ? (
+                                  <span className="font-mono">
+                                    {row.confirmedBookings} · {money(row.confirmedRevenue)}
+                                  </span>
                                 ) : (
                                   <span className="opacity-50">—</span>
                                 )}
@@ -929,7 +967,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         return (
                           <tr key={row.id} className="hover:bg-white/[0.03]">
                             <td className="px-3 py-2">
-                              <Link href={`/admin/packs/${row.id}`} className="font-semibold">
+                              <Link href={buildPackHref(row.id)} className="font-semibold">
                                 {row.name}
                               </Link>
                               <p className="text-[11px]">{row.slug} · {row.service}</p>
@@ -1002,4 +1040,3 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     </AdminPage>
   );
 }
-

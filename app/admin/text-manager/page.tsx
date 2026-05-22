@@ -1,5 +1,6 @@
 'use client';
 import { log } from '@/lib/logger';
+import { formatTimeShort } from '@/lib/constants';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
@@ -919,7 +920,7 @@ export default function TextManagerPage() {
                           {change.path.split('.').slice(-2).join('.')}
                         </code>
                         <div className="mt-1">
-                          {change.timestamp.toLocaleTimeString()}
+                          {formatTimeShort(change.timestamp)}
                         </div>
                       </div>
                     ))}

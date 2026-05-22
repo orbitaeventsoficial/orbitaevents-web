@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import type { CustomerCommSummaryDTO, CustomerInsightsDTO } from '@/lib/customer-hub/dto';
 import { buildCustomerNextActionLink } from '@/lib/customer-hub/nextActionLink';
+import { formatCurrency } from '@/lib/constants';
 
 const HEALTH_CONFIG: Record<CustomerInsightsDTO['relationalHealth'], { label: string; color: string; bg: string }> = {
   EXCELLENT: { label: 'Excel·lent', color: 'text-emerald-300', bg: 'bg-emerald-500/15 border-emerald-500/30' },
   GOOD: { label: 'Bona', color: 'text-cyan-300', bg: 'bg-cyan-500/15 border-cyan-500/30' },
   AT_RISK: { label: 'En risc', color: 'text-amber-300', bg: 'bg-amber-500/15 border-amber-500/30' },
-  COLD: { label: 'Fred', color: 'text-slate-300', bg: 'bg-slate-500/15 border-slate-500/30' },
+  COLD: { label: 'Fred', color: 'text-white/60', bg: 'bg-white/[0.08] border-white/15' },
   LOST: { label: 'Perdut', color: 'text-rose-300', bg: 'bg-rose-500/15 border-rose-500/30' },
 };
 
@@ -21,13 +22,9 @@ const URGENCY_COLOR: Record<string, string> = {
 const COMMERCIAL_RISK_COLOR: Record<string, string> = {
   HIGH: 'text-rose-300',
   MEDIUM: 'text-amber-300',
-  LOW: 'text-slate-300',
+  LOW: 'text-white/60',
   NONE: 'text-emerald-300',
 };
-
-function formatCurrency(val: number): string {
-  return val.toLocaleString('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-}
 
 export default function InsightsBanner({
   insights,

@@ -52,6 +52,7 @@ export default function CronsClient() {
       const data = await res.json();
       setCrons(data.crons || []);
     } catch (err) {
+      console.error('Error carregant llista de crons', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setLoading(false);

@@ -16,6 +16,7 @@ import ExportCsvButton from '../components/ExportCsvButton';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { ADMIN_ECONOMY_HELP, helpAttrs } from '@/app/admin/components/adminHelpContent';
 import { type PaymentRow, money, paymentStateBadge } from './economia-types';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export function KpiCard({ label, value, sub, color, borderColor, bgColor, delay = 0 }: {
   label: string;
@@ -294,6 +295,7 @@ export function CobramentFiltersSection({
           <input
             type="text"
             placeholder="Cerca referència o client..."
+            aria-label="Cercar per referència o client"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 min-w-[180px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-white/30 focus:outline-none"
@@ -432,7 +434,7 @@ export function CobramentFiltersSection({
                 <td className="px-2 py-2 text-right hidden sm:table-cell font-semibold text-xs">{money(row.total)}</td>
                 <td className="px-2 py-2">
                   <Link
-                    href={`/admin/bookings/${row.id}`}
+                    href={buildBookingHref(row.id)}
                     className="text-xs text-white/40 hover:text-white/70"
                     {...helpAttrs(ADMIN_ECONOMY_HELP.rowLink(row.reference))}
                   >

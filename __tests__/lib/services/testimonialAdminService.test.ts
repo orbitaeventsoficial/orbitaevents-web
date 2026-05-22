@@ -6,6 +6,7 @@ const { mockPrisma } = vi.hoisted(() => ({
       findMany: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     customerDiscountCode: {
       findMany: vi.fn(),
@@ -18,6 +19,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 import {
   listAdminTestimonials,
   moderateTestimonial,
+  countPendingTestimonials,
 } from '@/lib/services/testimonialAdminService';
 
 beforeEach(() => {
@@ -131,5 +133,26 @@ describe('moderateTestimonial', () => {
   it('retorna 400 per acció desconeguda', async () => {
     const result = await moderateTestimonial('t1', 'unknown');
     expect(result.status).toBe(400);
+  });
+});
+
+describe('countPendingTestimonials', () => {
+  it('retorna el nombre de testimonis pendents', async () => {
+    mockPrisma.customerTestimonial.count.mockResolvedValue(7);
+
+    const result = await countPendingTestimonials();
+
+    expect(result).toBe(7);
+    expect(mockPrisma.customerTestimonial.count).toHaveBeenCalledWith({
+      where: { isApproved: false },
+    });
+  });
+
+  it('retorna 0 si no hi ha pendents', async () => {
+    mockPrisma.customerTestimonial.count.mockResolvedValue(0);
+
+    const result = await countPendingTestimonials();
+
+    expect(result).toBe(0);
   });
 });

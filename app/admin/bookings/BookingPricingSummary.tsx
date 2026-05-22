@@ -1,3 +1,5 @@
+import { formatCurrency, formatCurrencyExact } from '@/lib/constants';
+
 interface BookingPricingSummaryProps {
   pricing: {
     packPrice: number;
@@ -55,51 +57,51 @@ export default function BookingPricingSummary({
         <div className="space-y-1.5 text-sm">
           <div className="flex justify-between">
             <span>Pack</span>
-            <span>{pricing.packPrice.toFixed(2)}€</span>
+            <span>{formatCurrencyExact(pricing.packPrice)}</span>
           </div>
           {pricing.extraHoursPrice > 0 && (
             <div className="flex justify-between">
               <span>Hores extra</span>
-              <span>+{pricing.extraHoursPrice.toFixed(2)}€</span>
+              <span>+{formatCurrencyExact(pricing.extraHoursPrice)}</span>
             </div>
           )}
           {pricing.extrasPrice > 0 && (
             <div className="flex justify-between">
               <span>Extres</span>
-              <span>+{pricing.extrasPrice.toFixed(2)}€</span>
+              <span>+{formatCurrencyExact(pricing.extrasPrice)}</span>
             </div>
           )}
           <div className="flex justify-between border-t pt-1.5">
             <span>Subtotal</span>
-            <span>{pricing.subtotal.toFixed(2)}€</span>
+            <span>{formatCurrencyExact(pricing.subtotal)}</span>
           </div>
           {pricing.discount > 0 && (
             <div className="flex justify-between">
               <span>Descompte</span>
-              <span>-{pricing.discount.toFixed(2)}€</span>
+              <span>-{formatCurrencyExact(pricing.discount)}</span>
             </div>
           )}
           <div className="flex justify-between">
             <span>IVA (21%)</span>
-            <span>+{pricing.vatAmount.toFixed(2)}€</span>
+            <span>+{formatCurrencyExact(pricing.vatAmount)}</span>
           </div>
           <div className="flex justify-between border-t pt-2 text-lg font-bold">
             <span>Total</span>
-            <span>{pricing.total.toFixed(2)}€</span>
+            <span>{formatCurrencyExact(pricing.total)}</span>
           </div>
           {pricing.travelCharge > 0 && (
             <div className="flex justify-between">
               <span>🚗 Desplaçament ({travelBlocks} trams)</span>
-              <span>+{pricing.travelCharge.toFixed(2)}€</span>
+              <span>+{formatCurrencyExact(pricing.travelCharge)}</span>
             </div>
           )}
           <div className="flex justify-between pt-1 text-xs">
             <span>Senyal (30%)</span>
-            <span>{pricing.deposit.toFixed(2)}€</span>
+            <span>{formatCurrencyExact(pricing.deposit)}</span>
           </div>
           {internalTravelCost > 0 && (
             <p className="border-t pt-1 text-[11px]">
-              * Cost intern estimat de transport: {internalTravelCost.toFixed(2)} € (coeficient {defaultVehicleCostPerKm.toFixed(2)} €/km sobre km extra).
+              * Cost intern estimat de transport: {formatCurrencyExact(internalTravelCost)} (coeficient {defaultVehicleCostPerKm.toFixed(2)} €/km sobre km extra).
             </p>
           )}
         </div>
@@ -113,11 +115,11 @@ export default function BookingPricingSummary({
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-xs opacity-60">Cost estimat</p>
-                <p className="text-lg font-bold">{marginEstimate.directCost.toFixed(0)}€</p>
+                <p className="text-lg font-bold">{formatCurrency(marginEstimate.directCost)}</p>
               </div>
               <div>
                 <p className="text-xs opacity-60">Marge net</p>
-                <p className={`text-lg font-bold ${tone.text}`}>{marginEstimate.netMargin.toFixed(0)}€</p>
+                <p className={`text-lg font-bold ${tone.text}`}>{formatCurrency(marginEstimate.netMargin)}</p>
               </div>
               <div>
                 <p className="text-xs opacity-60">Marge %</p>

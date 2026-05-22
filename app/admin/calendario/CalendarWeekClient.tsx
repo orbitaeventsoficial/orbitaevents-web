@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { buildLeadCustomerHref } from '@/lib/admin/leadCustomerHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 import { useRouter } from 'next/navigation';
 import { formatDateShort, formatDateFull } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
@@ -85,6 +86,7 @@ export default function CalendarWeekClient() {
       setBlockingDate(null);
       setBlockNote('');
     } catch (err) {
+      console.error('Error bloquejant dia del calendari', err);
       toast.error(err instanceof Error ? err.message : 'Error bloquejant dia');
     }
   }, [toast]);
@@ -98,6 +100,7 @@ export default function CalendarWeekClient() {
       toast.success(`Dia ${formatDateShort(dateKey)} desbloquejat`);
       setRefreshKey((k) => k + 1);
     } catch (err) {
+      console.error('Error desbloquejant dia del calendari', err);
       toast.error(err instanceof Error ? err.message : 'Error desbloquejant dia');
     }
   }, [toast]);
@@ -351,7 +354,7 @@ export default function CalendarWeekClient() {
                 {visibleLayers.bookings && dayData.reservas.map((r) => (
                   <Link
                     key={r.id}
-                    href={`/admin/bookings/${r.id}`}
+                    href={buildBookingHref(r.id)}
                     className="block rounded-xl border px-2.5 py-2 transition-all admin-card-glass"
                   >
                     <div className="flex items-center justify-between gap-1">

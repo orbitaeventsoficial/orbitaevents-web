@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 import { getRequestId } from '@/lib/request-context';
-import { prisma } from '@/lib/prisma';
+import { updateBulkPaymentField } from '@/lib/services/bookingBulkPaymentService';
 import { z } from 'zod';
 
 const bulkPaymentSchema = z.object({
@@ -27,13 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { bookingIds, field, value } = parsed.data;
-    const now = new Date();
-    const timestampField = field === 'depositPaid' ? 'depositPaidAt' : 'remainingPaidAt';
-
-    const result = await prisma.booking.updateMany({
-      where: { id: { in: bookingIds } },
-      data: { [field]: value, [timestampField]: value ? now : null },
-    });
+    const result = await updateBulkPaymentField(bookingIds, field, value);
 
     log.info(`Bulk payment update: ${field}=${value} per ${result.count} reserves`, {
       context: { requestId, bookingIds },

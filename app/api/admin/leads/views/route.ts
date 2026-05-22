@@ -1,7 +1,6 @@
 ﻿// app/api/admin/leads/views/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, unauthorizedResponse, verifyBasicAuth, verifyBearerAuth } from '@/lib/auth';
-import { verifyCsrf } from '@/lib/csrf';
+import { requireAuth, verifyBasicAuth, verifyBearerAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
 import {
   createLeadSavedView,
@@ -36,11 +35,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const bearer = verifyBearerAuth(req);
-  const auth = bearer.authenticated ? bearer : verifyBasicAuth(req);
-  if (!auth.authenticated) return unauthorizedResponse(auth.error);
-  const csrfError = verifyCsrf(req);
-  if (csrfError) return csrfError;
+  const authError = requireAuth(req);
+  if (authError) return authError;
 
   try {
     const body = await req.json();
@@ -60,11 +56,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const bearer = verifyBearerAuth(req);
-  const auth = bearer.authenticated ? bearer : verifyBasicAuth(req);
-  if (!auth.authenticated) return unauthorizedResponse(auth.error);
-  const csrfError = verifyCsrf(req);
-  if (csrfError) return csrfError;
+  const authError = requireAuth(req);
+  if (authError) return authError;
 
   try {
     const { searchParams } = new URL(req.url);

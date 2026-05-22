@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
+import { formatCurrencyExact } from '@/lib/constants';
 import {
   createQuoteFromLead,
   generateQuoteHTML,
@@ -252,7 +253,7 @@ export async function sendAdminQuoteEmail(body: AdminQuoteEmailPayload | undefin
     await prisma.leadNote.create({
       data: {
         leadId: targetLeadId,
-        content: `📄 Pressupost enviat: ${quoteData.quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
+        content: `📄 Pressupost enviat: ${quoteData.quoteNumber}\n💰 Total: ${formatCurrencyExact(quoteData.total)}\n📦 Pack: ${packData.name}`,
       },
     });
     const documentTitle = `Pressupost ${quoteData.quoteNumber}`;

@@ -14,16 +14,18 @@ export function ComposeModal({
   replyTo,
   packOptions,
   onClose,
+  initialBody,
 }: {
   replyTo: UnifiedEmail | null;
   packOptions: QuotePackOption[];
   onClose: () => void;
+  initialBody?: string;
 }) {
   const PACK_OPTIONS = resolvePackOptions(packOptions);
   const initialPack = PACK_OPTIONS[0];
   const [to, setTo] = useState(replyTo?.from || '');
   const [subject, setSubject] = useState(replyTo ? `Re: ${replyTo.subject}` : '');
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(initialBody ?? '');
   const [locale] = useState((replyTo?.leadData?.preferredLocale || 'ca').toLowerCase());
   const [attachQuote, setAttachQuote] = useState(false);
   const [quotePackId, setQuotePackId] = useState(initialPack.id);

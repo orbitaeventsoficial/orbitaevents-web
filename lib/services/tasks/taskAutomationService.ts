@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { OPEN_TASK_STATUSES, TASK_DEDUPE_KEY } from '@/lib/constants';
+import { TASK_AUTOMATION_THRESHOLDS } from '@/lib/constants/automationThresholds';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -184,10 +185,10 @@ export function generateAutoTasks(input: AutoTaskInput): AutoTaskProposal[] {
 
 export async function runTaskAutomation(now: Date = new Date()): Promise<AutoTaskResult> {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const threeDaysAhead = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 3);
-  const slaThreshold = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const staleThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const quoteFollowupThreshold = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+  const threeDaysAhead = new Date(now.getFullYear(), now.getMonth(), now.getDate() + TASK_AUTOMATION_THRESHOLDS.bookingPrepDaysAhead);
+  const slaThreshold = new Date(now.getTime() - TASK_AUTOMATION_THRESHOLDS.slaBrokenMs);
+  const staleThreshold = new Date(now.getTime() - TASK_AUTOMATION_THRESHOLDS.staleLeadMs);
+  const quoteFollowupThreshold = new Date(now.getTime() - TASK_AUTOMATION_THRESHOLDS.quoteFollowupMs);
 
   const [slaLeads, staleLeads, bookingsToPrep, overduePayments, postEventPending, atRiskClients, quoteFollowups] = await Promise.all([
     prisma.lead.findMany({
@@ -216,7 +217,7 @@ export async function runTaskAutomation(now: Date = new Date()): Promise<AutoTas
       take: 20,
     }),
     prisma.customer.findMany({
-      where: { healthScore: { lte: 40 } },
+      where: { healthScore: { lte: TASK_AUTOMATION_THRESHOLDS.atRiskHealthScoreMax } },
       select: { id: true, name: true },
       take: 20,
     }),

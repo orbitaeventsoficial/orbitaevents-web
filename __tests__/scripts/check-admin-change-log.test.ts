@@ -14,7 +14,7 @@ function writeFixture(protocol: string, counter: number, diario?: string) {
   writeFileSync(path.join(root, 'docs', 'protocol-producte-admin-ca.md'), protocol, 'utf8');
   writeFileSync(
     path.join(root, 'docs', 'diario.md'),
-    diario ?? `## 2026-04-10 — Canvi #${counter}: canvi de prova\n`,
+    diario ?? diarioEntry(counter),
     'utf8',
   );
   writeFileSync(
@@ -30,11 +30,28 @@ function runGuard(protocol: string, counter: number, diario?: string) {
   return spawnSync(process.execPath, [scriptPath], { cwd, encoding: 'utf8' });
 }
 
+function diarioEntry(number: number, fields = true) {
+  return [
+    `## 2026-04-10 — Canvi #${number}: canvi de prova`,
+    '### Tancament',
+    fields ? '- Validació tècnica: test de prova.' : '',
+    fields ? '- Validació funcional: comportament de prova.' : '',
+    fields ? '- Validació humana/UX: lectura de prova.' : '',
+    fields ? '- Començat per: `codex`' : '',
+    fields ? '- Treballant per: `codex`' : '',
+    fields ? '- Tancat per: `codex`' : '',
+    '',
+  ].filter(Boolean).join('\n');
+}
+
 function change(number: number, fields = true) {
   return [
     `### Canvi #${number} — 2026-04-10 — codex (FET)`,
     '**Canvi de prova.**',
     '- Detall de prova.',
+    fields ? '- Validació tècnica: test de prova.' : '',
+    fields ? '- Validació funcional: comportament de prova.' : '',
+    fields ? '- Validació humana/UX: lectura de prova.' : '',
     fields ? '- Començat per: `codex`' : '',
     fields ? '- Treballant per: `codex`' : '',
     fields ? '- Tancat per: `codex`' : '',
@@ -64,10 +81,63 @@ describe('check-admin-change-log', () => {
     const result = runGuard(
       `${change(57)}\n${change(58)}\n`,
       58,
-      '## 2026-04-10 — Canvi #57: canvi anterior\n',
+      diarioEntry(57),
     );
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('docs/diario.md missing entry for current change #58');
+  });
+
+  it('rejects current diario entries without ownership fields', () => {
+    const result = runGuard(
+      `${change(57)}\n${change(58)}\n`,
+      58,
+      [
+        '## 2026-04-10 — Canvi #58: canvi de prova',
+        '### Tancament',
+        '- Validació tècnica: test de prova.',
+        '- Validació funcional: comportament de prova.',
+        '- Validació humana/UX: lectura de prova.',
+        '',
+      ].join('\n'),
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('docs/diario.md current entry #58 missing ownership fields');
+  });
+
+  it('rejects current diario entries without validation layers', () => {
+    const result = runGuard(
+      `${change(57)}\n${change(58)}\n`,
+      58,
+      [
+        '## 2026-04-10 — Canvi #58: canvi de prova',
+        '### Tancament',
+        '- Començat per: `codex`',
+        '- Treballant per: `codex`',
+        '- Tancat per: `codex`',
+        '',
+      ].join('\n'),
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('docs/diario.md current entry #58 missing validation layers');
+  });
+
+  it('rejects current protocol entries without validation layers', () => {
+    const result = runGuard(
+      [
+        change(57),
+        [
+          '### Canvi #58 — 2026-04-10 — codex (FET)',
+          '**Canvi de prova.**',
+          '- Detall de prova.',
+          '- Començat per: `codex`',
+          '- Treballant per: `codex`',
+          '- Tancat per: `codex`',
+        ].join('\n'),
+      ].join('\n'),
+      58,
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('protocol current entry #58 missing validation layers');
   });
 
   it('rejects new changes without ownership fields', () => {

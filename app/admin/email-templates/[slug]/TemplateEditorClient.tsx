@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { buildEmailTemplateHref } from '@/lib/admin/emailTemplateWorkspaceHref';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { EditorControlStrip } from '../../components/EditorControlStrip';
 import SortableList from '../../components/SortableList';
@@ -153,6 +154,7 @@ export default function TemplateEditorClient({
         setBlocks([createBlock('heading'), createBlock('text')]);
       }
     } catch (err) {
+      console.error('Error carregant plantilla email', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setLoading(false);
@@ -181,6 +183,7 @@ export default function TemplateEditorClient({
       if (!res.ok) throw new Error('Error desant');
       toast.success('Plantilla desada!');
     } catch (err) {
+      console.error('Error desant plantilla email', err);
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setSaving(false);
@@ -264,6 +267,7 @@ export default function TemplateEditorClient({
 
       toast.success(`Traduït a ${locale.toUpperCase()} automàticament`);
     } catch (err) {
+      console.error('Error traduint plantilla email automàticament', err);
       toast.error(err instanceof Error ? err.message : 'Error traduint');
     } finally {
       setTranslating(false);
@@ -354,7 +358,7 @@ export default function TemplateEditorClient({
               type="button"
               onClick={() => {
                 setLocale(l);
-                router.push(`/admin/email-templates/${slug}?locale=${l}`);
+                router.push(buildEmailTemplateHref(slug, l));
               }}
               className={getLocaleTabClass(l === locale)}
             >
@@ -423,9 +427,14 @@ export default function TemplateEditorClient({
                   <button
                     key={v}
                     type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`{{${v}}}`);
-                      toast.success(`{{${v}}} copiat!`);
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(`{{${v}}}`);
+                        toast.success(`{{${v}}} copiat!`);
+                      } catch (err) {
+                        console.error('Error copiant variable al portapapers', err);
+                        toast.error("No s'ha pogut copiar la variable");
+                      }
                     }}
                     className="ap-badge font-mono text-[10px]"
                     title={`Clic per copiar {{${v}}}`}

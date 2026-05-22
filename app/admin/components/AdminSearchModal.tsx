@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import {
@@ -204,20 +204,20 @@ export default function AdminSearchModal({
     setSelectedIndex(0);
   }, [trimmedQuery, results, recentItems, open]);
 
-  const closeAndReset = () => {
+  const closeAndReset = useCallback(() => {
     setQuery('');
     setResults(EMPTY_RESULTS);
     setError(null);
     setSelectedIndex(0);
     onClose();
-  };
+  }, [onClose]);
 
-  const handleSelect = (item: AdminPaletteEntry) => {
+  const handleSelect = useCallback((item: AdminPaletteEntry) => {
     addRecentItem({ href: item.href, label: item.label, type: item.type });
     setRecentItems(getRecentItems());
     closeAndReset();
     router.push(item.href);
-  };
+  }, [closeAndReset, router]);
 
   useEffect(() => {
     if (!open) return;
@@ -248,7 +248,7 @@ export default function AdminSearchModal({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, selectableEntries, selectedIndex]);
+  }, [open, selectableEntries, selectedIndex, closeAndReset, handleSelect]);
 
   const hasResults = commandEntries.length > 0 || searchEntries.length > 0;
   const leadEntries = searchEntries.filter((entry) => entry.type === 'Entrada');
@@ -264,7 +264,7 @@ export default function AdminSearchModal({
         aria-modal="true"
         aria-labelledby="admin-search-title"
         onClick={(event) => event.stopPropagation()}
-        className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#0b1117]/95 shadow-2xl"
+        className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-white/10 admin-overlay-deep shadow-2xl"
         {...helpAttrs(ADMIN_SHARED_HELP.searchModal)}
       >
         <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">

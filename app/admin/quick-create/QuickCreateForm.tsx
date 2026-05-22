@@ -6,6 +6,8 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { EVENT_TYPE_VALUES, getEventLabel } from '@/lib/constants';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
+import { buildProposalHref } from '@/lib/admin/proposalWorkspaceHref';
 import { suggestPackForLead } from '@/lib/services/packSuggestionService';
 
 type Pack = { id: string; slug: string; code: string; price: number };
@@ -130,10 +132,10 @@ export default function QuickCreateForm({ packs }: { packs: Pack[] }) {
       }
       if (payload.bookingId) {
         toast.success('Lead, pressupost i reserva creats');
-        router.push(`/admin/bookings/${payload.bookingId}`);
+        router.push(buildBookingHref(payload.bookingId));
       } else if (payload.proposalId) {
         toast.success('Lead i pressupost creats');
-        router.push(`/admin/presupuestos/${payload.proposalId}`);
+        router.push(buildProposalHref(payload.proposalId));
       } else {
         toast.success('Lead creat');
         router.push(buildLeadWorkspaceHref(payload.leadId));

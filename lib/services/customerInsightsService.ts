@@ -1,3 +1,4 @@
+import { formatCurrencyExact } from '@/lib/constants';
 import type { BookingDTO, CustomerHubDTO, LeadDTO, TaskDTO, MessageDTO } from '@/lib/customer-hub/dto';
 
 // ─── Types ──────────────────────────────────────────────────────────────
@@ -145,7 +146,7 @@ function deriveNextAction(data: {
     if (unpaidBooking) {
       return {
         type: 'COLLECT_PAYMENT',
-        label: `Cobrament pendent: ${pendingPaymentTotal.toLocaleString('ca-ES')}€`,
+        label: `Cobrament pendent: ${formatCurrencyExact(pendingPaymentTotal)}`,
         urgency: 'HIGH',
         context: unpaidBooking.reference,
       };

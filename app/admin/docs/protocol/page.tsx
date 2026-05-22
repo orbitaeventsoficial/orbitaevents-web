@@ -152,6 +152,7 @@ export default async function AdminProtocolPage({
             name="q"
             defaultValue={query}
             placeholder="Cerca per #462, claude, audit trail..."
+            aria-label="Cercar al protocol"
             className="flex-1 min-w-[240px] rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm placeholder:text-white/40 focus:border-amber-500/50 focus:outline-none"
           />
           <select

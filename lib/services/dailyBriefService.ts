@@ -10,6 +10,7 @@ import { LEAD_SCORING_STATUS_PROBABILITY } from '@/lib/constants';
 import { generateCampaigns, type Campaign } from './campaignService';
 import { deriveLeadResponseState, loadPendingFollowUps } from '@/lib/services/responseTrackingService';
 import { loadPipelineSuggestions } from '@/lib/services/leadPipelineSuggestionsService';
+import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
 
 export function parseBudgetValue(input?: string | null): number {
   if (!input) return 0;
@@ -22,6 +23,14 @@ export function parseBudgetValue(input?: string | null): number {
 // ───────────────────────────────────────────────────────────────────────────
 
 export type AlertLevel = 'CRITICAL' | 'WARNING' | 'INFO';
+
+export type SocialBriefContent = {
+  daysSinceLastPost: number | null;
+  isActive: boolean;
+  consistencyScore: number;
+  draftsPending: number;
+  scheduledUpcoming: number;
+};
 
 export type BriefAlert = {
   level: AlertLevel;
@@ -53,6 +62,7 @@ export type DailyBrief = {
   alerts: BriefAlert[];
   actions: BriefAction[];
   topCampaigns: Array<{ name: string; type: string; audienceSize: number; urgency: string }>;
+  socialContent: SocialBriefContent | null;
 };
 
 export type DailyBriefInput = {
@@ -77,6 +87,7 @@ export type DailyBriefInput = {
   leadsLast7d: number;
   leadsLast30d: number;
   now: Date;
+  socialContent?: SocialBriefContent;
 };
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -341,6 +352,33 @@ export function generateDailyBrief(input: DailyBriefInput): DailyBrief {
     actions.push({ priority: 50, label: 'Completar post-event', detail: `${input.postEventPending} pendents`, href: '/admin/post-event' });
   }
 
+  if (input.socialContent) {
+    const { daysSinceLastPost, isActive, draftsPending } = input.socialContent;
+    if (daysSinceLastPost !== null && daysSinceLastPost > 30) {
+      alerts.push({
+        level: 'WARNING',
+        icon: '📱',
+        title: `Canal social aturat: ${daysSinceLastPost} dies sense publicar`,
+        detail: "La visibilitat orgànica s'erosiona. Publica contingut per mantenir presència.",
+        href: '/admin/social',
+      });
+      actions.push({ priority: 45, label: 'Reactivar canal social', detail: `${daysSinceLastPost} dies sense publicar`, href: '/admin/social' });
+    } else if (daysSinceLastPost !== null && daysSinceLastPost > 14) {
+      alerts.push({
+        level: 'INFO',
+        icon: '📱',
+        title: `Canal social inactiu: ${daysSinceLastPost} dies sense publicar`,
+        detail: draftsPending > 0
+          ? `${draftsPending} ${plural(draftsPending, 'esborrany pendent', 'esborranys pendents')} de publicació.`
+          : 'Crea i publica contingut nou per mantenir visibilitat.',
+        href: '/admin/social',
+      });
+      actions.push({ priority: 35, label: 'Publicar contingut social', detail: `${daysSinceLastPost} dies sense publicar`, href: '/admin/social' });
+    } else if (daysSinceLastPost === null && !isActive && isLeadDrought) {
+      actions.push({ priority: 40, label: 'Iniciar canal social', detail: 'Cap post publicat. El social és el canal gratuït de Fase 1.', href: '/admin/social' });
+    }
+  }
+
   actions.sort((a, b) => b.priority - a.priority);
 
   const topCampaigns = input.campaigns
@@ -368,6 +406,7 @@ export function generateDailyBrief(input: DailyBriefInput): DailyBrief {
     alerts,
     actions,
     topCampaigns,
+    socialContent: input.socialContent ?? null,
   };
 }
 
@@ -386,6 +425,7 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   const [
+    socialPulse,
     newLeadsToday,
     openLeads,
     overdueTasksCount,
@@ -412,6 +452,7 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     firstTime,
     returning,
   ] = await Promise.all([
+    loadSocialContentPulse(),
     prisma.lead.count({ where: { createdAt: { gte: todayStart, lte: todayEnd } } }),
     prisma.lead.count({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
     prisma.task.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, dueDate: { lt: todayStart } } }),
@@ -509,5 +550,12 @@ export async function loadDailyBrief(now: Date = new Date()): Promise<DailyBrief
     leadsLast7d,
     leadsLast30d,
     now,
+    socialContent: {
+      daysSinceLastPost: socialPulse.daysSinceLastPost,
+      isActive: socialPulse.isActive,
+      consistencyScore: socialPulse.consistencyScore,
+      draftsPending: socialPulse.draftsPending,
+      scheduledUpcoming: socialPulse.scheduledUpcoming,
+    },
   });
 }

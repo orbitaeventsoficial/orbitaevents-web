@@ -1,4 +1,5 @@
 import { buildCustomerBookingListHref, buildCustomerTaskListHref } from './customerWorkspaceHref';
+import { buildBookingHref } from './bookingWorkspaceHref';
 
 export function buildLeadWorkspaceHref(leadId: string, hash?: string | null): string {
   return hash ? `/admin/leads/${leadId}#${hash}` : `/admin/leads/${leadId}`;
@@ -15,7 +16,7 @@ export function buildLeadPaymentsHref(input: {
   customerId?: string | null;
   bookingId?: string | null;
 }): string {
-  if (input.bookingId) return `/admin/bookings/${input.bookingId}`;
+  if (input.bookingId) return buildBookingHref(input.bookingId);
   if (input.customerId) return buildCustomerBookingListHref(input.customerId);
   return buildLeadWorkspaceHref(input.leadId);
 }

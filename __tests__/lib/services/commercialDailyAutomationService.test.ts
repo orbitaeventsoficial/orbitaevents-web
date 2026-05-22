@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const activeLeads = Array.from({ length: 51 }, (_, index) => ({
   id: `lead-${index + 1}`,
@@ -25,6 +27,7 @@ const {
   mockSaveCronRunStatus,
   mockLoadDailyBrief,
   mockLoadCapacityConflicts,
+  mockLoadWeeklyCapacityForecast,
   mockFetchRecentCanonicalCommunicationMetrics,
   mockGetRecipientsAsString,
 } = vi.hoisted(() => ({
@@ -52,6 +55,7 @@ const {
   mockSaveCronRunStatus: vi.fn(),
   mockLoadDailyBrief: vi.fn(),
   mockLoadCapacityConflicts: vi.fn(),
+  mockLoadWeeklyCapacityForecast: vi.fn(),
   mockFetchRecentCanonicalCommunicationMetrics: vi.fn(),
   mockGetRecipientsAsString: vi.fn(),
 }));
@@ -83,6 +87,9 @@ vi.mock('@/lib/services/dailyBriefService', () => ({
 }));
 vi.mock('@/lib/services/capacityConflictService', () => ({
   loadCapacityConflicts: mockLoadCapacityConflicts,
+}));
+vi.mock('@/lib/services/operationalForecastService', () => ({
+  loadWeeklyCapacityForecast: mockLoadWeeklyCapacityForecast,
 }));
 vi.mock('@/lib/services/timelineQueryService', () => ({
   fetchRecentCanonicalCommunicationMetrics: mockFetchRecentCanonicalCommunicationMetrics,
@@ -148,6 +155,7 @@ beforeEach(() => {
     conflicts: [],
     verdict: 'Cap conflicte de capacitat en els pròxims 14 dies.',
   });
+  mockLoadWeeklyCapacityForecast.mockResolvedValue([]);
 });
 
 describe('runCommercialDailyAutomation', () => {
@@ -323,5 +331,86 @@ describe('runCommercialDailyAutomation', () => {
     expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
       text: expect.stringContaining('• 2 seguiments urgents'),
     }));
+  });
+
+  it('inclou setmanes CRITICAL del forecast capacitat a email i WhatsApp', async () => {
+    mockLoadWeeklyCapacityForecast.mockResolvedValue([
+      {
+        weekStart: '2026-06-01',
+        weekEnd: '2026-06-07',
+        bookingsCount: 8,
+        totalGuests: 600,
+        overloadedDays: 2,
+        previousYearBookings: 4,
+        yoyDelta: 1,
+        alertLevel: 'CRITICAL',
+        alertMessage: 'Setmana sobrecarregada: 8 reserves (2 dies sobrecarregats).',
+      },
+      {
+        weekStart: '2026-06-08',
+        weekEnd: '2026-06-14',
+        bookingsCount: 5,
+        totalGuests: 350,
+        overloadedDays: 0,
+        previousYearBookings: 3,
+        yoyDelta: 0.67,
+        alertLevel: 'WARNING',
+        alertMessage: 'Setmana intensa: 5 reserves. Vigilar capacitat.',
+      },
+    ]);
+
+    const result = await runCommercialDailyAutomation();
+
+    expect(result.weeklyForecast.criticalCount).toBe(1);
+    expect(result.weeklyForecast.warningCount).toBe(1);
+    expect(result.weeklyForecast.criticalWeeks[0]?.weekStart).toBe('2026-06-01');
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining('Forecast capacitat 4 setmanes'),
+    }));
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.stringContaining('Setmana 2026-06-01'),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('📅 Forecast capacitat'),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.stringContaining('Setm. 2026-06-01: 8 reserves'),
+    }));
+  });
+
+  it('no afegeix bloc forecast quan totes les setmanes són OK', async () => {
+    mockLoadWeeklyCapacityForecast.mockResolvedValue([
+      {
+        weekStart: '2026-06-01',
+        weekEnd: '2026-06-07',
+        bookingsCount: 2,
+        totalGuests: 100,
+        overloadedDays: 0,
+        previousYearBookings: 2,
+        yoyDelta: 0,
+        alertLevel: 'INFO',
+        alertMessage: '2 reserves planificades.',
+      },
+    ]);
+
+    await runCommercialDailyAutomation();
+
+    expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({
+      html: expect.not.stringContaining('Forecast capacitat 4 setmanes'),
+    }));
+    expect(mockSendWhatsAppText).toHaveBeenCalledWith(expect.objectContaining({
+      text: expect.not.stringContaining('📅 Forecast capacitat'),
+    }));
+  });
+
+  it('normalitza JSON abans de passar details a Prisma sense cast unknown opac', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'lib', 'services', 'commercialDailyAutomationService.ts'),
+      'utf8',
+    );
+
+    expect(source).toContain('function normalizeDailyAutomationDetails(details: unknown): Prisma.InputJsonValue');
+    expect(source).toContain('JSON.parse(JSON.stringify(details)) as Prisma.InputJsonValue');
+    expect(source).not.toContain('as unknown as Prisma.InputJsonValue');
   });
 });

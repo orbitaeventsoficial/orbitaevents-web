@@ -257,10 +257,14 @@ export default function ScriptsClient() {
       ? 'Aquesta categoria toca dades reals. Cal mirar primer el text, arguments i si hi ha dry-run abans de disparar res.'
       : 'Amb la categoria acotada, el següent pas bo és copiar la comanda correcta i executar-la al terminal amb el context adequat.';
 
-  const copyCommand = (cmd: string) => {
-    navigator.clipboard.writeText(cmd);
-    setCopiedCommand(cmd);
-    setTimeout(() => setCopiedCommand(null), 2000);
+  const copyCommand = async (cmd: string) => {
+    try {
+      await navigator.clipboard.writeText(cmd);
+      setCopiedCommand(cmd);
+      setTimeout(() => setCopiedCommand(null), 2000);
+    } catch {
+      setCopiedCommand(null);
+    }
   };
 
   return (

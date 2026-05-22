@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import type { CustomerFollowUpSummaryDTO, CustomerInsightsDTO, TimelineEventDTO, TimelineEventType } from '@/lib/customer-hub/dto';
-import { DEFAULT_LOCALE } from '@/lib/constants';
+import { formatDateFull, formatDateShort, formatTimeShort, formatWeekdayLong } from '@/lib/constants';
 import { ADMIN_ACTIVITY_ACTION_META, CUSTOMER_TIMELINE_EVENT_META, CUSTOMER_TIMELINE_FILTER_OPTIONS } from '@/lib/constants/admin';
 import { buildCustomerCommercialPriority } from '@/lib/customer-hub/commercialPriority';
 import { buildCustomerCommercialRiskLink } from '@/lib/customer-hub/nextActionLink';
@@ -26,21 +26,15 @@ function formatDayHeader(dateStr: string): string {
 
   if (diffDays === 0) return 'Avui';
   if (diffDays === 1) return 'Ahir';
-  if (diffDays < 7) return date.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'long' });
+  if (diffDays < 7) return formatWeekdayLong(date);
 
-  return date.toLocaleDateString(DEFAULT_LOCALE, {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-  });
+  return date.getFullYear() !== now.getFullYear()
+    ? formatDateFull(date)
+    : formatDateShort(date);
 }
 
 function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString(DEFAULT_LOCALE, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatTimeShort(dateStr);
 }
 
 function sanitizeEventTitle(title: string): string {

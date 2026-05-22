@@ -20,7 +20,7 @@ const now = new Date('2026-06-15T10:00:00Z');
 const emptyBrief: DailyBrief = {
   date: '2026-06-15', greeting: 'Bon dia', summary: 'Resum',
   kpis: { newLeadsToday: 2, openLeads: 10, overdueTasksCount: 1, upcomingBookings7d: 3, pendingPaymentsCount: 2, forecastWeighted: 5000 },
-  alerts: [], actions: [], topCampaigns: [],
+  alerts: [], actions: [], topCampaigns: [], socialContent: null,
 };
 
 const briefWithAlerts: DailyBrief = {

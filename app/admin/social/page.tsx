@@ -1,6 +1,7 @@
 import { AdminPage } from '../components/AdminPage';
 import { listSocialPosts, getSocialPostCounts } from '@/lib/services/socialPostService';
 import { loadSocialIdeas } from '@/lib/services/socialIdeasService';
+import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
 import SocialClient from './SocialClient';
 
 export const dynamic = 'force-dynamic';
@@ -10,10 +11,11 @@ export const metadata = {
 };
 
 export default async function SocialPage() {
-  const [posts, counts, ideas] = await Promise.all([
+  const [posts, counts, ideas, contentPulse] = await Promise.all([
     listSocialPosts(),
     getSocialPostCounts(),
     loadSocialIdeas(),
+    loadSocialContentPulse(),
   ]);
 
   const serializedPosts = posts.map((p) => ({
@@ -38,6 +40,7 @@ export default async function SocialPage() {
         initialPosts={serializedPosts}
         initialCounts={counts}
         initialIdeas={serializedIdeas}
+        initialContentPulse={contentPulse}
       />
     </AdminPage>
   );

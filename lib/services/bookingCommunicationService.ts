@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
-import { BOOKING_COMMUNICATION_COPY, toIntlLocale } from '@/lib/constants';
+import { BOOKING_COMMUNICATION_COPY, toIntlLocale, formatCurrencyExact } from '@/lib/constants';
 import { recordBookingCommunicationLog } from '@/lib/services/bookingCommunicationLogService';
 
 export type BookingCommAction = 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded';
@@ -53,8 +53,8 @@ function buildEmailContent(flow: BookingCommFlow, booking: {
 
   if (flow === 'PAYMENT' && t.extra) {
     html += `<ul style="line-height:1.8">${t.extra(
-      booking.depositAmount.toLocaleString(intlLocale) + '€',
-      booking.remainingAmount.toLocaleString(intlLocale) + '€',
+      formatCurrencyExact(booking.depositAmount),
+      formatCurrencyExact(booking.remainingAmount),
       new Date(booking.eventDate).toLocaleDateString(intlLocale),
     )}</ul>`;
     if (t.cta) html += `<p>${t.cta}</p>`;

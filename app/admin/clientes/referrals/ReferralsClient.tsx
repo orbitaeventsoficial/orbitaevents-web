@@ -3,18 +3,16 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { ReferralsSummary, ReferralCandidate } from '@/lib/services/referralsService';
+import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+import { formatCurrency } from '@/lib/constants';
 
 type Props = { summary: ReferralsSummary };
 
 const PRIORITY_TONE: Record<ReferralCandidate['priority'], string> = {
   ALTA: 'border-rose-500/30 bg-rose-500/10 text-rose-300',
   MITJANA: 'border-amber-500/30 bg-amber-500/10 text-amber-300',
-  BAIXA: 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+  BAIXA: 'border-white/15 bg-white/[0.06] text-white/60',
 };
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
-}
 
 function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -92,7 +90,7 @@ export default function ReferralsClient({ summary }: Props) {
                     <span className="text-lg font-bold opacity-60 shrink-0">#{idx + 1}</span>
                     <div className="min-w-0 flex-1">
                       <Link
-                        href={`/admin/clientes/${r.id}`}
+                        href={buildCustomerHubHref(r.id)}
                         className="text-sm font-semibold hover:text-cyan-300 transition-colors"
                       >
                         {r.name}
@@ -182,7 +180,7 @@ export default function ReferralsClient({ summary }: Props) {
                     </div>
                     <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                       <Link
-                        href={`/admin/clientes/${c.id}`}
+                        href={buildCustomerHubHref(c.id)}
                         className="text-sm font-semibold hover:text-cyan-300 transition-colors"
                       >
                         {c.name}
@@ -246,7 +244,7 @@ export default function ReferralsClient({ summary }: Props) {
                     {copied === c.id ? '✓ Copiat' : 'Copiar missatge'}
                   </button>
                   <Link
-                    href={`/admin/clientes/${c.id}`}
+                    href={buildCustomerHubHref(c.id)}
                     className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] hover:bg-white/10"
                   >
                     Veure fitxa →

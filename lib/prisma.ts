@@ -12,12 +12,13 @@ function buildDatabaseUrl(): string {
   return url;
 }
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+declare global {
+  // eslint-disable-next-line no-var -- `var` és obligatori a `declare global` per fer el singleton de Prisma compatible amb hot reload de Next.js
+  var prisma: PrismaClient | undefined;
+}
 
 export const prisma =
-  globalForPrisma.prisma ??
+  globalThis.prisma ??
   new PrismaClient({
     log:
       process.env.NODE_ENV === 'development'
@@ -32,4 +33,4 @@ export const prisma =
     },
   });
 
-globalForPrisma.prisma = prisma;
+globalThis.prisma = prisma;

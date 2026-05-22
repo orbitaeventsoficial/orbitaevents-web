@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import MobileQuickActions from '@/app/admin/components/MobileQuickActions';
+import { buildLeadComposeHref } from '@/lib/admin/leadWorkspaceHref';
 import { useToast } from '@/app/admin/components/ToastProvider';
 import { log } from '@/lib/logger';
 import { patchLeadStatus } from '../leadStatusClient';
@@ -33,6 +34,7 @@ export default function LeadMobileQuickActions({
     <MobileQuickActions
       phone={leadPhone}
       email={leadEmail}
+      emailHref={buildLeadComposeHref(leadId)}
       whatsappMessage={`Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`}
       primaryAction={
         canMarkContacted

@@ -265,7 +265,7 @@ export function assembleCockpit(input: CockpitAssemblyInput): ExecutiveCockpit {
 const EMPTY_BRIEF: DailyBrief = {
   date: '', greeting: '', summary: '',
   kpis: { newLeadsToday: 0, openLeads: 0, overdueTasksCount: 0, upcomingBookings7d: 0, pendingPaymentsCount: 0, forecastWeighted: 0 },
-  alerts: [], actions: [], topCampaigns: [],
+  alerts: [], actions: [], topCampaigns: [], socialContent: null,
 };
 const EMPTY_PULSE: OperationalPulse = { overallLevel: 'GOOD', overallScore: 50, metrics: [], pipelineDrivers: [], generatedAt: '' };
 const EMPTY_FOLLOWUPS: FollowUpSummary = { generatedAt: '', total: 0, urgent: 0, normal: 0, low: 0, items: [] };

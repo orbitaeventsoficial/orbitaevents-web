@@ -1,3 +1,4 @@
+import { formatCurrencyExact } from '@/lib/constants';
 import type { BookingDiscountValidation, BookingFormData } from './booking-form.types';
 
 interface BookingTravelDiscountSectionProps {
@@ -68,7 +69,7 @@ export default function BookingTravelDiscountSection({
             <label className="text-xs">Cost desplaçament</label>
             <div className="mt-1 flex h-[42px] items-center rounded-xl border px-3 py-2.5">
               {travelCharge > 0 ? (
-                <span className="text-sm font-semibold">{travelCharge.toFixed(2)} €</span>
+                <span className="text-sm font-semibold">{formatCurrencyExact(travelCharge)}</span>
               ) : (
                 <span className="text-sm">— €</span>
               )}

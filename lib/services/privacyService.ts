@@ -110,7 +110,7 @@ export async function recordConsent(input: ConsentInput) {
     action: input.granted ? 'CONSENT_GRANTED' : 'CONSENT_REVOKED',
     performerIp: input.ipAddress,
     performerUserAgent: input.userAgent,
-    newData: input as unknown as Record<string, unknown>,
+    newData: JSON.parse(JSON.stringify(input)) as Record<string, unknown>,
     legalBasis: 'Consentiment explícit',
   });
 
@@ -283,7 +283,7 @@ export async function createDataRequest(input: DataRequestInput) {
     entityType: 'DataRequest',
     entityId: request.id,
     action: 'DATA_ACCESSED',
-    newData: input as unknown as Record<string, unknown>,
+    newData: JSON.parse(JSON.stringify(input)) as Record<string, unknown>,
     legalBasis: `Dret ${input.requestType}`,
   });
 
@@ -870,4 +870,41 @@ export async function checkGdprCompliance(customerId: string) {
   };
 }
 
+export async function fetchCustomerPrivacyData(customerId: string) {
+  const [consents, requests] = await Promise.all([
+    prisma.consentRecord.findMany({
+      where: { customerId },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.dataRequest.findMany({
+      where: { customerId },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+  return { consents, requests };
+}
 
+export async function listPrivacyAuditLogs(opts: {
+  limit: number;
+  offset: number;
+  action?: string | null;
+}) {
+  const where: Record<string, unknown> = {};
+  if (opts.action && opts.action !== 'all') {
+    where.action = opts.action;
+  }
+  const [logs, total] = await Promise.all([
+    prisma.privacyAuditLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: opts.limit,
+      skip: opts.offset,
+    }),
+    prisma.privacyAuditLog.count({ where }),
+  ]);
+  return { logs, total };
+}
+
+export async function findConsentById(consentId: string) {
+  return prisma.consentRecord.findUnique({ where: { id: consentId } });
+}

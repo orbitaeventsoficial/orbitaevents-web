@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { BOOKING_STATUS_OPTIONS, DASHBOARD_WIDGET_COLOR_MAP, LEAD_STATUS_OPTIONS } from '@/lib/constants';
+import { ADMIN_CHART_SERIES_COLORS, ADMIN_SVG_COLORS } from '@/lib/constants/admin';
 import { ADMIN_ACTIONS_HELP, helpAttrs } from '../components/adminHelpContent';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -139,7 +140,7 @@ export function RadialProgress({
         role="img"
         aria-label={`${clamped}%`}
       >
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={strokeWidth} />
+        <circle cx={center} cy={center} r={radius} fill="none" stroke={ADMIN_SVG_COLORS.donutTrack} strokeWidth={strokeWidth} />
         <circle
           cx={center} cy={center} r={radius} fill="none" stroke={color.stroke} strokeWidth={strokeWidth} strokeLinecap="round"
           strokeDasharray={circumference} strokeDashoffset={offset} className="admin-radial-ring"
@@ -262,16 +263,16 @@ export function MonthlyBarChart({ data, height = 160 }: { data: BarData[]; heigh
       <svg viewBox={`0 0 100 ${height}`} className="w-full" style={{ height: `${height}px` }} role="img" aria-label="Gràfica mensual d'ingressos">
         <defs>
           <linearGradient id="bar-grad-current" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#34d399" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#34d399" stopOpacity="0.4" />
+            <stop offset="0%" stopColor={ADMIN_CHART_SERIES_COLORS.leads} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={ADMIN_CHART_SERIES_COLORS.leads} stopOpacity="0.4" />
           </linearGradient>
           <linearGradient id="bar-grad-prev" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#94a0af" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#94a0af" stopOpacity="0.15" />
+            <stop offset="0%" stopColor={ADMIN_CHART_SERIES_COLORS.prevBar} stopOpacity="0.5" />
+            <stop offset="100%" stopColor={ADMIN_CHART_SERIES_COLORS.prevBar} stopOpacity="0.15" />
           </linearGradient>
         </defs>
         {[0.25, 0.5, 0.75].map((pct) => (
-          <line key={pct} x1="0" y1={height * (1 - pct)} x2="100" y2={height * (1 - pct)} stroke="rgba(255,255,255,0.05)" strokeWidth="0.3" />
+          <line key={pct} x1="0" y1={height * (1 - pct)} x2="100" y2={height * (1 - pct)} stroke={ADMIN_SVG_COLORS.gridLine} strokeWidth="0.3" />
         ))}
         {data.map((d, i) => {
           const x = i * barWidth + gap / 2;
@@ -284,7 +285,7 @@ export function MonthlyBarChart({ data, height = 160 }: { data: BarData[]; heigh
                 <rect x={x} y={height - prevH} width={innerW} height={prevH} rx="1.5" fill="url(#bar-grad-prev)" />
               )}
               <rect x={hasPrevious ? x + innerW + 0.6 : x} y={height - currentH} width={innerW} height={currentH} rx="1.5" fill="url(#bar-grad-current)" />
-              <text x={x + usable / 2} y={height - 2} textAnchor="middle" fill="rgba(255,255,255,0.35)" fontSize="3.2" fontFamily="var(--font-mono, monospace)">
+              <text x={x + usable / 2} y={height - 2} textAnchor="middle" fill={ADMIN_SVG_COLORS.axisLabel} fontSize="3.2" fontFamily="var(--font-mono, monospace)">
                 {d.label}
               </text>
             </g>
@@ -298,7 +299,7 @@ export function MonthlyBarChart({ data, height = 160 }: { data: BarData[]; heigh
         </div>
         {hasPrevious && (
           <div className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full opacity-40" style={{ background: '#94a0af' }} />
+            <span className="inline-block h-2 w-2 rounded-full opacity-40" style={{ background: ADMIN_CHART_SERIES_COLORS.prevBar }} />
             <span className="opacity-50">Any anterior</span>
           </div>
         )}
@@ -348,7 +349,7 @@ export function DonutChart({ segments, size = 120 }: { segments: DonutSegment[];
           <div key={seg.label} className="flex items-center gap-2">
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: seg.color }} />
             <span className="opacity-60">{seg.label}</span>
-            <span className="font-medium" style={{ fontFamily: 'var(--font-mono, monospace)' }}>{seg.value}</span>
+            <span className="font-medium font-mono">{seg.value}</span>
           </div>
         ))}
       </div>

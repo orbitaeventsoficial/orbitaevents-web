@@ -14,6 +14,7 @@ import {
   buildCustomerWorkspaceTabHref,
 } from '@/lib/admin/customerWorkspaceHref';
 import { ADMIN_ACTIVITY_ACTION_META } from '@/lib/constants/admin';
+import { buildCustomerCommunicationSpine } from '@/lib/customer-hub/communicationSpine';
 
 export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
@@ -22,6 +23,11 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   const [error, setError] = useState<string | null>(null);
   const commSummary = data.commSummary;
   const followUpSummary = data.followUpSummary;
+  const communicationSpine = buildCustomerCommunicationSpine({
+    customerId: data.customer.id,
+    commSummary,
+    followUpSummary,
+  });
   const lastTouchLabel = [
     commSummary.lastContactChannel === 'EMAIL' ? 'Email'
       : commSummary.lastContactChannel === 'WHATSAPP' ? 'WhatsApp'
@@ -66,13 +72,31 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
       const payload = await res.json().catch(() => ({}));
       if (!res.ok || !payload?.ok) throw new Error(payload?.error || 'No s’ha pogut desar la nota');
       setNote(''); router.refresh();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Error desant la nota'); } finally { setSaving(false); }
+    } catch (err) { console.error('Error desant nota comunicació', err); setError(err instanceof Error ? err.message : 'Error desant la nota'); } finally { setSaving(false); }
   };
 
   return (
     <section className="rounded-2xl border p-5" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.root)}>
       <h2 className="text-lg font-semibold">Comunicacions</h2>
       <p className="mt-1 text-sm">Historial de correus, notes i seguiment.</p>
+      <div className="mt-3 rounded-xl border p-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs">Fil canònic de conversa</p>
+            <p className="mt-1 text-sm font-semibold">{communicationSpine.stateLabel}</p>
+            <p className="mt-1 text-xs opacity-75">{communicationSpine.detail}</p>
+          </div>
+          <span className="rounded-full border px-2 py-1 text-[11px]">{communicationSpine.ownerLabel}</span>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <Link href={communicationSpine.hubHref} className="rounded border px-2 py-1">
+            Obrir fil del client
+          </Link>
+          <Link href={communicationSpine.taskHref} className="rounded border px-2 py-1">
+            Crear tasca des del fil
+          </Link>
+        </div>
+      </div>
       <div className="mt-3 rounded-xl border p-3" {...helpAttrs(ADMIN_CUSTOMER_PANEL_HELP_2.comms.quickActions)}>
         <p className="text-xs">Accions ràpides</p>
         <div className="mt-2 flex flex-wrap gap-2">

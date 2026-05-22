@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FAQ_CATEGORY_OPTIONS } from '@/lib/constants';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type Translation = {
   locale: 'ca' | 'es' | 'en';
@@ -77,7 +78,7 @@ export default function FaqEditorForm({
         })),
       };
 
-      const res = await fetch(
+      const res = await fetchWithCsrf(
         mode === 'create' ? '/api/admin/faq' : `/api/admin/faq/${initial?.id}`,
         {
           method: mode === 'create' ? 'POST' : 'PATCH',

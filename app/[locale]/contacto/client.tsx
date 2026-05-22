@@ -30,6 +30,7 @@ function ContactContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              suppressHydrationWarning
             >
               <h1 className="mb-3 text-3xl font-black text-white md:text-5xl lg:text-6xl tracking-tight">
                 {t('page.titlePart1')}
@@ -90,6 +91,7 @@ function ContactContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="px-4 pb-10 sm:pb-16"
+          suppressHydrationWarning
         >
           <div className="max-w-2xl mx-auto">
             <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-5 shadow-2xl backdrop-blur-sm md:p-8 hover:border-amber-500/20 hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] transition-all duration-500">

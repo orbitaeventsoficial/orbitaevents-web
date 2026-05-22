@@ -3,7 +3,10 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithCsrf } from '@/lib/csrf';
+import ConfirmDialog, { useConfirmDialog } from '../components/ConfirmDialog';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
+import AiCopySuggestionsInline from '../components/AiCopySuggestionsInline';
+import { buildSocialOperatingLoop } from '@/lib/socialOperatingLoop';
 import {
   SOCIAL_PLATFORM_LABELS,
   SOCIAL_POST_STATUS_LABELS,
@@ -13,6 +16,9 @@ import {
   SOCIAL_POST_STATUSES,
   SOCIAL_CONTENT_TYPES,
   SOCIAL_CATEGORIES,
+  formatDate as formatDateCanonical,
+  formatDateTime as formatDateTimeCanonical,
+  formatMonthYearLong,
   type SocialPlatform,
   type SocialPostStatus,
   type SocialContentType,
@@ -52,6 +58,19 @@ type SerializedIdea = {
   reason: string;
 };
 
+type SerializedContentPulse = {
+  windowDays: number;
+  postsLast30d: number;
+  publishedLast30d: number;
+  scheduledUpcoming: number;
+  draftsPending: number;
+  daysSinceLastPost: number | null;
+  isActive: boolean;
+  consistencyScore: number;
+  instagramLeadCount: number;
+  instagramWonCount: number;
+};
+
 type PostSeed = {
   title: string;
   caption: string;
@@ -81,7 +100,7 @@ const IDEA_SOURCE_LABEL: Record<SerializedIdea['source'], string> = {
 };
 
 const STATUS_TONE: Record<string, string> = {
-  IDEA: 'bg-slate-500/15 border-slate-500/30 text-slate-300',
+  IDEA: 'bg-white/[0.08] border-white/15 text-white/60',
   DRAFT: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
   SCHEDULED: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
   PUBLISHED: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
@@ -100,24 +119,27 @@ const PLATFORM_ICON: Record<string, string> = {
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  return formatDateCanonical(iso);
 }
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString('ca-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return formatDateTimeCanonical(iso);
 }
 
 export default function SocialClient({
   initialPosts,
   initialCounts,
   initialIdeas = [],
+  initialContentPulse,
 }: {
   initialPosts: SerializedPost[];
   initialCounts: Counts;
   initialIdeas?: SerializedIdea[];
+  initialContentPulse: SerializedContentPulse;
 }) {
   const router = useRouter();
+  const { confirm, dialogProps } = useConfirmDialog();
   const [posts, setPosts] = useState(initialPosts);
   const [counts] = useState(initialCounts);
   const [ideas, setIdeas] = useState(initialIdeas);
@@ -180,14 +202,16 @@ export default function SocialClient({
   }, [calMonth]);
 
   async function handleDelete(id: string) {
-    if (!confirm('Segur que vols eliminar aquesta publicació?')) return;
+    const ok = await confirm({ title: 'Eliminar publicació', message: 'Segur que vols eliminar aquesta publicació?', confirmLabel: 'Eliminar', variant: 'danger' });
+    if (!ok) return;
     try {
       const res = await fetchWithCsrf(`/api/admin/social-posts/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       setPosts((prev) => prev.filter((p) => p.id !== id));
       setFlash({ type: 'success', text: 'Publicació eliminada' });
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error('Error eliminant publicació social', err);
       setFlash({ type: 'error', text: 'Error eliminant publicació' });
     }
   }
@@ -203,7 +227,8 @@ export default function SocialClient({
       if (!res.ok || !data.ok) throw new Error();
       setPosts((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus, updatedAt: new Date().toISOString() } : p));
       setFlash({ type: 'success', text: `Estat canviat a ${SOCIAL_POST_STATUS_LABELS[newStatus as SocialPostStatus] || newStatus}` });
-    } catch {
+    } catch (err) {
+      console.error('Error canviant estat publicació social', err);
       setFlash({ type: 'error', text: 'Error canviant estat' });
     }
   }
@@ -232,27 +257,58 @@ export default function SocialClient({
   const scheduledCount = counts.SCHEDULED ?? 0;
   const draftCount = counts.DRAFT ?? 0;
   const publishedCount = counts.PUBLISHED ?? 0;
+  const pulse = initialContentPulse;
+  const instagramConversionRate = pulse.instagramLeadCount > 0
+    ? Math.round((pulse.instagramWonCount / pulse.instagramLeadCount) * 100)
+    : 0;
+  const pulseRisk = !pulse.isActive || pulse.consistencyScore < 50 || pulse.draftsPending > 0;
+  const pulseSummary = !pulse.isActive
+    ? `Cap publicació publicada en els últims ${pulse.windowDays} dies.`
+    : pulse.daysSinceLastPost === null
+      ? 'Hi ha activitat, però no hi ha data clara de darrera publicació.'
+      : `Última publicació fa ${pulse.daysSinceLastPost} dies.`;
   const weakestLink = totalPosts === 0
     ? 'Encara no hi ha cap peça al calendari editorial.'
+    : !pulse.isActive
+      ? `El calendari existeix, però no hi ha publicació viva dins la finestra de ${pulse.windowDays} dies.`
     : draftCount > 0
       ? `${draftCount} publicacions continuen en esborrany i demanen decisió editorial.`
+      : pulse.consistencyScore < 50
+        ? `La consistència editorial és baixa (${pulse.consistencyScore}%). Cal reforçar cadència abans d'obrir més canals.`
       : scheduledCount === 0 && publishedCount === 0
         ? 'Hi ha peces en pipeline però cap calendari o publicació activa ara mateix.'
         : 'El calendari té peça viva i no hi ha coll editorial evident al primer nivell.';
   const nextStepTitle = totalPosts === 0
     ? 'Crear la primera publicació del calendari'
+    : !pulse.isActive
+      ? 'Publicar una peça real abans de generar més idees'
     : draftCount > 0
       ? 'Tancar esborranys abans d’obrir més fronts'
+      : pulse.consistencyScore < 50
+        ? 'Programar cadència mínima per recuperar consistència'
       : ideas.length > 0
         ? 'Convertir idees suggerides en peces programades'
         : 'Mantenir el calendari viu i revisar la propera onada';
   const nextStepDescription = totalPosts === 0
     ? 'Sense peces al calendari no hi ha pipeline social real per operar.'
+    : !pulse.isActive
+      ? 'La prioritat no és omplir el backlog, sinó transformar una idea o esborrany en publicació visible.'
     : draftCount > 0
       ? 'El retorn més alt aquí no és generar més idees, sinó passar primer els esborranys a programats o descartar-los.'
+      : pulse.consistencyScore < 50
+        ? 'La lectura comercial demana regularitat: programa la següent peça abans de perseguir més formats.'
       : ideas.length > 0
         ? 'La millor palanca actual és transformar idees automàtiques en publicacions reals abans que es refredin.'
-        : 'Amb el pipeline estable, el següent pas útil és revisar programació, publicació i tracció del calendari actual.';
+      : 'Amb el pipeline estable, el següent pas útil és revisar programació, publicació i tracció del calendari actual.';
+  const operatingLoop = buildSocialOperatingLoop({
+    ideasCount: ideas.length,
+    scheduledCount,
+    publishedCount,
+    instagramLeadCount: pulse.instagramLeadCount,
+    instagramWonCount: pulse.instagramWonCount,
+    isActive: pulse.isActive,
+    consistencyScore: pulse.consistencyScore,
+  });
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -268,8 +324,11 @@ export default function SocialClient({
             view === 'calendar'
               ? 'La vista activa és calendari i el sistema agrupa el contingut per dia.'
               : 'La vista activa és llista i el sistema prioritza estat i accions directes.',
+            pulse.instagramLeadCount > 0
+              ? `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram: ${pulse.instagramLeadCount} leads, ${pulse.instagramWonCount} guanyats (${instagramConversionRate}%).`
+              : `${pulse.publishedLast30d} publicades en ${pulse.windowDays} dies · consistència ${pulse.consistencyScore}% · Instagram sense leads atribuïts dins la lectura actual.`,
           ],
-          tone: totalPosts > 0 ? 'info' : 'warning',
+          tone: pulseRisk ? 'warning' : 'info',
           emptyText: 'Encara no hi ha lectura automàtica útil perquè no hi ha peces al pipeline.',
         }}
         manual={{
@@ -298,6 +357,43 @@ export default function SocialClient({
             : undefined,
         }}
       />
+
+      <section className="admin-card-glass rounded-2xl border border-white/10 p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Bucle social únic</p>
+            <h2 className="mt-2 text-base font-black leading-snug">{operatingLoop.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/65">{operatingLoop.focus}</p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs lg:justify-end">
+            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.evidence}</span>
+            <span className="rounded-full border border-white/10 px-2 py-1">{operatingLoop.captureLabel}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-3 lg:grid-cols-4">
+        <article className={`admin-card-glass rounded-2xl border p-4 ${pulseRisk ? 'border-amber-500/30 bg-amber-500/[0.05]' : 'border-emerald-500/25 bg-emerald-500/[0.04]'}`}>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Pols editorial</p>
+          <h2 className="mt-2 text-base font-black leading-snug">{pulse.isActive ? 'Actiu' : 'Aturat'}</h2>
+          <p className="mt-2 text-xs leading-relaxed text-white/65">{pulseSummary}</p>
+        </article>
+        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Cadència</p>
+          <p className="mt-2 text-2xl font-black">{pulse.consistencyScore}%</p>
+          <p className="mt-1 text-xs text-white/60">{pulse.postsLast30d} peces creades · {pulse.scheduledUpcoming} programades</p>
+        </article>
+        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Cua editorial</p>
+          <p className="mt-2 text-2xl font-black">{pulse.draftsPending}</p>
+          <p className="mt-1 text-xs text-white/60">esborranys pendents de decisió</p>
+        </article>
+        <article className="admin-card-glass rounded-2xl border border-white/10 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Instagram → pipeline</p>
+          <p className="mt-2 text-2xl font-black">{pulse.instagramLeadCount}</p>
+          <p className="mt-1 text-xs text-white/60">{pulse.instagramWonCount} guanyats · {instagramConversionRate}% conversió</p>
+        </article>
+      </section>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -511,7 +607,7 @@ export default function SocialClient({
               ◀
             </button>
             <h3 className="min-w-0 text-center text-sm font-semibold">
-              {new Date(calMonth.year, calMonth.month).toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' })}
+              {formatMonthYearLong(new Date(calMonth.year, calMonth.month))}
             </h3>
             <button
               onClick={() => setCalMonth((m) => {
@@ -591,6 +687,7 @@ export default function SocialClient({
           }}
         />
       )}
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }
@@ -666,7 +763,8 @@ function SocialPostModal({
         scheduledAt: saved.scheduledAt ?? null,
         publishedAt: saved.publishedAt ?? null,
       });
-    } catch {
+    } catch (err) {
+      console.error('Error desant publicació social', err);
       setError('Error de connexió');
     } finally {
       setSaving(false);
@@ -682,7 +780,7 @@ function SocialPostModal({
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
-        className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0a0a0a] p-6 space-y-4 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg rounded-2xl border border-white/10 admin-form-deep p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
         <h2 className="text-lg font-semibold">{post ? 'Editar publicació' : 'Nova publicació'}</h2>
 
@@ -745,6 +843,12 @@ function SocialPostModal({
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">Descripció / Caption</label>
           <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} className="ap-input w-full" />
+          <AiCopySuggestionsInline
+            type="social-caption"
+            context={title.trim() ? `Títol: ${title}, Tipus: ${contentType}` : ''}
+            onApply={(text) => setCaption(text)}
+            label="Genera caption IA"
+          />
         </div>
 
         <div>
@@ -769,7 +873,3 @@ function SocialPostModal({
     </div>
   );
 }
-
-
-
-

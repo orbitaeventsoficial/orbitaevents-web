@@ -173,3 +173,87 @@ export async function getGallerySummary(bookingId: string) {
   ]);
   return { total, portfolioCount, portalCount };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GALERIA COMPARTIDA (share link públic)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type GalleryShareResult =
+  | { status: 'NOT_FOUND' }
+  | { status: 'PASSWORD_REQUIRED' }
+  | { status: 'WRONG_PASSWORD' }
+  | { status: 'OK'; bookingReference: string; eventDate: Date; photos: { id: string; photoUrl: string; caption: string | null }[] };
+
+function generateToken(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  return Array.from({ length: 24 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+export async function createGalleryShareToken(
+  bookingId: string,
+  password?: string | null,
+): Promise<{ token: string; passwordProtected: boolean }> {
+  const token = generateToken();
+  await prisma.booking.update({
+    where: { id: bookingId },
+    data: {
+      galleryShareToken: token,
+      gallerySharePassword: password?.trim() || null,
+    },
+  });
+  return { token, passwordProtected: !!(password?.trim()) };
+}
+
+export async function revokeGalleryShareToken(bookingId: string): Promise<void> {
+  await prisma.booking.update({
+    where: { id: bookingId },
+    data: { galleryShareToken: null, gallerySharePassword: null },
+  });
+}
+
+export async function getGalleryByShareToken(
+  token: string,
+  password?: string,
+): Promise<GalleryShareResult> {
+  const booking = await prisma.booking.findUnique({
+    where: { galleryShareToken: token },
+    select: {
+      id: true,
+      reference: true,
+      eventDate: true,
+      gallerySharePassword: true,
+      galleryPhotos: {
+        where: { isPortal: true },
+        orderBy: { sortOrder: 'asc' },
+        select: { id: true, photoUrl: true, caption: true },
+      },
+    },
+  });
+
+  if (!booking) return { status: 'NOT_FOUND' };
+
+  if (booking.gallerySharePassword) {
+    if (!password) return { status: 'PASSWORD_REQUIRED' };
+    if (password !== booking.gallerySharePassword) return { status: 'WRONG_PASSWORD' };
+  }
+
+  return {
+    status: 'OK',
+    bookingReference: booking.reference,
+    eventDate: booking.eventDate,
+    photos: booking.galleryPhotos,
+  };
+}
+
+export async function getGalleryShareInfo(
+  bookingId: string,
+): Promise<{ token: string | null; passwordProtected: boolean }> {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    select: { galleryShareToken: true, gallerySharePassword: true },
+  });
+  return {
+    token: booking?.galleryShareToken ?? null,
+    passwordProtected: !!(booking?.gallerySharePassword),
+  };
+}

@@ -6,6 +6,7 @@ import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/servi
 import { prisma } from '@/lib/prisma';
 import { CATALOG_TAB_META, formatCurrency } from '@/lib/constants';
 import { pluralize } from '@/lib/utils/pluralize';
+import { buildPackHref } from '@/lib/admin/packWorkspaceHref';
 
 type CatalogTab = keyof typeof CATALOG_TAB_META;
 
@@ -361,7 +362,7 @@ export default async function CatalogPage({
                   {sortedRows.map((pack) => (
                     <Link
                       key={pack.id}
-                      href={`/admin/packs/${pack.id}`}
+                      href={buildPackHref(pack.id)}
                       className="rounded-xl border px-4 py-3 text-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -487,7 +488,7 @@ export default async function CatalogPage({
                       {sortedRows.map((row) => (
                         <tr key={row.id} className="">
                           <td className="px-3 py-2">
-                            <Link href={`/admin/packs/${row.id}`} className="font-semibold">
+                            <Link href={buildPackHref(row.id)} className="font-semibold">
                               {row.name}
                             </Link>
                             <p className="text-xs">{row.slug} · {row.service}</p>
@@ -533,5 +534,4 @@ export default async function CatalogPage({
     </AdminPage>
   );
 }
-
 

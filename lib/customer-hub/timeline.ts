@@ -8,6 +8,7 @@ import {
   mapLeadActivityToCanonicalEvent,
 } from '@/lib/services/timelineQueryService';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 type BuildTimelineInput = {
   proposals: ProposalDTO[];
@@ -60,7 +61,7 @@ export function buildCustomerBusinessTimelineEvents(input: BusinessTimelineInput
       type: b.status === 'CONFIRMED' || b.status === 'COMPLETED' ? 'BOOKING_CONFIRMED' : 'BOOKING_CREATED',
       at: b.date,
       title: `Reserva ${b.reference || b.id.slice(0, 8)} · ${bookingStatusLabel(b.status)}`,
-      link: { label: 'Veure reserva', href: `/admin/bookings/${b.id}` },
+      link: { label: 'Veure reserva', href: buildBookingHref(b.id) },
     });
   }
 

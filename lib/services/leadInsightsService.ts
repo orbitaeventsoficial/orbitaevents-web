@@ -1,3 +1,4 @@
+import { formatCurrencyExact } from '@/lib/constants';
 import { scoreLead, estimateLeadAmount } from '@/lib/services/commercialScoring';
 
 // ─── Types ──────────────────────────────────────────────────────────────
@@ -137,7 +138,7 @@ function deriveNextAction(input: {
     if (pending > 0) {
       return {
         type: 'COLLECT_PAYMENT',
-        label: `Cobrament pendent: ${pending.toLocaleString('ca-ES')}€`,
+        label: `Cobrament pendent: ${formatCurrencyExact(pending)}`,
         urgency: 'HIGH',
       };
     }

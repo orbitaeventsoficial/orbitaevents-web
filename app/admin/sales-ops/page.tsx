@@ -15,6 +15,7 @@ import RunCommercialSequencesButton from './RunCommercialSequencesButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
 import SlaAutomationButton from './SlaAutomationButton';
 import { loadLossReport } from '@/lib/services/leadLossAnalyticsService';
+import { loadSocialContentPulse } from '@/lib/services/socialContentPulseService';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,7 +53,7 @@ function statusPanel(status: AuditStatus) {
 
 export default async function SalesOpsPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const [leadGroups, leads, slaSnapshot, commMetrics30d, sequenceExec30d, lossSummary] = await Promise.all([
+  const [leadGroups, leads, slaSnapshot, commMetrics30d, sequenceExec30d, lossSummary, socialPulse] = await Promise.all([
     prisma.lead.groupBy({ by: ['source', 'status', 'assignedTo'], _count: true }).catch(() => []),
     prisma.lead.findMany({
       where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } },
@@ -75,6 +76,18 @@ export default async function SalesOpsPage() {
       bySource: [],
       byMonth: [],
       topReason: null,
+    })),
+    loadSocialContentPulse(30).catch(() => ({
+      windowDays: 30,
+      postsLast30d: 0,
+      publishedLast30d: 0,
+      scheduledUpcoming: 0,
+      draftsPending: 0,
+      daysSinceLastPost: null,
+      isActive: false,
+      consistencyScore: 0,
+      instagramLeadCount: 0,
+      instagramWonCount: 0,
     })),
   ]);
 
@@ -169,6 +182,15 @@ export default async function SalesOpsPage() {
     { area: 'Visibilitat financera', status: 'A_MILLORAR' as AuditStatus, avui: 'Previsió disponible, falta lectura setmanal fixa.', en30: 'Revisió setmanal d\'ingressos, marge i cobraments.', en90: 'Quadre executiu de marge per tipus d\'esdeveniment.', href: '/admin/economia', cta: 'Revisar finances' },
     { area: 'Analítica web i embut', status: 'A_MILLORAR' as AuditStatus, avui: 'Analítica disponible, cal ritual d\'anàlisi.', en30: 'Informe setmanal amb accions concretes.', en90: 'Model d\'atribució simple per decidir inversió.', href: '/admin/analytics', cta: 'Obrir analítica' },
     { area: 'Post-esdeveniment i reputació', status: 'A_MILLORAR' as AuditStatus, avui: 'Flux actiu, marge de millora en ritme d\'execució.', en30: 'Automatitzar més recordatoris i seguiment.', en90: 'Bucle de feedback per millorar oferta comercial.', href: '/admin/post-event', cta: 'Tancar cicle post-esdeveniment' },
+    {
+      area: 'Contingut social (Instagram)',
+      status: (socialPulse.isActive && socialPulse.consistencyScore >= 60 ? 'FORT' : socialPulse.consistencyScore >= 30 || (socialPulse.isActive && (socialPulse.daysSinceLastPost ?? 99) < 14) ? 'A_MILLORAR' : 'CRITIC') as AuditStatus,
+      avui: socialPulse.isActive ? `${socialPulse.publishedLast30d} posts publicats en 30 dies · consistència ${socialPulse.consistencyScore}% · ${socialPulse.instagramLeadCount} leads Instagram.` : `Sense posts publicats en ${socialPulse.windowDays} dies. El contingut social alimenta el pipeline d'Instagram.`,
+      en30: 'Ritme constant de posts per mantenir visibilitat i generar leads orgànics.',
+      en90: 'Calendari editorial viu i correlació contingut → conversió per canal.',
+      href: '/admin/social',
+      cta: 'Obrir Social',
+    },
   ];
 
   return (
@@ -207,6 +229,48 @@ export default async function SalesOpsPage() {
           ...nextStep,
         }}
       />
+
+      <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold">Contingut social</h2>
+            <p className="mt-0.5 text-xs opacity-60">Activitat editorial i conversió orgànica des d&apos;Instagram</p>
+          </div>
+          <Link href="/admin/social" className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
+            Obrir Social →
+          </Link>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Posts 30 dies</p>
+            <p className="mt-1 text-xl font-bold">{socialPulse.postsLast30d}</p>
+            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.publishedLast30d} publicats</p>
+          </div>
+          <div className={`rounded-xl border p-3 ${socialPulse.scheduledUpcoming > 0 ? 'border-cyan-500/20 bg-cyan-500/[0.04]' : 'border-white/10 bg-white/[0.03]'}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Programats</p>
+            <p className={`mt-1 text-xl font-bold ${socialPulse.scheduledUpcoming > 0 ? 'text-cyan-300' : ''}`}>{socialPulse.scheduledUpcoming}</p>
+            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.draftsPending} esborranys</p>
+          </div>
+          <div className={`rounded-xl border p-3 ${socialPulse.consistencyScore >= 60 ? 'border-emerald-500/20 bg-emerald-500/[0.04]' : socialPulse.consistencyScore >= 30 ? 'border-amber-500/20 bg-amber-500/[0.04]' : 'border-rose-500/20 bg-rose-500/[0.06]'}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Consistència</p>
+            <p className={`mt-1 text-xl font-bold ${socialPulse.consistencyScore >= 60 ? 'text-emerald-300' : socialPulse.consistencyScore >= 30 ? 'text-amber-300' : 'text-rose-300'}`}>{socialPulse.consistencyScore}%</p>
+            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.daysSinceLastPost !== null ? `Fa ${socialPulse.daysSinceLastPost}d` : 'Mai publicat'}</p>
+          </div>
+          <div className="rounded-xl border border-pink-500/20 bg-pink-500/[0.04] p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">Leads Instagram</p>
+            <p className="mt-1 text-xl font-bold text-pink-300">{socialPulse.instagramLeadCount}</p>
+            <p className="mt-0.5 text-[10px] opacity-50">{socialPulse.instagramWonCount} tancats</p>
+          </div>
+        </div>
+        {!socialPulse.isActive && (
+          <div className="mt-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+            <p className="text-xs text-amber-200">Sense posts publicats en {socialPulse.windowDays} dies. El contingut social alimenta el pipeline d&apos;Instagram — activar-lo genera entrades orgàniques.</p>
+            <Link href="/admin/social" className="mt-2 inline-flex rounded border border-amber-400/30 px-2.5 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/10">
+              Crear primer post →
+            </Link>
+          </div>
+        )}
+      </section>
 
       <LossBreakdownPanel initialSummary={lossSummary} days={90} />
 

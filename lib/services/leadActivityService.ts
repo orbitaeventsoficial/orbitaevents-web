@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { LeadLostReason } from '@/lib/constants/leadLoss';
+import { formatCurrencyExact } from '@/lib/constants';
 import { mapLeadActivityToCanonicalEvent } from '@/lib/services/timelineQueryService';
 
 type LeadActivityInput = {
@@ -107,7 +108,7 @@ export async function recordLeadScoreSnapshot(input: {
       leadId: input.leadId,
       type: 'SYSTEM',
       title: 'Scoring snapshot',
-      description: `Score ${input.score} (${input.band}) · Prob ${(input.probability * 100).toFixed(1)}% · Weighted ${input.weightedAmount.toFixed(2)}€`,
+      description: `Score ${input.score} (${input.band}) · Prob ${(input.probability * 100).toFixed(1)}% · Weighted ${formatCurrencyExact(input.weightedAmount)}`,
       createdBy: 'Scoring Bot',
       metadata: {
         score: input.score,
@@ -235,6 +236,28 @@ export async function recordLeadContractCancelled(input: {
       type: 'SYSTEM',
       title: 'Contracte cancel·lat',
       description: `Contracte ${input.contractReference} cancel·lat`,
+    },
+  });
+}
+
+export async function recordLeadContractSigned(input: {
+  leadId: string;
+  contractReference: string;
+  signedBy: string;
+  source: 'admin' | 'portal';
+}) {
+  return prisma.leadActivity.create({
+    data: {
+      leadId: input.leadId,
+      type: 'DOCUMENT',
+      title: 'Contracte signat',
+      description: `Contracte ${input.contractReference} signat per ${input.signedBy}`,
+      metadata: {
+        contractReference: input.contractReference,
+        signedBy: input.signedBy,
+        source: input.source,
+      },
+      createdBy: input.source === 'portal' ? 'Portal client' : 'Admin',
     },
   });
 }

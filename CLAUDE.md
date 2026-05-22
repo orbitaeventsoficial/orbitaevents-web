@@ -27,13 +27,25 @@ Per estat funcional i peces consolidades:
 - **Verificació real**: no donar res per acabat només perquè compila.
 - **Conservar el que ja funciona**: si una zona està tancada o consolidada, no reobrir-la sense motiu real.
 
+## Protocol d'autonomia
+
+- Treballar en mode completament autònom: no demanar confirmació, no demanar "segueix?", no esperar input.
+- Acabar un canvi complet (servei + pàgina + missatges + tests + diario + counter), validar, i passar automàticament al proper ítem del backlog.
+- Continuar fins que tots els ítems pendents del backlog (§6 del protocol de producte) estiguin tancats.
+- Després d'un tall verd, no enviar resposta final si encara queda un `SEGÜENT`, `PENDENT CRÍTIC` o backlog accionable. La resposta final només toca quan no queda feina executable, hi ha bloqueig real o l'usuari demana explícitament parar/reportar.
+- Amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable. El pas immediat després de `validate:core` verd és rellegir §6, triar el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta, no tancar la conversa.
+- Aquesta regla també viu en format executable a `docs/agent-runtime-policy.json`: `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end`. El guard `pnpm run qa:nonstop-protocol` ha de fallar si el JSON, aquest fitxer o el protocol deixen d'estar alineats.
+- No interrompre el treball per preguntes que es poden resoldre llegint el protocol, el diari o el codi.
+- Reportar l'estat final quan no quedi cap ítem pendent, no en cada canvi.
+
 ## Flux obligatori abans de tocar res
 
 1. Llegir `CLAUDE.md`.
-2. Llegir `docs/diario.md`.
-3. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
-4. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/protocol-producte-admin-ca.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
-5. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
+2. Llegir `docs/agent-sync.md` — llegir el bloc de l'altre agent i actualitzar el propi amb estat `treballant` i el proper canvi previst.
+3. Llegir `docs/diario.md`.
+4. Si la tasca és d'admin o toca una zona ja consolidada, llegir `docs/estat-admin.md`.
+5. Si la tasca és d'admin o toca una zona consolidada, llegir també `docs/protocol-producte-admin-ca.md`, el tram rellevant del `§6` i el final del `§9` abans de començar.
+6. Si existeix una guia específica de la iniciativa, usar-la només com a context del tall concret.
 
 Cap agent pot començar feina real al repo sense haver fet aquesta lectura mínima.
 

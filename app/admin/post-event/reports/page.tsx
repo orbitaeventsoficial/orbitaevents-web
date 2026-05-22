@@ -3,6 +3,7 @@ import { formatDateSimple } from '@/lib/constants';
 import { getTranslatedPackName } from '@/lib/pack-name';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -151,7 +152,7 @@ export default async function ReportsPage() {
                     )}
                   </div>
                   <Link
-                    href={`/admin/bookings/${report.bookingId}`}
+                    href={buildBookingHref(report.bookingId)}
                     className="ap-btn ap-btn--secondary px-4 py-2 text-sm"
                   >
                     Veure detalls

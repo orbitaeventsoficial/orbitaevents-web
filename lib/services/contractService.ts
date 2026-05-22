@@ -11,7 +11,8 @@ import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 import { generateContractPDF, type ContractPdfData } from '@/lib/pdf-utils';
 import { type ContractData } from '@/lib/services/documentService';
 import { log } from '@/lib/logger';
-import { recordLeadContractCancelled, recordLeadContractSent } from '@/lib/services/leadActivityService';
+import { recordLeadContractCancelled, recordLeadContractSent, recordLeadContractSigned } from '@/lib/services/leadActivityService';
+import { uploadFile } from '@/lib/storage';
 
 async function getCompanyConfig() {
   const settings = await prisma.setting.findMany({
@@ -206,6 +207,10 @@ async function renderContractPDF(proposalId: string): Promise<{
     finalPaymentDue,
     cancellationPolicy,
     additionalClauses,
+    signedBy: proposal.contractSignedBy || undefined,
+    signedAt: proposal.contractSignedAt || undefined,
+    signatureBlob: proposal.contractSignatureBlob || undefined,
+    signatureIp: proposal.contractSignatureIp || undefined,
   };
 
   const pdfDoc = await generateContractPDF(pdfData, locale);
@@ -300,6 +305,24 @@ export async function sendContract(proposalId: string): Promise<void> {
   log.info(`Contracte enviat: ${proposal.contractReference} a ${proposal.customer.email}`);
 }
 
+export async function generateSignedContractPdf(proposalId: string): Promise<{ contractPdfUrl: string; contractPdfKey: string }> {
+  const { contractReference, pdfBuffer } = await renderContractPDF(proposalId);
+  const safeReference = contractReference.replace(/[^A-Za-z0-9_-]/g, '-');
+  const contractPdfKey = `contracts/${proposalId}/${safeReference}-signed.pdf`;
+  const uploaded = await uploadFile(contractPdfKey, pdfBuffer);
+
+  await prisma.proposal.update({
+    where: { id: proposalId },
+    data: {
+      contractPdfUrl: uploaded.publicUrl,
+      contractPdfKey: uploaded.path,
+    },
+  });
+
+  log.info(`PDF signat generat: ${contractReference} per proposta ${proposalId}`);
+  return { contractPdfUrl: uploaded.publicUrl, contractPdfKey: uploaded.path };
+}
+
 export async function markContractSigned(proposalId: string, signedBy: string): Promise<void> {
   const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId } });
 
@@ -321,6 +344,15 @@ export async function markContractSigned(proposalId: string, signedBy: string): 
       contractSignedBy: signedBy,
     },
   });
+
+  if (proposal.leadId && proposal.contractReference) {
+    await recordLeadContractSigned({
+      leadId: proposal.leadId,
+      contractReference: proposal.contractReference,
+      signedBy,
+      source: 'admin',
+    });
+  }
 
   log.info(`Contracte signat: ${proposal.contractReference} per ${signedBy}`);
 }

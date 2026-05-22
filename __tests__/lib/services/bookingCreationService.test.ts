@@ -136,9 +136,20 @@ describe('createBookingFromInput', () => {
     // But we'll check the financial structure is correct
     expect(createCall.data.vatRate).toBe(21);
     expect(createCall.data.depositAmount).toBeGreaterThan(0);
+    // remainingAmount = total - deposit, arrodonit a cèntims (#699): vat i total
+    // ara s'arrodoneixen per evitar soroll de coma flotant a BD/Stripe.
     expect(createCall.data.remainingAmount).toBe(
-      createCall.data.total - createCall.data.depositAmount
+      Math.round((createCall.data.total - createCall.data.depositAmount) * 100) / 100
     );
+    // Invariant de domini: dipòsit + restant = total (tot a 2 decimals).
+    expect(
+      Math.round((createCall.data.depositAmount + createCall.data.remainingAmount) * 100) / 100
+    ).toBe(createCall.data.total);
+    // Cap valor de diners pot tenir més de 2 decimals.
+    for (const field of ['vatAmount', 'total', 'depositAmount', 'remainingAmount'] as const) {
+      const v = createCall.data[field] as number;
+      expect(Math.round(v * 100) / 100).toBe(v);
+    }
   });
 
   it('aplica hores extra al preu', async () => {

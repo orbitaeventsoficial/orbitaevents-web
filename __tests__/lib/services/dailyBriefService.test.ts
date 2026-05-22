@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateDailyBrief, parseBudgetValue, type DailyBriefInput } from '@/lib/services/dailyBriefService';
+import { generateDailyBrief, parseBudgetValue, type DailyBriefInput, type SocialBriefContent } from '@/lib/services/dailyBriefService';
 
 const NOW = new Date('2026-04-10T09:00:00Z');
 
@@ -271,6 +271,57 @@ describe('generateDailyBrief', () => {
     expect(brief.summary).toContain('1 tasca vençuda');
     expect(brief.summary).toContain('1 reserva en 7 dies');
     expect(brief.summary).toContain('1 cobrament pendent');
+  });
+
+  it('socialContent absent → sense alerta social i socialContent null al retorn', () => {
+    const brief = generateDailyBrief(makeInput());
+    const socialAlert = brief.alerts.find((a) => a.icon === '📱');
+    expect(socialAlert).toBeUndefined();
+    expect(brief.socialContent).toBeNull();
+  });
+
+  it('contingut actiu recent (5 dies) → sense alerta social', () => {
+    const sc: SocialBriefContent = { daysSinceLastPost: 5, isActive: true, consistencyScore: 80, draftsPending: 0, scheduledUpcoming: 2 };
+    const brief = generateDailyBrief(makeInput({ socialContent: sc }));
+    const socialAlert = brief.alerts.find((a) => a.icon === '📱');
+    expect(socialAlert).toBeUndefined();
+    expect(brief.socialContent).toEqual(sc);
+  });
+
+  it('contingut inactiu 15 dies → alerta INFO canal social inactiu', () => {
+    const sc: SocialBriefContent = { daysSinceLastPost: 15, isActive: true, consistencyScore: 20, draftsPending: 0, scheduledUpcoming: 0 };
+    const brief = generateDailyBrief(makeInput({ socialContent: sc }));
+    const socialAlert = brief.alerts.find((a) => a.icon === '📱');
+    expect(socialAlert).toBeDefined();
+    expect(socialAlert!.level).toBe('INFO');
+    expect(socialAlert!.title).toContain('15 dies sense publicar');
+    expect(socialAlert!.href).toBe('/admin/social');
+  });
+
+  it('contingut aturat +30 dies → alerta WARNING canal social aturat', () => {
+    const sc: SocialBriefContent = { daysSinceLastPost: 31, isActive: false, consistencyScore: 0, draftsPending: 0, scheduledUpcoming: 0 };
+    const brief = generateDailyBrief(makeInput({ socialContent: sc }));
+    const socialAlert = brief.alerts.find((a) => a.icon === '📱');
+    expect(socialAlert).toBeDefined();
+    expect(socialAlert!.level).toBe('WARNING');
+    expect(socialAlert!.title).toContain('Canal social aturat');
+    expect(socialAlert!.title).toContain('31 dies');
+  });
+
+  it('contingut inactiu amb esborranys → detail menciona esborranys', () => {
+    const sc: SocialBriefContent = { daysSinceLastPost: 20, isActive: false, consistencyScore: 0, draftsPending: 3, scheduledUpcoming: 0 };
+    const brief = generateDailyBrief(makeInput({ socialContent: sc }));
+    const socialAlert = brief.alerts.find((a) => a.icon === '📱');
+    expect(socialAlert).toBeDefined();
+    expect(socialAlert!.detail).toContain('3 esborranys pendents');
+  });
+
+  it('cap post mai + sequera de leads → acció Iniciar canal social', () => {
+    const sc: SocialBriefContent = { daysSinceLastPost: null, isActive: false, consistencyScore: 0, draftsPending: 0, scheduledUpcoming: 0 };
+    const brief = generateDailyBrief(makeInput({ leadsLast7d: 0, leadsLast30d: 0, socialContent: sc }));
+    const action = brief.actions.find((a) => a.label.includes('Iniciar canal social'));
+    expect(action).toBeDefined();
+    expect(action!.href).toBe('/admin/social');
   });
 });
 

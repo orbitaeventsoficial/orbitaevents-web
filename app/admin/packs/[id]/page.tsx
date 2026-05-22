@@ -7,6 +7,7 @@ import EditPackForm from './EditPackForm';
 import { AdminPage } from '../../components/AdminPage';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { formatDateSimple, formatCurrency, getBookingStatusLabel } from '@/lib/constants';
+import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
 
 export const dynamic = 'force-dynamic';
 
@@ -136,13 +137,13 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
             {packBookings.map((b) => (
               <Link
                 key={b.id}
-                href={`/admin/bookings/${b.id}`}
+                href={buildBookingHref(b.id)}
                 className="flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors hover:bg-white/5"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-xs">{b.reference}</span>
                   <span className="font-medium">{b.clientName}</span>
-                  <span className="text-xs opacity-60">{formatDateSimple(b.eventDate, 'ca')}</span>
+                  <span className="text-xs opacity-60">{formatDateSimple(b.eventDate)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-[10px] ${
@@ -153,7 +154,7 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
                   }`}>
                     {getBookingStatusLabel(b.status)}
                   </span>
-                  <span className="text-xs font-medium">{formatCurrency(b.total || 0, 'ca')}</span>
+                  <span className="text-xs font-medium">{formatCurrency(b.total || 0)}</span>
                 </div>
               </Link>
             ))}

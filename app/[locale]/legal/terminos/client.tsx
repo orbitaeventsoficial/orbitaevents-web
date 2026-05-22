@@ -1,10 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { toIntlLocale } from '@/lib/constants';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function TerminosClient() {
   const t = useTranslations('legal.terminos');
+  const locale = useLocale();
   const { business } = SITE_CONFIG;
 
   return (
@@ -14,7 +16,7 @@ export default function TerminosClient() {
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
           <p className="text-lg" suppressHydrationWarning>
-            {t('lastUpdate')} {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {t('lastUpdate')} {new Date().toLocaleDateString(toIntlLocale(locale), { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
 
           <section>
