@@ -9,6 +9,11 @@ const ignoredDirs = new Set([
   'app/admin/components',
   'docs',
   'lib/constants',
+  // Fitxa tècnica del sistema visual: showroom autocontingut de mostres
+  // il·lustratives (paleta, tipografia, comunicacions, documents) per VISUALITZAR
+  // el design system, no catàlegs de domini reutilitzats. Zona protegida
+  // (CLAUDE.md §Zones consolidades) amb guard propi `qa:studio-integrity`.
+  'app/studio',
 ]);
 
 const allowedCatalogs = new Set([

@@ -1,3 +1,53 @@
+## 2026-05-23 — Canvi #757: `/studio` recuperada (v0.4 rica) i BLINDADA contra buidatge (claude)
+
+### Context
+Un agent extern havia buidat `app/studio/StudioShowroom.tsx` — les 16 seccions de la fitxa tècnica v0.4 — reduint-lo a un wireframe de 82 línies. La pèrdua va ser total i **sense rastre** perquè `app/studio/` mai havia estat a git (untracked): no hi havia cap `git checkout` per recuperar-ho. El propietari demana (1) tornar a la versió rica i (2) establir un sistema que impedeixi que això es repeteixi, **adaptant la normativa existent** (comptador + diari + guards de `validate:core`), no creant-ne una de paral·lela.
+
+### Canvi
+1. **Reconstrucció del TSX** des de les fonts que sobrevivien: `studio.css` (intacte, 4233 línies), `docs/studio-textos.md` (tots els textos), `docs/studio-fitxa-tecnica-handoff.md` (estructura) i les captures. Recuperades les 16 seccions amb classes `.o-spec-*` (Marca, Paleta, Tipografia, Spacing&Radii, Iconografia amb 16 icones monolínia inline, Actius, Botons, Inputs, Cards, Estats, Alertes, Responsive, Layout, To de veu, Comunicacions amb 8 emails desplegables, PDFs amb switcher de 4 documents). Zero hex de color al JSX (chips via `var(--token)`).
+2. **`scripts/check-studio-integrity.mjs` (NOU)** + `qa:studio-integrity` afegit a `validate:core`: falla si el TSX baixa de 400 línies, perd qualsevol secció `id="sec-*"`, perd les dades canòniques (`PALETTE`, `EMAIL_COMMS`, …) o si `studio.css` es buida. Antídot directe contra el buidatge.
+3. **`scripts/check-no-img-tag.mjs`**: excepció de path `app/studio/` documentada (eina interna `noindex` amb logotips SVG; `next/image` no els pot optimitzar sense `dangerouslyAllowSVG` global).
+4. **`.dbg-studio.cjs`**: ids de captura alineades amb les seccions reals (`#sec-*`) per a regressió visual.
+5. **`CLAUDE.md`**: `/studio` afegit a «Zones consolidades» i a «Què JA EXISTEIX».
+6. **A git**: `app/studio/`, docs i captures deixen de ser untracked.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors) · `node scripts/check-studio-integrity.mjs` OK · `node scripts/check-admin-change-log.mjs` OK · `/studio` HTTP 200 sense `PAGEERR` (Playwright).
+- Validació funcional: les 16 seccions renderitzen amb tema fosc+or; switcher de PDFs alterna els 4 documents; emails desplegables; captura de regressió `.codex-captures/studio-full.png` (2,99 MB) + per secció.
+- Validació humana/UX: el propietari recupera la fitxa tècnica que li agradava i té garantia que un proper agent no la pot buidar sense fer fallar `validate:core`.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-23.
+
+---
+
+## 2026-05-22 — Canvi #756: Fitxa tècnica `/studio` completada + 4 previsualitzacions PDF fidels (claude)
+
+### Context
+A `app/studio` hi havia una pàgina WIP — el showroom del sistema visual del **nou admin** — amb el CSS desfasat (v0.3) respecte el TSX (v0.4): icones gegants, fonts no connectades, seccions sense estil i la secció "Actius del repo" al menú però sense renderitzar. L'usuari volia veure-la, millorar-la a fons i, sobretot, **veure el contingut real dels PDFs** (no plaeholders).
+
+### Canvi
+1. **Fonts**: `studio.css` demanava `"Inter"`/`"JetBrains Mono"` pel nom literal → no existeixen amb next/font. Connectades a `var(--font-inter)` / `var(--font-mono)`.
+2. **~30 classes CSS que faltaven**: icones (fix icones gegants), brand cards, do/don't (`o-spec-rules`/`o-spec-voice`), breakpoints, header stats, search, section num, mocks.
+3. **Tokens nous**: ombres (`--o-shadow-*`, `--o-glow-accent`), paper per a emails (`--o-paper-*`) i **document PDF real** fosc i clar (`--o-doc-*`, `--o-docl-*`) amb els valors exactes de `lib/pdf-utils.ts` + `lib/pdf-config.ts`.
+4. **Secció "Actius del repo"** (no es renderitzava): favicons + logotips reals de `/public/img`. §0 Marca amb lockups reals (`orbitalockupwhite/dark.svg`).
+5. **§15 PDFs reconstruïda**: switcher de 4 documents amb previsualització **fidel del contingut real**: Pressupost + Contracte (fosc) i Catàleg de serveis + Informe executiu (clar), reproduint les seccions reals dels generadors.
+6. **Capçalera premium** (glow + stat chips), jerarquia de seccions, microinteraccions.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors). Render sense `PAGEERR` (Playwright). `node scripts/check-admin-change-log.mjs` OK.
+- Validació funcional: les 16 seccions renderitzen; el switcher de PDFs alterna correctament els 4 documents; els favicons/logos reals es carreguen des de `/public`. Captures de regressió a `.codex-captures/studio-*.png` i `doc-*.png`.
+- Validació humana/UX: el propietari pot obrir `http://localhost:3000/studio` i veure el contingut real de cada PDF amb l'estètica exacta del generador. ⚠️ Les dades de les previsualitzacions són **mostres** il·lustratives — pendent alimentar-les de `packs-config`/quote service real (documentat a `docs/studio-fitxa-tecnica-handoff.md`).
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-22.
+
+---
+
 ## 2026-05-22 — Canvi #755: Botó eliminar configuració IMAP a la safata (claude)
 
 ### Context

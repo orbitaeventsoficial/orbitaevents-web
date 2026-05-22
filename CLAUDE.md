@@ -370,6 +370,13 @@ Abans de proposar crear, auditar o modificar qualsevol d'això, consulta primer.
 - La referència viva del que ja existeix és `docs/estat-admin.md`.
 - Si una guia antiga queda completada, es marca com a TANCAT o s'arxiva.
 
+### `/studio` — fitxa tècnica del sistema visual (ZONA PROTEGIDA)
+
+- `app/studio/` és la fitxa tècnica viva del sistema visual del nou admin (16 seccions: tokens, components, comunicacions, documents). És el **laboratori** i la pàgina de **consulta** del disseny. Ja va ser reventada un cop (buidada de 16 seccions a un wireframe) perquè vivia fora de git.
+- **No buidar, no reduir, no wireframitzar.** Tota peça nova s'hi **afegeix** mantenint les seccions existents. El guard `qa:studio-integrity` (a `validate:core`) falla si el TSX perd seccions, baixa de 400 línies o si `studio.css` es buida.
+- Documents de referència: `docs/studio-fitxa-tecnica-handoff.md` (operativa) i `docs/studio-textos.md` (inventari de textos).
+- Tota passa sobre `/studio` (prova o definitiva) ha de quedar **a git** i documentada al diari amb número de canvi. Captura de regressió: `node .dbg-studio.cjs` → `.codex-captures/studio-*.png`.
+
 ## Documentació obligatòria
 
 - `docs/diario.md` s'ha d'actualitzar quan es tanca una passada rellevant.

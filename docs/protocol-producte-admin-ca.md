@@ -1289,6 +1289,40 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #757 — 2026-05-23 — claude (FET)
+
+**`/studio` recuperada (v0.4 rica) i BLINDADA perquè no es pugui tornar a reventar.**
+- Context: un agent extern havia buidat `app/studio/StudioShowroom.tsx` de les 16 seccions de la fitxa tècnica v0.4 a un wireframe de 82 línies. La pèrdua va ser total i sense rastre perquè `app/studio/` **mai havia estat a git** (untracked): cap `git checkout` per recuperar-ho. El propietari demana tornar a l'estat ric i establir un sistema que impedeixi el buidatge, adaptant la normativa existent (no inventar-ne una de paral·lela).
+- `app/studio/StudioShowroom.tsx`: reconstruïdes les 16 seccions (Marca, Paleta, Tipografia, Spacing&Radii, Iconografia amb 16 icones monolínia inline, Actius del repo, Botons, Inputs, Cards, Estats, Alertes, Responsive, Layout, To de veu, Comunicacions amb 8 emails desplegables, PDFs amb switcher de 4 documents fidels). Font: `studio.css` (intacte) + `docs/studio-textos.md` + `docs/studio-fitxa-tecnica-handoff.md` + captures. Zero hex de color al JSX (chips via `var(--token)`).
+- `scripts/check-studio-integrity.mjs` (NOU) + `qa:studio-integrity` a `validate:core`: falla si el TSX baixa de 400 línies, perd qualsevol de les 16 seccions `id="sec-*"`, perd les estructures de dades canòniques, o si `studio.css` es buida. És l'antídot directe contra el buidatge.
+- `scripts/check-no-img-tag.mjs`: excepció de path `app/studio/` documentada (eina interna `noindex` amb logotips SVG que `next/image` no pot optimitzar sense `dangerouslyAllowSVG` global).
+- `.dbg-studio.cjs`: alineades les ids de captura amb les seccions reals (`#sec-*`) per a regressió visual.
+- `CLAUDE.md`: `/studio` afegit a «Zones consolidades» i a «Què JA EXISTEIX».
+- Abast: pàgina interna `noindex` sense auth; no toca lògica de negoci, serveis ni admin consolidat. Tot queda ara trackejat a git.
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors) · `node scripts/check-studio-integrity.mjs` OK · `node scripts/check-admin-change-log.mjs` OK · render `/studio` HTTP 200 sense `PAGEERR`.
+- Validació funcional: les 16 seccions renderitzen amb el tema fosc+or correcte; el switcher de PDFs alterna els 4 documents; els emails es despleguen; captura de regressió `.codex-captures/studio-full.png` (2,99 MB) i per secció.
+- Validació humana/UX: el propietari recupera la fitxa tècnica que li agradava i té la garantia que un proper agent no la pot buidar sense fer fallar `validate:core`.
+- `ADMIN_CHANGE_COUNTER` passa a `757`; el següent canvi real ha de ser `#758`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #756 — 2026-05-22 — claude (FET)
+
+**Fitxa tècnica del sistema visual del nou admin a `/studio` — completada + 4 previsualitzacions PDF fidels.**
+- Context: existia una pàgina WIP a `app/studio` (showroom del sistema visual del nou admin) amb el CSS incomplet (v0.3) respecte el TSX (v0.4): icones gegants, fonts no connectades, seccions sense estil i la secció "Actius del repo" al menú però sense renderitzar. L'usuari va demanar veure-la, millorar-la a fons i, sobretot, **veure el contingut real dels PDFs**.
+- `app/studio/studio.css`: fonts connectades a `var(--font-inter)`/`var(--font-mono)` (next/font), ~30 classes que faltaven afegides (icones, brand cards, do/don't, breakpoints, header stats, search, mocks), tokens nous d'ombra (`--o-shadow-*`), paper (`--o-paper-*`, emails) i document PDF real fosc/clar (`--o-doc-*`, `--o-docl-*`) amb els valors exactes de `lib/pdf-utils.ts` i `lib/pdf-config.ts`.
+- `app/studio/StudioShowroom.tsx`: secció "Actius del repo" renderitzant favicons + logotips reals de `/public`; §0 Marca amb lockups reals; **§15 reconstruïda** amb switcher de 4 documents i previsualització fidel del contingut real: **Pressupost** + **Contracte** (tema fosc, `generateQuotePDF`/`generateContractPDF`) i **Catàleg de serveis** + **Informe executiu** (tema clar, `generateServiceBrochure`/`exportExecutiveReportPdf`).
+- `middleware.ts`: bypass i18n per a `/studio` (ja existia al worktree).
+- Abast: pàgina interna `noindex` sense auth; no toca lògica de negoci, serveis ni admin consolidat. Dades de les previsualitzacions són **mostres** il·lustratives (pendent alimentar-les de `packs-config`/quote service real — documentat al handoff).
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors) · render sense `PAGEERR` (Playwright) · `node scripts/check-admin-change-log.mjs` OK.
+- Validació funcional: les 16 seccions renderitzen; el switcher de PDFs alterna correctament els 4 documents; favicons/logos reals es carreguen des de `/public`; captures de regressió a `.codex-captures/`.
+- Validació humana/UX: el propietari pot veure a `/studio` el contingut real de cada PDF (Pressupost, Contracte, Catàleg, Informe) amb l'estètica exacta del generador, no plaeholders.
+- `ADMIN_CHANGE_COUNTER` passa a `756`; el següent canvi real ha de ser `#757`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #753 — 2026-05-22 — codex (FET)
 
 **§6.14 — `qa:protocol` exigeix també les 3 capes de validació a l'entrada actual del protocol, no només al diari.**

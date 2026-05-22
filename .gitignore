@@ -67,6 +67,10 @@ scripts/admin-screenshots/
 tmp/
 .codex-dev.pid
 
+# Captures de regressió visual de /studio (regenerables amb `node .dbg-studio.cjs`)
+# i logs de dev. No s'inflen al repo: el generador (.dbg-studio.cjs) sí va a git.
+.codex-captures/
+
 # Claude Code local settings (mai a git — poden contenir credencials)
 .claude/settings.local.json
 .claude/settings.json

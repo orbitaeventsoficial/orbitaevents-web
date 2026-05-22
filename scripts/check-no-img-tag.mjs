@@ -20,6 +20,13 @@ const SCOPES = ['app', 'lib'];
 const SKIP_DIRS = new Set(['__tests__', 'node_modules', '.next', '.git', 'dist', 'out']);
 const TEST_FILE_PATTERNS = ['.test.', '.spec.'];
 
+// Excepcions de path: /studio és la fitxa tècnica del sistema visual (zona
+// protegida, vegeu CLAUDE.md §Zones consolidades). És una eina interna amb
+// `robots: noindex`, sense impacte a Core Web Vitals públics, i mostra logotips
+// de marca en SVG que next/image no pot optimitzar sense `dangerouslyAllowSVG`
+// global (que NO volem activar per al site públic). Per això s'hi accepta <img>.
+const ALLOWLIST_PREFIXES = ['app/studio/'];
+
 function* walkDir(dir) {
   let entries;
   try {
@@ -74,8 +81,9 @@ for (const scope of SCOPES) {
   const scopeDir = path.join(ROOT, scope);
   if (!fs.existsSync(scopeDir)) continue;
   for (const file of walkDir(scopeDir)) {
-    filesChecked++;
     const rel = path.relative(ROOT, file).replace(/\\/g, '/');
+    if (ALLOWLIST_PREFIXES.some((p) => rel.startsWith(p))) continue;
+    filesChecked++;
     const lines = fs.readFileSync(file, 'utf-8').split('\n');
 
     for (let i = 0; i < lines.length; i++) {
