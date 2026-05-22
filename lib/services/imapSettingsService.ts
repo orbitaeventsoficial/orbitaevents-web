@@ -69,6 +69,12 @@ async function saveImapSettings(config: { host: string; port: number; user: stri
   );
 }
 
+export async function deleteImapSettings() {
+  await prisma.setting.deleteMany({
+    where: { key: { startsWith: 'imap.' } },
+  });
+}
+
 export async function readInboxImapSettings() {
   const config = await getImapConfigSafe();
   const connection = config.configured ? await testConnection() : null;

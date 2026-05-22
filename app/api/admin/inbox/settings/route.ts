@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
-import { handleInboxImapSettings, readInboxImapSettings } from '@/lib/services/imapSettingsService';
+import { deleteImapSettings, handleInboxImapSettings, readInboxImapSettings } from '@/lib/services/imapSettingsService';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +16,24 @@ export async function GET(req: NextRequest) {
     config,
     connection,
   });
+}
+
+export async function DELETE(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
+  const csrfError = await verifyCsrf(req);
+  if (csrfError) return csrfError;
+
+  try {
+    await deleteImapSettings();
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Error eliminant configuració IMAP' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

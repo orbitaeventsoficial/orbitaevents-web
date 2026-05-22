@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../../components/ToastProvider';
+import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
 import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 
@@ -21,6 +22,7 @@ interface ConnectionResult {
 
 export default function ImapSettingsClient() {
   const toast = useToast();
+  const { confirm, dialogProps } = useConfirmDialog();
   const [loading, setLoading] = useState(true);
   const [config, setConfig] = useState<ImapConfig | null>(null);
   const [connection, setConnection] = useState<ConnectionResult | null>(null);
@@ -85,6 +87,35 @@ export default function ImapSettingsClient() {
       toast.error(err instanceof Error ? err.message : 'Error');
     } finally {
       setTesting(false);
+    }
+  };
+
+  const deleteConfig = async () => {
+    const ok = await confirm({
+      title: 'Eliminar configuració IMAP',
+      message: 'S\'eliminarà el compte configurat. La safata quedarà sense connexió fins que es torni a configurar.',
+      variant: 'danger',
+      confirmLabel: 'Eliminar',
+    });
+    if (!ok) return;
+    try {
+      const res = await fetchWithCsrf('/api/admin/inbox/settings', { method: 'DELETE' });
+      const data = await res.json();
+      if (data.ok) {
+        toast.success('Configuració IMAP eliminada');
+        setConfig(null);
+        setConnection(null);
+        setHost('');
+        setPort('993');
+        setUser('');
+        setPass('');
+        setShowForm(false);
+      } else {
+        toast.error(data.error || 'Error eliminant');
+      }
+    } catch (err) {
+      console.error('Error eliminant configuració IMAP', err);
+      toast.error(err instanceof Error ? err.message : 'Error');
     }
   };
 
@@ -366,14 +397,27 @@ export default function ImapSettingsClient() {
           </div>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
-        >
-          Modificar configuració
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+          >
+            Modificar configuració
+          </button>
+          {config?.source === 'db' && (
+            <button
+              type="button"
+              onClick={deleteConfig}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-500/10 active:scale-[0.98]"
+            >
+              Eliminar configuració
+            </button>
+          )}
+        </div>
       )}
+
+      <ConfirmDialog {...dialogProps} />
 
       {/* Com funciona */}
       <div className="rounded-2xl border p-5">
