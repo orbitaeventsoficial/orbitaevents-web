@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/lib/prisma', () => ({
   prisma: { $queryRaw: vi.fn() },
@@ -14,7 +14,14 @@ import {
 } from '@/lib/services/healthCheckService';
 
 describe('checkDatabaseHealth', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // CI defineix NEXT_PHASE='phase-production-build' globalment, cosa que faria
+    // saltar la comprovació real de BD (isBuildPrerenderPhase). El neutralitzem
+    // perquè aquests tests validin el camí real (BD respon / BD falla).
+    vi.stubEnv('NEXT_PHASE', '');
+  });
+  afterEach(() => vi.unstubAllEnvs());
 
   it('retorna pass si BD respon', async () => {
     const { prisma } = await import('@/lib/prisma');

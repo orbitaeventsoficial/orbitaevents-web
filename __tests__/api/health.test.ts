@@ -2,7 +2,7 @@
  * Health API Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock Prisma
 vi.mock('@/lib/prisma', () => ({
@@ -15,7 +15,11 @@ vi.mock('@/lib/prisma', () => ({
 describe('Health API', () => {
   beforeEach(() => {
     vi.resetModules();
+    // CI defineix NEXT_PHASE='phase-production-build' globalment; el neutralitzem
+    // perquè la comprovació de BD s'executi de veritat i l'estat sigui 'healthy'.
+    vi.stubEnv('NEXT_PHASE', '');
   });
+  afterEach(() => vi.unstubAllEnvs());
 
   describe('GET /api/health', () => {
     it('should return healthy status', async () => {
