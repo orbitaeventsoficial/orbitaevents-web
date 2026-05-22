@@ -2578,6 +2578,7 @@
       },
       "viewService": "View service",
       "mostPopular": "⭐ MOST POPULAR",
+      "ctaWhatsappButton": "WhatsApp Direct",
       "cta": {
         "title": "Not sure which service you need?",
         "subtitle": "Tell us about your event and we will recommend the option that fits best.",
