@@ -1289,6 +1289,22 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #758 — 2026-05-23 — claude (FET)
+
+**`/studio-lab` (Òrbita Command) — pipeline arrossegable, color sòlid i tot clickable. On anem: el nou admin.**
+- Context: Codex havia arrencat `/studio-lab` amb el concepte **Òrbita Command** (laboratori del nou admin: el sistema organitza decisions, no pantalles), aprovat pel propietari ("molt millor encaminat"), però va quedar a mig fer (límit d'ús). Demanava: més **color sòlid**, **tot clickable**, i **leads arrossegables** entre estats (nou · contactat · pressupost enviat · guanyat · perdut). Restricció explícita: **no trencar res**.
+- `app/studio-lab/page.tsx`: reescrit com a **client component**. Pipeline de 5 estats amb **drag & drop HTML5** (arrossega un bolo i canvia d'estat), color sòlid per columna, KPIs vius (pipeline = suma dinàmica), capes clickables (Temps/Diners/Persones/Operació), rellotge en viu, i panell **Decisió ara** connectat al lead seleccionat (cada estat proposa la següent acció). Tot són botons (cards, KPIs, senyals, comandaments).
+- `app/studio-lab/studio-lab.css`: reescrit amb tokens scoped a `.sl-root` (no s'aboquen al document), colors d'estat sòlids (`--sl-nou/contactat/pressupost/guanyat/perdut`), estats interactius (hover, `is-dragging`, `is-over`, `is-selected`) i responsive (board amb scroll horitzontal a mòbil). Fix del bug `--sl-line-strong` (s'usava sense definir).
+- `scripts/check-layer-catalogs.mjs`: `app/studio-lab` afegit a `ignoredDirs` (prototip intern de mostres, no catàlegs de domini) → `validate:core` queda verd. Sense això, el lab trencava la validació.
+- Abast: prototip intern `noindex` sense auth (layout propi). No toca lògica de negoci, serveis, `/studio` ni admin consolidat. El bypass i18n de middleware ja cobreix `/studio-lab` (`startsWith('/studio')`).
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors) · `node scripts/check-layer-catalogs.mjs` OK · `node scripts/check-studio-integrity.mjs` OK (el `/studio` segueix intacte) · `/studio-lab` HTTP 200 sense `PAGEERR` (Playwright, amb `.next` net).
+- Validació funcional: les 5 columnes mostren count + suma €; els bolos s'arrosseguen entre estats i actualitzen estat/selecció; el panell de decisió canvia segons el lead; captura `.codex-captures/studio-lab.png`.
+- Validació humana/UX: el propietari veu una proposta de futur amb color sòlid, interacció real i el pipeline operatiu — la base del nou admin, no un wireframe.
+- `ADMIN_CHANGE_COUNTER` passa a `758`; el següent canvi real ha de ser `#759`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #757 — 2026-05-23 — claude (FET)
 
 **`/studio` recuperada (v0.4 rica) i BLINDADA perquè no es pugui tornar a reventar.**

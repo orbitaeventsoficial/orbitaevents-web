@@ -1,3 +1,32 @@
+## 2026-05-23 — Canvi #758: `/studio-lab` (Òrbita Command) — pipeline arrossegable + color sòlid + clickable (claude)
+
+### Context
+Codex va arrencar `/studio-lab` amb el concepte **Òrbita Command** (laboratori del nou admin: "el sistema no organitza pantalles, organitza decisions"), aprovat pel propietari, però va quedar a mig fer. Feedback a aplicar: més **color sòlid**, **tot clickable**, **leads arrossegables** entre estats. Restricció: **no trencar res**.
+
+### Canvi
+1. `app/studio-lab/page.tsx` reescrit com a **client component** amb pipeline de 5 estats (nou · contactat · pressupost enviat · guanyat · perdut) i **drag & drop HTML5**: arrossegar un bolo el mou d'estat (`moveLead`), amb estats visuals `is-dragging`/`is-over`. Tot són botons (cards, KPIs, capes, senyals, comandaments). Panell **Decisió ara** connectat al lead seleccionat (cada estat proposa la següent acció). Rellotge en viu i KPIs calculats (pipeline = suma dinàmica).
+2. `app/studio-lab/studio-lab.css` reescrit: tokens scoped a `.sl-root`, colors d'estat **sòlids** (`--sl-nou/contactat/pressupost/guanyat/perdut`) aplicats per `data-stage`, capçaleres de columna plenes de color, hover/drag/selected, responsive (board amb scroll horitzontal a mòbil). Fix del bug `--sl-line-strong` (s'usava sense definir).
+3. `scripts/check-layer-catalogs.mjs`: `app/studio-lab` a `ignoredDirs` (prototip intern de mostres) perquè `validate:core` quedi verd.
+4. `docs/studio-lab-handoff.md` (NOU): estat + roadmap del lab perquè es pugui continuar sense re-explicar.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `node scripts/check-layer-catalogs.mjs` OK · `node scripts/check-studio-integrity.mjs` OK · `/studio-lab` HTTP 200 sense `PAGEERR` (`.next` net).
+- Validació funcional: 5 columnes amb count + suma €; bolos arrossegables que canvien d'estat; panell de decisió reactiu; captura `.codex-captures/studio-lab.png`.
+- Validació humana/UX: proposta de futur amb color sòlid i interacció real (pipeline operatiu), no un wireframe.
+
+### Següent — ON ANEM (per continuar demà sense explicacions)
+- **`/studio-lab` = laboratori del nou admin** (Òrbita Command). `/studio` = fitxa tècnica del sistema visual. `/admin` = l'admin real a substituir.
+- Pendents al lab (per ordre): persistir l'ordre/estat del pipeline; connectar a leads reals (avui són mostres); donar contingut a les capes Diners/Persones/Operació (ara només Temps té vista); afegir el motiu de pèrdua en moure a "perdut"; accions dels comandaments reals (WhatsApp, contracte…).
+- Direcció: quan el lab convenci, **promoure'l a esquelet del nou admin** i començar a muntar-hi les peces de `/studio`.
+- Detall complet a `docs/studio-lab-handoff.md`.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude, 2026-05-23.
+
+---
+
 ## 2026-05-23 — Canvi #757: `/studio` recuperada (v0.4 rica) i BLINDADA contra buidatge (claude)
 
 ### Context

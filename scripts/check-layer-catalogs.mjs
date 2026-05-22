@@ -14,6 +14,9 @@ const ignoredDirs = new Set([
   // el design system, no catàlegs de domini reutilitzats. Zona protegida
   // (CLAUDE.md §Zones consolidades) amb guard propi `qa:studio-integrity`.
   'app/studio',
+  // Laboratori del nou admin (Òrbita Command): prototip intern noindex amb
+  // dades de mostra per iterar disseny i interaccions. No són catàlegs de domini.
+  'app/studio-lab',
 ]);
 
 const allowedCatalogs = new Set([
