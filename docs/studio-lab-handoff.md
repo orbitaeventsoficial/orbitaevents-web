@@ -15,16 +15,19 @@ Distinció de les tres superfícies:
 - `/studio` → la **fitxa tècnica** del sistema visual (tokens, components, PDFs). Zona protegida.
 - `/studio-lab` → el **laboratori** on es dissenya el nou admin (aquesta pàgina).
 
-## Estat actual (Canvi #763 — vora, paleta joia i agenda de caps de setmana)
+## Estat actual (Canvi #764 — reconstrucció de zero: Òrbita, comandament mínim)
 
-Sobre la v2 (#762), passa visual demanada pel propietari en directe:
+Replantejament de zero demanat pel propietari (canvi de pensament, no de pintura). **Tesi**: un negoci d'esdeveniments es gestiona amb el temps i amb **una sola decisió a la vegada**. La pantalla només respon: *què he de fer ara* i *com s'omple la temporada*. Fora el soroll (KPIs, kanban de 5 columnes, barra de lents, llegenda, log, menús).
 
-- **Targetes només-vora**: triage, pipeline, slots d'agenda, chips entre setmana i cel·les del cockpit deixen el farciment sòlid i passen a **fons fosc + vora de color** (`border-left: 3px var(--c)` + tint `color-mix` 6-7%). Selecció = anell cian (`--sl-accent`). El cockpit (`sl-decision`) és superfície fosca amb glow radial subtil + vora superior de color, a tot l'ample.
-- **Paleta joia (enterprise/glamour)**: robí `#ff4d5e`, or xampany `#e6ad44`, maragda `#28bf8e`, grafit `#5b6478` (substitueix el candy `#ff315f`/`#ffb020`/`#16d19a`). El significat del color segueix sent únic: **atenció**.
-- **Agenda = calendari de caps de setmana**: `monthsPlan` mostra **2-3 mesos apilats** (`SEASON_WINDOW=3`), cadascun a tot l'ample amb columnes **Dv/Ds/Dg** (`sl-wkcal`). Casella sense bolo → **"Lliure"** visible (`sl-slot.is-free`). Bolos entre setmana a `sl-weekday-list`.
-- **Tipografia/tamanys**: display (Plus Jakarta Sans) per a títols/clients, mono només per a números; pujats kickers, KPIs, títols i textos de targeta per omplir millor els contenidors.
+Tres regions:
+- **Top mínim**: marca `Òrbita` + data d'avui.
+- **FOCUS únic** (`sl-focus`): per defecte la decisió més prioritària (cua `decisions` ordenada per pes/urgència, ciclable amb `‹ ›` i comptador); en tocar un bolo, la mateixa zona es torna la **fitxa mínima** del bolo (data·import, següent pas, cobrament 2 passos, equip amb conflicte, acció primària, fletxes de fase) amb retorn a `Prioritats`. Mai dues coses competint.
+- **TEMPORADA** (`sl-season`): **3 mesos en columna** (`SEASON_WINDOW=3`) que hi caben perfectament; cada mes mostra **només les reserves** com a files netes (punt d'estat + data + client) i els **dissabtes lliures** com a xips. Estat = punt de color (`stateOf`: atenció xampany · en marxa neutre · tancat sàlvia · conflicte terracota · inactiu), mai farciment.
 
-### Estat v2 (Canvi #762 — Òrbita Command v2)
+Sistema visual: gairebé **monocrom + un sol metall (xampany)**, molt aire, display per a títols i mono per a dates/imports. Dades de **mostra**.
+
+### Estat v3 (Canvi #763 — vora, paleta joia i agenda de caps de setmana — substituït per #764)
+### Estat v2 (Canvi #762 — Òrbita Command v2 — substituït per #764)
 
 Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre pilars:
 
@@ -47,8 +50,8 @@ Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre
 
 | Fitxer | Rol |
 |---|---|
-| `app/studio-lab/page.tsx` | Client component. Dades: `STAGES`, `INITIAL_LEADS`, `LAYERS`, `SIGNALS`, `NEXT_ACTION`, `ACTIONS_BY_STAGE`. Estat React + drag&drop + agenda mensual. |
-| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root` + colors d'estat **només a la vora** (`--c`) + calendari de caps de setmana (`sl-wkcal`/`sl-slot`) + estats interactius + responsive. |
+| `app/studio-lab/page.tsx` | Client component. Dades de mostra `INITIAL_BOLOS` + helpers purs (dates, conflictes, salut). Estat: `selectedId` (null = mode prioritats), `focusIndex`, `monthAnchor`. Construeix `decisions` (cua) i `months` (temporada). |
+| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root`, gairebé monocrom + xampany (`--sl-gold`). Regions `sl-focus`, `sl-season`/`sl-months`/`sl-event`; estat com a punt (`sl-dot[data-state]`); responsive 3→1 columna. |
 | `app/studio-lab/layout.tsx` | `robots: noindex`. |
 | `.dbg-studio-lab.cjs` | Captura Playwright → `.codex-captures/studio-lab.png`. |
 

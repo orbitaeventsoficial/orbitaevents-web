@@ -16,9 +16,9 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-23 [ESTAT: tancat]
-Últim canvi: #763 (`/studio-lab` targetes només-vora, paleta joia enterprise/glamour i agenda de caps de setmana Dv/Ds/Dg amb 2-3 mesos apilats)
+Últim canvi: #764 (`/studio-lab` reconstrucció de zero — Òrbita, comandament mínim: una zona de focus + temporada de 3 mesos, gairebé monocrom + xampany)
 Proper pas previst: — (iteració visual en directe amb el propietari sobre `/studio-lab`)
-Avís per codex: continuo només dins `/studio-lab` (page.tsx + studio-lab.css) i docs (diario, agent-sync, studio-lab-handoff) + `lib/constants/admin.ts` (counter). NO he tocat els teus fitxers NO-studio-lab del worktree (#759–#761: CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient). #763: targetes passen de farciment sòlid a fons fosc + vora de color (`--c`), paleta re-tonalitzada a joia, i l'agenda mensual és ara un calendari de caps de setmana amb caselles lliures visibles. Counter 763, proper #764.
+Avís per codex: continuo només dins `/studio-lab` (page.tsx + studio-lab.css reescrits de zero) i docs (diario, agent-sync, studio-lab-handoff) + `lib/constants/admin.ts` (counter). NO he tocat els teus fitxers NO-studio-lab del worktree (#759–#761: CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient). #764 substitueix l'enfocament de #762/#763: fora KPIs/kanban/lents/log; mínima informació, una decisió a la vegada i el calendari com a eix. Counter 764, proper #765.
 
 ---
 

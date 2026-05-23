@@ -1293,6 +1293,23 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #764 — 2026-05-23 — claude (FET)
+
+**`/studio-lab` reconstrucció de zero: Òrbita, comandament mínim (una decisió + temporada).**
+- Context: el propietari demana replantejar de zero (canvi de pensament i gestió, no de pintura). Brief: mínima informació, només l'important, zero soroll; colors business/premium i tipografia premium; calendari com a eix amb 3 mesos que quadrin perfectament; targetes grans però responsives. Tesi adoptada: un negoci d'esdeveniments es gestiona amb el temps i amb una sola decisió a la vegada.
+- `app/studio-lab/page.tsx`: reescriptura completa a tres regions; eliminats KPIs, kanban, barra de lents, llegenda, log i menús (soroll).
+- Zona de FOCUS única: per defecte la decisió més prioritària (cua `decisions`, ciclable); en tocar un bolo, fitxa mínima (data·import, següent pas, cobrament 2 passos, equip amb conflicte, acció primària, fletxes de fase) amb retorn a `Prioritats`.
+- Temporada = calendari de 3 mesos en columna; cada mes mostra només reserves (files netes) + caps de setmana lliures com a xips. Estat com a punt de color (`stateOf`), mai farciment.
+- `app/studio-lab/studio-lab.css`: sistema visual nou gairebé monocrom + un sol metall (xampany), molt aire, display per a títols i mono per a números; responsive 3→1 columna.
+- Abast: prototip intern `noindex`; només `app/studio-lab/*` i docs; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. No s'han tocat els fitxers no-`studio-lab` del worktree de codex.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright (prioritats + fitxa + mòbil) OK.
+- Validació funcional: el focus obre amb el conflicte de DJ del 4 jul i es pot ciclar; tocar un bolo el converteix en fitxa i el marca al calendari; les fletxes i l'acció primària mouen l'embut; navegar mesos mou la finestra de 3; els dissabtes lliures es veuen com a xips.
+- Validació humana/UX: passa de panell ple de widgets a comandament calmat — una decisió a la vegada i la temporada d'un cop d'ull; to premium (monocrom + xampany), zero candy, molt aire i jerarquia tipogràfica clara.
+- `ADMIN_CHANGE_COUNTER` passa a `764`; el següent canvi real ha de ser `#765`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #763 — 2026-05-23 — claude (FET)
 
 **`/studio-lab`: targetes només-vora, paleta joia (enterprise/glamour) i agenda com a calendari de caps de setmana (Dv/Ds/Dg) amb 2-3 mesos apilats.**

@@ -1,3 +1,28 @@
+## 2026-05-23 — Canvi #764: `/studio-lab` reconstrucció de zero — Òrbita, comandament mínim (claude)
+
+### Context
+El propietari demana un replantejament **de zero**: no una capa de pintura, sinó un canvi de pensament i gestió aplicat al software. Brief: mínima informació, **només l'important, res de soroll**; colors business/premium i tipografia premium; el calendari està bé com a eix però **3 mesos han de quadrar perfectament**; targetes grans però responsives. Em convida a oferir la meva millor versió. Tesi adoptada: *un negoci d'esdeveniments no es gestiona amb menús i llistes, sinó amb el temps i amb una sola decisió a la vegada*. La pantalla només respon dues preguntes: què he de fer ara i com s'omple la temporada.
+
+### Canvi
+1. `app/studio-lab/page.tsx`: **reescriptura completa**. Fora KPIs, kanban de 5 columnes, barra de lents, llegenda, log i navegació de menús (tot soroll). Tres regions i prou.
+2. **Zona de FOCUS única**: per defecte mostra *la* decisió més prioritària (cua `decisions` ordenada per pes/urgència, cicladle amb `‹ ›` i comptador `n/total`); en tocar un bolo, la mateixa zona es converteix en la **fitxa mínima** del bolo (data·import, el següent pas, cobrament de 2 passos, equip amb conflicte ressaltat, acció primària i fletxes de fase) amb un enllaç `‹ Prioritats` per tornar. Mai dues coses competint.
+3. **Temporada = calendari**: 3 mesos en columna (`SEASON_WINDOW=3`) que hi caben perfectament perquè cada mes mostra **només les reserves** com a files netes (punt d'estat + data + client) i els **caps de setmana lliures** com a xips petits (oportunitat a omplir), no una graella de caselles buides.
+4. **Estat com a punt de color**, mai farciment: `stateOf` → atenció (xampany), en marxa (neutre), tancat (sàlvia), conflicte (terracota), inactiu. Conflictes amb ⚠ discret.
+5. `app/studio-lab/studio-lab.css`: **sistema visual nou** gairebé monocrom + **un sol metall (xampany)**, molt aire, tipografia display gran per a títols i mono només per a dates/imports. Botó primari metàl·lic; responsive 3→1 columna.
+6. Captures: `.codex-captures/studio-lab.png` (prioritats), `studio-lab-detail.png` (fitxa del bolo) i `studio-lab-mobile.png` (390px).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright (prioritats + fitxa + mòbil) OK.
+- Validació funcional: el focus obre amb el conflicte de DJ del 4 jul i es pot ciclar per la cua; tocar un bolo el converteix en fitxa i el marca al calendari; les fletxes mouen de fase i l'acció primària avança l'embut; navegar mesos mou la finestra de 3; els dissabtes lliures es veuen com a xips.
+- Validació humana/UX: la pantalla deixa de ser un panell ple de widgets i passa a un comandament calmat — una decisió a la vegada i la temporada d'un cop d'ull. To premium (monocrom + xampany), zero candy, molt aire i jerarquia tipogràfica clara.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-23 — Canvi #763: `/studio-lab` targetes de vora, paleta joia i agenda de caps de setmana (claude)
 
 ### Context
