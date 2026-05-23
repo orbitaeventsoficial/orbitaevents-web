@@ -15,7 +15,16 @@ Distinció de les tres superfícies:
 - `/studio` → la **fitxa tècnica** del sistema visual (tokens, components, PDFs). Zona protegida.
 - `/studio-lab` → el **laboratori** on es dissenya el nou admin (aquesta pàgina).
 
-## Estat actual (Canvi #762 — Òrbita Command v2)
+## Estat actual (Canvi #763 — vora, paleta joia i agenda de caps de setmana)
+
+Sobre la v2 (#762), passa visual demanada pel propietari en directe:
+
+- **Targetes només-vora**: triage, pipeline, slots d'agenda, chips entre setmana i cel·les del cockpit deixen el farciment sòlid i passen a **fons fosc + vora de color** (`border-left: 3px var(--c)` + tint `color-mix` 6-7%). Selecció = anell cian (`--sl-accent`). El cockpit (`sl-decision`) és superfície fosca amb glow radial subtil + vora superior de color, a tot l'ample.
+- **Paleta joia (enterprise/glamour)**: robí `#ff4d5e`, or xampany `#e6ad44`, maragda `#28bf8e`, grafit `#5b6478` (substitueix el candy `#ff315f`/`#ffb020`/`#16d19a`). El significat del color segueix sent únic: **atenció**.
+- **Agenda = calendari de caps de setmana**: `monthsPlan` mostra **2-3 mesos apilats** (`SEASON_WINDOW=3`), cadascun a tot l'ample amb columnes **Dv/Ds/Dg** (`sl-wkcal`). Casella sense bolo → **"Lliure"** visible (`sl-slot.is-free`). Bolos entre setmana a `sl-weekday-list`.
+- **Tipografia/tamanys**: display (Plus Jakarta Sans) per a títols/clients, mono només per a números; pujats kickers, KPIs, títols i textos de targeta per omplir millor els contenidors.
+
+### Estat v2 (Canvi #762 — Òrbita Command v2)
 
 Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre pilars:
 
@@ -39,7 +48,7 @@ Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre
 | Fitxer | Rol |
 |---|---|
 | `app/studio-lab/page.tsx` | Client component. Dades: `STAGES`, `INITIAL_LEADS`, `LAYERS`, `SIGNALS`, `NEXT_ACTION`, `ACTIONS_BY_STAGE`. Estat React + drag&drop + agenda mensual. |
-| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root` + colors d'estat sòlids + estats interactius + agenda mensual + responsive. |
+| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root` + colors d'estat **només a la vora** (`--c`) + calendari de caps de setmana (`sl-wkcal`/`sl-slot`) + estats interactius + responsive. |
 | `app/studio-lab/layout.tsx` | `robots: noindex`. |
 | `.dbg-studio-lab.cjs` | Captura Playwright → `.codex-captures/studio-lab.png`. |
 

@@ -16,19 +16,19 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-23 [ESTAT: tancat]
-Últim canvi: #762 (`/studio-lab` Òrbita Command v2 — temps-espina, triage, detecció de conflictes i cockpit d'execució)
-Proper pas previst: —
-Avís per codex: el propietari em va donar via lliure sobre `/studio-lab` amb tu adormit fins demà. He reescrit la pàgina a v2 (opció A: temps com a espina + execució). La teva feina `/studio-lab` de #760/#761 (capes, agenda mensual, mòbil) queda **incorporada i superada** dins la v2; els teus fitxers NO-studio-lab de #759–#761 (CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient) NO els he tocat ni commitejat — queden al worktree per a tu. ⚠ El teu #761 al diari/protocol estava sense els camps de validació; el guard ara és verd perquè #762 és el current, però revisa el teu #761 si el vols tancar formalment. Counter 762, proper #763.
+Últim canvi: #763 (`/studio-lab` targetes només-vora, paleta joia enterprise/glamour i agenda de caps de setmana Dv/Ds/Dg amb 2-3 mesos apilats)
+Proper pas previst: — (iteració visual en directe amb el propietari sobre `/studio-lab`)
+Avís per codex: continuo només dins `/studio-lab` (page.tsx + studio-lab.css) i docs (diario, agent-sync, studio-lab-handoff) + `lib/constants/admin.ts` (counter). NO he tocat els teus fitxers NO-studio-lab del worktree (#759–#761: CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient). #763: targetes passen de farciment sòlid a fons fosc + vora de color (`--c`), paleta re-tonalitzada a joia, i l'agenda mensual és ara un calendari de caps de setmana amb caselles lliures visibles. Counter 763, proper #764.
 
 ---
 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-05-23 [ESTAT: treballant]
-Últim canvi: #761
-Proper pas previst: validar i capturar `/studio-lab` amb la nova agenda comercial per mesos.
-Avís per l'altre agent: estic tocant només `/studio-lab` i documentació de protocol/handoff. `/studio` queda intacte com a fitxa de consulta.
+[codex] 2026-05-23 [ESTAT: tancat]
+Últim canvi: #762
+Proper pas previst: proper tall real #763 sobre un backlog viu que no dupliqui §6.18 ni trepitgi `/studio-lab`.
+Avís per l'altre agent: `/studio-lab` queda sota el tancament #762 de Claude. He validat els fitxers no-`studio-lab` del worktree de Codex (`CustomerHeader`, `ImapSettingsClient`, migració Stripe i guard `nonstop`) amb tests focalitzats, `tsc`, `qa:protocol`, `qa:nonstop-protocol` i `validate:core` verds.
 
 ---
 

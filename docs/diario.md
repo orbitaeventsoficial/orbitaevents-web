@@ -1,3 +1,28 @@
+## 2026-05-23 — Canvi #763: `/studio-lab` targetes de vora, paleta joia i agenda de caps de setmana (claude)
+
+### Context
+El propietari itera en directe sobre `/studio-lab` mirant el servidor local i dona feedback ràpid: (1) les targetes de color **sòlid** no agraden — vol **només la vora** de color; (2) la paleta semblava "petitsuisse" (candy/infantil) — vol un to **business / glamour / enterprise**; (3) vol veure l'agenda com a **calendari de caps de setmana** amb **divendres, dissabte i diumenge** i les caselles buides **visibles com a lliures**; (4) abans deia "només un mes si falta espai", després afina a **2-3 mesos que quadrin perfectament**; (5) la **tipografia** no agrada i la **lletra és massa petita** respecte als contenidors. Es demanen captures per iterar. Claude lidera el visual (memòria) i la passa queda a git i al diari per blindatge.
+
+### Canvi
+1. `app/studio-lab/studio-lab.css`: les targetes (`sl-triage-card`, `sl-card`, `sl-slot`, `sl-weekday-chip`, `sl-cell`) deixen el farciment sòlid (`--solid`/`--on`) i passen a **fons fosc + vora de color** (`border-left: 3px var(--c)` + tint mínim `color-mix 6-7%`), patró ja existent a `sl-signal`. Selecció = anell cian (`--sl-accent`), coherent amb la resta.
+2. Paleta d'atenció re-tonalitzada a **joia enterprise/glamour**: robí `#ff4d5e`, or xampany `#e6ad44`, maragda `#28bf8e`, grafit `#5b6478` (abans candy `#ff315f`/`#ffb020`/`#16d19a`). El mapping `data-health` queda net (només `--c`).
+3. Cockpit (`sl-decision`): de bloc sòlid a **superfície fosca + glow radial subtil + vora superior de color**, a **tot l'ample** (treu el buit de la dreta) i amb les accions (`sl-command-stack`) en fila (`auto-fit minmax(240px)`).
+4. **Agenda reescrita** (`app/studio-lab/page.tsx` + CSS): `monthsPlan` mostra **2-3 mesos apilats** (`SEASON_WINDOW=3`), cadascun a tot l'ample com a **calendari de caps de setmana** (`sl-wkcal`, 3 columnes Dv/Ds/Dg). Casella ocupada → bolo amb salut; **casella sense bolo → `sl-slot.is-free` "Lliure"** (vora discontínua). Bolos entre setmana no s'amaguen: `sl-weekday-list`. Eliminat el rail antic de dissabtes i els estils morts `sl-month-event`/`sl-month__*`/`sl-weekends`/`sl-wend`.
+5. **Tipografia i tamanys**: títols i clients amb display (Plus Jakarta Sans), mono reservat a números; pujats kickers (10→11.5/12px), KPIs (valor 16→22px), títols de secció (22→26px), títols de targeta (18→20px), dates/tipus/imports de card i slot, capçaleres de columna i llegenda. Responsive: `sl-wkcal` a 1 columna i capçaleres ocultes a ≤560px.
+6. Captures: `.codex-captures/studio-lab.png` (desktop 1440px) i `studio-lab-mobile.png` (390px).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captura Playwright desktop + mòbil OK.
+- Validació funcional: l'agenda mostra Juny–Agost 2026 apilats amb Dv/Ds/Dg; els caps de setmana lliures es veuen com a "Lliure"; seleccionar una casella o un bolo entre setmana sincronitza el cockpit; navegar mesos mou la finestra de 3; el pipeline i el triage mantenen drag&drop, lents i conflictes.
+- Validació humana/UX: el to passa de candy a joia enterprise sense perdre el significat únic del color (atenció), el color només viu a la vora, la lletra respira millor dins els contenidors i el calendari de caps de setmana fa llegible la capacitat real de la temporada amb els forats a omplir.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-23 — Canvi #762: `/studio-lab` Òrbita Command v2 — temps-espina, triage i cockpit (claude)
 
 ### Context

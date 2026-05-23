@@ -1293,6 +1293,23 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #763 — 2026-05-23 — claude (FET)
+
+**`/studio-lab`: targetes només-vora, paleta joia (enterprise/glamour) i agenda com a calendari de caps de setmana (Dv/Ds/Dg) amb 2-3 mesos apilats.**
+- Context: iteració visual en directe amb el propietari sobre el servidor local. Feedback: el color sòlid de les targetes no agrada (vol només la vora); la paleta semblava "petitsuisse" (vol to business/glamour/enterprise); vol l'agenda com a calendari de caps de setmana amb divendres/dissabte/diumenge i caselles buides visibles; vol 2-3 mesos que quadrin perfectament; la tipografia no agrada i la lletra és massa petita.
+- `app/studio-lab/studio-lab.css`: targetes (`sl-triage-card`, `sl-card`, `sl-slot`, `sl-weekday-chip`, `sl-cell`) passen de farciment sòlid (`--solid`/`--on`) a fons fosc + vora de color (`border-left: 3px var(--c)` + tint `color-mix` 6-7%); selecció = anell cian. Cockpit (`sl-decision`) a superfície fosca amb glow radial + vora superior, a tot l'ample i amb accions en fila.
+- Paleta d'atenció re-tonalitzada a joia: robí `#ff4d5e`, or xampany `#e6ad44`, maragda `#28bf8e`, grafit `#5b6478`; mapping `data-health` net (només `--c`).
+- `app/studio-lab/page.tsx` + CSS: agenda reescrita a `monthsPlan` (2-3 mesos apilats, `SEASON_WINDOW=3`), cada mes com a calendari de caps de setmana (`sl-wkcal`, columnes Dv/Ds/Dg); casella sense bolo → "Lliure" visible (`sl-slot.is-free`); bolos entre setmana a `sl-weekday-list`; eliminats els estils morts `sl-month-event`/`sl-month__*`/`sl-weekends`/`sl-wend`.
+- Tipografia/tamanys: display per a títols i clients, mono només per a números; pujats kickers, KPIs, títols de secció i textos de targeta per omplir millor els contenidors; responsive a 1 columna i capçaleres ocultes a ≤560px.
+- Abast: prototip intern `noindex`; només `app/studio-lab/*` i docs; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. No s'han tocat els fitxers no-`studio-lab` del worktree de codex.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captura Playwright desktop (1440px) + mòbil (390px) OK.
+- Validació funcional: l'agenda mostra Juny–Agost 2026 apilats amb Dv/Ds/Dg; els caps de setmana lliures es veuen com a "Lliure"; seleccionar casella o bolo entre setmana sincronitza el cockpit; navegar mesos mou la finestra de 3; pipeline, triage, lents i conflictes intactes.
+- Validació humana/UX: el to passa de candy a joia enterprise sense perdre el significat únic del color (atenció); el color només viu a la vora; la lletra respira millor dins els contenidors i el calendari de caps de setmana fa llegible la capacitat real amb els forats a omplir.
+- `ADMIN_CHANGE_COUNTER` passa a `763`; el següent canvi real ha de ser `#764`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #762 — 2026-05-23 — claude (FET)
 
 **`/studio-lab` evoluciona a Òrbita Command v2: temps com a espina, triage de decisions i cockpit d'execució.**
