@@ -1293,6 +1293,23 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #765 — 2026-05-23 — claude (FET)
+
+**`/studio-lab` Sala de comandament: soroll textual fora, senyal visual a dins (skill `frontend-design`).**
+- Context: el propietari aclareix el #764 — volia menys soroll, no menys interfície. Cal mantenir el que anava bé (caselles Dv/Ds/Dg, menú de navegació superior, columnes del pipeline). "Soroll" = dades textuals innecessàries ("X dissabtes lliures", "perill", etiquetes d'estat en paraules) → s'ha de mostrar visualment. Instal·la el plugin `frontend-design` i demana criteri propi per a la resta.
+- `app/studio-lab/page.tsx` + `studio-lab.css`: reescriptura completa conservant navegació per àrees, calendari de caps de setmana i pipeline arrossegable.
+- Soroll textual eliminat (KPIs, triage, llegenda, lents, frases advisory). Senyal visual: color = estat (vora-espina/punt), ple/buit = capacitat (meter de punts per cap de setmana + caselles lliures com a buit), barra = cobrament, ⚠ = conflicte, punts = fase. Es conserva la dada (client, data, import, equip).
+- Detall lateral mínim (`sl-detail`): bolo seleccionat o el més urgent per defecte; nom, data, import, cobrament, equip amb conflicte ressaltat, fase i una sola acció.
+- Estètica premium: espresso càlid + un sol metall (llautó), serif Cormorant (`--font-serif`, ja al repo) per a titulars i imports; sense dependències noves.
+- Abast: prototip intern `noindex`; només `app/studio-lab/*` i docs; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. No s'han tocat els fitxers no-`studio-lab` del worktree de codex.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright desktop + mòbil OK.
+- Validació funcional: calendari amb Dv/Ds/Dg i meter de capacitat; arrossegar leads entre columnes mou i actualitza el detall; el detall mostra el més urgent i l'acció avança l'embut; el conflicte del 4 jul surt com a ⚠ i recurs ressaltat.
+- Validació humana/UX: la pantalla passa de "parlar" a "mostrar"; capacitat i estat es llegeixen d'un cop d'ull pel color i el ple/buit, mantenint els elements que el propietari volia. To premium, sense soroll.
+- `ADMIN_CHANGE_COUNTER` passa a `765`; el següent canvi real ha de ser `#766`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #764 — 2026-05-23 — claude (FET)
 
 **`/studio-lab` reconstrucció de zero: Òrbita, comandament mínim (una decisió + temporada).**

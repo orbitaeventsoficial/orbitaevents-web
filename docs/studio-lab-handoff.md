@@ -15,19 +15,23 @@ Distinció de les tres superfícies:
 - `/studio` → la **fitxa tècnica** del sistema visual (tokens, components, PDFs). Zona protegida.
 - `/studio-lab` → el **laboratori** on es dissenya el nou admin (aquesta pàgina).
 
-## Estat actual (Canvi #764 — reconstrucció de zero: Òrbita, comandament mínim)
+## Estat actual (Canvi #765 — Sala de comandament: senyal visual, no soroll)
 
-Replantejament de zero demanat pel propietari (canvi de pensament, no de pintura). **Tesi**: un negoci d'esdeveniments es gestiona amb el temps i amb **una sola decisió a la vegada**. La pantalla només respon: *què he de fer ara* i *com s'omple la temporada*. Fora el soroll (KPIs, kanban de 5 columnes, barra de lents, llegenda, log, menús).
+Aclariment del propietari: volia **menys soroll, no menys interfície**. Es **mantenen** els elements que valorava (navegació superior per àrees, calendari de caps de setmana Dv/Ds/Dg, pipeline de columnes arrossegable) i s'elimina el **soroll textual** (dades advisory en paraules), que ara es llegeix **visualment**. Construït amb la skill `frontend-design`.
 
-Tres regions:
-- **Top mínim**: marca `Òrbita` + data d'avui.
-- **FOCUS únic** (`sl-focus`): per defecte la decisió més prioritària (cua `decisions` ordenada per pes/urgència, ciclable amb `‹ ›` i comptador); en tocar un bolo, la mateixa zona es torna la **fitxa mínima** del bolo (data·import, següent pas, cobrament 2 passos, equip amb conflicte, acció primària, fletxes de fase) amb retorn a `Prioritats`. Mai dues coses competint.
-- **TEMPORADA** (`sl-season`): **3 mesos en columna** (`SEASON_WINDOW=3`) que hi caben perfectament; cada mes mostra **només les reserves** com a files netes (punt d'estat + data + client) i els **dissabtes lliures** com a xips. Estat = punt de color (`stateOf`: atenció xampany · en marxa neutre · tancat sàlvia · conflicte terracota · inactiu), mai farciment.
+Composició:
+- **Masthead** (`sl-mast`): marca `Òrbita` (serif) + navegació per àrees amb desplegables (`sl-nav`) + data + senyal d'atenció (punt + número).
+- **Temporada** (`sl-cal`): 3 mesos (`SEASON_WINDOW=3`), cada mes amb un **meter de capacitat** (un punt ple/buit per cap de setmana) i la graella **Dv/Ds/Dg** (`sl-grid`). Casella ocupada → client (serif) + vora-espina de color (estat). Casella lliure → **buit visible** (sense la paraula "Lliure"). `⚠` = conflicte.
+- **Pipeline + Detall** (`sl-ops`): columnes Nou→Perdut arrossegables (`sl-board`/`sl-lead`) amb estat en color; i el **detall mínim** (`sl-detail`) del bolo seleccionat o el més urgent per defecte (nom, data, import, cobrament en barra, equip amb conflicte ressaltat, fase en punts, una acció).
 
-Sistema visual: gairebé **monocrom + un sol metall (xampany)**, molt aire, display per a títols i mono per a dates/imports. Dades de **mostra**.
+Principi: **color = estat**, **ple/buit = capacitat**, **barra = cobrament**, **⚠ = conflicte**, **punts = fase**. Es conserva només la dada (client, data, import, equip).
 
-### Estat v3 (Canvi #763 — vora, paleta joia i agenda de caps de setmana — substituït per #764)
-### Estat v2 (Canvi #762 — Òrbita Command v2 — substituït per #764)
+Sistema visual: **espresso càlid + un sol metall (llautó)**, serif **Cormorant** (`--font-serif`) per a titulars i imports, sans per a UI, mono per a dades; hairlines i molt aire. Dades de **mostra**. Sense dependències noves.
+
+### Històric (substituïts per #765)
+- #764 — comandament mínim (una zona de focus + temporada); massa despullat, treia elements que el propietari volia.
+- #763 — vora, paleta joia i agenda de caps de setmana.
+- #762 — Òrbita Command v2 (triage + cockpit).
 
 Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre pilars:
 
@@ -50,8 +54,8 @@ Re-centrat en el **temps com a espina** + **execució**, no només venda. Quatre
 
 | Fitxer | Rol |
 |---|---|
-| `app/studio-lab/page.tsx` | Client component. Dades de mostra `INITIAL_BOLOS` + helpers purs (dates, conflictes, salut). Estat: `selectedId` (null = mode prioritats), `focusIndex`, `monthAnchor`. Construeix `decisions` (cua) i `months` (temporada). |
-| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root`, gairebé monocrom + xampany (`--sl-gold`). Regions `sl-focus`, `sl-season`/`sl-months`/`sl-event`; estat com a punt (`sl-dot[data-state]`); responsive 3→1 columna. |
+| `app/studio-lab/page.tsx` | Client component. Dades de mostra `INITIAL_BOLOS` + helpers purs. Estat: `selectedId`, `openMenu` (nav), `monthAnchor`, `draggingId`/`dragOver`. `stateOf` (color), `findConflicts`, `months` (temporada), `detail` (seleccionat o més urgent). |
+| `app/studio-lab/studio-lab.css` | Tokens scoped a `.sl-root`: espresso + llautó, serif Cormorant (`--sl-serif`). Regions `sl-mast`/`sl-nav`, `sl-cal`/`sl-grid`/`sl-cell`, `sl-board`/`sl-lead`, `sl-detail`. Estat via `[data-state] → --c`; responsive. |
 | `app/studio-lab/layout.tsx` | `robots: noindex`. |
 | `.dbg-studio-lab.cjs` | Captura Playwright → `.codex-captures/studio-lab.png`. |
 

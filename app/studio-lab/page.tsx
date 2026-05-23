@@ -1,19 +1,20 @@
 'use client';
 
 /* ============================================================================
-   ÒRBITA — laboratori del nou admin (/studio-lab) · reconstrucció de zero
+   ÒRBITA — Sala de comandament (/studio-lab)
    ----------------------------------------------------------------------------
-   Tesi: un negoci d'esdeveniments no es gestiona amb menús i llistes, es
-   gestiona amb el TEMPS i amb UNA sola decisió a la vegada.
+   Es manté el que funcionava: navegació superior per àrees, calendari de caps
+   de setmana (Dv/Ds/Dg) i pipeline de leads arrossegable (Nou → Perdut).
 
-   La pantalla respon dues coses i prou:
-     1) Què he de fer ara  → una única zona de FOCUS (decisió o fitxa del bolo).
-     2) Com s'omple la temporada → el CALENDARI de 3 mesos (reserves + forats).
+   Principi: fora el SOROLL textual. Cap frase advisory ("queden 3 dissabtes",
+   "perill", "mes fort"). La informació es llegeix VISUALMENT:
+     · color = estat (atenció · en marxa · tancat · conflicte)
+     · ple/buit = capacitat (dissabtes ocupats vs lliures)
+     · barra = cobrament (senyal · resta)   · ⚠ = conflicte de recurs
+   Es conserva només la DADA (client, data, import, equip).
 
-   Tot el soroll fora: ni KPIs, ni kanban de 5 columnes, ni barra de lents, ni
-   log. Mínima informació, només l'important. Premium i gairebé monocrom + or.
-
-   Prototip intern (noindex). Dades de mostra. Iterable lliurement.
+   Estètica: espresso fosc + un sol metall (llautó), serif (Cormorant) per als
+   titulars i imports. Prototip intern noindex, dades de mostra.
 ============================================================================ */
 
 import { useMemo, useState } from 'react';
@@ -22,21 +23,20 @@ import './studio-lab.css';
 type Stage = 'nou' | 'contactat' | 'pressupost' | 'guanyat' | 'perdut';
 type Risk = 'alt' | 'mitjà' | 'baix';
 type ResourceId = 'dj' | 'so' | 'llums' | 'furgo' | 'foto';
-type Health = 'urgent' | 'watch' | 'ok' | 'idle';
 type DotState = 'attention' | 'progress' | 'settled' | 'conflict' | 'idle';
 
 const REF_TODAY = '2026-05-23';
 const SEASON_YEAR = 2026;
-const SEASON_WINDOW = 3; // mesos visibles alhora
+const SEASON_WINDOW = 3;
 
 const STAGE_ORDER: Stage[] = ['nou', 'contactat', 'pressupost', 'guanyat', 'perdut'];
-const STAGE_LABEL: Record<Stage, string> = {
-  nou: 'Nova',
-  contactat: 'Contactada',
-  pressupost: 'Negociant',
-  guanyat: 'Reservat',
-  perdut: 'Perduda',
-};
+const STAGES: { id: Stage; label: string }[] = [
+  { id: 'nou', label: 'Nou' },
+  { id: 'contactat', label: 'Contactat' },
+  { id: 'pressupost', label: 'Negociant' },
+  { id: 'guanyat', label: 'Reservat' },
+  { id: 'perdut', label: 'Perdut' },
+];
 
 const RESOURCES: Record<ResourceId, string> = {
   dj: 'DJ',
@@ -51,18 +51,27 @@ const MONTHS_FULL_CA = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Ju
 const WEEKDAYS_CA = ['diumenge', 'dilluns', 'dimarts', 'dimecres', 'dijous', 'divendres', 'dissabte'];
 const WEEKDAYS_SHORT_CA = ['dg', 'dl', 'dt', 'dc', 'dj', 'dv', 'ds'];
 
+/* Àrees de treball del nou admin (navegació superior amb desplegables). */
+const NAV_GROUPS: { id: string; label: string; items: string[] }[] = [
+  { id: 'comercial', label: 'Comercial', items: ['Entrades', 'Clients', 'Pressupostos', 'Pipeline'] },
+  { id: 'operacio', label: 'Operació', items: ['Reserves', 'Calendari', 'Tasques', 'Equip i inventari'] },
+  { id: 'diners', label: 'Diners', items: ['Facturació', 'Cobraments', 'Marges', 'Preus i packs'] },
+  { id: 'marqueting', label: 'Màrqueting', items: ['Catàleg', 'Ressenyes', 'Blog', 'Integracions'] },
+  { id: 'sistema', label: 'Sistema', items: ['Safata', 'Correus', 'Informes', 'Configuració'] },
+];
+
 type Bolo = {
   id: string;
   client: string;
   type: string;
-  date: string; // ISO YYYY-MM-DD
+  date: string;
   value: number;
   stage: Stage;
   risk: Risk;
   resources: ResourceId[];
   deposit: boolean;
   remaining: boolean;
-  checklist: number; // 0..100
+  checklist: number;
   lastTouchDays: number;
 };
 
@@ -81,7 +90,6 @@ const INITIAL_BOLOS: Bolo[] = [
 ];
 
 /* ── Helpers purs ──────────────────────────────────────────────────────── */
-
 function euro(n: number): string {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
 }
@@ -93,9 +101,7 @@ function isoDate(y: number, m: number, d: number): string {
   return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 function daysUntil(iso: string): number {
-  const a = Date.parse(`${iso}T00:00:00Z`);
-  const b = Date.parse(`${REF_TODAY}T00:00:00Z`);
-  return Math.round((a - b) / 86_400_000);
+  return Math.round((Date.parse(`${iso}T00:00:00Z`) - Date.parse(`${REF_TODAY}T00:00:00Z`)) / 86_400_000);
 }
 function dayLabel(iso: string): string {
   const { m, d } = parseISO(iso);
@@ -105,46 +111,19 @@ function weekdayIndex(iso: string): number {
   const { y, m, d } = parseISO(iso);
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
-function weekdayName(iso: string): string {
-  return WEEKDAYS_CA[weekdayIndex(iso)];
-}
-function weekdayShort(iso: string): string {
-  return WEEKDAYS_SHORT_CA[weekdayIndex(iso)];
-}
+function weekdayName(iso: string): string { return WEEKDAYS_CA[weekdayIndex(iso)]; }
+function weekdayShort(iso: string): string { return WEEKDAYS_SHORT_CA[weekdayIndex(iso)]; }
 function shiftIso(iso: string, days: number): string {
   const { y, m, d } = parseISO(iso);
   const t = new Date(Date.UTC(y, m - 1, d + days));
   return isoDate(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate());
 }
-function monthIndex(iso: string): number {
-  return parseISO(iso).m;
-}
+function monthIndex(iso: string): number { return parseISO(iso).m; }
 function saturdaysInMonth(y: number, m: number): string[] {
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const out: string[] = [];
-  for (let d = 1; d <= last; d++) {
-    if (new Date(Date.UTC(y, m - 1, d)).getUTCDay() === 6) out.push(isoDate(y, m, d));
-  }
+  for (let d = 1; d <= last; d++) if (new Date(Date.UTC(y, m - 1, d)).getUTCDay() === 6) out.push(isoDate(y, m, d));
   return out;
-}
-
-function healthOf(b: Bolo, conflictIds: Set<string>): Health {
-  if (b.stage === 'perdut') return 'idle';
-  if (conflictIds.has(b.id)) return 'urgent';
-  if (b.stage === 'nou' && b.lastTouchDays >= 3) return 'urgent';
-  if (b.stage === 'guanyat' && !b.deposit) return 'urgent';
-  if (b.stage === 'guanyat' && b.deposit && b.remaining && b.checklist >= 100) return 'ok';
-  return 'watch';
-}
-
-function stateOf(b: Bolo, conflictIds: Set<string>): DotState {
-  if (conflictIds.has(b.id)) return 'conflict';
-  switch (healthOf(b, conflictIds)) {
-    case 'urgent': return 'attention';
-    case 'ok': return 'settled';
-    case 'idle': return 'idle';
-    default: return 'progress';
-  }
 }
 
 type Conflict = { date: string; resource: ResourceId; bolos: Bolo[] };
@@ -164,53 +143,39 @@ function findConflicts(bolos: Bolo[]): Conflict[] {
   return conflicts.sort((a, b) => daysUntil(a.date) - daysUntil(b.date));
 }
 
+/* Estat → color. Un sol significat, llegit sense paraules. */
+function stateOf(b: Bolo, conflictIds: Set<string>): DotState {
+  if (b.stage === 'perdut') return 'idle';
+  if (conflictIds.has(b.id)) return 'conflict';
+  if (b.stage === 'nou' && b.lastTouchDays >= 3) return 'attention';
+  if (b.stage === 'guanyat' && !b.deposit) return 'attention';
+  if (b.stage === 'guanyat' && b.deposit && b.remaining && b.checklist >= 100) return 'settled';
+  return 'progress';
+}
+function urgencyRank(s: DotState): number {
+  return s === 'conflict' ? 3 : s === 'attention' ? 2 : s === 'progress' ? 1 : 0;
+}
 function primaryActionFor(b: Bolo): string {
   switch (b.stage) {
     case 'nou': return 'Respon ara';
-    case 'contactat': return 'Envia el pressupost';
+    case 'contactat': return 'Envia pressupost';
     case 'pressupost': return 'Tanca la senyal';
     case 'guanyat':
       if (!b.deposit) return 'Cobra la senyal';
-      if (b.checklist < 100) return 'Obre la producció';
-      return 'Confirma la logística';
+      if (b.checklist < 100) return 'Obre producció';
+      return 'Confirma logística';
     case 'perdut':
-    default: return 'Reactiva el contacte';
+    default: return 'Reactiva';
   }
 }
-
-function nextStepFor(b: Bolo, conflictResources: Set<ResourceId>): string {
-  if (conflictResources.size > 0) {
-    const r = Array.from(conflictResources)[0];
-    return `Tens el ${RESOURCES[r]} duplicat el mateix dia. Resol-ho abans de res.`;
-  }
-  switch (b.stage) {
-    case 'nou':
-      return b.lastTouchDays >= 3
-        ? `Fa ${b.lastTouchDays} dies que espera resposta. La velocitat marca la conversió.`
-        : 'Fes el primer contacte avui, mentre l\'interès és viu.';
-    case 'contactat':
-      return 'Envia el pressupost mentre l\'interès és calent.';
-    case 'pressupost':
-      return 'Truca per tancar la senyal i bloquejar la data.';
-    case 'guanyat':
-      if (!b.deposit) return 'Encara no està bloquejat: cobra la senyal.';
-      if (b.checklist < 100) return `Producció al ${b.checklist}%: equip, logística i documents.`;
-      return 'Tot a punt. Confirma la logística amb l\'equip.';
-    case 'perdut':
-    default:
-      return 'Programa una reactivació d\'aquí uns mesos.';
-  }
-}
-
-/* Cua de decisions: ordenada per pes i urgència. El cor del FOCUS. */
-type Decision = { id: string; boloId: string; kicker: string; title: string; why: string };
 
 export default function StudioLabPage() {
   const [bolos, setBolos] = useState<Bolo[]>(INITIAL_BOLOS);
-  const [selectedId, setSelectedId] = useState<string | null>(null); // null = mode prioritats
-  const [focusIndex, setFocusIndex] = useState(0);
-  const [monthAnchor, setMonthAnchor] = useState(6); // Juny
-  const [note, setNote] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [monthAnchor, setMonthAnchor] = useState(6);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState<Stage | null>(null);
 
   const conflicts = useMemo(() => findConflicts(bolos), [bolos]);
   const conflictIds = useMemo(() => {
@@ -219,43 +184,28 @@ export default function StudioLabPage() {
     return s;
   }, [conflicts]);
 
-  const decisions = useMemo<Decision[]>(() => {
-    type D = Decision & { weight: number; days: number };
-    const items: D[] = [];
-    conflicts.forEach((c, i) => {
-      items.push({
-        id: `cf-${i}`, boloId: c.bolos[0].id, weight: 100, days: daysUntil(c.date),
-        kicker: 'Conflicte de capacitat',
-        title: `${RESOURCES[c.resource]} duplicat el ${dayLabel(c.date)}`,
-        why: `${c.bolos.map((b) => b.client).join(' i ')} es trepitgen el mateix recurs i dia.`,
-      });
-    });
-    for (const b of bolos) {
-      const days = daysUntil(b.date);
-      if (b.stage === 'nou' && b.lastTouchDays >= 3)
-        items.push({ id: `sp-${b.id}`, boloId: b.id, weight: 92, days, kicker: 'Resposta pendent', title: `Respon ${b.client}`, why: `Fa ${b.lastTouchDays} dies que espera. Cada dia perd conversió.` });
-      if (b.stage === 'guanyat' && !b.deposit)
-        items.push({ id: `sg-${b.id}`, boloId: b.id, weight: 88, days, kicker: 'Caixa en risc', title: `Cobra la senyal de ${b.client}`, why: `${euro(b.value)} reservats sense senyal: la data no està bloquejada.` });
-      if (b.stage === 'guanyat' && b.deposit && !b.remaining && days <= 21 && days >= 0)
-        items.push({ id: `sr-${b.id}`, boloId: b.id, weight: 80, days, kicker: 'Resta a cobrar', title: `Resta de ${b.client}`, why: `Falten ${days} dies per a l'esdeveniment i la resta segueix pendent.` });
-      if (b.stage === 'pressupost')
-        items.push({ id: `cl-${b.id}`, boloId: b.id, weight: 76, days, kicker: 'A tancar', title: `Tanca ${b.client}`, why: `${euro(b.value)} en joc, encara negociant.` });
-      if (b.stage === 'guanyat' && b.checklist < 50 && days <= 60 && days >= 0)
-        items.push({ id: `pr-${b.id}`, boloId: b.id, weight: 70, days, kicker: 'Producció', title: `Prepara ${b.client}`, why: `Producció al ${b.checklist}% i l'esdeveniment s'acosta.` });
-    }
-    return items.sort((a, b) => b.weight - a.weight || a.days - b.days).slice(0, 6);
-  }, [bolos, conflicts]);
+  const attentionCount = useMemo(
+    () => bolos.filter((b) => { const s = stateOf(b, conflictIds); return s === 'attention' || s === 'conflict'; }).length,
+    [bolos, conflictIds],
+  );
 
-  const selected = useMemo(() => bolos.find((b) => b.id === selectedId) ?? null, [bolos, selectedId]);
-  const safeFocusIndex = decisions.length ? Math.min(focusIndex, decisions.length - 1) : 0;
-  const focusDecision = decisions[safeFocusIndex] ?? null;
-
-  const selectedConflictResources = useMemo(() => {
+  /* El bolo que demana el detall: el seleccionat o, per defecte, el més urgent. */
+  const ranked = useMemo(
+    () => [...bolos].sort((a, b) =>
+      urgencyRank(stateOf(b, conflictIds)) - urgencyRank(stateOf(a, conflictIds))
+      || daysUntil(a.date) - daysUntil(b.date)),
+    [bolos, conflictIds],
+  );
+  const detail = useMemo(
+    () => bolos.find((b) => b.id === selectedId) ?? ranked[0] ?? null,
+    [bolos, selectedId, ranked],
+  );
+  const detailConflictResources = useMemo(() => {
     const set = new Set<ResourceId>();
-    if (!selected) return set;
-    for (const c of conflicts) if (c.bolos.some((b) => b.id === selected.id)) set.add(c.resource);
+    if (!detail) return set;
+    for (const c of conflicts) if (c.bolos.some((b) => b.id === detail.id)) set.add(c.resource);
     return set;
-  }, [conflicts, selected]);
+  }, [conflicts, detail]);
 
   const viewMonths = useMemo(
     () => Array.from({ length: SEASON_WINDOW }, (_, i) => monthAnchor + i).filter((m) => m >= 1 && m <= 12),
@@ -263,179 +213,223 @@ export default function StudioLabPage() {
   );
 
   const months = useMemo(() => {
+    const byDate = new Map<string, Bolo>();
+    for (const b of bolos) if (b.stage !== 'perdut' && !byDate.has(b.date)) byDate.set(b.date, b);
     return viewMonths.map((m) => {
-      const events = bolos
-        .filter((b) => monthIndex(b.date) === m && b.stage !== 'perdut')
-        .sort((a, b) => daysUntil(a.date) - daysUntil(b.date));
-      const freeSaturdays = saturdaysInMonth(SEASON_YEAR, m)
-        .filter((sat) => {
-          const span = new Set([shiftIso(sat, -1), sat, shiftIso(sat, 1)]);
-          return !bolos.some((b) => b.stage !== 'perdut' && span.has(b.date));
-        })
-        .map((sat) => parseISO(sat).d);
-      return { m, label: MONTHS_FULL_CA[m - 1], events, freeSaturdays };
+      const sats = saturdaysInMonth(SEASON_YEAR, m);
+      const weekends = sats.map((sat) => {
+        const days = [shiftIso(sat, -1), sat, shiftIso(sat, 1)].map((iso) => ({
+          iso, day: parseISO(iso).d, inMonth: monthIndex(iso) === m, bolo: byDate.get(iso) ?? null,
+        }));
+        const taken = days.find((d) => d.bolo)?.bolo ?? null;
+        return { sat, days, taken };
+      });
+      return { m, label: MONTHS_FULL_CA[m - 1], weekends };
     });
   }, [viewMonths, bolos]);
 
   const rangeLabel = viewMonths.length
-    ? `${MONTHS_FULL_CA[viewMonths[0] - 1]} – ${MONTHS_FULL_CA[viewMonths[viewMonths.length - 1] - 1]} ${SEASON_YEAR}`
+    ? `${MONTHS_CA[viewMonths[0] - 1]} – ${MONTHS_CA[viewMonths[viewMonths.length - 1] - 1]} ${String(SEASON_YEAR).slice(2)}`
     : '';
 
-  function openBolo(id: string) {
+  function moveBolo(id: string, stage: Stage) {
+    setBolos((prev) => prev.map((b) => (b.id === id ? { ...b, stage } : b)));
     setSelectedId(id);
-    setNote(null);
   }
-  function backToPriorities() {
-    setSelectedId(null);
-    setNote(null);
-  }
-  function cycleFocus(dir: -1 | 1) {
-    if (!decisions.length) return;
-    setFocusIndex((i) => (Math.min(i, decisions.length - 1) + dir + decisions.length) % decisions.length);
+  function onDrop(stage: Stage) {
+    if (draggingId) moveBolo(draggingId, stage);
+    setDraggingId(null);
+    setDragOver(null);
   }
   function advance(b: Bolo, dir: -1 | 1) {
-    const idx = STAGE_ORDER.indexOf(b.stage);
-    const next = STAGE_ORDER[idx + dir];
-    if (!next) return;
-    setBolos((prev) => prev.map((x) => (x.id === b.id ? { ...x, stage: next } : x)));
-    setNote(`${b.client} → ${STAGE_LABEL[next]}.`);
+    const next = STAGE_ORDER[STAGE_ORDER.indexOf(b.stage) + dir];
+    if (next) moveBolo(b.id, next);
   }
   function runPrimary(b: Bolo) {
-    const transitions: Partial<Record<Stage, Stage>> = { nou: 'contactat', contactat: 'pressupost', pressupost: 'guanyat' };
-    const next = transitions[b.stage];
-    if (next) {
-      setBolos((prev) => prev.map((x) => (x.id === b.id ? { ...x, stage: next } : x)));
-      setNote(`${primaryActionFor(b)} · ${b.client} → ${STAGE_LABEL[next]}.`);
-      return;
-    }
-    setNote(`${primaryActionFor(b)} · acció preparada per ${b.client}.`);
+    const t: Partial<Record<Stage, Stage>> = { nou: 'contactat', contactat: 'pressupost', pressupost: 'guanyat' };
+    const next = t[b.stage];
+    if (next) moveBolo(b.id, next);
+    else setSelectedId(b.id);
   }
 
   return (
     <main className="sl-root">
-      <div className="sl-app">
-        {/* Barra superior — mínima: marca + temporada */}
-        <header className="sl-top">
+      <div className="sl-bg" aria-hidden="true" />
+      <div className="sl-wrap">
+        {/* Masthead — marca + àrees + senyal d'atenció */}
+        <header className="sl-mast">
           <div className="sl-brand">
             <span className="sl-brand__mark">Ò</span>
-            <span className="sl-brand__name">Òrbita</span>
+            <span className="sl-brand__word">Òrbita</span>
           </div>
-          <div className="sl-today">{weekdayName(REF_TODAY)} · {dayLabel(REF_TODAY)}</div>
-        </header>
-
-        {/* FOCUS — una sola cosa: la decisió més important o el bolo obert */}
-        <section className="sl-focus" aria-label="Focus">
-          {selected ? (
-            <article className="sl-focus__card" data-state={stateOf(selected, conflictIds)}>
-              <button type="button" className="sl-back" onClick={backToPriorities}>‹ Prioritats</button>
-              <p className="sl-focus__kicker">{STAGE_LABEL[selected.stage]} · {selected.type}</p>
-              <h1 className="sl-focus__title">{selected.client}</h1>
-              <p className="sl-focus__line">
-                <span>{weekdayName(selected.date)} {dayLabel(selected.date)}</span>
-                <span className="sl-sep" />
-                <span>{euro(selected.value)}</span>
-              </p>
-
-              <p className="sl-focus__step">{nextStepFor(selected, selectedConflictResources)}</p>
-
-              <div className="sl-meta">
-                <div className="sl-meta__item">
-                  <span>Cobrament</span>
-                  <div className="sl-pay" aria-hidden="true">
-                    <i className={selected.deposit ? 'on' : ''} />
-                    <i className={selected.remaining ? 'on' : ''} />
-                  </div>
-                  <b>{selected.deposit && selected.remaining ? 'Cobrat' : selected.deposit ? 'Senyal' : 'Sense senyal'}</b>
-                </div>
-                <div className="sl-meta__item">
-                  <span>Equip</span>
-                  <div className="sl-crew">
-                    {selected.resources.map((r) => (
-                      <span key={r} className={`sl-crew__chip${selectedConflictResources.has(r) ? ' is-conflict' : ''}`}>{RESOURCES[r]}</span>
+          <nav className="sl-nav" aria-label="Àrees de treball">
+            {NAV_GROUPS.map((g) => (
+              <div className="sl-nav__group" key={g.id}>
+                <button
+                  type="button"
+                  className={`sl-nav__title${openMenu === g.id ? ' is-open' : ''}`}
+                  aria-haspopup="true"
+                  aria-expanded={openMenu === g.id}
+                  onClick={() => setOpenMenu(openMenu === g.id ? null : g.id)}
+                >
+                  {g.label}
+                </button>
+                {openMenu === g.id && (
+                  <div className="sl-nav__menu" role="menu">
+                    {g.items.map((it) => (
+                      <button key={it} type="button" role="menuitem" onClick={() => setOpenMenu(null)}>{it}</button>
                     ))}
                   </div>
-                </div>
+                )}
               </div>
+            ))}
+          </nav>
+          <div className="sl-mast__meta">
+            <span className="sl-date">{weekdayName(REF_TODAY)} {parseISO(REF_TODAY).d}</span>
+            <span className={`sl-bell${attentionCount ? ' is-on' : ''}`} title={`${attentionCount} requereixen atenció`}>
+              <i aria-hidden="true" />{attentionCount}
+            </span>
+          </div>
+        </header>
+        {openMenu && <button type="button" className="sl-scrim" aria-label="Tanca el menú" onClick={() => setOpenMenu(null)} />}
 
-              <div className="sl-actions">
-                <button type="button" className="sl-btn sl-btn--primary" onClick={() => runPrimary(selected)}>{primaryActionFor(selected)}</button>
-                <div className="sl-stage-move" role="group" aria-label="Mou de fase">
-                  <button type="button" onClick={() => advance(selected, -1)} disabled={STAGE_ORDER.indexOf(selected.stage) === 0} aria-label="Fase anterior">‹</button>
-                  <button type="button" onClick={() => advance(selected, 1)} disabled={STAGE_ORDER.indexOf(selected.stage) === STAGE_ORDER.length - 1} aria-label="Fase següent">›</button>
-                </div>
-              </div>
-              {note && <p className="sl-note" aria-live="polite">{note}</p>}
-            </article>
-          ) : focusDecision ? (
-            <article className="sl-focus__card" data-state={conflictIds.has(focusDecision.boloId) ? 'conflict' : 'attention'}>
-              <p className="sl-focus__kicker">El següent pas · {focusDecision.kicker}</p>
-              <h1 className="sl-focus__title">{focusDecision.title}</h1>
-              <p className="sl-focus__step">{focusDecision.why}</p>
-              <div className="sl-actions">
-                <button type="button" className="sl-btn sl-btn--primary" onClick={() => openBolo(focusDecision.boloId)}>Obre i resol</button>
-                <div className="sl-queue" role="group" aria-label="Altres decisions">
-                  <button type="button" onClick={() => cycleFocus(-1)} aria-label="Decisió anterior">‹</button>
-                  <span>{safeFocusIndex + 1} / {decisions.length}</span>
-                  <button type="button" onClick={() => cycleFocus(1)} aria-label="Decisió següent">›</button>
-                </div>
-              </div>
-            </article>
-          ) : (
-            <article className="sl-focus__card sl-focus__card--calm">
-              <p className="sl-focus__kicker">El següent pas</p>
-              <h1 className="sl-focus__title">Tot sota control.</h1>
-              <p className="sl-focus__step">Cap decisió oberta. Mira la temporada i omple els caps de setmana lliures.</p>
-            </article>
-          )}
-        </section>
-
-        {/* TEMPORADA — el calendari: reserves + forats, 3 mesos */}
-        <section className="sl-season" aria-label="Temporada">
-          <header className="sl-season__head">
+        {/* TEMPORADA — calendari de caps de setmana, capacitat llegida en ple/buit */}
+        <section className="sl-block" aria-label="Temporada">
+          <header className="sl-block__head">
             <h2>Temporada</h2>
-            <div className="sl-range">
+            <div className="sl-step" role="group" aria-label="Navega pels mesos">
               <button type="button" onClick={() => setMonthAnchor((a) => Math.max(1, a - 1))} disabled={monthAnchor <= 1} aria-label="Mesos anteriors">‹</button>
               <span>{rangeLabel}</span>
               <button type="button" onClick={() => setMonthAnchor((a) => Math.min(12 - SEASON_WINDOW + 1, a + 1))} disabled={monthAnchor >= 12 - SEASON_WINDOW + 1} aria-label="Mesos següents">›</button>
             </div>
           </header>
 
-          <div className="sl-months">
+          <div className="sl-cal">
             {months.map((month) => (
-              <article key={month.m} className="sl-month">
-                <header className="sl-month__head">
+              <article className="sl-mon" key={month.m}>
+                <header className="sl-mon__head">
                   <h3>{month.label}</h3>
-                  <span>{month.events.length} {month.events.length === 1 ? 'reserva' : 'reserves'}</span>
-                </header>
-
-                <ul className="sl-events">
-                  {month.events.map((b) => (
-                    <li key={b.id}>
-                      <button
-                        type="button"
-                        className={`sl-event${b.id === selectedId ? ' is-selected' : ''}`}
-                        onClick={() => openBolo(b.id)}
-                      >
-                        <i className="sl-dot" data-state={stateOf(b, conflictIds)} aria-hidden="true" />
-                        <span className="sl-event__date">{weekdayShort(b.date)} {parseISO(b.date).d}</span>
-                        <span className="sl-event__client">{b.client}</span>
-                        {conflictIds.has(b.id) && <span className="sl-event__flag" aria-hidden="true">⚠</span>}
-                      </button>
-                    </li>
-                  ))}
-                  {month.events.length === 0 && <li className="sl-events__empty">Mes lliure</li>}
-                </ul>
-
-                {month.freeSaturdays.length > 0 && (
-                  <div className="sl-free" aria-label={`Dissabtes lliures de ${month.label}`}>
-                    <span className="sl-free__label">Lliure</span>
-                    {month.freeSaturdays.map((d) => (
-                      <span key={d} className="sl-free__day">{d}</span>
+                  <div className="sl-meter" aria-hidden="true">
+                    {month.weekends.map((w) => (
+                      <i
+                        key={w.sat}
+                        className={`sl-meter__pip${w.taken ? ' is-taken' : ''}`}
+                        data-state={w.taken ? stateOf(w.taken, conflictIds) : undefined}
+                      />
                     ))}
                   </div>
-                )}
+                </header>
+                <div className="sl-grid">
+                  <span className="sl-grid__h">dv</span>
+                  <span className="sl-grid__h">ds</span>
+                  <span className="sl-grid__h">dg</span>
+                  {month.weekends.map((w) =>
+                    w.days.map((d) => {
+                      const b = d.bolo;
+                      if (!b) {
+                        return <span key={d.iso} className={`sl-cell is-free${d.inMonth ? '' : ' is-out'}`}><span className="sl-cell__day">{d.day}</span></span>;
+                      }
+                      return (
+                        <button
+                          key={d.iso}
+                          type="button"
+                          className={`sl-cell is-booked${b.id === selectedId ? ' is-selected' : ''}${conflictIds.has(b.id) ? ' is-conflict' : ''}${d.inMonth ? '' : ' is-out'}`}
+                          data-state={stateOf(b, conflictIds)}
+                          onClick={() => setSelectedId(b.id)}
+                        >
+                          <span className="sl-cell__day">{d.day}</span>
+                          <span className="sl-cell__name">{b.client}</span>
+                          {conflictIds.has(b.id) && <span className="sl-cell__warn" aria-hidden="true">⚠</span>}
+                        </button>
+                      );
+                    }),
+                  )}
+                </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        {/* PIPELINE + DETALL — moure el lead i actuar, sense paraules sobreres */}
+        <section className="sl-block" aria-label="Pipeline">
+          <header className="sl-block__head">
+            <h2>Pipeline</h2>
+          </header>
+
+          <div className="sl-ops">
+            <div className="sl-board">
+              {STAGES.map((stage) => {
+                const items = bolos.filter((b) => b.stage === stage.id).sort((a, b) => daysUntil(a.date) - daysUntil(b.date));
+                return (
+                  <div
+                    key={stage.id}
+                    className={`sl-col${dragOver === stage.id ? ' is-over' : ''}`}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(stage.id); }}
+                    onDragLeave={() => setDragOver((s) => (s === stage.id ? null : s))}
+                    onDrop={() => onDrop(stage.id)}
+                  >
+                    <header className="sl-col__head">
+                      <span>{stage.label}</span>
+                      <b>{items.length}</b>
+                    </header>
+                    <div className="sl-col__body">
+                      {items.map((b) => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          className={`sl-lead${b.id === selectedId ? ' is-selected' : ''}${b.id === draggingId ? ' is-dragging' : ''}${conflictIds.has(b.id) ? ' is-conflict' : ''}`}
+                          data-state={stateOf(b, conflictIds)}
+                          draggable
+                          onDragStart={() => setDraggingId(b.id)}
+                          onDragEnd={() => { setDraggingId(null); setDragOver(null); }}
+                          onClick={() => setSelectedId(b.id)}
+                        >
+                          <span className="sl-lead__date">{weekdayShort(b.date)} {dayLabel(b.date)}</span>
+                          <span className="sl-lead__name">{b.client}</span>
+                          <span className="sl-lead__val">{euro(b.value)}</span>
+                          {conflictIds.has(b.id) && <span className="sl-lead__warn" aria-hidden="true">⚠</span>}
+                        </button>
+                      ))}
+                      {items.length === 0 && <span className="sl-col__empty" aria-hidden="true" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {detail && (
+              <aside className="sl-detail" data-state={stateOf(detail, conflictIds)} aria-label="Detall del bolo">
+                <span className="sl-detail__type">{detail.type}</span>
+                <h3 className="sl-detail__name">{detail.client}</h3>
+                <p className="sl-detail__when">{weekdayName(detail.date)} {dayLabel(detail.date)}</p>
+                <p className="sl-detail__val">{euro(detail.value)}</p>
+
+                <div className="sl-detail__pay" aria-label="Cobrament">
+                  <i className={detail.deposit ? 'on' : ''} />
+                  <i className={detail.remaining ? 'on' : ''} />
+                </div>
+
+                <div className="sl-detail__crew">
+                  {detail.resources.map((r) => (
+                    <span key={r} className={`sl-tag${detailConflictResources.has(r) ? ' is-conflict' : ''}`}>{RESOURCES[r]}</span>
+                  ))}
+                </div>
+
+                <div className="sl-detail__foot">
+                  <div className="sl-dots" aria-label="Fase">
+                    {STAGE_ORDER.map((s, i) => (
+                      <i key={s} className={`sl-dots__d${detail.stage === s ? ' is-now' : ''}${i < STAGE_ORDER.indexOf(detail.stage) ? ' is-done' : ''}`} />
+                    ))}
+                  </div>
+                  <div className="sl-detail__move" role="group" aria-label="Mou de fase">
+                    <button type="button" onClick={() => advance(detail, -1)} disabled={STAGE_ORDER.indexOf(detail.stage) === 0} aria-label="Fase anterior">‹</button>
+                    <button type="button" onClick={() => advance(detail, 1)} disabled={STAGE_ORDER.indexOf(detail.stage) === STAGE_ORDER.length - 1} aria-label="Fase següent">›</button>
+                  </div>
+                </div>
+
+                <button type="button" className="sl-act" onClick={() => runPrimary(detail)}>{primaryActionFor(detail)}</button>
+              </aside>
+            )}
           </div>
         </section>
       </div>

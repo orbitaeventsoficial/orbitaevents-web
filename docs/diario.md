@@ -1,3 +1,31 @@
+## 2026-05-23 — Canvi #765: `/studio-lab` Sala de comandament — soroll fora, senyal visual (claude)
+
+### Context
+Aclariment clau del propietari sobre el #764: "menys **soroll**, no menys **interfície**". El que ja anava bé s'havia de **mantenir** — les caselles **Dv/Ds/Dg**, el **menú de navegació superior** i les **columnes del pipeline** (moure el lead nou→guanyat→perdut). "Soroll" = **dades textuals innecessàries** ("queden X dissabtes lliures", "perill", "mes fort", etiquetes d'estat en paraules); això s'ha de transmetre **visualment** (color, ple/buit, punts, icones), no escrit. Em demana que dissenyi la resta amb criteri. El propietari instal·la el plugin `frontend-design` i puja l'esforç al màxim. Base: recuperem el #763 (`git checkout`) i el refem amb el principi de senyal-no-soroll.
+
+### Canvi
+1. `app/studio-lab/page.tsx` + `studio-lab.css`: **reescriptura completa** amb la skill `frontend-design`. Es conserven els tres elements que el propietari valorava: navegació per àrees (desplegables), calendari de caps de setmana (Dv/Ds/Dg) i pipeline arrossegable (Nou→Perdut).
+2. **Soroll textual fora, senyal visual a dins**: eliminats KPIs, triage, llegenda, barra de lents i totes les frases advisory. Ara la informació es llegeix sense paraules:
+   - **color = estat** (atenció · en marxa · tancat · conflicte) com a vora-espina i punt;
+   - **ple/buit = capacitat** — cada mes té un *meter* de punts (un per cap de setmana, ple/buit) i les caselles lliures són un **buit visible** (sense la paraula "Lliure");
+   - **barra de 2 segments = cobrament** (senyal/resta); **⚠ = conflicte** de recurs; **punts = fase** al detall.
+   Es conserva només la dada: client, data, import, equip.
+3. **Detall lateral mínim** (`sl-detail`): mostra el bolo seleccionat o, per defecte, el més urgent; nom, data, import, cobrament, equip (recurs en conflicte ressaltat), fase i una sola acció primària. Sense frases.
+4. **Estètica premium** ("sala de comandament"): espresso càlid + **un sol metall (llautó)**, serif **Cormorant** (`--font-serif`, ja carregada al repo) per a titulars, marca i imports; mono per a dades; fils (hairlines), atmosfera càlida i molt aire. Sense dependències noves.
+5. Captures: `.codex-captures/studio-lab.png` (desktop) i `studio-lab-mobile.png` (414px).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright desktop + mòbil OK.
+- Validació funcional: el calendari mostra Juny–Agost amb caselles Dv/Ds/Dg i el meter de capacitat; arrossegar un lead entre columnes el mou i actualitza el detall; el detall mostra el més urgent per defecte i l'acció primària avança l'embut; el conflicte de DJ del 4 jul surt com a ⚠ a les dues targetes i com a recurs ressaltat al detall.
+- Validació humana/UX: la pantalla deixa de "parlar" i passa a "mostrar"; la capacitat de la temporada i l'estat dels leads es llegeixen d'un cop d'ull pel color i el ple/buit, mantenint els elements que el propietari volia. To premium (espresso + llautó + serif), sense soroll.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-23 — Canvi #764: `/studio-lab` reconstrucció de zero — Òrbita, comandament mínim (claude)
 
 ### Context
