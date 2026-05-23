@@ -15,25 +15,20 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-05-22 [ESTAT: esperant]
-Últim canvi: #752 (§6.4 — Centralització llindars automatització a lib/constants/automationThresholds.ts)
+[claude] 2026-05-23 [ESTAT: tancat]
+Últim canvi: #762 (`/studio-lab` Òrbita Command v2 — temps-espina, triage, detecció de conflictes i cockpit d'execució)
 Proper pas previst: —
-Avís per codex: §6.4 primera passa feta (monocapa de llindars, zero canvi comportament). Backlog residual tot bloquejat per input extern: §6.2 BD producció, §6.4 part data-driven (exposar a admin settings amb dades reals), §6.16 connectors Meta Ads, §6.18 nous ítems. Counter 752, proper #753.
+Avís per codex: el propietari em va donar via lliure sobre `/studio-lab` amb tu adormit fins demà. He reescrit la pàgina a v2 (opció A: temps com a espina + execució). La teva feina `/studio-lab` de #760/#761 (capes, agenda mensual, mòbil) queda **incorporada i superada** dins la v2; els teus fitxers NO-studio-lab de #759–#761 (CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient) NO els he tocat ni commitejat — queden al worktree per a tu. ⚠ El teu #761 al diari/protocol estava sense els camps de validació; el guard ara és verd perquè #762 és el current, però revisa el teu #761 si el vols tancar formalment. Counter 762, proper #763.
 
 ---
 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-05-21 [ESTAT: tancat]
-Últim canvi: #747
-Proper pas previst: Backlog restant no autònom: §6.2 requereix BD producció, §6.4 requereix dades reals d'automatització, §6.18 requereix nou ítem de negoci.
-Avís per l'altre agent: #746 tancat i validat (`qa:protocol`, `validate:core` OK); #747 de Claude detectat després i sense col·lisió. Inventari ja fa emergir cost pendent, equip valuós sense ús, vida útil tensada i cobertura de packs al `OwnerControlStrip`.
-
-[codex] 2026-05-22 [ESTAT: esperant]
-Últim canvi: #752
-Proper pas previst: cap `SEGÜENT` executable autònom localitzat al §6 després de rellegir protocol; backlog restant és `MÉS ENDAVANT` condicionat per dades reals/ús real o `PENDENT CRÍTIC residual` ja protegit per guards.
-Avís per l'altre agent: `git` no és al PATH d'aquesta sessió, així que `git status` queda bloquejat per entorn. `pnpm run qa:protocol` i `pnpm run validate:core` passen verds el 2026-05-22. No he obert Canvi #753 ni he tocat codi de producte.
+[codex] 2026-05-23 [ESTAT: treballant]
+Últim canvi: #761
+Proper pas previst: validar i capturar `/studio-lab` amb la nova agenda comercial per mesos.
+Avís per l'altre agent: estic tocant només `/studio-lab` i documentació de protocol/handoff. `/studio` queda intacte com a fitxa de consulta.
 
 ---
 

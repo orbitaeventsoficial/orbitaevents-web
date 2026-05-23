@@ -1,3 +1,101 @@
+## 2026-05-23 — Canvi #762: `/studio-lab` Òrbita Command v2 — temps-espina, triage i cockpit (claude)
+
+### Context
+El propietari valida la idea base d'`/studio-lab` però pregunta directament si el sistema és realment bo o si n'hi ha un de millor que no coneix. Diagnòstic: el concepte era sòlid però **estava optimitzat per a la venda i tractava "guanyat" com la meta**, quan en una empresa d'esdeveniments guanyar el bolo és l'inici de la part difícil (execució, equip, conflictes de dia/recurs, cobrament). El propietari tria l'opció A: reconstrucció ambiciosa re-centrada en el TEMPS com a espina, amb triage de decisions i execució, conservant la identitat visual (dark, color sòlid per estat, tokens `--sl-*`). Codex dorm fins demà i deixa via lliure; el seu #759–#761 queda al worktree (la part `/studio-lab` queda superada per aquesta v2; la resta de fitxers de codex no es toca).
+
+### Canvi
+1. `app/studio-lab/page.tsx`: reescriptura a **Òrbita Command v2** amb model de dades enriquit (`Bolo` amb `date` ISO, `resources`, `deposit`/`remaining`, `checklist`, `lastTouchDays`).
+2. **Triage "Avui"** (`sl-triage`): nou cor de la pàgina a dalt de tot. Genera 3-5 decisions reals prioritzades per pes i urgència (conflicte > resposta pendent > senyal en risc > resta a cobrar > tancament calent > producció pendent).
+3. **Detecció de conflictes** (`findConflicts`): troba dies amb dos bolos actius que comparteixen recurs (DJ, so, llums, furgoneta, fotògraf). KPI `Conflictes`, banner i marcador ⚠ a cards/events i chips d'equip.
+4. **Capes amb efecte real**: Temps/Diners/Persones/Operació re-ordenen el pipeline (`lensComparator`) i expliquen el seu efecte; deixen de ser decoratives.
+5. **Cockpit d'execució** (evolució de `Decisió ara`): semàfor de cobrament (senyal/resta, patró del repo), barra de producció (checklist %), chips d'equip amb conflicte ressaltat, *pròxima millor acció* contextual i fletxes `‹ ›` per moure de fase (moviment usable a mòbil sense drag).
+6. `app/studio-lab/studio-lab.css`: nous estils `sl-triage*`, `sl-conflict-banner`, `is-conflict`, `sl-card__foot`/`__pay`, `sl-decision__head`, `sl-move`, `sl-cockpit-grid`, `sl-cell`, `sl-pay-track`, `sl-progress`, `sl-crew`/`sl-chip`, més responsive i bloc `prefers-reduced-motion` (fatiga visual). Tokens i identitat conservats.
+7. `docs/studio-lab-handoff.md`: estat i roadmap actualitzats a la v2.
+8. Captures: `.codex-captures/studio-lab.png` (desktop) i `studio-lab-v2-mobile.png` (mòbil 390px).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · captura Playwright desktop + mòbil OK.
+- Validació funcional: el triage prioritza el conflicte de DJ del 4 jul (Masia Soler + Tech Nova SL) primer; canviar de lent re-ordena les columnes del pipeline; les fletxes `‹ ›` mouen el bolo seleccionat de fase i actualitzen counts/sumes; el cockpit mostra cobrament, producció i equip coherents amb el bolo.
+- Validació humana/UX: el lab ja no és només un kanban de venda; obre amb "què cal decidir avui", evita el doble-booking abans que passi i mostra l'execució del bolo. Aplicats principis de càrrega cognitiva (decisió primer, una acció primària), ergonomia de pantalla fosca (text no-blanc-pur sobre fons no-negre-pur, vermell saturat només en accents petits) i `prefers-reduced-motion`.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-23 — Canvi #761: `/studio-lab` agenda comercial per mesos (codex)
+
+### Context
+El propietari recorda la proposta "Juny: bolo X/Y; Juliol: bolo Z/W..." i confirma que està mirant només el lab. Faltava una lectura de calendari comercial abans del pipeline: mes a mes, bolo a bolo, amb risc, import i estat.
+
+### Canvi
+1. `app/studio-lab/page.tsx`: nova `monthlyPlan` derivada dels `INITIAL_LEADS`, agrupant Juny/Juliol/Agost amb totals, bolos tancats i risc alt.
+2. `app/studio-lab/page.tsx`: nova secció `Agenda comercial` entre KPIs i pipeline; cada bolo mensual és clickable i sincronitza `selectedId`, `activeStage` i el log de moviment.
+3. `app/studio-lab/studio-lab.css`: estils de `sl-month-plan`, `sl-month-grid`, `sl-month` i `sl-month-event`, amb responsive 1 columna a tablet/mòbil.
+4. `docs/studio-lab-handoff.md`: estat actualitzat a Canvi #761 i rol de l'agenda mensual documentat.
+
+### Validació
+- Pendent en aquesta entrada: TypeScript, `qa:studio-integrity`, captura Playwright i protocol després del canvi.
+
+### Tancament
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: pendent.
+
+---
+
+## 2026-05-23 — Canvi #760: `/studio-lab` segona volta — capes útils, accions amb feedback i mòbil usable (codex)
+
+### Context
+El propietari està mirant només `/studio-lab`; `/studio` queda com a fitxa tècnica de consulta. La captura inicial del lab era bona en desktop però el mòbil tenia el board tallat en horitzontal i les capes Temps/Diners/Persones/Operació encara aportaven poc comportament.
+
+### Canvi
+1. `app/studio-lab/page.tsx`: nou `LAYER_CONTENT` perquè cada capa canviï headline, mètrica focal, focus i senyals visibles.
+2. `app/studio-lab/page.tsx`: `runCommand()` dona efecte als comandaments; alguns mouen el bolo d'estat i tots escriuen feedback a `Últim moviment`.
+3. `app/studio-lab/page.tsx`: selector d'estat per mòbil; en tocar `Guanyat`, `Perdut`, etc. mostra aquella columna i selecciona el primer bolo coherent amb la decisió.
+4. `app/studio-lab/studio-lab.css`: franja de lectura activa, selector responsive en graella, log de comandaments i board mòbil sense scroll lateral tallat.
+5. `docs/studio-lab-handoff.md`: estat actualitzat a Canvi #760 i roadmap ajustat.
+6. Captures noves a `.codex-captures/`: `studio-lab-after-desktop.png`, `studio-lab-after-command.png`, `studio-lab-after-mobile-fixed.png`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run qa:studio-integrity` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: `Generar pressupost` mou `Atlas Group` a `Pressupost enviat`, actualitza counts/sumes i mostra feedback; en mòbil `Guanyat` selecciona `Masia Soler` i el panell de decisió segueix la columna visible.
+- Validació humana/UX: el lab es llegeix millor com a proposta de nou admin: capes amb sentit, accions que responen i mòbil sense board trencat.
+
+### Tancament
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-23.
+
+---
+
+## 2026-05-23 — Canvi #759: manteniment petit + arrencada reforçada `go/seguim/continua` (codex)
+
+### Context
+El propietari ha detectat correctament que "seguim" s'ha de tractar com una ordre de continuïtat del protocol, no com una invitació a mirar només els diffs locals. Cal reforçar l'inici perquè checklist, diari, `agent-sync`, §6 i §9 es mirin a la primera. A més, el worktree tenia tres correccions petites pendents de tancament formal: IMAP Railway, plural del Customer Hub i migració Stripe.
+
+### Canvi
+1. `CLAUDE.md`, `docs/protocol-producte-admin-ca.md`, `docs/agent-runtime-policy.json`, `scripts/check-nonstop-protocol.mjs` i `__tests__/scripts/check-nonstop-protocol.test.ts`: `go/seguim/continua` activen el mateix protocol d'arrencada. El guard exigeix ara lectura de `agent-sync`, diari, §6, final del §9, `git status`, `ADMIN_CHANGE_COUNTER` i identificació del backlog o tall de manteniment.
+2. `app/admin/inbox/settings/ImapSettingsClient.tsx`: "Eliminar configuració" queda disponible també amb `source='env'`, però no executa `DELETE`; mostra instrucció clara per eliminar `IMAP_HOST`, `IMAP_PORT`, `IMAP_USER` i `IMAP_PASS` a Railway Variables.
+3. `app/admin/clientes/[id]/_components/CustomerHeader.tsx`: plural explícit `tasca oberta` / `tasques obertes`.
+4. `prisma/migrations/20260516100000_add_stripe_webhook_events/migration.sql`: `processedAt` passa a `TIMESTAMP(3)` per PostgreSQL.
+5. Tests focalitzats: nou `ImapSettingsClient.test.tsx`, ampliació de `CustomerHeader.test.tsx` i cobertura nova del checklist d'arrencada a `check-nonstop-protocol.test.ts`.
+6. `docs/protocol-producte-admin-ca.md` §6.14 + §9, `docs/diario.md`, `docs/agent-sync.md` i `lib/constants/admin.ts`: registre formal del tall i `ADMIN_CHANGE_COUNTER` 758 → 759.
+
+### Validació
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\clientes\CustomerHeader.test.tsx __tests__\app\admin\inbox\ImapSettingsClient.test.tsx` OK (4 tests) · `pnpm exec vitest run __tests__\scripts\check-nonstop-protocol.test.ts` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: IMAP env mostra instrucció Railway sense confirmació ni DELETE; IMAP db continua fent confirmació + DELETE; migració Stripe queda alineada amb PostgreSQL; el protocol executable ja no permet perdre el checklist inicial davant un "seguim".
+- Validació humana/UX: el propietari rep continuïtat real des del primer moviment; a la pantalla IMAP veu què fer segons la font de credencials i al Customer Hub no apareix text trencat.
+
+### Tancament
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex, 2026-05-23.
+
+---
+
 ## 2026-05-23 — Canvi #758: `/studio-lab` (Òrbita Command) — pipeline arrossegable + color sòlid + clickable (claude)
 
 ### Context

@@ -173,6 +173,7 @@ Passar d'un admin amb moltes eines a un sistema operatiu comercial i d'operacion
 - **Validació humana obligatòria**: una funció no es dona per bona només perquè el codi, els tests o la lògica interna semblin correctes. Si l'ús real depèn de botons, noms, estats, textos o d'un flux d'interfície, també s'ha de validar com ho faria una persona no tècnica. Si la UI indueix a error o fa passar per alt el comportament bo, el treball es considera incomplet.
 - **No consolidar només a nivell de codi**: també cal consolidar llenguatge, UX i model mental.
 - **Qualsevol millora grossa ha de quedar reflectida en aquest document.**
+- **Norma d'arrencada davant `go/seguim/continua`**: qualsevol ordre curta de continuïtat del propietari activa immediatament el protocol complet, encara que no digui literalment `go`. Abans de donar resposta final, resumir estat o tocar codi, l'agent ha de llegir `docs/agent-sync.md`, el final de `docs/diario.md`, el §6 i el final del §9; comprovar `git status` i `ADMIN_CHANGE_COUNTER`; i declarar quin `SEGÜENT`, `PENDENT CRÍTIC` o tall de manteniment justifica la feina. Sense aquesta arrencada, no s'ha començat.
 - **Norma operativa de "go" del propietari**: quan el propietari escriu `go` (sol, sense més) és la seva forma més curta d'ordenar *"continua segons tot el que està previst al protocol de treball i al checklist"*. No cal demanar direcció concreta — l'agent ha d'obrir `docs/protocol-producte-admin-ca.md`, localitzar un `SEGÜENT` actiu i acotat als §6.N, i atacar-lo seguint la norma de tancament rigorós. Preguntar "què vols?" davant un `go` és malgastar tokens i temps del propietari.
 - **Norma de continuïtat després de tall verd**: amb un `go` actiu, tancar un Canvi #N amb tests i guards verds no autoritza a parar. Amb `go` actiu, la resposta final queda prohibida després d'un tall verd mentre hi hagi backlog accionable. L'agent ha de rellegir §6, escollir el següent `SEGÜENT` / `PENDENT CRÍTIC` executable i continuar automàticament amb una actualització curta. Només pot enviar resposta final si (1) no queda cap feina accionable al backlog, (2) hi ha un bloqueig real que requereix decisió humana, o (3) el propietari demana explícitament `para`, `atura't`, `només reporta` o equivalent.
 - **Font executable de runtime**: la mateixa norma viu també a `docs/agent-runtime-policy.json` amb `repository=orbitaevents`, `defaultWorkspacePath=D:\orbitaevents`, `mode=nonstop_until_end` i `afterGreenCutWithActionableBacklog=forbidden`. El guard `pnpm run qa:nonstop-protocol` valida que el JSON, `CLAUDE.md`, aquest protocol i `validate:core` continuïn alineats.
@@ -837,6 +838,8 @@ Criteri pràctic:
 **FET** *(2026-05-17 per `codex` — Canvi #605)*: el pont operatiu d'identitat visual queda escrit a `docs/visual-identity-bridge-ca.md`. Defineix què comparteixen admin, web pública i mòduls nous, quines diferències són permeses, i un checklist abans d'afegir o redissenyar pantalles. Efecte: la coherència visual deixa de dependre de gust o memòria i queda governada per funció (confiança pública vs control admin).
 **FET** *(2026-05-18 per `codex` — Canvi #633; actualitzat al #681)*: el pont d'identitat visual deixa de ser només documental i queda protegit per `qa:visual-identity-bridge` dins `validate:core`. El guard exigeix el document `docs/visual-identity-bridge-ca.md`, la referència de §6.11 a la regla residual protegida, el Canvi #605, el Canvi #681 i el wiring del pipeline perquè futurs canvis no puguin esborrar la regla de coherència admin/web/mòduls sense trencar validació.
 **FET documental** *(2026-05-21 per `claude` — Canvi #743)*: el `MÉS ENDAVANT` històric "sistema visual formalitzat. Tokens, ritmes, components premium compartits. Mobile admin d'alt nivell" queda regularitzat com a `FET`. Tokens canònics `--at-bg/surface/panel/raised/border` definits a `admin-theme.css` (4 capes amb 20+ unitats de diferència, contrast 30+). Ritmes: `.admin-card-glass`, `.admin-gradient--*`, `.admin-stagger-item` amb `prefers-reduced-motion`, focus rings `cyan-500/50`, hover `white/[0.03]`. Components premium compartits: `AdminCard*`, `ConfirmDialog`, `PipelineBoard`, `OwnerControlStrip`, `BookingSectionNav`, etc. Mobile admin d'alt nivell: PWA instal·lable amb manifest + 4 shortcuts (#458), `MobileQuickActions` strip shared per lead/customer/booking (#451), `ADMIN_MOBILE_PRIMARY_NAV` per home admin mòbil, viewport-aware menús, calendari mòbil scroll horitzontal (#715). Guards estàtics blinden la coherència: `qa:no-admin-slate-gray` (#653), `qa:no-admin-static-css-var-styles`, `qa:no-admin-inline-font-size`, `qa:no-admin-toFixed-currency` (#645), `qa:no-admin-inline-font-styles`, `qa:no-admin-gradient-classes`, `qa:visual-overflow` (#391), `qa:visual-identity-bridge` (#633). El pont d'identitat web/admin/mòduls és documental + executable.
+**FET** *(2026-05-23 per `codex` — Canvi #760)*: `/studio-lab` fa una volta més cap a prototip usable del nou admin. Les capes Temps/Diners/Persones/Operació canvien headline, mètrica focal i senyals; els comandaments del panell `Decisió ara` mouen bolos quan toca i deixen feedback visible; el mòbil guanya selector d'estat en graella i evita el board horitzontal tallat. Captures noves a `.codex-captures/studio-lab-after-*.png`.
+**FET** *(2026-05-23 per `codex` — Canvi #761)*: `/studio-lab` incorpora la lectura "Juny bolo a bolo, Juliol bolo a bolo..." com a `Agenda comercial` entre KPIs i pipeline. Els mesos agreguen total, tancats i risc alt; cada bolo mensual és clickable i sincronitza el panell `Decisió ara` i l'estat actiu del pipeline.
 **MÉS ENDAVANT**: components compartits específics si apareix un patró visual que es repeteixi inline a 3+ pantalles sense extracció.
 
 ## 6.12 Web pública / Conversió
@@ -946,6 +949,7 @@ Criteri pràctic:
 **FET** *(2026-05-05 per `codex` — Canvi #521)*: `ExportCsvButton` passa a ser genèric sobre el tipus real de fila (`TData`) i les columnes reben accessors tipats. `EconomiaClient` exporta la rendibilitat amb `ProfitabilityRow[]` directament i elimina el cast doble `as unknown as Record<string, unknown>[]`. `__tests__/app/admin/components/ExportCsvButton.test.ts` blinda el contracte i evita regressió del CSV econòmic cap a casts opacs.
 **FET** *(2026-05-05 per `codex` — Canvi #522)*: `adminAutomationService` deixa de passar summaries d'automatització a Prisma amb casts dobles `as unknown as Prisma.InputJsonValue`. El helper local `normalizeAdminLogDetails()` serialitza a JSON abans de guardar `details` als logs `COMM_SEQUENCE_BATCH`, `AUTOMATION_SLA_ENFORCED` i `AUTOMATION_RUN_ALL`; `__tests__/lib/services/adminAutomationService.test.ts` blinda el patró i evita regressió cap al cast opac.
 **FET** *(2026-05-20 per `codex` — Canvi #721)*: `qa:admin-mutating-fetch-csrf` ha detectat i tancat una regressió real a `app/admin/inbox/AiReplySuggestions.tsx`: el POST a `/api/admin/ai/inbox-reply` passa a `fetchWithCsrf()` i l'error path deixa de tenir `catch` buit. `validate:core` torna a poder protegir mutacions admin sense excepcions.
+**FET** *(2026-05-23 per `codex` — Canvi #759)*: manteniment petit i reforç d'arrencada formalitzats sota el pendent crític de no deixar regressions silencioses. La pantalla IMAP explica correctament que una configuració `source='env'` s'elimina a Railway Variables, el Customer Hub mostra `tasca oberta` / `tasques obertes`, la migració `stripe_webhook_events` usa `TIMESTAMP(3)` coherent amb PostgreSQL i `qa:nonstop-protocol` blinda que `go/seguim/continua` obliguin a llegir `agent-sync`, diari, §6, §9, `git status` i `ADMIN_CHANGE_COUNTER` abans de començar.
 **PENDENT CRÍTIC**: evitar regressions silencioses en repo gran.
 **FET** *(2026-05-12 per `claude` — Canvi #549)*: guard `qa:api-admin-auth` detecta qualsevol ruta `/api/admin/*` sense `requireAuth`. Fix P0 de 4 rutes que estaven desprotegides (`leads/follow-ups`, `leads/suggestions`, `leads/[id]/quote`, `leads/[id]/status`). `validate:core` puja a 18 guards. 5 tests blindats.
 **FET** *(2026-05-11 per `claude` — Canvi #538)*: dos guards nous al `validate:core` (17 guards totals) cobreixen consistència de dominis compartits del manual de màrqueting. `scripts/check-admin-manual-hrefs.mjs` verifica que tots els `adminHref`/`href` d'`/admin/*` al manual apuntin a `page.tsx` reals a `app/` (21 hrefs verificats). `scripts/check-admin-manual-consistency.mjs` valida la coherència interna del gate: `requiredActionIds`/`blockedActionIds` existeixen a `ADMIN_MARKETING_PHASES`, `requiredOutputs` cobreix exactament els requerits, `blockedReasons` cobreix exactament els bloquejats, `ADMIN_MARKETING_PHASE_EVIDENCE` cobreix exactament els requerits, `primaryActionId`/`nextPhaseActionId` existeixen i no estan bloquejats, bootstrap amb ≥1 finestra. Tests: 15 tests hrefs + 13 tests consistency. Entrades `qa:admin-manual-hrefs` i `qa:admin-manual-consistency` a `package.json`.
@@ -1288,6 +1292,77 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+### Canvi #762 — 2026-05-23 — claude (FET)
+
+**`/studio-lab` evoluciona a Òrbita Command v2: temps com a espina, triage de decisions i cockpit d'execució.**
+- Context: el propietari valida la idea base però demana si hi ha un sistema millor. Diagnòstic acceptat (opció A): el concepte estava optimitzat per a la venda i tractava "guanyat" com la meta, quan en esdeveniments guanyar és l'inici de l'execució. Reconstrucció re-centrada en el temps, conservant identitat visual.
+- `app/studio-lab/page.tsx`: model `Bolo` enriquit (data ISO, recursos, senyal/resta, checklist, dies sense contacte) i reescriptura completa de la pàgina en quatre pilars.
+- Triage "Avui": secció nova al capdamunt amb 3-5 decisions reals prioritzades per pes i urgència (conflicte, resposta pendent, senyal en risc, resta a cobrar, tancament calent, producció pendent).
+- Detecció de conflictes de capacitat: `findConflicts` troba dies amb dos bolos que comparteixen recurs; es reflecteix a KPI, banner, marcador ⚠ i chips d'equip.
+- Capes funcionals: Temps/Diners/Persones/Operació re-ordenen el pipeline (`lensComparator`) en lloc de ser decoratives.
+- Cockpit d'execució: semàfor de cobrament (senyal/resta), barra de producció, equip amb conflicte ressaltat, pròxima millor acció contextual i fletxes `‹ ›` de fase (moviment usable a mòbil).
+- `app/studio-lab/studio-lab.css`: estils nous per a triage, banner, conflictes, cockpit, equip i `prefers-reduced-motion`; tokens `--sl-*` i color sòlid per estat conservats.
+- `docs/studio-lab-handoff.md`: estat i roadmap a la v2.
+- Abast: prototip intern `noindex`; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. La part `/studio-lab` del worktree pendent de codex (#760/#761) queda superada per aquesta v2; la resta de fitxers de codex no es toca.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · captura Playwright desktop + mòbil OK.
+- Validació funcional: el triage prioritza el conflicte de DJ del 4 jul; canviar de lent re-ordena el pipeline; les fletxes mouen el bolo de fase i actualitzen counts/sumes; el cockpit reflecteix cobrament, producció i equip.
+- Validació humana/UX: el lab obre amb "què cal decidir avui", evita doble-booking abans que passi i mostra l'execució; aplicats principis de càrrega cognitiva, ergonomia de pantalla fosca i moviment reduït.
+- `ADMIN_CHANGE_COUNTER` passa a `762`; el següent canvi real ha de ser `#763`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #761 — 2026-05-23 — codex (FET)
+
+**`/studio-lab` recupera la proposta de calendari comercial: Juny, Juliol i Agost bolo a bolo.**
+- Context: el propietari recorda la proposta de veure els mesos com "Juny: bolo X/Y; Juliol: bolo Z/W..." i confirma que només està mirant `/studio-lab`. La peça faltava per fer que el prototip no fos només pipeline d'estats, sinó també agenda comercial de temporada.
+- `app/studio-lab/page.tsx`: nova agrupació `monthlyPlan` derivada dels bolos de mostra. Juny, Juliol i Agost mostren bolos, suma €, tancats i risc alt.
+- `app/studio-lab/page.tsx`: nova secció `Agenda comercial` entre KPIs i pipeline. Cada bolo mensual és un botó; en clicar-lo selecciona el bolo, activa la fase corresponent i escriu feedback a `Últim moviment`.
+- `app/studio-lab/studio-lab.css`: nous estils `sl-month-plan`, `sl-month-grid`, `sl-month`, `sl-month-event` i responsive a una columna perquè la lectura mes-a-mes sigui usable també en mòbil.
+- `docs/studio-lab-handoff.md`: estat actualitzat de #760 a #761 i documentada la funció d'agenda mensual.
+- Abast: prototip intern `noindex`; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: pendent d'executar en tancament de torn.
+- `ADMIN_CHANGE_COUNTER` passa a `761`; el següent canvi real ha de ser `#762`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: pendent
+
+### Canvi #760 — 2026-05-23 — codex (FET)
+
+**`/studio-lab` guanya una segona volta visual i funcional: capes útils, accions amb feedback i mòbil sense board tallat.**
+- Context: el propietari està mirant només `/studio-lab` i demana millorar aspecte i funcionalitat. `/studio` queda com a fitxa tècnica de consulta i no es toca. La captura inicial del lab mostrava una base bona en desktop però en mòbil el board quedava tallat en horitzontal i les capes encara eren més decoratives que funcionals.
+- `app/studio-lab/page.tsx`: afegit `LAYER_CONTENT` per fer que Temps/Diners/Persones/Operació canviïn headline, mètrica focal i senyals visibles. Els comandaments executen `runCommand()`: alguns mouen el bolo d'estat (`Marcar com a contactat`, `Generar pressupost`, `Generar contracte`, `Registrar motiu de pèrdua`) i tots actualitzen el log `Últim moviment`.
+- `app/studio-lab/page.tsx`: nou selector d'estat `sl-stage-strip` per mòbil. En tocar un estat, mostra aquella columna i selecciona el primer bolo d'aquell estat perquè el panell `Decisió ara` no quedi desconnectat de la columna visible.
+- `app/studio-lab/studio-lab.css`: nova franja `sl-layer-brief`, selector d'estat responsive en graella, log de comandaments i ajust mòbil perquè el board no depengui del scroll horitzontal tallat a 390px.
+- `docs/studio-lab-handoff.md`: estat actualitzat de #758 a #760 i roadmap drenat: les capes ja tenen lectura pròpia i el mòbil ja és usable.
+- Captures: `.codex-captures/studio-lab-after-desktop.png`, `studio-lab-after-command.png`, `studio-lab-after-mobile-fixed.png` i captures `before` per comparació.
+- Abast: prototip intern `noindex`; no toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. Les dades del lab continuen sent de mostra.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK · `pnpm run qa:studio-integrity` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: les capes canvien contingut; una acció `Generar pressupost` mou `Atlas Group` a `Pressupost enviat`, actualitza counts/sumes i escriu feedback; en mòbil `Guanyat` selecciona `Masia Soler` i mostra la decisió correcta.
+- Validació humana/UX: el lab ja es pot inspeccionar millor com a proposta de nou admin: menys tall lateral en mòbil, més context executiu per capa i accions que responen en pantalla.
+- `ADMIN_CHANGE_COUNTER` passa a `760`; el següent canvi real ha de ser `#761`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #759 — 2026-05-23 — codex (FET)
+
+**Manteniment petit + arrencada reforçada: IMAP Railway, plural Customer Hub, migració Stripe PostgreSQL i `go/seguim/continua` amb checklist obligatori.**
+- Context: el propietari ha detectat correctament que una resposta a "seguim" no pot limitar-se a mirar diffs locals: el protocol exigeix checklist, diari, `agent-sync`, §6 i §9 des del primer moviment. A més, el worktree ja contenia tres correccions petites pendents de formalitzar: IMAP Railway, plural de tasques i SQL de migració Stripe.
+- `CLAUDE.md`, `docs/protocol-producte-admin-ca.md`, `docs/agent-runtime-policy.json`, `scripts/check-nonstop-protocol.mjs` i `__tests__/scripts/check-nonstop-protocol.test.ts`: `go/seguim/continua` passen a ser ordres equivalents de continuïtat. El guard exigeix ara la llista d'arrencada (`agent-sync`, diari, §6, §9, `git status`, `ADMIN_CHANGE_COUNTER` i backlog/tall de manteniment identificat) i falla si desapareix del JSON executable.
+- `app/admin/inbox/settings/ImapSettingsClient.tsx`: el botó "Eliminar configuració" queda visible també amb `source='env'`, però no obre confirmació ni crida `DELETE`; mostra un toast clar indicant que cal eliminar `IMAP_HOST`, `IMAP_PORT`, `IMAP_USER` i `IMAP_PASS` des de Railway Variables.
+- `app/admin/clientes/[id]/_components/CustomerHeader.tsx`: el resum manual passa a construir explícitament `1 tasca oberta` o `N tasques obertes`, evitant plural defectuós.
+- `prisma/migrations/20260516100000_add_stripe_webhook_events/migration.sql`: `processedAt` passa de `DATETIME` a `TIMESTAMP(3)` per mantenir la migració alineada amb PostgreSQL.
+- Tests: nou `__tests__/app/admin/inbox/ImapSettingsClient.test.tsx` per IMAP env/db; `CustomerHeader.test.tsx` cobreix el plural; `check-nonstop-protocol.test.ts` cobreix el checklist d'arrencada.
+- Abast: no toca servei IMAP, auth, schema Prisma, webhook Stripe ni lògica de pagaments; el canvi funcional és UI/SQL de migració ja existent i reforç del protocol executable.
+- Validació tècnica: `pnpm exec vitest run __tests__\app\admin\clientes\CustomerHeader.test.tsx __tests__\app\admin\inbox\ImapSettingsClient.test.tsx` OK (4 tests) · `pnpm exec vitest run __tests__\scripts\check-nonstop-protocol.test.ts` OK · `npx tsc --noEmit --pretty false` OK · `pnpm run validate:core` OK · `pnpm run qa:protocol` OK.
+- Validació funcional: una configuració IMAP via Railway dona instrucció accionable sense intentar esborrar BD; una configuració via BD continua fent confirmació + DELETE; la migració Stripe deixa de generar SQL no PostgreSQL; les futures ordres `seguim` han de passar pel checklist inicial.
+- Validació humana/UX: el propietari rep des del primer moviment una lectura alineada amb protocol i checklist; a UI, el botó IMAP dona la resposta correcta segons la font real i el Customer Hub deixa de mostrar text trencat.
+- `ADMIN_CHANGE_COUNTER` passa a `759`; el següent canvi real ha de ser `#760`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
 
 ### Canvi #758 — 2026-05-23 — claude (FET)
 
