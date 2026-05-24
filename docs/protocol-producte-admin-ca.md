@@ -1293,6 +1293,39 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #767 — 2026-05-24 — claude (FET)
+
+**`/studio-lab/leads`: esquelet d'app separat + 4 aspectes commutables + hora/lloc al calendari.**
+- Context: validant l'aspecte de `/studio-lab/leads` amb el propietari en mode interactiu. Tres peticions: separar un esquelet (capçalera que regeix tot el programa) de les pàgines que canvien; afegir hora i lloc mínims a les targetes del calendari; i explorar la interfície (més color/contrast/marfil) amb diverses opcions per triar. El propietari tria **Contrast** com a aspecte per defecte.
+- `app/studio-lab/leads/page.tsx`: nou component `AppShell` = capçalera fixa (marca + nav per àrees centrada + cerca/CTA/avatar) sempre visible, també dins la fitxa d'un lead (abans la substituïa). Pàgines `TemporadaPage` i `LeadPage` com a children intercanviables. `lp2__bar` de `sticky` a `relative`.
+- Hora i lloc: nou camp `location` al tipus `Lead` i a les 9 dades de mostra; cada cel·la ocupada del calendari mostra `hora · lloc` en mono mínim (`fx__cellfoot`). Fila Lloc i lloc a la meta del hero a la fitxa.
+- `app/studio-lab/leads/leads-propostes.css`: substituït el tema `clar` per tres de nous (Marfil ivori, Joia nit-violeta-or, Contrast negre pur) + el `nit` existent (etiqueta "Grafit"). Catàleg `VARIANTS`; estats saturats per `--c` a Joia/Contrast; accents del hero generalitzats (`--strong` foscos vs. `--c` clar).
+- Abast: prototip intern `noindex`, dades de mostra; només `app/studio-lab/leads/*` + docs/counter + scripts de captura `.codex-captures/_leads-*.cjs`. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals. Cap dependència nova.
+- Validació tècnica: `pnpm run validate:core` OK · recompilació dev neta (HTTP 200, 0 errors a Playwright).
+- Validació funcional: commutador d'aspecte canvia Grafit/Marfil/Joia/Contrast; pipeline és la vista per defecte i el toggle passa a calendari; el calendari mostra `hora · lloc`; obrir un lead manté l'esquelet i mostra la fitxa amb Lloc; tornar recupera la Temporada.
+- Validació humana/UX: l'esquelet es llegeix com a marc estable i el contingut com a pàgina que canvia; el calendari guanya context (quan/on) sense soroll; es mantenen targetes de vora i criteri de paleta; el propietari valida Contrast com a defecte.
+- `ADMIN_CHANGE_COUNTER` passa a `767`; el següent canvi real ha de ser `#768`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #766 — 2026-05-24 — claude (FET)
+
+**`/studio-lab` Sala de comandament: poliment visual — joies sobre vellut (només CSS).**
+- Context: el propietari demana arrencar el servidor local, capturar `/studio-lab` i millorar-lo amb criteri. La pantalla del #765 ja era sòlida; cal una passada de poliment que reforci el principi base (color = estat, ple/buit = capacitat) sense afegir soroll ni canviar la lògica.
+- `app/studio-lab/studio-lab.css` (únic fitxer de codi tocat): les targetes ocupades (caselles del calendari i leads del pipeline) reben un rentat radial molt subtil del color d'estat des de la vora-espina (`color-mix(--c 9%)`), de manera que es llegeixen com a **peces il·luminades** sobre el fons fosc; cohesió amb el rentat que ja tenia el detall.
+- Caselles **lliures**: de vora discontínua a **pou recollit** (línia sòlida fina + fons fosc + ombra interior). El relleu reforça el `ple/buit` — l'ull va directe als caps de setmana ocupats.
+- **Hover** de targetes: halo tènue del color d'estat (`0 0 22px -8px var(--c)`) sumat a l'ombra fosca existent.
+- Capçaleres **Dv/Ds/Dg** (`sl-grid__h`): de `--sl-text-4` a `--sl-text-3` i +letterspacing per llegibilitat.
+- Abast: prototip intern `noindex`; només `app/studio-lab/studio-lab.css` + docs/counter. No toca `page.tsx`, ni la lògica, ni `/studio`, `/admin`, serveis, schema, auth ni dades reals. Tokens `--sl-*` existents; cap hex nou.
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright (`zoom-temporada/-pipeline/-detail`) OK.
+- Validació funcional: les caselles ocupades i els leads mantenen estat/conflicte/selecció; arrossegar segueix movent el lead i actualitzant el detall; cap canvi de comportament respecte #765.
+- Validació humana/UX: la temporada es llegeix millor d'un cop d'ull — els bolos ressalten com a joies i els buits recullen; la paleta joia i les targetes de vora es mantenen segons el criteri del propietari.
+- `ADMIN_CHANGE_COUNTER` passa a `766`; el següent canvi real ha de ser `#767`.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #765 — 2026-05-23 — claude (FET)
 
 **`/studio-lab` Sala de comandament: soroll textual fora, senyal visual a dins (skill `frontend-design`).**

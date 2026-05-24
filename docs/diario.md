@@ -1,3 +1,53 @@
+## 2026-05-24 — Canvi #767: `/studio-lab/leads` esquelet d'app + 4 aspectes + hora/lloc al calendari (claude)
+
+### Context
+Validant l'aspecte de `/studio-lab/leads` amb el propietari, en mode interactiu. Tres peticions encadenades: (1) **separar un esquelet** (capçalera que regeix tot el programa) de les pàgines que canvien; (2) afegir **hora i lloc mínims** a les targetes del calendari; (3) explorar la interfície amb **més color / contrast / marfil** i oferir **diverses opcions** per triar. Abans: tota la pantalla vivia en un sol `page.tsx`, amb dos aspectes (`nit`/`clar`) i sense lloc a les dades. El propietari tria **Contrast** com a aspecte per defecte.
+
+### Canvi
+Només `app/studio-lab/leads/` (prototip intern noindex, dades de mostra; zero lògica de negoci):
+1. **Esquelet separat** (`page.tsx`): nou component `AppShell` = capçalera fixa (marca + nav per àrees centrada + cerca/CTA/avatar) que **es manté sempre visible**, també dins la fitxa d'un lead (abans la substituïa). Les pàgines (`TemporadaPage`, `LeadPage`) es renderitzen com a children intercanviables. `lp2__bar` passa de `sticky` a `relative` perquè l'esquelet ja persisteix.
+2. **Hora i lloc al calendari**: nou camp `location` al tipus `Lead` i a les 9 dades de mostra; cada cel·la ocupada mostra `hora · lloc` en mono mínim (`fx__cellfoot`). Afegida també la fila **Lloc** i el lloc a la meta del hero a la fitxa del lead.
+3. **Quatre aspectes commutables** (`leads-propostes.css`): substituït el tema `clar` per tres de nous, més el `nit` existent (renombrat a etiqueta "Grafit"): **Marfil** (ivori càlid, tinta marró, accent maragda), **Joia** (nit violeta, accent or, estats saturats maragda/safir/ambre/ametista via `--c` per estat), **Contrast** (negre pur, vores marcades, accents vius). Catàleg `VARIANTS` a `page.tsx`; `VariantSwitch` el recorre. Regles d'accent del hero generalitzades als temes foscos (`--strong`) vs. clar (`--c`).
+4. **Aspecte per defecte = Contrast** (decisió del propietari); les 4 queden al commutador del lab.
+5. Captures: `.codex-captures/opt-{grafit,marfil,joia,contrast}-pipeline.png`, `opt-{grafit,marfil}-calendari.png`, `opt-detail-shell.png`.
+
+### Validació
+- Validació tècnica: `pnpm run validate:core` OK · recompilació dev neta (HTTP 200, 0 errors de consola/`pageerror` a Playwright).
+- Validació funcional: commutador d'aspecte canvia entre Grafit/Marfil/Joia/Contrast; pipeline és la vista per defecte i el toggle canvia a calendari; el calendari mostra `hora · lloc`; obrir un lead manté l'esquelet i mostra la fitxa amb Lloc; tornar recupera la Temporada.
+- Validació humana/UX: l'esquelet (capçalera) es llegeix com a marc estable i el contingut com a pàgina que canvia; el calendari guanya context (quan i on) sense soroll; es mantenen targetes de vora i criteri de paleta; el propietari valida Contrast com a defecte.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-24 — Canvi #766: `/studio-lab` poliment visual — joies sobre vellut (claude)
+
+### Context
+El propietari demana arrencar el servidor local (`pnpm run dev`, port 3000), capturar `/studio-lab` i **millorar-lo** amb criteri propi. La "Sala de comandament" del #765 ja era sòlida; la passada és de **poliment**, no de redisseny: reforçar el principi base (color = estat, ple/buit = capacitat) sense afegir soroll ni tocar la lògica.
+
+### Canvi
+Només `app/studio-lab/studio-lab.css` (zero canvis a `page.tsx`, zero lògica):
+1. **Joies sobre vellut**: les targetes ocupades (caselles `is-booked` del calendari i `sl-lead` del pipeline) reben un rentat radial molt subtil del color d'estat des de la vora-espina (`radial-gradient(... color-mix(in oklab, var(--c) 9%, transparent) ...)`). Ara es llegeixen com a peces il·luminades sobre el fons fosc, en cohesió amb el rentat que ja tenia `sl-detail`.
+2. **Caselles lliures → pou recollit**: de vora discontínua a línia sòlida fina + fons fosc (`rgba(0,0,0,0.16)`) + ombra interior. El relleu reforça el `ple/buit`: l'ull va directe als caps de setmana ocupats.
+3. **Hover amb halo d'estat**: a `is-booked` i `sl-lead`, halo tènue del color d'estat (`0 0 22px -8px var(--c)`) sumat a l'ombra fosca existent.
+4. **Llegibilitat Dv/Ds/Dg** (`sl-grid__h`): color de `--sl-text-4` a `--sl-text-3` i +letterspacing.
+5. Captures de regressió a `.codex-captures/` (`zoom-temporada`, `zoom-pipeline`, `zoom-detail`, `shot-studio-lab`).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK · `pnpm run validate:core` OK · captures Playwright OK.
+- Validació funcional: estat/conflicte/selecció de caselles i leads intactes; arrossegar segueix movent el lead i actualitzant el detall; cap canvi de comportament respecte #765 (només CSS).
+- Validació humana/UX: la temporada es llegeix millor d'un cop d'ull — bolos com a joies, buits que recullen; es mantenen targetes de vora i paleta joia segons el criteri del propietari.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-23 — Canvi #765: `/studio-lab` Sala de comandament — soroll fora, senyal visual (claude)
 
 ### Context
