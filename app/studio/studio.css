@@ -4231,3 +4231,218 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   §16–18 · LAB — paleta obsidiana · tipografia · components
+   Tokens i demos del laboratori del nou admin (Brass & Obsidian)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Estados joia (§16) ── */
+.o-lab-states {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--o-2);
+  margin-top: var(--o-2);
+}
+@media (max-width: 700px) { .o-lab-states { grid-template-columns: repeat(2, 1fr); } }
+
+.o-lab-state__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: block; margin-bottom: var(--o-2); }
+.o-lab-state__label { font-size: 12.5px; font-weight: 700; color: var(--c); display: block; margin-bottom: 2px; }
+.o-lab-state__hex { font-family: var(--o-font-mono); font-size: 10px; color: var(--o-text-3); display: block; }
+.o-lab-state__use { font-size: 11px; color: var(--o-text-3); display: block; margin-top: 3px; }
+
+/* ── Contenidor de demo del laboratori (§18) ── */
+.o-lab-demo {
+  --lab-canvas: #0a0a0c;
+  --lab-panel:  #131318;
+  --lab-raised: #1d1e25;
+  --lab-sunk:   #08080a;
+  --lab-t:      #ece7df;
+  --lab-t2:     #b6aea2;
+  --lab-t3:     #837c70;
+  --lab-gold:        #d7b86e;
+  --lab-gold-bright: #f0d99a;
+  --lab-hair-gold:   rgba(215, 184, 110, 0.22);
+  --lab-line:        rgba(236, 233, 227, 0.10);
+  --lab-line2:       rgba(236, 233, 227, 0.20);
+
+  background: var(--lab-canvas);
+  border: 1px solid var(--o-line);
+  border-radius: var(--o-r-lg);
+  padding: var(--o-5) var(--o-5);
+  color: var(--lab-t);
+  font-family: var(--o-font);
+  display: flex;
+  flex-direction: column;
+  gap: var(--o-4);
+}
+
+.o-lab-demo-label {
+  font-family: var(--o-font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--o-text-4);
+  margin: 0 0 calc(-1 * var(--o-2));
+}
+
+/* ── Botó de vora primari ── */
+.o-lab-btn-border {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 10px 16px; border-radius: 11px;
+  border: 1px solid var(--lab-hair-gold);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--lab-gold) 13%, var(--lab-raised)),
+    color-mix(in oklab, var(--lab-gold) 5%, var(--lab-panel))
+  );
+  color: var(--lab-gold-bright);
+  font: inherit; font-size: 14px; font-weight: 750; letter-spacing: 0.01em; cursor: default;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.o-lab-btn-border--sm { padding: 7px 12px; font-size: 13px; }
+
+/* ── Tira de mètriques ── */
+.o-lab-metrics {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--lab-line);
+  border-top: 1px solid var(--lab-hair-gold);
+  border-radius: 14px; overflow: hidden;
+}
+@media (max-width: 700px) { .o-lab-metrics { grid-template-columns: repeat(2, 1fr); } }
+
+.o-lab-metric { padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+.o-lab-metric + .o-lab-metric { border-left: 1px solid var(--lab-line); }
+@media (max-width: 700px) {
+  .o-lab-metric:nth-child(even) { border-left: 1px solid var(--lab-line); }
+  .o-lab-metric:nth-child(3) { border-top: 1px solid var(--lab-line); border-left: none; }
+  .o-lab-metric:nth-child(4) { border-top: 1px solid var(--lab-line); }
+}
+
+.o-lab-metric__label {
+  font-family: var(--o-font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--lab-t3);
+}
+.o-lab-metric__val {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.01em;
+  color: var(--lab-gold-bright); font-variant-numeric: tabular-nums; line-height: 1;
+}
+.o-lab-metric--count .o-lab-metric__val { color: var(--lab-t); }
+.o-lab-metric__note { font-size: 10px; color: var(--lab-t3); }
+
+/* ── Focus Card ── */
+.o-lab-focus {
+  padding: 14px 18px 16px;
+  border: 1px solid var(--lab-line2);
+  border-top: 1px solid var(--lab-hair-gold);
+  border-left: 3px solid var(--c, #3fa06a);
+  border-radius: 14px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--c, #3fa06a) 14%, var(--lab-panel)) 0, #0e0f12 66%);
+}
+
+.o-lab-focus__ew {
+  font-family: var(--o-font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--lab-gold-bright);
+  margin-bottom: 8px;
+}
+.o-lab-focus__name {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.05;
+  color: var(--lab-t);
+}
+.o-lab-focus__meta {
+  font-family: var(--o-font-mono); font-size: 12px;
+  color: var(--lab-t3); margin-top: 5px;
+}
+.o-lab-focus__val {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.01em;
+  color: var(--lab-gold-bright); font-variant-numeric: tabular-nums;
+  margin-top: 10px;
+}
+
+/* ── Pipeline Card ── */
+.o-lab-pipe-card {
+  padding: 12px 13px 13px;
+  border: 1px solid var(--lab-line);
+  border-left: 3px solid var(--c, #9d83c2);
+  border-radius: 11px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--c, #9d83c2) 8%, #1b1c22), #111116);
+}
+.o-lab-pipe-card__top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.o-lab-pipe-card__name {
+  font-size: 15px; font-weight: 800; letter-spacing: -0.01em;
+  color: #f1ece4; line-height: 1.1;
+}
+.o-lab-pipe-card__val {
+  font-size: 14px; font-weight: 800;
+  color: var(--lab-gold-bright); font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.o-lab-pipe-card__meta { font-size: 12.5px; color: var(--lab-t2); margin-top: 5px; }
+.o-lab-pipe-card__bar {
+  width: 100%; height: 4px; border-radius: 999px;
+  background: rgba(236, 233, 227, 0.09); overflow: hidden; margin-top: 8px;
+}
+.o-lab-pipe-card__prog { height: 100%; border-radius: inherit; }
+
+/* ── Calendar Cells ── */
+.o-lab-cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 600px) { .o-lab-cells { grid-template-columns: repeat(2, 1fr); } }
+
+.o-lab-cell {
+  padding: 9px 10px 10px 12px; border-radius: 11px; min-height: 90px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.o-lab-cell--free { border: 1px dashed var(--lab-line2); background: var(--lab-sunk); }
+.o-lab-cell--lead {
+  border: 1px solid var(--lab-line);
+  border-left: 3px solid var(--c, #e0922b);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--c, #e0922b) 16%, transparent) 0, transparent 42%),
+    linear-gradient(180deg, color-mix(in oklab, var(--c, #e0922b) 6%, #1b1c22), #111116);
+}
+.o-lab-cell__day {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.o-lab-cell--free .o-lab-cell__day { color: rgba(131, 124, 112, 0.50); }
+.o-lab-cell--lead .o-lab-cell__day { color: var(--lab-t2); }
+.o-lab-cell__name {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.01em;
+  color: #f1ece4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.o-lab-cell__type {
+  font-family: var(--o-font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--c, #e0922b);
+  margin-top: auto;
+}
+.o-lab-cell__free-label {
+  font-family: var(--o-font-mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--lab-gold); opacity: 0.5; margin-top: auto;
+}
+
+/* ── Sidebar Navigation ── */
+.o-lab-side {
+  padding: var(--o-3);
+  background: #0d0d10;
+  border-radius: var(--o-r-md);
+  border: 1px solid var(--lab-line);
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 240px;
+}
+.o-lab-side__item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 12px; min-height: 44px; border-radius: 11px;
+  font-size: 14px; font-weight: 700; color: var(--lab-t2);
+  position: relative;
+  border: 1px solid transparent;
+}
+.o-lab-side__item--active {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--lab-gold) 10%, var(--lab-raised)), var(--lab-panel));
+  color: var(--lab-gold-bright);
+  border-color: var(--lab-hair-gold);
+}
+.o-lab-side__item--active::before {
+  content: '';
+  position: absolute; left: -1px; top: 8px; bottom: 8px;
+  width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--lab-gold);
+}

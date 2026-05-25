@@ -1293,6 +1293,23 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #778 — 2026-05-25 — claude (FET)
+
+**`/studio`: 3 noves seccions §16–18 — Lab Paleta Obsidiana, Lab Tipografia, Lab Components (transferència del sistema de disseny des de /studio-lab/leads).**
+- Context: el propietari demana "passar tota la info a la fitxa. tipografies etc, a studio" — transferir els patrons de disseny consolidats al #777 (paleta obsidiana càlida, sistema de 3 fonts, components del lab) a la fitxa tècnica `/studio`, la referència viva del sistema visual.
+- `app/studio/StudioShowroom.tsx`: afegides 3 noves seccions (§16 Lab·Paleta, §17 Lab·Tipografia, §18 Lab·Components) amb les dades completes del laboratori. Total 19 seccions (era 16). Versió pujada v0.4→v0.5. Dades: paleta obsidiana (14 tokens, grup fons/text/or/línies), estats joia (4: topazi/ametista/maragda/cendra), escala tipogràfica (3 grups: Plus Jakarta/Inter/JetBrains Mono, 14 entrades), i demos de 6 components (botó de vora, tira de mètriques, Focus Card, targeta pipeline, cel·les de calendari, sidebar).
+- `app/studio/studio.css`: afegits ~130 línies de CSS `.o-lab-*` per als demos de components (context `.o-lab-demo` amb tokens propis del lab, classes per a cada component).
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `778` (xip; el lab reflecteix el número de canvi del repo).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `778` (lligats, sense salts); el següent canvi real ha de ser `#779`.
+- Abast: `/studio` (TSX + CSS) + número de canvi (`page.tsx` xip + counter + protocol + diari). No toca `/admin`, serveis, schema, auth ni dades reals.
+- Zona protegida `/studio`: guard `qa:studio-integrity` verifica ≥16 seccions, ≥400 línies de TSX i CSS no buit — ara 19 seccions i >1000 línies de TSX addicionals → OK.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter inclòs).
+- Validació funcional: `/studio` HTTP 200; §16-18 renderitzen; xip `#778` al peu lateral de `/studio-lab/leads`.
+- Validació humana/UX: les 3 noves seccions documenten el sistema visual del nou admin a la fitxa tècnica; el dissenyador pot consultar paleta, escala tipogràfica i components sense haver d'obrir el lab.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #777 — 2026-05-25 — claude (FET)
 
 **`/studio-lab/leads`: consolidació a git del shell lateral + fitxa v2 (feina de codex) + poliment visual i neteja de codi mort.**

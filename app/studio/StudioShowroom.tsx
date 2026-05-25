@@ -213,6 +213,88 @@ const BRAND_LOGOS: { file: string; src: string; use: string; light?: boolean }[]
 const FAVICON_VEC = ['favicon.svg', 'icon.svg', 'favicon-halloween.svg', 'favicon-mon-magic.svg'];
 const FAVICON_RASTER = ['favicon-32.png', 'favicon-48.png', 'favicon-96.png', 'favicon-180.png', 'favicon-192.png', 'favicon-512.png', 'apple-touch-icon.png'];
 
+/* ── 16 · Lab · Paleta Obsidiana ─────────────────────────────────────────── */
+const LAB_PALETTE_GROUPS: { group: string; items: { name: string; token: string; hex: string; use: string }[] }[] = [
+  {
+    group: 'Fons · Obsidiana càlida (mai negre pur ni slate fred)',
+    items: [
+      { name: 'Canvas', token: '--canvas', hex: '#0a0a0c', use: 'Viewport, body base' },
+      { name: 'Side', token: '--side', hex: '#0d0d10', use: 'Barra lateral' },
+      { name: 'Panel', token: '--panel', hex: '#131318', use: 'Cards, panells elevats' },
+      { name: 'Raised', token: '--raised', hex: '#1d1e25', use: 'Hover, botons, inputs' },
+      { name: 'Sunk', token: '--sunk', hex: '#08080a', use: 'Cel·les buides del calendari' },
+    ],
+  },
+  {
+    group: 'Text · càlid (mai blanc pur)',
+    items: [
+      { name: 'Primari', token: '--t', hex: '#ece7df', use: 'Títols, valors principals' },
+      { name: 'Secundari', token: '--t2', hex: '#b6aea2', use: 'Body, metadades' },
+      { name: 'Apagat', token: '--t3', hex: '#837c70', use: 'Labels, captions' },
+    ],
+  },
+  {
+    group: 'Or · Identitat Marca + Diners + Acció (heroi únic)',
+    items: [
+      { name: 'Gold', token: '--gold', hex: '#d7b86e', use: 'Accents, cursor actiu, hairlines' },
+      { name: 'Gold Bright', token: '--gold-bright', hex: '#f0d99a', use: 'Text monetari, valors en or' },
+      { name: 'Gold Ink', token: '--gold-ink', hex: '#2a210e', use: 'Text sobre fons or' },
+      { name: 'Gold Edge', token: '--gold-edge', hex: '#a9863f', use: 'Vores, profunditat' },
+      { name: 'Hair Gold', token: '--hair-gold', hex: 'rgba(215,184,110,.22)', use: 'Hairlines, vores decoratives' },
+    ],
+  },
+  {
+    group: 'Línies · càlides translúcides',
+    items: [
+      { name: 'Line', token: '--line', hex: 'rgba(236,233,227,.10)', use: 'Vora tènue' },
+      { name: 'Line 2', token: '--line2', hex: 'rgba(236,233,227,.20)', use: 'Vora visible' },
+    ],
+  },
+];
+
+const LAB_STAGES: { label: string; hex: string; strong: string; slug: string; desc: string }[] = [
+  { label: 'Nou · Topazi', hex: '#e0922b', strong: '#b45309', slug: 'nou', desc: 'Entra al funnel' },
+  { label: 'Contactat · Ametista', hex: '#9d83c2', strong: '#6a4f9c', slug: 'contactat', desc: 'En seguiment actiu' },
+  { label: 'Guanyat · Maragda', hex: '#3fa06a', strong: '#1f7a4c', slug: 'guanyat', desc: 'Tancat, confirmat' },
+  { label: 'Perdut · Cendra', hex: '#8a817a', strong: '#5d564f', slug: 'perdut', desc: 'Forat silenciós, mort' },
+];
+
+/* ── 17 · Lab · Tipografia ────────────────────────────────────────────────── */
+const LAB_TYPE_GROUPS: {
+  group: string;
+  entries: { role: string; spec: string; sample: string; use: string; style: React.CSSProperties }[];
+}[] = [
+  {
+    group: 'Plus Jakarta Sans — display · heroic · personalitat',
+    entries: [
+      { role: 'H1 pàgina', spec: '40px / 800 / -0.01em', sample: 'Casaments 2026', use: 'Títol principal de pàgina', style: { fontSize: 40, fontWeight: 800, letterSpacing: '-0.01em', fontFamily: 'var(--font-display)', lineHeight: 1 } },
+      { role: 'Focus Name', spec: '28px / 800 / -0.015em', sample: 'Boda · Laia i Nil', use: 'Nom del bolo al Focus Card', style: { fontSize: 28, fontWeight: 800, letterSpacing: '-0.015em', fontFamily: 'var(--font-display)' } },
+      { role: 'Valor clau', spec: '24px / 800 / -0.01em', sample: '2.490 €', use: 'Import/valor econòmic destacat', style: { fontSize: 24, fontWeight: 800, letterSpacing: '-0.01em', fontFamily: 'var(--font-display)', fontVariantNumeric: 'tabular-nums' } },
+      { role: 'Mes / Lane', spec: '23px / 800 / -0.01em', sample: 'Juny · 4 bolos', use: 'Capçalera de mes i lane de pipeline', style: { fontSize: 23, fontWeight: 800, letterSpacing: '-0.01em', fontFamily: 'var(--font-display)' } },
+      { role: 'Nom pipeline', spec: '16px / 800 / -0.01em', sample: 'Marta i Pere · Boda', use: 'Nom de lead a la targeta pipeline', style: { fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', fontFamily: 'var(--font-display)' } },
+      { role: 'Nom cel·la', spec: '15px / 800 / -0.01em', sample: 'Laia i Nil', use: 'Nom de lead a cel·la de calendari', style: { fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em', fontFamily: 'var(--font-display)' } },
+    ],
+  },
+  {
+    group: 'Inter — UI funcional · navegació · botons',
+    entries: [
+      { role: 'Sidebar item', spec: '14.5px / 700', sample: 'Leads · Pipeline', use: 'Ítem de menú lateral', style: { fontSize: 14.5, fontWeight: 700, fontFamily: 'var(--font-inter)' } },
+      { role: 'Sub-nav', spec: '13.5px / 650', sample: 'Primavera 2026', use: 'Subítem de menú, pestanya', style: { fontSize: 13.5, fontWeight: 650, fontFamily: 'var(--font-inter)' } },
+      { role: 'Botó primari', spec: '14px / 750 / 0.01em', sample: '+ Nova entrada', use: 'CTA del sidebar (botó de vora)', style: { fontSize: 14, fontWeight: 750, letterSpacing: '0.01em', fontFamily: 'var(--font-inter)' } },
+      { role: 'Body meta', spec: '13px / 400', sample: 'Casament · 120 pax · Vallromanes', use: 'Metadades del bolo, body de fitxa', style: { fontSize: 13, fontFamily: 'var(--font-inter)' } },
+    ],
+  },
+  {
+    group: 'JetBrains Mono — dades · labels · codis · identitat de dades',
+    entries: [
+      { role: 'Eyebrow / label', spec: '11px / 700 / 0.18em UP', sample: 'LEADS OBERTS', use: 'Eyebrow, captions, labels de secció', style: { fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' } },
+      { role: 'Focus meta', spec: '12.5px / 400 / 0.03em', sample: '14 jun 2026 · 120 pax · Vallromanes', use: 'Metadades al Focus Card', style: { fontSize: 12.5, letterSpacing: '0.03em', fontFamily: 'var(--font-mono)' } },
+      { role: 'Sub-títol pàgina', spec: '13px / 400 / 0.04em', sample: 'Jun – Ago 2026 · caps de setmana', use: 'Subtítol de pàgina i períodes', style: { fontSize: 13, letterSpacing: '0.04em', fontFamily: 'var(--font-mono)' } },
+      { role: 'Data / ID', spec: '12px / 400', sample: 'OE-LX9K2A · 2026-05-25', use: 'IDs, dates, codis de referència', style: { fontSize: 12, fontFamily: 'var(--font-mono)' } },
+    ],
+  },
+];
+
 /* ── 15 · Documents PDF — índex ───────────────────────────────────────────── */
 const PDF_DOCS = [
   { name: 'Pressupost', gen: 'generateQuotePDF · tema fosc' },
@@ -240,6 +322,9 @@ const SECTIONS: { num: string; id: string; label: string }[] = [
   { num: '13', id: 'veu', label: 'To de veu' },
   { num: '14', id: 'comunicacions', label: 'Comunicacions' },
   { num: '15', id: 'pdfs', label: 'PDFs' },
+  { num: '16', id: 'lab-paleta', label: 'Lab · Paleta' },
+  { num: '17', id: 'lab-tipografia', label: 'Lab · Tipografia' },
+  { num: '18', id: 'lab-components', label: 'Lab · Components' },
 ];
 
 type PdfId = 'pressupost' | 'contracte' | 'cataleg' | 'informe';
@@ -266,7 +351,7 @@ export default function StudioShowroom() {
           <div className="o-brand">
             <span className="o-brand__text">
               <span className="o-brand__name">Òrbita</span>
-              <span className="o-brand__sub">Sistema · v0.4</span>
+              <span className="o-brand__sub">Sistema · v0.5</span>
             </span>
           </div>
           <nav className="o-spec-toc__nav" aria-label="Seccions">
@@ -291,7 +376,7 @@ export default function StudioShowroom() {
               del nou admin. Tot el que el client veu i tot el que l&apos;admin manipula passa per aquí.
             </p>
             <div className="o-spec-header__stats">
-              <div><strong>16</strong> seccions</div>
+              <div><strong>19</strong> seccions</div>
               <div><strong>16</strong> tokens</div>
               <div><strong>16</strong> icones</div>
               <div><strong>8</strong> comunicacions</div>
@@ -829,14 +914,238 @@ export default function StudioShowroom() {
             </div>
           </section>
 
+          {/* 16 · Lab · Paleta Obsidiana */}
+          <section className="o-spec-section" id="sec-lab-paleta">
+            <SectionHead num="16" title="Lab · Paleta Obsidiana" intro="«Brass & Obsidian» — obsidiana càlida (mai negre pur ni slate fred), or sobri com a identitat de marca + diners. 4 tons joia per als estats del pipeline (sense blau, sense candy)." />
+            {LAB_PALETTE_GROUPS.map((g) => (
+              <div className="o-spec-group" key={g.group}>
+                <h3 className="o-spec-group__title">{g.group}</h3>
+                <div className="o-spec-swatches">
+                  {g.items.map((c) => (
+                    <div className="o-spec-swatch" key={c.token}>
+                      <div className="o-spec-swatch__chip" style={{ background: c.hex }} />
+                      <div className="o-spec-swatch__data">
+                        <span className="o-spec-swatch__name">{c.name}</span>
+                        <span className="o-spec-swatch__token">{c.token}</span>
+                        <span className="o-spec-swatch__hex">{c.hex}</span>
+                        <span className="o-spec-swatch__use">{c.use}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Estats del pipeline · quartet joia (sense blau, sense candy)</h3>
+              <div className="o-lab-states">
+                {LAB_STAGES.map((s) => (
+                  <div
+                    className="o-lab-state"
+                    key={s.slug}
+                    style={{ '--c': s.hex, background: `color-mix(in oklab, ${s.hex} 10%, #131318)`, border: `1px solid color-mix(in oklab, ${s.hex} 28%, transparent)` } as React.CSSProperties}
+                  >
+                    <span className="o-lab-state__dot" />
+                    <span className="o-lab-state__label">{s.label}</span>
+                    <span className="o-lab-state__hex">{s.hex}</span>
+                    <span className="o-lab-state__use">{s.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="o-spec-rules">
+              <div className="o-spec-rules__col o-spec-rules__col--do">
+                <h4>✓ Or = Diners · Marca · Acció primària</h4>
+                <ul>
+                  <li>Imports, marges, totals (valors monetaris)</li>
+                  <li>CTA «Nova entrada» (botó primari de vora)</li>
+                  <li>Hairlines de mark-up de l&apos;UI (vores decoratives)</li>
+                  <li>Cursor actiu: l&apos;element seleccionat ara</li>
+                </ul>
+              </div>
+              <div className="o-spec-rules__col o-spec-rules__col--dont">
+                <h4>✗ No usar or per a</h4>
+                <ul>
+                  <li>Comptadors d&apos;entrades (→ blanc càlid <code>--t</code>)</li>
+                  <li>Probabilitats en % (→ blanc càlid <code>--t</code>)</li>
+                  <li>Pax / nombre de convidats (→ blanc càlid <code>--t</code>)</li>
+                  <li>Estats del pipeline (→ tons joia dedicats per estat)</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* 17 · Lab · Tipografia */}
+          <section className="o-spec-section" id="sec-lab-tipografia">
+            <SectionHead num="17" title="Lab · Tipografia" intro="Tres fonts amb rol separat: Plus Jakarta Sans (display heroic, caràcter) · Inter (UI funcional, navegació) · JetBrains Mono (dades, labels, identitat de dades). Font-weight 650–800 al tram display." />
+            {LAB_TYPE_GROUPS.map((g) => (
+              <div className="o-spec-group" key={g.group}>
+                <h3 className="o-spec-group__title">{g.group}</h3>
+                <div className="o-spec-types">
+                  {g.entries.map((t) => (
+                    <div className="o-spec-type-row" key={t.role}>
+                      <div className="o-spec-type-meta">
+                        <span className="o-spec-type-name">{t.role}</span>
+                        <span className="o-spec-type-spec">{t.spec}</span>
+                        <span className="o-spec-type-use">{t.use}</span>
+                      </div>
+                      <div className="o-spec-type-sample" style={t.style}>{t.sample}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+
+          {/* 18 · Lab · Components */}
+          <section className="o-spec-section" id="sec-lab-components">
+            <SectionHead num="18" title="Lab · Components" intro="Patrons del laboratori: botó de vora (no sòlid), tira de mètriques (or=diners), Focus Card (decisió ara), targeta pipeline, cel·les de calendari i sidebar." />
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Botó de vora primari — hairline d&apos;or + fons fosc + sheen</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">border 1px solid --hair-gold · background gradient --raised+--panel · color --gold-bright · mai sòlid</p>
+                <div className="o-row">
+                  <button type="button" className="o-lab-btn-border">+ Nova entrada</button>
+                  <button type="button" className="o-lab-btn-border o-lab-btn-border--sm">Exportar</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Tira de mètriques — doctrina or=diners</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">top border --hair-gold · 4 cel·les · imports → --gold-bright · counts/% → --t (blanc càlid)</p>
+                <div className="o-lab-metrics">
+                  <div className="o-lab-metric o-lab-metric--count">
+                    <span className="o-lab-metric__label">Leads</span>
+                    <strong className="o-lab-metric__val">8</strong>
+                    <span className="o-lab-metric__note">count → blanc</span>
+                  </div>
+                  <div className="o-lab-metric">
+                    <span className="o-lab-metric__label">Valor total</span>
+                    <strong className="o-lab-metric__val">24.800 €</strong>
+                    <span className="o-lab-metric__note">diners → or</span>
+                  </div>
+                  <div className="o-lab-metric">
+                    <span className="o-lab-metric__label">Marge mig</span>
+                    <strong className="o-lab-metric__val">3.100 €</strong>
+                    <span className="o-lab-metric__note">diners → or</span>
+                  </div>
+                  <div className="o-lab-metric o-lab-metric--count">
+                    <span className="o-lab-metric__label">Prob. mit.</span>
+                    <strong className="o-lab-metric__val">62%</strong>
+                    <span className="o-lab-metric__note">% → blanc</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Focus Card — la decisió que toca ara</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">border-left 3px --c · gradient de l&apos;estat · top --hair-gold · eyebrow gold-bright · nom display 28px · valor or</p>
+                <div className="o-lab-focus" style={{ '--c': '#3fa06a' } as React.CSSProperties}>
+                  <div className="o-lab-focus__ew">↗ Focus · decisió ara</div>
+                  <div className="o-lab-focus__name">Boda · Laia i Nil</div>
+                  <div className="o-lab-focus__meta">14 jun 2026 · 120 pax · Mas de Sant Lleí</div>
+                  <div className="o-lab-focus__val">2.490 €</div>
+                </div>
+                <div className="o-lab-focus" style={{ '--c': '#9d83c2' } as React.CSSProperties}>
+                  <div className="o-lab-focus__ew">↗ Focus · decisió ara</div>
+                  <div className="o-lab-focus__name">Empresa · Aniversari Gremi</div>
+                  <div className="o-lab-focus__meta">21 jun 2026 · 200 pax · Fira de Barcelona</div>
+                  <div className="o-lab-focus__val">4.800 €</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Targeta pipeline — vista kanban</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">border-left 3px --c · gradient d&apos;estat · nom display 15px/800 · valor gold-bright · barra de probabilitat</p>
+                <div className="o-row" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start' }}>
+                  {([
+                    { c: '#e0922b', s: '#b45309', name: 'Marta i Pere', val: '1.890 €', meta: 'Boda · 120 pax · 14 jun', prob: 20 },
+                    { c: '#9d83c2', s: '#6a4f9c', name: 'Gremi Aniversari', val: '4.800 €', meta: 'Empresa · 200 pax · 21 jun', prob: 55 },
+                    { c: '#3fa06a', s: '#1f7a4c', name: 'Laia i Nil', val: '2.490 €', meta: 'Boda · 100 pax · 5 jul', prob: 100 },
+                  ] as const).map((l) => (
+                    <div className="o-lab-pipe-card" key={l.name} style={{ '--c': l.c, flex: '1 1 180px' } as React.CSSProperties}>
+                      <div className="o-lab-pipe-card__top">
+                        <span className="o-lab-pipe-card__name">{l.name}</span>
+                        <span className="o-lab-pipe-card__val">{l.val}</span>
+                      </div>
+                      <div className="o-lab-pipe-card__meta">{l.meta}</div>
+                      <div className="o-lab-pipe-card__bar">
+                        <div className="o-lab-pipe-card__prog" style={{ width: `${l.prob}%`, background: `linear-gradient(90deg, ${l.s}, ${l.c})` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Cel·les de calendari — forat silenciós vs reservat en relleu</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">Lliure = dashed + sunk background · Reservat = border-left --c + gradient d&apos;estat + relleu físic</p>
+                <div className="o-lab-cells">
+                  <div className="o-lab-cell o-lab-cell--free">
+                    <span className="o-lab-cell__day">14</span>
+                    <span className="o-lab-cell__free-label">Lliure</span>
+                  </div>
+                  <div className="o-lab-cell o-lab-cell--lead" style={{ '--c': '#e0922b' } as React.CSSProperties}>
+                    <span className="o-lab-cell__day">21</span>
+                    <span className="o-lab-cell__name">Marta i Pere</span>
+                    <span className="o-lab-cell__type">Boda</span>
+                  </div>
+                  <div className="o-lab-cell o-lab-cell--lead" style={{ '--c': '#9d83c2' } as React.CSSProperties}>
+                    <span className="o-lab-cell__day">28</span>
+                    <span className="o-lab-cell__name">Gremi Aniversari</span>
+                    <span className="o-lab-cell__type">Empresa</span>
+                  </div>
+                  <div className="o-lab-cell o-lab-cell--free">
+                    <span className="o-lab-cell__day">5</span>
+                    <span className="o-lab-cell__free-label">Lliure</span>
+                  </div>
+                  <div className="o-lab-cell o-lab-cell--lead" style={{ '--c': '#3fa06a' } as React.CSSProperties}>
+                    <span className="o-lab-cell__day">12</span>
+                    <span className="o-lab-cell__name">Laia i Nil</span>
+                    <span className="o-lab-cell__type">Boda</span>
+                  </div>
+                  <div className="o-lab-cell o-lab-cell--free">
+                    <span className="o-lab-cell__day">19</span>
+                    <span className="o-lab-cell__free-label">Lliure</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Sidebar navigation — idle vs actiu</h3>
+              <div className="o-lab-demo">
+                <p className="o-lab-demo-label">Actiu = gradient gold+raised · hairline border · accent bar 3px esquerra · text gold-bright · Idle = transparent · --t2</p>
+                <div className="o-lab-side">
+                  {['Calendari', 'Leads · Pipeline', 'Reserves', 'Clients', 'Safata d\'entrada'].map((item) => (
+                    <div
+                      key={item}
+                      className={`o-lab-side__item${item === 'Leads · Pipeline' ? ' o-lab-side__item--active' : ' o-lab-side__item--idle'}`}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
           <footer className="o-spec-footer">
-            Òrbita Studio · sistema visual v0.4 · 16 seccions · 8 comunicacions · 5 documents
+            Òrbita Studio · sistema visual v0.5 · 19 seccions · 8 comunicacions · 5 documents
           </footer>
         </main>
       </div>
 
       <div className="o-hud">
-        <strong>Studio v0.4</strong> · fitxa tècnica · <a href="/admin">admin actual</a>
+        <strong>Studio v0.5</strong> · fitxa tècnica · <a href="/admin">admin actual</a>
       </div>
     </div>
   );

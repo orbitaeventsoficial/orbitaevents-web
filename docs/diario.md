@@ -1,3 +1,29 @@
+## 2026-05-25 — Canvi #778: `/studio` §16–18 Lab Paleta · Tipografia · Components (claude)
+
+### Context
+El propietari demana "passar tota la info a la fitxa. tipografies etc, a studio" — transferir els patrons de disseny consolidats al #777 (paleta obsidiana càlida, sistema de 3 fonts, components del laboratori) a la fitxa tècnica `/studio` (la referència viva del sistema visual del nou admin).
+
+### Canvi
+- **`app/studio/StudioShowroom.tsx`**: 3 noves seccions afegides al final (§16, §17, §18). Total passa de 16 a **19 seccions**. Versió v0.4→v0.5.
+  - **§16 Lab · Paleta Obsidiana**: 14 tokens en 4 grups (fons obsidiana, text càlid, or com a heroi únic, línies translúcides); 4 estats joia (topazi/ametista/maragda/cendra); regles do/don't sobre la doctrina or=diners.
+  - **§17 Lab · Tipografia**: 3 grups amb 14 entrades totals — Plus Jakarta Sans (display heroic: H1 40px, Focus Name 28px, Valor clau 24px, Mes/Lane 23px, Nom pipeline 16px, Nom cel·la 15px), Inter (UI: sidebar 14.5px, sub-nav 13.5px, botó 14px/750), JetBrains Mono (dades: eyebrow 11px, focus meta 12.5px, sub-títol 13px, data/ID 12px). Mostres renderitzades en les fonts reals.
+  - **§18 Lab · Components**: 6 patrons demostrats en context `.o-lab-demo` (tema fosc del lab): (1) Botó de vora primari (hairline d'or + gradient fosc); (2) Tira de mètriques (4 cel·les, imports en or, counts/% en blanc càlid); (3) Focus Card (border-left col·or estat, gradient, eyebrow en or, nom 26px, valor); (4) Targeta pipeline (3 variants per als 3 estats guanyadors); (5) Cel·les de calendari (lliures = dashed sunk, reservades = border-left col·or + relleu); (6) Sidebar navigation (idle vs actiu amb gradient gold + accent bar 3px).
+- **`app/studio/studio.css`**: ~130 línies de CSS `.o-lab-*` noves (context, swatches d'estat, botó de vora, mètriques, focus card, pipeline card, cel·les de calendari, sidebar nav).
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = 778 (xip al peu lateral).
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 777→778.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard studio-integrity: 19 seccions ≥16 ✓; guard xip↔counter: LAB_CHANGE_NUMBER=778 OK).
+- Validació funcional: `/studio` HTTP 200; §16–18 renderitzen (paleta, tipografia, components); xip `#778` al peu lateral de `/studio-lab/leads`.
+- Validació humana/UX: la fitxa tècnica reflecteix el sistema visual del nou admin (paleta obsidiana, 3 fonts, 6 components). La zona protegida `/studio` s'ha ampliat (AFEGIT, mai reduït).
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #777: `/studio-lab/leads` shell lateral + fitxa v2 (consolidació de codex) + poliment visual i neteja (claude)
 
 ### Context
