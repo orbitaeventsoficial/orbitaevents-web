@@ -1293,6 +1293,21 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #776 — 2026-05-25 — claude (FET)
+
+**Inventari de recursos del repo (`docs/inventari-recursos.md`) — mapa per reaprofitar el que ja tenim.**
+- Context: el propietari demana llistar i entendre tot el que el repo ha acumulat (serveis, helpers, atributs únics, guards) perquè no quedi oblidat i es reutilitzi a la nova eina; el que faci soroll, a la brossa.
+- `docs/inventari-recursos.md` (NOU): catàleg curat (no abocador) amb escala real (~181 serveis, 55 guards, ~17 catàlegs), agrupat per capes A–G (helpers transversals, motors de negoci, lead/comercial, constants, patrons UX, atributs únics/disciplina, infra), amb llegenda d'aprofitament (🟢 joia / 🔵 reutilitzar / 🟡 avaluar) i **Pla d'aprofitament**: (1) primer exercici = `/studio-lab/leads` incorpora recursos reals (suggestions, colorTheme, weather, costEngine, conflictes, stats, leadRouteService); (2) la pàgina tipus = l'`AppShell` com a layout mestre del nou admin; (3) soroll a avaluar.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `776` (xip; el lab reflecteix el número de canvi del repo).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `776` (lligats, sense salts); el següent canvi real ha de ser `#777`.
+- Abast: només docs + número de canvi (`page.tsx` xip + counter). No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter inclòs).
+- Validació funcional: `docs/inventari-recursos.md` present amb capes A–G i pla; `/studio-lab/leads` HTTP 200; xip `Canvi #776`.
+- Validació humana/UX: el doc serveix de mapa per no reinventar i per guiar el primer exercici (leads) i la pàgina tipus (esquelet).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #775 — 2026-05-25 — claude (FET)
 
 **`/studio-lab/leads`: nova paleta — or com a heroi únic, carbassa retirada, 4 estats distints, forats silenciosos.**

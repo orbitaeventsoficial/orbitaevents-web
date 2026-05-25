@@ -16,8 +16,8 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #775 (`/studio-lab/leads` nova paleta — or heroi únic, carbassa fora, 4 estats distints, forats silenciosos)
-Proper pas previst: inventari de recursos del repo (serveis/helpers/atributs únics/guards reutilitzables) a `docs/inventari-recursos.md` — encàrrec del propietari per no oblidar el que ja tenim i reutilitzar-ho a la nova eina. Després, iteració visual `/studio-lab/leads` + implantació a `/admin/leads` segons `docs/studio-lab-leads-implantacio.md`.
+Últim canvi: #776 (inventari de recursos del repo a `docs/inventari-recursos.md`)
+Proper pas previst: primer exercici — `/studio-lab/leads` incorpora recursos reals (suggestions/colorTheme/weather/costEngine/conflictes/stats/leadRouteService) segons el Pla d'aprofitament de `docs/inventari-recursos.md`. Després, la "pàgina tipus" (l'AppShell com a layout mestre del nou admin), que encara no s'ha treballat. Principi del propietari: cap soroll.
 Avís per codex: ALERTA RESOLTA — les proves #768–773 estaven documentades però NO commitejades (git a #767). Reconciliades a git al #774. `qa:protocol` ara EXIGEIX que `LAB_CHANGE_NUMBER` del xip de `/studio-lab/leads` == `ADMIN_CHANGE_COUNTER`: cada canvi s'ha de reflectir al diari I a la pàgina o la validació peta. Numeració LLIGADA: counter ↔ protocol ↔ diari ↔ xip = 774. PENDENT (no meu): working tree conserva canvis d'admin sense `#N` (CustomerHeader, ImapSettingsClient + tests) i el blindatge nonstop (CLAUDE.md, agent-runtime-policy.json, check-nonstop-protocol + test) — sense commitejar, a decidir pel propietari. Counter 774, proper #775.
 
 ---

@@ -1,3 +1,23 @@
+## 2026-05-25 — Canvi #776: inventari de recursos del repo (`docs/inventari-recursos.md`) (claude)
+
+### Context
+El propietari demana una cosa important: **llistar i entendre tot el que el repo ha acumulat amb el temps** (serveis, helpers, atributs únics, guards) perquè no quedi oblidat al repo, donar-li el seu espai i reaprofitar-ho al màxim per fer la millor eina. El que faci soroll, a la brossa ("no vull soroll").
+
+### Canvi
+- `docs/inventari-recursos.md` (NOU): catàleg **curat** (no abocador). Escala real: ~181 serveis a `lib/services/`, 55 guards `qa:*`/`arch:*`, ~17 catàlegs a `lib/constants/`. Agrupat A–G: (A) helpers transversals, (B) motors de negoci (costEngine, fuelReferenceService, weatherService, commercialScoring, leadPipelineSuggestionsService, capacityConflictService…), (C) lead/comercial per al primer exercici, (D) constants/catàlegs, (E) patrons UX (useConfirmDialog, useAsyncForm, tokens admin), (F) atributs únics/disciplina (55 guards, blindatges), (G) infra. Llegenda 🟢/🔵/🟡 i **Pla d'aprofitament** (1 leads, 2 pàgina tipus/esquelet, 3 soroll a avaluar).
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter).
+- Validació funcional: doc present amb capes A–G + pla; `/studio-lab/leads` HTTP 200; xip `Canvi #776`.
+- Validació humana/UX: mapa per no reinventar; guia el primer exercici (incorporar recursos reals a leads) i la pàgina tipus (esquelet com a layout mestre).
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #775: `/studio-lab/leads` nova paleta — or heroi únic, carbassa fora, 4 estats distints, forats silenciosos (claude)
 
 ### Context
