@@ -1226,7 +1226,8 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 - `FET` *(2026-05-25 — Canvi #780)*: `seasonCalendarService` — servei pur de calendari de temporada + 13 tests.
 - `FET` *(2026-05-25 — Canvi #781)*: nova shell admin Brass & Obsidian — `app/admin/layout.tsx` reescrit (936→170 línies) + `app/admin/admin-shell.css` (tokens + navegació per grups + botó + peu).
 - `FET` *(2026-05-25 — Canvi #782)*: primera pàgina migrada — `/admin/leads` substitueix el contingut antic pel disseny Brass & Obsidian del studio-lab. Components antics en quarantena. Inventari: `docs/admin-leads-funcions-inventari.md`.
-- `PENDENT` — Aplicació de funcions reals a `/admin/leads`: dades Prisma, canvi d'estat inline, flux LOST, acció eliminar, suggeriments pipeline (per ordre de l'inventari).
+- `FET` *(2026-05-26 — Canvi #783)*: dades reals a `/admin/leads` — `page.tsx` convertit a server component; `LeadsSeasonClient.tsx` (client) rep leads reals de la BD via `loadSeasonCalendar`. Mapeig `SeasonCalendarEntry`→`LeadData`.
+- `PENDENT` — Canvi d'estat inline (`patchLeadStatus`), flux LOST, eliminar lead, `time`/`channel`/`owner` reals al servei (per ordre de l'inventari).
 
 **REFERÈNCIA**: `docs/admin-inventari-pagines.md` (inventari + ordre de migració + semàfor d'estat per pàgina).
 
@@ -1313,6 +1314,20 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+### Canvi #783 — 2026-05-26 — claude (FET)
+
+**Leads admin: dades reals via `loadSeasonCalendar` — split server/client.**
+- `app/admin/leads/page.tsx` (REESCRIT): server component async — crida `loadSeasonCalendar(windowStart=1r dia mes actual, 6 mesos)`, filtra `type=lead`, mapeja `SeasonCalendarEntry`→`LeadData`, passa props a `AdminLeadsClient`. Fields pendents (`time`, `channel`, `owner`, `last`, wx) amb placeholders fins als propers canvis.
+- `app/admin/leads/LeadsSeasonClient.tsx` (NOU): `'use client'` — tota la UI del #782 refactoritzada per rebre leads com a prop. Empty state al focus zone si no hi ha leads. Adaptat per handles leads buits.
+- `scripts/check-layer-catalogs.mjs`: allowlist actualitzada per al nou fitxer.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `783`; el proper canvi ha de ser `#784`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: pàgina carrega leads reals de BD (6 mesos des del mes actual). Empty state visible si no hi ha leads. Interactivitat (vista, mesos, focus, fitxa) intacta.
+- Pendent: `time`, `channel`, `owner`, `last` (no al `seasonCalendarService` actual), integració meteo (wx).
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #782 — 2026-05-25 — claude (FET)
 

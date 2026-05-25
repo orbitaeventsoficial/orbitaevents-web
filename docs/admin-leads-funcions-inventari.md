@@ -143,7 +143,7 @@ Les funcions del nou disseny s'apliquen per ordre d'impacte, una a una, per ordr
 
 | # | Funció | Component font | Canvi previst |
 |---|---|---|---|
-| 1 | Dades reals (Prisma + `loadSeasonCalendar`) | `seasonCalendarService` | Substituir `LEADS[]` mock per fetch real |
+| 1 | Dades reals (Prisma + `loadSeasonCalendar`) | `seasonCalendarService` | ✅ FET — Canvi #783 |
 | 2 | Canvi d'estat inline | `LeadQuickStatus.tsx` + `leadStatusClient.ts` | Activar PATCH d'estat des de la targeta pipeline |
 | 3 | Flux LOST (motiu obligatori) | `LeadLostStatusPrompt.tsx` | Integrar modal inline en canviar a perdut |
 | 4 | Acció eliminar | `LeadActions.tsx` (parcialment) | Botó eliminar amb `ConfirmDialog` i restricció LOST |

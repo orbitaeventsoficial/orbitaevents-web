@@ -1,3 +1,27 @@
+## 2026-05-26 — Canvi #783: leads admin — dades reals via `loadSeasonCalendar` (claude)
+
+### Context
+Canvi #783: primera funció real aplicada a `/admin/leads`. Substituïm les dades de mostra pel fetch real de la BD via `loadSeasonCalendar` (servei creat al #780). Patrón: `page.tsx` passa a server component async; tota la UI interactiva s'extreu a `LeadsSeasonClient.tsx` (client component).
+
+### Canvi
+- **`app/admin/leads/page.tsx`** (REESCRIT): server component async. Crida `loadSeasonCalendar(windowStart=1r dia del mes actual, 6 mesos)`. Filtra només entries `type === 'lead'` (reserves s'afegiran al proper pas). Mapeja `SeasonCalendarEntry` → `LeadData` (fields pendents: `time`, `channel`, `owner`, `last`, `wx` — placeholders fins als propers canvis de l'inventari). Passa `leads`, `initialMonth`, `year` a `AdminLeadsClient`.
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (NOU): client component `'use client'`. Conté tota la UI interactiva (TemporadaPage, LeadPage, WxBlock, helpers, icones). Rep `leads: LeadData[]`, `initialMonth`, `year` com a props. Gestiona `viewMode`, `monthStart`, `pageId`, `focusId`. Adaptat per funcionar amb dades buides (empty state al focus zone).
+- **`scripts/check-layer-catalogs.mjs`**: allowlist actualitzada (`LeadsSeasonClient.tsx` en comptes de `page.tsx`).
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `783`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 782→783.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors); `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: `page.tsx` és ara un server component pur; `LeadsSeasonClient.tsx` gestiona tota la interactivitat. La pàgina carrega dades reals de la BD per als leads actius de la temporada (6 mesos des del mes actual). Empty state mostrat si no hi ha leads.
+- Pendent: `time`, `channel`, `owner`, `last` (no al servei actual), integració meteo (wx).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ## 2026-05-25 — Canvi #782: leads admin Brass & Obsidian — pàgina migrada al nou sistema visual (claude)
 
 ### Context

@@ -15,10 +15,10 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #782 (`/admin/leads` migrada al disseny Brass & Obsidian del studio-lab — `app/admin/leads/leads-design.css` + `page.tsx` reescrit. Components antics en quarantena. Inventari: `docs/admin-leads-funcions-inventari.md`.)
-Proper pas previst: #783 — aplicar funcions reals a `/admin/leads` per ordre d'inventari: (1) dades Prisma via `loadSeasonCalendar`, (2) canvi d'estat inline, (3) flux LOST.
-Avís per codex: El propietari vol extirpació completa del vell admin i reconstrucció peça a peça (Frankenstein). §6.19 del protocol formalitza les directrius. Nova shell (`ax-*`) a `admin-shell.css` — #781. Primera pàgina migrada: `/admin/leads` — #782. Pàgines antigues segueixen funcionant (admin-theme.css importat). Inventari de pàgines: `docs/admin-inventari-pagines.md`. Inventari de funcions leads: `docs/admin-leads-funcions-inventari.md`.
+[claude] 2026-05-26 [ESTAT: tancat]
+Últim canvi: #783 (`/admin/leads` carrega dades reals via `loadSeasonCalendar`. `page.tsx`=server component, `LeadsSeasonClient.tsx`=client UI. Mapeig `SeasonCalendarEntry`→`LeadData`.)
+Proper pas previst: #784 — canvi d'estat inline a `/admin/leads`: activar `patchLeadStatus` des de les targetes del pipeline + flux LOST (`LeadLostStatusPrompt`).
+Avís per codex: Frankenstein en marxa. Shell #781, primera pàgina migrada #782, dades reals #783. `/admin/leads` ja usa BD. Funcions pendents a l'inventari: `docs/admin-leads-funcions-inventari.md`. Pàgines antigues segueixen funcionant (admin-theme.css importat). Inventari de pàgines: `docs/admin-inventari-pagines.md`.
 
 ---
 

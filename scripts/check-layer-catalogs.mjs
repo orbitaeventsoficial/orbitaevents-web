@@ -45,9 +45,9 @@ const allowedCatalogs = new Set([
   'lib/services/socialPerformanceService.ts::DAY_NAMES',
   // Season calendar display strings (Brass & Obsidian leads UI) — parallel to studio-lab/leads which is ignored.
   // Catalan month names and local SVG icon builder, purely presentational for the season calendar widget.
-  'app/admin/leads/page.tsx::MONTHS_FULL',
-  'app/admin/leads/page.tsx::MONTHS_SHORT',
-  'app/admin/leads/page.tsx::I',
+  'app/admin/leads/LeadsSeasonClient.tsx::MONTHS_FULL',
+  'app/admin/leads/LeadsSeasonClient.tsx::MONTHS_SHORT',
+  'app/admin/leads/LeadsSeasonClient.tsx::I',
   // Pseudo-random visual particle coordinates for the mobile hero — presentation-only runtime data, not a shared domain catalog (Canvi #354).
   'app/components/mobile-ultimate/MobileHeroUltimate.tsx::HERO_PARTICLES',
   // Local filter subset of CUSTOMER_ACTIVITY_ACTIONS used only inside customerActivityService to query recent email-bearing activity (Canvi #353, follows the COMM_ACTIVITY_TYPES precedent).
