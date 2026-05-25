@@ -10,6 +10,7 @@ Codex havia treballat `/studio-lab/leads` però **sense commitejar ni enumerar**
 - **Iteració amb el propietari sobre captures (mateix #777):**
   - **Root cause del botó lleig:** `fx__cta`/`fx__ctaic`/`lp2__ctaic` contenien `cta` → la regla global `html:not(.admin-mode) [class*="cta"]{…!important}` de `globals.css` els pintava amb el degradat candy públic i anul·lava tot el CSS del lab. Renombrats a `fx__add`/`fx__addic`/`lp2__goic`; "Nova entrada" passa a botó **de vora** (hairline d'or, fons fosc, sense glow). Les altres col·lisions de substring (`[class*="logo"]`, `[class*="card"]`) només apliquen hints de GPU → inofensives.
   - **Passada de tipografia** ("molts textos massa petits"): terra de mida apujat a labels mono (9–10→11), metes (11–12→12.5–13), menú lateral (àrees 13→14.5, subítems 12.5→13.5, botó/cerca/peu/icones), badges de pipeline i etiquetes de la fitxa.
+  - **Revisió final ("el teu zenit?"):** or=diners estricte (de-daurats recompte/`%`/pax → blanc); pipeline sense badge d'estat redundant; zona Focus equilibrada amb `Valor` en or al costat de l'anella.
 - `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = 777 (lligats). Següent: #778.
 
 ### Validació

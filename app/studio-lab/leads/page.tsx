@@ -322,6 +322,7 @@ function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setM
             <span className="fx__focusnote">{leadSummary(focus)}</span>
           </button>
           <div className="fx__focusside">
+            <div className="fx__focusval"><span>Valor</span><b>{euro(focus.value)}</b></div>
             <div className="fx__ring" style={{ '--p': PROB[focus.stage] } as CSSProperties} aria-label={`Probabilitat ${PROB[focus.stage]}%`}><span>{PROB[focus.stage]}%</span></div>
           </div>
         </div>
@@ -413,7 +414,6 @@ function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setM
                 <div className="fx__lanecards">
                   {LEADS.filter((l) => l.stage === stage).map((l) => (
                     <button key={l.id} type="button" className={`fx__pipelead${l.id === focusId ? ' is-active' : ''}`} data-stage={l.stage} onClick={() => onOpen(l.id)}>
-                      <span className="fx__stage">{STAGE_LABEL[l.stage]}</span>
                       <span className="fx__leadtop">
                         <b>{l.name}</b>
                         <strong>{euro(l.value)}</strong>
