@@ -1,3 +1,26 @@
+## 2026-05-25 — Canvi #781: shell admin Brass & Obsidian — extirpació del layout vell i nova carcassa (claude)
+
+### Context
+El propietari demana una extirpació completa del layout admin sorollós i la reconstrucció peça a peça. El primer pas és el tronc: substituir `app/admin/layout.tsx` (936 línies, carregat de soroll) per una nova carcassa neta amb l'estètica Brass & Obsidian del lab. La nova shell conserva la infraestructura irrenunciable (CSRF, admin-mode, ToastProvider, SW) i elimina tot el soroll acumulat.
+
+### Canvi
+- **`app/admin/admin-shell.css`** (NOU): CSS de la nova carcassa — tokens Obsidiana càlida (`--ax-canvas`, `--ax-panel`, `--ax-gold`, etc.), esquelet lateral `.ax--side` / `.ax__side` / `.ax__workspace`, sidebar amb navegació per grups (Comercial, Operació, Economia, Màrqueting, Sistema), botó "Nova entrada" de vora de llautó, peu amb xip de canvi, responsive a 900px.
+- **`app/admin/layout.tsx`** (REESCRIT): de 936 línies a ~170. Elimina: `AdminHelpOverlay`, `AdminSearchModal`, `FloatingAddButton`, `useAdminAlerts`, càrrega CSS dinàmica, càrrega d'assets de marca, konami, notificacions, navegació mòbil inferior, seccions col·lapsables. Conserva: `AdminHelpModeProvider` (per `InfoTooltip.tsx`), `ToastProvider`, `useCsrfFetch()`, `admin-mode` + `scroll-unlocked` a `document.documentElement` i `document.body`, setup del service worker. Importa `admin-theme.css` i `control-room.css` per compatibilitat amb pàgines en migració.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `781`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 780→781.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors); `pnpm run validate:core` OK (tots els guards verds, inclosos `qa:service-coverage`, `qa:protocol`, `qa:admin-mode-prefix`, `qa:studio-integrity`).
+- Validació funcional: la carcassa nova carrega la navegació per grups, manté el grup actiu sincronitzat amb el pathname, el botó "Nova entrada" apunta a `/admin/intake`, el xip de canvi mostra `#781`. Infraestructura CSRF, admin-mode, SW i Toast conservada.
+- Validació humana/UX: la shell nova és Brass & Obsidian —obsidiana càlida, vora de llautó, or corporatiu— consistent amb `/studio-lab`. El soroll vell (help overlay, search modal, FAB, konami, badges) desapareix. Cada pàgina existent continua funcionant (usa `ap-*` classes del `admin-theme.css` que segueix importat).
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #780: implantació leads pas 1 — `seasonCalendarService` + 13 tests (claude)
 
 ### Context

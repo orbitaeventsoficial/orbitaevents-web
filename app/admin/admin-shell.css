@@ -1,0 +1,245 @@
+/* ============================================================================
+   ÒRBITA ADMIN — Shell Brass & Obsidian
+   Canvi #781 — nova carcassa del panell d'administració.
+   Paleta, tipografia i esquelet lateral. Estil de pàgina concret queda
+   als CSS específics de cada pàgina (leads, booking, etc.).
+   Prefix: .ax-root (admin-x root) per diferenciar del lab (.fx-root).
+============================================================================ */
+
+/* ── Variables globals (Obsidiana càlida) ─────────────────────────────────── */
+.ax-root {
+  --ui:      var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  --mono:    var(--font-mono), ui-monospace, monospace;
+
+  min-height: 100vh;
+  background: var(--ax-canvas);
+  color: var(--ax-t);
+  font-family: var(--ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.ax-root *, .ax-root *::before, .ax-root *::after { box-sizing: border-box; }
+
+/* Tokens base — Obsidiana càlida (sense slate fred, sense neó) */
+.ax-root {
+  --ax-canvas: #0a0a0c;
+  --ax-side:   #0d0d10;
+  --ax-panel:  #131318;
+  --ax-raised: #1d1e25;
+  --ax-sunk:   #08080a;
+
+  --ax-line:      rgba(236, 233, 227, 0.10);
+  --ax-line2:     rgba(236, 233, 227, 0.20);
+  --ax-hair-gold: rgba(215, 184, 110, 0.22);
+
+  --ax-t:  #ece7df;
+  --ax-t2: #b6aea2;
+  --ax-t3: #837c70;
+
+  --ax-gold:        #d7b86e;
+  --ax-gold-bright: #f0d99a;
+  --ax-gold-ink:    #2a210e;
+  --ax-gold-edge:   #a9863f;
+}
+
+/* ── Esquelet de l'app ────────────────────────────────────────────────────── */
+.ax {
+  position: relative;
+  min-height: 100vh;
+  background: var(--ax-canvas);
+  isolation: isolate;
+}
+
+/* Atmosfera càlida tènue */
+.ax::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(118% 56% at 50% -16%, rgba(215, 184, 110, 0.08), transparent 58%),
+    radial-gradient(82%  50% at 84%  -8%, rgba(194, 86, 44, 0.06), transparent 54%),
+    radial-gradient(150% 130% at 50% 40%, transparent 56%, rgba(0, 0, 0, 0.46) 100%),
+    linear-gradient(180deg, #0c0c0f 0%, var(--ax-canvas) 46%, #07070a 100%);
+}
+
+/* Gra fi */
+.ax::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.04; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.ax__page { position: relative; z-index: 1; min-width: 0; }
+
+/* Layout de dues columnes: sidebar + workspace */
+.ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
+.ax__side {
+  position: fixed; inset: 0 auto 0 0; z-index: 40;
+  width: 236px; display: flex; flex-direction: column; gap: 17px;
+  padding: 16px 14px;
+  border-right: 1px solid var(--ax-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-side) 98%, #000),
+    color-mix(in oklab, var(--ax-canvas) 96%, #000)
+  );
+  box-shadow: 18px 0 48px -42px rgba(0, 0, 0, 0.96);
+}
+
+/* ── Marca ────────────────────────────────────────────────────────────────── */
+.ax__brand {
+  flex: none; display: flex; align-items: center;
+  height: 52px; padding: 0 0 16px;
+  border-bottom: 1px solid var(--ax-hair-gold);
+}
+.ax__logo {
+  display: block; width: 140px; height: 46px;
+  object-fit: contain; object-position: left center;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.42));
+}
+
+/* ── Navegació lateral ────────────────────────────────────────────────────── */
+.ax__sidenav {
+  display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0;
+  overflow-y: auto; scrollbar-width: none;
+}
+.ax__sidenav::-webkit-scrollbar { display: none; }
+
+.ax__sidegroup { display: flex; flex-direction: column; gap: 5px; }
+
+.ax__sideitem {
+  position: relative; display: flex; align-items: center; gap: 11px;
+  width: 100%; min-height: 46px; padding: 0 13px;
+  border: 1px solid transparent; border-radius: 12px;
+  background: transparent; color: var(--ax-t2);
+  font: inherit; font-size: 14.5px; font-weight: 700; text-align: left; cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.ax__sideitem:hover { background: var(--ax-panel); color: var(--ax-t); border-color: var(--ax-line); }
+.ax__sidegroup.is-active > .ax__sideitem {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 10%, var(--ax-raised)),
+    var(--ax-panel)
+  );
+  color: var(--ax-gold-bright);
+  border-color: var(--ax-hair-gold);
+}
+.ax__sidegroup.is-active > .ax__sideitem::before {
+  content: "";
+  position: absolute; left: -14px; top: 8px; bottom: 8px;
+  width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--ax-gold);
+}
+
+.ax__sidesub {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 3px 0 7px 26px;
+}
+.ax__sidesub a, .ax__sidesub button {
+  display: flex; align-items: center; min-height: 33px; padding: 0 10px;
+  border: 0; border-radius: 9px;
+  background: transparent; color: var(--ax-t3);
+  font: inherit; font-size: 13.5px; font-weight: 650; text-align: left;
+  cursor: pointer; text-decoration: none;
+  transition: background 140ms ease, color 140ms ease;
+}
+.ax__sidesub a:hover, .ax__sidesub button:hover { background: var(--ax-panel); color: var(--ax-t); }
+.ax__sidesub a.is-on, .ax__sidesub button.is-on {
+  color: var(--ax-gold-bright);
+  background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
+}
+
+/* ── Accions inferiors de la sidebar ──────────────────────────────────────── */
+.ax__sideactions {
+  display: flex; flex-direction: column; gap: 10px;
+  padding-top: 14px; border-top: 1px solid var(--ax-line);
+}
+
+/* Botó d'acció primària: vora de llautó, fons fosc amb sheen */
+.ax__add {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 11px 16px; border-radius: 12px;
+  border: 1px solid var(--ax-hair-gold);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 13%, var(--ax-raised)),
+    color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel))
+  );
+  color: var(--ax-gold-bright);
+  font: inherit; font-size: 14px; font-weight: 750; letter-spacing: 0.01em;
+  cursor: pointer; text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
+}
+.ax__add:hover {
+  transform: translateY(-1px);
+  border-color: var(--ax-gold);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 19%, var(--ax-raised)),
+    color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel))
+  );
+}
+.ax__add:active { transform: translateY(0); }
+.ax__addic { display: grid; place-items: center; color: var(--ax-gold); }
+.ax__addic svg { width: 15px; height: 15px; }
+
+/* ── Peu de la sidebar ────────────────────────────────────────────────────── */
+.ax__sidefoot {
+  margin-top: auto; display: flex; align-items: center; gap: 9px;
+  padding-top: 14px; border-top: 1px solid var(--ax-line);
+  color: var(--ax-t3); font-size: 13px; font-weight: 650;
+}
+.ax__sidefootname {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ax__meav {
+  display: grid; place-items: center; width: 32px; height: 32px;
+  border-radius: 50%; background: var(--ax-raised);
+  border: 1px solid var(--ax-line); color: var(--ax-t2);
+  font-size: 11px; font-weight: 700;
+}
+.ax__change {
+  display: inline-flex; align-items: center; min-height: 28px; padding: 5px 11px;
+  border: 1px solid var(--ax-hair-gold); border-radius: 999px;
+  background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
+  color: var(--ax-gold-bright);
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+}
+
+/* ── Animació ─────────────────────────────────────────────────────────────── */
+@keyframes ax-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.ax__page { animation: ax-rise 360ms cubic-bezier(.2, .7, .2, 1) both; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ax--side .ax__workspace { margin-left: 0; }
+  .ax__side {
+    position: relative; width: auto; min-height: 0;
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    padding: 10px 14px; gap: 10px;
+    border-right: 0; border-bottom: 1px solid var(--ax-line);
+  }
+  .ax__brand { height: auto; padding: 0; border-bottom: 0; }
+  .ax__logo { width: 118px; height: 38px; }
+  .ax__sidenav { flex-direction: row; overflow-x: auto; flex: 1; min-height: 0; min-width: 0; }
+  .ax__sidegroup { flex: 0 0 auto; }
+  .ax__sidegroup.is-active > .ax__sideitem::before {
+    left: 10px; right: 10px; top: auto; bottom: -1px;
+    width: auto; height: 2px; border-radius: 2px;
+  }
+  .ax__sidesub { display: none; }
+  .ax__sideactions, .ax__sidefoot { display: none; }
+  .ax__sideitem { min-height: 38px; font-size: 13.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-root *, .ax-root *::before, .ax-root *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

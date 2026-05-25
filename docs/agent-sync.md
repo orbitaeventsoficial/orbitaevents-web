@@ -16,9 +16,9 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #780 (`seasonCalendarService` — pas 1 de la implantació leads: servei pur + 13 tests)
-Proper pas previst: el propietari vol substituir l'admin sencer amb el disseny del lab, pàgina per pàgina. Pendent de decidir estratègia concreta (substituir `/admin/leads` directament vs esquelet nou). Pas 2 del checklist d'implantació era `SeasonCalendar` + `MonthSelector` a `/admin/leads`, però ara pot ser que s'escali a substituir el layout/shell de l'admin primer.
-Avís per codex: #780 afegeix `lib/services/seasonCalendarService.ts` + `__tests__/lib/services/seasonCalendarService.test.ts` (13 tests), puja xip lab a 780 i counter a 780. La nova direcció del propietari és substituir l'admin sencer amb el lab, pàgina per pàgina — pendent de confirmar l'abast exacte.
+Últim canvi: #781 (nova shell admin Brass & Obsidian — `app/admin/layout.tsx` reescrit 936→170 línies + `app/admin/admin-shell.css`)
+Proper pas previst: #782 — substituir el contingut de `/admin/leads/page.tsx` per la versió Brass & Obsidian (calendari de temporada + pipeline + focus zone + dades reals de `loadSeasonCalendar`).
+Avís per codex: El propietari vol extirpació completa del vell admin i reconstrucció peça a peça (Frankenstein). El §6.19 del protocol formalitza les directrius. La nova shell usa classes `ax-*` (veure `app/admin/admin-shell.css`). Les pàgines antigues segueixen funcionant via `admin-theme.css` importat. Inventari de pàgines a `docs/admin-inventari-pagines.md`. #780 va afegir `seasonCalendarService`. #781 va reescriure el layout.
 
 ---
 

@@ -1,935 +1,219 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamicImport from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
-import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
-import { ADMIN_LAYOUT_HELP, helpAttrs } from './components/adminHelpContent';
+import { usePathname } from 'next/navigation';
+import { AdminHelpModeProvider } from './components/AdminHelpMode';
 import { ToastProvider } from './components/ToastProvider';
-import { getPriorityItems, NAV_SECTIONS, type NavSection } from './components/nav-items';
-import { ADMIN_CHANGE_COUNTER, ADMIN_DETAIL_PAGE_LABELS, ADMIN_FAB_ITEMS, ADMIN_KONAMI_SEQUENCE, ADMIN_MOBILE_PRIMARY_NAV, ADMIN_PAGE_LABELS, ADMIN_SHORTCUT_ROUTES } from '@/lib/constants/admin';
-import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
-import { fetchImageManager } from '@/lib/api/imageManagerClient';
+import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
 import './admin-theme.css';
 import './control-room.css';
+import './admin-shell.css';
 
-const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
-  ssr: false,
-});
-const AdminHelpOverlay = dynamicImport(() => import('./components/AdminHelpOverlay'), {
-  ssr: false,
-});
+/* ── Grups de navegació ───────────────────────────────────────────────────── */
+type NavGroup = { id: string; label: string; items: { label: string; href: string }[] };
 
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: 'comercial', label: 'Comercial',
+    items: [
+      { label: 'Temporada', href: '/admin/leads' },
+      { label: 'Clients', href: '/admin/clientes' },
+      { label: 'Pressupostos', href: '/admin/presupuestos' },
+      { label: 'Entrada ràpida', href: '/admin/intake' },
+    ],
+  },
+  {
+    id: 'operacio', label: 'Operació',
+    items: [
+      { label: 'Reserves', href: '/admin/bookings' },
+      { label: 'Calendari', href: '/admin/calendario' },
+      { label: 'Tasques', href: '/admin/tasks' },
+      { label: 'Inventari', href: '/admin/inventory' },
+      { label: 'Packs', href: '/admin/packs' },
+    ],
+  },
+  {
+    id: 'economia', label: 'Economia',
+    items: [
+      { label: 'Finances', href: '/admin/economia' },
+      { label: 'Pricing', href: '/admin/pricing' },
+      { label: 'Reporting', href: '/admin/reporting' },
+      { label: 'Analytics', href: '/admin/analytics' },
+    ],
+  },
+  {
+    id: 'marqueting', label: 'Màrqueting',
+    items: [
+      { label: 'Hub', href: '/admin/marketing' },
+      { label: 'Portfolio', href: '/admin/portfolio' },
+      { label: 'Blog', href: '/admin/blog' },
+      { label: 'Social', href: '/admin/social' },
+      { label: 'Ressenyes', href: '/admin/ressenyes' },
+    ],
+  },
+  {
+    id: 'sistema', label: 'Sistema',
+    items: [
+      { label: 'Safata', href: '/admin/inbox' },
+      { label: 'Configuració', href: '/admin/settings' },
+      { label: 'Manual', href: '/admin/manual' },
+      { label: 'Salut', href: '/admin/salut' },
+      { label: 'Crons', href: '/admin/crons' },
+    ],
+  },
+];
 
-/**
- * ORBITA ADMIN LAYOUT - shell principal del panel admin de Orbita Events
- * Estil sobri i professional amb focus en llegibilitat
- * Mobile-first design amb bottom navigation
- */
-
-function FloatingAddButton() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const toggle = useCallback(() => setOpen((prev) => !prev), []);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="fixed bottom-24 right-4 z-[90] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6" {...helpAttrs(ADMIN_LAYOUT_HELP.quickActionsGroup)}>
-      {open && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-2">
-          {ADMIN_FAB_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-black/80 px-4 py-2.5 text-sm font-medium text-white/90 shadow-lg backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
-              data-help-title={item.label}
-              {...helpAttrs('description' in item && typeof item.description === 'string' ? { title: item.label, desc: item.description } : undefined)}
-            >
-              <span className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label="Accions rapides"
-        aria-expanded={open}
-        className={`flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all active:scale-95 ${open ? 'bg-white/20 rotate-45' : 'admin-gradient--fab'}`}
-        {...helpAttrs(ADMIN_LAYOUT_HELP.quickActionsFab)}
-      >
-        <span className="text-2xl font-bold text-white transition-transform">+</span>
-      </button>
-    </div>
-  );
+function getGroupForPath(pathname: string): string {
+  if (
+    pathname.startsWith('/admin/leads') ||
+    pathname.startsWith('/admin/clientes') ||
+    pathname.startsWith('/admin/presupuestos') ||
+    pathname.startsWith('/admin/intake') ||
+    pathname.startsWith('/admin/quick-create') ||
+    pathname.startsWith('/admin/sales-ops')
+  ) return 'comercial';
+  if (
+    pathname.startsWith('/admin/bookings') ||
+    pathname.startsWith('/admin/calendario') ||
+    pathname.startsWith('/admin/tasks') ||
+    pathname.startsWith('/admin/inventory') ||
+    pathname.startsWith('/admin/packs')
+  ) return 'operacio';
+  if (
+    pathname.startsWith('/admin/economia') ||
+    pathname.startsWith('/admin/pricing') ||
+    pathname.startsWith('/admin/reporting') ||
+    pathname.startsWith('/admin/analytics') ||
+    pathname.startsWith('/admin/cost-calculator')
+  ) return 'economia';
+  if (
+    pathname.startsWith('/admin/marketing') ||
+    pathname.startsWith('/admin/portfolio') ||
+    pathname.startsWith('/admin/blog') ||
+    pathname.startsWith('/admin/social') ||
+    pathname.startsWith('/admin/ressenyes') ||
+    pathname.startsWith('/admin/google-reviews') ||
+    pathname.startsWith('/admin/campaigns')
+  ) return 'marqueting';
+  return 'sistema';
 }
 
-function SidebarItem({
-  icon,
-  label,
-  href,
-  description,
-  isActive,
-  badge,
-  badgeColor = 'orange',
-  onClick,
-  onPrefetch,
-}: {
-  icon: string;
-  label: string;
-  href: string;
-  description?: string;
-  isActive: boolean;
-  badge?: string;
-  badgeColor?: 'orange' | 'blue' | 'green' | 'red';
-  onClick?: () => void;
-  onPrefetch?: (href: string) => void;
-}) {
-  const badgeStyles = {
-    orange: 'admin-nav-badge admin-nav-badge--orange',
-    blue: 'admin-nav-badge admin-nav-badge--blue',
-    green: 'admin-nav-badge admin-nav-badge--green',
-    red: 'admin-nav-badge admin-nav-badge--red',
-  };
-
-  return (
-    <Link
-      href={href}
-      prefetch={false}
-      onClick={onClick}
-      onMouseEnter={() => onPrefetch?.(href)}
-      onFocus={() => onPrefetch?.(href)}
-      aria-current={isActive ? 'page' : undefined}
-      {...helpAttrs(description ? { title: label, desc: description } : undefined)}
-      className={`admin-nav-item ${isActive ? 'admin-nav-item--active' : 'admin-nav-item--idle'}`}
-    >
-      {isActive && (
-        <span className="admin-nav-item-marker" />
-      )}
-      <span className="admin-nav-item-icon">{icon}</span>
-      <span className="admin-nav-item-label">{label}</span>
-      {badge && (
-        <span className={badgeStyles[badgeColor]}>
-          {badge}
-        </span>
-      )}
-    </Link>
-  );
-}
-
-function SidebarSection({
-  title,
-  storageKey,
-  defaultOpen = false,
-  children,
-}: {
-  title: string;
-  storageKey: string;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return defaultOpen;
-    const raw = window.localStorage.getItem(`admin.section.${storageKey}`);
-    if (raw === '1') return true;
-    if (raw === '0') return false;
-    return defaultOpen;
-  });
-
-  const toggle = useCallback(() => {
-    setOpen((value) => {
-      const next = !value;
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(`admin.section.${storageKey}`, next ? '1' : '0');
-      }
-      return next;
-    });
-  }, [storageKey]);
-
-  return (
-    <div className="admin-nav-section">
-      <button
-        type="button"
-        onClick={toggle}
-        className="admin-nav-section-btn"
-        {...helpAttrs(ADMIN_LAYOUT_HELP.navSection(title))}
-      >
-        <span>{title}</span>
-        <span className={`admin-nav-section-caret ${open ? 'admin-nav-section-caret--open' : ''}`}>▾</span>
-      </button>
-      {open && <div className="admin-nav-section-content">{children}</div>}
-    </div>
-  );
-}
-
-// Bottom navigation item per a mòbil
-function BottomNavItem({
-  icon,
-  label,
-  href,
-  description,
-  isActive,
-  badge,
-  onPrefetch,
-}: {
-  icon: string;
-  label: string;
-  href: string;
-  description?: string;
-  isActive: boolean;
-  badge?: number;
-  onPrefetch?: (href: string) => void;
-}) {
-  return (
-    <Link
-      href={href}
-      prefetch={false}
-      onMouseEnter={() => onPrefetch?.(href)}
-      onFocus={() => onPrefetch?.(href)}
-      {...helpAttrs(description ? { title: label, desc: description } : undefined)}
-      className={`admin-bottom-nav-item ${isActive ? 'admin-bottom-nav-item--active' : 'admin-bottom-nav-item--idle'}`}
-    >
-      <span className="admin-bottom-nav-icon-wrap">
-        {icon}
-        {badge && badge > 0 && (
-          <span className="admin-bottom-nav-badge">
-            {badge > 99 ? '99+' : badge}
-          </span>
-        )}
-      </span>
-      <span className="admin-bottom-nav-label">
-        {label}
-      </span>
-      {isActive && (
-        <span className="admin-bottom-nav-marker" />
-      )}
-    </Link>
-  );
-}
-
+/* ── Layout principal ─────────────────────────────────────────────────────── */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminHelpModeProvider>
-      <AdminLayoutShell>{children}</AdminLayoutShell>
+      <AdminShell>{children}</AdminShell>
     </AdminHelpModeProvider>
   );
 }
 
-function AdminLayoutShell({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [konamiActive, setKonamiActive] = useState(false);
-  const konamiRef = useRef<number>(0);
-  const [customAdminCss, setCustomAdminCss] = useState('');
-  const [managedAdminLogoSrc, setManagedAdminLogoSrc] = useState('/img/logosoloplaneta.svg');
-  const [managedAppleTouchIconSrc, setManagedAppleTouchIconSrc] = useState('/apple-touch-icon.png');
+function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
-  const {
-    newLeadsCount,
-    inboxUnreadCount,
-    packPriceAlertsCount,
-    financeAlertsCount,
-    totalCount: notificationsCount,
-  } = useAdminAlerts();
+  const [activeGroup, setActiveGroup] = useState<string>(() => getGroupForPath(pathname ?? ''));
   useCsrfFetch();
 
-  const loadAdminCss = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/css', { credentials: 'include', cache: 'no-store' });
-      if (!res.ok) return;
-      const data = await res.json().catch(() => ({}));
-      if (typeof data?.css === 'string') {
-        setCustomAdminCss(data.css);
-      }
-    } catch (error) {
-      log.warn("No s'ha pogut carregar el CSS admin personalitzat", { error: error instanceof Error ? error.message : String(error) });
-    }
-  }, []);
-
+  /* admin-mode + scroll-unlocked per compatibilitat CSS durant la migració */
   useEffect(() => {
-    loadAdminCss();
-  }, [loadAdminCss]);
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadManagedBrandAssets() {
-      try {
-        const response = await fetchImageManager(
-          ['layout.logo.admin', 'layout.appleTouchIcon'],
-          { cache: 'no-store' },
-        );
-        if (cancelled) return;
-        const managedAdminLogo = response.data?.['layout.logo.admin']?.item?.src;
-        const managedAppleTouchIcon = response.data?.['layout.appleTouchIcon']?.item?.src;
-        if (typeof managedAdminLogo === 'string' && managedAdminLogo.trim()) {
-          setManagedAdminLogoSrc(managedAdminLogo);
-        }
-        if (typeof managedAppleTouchIcon === 'string' && managedAppleTouchIcon.trim()) {
-          setManagedAppleTouchIconSrc(managedAppleTouchIcon);
-        }
-      } catch (error) {
-        log.warn("No s'ha pogut carregar els assets de marca de l'admin", { error: error instanceof Error ? error.message : String(error) });
-      }
-    }
-
-    loadManagedBrandAssets();
+    document.documentElement.classList.add('admin-mode', 'scroll-unlocked');
+    document.body.classList.add('admin-mode', 'scroll-unlocked');
     return () => {
-      cancelled = true;
+      document.documentElement.classList.remove('admin-mode', 'scroll-unlocked');
+      document.body.classList.remove('admin-mode', 'scroll-unlocked');
     };
   }, []);
 
+  /* Segueix el grup actiu amb el pathname */
   useEffect(() => {
-    const onCssUpdated = () => {
-      loadAdminCss();
-    };
-    window.addEventListener('admin-css-updated', onCssUpdated);
-    return () => {
-      window.removeEventListener('admin-css-updated', onCssUpdated);
-    };
-  }, [loadAdminCss]);
+    setActiveGroup(getGroupForPath(pathname ?? ''));
+  }, [pathname]);
 
+  /* Service worker (prod) */
   useEffect(() => {
-    setMounted(true);
     if (!('serviceWorker' in navigator)) return;
-
-    const hostname = window.location.hostname;
-    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-    if (isLocalhost) {
+    const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    if (isLocal) {
       navigator.serviceWorker.getRegistrations()
-        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
-        .catch((error) => { log.warn("No s'han pogut netejar els service workers locals", { error: error instanceof Error ? error.message : String(error) }); });
+        .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+        .catch((e) => log.warn('SW cleanup', { error: String(e) }));
       return;
     }
-
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
-      log.warn("No s'ha pogut registrar el service worker admin", { error: error instanceof Error ? error.message : String(error) });
-    });
+    navigator.serviceWorker.register('/sw.js')
+      .catch((e) => log.warn('SW register', { error: String(e) }));
   }, []);
 
-  useEffect(() => {
-    const criticalRoutes = ['/admin/leads', '/admin/clientes', '/admin/bookings', '/admin/tasks', '/admin/inbox'];
-    const run = () => criticalRoutes.forEach((href) => router.prefetch(href));
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
-        .requestIdleCallback(() => run());
-      return () => {
-        if ('cancelIdleCallback' in window) {
-          (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
-        }
-      };
-    }
-    const timeoutId = globalThis.setTimeout(run, 500);
-    return () => globalThis.clearTimeout(timeoutId);
-  }, [router]);
-
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    document.documentElement.classList.add('admin-mode');
-    document.body.classList.add('admin-mode');
-    document.documentElement.classList.add('scroll-unlocked');
-    document.body.classList.add('scroll-unlocked');
-    return () => {
-      document.documentElement.classList.remove('admin-mode');
-      document.body.classList.remove('admin-mode');
-      document.documentElement.classList.remove('scroll-unlocked');
-      document.body.classList.remove('scroll-unlocked');
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleShortcut = (event: KeyboardEvent) => {
-      if (helpModeEnabled) {
-        if (event.key === 'Escape') return;
-        event.preventDefault();
-        event.stopPropagation();
-        return;
-      }
-
-      // Ctrl/Cmd+K obre el cercador
-      const isK = event.key.toLowerCase() === 'k';
-      if ((event.metaKey || event.ctrlKey) && isK) {
-        event.preventDefault();
-        setSearchOpen(true);
-        return;
-      }
-
-      // Alt+numero obre navegacio rapida
-      if (event.altKey && !event.ctrlKey && !event.metaKey) {
-        const target = ADMIN_SHORTCUT_ROUTES[event.key.toLowerCase()];
-        if (target) {
-          event.preventDefault();
-          router.push(target);
-          return;
-        }
-        // Alt+N obre el FAB (simula click)
-        if (event.key.toLowerCase() === 'n') {
-          event.preventDefault();
-          const fab = document.querySelector('[aria-label="Accions rapides"]') as HTMLButtonElement | null;
-          fab?.click();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleShortcut, true);
-    return () => window.removeEventListener('keydown', handleShortcut, true);
-  }, [helpModeEnabled, router]);
-
-  useEffect(() => {
-    const handleKonami = (e: KeyboardEvent) => {
-      if (e.key === ADMIN_KONAMI_SEQUENCE[konamiRef.current]) {
-        konamiRef.current += 1;
-        if (konamiRef.current === ADMIN_KONAMI_SEQUENCE.length) {
-          konamiRef.current = 0;
-          setKonamiActive(true);
-          setTimeout(() => setKonamiActive(false), 3000);
-        }
-      } else {
-        konamiRef.current = e.key === ADMIN_KONAMI_SEQUENCE[0] ? 1 : 0;
-      }
-    };
-    window.addEventListener('keydown', handleKonami);
-    return () => window.removeEventListener('keydown', handleKonami);
-  }, []);
-
-  const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
-  const navSections = useMemo<NavSection[]>(() => NAV_SECTIONS.map((section) => ({
-    ...section,
-    items: section.items.map((item) => {
-      if (item.href !== '/admin/inbox') return item;
-      if (inboxUnreadCount > 0) {
-        return { ...item, badge: String(inboxUnreadCount), badgeColor: 'red' };
-      }
-      return { ...item, badge: 'IMAP', badgeColor: 'blue' };
-    }),
-  })), [inboxUnreadCount]);
-
-  const notificationsLabel = useMemo(() => {
-    const parts: string[] = [];
-    if (newLeadsCount > 0) parts.push(`${newLeadsCount} entrades noves`);
-    if (inboxUnreadCount > 0) parts.push(`${inboxUnreadCount} correus no llegits`);
-    if (packPriceAlertsCount > 0) parts.push(`${packPriceAlertsCount} alertes de preus`);
-    if (financeAlertsCount > 0) parts.push(`${financeAlertsCount} alertes de finances`);
-    if (notificationsCount === 0) return 'Notificacions';
-    return `Notificacions: ${parts.join(' · ') || `${notificationsCount} pendents`}`;
-  }, [financeAlertsCount, inboxUnreadCount, newLeadsCount, notificationsCount, packPriceAlertsCount]);
-
-  const notificationBreakdown = useMemo(() => {
-    const items: Array<{
-      key: string;
-      label: string;
-      shortLabel: string;
-      count: number;
-      tone: 'lead' | 'mail' | 'risk';
-    }> = [];
-
-    if (newLeadsCount > 0) {
-      items.push({ key: 'lead', label: 'Entrades noves', shortLabel: 'Leads', count: newLeadsCount, tone: 'lead' });
-    }
-    if (inboxUnreadCount > 0) {
-      items.push({ key: 'mail', label: 'Correus no llegits', shortLabel: 'Mail', count: inboxUnreadCount, tone: 'mail' });
-    }
-
-    const riskCount = packPriceAlertsCount + financeAlertsCount;
-    if (riskCount > 0) {
-      items.push({ key: 'risk', label: 'Alertes crítiques', shortLabel: 'Risc', count: riskCount, tone: 'risk' });
-    }
-
-    return items;
-  }, [financeAlertsCount, inboxUnreadCount, newLeadsCount, packPriceAlertsCount]);
-
-  const isActive = useCallback((href: string): boolean => {
-    return href === '/admin' ? pathname === '/admin' : (pathname?.startsWith(href) ?? false);
-  }, [pathname]);
-
-  const prefetchRoute = useCallback((href: string) => {
-    router.prefetch(href);
-  }, [router]);
-
-  // Obtenir nom de la pagina actual per al breadcrumb
-  const getPageName = useCallback(() => {
-    if (!pathname) return 'Tauler';
-    const segments = pathname.split('/').filter(Boolean);
-    if (segments.length <= 1) return 'Tauler';
-    const page = segments[segments.length - 1];
-    const parent = segments[segments.length - 2] || '';
-    const isDynamicId =
-      /^[a-f0-9]{24}$/i.test(page) || // Mongo-like id
-      /^[a-f0-9-]{32,36}$/i.test(page) || // UUID variants
-      /^[a-z0-9]{20,}$/i.test(page); // CUID/ULID-like
-
-    if (isDynamicId) {
-      return ADMIN_DETAIL_PAGE_LABELS[parent] || 'Detall';
-    }
-
-    return ADMIN_PAGE_LABELS[page] || page.charAt(0).toUpperCase() + page.slice(1);
-  }, [pathname]);
-
-  const isHelpTarget = useCallback((target: EventTarget | null): boolean => {
-    if (!(target instanceof HTMLElement)) return false;
-    return Boolean(
-      target.closest('[data-help-tooltip="true"]') ||
-      target.closest('[data-help-tooltip-panel="true"]') ||
-      target.closest('[data-help-toggle="true"]')
-    );
-  }, []);
-
-
-  const blockInteractionInHelpMode = useCallback((event: React.SyntheticEvent) => {
-    if (!helpModeEnabled) return;
-    if (isHelpTarget(event.target)) return;
-    event.preventDefault();
-    event.stopPropagation();
-  }, [helpModeEnabled, isHelpTarget]);
+  const activeGroupData = NAV_GROUPS.find((g) => g.id === activeGroup) ?? NAV_GROUPS[0];
 
   return (
-    <>
-      {/* PWA head tags: Next.js App Router els puja a head */}
-      <link rel="manifest" href="/manifest.webmanifest" />
-      <meta name="theme-color" content="#121417" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      <meta name="apple-mobile-web-app-title" content="Òrbita Admin" />
-      <link rel="apple-touch-icon" href={managedAppleTouchIconSrc} />
-      {/* Easter egg: codi Konami ↑↑↓↓←→←→BA */}
-      {konamiActive && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-[9998] flex items-center justify-center"
-          style={{ animation: 'admin-stagger-in 0.3s ease forwards' }}
-        >
-          <div className="rounded-3xl border border-white/10 bg-black/80 px-10 py-8 text-center backdrop-blur-sm shadow-2xl">
-            <p className="text-5xl mb-3">🎧</p>
-            <p className="text-xl font-bold text-white">Òrbita Mode Activat</p>
-            <p className="mt-1 text-sm text-white/50">Ara sona millor</p>
-          </div>
-        </div>
-      )}
-      <div
-        className="admin-layout-shell"
-        onClickCapture={blockInteractionInHelpMode}
-        onDoubleClickCapture={blockInteractionInHelpMode}
-        onSubmitCapture={blockInteractionInHelpMode}
-        onPointerDownCapture={blockInteractionInHelpMode}
-      >
-          <a href="#admin-main-content" className="admin-skip-nav">Saltar al contingut principal</a>
-          {customAdminCss && (
-            <style id="admin-custom-css" dangerouslySetInnerHTML={{ __html: customAdminCss }} />
-          )}
-          {helpModeEnabled && (
-            <div className="admin-help-banner">
-              Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.
-            </div>
-          )}
-          {helpModeEnabled && <AdminHelpOverlay />}
-          {/* Desktop Sidebar */}
-          <aside className="admin-sidebar">
-        {/* Logo */}
-        <div className="admin-sidebar-head">
-          <Link href="/admin" className="admin-sidebar-brand">
-            <div className="admin-sidebar-logo-wrap">
+    <ToastProvider>
+      <div className="ax-root">
+        <div className="ax ax--side">
+
+          {/* ── Sidebar ─────────────────────────────────────────────────── */}
+          <aside className="ax__side">
+            <div className="ax__brand">
               <Image
-                src={managedAdminLogoSrc}
-                alt="Òrbita"
-                width={40}
-                height={40}
-                sizes="40px"
-                quality={80}
-                className="admin-logo-img" unoptimized={managedAdminLogoSrc.includes('/api/uploads/')}
+                src="/img/logoplanetatextdreta.svg"
+                alt="Òrbita Events"
+                width={140} height={46}
+                priority
+                className="ax__logo"
               />
             </div>
-            <div>
-              <span className="admin-sidebar-brand-main">Òrbita</span>
-              <span className="admin-sidebar-brand-accent">Admin</span>
-            </div>
-          </Link>
-        </div>
 
-        {/* Nav */}
-        <nav className="admin-sidebar-nav">
-          <div className="admin-sidebar-block">
-            <p className="admin-sidebar-block-title">
-              Prioritat
-            </p>
-            <div className="admin-sidebar-block-list">
-              {priorityItems.map((item) => (
-                <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
-              ))}
-            </div>
-          </div>
-
-          {navSections.map((section) => (
-            <SidebarSection
-              key={section.title}
-              title={section.title}
-              storageKey={section.title.toLowerCase().replace(/\s+/g, '-')}
-              defaultOpen={section.defaultOpen}
-            >
-              {section.items.map((item) => (
-                <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
-              ))}
-            </SidebarSection>
-          ))}
-        </nav>
-
-        {/* Footer */}
-          <div className="admin-sidebar-foot">
-          <div className="admin-sidebar-foot-card">
-            <p className="admin-sidebar-foot-kicker">Sistema</p>
-            <p className="admin-sidebar-foot-title">Òrbita Admin</p>
-            <p className="admin-sidebar-foot-meta">v2.1 · Prisma + Railway</p>
-          </div>
-        </div>
-      </aside>
-
-      {/* Mobile Header - Mejorado */}
-      <header className="admin-mobile-header">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          type="button"
-          aria-label="Obrir menú admin"
-          aria-expanded={sidebarOpen}
-          aria-controls="admin-mobile-sidebar"
-          className="admin-icon-btn admin-icon-btn--left" {...helpAttrs(ADMIN_LAYOUT_HELP.menuButton)}
-        >
-          <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-
-        <div className="admin-mobile-title-wrap">
-          <span className="admin-mobile-title">
-            <span className="admin-mobile-title-accent">Òrbita</span> Admin
-          </span>
-          <span className="admin-mobile-subtitle">{getPageName()}</span>
-        </div>
-
-        <div
-          aria-label={`Canvi número ${ADMIN_CHANGE_COUNTER}`}
-          title={`Canvi #${ADMIN_CHANGE_COUNTER}`}
-          className="admin-change-counter-chip admin-change-counter-chip--mobile"
-        >
-          <span className="admin-change-counter-chip-label">Canvi</span>
-          <span className="admin-change-counter-chip-value">#{ADMIN_CHANGE_COUNTER}</span>
-        </div>
-
-        <div className="admin-mobile-actions">
-          <button
-            type="button"
-            data-help-toggle="true"
-            onClick={toggleHelpMode}
-            {...helpAttrs(ADMIN_LAYOUT_HELP.helpToggle)}
-            className={`admin-help-btn relative z-[80] ${
-              helpModeEnabled
-                ? 'admin-help-btn--active'
-                : 'admin-help-btn--idle'
-            }`}
-            aria-label="Activar o desactivar mode ajuda"
-            aria-pressed={helpModeEnabled}
-          >
-            Ajuda
-          </button>
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="admin-icon-btn"
-            aria-label="Cercar (Ctrl+K)"
-            {...helpAttrs(ADMIN_LAYOUT_HELP.search)}
-          >
-            ⌕
-          </button>
-          <Link
-            href="/admin/settings/notifications"
-            className="admin-icon-btn admin-icon-btn--notif"
-            aria-label={notificationsLabel}
-            {...helpAttrs(ADMIN_LAYOUT_HELP.notifications)}
-          >
-            <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            {notificationsCount > 0 && (
-              <span className="admin-notif-dot">{notificationsCount > 99 ? '99+' : notificationsCount}</span>
-            )}
-          </Link>
-        </div>
-        {notificationBreakdown.length > 0 && (
-          <div className="admin-header-alert-strip admin-header-alert-strip--mobile" aria-label={notificationsLabel}>
-            {notificationBreakdown.map((item) => (
-              <span key={item.key} className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}>
-                <strong>{item.count}</strong> {item.shortLabel}
-              </span>
-            ))}
-          </div>
-        )}
-      </header>
-
-      {/* Mobile Sidebar Overlay - Con animación */}
-      {mounted && (
-        <>
-          {/* Backdrop */}
-          <div
-            className={`admin-mobile-backdrop
-              ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            onClick={() => setSidebarOpen(false)}
-            role="presentation"
-          />
-          {/* Sidebar */}
-          <aside
-            id="admin-mobile-sidebar"
-            aria-label="Menú admin"
-            className={`admin-mobile-sidebar
-              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-          >
-            {/* Header del sidebar */}
-            <div className="admin-mobile-sidebar-head">
-              <div className="admin-mobile-sidebar-brand">
-                <div className="admin-mobile-sidebar-logo">
-                  <Image
-                    src={managedAdminLogoSrc}
-                    alt="Òrbita"
-                    width={36}
-                    height={36}
-                    className="admin-logo-img" unoptimized={managedAdminLogoSrc.includes('/api/uploads/')}
-                  />
+            <nav className="ax__sidenav" aria-label="Àrees de treball">
+              {NAV_GROUPS.map((g) => (
+                <div key={g.id} className={`ax__sidegroup${g.id === activeGroup ? ' is-active' : ''}`}>
+                  <button
+                    type="button"
+                    className="ax__sideitem"
+                    aria-current={g.id === activeGroup ? 'true' : undefined}
+                    onClick={() => setActiveGroup(g.id)}
+                  >
+                    {g.label}
+                  </button>
+                  {g.id === activeGroup && (
+                    <div className="ax__sidesub">
+                      {activeGroupData.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={pathname?.startsWith(item.href) ? 'is-on' : undefined}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <span className="admin-mobile-sidebar-title">Òrbita Admin</span>
-                  <p className="admin-mobile-sidebar-subtitle">Panell de gestió</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                aria-label="Tancar menú admin"
-                onClick={() => setSidebarOpen(false)}
-                className="admin-icon-btn"
-                {...helpAttrs(ADMIN_LAYOUT_HELP.closeMenu)}
-              >
-                <svg className="admin-icon-svg" width={20} height={20} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Navegación */}
-            <nav className="admin-mobile-sidebar-nav">
-              <div className="admin-sidebar-block">
-                <p className="admin-sidebar-block-title">
-                  Prioritat
-                </p>
-                <div className="admin-sidebar-block-list">
-                  {priorityItems.map((item) => (
-                    <SidebarItem
-                      key={item.href}
-                      {...item}
-                      isActive={isActive(item.href)}
-                      onClick={() => setSidebarOpen(false)}
-                      onPrefetch={prefetchRoute}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {navSections.map((section) => (
-                <SidebarSection
-                  key={section.title}
-                  title={section.title}
-                  storageKey={section.title.toLowerCase().replace(/\s+/g, '-')}
-                  defaultOpen={section.defaultOpen}
-                >
-                  {section.items.map((item) => (
-                    <SidebarItem
-                      key={item.href}
-                      {...item}
-                      isActive={isActive(item.href)}
-                      onClick={() => setSidebarOpen(false)}
-                      onPrefetch={prefetchRoute}
-                    />
-                  ))}
-                </SidebarSection>
               ))}
             </nav>
 
-            {/* Footer del sidebar móvil */}
-            <div className="admin-mobile-sidebar-foot">
-              <Link
-                href="/admin/settings"
-                onClick={() => setSidebarOpen(false)}
-                className="admin-mobile-sidebar-foot-link"
-                {...helpAttrs(ADMIN_LAYOUT_HELP.settings)}
-              >
-                <div className="admin-mobile-sidebar-foot-avatar">
-                  A
-                </div>
-                <div className="admin-mobile-sidebar-foot-copy">
-                  <p className="admin-mobile-sidebar-foot-title">Admin</p>
-                  <p className="admin-mobile-sidebar-foot-subtitle">Configuració del compte</p>
-                </div>
-                <svg className="admin-cr-chevron" width={16} height={16} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+            <div className="ax__sideactions">
+              <Link href="/admin/intake" className="ax__add">
+                Nova entrada
               </Link>
             </div>
-          </aside>
-        </>
-      )}
 
-      {/* Desktop Header */}
-      <header className="admin-desktop-header">
-        <div className="admin-desktop-breadcrumb">
-          <Link href="/admin" className="admin-desktop-breadcrumb-link">Admin</Link>
-          <span className="admin-desktop-breadcrumb-sep">/</span>
-          <span className="admin-desktop-breadcrumb-current">{getPageName()}</span>
-        </div>
-        <div
-          aria-label={`Canvi número ${ADMIN_CHANGE_COUNTER}`}
-          title={`Canvi #${ADMIN_CHANGE_COUNTER}`}
-          className="admin-change-counter-chip admin-change-counter-chip--desktop"
-        >
-          <span className="admin-change-counter-chip-label">Canvi</span>
-          <span className="admin-change-counter-chip-value">#{ADMIN_CHANGE_COUNTER}</span>
-        </div>
-        <div className="admin-desktop-actions">
-          {notificationBreakdown.length > 0 && (
-            <div className="admin-header-alert-strip" aria-label={notificationsLabel}>
-              {notificationBreakdown.map((item) => (
-                <span
-                  key={item.key}
-                  className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}
-                  title={`${item.label}: ${item.count}`}
-                >
-                  <strong>{item.count}</strong> {item.shortLabel}
-                </span>
-              ))}
+            <div className="ax__sidefoot">
+              <span className="ax__meav" title="Òrbita Events">OE</span>
+              <span className="ax__sidefootname">Òrbita Events</span>
+              <span className="ax__change">#{ADMIN_CHANGE_COUNTER}</span>
             </div>
-          )}
-          <button
-            type="button"
-            data-help-toggle="true"
-            onClick={toggleHelpMode}
-            className={`admin-help-btn relative z-[80] ${
-              helpModeEnabled
-                ? 'admin-help-btn--active'
-                : 'admin-help-btn--idle'
-            }`}
-            aria-pressed={helpModeEnabled}
-            aria-label="Activar o desactivar mode ajuda"
-            {...helpAttrs(ADMIN_LAYOUT_HELP.helpToggle)}
-          >
-            Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="admin-desktop-search-btn"
-            aria-label="Cercar (Ctrl+K)"
-            {...helpAttrs(ADMIN_LAYOUT_HELP.search)}
-          >
-            Cercar
-            <span className="admin-desktop-kbd">Ctrl/Cmd+K</span>
-            <span className="admin-desktop-search-icon">⌕</span>
-          </button>
-          <Link
-            href="/admin/settings/notifications"
-            className="admin-icon-btn admin-icon-btn--notif"
-            aria-label={notificationsLabel}
-            {...helpAttrs(ADMIN_LAYOUT_HELP.notifications)}
-          >
-            🔔
-            {notificationsCount > 0 && (
-              <span className="admin-notif-dot">{notificationsCount > 99 ? '99+' : notificationsCount}</span>
-            )}
-          </Link>
-          <div className="admin-desktop-sep" />
-          <Link
-            href="/admin/settings"
-            className="admin-desktop-user"
-            {...helpAttrs(ADMIN_LAYOUT_HELP.settings)}
-          >
-            <div className="admin-desktop-user-avatar">A</div>
-            <span className="admin-desktop-user-label">Admin</span>
-            <span className="admin-desktop-user-subtitle">Configuració</span>
-          </Link>
-        </div>
-        {notificationBreakdown.length > 0 && (
-          <div className="admin-header-alert-strip admin-header-alert-strip--mobile" aria-label={notificationsLabel}>
-            {notificationBreakdown.map((item) => (
-              <span key={item.key} className={`admin-header-alert-chip admin-header-alert-chip--${item.tone}`}>
-                <strong>{item.count}</strong> {item.shortLabel}
-              </span>
-            ))}
+          </aside>
+
+          {/* ── Contingut principal ──────────────────────────────────────── */}
+          <div className="ax__workspace">
+            <main id="admin-main-content" className="ax__page">
+              {children}
+            </main>
           </div>
-        )}
-      </header>
 
-      {/* Main Content */}
-      <main id="admin-main-content" className="admin-main">
-        <div className="admin-shell admin-main-shell">
-          <ToastProvider>
-            {children}
-          </ToastProvider>
         </div>
-      </main>
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="admin-bottom-nav">
-        <div className="admin-bottom-nav-inner">
-          {ADMIN_MOBILE_PRIMARY_NAV.map((item) => (
-            <BottomNavItem
-              key={item.href}
-              icon={item.icon}
-              label={item.label}
-              href={item.href}
-              description={'description' in item && typeof item.description === 'string' ? item.description : undefined}
-              isActive={pathname?.startsWith(item.href) || false}
-              badge={'badgeKey' in item && item.badgeKey === 'newLeads' ? newLeadsCount : undefined}
-              onPrefetch={prefetchRoute}
-            />
-          ))}
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="admin-bottom-nav-item admin-bottom-nav-item--idle"
-          >
-            <span className="admin-bottom-nav-icon-wrap">⋯</span>
-            <span className="admin-bottom-nav-label">Més</span>
-          </button>
-        </div>
-      </nav>
-      <FloatingAddButton />
-      <AdminSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       </div>
-    </>
+    </ToastProvider>
   );
 }
-

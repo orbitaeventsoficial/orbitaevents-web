@@ -1209,6 +1209,26 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 
 **MÉS ENDAVANT**: tractar com a backlog viu — quan un ítem es tanca, marcar `FET` amb cita al canvi corresponent; quan apareix una nova mancança detectada per ús real, afegir-la mantenint la nomenclatura A-G + tag `[BLOC]/[BÀSIC]/[USP]`.
 
+## 6.19 Reconstrucció Admin (Frankenstein) — migració lab → admin real
+**CONTEXT**: L'admin existent (`/admin`) és un sistema sense ús en producció. Es pot descomposar i reconstruir sense risc de trencament per a usuaris reals. El disseny del nou admin viu ja llest a `/studio-lab`. La decisió és substituir l'admin sencer amb el disseny del lab, pàgina per pàgina, de forma controlada.
+**DIRECTRIUS IRRENUNCIABLES** *(dictades pel propietari — 2026-05-25)*:
+1. **Substitució integral**: el vell `/admin` queda expirat pàgina a pàgina. No hi ha convivència permanent entre el disseny old i el nou — cada pàgina migrada substitueix la seva predecessor i no existeix un estat híbrid a mig camí.
+2. **Frankenstein, no reescriptura**: els serveis de backend (`lib/services/*`), les API routes (`app/api/admin/*`), els guards i els tests existents es conserven. Canvia ÚNICAMENT la capa UI/pàgina. Cada pàgina nova crida els mateixos serveis i endpoints que usava la pàgina anterior — mai inventar serveis alternatius.
+3. **Peça a peça, tot auditat**: cada migració és un canvi numerat independent. Una pàgina es pot tancar com a "migrada" (`🟢`) ÚNICAMENT si s'han superat les tres capes de validació:
+   - **Tècnica**: `pnpm run validate:core` + `pnpm build` verds; TypeScript sense errors; zero hex hardcoded; zero inline styles prohibits.
+   - **Funcional**: les dades reals carreguen sense error; tots els paths (llista, detall, empty state, error state) estan provats; els serveis existents reben i retornen correctament.
+   - **Humana/UX**: la pàgina és usable i no regressa funcionalitats que la vella pàgina tenia; el disseny Brass & Obsidian és consistent amb `/studio-lab`; responsive OK a 375px/tablet/desktop.
+4. **Inventari com a referència viva**: `docs/admin-inventari-pagines.md` és el document de control de la migració. Cada pàgina migrada passa de `🔴` a `🟢` en aquell document quan el canvi numerat la tanca. Cap pàgina es pot marcar `🟢` sense el canvi corresponent al §9.
+5. **Ordre de migració**: seguir les fases de `docs/admin-inventari-pagines.md` — Fase 1 (nucli comercial) primer, sistema al final. Desviació de l'ordre requereix justificació explícita.
+6. **Zero promeses incompletes**: no es pot presentar una pàgina com a "migrada" si queda algun path o funcionalitat que la vella tenia i la nova no. Si una feature no arriba al canvi, s'anota explícitament com a `PENDENT` al diari i al §9.
+
+**ESTAT**:
+- `FET` *(2026-05-25 — Canvi #780)*: `seasonCalendarService` — servei pur de calendari de temporada + 13 tests.
+- `FET` *(2026-05-25 — Canvi #781)*: nova shell admin Brass & Obsidian — `app/admin/layout.tsx` reescrit (936→170 línies) + `app/admin/admin-shell.css` (tokens + navegació per grups + botó + peu).
+- `PENDENT` — Leads (`/admin/leads`): substitució de la pàgina de contingut per la versió Brass & Obsidian amb dades reals (Canvi #782, primer ítem de Fase 1).
+
+**REFERÈNCIA**: `docs/admin-inventari-pagines.md` (inventari + ordre de migració + semàfor d'estat per pàgina).
+
 ## Fase 1 — Consolidació del nucli (actual)
 - `Task` com a veritat canònica: pràcticament tancat, pendent de desplegar migració i netejar aliases legacy.
 - `timeline` canònica de lectura: avançada, pendent decidir Inbox/Comms i frontera timeline operativa vs log tècnic.
@@ -1292,6 +1312,20 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+### Canvi #781 — 2026-05-25 — claude (FET)
+
+**Shell admin Brass & Obsidian — extirpació del layout vell i nova carcassa.**
+- `app/admin/admin-shell.css` (NOU): tokens Obsidiana càlida (`--ax-canvas`, `--ax-panel`, `--ax-gold`), esquelet `.ax--side`, sidebar amb grups (Comercial/Operació/Economia/Màrqueting/Sistema), botó "Nova entrada" de vora de llautó, peu amb xip `#ADMIN_CHANGE_COUNTER`, responsive 900px.
+- `app/admin/layout.tsx` (REESCRIT): de 936 línies a ~170. Elimina: `AdminHelpOverlay`, `AdminSearchModal`, `FloatingAddButton`, `useAdminAlerts`, CSS dinàmic, assets de marca, konami, badges, nav mòbil inferior. Conserva: `AdminHelpModeProvider`, `ToastProvider`, `useCsrfFetch()`, `admin-mode`+`scroll-unlocked`, service worker.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `781`.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `781`; el següent canvi real ha de ser `#782`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: navegació per grups sincronitzada amb pathname; botó "Nova entrada" actiu; xip de canvi correcte; pàgines admin existents segueixen funcionant (admin-theme.css importat).
+- Validació humana/UX: shell Brass & Obsidian — obsidiana càlida, vora de llautó, or corporatiu — consistent amb studio-lab. Soroll eliminat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #780 — 2026-05-25 — claude (FET)
 
