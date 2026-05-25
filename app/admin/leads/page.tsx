@@ -1,653 +1,401 @@
-import { prisma } from '@/lib/prisma';
-import { log } from '@/lib/logger';
-import { cachedQuery, CacheTTL } from '@/lib/query-cache';
-import Link from 'next/link';
-import type { CSSProperties } from 'react';
-import { buildLeadCustomerContinuityTarget } from '@/lib/admin/leadCustomerHref';
-import { buildLeadComposeHref, buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
-import { buildBookingHref } from '@/lib/admin/bookingWorkspaceHref';
-import { AdminPage } from '../components/AdminPage';
-import { AdminHelpPanel } from '../components/AdminHelpPanel';
-import LeadActions from './LeadActions';
-import LeadLostReasonBadge from './LeadLostReasonBadge';
-import LeadQuickPriority from './LeadQuickPriority';
-import LeadQuickStatus from './LeadQuickStatus';
-import LeadViewToggle from './LeadViewToggle';
-import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
-import { getLeadPriorityColorDisplay, getLeadStatusColorDisplay, LEAD_COLOR_DEFAULT_VARS } from './colorTheme';
-import ExportCsvButton from '../components/ExportCsvButton';
-import PipelineSuggestionsPanel from './PipelineSuggestionsPanel';
-import { OwnerControlStrip } from '../components/OwnerControlStrip';
-import { buildLeadOwnerControlSummary } from '@/lib/services/leadOwnerControlSummaryService';
+'use client';
 
-export const dynamic = 'force-dynamic';
+/* ============================================================================
+   ÒRBITA ADMIN — Leads · Temporada (Brass & Obsidian)
+   ----------------------------------------------------------------------------
+   Pàgina de leads migrada al nou sistema visual. Canvi #782.
+   Estat: MOSTRA · dades de mostra, funcions reals pendents d'inventari.
+   Referència de disseny: /studio-lab/leads
+   Inventari de funcions: docs/admin-leads-funcions-inventari.md
+============================================================================ */
 
-export const metadata = {
-  title: 'Entrades | Òrbita Admin',
+import type { CSSProperties, ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import './leads-design.css';
+
+type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
+type ViewMode = 'calendari' | 'pipeline';
+type WxKind = 'sun' | 'partly' | 'cloud' | 'rain' | 'storm';
+type Wx = { kind: WxKind; tmax: number; tmin: number };
+
+type Lead = {
+  id: string; name: string; type: string; dateISO: string; time: string; location: string; pax: number; product: string; value: number;
+  stage: Stage; channel: string; owner: string; last: string; wx: Wx;
 };
 
-import { EVENT_TYPE_VALUES, LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES, PRIORITY_VALUES, formatDateShort, formatDate, getEventLabel, getSourceDisplay } from '@/lib/constants';
+const STAGE_LABEL: Record<Stage, string> = {
+  nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
+};
+const PIPELINE_STAGES: Stage[] = ['nou', 'contactat', 'guanyat', 'perdut'];
+const PROB: Record<Stage, number> = { nou: 20, contactat: 55, guanyat: 100, perdut: 0 };
+const WX_LABEL: Record<WxKind, string> = { sun: 'Sol', partly: 'Mig sol', cloud: 'Núvols', rain: 'Pluja', storm: 'Tempesta' };
 
+const YEAR = 2026;
+const MONTH_WINDOW = 3;
+const MONTH_MAX_START = 12 - MONTH_WINDOW + 1;
+const MONTHS_FULL = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+const MONTHS_SHORT = ['gen', 'feb', 'març', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'des'];
 
-function buildQuery(filters: {
-  status: string[];
-  priority: string[];
-  eventType: string[];
-  source: string[];
-  q: string;
-  from: Date | null;
-  to: Date | null;
-  includeLost?: boolean;
-}) {
-  const params = new URLSearchParams();
-  filters.status.forEach((value) => params.append('status', value));
-  filters.priority.forEach((value) => params.append('priority', value));
-  filters.eventType.forEach((value) => params.append('eventType', value));
-  filters.source.forEach((value) => params.append('source', value));
-  if (filters.q) params.set('q', filters.q);
-  if (filters.from) params.set('from', filters.from.toISOString().slice(0, 10));
-  if (filters.to) params.set('to', filters.to.toISOString().slice(0, 10));
-  if (filters.includeLost) params.set('includeLost', '1');
-  return params.toString();
+/* Dades de mostra — es substituiran per dades reals (veure inventari) */
+const LEADS: Lead[] = [
+  { id: 'l1', name: 'Laia i Nil', type: 'Boda', dateISO: '2026-06-13', time: '18:30', location: 'Vic', pax: 120, product: 'Boda Premium', value: 2490, stage: 'contactat', channel: 'WhatsApp', owner: 'Aina', last: 'fa 4 dies', wx: { kind: 'partly', tmax: 24, tmin: 15 } },
+  { id: 'l2', name: 'Atlas Group', type: 'Empresa', dateISO: '2026-06-20', time: '20:00', location: 'Barcelona', pax: 85, product: 'DJ + so corporatiu', value: 3200, stage: 'contactat', channel: 'Web', owner: 'Marc', last: 'fa 2 dies', wx: { kind: 'sun', tmax: 27, tmin: 16 } },
+  { id: 'l3', name: 'Aniversari Pol', type: 'Festa', dateISO: '2026-06-27', time: '17:00', location: 'Granollers', pax: 35, product: 'Pack Festa', value: 600, stage: 'guanyat', channel: 'Instagram', owner: 'Marc', last: 'avui', wx: { kind: 'sun', tmax: 29, tmin: 18 } },
+  { id: 'l4', name: 'Tech Nova SL', type: 'Empresa', dateISO: '2026-07-04', time: '19:30', location: 'Girona', pax: 140, product: 'Esdeveniment empresa', value: 4100, stage: 'guanyat', channel: 'Referència', owner: 'Aina', last: 'fa 3 dies', wx: { kind: 'partly', tmax: 28, tmin: 19 } },
+  { id: 'l5', name: 'Júlia & Pau', type: 'Boda', dateISO: '2026-07-11', time: '18:00', location: 'Sta. Coloma', pax: 110, product: 'Boda Essencial', value: 2750, stage: 'nou', channel: 'Web', owner: 'Marc', last: 'fa 1 dia', wx: { kind: 'sun', tmax: 31, tmin: 20 } },
+  { id: 'l6', name: 'Gala Vermut', type: 'Empresa', dateISO: '2026-07-17', time: '13:00', location: 'Sabadell', pax: 70, product: 'Vermut musical', value: 1500, stage: 'nou', channel: 'Email', owner: 'Aina', last: 'fa 5 dies', wx: { kind: 'cloud', tmax: 26, tmin: 19 } },
+  { id: 'l7', name: 'Ajuntament Vic', type: 'Festa major', dateISO: '2026-08-01', time: '22:30', location: 'Vic', pax: 450, product: 'Escenari + DJ', value: 5600, stage: 'contactat', channel: 'Email', owner: 'Aina', last: 'fa 8 dies', wx: { kind: 'sun', tmax: 33, tmin: 21 } },
+  { id: 'l8', name: 'Bodes del Mar', type: 'Boda', dateISO: '2026-08-08', time: '19:00', location: 'Sitges', pax: 160, product: 'Boda Premium', value: 3300, stage: 'guanyat', channel: 'Web', owner: 'Marc', last: 'fa 1 dia', wx: { kind: 'rain', tmax: 23, tmin: 18 } },
+  { id: 'l9', name: 'Festa privada BCN', type: 'Discomòbil', dateISO: '2026-08-16', time: '23:00', location: 'Barcelona', pax: 55, product: 'Discomòbil', value: 700, stage: 'perdut', channel: 'WhatsApp', owner: 'Marc', last: 'fa 20 dies', wx: { kind: 'storm', tmax: 25, tmin: 19 } },
+];
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+function euro(n: number): string { return `${n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} €`; }
+function parseISO(iso: string) { const [y, m, d] = iso.split('-').map(Number); return { y, m, d }; }
+function isoDate(y: number, m: number, d: number) { return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+function shiftIso(iso: string, days: number) { const { y, m, d } = parseISO(iso); const t = new Date(Date.UTC(y, m - 1, d + days)); return isoDate(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()); }
+function saturdaysInMonth(y: number, m: number) { const last = new Date(Date.UTC(y, m, 0)).getUTCDate(); const out: string[] = []; for (let d = 1; d <= last; d++) if (new Date(Date.UTC(y, m - 1, d)).getUTCDay() === 6) out.push(isoDate(y, m, d)); return out; }
+function fullDate(iso: string) { const { y, m, d } = parseISO(iso); return `${d} de ${MONTHS_FULL[m - 1].toLowerCase()} ${y}`; }
+function leadSummary(lead: Lead) {
+  if (lead.stage === 'nou') return `Entrat per ${lead.channel}. Cal primer contacte.`;
+  if (lead.stage === 'contactat') return `Seguiment amb ${lead.owner}. Últim contacte: ${lead.last}.`;
+  if (lead.stage === 'guanyat') return 'Crear reserva, contracte i pagament inicial.';
+  return 'Arxivat com a perdut. Revisar motiu i possible reactivació.';
 }
 
-
-function isLeadStatus(value: string): value is LeadStatus {
-  return (LEAD_STATUS_VALUES as readonly string[]).includes(value);
-}
-
-function isPriority(value: string): value is Priority {
-  return (PRIORITY_VALUES as readonly string[]).includes(value);
-}
-
-function isEventType(value: string): value is EventType {
-  return (EVENT_TYPE_VALUES as readonly string[]).includes(value);
-}
-
-function isLeadSource(value: string): value is LeadSource {
-  return (LEAD_SOURCE_VALUES as readonly string[]).includes(value);
-}
-
-function toArray(value?: string | string[]): string[] {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function parseDate(value?: string) {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-type LeadFilters = {
-  status: LeadStatus[];
-  priority: Priority[];
-  eventType: EventType[];
-  source: LeadSource[];
-  q: string;
-  from: Date | null;
-  to: Date | null;
-  includeLost: boolean;
+/* ── Icones ──────────────────────────────────────────────────────────────── */
+const ic = (d: ReactNode) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>
+);
+const I = {
+  search: ic(<><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></>),
+  plus:   ic(<><path d="M12 5v14M5 12h14" /></>),
+  arrow:  ic(<path d="M5 12h14M13 6l6 6-6 6" />),
+  back:   ic(<path d="M19 12H5M11 6l-6 6 6 6" />),
+  chevron: ic(<path d="M6 9l6 6 6-6" />),
+  whats:  ic(<path d="M4 20l1.5-4A8 8 0 1 1 9 19z" />),
+  mail:   ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>),
+  dots:   ic(<><circle cx="5" cy="12" r="1.4" /><circle cx="12" cy="12" r="1.4" /><circle cx="19" cy="12" r="1.4" /></>),
+};
+const WX_ICON: Record<WxKind, ReactNode> = {
+  sun:    ic(<><circle cx="12" cy="12" r="4.2" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" /></>),
+  partly: ic(<><circle cx="8" cy="8" r="3" /><path d="M8 1.5v2M1.5 8h2M3.6 3.6l1.4 1.4M12.4 3.6 11 5" /><path d="M7 18h9a3.5 3.5 0 0 0 .2-7 5 5 0 0 0-9.4 1.2A3.4 3.4 0 0 0 7 18z" /></>),
+  cloud:  ic(<path d="M7 18h10a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.5 1.4A3.7 3.7 0 0 0 7 18z" />),
+  rain:   ic(<><path d="M7 14h10a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.5 1.4A3.7 3.7 0 0 0 7 14z" /><path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5" /></>),
+  storm:  ic(<><path d="M7 13h10a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.5 1.4A3.7 3.7 0 0 0 7 13z" /><path d="M13 14l-3 4h3l-1 3.5" /></>),
 };
 
-type Pagination = {
-  page: number;
-  pageSize: number;
-  totalPages: number;
-};
-
-function getPendingTimeBadge(createdAt: Date, status: LeadStatus) {
-  if (status === 'WON' || status === 'LOST') {
-    return { label: 'Tancat', className: '' };
-  }
-
-  const hours = Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60));
-  if (hours >= 24) {
-    return { label: `${hours}h (urgent)`, className: '' };
-  }
-  if (hours >= 8) {
-    return { label: `${hours}h (aviat)`, className: '' };
-  }
-  return { label: `${Math.max(0, hours)}h (controlat)`, className: '' };
-}
-
-async function getLeads(filters: {
-  status?: string | string[];
-  priority?: string | string[];
-  eventType?: string | string[];
-  source?: string | string[];
-  q?: string;
-  from?: string;
-  to?: string;
-  page?: string;
-  includeLost?: string;
-}) {
-  try {
-    const status = toArray(filters.status).filter(isLeadStatus);
-    const priority = toArray(filters.priority).filter(isPriority);
-    const eventType = toArray(filters.eventType).filter(isEventType);
-    const source = toArray(filters.source).filter(isLeadSource);
-    const from = parseDate(filters.from);
-    const to = parseDate(filters.to);
-    const pageRaw = Number.parseInt(filters.page || '1', 10);
-    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
-    const pageSize = 25;
-    // Per defecte amaga els LOST per evitar soroll visual; si l'usuari filtra explícitament
-    // per status=LOST o demana includeLost=1, els mostrem.
-    const includeLost = filters.includeLost === '1' || status.includes('LOST');
-
-    const where: Prisma.LeadWhereInput = {
-      ...(status.length ? { status: { in: status } } : {}),
-      ...(!status.length && !includeLost ? { status: { not: 'LOST' } } : {}),
-      ...(priority.length ? { priority: { in: priority } } : {}),
-      ...(eventType.length ? { eventType: { in: eventType } } : {}),
-      ...(source.length ? { source: { in: source } } : {}),
-      ...(filters.q
-        ? {
-            OR: [
-              { name: { contains: filters.q, mode: 'insensitive' as const } },
-              { email: { contains: filters.q, mode: 'insensitive' as const } },
-              { phone: { contains: filters.q } },
-            ],
-          }
-        : {}),
-      ...(from || to
-        ? {
-            eventDate: {
-              ...(from ? { gte: from } : {}),
-              ...(to ? { lte: to } : {}),
-            },
-          }
-        : {}),
-    };
-
-    const cacheKey = [
-      'admin:leads',
-      `status=${status.join(',') || 'all'}`,
-      `priority=${priority.join(',') || 'all'}`,
-      `eventType=${eventType.join(',') || 'all'}`,
-      `source=${source.join(',') || 'all'}`,
-      `q=${filters.q || ''}`,
-      `from=${from ? from.toISOString().slice(0, 10) : ''}`,
-      `to=${to ? to.toISOString().slice(0, 10) : ''}`,
-      `page=${page}`,
-      `size=${pageSize}`,
-    ].join('|');
-
-    const [leads, filteredCount] = await cachedQuery(
-      cacheKey,
-      () => Promise.all([
-        prisma.lead.findMany({
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            eventType: true,
-            eventDate: true,
-            createdAt: true,
-            status: true,
-            lostReason: true,
-            priority: true,
-            source: true,
-            customerId: true,
-            _count: {
-              select: {
-                notes: true,
-              },
-            },
-            booking: {
-              select: {
-                id: true,
-                reference: true,
-              },
-            },
-          },
-        }),
-        prisma.lead.count({ where }),
-      ]),
-      CacheTTL.VERY_SHORT
-    );
-
-    const normalizedFilters: LeadFilters = { status, priority, eventType, source, q: filters.q || '', from, to, includeLost };
-    return {
-      leads,
-      filters: normalizedFilters,
-      pagination: {
-        page,
-        pageSize,
-        totalPages: Math.max(1, Math.ceil(filteredCount / pageSize)),
-      } as Pagination,
-    };
-  } catch (e) {
-    log.error('Error obtenint leads:', e);
-    return {
-      leads: [],
-      filters: { status: [], priority: [], eventType: [], source: [], q: '', from: null, to: null, includeLost: false } as LeadFilters,
-      pagination: { page: 1, pageSize: 25, totalPages: 1 } as Pagination,
-    };
-  }
-}
-
-export default async function LeadsPage({
-  searchParams,
-}: {
-  searchParams?: {
-    status?: string | string[];
-    priority?: string | string[];
-    eventType?: string | string[];
-    source?: string | string[];
-    q?: string;
-    from?: string;
-    to?: string;
-    page?: string;
-    includeLost?: string;
-  };
-}) {
-  const { status, priority, eventType, source, q, from, to, page, includeLost } = searchParams || {};
-  const data = await getLeads({ status, priority, eventType, source, q, from, to, page, includeLost });
-  const leads = data.leads;
-  const currentQuery = buildQuery(data.filters);
-  const ownerSummary = buildLeadOwnerControlSummary(leads);
-
+/* ── Components visuals ──────────────────────────────────────────────────── */
+function WxBlock({ wx, size }: { wx: Wx; size: 'card' | 'hero' }) {
   return (
-    <AdminPage
-      className="admin-leads-page"
-      title="Entrades"
-      subtitle="Tauler comercial, seguiment i pipeline operatiu."
-      actions={<div className="flex gap-2">
-        <ExportCsvButton
-          filename="entrades"
-          headers={['Nom', 'Email', 'Telèfon', 'Tipus', 'Origen', 'Estat', 'Data event']}
-          rows={leads.map((l) => [
-            l.name,
-            l.email,
-            l.phone || '',
-            getEventLabel(l.eventType),
-            getSourceDisplay(l.source).label,
-            l.status,
-            l.eventDate ? formatDate(l.eventDate) : '',
-          ])}
-        />
-        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>
-      </div>}
-    >
-    <PipelineSuggestionsPanel />
-    <div
-      id="leads-theme-root"
-      className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
-      style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
-    >
-      <OwnerControlStrip
-        system={{
-          eyebrow: 'Automàtic',
-          title: 'Què vigila el sistema',
-          tone: 'info',
-          items: ownerSummary.automaticSignals,
-          emptyText: 'Sense senyals automàtiques destacades a la vista actual.',
-        }}
-        manual={{
-          eyebrow: 'Manual',
-          title: 'Què et reclama decisió',
-          tone: ownerSummary.manualSignals.length > 0 ? 'warning' : 'success',
-          items: ownerSummary.manualSignals,
-          emptyText: 'No hi ha cap front manual calent a les entrades visibles.',
-        }}
-        nextStep={{
-          title: ownerSummary.nextStep.label,
-          detail: ownerSummary.nextStep.detail,
-          href: ownerSummary.nextStep.href,
-        }}
-      />
-
-      <AdminHelpPanel
-        title="Com treballar entrades"
-        description="Aquesta és la porta comercial. Aquí veus quines oportunitats s han de respondre abans i com avançar-les cap a client o reserva."
-        items={[
-          {
-            title: 'Temps pendent',
-            body: 'T ajuda a no deixar refredar una oportunitat important.',
-          },
-          {
-            title: 'Pipeline',
-            body: 'El pipeline va bé per moure oportunitats. La llista va millor per revisar detall.',
-          },
-          {
-            title: 'Connexions',
-            body: 'Si una entrada ja està lligada a un client o una reserva, ho tens a un clic.',
-          },
-        ]}
-      />
-
-      <section className="admin-leads-switcher rounded-2xl border p-2">
-        <div className="grid grid-cols-2 gap-2">
-          <Link
-            href="/admin/leads"
-            aria-current="page"
-            className="admin-keep-colors admin-leads-tab admin-leads-tab--active rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
-          >
-            Tauler Leads
-          </Link>
-          <Link
-            href="/admin/intake"
-            className="admin-keep-colors admin-leads-tab admin-leads-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
-          >
-            Entrada ràpida
-          </Link>
-        </div>
-      </section>
-
-      <section className="flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-xs">
-        <span className="text-white/60">Vista:</span>
-        {data.filters.includeLost ? (
-          <>
-            <span className="rounded-full bg-amber-500/20 border border-amber-400/30 px-2 py-0.5 text-amber-200">
-              Incloent perduts
-            </span>
-            <Link
-              href={(() => {
-                const params = new URLSearchParams(currentQuery);
-                params.delete('includeLost');
-                const qs = params.toString();
-                return qs ? `/admin/leads?${qs}` : '/admin/leads';
-              })()}
-              className="text-white/70 hover:text-white underline"
-            >
-              Amagar perduts
-            </Link>
-          </>
-        ) : (
-          <>
-            <span className="text-white/70">Per defecte amaguem leads perduts.</span>
-            <Link
-              href={(() => {
-                const params = new URLSearchParams(currentQuery);
-                params.set('includeLost', '1');
-                return `/admin/leads?${params.toString()}`;
-              })()}
-              className="text-amber-300 hover:text-amber-200 underline"
-            >
-              Mostrar també perduts
-            </Link>
-          </>
-        )}
-      </section>
-
-      <LeadViewToggle
-        pipelineFilters={{
-          status: data.filters.status,
-          priority: data.filters.priority,
-          eventType: data.filters.eventType,
-          source: data.filters.source,
-          q: data.filters.q,
-          from: data.filters.from ? data.filters.from.toISOString().slice(0, 10) : null,
-          to: data.filters.to ? data.filters.to.toISOString().slice(0, 10) : null,
-        }}
-      >
-
-      {/* Mobile Card View */}
-      <section className="admin-leads-mobile lg:hidden space-y-3">
-        {leads.length === 0 ? (
-          <div className="rounded-2xl border admin-card-glass p-8 text-center">
-            <span className="text-4xl">📭</span>
-            <p className="mt-2">Encara no hi ha entrades</p>
-            <p className="text-xs mt-1 admin-tone-text-slate">Les consultes del formulari web i altres canals apareixeran aquí automàticament.</p>
-          </div>
-        ) : (
-          leads.map((lead) => {
-            const statusConf = getLeadStatusColorDisplay(lead.status);
-            const eventType = getEventLabel(lead.eventType);
-            const continuityTarget = buildLeadCustomerContinuityTarget({
-              leadId: lead.id,
-              customerId: lead.customerId,
-            });
-
-            return (
-              <article
-                key={lead.id}
-                className="admin-leads-mobile-card rounded-2xl border p-4 transition-colors admin-card-glass"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-full border flex items-center justify-center font-semibold shrink-0">
-                      {lead.name?.charAt(0).toUpperCase() || '?'}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <Link href={buildLeadWorkspaceHref(lead.id)} className="font-medium truncate block">
-                        {lead.name}
-                      </Link>
-                      <p className="text-xs truncate">{lead.email}</p>
-                      <p className="text-[11px]">{getSourceDisplay(lead.source).label}</p>
-                    </div>
-                  </div>
-                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.badgeClass}`}>
-                    {statusConf.label}
-                  </span>
-                </div>
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <span>{eventType}</span>
-                  <span>
-                    {lead.eventDate
-                      ? formatDateShort(lead.eventDate)
-                      : 'Sense data'}
-                  </span>
-                </div>
-                <div className="mt-2">
-                  {(() => {
-                    const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
-                    return (
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${pending.className}`}>
-                        Temps pendent: {pending.label}
-                      </span>
-                    );
-                  })()}
-                </div>
-                {lead.status === 'LOST' && (
-                  <div className="mt-2">
-                    <LeadLostReasonBadge lostReason={lead.lostReason} />
-                  </div>
-                )}
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={buildLeadWorkspaceHref(lead.id)}
-                      className="rounded-xl border px-2 py-1 text-[11px] font-medium"
-                    >
-                      Obrir fitxa
-                    </Link>
-                    {lead.customerId && (
-                      <Link
-                        href={continuityTarget.href}
-                        title={continuityTarget.title}
-                        className="rounded-xl border px-2 py-1 text-[11px] font-medium"
-                      >
-                        {continuityTarget.label}
-                      </Link>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <LeadQuickPriority leadId={lead.id} currentPriority={lead.priority} />
-                    <LeadQuickStatus
-                      leadId={lead.id}
-                      currentStatus={lead.status}
-                    />
-                  </div>
-                </div>
-                {lead.booking && (
-                  <Link
-                    href={buildBookingHref(lead.booking.id)}
-                    className="mt-2 block text-xs font-medium hover:underline"
-                  >
-                    ✓ Reserva: {lead.booking.reference}
-                  </Link>
-                )}
-              </article>
-            );
-          })
-        )}
-      </section>
-
-      {/* Desktop Table View */}
-      <section className="admin-leads-table hidden lg:block rounded-2xl border p-0 overflow-hidden admin-card-glass">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1120px] text-sm" aria-label="Pipeline d'entrades">
-            <thead className="border-b">
-              <tr>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Client</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Contacte</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Tipus</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Origen</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Data</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Temps pendent</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Estat</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Prioritat</th>
-                <th scope="col" className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap overflow-hidden text-ellipsis">Accions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y admin-tone-border-subtle">
-              {leads.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl">📭</span>
-                      <p>Encara no hi ha entrades</p>
-                      <p className="text-xs admin-tone-text-slate">Les consultes del formulari web i altres canals apareixeran aquí automàticament.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                leads.map((lead) => {
-                  const statusConf = getLeadStatusColorDisplay(lead.status);
-                  const eventType = getEventLabel(lead.eventType);
-                  const priorityConf = getLeadPriorityColorDisplay(lead.priority);
-                  const continuityTarget = buildLeadCustomerContinuityTarget({
-                    leadId: lead.id,
-                    customerId: lead.customerId,
-                  });
-
-                  return (
-                    <tr key={lead.id} className="transition-colors hover:bg-white/[0.03]">
-                      <td className="px-3 xl:px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <Link href={buildLeadWorkspaceHref(lead.id)} className="font-medium whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[180px]">
-                            {lead.name}
-                          </Link>
-                          {lead.customerId && (
-                            <Link href={continuityTarget.href} className="text-[11px] font-semibold hover:underline" title={continuityTarget.title}>
-                              360
-                            </Link>
-                          )}
-                        </div>
-                        {lead.booking && (
-                          <Link href={buildBookingHref(lead.booking.id)} className="text-xs hover:underline block text-center">
-                            ✓ {lead.booking.reference}
-                          </Link>
-                        )}
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-center">
-                        <Link href={buildLeadComposeHref(lead.id)} className="hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
-                          {lead.email}
-                        </Link>
-                        {lead.phone && (
-                          <a href={`tel:${lead.phone}`} className="text-xs whitespace-nowrap overflow-hidden text-ellipsis inline-block max-w-[220px]">📱 {lead.phone}</a>
-                        )}
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{eventType}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">{getSourceDisplay(lead.source).label}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap overflow-hidden text-ellipsis text-center">
-                        {lead.eventDate
-                          ? formatDate(lead.eventDate)
-                          : '—'}
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-center">
-                        {(() => {
-                          const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
-                          return (
-                            <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${pending.className}`}>
-                              {pending.label}
-                            </span>
-                          );
-                        })()}
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-center">
-                        <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${statusConf.badgeClass}`}>
-                          {statusConf.label}
-                        </span>
-                        {lead.status === 'LOST' && (
-                          <div className="mt-1">
-                            <LeadLostReasonBadge lostReason={lead.lostReason} />
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-center">
-                        <span className={`inline-flex whitespace-nowrap overflow-hidden text-ellipsis rounded-full px-2 py-0.5 text-xs font-medium max-w-[140px] ${priorityConf.badgeClass}`}>
-                          {priorityConf.label}
-                        </span>
-                      </td>
-                      <td className="px-3 xl:px-4 py-3 text-center whitespace-nowrap overflow-hidden text-ellipsis">
-                        <LeadActions
-                          leadId={lead.id}
-                          leadName={lead.name}
-                          phone={lead.phone}
-                          hasBooking={!!lead.booking}
-                          currentStatus={lead.status}
-                          currentPriority={lead.priority}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {data.pagination.totalPages > 1 && (
-        <section className="admin-leads-pagination ap-card flex items-center justify-between rounded-2xl p-3 text-xs">
-          <span>
-            Pàgina {data.pagination.page} de {data.pagination.totalPages}
-          </span>
-          <div className="flex items-center gap-2">
-            {data.pagination.page > 1 ? (
-              <Link
-                href={`/admin/leads?${(() => {
-                  const params = new URLSearchParams(currentQuery);
-                  params.set('page', String(data.pagination.page - 1));
-                  return params.toString();
-                })()}`}
-                className="ap-btn ap-btn--secondary px-3 py-1 text-xs"
-              >
-                ← Anterior
-              </Link>
-            ) : (
-              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">← Anterior</span>
-            )}
-            {data.pagination.page < data.pagination.totalPages ? (
-              <Link
-                href={`/admin/leads?${(() => {
-                  const params = new URLSearchParams(currentQuery);
-                  params.set('page', String(data.pagination.page + 1));
-                  return params.toString();
-                })()}`}
-                className="rounded-xl border px-3 py-1"
-              >
-                Següent →
-              </Link>
-            ) : (
-              <span className="ap-btn ap-btn--secondary px-3 py-1 text-xs opacity-50">Següent →</span>
-            )}
-          </div>
-        </section>
-      )}
-
-      </LeadViewToggle>
+    <div className={`wx wx--${size}`} title={`Previsió: ${WX_LABEL[wx.kind]}`}>
+      <span className="wx__ic" data-wx={wx.kind}>{WX_ICON[wx.kind]}</span>
+      <span className="wx__t"><b>{wx.tmax}°</b><i>{wx.tmin}°</i></span>
+      <span className="wx__lab">{WX_LABEL[wx.kind]}</span>
     </div>
-    </AdminPage>
   );
 }
 
+/* ── Fitxa sencera d'un lead ─────────────────────────────────────────────── */
+function LeadPage({ lead, onBack }: { lead: Lead; onBack: () => void }) {
+  const prob = PROB[lead.stage];
+  const margin = Math.round(lead.value * 0.42);
+  const flowIdx = PIPELINE_STAGES.indexOf(lead.stage);
+  const primaryLabel = lead.stage === 'nou'
+    ? 'Passa a contactat'
+    : lead.stage === 'contactat'
+      ? 'Passa a guanyat'
+      : lead.stage === 'guanyat'
+        ? 'Crear reserva'
+        : 'Reactiva a nou';
+
+  return (
+    <div className="lp2" data-stage={lead.stage}>
+      <div className="lp2__bar">
+        <button type="button" className="lp2__back" onClick={onBack}><span className="lp2__backic">{I.back}</span>Torna</button>
+        <span className="lp2__crumb">Comercial <em>/</em> Temporada <em>/</em> {lead.name}</span>
+      </div>
+
+      <div className="lp2__layout">
+        <section className="lp2__main">
+          <div className="lp2__hero">
+            <div className="lp2__id">
+              <span className="lp2__kicker" data-stage={lead.stage}>{STAGE_LABEL[lead.stage]} · {lead.type}</span>
+              <h1 className="lp2__name">{lead.name}</h1>
+              <span className="lp2__meta">{fullDate(lead.dateISO)} · {lead.time} · {lead.location}</span>
+            </div>
+            <WxBlock wx={lead.wx} size="hero" />
+          </div>
+
+          <div className="lp2__stats" aria-label="Resum del lead">
+            <div className="lp2__stat"><span>Valor estimat</span><b>{euro(lead.value)}</b></div>
+            <div className="lp2__stat"><span>Probabilitat</span><b>{prob}%</b></div>
+            <div className="lp2__stat"><span>Marge est.</span><b>{euro(margin)}</b></div>
+            <div className="lp2__stat"><span>Pax</span><b>{lead.pax}</b></div>
+          </div>
+
+          <section className="lp2__panel lp2__panel--details">
+            <h2 className="lp2__h">Dades clau</h2>
+            <dl className="lp2__data">
+              <div><dt>Contacte</dt><dd>{lead.name}</dd></div>
+              <div><dt>Producte</dt><dd>{lead.product}</dd></div>
+              <div><dt>Canal</dt><dd>{lead.channel}</dd></div>
+              <div><dt>Propietari</dt><dd>{lead.owner}</dd></div>
+              <div><dt>Data</dt><dd>{fullDate(lead.dateISO)}</dd></div>
+              <div><dt>Hora</dt><dd>{lead.time}</dd></div>
+              <div><dt>Lloc</dt><dd>{lead.location}</dd></div>
+              <div><dt>Últim contacte</dt><dd>{lead.last}</dd></div>
+            </dl>
+          </section>
+
+          <section className="lp2__panel lp2__panel--wide">
+            <h2 className="lp2__h">Activitat</h2>
+            <div className="lp2__time">
+              <div className="lp2__ev"><span className="lp2__evdot" data-stage={lead.stage} /><div><b>Pressupost enviat</b><span>{lead.last} · {lead.owner}</span></div></div>
+              <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Trucada de seguiment</b><span>fa 5 dies · {lead.owner}</span></div></div>
+              <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Entrada des de {lead.channel}</b><span>fa 8 dies · automàtic</span></div></div>
+            </div>
+          </section>
+        </section>
+
+        <aside className="lp2__decision">
+          <section className="lp2__panel lp2__panel--action">
+            <span className="lp2__kicker">Accions</span>
+            <h2 className="lp2__actiontitle">Què ha passat?</h2>
+            <p>{leadSummary(lead)}</p>
+            <div className="lp2__quickacts" aria-label="Registrar activitat">
+              <button type="button"><span className="lp2__quickic">{I.whats}</span>Enviar WhatsApp</button>
+              <button type="button"><span className="lp2__quickic">{I.mail}</span>Enviar correu</button>
+              <button type="button"><span className="lp2__quickic">{I.whats}</span>Trucada feta</button>
+              <button type="button"><span className="lp2__quickic">{I.mail}</span>Pressupost enviat</button>
+              <button type="button"><span className="lp2__quickic">{I.dots}</span>Afegir nota</button>
+            </div>
+          </section>
+
+          <section className="lp2__panel">
+            <h2 className="lp2__h">Canviar estat</h2>
+            <div className="lp2__stagepick" role="group" aria-label="Canviar estat del lead">
+              {PIPELINE_STAGES.map((s, i) => (
+                <button type="button" key={s} className={`lp2__stagebtn${lead.stage !== 'perdut' && s !== 'perdut' && i < flowIdx ? ' is-done' : ''}${i === flowIdx ? ' is-now' : ''}`} data-stage={s} aria-pressed={i === flowIdx}>
+                  <span className="lp2__dot" />
+                  <span className="lp2__steplabel">{STAGE_LABEL[s]}</span>
+                </button>
+              ))}
+            </div>
+            <button type="button" className="lp2__commit">{primaryLabel} <span className="lp2__goic">{I.arrow}</span></button>
+          </section>
+
+          <section className="lp2__panel">
+            <h2 className="lp2__h">Previsió</h2>
+            <WxBlock wx={lead.wx} size="card" />
+            <dl className="lp2__rows lp2__rows--compact">
+              <div><dt>Temps</dt><dd>{WX_LABEL[lead.wx.kind]}</dd></div>
+              <div><dt>Màxima</dt><dd>{lead.wx.tmax}°</dd></div>
+              <div><dt>Mínima</dt><dd>{lead.wx.tmin}°</dd></div>
+            </dl>
+          </section>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+/* ── Pàgina de temporada (calendari / pipeline) ──────────────────────────── */
+type MonthBlock = {
+  m: number; label: string;
+  weekends: { sat: string; days: { iso: string; d: number; inMonth: boolean; lead: Lead | null }[] }[];
+};
+
+function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setMonthStart, visibleMonths }: {
+  viewMode: ViewMode; setViewMode: (v: ViewMode) => void; months: MonthBlock[]; onOpen: (id: string) => void;
+  monthStart: number; setMonthStart: (n: number) => void; visibleMonths: number[];
+}) {
+  const goPrev = () => setMonthStart(Math.max(1, monthStart - 1));
+  const goNext = () => setMonthStart(Math.min(MONTH_MAX_START, monthStart + 1));
+  const jump = (m: number) => setMonthStart(Math.min(MONTH_MAX_START, Math.max(1, m)));
+
+  const focusQueue = useMemo(() => LEADS.filter((l) => l.stage !== 'perdut').slice().sort((a, b) => a.dateISO.localeCompare(b.dateISO)), []);
+  const [focusId, setFocusId] = useState(focusQueue[0]?.id ?? LEADS[0].id);
+  const focus = LEADS.find((l) => l.id === focusId) ?? focusQueue[0];
+  const focusPos = focusQueue.findIndex((l) => l.id === focusId);
+  const cycleFocus = (dir: number) => {
+    if (focusQueue.length === 0) return;
+    const base = focusPos < 0 ? 0 : focusPos;
+    setFocusId(focusQueue[(base + dir + focusQueue.length) % focusQueue.length].id);
+  };
+
+  const totalValue = LEADS.reduce((sum, l) => sum + l.value, 0);
+  const openValue = LEADS.filter((l) => l.stage === 'nou' || l.stage === 'contactat').reduce((sum, l) => sum + l.value, 0);
+  const wonValue = LEADS.filter((l) => l.stage === 'guanyat').reduce((sum, l) => sum + l.value, 0);
+  const bookedWeekends = LEADS.filter((l) => l.stage !== 'perdut').length;
+
+  return (
+    <>
+      <div className="fx__pagehead">
+        <div className="fx__tt">
+          <span className="fx__eyebrow">Temporada {YEAR}</span>
+          <h1 className="fx__h1">Caps de setmana</h1>
+        </div>
+        <div className="fx__headright">
+          <span className="fx__sub">{MONTHS_SHORT[visibleMonths[0] - 1]} – {MONTHS_SHORT[visibleMonths[visibleMonths.length - 1] - 1]} {YEAR} · caps de setmana</span>
+          <div className="fx__view" role="group" aria-label="Vista">
+            <button type="button" className={viewMode === 'calendari' ? 'is-on' : ''} aria-pressed={viewMode === 'calendari'} onClick={() => setViewMode('calendari')}>Calendari</button>
+            <button type="button" className={viewMode === 'pipeline' ? 'is-on' : ''} aria-pressed={viewMode === 'pipeline'} onClick={() => setViewMode('pipeline')}>Pipeline</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="fx__focus" data-stage={focus.stage}>
+        <div className="fx__focushead">
+          <span className="fx__focuseyebrow"><span className="fx__hintdot" aria-hidden="true" />Focus · la decisió que toca ara</span>
+          <div className="fx__focuscycle">
+            <button type="button" aria-label="Decisió anterior" onClick={() => cycleFocus(-1)}>{I.back}</button>
+            <span>{focusPos < 0 ? '–' : focusPos + 1} / {focusQueue.length}</span>
+            <button type="button" aria-label="Decisió següent" onClick={() => cycleFocus(1)}>{I.arrow}</button>
+          </div>
+        </div>
+        <div className="fx__focusbody">
+          <button type="button" className="fx__focusmain" onClick={() => onOpen(focus.id)}>
+            <span className="fx__focusmeta"><span className="fx__dot" data-stage={focus.stage} aria-hidden="true" />{focus.type} · {fullDate(focus.dateISO)} · {focus.location} · {focus.pax} pax</span>
+            <span className="fx__focusname">{focus.name}</span>
+            <span className="fx__focusnote">{leadSummary(focus)}</span>
+          </button>
+          <div className="fx__focusside">
+            <div className="fx__focusval"><span>Valor</span><b>{euro(focus.value)}</b></div>
+            <div className="fx__ring" style={{ '--p': PROB[focus.stage] } as CSSProperties} aria-label={`Probabilitat ${PROB[focus.stage]}%`}><span>{PROB[focus.stage]}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="fx__metrics" aria-label="Resum comercial">
+        <div className="fx__metric">
+          <span>Entrades</span>
+          <b>{LEADS.length}</b>
+          <small>{bookedWeekends} caps de setmana actius</small>
+        </div>
+        <div className="fx__metric">
+          <span>Pipeline obert</span>
+          <b>{euro(openValue)}</b>
+          <small>Nou + contactat</small>
+        </div>
+        <div className="fx__metric">
+          <span>Guanyat</span>
+          <b>{euro(wonValue)}</b>
+          <small>{LEADS.filter((l) => l.stage === 'guanyat').length} reserves per activar</small>
+        </div>
+        <div className="fx__metric">
+          <span>Valor temporada</span>
+          <b>{euro(totalValue)}</b>
+          <small>temporada {YEAR}</small>
+        </div>
+      </div>
+
+      <div className="fx__content">
+        {viewMode === 'calendari' ? (
+          <>
+            <div className="fx__calbar">
+              <button type="button" className="fx__calnav" onClick={goPrev} disabled={monthStart <= 1} aria-label="Mesos anteriors">{I.back}</button>
+              <div className="fx__calmonths" role="group" aria-label="Selector de mesos">
+                {MONTHS_SHORT.map((ms, i) => {
+                  const m = i + 1;
+                  const on = visibleMonths.includes(m);
+                  return <button key={ms} type="button" className={`fx__calchip${on ? ' is-on' : ''}`} aria-pressed={on} onClick={() => jump(m)}>{ms}</button>;
+                })}
+              </div>
+              <button type="button" className="fx__calnav" onClick={goNext} disabled={monthStart >= MONTH_MAX_START} aria-label="Mesos següents">{I.arrow}</button>
+            </div>
+            <div className="fx__cal">
+              {months.map((month) => {
+                const monthLeads = month.weekends.reduce((n, w) => n + w.days.filter((d) => d.lead && d.inMonth).length, 0);
+                return (
+                  <article className="fx__mon" key={month.m}>
+                    <div className="fx__monhead">
+                      <h2>{month.label}</h2>
+                      <span className="fx__monmeta">
+                        <span className="fx__moncount">{monthLeads} {monthLeads === 1 ? 'bolo' : 'bolos'}</span>
+                      </span>
+                    </div>
+                    <div className="fx__weekhead">
+                      <span className="fx__gh">Dv</span><span className="fx__gh">Ds</span><span className="fx__gh">Dg</span>
+                    </div>
+                    <div className="fx__grid">
+                      {month.weekends.map((w) => w.days.map((d) => {
+                        const l = d.lead;
+                        if (!l) return (
+                          <span key={d.iso} className={`fx__cell is-free${d.inMonth ? '' : ' is-out'}`}>
+                            <span className="fx__day">{d.d}</span>
+                            <span className="fx__freelabel">Lliure</span>
+                          </span>
+                        );
+                        return (
+                          <button key={d.iso} type="button" className={`fx__cell is-lead${d.inMonth ? '' : ' is-out'}${l.id === focusId ? ' is-active' : ''}`} data-stage={l.stage} onClick={() => onOpen(l.id)}>
+                            <span className="fx__celltop">
+                              <span className="fx__day">{d.d}</span>
+                              <span className="fx__cellmeta"><span className="fx__wx" data-wx={l.wx.kind}>{WX_ICON[l.wx.kind]}</span><span className="fx__dot" data-stage={l.stage} aria-hidden="true" /></span>
+                            </span>
+                            <span className="fx__celltype">{l.type}</span>
+                            <span className="fx__lname">{l.name}</span>
+                            <span className="fx__cellfoot">{l.time} · {l.location}</span>
+                          </button>
+                        );
+                      }))}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="fx__pipeline">
+            {PIPELINE_STAGES.map((stage) => (
+              <section className="fx__lane" key={stage} data-stage={stage}>
+                <div className="fx__lanehead"><h2>{STAGE_LABEL[stage]}</h2><span>{LEADS.filter((l) => l.stage === stage).length}</span></div>
+                <div className="fx__lanecards">
+                  {LEADS.filter((l) => l.stage === stage).map((l) => (
+                    <button key={l.id} type="button" className={`fx__pipelead${l.id === focusId ? ' is-active' : ''}`} data-stage={l.stage} onClick={() => onOpen(l.id)}>
+                      <span className="fx__leadtop">
+                        <b>{l.name}</b>
+                        <strong>{euro(l.value)}</strong>
+                      </span>
+                      <span className="fx__leadwhen">{fullDate(l.dateISO)} · {l.time} · {l.location}</span>
+                      <span className="fx__leaddetail">{l.pax} pax · {l.product}</span>
+                      <span className="fx__prob" aria-hidden="true"><i /></span>
+                      <small>{leadSummary(l)}</small>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+/* ── Pàgina principal ────────────────────────────────────────────────────── */
+export default function AdminLeadsPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>('calendari');
+  const [monthStart, setMonthStart] = useState(6);
+  const [pageId, setPageId] = useState<string | null>(null);
+
+  const visibleMonths = useMemo(() => Array.from({ length: MONTH_WINDOW }, (_, i) => monthStart + i), [monthStart]);
+  const byDate = useMemo(() => { const m = new Map<string, Lead>(); for (const l of LEADS) m.set(l.dateISO, l); return m; }, []);
+  const months = useMemo(() => visibleMonths.map((m) => {
+    const weekends = saturdaysInMonth(YEAR, m).map((sat) => ({
+      sat,
+      days: [shiftIso(sat, -1), sat, shiftIso(sat, 1)].map((iso) => ({ iso, d: parseISO(iso).d, inMonth: parseISO(iso).m === m, lead: byDate.get(iso) ?? null })),
+    }));
+    return { m, label: MONTHS_FULL[m - 1], weekends };
+  }), [byDate, visibleMonths]);
+
+  const pageLead = LEADS.find((l) => l.id === pageId) ?? null;
+
+  return (
+    <div className="fx-root is-contrast">
+      {pageLead
+        ? <LeadPage lead={pageLead} onBack={() => setPageId(null)} />
+        : <TemporadaPage viewMode={viewMode} setViewMode={setViewMode} months={months} onOpen={setPageId} monthStart={monthStart} setMonthStart={setMonthStart} visibleMonths={visibleMonths} />}
+    </div>
+  );
+}

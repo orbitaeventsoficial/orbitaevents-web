@@ -1,3 +1,27 @@
+## 2026-05-25 — Canvi #782: leads admin Brass & Obsidian — pàgina migrada al nou sistema visual (claude)
+
+### Context
+Canvi #782: primera pàgina migrada al nou sistema visual (Frankenstein). La pàgina `/admin/leads` substitueix completament el contingut antic (llista/kanban) pel disseny Brass & Obsidian del studio-lab. Els components antics queden en quarantena al directori `app/admin/leads/` sense ser importats; les seves funcions s'aplicaran una a una per ordre del propietari.
+
+### Canvi
+- **`app/admin/leads/leads-design.css`** (NOU): còpia exacta de `app/studio-lab/leads/leads-propostes.css` adaptada al context admin. Conté tots els tokens i classes del disseny Brass & Obsidian (`.fx-root.is-contrast`, `.fx__pagehead`, `.fx__focus`, `.fx__metrics`, `.fx__cal`, `.fx__pipeline`, `.fx__lane`, `.fx__pipelead`, etc.).
+- **`app/admin/leads/page.tsx`** (REESCRIT): disseny del studio-lab adaptat per a l'admin — sense AppShell (el layout proveeix la carcassa), sense imports del lab. Estat: dades de mostra (9 leads), funcions reals en quarantena esperant ordre d'aplicació.
+- **`docs/admin-leads-funcions-inventari.md`** (NOU): inventari complet de tots els components en quarantena (`LeadActions`, `LeadQuickStatus`, `LeadPipelineView`, `LeadLostStatusPrompt`, `LeadLostReasonBadge`, `LeadQuickPriority`, `PipelineSuggestionsPanel`, `LeadViewToggle`, `colorTheme`, `leadStatusClient`) amb funció, dependències i ordre d'aplicació recomanat.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `782`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 781→782.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors); `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: la pàgina `/admin/leads` carrega el disseny Brass & Obsidian integrat dins la nova shell (#781). Vista calendari de temporada i pipeline visuals correctes. Cap import dels components en quarantena.
+- Validació humana/UX: studio-lab IS l'admin. Pàgina consistent amb la shell nova. El xip de canvi mostra `#782`. L'inventari de funcions documenta el camí a seguir.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ## 2026-05-25 — Canvi #781: shell admin Brass & Obsidian — extirpació del layout vell i nova carcassa (claude)
 
 ### Context

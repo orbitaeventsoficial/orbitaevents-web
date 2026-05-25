@@ -37,7 +37,7 @@ const PROB: Record<Stage, number> = { nou: 20, contactat: 55, guanyat: 100, perd
 const WX_LABEL: Record<WxKind, string> = { sun: 'Sol', partly: 'Mig sol', cloud: 'Núvols', rain: 'Pluja', storm: 'Tempesta' };
 
 const YEAR = 2026;
-const LAB_CHANGE_NUMBER = 781;
+const LAB_CHANGE_NUMBER = 782;
 const MONTH_WINDOW = 3;
 const MONTH_MAX_START = 12 - MONTH_WINDOW + 1;
 const MONTHS_FULL = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];

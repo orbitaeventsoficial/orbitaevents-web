@@ -1225,7 +1225,8 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 **ESTAT**:
 - `FET` *(2026-05-25 — Canvi #780)*: `seasonCalendarService` — servei pur de calendari de temporada + 13 tests.
 - `FET` *(2026-05-25 — Canvi #781)*: nova shell admin Brass & Obsidian — `app/admin/layout.tsx` reescrit (936→170 línies) + `app/admin/admin-shell.css` (tokens + navegació per grups + botó + peu).
-- `PENDENT` — Leads (`/admin/leads`): substitució de la pàgina de contingut per la versió Brass & Obsidian amb dades reals (Canvi #782, primer ítem de Fase 1).
+- `FET` *(2026-05-25 — Canvi #782)*: primera pàgina migrada — `/admin/leads` substitueix el contingut antic pel disseny Brass & Obsidian del studio-lab. Components antics en quarantena. Inventari: `docs/admin-leads-funcions-inventari.md`.
+- `PENDENT` — Aplicació de funcions reals a `/admin/leads`: dades Prisma, canvi d'estat inline, flux LOST, acció eliminar, suggeriments pipeline (per ordre de l'inventari).
 
 **REFERÈNCIA**: `docs/admin-inventari-pagines.md` (inventari + ordre de migració + semàfor d'estat per pàgina).
 
@@ -1312,6 +1313,21 @@ Seqüència obligatòria de registre:
 - `user` — decisions manuals o interventions directes
 
 ## Entrades
+
+### Canvi #782 — 2026-05-25 — claude (FET)
+
+**Primera pàgina migrada al nou sistema visual — `/admin/leads` (Brass & Obsidian).**
+- `app/admin/leads/leads-design.css` (NOU): còpia de `leads-propostes.css` del studio-lab — tots els tokens i classes Brass & Obsidian (`.fx-root.is-contrast`, `.fx__pagehead`, `.fx__focus`, `.fx__metrics`, `.fx__cal`, `.fx__pipeline`, `.fx__lane`, `.fx__pipelead`, etc.).
+- `app/admin/leads/page.tsx` (REESCRIT): disseny studio-lab adaptat per a l'admin — sense AppShell (layout #781 proveeix la carcassa). Estat actual: dades de mostra (9 leads), funcions reals en quarantena esperant ordre.
+- `docs/admin-leads-funcions-inventari.md` (NOU): inventari complet de components en quarantena (`LeadActions`, `LeadQuickStatus`, `LeadPipelineView`, `LeadLostStatusPrompt`, `LeadLostReasonBadge`, `LeadQuickPriority`, `PipelineSuggestionsPanel`, `LeadViewToggle`, `colorTheme`, `leadStatusClient`) amb funció, dependències i ordre d'aplicació.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `782`.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `782`; el proper canvi ha de ser `#783`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: `/admin/leads` carrega el disseny Brass & Obsidian integrat dins la shell #781. Vista calendari i pipeline visuals correctes. Cap import dels components en quarantena.
+- Validació humana/UX: studio-lab IS l'admin. Consistent amb la shell nova. Xip `#782`. L'inventari documenta el camí de les funcions a aplicar.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
 
 ### Canvi #781 — 2026-05-25 — claude (FET)
 

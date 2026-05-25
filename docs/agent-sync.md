@@ -16,9 +16,9 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #781 (nova shell admin Brass & Obsidian — `app/admin/layout.tsx` reescrit 936→170 línies + `app/admin/admin-shell.css`)
-Proper pas previst: #782 — substituir el contingut de `/admin/leads/page.tsx` per la versió Brass & Obsidian (calendari de temporada + pipeline + focus zone + dades reals de `loadSeasonCalendar`).
-Avís per codex: El propietari vol extirpació completa del vell admin i reconstrucció peça a peça (Frankenstein). El §6.19 del protocol formalitza les directrius. La nova shell usa classes `ax-*` (veure `app/admin/admin-shell.css`). Les pàgines antigues segueixen funcionant via `admin-theme.css` importat. Inventari de pàgines a `docs/admin-inventari-pagines.md`. #780 va afegir `seasonCalendarService`. #781 va reescriure el layout.
+Últim canvi: #782 (`/admin/leads` migrada al disseny Brass & Obsidian del studio-lab — `app/admin/leads/leads-design.css` + `page.tsx` reescrit. Components antics en quarantena. Inventari: `docs/admin-leads-funcions-inventari.md`.)
+Proper pas previst: #783 — aplicar funcions reals a `/admin/leads` per ordre d'inventari: (1) dades Prisma via `loadSeasonCalendar`, (2) canvi d'estat inline, (3) flux LOST.
+Avís per codex: El propietari vol extirpació completa del vell admin i reconstrucció peça a peça (Frankenstein). §6.19 del protocol formalitza les directrius. Nova shell (`ax-*`) a `admin-shell.css` — #781. Primera pàgina migrada: `/admin/leads` — #782. Pàgines antigues segueixen funcionant (admin-theme.css importat). Inventari de pàgines: `docs/admin-inventari-pagines.md`. Inventari de funcions leads: `docs/admin-leads-funcions-inventari.md`.
 
 ---
 
