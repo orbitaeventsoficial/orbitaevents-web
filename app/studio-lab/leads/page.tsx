@@ -200,7 +200,7 @@ function LeadPage({ lead, onBack }: { lead: Lead; onBack: () => void }) {
                 </button>
               ))}
             </div>
-            <button type="button" className="lp2__commit">{primaryLabel} <span className="lp2__ctaic">{I.arrow}</span></button>
+            <button type="button" className="lp2__commit">{primaryLabel} <span className="lp2__goic">{I.arrow}</span></button>
           </section>
 
           <section className="lp2__panel">
@@ -251,7 +251,7 @@ function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="fx__sideactions">
           <label className="fx__search"><span className="fx__searchic">{I.search}</span><input type="text" placeholder="Cerca o executa" readOnly aria-label="Cerca" /><kbd className="fx__kbd">K</kbd></label>
-          <button type="button" className="fx__cta"><span className="fx__ctaic">{I.plus}</span>Nova entrada</button>
+          <button type="button" className="fx__add"><span className="fx__addic">{I.plus}</span>Nova entrada</button>
         </div>
         <div className="fx__sidefoot">
           <span className="fx__meav" title="Òrbita Events">OE</span>

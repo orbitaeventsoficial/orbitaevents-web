@@ -6,7 +6,10 @@ Codex havia treballat `/studio-lab/leads` però **sense commitejar ni enumerar**
 ### Canvi
 - Captures fetes a `.codex-captures/leads-desktop-{calendari,pipeline,fitxa}.png` i `leads-mobile-{calendari,fitxa}.png` (`.dbg-leads.cjs`).
 - `page.tsx`: tret codi mort (`STAGE_FLOW`, `activeGroup`); xip `Canvi #N` **mogut** de la capçalera de Temporada al **peu del menú lateral** (discret, global, sense competir amb el toggle). `LAB_CHANGE_NUMBER` = 777.
-- `leads-propostes.css`: **neteja** de tot el residu de la transició top-bar→lateral (`.fx__top/topmain/groups/gtitle*/topacts/contextbar/crumb2/subnav`) i de la fitxa v1 (`.lp2__figs/fig*/cols/pipe/step*/next*/num/baracts/ic*`); dos `@media 900px` fusionats; àtoms compartits conservats. Poliment: calendari més dens (`grid-auto-rows` 104→94) i ritme vertical ajustat (calendari heroi puja).
+- `leads-propostes.css`: **neteja** de tot el residu de la transició top-bar→lateral (`.fx__top/topmain/groups/gtitle*/topacts/contextbar/crumb2/subnav`) i de la fitxa v1 (`.lp2__figs/fig*/cols/pipe/step*/next*/num/baracts/ic*`); dos `@media 900px` fusionats; àtoms compartits conservats. Poliment: ritme vertical ajustat i calendari `grid-auto-rows` 102; **Focus i mètriques separats** amb aire; subtítol de rang de mesos (`.fx__sub`) més gran.
+- **Iteració amb el propietari sobre captures (mateix #777):**
+  - **Root cause del botó lleig:** `fx__cta`/`fx__ctaic`/`lp2__ctaic` contenien `cta` → la regla global `html:not(.admin-mode) [class*="cta"]{…!important}` de `globals.css` els pintava amb el degradat candy públic i anul·lava tot el CSS del lab. Renombrats a `fx__add`/`fx__addic`/`lp2__goic`; "Nova entrada" passa a botó **de vora** (hairline d'or, fons fosc, sense glow). Les altres col·lisions de substring (`[class*="logo"]`, `[class*="card"]`) només apliquen hints de GPU → inofensives.
+  - **Passada de tipografia** ("molts textos massa petits"): terra de mida apujat a labels mono (9–10→11), metes (11–12→12.5–13), menú lateral (àrees 13→14.5, subítems 12.5→13.5, botó/cerca/peu/icones), badges de pipeline i etiquetes de la fitxa.
 - `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = 777 (lligats). Següent: #778.
 
 ### Validació

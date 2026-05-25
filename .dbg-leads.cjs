@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.log('PAGEERR', e.message));
-  await page.goto('http://localhost:3001/studio-lab/leads', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto('http://localhost:3000/studio-lab/leads', { waitUntil: 'domcontentloaded', timeout: 60000 });
   await shot(page, 'desktop-calendari');
 
   // Pipeline view
@@ -33,7 +33,7 @@ const { chromium } = require('playwright');
   const mctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3 });
   const mpage = await mctx.newPage();
   mpage.on('pageerror', (e) => console.log('PAGEERR-M', e.message));
-  await mpage.goto('http://localhost:3001/studio-lab/leads', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await mpage.goto('http://localhost:3000/studio-lab/leads', { waitUntil: 'domcontentloaded', timeout: 60000 });
   await shot(mpage, 'mobile-calendari');
   await mpage.locator('.fx__cell.is-lead').first().click();
   await shot(mpage, 'mobile-fitxa');
