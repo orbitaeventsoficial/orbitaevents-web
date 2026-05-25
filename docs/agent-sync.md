@@ -16,9 +16,9 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #778 (`/studio` §16–18 Lab Paleta+Tipografia+Components — fitxa tècnica v0.5)
-Proper pas previst: (1) acabar de completar la fitxa `/studio` amb el nou catàleg (pendent: §Packs reals, §Serveis, completar §5 Actius amb hero/portfolio/client logos) i (2) posteriorment, incorporar el sistema de disseny del lab a `/admin` pas a pas.
-Avís per codex: #778 toca `app/studio/StudioShowroom.tsx`, `app/studio/studio.css`, `app/studio-lab/leads/page.tsx` (xip), `lib/constants/admin.ts`, docs. La fitxa tècnica ja té 19 seccions (era 16): §16 Paleta Obsidiana, §17 Tipografia (Plus Jakarta+Inter+Mono), §18 Components (botó de vora, mètriques, Focus Card, pipeline card, cel·les, sidebar). Parteix de #778.
+Últim canvi: #780 (`seasonCalendarService` — pas 1 de la implantació leads: servei pur + 13 tests)
+Proper pas previst: el propietari vol substituir l'admin sencer amb el disseny del lab, pàgina per pàgina. Pendent de decidir estratègia concreta (substituir `/admin/leads` directament vs esquelet nou). Pas 2 del checklist d'implantació era `SeasonCalendar` + `MonthSelector` a `/admin/leads`, però ara pot ser que s'escali a substituir el layout/shell de l'admin primer.
+Avís per codex: #780 afegeix `lib/services/seasonCalendarService.ts` + `__tests__/lib/services/seasonCalendarService.test.ts` (13 tests), puja xip lab a 780 i counter a 780. La nova direcció del propietari és substituir l'admin sencer amb el lab, pàgina per pàgina — pendent de confirmar l'abast exacte.
 
 ---
 

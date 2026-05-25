@@ -1,3 +1,26 @@
+## 2026-05-25 — Canvi #780: implantació leads pas 1 — `seasonCalendarService` + 13 tests (claude)
+
+### Context
+Inici de la implantació del sistema visual del lab a l'admin real, seguint `docs/studio-lab-leads-implantacio.md`. Pas 1: servei de backend pur (sense UI) que donada una finestra de mesos retorna els caps de setmana (Dv+Ds+Dg) amb leads i reserves assignats.
+
+### Canvi
+- **`lib/services/seasonCalendarService.ts`** (NOU): funció pura `buildSeasonCalendar(input)` i wrapper Prisma `loadSeasonCalendar(windowStart, months)`. La funció pura computa la finestra UTC, troba tots els Dv+Ds+Dg, distribueix entrades per cap de setmana i separa leads sense `eventDate` a `unscheduled`. El wrapper fa dues queries paral·leles: leads no LOST (dins finestra o sense data) i bookings no CANCELLED (dins finestra), mapejant la darrera proposta SENT/ACCEPTED com a `estimatedValue` del lead.
+- **`__tests__/lib/services/seasonCalendarService.test.ts`** (NOU): 13 tests — finestra UTC, generació Dv/Ds/Dg, zero entrades, distribució per dia (Dv/Ds/Dg), unscheduled, stats mixts, suma per cap de setmana, entrades fora de finestra, valor zero, weekKey.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `780`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 779→780.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (inclou `qa:service-coverage`); 13 tests verds.
+- Validació funcional: tots els casos —finestra, distribució, unscheduled, stats, valors— testejats i passen; `loadSeasonCalendar` es connectarà a UI al pas 2.
+- Validació humana/UX: el servei és la base del calendari de temporada; el contracte de dades (weekends, unscheduled, stats) és el que la UI necessitarà.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #779: `/studio` v0.6 amb catàleg comercial real i actius públics (codex)
 
 ### Context

@@ -1293,6 +1293,22 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #780 — 2026-05-25 — claude (FET)
+
+**Implantació leads pas 1: `seasonCalendarService` — servei pur de calendari de temporada + 13 tests.**
+- Context: inici de la implantació del sistema de disseny del lab (`/studio-lab/leads`) a l'admin real, seguint el checklist `docs/studio-lab-leads-implantacio.md`. Pas 1: servei de backend pur (sense UI) que donada una finestra de mesos retorna els caps de setmana (Dv+Ds+Dg) amb els leads i reserves assignades.
+- `lib/services/seasonCalendarService.ts` (NOU): funció pura `buildSeasonCalendar(input)` + wrapper Prisma `loadSeasonCalendar(windowStart, months)`. La funció pura pren leads i reserves en cru, computa la finestra (UTC), troba tots els Dv+Ds+Dg del rang, distribueix les entrades per cap de setmana i separa els leads sense eventDate a `unscheduled`. El wrapper fa dues queries paral·leles (leads no LOST + bookings no CANCELLED dins la finestra) i mapeja proposals (SENT/ACCEPTED, darrera) com a `estimatedValue` del lead. Zero hex, zero càlcul de marge inline (els marges s'afegiran al pas 3 via `costEngine`).
+- `__tests__/lib/services/seasonCalendarService.test.ts` (NOU): 13 tests — finestra correcta, generació de Dv/Ds/Dg, zero entrades, lead en dissabte, booking en dissabte, lead en divendres, lead en diumenge, leads sense data a `unscheduled`, stats mixts, suma de valors per cap de setmana, entrada fora de la finestra, valor zero, i weekKey com a data del divendres en YYYY-MM-DD.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `780`.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `780`; el següent canvi real ha de ser `#781`.
+- Abast: nou servei + test. No toca UI, schema, API ni `/admin`. El pas 2 (component `SeasonCalendar` a `/admin/leads`) és el següent.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (inclou `qa:service-coverage`).
+- Validació funcional: 13 tests verds (finestra, caps de setmana, distribució, stats, unscheduled, valors); `loadSeasonCalendar` farà query real en pas 2 quan es connecti la UI.
+- Validació humana/UX: el servei és la base del calendari de temporada; sense UI encara, però el contracte de dades és clar i testejat.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #779 — 2026-05-25 — codex (FET)
 
 **`/studio`: fitxa v0.6 amb nou catàleg comercial real + actius públics complets abans d'entrar a l'admin.**
