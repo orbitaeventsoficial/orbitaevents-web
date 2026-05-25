@@ -185,8 +185,8 @@
 
 .sl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .sl-grid__h {
-  font-family: var(--sl-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--sl-text-4); padding: 0 2px 2px;
+  font-family: var(--sl-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--sl-text-3); padding: 0 2px 2px;
 }
 .sl-cell {
   position: relative; min-height: 76px;
@@ -203,11 +203,13 @@
 /* Casella ocupada: vora-espina de color (estat), nom en serif */
 .sl-cell.is-booked {
   border: 1px solid var(--sl-line); border-left: 3px solid var(--c);
-  background: linear-gradient(180deg, var(--sl-raised), var(--sl-surface));
+  background:
+    radial-gradient(150% 130% at 0% 50%, color-mix(in oklab, var(--c) 9%, transparent), transparent 58%),
+    linear-gradient(180deg, var(--sl-raised), var(--sl-surface));
   cursor: pointer;
   transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
-.sl-cell.is-booked:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4); }
+.sl-cell.is-booked:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.42), 0 0 22px -8px var(--c); }
 .sl-cell.is-booked.is-selected { border-color: var(--sl-brass); box-shadow: 0 0 0 1px var(--sl-brass), 0 14px 30px rgba(0, 0, 0, 0.4); }
 .sl-cell__name {
   margin-top: auto;
@@ -216,10 +218,11 @@
 }
 .sl-cell__warn { position: absolute; top: 9px; right: 10px; font-size: 11px; color: var(--sl-conflict); }
 
-/* Casella lliure: un buit visible, sense paraules */
+/* Casella lliure: un pou recollit (ple/buit = relleu), sense paraules */
 .sl-cell.is-free {
-  border: 1px dashed var(--sl-line-2);
-  background: transparent;
+  border: 1px solid var(--sl-line);
+  background: rgba(0, 0, 0, 0.16);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .sl-cell.is-free .sl-cell__day { color: var(--sl-text-4); }
 
@@ -254,11 +257,13 @@
   padding: 11px 12px 11px 13px;
   border: 1px solid var(--sl-line); border-left: 3px solid var(--c);
   border-radius: 11px;
-  background: linear-gradient(180deg, var(--sl-raised), var(--sl-surface));
+  background:
+    radial-gradient(150% 130% at 0% 50%, color-mix(in oklab, var(--c) 9%, transparent), transparent 58%),
+    linear-gradient(180deg, var(--sl-raised), var(--sl-surface));
   color: var(--sl-text); font: inherit; text-align: left; cursor: grab;
   transition: transform 130ms ease, border-color 130ms ease, box-shadow 130ms ease;
 }
-.sl-lead:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0, 0, 0, 0.4); }
+.sl-lead:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0, 0, 0, 0.42), 0 0 20px -8px var(--c); }
 .sl-lead:active { cursor: grabbing; }
 .sl-lead.is-dragging { opacity: 0.4; }
 .sl-lead.is-selected { border-color: var(--sl-brass); box-shadow: 0 0 0 1px var(--sl-brass), 0 12px 26px rgba(0, 0, 0, 0.4); }

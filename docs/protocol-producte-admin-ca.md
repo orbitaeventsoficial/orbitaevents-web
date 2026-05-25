@@ -1293,6 +1293,116 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #774 — 2026-05-25 — claude (FET)
+
+**Blindatge de numeració + reconciliació a git de les proves #768–773 de `/studio-lab/leads`.**
+- Context: les proves visuals #768–773 es van documentar al diari/protocol i el counter va pujar a 773, però **mai es van commitejar**: git va quedar a #767. La doc deia "tancat" sense que la pàgina/git ho reflectissin (drift detectat per el propietari: "son proves").
+- `scripts/check-admin-change-log.mjs`: el guard `qa:protocol` ara, a més de counter↔protocol↔diari, exigeix que `LAB_CHANGE_NUMBER` del xip visible de `app/studio-lab/leads/page.tsx` sigui **igual** al `ADMIN_CHANGE_COUNTER`. Si la pàgina queda enrere respecte al diari, la validació FALLA. Skip net si el fitxer no existeix (fixtures de test).
+- `__tests__/scripts/check-admin-change-log.test.ts`: 2 tests nous (xip alineat passa; xip endarrerit falla amb missatge clar).
+- Reconciliació: les proves #768–773 (`page.tsx`, `leads-propostes.css`, `studio-lab.css`) queden commitejades a git perquè coincideixin amb la doc ja escrita. Es retira la prova morta `app/studio-lab/flux/` (no enllaçada, no documentada; idees ja migrades a `/studio-lab/leads`).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `774` (lligats, sense salts); el següent canvi real ha de ser `#775`.
+- Abast: només `/studio-lab` + guard/test + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (inclou el guard ampliat + `qa:protocol:test`).
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `Canvi #774`; el guard falla si es desincronitza el xip (provat amb el test nou).
+- Validació humana/UX: el drift doc↔pàgina↔git queda blindat; cada canvi futur s'ha de veure al diari I a la pàgina o no passa.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #773 — 2026-05-24 — claude (FET)
+
+**`/studio-lab/leads`: zona FOCUS (comandament) enllaçada amb calendari i pipeline.**
+- Context: el propietari demana millora radical (pintura/flux/interfície/estructura) i la millor versió. S'aplica el concepte "una sola cosa a la vegada" del brief sobre la base "Brass & Obsidian".
+- `app/studio-lab/leads/page.tsx` + `leads-propostes.css`: nova **zona FOCUS** (targeta hero, "la decisió que toca ara") amb cua de prioritats ciclable ‹ › (bolos no perduts, el més pròxim primer), anella de probabilitat (conic-gradient) i acció contextual; substitueix la barra de decisió prima.
+- **Enllaç visual**: el bolo en focus s'encén en or (`is-active`) a la casella del calendari i a la targeta del pipeline; en ciclar, el ressaltat segueix la decisió.
+- Tira d'indicadors més continguda; es manté la graella de caps de setmana amb forats i sense preu (#772).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `773` (lligats, sense salts); el següent canvi real ha de ser `#774`.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:nonstop-protocol` OK.
+- Validació funcional: HTTP 200; el FOCUS cicla i s'enllaça amb calendari/pipeline; selector i fitxa operatius.
+- Validació humana/UX: millora radical d'estructura/flux segons brief; pendent del vistiplau "wow".
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #772 — 2026-05-24 — claude (FET)
+
+**`/studio-lab/leads`: calendari (graella amb forats) sense preu a les targetes + llums/color + checklist d'implantació.**
+- Context: després del #771, el propietari demana la millor versió possible. Aclariment clau: li agraden els "forats" (caselles buides de la graella); el que molestava era veure el preu i no la resta d'info. Una prova de reestructurar a files es descarta. També demana checklist d'implantació i numeració lligada.
+- `app/studio-lab/leads/leads-propostes.css` + `page.tsx`: es manté la **graella Dv/Ds/Dg** amb slots lliures enfonsats ("forats"); targetes una mica més compactes (`grid-auto-rows` 104px, text intacte); **preu retirat** de les targetes (ara dia + meteo + dot d'estat + tipus + nom + hora·lloc); imports només al resum i a la fitxa. Llums/color: vinyeta, sheen a targetes de mes, reservats il·luminats pel to d'estat (sense neó), xifres del resum en or amb relleu.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `772`.
+- `docs/studio-lab-leads-implantacio.md` (NOU): checklist per portar el prototip a l'admin real reutilitzant `LeadPipelineView`, fitxa `/admin/leads/[id]`, `colorTheme.ts`, `weatherService`, `costEngine`, `leadPipelineSuggestionsService`; model `LeadStatus` (6 estats) i `Lead.eventDate`; servei nou `seasonCalendarService`; API+auth, sistema visual, i18n/a11y/tests/migració. Documenta les 3 seqüències de numeració i per què no coincideixen.
+- `ADMIN_CHANGE_COUNTER` = `772` (lligat amb protocol/diari, sense forats); el següent canvi real ha de ser `#773`.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:nonstop-protocol` OK.
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `Canvi #772`; calendari compacte amb text intacte; selector de mesos operatiu.
+- Validació humana/UX: poliment segons brief + checklist lliurat; pendent del vistiplau "wow".
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #771 — 2026-05-24 — claude (FET)
+
+**`/studio-lab/leads`: redirecció radical "Brass & Obsidian" amb paleta corporativa.**
+- Context: el propietari dóna comandament creatiu complet per arribar al "wow". Direcció: calendari de caps de setmana com a vista principal, pipeline secundari, paleta corporativa Òrbita (or primari + carbassa sofisticada `#c2562c`, sense blau, sense candy, sense glow), material plàstic/físic i tipografia gran.
+- `app/studio-lab/leads/leads-propostes.css` (reescrit): obsidiana càlida, or com a identitat (moneda `Ò` + xifres de diners), carbassa com a accent d'acció, tons joia per estats; relleu plàstic per reservats i enfonsat per lliures; atmosfera càlida + gra + aparició esglaonada amb `prefers-reduced-motion` respectat.
+- `app/studio-lab/leads/page.tsx`: vista per defecte `calendari`; selector de mesos (xips Gen–Des + fletxes) per córrer tot l'any d'un en un; targetes enriquides (tipus, nom, hora·lloc, import en or, dot d'estat) i consistents amb el pipeline; valor del mes en or; capçalera editorial + barra `Pròxima decisió`.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` passen a `771`; el següent canvi real ha de ser `#772`.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run qa:protocol` OK; `pnpm run qa:nonstop-protocol` OK.
+- Validació funcional: `/studio-lab/leads` HTTP 200; calendari per defecte; selector navega tot l'any amb clamp Oct–Des; clic a targeta obre fitxa; pipeline operatiu.
+- Validació humana/UX: passada de disseny segons el brief; pendent del vistiplau final del propietari sobre el "wow".
+- Començat per: `codex`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+### Canvi #770 — 2026-05-24 — codex (FET)
+
+**`/studio-lab/leads`: retorn a Contrast negre amb jerarquia corregida.**
+- Context: es prova una direcció crema/grassa però el propietari la descarta i demana tornar al Contrast anterior. Es conserven només els ajustos útils: blanc menys dur, nom/import menys dominants i resta d'informació més visible.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` passa a `770`; el xip visible mostra `Canvi #770`.
+- `app/studio-lab/leads/leads-propostes.css`: tokens restaurats a Contrast negre (canvas/panel/topbar/mètriques/cards fosques). Es descarten les proves crema/marfil i les tipografies serif per títol i números.
+- Tipografia i jerarquia: `CRM Events` torna a sans UI; KPIs i imports del resum passen a sans amb `tabular-nums`; es manté off-white en lloc de blanc pur; les targetes mantenen nom/import continguts i data/lloc/pax/producte/acció més llegibles.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+- Validació funcional: `/studio-lab/leads` HTTP 200; Contrast negre únic; `Canvi #770` visible; Pipeline/Calendari operatius; captures desktop i mòbil generades.
+- Validació humana/UX: torna el Contrast que el propietari volia, sense la direcció crema rebutjada, però conservant la correcció de llegibilitat i pes visual de les targetes.
+- `ADMIN_CHANGE_COUNTER` passa a `770`; el següent canvi real ha de ser `#771`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #769 — 2026-05-24 — codex (FET)
+
+**`/studio-lab/leads`: CRM Events en Contrast únic, sense selector d'aspecte.**
+- Context: el propietari demana la millor versió visual del CRM d'esdeveniments i fixa el criteri: sempre **Contrast**; la resta d'aspectes no interessen. En revisió, també marca que el blanc és massa blanc i que nom/import pesen massa respecte la resta d'informació important.
+- `app/studio-lab/leads/page.tsx`: eliminat l'estat de variant, `VARIANTS` i `VariantSwitch`; root fix `fx-root is-contrast`; `LAB_CHANGE_NUMBER` passa a `769`; la pantalla es reanomena `CRM Events` amb eyebrow `Comercial · Events CRM`.
+- `app/studio-lab/leads/leads-propostes.css`: neteja dels temes Grafit/Marfil/Joia i del selector flotant; Contrast queda com a sistema únic. Blanc base rebaixat a off-white, import/nom de targeta reduïts i data/lloc/pax/producte/acció pujats lleugerament perquè tota la informació operativa es llegeixi.
+- Visual CRM: topbar amb ombra subtil, mètriques més sòlides, pipeline amb cards més denses, barra de probabilitat com a senyal i responsive mòbil corregit perquè el títol no quedi tapat per la capçalera fixa.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+- Validació funcional: `/studio-lab/leads` HTTP 200; Contrast únic sense selector d'aspecte; `Canvi #769` visible; Pipeline/Calendari operatius; captures desktop i mòbil generades.
+- Validació humana/UX: la pantalla baixa duresa visual, manté Contrast, i reparteix millor el pes de nom/import/data/lloc/pax/producte/següent pas; es llegeix més com a CRM d'events que com a mockup de colors.
+- `ADMIN_CHANGE_COUNTER` passa a `769`; el següent canvi real ha de ser `#770`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+### Canvi #768 — 2026-05-24 — codex (FET)
+
+**`/studio-lab/leads`: grafit operatiu, mètriques de temporada i número visible del tall.**
+- Context: després del #767, el propietari pregunta si la fisonomia/estructura i colors són millorables. Es decideix passar de "contrast/neó de laboratori" a una lectura més d'eina comercial operativa, mantenint el lab com a prototip intern. També demana que els canvis quedin enumerats al diari i que el número aparegui dins l'admin studio lab.
+- `app/studio-lab/leads/page.tsx`: mode inicial de `contrast` a `nit` (`Grafit`); afegit `LAB_CHANGE_NUMBER = 768` i xip visible `Canvi #768` a la capçalera; nova franja de mètriques (entrades, pipeline obert, guanyat, valor temporada).
+- `app/studio-lab/leads/leads-propostes.css`: paleta Grafit rebaixada (fons grafit, turquesa menys agressiu, estats menys saturats); pipeline més compacte i targetes menys decoratives; responsive del resum 4/2/1 columnes; navegació mòbil alineada a l'esquerra.
+- Abast: prototip intern `noindex`, dades de mostra; només `/studio-lab/leads` + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK.
+- Validació funcional: `/studio-lab/leads` HTTP 200; `Canvi #768` visible; toggle Pipeline/Calendari i commutador Grafit/Marfil/Joia/Contrast continuen operatius.
+- Validació humana/UX: la pantalla queda més ancorada i professional: menys neó, més estructura, mètriques visibles i número de canvi dins el lab per revisar cada iteració sense perdre traça.
+- `ADMIN_CHANGE_COUNTER` passa a `768`; el següent canvi real ha de ser `#769`.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #767 — 2026-05-24 — claude (FET)
 
 **`/studio-lab/leads`: esquelet d'app separat + 4 aspectes commutables + hora/lloc al calendari.**

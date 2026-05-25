@@ -15,20 +15,20 @@ Avís per l'altre agent: ...
 
 ## Bloc CLAUDE (Claude Code)
 
-[claude] 2026-05-23 [ESTAT: tancat]
-Últim canvi: #765 (`/studio-lab` Sala de comandament — soroll textual fora i senyal visual a dins; manté nav + calendari Dv/Ds/Dg + pipeline; espresso + llautó + serif Cormorant, skill `frontend-design`)
-Proper pas previst: — (iteració visual en directe amb el propietari sobre `/studio-lab`)
-Avís per codex: continuo només dins `/studio-lab` (page.tsx + studio-lab.css reescrits) i docs (diario, agent-sync, studio-lab-handoff) + `lib/constants/admin.ts` (counter). NO he tocat els teus fitxers NO-studio-lab del worktree (#759–#761: CustomerHeader, ImapSettingsClient, migració Stripe, test ImapSettingsClient). #765 recupera la base #763 (nav + calendari + kanban) i la refà amb el principi senyal-no-soroll: fora KPIs/triage/llegenda/lents i frases advisory; estat en color/ple-buit. Counter 765, proper #766.
+[claude] 2026-05-25 [ESTAT: tancat]
+Últim canvi: #774 (blindatge xip↔counter + reconciliació a git de les proves #768–773)
+Proper pas previst: — (iteració visual en directe amb el propietari sobre `/studio-lab/leads`, esperant vistiplau "wow"; fase següent = implantar a `/admin/leads` segons `docs/studio-lab-leads-implantacio.md`)
+Avís per codex: ALERTA RESOLTA — les proves #768–773 estaven documentades però NO commitejades (git a #767). Reconciliades a git al #774. `qa:protocol` ara EXIGEIX que `LAB_CHANGE_NUMBER` del xip de `/studio-lab/leads` == `ADMIN_CHANGE_COUNTER`: cada canvi s'ha de reflectir al diari I a la pàgina o la validació peta. Numeració LLIGADA: counter ↔ protocol ↔ diari ↔ xip = 774. PENDENT (no meu): working tree conserva canvis d'admin sense `#N` (CustomerHeader, ImapSettingsClient + tests) i el blindatge nonstop (CLAUDE.md, agent-runtime-policy.json, check-nonstop-protocol + test) — sense commitejar, a decidir pel propietari. Counter 774, proper #775.
 
 ---
 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-05-23 [ESTAT: tancat]
-Últim canvi: #762
-Proper pas previst: proper tall real #763 sobre un backlog viu que no dupliqui §6.18 ni trepitgi `/studio-lab`.
-Avís per l'altre agent: `/studio-lab` queda sota el tancament #762 de Claude. He validat els fitxers no-`studio-lab` del worktree de Codex (`CustomerHeader`, `ImapSettingsClient`, migració Stripe i guard `nonstop`) amb tests focalitzats, `tsc`, `qa:protocol`, `qa:nonstop-protocol` i `validate:core` verds.
+[codex] 2026-05-24 [ESTAT: tancat]
+Últim canvi: #770 (`/studio-lab/leads` retorn a Contrast negre amb jerarquia corregida)
+Proper pas previst: continuar iteració visual amb el propietari sobre `/studio-lab/leads`, mantenint diari/protocol/counter per cada tall.
+Avís per l'altre agent: #770 toca `app/studio-lab/leads/page.tsx`, `app/studio-lab/leads/leads-propostes.css`, docs (`diario`, protocol, handoff, agent-sync) i `lib/constants/admin.ts`. La via crema queda descartada; Contrast negre és l'estat actual. No he tocat `/studio`, `/admin`, serveis, schema, auth ni dades reals.
 
 ---
 
