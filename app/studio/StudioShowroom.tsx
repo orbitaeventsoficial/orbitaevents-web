@@ -1,7 +1,7 @@
 'use client';
 
 /* ============================================================================
-   ÒRBITA · STUDIO — Fitxa tècnica del sistema visual del NOU ADMIN (v0.4)
+   ÒRBITA · STUDIO — Fitxa tècnica del sistema visual del NOU ADMIN (v0.6)
    ----------------------------------------------------------------------------
    Catàleg viu de tokens, components, comunicacions i documents. Tot el que el
    client veu i tot el que l'admin manipula passa per aquí.
@@ -17,7 +17,17 @@
 ============================================================================ */
 
 import { useState, type ReactNode } from 'react';
+import { CLIENT_LOGOS } from '@/config/client-logos';
+import { EXTRAS, INVENTARIO, getAllPacks, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
+import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
 import './studio.css';
+
+type PublicService = {
+  slug: ServiceSlug;
+  label: string;
+  route: string;
+  summary: string;
+};
 
 /* ── 04 · Iconografia — 16 icones monolínia (stroke 1.7, 24×24) ───────────── */
 const ico = (children: ReactNode) => (
@@ -212,6 +222,31 @@ const BRAND_LOGOS: { file: string; src: string; use: string; light?: boolean }[]
 
 const FAVICON_VEC = ['favicon.svg', 'icon.svg', 'favicon-halloween.svg', 'favicon-mon-magic.svg'];
 const FAVICON_RASTER = ['favicon-32.png', 'favicon-48.png', 'favicon-96.png', 'favicon-180.png', 'favicon-192.png', 'favicon-512.png', 'apple-touch-icon.png'];
+const PORTFOLIO_ASSETS = PORTFOLIO_CATEGORIES.slice(0, 9);
+const CLIENT_LOGO_ASSETS = CLIENT_LOGOS.slice(0, 9);
+
+const SERVICE_CATALOG: PublicService[] = [
+  { slug: 'bodas', label: 'Bodes', route: '/servicios/bodas', summary: 'Cerimònia, còctel, banquet i festa amb packs escalables.' },
+  { slug: 'discomovil', label: 'Discomòbil', route: '/servicios/discomovil', summary: 'Festes privades i pista de ball amb so, llum i tècnic.' },
+  { slug: 'fiestas', label: 'Festes', route: '/servicios/fiestas', summary: 'Aniversaris, comunions i celebracions familiars.' },
+  { slug: 'empresas', label: 'Empreses', route: '/servicios/empresas', summary: 'Cocktail, gala i producció corporativa amb lectura professional.' },
+];
+
+const PUBLIC_PACKS = getAllPacks();
+const PUBLIC_EXTRAS = EXTRAS;
+const servicePacks = (service: ServiceSlug) => PUBLIC_PACKS.filter((pack) => (service === 'fiestas' ? pack.service === 'discomovil' : pack.service === service));
+const titleFromSlug = (slug: string) => slug.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+const priceRange = (packs: PackDefinition[]) => {
+  if (packs.length === 0) return 'sense packs';
+  const values = packs.map((pack) => pack.priceValue);
+  return `${Math.min(...values)}€-${Math.max(...values)}€`;
+};
+const serviceCapacity = (packs: PackDefinition[]) => {
+  const mins = packs.map((pack) => pack.capacidadMinima).filter((value): value is number => typeof value === 'number');
+  const maxs = packs.map((pack) => pack.capacidadMaxima).filter((value): value is number => typeof value === 'number');
+  if (!mins.length && !maxs.length) return 'capacitat flexible';
+  return `${mins.length ? Math.min(...mins) : 0}-${maxs.length ? Math.max(...maxs) : '∞'} pax`;
+};
 
 /* ── 16 · Lab · Paleta Obsidiana ─────────────────────────────────────────── */
 const LAB_PALETTE_GROUPS: { group: string; items: { name: string; token: string; hex: string; use: string }[] }[] = [
@@ -325,6 +360,7 @@ const SECTIONS: { num: string; id: string; label: string }[] = [
   { num: '16', id: 'lab-paleta', label: 'Lab · Paleta' },
   { num: '17', id: 'lab-tipografia', label: 'Lab · Tipografia' },
   { num: '18', id: 'lab-components', label: 'Lab · Components' },
+  { num: '19', id: 'cataleg-comercial', label: 'Catàleg comercial' },
 ];
 
 type PdfId = 'pressupost' | 'contracte' | 'cataleg' | 'informe';
@@ -351,7 +387,7 @@ export default function StudioShowroom() {
           <div className="o-brand">
             <span className="o-brand__text">
               <span className="o-brand__name">Òrbita</span>
-              <span className="o-brand__sub">Sistema · v0.5</span>
+              <span className="o-brand__sub">Sistema · v0.6</span>
             </span>
           </div>
           <nav className="o-spec-toc__nav" aria-label="Seccions">
@@ -376,7 +412,7 @@ export default function StudioShowroom() {
               del nou admin. Tot el que el client veu i tot el que l&apos;admin manipula passa per aquí.
             </p>
             <div className="o-spec-header__stats">
-              <div><strong>19</strong> seccions</div>
+              <div><strong>20</strong> seccions</div>
               <div><strong>16</strong> tokens</div>
               <div><strong>16</strong> icones</div>
               <div><strong>8</strong> comunicacions</div>
@@ -558,6 +594,39 @@ export default function StudioShowroom() {
                       <span className="o-spec-asset__name">{f}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+              <div className="o-spec-group">
+                <h3 className="o-spec-group__title">Portfolio públic · covers reals</h3>
+                <div className="o-spec-asset-grid o-spec-asset-grid--media">
+                  {PORTFOLIO_ASSETS.map((item) => (
+                    <div className="o-spec-asset" key={item.slug}>
+                      <div className="o-spec-asset__preview o-spec-asset__preview--photo">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- /studio mostra fitxers reals de /public sense pipeline d'optimització */}
+                        <img src={item.cover} alt={item.name} />
+                      </div>
+                      <span className="o-spec-asset__name">{item.name}</span>
+                      <span className="o-spec-asset__use">{item.cover}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="o-spec-group">
+                <h3 className="o-spec-group__title">Logos de clients · prova social</h3>
+                <div className="o-spec-asset-grid">
+                  {CLIENT_LOGO_ASSETS.map((src) => {
+                    const file = src.split('/').at(-1) || src;
+                    return (
+                      <div className="o-spec-asset" key={src}>
+                        <div className="o-spec-asset__preview o-spec-asset__preview--light">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- /studio mostra fitxers reals de /public sense pipeline d'optimització */}
+                          <img src={src} alt={file} />
+                        </div>
+                        <span className="o-spec-asset__name">{file}</span>
+                        <span className="o-spec-asset__use">Logo client · home / confiança</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1138,14 +1207,106 @@ export default function StudioShowroom() {
             </div>
           </section>
 
+          {/* 19 · Catàleg comercial */}
+          <section className="o-spec-section" id="sec-cataleg-comercial">
+            <SectionHead num="19" title="Catàleg comercial" intro="Catàleg públic real: serveis, packs, extres, inventari base i actius que alimenten configurador, pressupostos, PDFs i admin." />
+            <div className="o-catalog-grid">
+              {SERVICE_CATALOG.map((service) => {
+                const packs = servicePacks(service.slug);
+                const highlighted = packs.find((pack) => pack.popular || pack.highlight) || packs[0];
+                return (
+                  <article className="o-catalog-service" key={service.slug}>
+                    <div className="o-catalog-service__head">
+                      <div>
+                        <span className="o-catalog-service__kicker">{service.route}</span>
+                        <h3>{service.label}</h3>
+                      </div>
+                      <span className="o-catalog-service__price">{priceRange(packs)}</span>
+                    </div>
+                    <p>{service.summary}</p>
+                    <div className="o-catalog-service__meta">
+                      <span>{packs.length} packs</span>
+                      <span>{serviceCapacity(packs)}</span>
+                      <span>{highlighted ? `${highlighted.duration} · ${highlighted.price}` : 'pendent'}</span>
+                    </div>
+                    {highlighted && (
+                      <div className="o-catalog-service__pick">
+                        <span>Pack guia</span>
+                        <strong>{titleFromSlug(highlighted.slug)}</strong>
+                        <code>{highlighted.id}</code>
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className="o-spec-group">
+              <h3 className="o-spec-group__title">Packs reals · fallback públic del configurador</h3>
+              <div className="o-catalog-table-wrap">
+                <table className="o-catalog-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Pack</th>
+                      <th scope="col">Servei</th>
+                      <th scope="col">Preu</th>
+                      <th scope="col">Durada</th>
+                      <th scope="col">Capacitat</th>
+                      <th scope="col">Senyal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PUBLIC_PACKS.map((pack) => (
+                      <tr key={pack.id}>
+                        <td><strong>{titleFromSlug(pack.slug)}</strong><code>{pack.id}</code></td>
+                        <td>{pack.service}</td>
+                        <td>{pack.price}</td>
+                        <td>{pack.duration}</td>
+                        <td>{pack.capacidadMinima || 0}-{pack.capacidadMaxima || '∞'} pax</td>
+                        <td>{pack.popular ? 'popular' : pack.badge ? pack.badge : 'base'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="o-catalog-columns">
+              <div className="o-spec-group">
+                <h3 className="o-spec-group__title">Extres públics</h3>
+                <div className="o-catalog-mini-list">
+                  {PUBLIC_EXTRAS.map((extra) => (
+                    <div className="o-catalog-mini" key={extra.id}>
+                      <span className="o-catalog-mini__icon" aria-hidden="true">{extra.icon}</span>
+                      <div>
+                        <strong>{titleFromSlug(extra.id)}</strong>
+                        <span>{extra.price !== null ? `${extra.price}€` : 'consultar'} · {extra.category || 'other'}</span>
+                        <code>{extra.enabled === false ? 'ocult configurador' : 'visible configurador'}</code>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="o-spec-group">
+                <h3 className="o-spec-group__title">Inventari base que sustenta els packs</h3>
+                <div className="o-catalog-inventory">
+                  <div><span>Controladora</span><strong>{INVENTARIO.controladora.nombre}</strong></div>
+                  <div><span>So</span><strong>{INVENTARIO.altavoces.nombre} · {INVENTARIO.altavoces.potenciaTotal}W</strong></div>
+                  <div><span>Llum PRO</span><strong>{INVENTARIO.iluminacion.cabezasMoviles.nombre}</strong></div>
+                  <div><span>Efectes</span><strong>{Object.values(INVENTARIO.extras).length} extres configurables</strong></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <footer className="o-spec-footer">
-            Òrbita Studio · sistema visual v0.5 · 19 seccions · 8 comunicacions · 5 documents
+            Òrbita Studio · sistema visual v0.6 · 20 seccions · 8 comunicacions · 5 documents
           </footer>
         </main>
       </div>
 
       <div className="o-hud">
-        <strong>Studio v0.5</strong> · fitxa tècnica · <a href="/admin">admin actual</a>
+        <strong>Studio v0.6</strong> · fitxa tècnica · <a href="/admin">admin actual</a>
       </div>
     </div>
   );

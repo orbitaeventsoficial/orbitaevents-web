@@ -1293,6 +1293,23 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #779 — 2026-05-25 — codex (FET)
+
+**`/studio`: fitxa v0.6 amb nou catàleg comercial real + actius públics complets abans d'entrar a l'admin.**
+- Context: el propietari demana acabar de completar la fitxa amb el nou catàleg i després començar a incorporar-ho a l'admin pas a pas i de nou. Aquest tall tanca la part de fitxa, sense tocar encara `/admin`.
+- `app/studio/StudioShowroom.tsx`: versió `v0.6`; la fitxa passa a 20 seccions. Afegida `§19 Catàleg comercial` amb dades reals de `getAllPacks()`, `EXTRAS` i `INVENTARIO`: serveis públics, rangs de preu, capacitats, pack guia per servei, taula de packs reals, extres i inventari base.
+- `app/studio/StudioShowroom.tsx`: `§05 Actius del repo` ampliada amb covers reals de `PORTFOLIO_CATEGORIES` i logos de clients de `CLIENT_LOGOS`, a més dels logos/favicons ja existents.
+- `app/studio/studio.css`: afegits estils `o-catalog-*` i preview fotogràfic d'actius perquè el catàleg quedi llegible i responsive dins la fitxa.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `779` (xip visible alineat amb el counter).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `779`; el següent canvi real ha de ser `#780`.
+- Abast: `/studio` + docs/counter/xip. No toca `/admin`, serveis, schema, auth ni dades reals. La incorporació a l'admin queda com a següent fase, pas a pas.
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: `/studio` manté les 16 seccions protegides i afegeix §19; el TOC marca 20 seccions; el catàleg renderitza serveis, packs, extres, inventari, portfolio i logos de clients des de fonts reals del repo.
+- Validació humana/UX: la fitxa deixa de ser només design system i passa a incloure el catàleg comercial que l'admin haurà d'incorporar després, amb una lectura clara abans de començar la migració visual.
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
 ### Canvi #778 — 2026-05-25 — claude (FET)
 
 **`/studio`: 3 noves seccions §16–18 — Lab Paleta Obsidiana, Lab Tipografia, Lab Components (transferència del sistema de disseny des de /studio-lab/leads).**

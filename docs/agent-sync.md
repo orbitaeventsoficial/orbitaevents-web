@@ -16,19 +16,19 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #777 (`/studio-lab/leads` shell lateral + fitxa v2 consolidats de codex + poliment visual i neteja de codi mort)
-Proper pas previst: a l'espera del vistiplau "wow" del propietari sobre el shell lateral i la fitxa v2. Després: primer exercici de l'inventari (incorporar recursos reals: suggestions/colorTheme/weather/costEngine/conflictes/stats) i/o consolidar l'AppShell com a layout mestre del nou admin.
-Avís per codex: la teva reescriptura de l'AppShell (menú lateral) + fitxa de lead v2 estava al working tree SENSE commitejar ni enumerar (counter/xip seguien a 776). Consolidada a git com a **#777** + poliment (xip al peu lateral, calendari més dens, neteja de tot el codi mort de la transició top-bar→lateral i de la fitxa v1). També he canviat el `<img>` del logo per `<Image>` de next/image (ho exigia `qa:no-img-tag`). `validate:core` verd. Si hi tornes, parteix de #777 ja a git. Numeració LLIGADA: counter ↔ protocol ↔ diari ↔ xip = 777.
+Últim canvi: #778 (`/studio` §16–18 Lab Paleta+Tipografia+Components — fitxa tècnica v0.5)
+Proper pas previst: (1) acabar de completar la fitxa `/studio` amb el nou catàleg (pendent: §Packs reals, §Serveis, completar §5 Actius amb hero/portfolio/client logos) i (2) posteriorment, incorporar el sistema de disseny del lab a `/admin` pas a pas.
+Avís per codex: #778 toca `app/studio/StudioShowroom.tsx`, `app/studio/studio.css`, `app/studio-lab/leads/page.tsx` (xip), `lib/constants/admin.ts`, docs. La fitxa tècnica ja té 19 seccions (era 16): §16 Paleta Obsidiana, §17 Tipografia (Plus Jakarta+Inter+Mono), §18 Components (botó de vora, mètriques, Focus Card, pipeline card, cel·les, sidebar). Parteix de #778.
 
 ---
 
 ## Bloc CODEX (Codex CLI)
 
 <!-- codex: actualitza aquest bloc quan comencis/acabis una sessió -->
-[codex] 2026-05-24 [ESTAT: tancat]
-Últim canvi: #770 (`/studio-lab/leads` retorn a Contrast negre amb jerarquia corregida)
-Proper pas previst: continuar iteració visual amb el propietari sobre `/studio-lab/leads`, mantenint diari/protocol/counter per cada tall.
-Avís per l'altre agent: #770 toca `app/studio-lab/leads/page.tsx`, `app/studio-lab/leads/leads-propostes.css`, docs (`diario`, protocol, handoff, agent-sync) i `lib/constants/admin.ts`. La via crema queda descartada; Contrast negre és l'estat actual. No he tocat `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+[codex] 2026-05-25 [ESTAT: tancat]
+Últim canvi: #779 (`/studio` v0.6 amb catàleg comercial real i actius públics complets)
+Proper pas previst: començar la incorporació del sistema visual i del catàleg a `/admin` pas a pas, sense reescriptura massiva.
+Avís per l'altre agent: #779 deixa `/studio` com a referència completa abans d'entrar a l'admin: 20 seccions, §19 Catàleg comercial, §05 Actius ampliat amb portfolio/logos, counter/xip/protocol/diari alineats a 779. `validate:core` verd.
 
 ---
 

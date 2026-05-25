@@ -56,7 +56,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 778;
+export const ADMIN_CHANGE_COUNTER = 779;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',

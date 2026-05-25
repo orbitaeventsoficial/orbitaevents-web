@@ -1,3 +1,28 @@
+## 2026-05-25 — Canvi #779: `/studio` v0.6 amb catàleg comercial real i actius públics (codex)
+
+### Context
+El propietari demana acabar de completar la fitxa amb el nou catàleg i després començar a incorporar-ho a l'admin pas a pas i de nou. El tall es limita a deixar `/studio` com a referència completa abans de tocar `/admin`.
+
+### Canvi
+- **`app/studio/StudioShowroom.tsx`**: fitxa pujada a `v0.6` i 20 seccions. Nova **§19 Catàleg comercial** amb fonts reals del repo: `getAllPacks()`, `EXTRAS`, `INVENTARIO`, `PORTFOLIO_CATEGORIES` i `CLIENT_LOGOS`.
+- **§19**: serveis públics (bodes, discomòbil, festes, empreses), rangs de preu, capacitats, pack guia, taula de packs reals, extres públics i inventari base.
+- **§05 Actius del repo**: afegits covers reals del portfolio i logos de clients, a més dels logos/favicons existents.
+- **`app/studio/studio.css`**: estils `o-catalog-*` i preview fotogràfic per fer llegible el catàleg dins la fitxa.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = 779.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 778→779.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `pnpm run validate:core` OK.
+- Validació funcional: `/studio` manté la zona protegida i afegeix el nou §19; TOC i footer indiquen 20 seccions; el xip del lab queda a `#779`.
+- Validació humana/UX: la fitxa ja conté design system + catàleg comercial real; la migració a `/admin` pot començar després de manera seqüencial.
+
+### Tancament
+- Començat per: codex
+- Treballant per: codex
+- Tancat per: codex
+
+---
+
 ## 2026-05-25 — Canvi #778: `/studio` §16–18 Lab Paleta · Tipografia · Components (claude)
 
 ### Context
