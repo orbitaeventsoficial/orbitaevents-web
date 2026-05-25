@@ -15,7 +15,9 @@ Distinció de les tres superfícies:
 - `/studio` → la **fitxa tècnica** del sistema visual (tokens, components, PDFs). Zona protegida.
 - `/studio-lab` → el **laboratori** on es dissenya el nou admin (aquesta pàgina).
 
-## Estat actual (Canvi #774 — blindatge numeració xip↔counter + reconciliació a git)
+## Estat actual (Canvi #775 — nova paleta: or heroi únic, carbassa fora, 4 estats distints)
+
+> **#775** (`/studio-lab/leads`): paleta refeta. **Or = heroi únic** (marca + diners + única acció primària); chrome calmat (nav/toggle/xips de mes = selecció tranquil·la, no taronja). **Carbassa retirada.** **4 estats distints per hue**: nou=topazi, contactat=ametista, guanyat=maragda, perdut=cendra — cap usa l'or, així "color = estat" funciona. **Forats silenciosos**: caselles lliures sense repetir "Lliure", s'encenen en or (oportunitat) en hover. Captures `leads-cal-v2.png` / `leads-pipe-v2.png`.
 
 > **#774** (blindatge): les proves #768–773 estaven documentades al diari/protocol però **no commitejades** (git a #767). Reconciliades a git. `qa:protocol` ara exigeix que el xip `LAB_CHANGE_NUMBER` de `/studio-lab/leads` sigui igual a `ADMIN_CHANGE_COUNTER` — cada canvi s'ha de reflectir al diari **i** a la pàgina o la validació falla. Retirada la prova morta `app/studio-lab/flux/`. Numeració lligada: counter ↔ protocol ↔ diari ↔ xip = **774**.
 

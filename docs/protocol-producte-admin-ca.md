@@ -1293,6 +1293,22 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #775 — 2026-05-25 — claude (FET)
+
+**`/studio-lab/leads`: nova paleta — or com a heroi únic, carbassa retirada, 4 estats distints, forats silenciosos.**
+- Context: el propietari demana opinió de disseny i dóna llibertat ("la carbassa no és imprescindible, si tens una paleta millor aplica-la"). Diagnòstic: la carbassa s'usava per a chrome no-acció i 3 dels 4 estats vivien a la mateixa banda ambre-or → "color = estat" fallava i el calendari era poc llegible.
+- `app/studio-lab/leads/leads-propostes.css`: **carbassa (`--metal*`) retirada**. **Or = heroi únic** (marca + diners + única acció primària): CTA i "Nova entrada" en or massís; nav-actiu, toggle de vista i xips de mes passen a **selecció tranquil·la** (superfície elevada + or fi, sense farciment). **Quartet d'estats distint per hue**: `nou`=topazi ambre, `contactat`=ametista, `guanyat`=maragda, `perdut`=cendra (gris desaturat, el més silenciós). Cap estat usa l'or.
+- **Caselles lliures silencioses**: fora la repetició de "Lliure" (apareixia ~15 cops); ara són forats amb vora discontínua que mostren només el dia i s'encenen en or (slot obert / oportunitat) en hover.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `775` (només el número; sense canvis de lògica).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `775` (lligats, sense salts); el següent canvi real ha de ser `#776`.
+- Abast: només `/studio-lab/leads` (CSS + número) + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter inclòs).
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `Canvi #775`; calendari i pipeline diferencien els 4 estats; forats sense soroll; captures `leads-cal-v2.png` / `leads-pipe-v2.png`.
+- Validació humana/UX: la paleta separa rols (or=marca/diners/acció · color=estat); el calendari guanya llegibilitat; pendent del vistiplau del propietari.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #774 — 2026-05-25 — claude (FET)
 
 **Blindatge de numeració + reconciliació a git de les proves #768–773 de `/studio-lab/leads`.**

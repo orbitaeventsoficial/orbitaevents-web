@@ -1,3 +1,26 @@
+## 2026-05-25 — Canvi #775: `/studio-lab/leads` nova paleta — or heroi únic, carbassa fora, 4 estats distints, forats silenciosos (claude)
+
+### Context
+El propietari em demana opinió de disseny honesta sobre `/studio-lab/leads` i em dóna llibertat de color: "la carbassa no és imprescindible, si tens una paleta millor aplica-la". Diagnòstic meu (amb captures): l'taronja s'usava per a chrome no-acció (nav, toggle, xips) **i** 3 dels 4 estats vivien a la mateixa banda ambre-or → el principi **"color = estat"** fallava i el calendari quedava poc llegible; només el verd destacava. Aplico la direcció sobre la base [[feedback-studio-lab-estetica]] (Brass & Obsidian, sense blau, sense candy, sense neó).
+
+### Canvi
+1. **Carbassa retirada** (`--metal*` eliminat de `leads-propostes.css`).
+2. **Or = heroi únic** (marca + diners + **única** acció primària): la CTA del FOCUS, "Nova entrada" i el botó de la fitxa passen a or massís (lingot, relleu plàstic). El nav-actiu, el toggle Calendari/Pipeline i els xips de mes deixen el farciment taronja i passen a **selecció tranquil·la** (superfície elevada + hairline d'or + text or). Així l'or-massís = "fes això" i la selecció no competeix.
+3. **Quartet d'estats distint per HUE** (joia, sense blau/candy): `nou`=topazi ambre · `contactat`=ametista · `guanyat`=maragda · `perdut`=cendra (gris desaturat = mort, el més silenciós). Cap estat usa l'or → mai es confon estat amb diners/acció. El type-label de la targeta adopta el to de l'estat.
+4. **Forats silenciosos**: les caselles lliures ja no repeteixen "Lliure" (~15 cops de soroll). Ara mostren només el dia, amb vora discontínua (slot obert), i s'**encenen en or** (oportunitat) en hover.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (inclou el guard xip↔counter del #774).
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `Canvi #775`; calendari i pipeline diferencien clarament els 4 estats; forats sense repetició; captures `.codex-captures/leads-cal-v2.png` i `leads-pipe-v2.png`.
+- Validació humana/UX: separació de rols neta (or = marca/diners/acció · color = estat del bolo); el calendari guanya llegibilitat real. Pendent del vistiplau del propietari.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #774: blindatge de numeració (xip↔counter) + reconciliació a git de les proves #768–773 (claude)
 
 ### Context
