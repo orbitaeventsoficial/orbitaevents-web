@@ -16,6 +16,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import './leads-propostes.css';
 
 type Stage = 'nou' | 'contactat' | 'guanyat' | 'perdut';
@@ -31,13 +32,12 @@ type Lead = {
 const STAGE_LABEL: Record<Stage, string> = {
   nou: 'Nou', contactat: 'Contactat', guanyat: 'Guanyat', perdut: 'Perdut',
 };
-const STAGE_FLOW: Stage[] = ['nou', 'contactat', 'guanyat'];
 const PIPELINE_STAGES: Stage[] = ['nou', 'contactat', 'guanyat', 'perdut'];
 const PROB: Record<Stage, number> = { nou: 20, contactat: 55, guanyat: 100, perdut: 0 };
 const WX_LABEL: Record<WxKind, string> = { sun: 'Sol', partly: 'Mig sol', cloud: 'Núvols', rain: 'Pluja', storm: 'Tempesta' };
 
 const YEAR = 2026;
-const LAB_CHANGE_NUMBER = 776;
+const LAB_CHANGE_NUMBER = 777;
 const MONTH_WINDOW = 3;
 const MONTH_MAX_START = 12 - MONTH_WINDOW + 1;
 const MONTHS_FULL = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
@@ -45,7 +45,7 @@ const MONTHS_SHORT = ['gen', 'feb', 'març', 'abr', 'mai', 'jun', 'jul', 'ago', 
 
 /* Grans grups de tota l'app (navegació superior amb desplegables) */
 const NAV_GROUPS: { id: string; label: string; items: string[]; active?: boolean }[] = [
-  { id: 'comercial', label: 'Comercial', items: ['Entrades', 'Clients', 'Pressupostos', 'Pipeline'], active: true },
+  { id: 'comercial', label: 'Comercial', items: ['Temporada', 'Entrades', 'Clients', 'Pressupostos'], active: true },
   { id: 'operacio', label: 'Operació', items: ['Reserves', 'Calendari', 'Tasques', 'Equip i inventari'] },
   { id: 'economia', label: 'Economia', items: ['Facturació', 'Cobraments', 'Marges', 'Preus i packs'] },
   { id: 'marqueting', label: 'Màrqueting', items: ['Catàleg', 'Ressenyes', 'Blog', 'Integracions'] },
@@ -91,6 +91,13 @@ const I = {
   mail: ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>),
   dots: ic(<><circle cx="5" cy="12" r="1.4" /><circle cx="12" cy="12" r="1.4" /><circle cx="19" cy="12" r="1.4" /></>),
 };
+const AREA_ICON: Record<string, ReactNode> = {
+  comercial: ic(<><path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 12l9 4 9-4" /><path d="M3 17l9 4 9-4" /></>),
+  operacio: ic(<><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" /></>),
+  economia: ic(<><circle cx="12" cy="12" r="9" /><path d="M14.5 9.2A3 3 0 0 0 9 11h4m-4 2h4a3 3 0 0 1-5.5 1.8" /></>),
+  marqueting: ic(<><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z" /><path d="M16 9a3.5 3.5 0 0 1 0 6" /></>),
+  sistema: ic(<><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" /></>),
+};
 const WX_ICON: Record<WxKind, ReactNode> = {
   sun: ic(<><circle cx="12" cy="12" r="4.2" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" /></>),
   partly: ic(<><circle cx="8" cy="8" r="3" /><path d="M8 1.5v2M1.5 8h2M3.6 3.6l1.4 1.4M12.4 3.6 11 5" /><path d="M7 18h9a3.5 3.5 0 0 0 .2-7 5 5 0 0 0-9.4 1.2A3.4 3.4 0 0 0 7 18z" /></>),
@@ -112,122 +119,149 @@ function WxBlock({ wx, size }: { wx: Wx; size: 'card' | 'hero' }) {
 function LeadPage({ lead, onBack }: { lead: Lead; onBack: () => void }) {
   const prob = PROB[lead.stage];
   const margin = Math.round(lead.value * 0.42);
-  const flowIdx = STAGE_FLOW.indexOf(lead.stage);
-  const primaryLabel = lead.stage === 'guanyat' ? 'Crear reserva' : lead.stage === 'perdut' ? 'Reactiva lead' : 'Mou a la fase següent';
+  const flowIdx = PIPELINE_STAGES.indexOf(lead.stage);
+  const primaryLabel = lead.stage === 'nou'
+    ? 'Passa a contactat'
+    : lead.stage === 'contactat'
+      ? 'Passa a guanyat'
+      : lead.stage === 'guanyat'
+        ? 'Crear reserva'
+        : 'Reactiva a nou';
   return (
     <div className="lp2" data-stage={lead.stage}>
       <div className="lp2__bar">
         <button type="button" className="lp2__back" onClick={onBack}><span className="lp2__backic">{I.back}</span>Torna</button>
-        <span className="lp2__crumb">Comercial <em>/</em> Entrades <em>/</em> {lead.name}</span>
-        <div className="lp2__baracts">
-          <button type="button" className="lp2__ic" aria-label="WhatsApp">{I.whats}</button>
-          <button type="button" className="lp2__ic" aria-label="Correu">{I.mail}</button>
-          <button type="button" className="lp2__ic" aria-label="Més">{I.dots}</button>
-          <button type="button" className="lp2__cta">{primaryLabel} <span className="lp2__ctaic">{I.arrow}</span></button>
-        </div>
+        <span className="lp2__crumb">Comercial <em>/</em> Temporada <em>/</em> {lead.name}</span>
       </div>
 
-      <div className="lp2__hero">
-        <div className="lp2__id">
-          <span className="lp2__kicker" data-stage={lead.stage}>{STAGE_LABEL[lead.stage]}</span>
-          <h1 className="lp2__name">{lead.name}</h1>
-          <span className="lp2__meta">{fullDate(lead.dateISO)} · {lead.time} · {lead.location} · {lead.pax} pax · {lead.product}</span>
-        </div>
-        <WxBlock wx={lead.wx} size="hero" />
-        <div className="lp2__figs">
-          <div className="lp2__fig"><span>Valor estimat</span><b>{euro(lead.value)}</b></div>
-          <div className="lp2__fig"><span>Probabilitat</span><b>{prob}%</b></div>
-          <div className="lp2__fig"><span>Marge est.</span><b>{euro(margin)}</b></div>
-        </div>
-      </div>
-
-      <div className="lp2__cols">
-        <section className="lp2__panel">
-          <h2 className="lp2__h">Pipeline</h2>
-          <div className="lp2__pipe">
-            {STAGE_FLOW.map((s, i) => (
-              <div key={s} className={`lp2__step${i < flowIdx ? ' is-done' : ''}${i === flowIdx ? ' is-now' : ''}`} data-stage={i === flowIdx ? lead.stage : undefined}>
-                <span className="lp2__dot" />
-                <span className="lp2__steplabel">{STAGE_LABEL[s]}</span>
-              </div>
-            ))}
+      <div className="lp2__layout">
+        <section className="lp2__main">
+          <div className="lp2__hero">
+            <div className="lp2__id">
+              <span className="lp2__kicker" data-stage={lead.stage}>{STAGE_LABEL[lead.stage]} · {lead.type}</span>
+              <h1 className="lp2__name">{lead.name}</h1>
+              <span className="lp2__meta">{fullDate(lead.dateISO)} · {lead.time} · {lead.location}</span>
+            </div>
+            <WxBlock wx={lead.wx} size="hero" />
           </div>
-          <button type="button" className="lp2__next">{primaryLabel} <span className="lp2__nextic">{I.arrow}</span></button>
-        </section>
 
-        <section className="lp2__panel">
-          <h2 className="lp2__h">Client</h2>
-          <dl className="lp2__rows">
-            <div><dt>Contacte</dt><dd>{lead.name}</dd></div>
-            <div><dt>Canal d&apos;entrada</dt><dd>{lead.channel}</dd></div>
-            <div><dt>Estat</dt><dd>{STAGE_LABEL[lead.stage]}</dd></div>
-            <div><dt>Propietari</dt><dd>{lead.owner}</dd></div>
-            <div><dt>Últim contacte</dt><dd>{lead.last}</dd></div>
-          </dl>
-        </section>
-
-        <section className="lp2__panel">
-          <h2 className="lp2__h">Esdeveniment</h2>
-          <dl className="lp2__rows">
-            <div><dt>Tipus</dt><dd>{lead.type}</dd></div>
-            <div><dt>Data</dt><dd>{fullDate(lead.dateISO)}</dd></div>
-            <div><dt>Hora</dt><dd>{lead.time}</dd></div>
-            <div><dt>Lloc</dt><dd>{lead.location}</dd></div>
-            <div><dt>Pax</dt><dd>{lead.pax}</dd></div>
-            <div><dt>Producte</dt><dd>{lead.product}</dd></div>
-            <div><dt>Previsió</dt><dd>{WX_LABEL[lead.wx.kind]} · {lead.wx.tmax}° / {lead.wx.tmin}°</dd></div>
-            <div><dt>Marge estimat</dt><dd className="lp2__num">{euro(margin)}</dd></div>
-          </dl>
-        </section>
-
-        <section className="lp2__panel lp2__panel--wide">
-          <h2 className="lp2__h">Activitat</h2>
-          <div className="lp2__time">
-            <div className="lp2__ev"><span className="lp2__evdot" data-stage={lead.stage} /><div><b>Pressupost enviat</b><span>{lead.last} · {lead.owner}</span></div></div>
-            <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Trucada de seguiment</b><span>fa 5 dies · {lead.owner}</span></div></div>
-            <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Entrada des de {lead.channel}</b><span>fa 8 dies · automàtic</span></div></div>
+          <div className="lp2__stats" aria-label="Resum del lead">
+            <div className="lp2__stat"><span>Valor estimat</span><b>{euro(lead.value)}</b></div>
+            <div className="lp2__stat"><span>Probabilitat</span><b>{prob}%</b></div>
+            <div className="lp2__stat"><span>Marge est.</span><b>{euro(margin)}</b></div>
+            <div className="lp2__stat"><span>Pax</span><b>{lead.pax}</b></div>
           </div>
+
+          <section className="lp2__panel lp2__panel--details">
+            <h2 className="lp2__h">Dades clau</h2>
+            <dl className="lp2__data">
+              <div><dt>Contacte</dt><dd>{lead.name}</dd></div>
+              <div><dt>Producte</dt><dd>{lead.product}</dd></div>
+              <div><dt>Canal</dt><dd>{lead.channel}</dd></div>
+              <div><dt>Propietari</dt><dd>{lead.owner}</dd></div>
+              <div><dt>Data</dt><dd>{fullDate(lead.dateISO)}</dd></div>
+              <div><dt>Hora</dt><dd>{lead.time}</dd></div>
+              <div><dt>Lloc</dt><dd>{lead.location}</dd></div>
+              <div><dt>Últim contacte</dt><dd>{lead.last}</dd></div>
+            </dl>
+          </section>
+
+          <section className="lp2__panel lp2__panel--wide">
+            <h2 className="lp2__h">Activitat</h2>
+            <div className="lp2__time">
+              <div className="lp2__ev"><span className="lp2__evdot" data-stage={lead.stage} /><div><b>Pressupost enviat</b><span>{lead.last} · {lead.owner}</span></div></div>
+              <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Trucada de seguiment</b><span>fa 5 dies · {lead.owner}</span></div></div>
+              <div className="lp2__ev"><span className="lp2__evdot" /><div><b>Entrada des de {lead.channel}</b><span>fa 8 dies · automàtic</span></div></div>
+            </div>
+          </section>
         </section>
+
+        <aside className="lp2__decision">
+          <section className="lp2__panel lp2__panel--action">
+            <span className="lp2__kicker">Accions</span>
+            <h2 className="lp2__actiontitle">Què ha passat?</h2>
+            <p>{leadSummary(lead)}</p>
+            <div className="lp2__quickacts" aria-label="Registrar activitat">
+              <button type="button"><span className="lp2__quickic">{I.whats}</span>Enviar WhatsApp</button>
+              <button type="button"><span className="lp2__quickic">{I.mail}</span>Enviar correu</button>
+              <button type="button"><span className="lp2__quickic">{I.whats}</span>Trucada feta</button>
+              <button type="button"><span className="lp2__quickic">{I.mail}</span>Pressupost enviat</button>
+              <button type="button"><span className="lp2__quickic">{I.dots}</span>Afegir nota</button>
+            </div>
+          </section>
+
+          <section className="lp2__panel">
+            <h2 className="lp2__h">Canviar estat</h2>
+            <div className="lp2__stagepick" role="group" aria-label="Canviar estat del lead">
+              {PIPELINE_STAGES.map((s, i) => (
+                <button type="button" key={s} className={`lp2__stagebtn${lead.stage !== 'perdut' && s !== 'perdut' && i < flowIdx ? ' is-done' : ''}${i === flowIdx ? ' is-now' : ''}`} data-stage={s} aria-pressed={i === flowIdx}>
+                  <span className="lp2__dot" />
+                  <span className="lp2__steplabel">{STAGE_LABEL[s]}</span>
+                </button>
+              ))}
+            </div>
+            <button type="button" className="lp2__commit">{primaryLabel} <span className="lp2__ctaic">{I.arrow}</span></button>
+          </section>
+
+          <section className="lp2__panel">
+            <h2 className="lp2__h">Previsió</h2>
+            <WxBlock wx={lead.wx} size="card" />
+            <dl className="lp2__rows lp2__rows--compact">
+              <div><dt>Temps</dt><dd>{WX_LABEL[lead.wx.kind]}</dd></div>
+              <div><dt>Màxima</dt><dd>{lead.wx.tmax}°</dd></div>
+              <div><dt>Mínima</dt><dd>{lead.wx.tmin}°</dd></div>
+            </dl>
+          </section>
+        </aside>
       </div>
     </div>
   );
 }
 
-/* ── Esquelet de l'app: capçalera fixa que regeix tot el programa ────────── */
+/* ── Esquelet de l'app: menú lateral + barra d'accions ────────────────────── */
 function AppShell({ children }: { children: ReactNode }) {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   return (
-    <div className="fx">
-      <header className="fx__top">
-        <div className="fx__brand"><span className="fx__mark">Ò</span><span className="fx__brandword">Òrbita</span></div>
-        <nav className="fx__groups" aria-label="Àrees de treball">
-          {NAV_GROUPS.map((g) => (
-            <div className="fx__group" key={g.id}>
-              <button
-                type="button"
-                className={`fx__gtitle${g.active ? ' is-active' : ''}${openMenu === g.id ? ' is-open' : ''}`}
-                aria-haspopup="true"
-                aria-expanded={openMenu === g.id}
-                onClick={() => setOpenMenu(openMenu === g.id ? null : g.id)}
-              >
-                {g.label}<span className="fx__gchev">{I.chevron}</span>
-              </button>
-              {openMenu === g.id && (
-                <div className="fx__menu" role="menu">
-                  {g.items.map((it) => (<button key={it} type="button" role="menuitem" onClick={() => setOpenMenu(null)}>{it}</button>))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        <div className="fx__topacts">
-          <label className="fx__search"><span className="fx__searchic">{I.search}</span><input type="text" placeholder="Cerca…" readOnly aria-label="Cerca" /></label>
-          <button type="button" className="fx__cta"><span className="fx__ctaic">{I.plus}</span>Nova entrada</button>
-          <span className="fx__meav" title="Òrbita Events">OE</span>
+    <div className="fx fx--side">
+      <aside className="fx__side">
+        <div className="fx__brand">
+          <Image className="fx__logo" src="/img/logoplanetatextdreta.svg" alt="Òrbita Events" width={140} height={46} priority />
         </div>
-      </header>
-      {openMenu && <button type="button" className="fx__menuscrim" aria-label="Tanca el menú" onClick={() => setOpenMenu(null)} />}
-      <div className="fx__page">{children}</div>
+        <nav className="fx__sidenav" aria-label="Àrees de treball">
+          {NAV_GROUPS.map((g) => {
+            return (
+              <div className={`fx__sidegroup${g.active ? ' is-active' : ''}`} key={g.id}>
+                <button
+                  type="button"
+                  className="fx__sideitem"
+                  aria-current={g.active ? 'page' : undefined}
+                >
+                  <span className="fx__gic">{AREA_ICON[g.id]}</span>
+                  <span>{g.label}</span>
+                </button>
+                {g.active && (
+                  <div className="fx__sidesub">
+                    {g.items.map((it, i) => (
+                      <button type="button" className={i === 0 ? 'is-on' : ''} key={it}>{it}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+        <div className="fx__sideactions">
+          <label className="fx__search"><span className="fx__searchic">{I.search}</span><input type="text" placeholder="Cerca o executa" readOnly aria-label="Cerca" /><kbd className="fx__kbd">K</kbd></label>
+          <button type="button" className="fx__cta"><span className="fx__ctaic">{I.plus}</span>Nova entrada</button>
+        </div>
+        <div className="fx__sidefoot">
+          <span className="fx__meav" title="Òrbita Events">OE</span>
+          <span className="fx__sidefootname">Òrbita Events</span>
+          <span className="fx__change" title="Número de canvi del laboratori">#{LAB_CHANGE_NUMBER}</span>
+        </div>
+      </aside>
+      <div className="fx__workspace">
+        <div className="fx__page">{children}</div>
+      </div>
     </div>
   );
 }
@@ -252,8 +286,6 @@ function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setM
     const base = focusPos < 0 ? 0 : focusPos;
     setFocusId(focusQueue[(base + dir + focusQueue.length) % focusQueue.length].id);
   };
-  const focusAction = focus.stage === 'guanyat' ? 'Crear reserva' : focus.stage === 'nou' ? 'Primer contacte' : focus.stage === 'perdut' ? 'Reactivar' : 'Mou a la fase següent';
-
   const totalValue = LEADS.reduce((sum, lead) => sum + lead.value, 0);
   const openValue = LEADS.filter((lead) => lead.stage === 'nou' || lead.stage === 'contactat').reduce((sum, lead) => sum + lead.value, 0);
   const wonValue = LEADS.filter((lead) => lead.stage === 'guanyat').reduce((sum, lead) => sum + lead.value, 0);
@@ -263,16 +295,15 @@ function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setM
     <>
       <div className="fx__pagehead">
         <div className="fx__tt">
-          <span className="fx__eyebrow">Comercial · Temporada {YEAR}</span>
+          <span className="fx__eyebrow">Temporada {YEAR}</span>
           <h1 className="fx__h1">Caps de setmana</h1>
         </div>
         <div className="fx__headright">
-          <span className="fx__change">Canvi #{LAB_CHANGE_NUMBER}</span>
+          <span className="fx__sub">{MONTHS_SHORT[visibleMonths[0] - 1]} – {MONTHS_SHORT[visibleMonths[visibleMonths.length - 1] - 1]} {YEAR} · caps de setmana</span>
           <div className="fx__view" role="group" aria-label="Vista">
             <button type="button" className={viewMode === 'calendari' ? 'is-on' : ''} aria-pressed={viewMode === 'calendari'} onClick={() => setViewMode('calendari')}>Calendari</button>
             <button type="button" className={viewMode === 'pipeline' ? 'is-on' : ''} aria-pressed={viewMode === 'pipeline'} onClick={() => setViewMode('pipeline')}>Pipeline</button>
           </div>
-          <span className="fx__sub">{MONTHS_SHORT[visibleMonths[0] - 1]} – {MONTHS_SHORT[visibleMonths[visibleMonths.length - 1] - 1]} {YEAR} · caps de setmana</span>
         </div>
       </div>
       <div className="fx__focus" data-stage={focus.stage}>
@@ -292,7 +323,6 @@ function TemporadaPage({ viewMode, setViewMode, months, onOpen, monthStart, setM
           </button>
           <div className="fx__focusside">
             <div className="fx__ring" style={{ '--p': PROB[focus.stage] } as CSSProperties} aria-label={`Probabilitat ${PROB[focus.stage]}%`}><span>{PROB[focus.stage]}%</span></div>
-            <button type="button" className="fx__cta" onClick={() => onOpen(focus.id)}>{focusAction}<span className="fx__ctaic">{I.arrow}</span></button>
           </div>
         </div>
       </div>

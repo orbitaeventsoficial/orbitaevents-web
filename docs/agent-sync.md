@@ -16,9 +16,9 @@ Avís per l'altre agent: ...
 ## Bloc CLAUDE (Claude Code)
 
 [claude] 2026-05-25 [ESTAT: tancat]
-Últim canvi: #776 (inventari de recursos del repo a `docs/inventari-recursos.md`)
-Proper pas previst: primer exercici — `/studio-lab/leads` incorpora recursos reals (suggestions/colorTheme/weather/costEngine/conflictes/stats/leadRouteService) segons el Pla d'aprofitament de `docs/inventari-recursos.md`. Després, la "pàgina tipus" (l'AppShell com a layout mestre del nou admin), que encara no s'ha treballat. Principi del propietari: cap soroll.
-Avís per codex: ALERTA RESOLTA — les proves #768–773 estaven documentades però NO commitejades (git a #767). Reconciliades a git al #774. `qa:protocol` ara EXIGEIX que `LAB_CHANGE_NUMBER` del xip de `/studio-lab/leads` == `ADMIN_CHANGE_COUNTER`: cada canvi s'ha de reflectir al diari I a la pàgina o la validació peta. Numeració LLIGADA: counter ↔ protocol ↔ diari ↔ xip = 774. PENDENT (no meu): working tree conserva canvis d'admin sense `#N` (CustomerHeader, ImapSettingsClient + tests) i el blindatge nonstop (CLAUDE.md, agent-runtime-policy.json, check-nonstop-protocol + test) — sense commitejar, a decidir pel propietari. Counter 774, proper #775.
+Últim canvi: #777 (`/studio-lab/leads` shell lateral + fitxa v2 consolidats de codex + poliment visual i neteja de codi mort)
+Proper pas previst: a l'espera del vistiplau "wow" del propietari sobre el shell lateral i la fitxa v2. Després: primer exercici de l'inventari (incorporar recursos reals: suggestions/colorTheme/weather/costEngine/conflictes/stats) i/o consolidar l'AppShell com a layout mestre del nou admin.
+Avís per codex: la teva reescriptura de l'AppShell (menú lateral) + fitxa de lead v2 estava al working tree SENSE commitejar ni enumerar (counter/xip seguien a 776). Consolidada a git com a **#777** + poliment (xip al peu lateral, calendari més dens, neteja de tot el codi mort de la transició top-bar→lateral i de la fitxa v1). També he canviat el `<img>` del logo per `<Image>` de next/image (ho exigia `qa:no-img-tag`). `validate:core` verd. Si hi tornes, parteix de #777 ja a git. Numeració LLIGADA: counter ↔ protocol ↔ diari ↔ xip = 777.
 
 ---
 

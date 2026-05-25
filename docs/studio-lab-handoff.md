@@ -15,7 +15,9 @@ Distinció de les tres superfícies:
 - `/studio` → la **fitxa tècnica** del sistema visual (tokens, components, PDFs). Zona protegida.
 - `/studio-lab` → el **laboratori** on es dissenya el nou admin (aquesta pàgina).
 
-## Estat actual (Canvi #775 — nova paleta: or heroi únic, carbassa fora, 4 estats distints)
+## Estat actual (Canvi #777 — shell lateral + fitxa v2 consolidats + poliment)
+
+> **#777** (`/studio-lab/leads`): consolidació a git de la feina de **codex** (estava al working tree sense commitejar ni enumerar): `AppShell` reescrit de barra superior a **menú lateral** (logo real, àrees amb subítems, cerca ⌘K, "Nova entrada", peu amb el xip de canvi) i **fitxa de lead v2** a dues columnes orientades a la decisió (informació | accions·canvi d'estat·previsió). Per damunt, **poliment de Claude**: xip `Canvi #N` mogut al peu del menú (capçalera de Temporada descongestionada), calendari més dens (`grid-auto-rows` 104→94) i ritme vertical ajustat, i **neteja total de codi mort** (residus de la transició top-bar→lateral i de la fitxa v1; dos `@media 900px` fusionats). Captures `.codex-captures/leads-desktop-*.png` i `leads-mobile-*.png`. Pendent del vistiplau "wow" del propietari sobre el shell lateral i la fitxa v2.
 
 > **#775** (`/studio-lab/leads`): paleta refeta. **Or = heroi únic** (marca + diners + única acció primària); chrome calmat (nav/toggle/xips de mes = selecció tranquil·la, no taronja). **Carbassa retirada.** **4 estats distints per hue**: nou=topazi, contactat=ametista, guanyat=maragda, perdut=cendra — cap usa l'or, així "color = estat" funciona. **Forats silenciosos**: caselles lliures sense repetir "Lliure", s'encenen en or (oportunitat) en hover. Captures `leads-cal-v2.png` / `leads-pipe-v2.png`.
 

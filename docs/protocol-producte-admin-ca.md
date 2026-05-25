@@ -1293,6 +1293,22 @@ Seqüència obligatòria de registre:
 
 ## Entrades
 
+### Canvi #777 — 2026-05-25 — claude (FET)
+
+**`/studio-lab/leads`: consolidació a git del shell lateral + fitxa v2 (feina de codex) + poliment visual i neteja de codi mort.**
+- Context: codex havia reescrit l'esquelet de l'app (`AppShell`) de barra superior a **menú lateral** i la fitxa de lead a una vista de **dues columnes orientada a la decisió** (informació a l'esquerra · accions/canvi d'estat/previsió a la dreta), però estava al working tree **sense commitejar ni enumerar** (counter/xip seguien a 776). El propietari demana captures de l'estat i, després, millores d'aspecte/organització.
+- `app/studio-lab/leads/page.tsx`: tret codi mort (`STAGE_FLOW`, `activeGroup` no usats); xip de canvi (`Canvi #N`) **mogut** de la capçalera de Temporada al **peu del menú lateral** (`fx__sidefoot`) → discret, sempre visible i sense competir amb el toggle de vista. `LAB_CHANGE_NUMBER` = `777`.
+- `app/studio-lab/leads/leads-propostes.css`: **neteja de residus** de la transició top-bar→lateral (`.fx__top`, `.fx__topmain`, `.fx__groups`, `.fx__gtitle*`, `.fx__topacts`, `.fx__contextbar`, `.fx__crumb2`, `.fx__subnav`) i de la fitxa v1 (`.lp2__figs/fig*`, `.lp2__cols`, `.lp2__pipe/step*/next*`, `.lp2__num`, `.lp2__baracts/ic*`). Dos `@media (max-width:900px)` **fusionats** en un. Àtoms compartits (marca/logo/cerca/avatar/icones d'àrea) conservats.
+- Poliment: calendari més dens (`grid-auto-rows` 104→94px) i ritme vertical ajustat (`pagehead`/`content`) perquè el calendari (heroi) pugi; estil del xip al peu lateral.
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = `777` (lligats, sense salts); el següent canvi real ha de ser `#778`.
+- Abast: només `/studio-lab/leads` (CSS + page) + docs/counter. No toca `/studio`, `/admin`, serveis, schema, auth ni dades reals.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter inclòs).
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `#777` al peu lateral; calendari, pipeline i fitxa operatius; captures `leads-desktop-*.png` / `leads-mobile-*.png`.
+- Validació humana/UX: capçalera de Temporada descongestionada, calendari més compacte, codi sense morts; pendent del vistiplau "wow" del propietari sobre la direcció del shell lateral i la fitxa v2.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ### Canvi #776 — 2026-05-25 — claude (FET)
 
 **Inventari de recursos del repo (`docs/inventari-recursos.md`) — mapa per reaprofitar el que ja tenim.**

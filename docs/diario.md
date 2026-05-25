@@ -1,3 +1,26 @@
+## 2026-05-25 — Canvi #777: `/studio-lab/leads` shell lateral + fitxa v2 (consolidació de codex) + poliment visual i neteja (claude)
+
+### Context
+Codex havia treballat `/studio-lab/leads` però **sense commitejar ni enumerar** (counter/xip seguien a 776): havia convertit l'`AppShell` de barra superior a **menú lateral** i la fitxa de lead a **dues columnes orientades a la decisió** (informació | accions/estat/previsió). El propietari demana: (1) **captures** de l'estat actual; (2) després, **millores visuals** (aspecte, organització).
+
+### Canvi
+- Captures fetes a `.codex-captures/leads-desktop-{calendari,pipeline,fitxa}.png` i `leads-mobile-{calendari,fitxa}.png` (`.dbg-leads.cjs`).
+- `page.tsx`: tret codi mort (`STAGE_FLOW`, `activeGroup`); xip `Canvi #N` **mogut** de la capçalera de Temporada al **peu del menú lateral** (discret, global, sense competir amb el toggle). `LAB_CHANGE_NUMBER` = 777.
+- `leads-propostes.css`: **neteja** de tot el residu de la transició top-bar→lateral (`.fx__top/topmain/groups/gtitle*/topacts/contextbar/crumb2/subnav`) i de la fitxa v1 (`.lp2__figs/fig*/cols/pipe/step*/next*/num/baracts/ic*`); dos `@media 900px` fusionats; àtoms compartits conservats. Poliment: calendari més dens (`grid-auto-rows` 104→94) i ritme vertical ajustat (calendari heroi puja).
+- `ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER` = 777 (lligats). Següent: #778.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK (guard xip↔counter).
+- Validació funcional: `/studio-lab/leads` HTTP 200; xip `#777` al peu lateral; calendari/pipeline/fitxa operatius; captures noves preses.
+- Validació humana/UX: capçalera descongestionada + calendari més compacte + zero codi mort; pendent del vistiplau "wow" del propietari sobre el shell lateral i la fitxa v2.
+
+### Tancament
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-25 — Canvi #776: inventari de recursos del repo (`docs/inventari-recursos.md`) (claude)
 
 ### Context
