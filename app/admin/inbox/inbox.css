@@ -1273,3 +1273,105 @@
 .cx__extraitem:hover { background: var(--ax-raised); }
 .cx__extraitem.is-on { border-color: var(--ax-hair-gold); background: color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel)); }
 .cx__extralabel { font-size: 13px; color: var(--ax-t); }
+
+/* ========================================================================
+   INBOX SETTINGS — ix__settings*
+   ======================================================================== */
+.ix__settingsbody { display: flex; flex-direction: column; gap: 20px; max-width: 700px; }
+
+/* Connection status card */
+.ix__connstat {
+  border: 1px solid var(--ax-line);
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--ax-panel);
+}
+.ix__connstat.is-ok { border-color: color-mix(in oklab, var(--o-stage-done) 35%, var(--ax-line)); }
+.ix__connstat.is-error { border-color: color-mix(in oklab, var(--o-stage-lost) 35%, var(--ax-line)); }
+.ix__connstat.is-pending { border-color: color-mix(in oklab, var(--ax-gold) 25%, var(--ax-line)); }
+.ix__connstat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ix__connstat-left { display: flex; align-items: center; gap: 12px; }
+.ix__connstat-dot {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+}
+.is-ok .ix__connstat-dot { background: var(--o-stage-done); }
+.is-error .ix__connstat-dot { background: var(--o-stage-lost); }
+.is-pending .ix__connstat-dot { background: var(--ax-gold); }
+.ix__connstat-title { font-weight: 600; font-size: 15px; color: var(--ax-t); }
+.ix__connstat-source { font-size: 12px; color: var(--ax-t3); margin-top: 3px; }
+.ix__connstat-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 3px 8px; border-radius: 6px;
+  background: color-mix(in oklab, var(--o-stage-done) 18%, transparent);
+  color: var(--o-stage-done);
+  border: 1px solid color-mix(in oklab, var(--o-stage-done) 30%, transparent);
+}
+.ix__connstat-error { font-size: 13px; color: var(--o-stage-lost); margin-top: 10px; }
+
+/* Config display grid */
+.ix__configcard {
+  border: 1px solid var(--ax-line);
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--ax-panel);
+}
+.ix__configcard-title { font-size: 11px; font-weight: 700; color: var(--ax-t3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+.ix__configrow { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ax-line2); padding-bottom: 10px; margin-bottom: 10px; font-size: 13px; }
+.ix__configrow:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.ix__configlabel { color: var(--ax-t3); }
+.ix__configval { font-family: 'JetBrains Mono', monospace; color: var(--ax-t); }
+
+/* IMAP form */
+.ix__formcard {
+  border: 1px solid var(--ax-line);
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--ax-panel);
+}
+.ix__formcard-title { font-size: 11px; font-weight: 700; color: var(--ax-t3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+.ix__formgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 540px) { .ix__formgrid { grid-template-columns: 1fr 1fr; } }
+.ix__formfield { display: flex; flex-direction: column; gap: 5px; }
+.ix__formlabel { font-size: 12px; font-weight: 500; color: var(--ax-t2); }
+.ix__forminput {
+  width: 100%; border: 1px solid var(--ax-line); border-radius: 10px;
+  background: var(--ax-sunk); color: var(--ax-t);
+  padding: 9px 12px; font-size: 14px;
+  transition: border-color 140ms ease;
+}
+.ix__forminput:focus { outline: none; border-color: var(--ax-hair-gold); }
+.ix__formactions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+/* Settings action buttons */
+.ix__settingsbtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--ax-line); background: var(--ax-raised); color: var(--ax-t);
+  cursor: pointer; transition: background 140ms ease, border-color 140ms ease;
+}
+.ix__settingsbtn:hover { background: color-mix(in oklab, var(--ax-gold) 8%, var(--ax-raised)); border-color: var(--ax-hair-gold); }
+.ix__settingsbtn:disabled { opacity: 0.5; cursor: default; }
+.ix__settingsbtn.is-primary { background: var(--ax-gold); color: #000; border-color: var(--ax-gold); }
+.ix__settingsbtn.is-primary:hover { background: var(--ax-gold-bright); border-color: var(--ax-gold-bright); }
+.ix__settingsbtn.is-danger { border-color: color-mix(in oklab, var(--o-stage-lost) 40%, var(--ax-line)); color: var(--o-stage-lost); }
+.ix__settingsbtn.is-danger:hover { background: color-mix(in oklab, var(--o-stage-lost) 8%, var(--ax-raised)); }
+
+/* How it works */
+.ix__howto {
+  border: 1px solid var(--ax-line);
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--ax-panel);
+}
+.ix__howto-title { font-size: 11px; font-weight: 700; color: var(--ax-t3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.ix__howto-list { display: flex; flex-direction: column; gap: 6px; }
+.ix__howto-item { font-size: 13px; color: var(--ax-t2); }
+
+/* Loading spinner for settings */
+.ix__settings-loading { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ax-t2); }
+.ix__settings-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid var(--ax-t3); border-top-color: var(--ax-gold);
+  border-radius: 50%; animation: ix-spin 0.8s linear infinite;
+}
+@keyframes ix-spin { to { transform: rotate(360deg); } }

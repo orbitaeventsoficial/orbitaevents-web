@@ -1,3 +1,22 @@
+## 2026-05-26 — Canvi #802: extirpació inbox/settings — reconstrucció Brass & Obsidian (claude)
+
+### Context
+Continuació directa del #801. Tanca l'àrea mail sencera: `inbox`, `compose` i ara `settings`. `EditorControlStrip` usava `ap-btn` → eliminat i substituït per botons `ix__settingsbtn`.
+
+### Canvi
+- **`app/admin/inbox/settings/page.tsx`**: eliminat `AdminPage`. Estructura `.ix > .ix__head + .ix__settingsbody`.
+- **`app/admin/inbox/settings/ImapSettingsClient.tsx`**: reescrit. `ix__connstat.is-ok/error/pending`, `ix__configcard`, `ix__formcard`, `ix__settingsbtn.is-primary/danger`, `ix__howto`. Cap `ap-*`, cap `admin-tone-*`, cap Tailwind inline.
+- **`app/admin/inbox/inbox.css`**: classes `ix__settings*`, `ix__connstat*` (estat connexió), `ix__configcard*`, `ix__formcard*`, `ix__settingsbtn`, `ix__howto*`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 801→802.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK.
+- Validació funcional: configuració IMAP accessible, mostra estat real connexió (ok/error/pendent), formulari editable i eliminar-config sense classes del sistema vell.
+- Validació humana/UX: punt de color (verd/vermell/ambre) indica connexió, botons or per acció primària, estructura Brass & Obsidian consistent amb inbox i compose.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
 ## 2026-05-26 — Canvi #801: extirpació disseny vell inbox + reconstrucció des de zero (Brass & Obsidian) (claude)
 
 ### Context
@@ -1765,7 +1784,7 @@ La Fase 5 Polish Final (Canvis #722–#734) ha completat tots els objectius del 
 - Documental, sense canvis de codi funcional.
 
 ### Tancament
-- Comenzat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1787,7 +1806,7 @@ El layout admin no tenia cap skip navigation link. Usuaris de teclat han de nave
 - Segon Tab activa el focus dins el `<main>`, saltant sidebar i header.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1810,7 +1829,7 @@ El layout admin no tenia cap skip navigation link. Usuaris de teclat han de nave
 - 5 controls de cerca ara completament accessibles.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1831,7 +1850,7 @@ El layout admin no tenia cap skip navigation link. Usuaris de teclat han de nave
 - Validació Lighthouse: millora "Properly size images" per 22+ pàgines de zona.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1852,7 +1871,7 @@ Diagnosi-visual Fase 5 menciona explícitament "Easter eggs si vols sorprendre".
 - Validació humana/UX: sorpresa divertida, 100% inofensiva.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1872,7 +1891,7 @@ La pàgina de pricing tenia 4 tabs (Overview, Extras, Packs, Inventari) sense ca
 - Validació funcional: canvi de tab amb fade + slide subtil.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 
@@ -1893,7 +1912,7 @@ Diagnosi d'accessibilitat manual: `InventoryListSections.tsx` tenia 5 controls i
 - Validació accessibilitat: els 8 controls ara tenen accessible name per a lectors de pantalla.
 
 ### Tancament
-- Começat per: claude
+- Començat per: claude
 - Treballant per: claude
 - Tancat per: claude, 2026-05-20.
 

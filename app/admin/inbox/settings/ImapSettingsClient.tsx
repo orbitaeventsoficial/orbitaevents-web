@@ -1,9 +1,10 @@
+// app/admin/inbox/settings/ImapSettingsClient.tsx
+// Canvi #802 — extirpació ap-*/admin-tone-*, reconstrucció ix__settings* classes
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../../components/ToastProvider';
 import ConfirmDialog, { useConfirmDialog } from '../../components/ConfirmDialog';
-import { EditorControlStrip } from '../../components/EditorControlStrip';
 import { fetchWithCsrf } from '@/lib/csrf';
 
 interface ImapConfig {
@@ -27,7 +28,6 @@ export default function ImapSettingsClient() {
   const [config, setConfig] = useState<ImapConfig | null>(null);
   const [connection, setConnection] = useState<ConnectionResult | null>(null);
 
-  // Form state
   const [host, setHost] = useState('');
   const [port, setPort] = useState('993');
   const [user, setUser] = useState('');
@@ -43,8 +43,6 @@ export default function ImapSettingsClient() {
       const data = await res.json();
       setConfig(data.config);
       setConnection(data.connection);
-
-      // Pre-fill form with existing values
       if (data.config) {
         setHost(data.config.host || '');
         setPort(String(data.config.port || 993));
@@ -93,7 +91,7 @@ export default function ImapSettingsClient() {
   const deleteConfig = async () => {
     const ok = await confirm({
       title: 'Eliminar configuració IMAP',
-      message: 'S\'eliminarà el compte configurat. La safata quedarà sense connexió fins que es torni a configurar.',
+      message: "S'eliminarà el compte configurat. La safata quedarà sense connexió fins que es torni a configurar.",
       variant: 'danger',
       confirmLabel: 'Eliminar',
     });
@@ -134,11 +132,7 @@ export default function ImapSettingsClient() {
       const data = await res.json();
       if (data.ok) {
         toast.success('Configuració IMAP desada');
-        if (data.connection?.ok) {
-          setConnection({ ok: true });
-        } else {
-          setConnection({ ok: false, error: data.connection?.error });
-        }
+        setConnection(data.connection?.ok ? { ok: true } : { ok: false, error: data.connection?.error });
         setShowForm(false);
         await loadConfig();
       } else {
@@ -154,182 +148,96 @@ export default function ImapSettingsClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm" role="status">
-        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      <div className="ix__settings-loading" role="status">
+        <span className="ix__settings-spinner" />
         Carregant configuració...
       </div>
     );
   }
 
-  const connectionTone = connection?.ok
-    ? 'ap-card ap-card--success'
+  const connClass = connection?.ok
+    ? 'ix__connstat is-ok'
     : config?.configured
-      ? 'ap-card ap-card--danger'
-      : 'ap-card ap-card--warning';
+      ? 'ix__connstat is-error'
+      : 'ix__connstat is-pending';
 
-  const connectionDot = connection?.ok
-    ? 'admin-tone-bg-success'
+  const connTitle = connection?.ok
+    ? 'IMAP connectat i operatiu'
     : config?.configured
-      ? 'admin-tone-bg-danger'
-      : 'admin-tone-bg-warning';
+      ? 'IMAP configurat però amb error'
+      : 'IMAP no configurat';
+
   const sourceLabel =
-    config?.source === 'env'
-      ? 'Railway'
-      : config?.source === 'db'
-        ? 'Admin'
-        : 'Sense config';
-  const setupModeLabel = config?.configured
-    ? showForm
-      ? 'Editant'
-      : 'Actiu'
-    : 'Pendent';
-  const weakestLink = connection?.ok
-    ? null
-    : config?.configured
-      ? 'Les credencials existeixen però la connexió IMAP no és operativa.'
-      : 'La safata encara no té credencials mínimes per llegir correus.';
-  const sourceNote =
-    config?.source === 'env'
-      ? 'Railway té prioritat sobre qualsevol valor desat des de l’admin.'
-      : config?.source === 'db'
-        ? 'La configuració actual viu a base de dades i es pot actualitzar des d’aquesta pantalla.'
-        : 'Encara no hi ha cap font activa per a la safata IMAP.';
-  const actionTitle = !config?.configured
-    ? 'Completar la configuració mínima de la safata'
-    : connection?.ok
-      ? 'Mantenir la cadena estable i tornar a operativa'
-      : 'Regularitzar la connexió abans de confiar en la safata';
-  const actionDescription = !config?.configured
-    ? 'Sense host, usuari i contrasenya no hi ha importació real de correus cap a l’Inbox.'
-    : connection?.ok
-      ? 'La base és bona: el següent pas útil és tornar a la safata o revisar integracions si vols ampliar la cadena.'
-      : 'Abans d’obrir més automatismes o seguiments, cal validar credencials i provar connexió amb el servidor IMAP.';
+    config?.source === 'env' ? 'Variables Railway' :
+    config?.source === 'db' ? 'Configurat des de l\'admin' :
+    null;
 
   return (
-    <div className="space-y-4">
-      <EditorControlStrip
-        overview={{
-          eyebrow: 'Cobertura',
-          title: 'Quin estat té ara mateix la safata IMAP',
-          tone: connection?.ok ? 'success' : config?.configured ? 'warning' : 'default',
-          stats: [
-            { label: 'Connexió', value: connection?.ok ? 'OK' : config?.configured ? 'Error' : 'Pendent', tone: connection?.ok ? 'success' : 'warning' },
-            { label: 'Font', value: sourceLabel, hint: config?.configured ? 'credencial principal' : 'sense origen actiu' },
-            { label: 'Sessió', value: setupModeLabel, tone: showForm ? 'warning' : config?.configured ? 'success' : 'default' },
-          ],
-        }}
-        status={{
-          eyebrow: 'Estat',
-          title: 'Què convé revisar abans de tocar correus',
-          tone: connection?.ok ? 'info' : config?.configured ? 'warning' : 'default',
-          items: [
-            weakestLink ?? 'La safata pot llegir correus i la connexió IMAP està operativa.',
-            sourceNote,
-            connection?.ok
-              ? 'La configuració actual respon correctament al test de connexió.'
-              : connection?.error
-                ? `Últim error detectat: ${connection.error}`
-                : 'Encara no hi ha cap test de connexió operatiu amb aquesta configuració.',
-          ],
-        }}
-        action={{
-          eyebrow: 'Acció principal',
-          title: actionTitle,
-          description: actionDescription,
-          tone: connection?.ok ? 'success' : 'warning',
-          primaryAction: {
-            href: connection?.ok ? '/admin/inbox' : '/admin/settings/integrations',
-            label: connection?.ok ? 'Tornar a la safata' : 'Veure integracions',
-          },
-          secondaryAction: { href: '/admin/settings', label: 'Configuració' },
-          secondaryPills: [
-            config?.configured ? 'Credencials presents' : 'Sense credencials',
-            config?.secure === false ? 'Sense SSL/TLS' : 'SSL/TLS',
-          ],
-        }}
-      />
-
+    <>
       {/* Estat de connexió */}
-      <div className={`${connectionTone} rounded-2xl border p-5`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className={`h-4 w-4 rounded-full ${connectionDot}`} />
+      <div className={connClass}>
+        <div className="ix__connstat-header">
+          <div className="ix__connstat-left">
+            <span className="ix__connstat-dot" />
             <div>
-              <h2 className="font-semibold">
-                {connection?.ok
-                  ? 'IMAP connectat i operatiu'
-                  : config?.configured
-                    ? 'IMAP configurat pero amb error'
-                    : 'IMAP no configurat'}
-              </h2>
-              {config?.source === 'env' && (
-                <p className="mt-0.5 text-xs text-white/50">Font: variables d&apos;entorn (Railway)</p>
-              )}
-              {config?.source === 'db' && (
-                <p className="mt-0.5 text-xs text-white/50">Font: base de dades (configurat des de l&apos;admin)</p>
-              )}
+              <p className="ix__connstat-title">{connTitle}</p>
+              {sourceLabel && <p className="ix__connstat-source">{sourceLabel}</p>}
             </div>
           </div>
-          {connection?.ok && <span className="ap-badge ap-badge--success">ONLINE</span>}
+          {connection?.ok && <span className="ix__connstat-badge">ONLINE</span>}
         </div>
         {connection && !connection.ok && connection.error && (
-          <p className="mt-2 text-sm admin-tone-text-danger">{connection.error}</p>
+          <p className="ix__connstat-error">{connection.error}</p>
         )}
       </div>
 
       {/* Config actual */}
       {config?.configured && (
-        <div className="rounded-2xl border p-5">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide">Configuració actual</h3>
-          <div className="grid gap-2 text-sm">
-            <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-white/50">Servidor</span>
-              <span className="font-mono">{config.host}</span>
-            </div>
-            <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-white/50">Port</span>
-              <span className="font-mono">{config.port}</span>
-            </div>
-            <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-white/50">Usuari</span>
-              <span className="font-mono">{config.user}</span>
-            </div>
-            <div className="flex justify-between border-b border-white/5 pb-2">
-              <span className="text-white/50">SSL/TLS</span>
-              <span>{config.secure ? 'Si (port 993)' : 'No'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/50">Contrasenya</span>
-              <span>........</span>
-            </div>
+        <div className="ix__configcard">
+          <p className="ix__configcard-title">Configuració actual</p>
+          <div className="ix__configrow">
+            <span className="ix__configlabel">Servidor</span>
+            <span className="ix__configval">{config.host}</span>
+          </div>
+          <div className="ix__configrow">
+            <span className="ix__configlabel">Port</span>
+            <span className="ix__configval">{config.port}</span>
+          </div>
+          <div className="ix__configrow">
+            <span className="ix__configlabel">Usuari</span>
+            <span className="ix__configval">{config.user}</span>
+          </div>
+          <div className="ix__configrow">
+            <span className="ix__configlabel">SSL/TLS</span>
+            <span className="ix__configval">{config.secure ? 'Sí (port 993)' : 'No'}</span>
+          </div>
+          <div className="ix__configrow">
+            <span className="ix__configlabel">Contrasenya</span>
+            <span className="ix__configval">••••••••</span>
           </div>
         </div>
       )}
 
       {/* Formulari de configuració */}
       {!config?.configured || showForm ? (
-        <div className="rounded-2xl border p-5">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+        <div className="ix__formcard">
+          <p className="ix__formcard-title">
             {config?.configured ? 'Modificar configuració' : 'Configurar connexió IMAP'}
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="imap-host" className="mb-1 block text-xs font-medium">
-                Servidor IMAP
-              </label>
+          </p>
+          <div className="ix__formgrid">
+            <div className="ix__formfield">
+              <label htmlFor="imap-host" className="ix__formlabel">Servidor IMAP</label>
               <input
                 id="imap-host"
                 type="text"
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 placeholder="imap.dondominio.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+                className="ix__forminput"
               />
             </div>
-            <div>
-              <label htmlFor="imap-port" className="mb-1 block text-xs font-medium">
-                Port
-              </label>
+            <div className="ix__formfield">
+              <label htmlFor="imap-port" className="ix__formlabel">Port</label>
               <input
                 id="imap-port"
                 type="number"
@@ -337,43 +245,38 @@ export default function ImapSettingsClient() {
                 onChange={(e) => setPort(e.target.value)}
                 placeholder="993"
                 min={1}
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+                className="ix__forminput"
               />
             </div>
-            <div>
-              <label htmlFor="imap-user" className="mb-1 block text-xs font-medium">
-                Usuari (email)
-              </label>
+            <div className="ix__formfield">
+              <label htmlFor="imap-user" className="ix__formlabel">Usuari (email)</label>
               <input
                 id="imap-user"
                 type="email"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 placeholder="info@orbitaevents.com"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+                className="ix__forminput"
               />
             </div>
-            <div>
-              <label htmlFor="imap-pass" className="mb-1 block text-xs font-medium">
-                Contrasenya
-              </label>
+            <div className="ix__formfield">
+              <label htmlFor="imap-pass" className="ix__formlabel">Contrasenya</label>
               <input
                 id="imap-pass"
                 type="password"
                 value={pass}
                 onChange={(e) => setPass(e.target.value)}
-                placeholder="........"
-                className="w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+                placeholder="••••••••"
+                className="ix__forminput"
               />
             </div>
           </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="ix__formactions">
             <button
               type="button"
               disabled={testing}
               onClick={testConnection}
-              className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 disabled:opacity-50 active:scale-[0.98]"
+              className="ix__settingsbtn"
             >
               {testing ? 'Provant...' : 'Provar connexió'}
             </button>
@@ -381,7 +284,7 @@ export default function ImapSettingsClient() {
               type="button"
               disabled={saving}
               onClick={saveConfig}
-              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+              className="ix__settingsbtn is-primary"
             >
               {saving ? 'Desant...' : 'Desa i connecta'}
             </button>
@@ -389,7 +292,7 @@ export default function ImapSettingsClient() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="inline-flex items-center rounded-xl border px-3 py-2 text-sm transition-all active:scale-[0.98]"
+                className="ix__settingsbtn"
               >
                 Cancel·lar
               </button>
@@ -397,11 +300,11 @@ export default function ImapSettingsClient() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="ix__formactions">
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 active:scale-[0.98]"
+            className="ix__settingsbtn"
           >
             Modificar configuració
           </button>
@@ -409,7 +312,7 @@ export default function ImapSettingsClient() {
             <button
               type="button"
               onClick={deleteConfig}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-500/10 active:scale-[0.98]"
+              className="ix__settingsbtn is-danger"
             >
               Eliminar configuració
             </button>
@@ -420,15 +323,14 @@ export default function ImapSettingsClient() {
       <ConfirmDialog {...dialogProps} />
 
       {/* Com funciona */}
-      <div className="rounded-2xl border p-5">
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide">Com funciona</h3>
-        <ul className="space-y-1.5 text-sm text-white/70">
-          <li>• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
-          <li>• La safata mostra tots els correus disponibles al compte IMAP configurat.</li>
-          <li>• Les credencials es guarden xifrades a la base de dades.</li>
-          <li>• Si tens variables d&apos;entorn configurades a Railway, tenen prioritat.</li>
+      <div className="ix__howto">
+        <p className="ix__howto-title">Com funciona</p>
+        <ul className="ix__howto-list">
+          <li className="ix__howto-item">• La safata llegeix correus directament del servidor IMAP (DonDominio).</li>
+          <li className="ix__howto-item">• Les credencials es guarden xifrades a la base de dades.</li>
+          <li className="ix__howto-item">• Si tens variables d&apos;entorn configurades a Railway, tenen prioritat.</li>
         </ul>
       </div>
-    </div>
+    </>
   );
 }

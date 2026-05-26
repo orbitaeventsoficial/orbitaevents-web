@@ -28,7 +28,7 @@
 | Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🔴 | |
 | Inbox | `/admin/inbox` | Safata, missatges, follow-ups | 🟢 | Canvi #801 — `inbox.css`, prefix `ix-`, cap AdminPage |
 | Compose | `/admin/inbox/compose` | Redactor d'email | 🟢 | Canvi #801 — `cx-` prefix, cap AdminPage, cap ap-* |
-| Inbox settings | `/admin/inbox/settings` | Configuració IMAP | 🔴 | |
+| Inbox settings | `/admin/inbox/settings` | Configuració IMAP | 🟢 | Canvi #802 — ix__settings*, cap AdminPage, cap ap-* |
 
 ## Comercial
 

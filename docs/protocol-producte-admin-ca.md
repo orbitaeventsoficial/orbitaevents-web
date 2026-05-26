@@ -1372,6 +1372,23 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #802 — 2026-05-26 — claude (FET)
+
+**Extirpació settings IMAP (inbox/settings) — reconstrucció ix__settings* (Brass & Obsidian).**
+- `app/admin/inbox/settings/page.tsx`: eliminat `AdminPage`. Estructura `.ix > .ix__head + .ix__settingsbody`. Import `../inbox.css`.
+- `app/admin/inbox/settings/ImapSettingsClient.tsx`: eliminat `EditorControlStrip` (usava `ap-btn`), eliminats `ap-card`, `ap-badge`, `admin-tone-bg-*`, `admin-tone-text-*`. Reescrit amb `ix__connstat.is-ok/error/pending`, `ix__configcard`, `ix__formcard`, `ix__settingsbtn.is-primary/danger`, `ix__howto`.
+- `app/admin/inbox/inbox.css`: afegides classes `ix__settings*`, `ix__connstat*`, `ix__configcard*`, `ix__formcard*`, `ix__settingsbtn`, `ix__howto*`, `ix__settings-loading`, `ix__settings-spinner`. Tots tokens `--ax-*`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 801→802.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `802`.
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK.
+- Validació funcional: settings IMAP mostra estat connexió (ok/error/pendent), config actual i formulari d'edició sense cap classe del sistema vell.
+- Validació humana/UX: estat connexió amb punt de color (verd/vermell/ambre), botons Brass & Obsidian, secció "Com funciona" amb tokens consistents.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ### Canvi #801 — 2026-05-26 — claude (FET)
 
 **Extirpació disseny vell inbox + reconstrucció des de zero (Brass & Obsidian).**
