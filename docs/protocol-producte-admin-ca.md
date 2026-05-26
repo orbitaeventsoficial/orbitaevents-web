@@ -1372,6 +1372,20 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #803 — 2026-05-26 — claude (FET)
+
+**Sidebar: botó Safata persistent + treu Calendari + fix bug estat NEW→CONTACTED.**
+- `app/admin/layout.tsx`: eliminat `Calendari` del grup `Operació`; eliminada `Safata` del grup `Sistema`; afegit botó persistent `ax__inbox` a `ax__sideactions` (fora dels grups col·lapsables, visible des de qualsevol pàgina). Tecla ràpida `c` → `m` (inbox). Eliminat `pathname.startsWith('/admin/calendario')` de `getGroupForPath`.
+- `app/admin/admin-shell.css`: afegit `.ax__inbox` (botó secundari de sidebar) + `.ax__inbox.is-on` (estat actiu), consumint tokens `--ax-*`.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 802→803; `ADMIN_SHORTCUT_ROUTES`: `c:/admin/calendario` → `m:/admin/inbox`.
+- `lib/services/leads/statusRouteHandler.ts`: fix bug P2002 a `customer.upsert` — fallback per a customers creats sense Gmail dot-stripping (emailNormalized divergent). Si l'upsert falla per unique violation (`P2002`), cerca per `email` raw i vincula el customer existent.
+
+- Començat per: claude
+- Treballat per: claude
+- Tancat per: claude
+
+---
+
 ### Canvi #802 — 2026-05-26 — claude (FET)
 
 **Extirpació settings IMAP (inbox/settings) — reconstrucció ix__settings* (Brass & Obsidian).**

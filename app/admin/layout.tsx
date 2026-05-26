@@ -9,6 +9,7 @@ import { ToastProvider } from './components/ToastProvider';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import { log } from '@/lib/logger';
 import { ADMIN_CHANGE_COUNTER } from '@/lib/constants/admin';
+import '../studio/orbita-tokens.css';
 import './admin-theme.css';
 import './control-room.css';
 import './admin-shell.css';
@@ -21,6 +22,7 @@ const NAV_GROUPS: NavGroup[] = [
     id: 'comercial', label: 'Comercial',
     items: [
       { label: 'Temporada', href: '/admin/leads' },
+      { label: 'Arxiu', href: '/admin/leads/arxiu' },
       { label: 'Clients', href: '/admin/clientes' },
       { label: 'Pressupostos', href: '/admin/presupuestos' },
       { label: 'Entrada ràpida', href: '/admin/intake' },
@@ -30,7 +32,6 @@ const NAV_GROUPS: NavGroup[] = [
     id: 'operacio', label: 'Operació',
     items: [
       { label: 'Reserves', href: '/admin/bookings' },
-      { label: 'Calendari', href: '/admin/calendario' },
       { label: 'Tasques', href: '/admin/tasks' },
       { label: 'Inventari', href: '/admin/inventory' },
       { label: 'Packs', href: '/admin/packs' },
@@ -58,8 +59,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: 'sistema', label: 'Sistema',
     items: [
-      { label: 'Safata', href: '/admin/inbox' },
       { label: 'Configuració', href: '/admin/settings' },
+      { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
       { label: 'Salut', href: '/admin/salut' },
       { label: 'Crons', href: '/admin/crons' },
@@ -78,7 +79,6 @@ function getGroupForPath(pathname: string): string {
   ) return 'comercial';
   if (
     pathname.startsWith('/admin/bookings') ||
-    pathname.startsWith('/admin/calendario') ||
     pathname.startsWith('/admin/tasks') ||
     pathname.startsWith('/admin/inventory') ||
     pathname.startsWith('/admin/packs')
@@ -195,6 +195,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="ax__sideactions">
               <Link href="/admin/intake" className="ax__add">
                 Nova entrada
+              </Link>
+              <Link
+                href="/admin/inbox"
+                className={`ax__inbox${pathname?.startsWith('/admin/inbox') ? ' is-on' : ''}`}
+              >
+                ✉ Safata d&apos;entrada
               </Link>
             </div>
 

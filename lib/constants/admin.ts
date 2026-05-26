@@ -5,7 +5,7 @@ export const ADMIN_SHORTCUT_ROUTES: Record<string, string> = {
   '2': '/admin/clientes',
   '3': '/admin/tasks',
   '4': '/admin/bookings',
-  c: '/admin/calendario',
+  m: '/admin/inbox',
 };
 
 export const ADMIN_KONAMI_SEQUENCE = [
@@ -57,7 +57,7 @@ export const ADMIN_PAGE_LABELS: Record<string, string> = {
   'image-manager': 'Gestor d\'imatges',
 };
 
-export const ADMIN_CHANGE_COUNTER = 802;
+export const ADMIN_CHANGE_COUNTER = 803;
 
 export const ADMIN_DETAIL_PAGE_LABELS: Record<string, string> = {
   inventory: 'Fitxa inventari',

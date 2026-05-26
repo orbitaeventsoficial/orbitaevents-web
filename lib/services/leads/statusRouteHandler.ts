@@ -79,27 +79,40 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string) {
       const phoneNormalized = existingLead.phone ? normalizePhone(existingLead.phone) : null;
       const nameNormalized = normalizeName(existingLead.name);
 
-      const customer = await prisma.customer.upsert({
-        where: { emailNormalized },
-        update: {
-          name: existingLead.name,
-          nameNormalized,
-          phone: existingLead.phone || null,
-          phoneNormalized,
-          source: existingLead.source,
-          preferredLocale: existingLead.preferredLocale || 'ca',
-        },
-        create: {
-          email: existingLead.email.toLowerCase().trim(),
-          emailNormalized,
-          name: existingLead.name,
-          nameNormalized,
-          phone: existingLead.phone || null,
-          phoneNormalized,
-          source: existingLead.source,
-          preferredLocale: existingLead.preferredLocale || 'ca',
-        },
-      });
+      let customer;
+      try {
+        customer = await prisma.customer.upsert({
+          where: { emailNormalized },
+          update: {
+            name: existingLead.name,
+            nameNormalized,
+            phone: existingLead.phone || null,
+            phoneNormalized,
+            source: existingLead.source,
+            preferredLocale: existingLead.preferredLocale || 'ca',
+          },
+          create: {
+            email: existingLead.email.toLowerCase().trim(),
+            emailNormalized,
+            name: existingLead.name,
+            nameNormalized,
+            phone: existingLead.phone || null,
+            phoneNormalized,
+            source: existingLead.source,
+            preferredLocale: existingLead.preferredLocale || 'ca',
+          },
+        });
+      } catch (upsertErr: unknown) {
+        // P2002: email unique violation — customer exists with same email but different
+        // emailNormalized (e.g. created before Gmail dot-stripping was applied)
+        const isPrismaP2002 = typeof upsertErr === 'object' && upsertErr !== null
+          && 'code' in upsertErr && (upsertErr as { code: string }).code === 'P2002';
+        if (!isPrismaP2002) throw upsertErr;
+        const rawEmail = existingLead.email.toLowerCase().trim();
+        const existing = await prisma.customer.findFirst({ where: { email: rawEmail }, select: { id: true } });
+        if (!existing) throw upsertErr;
+        customer = existing;
+      }
 
       linkedCustomerId = customer.id;
     }

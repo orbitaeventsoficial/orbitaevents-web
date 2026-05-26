@@ -22,7 +22,7 @@
 | Reserves (llista) | `/admin/bookings` | Llista, kanban, filtres | 🔴 | |
 | Reserva detall | `/admin/bookings/[id]` | Cabina operativa, cobraments, checklist, inventari | 🔴 | |
 | Nova reserva | `/admin/bookings/new` | Formulari ràpid | 🔴 | |
-| Calendari | `/admin/calendario` | Calendari de capacitat | 🔴 | |
+| Calendari | `/admin/calendario` | Calendari de capacitat | 🔴 | Eliminat del nav (#803) — accessible directament per URL |
 | Calendari capacitat | `/admin/calendario/capacity` | Forecast setmanal | 🔴 | |
 | Tasques | `/admin/tasks` | Llista/kanban, cues, automatismes | 🔴 | |
 | Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🔴 | |

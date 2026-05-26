@@ -6,7 +6,7 @@
    Prefix: .ax-root (admin-x root) per diferenciar del lab (.fx-root).
 ============================================================================ */
 
-/* ── Variables globals (Obsidiana càlida) ─────────────────────────────────── */
+/* ── Variables globals (aliases a app/studio/orbita-tokens.css) ──────────── */
 .ax-root {
   --ui:      var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
   --display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
@@ -20,28 +20,6 @@
   text-rendering: optimizeLegibility;
 }
 .ax-root *, .ax-root *::before, .ax-root *::after { box-sizing: border-box; }
-
-/* Tokens base — Obsidiana càlida (sense slate fred, sense neó) */
-.ax-root {
-  --ax-canvas: #0a0a0c;
-  --ax-side:   #0d0d10;
-  --ax-panel:  #131318;
-  --ax-raised: #1d1e25;
-  --ax-sunk:   #08080a;
-
-  --ax-line:      rgba(236, 233, 227, 0.10);
-  --ax-line2:     rgba(236, 233, 227, 0.20);
-  --ax-hair-gold: rgba(215, 184, 110, 0.22);
-
-  --ax-t:  #ece7df;
-  --ax-t2: #b6aea2;
-  --ax-t3: #837c70;
-
-  --ax-gold:        #d7b86e;
-  --ax-gold-bright: #f0d99a;
-  --ax-gold-ink:    #2a210e;
-  --ax-gold-edge:   #a9863f;
-}
 
 /* ── Esquelet de l'app ────────────────────────────────────────────────────── */
 .ax {
@@ -71,6 +49,122 @@
 }
 
 .ax__page { position: relative; z-index: 1; min-width: 0; }
+
+/* ── Error boundary admin ────────────────────────────────────────────────── */
+.ax__error {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--ax-t);
+  font-family: var(--ui);
+}
+
+.ax__errorcard {
+  width: min(100%, 520px);
+  padding: 30px;
+  border: 1px solid var(--ax-line);
+  border-top-color: var(--ax-hair-gold);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--ax-panel), color-mix(in oklab, var(--ax-panel) 88%, var(--ax-canvas)));
+  box-shadow: 0 28px 60px -42px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.ax__erroricon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 18px;
+  border: 1px solid var(--ax-hair-gold);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
+  color: var(--ax-gold-bright);
+}
+
+.ax__erroricon svg { width: 28px; height: 28px; }
+
+.ax__errortitle {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ax-t);
+}
+
+.ax__errortext {
+  margin: 0 0 22px;
+  color: var(--ax-t2);
+  font-size: 14px;
+}
+
+.ax__errordebug {
+  margin: 0 0 22px;
+  padding: 13px 14px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 12px;
+  background: var(--ax-sunk);
+  color: var(--ax-t2);
+  text-align: left;
+}
+
+.ax__errordebug p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.ax__errordigest {
+  margin-top: 8px !important;
+  color: var(--ax-t3);
+  font-size: 11px !important;
+}
+
+.ax__erroractions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ax__errorbtn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 130ms ease, border-color 130ms ease, background 130ms ease, color 130ms ease;
+}
+
+.ax__errorbtn:hover { transform: translateY(-1px); }
+.ax__errorbtn:active { transform: translateY(0); }
+
+.ax__errorbtn--primary {
+  border: 1px solid var(--ax-hair-gold);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--ax-gold) 18%, var(--ax-raised)), color-mix(in oklab, var(--ax-gold) 7%, var(--ax-panel)));
+  color: var(--ax-gold-bright);
+}
+
+.ax__errorbtn--ghost {
+  border: 1px solid var(--ax-line2);
+  background: transparent;
+  color: var(--ax-t2);
+}
+
+.ax__errorbtn--ghost:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t);
+  background: var(--ax-raised);
+}
 
 /* Layout de dues columnes: sidebar + workspace */
 .ax--side .ax__workspace { min-width: 0; margin-left: 236px; }
@@ -185,6 +279,28 @@
 .ax__add:active { transform: translateY(0); }
 .ax__addic { display: grid; place-items: center; color: var(--ax-gold); }
 .ax__addic svg { width: 15px; height: 15px; }
+
+/* Botó d'accés directe a la safata d'entrada */
+.ax__inbox {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 16px; border-radius: 12px;
+  border: 1px solid var(--ax-line);
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; text-decoration: none;
+  transition: border-color 130ms ease, color 130ms ease, background 130ms ease;
+}
+.ax__inbox:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t1);
+  background: color-mix(in oklab, var(--ax-gold) 6%, transparent);
+}
+.ax__inbox.is-on {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+  background: color-mix(in oklab, var(--ax-gold) 9%, transparent);
+}
 
 /* ── Peu de la sidebar ────────────────────────────────────────────────────── */
 .ax__sidefoot {

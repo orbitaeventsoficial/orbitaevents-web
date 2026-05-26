@@ -1,3 +1,19 @@
+## 2026-05-26 — Canvi #803: sidebar Safata persistent + fix bug estat NEW→CONTACTED (claude)
+
+### Context
+L'usuari informa que (1) no hi ha botó visible de safata al sidebar, (2) el Calendari pot eliminar-se perquè ja existeix a Reserves, i (3) error en canviar estat lead de NEW a CONTACTED. El botó de safata havia d'estar "fora dels grups de nav, visible sempre, centralitzat en un punt".
+
+### Canvi
+- **`app/admin/layout.tsx`**: eliminat `Calendari` d'Operació; `Safata` fora del grup Sistema; botó `ax__inbox` persistent a `ax__sideactions` (fora dels grups col·lapsables). Actiu amb classe `is-on`.
+- **`app/admin/admin-shell.css`**: afegit `.ax__inbox` (vora fina, fons transparent, hover gold subtle) i `.ax__inbox.is-on`. Tokens `--ax-*` exclusivament.
+- **`lib/constants/admin.ts`**: counter 802→803; tecla ràpida `c` (Calendari) → `m` (inbox).
+- **`lib/services/leads/statusRouteHandler.ts`**: fix bug P2002 al `customer.upsert` — si existeix un Customer creat sense Gmail dot-stripping (`emailNormalized` divergent), l'upsert fallava. Ara fallback a `findFirst({ where: { email: rawEmail } })`.
+
+### Validació
+- `npx tsc --noEmit` OK; `pnpm run validate:core` OK (exit 0, tots guards).
+- Tests `leadRouteService` passen (12/12).
+- Sidebar: botó "✉ Safata d'entrada" visible des de qualsevol pàgina, independent del grup actiu.
+
 ## 2026-05-26 — Canvi #802: extirpació inbox/settings — reconstrucció Brass & Obsidian (claude)
 
 ### Context
