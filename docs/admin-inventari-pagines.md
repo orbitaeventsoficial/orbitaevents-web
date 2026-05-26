@@ -3,6 +3,8 @@
 > Referència per a la migració del disseny (lab → admin real).
 > Ordre: pàgines de negoci primer, sistema al final.
 > Estat: 🔴 old (disseny original) · 🟡 en curs · 🟢 migrada al nou disseny
+>
+> **Aquest fitxer és el mapa canònic de la migració**. Quan una pàgina passa a 🟡 o 🟢, ha de portar a la columna "Nota" la referència explícita al `Canvi #NNN` que ho documenta. El guard `qa:admin-frankenstein-migration` valida l'alineament protocol ↔ inventari. Vegeu també `§Migració del Frankenstein` al `docs/protocol-producte-admin-ca.md`.
 
 ---
 
@@ -10,7 +12,7 @@
 
 | Pàgina | Ruta | Contingut clau | Estat | Nota |
 |---|---|---|---|---|
-| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 llest; servei #780 fet |
+| Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796. **7/8 funcions inventari leads tancades** (#5 suggeriments pendent decisió propietari) |
 | Lead fitxa | `/admin/leads/[id]` | Timeline, tasques, documents, scoring, insights | 🔴 | |
 | Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🔴 | |
 | Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🔴 | |
@@ -24,8 +26,8 @@
 | Calendari capacitat | `/admin/calendario/capacity` | Forecast setmanal | 🔴 | |
 | Tasques | `/admin/tasks` | Llista/kanban, cues, automatismes | 🔴 | |
 | Nova tasca | `/admin/tasks/new` | Formulari amb assistència | 🔴 | |
-| Inbox | `/admin/inbox` | Safata, missatges, follow-ups | 🔴 | |
-| Compose | `/admin/inbox/compose` | Redactor d'email | 🔴 | |
+| Inbox | `/admin/inbox` | Safata, missatges, follow-ups | 🟢 | Canvi #801 — `inbox.css`, prefix `ix-`, cap AdminPage |
+| Compose | `/admin/inbox/compose` | Redactor d'email | 🟢 | Canvi #801 — `cx-` prefix, cap AdminPage, cap ap-* |
 | Inbox settings | `/admin/inbox/settings` | Configuració IMAP | 🔴 | |
 
 ## Comercial

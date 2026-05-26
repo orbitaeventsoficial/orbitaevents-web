@@ -8,12 +8,7 @@ import { fetchWithCsrf } from '@/lib/csrf';
 import { ComposeModal, QuoteModal } from './InboxModals';
 import { resolveImportedLeadHref } from './importNavigation';
 import type { LeadData, ImapEmail, UnifiedEmail, InboxStats, QuotePackOption } from './inbox-types';
-import {
-  InboxDetailPane,
-  InboxListPane,
-  InboxSidebar,
-} from './InboxSections';
-import { ADMIN_INBOX_HELP, helpAttrs } from '../components/adminHelpContent';
+import { InboxDetailPane, InboxListPane, InboxSidebar, InboxTabs } from './InboxSections';
 
 export default function InboxClient({
   initialLeads,
@@ -36,6 +31,7 @@ export default function InboxClient({
   const [loadingTrash, setLoadingTrash] = useState(false);
   const [imapError, setImapError] = useState<string | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<UnifiedEmail | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompose, setShowCompose] = useState(false);
@@ -71,7 +67,9 @@ export default function InboxClient({
       imapData: email,
     }));
 
-    return [...leadEmails, ...imapUnified].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return [...leadEmails, ...imapUnified].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
   }, [initialLeads, imapEmails]);
 
   const loadImapEmails = useCallback(async () => {
@@ -81,7 +79,9 @@ export default function InboxClient({
       const params = new URLSearchParams({ limit: '25', _t: String(Date.now()) });
       const res = await fetchWithCsrf(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const data = await res.json();
-      const message = data?.details ? `${data?.error || 'Error carregant emails'}: ${data.details}` : data?.error || 'Error carregant emails';
+      const message = data?.details
+        ? `${data?.error || 'Error carregant emails'}: ${data.details}`
+        : data?.error || 'Error carregant emails';
       if (!res.ok || !data.ok) {
         setImapError(message);
         setFlashMessage({ type: 'error', text: message });
@@ -136,22 +136,25 @@ export default function InboxClient({
     loadImapEmails();
   }, [imapConfigured, activeTab, imapEmails.length, trashEmails.length, loadImapEmails, loadTrashEmails]);
 
-  const trashUnified: UnifiedEmail[] = useMemo(() => {
-    return trashEmails.map((email) => ({
-      id: email.id,
-      type: 'imap' as const,
-      from: email.from.address,
-      fromName: email.from.name || email.from.address.split('@')[0],
-      subject: email.subject,
-      preview: email.bodyText?.slice(0, 150) || '',
-      date: new Date(email.date),
-      read: email.isRead,
-      imapData: email,
-    }));
-  }, [trashEmails]);
+  const trashUnified: UnifiedEmail[] = useMemo(
+    () =>
+      trashEmails.map((email) => ({
+        id: email.id,
+        type: 'imap' as const,
+        from: email.from.address,
+        fromName: email.from.name || email.from.address.split('@')[0],
+        subject: email.subject,
+        preview: email.bodyText?.slice(0, 150) || '',
+        date: new Date(email.date),
+        read: email.isRead,
+        imapData: email,
+      })),
+    [trashEmails],
+  );
 
   const deferredQuery = useDeferredValue(searchQuery);
   const queryLower = deferredQuery.trim().toLowerCase();
+
   const filteredEmails = useMemo(() => {
     let source = activeTab === 'trash' ? trashUnified : emails;
     if (activeTab === 'leads') source = emails.filter((e) => e.type === 'lead');
@@ -159,7 +162,12 @@ export default function InboxClient({
     return source.filter((email) => {
       if (filter === 'unread' && email.read) return false;
       if (queryLower) {
-        return email.from.toLowerCase().includes(queryLower) || email.fromName.toLowerCase().includes(queryLower) || email.subject.toLowerCase().includes(queryLower) || email.preview.toLowerCase().includes(queryLower);
+        return (
+          email.from.toLowerCase().includes(queryLower) ||
+          email.fromName.toLowerCase().includes(queryLower) ||
+          email.subject.toLowerCase().includes(queryLower) ||
+          email.preview.toLowerCase().includes(queryLower)
+        );
       }
       return true;
     });
@@ -172,10 +180,13 @@ export default function InboxClient({
 
   async function handleSelectEmail(email: UnifiedEmail) {
     setSelectedEmail(email);
+    setMobileDetailOpen(true);
     if (email.type !== 'imap' || !email.imapData?.uid) return;
     setLoadingSelected(true);
     try {
-      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, { cache: 'no-store' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        cache: 'no-store',
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok || !data?.email) return;
       const detailed = data.email as ImapEmail;
@@ -189,7 +200,9 @@ export default function InboxClient({
         };
       });
     } catch (error) {
-      log.warn("No s'han pogut carregar els detalls de l'email seleccionat", { error: error instanceof Error ? error.message : String(error) });
+      log.warn("No s'han pogut carregar els detalls de l'email", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     } finally {
       setLoadingSelected(false);
     }
@@ -201,14 +214,27 @@ export default function InboxClient({
       const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}/lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fallbackEmail: { fromAddress: email.imapData.from.address || email.from, fromName: email.imapData.from.name || email.fromName, subject: email.imapData.subject || email.subject, bodyText: email.imapData.bodyText || email.preview || '' } }),
+        body: JSON.stringify({
+          fallbackEmail: {
+            fromAddress: email.imapData.from.address || email.from,
+            fromName: email.imapData.from.name || email.fromName,
+            subject: email.imapData.subject || email.subject,
+            bodyText: email.imapData.bodyText || email.preview || '',
+          },
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok || !data?.lead?.id) {
         setFlashMessage({ type: 'error', text: data?.error || "No s'ha pogut importar el lead" });
         return;
       }
-      setFlashMessage({ type: 'success', text: data.action === 'updated' ? `Entrada actualitzada: ${data.lead.name}` : `Entrada creada: ${data.lead.name}` });
+      setFlashMessage({
+        type: 'success',
+        text:
+          data.action === 'updated'
+            ? `Entrada actualitzada: ${data.lead.name}`
+            : `Entrada creada: ${data.lead.name}`,
+      });
       router.push(resolveImportedLeadHref(data.lead));
       router.refresh();
     } catch (error) {
@@ -219,10 +245,19 @@ export default function InboxClient({
 
   async function handleMoveToTrash(email: UnifiedEmail) {
     if (email.type !== 'imap' || !email.imapData?.uid) return;
-    const ok = await confirm({ title: 'Moure a paperera', message: 'Segur que vols moure aquest email a la paperera?', confirmLabel: 'Moure', variant: 'warning' });
+    const ok = await confirm({
+      title: 'Moure a paperera',
+      message: 'Segur que vols moure aquest email a la paperera?',
+      confirmLabel: 'Moure',
+      variant: 'warning',
+    });
     if (!ok) return;
     try {
-      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'moveToTrash' }) });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'moveToTrash' }),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
         setFlashMessage({ type: 'error', text: data?.error || "No s'ha pogut moure a la paperera" });
@@ -243,10 +278,17 @@ export default function InboxClient({
   async function handleRestoreEmail(email: UnifiedEmail) {
     if (email.type !== 'imap' || !email.imapData?.uid) return;
     try {
-      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'restore' }) });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore' }),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        setFlashMessage({ type: 'error', text: data?.error || "No s'ha pogut restaurar l'email" });
+        setFlashMessage({
+          type: 'error',
+          text: data?.error || "No s'ha pogut restaurar l'email",
+        });
         return;
       }
       setTrashEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
@@ -262,13 +304,23 @@ export default function InboxClient({
 
   async function handleDeletePermanently(email: UnifiedEmail) {
     if (email.type !== 'imap' || !email.imapData?.uid) return;
-    const ok = await confirm({ title: 'Eliminar permanentment', message: 'Aquesta acció és irreversible. Segur?', confirmLabel: 'Eliminar', variant: 'danger' });
+    const ok = await confirm({
+      title: 'Eliminar permanentment',
+      message: 'Aquesta acció és irreversible. Segur?',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
     if (!ok) return;
     try {
-      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, { method: 'DELETE' });
+      const res = await fetchWithCsrf(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'DELETE',
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        setFlashMessage({ type: 'error', text: data?.error || "No s'ha pogut eliminar l'email" });
+        setFlashMessage({
+          type: 'error',
+          text: data?.error || "No s'ha pogut eliminar l'email",
+        });
         return;
       }
       setTrashEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
@@ -284,12 +336,11 @@ export default function InboxClient({
   const totalUnread = stats.unreadLeads + imapUnread;
 
   return (
-    <div className="flex-1 flex overflow-hidden" {...helpAttrs(ADMIN_INBOX_HELP.root)}>
-      <InboxSidebar
+    <>
+      {/* Pestanyes mobile */}
+      <InboxTabs
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        filter={filter}
-        setFilter={setFilter}
+        setActiveTab={(tab) => { setActiveTab(tab); setMobileDetailOpen(false); }}
         emailsCount={emails.length}
         leadsCount={initialLeads.length}
         imapConfigured={imapConfigured}
@@ -297,55 +348,84 @@ export default function InboxClient({
         imapUnread={imapUnread}
         trashCount={trashCount}
         totalUnread={totalUnread}
-        loadingImap={loadingImap}
-        loadingTrash={loadingTrash}
-        imapError={imapError}
-        loadImapEmails={loadImapEmails}
-        loadTrashEmails={loadTrashEmails}
       />
-      <InboxListPane
-        activeTab={activeTab}
-        filter={filter}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        flashMessage={flashMessage}
-        clearFlashMessage={() => setFlashMessage(null)}
-        loadingImap={loadingImap}
-        loadingTrash={loadingTrash}
-        imapEmailsCount={imapEmails.length}
-        trashEmailsCount={trashEmails.length}
-        filteredEmails={filteredEmails}
-        selectedEmail={selectedEmail}
-        handleSelectEmail={handleSelectEmail}
-      />
-      <InboxDetailPane
-        selectedEmail={selectedEmail}
-        loadingSelected={loadingSelected}
-        activeTab={activeTab}
-        handleReply={handleReply}
-        handleOpenQuote={() => setShowQuote(true)}
-        handleOpenLead={(lead) => router.push(resolveImportedLeadHref(lead))}
-        handleImportLeadFromEmail={handleImportLeadFromEmail}
-        handleMoveToTrash={handleMoveToTrash}
-        handleRestoreEmail={handleRestoreEmail}
-        handleDeletePermanently={handleDeletePermanently}
-        onApplySuggestion={(text) => {
-          setSuggestedBody(text);
-          if (selectedEmail) handleReply(selectedEmail);
-        }}
-      />
+
+      {/* Workspace de 3 columnes */}
+      <div className="ix__workspace">
+        <InboxSidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          filter={filter}
+          setFilter={setFilter}
+          emailsCount={emails.length}
+          leadsCount={initialLeads.length}
+          imapConfigured={imapConfigured}
+          imapEmailsCount={imapEmails.length}
+          imapUnread={imapUnread}
+          trashCount={trashCount}
+          totalUnread={totalUnread}
+          loadingImap={loadingImap}
+          loadingTrash={loadingTrash}
+          imapError={imapError}
+          loadImapEmails={loadImapEmails}
+          loadTrashEmails={loadTrashEmails}
+        />
+        <InboxListPane
+          activeTab={activeTab}
+          filter={filter}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          flashMessage={flashMessage}
+          clearFlashMessage={() => setFlashMessage(null)}
+          loadingImap={loadingImap}
+          loadingTrash={loadingTrash}
+          imapEmailsCount={imapEmails.length}
+          trashEmailsCount={trashEmails.length}
+          filteredEmails={filteredEmails}
+          selectedEmail={selectedEmail}
+          handleSelectEmail={handleSelectEmail}
+        />
+        <InboxDetailPane
+          selectedEmail={selectedEmail}
+          loadingSelected={loadingSelected}
+          activeTab={activeTab}
+          mobileOpen={mobileDetailOpen}
+          onMobileClose={() => setMobileDetailOpen(false)}
+          handleReply={handleReply}
+          handleOpenQuote={() => setShowQuote(true)}
+          handleOpenLead={(lead) => router.push(resolveImportedLeadHref(lead))}
+          handleImportLeadFromEmail={handleImportLeadFromEmail}
+          handleMoveToTrash={handleMoveToTrash}
+          handleRestoreEmail={handleRestoreEmail}
+          handleDeletePermanently={handleDeletePermanently}
+          onApplySuggestion={(text) => {
+            setSuggestedBody(text);
+            if (selectedEmail) handleReply(selectedEmail);
+          }}
+        />
+      </div>
+
       {showCompose && (
         <ComposeModal
           replyTo={replyTo}
           packOptions={quotePacks}
           initialBody={suggestedBody}
-          onClose={() => { setShowCompose(false); setReplyTo(null); setSuggestedBody(''); }}
+          onClose={() => {
+            setShowCompose(false);
+            setReplyTo(null);
+            setSuggestedBody('');
+          }}
         />
       )}
       <ConfirmDialog {...dialogProps} />
       {showQuote && selectedEmail && (
-        <QuoteModal target={selectedEmail} packOptions={quotePacks} onClose={() => setShowQuote(false)} onSent={(message) => setFlashMessage({ type: 'success', text: message })} />
+        <QuoteModal
+          target={selectedEmail}
+          packOptions={quotePacks}
+          onClose={() => setShowQuote(false)}
+          onSent={(message) => setFlashMessage({ type: 'success', text: message })}
+        />
       )}
-    </div>
+    </>
   );
 }

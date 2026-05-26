@@ -1,3 +1,593 @@
+## 2026-05-26 — Canvi #801: extirpació disseny vell inbox + reconstrucció des de zero (Brass & Obsidian) (claude)
+
+### Context
+L'usuari demana no replicar el sistema visual vell amb token-swaps sinó extirpar completament AdminPage, ap-*, admin-tone-* i reconstruir cada zona del admin des de zero amb el sistema Brass & Obsidian. El primer bloc escollit és la safata d'entrada (inbox + compose) per ser la zona amb canvis més recents (#799, #800) i tenir-la fresca.
+
+### Canvi
+
+**CSS (NOU):**
+- **`app/admin/inbox/inbox.css`** (NOU, 660+ línies): sistema visual complet per a inbox i compose. Famílies `ix-` (safata) i `cx-` (redactor). Tots els colors via tokens `--ax-*` de `orbita-tokens.css`. Cap hex hardcoded. Inclou layout 3 columnes desktop, navegació lateral, llista missatges, panell detall, modal mòbil, formulari de composició, pills de segment i previsualització d'audiència.
+
+**Inbox — reconstrucció completa:**
+- **`app/admin/inbox/page.tsx`**: eliminat `AdminPage`. Estructura directa `.ix > .ix__head + .ix__workspace`. Capçalera amb eyebrow/títol/subtítol + accions (Nou correu, Configuració).
+- **`app/admin/inbox/InboxSections.tsx`**: eliminats tots `admin-tone-*`, `ap-*` i Tailwind inline. Classes `ix-*`. Export nou `InboxTabs` per a navegació mòbil (`.ix__tabs` / `.ix__tab`). `InboxDetailPane` rep dos nous props obligatoris: `mobileOpen: boolean` i `onMobileClose: () => void`.
+- **`app/admin/inbox/InboxClient.tsx`**: estat nou `mobileDetailOpen`, `handleSelectEmail` obre el detall mòbil, passa `mobileOpen`/`onMobileClose` a `InboxDetailPane`. Lògica de negoci preservada íntegrament.
+
+**Compose — reconstrucció completa:**
+- **`app/admin/inbox/compose/ComposeForm.tsx`**: eliminades constants `INPUT_CLASSES`, `IDLE_BUTTON`, `ACTIVE_BUTTON`, `CARD_SELECTED`, `CARD_IDL`. Classes `cx__input`, `cx__select`, `cx__textarea`, `cx__modebtn.is-on`, `cx__tplitem.is-on`. Mode toggle, templates i formulari usant `cx-` prefixes.
+- **`app/admin/inbox/compose/page.tsx`**: eliminat `AdminPage`. Estructura `.cx > .cx__head + .cx__body`. Segment pills i `ComposeForm`.
+
+**Tests adaptats:**
+- **`__tests__/app/admin/inbox/InboxSections.test.tsx`**: afegits `mobileOpen={false}` i `onMobileClose={vi.fn()}` al render de `InboxDetailPane`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm test:run` OK; `pnpm run validate:core` OK.
+- Validació funcional: inbox i compose carreguen sense `AdminPage`. Layout 3 columnes desktop, overlay mòbil per a detall.
+- Validació humana/UX: Brass & Obsidian aplicat — fons obsidiana, accents or, sense cians ni grisos Tailwind.
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+## 2026-05-26 — Canvi #800: visibilitat del cos del correu enviat — snapshot htmlBody + modal a la fitxa lead (claude)
+
+### Context
+Completament del cicle de fiabilitat iniciat al #799. Després del #799 el propietari pot verificar QUE s'ha enviat un correu (rastre a `adminLog`, `leadActivity`, `EmailSend`) i veure'l a la fitxa del lead, però **no podia veure el cos del correu** sense anar al webmail de DonDominio. Aquest canvi resol el "vull poguer veure el mail enviat": ampliació de `EmailSend` amb `htmlBody`, vinculació de `leadActivity.metadata.emailSendId` per al lookup directe, endpoint protegit i modal de previsualització amb iframe sandbox a la fitxa.
+
+### Canvi
+
+**Schema + migration:**
+- **`prisma/schema.prisma`**: `model EmailSend` afegeix `htmlBody String? @db.Text` (snapshot del HTML enviat per a previsualització admin).
+- **`prisma/migrations/20260526110000_add_email_send_body/migration.sql`** (NOU): `ALTER TABLE "email_sends" ADD COLUMN "htmlBody" TEXT;`. Aplicar a Railway via `prisma migrate deploy`.
+
+**Servei tracking:**
+- **`lib/services/emailTrackingService.ts`**:
+  - `recordEmailSend` accepta nou param opcional `htmlBody?: string | null` i el desa.
+  - Funció nova `loadSentEmail(idOrToken)`: cerca per `id` o `trackingToken`, retorna metadades + `htmlBody`. Compleix `qa:prisma-in-routes` per evitar Prisma directe al route.
+
+**Vinculació activity ↔ EmailSend:**
+- **`lib/services/leadActivityService.ts`**: `recordLeadEmailSent` accepta nou param opcional `emailSendId?: string | null` i el guarda a `metadata: { emailSendId }`.
+- **`lib/services/adminEmailSendService.ts`**:
+  - `recordEmailSend(...)` ara rep `htmlBody: finalHtml` (HTML brandejat post-`buildBrandedEmailHtml` però pre-tracking/pixel — suficient per a previsualització, sense pixels invisibles ni link wraps).
+  - `recordLeadEmailSent(...)` ara rep `emailSendId: trackingRecord?.id || null` perquè el front pugui correlacionar.
+
+**Endpoint:**
+- **`app/api/admin/emails/sent/[id]/route.ts`** (NOU): `GET` retorna `{id, trackingToken, templateKey, to, subject, htmlBody, leadId, customerId, locale, sentAt, openedAt, openCount, clickedAt, clickCount}`. Accepta `id` (`cuid`) o `trackingToken` per flexibilitat futura. Auth via `requireAuth`. Servei `loadSentEmail` (no Prisma directe).
+
+**UI a la fitxa del lead:**
+- **`app/admin/leads/LeadsSeasonClient.tsx`**:
+  - Type `SentEmailDetail` (mateixos camps del endpoint).
+  - Estat local `sentEmail` / `sentEmailLoading` / `sentEmailError` + funcions `openSentEmail(id)` / `closeSentEmail()`.
+  - Al panell "Activitat", els items tipus `EMAIL` amb `metadata.emailSendId` mostren ara un botó `Veure cos del correu →`.
+  - Modal afegit al final de `LeadPage` (`.fx__lostmodal` + `.lp2__sentmodal`): header amb subject + botó tancar, llista de metadades (`to`, `Enviat`, `Obert`, `Idioma`, `Plantilla`), iframe `sandbox=""` (aïllament total: cap script, cap fetch) amb `srcDoc={htmlBody}`. Fallback amistós si `htmlBody === null` (emails enviats abans del #800).
+- **`app/admin/leads/leads-design.css`**:
+  - `.lp2__evlink` (botó "Veure cos"): petit, or, hover gold-bright + hair-gold border.
+  - `.lp2__sentmodal` (modal): width fins 800px, max-height 88vh, flex column.
+  - `.lp2__sentmodal-head`, `.lp2__sentmodal-close` (botó X).
+  - `.lp2__sentmodal-meta` (grid 2 cols amb metadades, 1 col a <720px).
+  - `.lp2__sentmodal-frame` (iframe): width 100%, min-height 520px, fons `white` (no decisió de disseny admin — és el client de correu real renderitzat fidelment al sandbox).
+
+**Tests:**
+- **`__tests__/lib/services/adminEmailSendService.test.ts`** (MODIFICAT): mock `emailTrackingService.recordEmailSend` afegit (retorna `{id:'es-test-1', trackingToken:'tt-1'}`). 2 tests nous: (a) `recordEmailSend` rep `htmlBody` que conté el cos; (b) `recordLeadEmailSent` rep `emailSendId: 'es-test-1'` per a leads. Test existent `crea leadNote i registra leadActivity` adaptat a `expect.objectContaining` perquè ara el call inclou més camps.
+- **`__tests__/lib/services/emailTrackingService.test.ts`** (MODIFICAT): test `creates a record` actualitzat per acceptar `htmlBody: null` al payload exacte.
+
+**Counter + xip:**
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 799→800.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `800`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm test:run -- --run __tests__/lib/services/adminEmailSendService.test.ts __tests__/lib/services/emailTrackingService.test.ts` OK (4588 tests verds); `pnpm run validate:core` OK — tots els guards verds (inclou `qa:schema-drift` per la nova columna, `qa:prisma-in-routes` per al servei nou, `qa:service-coverage`, `qa:api-admin-auth`).
+- Validació funcional: a partir d'aquest canvi, qualsevol email enviat des de `/admin/inbox/compose` desa una còpia del HTML brandejat a `EmailSend.htmlBody` i vincula `leadActivity.metadata.emailSendId` al record. Obrir la fitxa d'un lead amb activitat EMAIL recent → veure botó "Veure cos del correu →" sota l'entrada → clic obre modal amb metadades + iframe sandbox amb el HTML real. **Atenció**: els emails enviats abans del #800 NO tenen `htmlBody` ni `emailSendId` al leadActivity (incloent el de prova del propietari del 26/05 09:46 a Eric Conchillo). Per a aquells, el modal mostra "Aquest correu es va enviar abans que el sistema guardés snapshot del cos."
+- Validació humana/UX: experience completa — el sistema diu "Enviat" (toast del compose, fix #799 amb adminLog real) → es veu a la fitxa amb timestamp (fix #799 panell Activitat real) → clic per veure el cos exacte enviat (#800 modal). Promesa de fiabilitat acomplida. Iframe `sandbox=""` aïlla completament el HTML extern (cap script, cap fetch, cap navegació). Fons blanc fidel al client de correu real.
+- Pendent: `prisma migrate deploy` a Railway perquè la columna nova existeixi a producció. Aplicar quan el propietari ho confirmi (igual que la migration `add_lead_archive` del #791 va aplicar codex al #797). Si vol, `sendAdminQuoteEmail` també podria desar `htmlBody` (actualment només compose normal). I el cas extrem de modal sense `htmlBody` (emails antics) podria oferir un fallback de cercar IMAP Sent — fora d'abast d'aquest canvi.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #799: fix dual — adminLog COMM_SENT + panell Activitat real a la fitxa de lead (claude)
+
+### Context
+El propietari ha enviat un correu des de `/admin/inbox/compose` (lead Eric Conchillo, assumpte "Tu consulta para tu festa privada"). El sistema li va dir "Enviat" però **no apareixia a `/admin/activity` → Comunicacions**, ni el cos enlloc visible a la fitxa del lead. Diagnòstic: dos bugs combinats. **(A)** `sendAdminEmail` i `sendAdminQuoteEmail` envien via SMTP i registren a `leadActivity` + `customerActivity`, però **no escriuen `adminLog.create({action:'COMM_SENT'})`**, que és la font única que `fetchCanonicalAdminActivityPage` consulta — per això `/admin/activity` mostra 0 entrades de Comunicacions tot i haver enviat correu. **(B)** El panell "Activitat" de la fitxa nova (Brass & Obsidian) de `LeadsSeasonClient.tsx` era un placeholder hardcoded ("Entrada registrada / Pendent d'activitat") — no llegia la timeline real, així doncs ni i tan sols les `leadActivity` reals (que SÍ es creaven) apareixien visualment. Resultat conjunt: l'usuari no podia verificar res del que el sistema deia "Enviat".
+
+Aquest canvi tanca els dos bugs.
+
+### Canvi
+
+**Bug A — adminLog COMM_SENT als serveis admin email:**
+
+- **`lib/services/adminEmailSendService.ts`** (MODIFICAT): després del `sendEmail` exitós i les escriptures a `leadActivity`/`customerActivity`/`leadNote`, ara fa `prisma.adminLog.create({ data: { action: 'COMM_SENT', entity, entityId, details } })` amb:
+  - `entity`: `'lead'` si hi ha `resolvedLeadId`, `'customer'` si hi ha `customerId`, `'admin_email'` si no hi ha cap (correu genèric).
+  - `entityId`: l'id corresponent o `null`.
+  - `details`: `{to, subject, channel:'email', flow: quoteAttachment ? 'admin_compose_with_quote' : 'admin_compose', hasAttachments, locale, templateKey, trackingId}`.
+- **`lib/services/adminQuoteEmailService.ts`** (MODIFICAT): mateix patró — després dels 1-2 `sendEmail` (client + còpia admin) afegeix `prisma.adminLog.create({ action: 'COMM_SENT', entity, entityId, details: {flow:'admin_quote', quoteNumber, total, ..., adminCopySent} })`. Usa `activeLeadId` (variable de scope) per a `entity`/`entityId`.
+- **`/api/admin/emails/send-bulk`** (cobertura automàtica): el servei `sendBulkComposeSegment` crida `sendAdminEmail` per a cada destinatari, així cada enviament massiu ja queda registrat individualment via el fix de A.
+- **Tests (`__tests__/lib/services/adminEmailSendService.test.ts`)**: 3 tests nous verifiquen que es crida `adminLog.create` amb:
+  - `entity='lead'` + `entityId=leadId` si hi ha leadId.
+  - `entity='customer'` + `entityId=customerId` si només hi ha customerId.
+  - `entity='admin_email'` + `entityId=null` si no hi ha res.
+  Mock `adminLog: { create: vi.fn() }` afegit al `mockPrisma`.
+- **Tests (`__tests__/lib/services/adminQuoteEmailService.test.ts`)**: `mockPrisma.adminLog.create` afegit a `vi.hoisted` i a `beforeEach` per evitar errors als tests existents.
+
+**Bug B — panell "Activitat" llegeix `leadActivity` real:**
+
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - Type `LeadActivityType` (8 valors enum Prisma) i `LeadActivityEntry` (id/type/title/description/createdAt).
+  - Constant `ACTIVITY_ICON` amb emoji per tipus (NOTE=📝, EMAIL=📧, CALL=📞, WHATSAPP=💬, DOCUMENT=📎, TASK=✅, STATUS_CHANGE=🔄, SYSTEM=⚙️).
+  - Helper `formatActivityTimestamp(iso)` que retorna "Avui · HH:MM" si és avui, "DD mes · HH:MM" si és un altre dia.
+  - Dins `LeadPage`: nou `useEffect` que fa `fetch('/api/admin/leads/${lead.id}/activities')` quan s'obre la fitxa (si `kind==='lead'`). Estat local `activities: LeadActivityEntry[] | null` + `activitiesError: string | null`. L'endpoint ja existia (`listLeadActivities` a `leadActivityService`).
+  - Panell `lp2__panel--wide` "Activitat" substituït: 4 estats (loading "Carregant…", error, empty "Cap activitat enregistrada encara", llista de fins a 12 entries amb icona+title+timestamp+description).
+- **`app/admin/leads/leads-design.css`** (MODIFICAT): `.lp2__evdot` ara és inline-flex 20×20px amb emoji al centre (abans 9px dot sòlid). Tints per `data-type` (EMAIL=ametista, WHATSAPP=maragda, CALL=or, DOCUMENT=or, STATUS_CHANGE=topazi) mescla suau amb `--raised`.
+
+**Counter i tracking:**
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 798→799.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `799`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm test:run -- --run __tests__/lib/services/adminEmailSendService.test.ts __tests__/lib/services/adminQuoteEmailService.test.ts` OK (4586 tests verds, 3 nous); `pnpm run validate:core` OK — tots els guards verds (inclou `qa:admin-mutating-fetch-csrf`, `qa:service-coverage`, `qa:protocol`).
+- Validació funcional: a partir d'aquest canvi, qualsevol email enviat des de `/admin/inbox/compose` (mode email o quote) o des de `/api/admin/emails/send-bulk` deixarà rastre a `adminLog` amb `action: 'COMM_SENT'`. `/admin/activity` → filtre Comunicacions mostrarà ara els nous enviaments amb destinatari, assumpte i hora. Obrir la fitxa d'un lead amb activitat existent (per ex. `Eric Conchillo` → lead `cmpk52bry003ivigkb0x4v5o0`) ara mostra al panell "Activitat": "📧 Email enviat · Avui · 09:46" en lloc del placeholder. **Atenció**: el correu ja enviat per al propietari el 26/05 09:46 NO retroactivament apareixerà a `/admin/activity` (perquè no es va escriure adminLog en aquell moment), però SÍ apareixerà al panell de la fitxa del lead via aquest fix B.
+- Validació humana/UX: la promesa del toast "Enviat" ara és consistent — si surt OK, hi ha rastre en 3 llocs (adminLog unificat + leadActivity timeline + EmailSend tracking). Estètica Brass & Obsidian respectada: emoji discret al dot, tints suau per tipus. Coherència amb el patró `bookingCommunicationService` que ja escrivia adminLog COMM_SENT (consolidació de la monocapa de comunicacions).
+- Pendent: visibilitat del cos del mail enviat (HTML) — encara cal anar a la carpeta Sent del DonDominio o a `/api/admin/inbox/messages?folder=Sent` (no hi ha UI dedicada). Es pot afegir un bonus a una fase posterior si el propietari ho prioritza.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #798: promoció de la norma visual canònica a secció §2.5 protocol + CLAUDE.md + inventari (claude)
+
+### Context
+El propietari va demanar (entre #796 i ara): "això ha de quedar escrit i blindat al protocol de treball", referint-se al panorama de migració de l'admin Frankenstein → Brass & Obsidian peça a peça. Codex va escriure la norma operativa al cos del Canvi #797 (línia dins el cos), però només com a una línia dins una entrada llarga: fàcil d'enterrar. Aquest tall promou la norma a article visible al protocol (§2.5) + secció pròpia a CLAUDE.md (que Claude carrega d'arrencada) + header millorat de l'inventari general. Tres punts visibles perquè un futur agent no la pugui saltar.
+
+### Canvi
+- **`docs/protocol-producte-admin-ca.md`**: nova secció `§2.5 Migració del Frankenstein admin — `/studio` com a font visual canònica` (entre §2.4 i §3 Workspaces).
+  - **Premissa**: l'admin antic és Frankenstein, es substitueix tros a tros. 4 superfícies amb rols clars: `/admin` (producció, s'extirpa), `/admin/studio` (fitxa tècnica viva, sota auth), `/studio-lab` (laboratori), `/studio` (només redirect).
+  - **Norma operativa** (8 punts): (1) `/admin/studio` + `orbita-tokens.css` són la font de veritat. (2) `app/admin/**` NO inventa paletes/hex/gradients/estats locals. (3) Si falta una variant, primer s'amplia Studio. (4) CSS local d'admin queda restringit a layout. (5) L'admin antic s'elimina quan es migra. (6) Cada pàgina té estat 🔴/🟡/🟢 a l'inventari. (7) Estats 🟡/🟢 han de citar `Canvi #NNN`. (8) Ordre de fases viu a l'inventari.
+  - **Repartiment ownership**: codex = sistema visual; claude = contingut migrat. Davant col·lisió visual prevalen canvis de codex.
+- **`CLAUDE.md`**: nova secció `## Sistema visual admin — norma canònica /admin/studio` amb resum operatiu (5 punts) + pointer a §2.5 del protocol. Es carrega a totes les sessions de Claude.
+- **`docs/admin-inventari-pagines.md`** (ja modificat al #796): header introductori amb regla canònica + pointer a §2.5. Item Leads manté la cronologia #780-#794+#796 + nota "7/8 funcions tancades".
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `798`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 797→798.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — `qa:protocol` valida counter ↔ §9 ↔ diari ↔ LAB_CHANGE_NUMBER alineats a 798; `qa:studio-integrity` continua verd; tots els guards verds.
+- Validació funcional: obrir el protocol → §2.5 visible com a article propi just abans del §3 Workspaces, no enterrat al §9. Obrir CLAUDE.md → secció nova entre "Hardcode i monocapa" i "Dependències" amb el resum. Obrir `admin-inventari-pagines.md` → header explica la regla.
+- Validació humana/UX: la norma "no inventar paleta a admin" ara és impossible d'enterrar — 3 punts de fricció (protocol §2.5 com a article, CLAUDE.md com a constitució, inventari com a mapa viu).
+- Pendent: opció de guard automàtic `qa:admin-frankenstein-migration` (draft funcional fet i provat amb 5 tests verds, retirat per no duplicar la decisió de codex al #797 de no afegir guard). Si el propietari ho confirma, ho recupero en un #799.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #797: Studio sota admin + norma CSS canònica + migration `lead_archive` aplicada (codex)
+
+### Context
+En obrir `/admin/leads/arxiu` apareixia l'error `Invalid prisma.leadArchive.findMany(): The table public.lead_archive does not exist`, perquè els canvis #791-#793 havien creat schema/migration però la BD Railway encara no tenia aplicada la migration. El propietari també ha aclarit la norma visual: Studio ha d'estar sota el paraigua admin, protegit, i el CSS admin ha de tirar de la fitxa tècnica, no d'una paleta paral·lela.
+
+### Canvi
+- **BD Railway**: executat `npx prisma migrate deploy` amb connexió externa aprovada. Aplicada correctament la migration `20260526100000_add_lead_archive`; la taula `public.lead_archive` ja existeix.
+- **`app/admin/studio/page.tsx` + `loading.tsx`** (NOU): la fitxa tècnica visual passa a viure sota `/admin/studio`, dins el layout admin i sota Basic/Bearer auth del middleware.
+- **`app/studio/page.tsx`**: la ruta antiga `/studio` ja no renderitza la fitxa pública; fa `redirect('/admin/studio')` per preservar enllaços sense exposar el contingut fora de l'admin.
+- **`app/admin/layout.tsx`**: entrada `Studio` al grup `Sistema`.
+- **`app/admin/error.tsx` + `app/admin/admin-shell.css`**: l'error boundary deixa Tailwind/utilitats locals i passa a classes `.ax__error*`, consumint `--ax-*`/tokens de Studio per tipografia, fons, vora, botons i debug box.
+- **`CLAUDE.md` + `docs/protocol-producte-admin-ca.md`**: norma CSS escrita explícitament: `/admin/studio` és la fitxa interna; `app/studio/orbita-tokens.css` és la font de veritat; `app/admin/**` no inventa paletes, hex, gradients o estats locals; si falta una variant, primer s'amplia Studio i després es consumeix.
+- **`lib/constants/admin.ts` + `app/studio-lab/leads/page.tsx`**: counter i xip passen a `797`.
+
+### Validació
+- Validació tècnica: `npx prisma migrate deploy` OK contra Railway; `npx tsc --noEmit --pretty false` OK; `pnpm run qa:protocol` OK; `pnpm run qa:studio-integrity` OK; `pnpm run validate:core` OK.
+- Validació funcional: `/admin/leads/arxiu` ja té la taula `lead_archive` disponible; `/admin/studio` queda sota auth admin; `/studio` redirigeix a `/admin/studio`.
+- Validació humana/UX: la pantalla d'error admin hereta la tipografia i paleta del sistema `.ax-*`; la norma evita que Claude/Codex tornin a duplicar CSS d'aplicació de temes, colors o estats en pàgines admin.
+
+### Tancament
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+## 2026-05-26 — Canvi #796: leads — prioritat inline a la fitxa (item #6 inventari) (claude)
+
+### Context
+Item #6 del backlog d'`/admin/leads`: `LeadQuickPriority` inline. Diari #788 ho marcava com a "en pausa per decisió del propietari". L'ordre `seguim` del propietari activa el protocol complet (norma "go/seguim/continua"); codex està en paral·lel a #795 (tokens admin↔studio, només CSS — no col·lisiona amb el meu front que és JSX + servei). Aquest canvi afegeix un selector inline de prioritat (LOW/MEDIUM/HIGH/URGENT) al panell lateral de la fitxa, amb PATCH optimista a `/api/admin/leads/[id]`.
+
+### Canvi
+- **`lib/services/seasonCalendarService.ts`** (MODIFICAT):
+  - `SeasonCalendarLeadRaw` + `SeasonCalendarEntry` afegeixen `priority: string | null`.
+  - `buildSeasonCalendar`: propaga `priority` als entries de tipus lead; bookings sempre `priority: null` (els bookings no tenen prioritat editable).
+  - `loadSeasonCalendar`: `select: { ..., priority: true }` al `prisma.lead.findMany`; mapejat al raw.
+- **`__tests__/lib/services/seasonCalendarService.test.ts`** (MODIFICAT):
+  - `makeLead` defaults `priority: null`.
+  - Nou test: `'propaga priority del lead a l'entry (i null als bookings)'` — assert `leadEntry.priority === 'HIGH'` i `bookingEntry.priority === null`. 14 tests verds.
+- **`app/admin/leads/page.tsx`** (MODIFICAT):
+  - Helper pur `toLeadPriority(raw)`: valida contra `PRIORITY_VALUES` canònic de `lib/constants` (catàleg compartit, no Set local — codex va consolidar `LEAD_STATUS_VALUES`/`PRIORITY_VALUES` al #795). Fallback `'MEDIUM'`.
+  - `entryToLead`: propaga `priority: toLeadPriority(e.priority)` només per a leads; bookings `priority: 'MEDIUM'` per defecte (no s'edita visualment).
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - Nou export type `LeadPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'`.
+  - `LeadData` afegeix `priority: LeadPriority`.
+  - Constant `PRIORITY_OPTIONS` amb 4 entrades { key, label } en català ("Baixa"/"Mitjana"/"Alta"/"Urgent").
+  - `LeadPage`: nou estat local `priorityValue: LeadPriority` (sincronitzat amb `lead.priority` via `useEffect`) + `prioritySaving: boolean`. Funció `applyPriority(next)` fa `fetchWithCsrf('/api/admin/leads/${lead.id}', {method:'PATCH', body: JSON.stringify({priority: next})})`. Optimistic update (UI canvia abans del fetch); rollback amb el valor anterior si l'API retorna error; toast d'èxit `'Prioritat actualitzada.'` o d'error amb message del response.
+  - Panell nou "Prioritat" inserit ENTRE el panell d'accions (WhatsApp/correu) i el panell "Canviar estat". `role="radiogroup"`, 4 `<button role="radio" aria-checked>`. Disabled si `!editable` (booking) o `priorityValue === opt.key`. Per a bookings: fallback message "Les reserves no tenen prioritat editable".
+- **`app/admin/leads/leads-design.css`** (MODIFICAT):
+  - Bloc nou `Prioritat inline`: `.lp2__priopick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }`, `.lp2__priobtn` amb estètica equivalent a `.lp2__stagebtn` però compacta (36px min-height vs 38px). `.lp2__priodot` (8px) amb 4 colors per `data-prio`: low=gris translúcid, medium=ametista (color de `--o-stage-contacted`), high=or (color marca), urgent=carbassa (color de `--o-stage-lost-strong`). Estat `.is-on` posa border `hair-gold` + halo or al dot (`box-shadow` 3px). Media query a <720px: `grid-template-columns: repeat(2, 1fr)`.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `796`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 795→796.
+- **`docs/admin-leads-funcions-inventari.md`**: item #6 marcat com a ✅ FET — Canvi #796.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm test:run -- --run __tests__/lib/services/seasonCalendarService.test.ts` OK (14 tests, 1 nou); `pnpm run validate:core` OK — tots els guards verds (inclou `qa:schema-drift`, `qa:service-coverage`, `qa:admin-mutating-fetch-csrf`).
+- Validació funcional: obrir fitxa lead → al panell lateral ara apareix un nou bloc "Prioritat" amb 4 botons en grid. La prio actual queda marcada amb halo or i el seu botó disabled. Clic a una altra prio: el botó canvia visualment immediatament (optimistic), arribada del response refresca via `router.refresh()`. Toast "Prioritat actualitzada." Si l'API retorna error, rollback al valor anterior + toast d'error. Per a bookings (reserva al pipeline): el panell mostra el missatge "Les reserves no tenen prioritat editable" en lloc dels botons. Tots els botons són accessibles via teclat (role="radio").
+- Validació humana/UX: grid 4 cols compacte (no domina el panell lateral); responsive 2x2 a mòbil per evitar text retallat. Code de color semàntic intuïtiu (gris=baixa, ametista=mitjana, or=alta, carbassa=urgent) — coherent amb la paleta Brass & Obsidian existent. L'usuari pot canviar prio amb un sol clic sense obrir cap modal. Estat actiu visualment fort (halo or) per llegir-se d'un cop d'ull. Disabled state respectuós (botó actiu no s'opacifica). Coherent amb el patró del panell "Canviar estat" del mateix lateral.
+- Pendent: visualització del nivell de prioritat a les targetes del calendari i a les targetes del pipeline kanban (item bonus — actualment només a la fitxa); item #5 (suggeriments com a panell d'ajuda) queda pendent de decisió del propietari (codex suggereix posar-lo "en pausa" perquè pot ser soroll).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #795: `/studio` com a font de veritat dels tokens visuals admin (codex)
+
+### Context
+El propietari ha aclarit que el disseny bo és el de `/admin/leads`, però que la font oficial ha de ser `/studio`: cal sacrificar la duplicació del CSS admin actual i fer que l'admin consumeixi el sistema documentat a la fitxa tècnica. Els canvis #791-#794 venien de Claude i estaven fets al working tree però no consolidats en commit; aquest tall continua sobre aquella base sense revertir-la.
+
+### Canvi
+- **`app/studio/orbita-tokens.css`** (NOU): fitxer compartit de tokens visuals. Defineix els tokens canònics `--o-*` de `/studio`, els tokens Brass & Obsidian per admin (`--o-admin-*`), estats de pipeline (`--o-stage-*`) i aliases de compatibilitat per l'admin (`--ax-*`, `--canvas`, `--gold`, `--t`, etc.).
+- **`app/studio/StudioShowroom.tsx` + `app/studio/studio.css`**: `StudioShowroom` importa primer `orbita-tokens.css`; `studio.css` deixa de definir el bloc llarg de tokens i passa a consumir-los. La fitxa tècnica manté les seccions i el CSS de components intactes.
+- **`app/admin/layout.tsx` + `app/admin/admin-shell.css`**: el layout admin importa `../studio/orbita-tokens.css`; `admin-shell.css` elimina la definició local de `--ax-*` i la resol via aliases compartits.
+- **`app/admin/leads/leads-design.css`**: elimina el bloc local de tema (`--canvas`, `--gold`, `--card-*`, `--cell-*`) i usa els aliases compartits. Els colors d'estat passen de hex locals a `--o-stage-*`.
+- **`app/admin/leads/arxiu/arxiu-design.css`**: comentari actualitzat: comparteix tokens via `app/studio/orbita-tokens.css`.
+- **`app/admin/leads/page.tsx`**: eliminat el catàleg local `LEAD_PRIORITY_VALUES`; ara reutilitza `PRIORITY_VALUES` i `LEAD_STATUS_VALUES` de `lib/constants` per passar el guard de monocapa.
+- **`scripts/check-studio-integrity.mjs` + test**: el guard ara també exigeix `orbita-tokens.css`, els selectors compartits (`.o-studio-root`, `.ax-root`, `.fx-root.is-contrast`) i tokens mínims (`--o-bg`, `--o-admin-canvas`, `--ax-canvas`, `--canvas`, `--gold`, `--o-stage-new`). Test ampliat a 7 casos.
+- **`ADMIN_CHANGE_COUNTER` i `LAB_CHANGE_NUMBER`**: `794 → 795`.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit --pretty false` OK; `node scripts/check-studio-integrity.mjs` OK; `pnpm exec vitest run __tests__\scripts\check-studio-integrity.test.ts` OK (7 tests); `pnpm run validate:core` OK.
+- Validació funcional: `/studio` manté la fitxa tècnica amb les seccions intactes i `/admin/leads` conserva les classes `.fx-*`/`.lp2-*`, però resol paleta i estats des de `app/studio/orbita-tokens.css`.
+- Validació humana/UX: canvi visualment conservador; no reescriu JSX ni reobre fluxos. La decisió important és arquitectònica: `/studio` queda com a lloc autoritzat per canviar paleta i tokens del nou admin.
+
+### Tancament
+- Començat per: `codex`
+- Treballant per: `codex`
+- Tancat per: `codex`
+
+---
+
+## 2026-05-26 — Canvi #794: leads — integració meteo real (OpenWeatherMap) per leads dels propers 5 dies (claude)
+
+### Context
+El placeholder `partly 22°/14°` a totes les targetes del calendari es substitueix per dades reals d'OpenWeatherMap quan: (a) hi ha API key configurada (`OPENWEATHERMAP_API_KEY`), (b) el lead té `eventDate` dins els pròxims 5 dies (forecast màxim de l'API gratuïta), (c) el lead té `eventLocation` no buit. Si no es compleixen els 3 → cau al placeholder existent.
+
+### Canvi
+- **`lib/services/weatherService.ts`** (MODIFICAT):
+  - Nous types: `EventWeatherKind` (`'sun' | 'partly' | 'cloud' | 'rain' | 'storm'`), `EventWeather` (`{ kind, tempMin, tempMax, description, rainProbability }`).
+  - `OWM_KIND_MAP`: taula de mapeig OpenWeatherMap → kind visual del lab (`Clear→sun`, `Clouds→cloud`, `Rain/Drizzle→rain`, `Thunderstorm/Snow→storm`, boira/dust→cloud).
+  - Helper exportat `owmMainToKind(main)`.
+  - Cache nova `eventWeatherCache: Map<string, { value, cachedAt }>` amb clau `location|YYYY-MM-DD`, mateix TTL 1h.
+  - Funció nova `getWeatherForEvent(location, eventDate)`: retorna `EventWeather | null`. Filtra el forecast (3h points) pel mateix dia UTC i agrega: `tempMin/tempMax` (min/max dels points del dia), `rainProbability` (`max(pop)` dels points), `kind` dominant amb prioritat `storm > rain > kind més freqüent`. Si l'esdeveniment és a >5 dies → null. Si <-1 dia (passat) → null.
+- **`app/admin/leads/page.tsx`**: import `getWeatherForEvent` i `EventWeather`. Després de `loadSeasonCalendar`, filtra entries candidats al rang (5 dies + location no buida) i fa `Promise.allSettled` per carregar weather en paral·lel. `entryToLead(entry, weather)` ara accepta el segon param; si null → fallback placeholder existent. Map `weatherById: Map<id, EventWeather>` evita el lookup per cada entry.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `794`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 793→794.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: a `/admin/leads`, els leads amb data dins dels pròxims 5 dies i ubicació real (p. ex. "Barcelona", "Girona") veuen meteo real (per ex. `sun 24°/16°` o `rain 18°/12°`). Els altres (data > 5 dies, sense ubicació, o sense API key configurada) segueixen amb el placeholder `partly 22°/14°`. La fitxa del lead (`LeadPage`) també rep el `wx` real i el panell "Previsió" mostra `WX_LABEL[kind]` traduït.
+- Validació humana/UX: cap canvi visual quan no hi ha API key (`.env` sense `OPENWEATHERMAP_API_KEY`) — sistema graceful fallback. Cache d'1h per location+data evita crides repetides.
+- Pendent: meteo dels pròxims 6 dies → 16 dies (API de pagament). Drill-down a la fitxa amb gràfic per hores. Per ara queda lliurat el #794.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #793: arxiu històric pas 3 — pàgina `/admin/leads/arxiu` amb taula + 4 panells stats (claude)
+
+### Context
+Pas 3 (final) de l'arxiu: UI navegable a `/admin/leads/arxiu` que llegeix del `leadArchiveService` (#792). Brass & Obsidian, server-rendered amb filtres via query params (GET). Entrada al sidebar al grup Comercial.
+
+### Canvi
+- **`app/admin/leads/arxiu/page.tsx`** (NOU): server component async. Llegeix searchParams (motiu/tipus/canal/q/page), crida `loadArchiveList` + `loadArchiveStats` en paral·lel (rang de stats: 12 mesos UTC). Passa `list`/`stats`/`filters`/`catalog` (3 mapings: `LEAD_LOST_REASON_LABELS`, `EVENT_TYPE_PLAIN`, `SOURCE_LABELS`) al client.
+- **`app/admin/leads/arxiu/ArxiuClient.tsx`** (NOU): client component. Renderitza:
+  - Header amb període (window from/to ISO).
+  - Grid de 6 panells stats: total perduts (gran), valor total perdut (gran), distribució per motiu (barres horitzontals or), tendència mensual lost vs won (barres dobles cendra/maragda), per tipus d'event (llista), per canal d'entrada (llista).
+  - Form de filtres `<form method="get">` amb 4 camps (cerca, motiu, tipus, canal) + "Filtrar"/"Netejar". Server-rendered sense JS.
+  - Taula filtrable de leads arxivats: Lead/Contacte/Esdeveniment/Canal/Motiu/Valor/Arxivat. Empty-row si zero. Hover lleu.
+  - Paginació "Anterior/Següent" basada en `pageHref(target)` (manté filtres als query params).
+- **`app/admin/leads/arxiu/arxiu-design.css`** (NOU): tokens compartits via `.fx-root.is-contrast`. Estils `.ax__*` per a header, statgrid (2 cols → 1 col a 900px), barres, tendència bicolora, taula amb hover discret, paginació. Botons `--primary` (gradient or) i `--ghost` (transparent + hair-gold hover).
+- **`app/admin/layout.tsx`**: afegida entrada `{ label: 'Arxiu', href: '/admin/leads/arxiu' }` al grup Comercial (entre "Temporada" i "Clients").
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `793`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 792→793.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: navegar a `/admin/leads/arxiu` (o clic "Arxiu" al sidebar) carrega: 4 panells stats agregats dels últims 12 mesos, taula paginada (20 entrades/pàgina) amb tots els filtres aplicats via querystring. Pèrdues automàtiques (`archivedBy='system:lead-cleanup'`) i manuals (`archivedBy='admin'`) es distingeixen amb tag "auto"/"manual" a la columna "Arxivat". Pages navegables sense perdre filtres.
+- Validació humana/UX: estètica Brass & Obsidian completament aplicada (or per accents, cendra/maragda als barres de tendència, panell amb obsidiana càlida). Responsive a 900px → tot una columna.
+- Pendent: #794 (meteo real). Bonus per al futur: més filtres a la taula (rang archivedAt manual), export CSV, drill-down a la fitxa client si encara existeix.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #792: leadArchiveService — listing + 4 stats (motius, € perdut, tipus/canal, tendència) (claude)
+
+### Context
+Pas 2 de l'arxiu històric. Crear el servei que dona dades a la UI (#793): listing filtrable + 4 panells de stats. Funcions pures testejables + wrappers Prisma.
+
+### Canvi
+- **`lib/services/leadArchiveService.ts`** (NOU):
+  - Types: `ArchiveFilters` (lostReason/eventType/source/from/to/search), `ArchivePagination` (limit/offset), `ArchiveRecord` (snapshot complet), `ArchiveStats` (totalLost + totalLostValue + 4 panells).
+  - **Funcions pures** (sense Prisma, testejables):
+    - `computeReasonStats(records)` → motius amb count + percentage (1 decimal) + totalValue, ordenats per count desc; null → `'UNCLASSIFIED'`.
+    - `computeBreakdownByEventType(records)` / `computeBreakdownBySource(records)` → { key, count, totalValue } ordenats per count desc.
+    - `computeMonthlyStats(archived, wonLeads)` → array `{ monthKey: 'YYYY-MM', lost, won, lostValue }` ordenat cronològicament. Combina mes d'`archivedAt` (lost) i mes de `convertedAt ?? createdAt` (won).
+    - `computeArchiveStats({ records, wonLeads })` → agregació total dels 4 panells.
+  - **Wrappers Prisma**:
+    - `loadArchiveList(filters, pagination)` → llista paginada (`leadArchive.findMany` + `.count` en paral·lel). Filters traduïts a `where`: `lostReason`/`eventType`/`source` exactes; `from/to` a `archivedAt` range; `search` ILIKE sobre `name` i `email`.
+    - `loadArchiveStats({ from, to })` → fa 2 queries paral·leles (`leadArchive` snapshot dels camps necessaris + `lead` amb status WON dins del range) i delega a `computeArchiveStats`.
+- **`__tests__/lib/services/leadArchiveService.test.ts`** (NOU): 9 tests purs — reason agg/ordre/UNCLASSIFIED/buit; breakdown event/source; monthly combinació lost+won; archiveStats agregació total; zero records.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `792`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 791→792.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds (inclou `qa:service-coverage` per al nou test).
+- Validació funcional: 9 tests purs verds. Els wrappers Prisma estan preparats per ser cridats des de l'API route del #793.
+- Validació humana/UX: no aplica (#792 és servei pur). UI vindrà al #793.
+- Pendent: #793 (pàgina `/admin/leads/arxiu`); #794 (meteo real).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #791: arxiu històric de leads LOST — schema + snapshot abans de purgar (claude)
+
+### Context
+El propietari decideix A1+B1+C(tot) per a l'arxiu: snapshot a una taula nova `lead_archive` abans de purgar, pàgina dedicada `/admin/leads/arxiu` amb 4 panells stats. Pas 1 (aquest canvi): schema + migration + snapshot al cron i al delete manual. Servei + UI venen al #792-#793.
+
+### Canvi
+- **`prisma/schema.prisma`**: nou model `LeadArchive` (taula `lead_archive`) amb snapshot dels camps clau del lead (id original, name, email, phone, eventType, eventDate, eventLocation, guestCount, source, estimatedValue, priority, assignedTo, lostReason, lostAt, originalCreatedAt, originalUpdatedAt, contactedAt, archivedAt default now, archivedBy). 5 indexs (`archivedAt`, `lostReason`, `eventType`, `source`, `lostAt`).
+- **`prisma/migrations/20260526100000_add_lead_archive/migration.sql`** (NOU): `CREATE TABLE "lead_archive"` + 5 `CREATE INDEX`.
+- **`lib/services/leadArchiveSnapshot.ts`** (NOU): helper compartit `snapshotLeadsBeforeDelete(tx, { leadIds, archivedBy })`. Crida `tx.lead.findMany` + `tx.leadArchive.createMany`. Retorna nombre d'arxivats. Inclou el proposal SENT/ACCEPTED més recent al `estimatedValue`.
+- **`lib/services/leadCleanupService.ts`** (MODIFICAT): import `snapshotLeadsBeforeDelete`. Dins de la `prisma.$transaction` del auto-delete: snapshot ABANS del `deleteMany`. Log actualitzat ("arxivats a lead_archive").
+- **`lib/services/leadRouteService.ts`** (MODIFICAT): import `snapshotLeadsBeforeDelete`. Dins de la `prisma.$transaction` de `deleteLeadIfAllowed` (delete manual via botó admin): snapshot ABANS del `delete`. `archivedBy: 'admin'`.
+- **`__tests__/lib/services/leadArchiveSnapshot.test.ts`** (NOU): 4 tests — empty leadIds, ids inexistents, mapeig camps + estimatedValue del proposal, estimatedValue null si no hi ha proposal.
+- **`__tests__/lib/services/leadCleanupService.test.ts`**: mock `snapshotLeadsBeforeDelete` afegit; assertion que es crida amb els ids correctes i `archivedBy: 'system:lead-cleanup'`.
+- **`__tests__/lib/services/leadRouteService.test.ts`**: mock `snapshotLeadsBeforeDelete` afegit perquè el test del delete passi.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `791`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 790→791.
+
+### Validació
+- Validació tècnica: `npx prisma generate` OK; `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds (inclou `qa:schema-drift` per la nova taula i `qa:service-coverage` per al nou snapshot service).
+- Validació funcional: el cron `runLeadCleanup` ara fa snapshot dels leads LOST de >90 dies a `lead_archive` ABANS d'eliminar-los de la taula `leads`. El delete manual des de la fitxa admin (botó "Eliminar entrada") fa el mateix amb `archivedBy: 'admin'`. La migration SQL s'aplicarà al deploy via `prisma migrate deploy` o `pnpm db:push`. Tests verds.
+- Validació humana/UX: cap canvi visible per a l'usuari (#791 és infraestructura). La feina visible vindrà al #793 amb la pàgina `/admin/leads/arxiu`.
+- Pendent: #792 servei de listar/stats; #793 UI; #794 meteo real.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #790: leads — `seasonCalendarService` enriquit amb canal/owner/últim contacte (claude)
+
+### Context
+Pendent del backlog: la fitxa i les targetes mostraven placeholders buits per als camps `channel`, `owner` i `last`. El servei ja existia, només calia exposar 3 camps de l'schema Prisma `Lead`: `source` (enum `LeadSource`), `assignedTo` (text), `contactedAt` (DateTime). Mapeig pur sense canviar la lògica del calendari.
+
+### Canvi
+- **`lib/services/seasonCalendarService.ts`** (MODIFICAT): `SeasonCalendarLeadRaw` + `SeasonCalendarEntry` afegeixen `source: string | null`, `assignedTo: string | null`, `contactedAt: Date | null`. `buildSeasonCalendar` els propaga; bookings sempre `null` (raw + entry). `loadSeasonCalendar` selecciona els 3 camps al query Prisma i els mapeja al raw.
+- **`__tests__/lib/services/seasonCalendarService.test.ts`**: `makeLead` defaults `source: null`, `assignedTo: null`, `contactedAt: null` (13 tests segueixen verds).
+- **`app/admin/leads/page.tsx`**: imports `SOURCE_LABELS` (de `lib/constants`). Helper `sourceLabel(raw)` mapeja codi raw → label en català ("WEBSITE"→"Web", "INSTAGRAM"→"Instagram", etc.). Helper pur `relativeLastContact(date)` torna "avui"/"fa 1 dia"/"fa N dies"/"fa N setmanes"/"fa N mesos" segons la diferència amb ara. `entryToLead` ara propaga: `channel = sourceLabel(e.source)`, `owner = e.assignedTo ?? ''`, `last = relativeLastContact(e.contactedAt)`.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `790`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 789→790.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds (inclou els 13 tests del servei).
+- Validació funcional: a `/admin/leads`, al panell "Dades clau" de la fitxa apareix ara `Canal: Web` (o el que sigui), `Propietari: nom`, `Últim contacte: fa 3 dies`. A les targetes del pipeline, el `leadSummary()` ja feia servir `lead.channel`/`lead.owner`/`lead.last` (ara amb valors reals). Per a reserves (kind='booking'), els camps queden buits.
+- Validació humana/UX: el `relativeLastContact` és més llegible que una data absoluta per al peu de les targetes. Brass & Obsidian respectat.
+- Pendent: #791 meteo real (weatherService); decidir amb el propietari l'arxiu de LOST amb stats (A/B/C de la conversa).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #789: leads — fix unificació flux LOST (fitxa també usa modal global) + telèfon/email visibles a la fitxa (claude)
+
+### Context
+El propietari avisa que "no es pot passar a perdut" des de la fitxa. Causa arrel: la fitxa usava un `LeadLostStatusPrompt` inline (renderitzat sota el panell "Canviar estat") amb estat local `lostOpen`, mentre que el drag & drop usava un modal centrat `.fx__lostmodal` amb estat global d'`AdminLeadsClient`. Discrepància visual: l'inline és poc visible (apareix al pie del panell, sense backdrop) i pot quedar fora del viewport. Aquest canvi unifica el flux LOST → la fitxa també delega al modal global via `onMoveLead`. Bonus: `phone` i `email` (#788) ara es mostren al panell "Dades clau" perquè el propietari vegi si el lead té contacte abans de clicar WhatsApp/correu.
+
+### Canvi
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - `LeadPage` accepta nova prop `onMoveLead(leadId, target)` — la mateixa funció que ja rep `TemporadaPage` per al drag & drop.
+  - Eliminats: estats locals `lostOpen`, `lostReason`, `lostNote`. La signatura `applyStatus(next)` ja no necessita `extra` perquè LOST va sempre pel modal global.
+  - `handleStageClick('perdut')` ara crida `onMoveLead(lead.id, 'perdut')` (que obre el modal centrat amb backdrop blur). Coherent amb el drag.
+  - Eliminat el `<LeadLostStatusPrompt>` inline del panell "Canviar estat". El component `LeadLostStatusPrompt` segueix usat dins del modal global d'`AdminLeadsClient`.
+  - `AdminLeadsClient` passa `onMoveLead={handleMoveLead}` també a `LeadPage`.
+  - Panell "Dades clau" mostra `Telèfon` i `Email` quan estan presents al `LeadData` (ja exposats per #788).
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `789`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 788→789.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: obrir fitxa lead → clic a "Perdut" del picker → ara s'obre un modal centrat amb backdrop blur (igual que al drag & drop). Selecciona motiu, opcionalment nota, clic "Confirmar pèrdua" → PATCH LOST + toast + refresh. El modal és inhibible amb Escape o clic al backdrop. El panell "Dades clau" mostra `Telèfon: 666 ...` i `Email: ...` si el lead té aquests camps a la BD.
+- Validació humana/UX: consistència total entre fitxa i drag & drop. Backdrop blur + portal eviten que el prompt quedi fora del viewport. Telèfon/email visibles ajuden a saber per què el botó WhatsApp està habilitat/disabled.
+- Pendent: enriquir servei amb `time`/`channel`/`owner`/`last` (#790); meteo real (#791); arxiu de leads LOST amb dades estadístiques (a decidir amb el propietari — vegeu nota a continuació).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #788: leads — accions ràpides WhatsApp + redactor canònic de correu (claude)
+
+### Context
+Canvi #788: cinquena (i última de la tongada que el propietari ha aprovat: #4 ✅ #7 ✅ #8 ✅) funció aplicada al `/admin/leads`. Activem els botons "Enviar WhatsApp" i "Redactar correu" del panell d'accions de la fitxa, substituint els 5 botons mock per 2 botons reals. WhatsApp obre `wa.me/{phone}` amb missatge prefilled; correu redirigeix al redactor canònic `/admin/inbox/compose?leadId=...&template=seguiment` (no `mailto:` — el guard `qa:admin-no-mailto` ho prohibeix).
+
+### Canvi
+- **`lib/services/seasonCalendarService.ts`**: `SeasonCalendarLeadRaw` + `SeasonCalendarEntry` afegeixen `phone: string | null` i `email: string | null`. `buildSeasonCalendar` els propaga; bookings sempre `null`. `loadSeasonCalendar` selecciona `phone` i `email` del query Prisma i els mapeja al raw.
+- **`__tests__/lib/services/seasonCalendarService.test.ts`**: `makeLead` defaults amb `phone: null` i `email: null` (13 tests verds).
+- **`app/admin/leads/page.tsx`**: `entryToLead` propaga `phone` i `email` a `LeadData` (només per a leads).
+- **`app/admin/leads/LeadsSeasonClient.tsx`**:
+  - `LeadData` ara porta `phone: string | null` i `email: string | null`.
+  - Imports nous: `Link` (de `next/link`), `buildLeadComposeHref` (de `lib/admin/leadWorkspaceHref`).
+  - Nou helper pur `buildLeadWhatsAppHref(phone, name)` que retorna `https://wa.me/{digits}?text=...` amb missatge de salutació en català.
+  - Panell d'accions de la fitxa (`lp2__quickacts`) refet: dels 5 botons mock anteriors a 2 botons reals — "Enviar WhatsApp" (`<a target="_blank" rel="noopener noreferrer">` només si `lead.phone`; sinó botó inhabilitat amb missatge "sense telèfon") i "Redactar correu" (`<Link>` a `buildLeadComposeHref(lead.id, 'seguiment')`). Per a bookings, ambdós inhabilitats.
+- **`app/admin/leads/leads-design.css`**: estils `.lp2__quickacts a` (mateix patró que `button`); `text-decoration: none`; estat `:disabled` amb opacitat reduïda.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `788`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 787→788.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds (inclou `qa:admin-no-mailto` ✅ i els 13 tests del `seasonCalendarService`).
+- Validació funcional: obrir fitxa lead amb telèfon → clic "Enviar WhatsApp" → s'obre `wa.me/{phone}` en nova pestanya amb missatge prefilled. Sense telèfon → botó inhabilitat amb tooltip explicatiu. Clic "Redactar correu" → navega a `/admin/inbox/compose?leadId={id}&template=seguiment` (redactor canònic existent). Per a reserves (kind='booking'), ambdós botons inhabilitats.
+- Validació humana/UX: panell d'accions net (2 botons vs 5 mock). Estètica Brass & Obsidian respectada (hover gold-bright, vora hair-gold).
+- Pendent: #5 (suggeriments) i #6 (prioritat) queden en pausa per decisió del propietari (#5 ja existeix com a "Focus zone" al disseny; cal validar si cal portar lògica del `PipelineSuggestionsPanel`).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #787: leads — badge motiu de pèrdua als leads LOST + LOST visibles al pipeline (claude)
+
+### Context
+Canvi #787: quarta funció aplicada al `/admin/leads`. Mostrem el motiu canònic de pèrdua als leads en estat `LOST` (targeta del pipeline + fitxa). Pre-requisit: ampliar la finestra de `loadSeasonCalendar` perquè inclogui els leads `LOST` amb data dins la finestra (abans els excloïa, així els que arrossegaves a "Perdut" desapareixien del pipeline). Els leads LOST sense data queden fora (sense valor visual).
+
+### Canvi
+- **`lib/services/seasonCalendarService.ts`** (MODIFICAT):
+  - `SeasonCalendarLeadRaw` + `SeasonCalendarEntry` ara porten `lostReason: string | null`.
+  - Funció pura `buildSeasonCalendar`: propaga `lostReason` als entries de lead; bookings sempre `lostReason: null`.
+  - `loadSeasonCalendar` (wrapper Prisma): query refet — `OR` entre `eventDate within window` (qualsevol status, inclou LOST) i `eventDate=null AND status notIn LOST` (unscheduled sense LOST). Selecciona `lostReason` al `select`.
+- **`__tests__/lib/services/seasonCalendarService.test.ts`**: `makeLead` afegeix `lostReason: null` per defecte (manté 13 tests existents verds).
+- **`app/admin/leads/page.tsx`**: `entryToLead` propaga `lostReason` a `LeadData` (només per a leads; bookings null).
+- **`app/admin/leads/LeadsSeasonClient.tsx`**:
+  - `LeadData` ara porta `lostReason: string | null`.
+  - Imports nous: `LEAD_LOST_REASON_LABELS`, `isAutoLossReason`, `isLeadLostReason` (de `lib/constants/leadLoss`).
+  - Nou component intern `LostReasonBadge({ reason })`: renderitza null si el motiu no és canònic; mostra tag "Auto" si és `AUTO_LOST_REASONS` (ambre) o "Motiu" si és manual (cendra). Estil consistent amb Brass & Obsidian — colors derivats del token `--c` del data-stage.
+  - Badge renderitzat: a la targeta `fx__pipelead` quan stage='perdut'; a la `lp2__id` de la fitxa quan stage='perdut'.
+- **`app/admin/leads/leads-design.css`**: bloc `.fx__lostbadge` (pill amb tag + text); variant `.is-auto` (ambre); `.fx__lostbadge-tag` (label tipogràfic en uppercase); `.fx__lostbadge-text` (truncat).
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `787`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 786→787.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds (incloses les 13 tests del `seasonCalendarService`).
+- Validació funcional: marca un lead com a perdut → veuràs la targeta a la columna "Perdut" del pipeline amb el badge "Motiu · Preu massa alt" (o el motiu que sigui). Si el motiu és `EVENT_PASSED` (pèrdua automàtica via cron), el badge surt en ambre amb tag "Auto". A la fitxa del lead LOST també apareix el badge sota la meta (data/lloc). Els leads LOST sense `eventDate` no apareixen al pipeline.
+- Validació humana/UX: badge subtil però llegible, amb to derivat del token `--c="perdut"` (cendra) per al motiu manual i ambre per al motiu automàtic. Brass & Obsidian respectat.
+- Pendent (#788): botons WhatsApp/Email reals (#788). #5 suggeriments i #6 prioritat queden en pausa segons decisió del propietari.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #786: leads — acció eliminar amb `ConfirmDialog` + restricció LOST (claude)
+
+### Context
+Canvi #786: tercera funció aplicada al `/admin/leads`. Activem l'acció "Eliminar entrada" des de la fitxa del lead, seguint el patró estàndard de l'admin: `useConfirmDialog` per al diàleg de confirmació; backend (`leadRouteService.removeLead`) ja valida que el lead estigui en estat `LOST` i sense reserva associada. Es manté la convivència amb `LeadActions.tsx` antic (queda en quarantena, no s'importa).
+
+### Canvi
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - Imports nous: `useConfirmDialog`, `ConfirmDialog` (de `app/admin/components/ConfirmDialog`), `fetchWithCsrf` (de `lib/csrf`).
+  - `LeadPage` accepta nova prop `onDeleted(leadId)`; estat local `deleting`; nova `handleDelete()` (confirma amb `useConfirmDialog`, DELETE via `fetchWithCsrf`, toast d'èxit, `onDeleted` per tornar al pipeline, `router.refresh()` per re-fetch).
+  - Nou panell `lp2__panel--danger` al final de l'aside: visible només per a leads (kind='lead'); botó "Eliminar entrada" habilitat només si `stage='perdut'`. Missatge informatiu si no es pot eliminar ("primer ha d'estar marcat com a perdut").
+  - `<ConfirmDialog {...dialogProps} />` al root de la fitxa.
+  - `AdminLeadsClient` passa `onDeleted={() => setPageId(null)}` per tornar al pipeline en delete.
+- **`app/admin/leads/leads-design.css`**: nou bloc `.lp2__panel--danger` (vora amb tint vermell terra `#d4513b`, fons lleugerament tenyit). `.lp2__dangerhint` (text d'ajuda) i `.lp2__delete` (botó vermell discret amb hover més intens). Disabled state amb opacitat reduïda i cursor `not-allowed`.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `786`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 785→786.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: a `/admin/leads`, obrint la fitxa d'un lead → panell "Eliminar entrada" al final de l'aside. Si l'estat és `nou`/`contactat`/`guanyat`, el botó queda inhabilitat amb missatge informatiu. Per eliminar: 1) moure a "Perdut" (qualsevol mètode: picker, commit, drag); 2) el botó queda habilitat; 3) clic obre `ConfirmDialog` danger amb missatge "Aquesta acció no es pot desfer"; 4) confirmació envia `DELETE /api/admin/leads/[id]`; 5) toast d'èxit, tornada al pipeline, dades refrescades. Si el backend retorna error (per ex. lead amb reserva associada), toast d'error.
+- Validació humana/UX: panell amb identitat visual clara (tint vermell terra `#d4513b`, sense neon). Botó discret en repòs, hover més marcat. `ConfirmDialog` reutilitzat (portal + framer-motion) — accessible (focus al botó de confirmació, Escape per cancel·lar).
+- Pendent: badge motiu pèrdua als leads LOST (#787), botons WhatsApp/Email reals (#788).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #785: leads pipeline — drag & drop entre lanes + traducció de tipus d'event (claude)
+
+### Context
+Canvi #785: dues correccions/feature al `/admin/leads`. Primera, el propietari avisa que el pipeline no permet moure targetes: s'activa drag & drop natiu (HTML5) entre les 4 lanes amb optimistic update + commit via `patchLeadStatus`. Si la lane destinació és "Perdut", s'obre el modal canònic (`LeadLostStatusPrompt`) abans del PATCH. Segona, el propietari detecta que el camp "Producte" mostra el codi raw (`PRIVATE_PARTY`) en lloc del label en català: es centralitza la traducció via `EVENT_TYPE_PLAIN`.
+
+### Canvi
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - `AdminLeadsClient` ara és el responsable de l'estat de moviments: estat `optimisticStage`, `pendingId`, `lostTarget`, `lostReason`, `lostNote`, `lostSaving`. `effectiveLeads` aplica l'overlay optimista; `useEffect` el buida quan arriben dades fresques (signatura `id:stage`).
+  - Funcions: `commitMove(leadId, target, previous)` (PATCH + toast + refresh + revert en error), `handleMoveLead(leadId, target)` (validació + tria entre commit o obrir prompt LOST), `confirmLost()` (PATCH LOST amb motiu canònic).
+  - Render: modal global `.fx__lostmodal` amb `LeadLostStatusPrompt` quan `lostTarget` està set.
+  - `TemporadaPage` rep `onMoveLead` i `pendingId` per props; afegeix estat local `dragLeadId`/`dropStage`. Cada `<section className="fx__lane">` és droppable (`onDragOver`/`onDrop`); cada `<button className="fx__pipelead">` és `draggable` (excepte reserves o leads pendents).
+- **`app/admin/leads/page.tsx`** (MODIFICAT): nova `eventTypeLabel(raw)` que mapeja via `EVENT_TYPE_PLAIN` (de `lib/constants`). `entryToLead` ara guarda el label traduït a `type` i `product` (abans hi guardava el codi raw `PRIVATE_PARTY`/`WEDDING`/etc.).
+- **`app/admin/leads/leads-design.css`**: nous estils `.fx__pipelead[draggable="true"]` (cursor grab/grabbing), `.fx__pipelead.is-dragging`, `.fx__pipelead.is-pending`, `.fx__lane.is-drop` (highlight or quan és el target del drop). Bloc `.fx__lostmodal` + `.fx__lostmodal-card` + `.fx__lostmodal-h` per al modal de motiu canònic.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `785`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 784→785.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors); `pnpm run validate:core` OK — tots els guards verds.
+- Validació funcional: a `/admin/leads` → vista "Pipeline": arrossegar una targeta de lead a una altra lane → la targeta es mou immediatament (optimistic), apareix toast d'èxit, `router.refresh()` re-fetcha les dades. Drop a la lane "Perdut" → modal centrat amb motiu canònic obligatori; només confirma després de triar motiu. En error, la targeta torna a la seva lane original i es mostra toast d'error. Les reserves (kind='booking') no són draggable. Camp "Producte" ara mostra "Casament", "Festa privada", etc. en lloc dels codis raw.
+- Validació humana/UX: cursor `grab`/`grabbing`, opacitat reduïda durant el drag, lane destinació amb halo or quan rep l'over. Estil Brass & Obsidian respectat. Modal LOST amb backdrop blur sobre el panell.
+- Pendent (#786+): eliminar lead (acció amb `ConfirmDialog`); prioritat inline; suggeriments pipeline; `time`/`channel`/`owner` reals al servei.
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
+## 2026-05-26 — Canvi #784: leads admin — canvi d'estat inline (`patchLeadStatus`) + flux LOST (claude)
+
+### Context
+Canvi #784: segona funció aplicada al `/admin/leads` Brass & Obsidian. La fitxa interna del lead (`LeadPage` dins `LeadsSeasonClient.tsx`) deixa de ser només visual: els botons del picker d'estats i el botó "Commit" ara invoquen `patchLeadStatus` real. El flux LOST integra `LeadLostStatusPrompt` per exigir motiu canònic. Les reserves segueixen sent no editables des d'aquesta vista.
+
+### Canvi
+- **`app/admin/leads/LeadsSeasonClient.tsx`** (MODIFICAT):
+  - `LeadData` ara porta `kind: 'lead' | 'booking'` i `realStatus: LeadStatus | null` (canvi de contracte que permet decidir si una entrada és editable des d'aquí).
+  - Nou mapa `STAGE_TO_STATUS` (`nou→NEW`, `contactat→CONTACTED`, `guanyat→WON`); `perdut` passa pel modal de motiu.
+  - `LeadPage`: imports nous (`useRouter`, `useToast`, `patchLeadStatus`, `LeadLostStatusPrompt`). Estat local `saving`, `lostOpen`, `lostReason`, `lostNote`. Helpers `applyStatus`, `handleStageClick`, `handlePrimary`. Els 4 botons del `lp2__stagepick` ara són `onClick` reals (s'inhabiliten si no és editable, està guardant o ja és l'estat actual). El botó `lp2__commit` avança al següent stage; per a `guanyat` mostra toast informatiu ("Creació de reserva pendent"). El `LeadLostStatusPrompt` es renderitza dins del mateix panell. Després d'un canvi, `router.refresh()` re-fetcha les dades del server component.
+- **`app/admin/leads/page.tsx`** (MODIFICAT): `entryToLead` propaga `kind` i `realStatus` (només per a entrades `lead`; bookings tenen `realStatus=null`).
+- **`app/admin/leads/leads-design.css`**: estils nous per a `.lp2__commit:disabled`, `.lp2__stagebtn:disabled` i `.lp2__nopanel` (missatge no-editable per a bookings).
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = `784`.
+- **`lib/constants/admin.ts`**: `ADMIN_CHANGE_COUNTER` 783→784.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors); `pnpm run validate:core` OK — tots els guards verds (inclosos `qa:admin-mutating-fetch-csrf`, `qa:no-native-dialog`, `qa:protocol`).
+- Validació funcional: a `/admin/leads`, en obrir la fitxa d'un lead (clic a una targeta del calendari o pipeline), el panell "Canviar estat" ja és interactiu: clic a un stage diferent → `PATCH /api/admin/leads/[id]/status` via `patchLeadStatus`, toast d'èxit, `router.refresh()`. Si el target és "Perdut", apareix `LeadLostStatusPrompt` amb selector de motiu canònic (`LEAD_LOST_REASONS`) i nota opcional; el botó queda inhabilitat fins que hi ha motiu. Per a bookings, els botons d'estat estan deshabilitats i es mostra el missatge `lp2__nopanel`.
+- Validació humana/UX: l'estètica Brass & Obsidian es respecta — els botons del picker es deshabiliten quan són l'estat actual o quan s'està guardant (opacitat reduïda, cursor `not-allowed`). El botó `lp2__commit` mostra "Guardant…" mentre el PATCH és en marxa. El prompt LOST reutilitza les classes `ap-input`/`ap-btn` (admin-theme.css segueix importat per compatibilitat). Cap pèrdua visual ni de funcionalitat respecte al #783.
+- Pendent (per a propers canvis): canvi d'estat directe des de la targeta del pipeline (sense obrir la fitxa) — funció #2 de l'inventari (vista pipeline); eliminar lead (#4); suggeriments pipeline (#5); prioritat inline (#6).
+
+### Tancament
+- Començat per: `claude`
+- Treballant per: `claude`
+- Tancat per: `claude`
+
+---
+
 ## 2026-05-26 — Canvi #783: leads admin — dades reals via `loadSeasonCalendar` (claude)
 
 ### Context

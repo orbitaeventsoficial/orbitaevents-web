@@ -156,7 +156,7 @@ describe('ComposeForm', () => {
     expect(screen.getByPlaceholderText('Escriu el teu missatge...')).toHaveValue('Body Maria Garcia');
   });
 
-  it('mostra resum d’audiència quan el redactor està en mode segmentat', () => {
+  it("mostra resum d'audiència quan el redactor està en mode segmentat", () => {
     render(
       <ComposeForm
         leads={LEADS}
@@ -168,6 +168,6 @@ describe('ComposeForm', () => {
 
     expect(screen.getByText('Audiència segmentada')).toBeInTheDocument();
     expect(screen.getAllByText('Clients de bodes 2025')).toHaveLength(2);
-    expect(screen.getByText('1 destinataris preparats per l’enviament massiu.')).toBeInTheDocument();
+    expect(screen.getByText("1 destinataris preparats per l'enviament massiu.")).toBeInTheDocument();
   });
 });

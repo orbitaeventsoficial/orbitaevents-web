@@ -1,7 +1,14 @@
 import DOMPurify from 'dompurify';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { formatDateShort, formatDateSimple, formatDateTimeFull, formatTimeShort, formatWeekdayShort, getEventLabel } from '@/lib/constants';
+import {
+  formatDateSimple,
+  formatDateTimeFull,
+  formatTimeShort,
+  formatWeekdayShort,
+  formatDateShort,
+  getEventLabel,
+} from '@/lib/constants';
 import type { LeadData, UnifiedEmail } from './inbox-types';
 import { getLeadStatusTone } from './inbox-types';
 import { ADMIN_INBOX_HELP, helpAttrs } from '../components/adminHelpContent';
@@ -12,38 +19,24 @@ const AiReplySuggestions = dynamic(() => import('./AiReplySuggestions'), { ssr: 
 
 function getInboxScopeLabel(activeTab: 'all' | 'leads' | 'emails' | 'trash') {
   switch (activeTab) {
-    case 'leads':
-      return 'Entrades web';
-    case 'emails':
-      return 'Correus IMAP';
-    case 'trash':
-      return 'Paperera';
-    default:
-      return 'Safata unificada';
+    case 'leads':   return 'Entrades web';
+    case 'emails':  return 'Correus IMAP';
+    case 'trash':   return 'Paperera';
+    default:        return 'Safata unificada';
   }
-}
-
-function getInboxFilterLabel(filter: 'all' | 'unread') {
-  return filter === 'unread' ? 'No llegits' : 'Tots els missatges';
 }
 
 export function formatInboxEmailDate(date: Date) {
   const d = new Date(date);
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) {
-    return formatTimeShort(d);
-  }
-  if (diffDays === 1) {
-    return 'Ahir';
-  }
-  if (diffDays < 7) {
-    return formatWeekdayShort(d);
-  }
+  if (diffDays === 0) return formatTimeShort(d);
+  if (diffDays === 1) return 'Ahir';
+  if (diffDays < 7) return formatWeekdayShort(d);
   return formatDateShort(d);
 }
 
+/* ── Navegació lateral (lg+) ─────────────────────────────────────────────── */
 export function InboxSidebar({
   activeTab,
   setActiveTab,
@@ -63,9 +56,9 @@ export function InboxSidebar({
   loadTrashEmails,
 }: {
   activeTab: 'all' | 'leads' | 'emails' | 'trash';
-  setActiveTab: (value: 'all' | 'leads' | 'emails' | 'trash') => void;
+  setActiveTab: (v: 'all' | 'leads' | 'emails' | 'trash') => void;
   filter: 'all' | 'unread';
-  setFilter: (value: 'all' | 'unread') => void;
+  setFilter: (v: 'all' | 'unread') => void;
   emailsCount: number;
   leadsCount: number;
   imapConfigured: boolean;
@@ -80,74 +73,169 @@ export function InboxSidebar({
   loadTrashEmails: () => void;
 }) {
   return (
-    <aside className="hidden w-56 border-r p-4 lg:block" {...helpAttrs(ADMIN_INBOX_HELP.sidebar)}>
-      <div className="mb-4 rounded-2xl border p-3 admin-tone-soft-info">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] admin-tone-text-info">Triage</p>
-        <div className="mt-3 grid gap-2">
-          <div className="rounded-xl border border-white/10 bg-black/10 px-3 py-2">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/45">No llegits</p>
-            <p className="mt-1 text-xl font-semibold text-white/90">{totalUnread}</p>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-black/10 px-3 py-2">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/45">Canal actiu</p>
-            <p className="mt-1 text-sm font-medium text-white/80">{getInboxScopeLabel(activeTab)}</p>
-          </div>
+    <nav className="ix__nav" aria-label="Canals" {...helpAttrs(ADMIN_INBOX_HELP.sidebar)}>
+      {/* Resum ràpid */}
+      <div className="ix__navsummary">
+        <div className="ix__navstat">
+          <span className="ix__navstat-label">No llegits</span>
+          <span className="ix__navstat-value">{totalUnread}</span>
+        </div>
+        <div className="ix__navstat">
+          <span className="ix__navstat-label">Canal actiu</span>
+          <span className="ix__navstat-value--small">{getInboxScopeLabel(activeTab)}</span>
         </div>
       </div>
 
-      <div className="mb-6 space-y-1">
-        <button onClick={() => setActiveTab('all')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${activeTab === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-          📬 Tot ({emailsCount})
+      {/* Pestanyes de canal */}
+      <div className="ix__navgroup">
+        <p className="ix__navlabel">Canal</p>
+        <button
+          type="button"
+          onClick={() => setActiveTab('all')}
+          className={`ix__navitem${activeTab === 'all' ? ' is-on' : ''}`}
+        >
+          <span>Tot ({emailsCount})</span>
+          {totalUnread > 0 && activeTab !== 'all' && (
+            <span className="ix__navbadge">{totalUnread}</span>
+          )}
         </button>
-        <button onClick={() => setActiveTab('leads')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${activeTab === 'leads' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-          📋 Entrades web ({leadsCount})
+        <button
+          type="button"
+          onClick={() => setActiveTab('leads')}
+          className={`ix__navitem${activeTab === 'leads' ? ' is-on' : ''}`}
+        >
+          <span>Entrades web ({leadsCount})</span>
         </button>
         {imapConfigured && (
           <>
-            <button onClick={() => setActiveTab('emails')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${activeTab === 'emails' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-              📧 Emails ({imapEmailsCount})
-              {imapUnread > 0 && <span className="ml-2 rounded-full px-2 py-0.5 text-xs">{imapUnread}</span>}
+            <button
+              type="button"
+              onClick={() => setActiveTab('emails')}
+              className={`ix__navitem${activeTab === 'emails' ? ' is-on' : ''}`}
+            >
+              <span>Correus ({imapEmailsCount})</span>
+              {imapUnread > 0 && <span className="ix__navbadge">{imapUnread}</span>}
             </button>
-            <button onClick={() => setActiveTab('trash')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors ${activeTab === 'trash' ? 'admin-tone-soft-info admin-tone-text-info' : 'admin-tone-idle'}`}>
-              🗑️ Paperera {trashCount > 0 && `(${trashCount})`}
+            <button
+              type="button"
+              onClick={() => setActiveTab('trash')}
+              className={`ix__navitem${activeTab === 'trash' ? ' is-on' : ''}`}
+            >
+              <span>Paperera{trashCount > 0 ? ` (${trashCount})` : ''}</span>
             </button>
           </>
         )}
       </div>
 
-      <hr className="my-4" />
+      <div className="ix__navdivider" />
 
-      <nav className="space-y-1">
-        <button onClick={() => setFilter('all')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm transition-colors ${filter === 'all' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5'}`}>
+      {/* Filtres de lectura */}
+      <div className="ix__navgroup">
+        <p className="ix__navlabel">Filtre</p>
+        <button
+          type="button"
+          onClick={() => setFilter('all')}
+          className={`ix__navitem${filter === 'all' ? ' is-on' : ''}`}
+        >
           Tots
         </button>
-        <button onClick={() => setFilter('unread')} type="button" className={`w-full rounded-xl px-3 py-2 text-left text-sm transition-colors ${filter === 'unread' ? 'admin-tone-soft-info admin-tone-text-info' : 'text-white/40 hover:bg-white/5'}`}>
-          🔵 No llegits ({totalUnread})
+        <button
+          type="button"
+          onClick={() => setFilter('unread')}
+          className={`ix__navitem${filter === 'unread' ? ' is-on' : ''}`}
+        >
+          No llegits ({totalUnread})
         </button>
-      </nav>
+      </div>
 
       {imapConfigured && (
-        <div className="mt-4 rounded-xl border p-3">
-          <p className="text-sm font-medium">Només Òrbita</p>
-          <p className="mt-1 text-xs">Es mostren només emails de <span>orbitaevents.com</span></p>
-        </div>
-      )}
-
-      {imapConfigured && (
-        <button onClick={activeTab === 'trash' ? loadTrashEmails : loadImapEmails} disabled={loadingImap || loadingTrash} type="button" className="mt-4 w-full rounded-xl border px-3 py-2 text-sm transition-colors disabled:opacity-50">
-          {loadingImap || loadingTrash ? '⏳ Carregant...' : '🔄 Actualitzar'}
-        </button>
+        <>
+          <div className="ix__navdivider" />
+          <div className="ix__navnote">
+            <strong>Només Òrbita</strong>
+            <br />Es mostren emails de orbitaevents.com
+          </div>
+          <button
+            type="button"
+            onClick={activeTab === 'trash' ? loadTrashEmails : loadImapEmails}
+            disabled={loadingImap || loadingTrash}
+            className="ix__navrefresh"
+          >
+            {loadingImap || loadingTrash ? 'Carregant...' : '⟳ Actualitzar'}
+          </button>
+        </>
       )}
 
       {imapError && (
-        <div className="mt-4 rounded-xl border p-3">
-          <p className="text-xs">{imapError}</p>
-        </div>
+        <div className="ix__naverror">{imapError}</div>
       )}
-    </aside>
+    </nav>
   );
 }
 
+/* ── Pestanyes mobile (< lg) ─────────────────────────────────────────────── */
+export function InboxTabs({
+  activeTab,
+  setActiveTab,
+  emailsCount,
+  leadsCount,
+  imapConfigured,
+  imapEmailsCount,
+  imapUnread,
+  trashCount,
+  totalUnread,
+}: {
+  activeTab: 'all' | 'leads' | 'emails' | 'trash';
+  setActiveTab: (v: 'all' | 'leads' | 'emails' | 'trash') => void;
+  emailsCount: number;
+  leadsCount: number;
+  imapConfigured: boolean;
+  imapEmailsCount: number;
+  imapUnread: number;
+  trashCount: number;
+  totalUnread: number;
+}) {
+  return (
+    <div className="ix__tabs" role="tablist" aria-label="Canals">
+      <button
+        type="button" role="tab"
+        onClick={() => setActiveTab('all')}
+        className={`ix__tab${activeTab === 'all' ? ' is-on' : ''}`}
+      >
+        Tot ({emailsCount})
+        {totalUnread > 0 && <span className="ix__navbadge">{totalUnread}</span>}
+      </button>
+      <button
+        type="button" role="tab"
+        onClick={() => setActiveTab('leads')}
+        className={`ix__tab${activeTab === 'leads' ? ' is-on' : ''}`}
+      >
+        Web ({leadsCount})
+      </button>
+      {imapConfigured && (
+        <>
+          <button
+            type="button" role="tab"
+            onClick={() => setActiveTab('emails')}
+            className={`ix__tab${activeTab === 'emails' ? ' is-on' : ''}`}
+          >
+            IMAP ({imapEmailsCount})
+            {imapUnread > 0 && <span className="ix__navbadge">{imapUnread}</span>}
+          </button>
+          <button
+            type="button" role="tab"
+            onClick={() => setActiveTab('trash')}
+            className={`ix__tab${activeTab === 'trash' ? ' is-on' : ''}`}
+          >
+            Paperera{trashCount > 0 ? ` (${trashCount})` : ''}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Columna de llista ────────────────────────────────────────────────────── */
 export function InboxListPane({
   activeTab,
   filter,
@@ -166,7 +254,7 @@ export function InboxListPane({
   activeTab: 'all' | 'leads' | 'emails' | 'trash';
   filter: 'all' | 'unread';
   searchQuery: string;
-  setSearchQuery: (value: string) => void;
+  setSearchQuery: (v: string) => void;
   flashMessage: { type: 'success' | 'error'; text: string } | null;
   clearFlashMessage: () => void;
   loadingImap: boolean;
@@ -177,61 +265,98 @@ export function InboxListPane({
   selectedEmail: UnifiedEmail | null;
   handleSelectEmail: (email: UnifiedEmail) => void;
 }) {
+  const isLoading =
+    (loadingImap && imapEmailsCount === 0) ||
+    (loadingTrash && trashEmailsCount === 0);
+
   return (
-    <div className="flex w-96 flex-col border-r" {...helpAttrs(ADMIN_INBOX_HELP.list)}>
-      <div className="border-b px-4 py-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">Inbox Workspace</p>
-            <h2 className="mt-1 text-base font-semibold text-white/90">{getInboxScopeLabel(activeTab)}</h2>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-right">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/45">{getInboxFilterLabel(filter)}</p>
-            <p className="mt-1 text-sm font-medium text-white/80">{filteredEmails.length} resultats</p>
-          </div>
+    <div className="ix__list" {...helpAttrs(ADMIN_INBOX_HELP.list)}>
+      {/* Capçalera */}
+      <div className="ix__listhead">
+        <div className="ix__listscope">
+          <span className="ix__listscope-label">{getInboxScopeLabel(activeTab)}</span>
+          <span className="ix__listscope-title">
+            {filter === 'unread' ? 'No llegits' : 'Tots els missatges'}
+          </span>
+        </div>
+        <div className="ix__listcount">
+          {filteredEmails.length} resultats
         </div>
       </div>
 
-      <div className="border-b p-3" {...helpAttrs(ADMIN_INBOX_HELP.search)}>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2">🔍</span>
-          <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cercar..." aria-label="Cercar emails" className="ap-input py-2 pl-10 pr-4 text-sm" />
-        </div>
+      {/* Cerca */}
+      <div className="ix__search" {...helpAttrs(ADMIN_INBOX_HELP.search)}>
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Cercar per nom, email, assumpte..."
+          aria-label="Cercar missatges"
+          className="ix__searchinput"
+        />
       </div>
 
+      {/* Flash */}
       {flashMessage && (
-        <div className={`mx-3 mt-3 rounded-xl border px-3 py-2 text-xs ${flashMessage.type === 'success' ? 'admin-tone-soft-success admin-tone-border-success admin-tone-text-success' : 'admin-tone-soft-danger admin-tone-border-danger admin-tone-text-danger'}`} role={flashMessage.type === 'error' ? 'alert' : 'status'} aria-live="polite">
-          <div className="flex items-center justify-between gap-3">
-            <span>{flashMessage.text}</span>
-            <button onClick={clearFlashMessage} type="button" aria-label="Tancar missatge" className="text-xs">✕</button>
-          </div>
+        <div
+          className={`ix__flash ix__flash--${flashMessage.type}`}
+          role={flashMessage.type === 'error' ? 'alert' : 'status'}
+          aria-live="polite"
+        >
+          <span>{flashMessage.text}</span>
+          <button
+            type="button"
+            onClick={clearFlashMessage}
+            className="ix__flashclose"
+            aria-label="Tancar"
+          >
+            ✕
+          </button>
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
-        {(loadingImap && imapEmailsCount === 0) || (loadingTrash && trashEmailsCount === 0) ? (
-          <div className="p-8 text-center"><div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" /><p>Carregant emails...</p></div>
+      {/* Missatges */}
+      <div className="ix__messages">
+        {isLoading ? (
+          <div className="ix__listplaceholder">
+            <div className="ix__spin" />
+            <p className="ix__listplaceholder-body">Carregant missatges...</p>
+          </div>
         ) : filteredEmails.length === 0 ? (
-          <div className="p-8 text-center">
-            <span className="text-4xl">📭</span>
-            <p className="mt-2 text-sm font-semibold text-white/85">No hi ha missatges en aquesta vista</p>
-            <p className="mt-1 text-xs admin-tone-text-slate">Canvia el filtre, revisa un altre canal o recarrega per buscar activitat nova.</p>
+          <div className="ix__listplaceholder">
+            <div className="ix__listplaceholder-icon">📭</div>
+            <p className="ix__listplaceholder-title">Cap missatge</p>
+            <p className="ix__listplaceholder-body">
+              Canvia el filtre o revisa un altre canal per buscar activitat nova.
+            </p>
           </div>
         ) : (
           filteredEmails.map((email) => (
-            <button key={email.id} onClick={() => handleSelectEmail(email)} type="button" className={`w-full border-b border-white/5 p-4 text-left transition-colors hover:bg-white/[0.03] ${selectedEmail?.id === email.id ? 'admin-tone-bg-info border-l-4 admin-tone-border-info' : ''} ${!email.read ? 'admin-tone-bg-info' : ''}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2" {...helpAttrs(ADMIN_INBOX_HELP.messageActions)}>
-                    {!email.read && <span className="h-2 w-2 flex-shrink-0 rounded-full" />}
-                    <span className={`rounded px-1.5 py-0.5 text-xs ${email.type === 'lead' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-bg-success admin-tone-text-success'}`}>{email.type === 'lead' ? 'Entrada web' : 'Correu IMAP'}</span>
-                    {!email.read && <span className="rounded px-1.5 py-0.5 text-[10px]">Nou</span>}
-                    <p className={`truncate text-sm ${!email.read ? 'font-semibold text-white/90' : 'text-white/60'}`}>{email.fromName}</p>
+            <button
+              key={email.id}
+              type="button"
+              onClick={() => handleSelectEmail(email)}
+              className={[
+                'ix__msgitem',
+                selectedEmail?.id === email.id ? 'is-selected' : '',
+                !email.read ? 'is-unread' : '',
+              ].filter(Boolean).join(' ')}
+            >
+              <div className="ix__msgrow">
+                <div className="ix__msginfo">
+                  <div className="ix__msgmeta">
+                    {!email.read && <span className="ix__msgdot" aria-label="No llegit" />}
+                    <span className={`ix__badge ix__badge--${email.type === 'lead' ? 'lead' : 'imap'}`}>
+                      {email.type === 'lead' ? 'Web' : 'IMAP'}
+                    </span>
+                    <span className="ix__msgsender">{email.fromName}</span>
                   </div>
-                  <p className="mt-0.5 truncate text-sm">{email.subject}</p>
-                  <p className="mt-1 truncate text-xs">{email.preview || email.subject}</p>
+                  <p className="ix__msgsubject">{email.subject}</p>
+                  <p className="ix__msgpreview">{email.preview || email.subject}</p>
                 </div>
-                <div className="flex flex-shrink-0 flex-col items-end gap-1"><span className="text-xs">{formatInboxEmailDate(email.date)}</span></div>
+                <div>
+                  <span className="ix__msgtime">{formatInboxEmailDate(email.date)}</span>
+                </div>
               </div>
             </button>
           ))
@@ -241,10 +366,13 @@ export function InboxListPane({
   );
 }
 
+/* ── Panell de detall ─────────────────────────────────────────────────────── */
 export function InboxDetailPane({
   selectedEmail,
   loadingSelected,
   activeTab,
+  mobileOpen,
+  onMobileClose,
   handleReply,
   handleOpenQuote,
   handleOpenLead,
@@ -257,6 +385,8 @@ export function InboxDetailPane({
   selectedEmail: UnifiedEmail | null;
   loadingSelected: boolean;
   activeTab: 'all' | 'leads' | 'emails' | 'trash';
+  mobileOpen: boolean;
+  onMobileClose: () => void;
   handleReply: (email: UnifiedEmail) => void;
   handleOpenQuote: () => void;
   handleOpenLead: (lead: Pick<LeadData, 'id' | 'customerId'>) => void;
@@ -266,113 +396,256 @@ export function InboxDetailPane({
   handleDeletePermanently: (email: UnifiedEmail) => void;
   onApplySuggestion?: (text: string) => void;
 }) {
-  if (!selectedEmail) {
-    return <div className="flex flex-1 items-center justify-center"><div className="text-center"><span className="text-6xl">📬</span><p className="mt-4 text-sm font-semibold text-white/85">Selecciona un missatge per veure&apos;l</p><p className="mt-2 text-xs text-white/50">La columna dreta s&apos;activa quan tries una conversa o una entrada web.</p></div></div>;
-  }
-
-  const actionHint = activeTab === 'trash'
-    ? { title: 'Acció recomanada', body: 'Decideix si aquest correu s\'ha de restaurar o eliminar definitivament.' }
-    : { title: 'Acció recomanada', body: 'Converteix aquest correu en lead si és comercial; si no, respon o arxiva ràpid.' };
-  const selectedLead = selectedEmail.type === 'lead' ? selectedEmail.leadData ?? null : null;
-
   return (
-    <div className="flex flex-1 flex-col" {...helpAttrs(ADMIN_INBOX_HELP.detail)}>
-      <div className="border-b p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className={`rounded px-2 py-1 text-xs ${selectedEmail.type === 'lead' ? 'admin-tone-bg-violet admin-tone-text-violet' : 'admin-tone-bg-success admin-tone-text-success'}`}>{selectedEmail.type === 'lead' ? '📋 Entrada web' : '📧 Correu IMAP'}</span>
-              {selectedEmail.leadData?.status && <span className={`rounded border px-2 py-1 text-xs font-medium ${getLeadStatusTone(selectedEmail.leadData.status).bg} ${getLeadStatusTone(selectedEmail.leadData.status).text} ${getLeadStatusTone(selectedEmail.leadData.status).border}`}>{selectedEmail.leadData.status}</span>}
-            </div>
-            <h2 className="text-xl font-semibold">{selectedEmail.subject}</h2>
-            <div className="mt-3 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full font-bold">{selectedEmail.fromName.charAt(0).toUpperCase()}</div>
-              <div><p className="font-medium">{selectedEmail.fromName}</p><p className="text-sm">{selectedEmail.from}</p></div>
-            </div>
-          </div>
-          <span className="text-sm">{formatDateTimeFull(selectedEmail.date)}</span>
+    <div
+      className={`ix__detail${mobileOpen ? ' is-open' : ''}`}
+      {...helpAttrs(ADMIN_INBOX_HELP.detail)}
+    >
+      {/* Botó tornar (mobile) */}
+      <button type="button" onClick={onMobileClose} className="ix__detailbackbtn">
+        ← Tornar a la llista
+      </button>
+
+      {!selectedEmail ? (
+        <div className="ix__detailblank">
+          <div className="ix__detailblank-icon">📬</div>
+          <p className="ix__detailblank-title">Selecciona un missatge</p>
+          <p className="ix__detailblank-body">
+            La columna dreta s&apos;activa quan tries una conversa o una entrada web.
+          </p>
         </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-6">
-        {selectedLead ? (
-          <>
-            <InboxLeadContext lead={selectedLead} />
-            <div className="mb-4">
-              <CommSummaryPanel leadId={selectedLead.id} customerId={selectedLead.customerId} />
+      ) : (
+        <>
+          {/* Capçalera del detall */}
+          <div className="ix__detailhead">
+            <div className="ix__detailheadrow">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="ix__detailmeta">
+                  <span className={`ix__badge ix__badge--${selectedEmail.type === 'lead' ? 'lead' : 'imap'}`}>
+                    {selectedEmail.type === 'lead' ? 'Entrada web' : 'Correu IMAP'}
+                  </span>
+                  {selectedEmail.leadData?.status && (
+                    <span className="ix__statusbadge">
+                      {selectedEmail.leadData.status}
+                    </span>
+                  )}
+                </div>
+                <h2 className="ix__detailsubject">{selectedEmail.subject}</h2>
+                <div className="ix__detailsender">
+                  <div className="ix__senderavatar">
+                    {selectedEmail.fromName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="ix__senderinfo">
+                    <p className="ix__sendername">{selectedEmail.fromName}</p>
+                    <p className="ix__senderaddr">{selectedEmail.from}</p>
+                  </div>
+                </div>
+              </div>
+              <span className="ix__detaildate">
+                {formatDateTimeFull(selectedEmail.date)}
+              </span>
             </div>
-          </>
-        ) : (
-          <div className="mb-6 rounded-2xl border px-4 py-4 admin-tone-soft-info">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] admin-tone-text-info">{actionHint.title}</p>
-            <p className="mt-2 text-sm text-white/85">{actionHint.body}</p>
           </div>
-        )}
 
-        {selectedLead && (
-          <div className="mb-6 rounded-xl border p-6">
-            <h3 className="mb-4 font-semibold">📋 Detalls de la sol·licitud</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><span>Tipus d&apos;event:</span><p className="font-medium">{getEventLabel(selectedLead.eventType || '', 'No especificat')}</p></div>
-              {selectedLead.eventDate && <div><span>Data:</span><p className="font-medium">{formatDateSimple(selectedLead.eventDate)}</p></div>}
-              {selectedLead.guestCount && <div><span>Convidats:</span><p className="font-medium">{selectedLead.guestCount} persones</p></div>}
-              {selectedLead.budget && <div><span>Pressupost:</span><p className="font-medium">{selectedLead.budget}</p></div>}
-              {selectedLead.eventLocation && <div><span>Ubicació:</span><p className="font-medium">{selectedLead.eventLocation}</p></div>}
-              {selectedLead.phone && <div><span>Telèfon:</span><p className="font-medium"><a href={`tel:${selectedLead.phone}`} className="hover:underline">{selectedLead.phone}</a></p></div>}
+          {/* Cos del detall */}
+          <div className="ix__detailbody">
+            {selectedEmail.type === 'lead' && selectedEmail.leadData ? (
+              <>
+                <InboxLeadContext lead={selectedEmail.leadData} />
+                <div style={{ marginBottom: 16 }}>
+                  <CommSummaryPanel
+                    leadId={selectedEmail.leadData.id}
+                    customerId={selectedEmail.leadData.customerId}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="ix__actionhint">
+                <p className="ix__actionhint-label">
+                  {activeTab === 'trash' ? 'Acció recomanada' : 'Acció recomanada'}
+                </p>
+                <p className="ix__actionhint-body">
+                  {activeTab === 'trash'
+                    ? "Decideix si aquest correu s'ha de restaurar o eliminar definitivament."
+                    : "Converteix aquest correu en lead si és comercial; si no, respon o arxiva ràpid."}
+                </p>
+              </div>
+            )}
+
+            {selectedEmail.type === 'lead' && selectedEmail.leadData && (
+              <div className="ix__leadcard">
+                <p className="ix__leadcard-title">Detalls de la sol·licitud</p>
+                <div className="ix__leadgrid">
+                  <div>
+                    <p className="ix__leadfield-label">Tipus d&apos;event</p>
+                    <p className="ix__leadfield-value">
+                      {getEventLabel(selectedEmail.leadData.eventType || '', 'No especificat')}
+                    </p>
+                  </div>
+                  {selectedEmail.leadData.eventDate && (
+                    <div>
+                      <p className="ix__leadfield-label">Data</p>
+                      <p className="ix__leadfield-value">
+                        {formatDateSimple(selectedEmail.leadData.eventDate)}
+                      </p>
+                    </div>
+                  )}
+                  {selectedEmail.leadData.guestCount && (
+                    <div>
+                      <p className="ix__leadfield-label">Convidats</p>
+                      <p className="ix__leadfield-value">
+                        {selectedEmail.leadData.guestCount} persones
+                      </p>
+                    </div>
+                  )}
+                  {selectedEmail.leadData.budget && (
+                    <div>
+                      <p className="ix__leadfield-label">Pressupost</p>
+                      <p className="ix__leadfield-value">{selectedEmail.leadData.budget}</p>
+                    </div>
+                  )}
+                  {selectedEmail.leadData.eventLocation && (
+                    <div>
+                      <p className="ix__leadfield-label">Ubicació</p>
+                      <p className="ix__leadfield-value">{selectedEmail.leadData.eventLocation}</p>
+                    </div>
+                  )}
+                  {selectedEmail.leadData.phone && (
+                    <div>
+                      <p className="ix__leadfield-label">Telèfon</p>
+                      <p className="ix__leadfield-value">
+                        <a
+                          href={`tel:${selectedEmail.leadData.phone}`}
+                          style={{ textDecoration: 'underline', textDecorationColor: 'var(--ax-gold)' }}
+                        >
+                          {selectedEmail.leadData.phone}
+                        </a>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Cos del missatge */}
+            <div className="ix__msgsection">
+              <p className="ix__msgsection-title">Missatge</p>
+              {loadingSelected && selectedEmail.type === 'imap' && (
+                <p className="ix__detailloading">
+                  <span className="ix__spin" style={{ width: 16, height: 16 }} />
+                  Carregant contingut complet...
+                </p>
+              )}
+              {selectedEmail.imapData?.bodyHtml ? (
+                <div
+                  className="ix__emailhtml"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml),
+                  }}
+                />
+              ) : (
+                <p className="ix__emailtext">
+                  {selectedEmail.leadData?.message ||
+                    selectedEmail.imapData?.bodyText ||
+                    selectedEmail.preview ||
+                    'Sense missatge'}
+                </p>
+              )}
             </div>
+
+            {/* Suggeriments IA */}
+            {onApplySuggestion && activeTab !== 'trash' && (
+              <div style={{ marginTop: 16 }}>
+                <AiReplySuggestions email={selectedEmail} onApply={onApplySuggestion} />
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="prose prose-invert max-w-none">
-          <h4 className="mb-2 text-sm font-medium">Missatge:</h4>
-          {loadingSelected && selectedEmail.type === 'imap' && <p className="mb-2 text-xs">Carregant contingut complet...</p>}
-          {selectedEmail.imapData?.bodyHtml ? (
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }} className="rounded-xl border p-4" />
-          ) : (
-            <p className="whitespace-pre-wrap">{selectedLead?.message || selectedEmail.imapData?.bodyText || selectedEmail.preview || 'Sense missatge'}</p>
-          )}
-        </div>
-
-        {onApplySuggestion && activeTab !== 'trash' && (
-          <div className="mt-4">
-            <AiReplySuggestions email={selectedEmail} onApply={onApplySuggestion} />
-          </div>
-        )}
-      </div>
-
-      <div className="border-t p-4">
-        <div className="flex flex-wrap items-center gap-2" {...helpAttrs(ADMIN_INBOX_HELP.messageActions)}>
-          <button onClick={() => handleReply(selectedEmail)} type="button" className="ap-btn ap-btn--primary flex-1 px-4 py-2 font-medium">↩️ Respondre</button>
-          <button onClick={handleOpenQuote} type="button" className="rounded-xl border px-4 py-2 transition-colors">📄 Pressupost</button>
-          {selectedLead?.phone && (
-            <>
-              <a href={`https://wa.me/${selectedLead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="rounded-xl border px-4 py-2 transition-colors">💬 WhatsApp</a>
-              <a href={`tel:${selectedLead.phone}`} className="rounded-xl border px-4 py-2 transition-colors">📞 Trucar</a>
-            </>
-          )}
-          {selectedLead && (
+          {/* Accions */}
+          <div
+            className="ix__detailactions"
+            {...helpAttrs(ADMIN_INBOX_HELP.messageActions)}
+          >
             <button
-              onClick={() => handleOpenLead(selectedLead)}
               type="button"
-              className="rounded-xl border px-4 py-2 transition-colors"
+              onClick={() => handleReply(selectedEmail)}
+              className="ix__btn ix__btn--primary"
             >
-              {selectedLead.customerId ? '👤 Veure client' : '📋 Veure lead'}
+              ↩ Respondre
             </button>
-          )}
-          {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
-            <>
-              <button onClick={() => handleImportLeadFromEmail(selectedEmail)} type="button" className="rounded-xl border px-4 py-2 transition-colors">➕ Crear/actualitzar lead</button>
-              <button onClick={() => handleMoveToTrash(selectedEmail)} type="button" className="rounded-xl border px-4 py-2 transition-colors">🗑️ Paperera</button>
-            </>
-          )}
-          {selectedEmail.type === 'imap' && activeTab === 'trash' && (
-            <>
-              <button onClick={() => handleRestoreEmail(selectedEmail)} type="button" className="rounded-xl border px-4 py-2 transition-colors">↩️ Restaurar</button>
-              <button onClick={() => handleDeletePermanently(selectedEmail)} type="button" className="rounded-xl border px-4 py-2 transition-colors">❌ Eliminar permanent</button>
-            </>
-          )}
-        </div>
-      </div>
+            <button
+              type="button"
+              onClick={handleOpenQuote}
+              className="ix__btn ix__btn--ghost"
+            >
+              Pressupost
+            </button>
+            {selectedEmail.leadData?.phone && (
+              <>
+                <a
+                  href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ix__btn ix__btn--ghost"
+                >
+                  WhatsApp
+                </a>
+                <a
+                  href={`tel:${selectedEmail.leadData.phone}`}
+                  className="ix__btn ix__btn--ghost"
+                >
+                  Trucar
+                </a>
+              </>
+            )}
+            {selectedEmail.leadData && (
+              <button
+                type="button"
+                onClick={() => handleOpenLead(selectedEmail.leadData!)}
+                className="ix__btn ix__btn--ghost"
+              >
+                {selectedEmail.leadData.customerId ? '👤 Veure client' : '📋 Veure lead'}
+              </button>
+            )}
+            {selectedEmail.type === 'imap' && activeTab !== 'trash' && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleImportLeadFromEmail(selectedEmail)}
+                  className="ix__btn ix__btn--ghost"
+                >
+                  + Crear lead
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMoveToTrash(selectedEmail)}
+                  className="ix__btn ix__btn--ghost"
+                >
+                  Paperera
+                </button>
+              </>
+            )}
+            {selectedEmail.type === 'imap' && activeTab === 'trash' && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleRestoreEmail(selectedEmail)}
+                  className="ix__btn ix__btn--ghost"
+                >
+                  Restaurar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeletePermanently(selectedEmail)}
+                  className="ix__btn ix__btn--danger"
+                >
+                  Eliminar permanent
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

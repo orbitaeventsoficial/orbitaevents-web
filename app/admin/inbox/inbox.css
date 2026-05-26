@@ -1,0 +1,1275 @@
+/* ============================================================================
+   ÒRBITA ADMIN — Safata de correu (inbox + compose)
+   Canvi #801 — reconstrucció des de zero.
+   Prefix: ix- (inbox)
+   Paleta: tokens ax-* de orbita-tokens.css. Cap hex hardcoded.
+============================================================================ */
+
+/* ── Contenidor de pàgina ─────────────────────────────────────────────────── */
+.ix {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--ax-canvas);
+  color: var(--ax-t);
+}
+
+/* ── Capçalera de pàgina ─────────────────────────────────────────────────── */
+.ix__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid var(--ax-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-panel) 96%, var(--ax-canvas)),
+    var(--ax-canvas)
+  );
+}
+
+.ix__headleft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ix__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ax-gold);
+  opacity: 0.72;
+}
+
+.ix__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--ax-t);
+  line-height: 1.1;
+}
+
+.ix__subtitle {
+  font-size: 13px;
+  color: var(--ax-t2);
+  margin: 0;
+  margin-top: 1px;
+}
+
+.ix__headactions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Botons principals ────────────────────────────────────────────────────── */
+.ix__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+.ix__btn:hover { transform: translateY(-1px); }
+.ix__btn:active { transform: translateY(0); }
+
+.ix__btn--primary {
+  border: 1px solid var(--ax-hair-gold);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 16%, var(--ax-raised)),
+    color-mix(in oklab, var(--ax-gold) 6%, var(--ax-panel))
+  );
+  color: var(--ax-gold-bright);
+}
+.ix__btn--primary:hover {
+  border-color: var(--ax-gold);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 22%, var(--ax-raised)),
+    color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel))
+  );
+}
+
+.ix__btn--ghost {
+  border: 1px solid var(--ax-line2);
+  background: transparent;
+  color: var(--ax-t2);
+}
+.ix__btn--ghost:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t);
+  background: var(--ax-raised);
+}
+
+.ix__btn--danger {
+  border: 1px solid color-mix(in oklab, #c0392b 40%, transparent);
+  background: color-mix(in oklab, #c0392b 10%, transparent);
+  color: #e57373;
+}
+.ix__btn--danger:hover {
+  background: color-mix(in oklab, #c0392b 18%, transparent);
+}
+
+/* ── Workspace (3 columnes: nav + llista + detall) ────────────────────────── */
+.ix__workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Panell de navegació lateral (solo visible a lg+) ────────────────────── */
+.ix__nav {
+  flex: none;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid var(--ax-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-side) 98%, #000),
+    color-mix(in oklab, var(--ax-canvas) 96%, #000)
+  );
+  padding: 16px 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ix__nav::-webkit-scrollbar { display: none; }
+
+/* Targeta de resum (No llegits + canal actiu) */
+.ix__navsummary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--ax-line);
+  border-top-color: var(--ax-hair-gold);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--ax-panel) 60%, var(--ax-canvas));
+}
+
+.ix__navstat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ix__navstat-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ax-t3);
+}
+.ix__navstat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ax-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+.ix__navstat-value--small {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ax-t2);
+}
+
+/* Grups de pestanyes */
+.ix__navgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.ix__navlabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ax-t3);
+  padding: 0 10px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.ix__navitem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.ix__navitem:hover { background: var(--ax-panel); color: var(--ax-t); }
+.ix__navitem.is-on {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 10%, var(--ax-raised)),
+    var(--ax-panel)
+  );
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+
+.ix__navbadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--ax-gold);
+  color: var(--ax-canvas);
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ── Divider intern ──────────────────────────────────────────────────────── */
+.ix__navdivider {
+  height: 1px;
+  background: var(--ax-line);
+  margin: 8px 0;
+}
+
+/* Botó recarregar */
+.ix__navrefresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ax-t3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+  margin-top: 6px;
+}
+.ix__navrefresh:hover { border-color: var(--ax-hair-gold); color: var(--ax-t); background: var(--ax-raised); }
+.ix__navrefresh:disabled { opacity: 0.45; pointer-events: none; }
+
+/* Error IMAP */
+.ix__naverror {
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid color-mix(in oklab, #c0392b 35%, transparent);
+  border-radius: 9px;
+  background: color-mix(in oklab, #c0392b 8%, transparent);
+  font-size: 11px;
+  color: #e57373;
+}
+
+/* Nota de filtre de domini */
+.ix__navnote {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--ax-line);
+  border-radius: 9px;
+  background: color-mix(in oklab, var(--ax-gold) 5%, transparent);
+  font-size: 11px;
+  color: var(--ax-t3);
+  line-height: 1.5;
+}
+.ix__navnote strong { color: var(--ax-gold); font-weight: 700; }
+
+/* ── Columna de llista (400px fixed) ─────────────────────────────────────── */
+.ix__list {
+  flex: none;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ax-line);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Capçalera de la llista */
+.ix__listhead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+.ix__listscope {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ix__listscope-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ax-t3);
+}
+.ix__listscope-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ax-t);
+}
+
+.ix__listcount {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--ax-line);
+  border-radius: 8px;
+  background: var(--ax-sunk);
+  font-size: 11px;
+  color: var(--ax-t2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cerca */
+.ix__search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+.ix__searchinput {
+  flex: 1;
+  background: var(--ax-sunk);
+  border: 1px solid var(--ax-line2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  color: var(--ax-t);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.ix__searchinput::placeholder { color: var(--ax-t3); }
+.ix__searchinput:focus {
+  border-color: var(--ax-hair-gold);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ax-gold) 12%, transparent);
+}
+
+/* Missatge flash */
+.ix__flash {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 12px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ix__flash--success {
+  border-color: color-mix(in oklab, #27ae60 35%, transparent);
+  background: color-mix(in oklab, #27ae60 10%, transparent);
+  color: #6fcf97;
+}
+.ix__flash--error {
+  border-color: color-mix(in oklab, #c0392b 35%, transparent);
+  background: color-mix(in oklab, #c0392b 10%, transparent);
+  color: #e57373;
+}
+.ix__flashclose {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: 14px;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+.ix__flashclose:hover { opacity: 1; }
+
+/* Llista de missatges */
+.ix__messages {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ax-line2) transparent;
+}
+
+.ix__msgitem {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--ax-line);
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.ix__msgitem:hover { background: var(--ax-panel); color: var(--ax-t); }
+
+.ix__msgitem.is-selected {
+  background: color-mix(in oklab, var(--ax-gold) 6%, var(--ax-panel));
+  border-left: 3px solid var(--ax-gold);
+  padding-left: 13px;
+  color: var(--ax-t);
+}
+
+.ix__msgitem.is-unread { background: color-mix(in oklab, var(--ax-panel) 80%, var(--ax-canvas)); }
+.ix__msgitem.is-unread:hover { background: var(--ax-panel); }
+
+.ix__msgrow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ix__msginfo { flex: 1; min-width: 0; }
+
+.ix__msgmeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.ix__msgdot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ax-gold);
+  box-shadow: 0 0 6px var(--ax-gold);
+}
+
+.ix__msgsender {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ax-t);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.ix__msgsubject {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ax-t);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 3px;
+}
+
+.ix__msgpreview {
+  font-size: 12px;
+  color: var(--ax-t3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ix__msgtime {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--ax-t3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badges de tipus */
+.ix__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.ix__badge--lead {
+  background: color-mix(in oklab, #9b59b6 15%, transparent);
+  border: 1px solid color-mix(in oklab, #9b59b6 40%, transparent);
+  color: #d7aefb;
+}
+
+.ix__badge--imap {
+  background: color-mix(in oklab, #27ae60 12%, transparent);
+  border: 1px solid color-mix(in oklab, #27ae60 35%, transparent);
+  color: #6fcf97;
+}
+
+/* Estat buit / loading */
+.ix__listplaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--ax-t3);
+}
+.ix__listplaceholder-icon { font-size: 40px; margin-bottom: 12px; }
+.ix__listplaceholder-title { font-size: 14px; font-weight: 700; color: var(--ax-t2); margin-bottom: 4px; }
+.ix__listplaceholder-body { font-size: 12px; color: var(--ax-t3); line-height: 1.5; }
+
+/* Spinner */
+.ix__spin {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--ax-line2);
+  border-top-color: var(--ax-gold);
+  border-radius: 50%;
+  animation: ix-spin 0.7s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes ix-spin { to { transform: rotate(360deg); } }
+
+/* Tabs mobile (< lg) */
+.ix__tabs {
+  display: none;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--ax-line);
+  padding: 0 12px;
+  gap: 4px;
+  background: var(--ax-canvas);
+}
+.ix__tabs::-webkit-scrollbar { display: none; }
+
+.ix__tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ax-t3);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+}
+.ix__tab:hover { color: var(--ax-t2); }
+.ix__tab.is-on {
+  color: var(--ax-gold-bright);
+  border-bottom-color: var(--ax-gold);
+}
+
+/* ── Panell de detall ─────────────────────────────────────────────────────── */
+.ix__detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Estat buit del detall */
+.ix__detailblank {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  color: var(--ax-t3);
+}
+.ix__detailblank-icon { font-size: 52px; margin-bottom: 16px; opacity: 0.6; }
+.ix__detailblank-title { font-size: 15px; font-weight: 700; color: var(--ax-t2); margin-bottom: 6px; }
+.ix__detailblank-body { font-size: 12px; color: var(--ax-t3); line-height: 1.6; max-width: 300px; }
+
+/* Capçalera del detall */
+.ix__detailhead {
+  flex: none;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+.ix__detailheadrow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ix__detailmeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.ix__detailsubject {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ax-t);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.ix__detailsender {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ix__senderavatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--ax-gold) 15%, var(--ax-panel));
+  border: 1px solid var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ix__senderinfo { flex: 1; min-width: 0; }
+.ix__sendername {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ax-t);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ix__senderaddr {
+  font-size: 12px;
+  color: var(--ax-t3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ix__detaildate {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--ax-t3);
+  font-variant-numeric: tabular-nums;
+  padding-top: 4px;
+}
+
+/* Cos del detall (scroll) */
+.ix__detailbody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ax-line2) transparent;
+}
+
+/* Card d'acció recomanada */
+.ix__actionhint {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--ax-line);
+  border-top-color: var(--ax-hair-gold);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
+}
+.ix__actionhint-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ax-gold);
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+.ix__actionhint-body { font-size: 13px; color: var(--ax-t2); line-height: 1.5; }
+
+/* Card de dades del lead */
+.ix__leadcard {
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--ax-line);
+  border-radius: 12px;
+  background: var(--ax-panel);
+}
+.ix__leadcard-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ax-t);
+  margin-bottom: 12px;
+}
+.ix__leadgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+@media (min-width: 1280px) {
+  .ix__leadgrid { grid-template-columns: repeat(3, 1fr); }
+}
+.ix__leadfield-label { font-size: 11px; color: var(--ax-t3); margin-bottom: 2px; }
+.ix__leadfield-value { font-size: 13px; font-weight: 600; color: var(--ax-t); }
+
+/* Cos HTML de correu IMAP */
+.ix__emailhtml {
+  padding: 16px;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ax-t);
+  overflow-x: auto;
+}
+
+/* Cos text pla */
+.ix__emailtext {
+  padding: 16px;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ax-t);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Loading del detall */
+.ix__detailloading {
+  font-size: 11px;
+  color: var(--ax-t3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Secció de missatge */
+.ix__msgsection { margin-bottom: 20px; }
+.ix__msgsection-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ax-t3);
+  margin-bottom: 8px;
+}
+
+/* ── Barra d'accions del detall ───────────────────────────────────────────── */
+.ix__detailactions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-top: 1px solid var(--ax-line);
+  background: color-mix(in oklab, var(--ax-panel) 60%, var(--ax-canvas));
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .ix__nav { display: none; }
+  .ix__tabs { display: flex; }
+  .ix__list { width: 100%; border-right: none; }
+  .ix__detail { display: none; }
+  .ix__detail.is-open { display: flex; position: fixed; inset: 0; z-index: 50; background: var(--ax-canvas); }
+  .ix__detailbackbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--ax-line);
+    background: transparent;
+    color: var(--ax-t2);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ix__detailbackbtn { display: none; }
+  .ix__list { width: 380px; }
+}
+
+/* ── Bàner IMAP no configurat ────────────────────────────────────────────── */
+.ix__imapbanner {
+  margin: 16px 20px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--ax-line);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--ax-raised) 80%, var(--ax-canvas));
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ix__imapbanner-icon { font-size: 20px; flex-shrink: 0; }
+.ix__imapbanner-title { font-size: 14px; font-weight: 700; color: var(--ax-t); margin-bottom: 4px; }
+.ix__imapbanner-body { font-size: 12px; color: var(--ax-t2); line-height: 1.6; }
+.ix__imapbanner-code {
+  display: block;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--ax-sunk);
+  border: 1px solid var(--ax-line2);
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  color: var(--ax-t3);
+  word-break: break-all;
+}
+
+/* ── Panell follow-ups ────────────────────────────────────────────────────── */
+.ix__followups {
+  margin: 16px 20px 0;
+}
+
+/* ── Estat de lead a badge ────────────────────────────────────────────────── */
+.ix__statusbadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--ax-line);
+  color: var(--ax-t2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* COMPOSE — redactor d'email                                                  */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.cx {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--ax-canvas);
+  color: var(--ax-t);
+}
+
+/* Capçalera compose */
+.cx__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--ax-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-panel) 96%, var(--ax-canvas)),
+    var(--ax-canvas)
+  );
+}
+
+.cx__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+  flex-shrink: 0;
+}
+.cx__back:hover { border-color: var(--ax-hair-gold); color: var(--ax-t); background: var(--ax-raised); }
+
+.cx__headtitles { flex: 1; min-width: 0; }
+.cx__headeyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ax-gold);
+  opacity: 0.72;
+}
+.cx__headtitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ax-t);
+  letter-spacing: -0.01em;
+}
+
+/* Cos del compose */
+.cx__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 40px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ax-line2) transparent;
+}
+
+/* Segments de campanya */
+.cx__segments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.cx__segpill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.cx__segpill:hover { border-color: var(--ax-hair-gold); color: var(--ax-t); background: var(--ax-raised); }
+.cx__segpill.is-on {
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel));
+  color: var(--ax-gold-bright);
+}
+
+/* Toggle de mode (email / pressupost) */
+.cx__modetoggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 12px;
+  background: var(--ax-sunk);
+  margin-bottom: 20px;
+  width: fit-content;
+}
+.cx__modebtn {
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.cx__modebtn.is-on {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ax-gold) 14%, var(--ax-raised)),
+    color-mix(in oklab, var(--ax-gold) 6%, var(--ax-panel))
+  );
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+
+/* Card principal del formulari */
+.cx__formcard {
+  border: 1px solid var(--ax-line);
+  border-top-color: var(--ax-hair-gold);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--ax-panel) 80%, var(--ax-canvas));
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.cx__forminner {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Camps de formulari */
+.cx__field { display: flex; flex-direction: column; gap: 6px; }
+.cx__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ax-t2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.cx__input,
+.cx__select,
+.cx__textarea {
+  background: var(--ax-sunk);
+  border: 1px solid var(--ax-line2);
+  border-radius: 9px;
+  padding: 9px 13px;
+  color: var(--ax-t);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.cx__input::placeholder,
+.cx__textarea::placeholder { color: var(--ax-t3); }
+.cx__input:focus,
+.cx__select:focus,
+.cx__textarea:focus {
+  border-color: var(--ax-hair-gold);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ax-gold) 12%, transparent);
+}
+.cx__textarea {
+  resize: vertical;
+  min-height: 180px;
+  line-height: 1.6;
+}
+.cx__select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* Card de dades del lead seleccionat */
+.cx__leaddetail {
+  padding: 14px 16px;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+}
+.cx__leaddetail-title { font-size: 12px; font-weight: 700; color: var(--ax-t2); margin-bottom: 10px; }
+.cx__leaddetail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+}
+@media (min-width: 640px) { .cx__leaddetail-grid { grid-template-columns: repeat(4, 1fr); } }
+.cx__leaddetail-label { font-size: 11px; color: var(--ax-t3); }
+.cx__leaddetail-value { font-size: 13px; font-weight: 600; color: var(--ax-t); }
+.cx__leaddetail-msg { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ax-line); }
+.cx__leaddetail-msgtext { font-size: 13px; color: var(--ax-t2); margin-top: 4px; }
+.cx__packprice { font-weight: 800; font-size: 16px; margin-top: 4px; color: var(--ax-gold-bright); }
+.cx__packname { font-weight: 700; font-size: 14px; }
+.cx__priceinput { font-size: 22px; font-weight: 800; }
+.cx__recipcount { font-size: 12px; opacity: 0.7; }
+
+/* Card de plantilles */
+.cx__tplcard {
+  border: 1px solid var(--ax-line);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--ax-panel);
+  margin-bottom: 20px;
+}
+.cx__tpllabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ax-t3);
+  margin-bottom: 10px;
+}
+.cx__tplgrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 640px) { .cx__tplgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .cx__tplgrid { grid-template-columns: repeat(3, 1fr); } }
+
+.cx__tplitem {
+  padding: 10px 12px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ax-t2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.cx__tplitem:hover { background: var(--ax-raised); color: var(--ax-t); }
+.cx__tplitem.is-on {
+  background: color-mix(in oklab, var(--ax-gold) 10%, var(--ax-panel));
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+.cx__tplname { font-size: 13px; font-weight: 700; }
+.cx__tpldesc { font-size: 11px; opacity: 0.55; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Card d'audiència segmentada */
+.cx__segcard {
+  border: 1px solid var(--ax-line);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--ax-panel);
+  margin-bottom: 20px;
+}
+.cx__segcard-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ax-t3);
+  margin-bottom: 8px;
+}
+.cx__segcard-name { font-size: 14px; font-weight: 700; color: var(--ax-t); margin-bottom: 4px; }
+.cx__segcard-desc { font-size: 12px; color: var(--ax-t2); margin-bottom: 8px; }
+.cx__segcard-count { font-size: 13px; font-weight: 600; color: var(--ax-gold-bright); margin-bottom: 10px; }
+.cx__segrecipgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.cx__segrecip {
+  padding: 8px 10px;
+  border: 1px solid var(--ax-line);
+  border-radius: 8px;
+  background: var(--ax-sunk);
+}
+.cx__segrecip-name { font-size: 12px; font-weight: 600; color: var(--ax-t); }
+.cx__segrecip-email { font-size: 11px; color: var(--ax-t3); }
+
+/* Locale selector */
+.cx__localepicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cx__localebtn {
+  padding: 5px 12px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ax-t3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.cx__localebtn.is-on {
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 12%, var(--ax-panel));
+  color: var(--ax-gold-bright);
+}
+.cx__localebtn:hover:not(.is-on) { color: var(--ax-t2); border-color: var(--ax-line); }
+
+/* Barra d'enviament */
+.cx__sendbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Error d'enviament */
+.cx__error {
+  padding: 10px 14px;
+  border: 1px solid color-mix(in oklab, #c0392b 35%, transparent);
+  border-radius: 9px;
+  background: color-mix(in oklab, #c0392b 10%, transparent);
+  color: #e57373;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Èxit d'enviament */
+.cx__success {
+  padding: 16px;
+  border: 1px solid color-mix(in oklab, #27ae60 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklab, #27ae60 10%, transparent);
+  color: #6fcf97;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Pressupost — camps addicionals */
+.cx__quotefields { display: flex; flex-direction: column; gap: 16px; }
+.cx__qfrow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Extres del pack */
+.cx__extras { display: flex; flex-direction: column; gap: 6px; }
+.cx__extraitem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--ax-line);
+  border-radius: 8px;
+  background: var(--ax-sunk);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.cx__extraitem:hover { background: var(--ax-raised); }
+.cx__extraitem.is-on { border-color: var(--ax-hair-gold); background: color-mix(in oklab, var(--ax-gold) 8%, var(--ax-panel)); }
+.cx__extralabel { font-size: 13px; color: var(--ax-t); }
