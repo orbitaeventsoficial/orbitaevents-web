@@ -1,0 +1,180 @@
+/* ==========================================================================
+   ORBITA DESIGN TOKENS
+   --------------------------------------------------------------------------
+   Font de veritat visual compartida per /studio i /admin.
+   /studio documenta el sistema; l'admin consumeix aquests tokens amb aliases
+   propis per mantenir compatibilitat amb les classes ja consolidades.
+   ========================================================================== */
+
+.o-studio-root,
+.ax-root,
+.fx-root.is-contrast {
+  --o-bg:        #07090d;
+  --o-surface:   #0e1219;
+  --o-elev-1:    #141923;
+  --o-elev-2:    #1c2230;
+  --o-elev-3:    #252b3a;
+
+  --o-line:        rgba(255, 255, 255, 0.06);
+  --o-line-soft:   rgba(255, 255, 255, 0.03);
+  --o-line-strong: rgba(255, 255, 255, 0.12);
+
+  --o-text:    #f5f7fa;
+  --o-text-2:  #a2acba;
+  --o-text-3:  #6b7585;
+  --o-text-4:  #4a525e;
+
+  --o-accent:        #d4a857;
+  --o-accent-deep:   #b8923f;
+  --o-accent-soft:   rgba(212, 168, 87, 0.12);
+  --o-accent-line:   rgba(212, 168, 87, 0.32);
+  --o-accent-ink:    #1a1208;
+
+  --o-success:      #3ec57b;
+  --o-success-soft: rgba(62, 197, 123, 0.14);
+  --o-warning:      #e8a93a;
+  --o-warning-soft: rgba(232, 169, 58, 0.14);
+  --o-danger:       #e2596a;
+  --o-danger-soft:  rgba(226, 89, 106, 0.14);
+  --o-info:         #5fb7e8;
+  --o-info-soft:    rgba(95, 183, 232, 0.14);
+
+  --o-1: 0.25rem;
+  --o-2: 0.5rem;
+  --o-3: 0.75rem;
+  --o-4: 1rem;
+  --o-5: 1.25rem;
+  --o-6: 1.5rem;
+  --o-8: 2rem;
+  --o-10: 2.5rem;
+  --o-12: 3rem;
+
+  --o-r-sm: 6px;
+  --o-r-md: 10px;
+  --o-r-lg: 14px;
+  --o-r-xl: 20px;
+  --o-r-pill: 9999px;
+
+  --o-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --o-shadow-md: 0 6px 22px rgba(0, 0, 0, 0.38);
+  --o-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.50);
+  --o-glow-accent: 0 10px 34px rgba(212, 168, 87, 0.14);
+
+  --o-paper:       #f7f5f0;
+  --o-paper-2:     #ebe7df;
+  --o-paper-ink:   #20242c;
+  --o-paper-ink-2: #6a7180;
+  --o-paper-line:  rgba(32, 36, 44, 0.10);
+
+  --o-doc-bg:        #121418;
+  --o-doc-surface:   #181c21;
+  --o-doc-surface-2: #1d2228;
+  --o-doc-border:    #334155;
+  --o-doc-accent:    #d4af37;
+  --o-doc-text:      #f1f5f9;
+  --o-doc-muted:     #94a3b8;
+  --o-doc-total-bg:  #221f0a;
+
+  --o-docl-bg:        #ffffff;
+  --o-docl-surface:   #f5f5f5;
+  --o-docl-surface-2: #fafafa;
+  --o-docl-band:      #1a1a1a;
+  --o-docl-ink:       #1a1a1a;
+  --o-docl-muted:     #808080;
+  --o-docl-muted-2:   #4a4a4a;
+  --o-docl-line:      #e5e5e5;
+  --o-docl-accent:    #daa520;
+
+  --o-font: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --o-font-mono: var(--font-mono), "SF Mono", Menlo, Consolas, monospace;
+  --o-font-display: var(--font-display), var(--font-inter), "Segoe UI", system-ui, sans-serif;
+
+  --o-sidebar-w: 200px;
+
+  /* Admin / Brass & Obsidian */
+  --o-admin-canvas: #0a0a0c;
+  --o-admin-side:   #0d0d10;
+  --o-admin-panel:  #131318;
+  --o-admin-raised: #1d1e25;
+  --o-admin-sunk:   #08080a;
+
+  --o-admin-line:      rgba(236, 233, 227, 0.10);
+  --o-admin-line-2:    rgba(236, 233, 227, 0.20);
+  --o-admin-hair-gold: rgba(215, 184, 110, 0.22);
+
+  --o-admin-text:  #ece7df;
+  --o-admin-text-2: #b6aea2;
+  --o-admin-text-3: #837c70;
+
+  --o-admin-gold:        #d7b86e;
+  --o-admin-gold-bright: #f0d99a;
+  --o-admin-gold-ink:    #2a210e;
+  --o-admin-gold-edge:   #a9863f;
+
+  --o-stage-new: #e0922b;
+  --o-stage-new-strong: #b45309;
+  --o-stage-contacted: #9d83c2;
+  --o-stage-contacted-strong: #6a4f9c;
+  --o-stage-won: #3fa06a;
+  --o-stage-won-strong: #1f7a4c;
+  --o-stage-lost: #8a817a;
+  --o-stage-lost-strong: #5d564f;
+}
+
+.ax-root,
+.fx-root.is-contrast {
+  --ui:      var(--o-font);
+  --display: var(--o-font-display);
+  --mono:    var(--o-font-mono);
+
+  --canvas: var(--o-admin-canvas);
+  --side:   var(--o-admin-side);
+  --panel:  var(--o-admin-panel);
+  --raised: var(--o-admin-raised);
+  --sunk:   var(--o-admin-sunk);
+
+  --line:      var(--o-admin-line);
+  --line2:     var(--o-admin-line-2);
+  --hair-gold: var(--o-admin-hair-gold);
+
+  --t:  var(--o-admin-text);
+  --t2: var(--o-admin-text-2);
+  --t3: var(--o-admin-text-3);
+
+  --gold:        var(--o-admin-gold);
+  --gold-bright: var(--o-admin-gold-bright);
+  --gold-ink:    var(--o-admin-gold-ink);
+  --gold-edge:   var(--o-admin-gold-edge);
+
+  --card-bg: linear-gradient(180deg, #1c1d24, var(--o-admin-panel));
+  --card-ink: var(--o-admin-text);
+  --card-ink2: var(--o-admin-text-2);
+  --card-ink3: var(--o-admin-text-3);
+  --card-line: rgba(236, 233, 227, 0.12);
+  --card-line2: var(--o-admin-line-2);
+  --card-fill: rgba(236, 233, 227, 0.04);
+  --card-shadow: 0 34px 70px -36px rgba(0, 0, 0, 0.94);
+
+  --cell-bg: linear-gradient(180deg, #1b1c22, #121217);
+  --cell-name: #f1ece4;
+  --cell-val: var(--o-admin-gold-bright);
+
+  --ax-canvas: var(--o-admin-canvas);
+  --ax-side:   var(--o-admin-side);
+  --ax-panel:  var(--o-admin-panel);
+  --ax-raised: var(--o-admin-raised);
+  --ax-sunk:   var(--o-admin-sunk);
+
+  --ax-line:      var(--o-admin-line);
+  --ax-line2:     var(--o-admin-line-2);
+  --ax-hair-gold: var(--o-admin-hair-gold);
+
+  --ax-t:  var(--o-admin-text);
+  --ax-t2: var(--o-admin-text-2);
+  --ax-t3: var(--o-admin-text-3);
+
+  --ax-gold:        var(--o-admin-gold);
+  --ax-gold-bright: var(--o-admin-gold-bright);
+  --ax-gold-ink:    var(--o-admin-gold-ink);
+  --ax-gold-edge:   var(--o-admin-gold-edge);
+}

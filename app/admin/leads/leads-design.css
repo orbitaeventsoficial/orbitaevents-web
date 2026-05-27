@@ -22,36 +22,13 @@
 /* Estats — quartet joia distint per HUE (sense blau, sense candy).
    nou=topazi · contactat=ametista · guanyat=maragda · perdut=cendra (mort, silenciós).
    L'or queda EXCLUSIU per a marca + diners + acció: cap estat l'usa. */
-.fx-root [data-stage="nou"]       { --c: #e0922b; --strong: #b45309; }
-.fx-root [data-stage="contactat"] { --c: #9d83c2; --strong: #6a4f9c; }
-.fx-root [data-stage="guanyat"]   { --c: #3fa06a; --strong: #1f7a4c; }
-.fx-root [data-stage="perdut"]    { --c: #8a817a; --strong: #5d564f; }
+.fx-root [data-stage="nou"]       { --c: var(--o-stage-new); --strong: var(--o-stage-new-strong); }
+.fx-root [data-stage="contactat"] { --c: var(--o-stage-contacted); --strong: var(--o-stage-contacted-strong); }
+.fx-root [data-stage="guanyat"]   { --c: var(--o-stage-won); --strong: var(--o-stage-won-strong); }
+.fx-root [data-stage="perdut"]    { --c: var(--o-stage-lost); --strong: var(--o-stage-lost-strong); }
 
-/* ── Tema únic — Obsidiana càlida ──────────────────────────────────────────── */
-.fx-root.is-contrast {
-  --canvas: #0a0a0c; --side: #0d0d10; --panel: #131318; --raised: #1d1e25; --sunk: #08080a;
-
-  --line:  rgba(236, 233, 227, 0.10);
-  --line2: rgba(236, 233, 227, 0.20);
-  --hair-gold: rgba(215, 184, 110, 0.22);
-
-  --t:  #ece7df;   /* blanc càlid, mai blanc pur */
-  --t2: #b6aea2;   /* gris càlid */
-  --t3: #837c70;   /* apagat càlid */
-
-  /* Or — identitat de marca + diners + acció primària (heroi únic; carbassa retirada al #775) */
-  --gold: #d7b86e; --gold-bright: #f0d99a; --gold-ink: #2a210e; --gold-edge: #a9863f;
-
-  /* Targeta (fitxa) — plàstic fosc */
-  --card-bg: linear-gradient(180deg, #1c1d24, #131318);
-  --card-ink: #ece7df; --card-ink2: #b6aea2; --card-ink3: #837c70;
-  --card-line: rgba(236, 233, 227, 0.12); --card-line2: rgba(236, 233, 227, 0.2); --card-fill: rgba(236, 233, 227, 0.04);
-  --card-shadow: 0 34px 70px -36px rgba(0, 0, 0, 0.94);
-
-  /* Cel·la de calendari */
-  --cell-bg: linear-gradient(180deg, #1b1c22, #121217);
-  --cell-name: #f1ece4; --cell-val: #f0d99a;
-}
+/* ── Tema únic — Obsidiana càlida
+   Tokens resolts a app/studio/orbita-tokens.css. ────────────────────────── */
 
 /* ── Esquelet d'app (menú lateral) ────────────────────────────────────────── */
 .fx { position: relative; min-height: 100vh; background: var(--canvas); isolation: isolate; }
@@ -311,10 +288,46 @@
 .lp2__time { display: flex; flex-direction: column; }
 .lp2__ev { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .lp2__ev:last-child { border-bottom: 0; }
-.lp2__evdot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--t3); margin-top: 4px; }
+.lp2__evdot { flex: none; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--raised); color: var(--t2); font-size: 12px; line-height: 1; margin-top: 2px; }
 .lp2__evdot[data-stage] { background: var(--c); box-shadow: 0 0 0 3px color-mix(in oklab, var(--c) 20%, transparent); }
+.lp2__ev[data-type="EMAIL"]    .lp2__evdot { background: color-mix(in oklab, var(--o-stage-contacted) 24%, var(--raised)); }
+.lp2__ev[data-type="WHATSAPP"] .lp2__evdot { background: color-mix(in oklab, var(--o-stage-won) 24%, var(--raised)); }
+.lp2__ev[data-type="CALL"]     .lp2__evdot { background: color-mix(in oklab, var(--gold) 18%, var(--raised)); }
+.lp2__ev[data-type="DOCUMENT"] .lp2__evdot { background: color-mix(in oklab, var(--gold) 16%, var(--raised)); }
+.lp2__ev[data-type="STATUS_CHANGE"] .lp2__evdot { background: color-mix(in oklab, var(--o-stage-new) 22%, var(--raised)); }
 .lp2__ev b { display: block; font-size: 13.5px; font-weight: 600; color: var(--t); }
 .lp2__ev span { display: block; margin-top: 2px; font-family: var(--mono); font-size: 12px; color: var(--t3); }
+.lp2__evlink {
+  display: inline-flex; align-items: center; margin-top: 6px; padding: 4px 10px;
+  background: transparent; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--gold); font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.lp2__evlink:hover { background: color-mix(in oklab, var(--gold) 8%, var(--raised)); border-color: var(--hair-gold); color: var(--gold-bright); }
+
+/* ── Modal "Cos del correu enviat" ────────────────────────────────────────── */
+.lp2__sentmodal { width: min(800px, 96vw); max-height: 88vh; display: flex; flex-direction: column; gap: 12px; padding: 18px 22px 20px; }
+.lp2__sentmodal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.lp2__sentmodal-close {
+  flex: none; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--t2);
+  font-size: 14px; line-height: 1; cursor: pointer; transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.lp2__sentmodal-close:hover { background: var(--raised); border-color: var(--line2); color: var(--t); }
+.lp2__sentmodal-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 18px; margin: 0; padding: 10px 12px; background: var(--raised); border-radius: 9px; }
+.lp2__sentmodal-meta > div { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.lp2__sentmodal-meta dt { flex: none; font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 0.04em; }
+.lp2__sentmodal-meta dd { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--t); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp2__sentmodal-frame {
+  width: 100%; min-height: 520px; flex: 1 1 auto; border: 1px solid var(--line); border-radius: 9px;
+  /* Fons blanc del client de correu real: l'iframe sandbox renderitza el HTML
+     tal com l'ha vist el destinatari, no és decisió de disseny admin. */
+  background: white;
+}
+@media (max-width: 720px) {
+  .lp2__sentmodal-meta { grid-template-columns: 1fr; }
+  .lp2__sentmodal-frame { min-height: 360px; }
+}
 
 /* Fitxa lead v2: informació i decisió en un sol lloc */
 .lp2__layout { display: grid; grid-template-columns: minmax(0, 1fr) 318px; gap: 18px; padding: 18px 30px 40px; }
@@ -339,12 +352,16 @@
 .lp2__actiontitle { margin: 7px 0 8px; font-family: var(--display); font-size: 23px; line-height: 1.02; letter-spacing: -0.01em; color: var(--t); }
 .lp2__panel--action p { margin: 0 0 17px; color: var(--t2); font-size: 13px; line-height: 1.45; }
 .lp2__quickacts { display: grid; gap: 8px; }
-.lp2__quickacts button {
+.lp2__quickacts button,
+.lp2__quickacts a {
   display: flex; align-items: center; gap: 9px; min-height: 38px; padding: 0 12px; border: 1px solid var(--line2); border-radius: 11px;
   background: color-mix(in oklab, var(--raised) 70%, transparent); color: var(--t); font: inherit; font-size: 13px; font-weight: 700; text-align: left; cursor: pointer;
+  text-decoration: none;
   transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
 }
-.lp2__quickacts button:hover { border-color: var(--hair-gold); background: var(--raised); color: var(--gold-bright); }
+.lp2__quickacts button:hover:not(:disabled),
+.lp2__quickacts a:hover { border-color: var(--hair-gold); background: var(--raised); color: var(--gold-bright); }
+.lp2__quickacts button:disabled { opacity: 0.45; cursor: not-allowed; }
 .lp2__quickic { display: grid; place-items: center; color: var(--gold); }
 .lp2__quickic svg { width: 15px; height: 15px; }
 .lp2__stagepick { display: flex; flex-direction: column; gap: 7px; }
@@ -367,6 +384,102 @@
 }
 .lp2__commit:hover { color: var(--gold-bright); }
 .lp2__commit:active { transform: translateY(1px); }
+.lp2__commit:disabled { color: var(--t3); cursor: not-allowed; }
+.lp2__stagebtn:disabled { opacity: 0.55; cursor: not-allowed; }
+.lp2__nopanel { margin: 12px 0 0; font-size: 12.5px; color: var(--t2); line-height: 1.45; }
+
+/* ── Prioritat inline ────────────────────────────────────────────────────── */
+.lp2__priopick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.lp2__priobtn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px;
+  background: transparent; color: var(--t3); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+.lp2__priobtn:hover { border-color: var(--line2); background: var(--raised); color: var(--t); }
+.lp2__priodot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--t3); }
+.lp2__priobtn[data-prio="low"]    .lp2__priodot { background: color-mix(in oklab, var(--t2) 70%, transparent); }
+.lp2__priobtn[data-prio="medium"] .lp2__priodot { background: var(--o-stage-contacted, #9c84d9); }
+.lp2__priobtn[data-prio="high"]   .lp2__priodot { background: var(--gold, #d7b86e); }
+.lp2__priobtn[data-prio="urgent"] .lp2__priodot { background: var(--o-stage-lost-strong, #c2562c); }
+.lp2__priobtn.is-on { color: var(--t); border-color: var(--hair-gold); background: color-mix(in oklab, var(--gold) 8%, transparent); }
+.lp2__priobtn.is-on .lp2__priodot { box-shadow: 0 0 0 3px color-mix(in oklab, var(--gold) 18%, transparent); }
+.lp2__priobtn:disabled { opacity: 0.65; cursor: not-allowed; }
+.lp2__priobtn:disabled.is-on { opacity: 1; cursor: default; }
+@media (max-width: 720px) {
+  .lp2__priopick { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Pipeline · drag & drop ──────────────────────────────────────────────── */
+.fx__pipelead[draggable="true"] { cursor: grab; }
+.fx__pipelead[draggable="true"]:active { cursor: grabbing; }
+.fx__pipelead.is-dragging { opacity: 0.45; transform: scale(0.98); }
+.fx__pipelead.is-pending { opacity: 0.7; pointer-events: none; }
+.fx__lane.is-drop {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 14%, var(--panel)), color-mix(in oklab, var(--panel) 80%, var(--canvas)));
+  box-shadow: inset 0 0 0 1px var(--hair-gold), 0 24px 50px -42px rgba(0, 0, 0, 0.85);
+}
+
+/* ── Modal LOST global (per drag a la lane perdut) ───────────────────────── */
+.fx__lostmodal {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  background: rgba(8, 8, 10, 0.66); backdrop-filter: blur(4px);
+  padding: 24px;
+}
+.fx__lostmodal-card {
+  width: 100%; max-width: 480px;
+  background: var(--panel); border: 1px solid var(--line2); border-radius: 16px;
+  padding: 22px 22px 16px;
+  box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.85);
+}
+.fx__lostmodal-h {
+  margin: 0 0 12px;
+  font-family: var(--display); font-size: 16px; font-weight: 800; color: var(--t);
+}
+
+/* ── Panell de perill (eliminar entrada) ─────────────────────────────────── */
+.lp2__panel--danger {
+  border-color: color-mix(in oklab, #d4513b 30%, var(--line));
+  background: linear-gradient(180deg, color-mix(in oklab, #d4513b 5%, var(--panel)), var(--panel));
+}
+.lp2__dangerhint { margin: 0 0 12px; font-size: 12.5px; color: var(--t2); line-height: 1.45; }
+.lp2__delete {
+  width: 100%; min-height: 38px; padding: 0 12px;
+  border: 1px solid color-mix(in oklab, #d4513b 55%, var(--line));
+  border-radius: 11px;
+  background: color-mix(in oklab, #d4513b 12%, transparent);
+  color: #f3a695; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+.lp2__delete:hover:not(:disabled) {
+  background: color-mix(in oklab, #d4513b 22%, transparent);
+  border-color: color-mix(in oklab, #d4513b 80%, var(--line));
+  color: #fff;
+}
+.lp2__delete:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Badge motiu de pèrdua (leads LOST) ──────────────────────────────────── */
+.fx__lostbadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px; margin-top: 4px;
+  border: 1px solid color-mix(in oklab, var(--c) 38%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--c) 12%, transparent);
+  color: var(--t); font-size: 11.5px; font-weight: 600; line-height: 1;
+  max-width: 100%;
+}
+.fx__lostbadge.is-auto {
+  border-color: color-mix(in oklab, #e0922b 42%, var(--line));
+  background: color-mix(in oklab, #e0922b 14%, transparent);
+}
+.fx__lostbadge-tag {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--t2);
+}
+.fx__lostbadge.is-auto .fx__lostbadge-tag { color: #e0922b; }
+.fx__lostbadge-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lp2__rows--compact { margin-top: 12px; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
@@ -422,6 +535,62 @@
   .lp2__stat { border-left: 0 !important; }
   .lp2__stat + .lp2__stat { border-top: 1px solid var(--line); }
 }
+@media (max-width: 900px) {
+  .lp2__layout { grid-template-columns: 1fr; }
+}
 @media (prefers-reduced-motion: reduce) {
   .fx-root *, .fx-root *::before, .fx-root *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ── Fitxa de lead — capçalera i KPIs ─────────────────────────────────────── */
+.lp2__baracts { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lp2__btn--sec { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--t2); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: border-color 140ms ease, color 140ms ease; }
+.lp2__btn--sec:hover { border-color: var(--hair-gold); color: var(--t); }
+.lp2__btn--prim { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border: 0; border-radius: 10px; background: var(--gold); color: var(--canvas); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; transition: opacity 140ms ease; }
+.lp2__btn--prim:hover { opacity: 0.88; }
+.lp2__exec { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 16px 30px 0; }
+.lp2__kpi { padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel) 90%, var(--canvas))); }
+.lp2__kpi-label { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t3); margin-bottom: 4px; }
+.lp2__kpi-val { font-family: var(--display); font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--gold-bright); }
+.lp2__kpi--neutral .lp2__kpi-val { color: var(--t); }
+
+/* ── Fitxa de lead — secció reserva ──────────────────────────────────────── */
+.lp2__bookcards { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 16px; }
+.lp2__bookcard { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: color-mix(in oklab, var(--panel) 92%, #000); }
+.lp2__bookcard-title { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; }
+.lp2__bookfield { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.lp2__bookfield:last-child { border-bottom: 0; }
+.lp2__bookfield dt { color: var(--t3); }
+.lp2__bookfield dd { margin: 0; font-weight: 600; color: var(--t2); text-align: right; }
+.lp2__bookfield dd strong { color: var(--gold-bright); }
+.lp2__postevent { border: 1px solid var(--line); border-radius: 14px; background: color-mix(in oklab, var(--panel) 92%, #000); padding: 16px; margin-bottom: 14px; }
+.lp2__postevent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+.lp2__prow { display: flex; align-items: baseline; gap: 8px; font-size: 13px; min-width: 0; }
+.lp2__prow dt { color: var(--t3); font-size: 12px; flex: none; }
+.lp2__prow dd { margin: 0; font-weight: 600; color: var(--t); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp2__tone--ok { color: var(--o-stage-won-strong); }
+.lp2__tone--warn { color: var(--gold); }
+.lp2__tone--bad { color: var(--o-stage-lost); }
+.lp2__bookacts { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp2__nobook { text-align: center; padding: 28px 0 12px; }
+.lp2__nobook p { font-size: 13px; color: var(--t3); margin-bottom: 14px; }
+
+/* ── Fitxa de lead — sidebar sections ────────────────────────────────────── */
+.lp2__histitem { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; background: color-mix(in oklab, var(--panel) 92%, #000); text-decoration: none; color: var(--t); transition: border-color 140ms ease, background 140ms ease; margin-bottom: 8px; }
+.lp2__histitem:hover { border-color: var(--hair-gold); background: color-mix(in oklab, var(--gold) 6%, var(--panel)); }
+.lp2__histitem b { display: block; font-size: 13px; font-weight: 700; color: var(--t); margin-bottom: 2px; }
+.lp2__histitem span { display: block; font-family: var(--mono); font-size: 11px; color: var(--t3); }
+.lp2__mono-xs { font-family: var(--mono); font-size: 11px; word-break: break-all; }
+.lp2__link-gold { color: var(--gold); text-decoration: underline; }
+.lp2__link-gold:hover { color: var(--gold-bright); }
+.lp2__empty { font-size: 13px; color: var(--t3); }
+
+@media (max-width: 900px) {
+  .lp2__exec { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 12px 16px 0; }
+  .lp2__bookcards { grid-template-columns: 1fr; }
+  .lp2__postevent-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .lp2__exec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp2__baracts { gap: 6px; }
 }

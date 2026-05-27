@@ -1,13 +1,25 @@
 import Link from 'next/link';
-import { AdminEmptyState } from '../components/AdminPage';
 import { OwnerControlStrip } from '../components/OwnerControlStrip';
 import { AdminHelpPanel } from '../components/AdminHelpPanel';
 import ExportCsvButton from '../components/ExportCsvButton';
 import { ADMIN_CUSTOMERS_LIST_HELP, helpAttrs } from '../components/adminHelpContent';
 import { getCustomerSourceLabel } from '@/lib/constants';
 import type { Customer, CustomerStats, ExecutionPriority } from './customer-utils';
-import { PRIORITY_FILTER_STYLES, buildCustomerHubOperatingSummary, getNextStep } from './customer-utils';
+import { buildCustomerHubOperatingSummary, getNextStep } from './customer-utils';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
+
+function sourceBadgeClass(source?: string): string {
+  if (source === 'manual') return 'cl__badge cl__badge--src-manual';
+  if (source === 'web') return 'cl__badge cl__badge--src-web';
+  if (source === 'testimonial_form') return 'cl__badge cl__badge--src-form';
+  return 'cl__badge cl__badge--src-other';
+}
+
+function priorityBadgeClass(level: ExecutionPriority): string {
+  if (level === 'ALTA') return 'cl__badge cl__badge--alta';
+  if (level === 'MITJANA') return 'cl__badge cl__badge--mitjana';
+  return 'cl__badge cl__badge--baixa';
+}
 
 export function CustomersHelpPanel() {
   return (
@@ -27,22 +39,14 @@ export function CustomersStatsActions({ stats }: { stats: CustomerStats | null }
   if (!stats) return null;
 
   return (
-    <div className="flex gap-3 flex-wrap">
-      <CustomerStatCard label="Total" value={stats.total} />
-      <CustomerStatCard label="VIP" value={stats.vip} />
-      <CustomerStatCard label="Amb esdeveniments" value={stats.withEvents} />
+    <div className="cl__kpis">
+      <div className="cl__kpi"><b>{stats.total}</b><span>Total</span></div>
+      <div className="cl__kpi"><b>{stats.vip}</b><span>VIP</span></div>
+      <div className="cl__kpi"><b>{stats.withEvents}</b><span>Amb events</span></div>
     </div>
   );
 }
 
-function CustomerStatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-2xl border admin-card-glass px-4 py-3 text-center">
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-xs">{label}</p>
-    </div>
-  );
-}
 export function CustomerHubOperatingStrip({
   customers,
   stats,
@@ -78,7 +82,6 @@ export function CustomerHubOperatingStrip({
   );
 }
 
-
 export function CustomersToolbar({
   searchInput,
   setSearchInput,
@@ -91,9 +94,9 @@ export function CustomersToolbar({
   onAddCustomer: () => void;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
-      <div className="relative flex-1">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="cl__toolbar">
+      <div className="cl__searchbox">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -102,12 +105,12 @@ export function CustomersToolbar({
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           aria-label="Cercar client"
-          className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-1 transition-all"
+          className="cl__searchinput"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.search)}
         />
       </div>
 
-      <div className="flex gap-2" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
+      <div className="cl__toolbtns" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
         <ExportCsvButton
           filename="clients"
           headers={['Nom', 'Email', 'Telèfon', 'Ciutat', 'Font', 'Esdeveniments', 'Despesa total', 'VIP']}
@@ -125,10 +128,10 @@ export function CustomersToolbar({
         <button
           onClick={onAddCustomer}
           type="button"
-          className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-all"
+          className="cl__add"
           {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.addCustomer)}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Afegir Client
@@ -145,16 +148,22 @@ export function CustomersPriorityFilters({
   priorityFilter: 'ALL' | ExecutionPriority;
   setPriorityFilter: (value: 'ALL' | ExecutionPriority) => void;
 }) {
+  const activeClass = (value: 'ALL' | ExecutionPriority): string => {
+    if (priorityFilter !== value) return 'cl__prio';
+    if (value === 'ALL') return 'cl__prio cl__prio--all-on';
+    if (value === 'ALTA') return 'cl__prio cl__prio--alta-on';
+    if (value === 'MITJANA') return 'cl__prio cl__prio--mitjana-on';
+    return 'cl__prio cl__prio--baixa-on';
+  };
+
   return (
-    <div className="flex flex-wrap justify-center gap-2" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.priorityFilters)}>
+    <div className="cl__prios" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.priorityFilters)}>
       {(['ALL', 'ALTA', 'MITJANA', 'BAIXA'] as const).map((value) => (
         <button
           key={value}
           type="button"
           onClick={() => setPriorityFilter(value)}
-          className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
-            priorityFilter === value ? PRIORITY_FILTER_STYLES[value] : 'admin-tone-idle'
-          }`}
+          className={activeClass(value)}
         >
           {value === 'ALL' ? 'Totes prioritats' : `Prioritat ${value.toLowerCase()}`}
         </button>
@@ -165,29 +174,25 @@ export function CustomersPriorityFilters({
 
 export function CustomersError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="border rounded-xl p-4 flex items-center justify-between" role="alert">
-      <p className="text-amber-400">{message}</p>
-      <button type="button" onClick={onRetry} className="ap-btn ap-btn--primary text-sm">Reintentar</button>
+    <div className="cl__error" role="alert">
+      <p>{message}</p>
+      <button type="button" onClick={onRetry} className="cl__error-retry">Reintentar</button>
     </div>
   );
 }
 
 export function CustomersLoading() {
   return (
-    <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-      <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
+    <div className="cl__loading" role="status" aria-live="polite">
+      <div className="cl__spinner" aria-label="Carregant…" />
     </div>
   );
 }
 
 export function CustomersEmpty() {
   return (
-    <div role="status" aria-live="polite">
-      <AdminEmptyState
-        icon="👥"
-        title="No hi ha clients"
-        description="Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment."
-      />
+    <div className="cl__empty" role="status" aria-live="polite">
+      No hi ha clients. Els clients es creen automàticament a partir de reserves confirmades. També pots afegir-ne manualment.
     </div>
   );
 }
@@ -200,51 +205,63 @@ export function CustomersMobileList({
   onStartProcess: (customer: Customer) => void;
 }) {
   return (
-    <section className="lg:hidden space-y-3" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.mobileList)}>
+    <section className="cl__cards" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.mobileList)}>
       {filteredCustomers.map(({ customer, priority }) => {
         const nextStep = getNextStep(customer);
         return (
           <article
             key={customer.id}
-            className="ap-card block rounded-2xl p-4 transition-colors hover:admin-tone-bg-neutral"
+            className="cl__card"
             {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.mobileCard(customer.name, priority.level))}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
-                    {customer.name.charAt(0).toUpperCase()}
-                  </div>
-                  <p className="font-medium truncate">
-                    {customer.customerNumber != null && <span className="mr-1.5 text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>}
+            <div className="cl__card-top">
+              <div className="cl__card-info">
+                <div className="cl__card-nameline">
+                  <div className="cl__avatar">{customer.name.charAt(0).toUpperCase()}</div>
+                  <span className="cl__name">
+                    {customer.customerNumber != null && (
+                      <span className="cl__code">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
+                    )}
                     {customer.name}
-                    {customer.is_vip && <span className="ml-2 px-2 py-0.5 text-[10px] rounded-full font-medium bg-amber-500/20 text-amber-300">VIP</span>}
-                  </p>
+                    {customer.is_vip && <span className="cl__badge cl__badge--vip" style={{ marginLeft: 6 }}>VIP</span>}
+                  </span>
                 </div>
-                {customer.city && <p className="text-xs mt-1 ml-10">{customer.city}</p>}
-                {customer.email && <p className="text-xs mt-0.5 ml-10 truncate">{customer.email}</p>}
-                {customer.phone && <p className="text-xs mt-0.5 ml-10">{customer.phone}</p>}
+                {customer.city && <p className="cl__card-meta">{customer.city}</p>}
+                {customer.email && <p className="cl__card-meta">{customer.email}</p>}
+                {customer.phone && <p className="cl__card-meta">{customer.phone}</p>}
               </div>
-              <div className="text-right shrink-0">
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${priority.level === 'ALTA' ? 'admin-tone-soft-danger' : priority.level === 'MITJANA' ? 'bg-amber-500/20 text-amber-300' : 'admin-tone-soft-success'}`}>
-                  {priority.level}
-                </span>
-                <p className="text-xs mt-1">{customer.total_events} events</p>
+              <div className="cl__card-right">
+                <span className={priorityBadgeClass(priority.level)} title={priority.hint}>{priority.level}</span>
+                <p className="cl__card-meta">{customer.total_events} events</p>
               </div>
             </div>
-            <div className="mt-3 flex items-center justify-between border-t pt-3 admin-tone-border-neutral">
-              <div className="flex items-center gap-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium ${customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' : customer.source === 'web' ? 'admin-tone-soft-success' : customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' : 'bg-white/5 text-white/40'}`}>
-                  {getCustomerSourceLabel(customer.source)}
-                </span>
-                <Link href={nextStep.href} className="text-[11px] font-medium">{nextStep.label} →</Link>
+            <div className="cl__card-footer">
+              <div className="cl__card-footleft">
+                <span className={sourceBadgeClass(customer.source)}>{getCustomerSourceLabel(customer.source)}</span>
+                <Link href={nextStep.href} className="cl__nextstep-link">{nextStep.label} →</Link>
               </div>
-              <div className="flex gap-2" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
-                <button onClick={() => onStartProcess(customer)} type="button" className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" title="Iniciar procés" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div className="cl__rowacts" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
+                <button
+                  onClick={() => onStartProcess(customer)}
+                  type="button"
+                  className="cl__rowbtn"
+                  title="Iniciar procés"
+                  {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
+                >
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </button>
-                <Link href={buildCustomerHubHref(customer.id)} className="p-2.5 rounded-xl transition-all min-h-[44px] min-w-[44px] flex items-center justify-center" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                <Link
+                  href={buildCustomerHubHref(customer.id)}
+                  className="cl__rowbtn"
+                  title="Fitxa 360"
+                  {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
+                >
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
                 </Link>
               </div>
             </div>
@@ -263,64 +280,87 @@ export function CustomersDesktopTable({
   onStartProcess: (customer: Customer) => void;
 }) {
   return (
-    <section className="hidden lg:block rounded-2xl border p-0 admin-card-glass overflow-hidden" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.desktopTable)}>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1060px] text-sm" aria-label="Llistat de clients">
-          <thead>
-            <tr className="border-b transition-colors hover:bg-white/[0.03]">
-              <th scope="col" className="text-center p-4 font-medium">Nom</th>
-              <th scope="col" className="text-center p-4 font-medium hidden md:table-cell">Contacte</th>
-              <th scope="col" className="text-center p-4 font-medium hidden lg:table-cell">Font</th>
-              <th scope="col" className="text-center p-4 font-medium hidden sm:table-cell">Esdeveniments</th>
-              <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Prioritat</th>
-              <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Proper pas</th>
-              <th scope="col" className="text-center p-4 font-medium">Accions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCustomers.map(({ customer, priority }) => {
-              const nextStep = getNextStep(customer);
-              return (
-                <tr key={customer.id} className="border-b transition-colors hover:bg-white/[0.03]">
-                  <td className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">{customer.name.charAt(0).toUpperCase()}</div>
-                      <div className="min-w-0">
-                        <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                          {customer.customerNumber != null && <span className="text-[10px] font-mono text-white/40">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>}
-                          {customer.name}
-                          {customer.is_vip && <span className="px-2 py-0.5 text-xs rounded-full font-medium">VIP</span>}
-                        </p>
-                        {customer.city && <p className="text-sm truncate">{customer.city}</p>}
-                      </div>
+    <section className="cl__tablewrap" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.desktopTable)}>
+      <table className="cl__table" aria-label="Llistat de clients">
+        <thead>
+          <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Contacte</th>
+            <th scope="col">Font</th>
+            <th scope="col">Esdeveniments</th>
+            <th scope="col">Prioritat</th>
+            <th scope="col">Proper pas</th>
+            <th scope="col">Accions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredCustomers.map(({ customer, priority }) => {
+            const nextStep = getNextStep(customer);
+            return (
+              <tr key={customer.id}>
+                <td>
+                  <div className="cl__namecell">
+                    <div className="cl__avatar">{customer.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                      <span className="cl__name">
+                        {customer.customerNumber != null && (
+                          <span className="cl__code">CLI-{String(customer.customerNumber).padStart(4, '0')}</span>
+                        )}
+                        {customer.name}
+                        {customer.is_vip && <span className="cl__badge cl__badge--vip" style={{ marginLeft: 6 }}>VIP</span>}
+                      </span>
+                      {customer.city && <span className="cl__city">{customer.city}</span>}
                     </div>
-                  </td>
-                  <td className="p-4 hidden md:table-cell text-center">
-                    <div className="space-y-1 min-w-0">
-                      {customer.email && <p className="text-sm flex items-center justify-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><span className="max-w-[240px] truncate">{customer.email}</span></p>}
-                      {customer.phone && <p className="text-sm flex items-center justify-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>{customer.phone}</p>}
-                    </div>
-                  </td>
-                  <td className="p-4 hidden lg:table-cell text-center"><span className={`px-3 py-1 rounded-full text-xs font-medium ${customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' : customer.source === 'web' ? 'admin-tone-soft-success' : customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' : 'bg-white/5 text-white/40'}`}>{getCustomerSourceLabel(customer.source)}</span></td>
-                  <td className="p-4 hidden sm:table-cell text-center">{customer.total_events || 0}</td>
-                  <td className="p-4 hidden xl:table-cell text-center"><span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${priority.level === 'ALTA' ? 'admin-tone-soft-danger' : priority.level === 'MITJANA' ? 'bg-amber-500/20 text-amber-300' : 'admin-tone-soft-success'}`} title={priority.hint}>{priority.level}</span></td>
-                  <td className="p-4 hidden xl:table-cell text-center"><div className="space-y-1"><Link href={nextStep.href} className="inline-flex rounded-xl border px-2 py-1 text-xs font-semibold">{nextStep.label}</Link><p className="text-[11px]">{nextStep.hint}</p></div></td>
-                  <td className="p-4 text-center">
-                    <div className="flex flex-wrap justify-center gap-2" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.rowActions)}>
-                      <button onClick={() => onStartProcess(customer)} type="button" className="p-2 rounded-xl transition-all" title="Iniciar procés" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      </button>
-                      <Link href={buildCustomerHubHref(customer.id)} className="p-2 rounded-xl transition-all" title="Fitxa 360" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                  </div>
+                </td>
+                <td>
+                  {customer.email && <div>{customer.email}</div>}
+                  {customer.phone && <div>{customer.phone}</div>}
+                </td>
+                <td>
+                  <span className={sourceBadgeClass(customer.source)}>{getCustomerSourceLabel(customer.source)}</span>
+                </td>
+                <td>{customer.total_events || 0}</td>
+                <td>
+                  <span className={priorityBadgeClass(priority.level)} title={priority.hint}>{priority.level}</span>
+                </td>
+                <td>
+                  <div className="cl__nextstep">
+                    <Link href={nextStep.href} className="cl__nextstep-link">{nextStep.label}</Link>
+                    <span className="cl__nextstep-hint">{nextStep.hint}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="cl__rowacts" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.rowActions)}>
+                    <button
+                      onClick={() => onStartProcess(customer)}
+                      type="button"
+                      className="cl__rowbtn"
+                      title="Iniciar procés"
+                      {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.startProcess)}
+                    >
+                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <Link
+                      href={buildCustomerHubHref(customer.id)}
+                      className="cl__rowbtn"
+                      title="Fitxa 360"
+                      {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.customerFile)}
+                    >
+                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </section>
   );
 }
@@ -339,13 +379,25 @@ export function CustomersPagination({
   setPage: (updater: (prev: number) => number) => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 text-xs sm:flex-row sm:justify-between" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.pagination)}>
+    <div className="cl__pager" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.pagination)}>
       <span>Pàgina {page} de {totalPages} · {filteredCount} visibles · {totalCustomers} clients</span>
-      <div className="flex gap-2" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.toolbar)}>
-        <button type="button" onClick={() => setPage((prev) => Math.max(1, prev - 1))} disabled={page === 1} className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.previousPage)}>
+      <div className="cl__pager-btns">
+        <button
+          type="button"
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page === 1}
+          className="cl__pager-btn"
+          {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.previousPage)}
+        >
           ← Anterior
         </button>
-        <button type="button" onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} disabled={page === totalPages} className="rounded-xl border px-3 py-1 disabled:pointer-events-none disabled:opacity-40" {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.nextPage)}>
+        <button
+          type="button"
+          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page === totalPages}
+          className="cl__pager-btn"
+          {...helpAttrs(ADMIN_CUSTOMERS_LIST_HELP.nextPage)}
+        >
           Següent →
         </button>
       </div>

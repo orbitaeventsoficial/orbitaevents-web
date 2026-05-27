@@ -13,10 +13,10 @@
 | Pàgina | Ruta | Contingut clau | Estat | Nota |
 |---|---|---|---|---|
 | Leads | `/admin/leads` | Calendari temporada, pipeline kanban, focus zone, fitxa lead | 🟡 | Lab #777 + servei #780 + shell #781 + pàgina #782 + dades reals #783 + canvi estat #784 + drag #785 + delete #786 + badge LOST #787 + WhatsApp/correu #788 + fix LOST #789 + enriquit #790 + arxiu #791-#793 + meteo #794 + prioritat inline #796. **7/8 funcions inventari leads tancades** (#5 suggeriments pendent decisió propietari) |
-| Lead fitxa | `/admin/leads/[id]` | Timeline, tasques, documents, scoring, insights | 🔴 | |
+| Lead fitxa | `/admin/leads/[id]` | Timeline, tasques, documents, scoring, insights | 🟢 | Canvi #810 — `leads-design.css` ampliat (`lp2__*`), `AdminPage` eliminat, sub-components conservats |
 | Lead re-engagement | `/admin/leads/reengagement` | Candidats a recuperar, WhatsApp/email | 🔴 | |
-| Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🔴 | |
-| Client fitxa 360 | `/admin/clientes/[id]` | Hub relacional, timeline, comunicacions, tasques | 🔴 | |
+| Clients (llista) | `/admin/clientes` | Llista, segments, filtres | 🟢 | Canvi #811 — `clientes.css`, prefix `cl__`, cap AdminPage |
+| Client fitxa 360 | `/admin/clientes/[id]` | Hub relacional, timeline, comunicacions, tasques | 🟢 | Canvi #812 — `customer-hub.css`, prefix `ch__`, cap AdminPage, cap ap-* |
 | Reactivació | `/admin/clientes/reactivation` | Candidats per reactivar | 🔴 | |
 | Referrals | `/admin/clientes/referrals` | Top referrers, candidats | 🔴 | |
 | Reserves (llista) | `/admin/bookings` | Llista, kanban, filtres | 🔴 | |
@@ -37,7 +37,7 @@
 | Pressupostos | `/admin/presupuestos` | Llista de proposals | 🔴 | |
 | Pressupost detall | `/admin/presupuestos/[id]` | Detall, PDF Studio | 🔴 | |
 | Sales Ops | `/admin/sales-ops` | SLA, seqüències, automatismes | 🔴 | |
-| Intake ràpid | `/admin/intake` | Formulari de nova entrada | 🔴 | |
+| Intake ràpid | `/admin/intake` | Formulari de nova entrada | 🟢 | Canvi #809 — `intake.css`, prefix `ni-`, extracció IA Gemini, "Nou lead" tret del nav |
 | Quick create | `/admin/quick-create` | Creació assistida lead/pressupost | 🔴 | |
 | Marketing | `/admin/marketing` | Hub de captació, canals, gaps | 🔴 | |
 | Campanyes | `/admin/campaigns` | Campanyes de reactivació | 🔴 | |

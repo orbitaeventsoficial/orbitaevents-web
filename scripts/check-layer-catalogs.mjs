@@ -52,6 +52,8 @@ const allowedCatalogs = new Set([
   'app/components/mobile-ultimate/MobileHeroUltimate.tsx::HERO_PARTICLES',
   // Local filter subset of CUSTOMER_ACTIVITY_ACTIONS used only inside customerActivityService to query recent email-bearing activity (Canvi #353, follows the COMM_ACTIVITY_TYPES precedent).
   'lib/services/customerActivityService.ts::EMAIL_ACTIVITY_ACTIONS',
+  // Inline composer quick-templates for SafataClient — 3 presentational presets (primer-contacte, seguiment, lliure) used only inside this component, not a shared domain catalog (Canvi #804).
+  'app/admin/inbox/SafataClient.tsx::TPLS',
 ]);
 
 const suspiciousConst = /^(?:export\s+)?const\s+([A-Z0-9_]+)\s*=\s*(\[|\{|new Set\(|Object\.freeze\()/gm;

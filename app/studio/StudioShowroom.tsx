@@ -12,14 +12,15 @@
    mínim de superfície. Tota passa (prova o definitiva) ha de quedar a git i
    documentada al diari amb número de canvi.
 
-   Estils: tots a ./studio.css, scoped a .o-studio-root. Zero hex de color al
-   JSX (els chips usen var(--token)); el hex que es veu és contingut textual.
+   Estils: tokens a ./orbita-tokens.css i components a ./studio.css, scoped a
+   .o-studio-root. Zero hex de color al JSX; el hex visible és contingut textual.
 ============================================================================ */
 
 import { useState, type ReactNode } from 'react';
 import { CLIENT_LOGOS } from '@/config/client-logos';
 import { EXTRAS, INVENTARIO, getAllPacks, type PackDefinition, type ServiceSlug } from '@/config/packs-config';
 import { PORTFOLIO_CATEGORIES } from '@/config/portfolio-images';
+import './orbita-tokens.css';
 import './studio.css';
 
 type PublicService = {

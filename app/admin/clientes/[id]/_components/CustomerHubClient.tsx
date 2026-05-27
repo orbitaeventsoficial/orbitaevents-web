@@ -1,5 +1,6 @@
 'use client';
 
+import './customer-hub.css';
 import { Component, createContext, useCallback, useContext, useEffect, useState, useTransition, type ReactNode } from 'react';
 import { log } from '@/lib/logger';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
@@ -85,17 +86,15 @@ class PanelErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="rounded-2xl border p-5">
-            <p className="text-sm font-semibold">
-              Error carregant {this.props.panelName}
-            </p>
-            <p className="mt-1 text-xs">
+          <div className="ch__pnl-err">
+            <p className="ch__pnl-err-title">Error carregant {this.props.panelName}</p>
+            <p className="ch__pnl-err-msg">
               {this.state.error?.message || 'Error desconegut'}
             </p>
             <button
               type="button"
               onClick={() => this.setState({ hasError: false })}
-              className="mt-3 rounded-xl border px-3 py-1.5 text-xs"
+              className="ch__pnl-err-btn"
             >
               Torna a intentar
             </button>
@@ -110,14 +109,11 @@ class PanelErrorBoundary extends Component<
 
 function PanelSkeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border p-5">
-      <div className="h-6 w-1/3 rounded" />
-      <div className="mt-2 h-4 w-2/3 rounded" />
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-20 rounded-xl" />
-        ))}
-      </div>
+    <div className="ch__skeleton">
+      <div className="ch__skeleton-bar" />
+      <div className="ch__skeleton-bar" />
+      <div className="ch__skeleton-bar" />
+      <div className="ch__skeleton-bar" />
     </div>
   );
 }
@@ -232,17 +228,17 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
 
   return (
     <HubContext.Provider value={contextValue}>
-      <div className="space-y-4">
+      <div className="ch__root">
         <CustomerHeader data={data} tab={tab} setTab={setTab} />
 
         {refreshError && (
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-xl border px-4 py-2 text-sm" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshError)}>
+          <div className="ch__alert">
+            <div className="ch__alert-inner" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshError)}>
               {refreshError}
               <button
                 type="button"
                 onClick={refresh}
-                className="ml-2 underline hover:no-underline"
+                className="ch__alert-btn"
               >
                 Torna a intentar
               </button>
@@ -251,19 +247,19 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         )}
 
         {isPending && (
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-xl border px-4 py-2 text-sm" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshing)}>
-              <span className="mr-2 inline-block animate-spin">⟳</span>
+          <div className="ch__alert">
+            <div className="ch__alert-inner" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refreshing)}>
+              <span className="ch__spin">⟳</span>
               Actualitzant dades...
             </div>
           </div>
         )}
 
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.layout)}>
-          <div className="min-w-0 lg:col-span-8" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.mainPanel)}>
+        <div className="ch__grid" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.layout)}>
+          <div className="ch__main" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.mainPanel)}>
             {renderPanel()}
           </div>
-          <div className="min-w-0 lg:col-span-4" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.timeline)}>
+          <div className="ch__aside" {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.timeline)}>
             <PanelErrorBoundary panelName="Timeline">
               <TimelinePanel
                 timeline={data.timeline}
@@ -281,11 +277,11 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
           type="button"
           onClick={refresh}
           disabled={isPending}
-          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden"
+          className="ch__fab"
           aria-label={ADMIN_CUSTOMER_HELP.hub.refresh.title}
           {...helpAttrs(ADMIN_CUSTOMER_HELP.hub.refresh)}
         >
-          <span className={isPending ? 'inline-block animate-spin' : ''}>🔄</span>
+          <span className={isPending ? 'ch__spin' : ''}>🔄</span>
         </button>
       </div>
     </HubContext.Provider>

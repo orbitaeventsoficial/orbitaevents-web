@@ -17,11 +17,21 @@ function run(cwd: string) {
   return spawnSync(process.execPath, [scriptPath], { cwd, encoding: 'utf8' });
 }
 
-function makeStudio(root: string, tsx: string, css: string) {
+function validTokens() {
+  return [
+    '.o-studio-root{}',
+    '.ax-root{}',
+    '.fx-root.is-contrast{}',
+    ':root{--o-bg:#07090d;--o-admin-canvas:#0a0a0c;--ax-canvas:var(--o-admin-canvas);--canvas:var(--o-admin-canvas);--gold:#d7b86e;--o-stage-new:#e0922b;}',
+  ].join('\n');
+}
+
+function makeStudio(root: string, tsx: string, css: string, tokens = validTokens()) {
   const dir = path.join(root, 'app', 'studio');
   mkdirSync(dir, { recursive: true });
   writeFileSync(path.join(dir, 'StudioShowroom.tsx'), tsx);
   writeFileSync(path.join(dir, 'studio.css'), css);
+  writeFileSync(path.join(dir, 'orbita-tokens.css'), tokens);
 }
 
 function validTsx() {
@@ -50,6 +60,7 @@ describe('check-studio-integrity', () => {
     const dir = path.join(root, 'app', 'studio');
     mkdirSync(dir, { recursive: true });
     writeFileSync(path.join(dir, 'studio.css'), validCss());
+    writeFileSync(path.join(dir, 'orbita-tokens.css'), validTokens());
     const result = run(root);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('no existeix');
@@ -78,6 +89,14 @@ describe('check-studio-integrity', () => {
     const result = run(root);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('studio.css');
+  });
+
+  it('falla si falten els tokens compartits de /studio', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'oe-studio-'));
+    makeStudio(root, validTsx(), validCss(), '.o-studio-root{}');
+    const result = run(root);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('orbita-tokens.css');
   });
 
   it('passa amb un TSX i CSS sintètics complets', () => {

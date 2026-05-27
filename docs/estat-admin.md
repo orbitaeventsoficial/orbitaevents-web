@@ -3,6 +3,8 @@
 > Última actualització: 2026-05-21
 > NO cal re-auditar cada sessió. Només actualitzar les seccions que canvien.
 
+> Nota 2026-05-26 — Canvi #795: la font de veritat visual passa a `/studio` via `app/studio/orbita-tokens.css`. L'admin manté classes pròpies (`.ax-*`, `.fx-*`) però els tokens base de paleta/estat venen del fitxer compartit de Studio.
+
 ## Resum
 
 - **83 pàgines admin**, **~170 rutes API**, **12 crons**, **~121 serveis**
@@ -394,7 +396,6 @@ Sèrie de talls per drenar tots els `MÉS ENDAVANT` factuals del Master Checklis
 | A1 | **Insights narratius** — fins a 5 insights prioritzats en català al dashboard | `dashboardInsightsService.ts` | ✅ |
 | A5 | **Timeline unificat** — email+WhatsApp+trucades+notes en un fil, icones per canal | `TimelinePanel.tsx` | ✅ |
 | A6 | **Auto-triggers** — proposal→contracte, lead→welcome, booking→checklist | `automationTriggers.ts` | ✅ |
-
 
 
 

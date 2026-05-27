@@ -1283,6 +1283,10 @@ Salt qualitatiu multi-tall. Honeybook s'ha menjat el mercat USA d'events amb aix
 - `FET` *(2026-05-26 — Canvi #796)*: prioritat inline a la fitxa de leads (item #6 inventari). `seasonCalendarService` propaga `priority`, `LeadsSeasonClient` mostra selector LOW/MEDIUM/HIGH/URGENT amb PATCH optimista i rollback.
 - `FET` *(2026-05-26 — Canvi #797)*: `/studio` queda reubicat sota `/admin/studio` (sota auth), `/studio` redirigeix, error boundary admin passa a classes `.ax__error*`, i s'aplica a Railway la migration `lead_archive`.
 - `PENDENT` — #5 suggeriments queda en pausa per decisió del propietari: si es recupera, ha de ser botó/modal d'ajuda, no panell sempre visible. #6 prioritat ja és FET al #796.
+- `FET` *(2026-05-27 — Canvi #809)*: `/admin/intake` migrada al nou disseny Brass & Obsidian (`intake.css`, prefix `ni-`). Extracció IA via Gemini (`gemini-1.5-flash`, tier gratuït, `GEMINI_API_KEY`). "Nou lead" eliminat del nav — substituït per botó `+ Nova entrada` a la capçalera de `/admin/leads`. Inventari actualitzat: intake 🔴→🟢.
+- `FET` *(2026-05-27 — Canvi #810)*: `/admin/leads/[id]` (fitxa de lead) migrada al nou disseny Brass & Obsidian. `AdminPage` substituït per shell `fx-root` + `lp2__*`. Noves classes a `leads-design.css`: `lp2__baracts`, `lp2__btn--sec`, `lp2__btn--prim`, `lp2__exec`, `lp2__kpi`, `lp2__bookcards`, `lp2__postevent`, `lp2__histitem`, etc. Tests dossierService + dossier-html-builder creats. Dossiers CSS extret a `dossiers.css`. Inventari actualitzat: Lead fitxa 🔴→🟢.
+- `FET` *(2026-05-27 — Canvi #811)*: `/admin/clientes` (llista CRM clients) migrada al nou disseny Brass & Obsidian. `clientes.css` nou (`cl__` prefix). `CustomersPageSections.tsx` i `page.tsx` actualitzats: `AdminPage` eliminat, shell `fx-root` + `cl__pagehead` + `cl__content`. `CrmSegmentFilters` migrat a `cl__segs/cl__seg/cl__seg--on/cl__clearfilters/cl__lifecycle`. Inventari actualitzat: Clients (llista) 🔴→🟢.
+- `FET` *(2026-05-27 — Canvi #812)*: `/admin/clientes/[id]` (fitxa 360 del client) migrada al nou disseny Brass & Obsidian. `customer-hub.css` nou (`ch__` prefix). `CustomerHubClient.tsx` i `CustomerHeader.tsx` actualitzats: `AdminPage`, `ap-btn`, `admin-tone-*`, `admin-customer-*` eliminats; shell `ch__root`, capçalera `ch__header/ch__hero`, KPIs `ch__kpis/ch__kpi`, progress `ch__stagebar/ch__stage--cur/done/lost`, tabs `ch__tabs/ch__tab--on`, accions `ch__btn/ch__btn--prim/sec/warn/danger`. `data-status` per colors CSS sense Tailwind. Skeleton `page.tsx` simplificat a `ch__skeleton-header`. Panels internos conservats. Inventari actualitzat: Client fitxa 360 🔴→🟢.
 
 **REFERÈNCIA**: `docs/admin-inventari-pagines.md` (inventari + ordre de migració + semàfor d'estat per pàgina).
 
@@ -1372,6 +1376,176 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #812 — 2026-05-27 — claude (FET)
+
+**`/admin/clientes/[id]` (fitxa 360 del client) migrada al nou disseny Brass & Obsidian.**
+
+- `app/admin/clientes/[id]/customer-hub.css` (NOU): sistema `ch__` — header sticky glass, `ch__avatar[data-status]`, `ch__status[data-status]`, `ch__kpis` 5 cols, `ch__stagebar/ch__stage--cur/done/lost`, `ch__tabs/ch__tab--on`, grid `ch__grid/ch__main/ch__aside`, alerts `ch__alert`, FAB `ch__fab`, skeleton, `ch__pnl-err*`. Tokens `var(--o-*)`, `var(--gold)`, `var(--raised)` — zero Tailwind color/font classes.
+- `app/admin/clientes/[id]/_components/CustomerHubClient.tsx`: importa `customer-hub.css`. Shell `ch__root`. `PanelErrorBoundary` → `ch__pnl-err*`. `PanelSkeleton` → `ch__skeleton`. Grid `ch__grid/ch__main/ch__aside`. FAB `ch__fab`. Alerts `ch__alert-inner/ch__alert-btn`.
+- `app/admin/clientes/[id]/_components/CustomerHeader.tsx`: `CUSTOMER_HUB_AVATAR_TONES` i `CUSTOMER_HUB_STATUS_TONES` (Tailwind strings) eliminats. Tots els `ap-btn`, `admin-tone-*`, `admin-customer-*` substituïts. Status badge: `ch__status + data-status`. Stage progress: `ch__stage--cur/done/lost`. Tabs: `ch__tab/ch__tab--on/ch__tab-badge`. Accions: `ch__btn/ch__btn--prim/sec/warn/danger + ch__btn-label`. `OwnerControlStrip`, `MobileQuickActions`, `InsightsBanner` conservats.
+- `app/admin/clientes/[id]/page.tsx`: importa `customer-hub.css`. `CustomerHubSkeleton` simplificada a `ch__skeleton-header + ch__grid + ch__skeleton`.
+- `lib/constants/admin.ts`: 811→812. `LAB_CHANGE_NUMBER` = 812.
+
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: tots els panels, tabs, canvi d'estat, KPIs i accions conserven comportament via sub-components intactes.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #811 — 2026-05-27 — claude (FET)
+
+**`/admin/clientes` (llista CRM clients) migrada al nou disseny Brass & Obsidian.**
+
+- `app/admin/clientes/clientes.css` (NOU): sistema visual complet prefix `cl__`. Capçalera (`cl__pagehead`, `cl__h1`, `cl__kpis`, `cl__kpi`), toolbar (`cl__toolbar`, `cl__searchbox`, `cl__searchinput`, `cl__toolbtns`, `cl__add`), segments (`cl__segs`, `cl__seg`, `cl__seg--on`, `cl__seg-badge`, `cl__clearfilters`), lifecycle (`cl__lifecycle`, `cl__lifecycle-sel`), priority filters (`cl__prios`, `cl__prio`, variants `--all/alta/mitjana/baixa-on`), error/loading/empty, taula desktop (`cl__tablewrap`, `cl__table`, `cl__avatar`, `cl__namecell`, `cl__badge` + variants font/prioritat), targetes mòbil (`cl__cards`, `cl__card`), paginació (`cl__pager`, `cl__pager-btns`, `cl__pager-btn`). Responsive 1024px/900px.
+- `app/admin/clientes/CustomersPageSections.tsx`: tots els components actualitzats a `cl__*`. `AdminEmptyState` eliminat → `cl__empty`. `PRIORITY_FILTER_STYLES` eliminat → classes `cl__prio--*-on`. Helpers `sourceBadgeClass()` i `priorityBadgeClass()` per a badges tipificats. `CustomersDesktopTable` elimina `hidden lg:block` (CSS gestiona responsive). `CustomersMobileList` elimina `lg:hidden` (CSS gestiona).
+- `app/admin/clientes/page.tsx`: `AdminPage` eliminat → `fx-root` + `cl__pagehead` + `cl__content`. `CrmSegmentFilters` migrat a `cl__segs/cl__seg--on/cl__clearfilters/cl__lifecycle/cl__lifecycle-sel`. `import './clientes.css'` afegit.
+- `lib/constants/admin.ts`: 810→811. `LAB_CHANGE_NUMBER` = 811.
+
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: TypeScript compila; fetch clients, filtres CRM, paginació, modals add/action conserven tot el comportament.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #810 — 2026-05-27 — claude (FET)
+
+**`/admin/leads/[id]` (fitxa de lead) migrada al nou disseny Brass & Obsidian.**
+
+- `AdminPage` eliminat → shell `fx-root` + `lp2__bar` + `lp2__hero` + `lp2__exec` + `lp2__layout`.
+- Noves classes a `leads-design.css`: `lp2__baracts`, `lp2__btn--sec`, `lp2__btn--prim`, `lp2__exec`, `lp2__kpi`, `lp2__bookcards`, `lp2__bookcard`, `lp2__bookfield`, `lp2__postevent`, `lp2__prow`, `lp2__bookacts`, `lp2__nobook`, `lp2__histitem`, `lp2__tone--ok/warn/bad`, `lp2__mono-xs`, `lp2__link-gold`, `lp2__empty`.
+- Sub-components existents (`LeadProfileEditor`, `LeadNotesPanel`, `LeadDossiersPanel`, `LeadWorkspace`, `LeadActionsEnhanced`, etc.) mantinguts intactes.
+- Tests `dossierService.test.ts` i `dossier-html-builder.test.ts` creats per passar el guard `qa:service-coverage`.
+- CSS inline de `DossierGeneratorClient.tsx` extret a `dossiers.css`. Dos `window.open` sense `noopener` corregits.
+- `lib/constants/admin.ts`: 809→810. `LAB_CHANGE_NUMBER` = 810.
+
+- Validació tècnica: `pnpm run validate:core` 0 errors. `npx tsc --noEmit` 0 errors.
+- Validació funcional: TypeScript compila; sub-components conserven comportament; paths lead fitxa operatius.
+- Validació humana/UX: pendent verificació al browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #809 — 2026-05-27 — claude (FET)
+
+**`/admin/intake` migrada al nou disseny Brass & Obsidian + extracció IA via Gemini.**
+- `app/admin/intake/intake.css` (NOU): disseny complet prefix `ni-`, tokens `--ax-*`, targeta IA amb vora gold.
+- `app/admin/intake/page.tsx`: reescrit al nou disseny; secció IA prominent al capdamunt.
+- `app/api/admin/leads/extract/route.ts`: migrat d'Anthropic a Gemini (`gemini-1.5-flash`); try/catch separat; prompt millorat per WhatsApp.
+- `app/admin/layout.tsx`: eliminat "Nou lead" del nav Pipeline.
+- `app/admin/leads/LeadsSeasonClient.tsx`: botó `+ Nova entrada` a la capçalera.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `809`.
+- `lib/constants/admin.ts`: 808→809.
+
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: intake operatiu; extracció IA funcional amb `GEMINI_API_KEY` configurada.
+- Validació humana/UX: pendent verificació browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #808 — 2026-05-26 — claude (FET)
+
+**Dossiers com a entitat — assignació al lead + enviament per email.**
+- `prisma/schema.prisma`: nou model `Dossier` (leadId FK, productIds[], sentAt, sentTo).
+- `prisma/migrations/20260526200000_add_dossiers/migration.sql`: migració SQL manual.
+- `lib/services/dossierService.ts` (NOU): `createDossier`, `getDossiersByLead`, `getDossierById`, `deleteDossier`, `sendDossierByEmail`.
+- `app/api/admin/dossiers/` (NOU): POST crear, GET+DELETE per id, POST send email.
+- `app/admin/leads/[id]/LeadDossiersPanel.tsx` + `LeadDossierActions.tsx` (NOU): panell dossiers a la fitxa lead.
+- `app/admin/leads/[id]/page.tsx`: afegit `LeadDossiersPanel`.
+- `lib/constants/admin.ts`: 807→808.
+
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: pendent execució migració a BD + verificació browser.
+- Validació humana/UX: pendent verificació browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #807 — 2026-05-26 — claude (FET)
+
+**Catàleg productes animació + generador de dossiers a `/admin/dossiers`.**
+- `lib/constants/animacio-products.ts` (NOU): catàleg dels 3 productes (Bingo Musical, Batalla Musical, Servei de DJ) amb trams de preu i equip.
+- `lib/utils/dossier-html-builder.ts` (NOU): `buildDossierHtml(client, products)` → HTML complet del dossier.
+- `app/admin/dossiers/` (NOU): pàgina + DossierGeneratorClient (formulari client + selecció productes + preview/download) + loading.tsx.
+- `app/admin/layout.tsx`: "Dossiers" afegit al grup Comercial.
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `807`.
+- `lib/constants/admin.ts`: 806→807.
+
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: ruta `/admin/dossiers` accessible, HTML generat correctament, descàrrega funcional.
+- Validació humana/UX: pendent verificació browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #806 — 2026-05-26 — claude (FET)
+
+**Admin sessió persistent — cookie 30 dies, sense diàleg de clau repetit.**
+- `lib/middleware/admin-auth.ts`: 3 camins: (1) cookie `admin-session` HMAC-SHA256 vàlida → passa; (2) Bearer → passa; (3) Basic Auth correcte → emet cookie 30 dies i passa. CSRF preservat a tots els camins. Helpers `hmacHex/makeSessionToken/verifySessionToken` amb Web Crypto API (Edge Runtime).
+- `app/studio-lab/leads/page.tsx`: `LAB_CHANGE_NUMBER` = `806`.
+- `lib/constants/admin.ts`: 805→806.
+
+- Validació tècnica: `npx tsc --noEmit` 0 errors. `pnpm run validate:core` verd.
+- Validació funcional: primer accés Basic Auth → cookie emesa; accesos posteriors sense diàleg.
+- Validació humana/UX: pendent verificació browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #805 — 2026-05-26 — claude (FET)
+
+**Fix guards SafataClient + ImapSettingsClient — validate:core verd.**
+- `SafataClient.tsx`: 7 `toLocaleString`/`toLocaleDateString` → `formatDate`, `formatDateShort`, `formatDateTime`; 2 inline `style={{ CSS var }}` → classes `.sf__empty-title--error`, `.sf__imap-text-empty`.
+- `ImapSettingsClient.tsx`: inline font/margin styles → `.ix__formcard-hint`, `.ix__forminput--textarea`, `.ix__formfield--signature`.
+- `inbox.css`: 5 classes noves. `.ix__forminput` afegit `font-family: inherit`.
+- `lib/constants/admin.ts`: 804→805.
+
+- Validació tècnica: `pnpm run validate:core` EXIT 0 (60 fitxers, 577 tests).
+- Validació funcional: tots els guards de monocapa passen.
+- Validació humana/UX: canvi de neteja sense impacte visual.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #804 — 2026-05-26 — claude (FET)
+
+**SafataClient — programa de correu complet (3 tabs, compositor inline, IMAP, Enviats, firma).**
+- `app/admin/inbox/SafataClient.tsx` (NOU): component complet amb 3 tabs (`entrades | imap | enviats`), `Composer` reutilitzable (plantilles, CC), `LeadDetail` (auto-mark-read, crear client, WhatsApp), `ImapDetail` (cos correu + resposta), `SendDetail` (obertures/clics). Auto-refresh leads 60s.
+- `app/api/admin/inbox/refresh-leads/route.ts` (NOU): endpoint GET leads+stats per a auto-refresh. `requireAuth`.
+- `app/admin/inbox/inbox.css`: classes noves `.sf__load-more`, `.sf__spin`, `.sf__imap-*`, `.sf__compose-cc*`.
+- `app/admin/inbox/settings/ImapSettingsClient.tsx`: bloc firma de mail (textarea + desar).
+- `app/api/admin/inbox/settings/route.ts`: GET retorna `signature`; PATCH desa firma a `Setting`.
+- `lib/email.ts`: `getEmailSignatureHtml/Text()` async, llegeixen override de BD (telèfon +34 699 12 10 23).
+- `lib/services/postEventDispatchService.ts`: `recordEmailSend()` per a emails post-event → Enviats.
+- `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 803→804.
+
+- Validació tècnica: `npx tsc --noEmit` OK (0 errors).
+- Validació funcional: SafataClient 3 tabs, compositor inline, auto-refresh leads, paginació IMAP/Enviats. Firma configurable des de Settings.
+- Validació humana/UX: pendent verificació browser per l'usuari.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ### Canvi #803 — 2026-05-26 — claude (FET)
 
 **Sidebar: botó Safata persistent + treu Calendari + fix bug estat NEW→CONTACTED.**
@@ -1380,8 +1554,11 @@ Seqüència obligatòria de registre:
 - `lib/constants/admin.ts`: `ADMIN_CHANGE_COUNTER` 802→803; `ADMIN_SHORTCUT_ROUTES`: `c:/admin/calendario` → `m:/admin/inbox`.
 - `lib/services/leads/statusRouteHandler.ts`: fix bug P2002 a `customer.upsert` — fallback per a customers creats sense Gmail dot-stripping (emailNormalized divergent). Si l'upsert falla per unique violation (`P2002`), cerca per `email` raw i vincula el customer existent.
 
+- Validació tècnica: `npx tsc --noEmit` OK; `pnpm run validate:core` OK; tests `leadRouteService` 12/12.
+- Validació funcional: sidebar botó persistent visible, fix P2002 verificat.
+- Validació humana/UX: botó "✉ Safata d'entrada" persistent al sidebar confirmat visualment.
 - Començat per: claude
-- Treballat per: claude
+- Treballant per: claude
 - Tancat per: claude
 
 ---

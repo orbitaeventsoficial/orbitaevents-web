@@ -19,6 +19,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const TSX = path.join(ROOT, 'app', 'studio', 'StudioShowroom.tsx');
 const CSS = path.join(ROOT, 'app', 'studio', 'studio.css');
+const TOKENS = path.join(ROOT, 'app', 'studio', 'orbita-tokens.css');
 
 // Les 16 seccions canòniques de la fitxa tècnica v0.4 (id="sec-<id>").
 const SECTION_IDS = [
@@ -47,6 +48,7 @@ function read(file, label) {
 
 const tsx = read(TSX, 'StudioShowroom.tsx');
 const css = read(CSS, 'studio.css');
+const tokens = read(TOKENS, 'orbita-tokens.css');
 
 if (tsx) {
   const lines = tsx.split('\n').length;
@@ -84,6 +86,19 @@ if (css) {
   }
 }
 
+if (tokens) {
+  for (const token of ['--o-bg', '--o-admin-canvas', '--ax-canvas', '--canvas', '--gold', '--o-stage-new']) {
+    if (!tokens.includes(token)) {
+      errors.push(`Falta el token compartit "${token}" a orbita-tokens.css.`);
+    }
+  }
+  for (const selector of ['.o-studio-root', '.ax-root', '.fx-root.is-contrast']) {
+    if (!tokens.includes(selector)) {
+      errors.push(`Falta el selector compartit "${selector}" a orbita-tokens.css.`);
+    }
+  }
+}
+
 if (errors.length > 0) {
   console.error('✗ check-studio-integrity: la fitxa tècnica /studio s\'ha degradat:\n');
   for (const e of errors) console.error(`  · ${e}`);
@@ -92,4 +107,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`✓ check-studio-integrity: /studio íntegre — ${SECTION_IDS.length} seccions, dades i CSS presents.`);
+console.log(`✓ check-studio-integrity: /studio íntegre — ${SECTION_IDS.length} seccions, dades, CSS i tokens compartits presents.`);

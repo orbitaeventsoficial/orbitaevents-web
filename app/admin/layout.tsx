@@ -15,55 +15,51 @@ import './control-room.css';
 import './admin-shell.css';
 
 /* ── Grups de navegació ───────────────────────────────────────────────────── */
-type NavGroup = { id: string; label: string; items: { label: string; href: string }[] };
+type NavItem = { label: string; href: string; secondary?: boolean };
+type NavGroup = { id: string; label: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    id: 'comercial', label: 'Comercial',
+    id: 'pipeline', label: 'Pipeline',
     items: [
-      { label: 'Temporada', href: '/admin/leads' },
-      { label: 'Arxiu', href: '/admin/leads/arxiu' },
+      { label: 'Leads', href: '/admin/leads' },
+      { label: 'Dossiers', href: '/admin/dossiers' },
       { label: 'Clients', href: '/admin/clientes' },
       { label: 'Pressupostos', href: '/admin/presupuestos' },
-      { label: 'Entrada ràpida', href: '/admin/intake' },
+      { label: 'Arxiu', href: '/admin/leads/arxiu', secondary: true },
     ],
   },
   {
-    id: 'operacio', label: 'Operació',
+    id: 'events', label: 'Events',
     items: [
       { label: 'Reserves', href: '/admin/bookings' },
       { label: 'Tasques', href: '/admin/tasks' },
       { label: 'Inventari', href: '/admin/inventory' },
+    ],
+  },
+  {
+    id: 'cataleg', label: 'Catàleg',
+    items: [
       { label: 'Packs', href: '/admin/packs' },
-    ],
-  },
-  {
-    id: 'economia', label: 'Economia',
-    items: [
-      { label: 'Finances', href: '/admin/economia' },
       { label: 'Pricing', href: '/admin/pricing' },
-      { label: 'Reporting', href: '/admin/reporting' },
-      { label: 'Analytics', href: '/admin/analytics' },
     ],
   },
   {
-    id: 'marqueting', label: 'Màrqueting',
+    id: 'web', label: 'Web',
     items: [
-      { label: 'Hub', href: '/admin/marketing' },
       { label: 'Portfolio', href: '/admin/portfolio' },
       { label: 'Blog', href: '/admin/blog' },
-      { label: 'Social', href: '/admin/social' },
       { label: 'Ressenyes', href: '/admin/ressenyes' },
+      { label: 'Social', href: '/admin/social' },
     ],
   },
   {
     id: 'sistema', label: 'Sistema',
     items: [
+      { label: 'Finances', href: '/admin/economia' },
       { label: 'Configuració', href: '/admin/settings' },
       { label: 'Studio', href: '/admin/studio' },
       { label: 'Manual', href: '/admin/manual' },
-      { label: 'Salut', href: '/admin/salut' },
-      { label: 'Crons', href: '/admin/crons' },
     ],
   },
 ];
@@ -71,34 +67,34 @@ const NAV_GROUPS: NavGroup[] = [
 function getGroupForPath(pathname: string): string {
   if (
     pathname.startsWith('/admin/leads') ||
+    pathname.startsWith('/admin/dossiers') ||
     pathname.startsWith('/admin/clientes') ||
     pathname.startsWith('/admin/presupuestos') ||
     pathname.startsWith('/admin/intake') ||
     pathname.startsWith('/admin/quick-create') ||
     pathname.startsWith('/admin/sales-ops')
-  ) return 'comercial';
+  ) return 'pipeline';
   if (
     pathname.startsWith('/admin/bookings') ||
     pathname.startsWith('/admin/tasks') ||
     pathname.startsWith('/admin/inventory') ||
-    pathname.startsWith('/admin/packs')
-  ) return 'operacio';
+    pathname.startsWith('/admin/calendario')
+  ) return 'events';
   if (
-    pathname.startsWith('/admin/economia') ||
+    pathname.startsWith('/admin/packs') ||
     pathname.startsWith('/admin/pricing') ||
-    pathname.startsWith('/admin/reporting') ||
-    pathname.startsWith('/admin/analytics') ||
+    pathname.startsWith('/admin/catalog') ||
     pathname.startsWith('/admin/cost-calculator')
-  ) return 'economia';
+  ) return 'cataleg';
   if (
-    pathname.startsWith('/admin/marketing') ||
     pathname.startsWith('/admin/portfolio') ||
     pathname.startsWith('/admin/blog') ||
     pathname.startsWith('/admin/social') ||
     pathname.startsWith('/admin/ressenyes') ||
+    pathname.startsWith('/admin/marketing') ||
     pathname.startsWith('/admin/google-reviews') ||
     pathname.startsWith('/admin/campaigns')
-  ) return 'marqueting';
+  ) return 'web';
   return 'sistema';
 }
 
@@ -164,6 +160,19 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               />
             </div>
 
+            {/* Accions primàries al capdamunt */}
+            <div className="ax__sidetop">
+              <Link
+                href="/admin/inbox"
+                className={`ax__inbox${pathname?.startsWith('/admin/inbox') ? ' is-on' : ''}`}
+              >
+                ✉ Safata d&apos;entrada
+              </Link>
+              <Link href="/admin/intake" className="ax__add">
+                Nova entrada
+              </Link>
+            </div>
+
             <nav className="ax__sidenav" aria-label="Àrees de treball">
               {NAV_GROUPS.map((g) => (
                 <div key={g.id} className={`ax__sidegroup${g.id === activeGroup ? ' is-active' : ''}`}>
@@ -181,7 +190,10 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={pathname?.startsWith(item.href) ? 'is-on' : undefined}
+                          className={[
+                            pathname?.startsWith(item.href) ? 'is-on' : '',
+                            item.secondary ? 'is-secondary' : '',
+                          ].filter(Boolean).join(' ') || undefined}
                         >
                           {item.label}
                         </Link>
@@ -191,18 +203,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 </div>
               ))}
             </nav>
-
-            <div className="ax__sideactions">
-              <Link href="/admin/intake" className="ax__add">
-                Nova entrada
-              </Link>
-              <Link
-                href="/admin/inbox"
-                className={`ax__inbox${pathname?.startsWith('/admin/inbox') ? ' is-on' : ''}`}
-              >
-                ✉ Safata d&apos;entrada
-              </Link>
-            </div>
 
             <div className="ax__sidefoot">
               <span className="ax__meav" title="Òrbita Events">OE</span>

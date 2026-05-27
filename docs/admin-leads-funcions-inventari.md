@@ -144,13 +144,14 @@ Les funcions del nou disseny s'apliquen per ordre d'impacte, una a una, per ordr
 | # | Funció | Component font | Canvi previst |
 |---|---|---|---|
 | 1 | Dades reals (Prisma + `loadSeasonCalendar`) | `seasonCalendarService` | ✅ FET — Canvi #783 |
-| 2 | Canvi d'estat inline | `LeadQuickStatus.tsx` + `leadStatusClient.ts` | Activar PATCH d'estat des de la targeta pipeline |
-| 3 | Flux LOST (motiu obligatori) | `LeadLostStatusPrompt.tsx` | Integrar modal inline en canviar a perdut |
-| 4 | Acció eliminar | `LeadActions.tsx` (parcialment) | Botó eliminar amb `ConfirmDialog` i restricció LOST |
+| 2 | Canvi d'estat inline (fitxa) | `leadStatusClient.ts` (`patchLeadStatus`) | ✅ FET — Canvi #784 (botons `lp2__stagepick` + `lp2__commit` a `LeadPage`) |
+| 3 | Flux LOST (motiu obligatori) | `LeadLostStatusPrompt.tsx` | ✅ FET — Canvi #784 (integrat dins del panell de canvi d'estat) |
+| 2.b | Canvi d'estat des del pipeline (drag & drop entre lanes) | `LeadPipelineView.tsx` (D&D) | ✅ FET — Canvi #785 |
+| 4 | Acció eliminar | `LeadActions.tsx` (parcialment) | ✅ FET — Canvi #786 (panell `lp2__panel--danger` + `useConfirmDialog` + restricció LOST) |
 | 5 | Suggeriments pipeline | `PipelineSuggestionsPanel.tsx` | Focus zone del nou disseny (evolució del panell) |
-| 6 | Prioritat inline | `LeadQuickPriority.tsx` | PATCH prioritat des de la targeta |
-| 7 | Badge motiu pèrdua | `LeadLostReasonBadge.tsx` | Afegir context visual a leads LOST al pipeline |
-| 8 | WhatsApp / Email | `LeadActions.tsx` (parcialment) | Botons d'acció ràpida des de la fitxa del lead |
+| 6 | Prioritat inline | `LeadQuickPriority.tsx` | ✅ FET — Canvi #796 (panell "Prioritat" radiogroup de 4 botons a la fitxa, PATCH optimista a `/api/admin/leads/[id]` amb rollback, estètica Brass & Obsidian + dot semàntic per nivell) |
+| 7 | Badge motiu pèrdua | `LeadLostReasonBadge.tsx` | ✅ FET — Canvi #787 (`LostReasonBadge` intern, Brass & Obsidian; pipeline + fitxa; servei propaga `lostReason`) |
+| 8 | WhatsApp / Email | `LeadActions.tsx` (parcialment) | ✅ FET — Canvi #788 (WhatsApp `<a>` amb missatge prefilled si hi ha telèfon; correu via `buildLeadComposeHref` al redactor canònic, sense `mailto:`) |
 
 ---
 

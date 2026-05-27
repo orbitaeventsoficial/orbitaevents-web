@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
 import CustomerHubClient from './_components/CustomerHubClient';
 import { log } from '@/lib/logger';
+import './customer-hub.css';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // METADATA
@@ -61,91 +62,26 @@ async function CustomerHubLoader({ id }: { id: string }) {
 
 function CustomerHubSkeleton() {
   return (
-    <div className="animate-pulse space-y-4">
-      {/* Header skeleton */}
-      <header className="sticky top-0 z-30 border-b backdrop-blur">
-        <div className="mx-auto max-w-7xl px-4 py-3 space-y-3">
-          {/* Top row */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-16 rounded" />
-                <div className="h-5 w-20 rounded-full" />
-              </div>
-              <div className="h-7 w-48 rounded" />
-              <div className="h-4 w-64 rounded" />
-            </div>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-9 w-24 rounded-xl" />
-              ))}
-            </div>
-          </div>
-
-          {/* KPIs */}
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 rounded-xl" />
-            ))}
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-9 w-28 rounded-xl" />
-            ))}
+    <div className="ch__root">
+      <div className="ch__skeleton-header">
+        <div className="ch__skeleton-header-bar" />
+        <div className="ch__skeleton-header-bar" />
+        <div className="ch__skeleton-header-bar" />
+      </div>
+      <div className="ch__grid">
+        <div className="ch__main">
+          <div className="ch__skeleton">
+            <div className="ch__skeleton-bar" />
+            <div className="ch__skeleton-bar" />
+            <div className="ch__skeleton-bar" />
+            <div className="ch__skeleton-bar" />
           </div>
         </div>
-      </header>
-
-      {/* Content */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 pb-6 lg:grid-cols-12">
-        {/* Main panel */}
-        <div className="lg:col-span-8 space-y-4">
-          {/* Section 1 */}
-          <div className="rounded-2xl border p-5">
-            <div className="h-6 w-1/3 rounded" />
-            <div className="mt-2 h-4 w-2/3 rounded" />
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-14 rounded-xl" />
-              ))}
-            </div>
-          </div>
-
-          {/* Section 2 */}
-          <div className="rounded-2xl border p-5">
-            <div className="h-6 w-1/4 rounded" />
-            <div className="mt-2 h-4 w-1/2 rounded" />
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-24 rounded-xl" />
-              ))}
-            </div>
-          </div>
-
-          {/* Section 3 */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[1, 2].map((i) => (
-              <div key={i} className="h-32 rounded-2xl border" />
-            ))}
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="lg:col-span-4">
-          <div className="rounded-2xl border p-4">
-            <div className="h-5 w-1/2 rounded" />
-            <div className="mt-3 flex gap-1">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-6 w-16 rounded-full" />
-              ))}
-            </div>
-            <div className="mt-4 space-y-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-16 rounded-xl" />
-              ))}
-            </div>
+        <div className="ch__aside">
+          <div className="ch__skeleton">
+            <div className="ch__skeleton-bar" />
+            <div className="ch__skeleton-bar" />
+            <div className="ch__skeleton-bar" />
           </div>
         </div>
       </div>

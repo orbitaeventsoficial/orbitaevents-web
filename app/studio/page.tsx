@@ -1,5 +1,5 @@
-import StudioShowroom from './StudioShowroom';
+import { redirect } from 'next/navigation';
 
 export default function StudioPage() {
-  return <StudioShowroom />;
+  redirect('/admin/studio');
 }

@@ -7,11 +7,11 @@ interface AdminErrorProps {
 
 export default function AdminError({ error, reset }: AdminErrorProps) {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full rounded-2xl border p-8 text-center shadow-xl shadow-black/35">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border">
+    <div className="ax__error">
+      <div className="ax__errorcard">
+        <div className="ax__erroricon">
           <svg
-            className="w-8 h-8"
+            aria-hidden="true"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -25,39 +25,39 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           </svg>
         </div>
 
-        <h2 className="mb-2 text-xl font-bold">
+        <h2 className="ax__errortitle">
           Error al panell d&apos;administració
         </h2>
 
-        <p className="mb-6">
+        <p className="ax__errortext">
           S&apos;ha produït un error inesperat.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
-          <div className="mb-6 rounded-xl border p-4">
-            <p className="text-sm font-mono break-all">
+          <div className="ax__errordebug">
+            <p>
               {error.message}
             </p>
             {error.digest && (
-              <p className="mt-2 text-xs">
+              <p className="ax__errordigest">
                 Digest: {error.digest}
               </p>
             )}
           </div>
         )}
 
-        <div className="flex gap-3 justify-center">
+        <div className="ax__erroractions">
           <button
             onClick={reset}
             type="button"
-            className="rounded-xl px-5 py-2.5 font-medium text-white transition-all"
+            className="ax__errorbtn ax__errorbtn--primary"
           >
             Torna-ho a provar
           </button>
 
           <a
             href="/admin"
-            className="rounded-xl border px-5 py-2.5 font-medium transition-colors"
+            className="ax__errorbtn ax__errorbtn--ghost"
           >
             Tornar a l&apos;inici
           </a>
@@ -66,4 +66,3 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
     </div>
   );
 }
-

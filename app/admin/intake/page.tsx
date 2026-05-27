@@ -1,19 +1,13 @@
 'use client';
 
-/**
- * QUICK INTAKE - Creació ràpida d'entrades des de qualsevol canal
- * Telèfon, WhatsApp, Instagram, Wallapop, boca-orella, email, web...
- * Amb detecció de duplicats en temps real
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/app/admin/components/ToastProvider';
-import { AdminPage } from '../components/AdminPage';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 import { buildCustomerHubHref } from '@/lib/admin/customerWorkspaceHref';
-import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS, INTAKE_SOURCE_SELECTED_STYLES } from '@/lib/constants';
+import { INTAKE_EVENT_TYPE_OPTIONS, INTAKE_PRIORITY_OPTIONS, INTAKE_SOURCE_OPTIONS } from '@/lib/constants';
+import './intake.css';
 
 type DuplicateWarning = {
   id: string;
@@ -33,6 +27,7 @@ type FormData = {
   source: string;
   eventType: string;
   eventDate: string;
+  eventTime: string;
   eventLocation: string;
   guestCount: string;
   budget: string;
@@ -49,6 +44,7 @@ const INITIAL_FORM: FormData = {
   source: 'PHONE',
   eventType: 'OTHER',
   eventDate: '',
+  eventTime: '',
   eventLocation: '',
   guestCount: '',
   budget: '',
@@ -67,6 +63,66 @@ export default function IntakePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{ id: string; name: string } | null>(null);
+  const [pasteText, setPasteText] = useState('');
+  const [extracting, setExtracting] = useState(false);
+
+  const handleExtract = useCallback(async (textOverride?: string) => {
+    const text = textOverride ?? pasteText;
+    if (!text.trim()) return;
+    setExtracting(true);
+    try {
+      const res = await fetchWithCsrf('/api/admin/leads/extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(errData.error || 'Error extreient');
+      }
+      const { data, fallback, fallbackReason } = await res.json() as {
+        data: Partial<FormData>;
+        fallback?: boolean;
+        fallbackReason?: 'quota' | 'unavailable';
+      };
+      setForm((prev) => ({
+        ...prev,
+        name: data.name || prev.name,
+        email: data.email || prev.email,
+        phone: data.phone || prev.phone,
+        eventType: data.eventType || prev.eventType,
+        eventDate: data.eventDate || prev.eventDate,
+        eventTime: data.eventTime || prev.eventTime,
+        eventLocation: data.eventLocation || prev.eventLocation,
+        guestCount: data.guestCount || prev.guestCount,
+        message: data.message || prev.message,
+        source: data.source || prev.source,
+      }));
+      setPasteText('');
+      if (fallback) {
+        toast.warning(
+          fallbackReason === 'quota'
+            ? 'Extracció local parcial: la quota IA està limitada ara mateix'
+            : 'Extracció local parcial: la IA no ha respost correctament'
+        );
+      } else {
+        toast.success('Camps omplerts automàticament');
+      }
+    } catch (err) {
+      console.error('[intake] extract error:', err);
+      toast.error(err instanceof Error ? err.message : 'No he pogut extreure la informació');
+    } finally {
+      setExtracting(false);
+    }
+  }, [pasteText, toast]);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (!pasted.trim()) return;
+    const fullText = (pasteText + pasted).trim();
+    setPasteText(fullText);
+    handleExtract(fullText);
+  }, [pasteText, handleExtract]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -84,7 +140,6 @@ export default function IntakePage() {
     setSuccess(null);
   };
 
-  // Real-time duplicate check
   const debounceName = form.name;
   const debounceEmail = form.email;
   const debouncePhone = form.phone;
@@ -93,7 +148,6 @@ export default function IntakePage() {
       setDuplicates([]);
       return;
     }
-
     const timer = setTimeout(async () => {
       setCheckingDuplicates(true);
       try {
@@ -107,12 +161,11 @@ export default function IntakePage() {
           setDuplicates(data?.data?.matches || []);
         }
       } catch {
-        // Silent
+        // silent
       } finally {
         setCheckingDuplicates(false);
       }
     }, 500);
-
     return () => clearTimeout(timer);
   }, [debounceName, debounceEmail, debouncePhone]);
 
@@ -121,8 +174,6 @@ export default function IntakePage() {
       setError('Nom i email són obligatoris');
       return;
     }
-
-    // Warn about high-score duplicates
     const highDup = duplicates.find((d) => d.matchScore >= 80);
     if (highDup && !duplicateOverride) {
       toast.warning(`Possible duplicat: "${highDup.name}" (${highDup.matchScore}%). Fes clic de nou per crear igualment.`);
@@ -130,16 +181,19 @@ export default function IntakePage() {
       return;
     }
     setDuplicateOverride(false);
-
     setSubmitting(true);
     setError(null);
-
     try {
-      // Address goes into message; DNI is now a proper field
       const extraParts: string[] = [];
       if (form.address.trim()) extraParts.push(`Adreça: ${form.address.trim()}`);
       const baseMessage = form.message.trim();
       const fullMessage = [...extraParts, baseMessage].filter(Boolean).join('\n') || undefined;
+
+      const eventDateTime = form.eventDate
+        ? form.eventTime
+          ? `${form.eventDate}T${form.eventTime}`
+          : form.eventDate
+        : undefined;
 
       const body: Record<string, unknown> = {
         name: form.name.trim(),
@@ -148,7 +202,7 @@ export default function IntakePage() {
         dni: form.dni.trim().toUpperCase() || undefined,
         source: form.source || 'OTHER',
         eventType: form.eventType,
-        eventDate: form.eventDate || undefined,
+        eventDate: eventDateTime,
         eventLocation: form.eventLocation.trim() || undefined,
         guestCount: form.guestCount ? parseInt(form.guestCount, 10) : undefined,
         budget: form.budget.trim() || undefined,
@@ -173,7 +227,7 @@ export default function IntakePage() {
       setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
       setDuplicates([]);
     } catch (err) {
-      console.error('Error enviant intake manual de lead', err);
+      console.error('[intake] submit error:', err);
       const msg = err instanceof Error ? err.message : 'Error desconegut';
       setError(msg);
       toast.error(msg);
@@ -183,201 +237,173 @@ export default function IntakePage() {
   }, [form, duplicates, duplicateOverride, toast]);
 
   return (
-    <AdminPage
-      title="Entrada ràpida"
-      subtitle="Crea una entrada des de qualsevol canal amb detecció de duplicats"
-      back={{ href: '/admin/leads', label: 'Entrades' }}
-    >
+    <div className="ni">
 
-      <section className="rounded-2xl border p-2">
-        <div className="grid grid-cols-2 gap-2">
-          <Link
-            href="/admin/leads"
-            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-medium transition-colors"
-          >
-            Tauler Leads
-          </Link>
-          <Link
-            href="/admin/intake"
-            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
-            aria-current="page"
-          >
-            Entrada ràpida
-          </Link>
-        </div>
-      </section>
+      {/* Capçalera */}
+      <div className="ni__head">
+        <span className="ni__eyebrow">Pipeline · Nova entrada</span>
+        <h1 className="ni__h1">Nova entrada</h1>
+        <p className="ni__sub">Crea una entrada des de qualsevol canal · detecció de duplicats en temps real</p>
+      </div>
 
-      {/* Success */}
+      {/* ── IA Extractor ─────────────────────────────────────────────────── */}
+      <div className="ni__card ni__card--ai">
+        <p className="ni__card-title">IA · Extracció automàtica</p>
+        <p className="ni__card-hint">
+          Enganxa un WhatsApp, email o text amb la info del client — s&apos;ompliran els camps del formulari automàticament.
+        </p>
+        <textarea
+          value={pasteText}
+          onChange={(e) => setPasteText(e.target.value)}
+          onPaste={handlePaste}
+          className="ni__input ni__textarea"
+          rows={6}
+          placeholder={"Bon dia, sóc l'Adrià de l'Associació de Veïns de Rubí...\n(copia i enganxa aquí la conversa completa)"}
+          aria-label="Text per extreure informació del client"
+        />
+        {extracting && (
+          <p className="ni__card-hint" style={{ marginTop: 8 }}>⟳ Extraient informació…</p>
+        )}
+      </div>
+
+      {/* ── Èxit ─────────────────────────────────────────────────────────── */}
       {success && (
-        <div className="rounded-2xl border p-5">
-          <p className="font-medium">
-            Entrada creada correctament per a {success.name}
-          </p>
-          <div className="mt-3 flex gap-2">
-            <Link
-              href={buildLeadWorkspaceHref(success.id)}
-              className="rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
-            >
+        <div className="ni__success">
+          <p className="ni__success-title">Entrada creada per a {success.name}</p>
+          <div className="ni__success-btns">
+            <Link href={buildLeadWorkspaceHref(success.id)} className="ni__btn ni__btn--primary">
               Obrir entrada →
             </Link>
-            <button
-              type="button"
-              onClick={() => setSuccess(null)}
-              className="rounded-xl border px-4 py-2 text-sm transition-colors"
-            >
+            <button type="button" onClick={() => setSuccess(null)} className="ni__btn ni__btn--ghost">
               Crear una altra
             </button>
           </div>
         </div>
       )}
 
-      {/* Error */}
+      {/* ── Error ────────────────────────────────────────────────────────── */}
       {error && (
-        <div className="rounded-xl border p-4">
-          <p className="text-sm">{error}</p>
-        </div>
+        <div className="ni__error">{error}</div>
       )}
 
-      {/* Duplicate warnings */}
+      {/* ── Duplicats ────────────────────────────────────────────────────── */}
       {duplicates.length > 0 && (
-        <div className="rounded-2xl border p-4">
-          <p className="text-sm font-semibold flex items-center gap-2">
-            {checkingDuplicates && <span className="animate-spin">⟳</span>}
-            Possibles duplicats detectats ({duplicates.length})
+        <div className="ni__dups">
+          <p className="ni__dups-title">
+            {checkingDuplicates && <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span>}
+            Possibles duplicats ({duplicates.length})
           </p>
-          <div className="mt-3 space-y-2">
-            {duplicates.map((dup) => (
-              <Link
-                key={dup.id}
-                href={buildCustomerHubHref(dup.id)}
-                className="flex items-center justify-between rounded-xl border p-3 transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-medium">{dup.name}</p>
-                  <p className="text-xs">
-                    {dup.email}{dup.phone ? ` · ${dup.phone}` : ''}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                    dup.matchScore >= 80 ? 'admin-tone-soft-danger' :
-                    dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                    'bg-white/5 text-white/40'
-                  }`}>
-                    {dup.matchScore}%
-                  </span>
-                  <div className="flex gap-1">
-                    {dup.matchReasons.map((r, i) => (
-                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded">
-                        {r.field}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {duplicates.map((dup) => (
+            <Link key={dup.id} href={buildCustomerHubHref(dup.id)} className="ni__dup-row">
+              <div>
+                <p className="ni__dup-name">{dup.name}</p>
+                <p className="ni__dup-meta">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
+              </div>
+              <span className={`ni__dup-badge ${
+                dup.matchScore >= 80 ? 'ni__dup-badge--high' :
+                dup.matchScore >= 50 ? 'ni__dup-badge--med' :
+                'ni__dup-badge--low'
+              }`}>
+                {dup.matchScore}%
+              </span>
+            </Link>
+          ))}
         </div>
       )}
 
-      {/* Source selector */}
-      <div className="rounded-2xl border p-5">
-        <label className="text-sm font-semibold">Canal d&apos;entrada</label>
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {/* ── Canal d'entrada ──────────────────────────────────────────────── */}
+      <div className="ni__card">
+        <p className="ni__card-title">Canal d&apos;entrada</p>
+        <div className="ni__pills">
           {INTAKE_SOURCE_OPTIONS.map((src) => (
             <button
               key={src.value}
               type="button"
               onClick={() => updateField('source', src.value)}
               aria-pressed={form.source === src.value}
-              className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
-                form.source === src.value
-                  ? `${INTAKE_SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
-                  : 'border-white/10 bg-white/[0.02] text-white/60 hover:bg-white/5'
-              }`}
+              className={`ni__pill${form.source === src.value ? ' ni__pill--on' : ''}`}
             >
-              <span className="inline-flex items-center justify-center gap-1.5">
-                <span className="text-lg leading-none">{src.icon}</span>
-                <span className="leading-none">{src.label}</span>
-              </span>
+              <span className="ni__pill-icon">{src.icon}</span>
+              {src.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Main form */}
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Dades del client</h2>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="intake-name" className="text-xs">Nom *</label>
+      {/* ── Dades del client ─────────────────────────────────────────────── */}
+      <div className="ni__card">
+        <p className="ni__card-title">Dades del client</p>
+        <div className="ni__grid ni__grid--2">
+          <div className="ni__field">
+            <label htmlFor="intake-name" className="ni__label">Nom *</label>
             <input
               id="intake-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Nom i cognom"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div>
-            <label htmlFor="intake-email" className="text-xs">Email *</label>
+          <div className="ni__field">
+            <label htmlFor="intake-email" className="ni__label">Email *</label>
             <input
               id="intake-email"
               type="email"
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="client@exemple.com"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div>
-            <label htmlFor="intake-phone" className="text-xs">Telèfon</label>
+          <div className="ni__field">
+            <label htmlFor="intake-phone" className="ni__label">Telèfon</label>
             <input
               id="intake-phone"
               type="tel"
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div>
-            <label htmlFor="intake-dni" className="text-xs">DNI / NIF / CIF</label>
+          <div className="ni__field">
+            <label htmlFor="intake-dni" className="ni__label">DNI / NIF / CIF</label>
             <input
               id="intake-dni"
               type="text"
               value={form.dni}
               onChange={(e) => updateField('dni', e.target.value.toUpperCase())}
-              placeholder="12345678A / B12345678"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              placeholder="12345678A"
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="intake-address" className="text-xs">Adreça</label>
+          <div className="ni__field ni__col2">
+            <label htmlFor="intake-address" className="ni__label">Adreça</label>
             <input
               id="intake-address"
               type="text"
               value={form.address}
               onChange={(e) => updateField('address', e.target.value)}
               placeholder="Carrer, número, CP, ciutat"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div>
-            <label className="text-xs">Prioritat</label>
-            <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="ni__field ni__col2">
+            <label className="ni__label">Prioritat</label>
+            <div className="ni__pills" style={{ marginTop: '2px' }}>
               {INTAKE_PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
-                  className={`admin-keep-colors rounded-xl border px-2 py-2 text-sm font-medium transition-all ${
-                    form.priority === p.value
-                      ? `${p.selected} shadow-sm`
-                      : 'admin-tone-idle'
-                  }`}
+                  aria-pressed={form.priority === p.value}
+                  className={`ni__pill${form.priority === p.value ? ' ni__pill--on' : ''}`}
                 >
                   {p.label}
                 </button>
@@ -387,103 +413,114 @@ export default function IntakePage() {
         </div>
       </div>
 
-      {/* Event details */}
-      <div className="rounded-2xl border p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Detalls de l&apos;esdeveniment</h2>
+      {/* ── Detalls de l'event ───────────────────────────────────────────── */}
+      <div className="ni__card">
+        <p className="ni__card-title">Detalls de l&apos;event</p>
 
-        <div>
-          <label className="text-xs">Tipus d&apos;esdeveniment</label>
-          <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
+        <div className="ni__field" style={{ marginBottom: '18px' }}>
+          <label className="ni__label">Tipus d&apos;event</label>
+          <div className="ni__tiles">
             {INTAKE_EVENT_TYPE_OPTIONS.map((et) => (
               <button
                 key={et.value}
                 type="button"
                 onClick={() => updateField('eventType', et.value)}
                 aria-pressed={form.eventType === et.value}
-                className={`admin-keep-colors rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
-                  form.eventType === et.value
-                    ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
-                    : 'admin-tone-idle'
-                }`}
+                className={`ni__tile${form.eventType === et.value ? ' ni__tile--on' : ''}`}
               >
-                <span className="text-base leading-none">{et.icon}</span>
-                <span className="block mt-1 leading-tight">{et.label}</span>
+                <span className="ni__tile-icon">{et.icon}</span>
+                {et.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="intake-date" className="text-xs">Data</label>
-            <input
-              id="intake-date"
-              type="date"
-              value={form.eventDate}
-              onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
-            />
+        <div className="ni__grid ni__grid--3" style={{ marginBottom: '14px' }}>
+          <div className="ni__grid ni__grid--2" style={{ gap: '10px' }}>
+            <div className="ni__field">
+              <label htmlFor="intake-date" className="ni__label">Data</label>
+              <input
+                id="intake-date"
+                type="date"
+                value={form.eventDate}
+                onChange={(e) => updateField('eventDate', e.target.value)}
+                className="ni__input"
+              />
+            </div>
+            <div className="ni__field">
+              <label htmlFor="intake-time" className="ni__label">Hora</label>
+              <input
+                id="intake-time"
+                type="time"
+                value={form.eventTime}
+                onChange={(e) => updateField('eventTime', e.target.value)}
+                className="ni__input"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="intake-location" className="text-xs">Ubicació</label>
+          <div className="ni__field">
+            <label htmlFor="intake-location" className="ni__label">Ubicació</label>
             <input
               id="intake-location"
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Lloc de celebració"
-              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+              className="ni__input"
+              autoComplete="off"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label htmlFor="intake-guests" className="text-xs">Convidats</label>
+          <div className="ni__grid ni__grid--2" style={{ gap: '10px' }}>
+            <div className="ni__field">
+              <label htmlFor="intake-guests" className="ni__label">Convidats</label>
               <input
                 id="intake-guests"
                 type="number"
                 min={1}
                 value={form.guestCount}
                 onChange={(e) => updateField('guestCount', e.target.value)}
-                placeholder="100"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                placeholder="60"
+                className="ni__input"
               />
             </div>
-            <div>
-              <label htmlFor="intake-budget" className="text-xs">Pressupost</label>
+            <div className="ni__field">
+              <label htmlFor="intake-budget" className="ni__label">Pressupost</label>
               <input
                 id="intake-budget"
                 type="text"
                 value={form.budget}
                 onChange={(e) => updateField('budget', e.target.value)}
                 placeholder="2.000€"
-                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm "
+                className="ni__input"
+                autoComplete="off"
               />
             </div>
           </div>
         </div>
 
-        <div>
-          <label htmlFor="intake-message" className="text-xs">Missatge / Notes</label>
+        <div className="ni__field">
+          <label htmlFor="intake-message" className="ni__label">Notes</label>
           <textarea
             id="intake-message"
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
             rows={3}
-            placeholder="Detalls addicionals, què necessita el client, context de la conversa..."
-            className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
+            placeholder="Detalls addicionals, context de la conversa..."
+            className="ni__input ni__textarea"
+            style={{ minHeight: 'unset' }}
           />
         </div>
       </div>
 
-      {/* Submit */}
-      <div className="flex items-center gap-3">
+      {/* ── Accions ──────────────────────────────────────────────────────── */}
+      <div className="ni__actions">
         <button
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.name || !form.email}
-          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="ni__btn ni__btn--submit"
         >
-          {submitting ? 'Creant entrada...' : 'Crear entrada'}
+          {submitting ? 'Creant…' : 'Crear entrada'}
         </button>
         <button
           type="button"
@@ -493,11 +530,12 @@ export default function IntakePage() {
             setError(null);
             setSuccess(null);
           }}
-          className="rounded-xl border px-4 py-3 text-sm transition-colors"
+          className="ni__btn ni__btn--ghost"
         >
           Netejar
         </button>
       </div>
-    </AdminPage>
+
+    </div>
   );
 }

@@ -96,6 +96,16 @@ Exemples: coordenades calculades, amplades dinàmiques, transform puntual.
 - Si tens dubte entre local i compartit, per defecte va a la capa comuna.
 - Anti-patrons prohibits: `Object.keys(...)` locals per opcions compartides, maps locals de labels, `Set(...)` locals per regles de domini, arrays derivats locals per categories/status.
 
+## Sistema visual admin — norma canònica `/admin/studio`
+
+Vegeu `protocol-producte-admin-ca.md` §2.5 (Migració del Frankenstein admin). Resum operatiu:
+
+- **`/admin/studio` + `app/studio/orbita-tokens.css` són la font de veritat visual de l'admin** (Canvis #795 + #797 + #798).
+- `app/admin/**` **NO inventa paletes, hex, gradients ni estats locals**. Només consumeix tokens (`--ax-*`, `--canvas`, `--gold`, `--t*`, `--o-stage-*`) i classes ja exposades pel sistema.
+- Si falta un color, estat o component, **primer s'amplia `/admin/studio` i/o `orbita-tokens.css`**, després es consumeix des de l'admin. Mai a l'inrevés.
+- CSS local d'una pàgina admin queda restringit a **layout específic** (grid, gaps, posició, ordre de columnes). Decisions cromàtiques o tipogràfiques no viuen a fitxers `app/admin/**.css`.
+- `docs/admin-inventari-pagines.md` és el **mapa de la migració** peça a peça: 🔴 old · 🟡 en curs · 🟢 migrada. Cada estat 🟡/🟢 ha de citar el `Canvi #NNN` a la nota.
+
 ## Dependències
 
 Norma per defecte: **zero-dependency si és raonable**.
@@ -225,10 +235,19 @@ Formularis validats          → client + servidor
 
 ## CSS architecture admin
 
+### Regla canònica de sistema visual (2026-05-26)
+
+- `/admin/studio` és la fitxa tècnica interna i sota auth del sistema visual. La ruta antiga `/studio` només redirigeix a `/admin/studio`.
+- `app/studio/orbita-tokens.css` és la font de veritat de paleta, tokens, tipografia base i estats visuals del nou admin (`--o-*`, `--o-admin-*`, aliases `--ax-*`, `--canvas`, `--gold`, `--t`, `--o-stage-*`).
+- Cap pàgina o component dins `app/admin/**` pot inventar paleta, hex, gradients o estats locals. Si falta un color, component o variant, primer s'amplia `/admin/studio`/`orbita-tokens.css`; després l'admin el consumeix.
+- CSS local de pàgina admin només pot definir layout i composició pròpia (grid, gaps, amplades, responsive, posició). Les decisions cromàtiques, de tipografia, ombres i estats viuen a Studio.
+- Els error states de l'admin també han de consumir `.ax-*` i tokens de Studio; no s'usen Tailwind utilitari ni tipografies ad hoc per a pantalles d'error.
+
 ### Fitxers CSS admin (carregats a `admin/layout.tsx`)
 
-- `globals.css` — estructura (sidebar, headers, nav) + tokens extra
-- `admin-theme.css` — tokens base (`--at-bg/surface/panel/border`), glass, pipeline colors, semantic tones
+- `../studio/orbita-tokens.css` — font canònica de tokens visuals compartits entre Studio i admin
+- `admin-shell.css` — shell admin, navegació, error boundary i aliases `.ax-*` consumint tokens de Studio
+- `admin-theme.css` — compatibilitat legacy (`--at-*`), glass i semantic tones mentre dura la migració
 - `control-room.css` — dashboard específic amb tokens `--at-cr-*`
 
 ### Regles de cascada
@@ -239,9 +258,8 @@ Formularis validats          → client + servidor
 
 ### Paleta admin (tokens)
 
-- `--at-bg: #0f1218` → `--at-surface: #1a1f2b` → `--at-panel: #222938` → `--at-raised: #2d3548`
-- Cada capa ha de tenir mínim 20 unitats de diferència amb l'anterior.
-- Colors: sistema `white/opacity` sobre fons fosc. MAI `slate-*`, `gray-*`, ni hex custom als components.
+- La paleta nova surt de `app/studio/orbita-tokens.css`: `--o-admin-canvas`, `--o-admin-panel`, `--o-admin-raised`, `--o-admin-gold`, `--o-stage-*`.
+- Colors: tokens de Studio o sistema `white/opacity` sobre fons fosc. MAI `slate-*`, `gray-*`, ni hex custom als components.
 - Glass cards: `.admin-card-glass`. Focus: `focus:ring-1 focus:ring-cyan-500/50`. Table hover: `hover:bg-white/[0.03]`.
 - Gradients: MAI Tailwind gradient classes directes. Usar `.admin-gradient--*`.
 - Stagger: `.admin-stagger-item` amb `prefers-reduced-motion` respectat.
