@@ -54,8 +54,11 @@ function normalizeLetters(input: string): string {
 
 function capitalizeWords(input: string): string {
   return normalizeWhitespace(input)
-    .replace(/[.,;:!?()[\]{}"“”]+$/g, '')
-    .replace(/\b[\p{L}]/gu, (char) => char.toUpperCase());
+    .replace(/[.,;:!?()[\]{}”””]+$/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 function cleanTail(input: string, max = 160): string {
@@ -128,24 +131,30 @@ function extractEventDate(text: string): string {
     return toIsoDate(year, Number(dmy[2]), Number(dmy[1]));
   }
 
-  const named = text.match(
-    /\b(\d{1,2})\s*(?:de\s+)?([a-zA-ZÀ-ÿ]+)\s*(?:de\s+)?(\d{2,4})?\b/i
+  const namedMatches = text.matchAll(
+    /\b(\d{1,2})\s*(?:de\s+)?([a-zA-ZÀ-ÿ]+)\s*(?:de\s+)?(\d{2,4})?\b/gi
   );
-  if (!named) return '';
+  for (const named of namedMatches) {
+    const day = Number(named[1]);
+    const month = MONTHS[normalizeLetters(named[2])];
+    if (!month) continue;
+    const currentYear = new Date().getFullYear();
+    const yearRaw = named[3] ? Number(named[3]) : currentYear;
+    const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw;
+    const iso = toIsoDate(year, month, day);
+    if (iso) return iso;
+  }
 
-  const day = Number(named[1]);
-  const month = MONTHS[normalizeLetters(named[2])];
-  if (!month) return '';
-  const currentYear = new Date().getFullYear();
-  const yearRaw = named[3] ? Number(named[3]) : currentYear;
-  const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw;
-  return toIsoDate(year, month, day);
+  return '';
 }
 
 function extractEventTime(text: string): string {
-  const range = text.match(
-    /\b(?:de\s+|des de\s+|desde\s+|a partir de\s+|a las?\s+|a les\s+)?([01]?\d|2[0-3])[:.]([0-5]\d)\b/i
+  const labeled = text.match(
+    /\b(?:horari|horario|hora|comen[cç]ar(?:[ií]em)?|comienza|empieza|inici|inicio|a partir de|des de|desde|a les|a las?)\s*(?:[:\-]?\s*)?([01]?\d|2[0-3])[:.]([0-5]\d)\b/i
   );
+  if (labeled) return `${labeled[1].padStart(2, '0')}:${labeled[2]}`;
+
+  const range = text.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\s*(?:h)?\s*(?:-|a|to|hasta)\s*(?:[01]?\d|2[0-3])[:.][0-5]\d\b/i);
   return range ? `${range[1].padStart(2, '0')}:${range[2]}` : '';
 }
 
@@ -159,16 +168,23 @@ function extractGuestCount(text: string): string {
 }
 
 function extractBudget(text: string): string {
-  const labeled = text.match(/(?:pressupost|presupuesto|budget)\s*[:\-]?\s*([^\n\r.,;]{2,80})/i);
-  if (labeled?.[1]) return cleanTail(labeled[1], 120);
+  const labeled = text.match(/(?:pressupost|presupuesto|budget)\s*[:\-]?\s*([^\n\r;]{2,80})/i);
+  const amountPattern = /\b(\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d{2,6}(?:[.,]\d{1,2})?)\s*(?:€|eur|euros?)\b/i;
+  if (labeled?.[1]) {
+    const labeledText = cleanTail(labeled[1], 120).replace(/^(?:és|es|de|entre)\s+/i, '');
+    const range = labeledText.match(/\b(\d{2,6})\s*(?:-|–|a|y|i)\s*(\d{2,6})\s*(?:€|eur|euros?)?/i);
+    if (range) return `${range[1]}-${range[2]}€`;
+    const labeledAmount = labeledText.match(amountPattern);
+    return labeledAmount?.[1] ? `${labeledAmount[1]}€` : labeledText;
+  }
 
-  const amount = text.match(/\b(\d{2,6}(?:[.,]\d{1,2})?)\s*(?:€|eur|euros?)\b/i);
+  const amount = text.match(amountPattern);
   return amount?.[1] ? `${amount[1]}€` : '';
 }
 
 function extractLocation(text: string): string {
   const labeled = text.match(
-    /(?:ubicaci[oó]|ubicaci[oó]n|lloc|lugar|localitat|localidad|ciutat|ciudad|poblaci[oó]|municipi|direcci[oó]|direcci[oó]n)\s*[:\-]?\s*([^\n\r]{3,160})/i
+    /(?:^|\n)\s*(?:ubicaci[oó]n?|lloc|lugar|localitat|localidad|ciutat|ciudad|poblaci[oó]n?|municipi)\s*[:\-]\s*([^\n\r]{3,160})/im
   );
   if (labeled?.[1]) return cleanTail(labeled[1]);
 
@@ -177,7 +193,7 @@ function extractLocation(text: string): string {
   );
   if (sentence?.[1]) return cleanTail(sentence[1]);
 
-  const city = text.match(/\b(?:a|en)\s+([A-ZÀ-Ý][\p{L}' -]{2,60})\b/u);
+  const city = text.match(/\b(?:a|en)\s+([\p{L}][\p{L}' -]{2,60})(?=$|[.,;])/iu);
   return city?.[1] ? cleanTail(city[1], 80) : '';
 }
 

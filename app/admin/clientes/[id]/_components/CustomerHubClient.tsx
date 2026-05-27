@@ -1,6 +1,6 @@
 'use client';
 
-import './customer-hub.css';
+import '../customer-hub.css';
 import { Component, createContext, useCallback, useContext, useEffect, useState, useTransition, type ReactNode } from 'react';
 import { log } from '@/lib/logger';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
