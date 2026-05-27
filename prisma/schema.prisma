@@ -495,11 +495,15 @@ model Dossier {
   sentAt      DateTime?
   sentTo      String?   // email al qual es va enviar
 
+  // Paperera de reciclatge (30 dies)
+  deletedAt   DateTime?
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([leadId])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("dossiers")
 }
 

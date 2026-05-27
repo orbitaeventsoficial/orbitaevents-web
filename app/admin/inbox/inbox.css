@@ -108,6 +108,19 @@
 }
 
 /* Botó "Personalitzar" */
+.sf__sort-select {
+  padding: 7px 12px;
+  border: 1px solid var(--ax-line2);
+  border-radius: 8px;
+  background: var(--ax-panel);
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  appearance: auto;
+}
+.sf__sort-select:focus { outline: 1px solid var(--ax-gold); border-color: var(--ax-gold); }
+
 .sf__composer-btn {
   display: inline-flex;
   align-items: center;

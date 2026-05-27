@@ -1,3 +1,54 @@
+## 2026-05-27 — Canvi #820: Dossiers — paperera soft-delete + restore + purge + cron 30 dies (claude)
+
+### Context
+Els dossiers s'esborràven directament (hard delete). Ara passen per una paperera de 30 dies: soft-delete via `deletedAt`, llista de la paperera a la pàgina, accions Restaurar / Eliminar permanent, i cron diari que purga automàticament els que porten >30 dies.
+
+### Canvi
+- **`prisma/schema.prisma`**: camp `deletedAt DateTime?` + índex `deletedAt` al model `Dossier`.
+- **`prisma/migrations/20260527100000_dossier_soft_delete/migration.sql`**: migració SQL per afegir la columna i l'índex.
+- **`lib/services/dossierService.ts`**: noves funcions `softDeleteDossier` (UPDATE deletedAt=NOW), `restoreDossier` (UPDATE deletedAt=NULL), `purgeDossier` (delete físic), `getDeletedDossiers` (queryRaw amb join lead), `purgeExpiredDossiers(cutoff)` (DELETE WHERE deletedAt≤cutoff). `getAllDossiers` filtra WHERE deletedAt IS NULL. `deleteDossier` passa a deprecada → crida `softDeleteDossier`.
+- **`app/api/admin/dossiers/[id]/route.ts`**: DELETE → `softDeleteDossier`; PATCH accepta `action: 'restore' | 'purge'`.
+- **`app/api/admin/dossiers/trash/route.ts`** (NOU): GET llista de dossiers esborrats (auth requerida).
+- **`app/api/cron/dossier-trash-purge/route.ts`** (NOU): cron diari que purga dossiers >30 dies; desa estat al monitor via `saveCronRunStatus` (prefix `dossier.trash-purge`).
+- **`app/admin/dossiers/page.tsx`**: secció "Paperera de dossiers" sota la llista activa; mostra data d'eliminació i hint de purga als 30 dies.
+- **`app/admin/dossiers/DossierListActions.tsx`**: nova prop `isDeleted`; botons Restaurar + Eliminar definitiu a la paperera; botó principal passa de hard-delete a "🗑 Paperera".
+- **`app/admin/dossiers/dossiers.css`**: classes `.dg__section-title--trash` i `.dg__list-row--deleted`.
+- **`lib/constants/admin.ts`**: nova entrada a `ADMIN_CRON_PREFIXES` per al cron de purga; counter 819→820.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = 820.
+- **`__tests__/lib/services/dossierService.test.ts`**: 17 tests — cobreixen createDossier, getDossiersByLead, getDossierById, getAllDossiers, softDeleteDossier, restoreDossier, purgeDossier, getDeletedDossiers, purgeExpiredDossiers, deleteDossier (deprecated), sendDossierByEmail.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors. 17/17 tests verds.
+- Validació funcional: soft-delete, restore, purge i cron registrat al monitor. Migració pendent d'aplicar a Railway (`npx prisma migrate deploy`).
+- Validació humana/UX: pendent verificació al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+## 2026-05-27 — Canvi #819: Safata Enviats via IMAP Sent + fix filtre carpetes sortida (claude)
+
+### Context
+La pestanya "Enviats" de la Safata mostrava registres de la BD (`EmailSend`), que podien desaparèixer si s'esborraven dossiers o leads. L'usuari necessita veure la veritat del servidor de correu: tot el que s'ha enviat realment existeix al folder Sent de l'IMAP.
+
+### Canvi
+- **`app/admin/inbox/SafataClient.tsx`**: pestanya "Enviats" carrega ara del folder Sent del servidor IMAP. Descoberta automàtica del nom del folder via `?action=folders` (candidats `Sent/INBOX.Sent/Sent Items/Sent Mail`). Nou `SentImapDetail` mostra el cos del correu enviat i mètriques BD si existeixen. `Composer.onSent` simplificat a `() => void` (no cal crear objecte local). `ImapDetail.onSent` substituït per `onSentRefresh` per netejar la cache de sent.
+- **`app/api/admin/inbox/messages/route.ts`**: nou `?action=folders` retorna llista IMAP. Carpetes Sent/Draft/Trash passen `skipToFilter=true` per evitar que `INBOX_TO_FILTER` bloquegés emails enviats a clients.
+- **`lib/imap.ts`**: `fetchEmails` accepta `skipToFilter?: boolean` — quant cert, no aplica filtre de destinatari. Clau per carpetes Sent on `to` és el client, no Òrbita.
+- **`lib/constants/admin.ts`**: counter 814→819. `LAB_CHANGE_NUMBER` = 819.
+- **`app/studio-lab/leads/page.tsx`**: `LAB_CHANGE_NUMBER` = 819.
+
+### Validació
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: SafataClient compila sense errors; lògica de descoberta de folder és autònoma.
+- Validació humana/UX: pendent verificació al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ## 2026-05-27 — Canvi #814: Bingo Musical + Batalla Musical al catàleg web + auto-link client admin + fix tests (claude+codex)
 
 ### Context

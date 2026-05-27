@@ -1395,6 +1395,108 @@ Seqüència obligatòria de registre:
 
 ---
 
+### Canvi #820 — 2026-05-27 — claude (FET)
+
+**Dossiers: paperera soft-delete + restore + purge automàtic 30 dies.**
+
+- `prisma/schema.prisma` + `migrations/20260527100000_dossier_soft_delete`: camp `deletedAt` + índex al model `Dossier`.
+- `lib/services/dossierService.ts`: `softDeleteDossier`, `restoreDossier`, `purgeDossier`, `getDeletedDossiers`, `purgeExpiredDossiers`. `getAllDossiers` filtra `deletedAt IS NULL`. `deleteDossier` → deprecated wrapper.
+- `app/api/admin/dossiers/[id]/route.ts`: DELETE→softDelete; PATCH restore/purge.
+- `app/api/admin/dossiers/trash/route.ts` (NOU): GET dossiers esborrats.
+- `app/api/cron/dossier-trash-purge/route.ts` (NOU): cron diari purga >30 dies; `saveCronRunStatus` prefix `dossier.trash-purge`.
+- `app/admin/dossiers/page.tsx`: secció "Paperera de dossiers" amb hint de purga.
+- `app/admin/dossiers/DossierListActions.tsx`: prop `isDeleted`, botons Restaurar + Eliminar.
+- `lib/constants/admin.ts`: `ADMIN_CRON_PREFIXES` + entrada purga; counter 819→820.
+- `__tests__/lib/services/dossierService.test.ts`: 17 tests cobreixen totes les funcions.
+- Validació tècnica: `npx tsc --noEmit` 0 errors. 17/17 tests verds.
+- Validació funcional: soft-delete, restore, purge i cron registrat al monitor de crons.
+- Validació humana/UX: pendent verificació al browser. Migració pendent d'aplicar a Railway (`npx prisma migrate deploy`).
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #819 — 2026-05-27 — claude (FET)
+
+**Safata Enviats: font de veritat IMAP Sent + fix filtre carpetes sortida.**
+
+- `app/admin/inbox/SafataClient.tsx`: pestanya "Enviats" ara carrega del folder Sent del servidor IMAP (no BD). Descoberta automàtica del nom del folder via `?action=folders` amb candidats `Sent/INBOX.Sent/Sent Items/Sent Mail`. Mostra cos del correu. Mètriques BD (obertures/clics) correlacionades per assumpte+destinatari si existeixen.
+- `app/api/admin/inbox/messages/route.ts`: nou `?action=folders` retorna la llista de folders IMAP. Detecta carpetes de sortida (`sent/draft/trash`) i aplica `skipToFilter=true` per evitar que `INBOX_TO_FILTER` filtrés emails enviats a clients externs.
+- `lib/imap.ts`: `fetchEmails` accepta `skipToFilter?: boolean` — quan és cert, no aplica el filtre de destinatari (`INBOX_TO_FILTER`) a la query. Imprescindible per carpetes Sent on el `to` és el client, no Òrbita.
+- `lib/constants/admin.ts`: 814→819. `LAB_CHANGE_NUMBER` = 819.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: SafataClient compila i el flux de descoberta de folder és autònom.
+- Validació humana/UX: pendent verificació al browser.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #818 — 2026-05-27 — claude (FET)
+
+**Dossier: `sendDossierByEmail` registra a EmailSend + `getAllDossiers` inclou lead.**
+
+- `lib/services/dossierService.ts`: `sendDossierByEmail()` crida `recordEmailSend()` després d'enviar correctament. El registre sobreviu a l'esborrat del dossier.
+- `lib/services/dossierService.ts`: `getAllDossiers()` inclou `include: { lead: { select: { id, name, status } } }`.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: correus de dossier ara traçables a EmailSend independentment del dossier.
+- Validació humana/UX: pendent.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #817 — 2026-05-27 — claude (FET)
+
+**Dossier: cercador de leads inline al generador.**
+
+- `app/admin/dossiers/DossierGeneratorClient.tsx`: cercador de leads via `GET /api/admin/leads?search=XXX&limit=8`. Debounce 280ms. Dropdown per sota amb llista de resultats. Seleccionant un lead s'omple nom, email, telèfon, eventDesc. Pill "Lead vinculat" amb botó "Canviar". Click fora tanca dropdown.
+- `app/admin/dossiers/dossiers.css`: classes `dg__search-*`, `dg__linked-*` pel nou flux.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: cerca funcional client-side, selecció omple formulari.
+- Validació humana/UX: pendent.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #816 — 2026-05-27 — claude (FET)
+
+**Dossier: portada negra (logoDataUri) a `LeadDossierActions` i `DossierListActions`.**
+
+- `app/admin/leads/[id]/LeadDossiersPanel.tsx`: llegeix SVG logo i el passa com `logoDataUri`.
+- `app/admin/leads/[id]/LeadDossierActions.tsx`: accepta i usa `logoDataUri` en `buildDossierHtml`.
+- `app/admin/dossiers/DossierListActions.tsx`: accepta i usa `logoDataUri`.
+- `app/admin/dossiers/page.tsx`: llegeix logo i el passa a `DossierListActions`.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: portada negra visible a previsualitzar des de lead i des de llista dossiers.
+- Validació humana/UX: pendent.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
+### Canvi #815 — 2026-05-27 — claude (FET)
+
+**Dossier: llista de dossiers desats + generador com a pàgina servidor.**
+
+- `app/admin/dossiers/page.tsx`: pàgina servidor async. Llista dossiers desats (sota el generador). Cada fila mostra nom, empresa, productes, data, sentAt i link al lead si existeix.
+- `app/admin/dossiers/DossierListActions.tsx` (NOU): botó Vista/Enviar/Eliminar per cada dossier.
+- `app/admin/dossiers/dossiers.css`: classes `dg__list-*` per la llista.
+- Validació tècnica: `npx tsc --noEmit` 0 errors.
+- Validació funcional: llista visible i accions funcionals.
+- Validació humana/UX: pendent.
+- Començat per: claude
+- Treballant per: claude
+- Tancat per: claude
+
+---
+
 ### Canvi #811 — 2026-05-27 — claude (FET)
 
 **`/admin/clientes` (llista CRM clients) migrada al nou disseny Brass & Obsidian.**

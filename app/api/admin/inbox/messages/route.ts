@@ -11,6 +11,7 @@ import {
   countUnread,
   countTotal,
   testConnection,
+  listFolders,
 } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
 
@@ -36,6 +37,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(result);
     }
 
+    // Llistar carpetes IMAP
+    if (action === 'folders') {
+      const folders = await listFolders();
+      return NextResponse.json({ ok: true, folders });
+    }
+
     // Comptar no llegits
     if (action === 'count') {
       const count = await countUnread(folder);
@@ -48,12 +55,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ total });
     }
 
+    // Carpetes de sortida no requereixen el filtre de destinatari (to)
+    const folderLower = folder.toLowerCase();
+    const skipToFilter = folderLower.includes('sent') || folderLower.includes('draft') || folderLower.includes('trash');
+
     // Obtenir emails
     const emails = await fetchEmails({
       folder,
       limit,
       offset,
       onlyUnread,
+      skipToFilter,
     });
 
     const totalCount = emails.length;

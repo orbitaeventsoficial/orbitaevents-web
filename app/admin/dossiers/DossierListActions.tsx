@@ -15,13 +15,16 @@ interface Props {
   clientInfo: DossierClientInfo;
   alreadySent: boolean;
   logoDataUri?: string;
+  isDeleted?: boolean;
 }
 
-export function DossierListActions({ dossierId, email, nom, productIds, clientInfo, alreadySent, logoDataUri }: Props) {
+export function DossierListActions({ dossierId, email, nom, productIds, clientInfo, alreadySent, logoDataUri, isDeleted }: Props) {
   const toast = useToast();
   const router = useRouter();
   const [sending, setSending] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+  const [purging, setPurging] = useState(false);
 
   function preview() {
     const products = ANIMACIO_PRODUCTS.filter((p) => productIds.includes(p.id));
@@ -49,17 +52,70 @@ export function DossierListActions({ dossierId, email, nom, productIds, clientIn
     }
   }
 
-  async function remove() {
+  async function moveToTrash() {
     setDeleting(true);
     try {
       await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, { method: 'DELETE' });
+      toast.success('Dossier mogut a la paperera (30 dies per restaurar)');
       router.refresh();
     } catch (err) {
       console.error('[DossierListActions] delete error:', err);
-      toast.error('Error eliminant el dossier');
+      toast.error('Error movent el dossier a la paperera');
     } finally {
       setDeleting(false);
     }
+  }
+
+  async function restore() {
+    setRestoring(true);
+    try {
+      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore' }),
+      });
+      toast.success('Dossier restaurat');
+      router.refresh();
+    } catch (err) {
+      console.error('[DossierListActions] restore error:', err);
+      toast.error('Error restaurant el dossier');
+    } finally {
+      setRestoring(false);
+    }
+  }
+
+  async function purge() {
+    setPurging(true);
+    try {
+      await fetchWithCsrf(`/api/admin/dossiers/${dossierId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'purge' }),
+      });
+      toast.success('Dossier eliminat permanentment');
+      router.refresh();
+    } catch (err) {
+      console.error('[DossierListActions] purge error:', err);
+      toast.error('Error eliminant el dossier');
+    } finally {
+      setPurging(false);
+    }
+  }
+
+  if (isDeleted) {
+    return (
+      <div className="dg__list-acts">
+        <button type="button" onClick={preview} className="dg__btn dg__btn--preview" title="Previsualitzar">
+          Vista
+        </button>
+        <button type="button" onClick={restore} disabled={restoring} className="dg__btn dg__btn--save" title="Restaurar de la paperera">
+          {restoring ? '…' : '↩ Restaurar'}
+        </button>
+        <button type="button" onClick={purge} disabled={purging} className="dg__btn dg__btn--danger" aria-label={`Eliminar permanentment dossier de ${nom}`} title="Eliminar permanentment">
+          {purging ? '…' : '✕ Eliminar'}
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -80,12 +136,13 @@ export function DossierListActions({ dossierId, email, nom, productIds, clientIn
       )}
       <button
         type="button"
-        onClick={remove}
+        onClick={moveToTrash}
         disabled={deleting}
         className="dg__btn dg__btn--danger"
-        aria-label={`Eliminar dossier de ${nom}`}
+        aria-label={`Mou a la paperera dossier de ${nom}`}
+        title="Moure a la paperera (30 dies per restaurar)"
       >
-        {deleting ? '…' : '✕'}
+        {deleting ? '…' : '🗑'}
       </button>
     </div>
   );

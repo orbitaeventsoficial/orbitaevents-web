@@ -65,3 +65,7 @@ html.admin-mode .dg__linked-nom { font-size: 14px; font-weight: 600; color: var(
 html.admin-mode .dg__linked-email { font-size: 12px; color: var(--ax-t3); }
 html.admin-mode .dg__linked-clear { margin-left: auto; font-size: 12px; color: var(--ax-t3); background: none; border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
 html.admin-mode .dg__linked-clear:hover { color: var(--ax-t1); border-color: rgba(255,255,255,0.25); }
+
+/* Paperera de dossiers */
+html.admin-mode .dg__section-title--trash { color: var(--ax-t2); }
+html.admin-mode .dg__list-row--deleted { opacity: 0.7; border-color: rgba(220,60,60,0.15); }

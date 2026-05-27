@@ -165,10 +165,12 @@ export async function fetchEmails(options: {
   limit?: number;
   offset?: number;
   onlyUnread?: boolean;
+  skipToFilter?: boolean;
 }): Promise<EmailMessage[]> {
-  const { folder = 'INBOX', limit = 50, offset = 0, onlyUnread = false } = options;
+  const { folder = 'INBOX', limit = 50, offset = 0, onlyUnread = false, skipToFilter = false } = options;
 
-  const allowed = getInboxToFilter();
+  // No aplicar filtre de destinatari a carpetes de sortida (Sent, Drafts, etc.)
+  const allowed = skipToFilter ? [] : getInboxToFilter();
 
   // Si hi ha filtre actiu, sobrebusquem (3×) i retallem post-filtre per
   // garantir que retornem ~limit emails que coincideixen.

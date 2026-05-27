@@ -39,21 +39,58 @@ export async function getDossiersByLead(leadId: string) {
 }
 
 export async function getAllDossiers(limit = 50) {
-  return prisma.dossier.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-    include: {
-      lead: { select: { id: true, name: true, status: true } },
-    },
-  });
+  return prisma.$queryRaw<unknown[]>`
+    SELECT d.*,
+      CASE WHEN d."leadId" IS NOT NULL THEN
+        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
+      END AS lead
+    FROM "Dossier" d
+    LEFT JOIN "Lead" l ON l.id = d."leadId"
+    WHERE d."deletedAt" IS NULL
+    ORDER BY d."createdAt" DESC
+    LIMIT ${limit}
+  `;
 }
 
 export async function getDossierById(id: string) {
   return prisma.dossier.findUnique({ where: { id } });
 }
 
-export async function deleteDossier(id: string) {
+export async function softDeleteDossier(id: string) {
+  await prisma.$executeRaw`UPDATE "Dossier" SET "deletedAt" = NOW() WHERE id = ${id}`;
+}
+
+export async function restoreDossier(id: string) {
+  await prisma.$executeRaw`UPDATE "Dossier" SET "deletedAt" = NULL WHERE id = ${id}`;
+}
+
+export async function purgeDossier(id: string) {
   return prisma.dossier.delete({ where: { id } });
+}
+
+export async function getDeletedDossiers() {
+  return prisma.$queryRaw<unknown[]>`
+    SELECT d.*,
+      CASE WHEN d."leadId" IS NOT NULL THEN
+        jsonb_build_object('id', l.id, 'name', l.name, 'status', l.status)
+      END AS lead
+    FROM "Dossier" d
+    LEFT JOIN "Lead" l ON l.id = d."leadId"
+    WHERE d."deletedAt" IS NOT NULL
+    ORDER BY d."deletedAt" DESC
+  `;
+}
+
+export async function purgeExpiredDossiers(cutoff: Date): Promise<number> {
+  const count = await prisma.$executeRaw`
+    DELETE FROM "Dossier" WHERE "deletedAt" IS NOT NULL AND "deletedAt" <= ${cutoff}
+  `;
+  return count;
+}
+
+/** @deprecated Usar softDeleteDossier */
+export async function deleteDossier(id: string) {
+  return softDeleteDossier(id);
 }
 
 export async function sendDossierByEmail(id: string): Promise<{ ok: boolean; error?: string }> {

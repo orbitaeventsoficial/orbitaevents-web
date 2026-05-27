@@ -49,12 +49,14 @@ export type SafataEmailSend = {
   clickCount: number;
 };
 
+type ImapEmailAddr = { name: string; address: string };
+
 type ImapEmail = {
   id: string;
   uid: number;
   messageId: string;
-  from: { name: string; address: string };
-  to: { name: string; address: string }[];
+  from: ImapEmailAddr;
+  to: ImapEmailAddr[];
   subject: string;
   date: string;
   bodyText: string;
@@ -101,9 +103,11 @@ export default function SafataClient({
 }) {
   const [tab, setTab] = useState<'entrades' | 'imap' | 'enviats'>('entrades');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'data-desc' | 'data-asc' | 'unread' | 'remitent'>('data-desc');
   const [selectedLead, setSelectedLead] = useState<SafataLead | null>(null);
   const [selectedImap, setSelectedImap] = useState<ImapEmail | null>(null);
   const [selectedSend, setSelectedSend] = useState<SafataEmailSend | null>(null);
+  const [selectedSentImap, setSelectedSentImap] = useState<ImapEmail | null>(null);
 
   /* Entrades web */
   const [localLeads, setLocalLeads] = useState<SafataLead[]>(initialLeads);
@@ -118,8 +122,17 @@ export default function SafataClient({
   const [imapHasMore, setImapHasMore] = useState(false);
   const IMAP_PAGE = 30;
 
-  /* Enviats */
-  const [localSends, setLocalSends] = useState<SafataEmailSend[]>(initialSends);
+  /* Enviats IMAP */
+  const [sentEmails, setSentEmails] = useState<ImapEmail[]>([]);
+  const [sentLoading, setSentLoading] = useState(false);
+  const [sentError, setSentError] = useState('');
+  const [sentFolder, setSentFolder] = useState<string | null>(null);
+  const [sentOffset, setSentOffset] = useState(0);
+  const [sentHasMore, setSentHasMore] = useState(false);
+  const SENT_PAGE = 30;
+
+  /* BD enviats (per mètriques obertures/clics) */
+  const [localSends] = useState<SafataEmailSend[]>(initialSends);
   const [sendsPage, setSendsPage] = useState(1);
   const SENDS_PAGE = 50;
 
@@ -167,6 +180,60 @@ export default function SafataClient({
     if (tab === 'imap' && imapEmails.length === 0 && !imapLoading) loadImap(0);
   }, [tab, imapEmails.length, imapLoading, loadImap]);
 
+  const discoverSentFolder = useCallback(async (): Promise<string | null> => {
+    const SENT_CANDIDATES = ['Sent', 'INBOX.Sent', 'Sent Items', 'Sent Mail', 'INBOX/Sent'];
+    if (!imapConfigured) return null;
+    try {
+      const res = await fetch('/api/admin/inbox/messages?action=folders', { headers: { 'x-admin': '1' } });
+      const data = await res.json() as { ok: boolean; folders?: string[] };
+      if (!data.ok || !data.folders) return null;
+      const folders = data.folders;
+      for (const candidate of SENT_CANDIDATES) {
+        const found = folders.find(f => f.toLowerCase() === candidate.toLowerCase());
+        if (found) return found;
+      }
+      // Recerca parcial: qualsevol que contingui 'sent'
+      const partial = folders.find(f => f.toLowerCase().includes('sent'));
+      return partial ?? null;
+    } catch (err) {
+      console.error('[Safata] Error descobrint carpeta Sent:', err);
+      return null;
+    }
+  }, [imapConfigured]);
+
+  const loadSentEmails = useCallback(async (folder: string, offset = 0, append = false) => {
+    setSentLoading(true);
+    setSentError('');
+    try {
+      const res = await fetch(
+        `/api/admin/inbox/messages?folder=${encodeURIComponent(folder)}&limit=${SENT_PAGE}&offset=${offset}`,
+        { headers: { 'x-admin': '1' } }
+      );
+      const data = await res.json() as { ok: boolean; emails?: ImapEmail[]; error?: string };
+      if (!data.ok) { setSentError(data.error ?? 'Error carregant enviats'); return; }
+      const emails = data.emails ?? [];
+      setSentEmails(prev => append ? [...prev, ...emails] : emails);
+      setSentOffset(offset + emails.length);
+      setSentHasMore(emails.length === SENT_PAGE);
+    } catch (err) {
+      console.error('[Safata] Error carregant enviats IMAP:', err);
+      setSentError('Error de connexió IMAP');
+    } finally {
+      setSentLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tab !== 'enviats' || !imapConfigured) return;
+    if (sentEmails.length > 0 || sentLoading) return;
+    (async () => {
+      const folder = sentFolder ?? await discoverSentFolder();
+      if (!folder) { setSentError('No s\'ha trobat la carpeta de correus enviats al servidor'); return; }
+      setSentFolder(folder);
+      loadSentEmails(folder, 0);
+    })();
+  }, [tab, imapConfigured, sentEmails.length, sentLoading, sentFolder, discoverSentFolder, loadSentEmails]);
+
   const updateLocalStatus = (id: string, status: string) => {
     setLocalLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
     setSelectedLead(prev => prev?.id === id ? { ...prev, status } : prev);
@@ -191,27 +258,55 @@ export default function SafataClient({
     setSelectedLead(null);
     setSelectedImap(null);
     setSelectedSend(null);
+    setSelectedSentImap(null);
     setSearch('');
   };
 
+  /* Ordenació */
+  function sortEmails<T extends { isRead?: boolean; date?: string | Date; from?: { name?: string; address?: string } }>(items: T[]): T[] {
+    const arr = [...items];
+    if (sortBy === 'data-asc') arr.sort((a, b) => new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime());
+    else if (sortBy === 'unread') arr.sort((a, b) => (a.isRead === b.isRead ? new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime() : a.isRead ? 1 : -1));
+    else if (sortBy === 'remitent') arr.sort((a, b) => (a.from?.name ?? a.from?.address ?? '').localeCompare(b.from?.name ?? b.from?.address ?? ''));
+    else arr.sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime());
+    return arr;
+  }
+
+  function sortLeads<T extends { status?: string; createdAt?: string | Date; name?: string }>(leads: T[]): T[] {
+    const arr = [...leads];
+    if (sortBy === 'unread') arr.sort((a, b) => (a.status === 'NEW' ? -1 : b.status === 'NEW' ? 1 : 0));
+    else if (sortBy === 'data-asc') arr.sort((a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime());
+    else if (sortBy === 'remitent') arr.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
+    else arr.sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
+    return arr;
+  }
+
   /* Filtres */
-  const filteredLeads = localLeads.filter(l => {
+  const filteredLeads = sortLeads(localLeads.filter(l => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || (l.eventType ?? '').toLowerCase().includes(q);
-  });
+  }));
 
-  const filteredImap = imapEmails.filter(e => {
+  const filteredImap = sortEmails(imapEmails.filter(e => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return e.from.address.toLowerCase().includes(q) || e.from.name.toLowerCase().includes(q) || e.subject.toLowerCase().includes(q);
-  });
+  }));
 
   const filteredSends = localSends.filter(s => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return s.to.toLowerCase().includes(q) || s.subject.toLowerCase().includes(q);
   });
+
+  const filteredSentImap = sortEmails(sentEmails.filter(e => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    const toStr = (e.to ?? []).map((t: ImapEmailAddr) => `${t.name} ${t.address}`).join(' ');
+    return e.from.address.toLowerCase().includes(q) || e.from.name.toLowerCase().includes(q) ||
+      e.subject.toLowerCase().includes(q) || toStr.toLowerCase().includes(q);
+  }));
 
   const imapUnread = imapEmails.filter(e => !e.isRead).length;
 
@@ -240,6 +335,17 @@ export default function SafataClient({
               Enviats
             </button>
           </div>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as typeof sortBy)}
+            className="sf__sort-select"
+            aria-label="Ordenar per"
+          >
+            <option value="data-desc">Data ↓</option>
+            <option value="data-asc">Data ↑</option>
+            <option value="unread">No llegits primer</option>
+            <option value="remitent">Remitent A-Z</option>
+          </select>
           <a href="/admin/inbox/settings" className="sf__composer-btn" aria-label="Configuració de mail">
             ⚙ Configuració
           </a>
@@ -262,7 +368,7 @@ export default function SafataClient({
         </div>
         <div className="sf__stat">
           <span className="sf__stat-label">Enviats</span>
-          <span className="sf__stat-value">{localSends.length}</span>
+          <span className="sf__stat-value">{sentEmails.length > 0 ? sentEmails.length : localSends.length}</span>
         </div>
         <div className="sf__stat">
           <span className="sf__stat-label">Obertes</span>
@@ -363,7 +469,7 @@ export default function SafataClient({
               </div>
 
               {selectedImap ? (
-                <ImapDetail email={selectedImap} onClose={() => setSelectedImap(null)} onSent={send => setLocalSends(prev => [send, ...prev])} />
+                <ImapDetail email={selectedImap} onClose={() => setSelectedImap(null)} onSentRefresh={() => { setSentEmails([]); setSentOffset(0); }} />
               ) : (
                 <div className="sf__detail-blank">
                   <span className="sf__detail-blank-icon">📨</span>
@@ -374,7 +480,7 @@ export default function SafataClient({
             </div>
           )}
 
-          {/* TAB: Enviats */}
+          {/* TAB: Enviats (IMAP Sent folder) */}
           {tab === 'enviats' && (
             <div className="sf__main">
               <div className="sf__list">
@@ -382,39 +488,59 @@ export default function SafataClient({
                   <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cercar per destinatari o assumpte..." aria-label="Cercar enviats" className="sf__searchinput" />
                 </div>
                 <div className="sf__list-head">
-                  <span className="sf__list-scope">Emails enviats</span>
-                  <span className="sf__list-count">{filteredSends.length}</span>
+                  <span className="sf__list-scope">{sentFolder ?? 'Sent'}</span>
+                  <span className="sf__list-count">{filteredSentImap.length}</span>
                 </div>
                 <div className="sf__list-items">
-                  {filteredSends.length === 0 ? (
+                  {sentLoading && sentEmails.length === 0 ? (
+                    <div className="sf__empty"><span className="sf__empty-icon sf__spin">↻</span><p className="sf__empty-title">Carregant enviats...</p></div>
+                  ) : sentError ? (
+                    <div className="sf__empty">
+                      <p className="sf__empty-title sf__empty-title--error">{sentError}</p>
+                      {sentFolder && (
+                        <button type="button" onClick={() => loadSentEmails(sentFolder, 0)} className="sf__action-btn sf__action-btn--ghost">Reintentar</button>
+                      )}
+                    </div>
+                  ) : !imapConfigured ? (
+                    <div className="sf__empty"><span className="sf__empty-icon">⚙</span><p className="sf__empty-title">IMAP no configurat</p></div>
+                  ) : filteredSentImap.length === 0 ? (
                     <div className="sf__empty"><span className="sf__empty-icon">📤</span><p className="sf__empty-title">Cap email enviat</p></div>
-                  ) : filteredSends.slice(0, sendsPage * SENDS_PAGE).map(s => (
-                    <button key={s.id} type="button" onClick={() => setSelectedSend(s)}
-                      className={`sf__lead${selectedSend?.id === s.id ? ' is-selected' : ''}`}>
-                      <div className="sf__lead-row">
-                        <span className="sf__lead-name">{s.to}</span>
-                        {s.openCount > 0 && <span className="sf__lead-status">👁 {s.openCount}</span>}
-                      </div>
-                      <p className="sf__lead-preview">
-                        {s.subject} · {formatDate(s.sentAt)}
-                      </p>
-                    </button>
-                  ))}
-                  {filteredSends.length > sendsPage * SENDS_PAGE && (
-                    <button type="button" onClick={() => setSendsPage(p => p + 1)} className="sf__load-more">
-                      Carregar més ({filteredSends.length - sendsPage * SENDS_PAGE} restants)
-                    </button>
+                  ) : (
+                    <>
+                      {filteredSentImap.map(email => {
+                        const toAddr = (email.to ?? [])[0];
+                        const toDisplay = toAddr ? (toAddr.name || toAddr.address) : '—';
+                        const bdRecord = localSends.find(s => s.to === (toAddr?.address ?? '') && s.subject === email.subject);
+                        return (
+                          <button key={email.id} type="button" onClick={() => { setSelectedSentImap(email); setSelectedSend(bdRecord ?? null); }}
+                            className={`sf__lead${selectedSentImap?.id === email.id ? ' is-selected' : ''}`}>
+                            <div className="sf__lead-row">
+                              <span className="sf__lead-name">{toDisplay}</span>
+                              {bdRecord && bdRecord.openCount > 0 && <span className="sf__lead-status">👁 {bdRecord.openCount}</span>}
+                              <span className="sf__lead-status">{formatDateShort(email.date)}</span>
+                            </div>
+                            <p className="sf__lead-preview">{email.subject}</p>
+                          </button>
+                        );
+                      })}
+                      {sentHasMore && (
+                        <button type="button" onClick={() => sentFolder && loadSentEmails(sentFolder, sentOffset, true)} disabled={sentLoading}
+                          className="sf__load-more">
+                          {sentLoading ? 'Carregant...' : 'Carregar més'}
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
 
-              {selectedSend ? (
-                <SendDetail send={selectedSend} onClose={() => setSelectedSend(null)} />
+              {selectedSentImap ? (
+                <SentImapDetail email={selectedSentImap} bdRecord={selectedSend} onClose={() => { setSelectedSentImap(null); setSelectedSend(null); }} />
               ) : (
                 <div className="sf__detail-blank">
                   <span className="sf__detail-blank-icon">📤</span>
                   <p className="sf__detail-blank-title">Selecciona un enviat</p>
-                  <p className="sf__detail-blank-body">Les dades i el seguiment apareixeran aquí.</p>
+                  <p className="sf__detail-blank-body">El cos del missatge enviat apareixerà aquí.</p>
                 </div>
               )}
             </div>
@@ -441,7 +567,7 @@ function Composer({
   customerId?: string | null;
   locale?: string;
   replySubject?: string;
-  onSent: (send: SafataEmailSend) => void;
+  onSent: () => void;
   onClose: () => void;
 }) {
   const [tpl, setTpl] = useState(replySubject ? 'lliure' : TPLS[0].key);
@@ -480,15 +606,7 @@ function Composer({
       });
       const data = await res.json() as { ok: boolean; error?: string; id?: string };
       if (!data.ok) { setError(data.error ?? 'Error enviant'); return; }
-      onSent({
-        id: data.id ?? crypto.randomUUID(),
-        to, subject: subject.trim(),
-        templateKey: tpl !== 'lliure' ? tpl : null,
-        leadId: leadId ?? null, customerId: customerId ?? null,
-        locale: locale ?? null,
-        sentAt: new Date().toISOString(),
-        openedAt: null, openCount: 0, clickedAt: null, clickCount: 0,
-      });
+      onSent();
       onClose();
     } catch (err) {
       console.error('[Composer] Error:', err);
@@ -657,11 +775,11 @@ function LeadDetail({
 
 /* ── Detall IMAP ───────────────────────────────────────────────────────────── */
 function ImapDetail({
-  email, onClose, onSent,
+  email, onClose, onSentRefresh,
 }: {
   email: ImapEmail;
   onClose: () => void;
-  onSent: (send: SafataEmailSend) => void;
+  onSentRefresh?: () => void;
 }) {
   const [composeOpen, setComposeOpen] = useState(false);
   const [sendOk, setSendOk] = useState(false);
@@ -686,7 +804,7 @@ function ImapDetail({
 
       {composeOpen && (
         <Composer to={email.from.address} replySubject={email.subject}
-          onSent={send => { onSent(send); setSendOk(true); setComposeOpen(false); }}
+          onSent={() => { setSendOk(true); setComposeOpen(false); onSentRefresh?.(); }}
           onClose={() => setComposeOpen(false)} />
       )}
       {sendOk && <div className="sf__send-ok">✓ Mail enviat correctament</div>}
@@ -711,36 +829,61 @@ function ImapDetail({
   );
 }
 
-/* ── Detall enviat ─────────────────────────────────────────────────────────── */
-function SendDetail({ send, onClose }: { send: SafataEmailSend; onClose: () => void }) {
+/* ── Detall enviat IMAP ────────────────────────────────────────────────────── */
+function SentImapDetail({
+  email, bdRecord, onClose,
+}: {
+  email: ImapEmail;
+  bdRecord: SafataEmailSend | null;
+  onClose: () => void;
+}) {
+  const toAddr = (email.to ?? [])[0];
+  const toDisplay = toAddr ? (toAddr.name ? `${toAddr.name} <${toAddr.address}>` : toAddr.address) : '—';
+
   return (
     <div className="sf__detail">
       <div className="sf__detail-head">
         <div className="sf__detail-sender">
-          <div className="sf__detail-avatar">{send.to.charAt(0).toUpperCase()}</div>
+          <div className="sf__detail-avatar">{toDisplay.charAt(0).toUpperCase()}</div>
           <div className="sf__detail-senderinfo">
-            <p className="sf__detail-sendername">{send.to}</p>
-            <p className="sf__detail-senderaddr">{send.subject}</p>
+            <p className="sf__detail-sendername">{toDisplay}</p>
+            <p className="sf__detail-senderaddr">{email.subject}</p>
           </div>
         </div>
         <button type="button" onClick={onClose} className="sf__detail-close" aria-label="Tancar">✕</button>
       </div>
       <div className="sf__detail-scroll">
-        <div className="sf__data-grid">
-          <div className="sf__data-field"><p className="sf__data-label">Enviat</p><p className="sf__data-value">{formatDateTime(send.sentAt)}</p></div>
-          {send.templateKey && <div className="sf__data-field"><p className="sf__data-label">Plantilla</p><p className="sf__data-value">{send.templateKey}</p></div>}
-          <div className="sf__data-field"><p className="sf__data-label">Obertures</p><p className="sf__data-value">{send.openCount}</p></div>
-          <div className="sf__data-field"><p className="sf__data-label">Clics</p><p className="sf__data-value">{send.clickCount}</p></div>
-          {send.openedAt && <div className="sf__data-field"><p className="sf__data-label">Primer obert</p><p className="sf__data-value">{formatDateTime(send.openedAt)}</p></div>}
+        <div className="sf__imap-subjectbar">
+          <p className="sf__imap-subject">{email.subject}</p>
+          <p className="sf__imap-meta">{formatDateTime(email.date)}</p>
         </div>
-        <div className="sf__action-block">
-          <p className="sf__action-block-label">Accions</p>
-          <div className="sf__action-row">
-            {send.leadId && <a href={buildLeadWorkspaceHref(send.leadId)} className="sf__action-btn sf__action-btn--ghost">Veure lead</a>}
-            {send.customerId && <a href={buildCustomerHubHref(send.customerId)} className="sf__action-btn sf__action-btn--ghost">Veure client</a>}
-            <a href={`/api/admin/emails/sent/${send.id}`} target="_blank" rel="noopener noreferrer" className="sf__action-btn sf__action-btn--ghost">Previsualitzar HTML</a>
+
+        {/* Mètriques BD si existeixen */}
+        {bdRecord && (
+          <div className="sf__data-grid" style={{ marginBottom: 16 }}>
+            <div className="sf__data-field"><p className="sf__data-label">Obertures</p><p className="sf__data-value">{bdRecord.openCount}</p></div>
+            <div className="sf__data-field"><p className="sf__data-label">Clics</p><p className="sf__data-value">{bdRecord.clickCount}</p></div>
+            {bdRecord.openedAt && <div className="sf__data-field"><p className="sf__data-label">Primer obert</p><p className="sf__data-value">{formatDateTime(bdRecord.openedAt)}</p></div>}
+            {bdRecord.templateKey && <div className="sf__data-field"><p className="sf__data-label">Plantilla</p><p className="sf__data-value">{bdRecord.templateKey}</p></div>}
           </div>
+        )}
+
+        <div className="sf__imap-body">
+          {email.bodyText
+            ? <pre className="sf__imap-text">{email.bodyText}</pre>
+            : <p className="sf__imap-text-empty">(sense cos de text)</p>
+          }
         </div>
+
+        {(bdRecord?.leadId || bdRecord?.customerId) && (
+          <div className="sf__action-block">
+            <p className="sf__action-block-label">Accions</p>
+            <div className="sf__action-row">
+              {bdRecord.leadId && <a href={buildLeadWorkspaceHref(bdRecord.leadId)} className="sf__action-btn sf__action-btn--ghost">Veure lead</a>}
+              {bdRecord.customerId && <a href={buildCustomerHubHref(bdRecord.customerId)} className="sf__action-btn sf__action-btn--ghost">Veure client</a>}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

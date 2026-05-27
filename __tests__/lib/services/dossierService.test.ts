@@ -9,6 +9,8 @@ const { mockPrisma, mockSendEmail, mockBuildHtml } = vi.hoisted(() => ({
       delete: vi.fn(),
       update: vi.fn(),
     },
+    $executeRaw: vi.fn(),
+    $queryRaw: vi.fn(),
   },
   mockSendEmail: vi.fn(),
   mockBuildHtml: vi.fn(),
@@ -28,6 +30,12 @@ import {
   createDossier,
   getDossiersByLead,
   getDossierById,
+  getAllDossiers,
+  softDeleteDossier,
+  restoreDossier,
+  purgeDossier,
+  getDeletedDossiers,
+  purgeExpiredDossiers,
   deleteDossier,
   sendDossierByEmail,
 } from '@/lib/services/dossierService';
@@ -49,6 +57,7 @@ const mockDossier = {
   productIds: ['bingo-musical'],
   sentAt: null,
   sentTo: null,
+  deletedAt: null,
   createdAt: new Date(),
 };
 
@@ -104,11 +113,64 @@ describe('getDossierById', () => {
   });
 });
 
-describe('deleteDossier', () => {
-  it('elimina el dossier', async () => {
+describe('getAllDossiers', () => {
+  it('retorna dossiers actius via $queryRaw', async () => {
+    mockPrisma.$queryRaw.mockResolvedValue([mockDossier]);
+    const result = await getAllDossiers();
+    expect(mockPrisma.$queryRaw).toHaveBeenCalled();
+    expect(result).toHaveLength(1);
+  });
+});
+
+describe('softDeleteDossier', () => {
+  it('fa soft-delete via $executeRaw', async () => {
+    mockPrisma.$executeRaw.mockResolvedValue(1);
+    await softDeleteDossier('dos-1');
+    expect(mockPrisma.$executeRaw).toHaveBeenCalled();
+  });
+});
+
+describe('restoreDossier', () => {
+  it('restaura el dossier via $executeRaw', async () => {
+    mockPrisma.$executeRaw.mockResolvedValue(1);
+    await restoreDossier('dos-1');
+    expect(mockPrisma.$executeRaw).toHaveBeenCalled();
+  });
+});
+
+describe('purgeDossier', () => {
+  it('elimina permanentment via dossier.delete', async () => {
     mockPrisma.dossier.delete.mockResolvedValue(mockDossier);
-    await deleteDossier('dos-1');
+    await purgeDossier('dos-1');
     expect(mockPrisma.dossier.delete).toHaveBeenCalledWith({ where: { id: 'dos-1' } });
+  });
+});
+
+describe('getDeletedDossiers', () => {
+  it('retorna dossiers de la paperera via $queryRaw', async () => {
+    const deleted = { ...mockDossier, deletedAt: new Date() };
+    mockPrisma.$queryRaw.mockResolvedValue([deleted]);
+    const result = await getDeletedDossiers();
+    expect(mockPrisma.$queryRaw).toHaveBeenCalled();
+    expect(result).toHaveLength(1);
+  });
+});
+
+describe('purgeExpiredDossiers', () => {
+  it('purga dossiers antics via $executeRaw i retorna count', async () => {
+    mockPrisma.$executeRaw.mockResolvedValue(3);
+    const cutoff = new Date('2026-01-01');
+    const count = await purgeExpiredDossiers(cutoff);
+    expect(mockPrisma.$executeRaw).toHaveBeenCalled();
+    expect(count).toBe(3);
+  });
+});
+
+describe('deleteDossier (deprecated)', () => {
+  it('crida softDeleteDossier internament', async () => {
+    mockPrisma.$executeRaw.mockResolvedValue(1);
+    await deleteDossier('dos-1');
+    expect(mockPrisma.$executeRaw).toHaveBeenCalled();
   });
 });
 

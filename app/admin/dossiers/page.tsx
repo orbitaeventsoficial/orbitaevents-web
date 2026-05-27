@@ -3,10 +3,11 @@ import { join } from 'path';
 import { AdminPage } from '../components/AdminPage';
 import { DossierGeneratorClient } from './DossierGeneratorClient';
 import { ANIMACIO_PRODUCTS } from '@/lib/constants/animacio-products';
-import { getAllDossiers } from '@/lib/services/dossierService';
+import { getAllDossiers, getDeletedDossiers } from '@/lib/services/dossierService';
 import { formatDateShort } from '@/lib/constants';
 import Link from 'next/link';
 import { DossierListActions } from './DossierListActions';
+import { buildLeadWorkspaceHref } from '@/lib/admin/leadWorkspaceHref';
 
 export const metadata = { title: 'Dossiers' };
 
@@ -31,9 +32,17 @@ function readLogoDataUri(): string {
   }
 }
 
+type DossierRow = {
+  id: string; nom: string; empresa?: string | null; productIds: string[];
+  createdAt: Date | string; sentAt?: Date | string | null; sentTo?: string | null;
+  email?: string | null; eventDesc?: string | null; telefon?: string | null;
+  salutacio?: string | null; deletedAt?: Date | string | null;
+  lead?: { id: string; name: string; status: string } | null;
+};
+
 export default async function DossiersPage({ searchParams }: PageProps) {
   const logoDataUri = readLogoDataUri();
-  const dossiers = await getAllDossiers(50);
+  const [dossiers, deletedDossiers] = await Promise.all([getAllDossiers(50), getDeletedDossiers()]) as [DossierRow[], DossierRow[]];
 
   return (
     <AdminPage
@@ -72,15 +81,15 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     <span className="dg__list-meta">
                       {productNames || 'Sense productes'}
                       {' · '}
-                      {formatDateShort(d.createdAt.toISOString())}
+                      {formatDateShort(typeof d.createdAt === 'string' ? d.createdAt : d.createdAt.toISOString())}
                     </span>
                     {d.sentAt && (
                       <span className="dg__list-sent">
-                        Enviat {formatDateShort(d.sentAt.toISOString())} → {d.sentTo}
+                        Enviat {formatDateShort(typeof d.sentAt === 'string' ? d.sentAt : d.sentAt.toISOString())} → {d.sentTo}
                       </span>
                     )}
                     {d.lead && (
-                      <Link href={`/admin/leads/${d.lead.id}`} className="dg__list-lead">
+                      <Link href={buildLeadWorkspaceHref(d.lead.id)} className="dg__list-lead">
                         Lead: {d.lead.name} ({d.lead.status})
                       </Link>
                     )}
@@ -100,6 +109,51 @@ export default async function DossiersPage({ searchParams }: PageProps) {
                     }}
                     alreadySent={!!d.sentAt}
                     logoDataUri={logoDataUri}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Paperera de dossiers (30 dies) */}
+      {deletedDossiers.length > 0 && (
+        <section className="dg__list-section">
+          <h2 className="dg__section-title dg__section-title--trash">🗑 Paperera de dossiers ({deletedDossiers.length})</h2>
+          <p className="dg__section-hint">Els dossiers eliminats es purgen automàticament als 30 dies.</p>
+          <div className="dg__list">
+            {deletedDossiers.map((d) => {
+              const productNames = ANIMACIO_PRODUCTS
+                .filter((p) => d.productIds.includes(p.id))
+                .map((p) => p.nom)
+                .join(' · ');
+              return (
+                <div key={d.id} className="dg__list-row dg__list-row--deleted">
+                  <div className="dg__list-info">
+                    <span className="dg__list-nom">{d.nom}{d.empresa ? ` — ${d.empresa}` : ''}</span>
+                    <span className="dg__list-meta">
+                      {productNames || 'Sense productes'}
+                      {' · '}
+                      {d.deletedAt ? `Eliminat ${formatDateShort(typeof d.deletedAt === 'string' ? d.deletedAt : d.deletedAt.toISOString())}` : 'Eliminat'}
+                    </span>
+                  </div>
+                  <DossierListActions
+                    dossierId={d.id}
+                    email={d.email ?? undefined}
+                    nom={d.nom}
+                    productIds={d.productIds}
+                    clientInfo={{
+                      nom: d.nom,
+                      empresa: d.empresa ?? undefined,
+                      telefon: d.telefon ?? undefined,
+                      email: d.email ?? undefined,
+                      eventDesc: d.eventDesc ?? undefined,
+                      salutacio: d.salutacio ?? undefined,
+                    }}
+                    alreadySent={!!d.sentAt}
+                    logoDataUri={logoDataUri}
+                    isDeleted
                   />
                 </div>
               );
