@@ -1,0 +1,35 @@
+html.admin-mode .dg__wrap { display: flex; flex-direction: column; gap: 24px; }
+html.admin-mode .dg__grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 900px) {
+  html.admin-mode .dg__grid { grid-template-columns: 1fr 1fr; }
+}
+html.admin-mode .dg__section-title { font-size: 15px; font-weight: 700; color: var(--ax-t1); margin-bottom: 16px; }
+html.admin-mode .dg__section-hint { font-size: 13px; color: var(--ax-t3); margin-bottom: 16px; }
+html.admin-mode .dg__fields { display: flex; flex-direction: column; gap: 14px; }
+html.admin-mode .dg__field { display: flex; flex-direction: column; gap: 6px; }
+html.admin-mode .dg__field--full { grid-column: 1 / -1; }
+html.admin-mode .dg__label { font-size: 12px; font-weight: 600; color: var(--ax-t2); text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; }
+html.admin-mode .dg__label-hint { font-size: 11px; font-weight: 400; color: var(--ax-t3); text-transform: none; letter-spacing: 0; }
+html.admin-mode .dg__products { display: flex; flex-direction: column; gap: 10px; }
+html.admin-mode .dg__product-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--ax-border, rgba(255,255,255,0.08)); background: var(--ax-surface2, rgba(255,255,255,0.04)); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+html.admin-mode .dg__product-card--active { border-color: var(--o-admin-gold); background: rgba(255,255,255,0.04); }
+html.admin-mode .dg__product-card:hover { border-color: var(--o-admin-gold); }
+html.admin-mode .dg__product-checkbox { position: absolute; opacity: 0; pointer-events: none; }
+html.admin-mode .dg__product-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+html.admin-mode .dg__product-name { font-size: 14px; font-weight: 600; color: var(--ax-t1); }
+html.admin-mode .dg__product-price { font-size: 12px; color: var(--ax-t3); }
+html.admin-mode .dg__product-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ax-border, rgba(255,255,255,0.15)); display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; transition: all 0.15s; }
+html.admin-mode .dg__product-check--on { border-color: var(--o-admin-gold); background: var(--o-admin-gold); color: #fff; }
+html.admin-mode .dg__warn { font-size: 13px; color: var(--o-stage-lost); margin-top: 8px; }
+html.admin-mode .dg__actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+html.admin-mode .dg__btn { padding: 11px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+html.admin-mode .dg__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+html.admin-mode .dg__btn--preview { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); }
+html.admin-mode .dg__btn--preview:hover:not(:disabled) { background: var(--ax-surface3, rgba(255,255,255,0.12)); }
+html.admin-mode .dg__btn--save { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--o-admin-gold); }
+html.admin-mode .dg__btn--save:hover:not(:disabled) { background: var(--ax-sunk); }
+html.admin-mode .dg__btn--pdf { background: var(--o-admin-gold); color: var(--ax-canvas); }
+html.admin-mode .dg__btn--pdf:hover:not(:disabled) { opacity: 0.88; }
+html.admin-mode .dg__btn--download { background: var(--ax-surface2, rgba(255,255,255,0.08)); color: var(--ax-t1); border: 1px solid var(--ax-border, rgba(255,255,255,0.1)); }
+html.admin-mode .dg__btn--download:hover:not(:disabled) { background: var(--ax-surface3, rgba(255,255,255,0.12)); }
+html.admin-mode .dg__hint { font-size: 12px; color: var(--ax-t3); }

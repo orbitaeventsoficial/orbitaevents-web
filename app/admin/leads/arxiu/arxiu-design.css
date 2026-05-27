@@ -1,0 +1,89 @@
+/* ============================================================================
+   ÒRBITA ADMIN — Leads · Arxiu històric (Brass & Obsidian)
+   ----------------------------------------------------------------------------
+   Comparteix tokens amb app/studio/orbita-tokens.css via `.fx-root.is-contrast`.
+   Aquest fitxer afegeix només la layout específica de la pàgina d'arxiu.
+============================================================================ */
+
+.fx-root.is-contrast { padding: 18px 24px 60px; }
+
+.ax__pagehead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+.ax__tt { display: flex; flex-direction: column; gap: 4px; }
+.ax__eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.ax__h1 { margin: 0; font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -0.01em; color: var(--t); }
+.ax__sub { font-size: 12.5px; color: var(--t2); font-family: var(--mono); }
+
+/* ── Grid d'stats (6 panells: 2 columnes a desktop) ─────────────────────── */
+.ax__statgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+.ax__stat {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 18px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--panel);
+}
+.ax__stat--wide { grid-column: span 2; }
+.ax__statlabel { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); }
+.ax__statbig { font-family: var(--display); font-size: 28px; font-weight: 800; letter-spacing: -0.01em; color: var(--t); line-height: 1; }
+.ax__stat small { font-size: 12px; color: var(--t2); }
+.ax__empty { margin: 4px 0 0; font-size: 12.5px; color: var(--t3); font-style: italic; }
+
+/* ── Reason list (motiu — bar + count) ───────────────────────────────────── */
+.ax__reasonlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.ax__reasonlist li { display: grid; grid-template-columns: 1.2fr 2fr auto; align-items: center; gap: 11px; font-size: 13px; }
+.ax__reasonname { color: var(--t); font-weight: 600; }
+.ax__bar { position: relative; height: 7px; background: color-mix(in oklab, var(--t3) 22%, transparent); border-radius: 999px; overflow: hidden; }
+.ax__bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); border-radius: 999px; transition: width 380ms ease; }
+.ax__reasonval { font-family: var(--mono); font-size: 12px; color: var(--t2); white-space: nowrap; text-align: right; }
+
+/* ── Trend list (mensual lost vs won) ────────────────────────────────────── */
+.ax__trendlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ax__trendlist li { display: grid; grid-template-columns: 92px 1fr auto; align-items: center; gap: 11px; font-size: 12.5px; }
+.ax__trendmonth { color: var(--t2); font-family: var(--mono); }
+.ax__trendbars { position: relative; height: 9px; background: color-mix(in oklab, var(--t3) 18%, transparent); border-radius: 999px; overflow: hidden; }
+.ax__trendbars i { display: block; height: 100%; position: absolute; top: 0; left: 0; border-radius: 999px; }
+.ax__trendlost { background: color-mix(in oklab, #8a817a 80%, var(--t)); }
+.ax__trendwon { background: color-mix(in oklab, #3fa06a 80%, var(--t)); mix-blend-mode: screen; }
+.ax__trendnum { color: var(--t2); font-family: var(--mono); white-space: nowrap; font-size: 11.5px; text-align: right; }
+
+/* ── Simple list (event type / source) ───────────────────────────────────── */
+.ax__simplelist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ax__simplelist li { display: grid; grid-template-columns: 1fr auto auto; gap: 11px; align-items: center; font-size: 13px; color: var(--t); padding: 6px 10px; border-radius: 9px; background: color-mix(in oklab, var(--raised) 50%, transparent); }
+.ax__simplelist li b { font-family: var(--mono); font-weight: 800; color: var(--gold); }
+.ax__simplelist li small { font-family: var(--mono); font-size: 11px; color: var(--t3); }
+
+/* ── Filtres ─────────────────────────────────────────────────────────────── */
+.ax__filters { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 18px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.ax__field { display: flex; flex-direction: column; gap: 5px; }
+.ax__field label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 0.04em; }
+.ax__field input, .ax__field select { width: 100%; min-height: 36px; padding: 0 11px; border: 1px solid var(--line2); border-radius: 9px; background: color-mix(in oklab, var(--raised) 70%, transparent); color: var(--t); font: inherit; font-size: 13px; }
+.ax__field input:focus, .ax__field select:focus { outline: 1px solid var(--hair-gold); border-color: var(--hair-gold); }
+.ax__actions { display: flex; gap: 8px; }
+
+.ax__btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 14px; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 140ms ease, color 140ms ease, border-color 140ms ease; }
+.ax__btn--primary { border: 1px solid var(--gold-edge); background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--gold-ink); }
+.ax__btn--primary:hover { filter: brightness(1.05); }
+.ax__btn--ghost { border: 1px solid var(--line2); background: transparent; color: var(--t2); }
+.ax__btn--ghost:hover { border-color: var(--hair-gold); color: var(--t); background: var(--raised); }
+
+/* ── Taula ───────────────────────────────────────────────────────────────── */
+.ax__tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.ax__table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ax__table thead th { padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--t3); border-bottom: 1px solid var(--line); background: color-mix(in oklab, var(--raised) 50%, transparent); }
+.ax__table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--t); vertical-align: top; }
+.ax__table tbody tr:last-child td { border-bottom: 0; }
+.ax__table tbody tr:hover td { background: color-mix(in oklab, var(--raised) 28%, transparent); }
+.ax__table small { color: var(--t3); font-size: 11.5px; }
+.ax__num { font-family: var(--mono); white-space: nowrap; }
+.ax__archivedby { font-style: italic; color: var(--t3); }
+.ax__emptyrow { padding: 28px; text-align: center; color: var(--t3); font-style: italic; }
+
+/* ── Paginació ───────────────────────────────────────────────────────────── */
+.ax__paginate { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 16px; padding: 10px 14px; font-size: 13px; color: var(--t2); }
+.ax__pages { display: flex; gap: 8px; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ax__statgrid { grid-template-columns: 1fr; }
+  .ax__stat--wide { grid-column: span 1; }
+  .ax__filters { grid-template-columns: 1fr; }
+}

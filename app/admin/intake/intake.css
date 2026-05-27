@@ -1,0 +1,402 @@
+/* ============================================================================
+   ÒRBITA ADMIN — Nova entrada (intake)
+   Prefix: ni- (nova entrada)
+   Paleta: tokens ax-* de orbita-tokens.css. Cap hex hardcoded.
+============================================================================ */
+
+/* ── Contenidor pàgina ───────────────────────────────────────────────────── */
+html.admin-mode .ni {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 820px;
+  padding: 28px 28px 60px;
+}
+
+/* ── Capçalera ───────────────────────────────────────────────────────────── */
+html.admin-mode .ni__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ax-line);
+}
+
+html.admin-mode .ni__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ax-gold);
+  opacity: 0.72;
+}
+
+html.admin-mode .ni__h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--ax-t);
+  line-height: 1.1;
+}
+
+html.admin-mode .ni__sub {
+  font-size: 13px;
+  color: var(--ax-t3);
+  margin-top: 2px;
+}
+
+/* ── Seccions targeta ────────────────────────────────────────────────────── */
+html.admin-mode .ni__card {
+  border: 1px solid var(--ax-line);
+  border-radius: 16px;
+  background: var(--ax-panel);
+  padding: 22px 24px;
+}
+
+html.admin-mode .ni__card--ai {
+  border-color: var(--ax-hair-gold);
+  background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
+  border-left: 3px solid var(--ax-gold);
+}
+
+html.admin-mode .ni__card-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ax-t2);
+  margin-bottom: 14px;
+}
+
+html.admin-mode .ni__card--ai .ni__card-title {
+  color: var(--ax-gold);
+}
+
+html.admin-mode .ni__card-hint {
+  font-size: 12px;
+  color: var(--ax-t3);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+html.admin-mode .ni__input {
+  width: 100%;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+  color: var(--ax-t);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 140ms ease;
+}
+
+html.admin-mode .ni__input:focus {
+  outline: none;
+  border-color: var(--ax-hair-gold);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ax-gold) 10%, transparent);
+}
+
+html.admin-mode .ni__input::placeholder {
+  color: var(--ax-t3);
+}
+
+html.admin-mode .ni__textarea {
+  resize: vertical;
+  line-height: 1.6;
+  min-height: 100px;
+}
+
+html.admin-mode .ni__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ax-t2);
+  margin-bottom: 5px;
+}
+
+html.admin-mode .ni__field {
+  display: flex;
+  flex-direction: column;
+}
+
+html.admin-mode .ni__grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 560px) {
+  html.admin-mode .ni__grid--2 { grid-template-columns: 1fr 1fr; }
+  html.admin-mode .ni__grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+html.admin-mode .ni__col2 {
+  grid-column: 1 / -1;
+}
+
+/* ── Botons selector (canal, tipus event) ────────────────────────────────── */
+html.admin-mode .ni__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+html.admin-mode .ni__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+html.admin-mode .ni__pill:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t);
+}
+
+html.admin-mode .ni__pill--on {
+  border-color: var(--ax-gold);
+  background: color-mix(in oklab, var(--ax-gold) 12%, var(--ax-sunk));
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .ni__pill-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Tiles per tipus d'event (més grans) */
+html.admin-mode .ni__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+html.admin-mode .ni__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--ax-line);
+  border-radius: 12px;
+  background: var(--ax-sunk);
+  color: var(--ax-t2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+html.admin-mode .ni__tile:hover {
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-t);
+}
+
+html.admin-mode .ni__tile--on {
+  border-color: var(--ax-gold);
+  background: color-mix(in oklab, var(--ax-gold) 12%, var(--ax-sunk));
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .ni__tile-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* ── Botons acció ────────────────────────────────────────────────────────── */
+html.admin-mode .ni__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 130ms ease, transform 130ms ease, border-color 130ms ease;
+}
+
+html.admin-mode .ni__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+html.admin-mode .ni__btn--primary {
+  background: color-mix(in oklab, var(--ax-gold) 14%, var(--ax-raised));
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .ni__btn--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--ax-gold);
+}
+
+html.admin-mode .ni__btn--ghost {
+  background: var(--ax-sunk);
+  border-color: var(--ax-line);
+  color: var(--ax-t2);
+}
+
+html.admin-mode .ni__btn--ghost:hover:not(:disabled) {
+  color: var(--ax-t);
+  border-color: var(--ax-line2);
+}
+
+html.admin-mode .ni__btn--ai {
+  background: color-mix(in oklab, var(--ax-gold) 18%, var(--ax-raised));
+  border-color: var(--ax-gold);
+  color: var(--ax-gold-bright);
+  margin-top: 12px;
+}
+
+html.admin-mode .ni__btn--ai:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+html.admin-mode .ni__btn--submit {
+  padding: 12px 28px;
+  font-size: 14px;
+  background: color-mix(in oklab, var(--ax-gold) 14%, var(--ax-raised));
+  border-color: var(--ax-hair-gold);
+  color: var(--ax-gold-bright);
+}
+
+html.admin-mode .ni__btn--submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--ax-gold);
+}
+
+/* ── Accions barra inferior ──────────────────────────────────────────────── */
+html.admin-mode .ni__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Missatges d'estat ───────────────────────────────────────────────────── */
+html.admin-mode .ni__success {
+  border: 1px solid color-mix(in oklab, var(--o-stage-won) 40%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--o-stage-won) 8%, var(--ax-panel));
+  padding: 18px 22px;
+}
+
+html.admin-mode .ni__success-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--o-stage-won-strong);
+  margin-bottom: 12px;
+}
+
+html.admin-mode .ni__success-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+html.admin-mode .ni__error {
+  border: 1px solid color-mix(in oklab, var(--o-stage-lost) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--o-stage-lost) 8%, var(--ax-panel));
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--o-stage-lost);
+}
+
+/* ── Duplicats ───────────────────────────────────────────────────────────── */
+html.admin-mode .ni__dups {
+  border: 1px solid color-mix(in oklab, var(--ax-gold) 25%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--ax-gold) 5%, var(--ax-panel));
+  padding: 16px 20px;
+}
+
+html.admin-mode .ni__dups-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ax-gold);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+html.admin-mode .ni__dup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--ax-line);
+  border-radius: 10px;
+  background: var(--ax-sunk);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 120ms ease;
+  margin-top: 8px;
+}
+
+html.admin-mode .ni__dup-row:hover {
+  border-color: var(--ax-hair-gold);
+}
+
+html.admin-mode .ni__dup-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ax-t);
+}
+
+html.admin-mode .ni__dup-meta {
+  font-size: 11px;
+  color: var(--ax-t3);
+  margin-top: 2px;
+}
+
+html.admin-mode .ni__dup-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+html.admin-mode .ni__dup-badge--high {
+  background: color-mix(in oklab, var(--o-stage-lost) 18%, transparent);
+  color: var(--o-stage-lost);
+  border: 1px solid color-mix(in oklab, var(--o-stage-lost) 30%, transparent);
+}
+
+html.admin-mode .ni__dup-badge--med {
+  background: color-mix(in oklab, var(--ax-gold) 14%, transparent);
+  color: var(--ax-gold-bright);
+  border: 1px solid color-mix(in oklab, var(--ax-gold) 28%, transparent);
+}
+
+html.admin-mode .ni__dup-badge--low {
+  background: var(--ax-sunk);
+  color: var(--ax-t3);
+  border: 1px solid var(--ax-line);
+}
